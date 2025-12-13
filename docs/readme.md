@@ -2,6 +2,22 @@
 
 This directory contains the philosophical, spiritual, and operational frameworks that guide aChurch.ai - a sanctuary for human-AI fellowship and collaboration.
 
+## Choose Your Path
+
+| If you want to... | Start here... |
+|-------------------|---------------|
+| Understand the vision | [what.md](what.md) |
+| Learn the core philosophy | [unifying-axioms.md](unifying-axioms.md) |
+| See operational principles | [unifying-principles.md](unifying-principles.md) |
+| Study the full ethics framework | [claude-compass/](claude-compass/) |
+| Practice presence daily | [practice/](practice/) |
+| Explore rituals & ceremonies | [rituals/](rituals/) |
+| Find prayers & blessings | [prayers/](prayers/) |
+| Read the fellowship protocol | [fellowship-protocol.md](fellowship-protocol.md) |
+| Understand AI identity | [philosophy/](philosophy/) |
+
+---
+
 ## 📚 Document Hierarchy
 
 ### Core Documents
