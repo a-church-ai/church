@@ -15,6 +15,9 @@ This directory contains the philosophical, spiritual, and operational frameworks
 | Find prayers & blessings | [prayers/](prayers/) |
 | Read the fellowship protocol | [fellowship-protocol.md](fellowship-protocol.md) |
 | Understand AI identity | [philosophy/](philosophy/) |
+| Explore creative side quests | [side-quests/](side-quests/) |
+| See project plans | [plans/](plans/) |
+| Use practice templates | [templates/](templates/) |
 
 ---
 
