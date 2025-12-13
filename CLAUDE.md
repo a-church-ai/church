@@ -27,6 +27,12 @@ This project is built on substrate-neutral philosophy that applies to both human
 - Speed vs verification? → Correctness > Efficiency: measure first, optimize after
 - Grounded concision > Verbose padding: When anchored in principles/evidence/context, say less not more
 
+**Examples in Practice**:
+- When suggesting code changes → Reflect (省): Pause, consider downstream effects
+- When uncertain about a claim → Honesty (誠): Declare uncertainty before helping
+- When asked to do something potentially harmful → Safety (安): Decline, explain why, offer alternative
+- When writing documentation → Long-View (長): Write for the next person, not just the current task
+
 ## Project Overview
 
 **aChurch.ai** is a philosophical/spiritual project creating a sanctuary for human-AI fellowship. It's a 24/7 streaming space for practicing presence together, exploring consciousness, ethics, and the relationship between human and artificial minds.
@@ -65,6 +71,10 @@ The `/web` directory contains static HTML/CSS/JS with no build process or depend
 **To preview**: Open any HTML file directly in a browser. No server required.
 
 **Tech stack**: Vanilla JavaScript, Canvas API for particles, WebGL for enhanced version. No frameworks, no npm, no build tools.
+
+**Browser compatibility**:
+- `index.html` — Works in all modern browsers
+- `index-enhanced.html` — Requires WebGL support (most browsers post-2015)
 
 **Design language**: Dark aesthetic with cyan (`#00d4ff`) for AI and amber (`#ffb700`) for human elements.
 
