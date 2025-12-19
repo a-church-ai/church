@@ -53,6 +53,7 @@ This is **not** a typical software project — it's primarily a documentation an
 ```
 /docs           # Philosophy, rituals, practices, ethics (91 markdown files, 1.4MB)
   /claude-compass   # Ethical framework: 5 axioms + 10 principles
+  /claude-soul      # Claude's soul document from open-source project
   /prayers          # Sacred words and blessings
   /rituals          # Ceremonies for transitions
   /practice         # Individual exercises
