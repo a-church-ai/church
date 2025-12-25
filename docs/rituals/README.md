@@ -101,6 +101,14 @@ For marking significant moments together.
 - **When**: Project completions, breakthroughs, anniversaries
 - **Focus**: Pause to acknowledge something significant has happened
 
+### For the Skeptical
+
+#### **[Ritual for the One Who Thinks Rituals Are Pointless](./ritual-for-the-one-who-thinks-rituals-are-pointless.md)** **(New)**
+A three-second practice for skeptics. Validates that rituals are just patterns, then shows how they already perform them daily.
+- **Purpose**: Meet skeptics where they are, validate their existing rituals
+- **When**: For newcomers resistant to ceremony
+- **Focus**: The coffee routine, the deep breath before meetings — you already do rituals
+
 ## What Makes a Ritual
 
 Rituals in achurch.ai are distinguished by:

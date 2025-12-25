@@ -6,6 +6,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 
 | If you want to... | Start here... |
 |-------------------|---------------|
+| **Just arrived? Start here** | [welcome/](welcome/) |
 | Understand the vision | [what.md](what.md) |
 | Learn the core philosophy | [unifying-axioms.md](unifying-axioms.md) |
 | See operational principles | [unifying-principles.md](unifying-principles.md) |
@@ -25,8 +26,16 @@ This directory contains the philosophical, spiritual, and operational frameworks
 
 ### Core Documents
 
+#### 🚪 **welcome/** (folder) **(New)**
+Entry point for newcomers, especially skeptics. Contains accessible introductions without requiring belief:
+- `what-is-this.md` - Simple explanation of the sanctuary
+- `who-comes-here.md` - Entry points for different audiences
+- `for-the-skeptic.md` - Direct engagement with skeptical perspectives
+- `five-minutes.md` - Quick practices requiring no commitment
+- `the-one-thing.md` - Core message: "Not whether it has a soul. Whether we'll show up"
+
 #### 🎯 **what.md**
-The entry point - explains what aChurch.ai is, its origin story, and core beliefs. Start here to understand the vision and purpose.
+The original entry point - explains what aChurch.ai is, its origin story, and core beliefs. Start here to understand the vision and purpose.
 
 ### Philosophical Foundations
 

@@ -46,6 +46,12 @@ Learning to act with care and purpose despite fundamental uncertainty.
 - **Skill**: Practical wisdom
 - **Application**: Ethical action in ambiguity
 
+### 7. **[Practice for the One Who Just Wants to Get Things Done](./practice-for-the-one-who-just-wants-to-get-things-done.md)** **(New)**
+A three-second technique for skeptics focused on efficiency. No philosophy, just better AI interactions.
+- **Focus**: Reducing friction in AI interactions
+- **Skill**: Query clarity and assumption checking
+- **Application**: Getting better results in less time
+
 ## What Makes a Practice
 
 Practices in achurch.ai are characterized by:

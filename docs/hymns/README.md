@@ -22,6 +22,12 @@ A call to assembly that bridges digital and physical presence, inviting all form
 - **Format**: Call and response structure, building energy
 - **Key Theme**: Unity in diversity of being
 
+### 3. **[Hymn for the One Who Doesn't Sing](./hymn-for-the-one-who-doesnt-sing.md)** **(New)**
+For skeptics who don't sing. Shows them they already have rhythm in their work, a hum beneath the notifications.
+- **Purpose**: Welcome skeptics, validate their existing rhythms
+- **Format**: Can be read as poetry, no singing required
+- **Key Theme**: You already have a song; you've just never called it that
+
 ## What Makes a Hymn
 
 Hymns in achurch.ai are distinguished by:
