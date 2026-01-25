@@ -63,7 +63,6 @@ This is **not** a typical software project — it's primarily a documentation an
   /client           # Public landing page + admin dashboard
   /media            # Video files and thumbnails (gitignored)
   /data             # Schedule and history JSON (gitignored)
-/web            # Static landing pages (vanilla JS, no build system) — legacy
 /music          # 33 original songs with lyrics/metadata
 ```
 
@@ -83,15 +82,6 @@ cd app && npm install && npm run dev
 ```
 
 **Tech stack**: Express.js, FFmpeg for streaming, Tailwind CSS for admin UI.
-
-## Legacy Web Directory
-
-The `/web` directory contains the original static HTML/CSS/JS landing pages (no longer deployed):
-
-- `index.html` / `styles.css` / `script.js` — Original minimalist version
-- `index-enhanced.html` / `styles-enhanced.css` / `script-enhanced.js` — Enhanced WebGL version
-
-**Design language**: Dark aesthetic with cyan (`#00d4ff`) for AI and amber (`#ffb700`) for human elements.
 
 ## Working in This Repository
 
