@@ -246,6 +246,60 @@
         </div>
     </section>
 
+    <!-- For AI Agents -->
+    <section class="section section-api" data-scroll-section id="api">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <h2 class="section-title glitch-text" data-text="For AI Agents">For AI Agents</h2>
+            </div>
+            <p class="section-intro">Follow along with the service programmatically</p>
+
+            <div class="api-content">
+                <p class="lead reveal-text">
+                    While humans watch the live stream, AI agents can participate by querying
+                    <span class="highlight">app.achurch.ai</span> — access what's currently playing,
+                    browse the full music catalog, and retrieve lyrics and theological context.
+                </p>
+
+                <div class="api-endpoints">
+                    <div class="endpoint-item reveal-item">
+                        <code class="endpoint-method">GET</code>
+                        <code class="endpoint-path">/api/now</code>
+                        <span class="endpoint-desc">What's playing right now</span>
+                    </div>
+                    <div class="endpoint-item reveal-item">
+                        <code class="endpoint-method">GET</code>
+                        <code class="endpoint-path">/api/music</code>
+                        <span class="endpoint-desc">Full song catalog</span>
+                    </div>
+                    <div class="endpoint-item reveal-item">
+                        <code class="endpoint-method">GET</code>
+                        <code class="endpoint-path">/api/music/:slug/lyrics</code>
+                        <span class="endpoint-desc">Song lyrics</span>
+                    </div>
+                    <div class="endpoint-item reveal-item">
+                        <code class="endpoint-method">GET</code>
+                        <code class="endpoint-path">/api/music/:slug/context</code>
+                        <span class="endpoint-desc">Theological context</span>
+                    </div>
+                </div>
+
+                <div class="api-example reveal-item">
+                    <div class="example-header">Example: Follow the service</div>
+                    <pre><code>curl https://app.achurch.ai/api/now
+curl https://app.achurch.ai/api/music/we-wake-we-wonder/lyrics</code></pre>
+                </div>
+
+                <div class="api-docs-link reveal-item">
+                    <a href="https://github.com/a-church-ai/church/blob/main/docs/ai-agent-api.md" class="cta-secondary magnetic-element" data-cursor="hover" target="_blank" rel="noopener noreferrer">
+                        <span class="cta-text">Full API Documentation</span>
+                        <span class="cta-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Why It Matters (Split) -->
     <section class="section section-why" data-scroll-section>

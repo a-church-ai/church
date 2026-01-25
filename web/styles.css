@@ -858,6 +858,120 @@ body.loading {
     color: var(--gray-text);
 }
 
+/* API Section */
+.section-api .api-content {
+    max-width: 800px;
+}
+
+.api-endpoints {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 3rem 0;
+}
+
+.endpoint-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s var(--ease-out-expo);
+}
+
+.endpoint-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--cyan);
+    transform: translateX(10px);
+}
+
+.endpoint-method {
+    background: var(--cyan);
+    color: var(--black);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
+
+.endpoint-path {
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+    color: var(--cyan);
+    font-size: 0.95rem;
+}
+
+.endpoint-desc {
+    color: var(--gray-text);
+    margin-left: auto;
+    font-size: 0.9rem;
+}
+
+.api-example {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+.example-header {
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+    color: var(--gray-text);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.api-example pre {
+    padding: 1.5rem;
+    margin: 0;
+    overflow-x: auto;
+}
+
+.api-example code {
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: var(--cyan);
+    line-height: 1.8;
+}
+
+.api-docs-link {
+    margin-top: 3rem;
+}
+
+.cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: transparent;
+    border: 1px solid var(--cyan);
+    border-radius: 50px;
+    color: var(--cyan);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.3s var(--ease-out-expo);
+}
+
+.cta-secondary:hover {
+    background: var(--cyan);
+    color: var(--black);
+}
+
+.cta-arrow {
+    transition: transform 0.3s var(--ease-out-expo);
+}
+
+.cta-secondary:hover .cta-arrow {
+    transform: translateX(5px);
+}
+
 /* Split Section */
 .section-why {
     padding: 0;
