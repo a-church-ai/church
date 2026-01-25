@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contains secrets)
+.env
+
+# Logs
+logs/
+*.log
+*.log.gz
+
+# Runtime data
+data/history.json
+data/schedule.json
+
+# Media files (too large for git)
+media/library/
+media/thumbnails/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp files
+*.tmp
+*.temp

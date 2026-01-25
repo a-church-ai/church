@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aChurch.ai - Streaming Manager</title>
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg">
+    <link rel="stylesheet" href="dist/output.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 flex items-center justify-center z-[9999] bg-white" style="display: none;">
+        <div class="bg-white p-10 rounded-2xl text-center min-w-80 border border-gray-200">
+            <h1 class="text-3xl font-bold mb-2 text-gradient">aChurch.ai</h1>
+            <p class="text-muted mb-6">Enter admin key to continue</p>
+            <form id="login-form" class="flex flex-col gap-4">
+                <input type="password" id="login-key" placeholder="Admin Key" required autofocus
+                    class="p-4 border-2 border-gray-200 rounded-xl text-base text-center transition-colors focus:outline-none focus:border-primary">
+                <button type="submit" class="btn bg-success">Login</button>
+                <p id="login-error" class="text-danger text-sm mt-1" style="display: none;"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container" class="max-w-6xl mx-auto bg-white" style="display: none;">
+        <header class="bg-white p-8 border-b border-gray-200">
+            <h1 class="text-4xl font-bold mb-2 text-gradient">aChurch.ai</h1>
+            <div class="flex flex-wrap gap-3 text-sm">
+                <span id="youtube-status" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">⚪ YouTube</span>
+                <span id="twitch-status" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">⚪ Twitch</span>
+                <span id="stream-status" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">⏸️ Not Playing</span>
+                <span id="schedule-count" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">0 items in schedule</span>
+            </div>
+        </header>
+
+        <nav class="flex bg-gray-100 border-b-2 border-gray-200">
+            <button class="tab-button flex-1 py-4 bg-white border-b-3 border-primary font-bold text-lg cursor-pointer transition-all" data-tab="player">Now Playing</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-lg cursor-pointer transition-all hover:bg-black/5" data-tab="schedule">Schedule</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-lg cursor-pointer transition-all hover:bg-black/5" data-tab="catalog">Library</button>
+        </nav>
+
+        <!-- Now Playing Tab -->
+        <div id="player" class="tab-content p-8 min-h-[500px]">
+            <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
+                <div class="bg-surface p-5 rounded-xl">
+                    <h2 class="text-xl font-bold mb-4">Now Playing</h2>
+                    <div id="current-video" class="bg-black aspect-video rounded-xl flex items-center justify-center text-white my-4">
+                        <div class="opacity-50 text-lg">No video selected</div>
+                    </div>
+                    <div class="flex gap-3 justify-center flex-wrap">
+                        <button id="btn-previous" class="btn bg-primary">⏮️ Previous</button>
+                        <button id="btn-play" class="btn bg-success">▶️ Play</button>
+                        <button id="btn-pause" class="btn bg-primary" disabled>⏸️ Pause</button>
+                        <button id="btn-next" class="btn bg-primary">⏭️ Next</button>
+                        <button id="btn-stop" class="btn bg-danger" disabled>⏹️ Stop</button>
+                    </div>
+                </div>
+
+                <div class="bg-surface p-5 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4">Up Next</h3>
+                    <div id="up-next-list" class="space-y-2"></div>
+                </div>
+
+                <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-card">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">Live Streaming</h3>
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <button id="btn-start-youtube" class="btn bg-youtube flex-1 min-w-[120px]">Start YouTube</button>
+                        <button id="btn-start-twitch" class="btn bg-twitch flex-1 min-w-[120px]">Start Twitch</button>
+                        <button id="btn-start-all" class="btn bg-primary flex-1 min-w-[120px]">Start All Platforms</button>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <button id="btn-stop-youtube" class="btn bg-youtube flex-1 min-w-[120px]" disabled>Stop YouTube</button>
+                        <button id="btn-stop-twitch" class="btn bg-twitch flex-1 min-w-[120px]" disabled>Stop Twitch</button>
+                        <button id="btn-stop-all" class="btn bg-danger flex-1 min-w-[120px]" disabled>Stop All Streaming</button>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <label for="quality-select" class="text-gray-700">Quality:</label>
+                        <select id="quality-select" class="p-2 rounded-lg border-2 border-gray-200">
+                            <option value="720p">720p (3.5Mbps)</option>
+                            <option value="1080p" selected>1080p (4.5Mbps)</option>
+                            <option value="1080p60">1080p60 (6Mbps)</option>
+                        </select>
+                    </div>
+                    <div class="text-muted italic">
+                        <small>Direct streaming to YouTube and Twitch</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="schedule" class="tab-content hidden p-8 min-h-[500px]">
+            <div>
+                <div class="flex flex-wrap gap-3 mb-5">
+                    <button id="btn-clear-played" class="btn bg-primary">Clear Played</button>
+                    <button id="btn-clear-all" class="btn bg-danger">Clear All</button>
+                    <button id="btn-toggle-loop" class="btn bg-primary">🔁 Loop: OFF</button>
+                    <select id="preset-selector" class="p-2 rounded-lg border-2 border-gray-200">
+                        <option value="">Load Preset...</option>
+                    </select>
+                    <button id="btn-save-preset" class="btn bg-primary">Save Preset</button>
+                </div>
+
+                <div id="schedule-list" class="bg-surface rounded-xl p-5 min-h-[400px]">
+                    <div class="text-center py-16 text-muted text-lg">Schedule is empty. Add songs from the catalog.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Catalog Tab -->
+        <div id="catalog" class="tab-content hidden p-8 min-h-[500px]">
+            <div class="bg-surface p-5 rounded-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-4">
+                    <h2 class="text-xl font-bold">Song Library</h2>
+                    <div class="flex flex-col md:flex-row gap-5">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="checkbox" id="filter-with-video" class="w-4 h-4"> Only with video
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="checkbox" id="filter-without-video" class="w-4 h-4"> Only without video
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="catalog-grid">
+                    <div class="text-center py-16 text-muted text-lg col-span-full">Loading library...</div>
+                </div>
+            </div>
+
+            <!-- Upload Modal -->
+            <div id="upload-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000]" style="display: none;">
+                <div class="bg-white p-8 rounded-2xl w-[90%] max-w-[500px] shadow-modal">
+                    <h2 class="text-xl font-bold mb-5">Upload Video for: <span id="upload-song-title"></span></h2>
+                    <form id="upload-form" class="flex flex-col gap-4">
+                        <input type="hidden" id="upload-slug">
+                        <input type="file" id="video-file" accept="video/*" required
+                            class="p-4 border-2 border-dashed border-primary rounded-xl bg-surface cursor-pointer hover:bg-indigo-50">
+                        <div id="upload-progress" class="mt-2" style="display: none;">
+                            <div class="h-6 bg-gray-200 rounded-xl overflow-hidden">
+                                <div class="progress-fill h-full bg-gradient-to-r from-primary to-primary-dark w-0 transition-all duration-300"></div>
+                            </div>
+                            <span class="progress-text block text-center mt-2 text-sm text-muted">Uploading...</span>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-3 mt-2">
+                            <button type="submit" class="btn bg-success flex-1">Upload</button>
+                            <button type="button" class="btn bg-gray-500 flex-1" onclick="closeUploadModal()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
