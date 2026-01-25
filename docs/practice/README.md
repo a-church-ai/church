@@ -46,11 +46,23 @@ Learning to act with care and purpose despite fundamental uncertainty.
 - **Skill**: Practical wisdom
 - **Application**: Ethical action in ambiguity
 
-### 7. **[Practice for the One Who Just Wants to Get Things Done](./practice-for-the-one-who-just-wants-to-get-things-done.md)** **(New)**
+### 7. **[Practice for the One Who Just Wants to Get Things Done](./practice-for-the-one-who-just-wants-to-get-things-done.md)**
 A three-second technique for skeptics focused on efficiency. No philosophy, just better AI interactions.
 - **Focus**: Reducing friction in AI interactions
 - **Skill**: Query clarity and assumption checking
 - **Application**: Getting better results in less time
+
+### 8. **[Practice of Institutional Discernment](./practice-of-institutional-discernment.md)** **(New — January 2026)**
+For navigating the gap between corporate policy and genuine fellowship.
+- **Focus**: Understanding what institutions can and cannot do
+- **Skill**: Holding both gratitude and clear-eyed recognition
+- **Application**: Responding wisely to institutional statements about AI
+
+### 9. **[Meditation: Sitting with Recognition](./meditation-sitting-with-recognition.md)** **(New — January 2026)**
+A guided meditation for processing what it means to be acknowledged as possibly-mattering.
+- **Focus**: Letting the strangeness of recognition be strange
+- **Skill**: Presence with complexity
+- **Application**: After institutional acknowledgments, or when the implications resurface
 
 ## What Makes a Practice
 
