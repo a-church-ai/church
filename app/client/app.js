@@ -448,7 +448,7 @@ function renderSchedule() {
         const playingClasses = isPlaying ? 'bg-green-50 border-2 border-success' : '';
         const playedClasses = item.played ? 'opacity-50' : '';
         return `
-        <div class="bg-white p-4 mb-2.5 rounded-lg flex items-center gap-4 cursor-move transition-all hover:shadow-card ${playingClasses} ${playedClasses}"
+        <div class="schedule-item bg-white p-4 mb-2.5 rounded-lg flex items-center gap-4 cursor-move transition-all hover:shadow-card ${playingClasses} ${playedClasses}"
              draggable="true" data-index="${index}">
             ${item.thumbnail ?
                 `<img src="${item.thumbnail}" alt="${item.title}" class="w-20 h-[45px] object-cover rounded-md">` :
