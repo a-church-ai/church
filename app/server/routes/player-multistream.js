@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const coordinator = require('../lib/streamers/coordinator');
 const logger = require('../lib/utils/logger');
+const { downloadFromS3 } = require('./content');
 const router = express.Router();
 
 // Data file paths
@@ -66,9 +67,68 @@ async function saveHistory(history) {
   await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2));
 }
 
-// Get video file path from slug
-function getVideoPath(slug) {
-  return path.resolve(path.join(__dirname, '../../media/library', `${slug}.mp4`));
+// Get video file path from slug (downloads from S3 if not local)
+async function getVideoPath(slug) {
+  const localPath = path.resolve(path.join(__dirname, '../../media/library', `${slug}.mp4`));
+
+  // Check if file exists locally
+  try {
+    await fs.access(localPath);
+    return localPath;
+  } catch {
+    // File doesn't exist locally, try to download from S3
+    logger.info(`Video ${slug}.mp4 not found locally, attempting S3 download...`);
+    const downloaded = await downloadFromS3(slug);
+    if (downloaded) {
+      return localPath;
+    }
+    // Return path anyway - let the caller handle the missing file error
+    logger.warn(`Video ${slug}.mp4 not found locally or in S3`);
+    return localPath;
+  }
+}
+
+// Pre-fetch adjacent videos in the schedule (runs in background, doesn't block)
+async function prefetchAdjacentVideos(currentIndex) {
+  const schedule = await loadSchedule();
+  const items = schedule.items;
+
+  if (items.length === 0) return;
+
+  // Determine which indices to prefetch (next and previous)
+  const indicesToPrefetch = [];
+
+  // Next video
+  let nextIndex = currentIndex + 1;
+  if (nextIndex >= items.length && schedule.loop) {
+    nextIndex = 0; // Wrap around if looping
+  }
+  if (nextIndex < items.length) {
+    indicesToPrefetch.push(nextIndex);
+  }
+
+  // Previous video (in case user goes back)
+  if (currentIndex > 0) {
+    indicesToPrefetch.push(currentIndex - 1);
+  }
+
+  // Prefetch each video in the background (don't await, just fire and forget)
+  for (const index of indicesToPrefetch) {
+    const slug = items[index].slug;
+    const localPath = path.resolve(path.join(__dirname, '../../media/library', `${slug}.mp4`));
+
+    // Check if already exists locally
+    fs.access(localPath).catch(async () => {
+      // File doesn't exist, download in background
+      logger.info(`Prefetching ${slug}.mp4 from S3...`);
+      try {
+        await downloadFromS3(slug);
+        logger.info(`Prefetch complete: ${slug}.mp4`);
+      } catch (err) {
+        logger.warn(`Prefetch failed for ${slug}.mp4:`, err.message);
+      }
+    });
+  }
 }
 
 // Enrich schedule item with library data
@@ -148,7 +208,7 @@ async function playNextVideo() {
 
   // Play next video
   const nextItem = schedule.items[schedule.currentIndex];
-  const videoPath = getVideoPath(nextItem.slug);
+  const videoPath = await getVideoPath(nextItem.slug);
 
   try {
     // If streaming is active, switch content
@@ -169,6 +229,9 @@ async function playNextVideo() {
 
   console.log(`Now playing: ${enrichedItem.title || nextItem.slug}`);
 
+  // Prefetch adjacent videos in background (don't await)
+  prefetchAdjacentVideos(schedule.currentIndex);
+
   return {
     success: true,
     nowPlaying: enrichedItem
@@ -184,7 +247,7 @@ coordinator.on('allPlatformsCompleted', async (event) => {
 
     if (!result.endReached && result.nowPlaying) {
       // Automatically start streaming the next video
-      const videoPath = getVideoPath(result.nowPlaying.slug);
+      const videoPath = await getVideoPath(result.nowPlaying.slug);
       await coordinator.startAll(videoPath, { quality: '1080p' });
 
       logger.info('Auto-progression successful, streaming next video:', result.nowPlaying.title);
@@ -251,7 +314,7 @@ router.post('/start-stream', async (req, res) => {
     }
 
     const currentItem = schedule.items[schedule.currentIndex];
-    const videoPath = getVideoPath(currentItem.slug);
+    const videoPath = await getVideoPath(currentItem.slug);
 
     let result;
 
@@ -275,6 +338,9 @@ router.post('/start-stream', async (req, res) => {
 
     const enrichedItem = await enrichScheduleItem(currentItem);
     logger.info(`Streaming started on ${platform}`, result);
+
+    // Prefetch adjacent videos in background
+    prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
       success: true,
@@ -347,7 +413,7 @@ router.post('/play', async (req, res) => {
     }
 
     const currentItem = schedule.items[schedule.currentIndex];
-    const videoPath = getVideoPath(currentItem.slug);
+    const videoPath = await getVideoPath(currentItem.slug);
 
     // If streaming is active, switch to current content
     if (coordinator.isAnyStreaming()) {
@@ -362,6 +428,9 @@ router.post('/play', async (req, res) => {
     playerStatus.isPlaying = true;
     playerStatus.currentVideo = enrichedItem;
     playerStatus.timeElapsed = 0;
+
+    // Prefetch adjacent videos in background
+    prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
       success: true,
@@ -434,7 +503,7 @@ router.post('/previous', async (req, res) => {
 
     // Play previous video
     const prevItem = schedule.items[schedule.currentIndex];
-    const videoPath = getVideoPath(prevItem.slug);
+    const videoPath = await getVideoPath(prevItem.slug);
 
     // If streaming is active, switch content
     if (coordinator.isAnyStreaming()) {
@@ -447,6 +516,9 @@ router.post('/previous', async (req, res) => {
     playerStatus.currentVideo = enrichedItem;
     playerStatus.currentIndex = schedule.currentIndex;
     playerStatus.timeElapsed = 0;
+
+    // Prefetch adjacent videos in background
+    prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
       success: true,
@@ -471,7 +543,7 @@ router.post('/jump/:index', async (req, res) => {
 
     schedule.currentIndex = index;
     const item = schedule.items[index];
-    const videoPath = getVideoPath(item.slug);
+    const videoPath = await getVideoPath(item.slug);
 
     // If streaming is active, switch content
     if (coordinator.isAnyStreaming()) {
@@ -484,6 +556,9 @@ router.post('/jump/:index', async (req, res) => {
     playerStatus.currentVideo = enrichedItem;
     playerStatus.currentIndex = index;
     playerStatus.timeElapsed = 0;
+
+    // Prefetch adjacent videos in background
+    prefetchAdjacentVideos(index);
 
     res.json({
       success: true,

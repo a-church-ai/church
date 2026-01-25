@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const ffmpeg = require('fluent-ffmpeg');
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const router = express.Router();
 
 // Library file path (source of truth)
@@ -110,6 +110,46 @@ async function deleteFromS3(slug) {
   } catch (error) {
     console.error('S3 delete error:', error);
     // Don't throw - just log the error
+  }
+}
+
+async function downloadFromS3(slug) {
+  if (!S3_BUCKET || !process.env.AWS_ACCESS_KEY_ID) {
+    console.log('S3 not configured, cannot download');
+    return null;
+  }
+
+  try {
+    const key = `${slug}.mp4`;
+    const localPath = path.join(__dirname, '../../media/library', `${slug}.mp4`);
+
+    // Ensure directory exists
+    await fs.mkdir(path.dirname(localPath), { recursive: true });
+
+    console.log(`Downloading ${slug}.mp4 from S3...`);
+
+    const response = await s3Client.send(new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key
+    }));
+
+    // Stream the response body to a file
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+    await fs.writeFile(localPath, buffer);
+
+    console.log(`Downloaded ${slug}.mp4 from S3 to ${localPath}`);
+    return localPath;
+  } catch (error) {
+    if (error.name === 'NoSuchKey') {
+      console.log(`Video ${slug}.mp4 not found in S3`);
+      return null;
+    }
+    console.error('S3 download error:', error);
+    return null;
   }
 }
 
@@ -409,3 +449,4 @@ router.delete('/:slug', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.downloadFromS3 = downloadFromS3;
