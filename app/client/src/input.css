@@ -4,8 +4,8 @@
 @source "../**/*.js";
 
 @theme {
-  --color-primary: #667eea;
-  --color-primary-dark: #764ba2;
+  --color-primary: #00b8d4;
+  --color-primary-dark: #0097a7;
   --color-success: #4caf50;
   --color-danger: #f44336;
   --color-warning: #ff9800;
@@ -14,12 +14,12 @@
   --color-youtube-disabled: #ffcdd2;
   --color-twitch: #9146ff;
   --color-twitch-disabled: #e1bee7;
-  --color-muted: #666666;
-  --color-surface: #f8f9fa;
+  --color-muted: #999999;
+  --color-surface: #fafafa;
 
-  --shadow-card: 0 2px 10px rgba(0,0,0,0.1);
-  --shadow-card-hover: 0 10px 30px rgba(0,0,0,0.2);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.3);
+  --shadow-card: 0 2px 10px rgba(0,0,0,0.05);
+  --shadow-card-hover: 0 10px 30px rgba(0,0,0,0.1);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.2);
 }
 
 @layer base {
@@ -31,11 +31,10 @@
 }
 
 @layer utilities {
-  .text-gradient {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .text-title {
+    color: #000;
+    font-weight: 300;
+    letter-spacing: 0.02em;
   }
 }
 

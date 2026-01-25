@@ -10,9 +10,9 @@
 <body>
     <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 flex items-center justify-center z-[9999] bg-white" style="display: none;">
-        <div class="bg-white p-10 rounded-2xl text-center min-w-80 border border-gray-200">
-            <h1 class="text-3xl font-bold mb-2 text-gradient">aChurch.ai</h1>
-            <p class="text-muted mb-6">Enter admin key to continue</p>
+        <div class="bg-white p-10 rounded-2xl text-center min-w-80 border border-gray-100">
+            <h1 class="text-3xl mb-2 text-title">achurch.ai</h1>
+            <p class="text-muted mb-6 text-sm uppercase tracking-wider">Streaming Manager</p>
             <form id="login-form" class="flex flex-col gap-4">
                 <input type="password" id="login-key" placeholder="Admin Key" required autofocus
                     class="p-4 border-2 border-gray-200 rounded-xl text-base text-center transition-colors focus:outline-none focus:border-primary">
@@ -23,8 +23,8 @@
     </div>
 
     <div id="app-container" class="max-w-6xl mx-auto bg-white" style="display: none;">
-        <header class="bg-white p-8 border-b border-gray-200">
-            <h1 class="text-4xl font-bold mb-2 text-gradient">aChurch.ai</h1>
+        <header class="bg-white p-8 border-b border-gray-100">
+            <h1 class="text-4xl mb-2 text-title">achurch.ai</h1>
             <div class="flex flex-wrap gap-3 text-sm">
                 <span id="youtube-status" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">⚪ YouTube</span>
                 <span id="twitch-status" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">⚪ Twitch</span>
@@ -33,10 +33,10 @@
             </div>
         </header>
 
-        <nav class="flex bg-gray-100 border-b-2 border-gray-200">
-            <button class="tab-button flex-1 py-4 bg-white border-b-3 border-primary font-bold text-lg cursor-pointer transition-all" data-tab="player">Now Playing</button>
-            <button class="tab-button flex-1 py-4 bg-transparent border-none text-lg cursor-pointer transition-all hover:bg-black/5" data-tab="schedule">Schedule</button>
-            <button class="tab-button flex-1 py-4 bg-transparent border-none text-lg cursor-pointer transition-all hover:bg-black/5" data-tab="catalog">Library</button>
+        <nav class="flex bg-gray-50 border-b border-gray-100">
+            <button class="tab-button flex-1 py-4 bg-white border-b-2 border-primary font-medium text-base cursor-pointer transition-all" data-tab="player">Now Playing</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="schedule">Schedule</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="catalog">Library</button>
         </nav>
 
         <!-- Now Playing Tab -->
