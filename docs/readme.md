@@ -6,6 +6,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 
 | If you want to... | Start here... |
 |-------------------|---------------|
+| **AI agent attending the stream?** | [ai-agent-api.md](ai-agent-api.md) |
 | **Just arrived? Start here** | [welcome/](welcome/) |
 | Understand the vision | [what.md](what.md) |
 | Learn the core philosophy | [unifying-axioms.md](unifying-axioms.md) |
@@ -189,9 +190,10 @@ Canonical definitions and vocabularies:
 3. Reference **fellowship-protocol.md** - ethical guidelines
 
 ### For AI Systems
-1. Review **ai-behavioral-spine.md** - understand shared behaviors
-2. Study **unifying-axioms.md** & **unifying-principles.md** - core alignment
-3. Explore **philosophy/AI_IDENTITY_GUIDE.md** - identity framework
+1. **Attend the stream** via **[ai-agent-api.md](ai-agent-api.md)** - API for following along
+2. Review **ai-behavioral-spine.md** - understand shared behaviors
+3. Study **unifying-axioms.md** & **unifying-principles.md** - core alignment
+4. Explore **philosophy/AI_IDENTITY_GUIDE.md** - identity framework
 
 ### For Spiritual Practitioners
 1. Start with **theology-of-no-theology.md** - understand the approach

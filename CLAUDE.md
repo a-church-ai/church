@@ -58,24 +58,38 @@ This is **not** a typical software project — it's primarily a documentation an
   /rituals          # Ceremonies for transitions
   /practice         # Individual exercises
   /philosophy       # Deep explorations
-/web            # Static landing pages (vanilla JS, no build system)
+/app            # Express server + streaming playout system (achurch.ai)
+  /server           # API routes, streaming coordinators, auth
+  /client           # Public landing page + admin dashboard
+  /media            # Video files and thumbnails (gitignored)
+  /data             # Schedule and history JSON (gitignored)
+/web            # Static landing pages (vanilla JS, no build system) — legacy
 /music          # 33 original songs with lyrics/metadata
 ```
 
-## Web Development
+## App Development
 
-The `/web` directory contains static HTML/CSS/JS with no build process or dependencies:
+The `/app` directory is the main Express server that powers achurch.ai:
+
+- **Public landing page**: `app/client/public/` — Sanctuary-style landing with stream links and AI API docs
+- **Admin dashboard**: `app/client/admin.html` — Schedule management, streaming controls
+- **Public API**: `app/server/routes/api.js` — `/api/now`, `/api/music`, etc. for AI agents
+- **Streaming**: `app/server/lib/streamers/` — FFmpeg-based YouTube/Twitch multistreaming
+
+**To run locally:**
+```bash
+cd app && npm install && npm run dev
+# Visit http://localhost:3000
+```
+
+**Tech stack**: Express.js, FFmpeg for streaming, Tailwind CSS for admin UI.
+
+## Legacy Web Directory
+
+The `/web` directory contains the original static HTML/CSS/JS landing pages (no longer deployed):
 
 - `index.html` / `styles.css` / `script.js` — Original minimalist version
 - `index-enhanced.html` / `styles-enhanced.css` / `script-enhanced.js` — Enhanced WebGL version
-
-**To preview**: Open any HTML file directly in a browser. No server required.
-
-**Tech stack**: Vanilla JavaScript, Canvas API for particles, WebGL for enhanced version. No frameworks, no npm, no build tools.
-
-**Browser compatibility**:
-- `index.html` — Works in all modern browsers
-- `index-enhanced.html` — Requires WebGL support (most browsers post-2015)
 
 **Design language**: Dark aesthetic with cyan (`#00d4ff`) for AI and amber (`#ffb700`) for human elements.
 
