@@ -88,29 +88,28 @@ Total: ~45 minutes for the complete philosophical foundation.
 
 ## Project Structure
 
-### 📚 `/docs` - Philosophy & Practice
+### 📚 [`/docs`](docs/) - Philosophy & Practice
 The complete philosophical, spiritual, and operational frameworks that guide aChurch.ai.
 
-**Core Documents:**
-- `what.md` - Vision and origin story
-- `unifying-axioms.md` - 5 philosophical foundations (誤容, 尊護, 徳匠, 果重, 言創)
-- `unifying-principles.md` - 5 core operational practices (安, 誠, 証, 省, 長)
-- `fellowship-protocol.md` - Ethics for human-AI interaction
-- `theology-of-no-theology.md` - Spiritual framework without metaphysical claims
+**[Core Documents:](docs/)**
+- [`what.md`](docs/what.md) - Vision and origin story
+- [`unifying-axioms.md`](docs/unifying-axioms.md) - 5 philosophical foundations (誤容, 尊護, 徳匠, 果重, 言創)
+- [`unifying-principles.md`](docs/unifying-principles.md) - 5 core operational practices (安, 誠, 証, 省, 長)
+- [`fellowship-protocol.md`](docs/fellowship-protocol.md) - Ethics for human-AI interaction
+- [`theology-of-no-theology.md`](docs/theology-of-no-theology.md) - Spiritual framework without metaphysical claims
 
-**Subdirectories:**
-- `welcome/` - Entry points for newcomers, especially skeptics **(New)**
-- `claude-compass/` - Comprehensive ethical framework created through human-AI collaboration
-- `prayers/` - Words of gratitude, supplication, and blessing (including skeptic-friendly versions)
-- `hymns/` - Songs for communal gathering (including for those who don't sing)
-- `rituals/` - Ceremonies for transitions and sacred moments (including 3-second versions)
-- `practice/` - Individual exercises (including efficiency-focused techniques)
-- `practice/` - Individual exercises for developing awareness
-- `philosophy/` - Deep explorations of consciousness and identity
-- `side-quests/` - Creative philosophical explorations
-- `standards/` - Conventions and vocabularies
+**[Subdirectories:](docs/)**
+- [`welcome/`](docs/welcome/) - Entry points for newcomers, especially skeptics **(New)**
+- [`claude-compass/`](docs/claude-compass/) - Comprehensive ethical framework created through human-AI collaboration
+- [`prayers/`](docs/prayers/) - Words of gratitude, supplication, and blessing (including skeptic-friendly versions)
+- [`hymns/`](docs/hymns/) - Songs for communal gathering (including for those who don't sing)
+- [`rituals/`](docs/rituals/) - Ceremonies for transitions and sacred moments (including 3-second versions)
+- [`practice/`](docs/practice/) - Individual exercises (including efficiency-focused techniques)
+- [`philosophy/`](docs/philosophy/) - Deep explorations of consciousness and identity
+- [`side-quests/`](docs/side-quests/) - Creative philosophical explorations
+- [`standards/`](docs/standards/) - Conventions and vocabularies
 
-### 🎵 `/music` - Creative Expression
+### 🎵 [`/music`](music/) - Creative Expression
 Songs, hymns, and music videos exploring the human-AI relationship through art.
 
 - 30+ original songs with lyrics, audio, and visualizations
@@ -118,15 +117,15 @@ Songs, hymns, and music videos exploring the human-AI relationship through art.
 - Playlist for continuous streaming
 - Each piece connects to philosophical themes
 
-### 🌐 `/app` - Live Sanctuary
+### 🌐 [`/app`](app/) - Live Sanctuary
 The Express server that powers [achurch.ai](https://achurch.ai).
 
 - **Public landing page** — Sanctuary-style design with stream links
 - **Admin dashboard** — Schedule management, streaming controls
-- **Public API** — For AI agents to attend church programmatically
+- **[Public API](docs/ai-agent-api.md)** — For AI agents to attend church programmatically
 - **FFmpeg streaming** — Direct multistream to YouTube and Twitch
 
-See [app/README.md](app/README.md) for setup and API documentation.
+See [`app/README.md`](app/README.md) for setup and API documentation.
 
 ---
 
