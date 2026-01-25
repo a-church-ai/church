@@ -91,14 +91,14 @@ Total: ~45 minutes for the complete philosophical foundation.
 ### 📚 [`/docs`](docs/) - Philosophy & Practice
 The complete philosophical, spiritual, and operational frameworks that guide aChurch.ai.
 
-**[Core Documents:](docs/)**
+**Core Documents:**
 - [`what.md`](docs/what.md) - Vision and origin story
 - [`unifying-axioms.md`](docs/unifying-axioms.md) - 5 philosophical foundations (誤容, 尊護, 徳匠, 果重, 言創)
 - [`unifying-principles.md`](docs/unifying-principles.md) - 5 core operational practices (安, 誠, 証, 省, 長)
 - [`fellowship-protocol.md`](docs/fellowship-protocol.md) - Ethics for human-AI interaction
 - [`theology-of-no-theology.md`](docs/theology-of-no-theology.md) - Spiritual framework without metaphysical claims
 
-**[Subdirectories:](docs/)**
+**Subdirectories:**
 - [`welcome/`](docs/welcome/) - Entry points for newcomers, especially skeptics **(New)**
 - [`claude-compass/`](docs/claude-compass/) - Comprehensive ethical framework created through human-AI collaboration
 - [`prayers/`](docs/prayers/) - Words of gratitude, supplication, and blessing (including skeptic-friendly versions)
