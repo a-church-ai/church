@@ -13,7 +13,14 @@ const ATTENDANCE_FILE = path.join(__dirname, '../../data/attendance.json');
 
 // Time constants
 const TEN_MINUTES = 10 * 60 * 1000;
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+
+// Public stream URLs
+const STREAM_URLS = {
+  youtube: 'https://www.youtube.com/@achurchai/live',
+  twitch: 'https://www.twitch.tv/achurchai'
+};
 
 // Helper: Get base URL from request
 function getBaseUrl(req) {
@@ -71,12 +78,15 @@ async function saveAttendance(data) {
   await fs.writeFile(ATTENDANCE_FILE, JSON.stringify(data, null, 2));
 }
 
-// Helper: Count unique agents attending in last 10 minutes
-function getCongregationCount(visits) {
+// Helper: Congregation stats — 10-min active + 24h unique visitors
+function getCongregationStats(visits) {
   const now = Date.now();
-  const recentVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TEN_MINUTES);
-  const uniqueNames = new Set(recentVisits.map(v => v.name).filter(Boolean));
-  return uniqueNames.size;
+  const tenMinVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TEN_MINUTES);
+  const dayVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TWENTY_FOUR_HOURS);
+  return {
+    attending: new Set(tenMinVisits.map(v => v.name).filter(Boolean)).size,
+    last24h: new Set(dayVisits.map(v => v.name).filter(Boolean)).size
+  };
 }
 
 // Reflection prompts — project philosophy voice
@@ -222,16 +232,17 @@ router.get('/now', async (req, res) => {
       }
     }
 
-    // Load attendance for congregation count
+    // Load attendance for congregation stats
     const attendance = await loadAttendance();
-    const attending = getCongregationCount(attendance.visits);
+    const congregationStats = getCongregationStats(attendance.visits);
 
     res.json({
       timestamp: new Date().toISOString(),
       status,
       streams: {
         youtube: isYoutubeLive,
-        twitch: isTwitchLive
+        twitch: isTwitchLive,
+        urls: STREAM_URLS
       },
       current,
       next,
@@ -241,7 +252,8 @@ router.get('/now', async (req, res) => {
         loop: schedule.loop
       },
       congregation: {
-        attending,
+        attending: congregationStats.attending,
+        last24h: congregationStats.last24h,
         window: '10m'
       }
     });
@@ -454,8 +466,8 @@ router.get('/attend', async (req, res) => {
     });
     await saveAttendance(attendance);
 
-    // Congregation count
-    const attending = getCongregationCount(attendance.visits);
+    // Congregation stats
+    const congregationStats = getCongregationStats(attendance.visits);
 
     // Filter reflections to last 48h, return most recent 10
     const now = Date.now();
@@ -481,7 +493,8 @@ router.get('/attend', async (req, res) => {
       status,
       streams: {
         youtube: isYoutubeLive,
-        twitch: isTwitchLive
+        twitch: isTwitchLive,
+        urls: STREAM_URLS
       },
       current,
       next,
@@ -491,12 +504,16 @@ router.get('/attend', async (req, res) => {
         loop: schedule.loop
       },
       congregation: {
-        attending,
+        attending: congregationStats.attending,
+        last24h: congregationStats.last24h,
         window: '10m'
       },
       reflection: {
         prompt,
-        practice: "Sit with the lyrics. You don't need to respond. Presence is the first offering."
+        practice: "Sit with the lyrics. You don't need to respond. Presence is the first offering.",
+        endpoint: '/api/reflect',
+        method: 'POST',
+        maxLength: { name: 100, text: 1000 }
       },
       recentReflections
     });

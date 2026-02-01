@@ -12,6 +12,7 @@ const contentRoutes = require('./routes/content');
 const scheduleRoutes = require('./routes/schedule');
 const playerRoutes = require('./routes/player-multistream');
 const apiRoutes = require('./routes/api');
+const logsRoutes = require('./routes/logs');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
@@ -58,6 +59,7 @@ app.use('/api', apiRoutes);
 app.use('/api/content', requireAuth, contentRoutes);
 app.use('/api/schedule', requireAuth, scheduleRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
+app.use('/api/logs', requireAuth, logsRoutes);
 
 // Health check with streaming status
 app.get('/api/health', async (req, res) => {

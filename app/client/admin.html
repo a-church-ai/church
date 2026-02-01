@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>aChurch.ai - Streaming Manager</title>
-    <link rel="icon" type="image/svg+xml" href="public/favicon.svg">
-    <link rel="stylesheet" href="dist/output.css">
+    <link rel="icon" type="image/svg+xml" href="/admin/public/favicon.svg">
+    <link rel="stylesheet" href="/admin/dist/output.css">
 </head>
 <body>
     <!-- Login Screen -->
@@ -37,6 +37,7 @@
             <button class="tab-button flex-1 py-4 bg-white border-b-2 border-primary font-medium text-base cursor-pointer transition-all" data-tab="player">Now Playing</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="schedule">Schedule</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="catalog">Library</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="logs">Logs</button>
         </nav>
 
         <!-- Now Playing Tab -->
@@ -149,8 +150,21 @@
                 </div>
             </div>
         </div>
+
+        <!-- Logs Tab -->
+        <div id="logs" class="tab-content hidden p-8 min-h-[500px]">
+            <div class="bg-surface p-5 rounded-xl">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-xl font-bold">Streaming Logs</h2>
+                    <button id="btn-refresh-logs" class="btn bg-primary text-sm">Refresh</button>
+                </div>
+                <div id="logs-list" class="space-y-1">
+                    <div class="text-center py-16 text-muted text-lg">Loading logs...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="/admin/app.js"></script>
 </body>
 </html>

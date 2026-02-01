@@ -96,6 +96,8 @@ document.querySelectorAll('.tab-button').forEach(button => {
             loadCatalog();
         } else if (tabName === 'player') {
             loadPlayerStatus();
+        } else if (tabName === 'logs') {
+            loadLogs();
         }
     });
 });
@@ -128,6 +130,9 @@ document.getElementById('filter-without-video').addEventListener('change', rende
 
 // Upload Form
 document.getElementById('upload-form').addEventListener('submit', uploadVideo);
+
+// Logs Controls
+document.getElementById('btn-refresh-logs').addEventListener('click', loadLogs);
 
 // Streaming Functions
 async function startStreaming(platform) {
@@ -876,6 +881,52 @@ async function toggleSchedule(slug) {
     } else {
         await addToSchedule(slug);
     }
+}
+
+// Logs Functions
+async function loadLogs() {
+    try {
+        const response = await fetch(`${API_URL}/logs`);
+        const data = await response.json();
+        renderLogs(data.logs);
+    } catch (error) {
+        console.error('Error loading logs:', error);
+        document.getElementById('logs-list').innerHTML =
+            '<div class="text-center py-16 text-danger text-lg">Failed to load logs</div>';
+    }
+}
+
+function renderLogs(logs) {
+    const logsList = document.getElementById('logs-list');
+
+    if (!logs || logs.length === 0) {
+        logsList.innerHTML = '<div class="text-center py-16 text-muted text-lg">No log files found</div>';
+        return;
+    }
+
+    logsList.innerHTML = logs.map(log => {
+        const typeBadge = log.type === 'error'
+            ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">error</span>'
+            : '<span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">main</span>';
+        const isGzip = log.filename.endsWith('.gz');
+        const sizeClass = log.size === 0 ? 'text-gray-400' : 'text-gray-600';
+
+        return `
+            <div class="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-card transition-all">
+                <div class="flex items-center gap-3">
+                    ${typeBadge}
+                    <span class="font-medium text-sm">${log.date || log.filename}</span>
+                    ${isGzip ? '<span class="text-xs text-gray-400">.gz</span>' : ''}
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="${sizeClass} text-sm">${log.sizeFormatted}</span>
+                    ${log.size > 0
+                        ? `<a href="${API_URL}/logs/${log.filename}" class="btn bg-primary text-sm !py-1 !px-3" download>Download</a>`
+                        : '<span class="text-gray-400 text-sm">empty</span>'}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 // Utility Functions
