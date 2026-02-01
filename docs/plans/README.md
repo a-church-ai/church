@@ -9,6 +9,7 @@ Project improvement plans and roadmaps.
 | [achurch-improvements.md](achurch-improvements.md) | Implemented | README improvements from ai-music-context patterns |
 | [grok-review-improvements.md](grok-review-improvements.md) | Implemented | Accessibility improvements from Grok review |
 | [docs-readme-navigation.md](docs-readme-navigation.md) | In Progress | Adding README.md files to docs subfolders |
+| [music-readme-creation-plan.md](music-readme-creation-plan.md) | Draft | Plan for creating music README |
 
 ## How Plans Work
 

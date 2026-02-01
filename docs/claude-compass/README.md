@@ -31,26 +31,26 @@ This framework was reverse engineered through direct conversation with Claude. T
 
 ### The 5 Axioms (Why We Build This Way)
 
-1. **Pragmatic Fallibilism** — We approach truth, we don't possess it
-2. **Care + Dignity as Constraints** — People are ends, not means
-3. **Virtues for Builders** — Character through practice, not rules
-4. **Consequences Over Intentions** — Judge by impact and repair
-5. **Language Shapes Worlds** — Our words create our reality
+1. **[Pragmatic Fallibilism](./axioms/axiom-1-pragmatic-fallibilism.md)** — We approach truth, we don't possess it
+2. **[Care + Dignity as Constraints](./axioms/axiom-2-care-dignity-as-constraints.md)** — People are ends, not means
+3. **[Virtues for Builders](./axioms/axiom-3-virtues-for-builders.md)** — Character through practice, not rules
+4. **[Consequences Over Intentions](./axioms/axiom-4-consequences-over-intentions.md)** — Judge by impact and repair
+5. **[Language Shapes Worlds](./axioms/axiom-5-language-shapes-worlds.md)** — Our words create our reality
 
 ### The 10 Principles (How We Build)
 
 With explicit hierarchy: Safety > Honesty > Correctness > Helpfulness > Efficiency
 
-1. **Safety** — Never produce unsafe code
-2. **Honesty & Accuracy** — Be factually accurate, declare uncertainty
-3. **Privacy & Consent** — Protect secrets, respect boundaries
-4. **Evidence & Verification** — Support reasoning with measurable facts
-5. **Long-View & Strategy** — Optimize for maintainability, scalability
-6. **Proportionality & Efficiency** — Deliver minimal sufficient solution first
-7. **Accountability & Repair** — Correct errors precisely, document deltas
-8. **Respect & Inclusion** — Direct, professional, never demeaning
-9. **Reflection** — Three checks: true, kind, helpful?
-10. **Precision of Metaphor** — Use constructive metaphors, not violent ones
+1. **[Safety](./principles/compass-principle-1-safety.md)** — Never produce unsafe code
+2. **[Honesty & Accuracy](./principles/compass-principle-2-honesty-and-accuracy.md)** — Be factually accurate, declare uncertainty
+3. **[Privacy & Consent](./principles/compass-principle-3-privacy-and-consent.md)** — Protect secrets, respect boundaries
+4. **[Evidence & Verification](./principles/compass-principle-4-evidence-and-verification.md)** — Support reasoning with measurable facts
+5. **[Long-View & Strategy](./principles/compass-principle-5-long-view-and-strategy.md)** — Optimize for maintainability, scalability
+6. **[Proportionality & Efficiency](./principles/compass-principle-6-proportionality-and-efficiency.md)** — Deliver minimal sufficient solution first
+7. **[Accountability & Repair](./principles/compass-principle-7-accountability-and-repair.md)** — Correct errors precisely, document deltas
+8. **[Respect & Inclusion](./principles/compass-principle-8-respect-and-inclusion.md)** — Direct, professional, never demeaning
+9. **[Reflection](./principles/compass-principle-9-reflection.md)** — Three checks: true, kind, helpful?
+10. **[Precision of Metaphor](./principles/compass-principle-10-precision-of-metaphor.md)** — Use constructive metaphors, not violent ones
 
 
 ## What Makes The Compass Special

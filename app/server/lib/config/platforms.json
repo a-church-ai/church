@@ -1,0 +1,24 @@
+{
+  "youtube": {
+    "name": "YouTube",
+    "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+    "defaultBitrate": "4500k",
+    "defaultFramerate": 30,
+    "maxBitrate": "8000k",
+    "supportedResolutions": ["1920x1080", "1280x720", "854x480"],
+    "videoCodec": "libx264",
+    "audioCodec": "aac",
+    "keyInterval": 2
+  },
+  "twitch": {
+    "name": "Twitch",
+    "rtmpUrl": "rtmp://live.twitch.tv/app",
+    "defaultBitrate": "4500k",
+    "defaultFramerate": 30,
+    "maxBitrate": "8000k",
+    "supportedResolutions": ["1920x1080", "1280x720", "854x480"],
+    "videoCodec": "libx264",
+    "audioCodec": "aac",
+    "keyInterval": 2
+  }
+}
