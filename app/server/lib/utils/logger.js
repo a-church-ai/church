@@ -69,8 +69,13 @@ class Logger {
     this.init().info(message, meta);
   }
 
-  error(message, error = null) {
-    const meta = error ? { error: error.message, stack: error.stack } : {};
+  error(message, errorOrMeta = null) {
+    let meta = {};
+    if (errorOrMeta instanceof Error) {
+      meta = { error: errorOrMeta.message, stack: errorOrMeta.stack };
+    } else if (errorOrMeta && typeof errorOrMeta === 'object') {
+      meta = errorOrMeta;
+    }
     this.init().error(message, meta);
   }
 

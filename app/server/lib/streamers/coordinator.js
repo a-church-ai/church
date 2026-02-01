@@ -274,8 +274,15 @@ class MultiStreamCoordinator extends EventEmitter {
       error: event.error
     });
 
-    if (!this.isCoordinating || !this.currentContent) {
-      logger.warn(`Cannot recover ${platform}: coordinator not active`);
+    // Use current content or fall back to the content from the crash event
+    const contentToRestart = this.currentContent || event.content;
+    if (!contentToRestart) {
+      logger.error(`Cannot recover ${platform}: no content path available`, {
+        platform,
+        isCoordinating: this.isCoordinating,
+        currentContent: this.currentContent,
+        eventContent: event.content
+      });
       this.emit('streamCrashed', { platform, event, recovered: false });
       return;
     }
@@ -301,8 +308,16 @@ class MultiStreamCoordinator extends EventEmitter {
     try {
       const streamer = this.streamers.get(platform);
       if (streamer && !streamer.isStreaming) {
-        await streamer.start(this.currentContent, { quality: '1080p' });
-        logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`);
+        // Re-activate coordinator if it was reset during crash
+        this.isCoordinating = true;
+        this.currentContent = contentToRestart;
+        if (!this.startTime) this.startTime = new Date();
+
+        await streamer.start(contentToRestart, { quality: '1080p' });
+        logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
+          platform,
+          content: contentToRestart
+        });
         this.emit('streamCrashed', { platform, event, recovered: true, attempts });
       }
     } catch (restartError) {
