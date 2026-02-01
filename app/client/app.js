@@ -954,13 +954,14 @@ function showMessage(message, type = 'info') {
 async function init() {
     await loadPlayerStatus();
     updateStreamingButtons();
+    loadUpNext();
     loadSchedule();
     loadCatalog();
     loadPresets();
 
     // Update status periodically
     setInterval(async () => {
-        if (document.querySelector('.tab-button[data-tab="player"]').classList.contains('active')) {
+        if (document.querySelector('.tab-button[data-tab="player"]').classList.contains('border-primary')) {
             await loadPlayerStatus();
             updateStreamingButtons();
             loadUpNext();
