@@ -179,15 +179,18 @@ class BaseStreamer extends EventEmitter {
     return this.errors.length > 0 ? this.errors[this.errors.length - 1] : null;
   }
 
-  // Handle natural stream ending (video completed)
+  // Handle stream ending (natural completion or crash)
   handleStreamEnded(event) {
-    if (event.reason === 'completed' && this.isStreaming) {
+    if (!this.isStreaming) return;
+
+    const endTime = new Date();
+    const duration = this.startTime ? endTime.getTime() - this.startTime.getTime() : 0;
+
+    if (event.reason === 'completed') {
       logger.stream(this.platform, `Video completed naturally: ${event.streamId}`);
-      
+
       // Update state
       this.isStreaming = false;
-      const endTime = new Date();
-      const duration = endTime.getTime() - this.startTime.getTime();
 
       // Emit content completion event for coordinator
       this.emit('contentCompleted', {
@@ -198,12 +201,43 @@ class BaseStreamer extends EventEmitter {
         endTime,
         reason: 'natural_completion'
       });
+    } else {
+      // Stream crashed or exited unexpectedly
+      logger.error(`Stream crashed on ${this.platform}: ${event.error || `exit code ${event.exitCode}`}`, {
+        streamId: this.streamId,
+        platform: this.platform,
+        content: this.currentContent,
+        reason: event.reason,
+        error: event.error,
+        exitCode: event.exitCode,
+        signal: event.signal,
+        duration
+      });
 
-      // Reset state
-      this.streamId = null;
-      this.currentContent = null;
-      this.startTime = null;
+      this.errors.push({
+        timestamp: endTime,
+        error: event.error || `Stream crashed (exit code: ${event.exitCode}, signal: ${event.signal})`
+      });
+
+      // Update state
+      this.isStreaming = false;
+
+      // Emit crash event so coordinator can attempt recovery
+      this.emit('streamCrashed', {
+        streamId: this.streamId,
+        platform: this.platform,
+        content: this.currentContent,
+        duration,
+        endTime,
+        reason: event.reason,
+        error: event.error
+      });
     }
+
+    // Reset state
+    this.streamId = null;
+    this.currentContent = null;
+    this.startTime = null;
   }
 
   // Health check method

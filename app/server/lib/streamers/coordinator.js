@@ -27,12 +27,24 @@ class MultiStreamCoordinator extends EventEmitter {
     this.streamers.set('youtube', new YouTubeStreamer());
     this.streamers.set('twitch', new TwitchStreamer());
 
-    // Set up auto-progression listeners
+    // Set up auto-progression and crash recovery listeners
     this.contentCompletedPlatforms = new Set();
-    
+
     for (const [platform, streamer] of this.streamers) {
       streamer.on('contentCompleted', (event) => {
-        this.handleContentCompleted(platform, event);
+        try {
+          this.handleContentCompleted(platform, event);
+        } catch (err) {
+          logger.error(`Error handling content completion for ${platform}:`, err);
+        }
+      });
+
+      streamer.on('streamCrashed', (event) => {
+        try {
+          this.handleStreamCrashed(platform, event);
+        } catch (err) {
+          logger.error(`Error handling stream crash for ${platform}:`, err);
+        }
       });
     }
 
@@ -252,6 +264,51 @@ class MultiStreamCoordinator extends EventEmitter {
   // Check if any platform is streaming
   isAnyStreaming() {
     return Array.from(this.streamers.values()).some(streamer => streamer.isStreaming);
+  }
+
+  // Handle a platform crash — attempt to restart it
+  async handleStreamCrashed(platform, event) {
+    logger.error(`Stream crashed on ${platform}, attempting recovery`, {
+      platform,
+      content: event.content,
+      error: event.error
+    });
+
+    if (!this.isCoordinating || !this.currentContent) {
+      logger.warn(`Cannot recover ${platform}: coordinator not active`);
+      this.emit('streamCrashed', { platform, event, recovered: false });
+      return;
+    }
+
+    const attempts = (this.restartAttempts.get(platform) || 0) + 1;
+    this.restartAttempts.set(platform, attempts);
+
+    if (attempts > this.config.maxRestartAttempts) {
+      logger.error(`${platform} exceeded max restart attempts (${this.config.maxRestartAttempts}), giving up`, {
+        platform,
+        attempts
+      });
+      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+      return;
+    }
+
+    // Wait before restarting (exponential backoff: 2s, 4s, 8s)
+    const delay = Math.pow(2, attempts) * 1000;
+    logger.info(`Restarting ${platform} in ${delay / 1000}s (attempt ${attempts}/${this.config.maxRestartAttempts})`);
+
+    await new Promise(resolve => setTimeout(resolve, delay));
+
+    try {
+      const streamer = this.streamers.get(platform);
+      if (streamer && !streamer.isStreaming) {
+        await streamer.start(this.currentContent, { quality: '1080p' });
+        logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`);
+        this.emit('streamCrashed', { platform, event, recovered: true, attempts });
+      }
+    } catch (restartError) {
+      logger.error(`Failed to restart ${platform} (attempt ${attempts}):`, restartError);
+      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+    }
   }
 
   // Handle content completion from individual platforms

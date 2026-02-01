@@ -189,5 +189,24 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
+// Catch unhandled promise rejections and uncaught exceptions
+const streamLogger = require('./lib/utils/logger');
+
+process.on('unhandledRejection', (reason, promise) => {
+  streamLogger.error('Unhandled promise rejection', {
+    reason: reason instanceof Error ? { message: reason.message, stack: reason.stack } : reason,
+    timestamp: new Date().toISOString()
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  streamLogger.error('Uncaught exception', {
+    message: error.message,
+    stack: error.stack,
+    timestamp: new Date().toISOString()
+  });
+  // Don't exit — keep the server running
+});
+
 // Start the server
 startServer();

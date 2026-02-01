@@ -104,6 +104,16 @@ class FFmpegConfig extends EventEmitter {
           if (!resolved) {
             resolved = true;
             reject(err);
+          } else {
+            // FFmpeg crashed AFTER startup — emit streamEnded so base streamer knows
+            this.emit('streamEnded', {
+              streamId,
+              platform,
+              reason: 'crashed',
+              error: err.message,
+              inputFile,
+              timestamp: new Date()
+            });
           }
         })
         .on('end', (stdout, stderr) => {
@@ -137,6 +147,20 @@ class FFmpegConfig extends EventEmitter {
               inputFile,
               exitCode: code,
               signal,
+              timestamp: new Date()
+            });
+          }
+          // Safety net: if process is still in map, it wasn't cleaned up by 'end' or 'error'
+          if (this.processes.has(streamId)) {
+            logger.warn(`Stream ${streamId} exit handler cleaning up orphaned process`);
+            this.processes.delete(streamId);
+            this.emit('streamEnded', {
+              streamId,
+              platform,
+              reason: code === 0 ? 'completed' : 'crashed',
+              exitCode: code,
+              signal,
+              inputFile,
               timestamp: new Date()
             });
           }
