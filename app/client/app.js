@@ -303,10 +303,16 @@ async function loadPlayerStatus() {
     try {
         const response = await fetch(`${API_URL}/player/status`);
         const wasPlaying = playerStatus.isPlaying;
+        const previousSlug = playerStatus.currentVideo?.slug;
         playerStatus = await response.json();
+        const currentSlug = playerStatus.currentVideo?.slug;
 
-        // If playback state changed, manage timer
-        if (playerStatus.isPlaying && !wasPlaying && !playbackTimerInterval) {
+        // Detect video change while playing — reset timer for new song
+        if (playerStatus.isPlaying && previousSlug && currentSlug && previousSlug !== currentSlug) {
+            startPlaybackTimer();
+        }
+        // Detect play state transition
+        else if (playerStatus.isPlaying && !wasPlaying && !playbackTimerInterval) {
             startPlaybackTimer();
         } else if (!playerStatus.isPlaying && playbackTimerInterval) {
             stopPlaybackTimer();
@@ -323,8 +329,8 @@ function updatePlayerDisplay() {
     const isPlaying = playerStatus.isPlaying;
 
     if (playerStatus.currentVideo) {
-        const elapsed = playerStatus.timeElapsed || 0;
         const total = playerStatus.totalDuration || playerStatus.currentVideo.duration || 0;
+        const elapsed = Math.min(playerStatus.timeElapsed || 0, total);
         const remaining = Math.max(0, total - elapsed);
 
         currentVideoDiv.innerHTML = `
