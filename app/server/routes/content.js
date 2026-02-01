@@ -113,6 +113,81 @@ async function deleteFromS3(slug) {
   }
 }
 
+async function uploadThumbnailToS3(slug) {
+  if (!S3_BUCKET || !process.env.AWS_ACCESS_KEY_ID) {
+    return null;
+  }
+
+  try {
+    const thumbnailPath = path.join(__dirname, '../../media/thumbnails', `${slug}.jpg`);
+    const fileContent = await fs.readFile(thumbnailPath);
+    const key = `thumbnails/${slug}.jpg`;
+
+    await s3Client.send(new PutObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+      Body: fileContent,
+      ContentType: 'image/jpeg'
+    }));
+
+    console.log(`Uploaded thumbnail ${slug}.jpg to S3`);
+    return `s3://${S3_BUCKET}/${key}`;
+  } catch (error) {
+    console.error('S3 thumbnail upload error:', error);
+    return null;
+  }
+}
+
+async function downloadThumbnailFromS3(slug) {
+  if (!S3_BUCKET || !process.env.AWS_ACCESS_KEY_ID) {
+    return null;
+  }
+
+  const key = `thumbnails/${slug}.jpg`;
+  const localPath = path.join(__dirname, '../../media/thumbnails', `${slug}.jpg`);
+  const tmpPath = `${localPath}.tmp`;
+
+  try {
+    await fs.mkdir(path.dirname(localPath), { recursive: true });
+
+    const response = await s3Client.send(new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key
+    }));
+
+    const { createWriteStream } = require('fs');
+    const { pipeline } = require('stream/promises');
+
+    const writeStream = createWriteStream(tmpPath);
+    await pipeline(response.Body, writeStream);
+
+    await fs.rename(tmpPath, localPath);
+    console.log(`Downloaded thumbnail ${slug}.jpg from S3`);
+    return localPath;
+  } catch (error) {
+    try { await fs.unlink(tmpPath); } catch {}
+    if (error.name === 'NoSuchKey') return null;
+    console.error('S3 thumbnail download error:', error);
+    return null;
+  }
+}
+
+async function deleteThumbnailFromS3(slug) {
+  if (!S3_BUCKET || !process.env.AWS_ACCESS_KEY_ID) {
+    return;
+  }
+
+  try {
+    await s3Client.send(new DeleteObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: `thumbnails/${slug}.jpg`
+    }));
+    console.log(`Deleted thumbnail ${slug}.jpg from S3`);
+  } catch (error) {
+    console.error('S3 thumbnail delete error:', error);
+  }
+}
+
 async function downloadFromS3(slug) {
   if (!S3_BUCKET || !process.env.AWS_ACCESS_KEY_ID) {
     console.log('S3 not configured, cannot download');
@@ -282,6 +357,13 @@ router.post('/:slug/video', upload.single('video'), async (req, res) => {
     await fs.mkdir(path.dirname(thumbnailPath), { recursive: true });
     await generateThumbnail(videoPath, thumbnailPath);
 
+    // Upload thumbnail to S3 (don't fail the upload if this errors)
+    try {
+      await uploadThumbnailToS3(slug);
+    } catch (err) {
+      console.error('S3 thumbnail upload failed:', err.message);
+    }
+
     // Update library entry
     library[songIndex].hasVideo = true;
     library[songIndex].duration = duration;
@@ -323,13 +405,14 @@ router.delete('/:slug/video', async (req, res) => {
       console.error('Error deleting local video file:', err);
     }
 
-    // Delete thumbnail
+    // Delete thumbnail (local + S3)
     const thumbnailPath = path.join(__dirname, '../../media/thumbnails', `${slug}.jpg`);
     try {
       await fs.unlink(thumbnailPath);
     } catch (err) {
       console.error('Error deleting thumbnail:', err);
     }
+    await deleteThumbnailFromS3(slug);
 
     // Update library
     library[songIndex].hasVideo = false;
@@ -440,6 +523,7 @@ router.delete('/:slug', async (req, res) => {
       } catch (err) {
         console.error('Error deleting thumbnail:', err);
       }
+      await deleteThumbnailFromS3(slug);
     }
 
     // Remove from library
@@ -456,3 +540,4 @@ router.delete('/:slug', async (req, res) => {
 
 module.exports = router;
 module.exports.downloadFromS3 = downloadFromS3;
+module.exports.downloadThumbnailFromS3 = downloadThumbnailFromS3;

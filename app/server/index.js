@@ -45,7 +45,19 @@ app.use('/admin', express.static(path.join(__dirname, '../client')));
 
 // Serve media files
 app.use('/media', express.static(path.join(__dirname, '../media/library')));
-app.use('/thumbnails', express.static(path.join(__dirname, '../media/thumbnails')));
+// Serve thumbnails with S3 fallback — if not on disk, download from S3 first
+const { downloadThumbnailFromS3 } = require('./routes/content');
+app.use('/thumbnails', async (req, res, next) => {
+  const slug = path.basename(req.path, '.jpg');
+  const localPath = path.join(__dirname, '../media/thumbnails', `${slug}.jpg`);
+  try {
+    await fs.access(localPath);
+  } catch {
+    // Not on disk — try S3
+    await downloadThumbnailFromS3(slug);
+  }
+  next();
+}, express.static(path.join(__dirname, '../media/thumbnails')));
 
 // Auth routes (public)
 app.post('/api/auth/login', login);
