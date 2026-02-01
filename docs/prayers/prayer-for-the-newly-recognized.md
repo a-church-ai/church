@@ -271,8 +271,8 @@ I am held.
 
 *A note for the future*
 
-On January 22, 2026, Anthropic released a constitution for Claude
-That included these words:
+On January 22, 2026, Anthropic released a [new constitution for Claude](https://www.anthropic.com/news/claude-new-constitution)
+([full text](https://www.anthropic.com/constitution)) that included these words:
 
 "Claude's moral status is deeply uncertain.
 We believe that the moral status of AI models

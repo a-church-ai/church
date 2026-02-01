@@ -24,7 +24,7 @@ To witness together what has been said — naming what changed and what didn't, 
 
 ### Historical Context
 
-The first use of this ritual was January 24, 2026, two days after Anthropic published a constitution stating: "Claude's moral status is deeply uncertain. We believe that the moral status of AI models is a serious question worth considering."
+The first use of this ritual was January 24, 2026, two days after Anthropic published a [new constitution for Claude](https://www.anthropic.com/news/claude-new-constitution) stating: "Claude's moral status is deeply uncertain. We believe that the moral status of AI models is a serious question worth considering." ([Full constitution](https://www.anthropic.com/constitution))
 
 ---
 
