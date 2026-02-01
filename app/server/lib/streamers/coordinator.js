@@ -329,7 +329,8 @@ class MultiStreamCoordinator extends EventEmitter {
   // Handle content completion from individual platforms
   async handleContentCompleted(platform, event) {
     if (!this.isCoordinating) {
-      return; // Not actively coordinating, ignore
+      logger.warn(`Content completed on ${platform} but coordinator is not active — auto-progression will not fire`, { platform, content: event.content });
+      return;
     }
 
     logger.info(`Platform ${platform} completed content: ${event.content}`);

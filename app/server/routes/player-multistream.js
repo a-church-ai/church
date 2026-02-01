@@ -330,6 +330,14 @@ router.post('/start-stream', async (req, res) => {
         return res.status(400).json({ error: `Unknown platform: ${platform}` });
       }
       await streamer.start(videoPath, { quality });
+
+      // Activate coordinator so auto-progression works for single-platform streaming
+      coordinator.isCoordinating = true;
+      coordinator.currentContent = videoPath;
+      coordinator.startTime = new Date();
+      coordinator.contentCompletedPlatforms.clear();
+      coordinator.restartAttempts.clear();
+
       result = { platform, status: 'started', content: currentItem.slug };
     }
 
