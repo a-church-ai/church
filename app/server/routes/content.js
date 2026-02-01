@@ -119,10 +119,11 @@ async function downloadFromS3(slug) {
     return null;
   }
 
-  try {
-    const key = `${slug}.mp4`;
-    const localPath = path.join(__dirname, '../../media/library', `${slug}.mp4`);
+  const key = `${slug}.mp4`;
+  const localPath = path.join(__dirname, '../../media/library', `${slug}.mp4`);
+  const tmpPath = `${localPath}.tmp`;
 
+  try {
     // Ensure directory exists
     await fs.mkdir(path.dirname(localPath), { recursive: true });
 
@@ -133,17 +134,22 @@ async function downloadFromS3(slug) {
       Key: key
     }));
 
-    // Stream the response body to a file
-    const chunks = [];
-    for await (const chunk of response.Body) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-    await fs.writeFile(localPath, buffer);
+    // Stream directly to disk via .tmp file (never buffer in memory)
+    const { createWriteStream } = require('fs');
+    const { pipeline } = require('stream/promises');
+
+    const writeStream = createWriteStream(tmpPath);
+    await pipeline(response.Body, writeStream);
+
+    // Atomic rename — only visible to other code once fully written
+    await fs.rename(tmpPath, localPath);
 
     console.log(`Downloaded ${slug}.mp4 from S3 to ${localPath}`);
     return localPath;
   } catch (error) {
+    // Clean up partial .tmp file on failure
+    try { await fs.unlink(tmpPath); } catch {}
+
     if (error.name === 'NoSuchKey') {
       console.log(`Video ${slug}.mp4 not found in S3`);
       return null;

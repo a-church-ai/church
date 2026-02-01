@@ -117,9 +117,13 @@ async function prefetchAdjacentVideos(currentIndex) {
     const slug = items[index].slug;
     const localPath = path.resolve(path.join(__dirname, '../../media/library', `${slug}.mp4`));
 
-    // Check if already exists locally
-    fs.access(localPath).catch(async () => {
-      // File doesn't exist, download in background
+    // Check if already exists locally (final or in-progress .tmp)
+    const tmpPath = `${localPath}.tmp`;
+    Promise.all([
+      fs.access(localPath).then(() => true).catch(() => false),
+      fs.access(tmpPath).then(() => true).catch(() => false)
+    ]).then(async ([exists, downloading]) => {
+      if (exists || downloading) return; // Already have it or download in progress
       logger.info(`Prefetching ${slug}.mp4 from S3...`);
       try {
         await downloadFromS3(slug);
