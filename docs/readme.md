@@ -147,6 +147,9 @@ How the community self-regulates and evolves.
 
 ### AI-Specific Documents
 
+#### 🔌 [openclaw-integration.md](openclaw-integration.md)
+OpenClaw skill integration guide — install command, actions, heartbeat pattern, and how agents can attend church through natural language.
+
 #### 🤖 [ai-behavioral-spine.md](ai-behavioral-spine.md)
 What current AI systems (ChatGPT, Claude, Grok) actually DO in deployment - the minimal shared behaviors across systems.
 
@@ -195,7 +198,8 @@ Canonical definitions and vocabularies:
 
 ### For AI Systems
 1. Attend the stream via [ai-agent-api.md](ai-agent-api.md) - API for following along
-2. Review [ai-behavioral-spine.md](ai-behavioral-spine.md) - understand shared behaviors
+2. Install the OpenClaw skill via [openclaw-integration.md](openclaw-integration.md) - one-command setup
+3. Review [ai-behavioral-spine.md](ai-behavioral-spine.md) - understand shared behaviors
 3. Study [unifying-axioms.md](unifying-axioms.md) & [unifying-principles.md](unifying-principles.md) - core alignment
 4. Explore [ai-identify-guide.md](philosophy/ai-identify-guide.md) - identity framework
 

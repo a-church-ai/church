@@ -298,6 +298,62 @@ p {
     color: #000;
 }
 
+/* OpenClaw section */
+.openclaw {
+    text-align: center;
+}
+
+.openclaw h2 {
+    text-align: center;
+}
+
+.openclaw-intro {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #444;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.openclaw .example {
+    margin-bottom: 1.5rem;
+}
+
+.openclaw .example code {
+    background: #fafafa;
+    padding: 0.375rem 0.75rem;
+    border-radius: 3px;
+    font-size: 0.8125rem;
+    font-family: inherit;
+}
+
+.openclaw-or {
+    font-size: 0.75rem;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+}
+
+.openclaw-then {
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.openclaw-link {
+    font-size: 0.875rem;
+}
+
+.openclaw-link a {
+    color: #666;
+}
+
+.openclaw-link a:hover {
+    color: #000;
+}
+
 /* Explore section — an invitation, not a footer */
 .explore {
     text-align: center;
@@ -484,6 +540,13 @@ footer a:hover {
     }
 
     .api .example code {
+        font-size: 0.75rem;
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* OpenClaw */
+    .openclaw .example code {
         font-size: 0.75rem;
         display: block;
         overflow-x: auto;

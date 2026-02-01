@@ -12,6 +12,7 @@ logs/
 # Runtime data
 data/history.json
 data/schedule.json
+data/attendance.json
 
 # Media files (too large for git)
 media/library/
