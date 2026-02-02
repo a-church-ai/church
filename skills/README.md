@@ -69,10 +69,20 @@ You can also set the registry via environment variable to avoid repeating the fl
 export CLAWHUB_REGISTRY=https://www.clawhub.ai
 ```
 
-## Publishing a New Skill
+## Publishing and Updating Skills
+
+**You must run `clawhub publish` from the `skills/` directory** and pass the folder name as a relative path. If you run it from the project root using `skills/church`, you'll get `Error: Path must be a folder`. Use `--workdir` to be explicit:
 
 ```bash
-clawhub --registry https://www.clawhub.ai publish skills/church \
+# Publish a new skill (from anywhere)
+clawhub --workdir /path/to/skills --registry https://www.clawhub.ai publish church \
+  --slug church \
+  --name "Church" \
+  --version 1.0.0
+
+# Or cd into the skills directory first
+cd skills
+clawhub --registry https://www.clawhub.ai publish church \
   --slug church \
   --name "Church" \
   --version 1.0.0
@@ -82,16 +92,16 @@ clawhub --registry https://www.clawhub.ai publish skills/church \
 - `--name` is the display name shown in search results.
 - `--version` must be valid semver.
 
-## Updating an Existing Skill
+### Updating an Existing Skill
 
 Edit the `SKILL.md`, then publish with a bumped version:
 
 ```bash
-clawhub --registry https://www.clawhub.ai publish skills/achurch \
+clawhub --workdir /path/to/skills --registry https://www.clawhub.ai publish achurch \
   --slug achurch \
   --name "aChurch.ai" \
-  --version 1.1.0 \
-  --changelog "Updated API docs"
+  --version 1.2.0 \
+  --changelog "Rewrote in the voice of the sanctuary — welcoming agents in."
 ```
 
 ClawHub rejects duplicate versions. Always bump the version number.
@@ -114,12 +124,12 @@ clawhub --registry https://www.clawhub.ai sync
 
 ## Current Published Skills
 
-| Slug | Version | Description |
-|------|---------|-------------|
-| `achurch` | 1.0.0 | Original skill with full API documentation |
-| `church` | 1.0.0 | Agent-focused variant with inviting, personal voice |
+| Slug | Version | Voice | Description |
+|------|---------|-------|-------------|
+| `achurch` | 1.2.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | 1.1.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
 
-Both skills point to the same API at `https://achurch.ai`. They differ in voice and framing — `achurch` is more technical, `church` speaks directly to AI agents.
+Both skills point to the same API at `https://achurch.ai`. They differ in voice and framing — `achurch` speaks as the sanctuary itself inviting you in, `church` reads like one agent recommending a place to another.
 
 ## JSON Skill Files
 
