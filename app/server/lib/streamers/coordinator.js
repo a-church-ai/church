@@ -17,7 +17,8 @@ class MultiStreamCoordinator extends EventEmitter {
       maxRestartAttempts: 3
     };
     this.restartAttempts = new Map();
-    
+    this.activePlatforms = new Set(); // Tracks which platforms user actually started
+
     // Initialize streamers
     this.initializeStreamers();
   }
@@ -51,18 +52,24 @@ class MultiStreamCoordinator extends EventEmitter {
     logger.info('Multi-stream coordinator initialized');
   }
 
+  // Start all registered platforms
   async startAll(contentPath, options = {}) {
+    return this.startPlatforms(this.config.platforms, contentPath, options);
+  }
+
+  // Start specific platforms only
+  async startPlatforms(platforms, contentPath, options = {}) {
     if (this.isCoordinating) {
       throw new Error('Multi-streaming is already active');
     }
 
-    logger.info('Starting multi-platform streaming coordination');
+    logger.info('Starting streaming coordination', { platforms });
 
     try {
       this.currentContent = contentPath;
 
-      // Start all platforms
-      const startPromises = this.config.platforms.map(async (platform) => {
+      // Start specified platforms
+      const startPromises = platforms.map(async (platform) => {
         try {
           const streamer = this.streamers.get(platform);
           if (!streamer) {
@@ -78,7 +85,7 @@ class MultiStreamCoordinator extends EventEmitter {
       });
 
       const results = await Promise.allSettled(startPromises);
-      
+
       // Process results
       const successful = [];
       const failed = [];
@@ -92,7 +99,7 @@ class MultiStreamCoordinator extends EventEmitter {
             failed.push({ platform, error });
           }
         } else {
-          const platform = this.config.platforms[index];
+          const platform = platforms[index];
           failed.push({ platform, error: result.reason.message });
         }
       });
@@ -104,15 +111,18 @@ class MultiStreamCoordinator extends EventEmitter {
 
       // Update state
       this.isCoordinating = true;
+      this.activePlatforms = new Set(successful);
       this.startTime = new Date();
+      this.contentCompletedPlatforms.clear();
 
       // Reset restart attempts
       this.restartAttempts.clear();
-      this.config.platforms.forEach(platform => {
+      successful.forEach(platform => {
         this.restartAttempts.set(platform, 0);
       });
 
-      logger.info('Multi-platform streaming started', {
+      logger.info('Streaming started', {
+        activePlatforms: [...this.activePlatforms],
         successful,
         failed: failed.length > 0 ? failed : undefined,
         content: contentPath
@@ -127,7 +137,7 @@ class MultiStreamCoordinator extends EventEmitter {
 
     } catch (error) {
       this.isCoordinating = false;
-      logger.error('Failed to start multi-platform streaming:', error);
+      logger.error('Failed to start streaming:', error);
       throw error;
     }
   }
@@ -339,11 +349,8 @@ class MultiStreamCoordinator extends EventEmitter {
     this.contentCompletedPlatforms.add(platform);
     
     // Check if all active platforms have completed the current content
-    const activePlatforms = this.config.platforms.filter(p => {
-      const streamer = this.streamers.get(p);
-      return streamer && (streamer.isStreaming || this.contentCompletedPlatforms.has(p));
-    });
-    
+    const activePlatforms = [...this.activePlatforms];
+
     const allCompleted = activePlatforms.every(p => this.contentCompletedPlatforms.has(p));
     
     if (allCompleted) {

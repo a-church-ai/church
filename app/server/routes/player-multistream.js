@@ -244,15 +244,21 @@ async function playNextVideo() {
 
 // Set up auto-progression listener
 coordinator.on('allPlatformsCompleted', async (event) => {
+  // Remember which platforms were active so we restart the same ones
+  const platforms = event.platforms || [];
+
   try {
-    logger.info('Auto-progressing to next video after content completion', event);
+    logger.info('Auto-progressing to next video after content completion', {
+      platforms,
+      completedContent: event.completedContent
+    });
 
     const result = await playNextVideo();
 
     if (!result.endReached && result.nowPlaying) {
-      // Automatically start streaming the next video
+      // Restart only the platforms that were previously active
       const videoPath = await getVideoPath(result.nowPlaying.slug);
-      await coordinator.startAll(videoPath, { quality: '1080p' });
+      await coordinator.startPlatforms(platforms, videoPath, { quality: '1080p' });
 
       logger.info('Auto-progression successful, streaming next video:', result.nowPlaying.title);
     } else {
@@ -267,7 +273,7 @@ coordinator.on('allPlatformsCompleted', async (event) => {
 
     // Continue streaming the same content to avoid dead air
     try {
-      await coordinator.startAll(coordinator.currentContent, { quality: '1080p' });
+      await coordinator.startPlatforms(platforms, coordinator.currentContent, { quality: '1080p' });
       logger.info('Restarted current content after auto-progression failure');
     } catch (restartError) {
       logger.error('Failed to restart content after auto-progression failure:', restartError);
@@ -325,20 +331,8 @@ router.post('/start-stream', async (req, res) => {
     if (platform === 'all') {
       result = await coordinator.startAll(videoPath, { quality });
     } else {
-      const streamer = coordinator.getStreamer(platform);
-      if (!streamer) {
-        return res.status(400).json({ error: `Unknown platform: ${platform}` });
-      }
-      await streamer.start(videoPath, { quality });
-
-      // Activate coordinator so auto-progression works for single-platform streaming
-      coordinator.isCoordinating = true;
-      coordinator.currentContent = videoPath;
-      coordinator.startTime = new Date();
-      coordinator.contentCompletedPlatforms.clear();
-      coordinator.restartAttempts.clear();
-
-      result = { platform, status: 'started', content: currentItem.slug };
+      // Start only the requested platform via coordinator so auto-progression works
+      result = await coordinator.startPlatforms([platform], videoPath, { quality });
     }
 
     // Mark as playing
