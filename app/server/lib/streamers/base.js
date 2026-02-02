@@ -17,9 +17,6 @@ class BaseStreamer extends EventEmitter {
     // Continuous mode state
     this.isContinuous = false;
     this.playlist = new ConcatPlaylist(platform);
-    this.durationTimer = null;
-    this.currentVideoDuration = null;
-    this.pendingNext = null;
 
     // Listen for FFmpeg stream events
     ffmpegConfig.on('streamEnded', (event) => {
@@ -100,26 +97,34 @@ class BaseStreamer extends EventEmitter {
   /**
    * Start in continuous mode using the concat demuxer.
    * A single FFmpeg process + RTMP connection persists across videos.
+   *
+   * @param {string[]} videoPaths - Array of video file paths to load into the playlist
+   * @param {object} options - Streaming options
    */
-  async startContinuous(contentPath, options = {}) {
+  async startContinuous(videoPaths, options = {}) {
     if (this.isStreaming) {
       throw new Error(`${this.platform} stream is already running`);
     }
 
+    // Accept a single path for backward compatibility
+    if (!Array.isArray(videoPaths)) {
+      videoPaths = [videoPaths];
+    }
+
     try {
       const streamKey = await this.validateStreamKey();
-      const fileInfo = await ffmpegConfig.validateInputFile(contentPath);
+
+      // Validate at least the first video
+      await ffmpegConfig.validateInputFile(videoPaths[0]);
 
       this.streamId = `${this.platform}-${uuidv4()}`;
       this.isContinuous = true;
-      this.currentContent = contentPath;
-      this.currentVideoDuration = fileInfo.duration;
-      this.pendingNext = null;
+      this.currentContent = videoPaths[0];
 
-      logger.stream(this.platform, `Starting continuous stream with content: ${contentPath}`);
+      logger.stream(this.platform, `Starting continuous stream with ${videoPaths.length} videos`);
 
-      // Initialize concat playlist with first video
-      this.playlist.init(contentPath);
+      // Initialize concat playlist with all videos
+      this.playlist.init(videoPaths);
 
       // Start FFmpeg with concat demuxer input
       await ffmpegConfig.startConcatStream(
@@ -135,120 +140,63 @@ class BaseStreamer extends EventEmitter {
       this.startTime = new Date();
       this.errors = [];
 
-      // Start duration timer to detect when this video entry finishes
-      this._startDurationTimer();
-
       this.emit('started', {
         streamId: this.streamId,
         platform: this.platform,
-        content: contentPath,
+        content: videoPaths[0],
         startTime: this.startTime,
-        continuous: true
+        continuous: true,
+        videoCount: videoPaths.length
       });
 
-      logger.stream(this.platform, `Continuous stream started: ${this.streamId}`);
+      logger.stream(this.platform, `Continuous stream started: ${this.streamId} (${videoPaths.length} videos loaded)`);
       return this.streamId;
 
     } catch (error) {
       this.isContinuous = false;
       this.errors.push({ timestamp: new Date(), error: error.message });
       logger.error(`Failed to start continuous ${this.platform} stream: ${error.message}`, error);
-      this.emit('error', { platform: this.platform, error: error.message, content: contentPath });
+      this.emit('error', { platform: this.platform, error: error.message, content: videoPaths[0] });
       throw error;
     }
   }
 
   /**
-   * Queue the next video for seamless playback (continuous mode only).
-   * Appends to the concat playlist — FFmpeg reads it when current video ends.
+   * Queue additional video(s) to the concat playlist (continuous mode only).
+   * Appends to the playlist — FFmpeg reads new entries when current video ends.
    */
   async queueNext(contentPath) {
     if (!this.isContinuous || !this.isStreaming) {
       throw new Error(`Cannot queue next: ${this.platform} is not in continuous streaming mode`);
     }
 
-    const fileInfo = await ffmpegConfig.validateInputFile(contentPath);
+    await ffmpegConfig.validateInputFile(contentPath);
 
     // Append to playlist file — FFmpeg will read it when current entry ends
     this.playlist.appendNext(contentPath);
 
-    // Store pending info for when duration timer fires
-    this.pendingNext = {
-      contentPath,
-      duration: fileInfo.duration
-    };
-
-    logger.stream(this.platform, `Queued next video: ${contentPath} (${Math.round(fileInfo.duration)}s)`);
-  }
-
-  /**
-   * Duration timer: fires when the current video should be done.
-   * Emits contentCompleted so coordinator can trigger auto-progression.
-   *
-   * Uses a conservative buffer because the timer must fire AFTER FFmpeg has
-   * started reading the next concat entry (if one exists). Firing too early
-   * means the next pre-queue hasn't happened yet → playlist exhaustion.
-   */
-  _startDurationTimer() {
-    if (this.durationTimer) clearTimeout(this.durationTimer);
-    if (!this.currentVideoDuration) return;
-
-    // Add 5s buffer to account for timing variance and ensure FFmpeg
-    // has transitioned to the next concat entry before we fire.
-    // The concat demuxer reads the next entry lazily, so we need to
-    // be sure it has already opened the next file.
-    const durationMs = (this.currentVideoDuration * 1000) + 5000;
-
-    this.durationTimer = setTimeout(() => {
-      this._onVideoEntryCompleted();
-    }, durationMs);
-  }
-
-  _onVideoEntryCompleted() {
-    const completedContent = this.currentContent;
-
-    if (this.pendingNext) {
-      // Transition to next video tracking
-      this.currentContent = this.pendingNext.contentPath;
-      this.currentVideoDuration = this.pendingNext.duration;
-      this.pendingNext = null;
-
-      // Restart duration timer for the new video
-      this._startDurationTimer();
-    } else {
-      // No next video queued — FFmpeg will exhaust the playlist and exit naturally
-      logger.warn(`[${this.platform.toUpperCase()}] No next video queued, FFmpeg will end when current video finishes`);
-    }
-
-    // Emit per-video completion (NOT stream end — FFmpeg is still running)
-    this.emit('contentCompleted', {
-      streamId: this.streamId,
-      platform: this.platform,
-      content: completedContent,
-      duration: this.currentVideoDuration,
-      endTime: new Date(),
-      reason: 'natural_completion'
-    });
+    logger.stream(this.platform, `Queued next video: ${contentPath}`);
   }
 
   /**
    * Hard switch: stop FFmpeg, reinitialize playlist, restart.
    * Used for manual skip/previous/jump — brief stream interruption is acceptable.
    */
-  async hardSwitch(newContentPath, options = {}) {
-    logger.stream(this.platform, `Hard switching content to: ${newContentPath}`);
+  async hardSwitch(videoPaths, options = {}) {
+    if (!Array.isArray(videoPaths)) {
+      videoPaths = [videoPaths];
+    }
+    logger.stream(this.platform, `Hard switching content to: ${videoPaths[0]}`);
     const wasContinuous = this.isContinuous;
-    if (this.durationTimer) clearTimeout(this.durationTimer);
-    this.pendingNext = null;
 
     await this.stop();
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Re-enter continuous mode if we were in it before the hard switch
     if (wasContinuous) {
-      return await this.startContinuous(newContentPath, options);
+      return await this.startContinuous(videoPaths, options);
     }
-    return await this.start(newContentPath, options);
+    return await this.start(videoPaths[0], options);
   }
 
   async stop() {
@@ -261,11 +209,6 @@ class BaseStreamer extends EventEmitter {
       logger.stream(this.platform, `Stopping stream: ${this.streamId}`);
 
       // Clean up continuous mode resources
-      if (this.durationTimer) {
-        clearTimeout(this.durationTimer);
-        this.durationTimer = null;
-      }
-      this.pendingNext = null;
       this.playlist.destroy();
 
       await ffmpegConfig.stopStream(this.streamId);
@@ -292,7 +235,6 @@ class BaseStreamer extends EventEmitter {
       this.streamId = null;
       this.currentContent = null;
       this.startTime = null;
-      this.currentVideoDuration = null;
 
     } catch (error) {
       this.errors.push({
@@ -366,25 +308,14 @@ class BaseStreamer extends EventEmitter {
     const endTime = new Date();
     const duration = this.startTime ? endTime.getTime() - this.startTime.getTime() : 0;
 
-    // Clean up continuous mode resources
-    if (this.durationTimer) {
-      clearTimeout(this.durationTimer);
-      this.durationTimer = null;
-    }
-    this.pendingNext = null;
-
     if (event.reason === 'completed') {
       const wasContinuous = this.isContinuous;
 
       if (wasContinuous) {
-        // In continuous mode, FFmpeg ending means the playlist was exhausted
-        // (no next video was queued in time). This is a failure case —
-        // emit 'playlistExhausted' instead of 'contentCompleted' to avoid
-        // triggering duplicate auto-progression (the duration timer already
-        // handles normal video transitions).
-        logger.stream(this.platform, `Continuous playlist exhausted: ${event.streamId}`);
+        // In continuous mode, FFmpeg ending means the playlist was exhausted.
+        // Emit 'playlistExhausted' so the coordinator can reload with fresh videos.
+        logger.stream(this.platform, `Continuous playlist exhausted: ${event.streamId} (${Math.round(duration / 1000)}s total)`);
 
-        // Update state
         this.isStreaming = false;
         this.isContinuous = false;
 
@@ -392,6 +323,7 @@ class BaseStreamer extends EventEmitter {
           streamId: this.streamId,
           platform: this.platform,
           content: this.currentContent,
+          videosPlayed: this.playlist.getEntryCount(),
           duration,
           endTime,
           reason: 'playlist_exhausted'
@@ -399,11 +331,9 @@ class BaseStreamer extends EventEmitter {
       } else {
         logger.stream(this.platform, `Video completed naturally: ${event.streamId}`);
 
-        // Update state
         this.isStreaming = false;
         this.isContinuous = false;
 
-        // Emit content completion event for coordinator
         this.emit('contentCompleted', {
           streamId: this.streamId,
           platform: this.platform,
@@ -431,11 +361,9 @@ class BaseStreamer extends EventEmitter {
         error: event.error || `Stream crashed (exit code: ${event.exitCode}, signal: ${event.signal})`
       });
 
-      // Update state
       this.isStreaming = false;
       this.isContinuous = false;
 
-      // Emit crash event so coordinator can attempt recovery
       this.emit('streamCrashed', {
         streamId: this.streamId,
         platform: this.platform,
@@ -451,7 +379,6 @@ class BaseStreamer extends EventEmitter {
     this.streamId = null;
     this.currentContent = null;
     this.startTime = null;
-    this.currentVideoDuration = null;
   }
 
   // Health check method

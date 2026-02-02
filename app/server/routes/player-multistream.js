@@ -232,95 +232,169 @@ async function playNextVideo() {
   };
 }
 
-// Pre-queue the next video in the schedule into the concat playlist
-// so FFmpeg always has a next entry ready before the current one finishes.
-async function preQueueNextVideo(currentIndex) {
-  try {
-    const schedule = await loadSchedule();
-    const items = schedule.items;
-    if (items.length === 0) return;
+// How many videos to buffer in the concat playlist at a time.
+// FFmpeg reads through these sequentially. When it finishes all of them,
+// the playlist is reloaded with the next batch. Larger = fewer restarts.
+const PLAYLIST_BUFFER_SIZE = 20;
 
-    let nextIndex = currentIndex + 1;
-    if (nextIndex >= items.length) {
+/**
+ * Build an array of video file paths for the next N schedule items.
+ * Downloads from S3 if needed. Returns { videoPaths, endIndex, videoCount }.
+ */
+async function buildPlaylistBuffer(startIndex, count) {
+  const schedule = await loadSchedule();
+  const items = schedule.items;
+  if (items.length === 0) return { videoPaths: [], endIndex: startIndex, videoCount: 0 };
+
+  const videoPaths = [];
+  let index = startIndex;
+
+  for (let i = 0; i < count; i++) {
+    if (index >= items.length) {
       if (schedule.loop) {
-        nextIndex = 0;
+        index = 0;
       } else {
-        return; // End of schedule, nothing to pre-queue
+        break; // End of schedule, no more videos
       }
     }
 
-    const nextSlug = items[nextIndex].slug;
-    const videoPath = await getVideoPath(nextSlug);
-    await coordinator.switchContent(videoPath, { quality: '1080p' });
-    logger.info(`Pre-queued next video: ${nextSlug} (index ${nextIndex})`);
-  } catch (err) {
-    logger.warn('Failed to pre-queue next video:', err.message);
+    // Avoid infinite loop if schedule has fewer items than buffer size
+    if (i > 0 && index === startIndex && schedule.loop) break;
+
+    try {
+      const slug = items[index].slug;
+      const videoPath = await getVideoPath(slug);
+      videoPaths.push(videoPath);
+    } catch (err) {
+      logger.warn(`Failed to get video for ${items[index].slug}, skipping:`, err.message);
+    }
+
+    index++;
+    if (index >= items.length && schedule.loop) {
+      index = 0;
+    }
   }
+
+  return { videoPaths, endIndex: index, videoCount: videoPaths.length };
 }
 
-// Set up auto-progression listener
-let autoProgressionInFlight = false;
+/**
+ * Advance the schedule index by N positions (marking items as played along the way).
+ */
+async function advanceSchedule(count) {
+  const schedule = await loadSchedule();
+  const history = await loadHistory();
 
-coordinator.on('allPlatformsCompleted', async (event) => {
-  const platforms = event.platforms || [];
-  const isContinuous = event.continuous; // FFmpeg still running in continuous mode
+  for (let i = 0; i < count; i++) {
+    if (schedule.currentIndex < schedule.items.length) {
+      const item = schedule.items[schedule.currentIndex];
+      item.played = true;
+      item.playedAt = new Date().toISOString();
 
-  // Prevent re-entrant auto-progression (e.g., duration timer + playlist_exhausted firing close together)
-  if (autoProgressionInFlight) {
-    logger.warn('Auto-progression already in flight, skipping duplicate trigger', {
-      completedContent: event.completedContent, continuous: isContinuous
-    });
-    return;
+      history.played.push({
+        ...item,
+        playedAt: new Date().toISOString()
+      });
+    }
+
+    schedule.currentIndex++;
+
+    if (schedule.currentIndex >= schedule.items.length) {
+      if (schedule.loop) {
+        schedule.currentIndex = 0;
+        schedule.items.forEach(item => { item.played = false; });
+      } else {
+        schedule.currentIndex = schedule.items.length - 1;
+        schedule.isPlaying = false;
+        break;
+      }
+    }
   }
-  autoProgressionInFlight = true;
+
+  await saveSchedule(schedule);
+  await saveHistory(history);
+  return schedule;
+}
+
+// Set up playlist-exhausted listener: when FFmpeg finishes all buffered videos,
+// advance the schedule and reload with the next batch.
+coordinator.on('playlistExhausted', async (event) => {
+  const platforms = event.platforms || [event.platform];
 
   try {
-    logger.info('Auto-progressing to next video after content completion', {
+    // Advance schedule by the number of videos that were in the playlist
+    const videosPlayed = event.videosPlayed || PLAYLIST_BUFFER_SIZE;
+    logger.info(`Playlist exhausted after ~${videosPlayed} videos, reloading`, { platforms });
+
+    await advanceSchedule(videosPlayed);
+    const schedule = await loadSchedule();
+
+    if (!schedule.isPlaying && !schedule.loop) {
+      logger.info('End of schedule reached, stopping streams');
+      await coordinator.stopAll();
+      return;
+    }
+
+    // Build next batch and restart
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+
+    if (videoCount === 0) {
+      logger.warn('No videos available for next batch, stopping');
+      await coordinator.stopAll();
+      return;
+    }
+
+    // Update player status
+    const enrichedItem = await enrichScheduleItem(schedule.items[schedule.currentIndex]);
+    playerStatus.currentVideo = enrichedItem;
+    playerStatus.currentIndex = schedule.currentIndex;
+
+    // Restart with new batch
+    await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
+    logger.info(`Reloaded playlist with ${videoCount} videos starting at index ${schedule.currentIndex}`);
+
+    // Prefetch S3 videos for the batch after this one
+    prefetchAdjacentVideos(schedule.currentIndex + videoCount);
+
+  } catch (error) {
+    logger.error('Failed to reload playlist after exhaustion:', error);
+
+    // Last resort: try to restart with whatever we have
+    try {
+      const schedule = await loadSchedule();
+      const videoPath = await getVideoPath(schedule.items[schedule.currentIndex].slug);
+      await coordinator.startPlatforms(platforms, [videoPath], { quality: '1080p' });
+      logger.info('Emergency restart with single video');
+    } catch (restartError) {
+      logger.error('Emergency restart failed:', restartError);
+    }
+  }
+});
+
+// Legacy: handle non-continuous content completion (single video mode)
+coordinator.on('allPlatformsCompleted', async (event) => {
+  const platforms = event.platforms || [];
+
+  try {
+    logger.info('Content completed (non-continuous), advancing to next video', {
       platforms,
-      continuous: isContinuous,
       completedContent: event.completedContent
     });
 
     const result = await playNextVideo();
 
     if (!result.endReached && result.nowPlaying) {
-      if (isContinuous) {
-        // Continuous mode: the video was already pre-queued in the playlist.
-        // AWAIT pre-queuing the NEXT one so FFmpeg always has something ready
-        // before the duration timer fires for the current video.
-        const schedule = await loadSchedule();
-        await preQueueNextVideo(schedule.currentIndex);
-        logger.info('Auto-progression: advanced to pre-queued video:', result.nowPlaying.title);
-      } else {
-        // Legacy mode or playlist exhausted: restart FFmpeg processes
-        const videoPath = await getVideoPath(result.nowPlaying.slug);
-        await coordinator.startPlatforms(platforms, videoPath, { quality: '1080p' });
-        logger.info('Auto-progression: started next video:', result.nowPlaying.title);
-      }
+      const schedule = await loadSchedule();
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
+      logger.info('Started next batch:', result.nowPlaying.title);
     } else {
-      logger.info('Auto-progression reached end of schedule or loop disabled');
-
-      // Stop all streams since we've reached the end
+      logger.info('End of schedule reached');
       await coordinator.stopAll();
     }
 
   } catch (error) {
     logger.error('Auto-progression failed:', error);
-
-    // Try to keep streaming to avoid dead air
-    try {
-      if (isContinuous && coordinator.currentContent) {
-        // In continuous mode, just log — FFmpeg may still be running
-        logger.warn('Auto-progression failed in continuous mode, FFmpeg may exhaust playlist');
-      } else {
-        await coordinator.startPlatforms(platforms, coordinator.currentContent, { quality: '1080p' });
-        logger.info('Restarted current content after auto-progression failure');
-      }
-    } catch (restartError) {
-      logger.error('Failed to restart content after auto-progression failure:', restartError);
-    }
-  } finally {
-    autoProgressionInFlight = false;
   }
 });
 
@@ -367,16 +441,18 @@ router.post('/start-stream', async (req, res) => {
     }
 
     const currentItem = schedule.items[schedule.currentIndex];
-    const videoPath = await getVideoPath(currentItem.slug);
+
+    // Build a deep buffer of videos for the concat playlist
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+
+    if (videoCount === 0) {
+      return res.status(400).json({ error: 'No playable videos found in schedule' });
+    }
 
     let result;
+    const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
 
-    if (platform === 'all') {
-      result = await coordinator.startAll(videoPath, { quality });
-    } else {
-      // Start only the requested platform via coordinator so auto-progression works
-      result = await coordinator.startPlatforms([platform], videoPath, { quality });
-    }
+    result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
 
     // Mark as playing
     schedule.isPlaying = true;
@@ -386,15 +462,10 @@ router.post('/start-stream', async (req, res) => {
     await updatePlayerStatus();
 
     const enrichedItem = await enrichScheduleItem(currentItem);
-    logger.info(`Streaming started on ${platform}`, result);
+    logger.info(`Streaming started on ${platform} with ${videoCount} videos buffered`, result);
 
-    // Pre-queue next video into concat playlist so FFmpeg has it ready
-    // MUST await — if this isn't in the playlist before the current video
-    // ends, FFmpeg will exhaust the playlist and the stream restarts.
-    await preQueueNextVideo(schedule.currentIndex);
-
-    // Prefetch adjacent videos from S3 in background
-    prefetchAdjacentVideos(schedule.currentIndex);
+    // Prefetch S3 videos beyond the buffer
+    prefetchAdjacentVideos(schedule.currentIndex + videoCount);
 
     res.json({
       success: true,
@@ -526,15 +597,12 @@ router.post('/next', async (req, res) => {
       });
     }
 
-    // Manual skip: hard switch FFmpeg (brief stream interruption is acceptable)
+    // Manual skip: hard switch FFmpeg with a deep buffer (brief stream interruption is acceptable)
     if (coordinator.isAnyStreaming() && result.nowPlaying) {
-      const videoPath = await getVideoPath(result.nowPlaying.slug);
-      await coordinator.hardSwitch(videoPath);
-      logger.info(`Manual skip: hard switched to ${result.nowPlaying.slug}`);
-
-      // Pre-queue the next video after hard switch
       const schedule = await loadSchedule();
-      preQueueNextVideo(schedule.currentIndex);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      await coordinator.hardSwitch(videoPaths);
+      logger.info(`Manual skip: hard switched to ${result.nowPlaying.slug} (${videoCount} videos buffered)`);
     }
 
     res.json(result);
@@ -568,11 +636,12 @@ router.post('/previous', async (req, res) => {
 
     // Play previous video
     const prevItem = schedule.items[schedule.currentIndex];
-    const videoPath = await getVideoPath(prevItem.slug);
 
-    // If streaming is active, hard switch (going backwards requires FFmpeg restart)
+    // If streaming is active, hard switch with deep buffer (going backwards requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.hardSwitch(videoPath);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      await coordinator.hardSwitch(videoPaths);
+      logger.info(`Previous: hard switched to index ${schedule.currentIndex} (${videoCount} videos buffered)`);
     }
 
     await saveSchedule(schedule);
@@ -582,8 +651,7 @@ router.post('/previous', async (req, res) => {
     playerStatus.currentIndex = schedule.currentIndex;
     playerStatus.timeElapsed = 0;
 
-    // Pre-queue next video and prefetch adjacent from S3
-    preQueueNextVideo(schedule.currentIndex);
+    // Prefetch adjacent videos from S3
     prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
@@ -609,11 +677,12 @@ router.post('/jump/:index', async (req, res) => {
 
     schedule.currentIndex = index;
     const item = schedule.items[index];
-    const videoPath = await getVideoPath(item.slug);
 
-    // If streaming is active, hard switch (jumping requires FFmpeg restart)
+    // If streaming is active, hard switch with deep buffer (jumping requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.hardSwitch(videoPath);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(index, PLAYLIST_BUFFER_SIZE);
+      await coordinator.hardSwitch(videoPaths);
+      logger.info(`Jump: hard switched to index ${index} (${videoCount} videos buffered)`);
     }
 
     await saveSchedule(schedule);
@@ -623,8 +692,7 @@ router.post('/jump/:index', async (req, res) => {
     playerStatus.currentIndex = index;
     playerStatus.timeElapsed = 0;
 
-    // Pre-queue next video and prefetch adjacent from S3
-    preQueueNextVideo(index);
+    // Prefetch adjacent videos from S3
     prefetchAdjacentVideos(index);
 
     res.json({

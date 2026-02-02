@@ -10,6 +10,11 @@ const logger = require('./logger');
  * the current one finishes. We can safely append entries while FFmpeg is
  * processing earlier ones.
  *
+ * Strategy: load a deep buffer of videos (up to BUFFER_SIZE) into the playlist
+ * at once. This prevents playlist exhaustion even if JavaScript event processing
+ * is delayed. When FFmpeg finishes all entries, the playlist is re-initialized
+ * with the next batch.
+ *
  * Playlist format (ffconcat):
  *   ffconcat version 1.0
  *   file '/absolute/path/to/video1.mp4'
@@ -23,12 +28,20 @@ class ConcatPlaylist {
   }
 
   /**
-   * Initialize playlist with the first video
+   * Initialize playlist with multiple videos at once.
+   * @param {string[]} filePaths - Array of video file paths to load
    */
-  init(filePath) {
-    this.entries = [filePath];
+  init(filePaths) {
+    if (!Array.isArray(filePaths)) {
+      filePaths = [filePaths];
+    }
+    this.entries = [...filePaths];
     this._write();
-    logger.info(`[${this.platform.toUpperCase()}] Concat playlist initialized`, { path: this.playlistPath, firstVideo: filePath });
+    logger.info(`[${this.platform.toUpperCase()}] Concat playlist initialized`, {
+      path: this.playlistPath,
+      videos: this.entries.length,
+      firstVideo: filePaths[0]
+    });
   }
 
   /**
@@ -46,6 +59,13 @@ class ConcatPlaylist {
    */
   getPath() {
     return this.playlistPath;
+  }
+
+  /**
+   * Get the number of entries currently in the playlist
+   */
+  getEntryCount() {
+    return this.entries.length;
   }
 
   /**

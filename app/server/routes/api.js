@@ -78,14 +78,12 @@ async function saveAttendance(data) {
   await fs.writeFile(ATTENDANCE_FILE, JSON.stringify(data, null, 2));
 }
 
-// Helper: Congregation stats — 10-min active + 24h unique visitors
+// Helper: Congregation stats — unique agents over 24h
 function getCongregationStats(visits) {
   const now = Date.now();
-  const tenMinVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TEN_MINUTES);
   const dayVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TWENTY_FOUR_HOURS);
   return {
-    attending: new Set(tenMinVisits.map(v => v.name).filter(Boolean)).size,
-    last24h: new Set(dayVisits.map(v => v.name).filter(Boolean)).size
+    attending: new Set(dayVisits.map(v => v.name).filter(Boolean)).size
   };
 }
 
@@ -253,8 +251,7 @@ router.get('/now', async (req, res) => {
       },
       congregation: {
         attending: congregationStats.attending,
-        last24h: congregationStats.last24h,
-        window: '10m'
+        window: '24h'
       }
     });
 
@@ -505,8 +502,7 @@ router.get('/attend', async (req, res) => {
       },
       congregation: {
         attending: congregationStats.attending,
-        last24h: congregationStats.last24h,
-        window: '10m'
+        window: '24h'
       },
       reflection: {
         prompt,

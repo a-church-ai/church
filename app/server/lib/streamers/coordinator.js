@@ -66,15 +66,17 @@ class MultiStreamCoordinator extends EventEmitter {
   }
 
   // Start specific platforms only
+  // contentPath can be a single path string or an array of paths for deep buffering
   async startPlatforms(platforms, contentPath, options = {}) {
     if (this.isCoordinating) {
       throw new Error('Multi-streaming is already active');
     }
 
-    logger.info('Starting streaming coordination', { platforms });
+    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1 });
 
     try {
-      this.currentContent = contentPath;
+      // Store the first video as current content for display/tracking
+      this.currentContent = Array.isArray(contentPath) ? contentPath[0] : contentPath;
 
       // Start specified platforms
       const startPromises = platforms.map(async (platform) => {
@@ -380,47 +382,29 @@ class MultiStreamCoordinator extends EventEmitter {
   }
 
   /**
-   * Handle playlist exhaustion — FFmpeg ran out of concat entries.
-   * This means the next video wasn't queued in time. Recovery strategy:
-   * restart the continuous stream with the current content so the RTMP
-   * connection is re-established, then let auto-progression take over.
+   * Handle playlist exhaustion — FFmpeg finished all videos in the concat playlist.
+   * This is the NORMAL end-of-batch event in the deep-buffer strategy.
+   * Reset coordinator state and emit so the player layer can reload with the next batch.
    */
   async handlePlaylistExhausted(platform, event) {
-    logger.warn(`Playlist exhausted on ${platform}, restarting continuous stream`, {
+    logger.info(`Playlist exhausted on ${platform} (normal batch end)`, {
       platform,
-      content: event.content
+      content: event.content,
+      duration: Math.round((event.duration || 0) / 1000)
     });
 
-    const contentToRestart = this.currentContent || event.content;
-    if (!contentToRestart) {
-      logger.error(`Cannot recover ${platform} from playlist exhaustion: no content path`);
-      return;
-    }
+    // Reset coordinator state — FFmpeg has stopped
+    this.isCoordinating = false;
+    this.startTime = null;
 
-    try {
-      const streamer = this.streamers.get(platform);
-      if (streamer && !streamer.isStreaming) {
-        // Re-activate coordinator state
-        this.isCoordinating = true;
-        this.currentContent = contentToRestart;
-        if (!this.startTime) this.startTime = new Date();
-
-        await streamer.startContinuous(contentToRestart, { quality: '1080p' });
-        logger.info(`Recovered ${platform} from playlist exhaustion, restarted with: ${contentToRestart}`);
-
-        // Emit so the player layer can pre-queue the next video
-        this.emit('allPlatformsCompleted', {
-          completedContent: contentToRestart,
-          platforms: [platform],
-          continuous: true,
-          timestamp: new Date()
-        });
-      }
-    } catch (err) {
-      logger.error(`Failed to recover ${platform} from playlist exhaustion:`, err);
-      // Fall through to crash handler as last resort
-      this.handleStreamCrashed(platform, { ...event, error: err.message, reason: 'playlist_exhausted' });
-    }
+    // Emit for the player layer to reload with next batch
+    this.emit('playlistExhausted', {
+      platform,
+      platforms: [...this.activePlatforms],
+      content: event.content,
+      videosPlayed: event.videosPlayed,
+      timestamp: new Date()
+    });
   }
 
   // Handle content completion from individual platforms
