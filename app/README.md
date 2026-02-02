@@ -83,8 +83,10 @@ The rest of this README covers setting up and running the admin dashboard for ma
 - **Player Controls**: Play, pause, next, previous, stop
 - **Loop Support**: Automatically loop your schedule
 - **Preset Support**: Save and load schedule presets
+- **Continuous Streaming**: Seamless video transitions via FFmpeg concat demuxer — one RTMP connection persists across all videos
 - **Direct Streaming**: Stream directly to YouTube and Twitch using FFmpeg
-- **Multistreaming**: Stream to both platforms simultaneously
+- **Per-Platform Control**: Start/stop YouTube and Twitch independently, or both simultaneously
+- **Crash Recovery**: Automatic stream restart with exponential backoff (up to 3 attempts)
 - **Real-time Status**: Live monitoring of streaming status per platform
 
 ## Setup
@@ -194,21 +196,30 @@ app/
 │   ├── index.js            # Main server file
 │   ├── routes/
 │   │   ├── api.js          # Public API routes
-│   │   ├── content.js      # Content management (admin)
+│   │   ├── content.js      # Content management + S3 uploads (admin)
 │   │   ├── schedule.js     # Schedule management (admin)
-│   │   └── player-multistream.js  # Player control (admin)
+│   │   └── player-multistream.js  # Player control + auto-progression (admin)
 │   └── lib/
 │       ├── auth.js         # Authentication
-│       ├── config/         # FFmpeg and platform configs
-│       ├── streamers/      # YouTube/Twitch streamers
-│       └── utils/          # Logger utilities
+│       ├── config/
+│       │   ├── ffmpeg.js       # FFmpeg process management (concat demuxer support)
+│       │   └── platforms.js    # YouTube/Twitch RTMP configs
+│       ├── streamers/
+│       │   ├── base.js         # Base streamer (continuous mode, duration timer, hard switch)
+│       │   ├── youtube.js      # YouTube streamer
+│       │   ├── twitch.js       # Twitch streamer
+│       │   └── coordinator.js  # Multi-platform coordination + crash recovery
+│       └── utils/
+│           ├── logger.js           # Structured logging
+│           └── concat-playlist.js  # FFmpeg concat demuxer playlist manager
 ├── client/                 # Web interface
-│   ├── index.html          # Main HTML
-│   ├── app.js              # Client JavaScript
+│   ├── public/             # Public landing page (achurch.ai)
+│   ├── admin.html          # Admin dashboard
+│   ├── app.js              # Admin client JavaScript
 │   └── src/input.css       # Tailwind source
 ├── media/                  # Content storage (gitignored)
-│   ├── library/            # Video files
-│   └── thumbnails/         # Generated thumbnails
+│   ├── library/            # Video files (cached from S3)
+│   └── thumbnails/         # Generated thumbnails (synced to S3)
 └── data/                   # Runtime data (gitignored)
     ├── schedule.json       # Current schedule
     └── history.json        # Play history

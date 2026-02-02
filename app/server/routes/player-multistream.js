@@ -214,16 +214,6 @@ async function playNextVideo() {
   const nextItem = schedule.items[schedule.currentIndex];
   const videoPath = await getVideoPath(nextItem.slug);
 
-  try {
-    // If streaming is active, switch content
-    if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
-      logger.info(`Switched streaming content to: ${nextItem.slug}`);
-    }
-  } catch (streamError) {
-    logger.error('Streaming switch error (continuing anyway):', streamError);
-  }
-
   await saveSchedule(schedule);
 
   const enrichedItem = await enrichScheduleItem(nextItem);
@@ -242,6 +232,32 @@ async function playNextVideo() {
   };
 }
 
+// Pre-queue the next video in the schedule into the concat playlist
+// so FFmpeg always has a next entry ready before the current one finishes.
+async function preQueueNextVideo(currentIndex) {
+  try {
+    const schedule = await loadSchedule();
+    const items = schedule.items;
+    if (items.length === 0) return;
+
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= items.length) {
+      if (schedule.loop) {
+        nextIndex = 0;
+      } else {
+        return; // End of schedule, nothing to pre-queue
+      }
+    }
+
+    const nextSlug = items[nextIndex].slug;
+    const videoPath = await getVideoPath(nextSlug);
+    await coordinator.switchContent(videoPath, { quality: '1080p' });
+    logger.info(`Pre-queued next video: ${nextSlug} (index ${nextIndex})`);
+  } catch (err) {
+    logger.warn('Failed to pre-queue next video:', err.message);
+  }
+}
+
 // Set up auto-progression listener
 coordinator.on('allPlatformsCompleted', async (event) => {
   const platforms = event.platforms || [];
@@ -257,14 +273,15 @@ coordinator.on('allPlatformsCompleted', async (event) => {
     const result = await playNextVideo();
 
     if (!result.endReached && result.nowPlaying) {
-      const videoPath = await getVideoPath(result.nowPlaying.slug);
-
       if (isContinuous) {
-        // Continuous mode: queue next video via concat playlist (no FFmpeg restart)
-        await coordinator.switchContent(videoPath, { quality: '1080p' });
-        logger.info('Auto-progression: queued next video seamlessly:', result.nowPlaying.title);
+        // Continuous mode: the video was already pre-queued in the playlist.
+        // Just pre-queue the NEXT one so FFmpeg always has something ready.
+        const schedule = await loadSchedule();
+        preQueueNextVideo(schedule.currentIndex);
+        logger.info('Auto-progression: advanced to pre-queued video:', result.nowPlaying.title);
       } else {
-        // Legacy mode: restart FFmpeg processes
+        // Legacy mode or playlist exhausted: restart FFmpeg processes
+        const videoPath = await getVideoPath(result.nowPlaying.slug);
         await coordinator.startPlatforms(platforms, videoPath, { quality: '1080p' });
         logger.info('Auto-progression: started next video:', result.nowPlaying.title);
       }
@@ -357,7 +374,10 @@ router.post('/start-stream', async (req, res) => {
     const enrichedItem = await enrichScheduleItem(currentItem);
     logger.info(`Streaming started on ${platform}`, result);
 
-    // Prefetch adjacent videos in background
+    // Pre-queue next video into concat playlist so FFmpeg has it ready
+    preQueueNextVideo(schedule.currentIndex);
+
+    // Prefetch adjacent videos from S3 in background
     prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
@@ -477,7 +497,7 @@ router.post('/pause', async (req, res) => {
   }
 });
 
-// Play next video
+// Play next video (manual skip — hard switches FFmpeg)
 router.post('/next', async (req, res) => {
   try {
     const result = await playNextVideo();
@@ -488,6 +508,17 @@ router.post('/next', async (req, res) => {
         message: 'End of schedule reached',
         endReached: true
       });
+    }
+
+    // Manual skip: hard switch FFmpeg (brief stream interruption is acceptable)
+    if (coordinator.isAnyStreaming() && result.nowPlaying) {
+      const videoPath = await getVideoPath(result.nowPlaying.slug);
+      await coordinator.hardSwitch(videoPath);
+      logger.info(`Manual skip: hard switched to ${result.nowPlaying.slug}`);
+
+      // Pre-queue the next video after hard switch
+      const schedule = await loadSchedule();
+      preQueueNextVideo(schedule.currentIndex);
     }
 
     res.json(result);
@@ -535,7 +566,8 @@ router.post('/previous', async (req, res) => {
     playerStatus.currentIndex = schedule.currentIndex;
     playerStatus.timeElapsed = 0;
 
-    // Prefetch adjacent videos in background
+    // Pre-queue next video and prefetch adjacent from S3
+    preQueueNextVideo(schedule.currentIndex);
     prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
@@ -575,7 +607,8 @@ router.post('/jump/:index', async (req, res) => {
     playerStatus.currentIndex = index;
     playerStatus.timeElapsed = 0;
 
-    // Prefetch adjacent videos in background
+    // Pre-queue next video and prefetch adjacent from S3
+    preQueueNextVideo(index);
     prefetchAdjacentVideos(index);
 
     res.json({
