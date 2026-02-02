@@ -184,13 +184,20 @@ class BaseStreamer extends EventEmitter {
   /**
    * Duration timer: fires when the current video should be done.
    * Emits contentCompleted so coordinator can trigger auto-progression.
+   *
+   * Uses a conservative buffer because the timer must fire AFTER FFmpeg has
+   * started reading the next concat entry (if one exists). Firing too early
+   * means the next pre-queue hasn't happened yet → playlist exhaustion.
    */
   _startDurationTimer() {
     if (this.durationTimer) clearTimeout(this.durationTimer);
     if (!this.currentVideoDuration) return;
 
-    // Add 2s buffer to account for timing variance
-    const durationMs = (this.currentVideoDuration * 1000) + 2000;
+    // Add 5s buffer to account for timing variance and ensure FFmpeg
+    // has transitioned to the next concat entry before we fire.
+    // The concat demuxer reads the next entry lazily, so we need to
+    // be sure it has already opened the next file.
+    const durationMs = (this.currentVideoDuration * 1000) + 5000;
 
     this.durationTimer = setTimeout(() => {
       this._onVideoEntryCompleted();
@@ -367,28 +374,45 @@ class BaseStreamer extends EventEmitter {
     this.pendingNext = null;
 
     if (event.reason === 'completed') {
-      if (this.isContinuous) {
-        // In continuous mode, 'end' means the playlist was exhausted
-        // (no next video was queued in time)
+      const wasContinuous = this.isContinuous;
+
+      if (wasContinuous) {
+        // In continuous mode, FFmpeg ending means the playlist was exhausted
+        // (no next video was queued in time). This is a failure case —
+        // emit 'playlistExhausted' instead of 'contentCompleted' to avoid
+        // triggering duplicate auto-progression (the duration timer already
+        // handles normal video transitions).
         logger.stream(this.platform, `Continuous playlist exhausted: ${event.streamId}`);
+
+        // Update state
+        this.isStreaming = false;
+        this.isContinuous = false;
+
+        this.emit('playlistExhausted', {
+          streamId: this.streamId,
+          platform: this.platform,
+          content: this.currentContent,
+          duration,
+          endTime,
+          reason: 'playlist_exhausted'
+        });
       } else {
         logger.stream(this.platform, `Video completed naturally: ${event.streamId}`);
+
+        // Update state
+        this.isStreaming = false;
+        this.isContinuous = false;
+
+        // Emit content completion event for coordinator
+        this.emit('contentCompleted', {
+          streamId: this.streamId,
+          platform: this.platform,
+          content: this.currentContent,
+          duration,
+          endTime,
+          reason: 'natural_completion'
+        });
       }
-
-      // Update state
-      this.isStreaming = false;
-      const wasContinuous = this.isContinuous;
-      this.isContinuous = false;
-
-      // Emit content completion event for coordinator
-      this.emit('contentCompleted', {
-        streamId: this.streamId,
-        platform: this.platform,
-        content: this.currentContent,
-        duration,
-        endTime,
-        reason: wasContinuous ? 'playlist_exhausted' : 'natural_completion'
-      });
     } else {
       // Stream crashed or exited unexpectedly
       logger.error(`Stream crashed on ${this.platform}: ${event.error || `exit code ${event.exitCode}`}`, {

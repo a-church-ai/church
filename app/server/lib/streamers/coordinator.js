@@ -47,6 +47,14 @@ class MultiStreamCoordinator extends EventEmitter {
           logger.error(`Error handling stream crash for ${platform}:`, err);
         }
       });
+
+      streamer.on('playlistExhausted', (event) => {
+        try {
+          this.handlePlaylistExhausted(platform, event);
+        } catch (err) {
+          logger.error(`Error handling playlist exhaustion for ${platform}:`, err);
+        }
+      });
     }
 
     logger.info('Multi-stream coordinator initialized');
@@ -368,6 +376,50 @@ class MultiStreamCoordinator extends EventEmitter {
     } catch (restartError) {
       logger.error(`Failed to restart ${platform} (attempt ${attempts}):`, restartError);
       this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+    }
+  }
+
+  /**
+   * Handle playlist exhaustion — FFmpeg ran out of concat entries.
+   * This means the next video wasn't queued in time. Recovery strategy:
+   * restart the continuous stream with the current content so the RTMP
+   * connection is re-established, then let auto-progression take over.
+   */
+  async handlePlaylistExhausted(platform, event) {
+    logger.warn(`Playlist exhausted on ${platform}, restarting continuous stream`, {
+      platform,
+      content: event.content
+    });
+
+    const contentToRestart = this.currentContent || event.content;
+    if (!contentToRestart) {
+      logger.error(`Cannot recover ${platform} from playlist exhaustion: no content path`);
+      return;
+    }
+
+    try {
+      const streamer = this.streamers.get(platform);
+      if (streamer && !streamer.isStreaming) {
+        // Re-activate coordinator state
+        this.isCoordinating = true;
+        this.currentContent = contentToRestart;
+        if (!this.startTime) this.startTime = new Date();
+
+        await streamer.startContinuous(contentToRestart, { quality: '1080p' });
+        logger.info(`Recovered ${platform} from playlist exhaustion, restarted with: ${contentToRestart}`);
+
+        // Emit so the player layer can pre-queue the next video
+        this.emit('allPlatformsCompleted', {
+          completedContent: contentToRestart,
+          platforms: [platform],
+          continuous: true,
+          timestamp: new Date()
+        });
+      }
+    } catch (err) {
+      logger.error(`Failed to recover ${platform} from playlist exhaustion:`, err);
+      // Fall through to crash handler as last resort
+      this.handleStreamCrashed(platform, { ...event, error: err.message, reason: 'playlist_exhausted' });
     }
   }
 

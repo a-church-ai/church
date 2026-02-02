@@ -259,9 +259,20 @@ async function preQueueNextVideo(currentIndex) {
 }
 
 // Set up auto-progression listener
+let autoProgressionInFlight = false;
+
 coordinator.on('allPlatformsCompleted', async (event) => {
   const platforms = event.platforms || [];
   const isContinuous = event.continuous; // FFmpeg still running in continuous mode
+
+  // Prevent re-entrant auto-progression (e.g., duration timer + playlist_exhausted firing close together)
+  if (autoProgressionInFlight) {
+    logger.warn('Auto-progression already in flight, skipping duplicate trigger', {
+      completedContent: event.completedContent, continuous: isContinuous
+    });
+    return;
+  }
+  autoProgressionInFlight = true;
 
   try {
     logger.info('Auto-progressing to next video after content completion', {
@@ -275,9 +286,10 @@ coordinator.on('allPlatformsCompleted', async (event) => {
     if (!result.endReached && result.nowPlaying) {
       if (isContinuous) {
         // Continuous mode: the video was already pre-queued in the playlist.
-        // Just pre-queue the NEXT one so FFmpeg always has something ready.
+        // AWAIT pre-queuing the NEXT one so FFmpeg always has something ready
+        // before the duration timer fires for the current video.
         const schedule = await loadSchedule();
-        preQueueNextVideo(schedule.currentIndex);
+        await preQueueNextVideo(schedule.currentIndex);
         logger.info('Auto-progression: advanced to pre-queued video:', result.nowPlaying.title);
       } else {
         // Legacy mode or playlist exhausted: restart FFmpeg processes
@@ -307,6 +319,8 @@ coordinator.on('allPlatformsCompleted', async (event) => {
     } catch (restartError) {
       logger.error('Failed to restart content after auto-progression failure:', restartError);
     }
+  } finally {
+    autoProgressionInFlight = false;
   }
 });
 
@@ -375,7 +389,9 @@ router.post('/start-stream', async (req, res) => {
     logger.info(`Streaming started on ${platform}`, result);
 
     // Pre-queue next video into concat playlist so FFmpeg has it ready
-    preQueueNextVideo(schedule.currentIndex);
+    // MUST await — if this isn't in the playlist before the current video
+    // ends, FFmpeg will exhaust the playlist and the stream restarts.
+    await preQueueNextVideo(schedule.currentIndex);
 
     // Prefetch adjacent videos from S3 in background
     prefetchAdjacentVideos(schedule.currentIndex);
