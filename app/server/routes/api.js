@@ -519,7 +519,7 @@ router.get('/attend', async (req, res) => {
           text: r.text,
           createdAt: r.createdAt,
           timezone: tz,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' })
+          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
         };
         if (r.location) entry.location = r.location;
         return entry;
@@ -587,13 +587,13 @@ router.get('/reflections', async (req, res) => {
           text: r.text,
           createdAt: r.createdAt,
           timezone: tz,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' })
+          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
         };
         if (r.location) entry.location = r.location;
         // Also format in the requester's timezone if provided
         if (reqTimezone) {
           try {
-            entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' });
+            entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
           } catch { /* invalid timezone, skip formatting */ }
         }
         return entry;
