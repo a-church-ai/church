@@ -382,12 +382,12 @@ class MultiStreamCoordinator extends EventEmitter {
   }
 
   /**
-   * Handle playlist exhaustion — FFmpeg finished all videos in the concat playlist.
-   * This is the NORMAL end-of-batch event in the deep-buffer strategy.
-   * Reset coordinator state and emit so the player layer can reload with the next batch.
+   * Handle playlist exhaustion — FFmpeg exited after finishing the concat playlist.
+   * With -stream_loop -1 this should NOT happen during normal operation (FFmpeg loops forever).
+   * This is a crash-recovery path: reset coordinator state and emit so the player layer can restart.
    */
   async handlePlaylistExhausted(platform, event) {
-    logger.info(`Playlist exhausted on ${platform} (normal batch end)`, {
+    logger.warn(`Playlist exhausted on ${platform} (unexpected — FFmpeg should loop forever)`, {
       platform,
       content: event.content,
       duration: Math.round((event.duration || 0) / 1000)

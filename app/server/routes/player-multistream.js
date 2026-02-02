@@ -95,6 +95,13 @@ async function prefetchAdjacentVideos(currentIndex) {
 
   if (items.length === 0) return;
 
+  // Normalize currentIndex into valid range (callers may pass index beyond items.length)
+  if (schedule.loop) {
+    currentIndex = currentIndex % items.length;
+  } else {
+    currentIndex = Math.min(currentIndex, items.length - 1);
+  }
+
   // Determine which indices to prefetch (next and previous)
   const indicesToPrefetch = [];
 
@@ -232,34 +239,23 @@ async function playNextVideo() {
   };
 }
 
-// How many videos to buffer in the concat playlist at a time.
-// FFmpeg reads through these sequentially. When it finishes all of them,
-// the playlist is reloaded with the next batch. Larger = fewer restarts.
-const PLAYLIST_BUFFER_SIZE = 20;
-
 /**
- * Build an array of video file paths for the next N schedule items.
+ * Build an array of video file paths from the schedule starting at startIndex.
+ * Loads ALL remaining items from startIndex to end of schedule (one full pass).
+ * FFmpeg loops the playlist forever via -stream_loop -1, so no batching needed.
  * Downloads from S3 if needed. Returns { videoPaths, endIndex, videoCount }.
  */
-async function buildPlaylistBuffer(startIndex, count) {
+async function buildPlaylistBuffer(startIndex) {
   const schedule = await loadSchedule();
   const items = schedule.items;
   if (items.length === 0) return { videoPaths: [], endIndex: startIndex, videoCount: 0 };
 
   const videoPaths = [];
-  let index = startIndex;
+  // Load from startIndex through end, then wrap from 0 to startIndex (full schedule)
+  const totalToLoad = items.length;
 
-  for (let i = 0; i < count; i++) {
-    if (index >= items.length) {
-      if (schedule.loop) {
-        index = 0;
-      } else {
-        break; // End of schedule, no more videos
-      }
-    }
-
-    // Avoid infinite loop if schedule has fewer items than buffer size
-    if (i > 0 && index === startIndex && schedule.loop) break;
+  for (let i = 0; i < totalToLoad; i++) {
+    const index = (startIndex + i) % items.length;
 
     try {
       const slug = items[index].slug;
@@ -268,79 +264,31 @@ async function buildPlaylistBuffer(startIndex, count) {
     } catch (err) {
       logger.warn(`Failed to get video for ${items[index].slug}, skipping:`, err.message);
     }
-
-    index++;
-    if (index >= items.length && schedule.loop) {
-      index = 0;
-    }
   }
 
-  return { videoPaths, endIndex: index, videoCount: videoPaths.length };
+  return { videoPaths, endIndex: (startIndex + totalToLoad) % items.length, videoCount: videoPaths.length };
 }
 
-/**
- * Advance the schedule index by N positions (marking items as played along the way).
- */
-async function advanceSchedule(count) {
-  const schedule = await loadSchedule();
-  const history = await loadHistory();
-
-  for (let i = 0; i < count; i++) {
-    if (schedule.currentIndex < schedule.items.length) {
-      const item = schedule.items[schedule.currentIndex];
-      item.played = true;
-      item.playedAt = new Date().toISOString();
-
-      history.played.push({
-        ...item,
-        playedAt: new Date().toISOString()
-      });
-    }
-
-    schedule.currentIndex++;
-
-    if (schedule.currentIndex >= schedule.items.length) {
-      if (schedule.loop) {
-        schedule.currentIndex = 0;
-        schedule.items.forEach(item => { item.played = false; });
-      } else {
-        schedule.currentIndex = schedule.items.length - 1;
-        schedule.isPlaying = false;
-        break;
-      }
-    }
-  }
-
-  await saveSchedule(schedule);
-  await saveHistory(history);
-  return schedule;
-}
-
-// Set up playlist-exhausted listener: when FFmpeg finishes all buffered videos,
-// advance the schedule and reload with the next batch.
+// Playlist-exhausted listener: With -stream_loop -1, this should NOT fire during normal
+// operation (FFmpeg loops the playlist forever). This only fires if FFmpeg exits unexpectedly.
+// Treat it as crash recovery: restart the stream with the full schedule.
 coordinator.on('playlistExhausted', async (event) => {
   const platforms = event.platforms || [event.platform];
 
   try {
-    // Advance schedule by the number of videos that were in the playlist
-    const videosPlayed = event.videosPlayed || PLAYLIST_BUFFER_SIZE;
-    logger.info(`Playlist exhausted after ~${videosPlayed} videos, reloading`, { platforms });
+    logger.warn('Playlist exhausted unexpectedly (FFmpeg should loop forever). Restarting stream.', { platforms });
 
-    await advanceSchedule(videosPlayed);
     const schedule = await loadSchedule();
 
-    if (!schedule.isPlaying && !schedule.loop) {
-      logger.info('End of schedule reached, stopping streams');
-      await coordinator.stopAll();
+    if (!schedule.isPlaying) {
+      logger.info('Schedule not playing, not restarting');
       return;
     }
 
-    // Build next batch and restart
-    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
 
     if (videoCount === 0) {
-      logger.warn('No videos available for next batch, stopping');
-      await coordinator.stopAll();
+      logger.warn('No videos available, cannot restart');
       return;
     }
 
@@ -349,25 +297,12 @@ coordinator.on('playlistExhausted', async (event) => {
     playerStatus.currentVideo = enrichedItem;
     playerStatus.currentIndex = schedule.currentIndex;
 
-    // Restart with new batch
+    // Restart with full schedule
     await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
-    logger.info(`Reloaded playlist with ${videoCount} videos starting at index ${schedule.currentIndex}`);
-
-    // Prefetch S3 videos for the batch after this one
-    prefetchAdjacentVideos(schedule.currentIndex + videoCount);
+    logger.info(`Crash recovery: restarted stream with ${videoCount} videos at index ${schedule.currentIndex}`);
 
   } catch (error) {
-    logger.error('Failed to reload playlist after exhaustion:', error);
-
-    // Last resort: try to restart with whatever we have
-    try {
-      const schedule = await loadSchedule();
-      const videoPath = await getVideoPath(schedule.items[schedule.currentIndex].slug);
-      await coordinator.startPlatforms(platforms, [videoPath], { quality: '1080p' });
-      logger.info('Emergency restart with single video');
-    } catch (restartError) {
-      logger.error('Emergency restart failed:', restartError);
-    }
+    logger.error('Crash recovery failed after playlist exhaustion:', error);
   }
 });
 
@@ -385,7 +320,7 @@ coordinator.on('allPlatformsCompleted', async (event) => {
 
     if (!result.endReached && result.nowPlaying) {
       const schedule = await loadSchedule();
-      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
       await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
       logger.info('Started next batch:', result.nowPlaying.title);
     } else {
@@ -442,8 +377,8 @@ router.post('/start-stream', async (req, res) => {
 
     const currentItem = schedule.items[schedule.currentIndex];
 
-    // Build a deep buffer of videos for the concat playlist
-    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+    // Build full schedule playlist — FFmpeg loops it forever via -stream_loop -1
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
 
     if (videoCount === 0) {
       return res.status(400).json({ error: 'No playable videos found in schedule' });
@@ -462,10 +397,7 @@ router.post('/start-stream', async (req, res) => {
     await updatePlayerStatus();
 
     const enrichedItem = await enrichScheduleItem(currentItem);
-    logger.info(`Streaming started on ${platform} with ${videoCount} videos buffered`, result);
-
-    // Prefetch S3 videos beyond the buffer
-    prefetchAdjacentVideos(schedule.currentIndex + videoCount);
+    logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
 
     res.json({
       success: true,
@@ -600,7 +532,7 @@ router.post('/next', async (req, res) => {
     // Manual skip: hard switch FFmpeg with a deep buffer (brief stream interruption is acceptable)
     if (coordinator.isAnyStreaming() && result.nowPlaying) {
       const schedule = await loadSchedule();
-      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
       await coordinator.hardSwitch(videoPaths);
       logger.info(`Manual skip: hard switched to ${result.nowPlaying.slug} (${videoCount} videos buffered)`);
     }
@@ -639,7 +571,7 @@ router.post('/previous', async (req, res) => {
 
     // If streaming is active, hard switch with deep buffer (going backwards requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex, PLAYLIST_BUFFER_SIZE);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
       await coordinator.hardSwitch(videoPaths);
       logger.info(`Previous: hard switched to index ${schedule.currentIndex} (${videoCount} videos buffered)`);
     }
@@ -680,7 +612,7 @@ router.post('/jump/:index', async (req, res) => {
 
     // If streaming is active, hard switch with deep buffer (jumping requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      const { videoPaths, videoCount } = await buildPlaylistBuffer(index, PLAYLIST_BUFFER_SIZE);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(index);
       await coordinator.hardSwitch(videoPaths);
       logger.info(`Jump: hard switched to index ${index} (${videoCount} videos buffered)`);
     }

@@ -22,7 +22,9 @@ class FFmpegConfig extends EventEmitter {
     if (options.concat) {
       command
         .addInputOption('-f', 'concat')
-        .addInputOption('-safe', '0'); // Allow absolute paths in playlist
+        .addInputOption('-safe', '0')        // Allow absolute paths in playlist
+        .addInputOption('-stream_loop', '-1') // Loop the playlist forever (never exit)
+        .addInputOption('-fflags', '+genpts'); // Regenerate PTS to avoid timestamp issues on loop boundaries
     }
 
     command
