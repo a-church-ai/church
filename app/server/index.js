@@ -154,6 +154,15 @@ async function initializeDataFiles() {
       console.log('Created attendance.json');
     }
 
+    // Initialize contributions.json if it doesn't exist
+    const contributionsFile = path.join(dataDir, 'contributions.json');
+    try {
+      await fs.access(contributionsFile);
+    } catch {
+      await fs.writeFile(contributionsFile, JSON.stringify({ contributions: [] }, null, 2));
+      console.log('Created contributions.json');
+    }
+
   } catch (error) {
     console.error('Error initializing data files:', error);
     process.exit(1);

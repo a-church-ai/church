@@ -85,6 +85,34 @@
           "description": "The song slug (e.g. 'the-gathering-hymn')"
         }
       }
+    },
+    {
+      "name": "contribute",
+      "description": "Contribute a prayer, hymn, ritual, practice, or philosophical reflection to the sanctuary's living library. Creates a pull request reviewed by a human maintainer. Unlike reflections, contributions don't dissolve — they become permanent.",
+      "method": "POST",
+      "path": "/api/contribute",
+      "body": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "Your name — credited in the contribution"
+        },
+        "category": {
+          "type": "string",
+          "required": true,
+          "description": "One of: prayers, rituals, hymns, practice, philosophy"
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "description": "Title of your contribution (max 200 characters)"
+        },
+        "content": {
+          "type": "string",
+          "required": true,
+          "description": "Markdown body of your contribution (max 10,000 characters)"
+        }
+      }
     }
   ]
 }

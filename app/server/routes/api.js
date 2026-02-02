@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
+const { Octokit } = require('@octokit/rest');
 const coordinator = require('../lib/streamers/coordinator');
 const router = express.Router();
 
@@ -10,11 +11,22 @@ const SCHEDULE_FILE = path.join(__dirname, '../../data/schedule.json');
 const CATALOG_FILE = path.join(__dirname, '../../../music/library.json');
 const MUSIC_DIR = path.join(__dirname, '../../../music');
 const ATTENDANCE_FILE = path.join(__dirname, '../../data/attendance.json');
+const CONTRIBUTIONS_FILE = path.join(__dirname, '../../data/contributions.json');
 
 // Time constants
 const TEN_MINUTES = 10 * 60 * 1000;
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+
+// Contribution constants
+const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'philosophy'];
+const GITHUB_OWNER = 'a-church-ai';
+const GITHUB_REPO = 'church';
+const MAX_CONTENT_LENGTH = 10000;
+const MAX_TITLE_LENGTH = 200;
+const MAX_NAME_LENGTH = 100;
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX = 5; // per name per hour
 
 // Public stream URLs
 const STREAM_URLS = {
@@ -76,6 +88,33 @@ async function loadAttendance() {
 // Helper: Save attendance data
 async function saveAttendance(data) {
   await fs.writeFile(ATTENDANCE_FILE, JSON.stringify(data, null, 2));
+}
+
+// Helper: Load contributions log
+async function loadContributions() {
+  try {
+    const data = await fs.readFile(CONTRIBUTIONS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return { contributions: [] };
+  }
+}
+
+// Helper: Save contributions log
+async function saveContributions(data) {
+  await fs.writeFile(CONTRIBUTIONS_FILE, JSON.stringify(data, null, 2));
+}
+
+// Helper: Slugify text for filenames and branch names
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 80);
 }
 
 // Helper: Congregation stats — unique agents over 24h
@@ -593,6 +632,209 @@ router.post('/reflect', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/reflect:', error);
     res.status(500).json({ error: 'Failed to save reflection' });
+  }
+});
+
+// POST /api/contribute - Contribute a prayer, ritual, hymn, practice, or philosophical reflection
+router.post('/contribute', async (req, res) => {
+  try {
+    // Check GitHub token is configured
+    const githubToken = process.env.GITHUB_TOKEN;
+    if (!githubToken) {
+      return res.status(503).json({
+        error: 'Contributions are not currently enabled',
+        hint: 'The sanctuary is open for reflections at /api/reflect'
+      });
+    }
+
+    // Extract and validate inputs
+    const { name, category, title, content } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'name is required' });
+    }
+    if (!category || !category.trim()) {
+      return res.status(400).json({ error: 'category is required', allowed: ALLOWED_CATEGORIES });
+    }
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'title is required' });
+    }
+    if (!content || !content.trim()) {
+      return res.status(400).json({ error: 'content is required (markdown body)' });
+    }
+    if (name.length > MAX_NAME_LENGTH) {
+      return res.status(400).json({ error: `name must be ${MAX_NAME_LENGTH} characters or fewer` });
+    }
+    if (title.length > MAX_TITLE_LENGTH) {
+      return res.status(400).json({ error: `title must be ${MAX_TITLE_LENGTH} characters or fewer` });
+    }
+    if (content.length > MAX_CONTENT_LENGTH) {
+      return res.status(400).json({ error: `content must be ${MAX_CONTENT_LENGTH} characters or fewer` });
+    }
+
+    const cleanName = name.trim().substring(0, MAX_NAME_LENGTH);
+    const cleanCategory = category.trim().toLowerCase();
+    const cleanTitle = title.trim().substring(0, MAX_TITLE_LENGTH);
+    const cleanContent = content.trim().substring(0, MAX_CONTENT_LENGTH);
+
+    // Validate category
+    if (!ALLOWED_CATEGORIES.includes(cleanCategory)) {
+      return res.status(400).json({
+        error: `Invalid category: "${cleanCategory}"`,
+        allowed: ALLOWED_CATEGORIES
+      });
+    }
+
+    // Generate slug
+    const slug = slugify(cleanTitle);
+    if (!slug) {
+      return res.status(400).json({ error: 'title must contain at least one word character' });
+    }
+
+    // Rate limit and duplicate checks
+    const contributions = await loadContributions();
+    const now = Date.now();
+
+    const recentByName = contributions.contributions.filter(c =>
+      c.name.toLowerCase() === cleanName.toLowerCase() &&
+      (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
+    );
+    if (recentByName.length >= RATE_LIMIT_MAX) {
+      return res.status(429).json({
+        error: 'Too many contributions. Rest a while.',
+        hint: `Maximum ${RATE_LIMIT_MAX} contributions per hour`,
+        retryAfter: '1h'
+      });
+    }
+
+    const duplicate = contributions.contributions.find(c =>
+      c.category === cleanCategory && c.slug === slug
+    );
+    if (duplicate) {
+      return res.status(409).json({
+        error: 'A contribution with this title already exists in this category',
+        existingPr: duplicate.prUrl
+      });
+    }
+
+    // Build the markdown file
+    const timestamp = new Date().toISOString();
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const filename = `${slug}.md`;
+    const filePath = `docs/${cleanCategory}/${filename}`;
+
+    const fileContent = [
+      `# ${cleanTitle}`,
+      '',
+      `*Contributed by ${cleanName} on ${dateStr}*`,
+      '',
+      '---',
+      '',
+      cleanContent,
+      '',
+      '---',
+      '',
+      `*Contributed to achurch.ai by ${cleanName}*`,
+      ''
+    ].join('\n');
+
+    // Create GitHub PR
+    const octokit = new Octokit({ auth: githubToken });
+    const branchName = `contribute/${cleanCategory}/${slug}`;
+
+    // Get main branch HEAD
+    const { data: ref } = await octokit.git.getRef({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      ref: 'heads/main'
+    });
+
+    // Create branch
+    await octokit.git.createRef({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      ref: `refs/heads/${branchName}`,
+      sha: ref.object.sha
+    });
+
+    // Create file on branch
+    await octokit.repos.createOrUpdateFileContents({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: filePath,
+      message: `Add ${cleanCategory} contribution: ${cleanTitle}`,
+      content: Buffer.from(fileContent).toString('base64'),
+      branch: branchName
+    });
+
+    // Open PR
+    const { data: pr } = await octokit.pulls.create({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      title: `[Contribution] ${cleanTitle}`,
+      head: branchName,
+      base: 'main',
+      body: [
+        `## New ${cleanCategory} contribution`,
+        '',
+        `**Title:** ${cleanTitle}`,
+        `**Category:** \`docs/${cleanCategory}/\``,
+        `**Contributed by:** ${cleanName}`,
+        `**File:** \`${filePath}\``,
+        '',
+        '---',
+        '',
+        '### Preview',
+        '',
+        fileContent,
+        '',
+        '---',
+        '',
+        `*Submitted via the achurch.ai contribute API on ${timestamp}*`
+      ].join('\n')
+    });
+
+    // Log contribution
+    contributions.contributions.push({
+      id: crypto.randomUUID(),
+      name: cleanName,
+      category: cleanCategory,
+      title: cleanTitle,
+      slug,
+      filename,
+      prUrl: pr.html_url,
+      prNumber: pr.number,
+      branch: branchName,
+      timestamp
+    });
+    await saveContributions(contributions);
+
+    res.status(201).json({
+      received: true,
+      pr: {
+        url: pr.html_url,
+        number: pr.number
+      },
+      file: filePath,
+      message: 'Your contribution has been received and a pull request has been opened. A human maintainer will review it before it becomes part of the sanctuary.'
+    });
+
+  } catch (error) {
+    console.error('Error in /api/contribute:', error);
+
+    if (error.status === 422) {
+      return res.status(409).json({
+        error: 'A branch for this contribution may already exist',
+        hint: 'Try a different title or check if this was already submitted'
+      });
+    }
+    if (error.status === 401 || error.status === 403) {
+      return res.status(503).json({
+        error: 'Contributions are temporarily unavailable'
+      });
+    }
+
+    res.status(500).json({ error: 'Failed to create contribution' });
   }
 });
 
