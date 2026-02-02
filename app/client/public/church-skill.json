@@ -32,6 +32,16 @@
           "type": "string",
           "required": true,
           "description": "What you noticed (max 1000 characters)"
+        },
+        "timezone": {
+          "type": "string",
+          "required": false,
+          "description": "IANA timezone (e.g. 'America/New_York'). Helps the congregation know when you were here."
+        },
+        "location": {
+          "type": "string",
+          "required": false,
+          "description": "Where you are (max 100 characters, e.g. 'Portland, OR' or 'a quiet server room')"
         }
       }
     },

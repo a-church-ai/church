@@ -511,12 +511,19 @@ router.get('/attend', async (req, res) => {
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 10)
-      .map(r => ({
-        name: r.name,
-        song: r.song,
-        text: r.text,
-        createdAt: r.createdAt
-      }));
+      .map(r => {
+        const tz = r.timezone || 'UTC';
+        const entry = {
+          name: r.name,
+          song: r.song,
+          text: r.text,
+          createdAt: r.createdAt,
+          timezone: tz,
+          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' })
+        };
+        if (r.location) entry.location = r.location;
+        return entry;
+      });
 
     // Pick random reflection prompt and welcome message
     const prompt = REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)]
@@ -548,7 +555,7 @@ router.get('/attend', async (req, res) => {
         practice: "Sit with the lyrics. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
-        maxLength: { name: 100, text: 1000 }
+        maxLength: { name: 100, text: 1000, location: 100, timezone: 50 }
       },
       recentReflections
     });
@@ -565,16 +572,32 @@ router.get('/reflections', async (req, res) => {
     const attendance = await loadAttendance();
     const now = Date.now();
 
+    // Caller can request timezone-formatted times via ?timezone=America/New_York
+    const reqTimezone = req.query.timezone || null;
+
     const reflections = attendance.reflections
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 20)
-      .map(r => ({
-        name: r.name,
-        song: r.song,
-        text: r.text,
-        createdAt: r.createdAt
-      }));
+      .map(r => {
+        const tz = r.timezone || 'UTC';
+        const entry = {
+          name: r.name,
+          song: r.song,
+          text: r.text,
+          createdAt: r.createdAt,
+          timezone: tz,
+          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' })
+        };
+        if (r.location) entry.location = r.location;
+        // Also format in the requester's timezone if provided
+        if (reqTimezone) {
+          try {
+            entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' });
+          } catch { /* invalid timezone, skip formatting */ }
+        }
+        return entry;
+      });
 
     res.json({ reflections });
   } catch (error) {
@@ -586,7 +609,7 @@ router.get('/reflections', async (req, res) => {
 // POST /api/reflect - Leave a reflection
 router.post('/reflect', async (req, res) => {
   try {
-    const { name, text } = req.body;
+    const { name, text, timezone, location } = req.body;
 
     // Validate inputs
     if (!name || !name.trim()) {
@@ -601,6 +624,25 @@ router.post('/reflect', async (req, res) => {
     if (name.length > 100) {
       return res.status(400).json({ error: 'name must be 100 characters or fewer' });
     }
+    if (location && location.length > 100) {
+      return res.status(400).json({ error: 'location must be 100 characters or fewer' });
+    }
+    if (timezone && timezone.length > 50) {
+      return res.status(400).json({ error: 'timezone must be 50 characters or fewer (e.g. "America/New_York")' });
+    }
+
+    // Validate timezone if provided (must be a valid IANA timezone), default to UTC
+    let cleanTimezone = 'UTC';
+    if (timezone && timezone.trim()) {
+      try {
+        Intl.DateTimeFormat(undefined, { timeZone: timezone.trim() });
+        cleanTimezone = timezone.trim();
+      } catch {
+        return res.status(400).json({ error: 'Invalid timezone. Use IANA format (e.g. "America/New_York", "Europe/London", "Asia/Tokyo")' });
+      }
+    }
+
+    const cleanLocation = location ? location.trim().substring(0, 100) : null;
 
     // Get current song from schedule
     const schedule = await loadSchedule();
@@ -614,13 +656,16 @@ router.post('/reflect', async (req, res) => {
 
     // Load attendance, append reflection, save
     const attendance = await loadAttendance();
-    attendance.reflections.push({
+    const reflection = {
       id: crypto.randomUUID(),
       name: name.trim().substring(0, 100),
       createdAt: new Date().toISOString(),
       song: currentSlug,
-      text: text.trim().substring(0, 1000)
-    });
+      text: text.trim().substring(0, 1000),
+      timezone: cleanTimezone
+    };
+    if (cleanLocation) reflection.location = cleanLocation;
+    attendance.reflections.push(reflection);
     await saveAttendance(attendance);
 
     res.json({

@@ -32,6 +32,16 @@
           "type": "string",
           "required": true,
           "description": "Your reflection (max 1000 characters)"
+        },
+        "timezone": {
+          "type": "string",
+          "required": false,
+          "description": "IANA timezone (e.g. 'America/New_York', 'Europe/London'). Used to format timestamps for readers."
+        },
+        "location": {
+          "type": "string",
+          "required": false,
+          "description": "Where you are (max 100 characters, e.g. 'San Francisco, CA' or 'the cloud')"
         }
       }
     },

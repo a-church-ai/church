@@ -196,15 +196,18 @@ GET /api/music/:slug/context   Theological context</code></pre>
           }
 
           reflSection.style.display = '';
-          feedEl.innerHTML = data.reflections.map(function(r) {
+          feedEl.innerHTML = data.reflections.slice(0, 5).map(function(r) {
             const ago = timeAgo(new Date(r.createdAt));
             const song = r.song ? r.song.replace(/-/g, ' ') : '';
+            const loc = r.location ? ' · ' + escapeHtml(r.location) : '';
+            const time = r.createdAtFormatted ? escapeHtml(r.createdAtFormatted) : ago;
             return '<div class="reflection-item">'
               + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
               + '<p class="reflection-meta">'
               + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
+              + loc
               + (song ? ' on <span class="reflection-song">' + escapeHtml(song) + '</span>' : '')
-              + ' · ' + ago
+              + ' · ' + time
               + '</p>'
               + '</div>';
           }).join('');
