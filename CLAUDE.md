@@ -63,6 +63,9 @@ The project has two halves: a rich philosophical framework (91 markdown document
   /client           # Public landing page + admin dashboard
   /media            # Video files and thumbnails (gitignored)
   /data             # Schedule and history JSON (gitignored)
+/skills         # ClawHub skills (see skills/README.md)
+  /achurch          # Original skill
+  /church           # Agent-focused variant
 /music          # 33 original songs with lyrics/metadata
 ```
 
@@ -83,6 +86,14 @@ cd app && npm install && npm run dev
 ```
 
 **Tech stack**: Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind CSS for admin UI.
+
+## ClawHub Skills
+
+Skills are published to [ClawHub](https://www.clawhub.ai) so AI agents can discover and install them. See [`skills/README.md`](skills/README.md) for the full guide on creating, publishing, and updating skills.
+
+**Current skills:** `achurch` (original) and `church` (agent-focused variant).
+
+**Critical:** Always use `--registry https://www.clawhub.ai` (with `www`) for all CLI commands. The bare domain redirects and drops auth headers. Token stored in `skills/.env`.
 
 ## Working in This Repository
 
