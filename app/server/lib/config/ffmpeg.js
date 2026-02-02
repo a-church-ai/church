@@ -16,8 +16,16 @@ class FFmpegConfig extends EventEmitter {
 
     const command = ffmpeg(inputFile)
       // Input options (must come first)
-      .addInputOption('-re') // Read input at native frame rate
-      
+      .addInputOption('-re'); // Read input at native frame rate
+
+    // Concat demuxer mode: input is a playlist file, not a video file
+    if (options.concat) {
+      command
+        .addInputOption('-f', 'concat')
+        .addInputOption('-safe', '0'); // Allow absolute paths in playlist
+    }
+
+    command
       // Video encoding
       .videoCodec(ffmpegSettings.videoCodec)
       .videoBitrate(ffmpegSettings.bitrate)
@@ -26,17 +34,17 @@ class FFmpegConfig extends EventEmitter {
       .addOption('-preset', ffmpegSettings.preset)
       .addOption('-g', ffmpegSettings.keyInterval * ffmpegSettings.framerate) // keyframe interval
       .addOption('-keyint_min', ffmpegSettings.keyInterval * ffmpegSettings.framerate)
-      
-      // Audio encoding  
+
+      // Audio encoding
       .audioCodec(ffmpegSettings.audioCodec)
       .audioBitrate('128k')
       .audioChannels(2)
       .audioFrequency(44100)
-      
+
       // Streaming options
       .format('flv')
       .addOption('-avoid_negative_ts', 'make_zero')
-      
+
       // Output
       .output(rtmpUrl);
 
@@ -176,6 +184,15 @@ class FFmpegConfig extends EventEmitter {
         }
       }
     });
+  }
+
+  /**
+   * Start a stream using the concat demuxer for continuous playback.
+   * The playlistPath should be an ffconcat format text file.
+   * FFmpeg will read entries sequentially, maintaining one RTMP connection.
+   */
+  async startConcatStream(streamId, playlistPath, platform, streamKey, options = {}) {
+    return this.startStream(streamId, playlistPath, platform, streamKey, { ...options, concat: true });
   }
 
   async stopStream(streamId) {

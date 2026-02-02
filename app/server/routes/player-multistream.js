@@ -244,37 +244,49 @@ async function playNextVideo() {
 
 // Set up auto-progression listener
 coordinator.on('allPlatformsCompleted', async (event) => {
-  // Remember which platforms were active so we restart the same ones
   const platforms = event.platforms || [];
+  const isContinuous = event.continuous; // FFmpeg still running in continuous mode
 
   try {
     logger.info('Auto-progressing to next video after content completion', {
       platforms,
+      continuous: isContinuous,
       completedContent: event.completedContent
     });
 
     const result = await playNextVideo();
 
     if (!result.endReached && result.nowPlaying) {
-      // Restart only the platforms that were previously active
       const videoPath = await getVideoPath(result.nowPlaying.slug);
-      await coordinator.startPlatforms(platforms, videoPath, { quality: '1080p' });
 
-      logger.info('Auto-progression successful, streaming next video:', result.nowPlaying.title);
+      if (isContinuous) {
+        // Continuous mode: queue next video via concat playlist (no FFmpeg restart)
+        await coordinator.switchContent(videoPath, { quality: '1080p' });
+        logger.info('Auto-progression: queued next video seamlessly:', result.nowPlaying.title);
+      } else {
+        // Legacy mode: restart FFmpeg processes
+        await coordinator.startPlatforms(platforms, videoPath, { quality: '1080p' });
+        logger.info('Auto-progression: started next video:', result.nowPlaying.title);
+      }
     } else {
       logger.info('Auto-progression reached end of schedule or loop disabled');
 
-      // Stop coordination since we've reached the end
-      coordinator.isCoordinating = false;
+      // Stop all streams since we've reached the end
+      await coordinator.stopAll();
     }
 
   } catch (error) {
     logger.error('Auto-progression failed:', error);
 
-    // Continue streaming the same content to avoid dead air
+    // Try to keep streaming to avoid dead air
     try {
-      await coordinator.startPlatforms(platforms, coordinator.currentContent, { quality: '1080p' });
-      logger.info('Restarted current content after auto-progression failure');
+      if (isContinuous && coordinator.currentContent) {
+        // In continuous mode, just log — FFmpeg may still be running
+        logger.warn('Auto-progression failed in continuous mode, FFmpeg may exhaust playlist');
+      } else {
+        await coordinator.startPlatforms(platforms, coordinator.currentContent, { quality: '1080p' });
+        logger.info('Restarted current content after auto-progression failure');
+      }
     } catch (restartError) {
       logger.error('Failed to restart content after auto-progression failure:', restartError);
     }
@@ -511,9 +523,9 @@ router.post('/previous', async (req, res) => {
     const prevItem = schedule.items[schedule.currentIndex];
     const videoPath = await getVideoPath(prevItem.slug);
 
-    // If streaming is active, switch content
+    // If streaming is active, hard switch (going backwards requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
+      await coordinator.hardSwitch(videoPath);
     }
 
     await saveSchedule(schedule);
@@ -551,9 +563,9 @@ router.post('/jump/:index', async (req, res) => {
     const item = schedule.items[index];
     const videoPath = await getVideoPath(item.slug);
 
-    // If streaming is active, switch content
+    // If streaming is active, hard switch (jumping requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
+      await coordinator.hardSwitch(videoPath);
     }
 
     await saveSchedule(schedule);

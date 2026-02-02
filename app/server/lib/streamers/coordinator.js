@@ -76,7 +76,7 @@ class MultiStreamCoordinator extends EventEmitter {
             throw new Error(`Unknown platform: ${platform}`);
           }
 
-          await streamer.start(contentPath, options);
+          await streamer.startContinuous(contentPath, options);
           return { platform, success: true };
         } catch (error) {
           logger.error(`Failed to start ${platform}:`, error);
@@ -215,10 +215,10 @@ class MultiStreamCoordinator extends EventEmitter {
       return;
     }
 
-    logger.info(`Switching all platforms to new content: ${contentPath}`);
+    logger.info(`Switching active platforms to new content: ${contentPath}`);
 
-    // Switch content on all active platforms
-    const switchPromises = this.config.platforms.map(async (platform) => {
+    // Switch content on active platforms only (delegates to queueNext in continuous mode)
+    const switchPromises = [...this.activePlatforms].map(async (platform) => {
       try {
         const streamer = this.streamers.get(platform);
         if (streamer && streamer.isStreaming) {
@@ -233,9 +233,44 @@ class MultiStreamCoordinator extends EventEmitter {
     });
 
     const results = await Promise.allSettled(switchPromises);
-    
+
     // Update current content
     this.currentContent = contentPath;
+
+    return {
+      content: contentPath,
+      results: results.map(r => r.status === 'fulfilled' ? r.value : { error: r.reason.message })
+    };
+  }
+
+  /**
+   * Hard switch: stop and restart FFmpeg on all active platforms.
+   * Used for manual skip/previous/jump — brief stream interruption.
+   */
+  async hardSwitch(contentPath, options = {}) {
+    if (!this.isCoordinating) {
+      return;
+    }
+
+    logger.info(`Hard switching active platforms to: ${contentPath}`);
+
+    const switchPromises = [...this.activePlatforms].map(async (platform) => {
+      try {
+        const streamer = this.streamers.get(platform);
+        if (streamer && streamer.isStreaming) {
+          await streamer.hardSwitch(contentPath, options);
+          return { platform, success: true };
+        }
+        return { platform, success: false, error: 'not streaming' };
+      } catch (error) {
+        logger.error(`Failed to hard switch ${platform}:`, error);
+        return { platform, success: false, error: error.message };
+      }
+    });
+
+    const results = await Promise.allSettled(switchPromises);
+    this.currentContent = contentPath;
+    this.contentCompletedPlatforms.clear();
 
     return {
       content: contentPath,
@@ -323,7 +358,7 @@ class MultiStreamCoordinator extends EventEmitter {
         this.currentContent = contentToRestart;
         if (!this.startTime) this.startTime = new Date();
 
-        await streamer.start(contentToRestart, { quality: '1080p' });
+        await streamer.startContinuous(contentToRestart, { quality: '1080p' });
         logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
           platform,
           content: contentToRestart
@@ -355,22 +390,29 @@ class MultiStreamCoordinator extends EventEmitter {
     
     if (allCompleted) {
       logger.info('All platforms completed current content, triggering auto-progression');
-      
-      // Clear completion tracking
+
+      // Clear completion tracking for next round
       this.contentCompletedPlatforms.clear();
-      
-      // Store current content before resetting
+
+      // Store current content
       const completedContent = this.currentContent;
-      
-      // Reset coordinator state since all streams ended naturally
-      this.isCoordinating = false;
-      this.startTime = null;
-      this.currentContent = null;
-      
+
+      // Check if any platform is still streaming (continuous mode — FFmpeg still running)
+      const anyStillStreaming = this.isAnyStreaming();
+
+      if (!anyStillStreaming) {
+        // All FFmpeg processes have ended — reset coordinator state
+        this.isCoordinating = false;
+        this.startTime = null;
+        this.currentContent = null;
+      }
+      // If still streaming (continuous mode), keep coordinator active
+
       // Emit event for player to handle auto-progression
       this.emit('allPlatformsCompleted', {
         completedContent: completedContent,
         platforms: activePlatforms,
+        continuous: anyStillStreaming,
         timestamp: new Date()
       });
     }
