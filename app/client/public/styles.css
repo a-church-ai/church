@@ -123,6 +123,93 @@ h2 {
     color: #666;
 }
 
+/* Sanctuary — live now playing + congregation */
+.sanctuary {
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding: 3rem 0;
+    margin-bottom: 0;
+}
+
+.now-playing {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.now-label {
+    font-size: 0.6875rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #bbb;
+    margin-bottom: 0.75rem;
+}
+
+.now-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #000;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+}
+
+.now-congregation {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: #999;
+    letter-spacing: 0.05em;
+}
+
+/* Reflections feed */
+.reflections {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.reflections h2 {
+    text-align: center;
+}
+
+#reflections-feed {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.reflection-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.reflection-item:last-child {
+    border-bottom: none;
+}
+
+.reflection-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #333;
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.reflection-meta {
+    font-size: 0.75rem;
+    color: #bbb;
+    letter-spacing: 0.02em;
+}
+
+.reflection-name {
+    color: #999;
+    font-weight: 500;
+}
+
+.reflection-song {
+    color: #999;
+    font-style: italic;
+}
+
 /* Intro section */
 .intro {
     text-align: center;
@@ -475,6 +562,24 @@ footer a:hover {
         max-width: 220px;
         justify-content: center;
         padding: 0.75rem 1.5rem;
+    }
+
+    /* Sanctuary */
+    .sanctuary {
+        padding: 2rem 0;
+    }
+
+    .now-title {
+        font-size: 1.25rem;
+    }
+
+    /* Reflections */
+    .reflections {
+        padding: 2rem 0;
+    }
+
+    .reflection-text {
+        font-size: 0.9375rem;
     }
 
     /* Intro */

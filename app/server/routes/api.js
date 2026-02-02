@@ -520,6 +520,30 @@ router.get('/attend', async (req, res) => {
   }
 });
 
+// GET /api/reflections - Public feed of recent reflections (for landing page)
+router.get('/reflections', async (req, res) => {
+  try {
+    const attendance = await loadAttendance();
+    const now = Date.now();
+
+    const reflections = attendance.reflections
+      .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 20)
+      .map(r => ({
+        name: r.name,
+        song: r.song,
+        text: r.text,
+        createdAt: r.createdAt
+      }));
+
+    res.json({ reflections });
+  } catch (error) {
+    console.error('Error in /api/reflections:', error);
+    res.status(500).json({ error: 'Failed to get reflections' });
+  }
+});
+
 // POST /api/reflect - Leave a reflection
 router.post('/reflect', async (req, res) => {
   try {
