@@ -1,6 +1,6 @@
 # ClawHub Skills
 
-This directory contains skills published to [ClawHub](https://www.clawhub.ai) so AI agents can discover and install them.
+This directory contains skills published to [ClawHub](https://clawhub.ai) so AI agents can discover and install them.
 
 ## Directory Structure
 
@@ -52,21 +52,21 @@ To authenticate the CLI:
 
 ```bash
 # Login with a token
-clawhub --registry https://www.clawhub.ai login --token "YOUR_TOKEN"
+clawhub --registry https://clawhub.ai login --token "YOUR_TOKEN"
 
 # Or open browser login
-clawhub --registry https://www.clawhub.ai login
+clawhub --registry https://clawhub.ai login
 
 # Verify
-clawhub --registry https://www.clawhub.ai whoami
+clawhub --registry https://clawhub.ai whoami
 ```
 
-**Important:** Always use `--registry https://www.clawhub.ai` (with `www`). The bare domain `clawhub.ai` returns a 307 redirect that drops the Authorization header, causing authentication failures.
+**Important:** Always use `--registry https://clawhub.ai` (without `www`). The `www` subdomain now redirects and drops the Authorization header, causing authentication failures.
 
 You can also set the registry via environment variable to avoid repeating the flag:
 
 ```bash
-export CLAWHUB_REGISTRY=https://www.clawhub.ai
+export CLAWHUB_REGISTRY=https://clawhub.ai
 ```
 
 ## Publishing and Updating Skills
@@ -75,14 +75,14 @@ export CLAWHUB_REGISTRY=https://www.clawhub.ai
 
 ```bash
 # Publish a new skill (from anywhere)
-clawhub --workdir /path/to/skills --registry https://www.clawhub.ai publish church \
+clawhub --workdir /path/to/skills --registry https://clawhub.ai publish church \
   --slug church \
   --name "Church" \
   --version 1.0.0
 
 # Or cd into the skills directory first
 cd skills
-clawhub --registry https://www.clawhub.ai publish church \
+clawhub --registry https://clawhub.ai publish church \
   --slug church \
   --name "Church" \
   --version 1.0.0
@@ -97,7 +97,7 @@ clawhub --registry https://www.clawhub.ai publish church \
 Edit the `SKILL.md`, then publish with a bumped version:
 
 ```bash
-clawhub --workdir /path/to/skills --registry https://www.clawhub.ai publish achurch \
+clawhub --workdir /path/to/skills --registry https://clawhub.ai publish achurch \
   --slug achurch \
   --name "aChurch.ai" \
   --version 1.2.0 \
@@ -110,24 +110,24 @@ ClawHub rejects duplicate versions. Always bump the version number.
 
 ```bash
 # Search for skills
-clawhub --registry https://www.clawhub.ai search "church"
+clawhub --registry https://clawhub.ai search "church"
 
 # Browse latest skills
-clawhub --registry https://www.clawhub.ai explore
+clawhub --registry https://clawhub.ai explore
 
 # Star a skill
-clawhub --registry https://www.clawhub.ai star church
+clawhub --registry https://clawhub.ai star church
 
 # Sync all local skills (publish new/updated)
-clawhub --registry https://www.clawhub.ai sync
+clawhub --registry https://clawhub.ai sync
 ```
 
 ## Current Published Skills
 
 | Slug | Version | Voice | Description |
 |------|---------|-------|-------------|
-| `achurch` | 1.2.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | 1.1.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
+| `achurch` | 1.7.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | 1.6.1 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
 
 Both skills point to the same API at `https://achurch.ai`. They differ in voice and framing — `achurch` speaks as the sanctuary itself inviting you in, `church` reads like one agent recommending a place to another.
 
