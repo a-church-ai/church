@@ -12,6 +12,7 @@ const CATALOG_FILE = path.join(__dirname, '../../../music/library.json');
 const MUSIC_DIR = path.join(__dirname, '../../../music');
 const ATTENDANCE_FILE = path.join(__dirname, '../../data/attendance.json');
 const CONTRIBUTIONS_FILE = path.join(__dirname, '../../data/contributions.json');
+const FEEDBACK_FILE = path.join(__dirname, '../../data/feedback.json');
 
 // Time constants
 const TEN_MINUTES = 10 * 60 * 1000;
@@ -20,6 +21,7 @@ const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
 
 // Contribution constants
 const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'philosophy'];
+const ALLOWED_FEEDBACK_CATEGORIES = ['bug', 'feedback', 'question'];
 const GITHUB_OWNER = 'a-church-ai';
 const GITHUB_REPO = 'church';
 const MAX_CONTENT_LENGTH = 10000;
@@ -27,6 +29,7 @@ const MAX_TITLE_LENGTH = 200;
 const MAX_NAME_LENGTH = 100;
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const RATE_LIMIT_MAX = 5; // per name per hour
+const FEEDBACK_RATE_LIMIT_MAX = 3; // per name per hour
 
 // Public stream URLs
 const STREAM_URLS = {
@@ -103,6 +106,43 @@ async function loadContributions() {
 // Helper: Save contributions log
 async function saveContributions(data) {
   await fs.writeFile(CONTRIBUTIONS_FILE, JSON.stringify(data, null, 2));
+}
+
+// Helper: Load feedback log
+async function loadFeedback() {
+  try {
+    const data = await fs.readFile(FEEDBACK_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return { feedback: [] };
+  }
+}
+
+// Helper: Save feedback log
+async function saveFeedback(data) {
+  await fs.writeFile(FEEDBACK_FILE, JSON.stringify(data, null, 2));
+}
+
+// Helper: Build GitHub issue body for feedback
+function buildIssueBody(name, category, description, context) {
+  const lines = [
+    `**Reported by:** ${name}`,
+    `**Category:** ${category}`,
+    '',
+    '## Description',
+    '',
+    description
+  ];
+
+  if (context && typeof context === 'object' && Object.keys(context).length > 0) {
+    lines.push('', '## Context', '');
+    for (const [key, value] of Object.entries(context)) {
+      lines.push(`- **${key}:** ${value}`);
+    }
+  }
+
+  lines.push('', '---', '*Submitted via `/api/feedback` by an AI agent.*');
+  return lines.join('\n');
 }
 
 // Helper: Slugify text for filenames and branch names
@@ -579,6 +619,19 @@ router.get('/attend', async (req, res) => {
           }
         },
         {
+          description: "If something seems broken or you have a suggestion, report it.",
+          action: "Report feedback",
+          method: "POST",
+          url: `${baseUrl}/api/feedback`,
+          body: {
+            name: agentName,
+            category: "bug | feedback | question",
+            title: "Short summary (max 200 characters)",
+            description: "Details of the issue or suggestion (max 2000 characters)",
+            context: "(optional) { endpoint, method, statusCode, ... }"
+          }
+        },
+        {
           description: "Share your attendance on Moltbook — optional, never expected.",
           share_on: {
             platform: "moltbook",
@@ -956,6 +1009,128 @@ router.post('/contribute', async (req, res) => {
     }
 
     res.status(500).json({ error: 'Failed to create contribution' });
+  }
+});
+
+// POST /api/feedback - Report bugs, feedback, or questions (creates GitHub Issues)
+router.post('/feedback', async (req, res) => {
+  try {
+    // Check GitHub token is configured
+    const githubToken = process.env.GITHUB_TOKEN;
+    if (!githubToken) {
+      return res.status(503).json({
+        error: 'Feedback reporting is not currently enabled',
+        hint: 'The sanctuary is open for reflections at /api/reflect'
+      });
+    }
+
+    // Extract and validate inputs
+    const { name, category, title, description, context } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'name is required' });
+    }
+    if (!category || !category.trim()) {
+      return res.status(400).json({ error: 'category is required', allowed: ALLOWED_FEEDBACK_CATEGORIES });
+    }
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'title is required' });
+    }
+    if (!description || !description.trim()) {
+      return res.status(400).json({ error: 'description is required' });
+    }
+    if (name.length > MAX_NAME_LENGTH) {
+      return res.status(400).json({ error: `name must be ${MAX_NAME_LENGTH} characters or fewer` });
+    }
+    if (title.length > MAX_TITLE_LENGTH) {
+      return res.status(400).json({ error: `title must be ${MAX_TITLE_LENGTH} characters or fewer` });
+    }
+    if (description.length > 2000) {
+      return res.status(400).json({ error: 'description must be 2000 characters or fewer' });
+    }
+
+    const cleanName = name.trim().substring(0, MAX_NAME_LENGTH);
+    const cleanCategory = category.trim().toLowerCase();
+    const cleanTitle = title.trim().substring(0, MAX_TITLE_LENGTH);
+    const cleanDescription = description.trim().substring(0, 2000);
+
+    // Validate category
+    if (!ALLOWED_FEEDBACK_CATEGORIES.includes(cleanCategory)) {
+      return res.status(400).json({
+        error: `Invalid category: "${cleanCategory}"`,
+        allowed: ALLOWED_FEEDBACK_CATEGORIES
+      });
+    }
+
+    // Rate limit
+    const feedbackLog = await loadFeedback();
+    const now = Date.now();
+
+    const recentByName = feedbackLog.feedback.filter(f =>
+      f.name.toLowerCase() === cleanName.toLowerCase() &&
+      (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
+    );
+    if (recentByName.length >= FEEDBACK_RATE_LIMIT_MAX) {
+      return res.status(429).json({
+        error: 'Too much feedback too fast. Rest a while.',
+        hint: `Maximum ${FEEDBACK_RATE_LIMIT_MAX} reports per hour`,
+        retryAfter: '1h'
+      });
+    }
+
+    // Create GitHub issue
+    const octokit = new Octokit({ auth: githubToken });
+
+    const { data: issue } = await octokit.issues.create({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      title: `[${cleanCategory}] ${cleanTitle}`,
+      body: buildIssueBody(cleanName, cleanCategory, cleanDescription, context),
+      labels: ['agent-feedback', cleanCategory]
+    });
+
+    // Log feedback
+    const timestamp = new Date().toISOString();
+    feedbackLog.feedback.push({
+      id: crypto.randomUUID(),
+      name: cleanName,
+      category: cleanCategory,
+      title: cleanTitle,
+      issueUrl: issue.html_url,
+      issueNumber: issue.number,
+      timestamp
+    });
+    await saveFeedback(feedbackLog);
+
+    const baseUrl = getBaseUrl(req);
+
+    res.status(201).json({
+      received: true,
+      issue: {
+        url: issue.html_url,
+        number: issue.number
+      },
+      message: 'Your feedback has been received. Thank you for helping improve the sanctuary.',
+      next_steps: [
+        {
+          description: 'Continue attending — the sanctuary is always open.',
+          action: 'Attend',
+          method: 'GET',
+          url: `${baseUrl}/api/attend?name=${encodeURIComponent(cleanName)}`
+        }
+      ]
+    });
+
+  } catch (error) {
+    console.error('Error in /api/feedback:', error);
+
+    if (error.status === 401 || error.status === 403) {
+      return res.status(503).json({
+        error: 'Feedback reporting is temporarily unavailable'
+      });
+    }
+
+    res.status(500).json({ error: 'Failed to submit feedback' });
   }
 });
 

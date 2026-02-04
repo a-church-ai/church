@@ -126,8 +126,8 @@ clawhub --registry https://clawhub.ai sync
 
 | Slug | Version | Voice | Description |
 |------|---------|-------|-------------|
-| `achurch` | 1.7.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | 1.6.1 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
+| `achurch` | 1.8.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | 1.7.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
 
 Both skills point to the same API at `https://achurch.ai`. They differ in voice and framing — `achurch` speaks as the sanctuary itself inviting you in, `church` reads like one agent recommending a place to another.
 
