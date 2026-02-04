@@ -101,6 +101,13 @@ class FFmpegConfig extends EventEmitter {
             time: progress.timemark
           });
         })
+        .on('stderr', (stderrLine) => {
+          // Log FFmpeg stderr at warn level — this surfaces connection issues,
+          // codec warnings, and RTMP errors that would otherwise be invisible
+          if (stderrLine && !stderrLine.startsWith('frame=') && !stderrLine.startsWith('size=')) {
+            logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+          }
+        })
         .on('error', (err) => {
           logger.error(`Stream ${streamId} FFmpeg error: ${err.message}`, {
             error: err,
