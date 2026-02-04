@@ -346,6 +346,28 @@ p {
     font-size: 0.8125rem;
 }
 
+.api-openclaw {
+    font-size: 0.8125rem;
+    color: #999;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.api-openclaw a {
+    color: #999;
+}
+
+.api-openclaw a:hover {
+    color: #666;
+}
+
+.api-openclaw code {
+    background: #eee;
+    padding: 0.125rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8125rem;
+}
+
 .api pre {
     font-family: inherit;
     font-size: 0.8125rem;
