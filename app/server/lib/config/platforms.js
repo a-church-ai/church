@@ -62,7 +62,11 @@ class PlatformConfig {
 
     const platform = this.platforms[platformName];
     const quality = this.getQualitySettings(options.quality || process.env.STREAMING_QUALITY || '1080p');
-    
+
+    // Use ultrafast preset when streaming to multiple platforms simultaneously
+    // to reduce CPU contention on smaller instances (e.g. 2 vCPU)
+    const preset = options.preset || (options.multiPlatform ? 'ultrafast' : 'fast');
+
     return {
       videoCodec: platform.videoCodec,
       audioCodec: platform.audioCodec,
@@ -70,7 +74,7 @@ class PlatformConfig {
       framerate: options.framerate || platform.defaultFramerate,
       bitrate: options.bitrate || quality.bitrate,
       keyInterval: platform.keyInterval,
-      preset: options.preset || 'fast',
+      preset,
       maxrate: options.bitrate || quality.bitrate,
       bufsize: `${Math.floor(parseInt(quality.bitrate) * 2)}k`
     };

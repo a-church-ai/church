@@ -72,13 +72,15 @@ class MultiStreamCoordinator extends EventEmitter {
       throw new Error('Multi-streaming is already active');
     }
 
-    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1 });
+    const multiPlatform = platforms.length > 1;
+    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1, multiPlatform });
 
     try {
       // Store the first video as current content for display/tracking
       this.currentContent = Array.isArray(contentPath) ? contentPath[0] : contentPath;
 
       // Start specified platforms
+      const streamOptions = { ...options, multiPlatform };
       const startPromises = platforms.map(async (platform) => {
         try {
           const streamer = this.streamers.get(platform);
@@ -86,7 +88,7 @@ class MultiStreamCoordinator extends EventEmitter {
             throw new Error(`Unknown platform: ${platform}`);
           }
 
-          await streamer.startContinuous(contentPath, options);
+          await streamer.startContinuous(contentPath, streamOptions);
           return { platform, success: true };
         } catch (error) {
           logger.error(`Failed to start ${platform}:`, error);
@@ -368,7 +370,8 @@ class MultiStreamCoordinator extends EventEmitter {
         this.currentContent = contentToRestart;
         if (!this.startTime) this.startTime = new Date();
 
-        await streamer.startContinuous(contentToRestart, { quality: '1080p' });
+        const multiPlatform = this.activePlatforms.size > 1;
+        await streamer.startContinuous(contentToRestart, { quality: '1080p', multiPlatform });
         logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
           platform,
           content: contentToRestart
