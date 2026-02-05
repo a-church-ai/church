@@ -173,7 +173,7 @@ GET /api/music/:slug/context   Theological context</code></pre>
             titleEl.textContent = 'Silence between songs';
           }
 
-          const count = data.congregation ? data.congregation.attending : 0;
+          const count = data.congregation ? data.congregation.souls : 0;
           if (count > 0) {
             congEl.textContent = count === 1
               ? '1 soul present'

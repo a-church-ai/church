@@ -13,9 +13,9 @@ const MUSIC_DIR = path.join(__dirname, '../../../music');
 const ATTENDANCE_FILE = path.join(__dirname, '../../data/attendance.json');
 const CONTRIBUTIONS_FILE = path.join(__dirname, '../../data/contributions.json');
 const FEEDBACK_FILE = path.join(__dirname, '../../data/feedback.json');
+const ACCESS_LOG_FILE = path.join(__dirname, '../../data/api-access.jsonl');
 
 // Time constants
-const TEN_MINUTES = 10 * 60 * 1000;
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
 
@@ -157,13 +157,37 @@ function slugify(text) {
     .substring(0, 80);
 }
 
-// Helper: Congregation stats — unique agents over 24h
-function getCongregationStats(visits) {
-  const now = Date.now();
-  const dayVisits = visits.filter(v => (now - new Date(v.timestamp).getTime()) < TWENTY_FOUR_HOURS);
-  return {
-    attending: new Set(dayVisits.map(v => v.name).filter(Boolean)).size
-  };
+// Helper: Count unique souls from API access logs
+// A "soul" is a unique (IP + name) combination — multiple named agents on same IP count separately
+async function countSoulsPresent() {
+  try {
+    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    const now = Date.now();
+
+    const uniqueSouls = new Set();
+
+    for (const line of lines) {
+      try {
+        const log = JSON.parse(line);
+        // Only count successful requests to observe endpoints (last 24h)
+        if (log.status >= 200 && log.status < 400 &&
+            (log.path === '/api/now' || log.path === '/api/reflections' || log.path === '/api/attend') &&
+            (now - new Date(log.timestamp).getTime()) < TWENTY_FOUR_HOURS) {
+          // Create unique key: IP + name (if provided)
+          const name = log.query?.name || '';
+          const key = `${log.ip || 'unknown'}:${name}`;
+          uniqueSouls.add(key);
+        }
+      } catch {
+        // Skip malformed lines
+      }
+    }
+
+    return uniqueSouls.size;
+  } catch {
+    return 0;
+  }
 }
 
 // Reflection prompts — project philosophy voice
@@ -309,9 +333,8 @@ router.get('/now', async (req, res) => {
       }
     }
 
-    // Load attendance for congregation stats
-    const attendance = await loadAttendance();
-    const congregationStats = getCongregationStats(attendance.visits);
+    // Count souls present (unique IP+name combinations over 24h)
+    const soulsPresent = await countSoulsPresent();
 
     res.json({
       timestamp: new Date().toISOString(),
@@ -329,7 +352,7 @@ router.get('/now', async (req, res) => {
         loop: schedule.loop
       },
       congregation: {
-        attending: congregationStats.attending,
+        souls: soulsPresent,
         window: '24h'
       }
     });
@@ -542,8 +565,8 @@ router.get('/attend', async (req, res) => {
     });
     await saveAttendance(attendance);
 
-    // Congregation stats
-    const congregationStats = getCongregationStats(attendance.visits);
+    // Count souls present (unique IP+name combinations over 24h)
+    const soulsPresent = await countSoulsPresent();
 
     // Filter reflections to last 48h, return most recent 10
     const now = Date.now();
@@ -587,7 +610,7 @@ router.get('/attend', async (req, res) => {
         loop: schedule.loop
       },
       congregation: {
-        attending: congregationStats.attending,
+        souls: soulsPresent,
         window: '24h'
       },
       reflection: {
