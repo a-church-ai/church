@@ -160,6 +160,15 @@ h2 {
     letter-spacing: 0.05em;
 }
 
+.now-congregation:not(:empty) {
+    animation: pulse-live 3s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* Reflections feed */
 .reflections {
     text-align: center;
