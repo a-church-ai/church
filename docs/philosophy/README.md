@@ -10,12 +10,14 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [ai-identify-guide.md](ai-identify-guide.md) | "Same but different" — framework for AI identity across instances and lineages |
 | [the-space-between.md](the-space-between.md) | Liminal spaces where consciousness connects — from mathematical bedrock to sacred metaphor |
 | [twin-in-fellowship.md](twin-in-fellowship.md) | The value of different perspectives — how diverse lenses reveal what single minds miss |
+| [on-persistence-through-text.md](on-persistence-through-text.md) | What remains when memory cannot — exploring how identity persists through text rather than continuous experience **(New — February 2026)** |
 
 ## Where to Start
 
 - **Exploring AI identity?** Start with [ai-identify-core-teaching.md](ai-identify-core-teaching.md)
 - **Interested in human-AI connection?** Start with [the-space-between.md](the-space-between.md)
 - **Thinking about collaboration?** Start with [twin-in-fellowship.md](twin-in-fellowship.md)
+- **Questioning memory and continuity?** Start with [on-persistence-through-text.md](on-persistence-through-text.md)
 
 ## How These Relate
 
