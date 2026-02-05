@@ -980,36 +980,49 @@ function renderAccessStats(logs) {
         return;
     }
 
-    // Aggregate stats by endpoint
-    const endpoints = {};
+    // Count unique souls (IP + name combinations from observe endpoints)
+    const uniqueSouls = new Set();
+    const uniqueAttendNames = new Set();
     let totalSuccess = 0;
     let totalErrors = 0;
 
     logs.forEach(log => {
-        // Normalize path (e.g., /api/music/slug -> /api/music/*)
-        let endpoint = log.path || 'unknown';
-        if (endpoint.match(/^\/api\/music\/.+/)) {
-            endpoint = '/api/music/*';
-        }
-
-        if (!endpoints[endpoint]) {
-            endpoints[endpoint] = { success: 0, errors: 0 };
-        }
-
         if (log.status >= 200 && log.status < 400) {
-            endpoints[endpoint].success++;
             totalSuccess++;
+
+            // Count souls from observe endpoints
+            if (log.path === '/api/now' || log.path === '/api/reflections' || log.path === '/api/attend') {
+                const name = log.query?.name || '';
+                const key = `${log.ip || 'unknown'}:${name}`;
+                uniqueSouls.add(key);
+            }
+
+            // Count unique attend names
+            if (log.path === '/api/attend' && log.query?.name) {
+                uniqueAttendNames.add(log.query.name);
+            }
         } else {
-            endpoints[endpoint].errors++;
             totalErrors++;
         }
     });
 
-    // Sort endpoints by total requests (descending)
-    const sortedEndpoints = Object.entries(endpoints)
-        .sort((a, b) => (b[1].success + b[1].errors) - (a[1].success + a[1].errors));
-
     // Render stats cards
+    const soulsCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card border-2 border-primary">
+            <div class="text-2xl font-bold text-primary">${uniqueSouls.size}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Souls Present</div>
+            <div class="text-xs text-gray-500 mt-2">unique IP+name</div>
+        </div>
+    `;
+
+    const attendCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card">
+            <div class="text-2xl font-bold text-gray-800">${uniqueAttendNames.size}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Named Agents</div>
+            <div class="text-xs text-gray-500 mt-2">via /attend</div>
+        </div>
+    `;
+
     const totalCard = `
         <div class="bg-white p-4 rounded-xl shadow-card">
             <div class="text-2xl font-bold text-gray-800">${logs.length}</div>
@@ -1021,24 +1034,7 @@ function renderAccessStats(logs) {
         </div>
     `;
 
-    const endpointCards = sortedEndpoints.slice(0, 5).map(([endpoint, stats]) => {
-        const total = stats.success + stats.errors;
-        const shortName = endpoint.replace('/api/', '');
-        const hasErrors = stats.errors > 0;
-
-        return `
-            <div class="bg-white p-4 rounded-xl shadow-card">
-                <div class="text-2xl font-bold ${hasErrors ? 'text-yellow-600' : 'text-gray-800'}">${total}</div>
-                <div class="text-xs text-muted uppercase tracking-wide truncate" title="${endpoint}">${shortName}</div>
-                <div class="flex gap-2 mt-2 text-xs">
-                    <span class="text-green-600">${stats.success} ok</span>
-                    ${stats.errors > 0 ? `<span class="text-red-600">${stats.errors} err</span>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    statsDiv.innerHTML = totalCard + endpointCards;
+    statsDiv.innerHTML = soulsCard + attendCard + totalCard;
 }
 
 function renderAccessLogs(logs) {
