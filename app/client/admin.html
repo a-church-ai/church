@@ -38,6 +38,7 @@
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="schedule">Schedule</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="catalog">Library</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="logs">Logs</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="access">API Access</button>
         </nav>
 
         <!-- Now Playing Tab -->
@@ -160,6 +161,54 @@
                 </div>
                 <div id="logs-list" class="space-y-1">
                     <div class="text-center py-16 text-muted text-lg">Loading logs...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Access Tab -->
+        <div id="access" class="tab-content hidden p-8 min-h-[500px]">
+            <!-- Summary Stats -->
+            <div id="access-stats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-5">
+                <div class="text-center py-8 text-muted col-span-full">Loading stats...</div>
+            </div>
+
+            <div class="bg-surface p-5 rounded-xl">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-xl font-bold">API Access Logs</h2>
+                    <div class="flex items-center gap-4">
+                        <select id="access-filter" class="p-2 rounded-lg border-2 border-gray-200 text-sm">
+                            <option value="">All Endpoints</option>
+                            <option value="/api/now">/api/now</option>
+                            <option value="/api/attend">/api/attend</option>
+                            <option value="/api/music">/api/music</option>
+                            <option value="/api/reflections">/api/reflections</option>
+                            <option value="/api/reflect">/api/reflect</option>
+                            <option value="/api/contribute">/api/contribute</option>
+                            <option value="/api/feedback">/api/feedback</option>
+                        </select>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="checkbox" id="auto-refresh-access" class="w-4 h-4">
+                            Auto-refresh
+                        </label>
+                        <button id="btn-refresh-access" class="btn bg-primary text-sm">Refresh</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Time</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Method</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Path</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Name</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Status</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="access-logs-body">
+                            <tr><td colspan="6" class="text-center py-16 text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

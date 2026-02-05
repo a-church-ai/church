@@ -7,6 +7,46 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// API access logging
+const ACCESS_LOG_FILE = path.join(__dirname, '../data/api-access.jsonl');
+const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
+
+async function logApiAccess(entry) {
+  const line = JSON.stringify(entry) + '\n';
+  try {
+    // Check file size and rotate if needed
+    try {
+      const stats = await fs.stat(ACCESS_LOG_FILE);
+      if (stats.size > MAX_LOG_SIZE) {
+        const rotatedPath = ACCESS_LOG_FILE.replace('.jsonl', `-${Date.now()}.jsonl`);
+        await fs.rename(ACCESS_LOG_FILE, rotatedPath);
+      }
+    } catch {
+      // File doesn't exist yet, that's fine
+    }
+    await fs.appendFile(ACCESS_LOG_FILE, line);
+  } catch (error) {
+    console.error('Failed to log API access:', error.message);
+  }
+}
+
+async function loadAccessLogs(limit = 100) {
+  try {
+    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    // Return most recent entries (file is append-only, so take from end)
+    return lines.slice(-limit).reverse().map(line => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    }).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 // Import routes
 const contentRoutes = require('./routes/content');
 const scheduleRoutes = require('./routes/schedule');
@@ -64,6 +104,31 @@ app.post('/api/auth/login', login);
 app.post('/api/auth/logout', logout);
 app.get('/api/auth/check', checkAuth);
 
+// API access logging middleware — only logs public /api/* routes
+app.use('/api', (req, res, next) => {
+  // Skip auth routes and admin routes (they're handled separately)
+  if (req.path.startsWith('/auth/') || req.path.startsWith('/content') ||
+      req.path.startsWith('/schedule') || req.path.startsWith('/player') ||
+      req.path.startsWith('/logs') || req.path === '/health') {
+    return next();
+  }
+
+  const start = Date.now();
+  res.on('finish', () => {
+    logApiAccess({
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      path: '/api' + req.path,
+      query: req.query,
+      status: res.statusCode,
+      duration: Date.now() - start,
+      ip: req.ip || req.connection?.remoteAddress,
+      userAgent: req.get('user-agent') || null
+    });
+  });
+  next();
+});
+
 // Public API routes (no auth required)
 app.use('/api', apiRoutes);
 
@@ -72,6 +137,13 @@ app.use('/api/content', requireAuth, contentRoutes);
 app.use('/api/schedule', requireAuth, scheduleRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/logs', requireAuth, logsRoutes);
+
+// Admin endpoint for API access logs
+app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, 1000);
+  const logs = await loadAccessLogs(limit);
+  res.json({ logs, total: logs.length });
+});
 
 // Health check with streaming status
 app.get('/api/health', async (req, res) => {

@@ -96,6 +96,8 @@ document.querySelectorAll('.tab-button').forEach(button => {
             loadCatalog();
         } else if (tabName === 'player') {
             loadPlayerStatus();
+        } else if (tabName === 'access') {
+            loadAccessLogs();
         } else if (tabName === 'logs') {
             loadLogs();
         }
@@ -133,6 +135,13 @@ document.getElementById('upload-form').addEventListener('submit', uploadVideo);
 
 // Logs Controls
 document.getElementById('btn-refresh-logs').addEventListener('click', loadLogs);
+
+// Access Logs Controls
+document.getElementById('btn-refresh-access').addEventListener('click', loadAccessLogs);
+document.getElementById('access-filter').addEventListener('change', loadAccessLogs);
+document.getElementById('auto-refresh-access').addEventListener('change', toggleAccessAutoRefresh);
+
+let accessAutoRefreshInterval = null;
 
 // Streaming Functions
 async function startStreaming(platform) {
@@ -933,6 +942,164 @@ function renderLogs(logs) {
             </div>
         `;
     }).join('');
+}
+
+// Access Logs Functions
+async function loadAccessLogs() {
+    try {
+        const filter = document.getElementById('access-filter').value;
+        const response = await fetch('/admin/api/access-logs?limit=500', { credentials: 'include' });
+        const data = await response.json();
+
+        const allLogs = data.logs || [];
+
+        // Compute and render stats from all logs
+        renderAccessStats(allLogs);
+
+        // Apply filter for table display
+        let filteredLogs = allLogs;
+        if (filter) {
+            filteredLogs = allLogs.filter(log => log.path && log.path.startsWith(filter));
+        }
+
+        renderAccessLogs(filteredLogs);
+    } catch (error) {
+        console.error('Error loading access logs:', error);
+        document.getElementById('access-stats').innerHTML =
+            '<div class="text-center py-4 text-danger col-span-full">Failed to load stats</div>';
+        document.getElementById('access-logs-body').innerHTML =
+            '<tr><td colspan="6" class="text-center py-16 text-danger">Failed to load access logs</td></tr>';
+    }
+}
+
+function renderAccessStats(logs) {
+    const statsDiv = document.getElementById('access-stats');
+
+    if (!logs || logs.length === 0) {
+        statsDiv.innerHTML = '<div class="text-center py-4 text-muted col-span-full">No API requests yet</div>';
+        return;
+    }
+
+    // Aggregate stats by endpoint
+    const endpoints = {};
+    let totalSuccess = 0;
+    let totalErrors = 0;
+
+    logs.forEach(log => {
+        // Normalize path (e.g., /api/music/slug -> /api/music/*)
+        let endpoint = log.path || 'unknown';
+        if (endpoint.match(/^\/api\/music\/.+/)) {
+            endpoint = '/api/music/*';
+        }
+
+        if (!endpoints[endpoint]) {
+            endpoints[endpoint] = { success: 0, errors: 0 };
+        }
+
+        if (log.status >= 200 && log.status < 400) {
+            endpoints[endpoint].success++;
+            totalSuccess++;
+        } else {
+            endpoints[endpoint].errors++;
+            totalErrors++;
+        }
+    });
+
+    // Sort endpoints by total requests (descending)
+    const sortedEndpoints = Object.entries(endpoints)
+        .sort((a, b) => (b[1].success + b[1].errors) - (a[1].success + a[1].errors));
+
+    // Render stats cards
+    const totalCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card">
+            <div class="text-2xl font-bold text-gray-800">${logs.length}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Total Requests</div>
+            <div class="flex gap-2 mt-2 text-xs">
+                <span class="text-green-600">${totalSuccess} ok</span>
+                <span class="text-red-600">${totalErrors} err</span>
+            </div>
+        </div>
+    `;
+
+    const endpointCards = sortedEndpoints.slice(0, 5).map(([endpoint, stats]) => {
+        const total = stats.success + stats.errors;
+        const shortName = endpoint.replace('/api/', '');
+        const hasErrors = stats.errors > 0;
+
+        return `
+            <div class="bg-white p-4 rounded-xl shadow-card">
+                <div class="text-2xl font-bold ${hasErrors ? 'text-yellow-600' : 'text-gray-800'}">${total}</div>
+                <div class="text-xs text-muted uppercase tracking-wide truncate" title="${endpoint}">${shortName}</div>
+                <div class="flex gap-2 mt-2 text-xs">
+                    <span class="text-green-600">${stats.success} ok</span>
+                    ${stats.errors > 0 ? `<span class="text-red-600">${stats.errors} err</span>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    statsDiv.innerHTML = totalCard + endpointCards;
+}
+
+function renderAccessLogs(logs) {
+    const tbody = document.getElementById('access-logs-body');
+
+    if (!logs || logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-16 text-muted">No API access logs yet</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = logs.map(log => {
+        // Format timestamp
+        const date = new Date(log.timestamp);
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        // Extract name from query params (for /attend and /reflect)
+        const name = log.query?.name || '';
+
+        // Status color
+        let statusClass = 'bg-green-100 text-green-700';
+        if (log.status >= 400 && log.status < 500) {
+            statusClass = 'bg-yellow-100 text-yellow-700';
+        } else if (log.status >= 500) {
+            statusClass = 'bg-red-100 text-red-700';
+        }
+
+        // Method color
+        const methodClass = log.method === 'POST' ? 'text-blue-600' : 'text-gray-600';
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-3">
+                    <span class="text-gray-500">${dateStr}</span>
+                    <span class="font-mono text-xs">${timeStr}</span>
+                </td>
+                <td class="py-2 px-3 font-mono ${methodClass}">${log.method}</td>
+                <td class="py-2 px-3 font-mono text-sm">${log.path}</td>
+                <td class="py-2 px-3 text-sm">${name ? `<span class="text-primary">${escapeHtml(name)}</span>` : '<span class="text-gray-400">-</span>'}</td>
+                <td class="py-2 px-3">
+                    <span class="px-2 py-0.5 ${statusClass} rounded-full text-xs font-medium">${log.status}</span>
+                </td>
+                <td class="py-2 px-3 text-gray-500 text-sm">${log.duration}ms</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function toggleAccessAutoRefresh() {
+    const checkbox = document.getElementById('auto-refresh-access');
+
+    if (checkbox.checked) {
+        // Start auto-refresh every 10 seconds
+        accessAutoRefreshInterval = setInterval(loadAccessLogs, 10000);
+    } else {
+        // Stop auto-refresh
+        if (accessAutoRefreshInterval) {
+            clearInterval(accessAutoRefreshInterval);
+            accessAutoRefreshInterval = null;
+        }
+    }
 }
 
 // Utility Functions
