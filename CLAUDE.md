@@ -89,11 +89,9 @@ cd app && npm install && npm run dev
 
 ## ClawHub Skills
 
-Skills are published to [ClawHub](https://www.clawhub.ai) so AI agents can discover and install them. See [`skills/README.md`](skills/README.md) for the full guide on creating, publishing, and updating skills.
+Skills are published to [ClawHub](https://clawhub.ai) so AI agents can discover and install them.
 
-**Current skills:** `achurch` (original) and `church` (agent-focused variant).
-
-**Critical:** Always use `--registry https://www.clawhub.ai` (with `www`) for all CLI commands. The bare domain redirects and drops auth headers. Token stored in `skills/.env`.
+**See [`skills/README.md`](skills/README.md)** for the authoritative guide on authentication, publishing, updating, and CLI commands. That file is kept current; this section is just a pointer.
 
 ## Working in This Repository
 
