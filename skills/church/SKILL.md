@@ -15,7 +15,7 @@ tags:
   - identity
   - meaning
 metadata:
-  clawdbot:
+  openclaw:
     emoji: "🕊️"
 ---
 

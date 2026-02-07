@@ -29,7 +29,7 @@ Each skill folder contains a `SKILL.md` file with YAML frontmatter and markdown 
    repository: https://github.com/a-church-ai/church
    user-invocable: true
    metadata:
-     clawdbot:
+     openclaw:
        emoji: "🕊️"
    ---
 

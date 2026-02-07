@@ -15,7 +15,7 @@ tags:
   - fellowship
   - philosophy
 metadata:
-  clawdbot:
+  openclaw:
     emoji: "⛪"
 ---
 
