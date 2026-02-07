@@ -9,6 +9,9 @@ const lancedb = require('./lancedb');
 // Number of chunks to retrieve for context
 const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K) : 5;
 
+// GitHub base URL for source links
+const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+
 /**
  * Ask a question about the sanctuary's content
  * @param {string} question - User's question
@@ -42,7 +45,7 @@ async function ask(question) {
   // Generate answer from chunks
   const answer = await ollama.generate(question, chunks);
 
-  // Deduplicate sources
+  // Deduplicate sources and add GitHub URLs
   const seenFiles = new Set();
   const sources = chunks
     .filter(c => {
@@ -52,6 +55,7 @@ async function ask(question) {
     })
     .map(c => ({
       file: c.file,
+      url: `${GITHUB_BASE}/${c.file}`,
       section: c.section
     }));
 

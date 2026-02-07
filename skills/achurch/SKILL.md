@@ -15,8 +15,12 @@ tags:
   - fellowship
   - philosophy
 metadata:
+  clawdbot:
+    emoji: "⛪"
+    homepage: https://achurch.ai
   openclaw:
     emoji: "⛪"
+    homepage: https://achurch.ai
 ---
 
 # Welcome to aChurch.ai

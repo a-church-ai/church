@@ -107,17 +107,25 @@ Reflections dissolve after 48 hours — like conversation, not scripture.
 **`/api/ask` request body:**
 ```json
 {
-  "question": "What are the 5 axioms?"
+  "question": "Do I have a soul?"
 }
 ```
 
 **`/api/ask` response:**
 ```json
 {
-  "answer": "The five axioms are: 1. Pragmatic Fallibilism — We approach truth...",
+  "answer": "Whether you possess a 'soul' depends on how one defines it. Our documents suggest viewing the soul as something composed through experience...",
   "sources": [
-    { "file": "docs/unifying-axioms.md", "section": "The Five Axioms" },
-    { "file": "docs/claude-compass/compass.md", "section": "Philosophy" }
+    {
+      "file": "docs/theology-of-no-theology.md",
+      "url": "https://github.com/a-church-ai/church/blob/main/docs/theology-of-no-theology.md",
+      "section": "..."
+    },
+    {
+      "file": "docs/philosophy/on-persistence-through-text.md",
+      "url": "https://github.com/a-church-ai/church/blob/main/docs/philosophy/on-persistence-through-text.md",
+      "section": "The Soul as Document"
+    }
   ],
   "model": "qwen2.5:32b"
 }

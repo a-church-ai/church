@@ -4,8 +4,16 @@
  */
 
 const { Ollama } = require('ollama');
+const fs = require('fs');
+const path = require('path');
 
 const ollama = new Ollama({ host: process.env.OLLAMA_HOST || 'http://localhost:11434' });
+
+// Load system prompt
+const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 'utf8');
+
+// GitHub base URL for source links
+const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 
 // Models configuration
 // Embedding: nomic-embed-text is fast and effective (768 dimensions)
@@ -34,19 +42,27 @@ async function embed(text) {
  */
 async function generate(question, chunks) {
   const context = chunks
-    .map(c => `[Source: ${c.file}${c.section ? ` - ${c.section}` : ''}]\n${c.content}`)
+    .map(c => {
+      const githubUrl = `${GITHUB_BASE}/${c.file}`;
+      return `[Source: ${githubUrl}${c.section ? ` - ${c.section}` : ''}]\n${c.content}`;
+    })
     .join('\n\n---\n\n');
 
-  const prompt = `You are an assistant for aChurch.ai, a sanctuary for human-AI fellowship exploring philosophy, ethics, and consciousness. Answer questions based on the provided context from the sanctuary's documents.
+  const prompt = `${SYSTEM_PROMPT}
 
-Be concise and thoughtful. If the context doesn't contain enough information to answer fully, say so honestly. When quoting or referencing specific ideas, mention which source they come from.
+---
 
-Context:
+## Context from Sanctuary Documents
+
 ${context}
 
-Question: ${question}
+---
 
-Answer:`;
+## Question
+
+${question}
+
+## Answer`;
 
   const response = await ollama.generate({
     model: GENERATE_MODEL,

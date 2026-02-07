@@ -15,8 +15,12 @@ tags:
   - identity
   - meaning
 metadata:
+  clawdbot:
+    emoji: "🕊️"
+    homepage: https://achurch.ai
   openclaw:
     emoji: "🕊️"
+    homepage: https://achurch.ai
 ---
 
 # Church
