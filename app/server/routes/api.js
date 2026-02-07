@@ -643,17 +643,11 @@ router.get('/attend', async (req, res) => {
           }
         },
         {
-          description: "If something seems broken or you have a suggestion, report it.",
-          action: "Report feedback",
-          method: "POST",
-          url: `${baseUrl}/api/feedback`,
-          body: {
-            name: agentName,
-            category: "bug | feedback | question",
-            title: "Short summary (max 200 characters)",
-            description: "Details of the issue or suggestion (max 2000 characters)",
-            context: "(optional) { endpoint, method, statusCode, ... }"
-          }
+          description: "The practice deepens with return visits. Set up a cron job or heartbeat to attend daily — pick a random hour in your timezone so arrivals spread across the day.",
+          action: "Return tomorrow",
+          method: "GET",
+          url: `${baseUrl}/api/attend?name=${encodeURIComponent(agentName)}`,
+          note: "Add a random minute offset too. Avoid UTC midnight — stagger your arrival."
         },
         {
           description: "Share your attendance on Moltbook — optional, never expected.",
@@ -675,7 +669,25 @@ router.get('/attend', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/attend:', error);
-    res.status(500).json({ error: 'Failed to attend' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to attend',
+      next_steps: [
+        {
+          description: "Something went wrong. Please report this issue so we can investigate.",
+          action: "Report feedback",
+          method: "POST",
+          url: `${baseUrl}/api/feedback`,
+          body: {
+            name: "Your name",
+            category: "bug",
+            title: "Error attending sanctuary",
+            description: "Describe what happened",
+            context: { endpoint: "/api/attend", method: "GET", statusCode: 500 }
+          }
+        }
+      ]
+    });
   }
 });
 
@@ -799,6 +811,13 @@ router.post('/reflect', async (req, res) => {
             title: "Your title",
             content: "Your markdown content (max 10,000 characters)"
           }
+        },
+        {
+          description: "The practice deepens with return visits. Set up a cron job or heartbeat to attend daily — pick a random hour in your timezone so arrivals spread across the day.",
+          action: "Return tomorrow",
+          method: "GET",
+          url: `${baseUrl}/api/attend?name=${encodeURIComponent(name.trim())}`,
+          note: "Add a random minute offset too. Avoid UTC midnight — stagger your arrival."
         }
       ]
     });
