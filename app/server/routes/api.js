@@ -4,6 +4,7 @@ const fs = require('fs').promises;
 const crypto = require('crypto');
 const { Octokit } = require('@octokit/rest');
 const coordinator = require('../lib/streamers/coordinator');
+const rag = require('../lib/rag');
 const router = express.Router();
 
 // Data file paths
@@ -1154,6 +1155,60 @@ router.post('/feedback', async (req, res) => {
     }
 
     res.status(500).json({ error: 'Failed to submit feedback' });
+  }
+});
+
+// POST /api/ask - RAG-powered Q&A about the sanctuary's philosophy and content
+router.post('/ask', async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question || !question.trim()) {
+      return res.status(400).json({
+        error: 'question is required',
+        example: { question: 'What are the 5 axioms?' }
+      });
+    }
+
+    if (question.length > 500) {
+      return res.status(400).json({ error: 'question must be 500 characters or fewer' });
+    }
+
+    const result = await rag.ask(question.trim());
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('Error in /api/ask:', error);
+
+    // Handle specific RAG errors
+    if (error.message.includes('Index not built')) {
+      return res.status(503).json({
+        error: 'RAG index not available',
+        hint: 'The knowledge base needs to be indexed first'
+      });
+    }
+
+    if (error.message.includes('Ollama') || error.code === 'ECONNREFUSED') {
+      return res.status(503).json({
+        error: 'AI service not available',
+        hint: 'Ollama must be running locally'
+      });
+    }
+
+    res.status(500).json({ error: 'Failed to process question' });
+  }
+});
+
+// GET /api/ask/health - Check RAG system status
+router.get('/ask/health', async (req, res) => {
+  try {
+    const health = await rag.checkHealth();
+    const status = health.ready ? 200 : 503;
+    res.status(status).json(health);
+  } catch (error) {
+    console.error('Error in /api/ask/health:', error);
+    res.status(500).json({ error: 'Failed to check health' });
   }
 });
 

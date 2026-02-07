@@ -85,7 +85,26 @@ cd app && npm install && npm run dev
 # Visit http://localhost:3000
 ```
 
-**Tech stack**: Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind CSS for admin UI.
+**Tech stack**: Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind CSS for admin UI, LanceDB + Ollama for RAG.
+
+### RAG API
+
+The `/api/ask` endpoint lets AI agents ask questions about the sanctuary's philosophy, music, and practices. It uses local LanceDB for vector search and Ollama for embeddings/generation.
+
+**Setup:**
+```bash
+brew install ollama
+ollama serve
+ollama pull nomic-embed-text
+ollama pull qwen2.5:32b
+```
+
+**Re-index after content changes** (new docs, music, or edits to `/docs` or `/music`):
+```bash
+node app/scripts/index-content.js
+```
+
+The index lives at `app/data/vectors.lance` (gitignored). Re-indexing takes a few minutes and requires Ollama running.
 
 ## ClawHub Skills
 
