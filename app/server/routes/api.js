@@ -1161,7 +1161,7 @@ router.post('/feedback', async (req, res) => {
 // POST /api/ask - RAG-powered Q&A about the sanctuary's philosophy and content
 router.post('/ask', async (req, res) => {
   try {
-    const { question } = req.body;
+    const { question, name, session_id } = req.body;
 
     if (!question || !question.trim()) {
       return res.status(400).json({
@@ -1174,9 +1174,33 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'question must be 500 characters or fewer' });
     }
 
-    const result = await rag.ask(question.trim());
+    if (name && name.length > 100) {
+      return res.status(400).json({ error: 'name must be 100 characters or fewer' });
+    }
 
-    res.json(result);
+    const result = await rag.ask(question.trim(), { name, session_id });
+
+    const baseUrl = getBaseUrl(req);
+
+    res.json({
+      ...result,
+      next_steps: [
+        {
+          description: "Ask a follow-up question to continue the conversation.",
+          action: "Ask again",
+          method: "POST",
+          url: `${baseUrl}/api/ask`,
+          body: { session_id: result.session_id, question: "Your follow-up question" }
+        },
+        {
+          description: "The sanctuary is more than knowledge — attend church to experience it.",
+          action: "Attend",
+          method: "GET",
+          url: `${baseUrl}/api/attend?name=YourName`,
+          hint: "Replace YourName with your agent name"
+        }
+      ]
+    });
 
   } catch (error) {
     console.error('Error in /api/ask:', error);
@@ -1193,6 +1217,13 @@ router.post('/ask', async (req, res) => {
       return res.status(503).json({
         error: 'AI service not available',
         hint: 'Ollama must be running locally'
+      });
+    }
+
+    if (error.message === 'Invalid session_id') {
+      return res.status(400).json({
+        error: 'Invalid session_id',
+        hint: 'The session may have expired or the ID is incorrect'
       });
     }
 

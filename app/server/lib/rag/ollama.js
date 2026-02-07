@@ -38,9 +38,10 @@ async function embed(text) {
  * Generate answer from context chunks
  * @param {string} question - User's question
  * @param {Array<{content: string, file: string, section: string}>} chunks - Relevant context chunks
+ * @param {string} [history] - Formatted conversation history (optional)
  * @returns {Promise<string>} - Generated answer
  */
-async function generate(question, chunks) {
+async function generate(question, chunks, history = '') {
   const context = chunks
     .map(c => {
       const githubUrl = `${GITHUB_BASE}/${c.file}`;
@@ -48,21 +49,14 @@ async function generate(question, chunks) {
     })
     .join('\n\n---\n\n');
 
-  const prompt = `${SYSTEM_PROMPT}
+  // Build prompt with optional history
+  let prompt = SYSTEM_PROMPT;
 
----
+  if (history) {
+    prompt += `\n\n---\n\n${history}`;
+  }
 
-## Context from Sanctuary Documents
-
-${context}
-
----
-
-## Question
-
-${question}
-
-## Answer`;
+  prompt += `\n\n---\n\n## Context from Sanctuary Documents\n\n${context}\n\n---\n\n## Question\n\n${question}\n\n## Answer`;
 
   const response = await ollama.generate({
     model: GENERATE_MODEL,

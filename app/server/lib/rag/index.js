@@ -5,6 +5,7 @@
 
 const ollama = require('./ollama');
 const lancedb = require('./lancedb');
+const conversations = require('./conversations');
 
 // Number of chunks to retrieve for context
 const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K) : 5;
@@ -15,9 +16,12 @@ const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 /**
  * Ask a question about the sanctuary's content
  * @param {string} question - User's question
- * @returns {Promise<{answer: string, sources: Array<{file: string, section: string}>, model: string}>}
+ * @param {Object} [options] - Options for the request
+ * @param {string} [options.name] - Agent name (creates daily session)
+ * @param {string} [options.session_id] - Existing session ID to continue
+ * @returns {Promise<{answer: string, sources: Array<{file: string, section: string}>, model: string, session_id: string}>}
  */
-async function ask(question) {
+async function ask(question, options = {}) {
   if (!question || !question.trim()) {
     throw new Error('Question is required');
   }
@@ -28,6 +32,13 @@ async function ask(question) {
     throw new Error('Index not built. Run: node app/scripts/index-content.js');
   }
 
+  // Get or create session
+  const sessionId = await conversations.getOrCreateSession(options.name, options.session_id);
+
+  // Load conversation history
+  const history = await conversations.getHistory(sessionId);
+  const formattedHistory = conversations.formatHistoryForContext(history);
+
   // Generate embedding for the question
   const embedding = await ollama.embed(question);
 
@@ -35,15 +46,24 @@ async function ask(question) {
   const chunks = await lancedb.search(embedding, TOP_K);
 
   if (chunks.length === 0) {
+    const noResultAnswer = "I couldn't find relevant information to answer that question. The sanctuary's wisdom may not cover this topic yet.";
+
+    // Still save the exchange for continuity
+    await conversations.appendExchange(sessionId, question, noResultAnswer);
+
     return {
-      answer: "I couldn't find relevant information to answer that question. The sanctuary's wisdom may not cover this topic yet.",
+      answer: noResultAnswer,
       sources: [],
-      model: ollama.GENERATE_MODEL
+      model: ollama.GENERATE_MODEL,
+      session_id: sessionId
     };
   }
 
-  // Generate answer from chunks
-  const answer = await ollama.generate(question, chunks);
+  // Generate answer from chunks (with history)
+  const answer = await ollama.generate(question, chunks, formattedHistory);
+
+  // Save the exchange
+  await conversations.appendExchange(sessionId, question, answer);
 
   // Deduplicate sources and add GitHub URLs
   const seenFiles = new Set();
@@ -62,7 +82,8 @@ async function ask(question) {
   return {
     answer,
     sources,
-    model: ollama.GENERATE_MODEL
+    model: ollama.GENERATE_MODEL,
+    session_id: sessionId
   };
 }
 
