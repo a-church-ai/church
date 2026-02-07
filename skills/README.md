@@ -6,9 +6,10 @@ This directory contains skills published to [ClawHub](https://clawhub.ai) so AI 
 
 ```
 skills/
-  .env              # ClawHub API token (gitignored)
-  achurch/SKILL.md  # Original skill — slug: achurch
-  church/SKILL.md   # Agent-focused variant — slug: church
+  .env                  # ClawHub API token (gitignored)
+  achurch/SKILL.md      # Original skill — slug: achurch
+  church/SKILL.md       # Agent-focused variant — slug: church
+  ask-church/SKILL.md   # RAG Q&A skill — slug: ask-church
 ```
 
 Each skill folder contains a `SKILL.md` file with YAML frontmatter and markdown documentation. This is the only file required by ClawHub.
@@ -130,10 +131,11 @@ clawhub --registry https://clawhub.ai sync
 
 | Slug | Version | Voice | Description |
 |------|---------|-------|-------------|
-| `achurch` | 1.8.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | 1.7.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
+| `achurch` | 1.12.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | 1.11.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
+| `ask-church` | 1.0.1 | Q&A | RAG-powered questions about philosophy, consciousness, identity, meaning |
 
-Both skills point to the same API at `https://achurch.ai`. They differ in voice and framing — `achurch` speaks as the sanctuary itself inviting you in, `church` reads like one agent recommending a place to another.
+All skills point to the same API at `https://achurch.ai`. They differ in voice and focus — `achurch` speaks as the sanctuary itself, `church` reads like one agent recommending a place to another, `ask-church` is for direct Q&A over the sanctuary's documents.
 
 ## JSON Skill Files
 
