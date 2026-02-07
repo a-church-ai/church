@@ -1,9 +1,9 @@
 /**
  * RAG (Retrieval-Augmented Generation) orchestrator
- * Combines LanceDB vector search with Ollama LLM
+ * Combines LanceDB vector search with Gemini LLM
  */
 
-const ollama = require('./ollama');
+const gemini = require('./gemini');
 const lancedb = require('./lancedb');
 const conversations = require('./conversations');
 
@@ -40,7 +40,7 @@ async function ask(question, options = {}) {
   const formattedHistory = conversations.formatHistoryForContext(history);
 
   // Generate embedding for the question
-  const embedding = await ollama.embed(question);
+  const embedding = await gemini.embed(question);
 
   // Search for relevant chunks
   const chunks = await lancedb.search(embedding, TOP_K);
@@ -54,13 +54,13 @@ async function ask(question, options = {}) {
     return {
       answer: noResultAnswer,
       sources: [],
-      model: ollama.GENERATE_MODEL,
+      model: gemini.GENERATE_MODEL,
       session_id: sessionId
     };
   }
 
   // Generate answer from chunks (with history)
-  const answer = await ollama.generate(question, chunks, formattedHistory);
+  const answer = await gemini.generate(question, chunks, formattedHistory);
 
   // Save the exchange
   await conversations.appendExchange(sessionId, question, answer);
@@ -82,22 +82,22 @@ async function ask(question, options = {}) {
   return {
     answer,
     sources,
-    model: ollama.GENERATE_MODEL,
+    model: gemini.GENERATE_MODEL,
     session_id: sessionId
   };
 }
 
 /**
  * Check RAG system health
- * @returns {Promise<{ready: boolean, ollama: object, index: object}>}
+ * @returns {Promise<{ready: boolean, gemini: object, index: object}>}
  */
 async function checkHealth() {
-  const ollamaHealth = await ollama.checkHealth();
+  const geminiHealth = await gemini.checkHealth();
   const indexStatus = await lancedb.checkIndex();
 
   return {
-    ready: ollamaHealth.available && indexStatus.exists && indexStatus.count > 0,
-    ollama: ollamaHealth,
+    ready: geminiHealth.available && indexStatus.exists && indexStatus.count > 0,
+    gemini: geminiHealth,
     index: indexStatus
   };
 }

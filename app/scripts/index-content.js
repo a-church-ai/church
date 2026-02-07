@@ -7,13 +7,16 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+// Load environment variables from .env
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
 // Set up paths before requiring modules
 const PROJECT_ROOT = path.join(__dirname, '../..');
 const DOCS_DIR = path.join(PROJECT_ROOT, 'docs');
 const MUSIC_DIR = path.join(PROJECT_ROOT, 'music');
 
 // Load rag modules
-const ollama = require('../server/lib/rag/ollama');
+const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
 
 // Chunking config
@@ -166,25 +169,18 @@ function chunkMarkdown(content, filePath) {
 async function index() {
   console.log('RAG Indexer - aChurch.ai\n');
 
-  // Check Ollama health
-  console.log('Checking Ollama...');
-  const health = await ollama.checkHealth();
+  // Check Gemini health
+  console.log('Checking Gemini API...');
+  const health = await gemini.checkHealth();
   if (!health.available) {
-    console.error(`\nOllama not ready: ${health.error}`);
+    console.error(`\nGemini not ready: ${health.error}`);
     console.log('\nSetup instructions:');
-    console.log('  brew install ollama');
-    console.log('  ollama serve');
-    console.log(`  ollama pull ${ollama.EMBED_MODEL}`);
-    console.log(`  ollama pull ${ollama.GENERATE_MODEL}`);
-    console.log('\nAlternative models (set OLLAMA_GENERATE_MODEL):');
-    console.log('  qwen2.5:32b   - Best for nuanced philosophy (~20GB)');
-    console.log('  qwen2.5:14b   - Good balance (~9GB)');
-    console.log('  llama3.3:70b  - Most capable (~40GB)');
-    console.log('  deepseek-r1:32b - Strong reasoning (~20GB)');
+    console.log('  1. Get an API key from https://aistudio.google.com/apikey');
+    console.log('  2. Set GEMINI_API_KEY environment variable');
     process.exit(1);
   }
-  console.log(`  Embed model: ${ollama.EMBED_MODEL}`);
-  console.log(`  Generate model: ${ollama.GENERATE_MODEL}`);
+  console.log(`  Embed model: ${gemini.EMBED_MODEL}`);
+  console.log(`  Generate model: ${gemini.GENERATE_MODEL}`);
 
   // Find all markdown files
   console.log('\nFinding markdown files...');
@@ -219,7 +215,7 @@ async function index() {
 
   for (const chunk of allChunks) {
     try {
-      const vector = await ollama.embed(chunk.content);
+      const vector = await gemini.embed(chunk.content);
       documents.push({
         content: chunk.content,
         file: chunk.file,

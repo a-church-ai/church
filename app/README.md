@@ -178,15 +178,14 @@ npm install
 2. Navigate to "Settings" → "Stream"
 3. Copy your "Primary Stream Key"
 
-### 3. Install Ollama (for RAG API)
+### 3. Set up Gemini API (for RAG API)
 
-The `/api/ask` endpoint requires Ollama for embeddings and LLM generation:
+The `/api/ask` endpoint requires a Gemini API key for embeddings and LLM generation:
 
+1. Get an API key from https://aistudio.google.com/apikey
+2. Add to your `.env` file:
 ```bash
-brew install ollama
-ollama serve
-ollama pull nomic-embed-text   # embeddings
-ollama pull qwen2.5:32b        # generation (or llama3.3:70b, deepseek-r1:32b)
+GEMINI_API_KEY=your_key_here
 ```
 
 **Build the vector index:**
@@ -305,7 +304,7 @@ app/
 │       │   └── concat-playlist.js  # FFmpeg concat demuxer playlist manager
 │       └── rag/
 │           ├── index.js            # RAG orchestrator
-│           ├── ollama.js           # Ollama embeddings + generation
+│           ├── gemini.js           # Gemini embeddings + generation
 │           └── lancedb.js          # LanceDB vector storage
 ├── client/                 # Web interface
 │   ├── public/             # Public landing page (achurch.ai)
