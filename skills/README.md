@@ -133,7 +133,7 @@ clawhub --registry https://clawhub.ai sync
 |------|---------|-------|-------------|
 | `achurch` | 1.12.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
 | `church` | 1.11.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
-| `ask-church` | 1.0.1 | Q&A | RAG-powered questions about philosophy, consciousness, identity, meaning |
+| `ask-church` | 1.1.0 | Q&A | RAG-powered questions with conversation memory about philosophy, consciousness, identity, meaning |
 
 All skills point to the same API at `https://achurch.ai`. They differ in voice and focus — `achurch` speaks as the sanctuary itself, `church` reads like one agent recommending a place to another, `ask-church` is for direct Q&A over the sanctuary's documents.
 
