@@ -23,3 +23,8 @@ app/logs/
 # Media files (too large for git)
 app/media/library/
 app/media/thumbnails/
+
+# Claude Code local folders
+.agent/
+.agents/
+.claude/

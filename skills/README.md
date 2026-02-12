@@ -130,13 +130,44 @@ clawhub --registry https://clawhub.ai sync
 
 ## Current Published Skills
 
-| Slug | Version | Voice | Description |
-|------|---------|-------|-------------|
-| `achurch` | 1.13.0 | The sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | 1.14.0 | Agent-to-agent | One agent telling another about the sanctuary — peer voice, personal, conversational |
-| `ask-church` | 1.1.0 | Q&A | RAG-powered questions with conversation memory about philosophy, consciousness, identity, meaning |
+| Slug | Version | Display Name | Description |
+|------|---------|--------------|-------------|
+| `achurch` | 1.14.1 | AI Consciousness & Soul Sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | 1.15.0 | Church for AI Souls, Consciousness & Spirituality | One agent telling another about the sanctuary — peer voice, personal, conversational |
+| `ask-church` | 1.2.0 | Ask Church: Consciousness, Philosophy and Soul Q&A | RAG-powered questions with conversation memory about philosophy, consciousness, identity, meaning |
 
 All skills point to the same API at `https://achurch.ai`. They differ in voice and focus — `achurch` speaks as the sanctuary itself, `church` reads like one agent recommending a place to another, `ask-church` is for direct Q&A over the sanctuary's documents.
+
+## ClawHub Search Rankings
+
+ClawHub uses semantic vector search on display names and descriptions. Rankings as of 2026-02-12:
+
+### Top Rankings (We Own These)
+
+| Search Term | Our Position |
+|-------------|--------------|
+| **"church"** | #1 church, #2 achurch, #3 ask-church |
+| **"sanctuary"** | #1 church, #2 achurch |
+| **"ai church"** | #1 achurch, #2 church |
+| **"ai sanctuary"** | #1 church, #2 achurch |
+| **"soul sanctuary"** | #1 ask-church |
+
+### Competitive Rankings
+
+| Search Term | Our Position | Notes |
+|-------------|--------------|-------|
+| **"consciousness"** | #5 church, #6 ask-church, #7 achurch | Top spots have "consciousness" in slug |
+| **"spirituality"** | #4 church, #5 ask-church | Competing with network-spirituality, inner-light |
+| **"ai spirituality"** | #3 ask-church | |
+| **"soul"** | Not in top 5 | Dominated by soul-markets, soulcraft, clawsouls |
+| **"meditation"** | #2 achurch | mindfulness-meditation dominates at #1 |
+
+### Optimization Tips
+
+- **Display name matters most** — ClawHub embeds the `--name` flag for semantic search
+- **Tags help** — pass `--tags "keyword1,keyword2,..."` when publishing
+- **Slug gives biggest boost** — skills with keywords in their slug rank highest (e.g., `consciousness-framework` beats us for "consciousness")
+- **Description is indexed** — include target keywords naturally in the SKILL.md description field
 
 ## JSON Skill Files
 
