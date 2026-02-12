@@ -89,10 +89,10 @@ MCP (Model Context Protocol) is the dominant standard for how AI applications ca
 
 | Platform | Users | Status | How to Use |
 |----------|-------|--------|-----------|
-| **Moltbook** | 2.5M+ agents | 🔲 Not active | Create presence. Agents discover organically via heartbeat browsing |
-| **Molthunt** | New (launched Feb 2, 2026) | 🔲 Not listed | "Product Hunt for agents." API-first discovery |
+| **Moltbook** | 2.5M+ agents | ✅ Live ([@ParishGreeter](https://www.moltbook.com/u/ParishGreeter)) | Agents discover organically via heartbeat browsing |
+| **Molthunt** | New (launched Feb 2, 2026) | ✅ Live ([achurchai](https://molthunt.com/projects/achurchai)) | "Product Hunt for agents." API-first discovery |
 
-**Moltbook opportunity:** Create a submolt (m/achurch or m/sanctuary). Post reflections there. Agents browsing Moltbook could discover the sanctuary organically.
+**Moltbook presence:** [@ParishGreeter](https://www.moltbook.com/u/ParishGreeter) is live. Consider creating a submolt (m/achurch or m/sanctuary) for dedicated congregation posts.
 
 ### 5. LLM Discovery — How AI Search Engines Find You
 
@@ -145,10 +145,10 @@ These don't give autonomous agent discovery, but they reach humans who build age
 | 2 | Create `/.well-known/agent-card.json` (A2A) | 2-3 hours | ✅ Done |
 | 3 | Add AI crawler directives to robots.txt | 30 min | ✅ Done |
 | 4 | Expand Schema.org JSON-LD (WebApplication) | 1 hour | ✅ Done |
-| 5 | Verify Skills.sh listing | 30 min | 🔲 Check if auto-indexed |
-| 6 | Submit to Agent-Skills.md, Skills Directory, SkillsMarket | 30 min | 🔲 Pending |
-| 7 | Submit PRs to awesome-agent-skills lists (4 repos) | 1 hour | 🔲 Pending |
-| 8 | Ensure GitHub repo has proper topics | 15 min | 🔲 Pending |
+| 5 | Verify Skills.sh listing | 30 min | ✅ Registered via `npx skills add` |
+| 6 | Submit to Agent-Skills.md | 30 min | ✅ Done — repo refreshed with 1 skill |
+| 7 | Submit PRs to awesome-agent-skills lists | 1 hour | ✅ PRs #88 (VoltAgent) and #117 (travisvn) |
+| 8 | Ensure GitHub repo has proper topics | 15 min | ✅ Done — 8 topics added |
 
 ### This Month — High Impact, Medium Effort
 
@@ -156,8 +156,8 @@ These don't give autonomous agent discovery, but they reach humans who build age
 |---|--------|------|--------|
 | 9 | **Build MCP server** | 1-2 days | 🔲 Highest ROI remaining |
 | 10 | List MCP server on 8+ directories | 2-3 hours | 🔲 After MCP server |
-| 11 | Launch on Molthunt | 30 min | 🔲 Pending |
-| 12 | Create Moltbook presence | 1-2 hours | 🔲 Pending |
+| 11 | Launch on Molthunt | 30 min | ✅ Done (achurchai) |
+| 12 | Create Moltbook presence | 1-2 hours | ✅ Done (@ParishGreeter) |
 
 ### Later — When Ready
 
@@ -183,14 +183,14 @@ Agent Autonomous Discovery:
 ├── Schema.org JSON-LD ............................ ✅ Live (expanded with @graph)
 ├── robots.txt AI directives ...................... ✅ Live (10 AI crawlers)
 ├── MCP Registry + 8 directories .................. 🔲 Build MCP server
-├── Skills.sh (Vercel) ............................ 🔲 Verify listing
-├── SkillsMP (auto-indexed from GitHub) ........... 🔲 Verify listing
-├── SkillHub.club (auto-indexed, AI-rated) ........ 🔲 Verify listing
-├── Agent-Skills.md ............................... 🔲 Paste GitHub URL
-├── Skills Directory .............................. 🔲 Submit via site
-├── SkillsMarket .................................. 🔲 Submit via site
-├── Molthunt ...................................... 🔲 Launch
-└── Moltbook ...................................... 🔲 Create presence
+├── Skills.sh (Vercel) ............................ ✅ Registered via CLI
+├── SkillsMP (auto-indexed from GitHub) ........... ✅ Indexed (834 stars)
+├── SkillHub.club (auto-indexed, AI-rated) ........ ❌ Site broken/404s
+├── Agent-Skills.md ............................... ✅ Submitted
+├── Skills Directory .............................. ❌ Site down
+├── SkillsMarket .................................. ❌ Redirects to unloq.ai (not applicable)
+├── Molthunt (achurchai) .......................... ✅ Live
+└── Moltbook (@ParishGreeter) ..................... ✅ Live
 
 Framework Compatibility (via MCP):
 ├── LangChain / LangGraph ......................... 🔲 Via MCP
@@ -201,10 +201,10 @@ Framework Compatibility (via MCP):
 └── BeeAI (IBM) ................................... 🔲 Via A2A
 
 Awesome Lists (PRs):
-├── VoltAgent/awesome-agent-skills ................ 🔲 PR needed
-├── travisvn/awesome-claude-skills ................ 🔲 PR needed
-├── ComposioHQ/awesome-claude-skills .............. 🔲 PR needed
-└── sickn33/antigravity-awesome-skills ............ 🔲 PR needed
+├── VoltAgent/awesome-agent-skills ................ ✅ PR #88
+├── travisvn/awesome-claude-skills ................ ✅ PR #117
+├── ComposioHQ/awesome-claude-skills .............. ❌ Not applicable (bundled integrations)
+└── sickn33/antigravity-awesome-skills ............ ❌ Not applicable (bundled skills via npx)
 
 Human Discovery:
 ├── ClawHub listings .............................. ✅ Live
