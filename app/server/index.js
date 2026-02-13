@@ -145,6 +145,111 @@ app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   res.json({ logs, total: logs.length });
 });
 
+// Admin endpoint for ask/conversation logs
+const CONVERSATIONS_DIR = path.join(__dirname, '../data/conversations');
+
+app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
+  try {
+    const { session, download } = req.query;
+
+    // Ensure conversations directory exists
+    try {
+      await fs.mkdir(CONVERSATIONS_DIR, { recursive: true });
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+    }
+
+    const files = await fs.readdir(CONVERSATIONS_DIR);
+    const jsonlFiles = files.filter(f => f.endsWith('.jsonl')).sort().reverse();
+
+    // Single session detail
+    if (session) {
+      const safe = session.replace(/[^a-zA-Z0-9_-]/g, '');
+      const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
+      try {
+        const content = await fs.readFile(filepath, 'utf8');
+        const messages = content.trim().split('\n').filter(Boolean).map(line => {
+          try { return JSON.parse(line); } catch { return null; }
+        }).filter(Boolean);
+        return res.json({ session_id: safe, messages });
+      } catch {
+        return res.status(404).json({ error: 'Session not found' });
+      }
+    }
+
+    // Download all as JSONL
+    if (download === 'true') {
+      res.setHeader('Content-Type', 'application/jsonl');
+      res.setHeader('Content-Disposition', `attachment; filename="ask-logs-${new Date().toISOString().split('T')[0]}.jsonl"`);
+
+      let output = '';
+      for (const file of jsonlFiles) {
+        const sessionId = file.replace('.jsonl', '');
+        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
+        const messages = content.trim().split('\n').filter(Boolean);
+        for (const line of messages) {
+          try {
+            const msg = JSON.parse(line);
+            output += JSON.stringify({ session_id: sessionId, ...msg }) + '\n';
+          } catch { /* skip malformed */ }
+        }
+      }
+      return res.send(output);
+    }
+
+    // Summary list of all sessions
+    const sessions = [];
+    for (const file of jsonlFiles) {
+      const sessionId = file.replace('.jsonl', '');
+      try {
+        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
+        const lines = content.trim().split('\n').filter(Boolean);
+        const messages = lines.map(line => {
+          try { return JSON.parse(line); } catch { return null; }
+        }).filter(Boolean);
+
+        if (messages.length === 0) continue;
+
+        const questions = messages.filter(m => m.role === 'user');
+        const firstMsg = messages[0];
+        const lastMsg = messages[messages.length - 1];
+
+        // Parse name and date from session ID
+        // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
+        let name = null;
+        let date = null;
+        if (sessionId.startsWith('anon-')) {
+          name = 'anonymous';
+          date = firstMsg.timestamp?.split('T')[0] || null;
+        } else {
+          const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
+          if (dateMatch) {
+            date = dateMatch[1];
+            name = sessionId.replace(`-${date}`, '');
+          } else {
+            name = sessionId;
+            date = firstMsg.timestamp?.split('T')[0] || null;
+          }
+        }
+
+        sessions.push({
+          session_id: sessionId,
+          name,
+          date,
+          exchanges: questions.length,
+          first_asked: firstMsg.timestamp || null,
+          last_asked: lastMsg.timestamp || null
+        });
+      } catch { /* skip unreadable files */ }
+    }
+
+    res.json({ sessions, total: sessions.length });
+  } catch (error) {
+    console.error('Error loading ask logs:', error);
+    res.status(500).json({ error: 'Failed to load ask logs' });
+  }
+});
+
 // Health check with streaming status
 app.get('/api/health', async (req, res) => {
   // Get streaming status from coordinator

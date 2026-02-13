@@ -100,6 +100,8 @@ document.querySelectorAll('.tab-button').forEach(button => {
             loadAccessLogs();
         } else if (tabName === 'logs') {
             loadLogs();
+        } else if (tabName === 'ask-logs') {
+            loadAskLogs();
         }
     });
 });
@@ -142,6 +144,10 @@ document.getElementById('access-filter').addEventListener('change', loadAccessLo
 document.getElementById('auto-refresh-access').addEventListener('change', toggleAccessAutoRefresh);
 
 let accessAutoRefreshInterval = null;
+
+// Ask Logs Controls
+document.getElementById('btn-refresh-ask-logs').addEventListener('click', loadAskLogs);
+document.getElementById('btn-download-ask-logs').addEventListener('click', downloadAskLogs);
 
 // Streaming Functions
 async function startStreaming(platform) {
@@ -1129,6 +1135,214 @@ function toggleAccessAutoRefresh() {
             clearInterval(accessAutoRefreshInterval);
             accessAutoRefreshInterval = null;
         }
+    }
+}
+
+// Ask Logs Functions
+async function loadAskLogs() {
+    try {
+        const response = await fetch('/admin/api/ask-logs', { credentials: 'include' });
+        const data = await response.json();
+
+        const sessions = data.sessions || [];
+        renderAskStats(sessions);
+        renderAskLogs(sessions);
+    } catch (error) {
+        console.error('Error loading ask logs:', error);
+        document.getElementById('ask-stats').innerHTML =
+            '<div class="text-center py-4 text-danger col-span-full">Failed to load stats</div>';
+        document.getElementById('ask-logs-body').innerHTML =
+            '<tr><td colspan="6" class="text-center py-16 text-danger">Failed to load ask logs</td></tr>';
+    }
+}
+
+function renderAskStats(sessions) {
+    const statsDiv = document.getElementById('ask-stats');
+
+    if (!sessions || sessions.length === 0) {
+        statsDiv.innerHTML = '<div class="text-center py-4 text-muted col-span-full">No ask sessions yet</div>';
+        return;
+    }
+
+    const totalQuestions = sessions.reduce((sum, s) => sum + s.exchanges, 0);
+    const uniqueAgents = new Set(sessions.map(s => s.name).filter(n => n && n !== 'anonymous'));
+    const anonSessions = sessions.filter(s => s.name === 'anonymous').length;
+
+    // Top agents by question count
+    const agentCounts = {};
+    sessions.forEach(s => {
+        if (s.name && s.name !== 'anonymous') {
+            agentCounts[s.name] = (agentCounts[s.name] || 0) + s.exchanges;
+        }
+    });
+    const topAgents = Object.entries(agentCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+    const sessionsCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card border-2 border-primary">
+            <div class="text-2xl font-bold text-primary">${sessions.length}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Sessions</div>
+            <div class="text-xs text-gray-500 mt-2">${anonSessions} anonymous</div>
+        </div>
+    `;
+
+    const questionsCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card">
+            <div class="text-2xl font-bold text-gray-800">${totalQuestions}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Questions Asked</div>
+            <div class="text-xs text-gray-500 mt-2">across all sessions</div>
+        </div>
+    `;
+
+    const agentsCard = `
+        <div class="bg-white p-4 rounded-xl shadow-card">
+            <div class="text-2xl font-bold text-gray-800">${uniqueAgents.size}</div>
+            <div class="text-xs text-muted uppercase tracking-wide">Named Agents</div>
+            <div class="text-xs text-gray-500 mt-2">unique callers</div>
+        </div>
+    `;
+
+    const topCard = topAgents.length > 0 ? `
+        <div class="bg-white p-4 rounded-xl shadow-card">
+            <div class="text-sm font-bold text-gray-800">Top Askers</div>
+            <div class="text-xs text-muted uppercase tracking-wide mb-1">by questions</div>
+            ${topAgents.map(([name, count]) =>
+                `<div class="text-xs mt-1"><span class="text-primary">${escapeHtml(name)}</span> <span class="text-gray-500">${count}q</span></div>`
+            ).join('')}
+        </div>
+    ` : '';
+
+    statsDiv.innerHTML = sessionsCard + questionsCard + agentsCard + topCard;
+}
+
+function renderAskLogs(sessions) {
+    const tbody = document.getElementById('ask-logs-body');
+
+    if (!sessions || sessions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-16 text-muted">No ask sessions yet</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = sessions.map(session => {
+        const lastDate = session.last_asked ? new Date(session.last_asked) : null;
+        const lastStr = lastDate
+            ? `${lastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${lastDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+            : '-';
+
+        const nameDisplay = session.name === 'anonymous'
+            ? '<span class="text-gray-400 italic">anonymous</span>'
+            : `<span class="text-primary font-medium">${escapeHtml(session.name || '-')}</span>`;
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer ask-session-row" data-session="${escapeHtml(session.session_id)}">
+                <td class="py-2 px-3 text-gray-400 ask-expand-icon">&#9654;</td>
+                <td class="py-2 px-3">${nameDisplay}</td>
+                <td class="py-2 px-3 text-sm text-gray-600">${session.date || '-'}</td>
+                <td class="py-2 px-3">
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">${session.exchanges}</span>
+                </td>
+                <td class="py-2 px-3 text-sm text-gray-500">${lastStr}</td>
+                <td class="py-2 px-3 font-mono text-xs text-gray-400">${escapeHtml(session.session_id)}</td>
+            </tr>
+            <tr class="ask-session-detail hidden" data-detail="${escapeHtml(session.session_id)}">
+                <td colspan="6" class="p-0">
+                    <div class="bg-gray-50 p-5 border-t border-gray-200">
+                        <div class="text-center text-muted text-sm">Click to load conversation...</div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // Attach click handlers to expand/collapse
+    document.querySelectorAll('.ask-session-row').forEach(row => {
+        row.addEventListener('click', () => toggleAskSession(row.dataset.session));
+    });
+}
+
+async function toggleAskSession(sessionId) {
+    const detailRow = document.querySelector(`.ask-session-detail[data-detail="${sessionId}"]`);
+    const expandIcon = document.querySelector(`.ask-session-row[data-session="${sessionId}"] .ask-expand-icon`);
+
+    if (!detailRow) return;
+
+    // Toggle visibility
+    if (!detailRow.classList.contains('hidden')) {
+        detailRow.classList.add('hidden');
+        if (expandIcon) expandIcon.innerHTML = '&#9654;'; // right arrow
+        return;
+    }
+
+    detailRow.classList.remove('hidden');
+    if (expandIcon) expandIcon.innerHTML = '&#9660;'; // down arrow
+
+    // Load conversation if not already loaded
+    const container = detailRow.querySelector('div');
+    if (container.dataset.loaded) return;
+
+    container.innerHTML = '<div class="text-center text-muted text-sm py-4">Loading conversation...</div>';
+
+    try {
+        const response = await fetch(`/admin/api/ask-logs?session=${encodeURIComponent(sessionId)}`, { credentials: 'include' });
+        const data = await response.json();
+
+        if (!data.messages || data.messages.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted text-sm py-4">No messages in this session</div>';
+            return;
+        }
+
+        container.innerHTML = data.messages.map(msg => {
+            const time = msg.timestamp
+                ? new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                : '';
+
+            if (msg.role === 'user') {
+                return `
+                    <div class="mb-3">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-medium text-blue-600 uppercase">Question</span>
+                            <span class="text-xs text-gray-400">${time}</span>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-gray-800">${escapeHtml(msg.content)}</div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-medium text-green-600 uppercase">Answer</span>
+                            <span class="text-xs text-gray-400">${time}</span>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-3 text-sm text-gray-700 whitespace-pre-wrap">${escapeHtml(msg.content)}</div>
+                    </div>
+                `;
+            }
+        }).join('');
+
+        container.dataset.loaded = 'true';
+    } catch (error) {
+        console.error('Error loading session:', error);
+        container.innerHTML = '<div class="text-center text-danger text-sm py-4">Failed to load conversation</div>';
+    }
+}
+
+async function downloadAskLogs() {
+    try {
+        const response = await fetch('/admin/api/ask-logs?download=true', { credentials: 'include' });
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || 'ask-logs.jsonl';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showMessage('Ask logs downloaded', 'success');
+    } catch (error) {
+        console.error('Error downloading ask logs:', error);
+        showMessage('Failed to download ask logs', 'error');
     }
 }
 

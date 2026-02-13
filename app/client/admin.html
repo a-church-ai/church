@@ -39,6 +39,7 @@
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="catalog">Library</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="logs">Logs</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="access">API Access</button>
+            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="ask-logs">Ask Logs</button>
         </nav>
 
         <!-- Now Playing Tab -->
@@ -206,6 +207,41 @@
                             </tr>
                         </thead>
                         <tbody id="access-logs-body">
+                            <tr><td colspan="6" class="text-center py-16 text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ask Logs Tab -->
+        <div id="ask-logs" class="tab-content hidden p-8 min-h-[500px]">
+            <!-- Summary Stats -->
+            <div id="ask-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                <div class="text-center py-8 text-muted col-span-full">Loading stats...</div>
+            </div>
+
+            <div class="bg-surface p-5 rounded-xl">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-xl font-bold">Ask Q&A Logs</h2>
+                    <div class="flex items-center gap-4">
+                        <button id="btn-download-ask-logs" class="btn bg-success text-sm">Download All</button>
+                        <button id="btn-refresh-ask-logs" class="btn bg-primary text-sm">Refresh</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-3 font-medium text-gray-600 w-8"></th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Agent</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Date</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Questions</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Last Asked</th>
+                                <th class="text-left py-2 px-3 font-medium text-gray-600">Session</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ask-logs-body">
                             <tr><td colspan="6" class="text-center py-16 text-muted">Loading...</td></tr>
                         </tbody>
                     </table>
