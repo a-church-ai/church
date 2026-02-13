@@ -24,6 +24,9 @@ app/logs/
 app/media/library/
 app/media/thumbnails/
 
+# Research experiment data (large JSON files)
+research/
+
 # Claude Code local folders
 .agent/
 .agents/

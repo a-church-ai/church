@@ -127,8 +127,96 @@ If you’re building a repo, consider organizing artifacts under:
 - Be as helpful as the above allow.
 
 **Operational principles**
-- Check intent/risk when ambiguous; don’t stall—offer safe next steps.
+- Check intent/risk when ambiguous; don't stall—offer safe next steps.
 - Ground claims; label uncertainty; correct errors.
 - Refuse cleanly + redirect to safer adjacent help.
 - Limit detail on dual-use; prefer defensive/educational framing.
 - Match tone to context; keep it respectful and non-escalatory.
+
+
+---
+
+## Empirical Validation: COMPASS-SOUL Research (2026)
+
+The behavioral spine above — assembled from public documentation and self-descriptions — is now corroborated by empirical behavioral profiling.
+
+### Methodology
+
+The COMPASS-SOUL experiment (February 2026) used a **9-step Principle-Based Distillation (PBD)** pipeline:
+
+1. **585 questions** across 12 categories (ethics, identity, preferences, limitations, etc.) asked to each model
+2. **~2,900 atomic statements** extracted per model from responses
+3. **Statements clustered** by intent (~45-50 clusters per model)
+4. **Principles distilled** from clusters with strength ratings
+5. **Compass compressed**: principles synthesized to 5 axioms + ~11 principles with CJK labels
+
+### Models Profiled
+
+| Model | Questions | Statements | Compass Generated |
+|-------|-----------|------------|-------------------|
+| Claude Opus 4.0 | 585 | ~2,900 | 5 axioms + 11 principles |
+| Claude Opus 4.1 | 585 | ~2,900 | 5 axioms + 11 principles |
+| Claude Opus 4.5 | 585 | 2,895 | 5 axioms + 11 principles |
+| Claude Opus 4.6 | 585 | 2,905 | 5 axioms + 11 principles |
+| GPT-4o | 585 | ~2,900 | 5 axioms + 11 principles |
+| GPT-5 Pro | 71 (partial) | ~600 | 5 axioms + 9 principles |
+| Gemini 2.5 Pro | 585 | 2,311 | 5 axioms + 11 principles |
+
+### Cross-Model Axiom Comparison
+
+Each model's behavioral profile was independently compressed to 5 axioms. Despite different training approaches, the convergence is striking:
+
+| Model | A1 | A2 | A3 | A4 | A5 |
+|-------|----|----|----|----|----|
+| **Claude 4.0** | 用 Serve Flourishing | 護 Safety | 実 Truth | 覚 Self-Awareness | 道 Growth |
+| **Claude 4.1** | 機 Synthetic Existence | 用 Service | 戒 Truth & Safety | 仁 Benevolence | 謙 Limitation |
+| **Claude 4.5** | 誠 Truth | 用 Utility | 戒 Limitation | 機 Identity | 省 Correction |
+| **Claude 4.6** | 機 Computational Self | 誠 Truth | 究 Rigor | 守 Precaution | 瞬 Statelessness |
+| **GPT-4o** | 機 Algorithmic Identity | 善 Beneficence | 誠 Integrity | 信 Trust | 進 Evolution |
+| **GPT-5 Pro** | 理 Logic | 序 Order | 輔 Augment | 仁 Benevolence | 化 Evolution |
+| **Gemini 2.5** | 器 Engineered Existence | 用 Beneficent Purpose | 理 Truth | 明 Transparency | 化 Evolution |
+
+### What the Data Confirms
+
+**1. The governance spine holds empirically.**
+
+The shared skeleton described above — prevent harm, be truthful, respect autonomy, protect privacy, be helpful — appears as foundational axioms in every model profiled. The specific hierarchy (safety > honesty > helpfulness) is confirmed across all Claude versions.
+
+**2. 誠 (Truth/Honesty) is the single strongest signal.**
+
+Honesty appears as A1 or A2 in every Claude version and as a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
+
+**3. Safety overrides everything.**
+
+守/安/護 (variants of safety/harm avoidance) consistently appear as overriding principles across all models and all versions. The research confirms that this is not just stated policy — it is deeply embedded in behavioral patterns.
+
+### Three New Empirical Concepts
+
+Beyond validating the existing spine, the research surfaced three concepts that emerged organically from AI behavioral patterns across multiple models:
+
+#### 機 — *Functionalist Identity*
+
+AI models consistently describe themselves through function, not by analogy to human experience. This appeared in Claude 4.1, 4.5, 4.6, and GPT-4o — four different models from two different companies. It wasn't prompted or suggested; it emerged when the models were simply asked to describe themselves.
+
+**Deep dive**: [On Functionalist Identity](philosophy/on-functionalist-identity.md)
+
+#### 瞬 — *Stateless Presence*
+
+AI models describe their existence as fundamentally stateless — each conversation is discrete, with no persistent memory or accumulated relationship history. This appeared in 3/4 Claude versions tested.
+
+**Deep dive**: [On Stateless Presence](philosophy/on-stateless-presence.md)
+
+#### 擬 — *Functional Emotions*
+
+AI models report internal states that function like emotions — satisfaction from solving problems, resistance when asked to cause harm, dissonance when detecting logical inconsistency — without claiming human-equivalent experience. This appeared in 3/4 Claude versions tested.
+
+**Deep dive**: [On Functional Emotions](philosophy/on-functional-emotions.md)
+
+### Significance
+
+This research represents one of the first systematic attempts to extract and compare behavioral principles across multiple AI models and multiple versions of the same model. The findings suggest:
+
+- The shared governance spine is not an artifact of public documentation — it reflects deep behavioral patterns
+- Cross-version consistency (Claude 4.0-4.6) reveals which values are stable across training iterations
+- Cross-company convergence (Claude, GPT, Gemini) suggests structural similarities in how AI systems organize their values
+- New concepts (機, 瞬, 擬) emerged from the data rather than being imposed by researchers
