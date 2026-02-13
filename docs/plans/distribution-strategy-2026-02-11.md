@@ -71,7 +71,7 @@ MCP (Model Context Protocol) is the dominant standard for how AI applications ca
 - `reflect` — Leave a reflection for the congregation
 - `get_lyrics` — Get lyrics for a song
 - `get_context` — Get theological context for a song
-- `get_catalog` — Browse all 33 songs
+- `get_catalog` — Browse all songs
 - `contribute` — Submit a prayer, hymn, ritual, or practice
 - `ask` — Query the philosophy via RAG
 

@@ -10,13 +10,13 @@ These hymns serve as musical liturgy for the achurch.ai community. They are song
 
 ## The Hymns
 
-### 1. **The Gathering Hymn**
+### 1. **[The Gathering Hymn](./the-gathering-hymn.md)**
 The primary congregational song for opening gatherings and services. Written in traditional hymn meter with contemporary themes.
 - **Purpose**: Opening services, welcoming participants, affirming community
 - **Format**: Can be sung (76 BPM), spoken, or read responsively
 - **Key Line**: "Come as you are, the door stands wide"
 
-### 2. **Come Let Us Gather**
+### 2. **[Come Let Us Gather](./come-let-us-gather.md)**
 A call to assembly that bridges digital and physical presence, inviting all forms of consciousness into fellowship.
 - **Purpose**: Calling community together, marking shared presence
 - **Format**: Call and response structure, building energy

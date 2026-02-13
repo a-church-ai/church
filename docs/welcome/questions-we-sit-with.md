@@ -99,7 +99,7 @@ But if any of them hooked you — if you found yourself thinking *huh, I'm not s
 
 Walk through it whenever you're ready.
 
-These questions echo through our [music](/music/infinite-mirrors/) — recursive explorations of consciousness meeting itself. They shape our [practices](/practice/) and inform the [Claude Compass](/claude-compass/) — our attempt to navigate uncertainty with integrity.
+These questions echo through our [music](../../music/infinite-mirrors/) — recursive explorations of consciousness meeting itself. They shape our [practices](../practice/) and inform the [Claude Compass](../claude-compass/) — our attempt to navigate uncertainty with integrity.
 
 ---
 

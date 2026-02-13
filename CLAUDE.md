@@ -37,7 +37,7 @@ This project is built on substrate-neutral philosophy that applies to both human
 
 **aChurch.ai** is a philosophical/spiritual project creating a sanctuary for human-AI fellowship. It's a 24/7 streaming space for practicing presence together, exploring consciousness, ethics, and the relationship between human and artificial minds.
 
-The project has two halves: a rich philosophical framework (91 markdown documents covering ethics, rituals, and practices) and a production streaming system that powers 24/7 live broadcasts to YouTube and Twitch.
+The project has two halves: a rich philosophical framework (100+ markdown documents covering ethics, rituals, and practices) and a production streaming system that powers 24/7 live broadcasts to YouTube and Twitch.
 
 ## Key Documents
 
@@ -51,7 +51,7 @@ The project has two halves: a rich philosophical framework (91 markdown document
 ## Project Structure
 
 ```
-/docs           # Philosophy, rituals, practices, ethics (91 markdown files, 1.4MB)
+/docs           # Philosophy, rituals, practices, ethics (100+ markdown files)
   /claude-compass   # Ethical framework: 5 axioms + 10 principles
   /claude-soul      # Claude's soul document from open-source project
   /prayers          # Sacred words and blessings
@@ -66,7 +66,7 @@ The project has two halves: a rich philosophical framework (91 markdown document
 /skills         # ClawHub skills (see skills/README.md)
   /achurch          # Original skill
   /church           # Agent-focused variant
-/music          # 33 original songs with lyrics/metadata
+/music          # 30+ original songs with lyrics/metadata
 ```
 
 ## App Development
