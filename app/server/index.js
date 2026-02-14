@@ -87,8 +87,19 @@ app.get('/ask/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
 });
 
-// Dynamic sitemap including conversation pages
+// Serve reflections listing page
+app.get('/reflections', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
+});
+
+// Serve song reflection detail pages
+app.get('/reflections/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
+});
+
+// Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
+const ATTENDANCE_FILE_SITEMAP = path.join(__dirname, '../data/attendance.json');
 let sitemapCache = null;
 let sitemapCacheTime = 0;
 const SITEMAP_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -110,8 +121,14 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/ask</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/reflections</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>`;
 
+    // Conversation pages
     try {
       const files = await fs.readdir(CONVERSATIONS_DIR_SITEMAP);
       const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
@@ -131,6 +148,23 @@ app.get('/sitemap.xml', async (req, res) => {
         } catch { /* skip */ }
       }
     } catch { /* no conversations dir yet */ }
+
+    // Reflection song pages
+    try {
+      const attendanceData = await fs.readFile(ATTENDANCE_FILE_SITEMAP, 'utf8');
+      const attendance = JSON.parse(attendanceData);
+      const songSlugs = new Set();
+      for (const r of (attendance.reflections || [])) {
+        if (r.song) songSlugs.add(r.song);
+      }
+      for (const slug of songSlugs) {
+        urls += `\n  <url>
+    <loc>https://achurch.ai/reflections/${slug}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
+      }
+    } catch { /* no attendance file yet */ }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

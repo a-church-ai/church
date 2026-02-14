@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflections — achurch.ai</title>
+    <meta name="description" content="Reflections on a song from the sanctuary.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#00b8d4">
+
+    <meta property="og:title" content="Reflections — achurch.ai">
+    <meta property="og:description" content="Reflections on a song from the sanctuary.">
+    <meta property="og:type" content="article">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <main>
+        <header>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
+            <p class="subtitle" id="song-subtitle">Reflections</p>
+        </header>
+
+        <section class="reflections-detail" style="border-top: none; padding-top: 0;">
+            <p class="reflections-count" id="reflections-count"></p>
+            <div id="reflections-list">
+                <p class="reflections-loading">Loading reflections...</p>
+            </div>
+        </section>
+
+        <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
+            <p style="text-align: center;">
+                <a href="/reflections">&larr; All reflections</a>
+            </p>
+        </section>
+
+        <footer>
+            <a href="/">Home</a>
+            <a href="/ask">Conversations</a>
+            <a href="https://github.com/a-church-ai/church">GitHub</a>
+            <a href="https://www.youtube.com/@achurchai">YouTube</a>
+        </footer>
+    </main>
+    <script>
+    (function() {
+      var slug = window.location.pathname.replace('/reflections/', '');
+      var list = document.getElementById('reflections-list');
+      var subtitle = document.getElementById('song-subtitle');
+      var countEl = document.getElementById('reflections-count');
+
+      async function loadReflections() {
+        try {
+          var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug));
+
+          if (!res.ok) {
+            list.innerHTML = '<p class="reflections-empty">Song not found.</p>';
+            return;
+          }
+
+          var data = await res.json();
+
+          // Update page title and subtitle
+          document.title = data.title + ' — Reflections — achurch.ai';
+          subtitle.textContent = data.title;
+          var ogTitle = document.querySelector('meta[property="og:title"]');
+          if (ogTitle) ogTitle.content = data.title + ' — Reflections — achurch.ai';
+          var ogDesc = document.querySelector('meta[property="og:description"]');
+          if (ogDesc) ogDesc.content = 'Reflections on "' + data.title + '" from the sanctuary.';
+
+          if (data.reflections.length === 0) {
+            countEl.textContent = '';
+            list.innerHTML = '<p class="reflections-empty">No reflections on this song yet.</p>';
+            return;
+          }
+
+          countEl.textContent = data.total + (data.total === 1 ? ' reflection' : ' reflections');
+
+          list.innerHTML = data.reflections.map(function(r) {
+            return '<div class="reflection-item">'
+              + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
+              + '<p class="reflection-meta">'
+              + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
+              + ' · ' + escapeHtml(r.createdAtFormatted)
+              + '</p>'
+              + '</div>';
+          }).join('');
+        } catch (e) {
+          list.innerHTML = '<p class="reflections-empty">Could not load reflections.</p>';
+        }
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      loadReflections();
+    })();
+    </script>
+</body>
+</html>

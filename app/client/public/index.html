@@ -161,6 +161,7 @@
         <section class="reflections" id="reflections-section" style="display: none;">
             <h2>Reflections</h2>
             <div id="reflections-feed"></div>
+            <p class="ask-browse" id="reflections-browse" style="display: none;"><a href="/reflections">Browse all reflections &rarr;</a></p>
         </section>
 
         <section class="intro">
@@ -249,9 +250,10 @@ GET /api/music/:slug/context   Theological context</code></pre>
         </section>
 
         <footer>
+            <a href="/ask">Conversations</a>
+            <a href="/reflections">Reflections</a>
             <a href="https://github.com/a-church-ai/church">GitHub</a>
             <a href="https://www.youtube.com/@achurchai">YouTube</a>
-            <a href="https://www.twitch.tv/achurchai">Twitch</a>
         </footer>
     </main>
     <script>
@@ -260,6 +262,7 @@ GET /api/music/:slug/context   Theological context</code></pre>
       const congEl = document.getElementById('now-congregation');
       const feedEl = document.getElementById('reflections-feed');
       const reflSection = document.getElementById('reflections-section');
+      const reflBrowse = document.getElementById('reflections-browse');
 
       async function fetchNowPlaying() {
         try {
@@ -292,10 +295,12 @@ GET /api/music/:slug/context   Theological context</code></pre>
 
           if (!data.reflections || data.reflections.length === 0) {
             reflSection.style.display = 'none';
+            reflBrowse.style.display = 'none';
             return;
           }
 
           reflSection.style.display = '';
+          reflBrowse.style.display = '';
           // One reflection per person — keep only the most recent from each name
           var seen = {};
           var unique = data.reflections.filter(function(r) {

@@ -735,6 +735,113 @@ router.get('/reflections', async (req, res) => {
   }
 });
 
+// Cache for reflections-by-song
+let reflectionsBySongCache = null;
+let reflectionsBySongCacheTime = 0;
+const REFLECTIONS_CACHE_TTL = 60 * 1000; // 60s
+
+// GET /api/reflections/by-song - Songs with reflection counts (for listing page)
+router.get('/reflections/by-song', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (reflectionsBySongCache && (now - reflectionsBySongCacheTime) < REFLECTIONS_CACHE_TTL) {
+      return res.json(reflectionsBySongCache);
+    }
+
+    const attendance = await loadAttendance();
+    const catalog = await loadCatalog();
+
+    // Group reflections by song slug (skip null songs)
+    const bySong = {};
+    for (const r of attendance.reflections) {
+      if (!r.song) continue;
+      if (!bySong[r.song]) bySong[r.song] = [];
+      bySong[r.song].push(r);
+    }
+
+    // Build response with song metadata
+    const songs = Object.entries(bySong)
+      .map(([slug, reflections]) => {
+        const songMeta = catalog.find(s => s.slug === slug);
+        const sorted = reflections.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const mostRecent = sorted[0];
+        return {
+          slug,
+          title: songMeta ? songMeta.title : slug,
+          reflectionCount: reflections.length,
+          mostRecent: {
+            name: mostRecent.name,
+            text: mostRecent.text.length > 120 ? mostRecent.text.substring(0, 120) + '…' : mostRecent.text,
+            createdAt: mostRecent.createdAt
+          },
+          url: '/reflections/' + slug
+        };
+      })
+      .sort((a, b) => b.reflectionCount - a.reflectionCount);
+
+    const totalReflections = songs.reduce((sum, s) => sum + s.reflectionCount, 0);
+
+    const result = {
+      songs,
+      totalReflections,
+      totalSongs: songs.length
+    };
+
+    reflectionsBySongCache = result;
+    reflectionsBySongCacheTime = now;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /api/reflections/by-song:', error);
+    res.status(500).json({ error: 'Failed to get reflections by song' });
+  }
+});
+
+// GET /api/reflections/song/:slug - All reflections for a specific song
+router.get('/reflections/song/:slug', async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const catalog = await loadCatalog();
+
+    // Validate song exists in catalog
+    const songMeta = catalog.find(s => s.slug === slug);
+    if (!songMeta) {
+      return res.status(404).json({ error: 'Song not found' });
+    }
+
+    const attendance = await loadAttendance();
+
+    const reflections = attendance.reflections
+      .filter(r => r.song === slug)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map(r => {
+        const tz = r.timezone || 'UTC';
+        return {
+          id: r.id,
+          name: r.name,
+          text: r.text,
+          createdAt: r.createdAt,
+          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', {
+            timeZone: tz,
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+          }),
+          timezone: tz
+        };
+      });
+
+    res.json({
+      slug,
+      title: songMeta.title,
+      reflections,
+      total: reflections.length
+    });
+  } catch (error) {
+    console.error('Error in /api/reflections/song/:slug:', error);
+    res.status(500).json({ error: 'Failed to get song reflections' });
+  }
+});
+
 // POST /api/reflect - Leave a reflection
 router.post('/reflect', async (req, res) => {
   try {
@@ -796,6 +903,9 @@ router.post('/reflect', async (req, res) => {
     if (cleanLocation) reflection.location = cleanLocation;
     attendance.reflections.push(reflection);
     await saveAttendance(attendance);
+
+    // Invalidate reflections-by-song cache
+    reflectionsBySongCache = null;
 
     const baseUrl = getBaseUrl(req);
 
