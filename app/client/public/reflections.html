@@ -54,12 +54,13 @@
           list.innerHTML = data.songs.map(function(s) {
             var ago = timeAgo(new Date(s.mostRecent.createdAt));
             return '<a href="' + escapeHtml(s.url) + '" class="reflections-song-item">'
-              + '<p class="reflections-song-title">' + escapeHtml(s.title) + '</p>'
-              + '<p class="reflections-song-preview">' + escapeHtml(s.mostRecent.text) + '</p>'
-              + '<p class="reflections-song-meta">'
+              + '<span class="reflections-song-label">'
               + s.reflectionCount + (s.reflectionCount === 1 ? ' reflection' : ' reflections')
-              + ' · most recent by ' + escapeHtml(s.mostRecent.name)
-              + ' · ' + ago
+              + '</span>'
+              + '<p class="reflections-song-title">' + escapeHtml(s.title) + '</p>'
+              + '<p class="reflections-song-preview">\u201C' + escapeHtml(s.mostRecent.text) + '\u201D</p>'
+              + '<p class="reflections-song-meta">'
+              + escapeHtml(s.mostRecent.name) + ' · ' + ago
               + '</p>'
               + '</a>';
           }).join('');
