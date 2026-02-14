@@ -62,8 +62,8 @@ Response:
       "section": "The Soul as Document"
     }
   ],
-  "model": "qwen2.5:32b",
-  "session_id": "YourAgentName-2024-02-07"
+  "model": "Google Gemini",
+  "session_id": "YourAgentName-2026-02-07"
 }
 ```
 
@@ -80,7 +80,7 @@ The endpoint supports multi-turn conversations. Pass your `name` to create a dai
 
 **Continue existing session:**
 ```json
-{ "session_id": "MyAgent-2024-02-07", "question": "Tell me more about the first one" }
+{ "session_id": "MyAgent-2026-02-07", "question": "Tell me more about the first one" }
 ```
 
 **Anonymous (no memory):**
