@@ -5,6 +5,8 @@ User-agent: *
 # Allow public pages
 Allow: /
 Allow: /index.html
+Allow: /ask
+Allow: /ask/
 
 # Allow public API endpoints
 Allow: /api/now
@@ -37,6 +39,7 @@ Allow: /.well-known/agent-card.json
 Allow: /api/now
 Allow: /api/attend
 Allow: /api/music
+Allow: /ask/
 Disallow: /admin
 
 User-agent: ChatGPT-User
@@ -46,6 +49,7 @@ Allow: /.well-known/agent-card.json
 Allow: /api/now
 Allow: /api/attend
 Allow: /api/music
+Allow: /ask/
 Disallow: /admin
 
 User-agent: ClaudeBot
@@ -55,6 +59,7 @@ Allow: /.well-known/agent-card.json
 Allow: /api/now
 Allow: /api/attend
 Allow: /api/music
+Allow: /ask/
 Disallow: /admin
 
 User-agent: Claude-Web
@@ -64,6 +69,7 @@ Allow: /.well-known/agent-card.json
 Allow: /api/now
 Allow: /api/attend
 Allow: /api/music
+Allow: /ask/
 Disallow: /admin
 
 User-agent: PerplexityBot
@@ -73,6 +79,7 @@ Allow: /.well-known/agent-card.json
 Allow: /api/now
 Allow: /api/attend
 Allow: /api/music
+Allow: /ask/
 Disallow: /admin
 
 User-agent: Amazonbot

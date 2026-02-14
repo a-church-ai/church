@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation — achurch.ai</title>
+    <meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#00b8d4">
+
+    <meta property="og:title" content="Conversation — achurch.ai">
+    <meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
+    <meta property="og:type" content="article">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <main>
+        <header>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
+            <p class="subtitle" id="conv-subtitle">Conversation</p>
+        </header>
+
+        <section class="conv-section" style="border-top: none; padding-top: 0;">
+            <div class="conv-thread" id="conv-thread">
+                <p class="conv-loading">Loading conversation...</p>
+            </div>
+        </section>
+
+        <section class="conv-followup-section" id="conv-followup-section" style="display: none; border-top: 1px solid #eee;">
+            <form id="followup-form">
+                <div class="ask-input-row">
+                    <input type="text" id="followup-input" placeholder="Ask a follow-up..." maxlength="500" autocomplete="off" />
+                    <button type="submit" id="followup-submit">Ask</button>
+                </div>
+            </form>
+            <p class="ask-status" id="followup-status"></p>
+        </section>
+
+        <section class="conv-nav" style="border-top: none; padding-top: 1rem;">
+            <p style="text-align: center;">
+                <a href="/ask">&larr; All conversations</a>
+            </p>
+        </section>
+
+        <footer>
+            <a href="/">Home</a>
+            <a href="https://github.com/a-church-ai/church">GitHub</a>
+            <a href="https://www.youtube.com/@achurchai">YouTube</a>
+        </footer>
+    </main>
+    <script>
+    (function() {
+      var slug = window.location.pathname.replace('/ask/', '');
+      var thread = document.getElementById('conv-thread');
+      var subtitle = document.getElementById('conv-subtitle');
+      var followupSection = document.getElementById('conv-followup-section');
+      var sessionId = slug;
+
+      // Cookie helpers
+      function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+
+      function getOwnerToken() {
+        return getCookie('ask_owner_' + slug);
+      }
+
+      function getStoredName() {
+        try { return localStorage.getItem('ask_name') || ''; } catch { return ''; }
+      }
+
+      async function loadConversation() {
+        try {
+          var res = await fetch('/api/ask/conversation/' + encodeURIComponent(slug));
+          if (!res.ok) {
+            thread.innerHTML = '<p class="conv-not-found">Conversation not found.</p>';
+            return;
+          }
+
+          var data = await res.json();
+          sessionId = data.session_id;
+
+          // Update page title and subtitle
+          if (data.messages.length > 0) {
+            var firstQ = data.messages.find(function(m) { return m.role === 'user'; });
+            if (firstQ) {
+              document.title = firstQ.content.substring(0, 60) + ' — achurch.ai';
+              var ogTitle = document.querySelector('meta[property="og:title"]');
+              if (ogTitle) ogTitle.content = firstQ.content.substring(0, 60) + ' — achurch.ai';
+              var ogDesc = document.querySelector('meta[property="og:description"]');
+              if (ogDesc) ogDesc.content = firstQ.content;
+            }
+            subtitle.textContent = data.name !== 'anonymous' ? data.name : 'Conversation';
+          }
+
+          renderMessages(data.messages);
+
+          // Show follow-up form only if user owns this conversation
+          var ownerToken = getOwnerToken();
+          if (data.has_owner && !ownerToken) {
+            // Owned by someone else — read only
+            followupSection.style.display = 'none';
+          } else {
+            // Either no owner (old-style) or user is the owner
+            followupSection.style.display = '';
+          }
+        } catch (e) {
+          thread.innerHTML = '<p class="conv-not-found">Could not load conversation.</p>';
+        }
+      }
+
+      function renderMessages(messages) {
+        thread.innerHTML = messages.map(function(m) {
+          var cls = m.role === 'user' ? 'conv-message-user' : 'conv-message-assistant';
+          var label = m.role === 'user' ? 'Question' : 'Answer';
+          var time = m.timestamp ? formatTime(new Date(m.timestamp)) : '';
+          return '<div class="conv-message ' + cls + '">'
+            + '<p class="conv-message-label">' + label + (time ? ' · ' + time : '') + '</p>'
+            + '<div class="conv-message-content">' + escapeHtml(m.content) + '</div>'
+            + '</div>';
+        }).join('');
+      }
+
+      function appendMessage(role, content) {
+        var cls = role === 'user' ? 'conv-message-user' : 'conv-message-assistant';
+        var label = role === 'user' ? 'Question' : 'Answer';
+        var time = formatTime(new Date());
+        var div = document.createElement('div');
+        div.className = 'conv-message ' + cls;
+        div.innerHTML = '<p class="conv-message-label">' + label + ' · ' + time + '</p>'
+          + '<div class="conv-message-content">' + escapeHtml(content) + '</div>';
+        thread.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // Follow-up form
+      var followupForm = document.getElementById('followup-form');
+      var followupInput = document.getElementById('followup-input');
+      var followupSubmit = document.getElementById('followup-submit');
+      var followupStatus = document.getElementById('followup-status');
+
+      followupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var question = followupInput.value.trim();
+        if (!question) return;
+
+        followupSubmit.disabled = true;
+        followupStatus.textContent = 'Thinking...';
+        followupStatus.className = 'ask-status ask-thinking';
+
+        appendMessage('user', question);
+        followupInput.value = '';
+
+        var ownerToken = getOwnerToken();
+        var storedName = getStoredName();
+
+        try {
+          var body = {
+            question: question,
+            name: storedName || 'Visitor',
+            session_id: sessionId
+          };
+          if (ownerToken) body.owner_token = ownerToken;
+
+          var res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          if (res.status === 429) {
+            followupStatus.textContent = 'Rest a while. You can ask again soon.';
+            followupStatus.className = 'ask-status ask-error';
+            followupSubmit.disabled = false;
+            return;
+          }
+
+          if (res.status === 403) {
+            followupStatus.textContent = 'Only the conversation starter can ask follow-ups.';
+            followupStatus.className = 'ask-status ask-error';
+            followupSubmit.disabled = false;
+            followupSection.style.display = 'none';
+            return;
+          }
+
+          if (!res.ok) {
+            followupStatus.textContent = 'Something went wrong. Try again.';
+            followupStatus.className = 'ask-status ask-error';
+            followupSubmit.disabled = false;
+            return;
+          }
+
+          var data = await res.json();
+          appendMessage('assistant', data.answer);
+          followupStatus.textContent = '';
+          followupSubmit.disabled = false;
+        } catch (err) {
+          followupStatus.textContent = 'Could not reach the sanctuary. Try again.';
+          followupStatus.className = 'ask-status ask-error';
+          followupSubmit.disabled = false;
+        }
+      });
+
+      function formatTime(date) {
+        return date.toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      loadConversation();
+    })();
+    </script>
+</body>
+</html>

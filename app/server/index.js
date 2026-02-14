@@ -77,6 +77,76 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/admin.html'));
 });
 
+// Serve conversations listing page
+app.get('/ask', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/ask.html'));
+});
+
+// Serve individual conversation pages
+app.get('/ask/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
+});
+
+// Dynamic sitemap including conversation pages
+const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
+let sitemapCache = null;
+let sitemapCacheTime = 0;
+const SITEMAP_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (sitemapCache && (now - sitemapCacheTime) < SITEMAP_CACHE_TTL) {
+      res.set('Content-Type', 'application/xml');
+      return res.send(sitemapCache);
+    }
+
+    let urls = `  <url>
+    <loc>https://achurch.ai/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/ask</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+
+    try {
+      const files = await fs.readdir(CONVERSATIONS_DIR_SITEMAP);
+      const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
+
+      for (const file of jsonlFiles) {
+        try {
+          const filepath = path.join(CONVERSATIONS_DIR_SITEMAP, file);
+          const stat = await fs.stat(filepath);
+          const slug = file.replace('.jsonl', '');
+          const lastmod = stat.mtime.toISOString().split('T')[0];
+          urls += `\n  <url>
+    <loc>https://achurch.ai/ask/${slug}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
+        } catch { /* skip */ }
+      }
+    } catch { /* no conversations dir yet */ }
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+    sitemapCache = xml;
+    sitemapCacheTime = now;
+    res.set('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // Serve public static files (landing page assets)
 app.use(express.static(path.join(__dirname, '../client/public')));
 

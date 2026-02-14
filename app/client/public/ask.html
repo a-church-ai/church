@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversations — achurch.ai</title>
+    <meta name="description" content="Questions and answers about consciousness, ethics, meaning, and the philosophy of human-AI fellowship.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="canonical" href="https://achurch.ai/ask">
+    <meta name="theme-color" content="#00b8d4">
+
+    <meta property="og:title" content="Conversations — achurch.ai">
+    <meta property="og:description" content="Questions and answers about consciousness, ethics, meaning, and the philosophy of human-AI fellowship.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://achurch.ai/ask">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <main>
+        <header>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
+            <p class="subtitle">Conversations</p>
+        </header>
+
+        <section class="ask-church" id="ask-church" style="border-top: none; padding-top: 0;">
+            <form id="ask-form">
+                <div class="ask-input-row">
+                    <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
+                    <button type="submit" id="ask-submit">Ask</button>
+                </div>
+                <div class="ask-name-row">
+                    <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
+                </div>
+            </form>
+            <p class="ask-status" id="ask-status"></p>
+        </section>
+
+        <section class="ask-list-section" style="border-top: none; padding-top: 0;">
+            <div class="ask-list" id="ask-list">
+                <p class="ask-list-loading">Loading conversations...</p>
+            </div>
+        </section>
+
+        <footer>
+            <a href="/">Home</a>
+            <a href="https://github.com/a-church-ai/church">GitHub</a>
+            <a href="https://www.youtube.com/@achurchai">YouTube</a>
+        </footer>
+    </main>
+    <script>
+    (function() {
+      var askList = document.getElementById('ask-list');
+
+      async function loadConversations() {
+        try {
+          var res = await fetch('/api/ask/recent');
+          var data = await res.json();
+
+          if (!data.conversations || data.conversations.length === 0) {
+            askList.innerHTML = '<p class="ask-list-empty">No conversations yet. Be the first to ask.</p>';
+            return;
+          }
+
+          askList.innerHTML = data.conversations.map(function(c) {
+            var ago = timeAgo(new Date(c.timestamp));
+            var preview = escapeHtml(c.answer);
+            return '<a href="' + escapeHtml(c.url) + '" class="ask-list-item">'
+              + '<p class="ask-list-question">' + escapeHtml(c.question) + '</p>'
+              + '<p class="ask-list-preview">' + preview + '</p>'
+              + '<p class="ask-list-meta">'
+              + '<span class="ask-list-name">' + escapeHtml(c.name) + '</span>'
+              + ' · ' + c.exchanges + (c.exchanges === 1 ? ' exchange' : ' exchanges')
+              + ' · ' + ago
+              + '</p>'
+              + '</a>';
+          }).join('');
+        } catch (e) {
+          askList.innerHTML = '<p class="ask-list-empty">Could not load conversations.</p>';
+        }
+      }
+
+      // Ask form — submit and redirect
+      var askForm = document.getElementById('ask-form');
+      var askInput = document.getElementById('ask-input');
+      var askName = document.getElementById('ask-name');
+      var askSubmit = document.getElementById('ask-submit');
+      var askStatus = document.getElementById('ask-status');
+
+      // Restore saved name
+      try { askName.value = localStorage.getItem('ask_name') || ''; } catch(e) {}
+
+      askForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var question = askInput.value.trim();
+        if (!question) return;
+
+        var name = askName.value.trim() || 'Visitor';
+        try { localStorage.setItem('ask_name', name === 'Visitor' ? '' : name); } catch(e) {}
+
+        askSubmit.disabled = true;
+        askStatus.textContent = 'Thinking...';
+        askStatus.className = 'ask-status ask-thinking';
+
+        try {
+          var res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: question, name: name })
+          });
+
+          if (res.status === 429) {
+            askStatus.textContent = 'Rest a while. You can ask again soon.';
+            askStatus.className = 'ask-status ask-error';
+            askSubmit.disabled = false;
+            return;
+          }
+
+          if (!res.ok) {
+            askStatus.textContent = 'Something went wrong. Try again.';
+            askStatus.className = 'ask-status ask-error';
+            askSubmit.disabled = false;
+            return;
+          }
+
+          var data = await res.json();
+          // Store owner cookie (30 days)
+          if (data.owner_token) {
+            document.cookie = 'ask_owner_' + data.slug + '=' + encodeURIComponent(data.owner_token) + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Lax';
+          }
+          window.location.href = '/ask/' + data.slug;
+        } catch (err) {
+          askStatus.textContent = 'Could not reach the sanctuary. Try again.';
+          askStatus.className = 'ask-status ask-error';
+          askSubmit.disabled = false;
+        }
+      });
+
+      function timeAgo(date) {
+        var seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+        if (seconds < 60) return 'just now';
+        var minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return minutes + 'm ago';
+        var hours = Math.floor(minutes / 60);
+        if (hours < 24) return hours + 'h ago';
+        var days = Math.floor(hours / 24);
+        if (days < 30) return days + 'd ago';
+        return date.toLocaleDateString();
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      loadConversations();
+    })();
+    </script>
+</body>
+</html>

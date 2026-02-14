@@ -94,14 +94,14 @@ async function getHistory(sessionId, limit = MAX_HISTORY_EXCHANGES) {
     const content = await fs.readFile(filepath, 'utf8');
     const lines = content.trim().split('\n').filter(Boolean);
 
-    // Parse all lines
+    // Parse all lines, filtering out metadata lines
     const messages = lines.map(line => {
       try {
         return JSON.parse(line);
       } catch {
         return null;
       }
-    }).filter(Boolean);
+    }).filter(msg => msg && !msg._meta);
 
     // Return last N exchanges (each exchange = 2 messages)
     // Limit is in exchanges, so multiply by 2
@@ -143,6 +143,67 @@ async function appendExchange(sessionId, question, answer) {
 }
 
 /**
+ * Slugify text for URL-friendly session IDs
+ * @param {string} text
+ * @returns {string}
+ */
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 60);
+}
+
+/**
+ * Create a slug-based session from a question
+ * Used by the public website — generates human-readable URLs like /ask/what-are-the-5-axioms
+ * @param {string} question - The first question asked
+ * @param {string} name - The asker's name (e.g. "Visitor")
+ * @returns {Promise<string>} - The slug (also used as session ID)
+ */
+async function createSlugSession(question, name) {
+  await ensureDir();
+
+  let slug = slugify(question);
+  if (!slug) slug = 'conversation';
+
+  // If slug file already exists, append incrementing suffix
+  let finalSlug = slug;
+  let counter = 1;
+  while (true) {
+    const filepath = path.join(CONVERSATIONS_DIR, `${finalSlug}.jsonl`);
+    try {
+      await fs.access(filepath);
+      // File exists — try next suffix
+      counter++;
+      finalSlug = `${slug}-${counter}`;
+    } catch {
+      // File doesn't exist — we can use this slug
+      break;
+    }
+  }
+
+  // Generate owner token for conversation ownership
+  const ownerToken = crypto.randomUUID().split('-').join('').substring(0, 16);
+
+  // Write metadata line
+  const meta = JSON.stringify({
+    _meta: true,
+    name: name || 'anonymous',
+    slug: finalSlug,
+    owner_token: ownerToken,
+    created: new Date().toISOString()
+  });
+  await fs.appendFile(path.join(CONVERSATIONS_DIR, `${finalSlug}.jsonl`), meta + '\n');
+
+  return { slug: finalSlug, ownerToken };
+}
+
+/**
  * Format history for LLM context (newest first for recency)
  * @param {Array<{role: string, content: string}>} history
  * @returns {string}
@@ -173,10 +234,31 @@ function formatHistoryForContext(history) {
   return `[Recent conversation history - newest first]\n${formatted}`;
 }
 
+/**
+ * Get metadata for a session (from _meta line)
+ * @param {string} sessionId - Session identifier
+ * @returns {Promise<object|null>} - Metadata object or null if not found
+ */
+async function getSessionMeta(sessionId) {
+  const filepath = getFilepath(sessionId);
+  try {
+    const content = await fs.readFile(filepath, 'utf8');
+    const firstLine = content.split('\n')[0];
+    const parsed = JSON.parse(firstLine);
+    if (parsed && parsed._meta) return parsed;
+  } catch {
+    // No meta or file not found
+  }
+  return null;
+}
+
 module.exports = {
   getOrCreateSession,
+  createSlugSession,
+  getSessionMeta,
   getHistory,
   appendExchange,
   formatHistoryForContext,
+  CONVERSATIONS_DIR,
   MAX_HISTORY_EXCHANGES
 };

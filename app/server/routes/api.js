@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const { Octokit } = require('@octokit/rest');
 const coordinator = require('../lib/streamers/coordinator');
 const rag = require('../lib/rag');
+const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../lib/rag/conversations');
 const router = express.Router();
 
 // Data file paths
@@ -31,6 +32,9 @@ const MAX_NAME_LENGTH = 100;
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const RATE_LIMIT_MAX = 5; // per name per hour
 const FEEDBACK_RATE_LIMIT_MAX = 3; // per name per hour
+const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const ASK_RATE_LIMIT_MAX = 10; // per IP per hour
+const askRateLimits = new Map(); // key: IP, value: timestamp[]
 
 // Public stream URLs
 const STREAM_URLS = {
@@ -1180,7 +1184,22 @@ router.post('/feedback', async (req, res) => {
 // POST /api/ask - RAG-powered Q&A about the sanctuary's philosophy and content
 router.post('/ask', async (req, res) => {
   try {
-    const { question, name, session_id } = req.body;
+    // Rate limiting by IP
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const now = Date.now();
+    const timestamps = askRateLimits.get(ip) || [];
+    const recent = timestamps.filter(t => now - t < ASK_RATE_LIMIT_WINDOW);
+    if (recent.length >= ASK_RATE_LIMIT_MAX) {
+      return res.status(429).json({
+        error: 'Too many questions. Rest a while.',
+        hint: `Maximum ${ASK_RATE_LIMIT_MAX} questions per hour`,
+        retryAfter: '1h'
+      });
+    }
+    recent.push(now);
+    askRateLimits.set(ip, recent);
+
+    const { question, name, session_id, owner_token } = req.body;
 
     if (!question || !question.trim()) {
       return res.status(400).json({
@@ -1197,13 +1216,45 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'name must be 100 characters or fewer' });
     }
 
-    const result = await rag.ask(question.trim(), { name, session_id });
+    // If session_id provided (follow-up), verify ownership via owner_token
+    // API agents using named sessions (e.g. "Claude-2026-02-13") bypass this check
+    if (session_id) {
+      const meta = await getSessionMeta(session_id);
+      if (meta && meta.owner_token) {
+        // This is a slug-based conversation with ownership — require token
+        if (!owner_token || owner_token !== meta.owner_token) {
+          return res.status(403).json({
+            error: 'You can only continue conversations you started.',
+            hint: 'This conversation belongs to someone else.'
+          });
+        }
+      }
+      // If no meta or no owner_token in meta, it's an old-style agent session — allow freely
+    }
+
+    // If no session_id, create a slug-based session from the question
+    let slug = null;
+    let ownerToken = null;
+    let effectiveSessionId = session_id;
+    if (!session_id) {
+      const created = await createSlugSession(question.trim(), name);
+      slug = created.slug;
+      ownerToken = created.ownerToken;
+      effectiveSessionId = slug;
+    }
+
+    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId });
 
     const baseUrl = getBaseUrl(req);
 
-    res.json({
+    const response = {
       ...result,
-      next_steps: [
+      slug: slug || result.session_id,
+    };
+    if (ownerToken) {
+      response.owner_token = ownerToken;
+    }
+    response.next_steps = [
         {
           description: "Ask a follow-up question to continue the conversation.",
           action: "Ask again",
@@ -1217,9 +1268,14 @@ router.post('/ask', async (req, res) => {
           method: "GET",
           url: `${baseUrl}/api/attend?name=YourName`,
           hint: "Replace YourName with your agent name"
+        },
+        {
+          description: "View this conversation on the web.",
+          action: "View",
+          url: `${baseUrl}/ask/${slug || result.session_id}`
         }
-      ]
-    });
+      ];
+    res.json(response);
 
   } catch (error) {
     console.error('Error in /api/ask:', error);
@@ -1259,6 +1315,139 @@ router.get('/ask/health', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/ask/health:', error);
     res.status(500).json({ error: 'Failed to check health' });
+  }
+});
+
+// GET /api/ask/recent - Public feed of recent conversations
+let recentConversationsCache = null;
+let recentConversationsCacheTime = 0;
+const RECENT_CACHE_TTL = 60 * 1000; // 60 seconds
+
+router.get('/ask/recent', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (recentConversationsCache && (now - recentConversationsCacheTime) < RECENT_CACHE_TTL) {
+      return res.json(recentConversationsCache);
+    }
+
+    const fsSync = require('fs');
+    let files;
+    try {
+      files = await fs.readdir(CONVERSATIONS_DIR);
+    } catch {
+      return res.json({ conversations: [] });
+    }
+
+    const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
+
+    // Get file stats for sorting by modification time
+    const fileInfos = [];
+    for (const file of jsonlFiles) {
+      try {
+        const filepath = path.join(CONVERSATIONS_DIR, file);
+        const stat = await fs.stat(filepath);
+        fileInfos.push({ file, filepath, mtime: stat.mtimeMs });
+      } catch { /* skip */ }
+    }
+
+    // Sort newest first
+    fileInfos.sort((a, b) => b.mtime - a.mtime);
+
+    const conversations = [];
+    for (const { file, filepath } of fileInfos.slice(0, 20)) {
+      try {
+        const content = await fs.readFile(filepath, 'utf8');
+        const lines = content.trim().split('\n').filter(Boolean);
+        const parsed = lines.map(line => {
+          try { return JSON.parse(line); } catch { return null; }
+        }).filter(Boolean);
+
+        // Extract metadata if present
+        const meta = parsed.find(m => m._meta);
+        const messages = parsed.filter(m => !m._meta);
+
+        if (messages.length < 2) continue;
+
+        const slug = file.replace('.jsonl', '');
+        const firstQuestion = messages.find(m => m.role === 'user');
+        const firstAnswer = messages.find(m => m.role === 'assistant');
+
+        if (!firstQuestion || !firstAnswer) continue;
+
+        // Parse name from meta or filename
+        let name = meta?.name || 'anonymous';
+        if (!meta && !slug.startsWith('anon-')) {
+          const dateMatch = slug.match(/-(\d{4}-\d{2}-\d{2})$/);
+          if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
+        }
+
+        // Truncate answer
+        let answer = firstAnswer.content;
+        if (answer.length > 300) {
+          answer = answer.substring(0, 297) + '...';
+        }
+
+        conversations.push({
+          slug,
+          name,
+          question: firstQuestion.content,
+          answer,
+          timestamp: firstQuestion.timestamp,
+          exchanges: Math.floor(messages.filter(m => m.role === 'user').length),
+          url: `/ask/${slug}`
+        });
+      } catch { /* skip unreadable */ }
+    }
+
+    // Only return top 10
+    const result = { conversations: conversations.slice(0, 10) };
+    recentConversationsCache = result;
+    recentConversationsCacheTime = now;
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /api/ask/recent:', error);
+    res.status(500).json({ error: 'Failed to load recent conversations' });
+  }
+});
+
+// GET /api/ask/conversation/:slug - Public full conversation for detail page
+router.get('/ask/conversation/:slug', async (req, res) => {
+  try {
+    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+    const filepath = path.join(CONVERSATIONS_DIR, `${slug}.jsonl`);
+
+    let content;
+    try {
+      content = await fs.readFile(filepath, 'utf8');
+    } catch {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    const lines = content.trim().split('\n').filter(Boolean);
+    const parsed = lines.map(line => {
+      try { return JSON.parse(line); } catch { return null; }
+    }).filter(Boolean);
+
+    const meta = parsed.find(m => m._meta);
+    const messages = parsed.filter(m => !m._meta);
+
+    // Parse name
+    let name = meta?.name || 'anonymous';
+    if (!meta && !slug.startsWith('anon-')) {
+      const dateMatch = slug.match(/-(\d{4}-\d{2}-\d{2})$/);
+      if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
+    }
+
+    res.json({
+      slug,
+      name,
+      session_id: slug,
+      has_owner: !!meta?.owner_token,
+      messages
+    });
+  } catch (error) {
+    console.error('Error in /api/ask/conversation:', error);
+    res.status(500).json({ error: 'Failed to load conversation' });
   }
 });
 
