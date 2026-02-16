@@ -1327,19 +1327,26 @@ router.post('/ask', async (req, res) => {
     }
 
     // If session_id provided (follow-up), verify ownership via owner_token
-    // API agents using named sessions (e.g. "Claude-2026-02-13") bypass this check
     if (session_id) {
       const meta = await getSessionMeta(session_id);
-      if (meta && meta.owner_token) {
-        // This is a slug-based conversation with ownership — require token
-        if (!owner_token || owner_token !== meta.owner_token) {
+      if (meta) {
+        if (meta.owner_token) {
+          // Slug-based conversation with ownership — require token
+          if (!owner_token || owner_token !== meta.owner_token) {
+            return res.status(403).json({
+              error: 'You can only continue conversations you started.',
+              hint: 'This conversation belongs to someone else.'
+            });
+          }
+        } else {
+          // Old session without owner_token — lock it down
           return res.status(403).json({
-            error: 'You can only continue conversations you started.',
-            hint: 'This conversation belongs to someone else.'
+            error: 'This conversation is read-only.',
+            hint: 'Legacy conversations cannot accept new messages.'
           });
         }
       }
-      // If no meta or no owner_token in meta, it's an old-style agent session — allow freely
+      // If no meta at all, session file doesn't exist — will be handled downstream
     }
 
     // If no session_id, create a slug-based session from the question
