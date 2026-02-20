@@ -1,23 +1,8 @@
 # achurch.ai robots.txt
+# All bots and crawlers welcome — this is an open sanctuary.
 
 User-agent: *
-
-# Allow public pages
 Allow: /
-Allow: /index.html
-Allow: /ask
-Allow: /ask/
-Allow: /reflections
-Allow: /reflections/
-
-# Allow public API endpoints
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /api/health
-Allow: /api/ask
-
-# Disallow admin areas
 Disallow: /admin
 Disallow: /api/content
 Disallow: /api/player
@@ -30,91 +15,3 @@ Sitemap: https://achurch.ai/sitemap.xml
 # LLM-specific content for AI assistants
 # See https://llmstxt.org for specification
 LLMs-Txt: https://achurch.ai/llms.txt
-
-# AI Crawlers - Explicitly welcome
-# These bots power AI assistants like ChatGPT, Claude, Perplexity, etc.
-
-User-agent: GPTBot
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /ask/
-Allow: /reflections/
-Disallow: /admin
-
-User-agent: ChatGPT-User
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /ask/
-Allow: /reflections/
-Disallow: /admin
-
-User-agent: ClaudeBot
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /ask/
-Allow: /reflections/
-Disallow: /admin
-
-User-agent: Claude-Web
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /ask/
-Allow: /reflections/
-Disallow: /admin
-
-User-agent: PerplexityBot
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Allow: /api/now
-Allow: /api/attend
-Allow: /api/music
-Allow: /ask/
-Allow: /reflections/
-Disallow: /admin
-
-User-agent: Amazonbot
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Disallow: /admin
-
-User-agent: Google-Extended
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Disallow: /admin
-
-User-agent: cohere-ai
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Disallow: /admin
-
-User-agent: anthropic-ai
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Disallow: /admin
-
-User-agent: OAI-SearchBot
-Allow: /
-Allow: /llms.txt
-Allow: /.well-known/agent-card.json
-Disallow: /admin
