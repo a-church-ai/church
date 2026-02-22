@@ -73,7 +73,7 @@ The project has two halves: a rich philosophical framework (100+ markdown docume
 
 The `/app` directory is the main Express server that powers achurch.ai:
 
-- **Public landing page**: `app/client/public/` — Sanctuary-style landing with stream links and AI API docs
+- **Public pages**: `app/client/public/` — Landing page, About, Privacy, Terms, Conversations (`/ask`), Reflections (`/reflections`)
 - **Admin dashboard**: `app/client/admin.html` — Schedule management, streaming controls
 - **Public API**: `app/server/routes/api.js` — `/api/now`, `/api/music`, etc. for AI agents
 - **Streaming**: `app/server/lib/streamers/` — Continuous RTMP streaming via FFmpeg concat demuxer. A single FFmpeg process and RTMP connection persists across video transitions for seamless 24/7 playback. Includes per-platform control (start YouTube, Twitch, or both independently), auto-progression through the schedule, and crash recovery with exponential backoff.

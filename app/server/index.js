@@ -97,6 +97,21 @@ app.get('/reflections/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
 });
 
+// Serve about page
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/about.html'));
+});
+
+// Serve privacy page
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/privacy.html'));
+});
+
+// Serve terms page
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/terms.html'));
+});
+
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
 const ATTENDANCE_FILE_SITEMAP = path.join(__dirname, '../data/attendance.json');
@@ -126,6 +141,21 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/reflections</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>`;
 
     // Conversation pages
