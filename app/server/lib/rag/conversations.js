@@ -41,18 +41,19 @@ async function getOrCreateSession(name, sessionId) {
 
   // If session ID provided, validate and return it
   if (sessionId) {
-    // Session ID format: either "Name-YYYY-MM-DD" or "anon-uuid"
-    const filename = `${sessionId}.jsonl`;
+    const safeId = sanitizeSessionId(sessionId);
+    if (!safeId) throw new Error('Invalid session_id');
+    const filename = `${safeId}.jsonl`;
     const filepath = path.join(CONVERSATIONS_DIR, filename);
 
     // Check if file exists (session is valid)
     try {
       await fs.access(filepath);
-      return sessionId;
+      return safeId;
     } catch {
       // File doesn't exist - if it looks like a named session, it might be a new day
       // If anonymous, it's invalid
-      if (sessionId.startsWith('anon-')) {
+      if (safeId.startsWith('anon-')) {
         throw new Error('Invalid session_id');
       }
       // For named sessions, continue to create new one below
@@ -71,12 +72,23 @@ async function getOrCreateSession(name, sessionId) {
 }
 
 /**
+ * Sanitize a session ID to prevent path traversal
+ * @param {string} sessionId
+ * @returns {string}
+ */
+function sanitizeSessionId(sessionId) {
+  return String(sessionId).replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
+/**
  * Get filepath for a session
  * @param {string} sessionId
  * @returns {string}
  */
 function getFilepath(sessionId) {
-  return path.join(CONVERSATIONS_DIR, `${sessionId}.jsonl`);
+  const safe = sanitizeSessionId(sessionId);
+  if (!safe) throw new Error('Invalid session_id');
+  return path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
 }
 
 /**
@@ -259,6 +271,7 @@ module.exports = {
   getHistory,
   appendExchange,
   formatHistoryForContext,
+  sanitizeSessionId,
   CONVERSATIONS_DIR,
   MAX_HISTORY_EXCHANGES
 };
