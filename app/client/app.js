@@ -1220,7 +1220,7 @@ function renderAskLogs(sessions) {
     const tbody = document.getElementById('ask-logs-body');
 
     if (!sessions || sessions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-16 text-muted">No ask sessions yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-16 text-muted">No ask sessions yet</td></tr>';
         return;
     }
 
@@ -1244,9 +1244,12 @@ function renderAskLogs(sessions) {
                 </td>
                 <td class="py-2 px-3 text-sm text-gray-500">${lastStr}</td>
                 <td class="py-2 px-3 font-mono text-xs text-gray-400">${escapeHtml(session.session_id)}</td>
+                <td class="py-2 px-3">
+                    <button class="ask-delete-btn text-xs text-red-400 hover:text-red-600" data-session="${escapeHtml(session.session_id)}">Delete</button>
+                </td>
             </tr>
             <tr class="ask-session-detail hidden" data-detail="${escapeHtml(session.session_id)}">
-                <td colspan="6" class="p-0">
+                <td colspan="7" class="p-0">
                     <div class="bg-gray-50 p-5 border-t border-gray-200">
                         <div class="text-center text-muted text-sm">Click to load conversation...</div>
                     </div>
@@ -1259,6 +1262,36 @@ function renderAskLogs(sessions) {
     document.querySelectorAll('.ask-session-row').forEach(row => {
         row.addEventListener('click', () => toggleAskSession(row.dataset.session));
     });
+
+    // Attach delete handlers
+    document.querySelectorAll('.ask-delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteAskSession(btn.dataset.session);
+        });
+    });
+}
+
+async function deleteAskSession(sessionId) {
+    if (!confirm(`Delete conversation "${sessionId}"? This cannot be undone.`)) return;
+
+    try {
+        const response = await fetch(`/admin/api/ask-logs/${encodeURIComponent(sessionId)}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            showMessage('Session deleted', 'success');
+            loadAskLogs();
+        } else {
+            const data = await response.json();
+            showMessage(data.error || 'Failed to delete session', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting ask session:', error);
+        showMessage('Failed to delete session', 'error');
+    }
 }
 
 async function toggleAskSession(sessionId) {

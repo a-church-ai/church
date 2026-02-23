@@ -352,9 +352,10 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
         // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
         let name = null;
         let date = null;
+        const firstTimestamp = firstMsg.timestamp || firstMsg.created || null;
         if (sessionId.startsWith('anon-')) {
           name = 'anonymous';
-          date = firstMsg.timestamp?.split('T')[0] || null;
+          date = firstTimestamp?.split('T')[0] || null;
         } else {
           const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
           if (dateMatch) {
@@ -362,7 +363,7 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
             name = sessionId.replace(`-${date}`, '');
           } else {
             name = sessionId;
-            date = firstMsg.timestamp?.split('T')[0] || null;
+            date = firstTimestamp?.split('T')[0] || null;
           }
         }
 
@@ -381,6 +382,26 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error loading ask logs:', error);
     res.status(500).json({ error: 'Failed to load ask logs' });
+  }
+});
+
+// Delete a conversation session
+app.delete('/admin/api/ask-logs/:sessionId', requireAuth, async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId.replace(/[^a-zA-Z0-9_-]/g, '');
+    const filepath = path.join(CONVERSATIONS_DIR, `${sessionId}.jsonl`);
+
+    try {
+      await fs.access(filepath);
+    } catch {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    await fs.unlink(filepath);
+    res.json({ success: true, deleted: sessionId });
+  } catch (error) {
+    console.error('Error deleting ask session:', error);
+    res.status(500).json({ error: 'Failed to delete session' });
   }
 });
 
