@@ -89,6 +89,9 @@ document.querySelectorAll('.tab-button').forEach(button => {
         document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
         document.getElementById(tabName).classList.remove('hidden');
 
+        // Update URL hash
+        history.replaceState(null, '', `#${tabName}`);
+
         // Load tab-specific data
         if (tabName === 'schedule') {
             loadSchedule();
@@ -1481,6 +1484,13 @@ async function init() {
     loadSchedule();
     loadCatalog();
     loadPresets();
+
+    // Restore tab from URL hash
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+        const tabBtn = document.querySelector(`.tab-button[data-tab="${hash}"]`);
+        if (tabBtn) tabBtn.click();
+    }
 
     // Update status periodically
     setInterval(async () => {

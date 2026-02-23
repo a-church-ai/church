@@ -305,7 +305,7 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
         const content = await fs.readFile(filepath, 'utf8');
         const messages = content.trim().split('\n').filter(Boolean).map(line => {
           try { return JSON.parse(line); } catch { return null; }
-        }).filter(Boolean);
+        }).filter(m => m && !m._meta);
         return res.json({ session_id: safe, messages });
       } catch {
         return res.status(404).json({ error: 'Session not found' });
