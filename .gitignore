@@ -18,6 +18,8 @@ app/data/history.json
 app/data/schedule.json
 app/data/vectors.lance/
 app/data/conversations/
+app/data/*.tmp
+app/data/*.bak
 app/logs/
 
 # Media files (too large for git)

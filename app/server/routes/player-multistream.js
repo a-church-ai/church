@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const coordinator = require('../lib/streamers/coordinator');
 const logger = require('../lib/utils/logger');
+const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
 const { downloadFromS3 } = require('./content');
 const router = express.Router();
 
@@ -164,43 +165,23 @@ async function resetProgressTracker(index) {
 
 // Helper functions
 async function loadSchedule() {
-  try {
-    const data = await fs.readFile(SCHEDULE_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {
-      items: [],
-      currentIndex: 0,
-      isPlaying: false,
-      loop: false
-    };
-  }
+  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
 }
 
 async function saveSchedule(schedule) {
-  await fs.writeFile(SCHEDULE_FILE, JSON.stringify(schedule, null, 2));
+  await safeWriteJSON(SCHEDULE_FILE, schedule);
 }
 
 async function loadLibrary() {
-  try {
-    const data = await fs.readFile(LIBRARY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return safeReadJSON(LIBRARY_FILE, []);
 }
 
 async function loadHistory() {
-  try {
-    const data = await fs.readFile(HISTORY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return { played: [] };
-  }
+  return safeReadJSON(HISTORY_FILE, { played: [] });
 }
 
 async function saveHistory(history) {
-  await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2));
+  await safeWriteJSON(HISTORY_FILE, history);
 }
 
 // Get video file path from slug (downloads from S3 if not local)

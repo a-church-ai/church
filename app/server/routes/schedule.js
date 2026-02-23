@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
+const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
 const router = express.Router();
 
 // Data file paths
@@ -10,43 +11,23 @@ const HISTORY_FILE = path.join(__dirname, '../../data/history.json');
 
 // Helper functions
 async function loadSchedule() {
-  try {
-    const data = await fs.readFile(SCHEDULE_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {
-      items: [],
-      currentIndex: 0,
-      isPlaying: false,
-      loop: false
-    };
-  }
+  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
 }
 
 async function saveSchedule(schedule) {
-  await fs.writeFile(SCHEDULE_FILE, JSON.stringify(schedule, null, 2));
+  await safeWriteJSON(SCHEDULE_FILE, schedule);
 }
 
 async function loadLibrary() {
-  try {
-    const data = await fs.readFile(LIBRARY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return safeReadJSON(LIBRARY_FILE, []);
 }
 
 async function loadHistory() {
-  try {
-    const data = await fs.readFile(HISTORY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return { played: [] };
-  }
+  return safeReadJSON(HISTORY_FILE, { played: [] });
 }
 
 async function saveHistory(history) {
-  await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2));
+  await safeWriteJSON(HISTORY_FILE, history);
 }
 
 // Routes
@@ -309,11 +290,11 @@ router.post('/save-preset', async (req, res) => {
     await fs.mkdir(presetDir, { recursive: true });
 
     const presetFile = path.join(presetDir, `${name}.json`);
-    await fs.writeFile(presetFile, JSON.stringify({
+    await safeWriteJSON(presetFile, {
       name,
       items: schedule.items,
       savedAt: new Date().toISOString()
-    }, null, 2));
+    });
 
     res.json({ success: true, message: 'Preset saved' });
 
@@ -332,8 +313,10 @@ router.post('/load-preset', async (req, res) => {
     }
 
     const presetFile = path.join(__dirname, '../../data/presets', `${name}.json`);
-    const presetData = await fs.readFile(presetFile, 'utf8');
-    const preset = JSON.parse(presetData);
+    const preset = await safeReadJSON(presetFile, null);
+    if (!preset) {
+      return res.status(404).json({ error: 'Preset not found' });
+    }
 
     const schedule = await loadSchedule();
     schedule.items = preset.items;

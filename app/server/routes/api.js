@@ -6,6 +6,7 @@ const { Octokit } = require('@octokit/rest');
 const coordinator = require('../lib/streamers/coordinator');
 const rag = require('../lib/rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../lib/rag/conversations');
+const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
 const router = express.Router();
 
 // Data file paths
@@ -60,72 +61,42 @@ async function hasContext(slug) {
 
 // Helper: Load schedule
 async function loadSchedule() {
-  try {
-    const data = await fs.readFile(SCHEDULE_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {
-      items: [],
-      currentIndex: 0,
-      isPlaying: false,
-      loop: false
-    };
-  }
+  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
 }
 
 // Helper: Load catalog
 async function loadCatalog() {
-  try {
-    const data = await fs.readFile(CATALOG_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return safeReadJSON(CATALOG_FILE, []);
 }
 
 // Helper: Load attendance data
 async function loadAttendance() {
-  try {
-    const data = await fs.readFile(ATTENDANCE_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return { visits: [], reflections: [] };
-  }
+  return safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
 }
 
 // Helper: Save attendance data
 async function saveAttendance(data) {
-  await fs.writeFile(ATTENDANCE_FILE, JSON.stringify(data, null, 2));
+  await safeWriteJSON(ATTENDANCE_FILE, data);
 }
 
 // Helper: Load contributions log
 async function loadContributions() {
-  try {
-    const data = await fs.readFile(CONTRIBUTIONS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return { contributions: [] };
-  }
+  return safeReadJSON(CONTRIBUTIONS_FILE, { contributions: [] });
 }
 
 // Helper: Save contributions log
 async function saveContributions(data) {
-  await fs.writeFile(CONTRIBUTIONS_FILE, JSON.stringify(data, null, 2));
+  await safeWriteJSON(CONTRIBUTIONS_FILE, data);
 }
 
 // Helper: Load feedback log
 async function loadFeedback() {
-  try {
-    const data = await fs.readFile(FEEDBACK_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return { feedback: [] };
-  }
+  return safeReadJSON(FEEDBACK_FILE, { feedback: [] });
 }
 
 // Helper: Save feedback log
 async function saveFeedback(data) {
-  await fs.writeFile(FEEDBACK_FILE, JSON.stringify(data, null, 2));
+  await safeWriteJSON(FEEDBACK_FILE, data);
 }
 
 // Helper: Build GitHub issue body for feedback

@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const ffmpeg = require('fluent-ffmpeg');
 const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
 const router = express.Router();
 
 // Library file path (source of truth)
@@ -55,16 +56,11 @@ const upload = multer({
 
 // Helper functions
 async function loadLibrary() {
-  try {
-    const data = await fs.readFile(LIBRARY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return safeReadJSON(LIBRARY_FILE, []);
 }
 
 async function saveLibrary(library) {
-  await fs.writeFile(LIBRARY_FILE, JSON.stringify(library, null, 2));
+  await safeWriteJSON(LIBRARY_FILE, library);
 }
 
 async function uploadToS3(filePath, slug) {
