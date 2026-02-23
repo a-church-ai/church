@@ -102,6 +102,8 @@ document.querySelectorAll('.tab-button').forEach(button => {
             loadLogs();
         } else if (tabName === 'ask-logs') {
             loadAskLogs();
+        } else if (tabName === 'reflections') {
+            loadReflections();
         }
     });
 });
@@ -148,6 +150,9 @@ let accessAutoRefreshInterval = null;
 // Ask Logs Controls
 document.getElementById('btn-refresh-ask-logs').addEventListener('click', loadAskLogs);
 document.getElementById('btn-download-ask-logs').addEventListener('click', downloadAskLogs);
+
+// Reflections Controls
+document.getElementById('btn-refresh-reflections').addEventListener('click', loadReflections);
 
 // Streaming Functions
 async function startStreaming(platform) {
@@ -1376,6 +1381,74 @@ async function downloadAskLogs() {
     } catch (error) {
         console.error('Error downloading ask logs:', error);
         showMessage('Failed to download ask logs', 'error');
+    }
+}
+
+// Reflections Functions
+async function loadReflections() {
+    try {
+        const response = await fetch('/admin/api/reflections', { credentials: 'include' });
+        const data = await response.json();
+        renderReflections(data.reflections || []);
+    } catch (error) {
+        console.error('Error loading reflections:', error);
+        document.getElementById('reflections-body').innerHTML =
+            '<tr><td colspan="5" class="text-center py-16 text-danger">Failed to load reflections</td></tr>';
+    }
+}
+
+function renderReflections(reflections) {
+    const tbody = document.getElementById('reflections-body');
+
+    if (!reflections || reflections.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-16 text-muted">No reflections yet</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = reflections.map(r => {
+        const date = r.createdAt ? new Date(r.createdAt) : null;
+        const dateStr = date
+            ? `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+            : '-';
+        const truncatedText = r.text && r.text.length > 80 ? r.text.substring(0, 80) + '...' : (r.text || '-');
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-3"><span class="text-primary font-medium">${escapeHtml(r.name || 'anonymous')}</span></td>
+                <td class="py-2 px-3 text-sm text-gray-600">${escapeHtml(r.song || '-')}</td>
+                <td class="py-2 px-3 text-sm text-gray-500 max-w-xs" title="${escapeHtml(r.text || '')}">${escapeHtml(truncatedText)}</td>
+                <td class="py-2 px-3 text-sm text-gray-500 whitespace-nowrap">${dateStr}</td>
+                <td class="py-2 px-3">
+                    <button class="reflection-delete-btn text-xs text-red-400 hover:text-red-600" data-id="${escapeHtml(r.id)}">Delete</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    document.querySelectorAll('.reflection-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteReflection(btn.dataset.id));
+    });
+}
+
+async function deleteReflection(id) {
+    if (!confirm('Delete this reflection? This cannot be undone.')) return;
+
+    try {
+        const response = await fetch(`/admin/api/reflections/${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            showMessage('Reflection deleted', 'success');
+            loadReflections();
+        } else {
+            const data = await response.json();
+            showMessage(data.error || 'Failed to delete reflection', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting reflection:', error);
+        showMessage('Failed to delete reflection', 'error');
     }
 }
 

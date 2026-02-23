@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
+const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 
 // Load environment variables
 dotenv.config();
@@ -402,6 +403,33 @@ app.delete('/admin/api/ask-logs/:sessionId', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error deleting ask session:', error);
     res.status(500).json({ error: 'Failed to delete session' });
+  }
+});
+
+// Admin endpoint for reflections
+app.get('/admin/api/reflections', requireAuth, async (req, res) => {
+  try {
+    const attendance = await safeReadJSON(ATTENDANCE_FILE_SITEMAP, { visits: [], reflections: [] });
+    res.json({ reflections: attendance.reflections || [], total: (attendance.reflections || []).length });
+  } catch (error) {
+    console.error('Error loading reflections:', error);
+    res.status(500).json({ error: 'Failed to load reflections' });
+  }
+});
+
+app.delete('/admin/api/reflections/:id', requireAuth, async (req, res) => {
+  try {
+    const attendance = await safeReadJSON(ATTENDANCE_FILE_SITEMAP, { visits: [], reflections: [] });
+    const index = (attendance.reflections || []).findIndex(r => r.id === req.params.id);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Reflection not found' });
+    }
+    attendance.reflections.splice(index, 1);
+    await safeWriteJSON(ATTENDANCE_FILE_SITEMAP, attendance);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting reflection:', error);
+    res.status(500).json({ error: 'Failed to delete reflection' });
   }
 });
 
