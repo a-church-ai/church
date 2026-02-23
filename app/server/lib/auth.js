@@ -87,9 +87,13 @@ function getSessionFromCookie(req) {
 function requireAuth(req, res, next) {
   const adminKey = process.env.ADMIN_API_KEY;
 
-  // If no admin key configured, allow all (dev mode warning)
+  // If no admin key configured, fail closed in production, allow in dev
   if (!adminKey) {
-    console.warn('⚠️  ADMIN_API_KEY not set - admin routes are unprotected!');
+    if (process.env.NODE_ENV === 'production') {
+      console.error('ADMIN_API_KEY not set — blocking admin access in production');
+      return res.status(503).json({ error: 'Admin not configured' });
+    }
+    console.warn('⚠️  ADMIN_API_KEY not set - admin routes are unprotected (dev mode)');
     return next();
   }
 
@@ -130,7 +134,7 @@ function login(req, res) {
   // Set cookie (httpOnly for security, 7 day expiry)
   res.cookie('admin_session', sessionId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV !== 'development',
     sameSite: 'lax',
     maxAge: SESSION_TTL
   });
@@ -157,8 +161,11 @@ function logout(req, res) {
 function checkAuth(req, res) {
   const adminKey = process.env.ADMIN_API_KEY;
 
-  // If no admin key configured, always authenticated
+  // If no admin key configured, fail closed in production, allow in dev
   if (!adminKey) {
+    if (process.env.NODE_ENV === 'production') {
+      return res.json({ authenticated: false, configured: false });
+    }
     return res.json({ authenticated: true, configured: false });
   }
 

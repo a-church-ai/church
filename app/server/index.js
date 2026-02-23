@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
@@ -63,7 +64,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({ credentials: true, origin: true }));
+app.use(helmet({
+  contentSecurityPolicy: false // allow inline scripts in admin dashboard
+}));
+app.use(cors({
+  credentials: true,
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://achurch.ai', 'https://www.achurch.ai']
+    : true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -254,7 +263,11 @@ app.use('/api', (req, res, next) => {
       timestamp: new Date().toISOString(),
       method: req.method,
       path: '/api' + req.path,
-      query: req.query,
+      query: Object.fromEntries(
+        Object.entries(req.query).map(([k, v]) =>
+          ['token', 'key', 'owner_token', 'api_key'].includes(k) ? [k, '[REDACTED]'] : [k, v]
+        )
+      ),
       status: res.statusCode,
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
@@ -571,7 +584,7 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (error) => {
   streamLogger.error('Uncaught exception', {
     message: error.message,
-    stack: error.stack,
+    stack: process.env.NODE_ENV === 'production' ? undefined : error.stack,
     timestamp: new Date().toISOString()
   });
   // Don't exit — keep the server running

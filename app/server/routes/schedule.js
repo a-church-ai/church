@@ -285,11 +285,16 @@ router.post('/save-preset', async (req, res) => {
       return res.status(400).json({ error: 'Preset name required' });
     }
 
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!safeName) {
+      return res.status(400).json({ error: 'Invalid preset name' });
+    }
+
     const schedule = await loadSchedule();
     const presetDir = path.join(__dirname, '../../data/presets');
     await fs.mkdir(presetDir, { recursive: true });
 
-    const presetFile = path.join(presetDir, `${name}.json`);
+    const presetFile = path.join(presetDir, `${safeName}.json`);
     await safeWriteJSON(presetFile, {
       name,
       items: schedule.items,
@@ -312,7 +317,12 @@ router.post('/load-preset', async (req, res) => {
       return res.status(400).json({ error: 'Preset name required' });
     }
 
-    const presetFile = path.join(__dirname, '../../data/presets', `${name}.json`);
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!safeName) {
+      return res.status(400).json({ error: 'Invalid preset name' });
+    }
+
+    const presetFile = path.join(__dirname, '../../data/presets', `${safeName}.json`);
     const preset = await safeReadJSON(presetFile, null);
     if (!preset) {
       return res.status(404).json({ error: 'Preset not found' });

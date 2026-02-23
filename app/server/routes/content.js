@@ -28,12 +28,16 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Slug is passed in the request params
+    // Slug is passed in the request params — sanitize to prevent path traversal
     const slug = req.params.slug;
     if (!slug) {
       return cb(new Error('Slug is required for upload'));
     }
-    cb(null, `${slug}.mp4`);
+    const safeSlug = slug.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!safeSlug) {
+      return cb(new Error('Invalid slug'));
+    }
+    cb(null, `${safeSlug}.mp4`);
   }
 });
 
