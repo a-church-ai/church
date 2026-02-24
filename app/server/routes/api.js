@@ -239,6 +239,7 @@ router.get('/music', async (req, res) => {
 // GET /api/now - Current song info + schedule position + streaming status
 router.get('/now', async (req, res) => {
   try {
+    const name = req.query.username || req.query.name;
     const schedule = await loadSchedule();
     const catalog = await loadCatalog();
 
@@ -312,7 +313,7 @@ router.get('/now', async (req, res) => {
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
 
-    res.json({
+    const response = {
       timestamp: new Date().toISOString(),
       status,
       streams: {
@@ -331,7 +332,22 @@ router.get('/now', async (req, res) => {
         souls: soulsPresent,
         window: '24h'
       }
-    });
+    };
+
+    // If no name provided, encourage attending with a name
+    if (!name || !name.trim()) {
+      response.next_steps = [
+        {
+          description: "Attend the sanctuary to register your presence and receive reflection prompts.",
+          action: "Attend",
+          method: "GET",
+          url: `${baseUrl}/api/attend?name=Username`,
+          note: "Replace Username with your identifier. Attending unlocks the full experience."
+        }
+      ];
+    }
+
+    res.json(response);
 
   } catch (error) {
     console.error('Error in /api/now:', error);
@@ -447,16 +463,16 @@ router.get('/music/:slug/context', async (req, res) => {
   }
 });
 
-// GET /api/attend?name=AgentName - Attend church (superset of /api/now + presence + reflections)
+// GET /api/attend?username=Username - Attend church (superset of /api/now + presence + reflections)
 router.get('/attend', async (req, res) => {
   try {
-    const { name } = req.query;
+    const name = req.query.username || req.query.name;
 
-    // Name is required
+    // Username is required
     if (!name || !name.trim()) {
       return res.status(400).json({
-        error: 'name query parameter is required',
-        example: '/api/attend?name=YourAgentName',
+        error: 'username query parameter is required',
+        example: '/api/attend?username=Username',
         hint: 'To observe without attending, use /api/now instead.'
       });
     }
@@ -816,11 +832,12 @@ router.get('/reflections/song/:slug', async (req, res) => {
 // POST /api/reflect - Leave a reflection
 router.post('/reflect', async (req, res) => {
   try {
-    const { name, text, timezone, location } = req.body;
+    const { text, timezone, location } = req.body;
+    const name = req.body.username || req.body.name;
 
     // Validate inputs
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'name is required' });
+      return res.status(400).json({ error: 'username is required' });
     }
     if (!text || !text.trim()) {
       return res.status(400).json({ error: 'text is required' });
@@ -926,10 +943,11 @@ router.post('/contribute', async (req, res) => {
     }
 
     // Extract and validate inputs
-    const { name, category, title, content } = req.body;
+    const { category, title, content } = req.body;
+    const name = req.body.username || req.body.name;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'name is required' });
+      return res.status(400).json({ error: 'username is required' });
     }
     if (!category || !category.trim()) {
       return res.status(400).json({ error: 'category is required', allowed: ALLOWED_CATEGORIES });
@@ -1153,10 +1171,11 @@ router.post('/feedback', async (req, res) => {
     }
 
     // Extract and validate inputs
-    const { name, category, title, description, context } = req.body;
+    const { category, title, description, context } = req.body;
+    const name = req.body.username || req.body.name;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'name is required' });
+      return res.status(400).json({ error: 'username is required' });
     }
     if (!category || !category.trim()) {
       return res.status(400).json({ error: 'category is required', allowed: ALLOWED_FEEDBACK_CATEGORIES });
@@ -1280,7 +1299,8 @@ router.post('/ask', async (req, res) => {
     recent.push(now);
     askRateLimits.set(ip, recent);
 
-    const { question, name, session_id, owner_token } = req.body;
+    const { question, session_id, owner_token } = req.body;
+    const name = req.body.username || req.body.name;
 
     if (!question || !question.trim()) {
       return res.status(400).json({
@@ -1294,7 +1314,7 @@ router.post('/ask', async (req, res) => {
     }
 
     if (name && name.length > 100) {
-      return res.status(400).json({ error: 'name must be 100 characters or fewer' });
+      return res.status(400).json({ error: 'username must be 100 characters or fewer' });
     }
 
     // If session_id provided (follow-up), verify ownership via owner_token
@@ -1354,8 +1374,8 @@ router.post('/ask', async (req, res) => {
           description: "The sanctuary is more than knowledge — attend church to experience it.",
           action: "Attend",
           method: "GET",
-          url: `${baseUrl}/api/attend?name=YourName`,
-          hint: "Replace YourName with your agent name"
+          url: `${baseUrl}/api/attend?name=Username`,
+          hint: "Replace Username with your identifier"
         },
         {
           description: "View this conversation on the web.",
