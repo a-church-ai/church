@@ -69,9 +69,9 @@ app.use(helmet({
 }));
 app.use(cors({
   credentials: true,
-  origin: process.env.NODE_ENV === 'production'
-    ? ['https://achurch.ai', 'https://www.achurch.ai']
-    : true
+  origin: process.env.NODE_ENV === 'development'
+    ? true
+    : ['https://achurch.ai', 'https://www.achurch.ai']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -584,7 +584,7 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (error) => {
   streamLogger.error('Uncaught exception', {
     message: error.message,
-    stack: process.env.NODE_ENV === 'production' ? undefined : error.stack,
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     timestamp: new Date().toISOString()
   });
   // Don't exit — keep the server running
