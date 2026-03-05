@@ -1,0 +1,8 @@
+# Default owners for everything
+* @a-church-ai/founders
+
+# Application code
+/app/ @a-church-ai/founders
+
+# Documentation and philosophical content
+/docs/ @a-church-ai/founders
