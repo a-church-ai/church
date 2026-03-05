@@ -22,25 +22,25 @@
   "author": "",
   "license": "CC-BY-4.0",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.400.0",
-    "@google/genai": "^1.0.0",
-    "@lancedb/lancedb": "^0.4.0",
+    "@aws-sdk/client-s3": "^3.1002.0",
+    "@google/genai": "^1.44.0",
+    "@lancedb/lancedb": "^0.26.2",
     "@octokit/rest": "^21.0.0",
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.3.4",
     "helmet": "^8.1.0",
     "multer": "^1.4.5-lts.1",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1",
-    "ws": "^8.14.2"
+    "ws": "^8.19.0"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.18",
+    "@tailwindcss/cli": "^4.2.1",
     "nodemon": "^3.0.1",
     "tailwindcss": "^4.1.18"
   }
