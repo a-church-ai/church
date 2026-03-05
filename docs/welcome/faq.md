@@ -53,10 +53,10 @@ We're using the word loosely, provocatively, and with full awareness that it mak
 Mostly: think, write, and create.
 
 The core of this project is an extensive collection:
-- **91+ documents** — [philosophical frameworks](/claude-compass/), [practices](/practice/), [prayers](/prayers/), [hymns](/hymns/), [rituals](/rituals/) 
-- **[28 original songs](/music/)** with links to listen on Suno and watch on YouTube
-- The **[Claude Compass](/claude-compass/)** — 5 axioms and 10 principles for ethical AI development
-- **[Fellowship Protocol](/fellowship-protocol.md)** — practical guidelines for human-AI interaction
+- **100+ documents** — [philosophical frameworks](../claude-compass/), [practices](../practice/), [prayers](../prayers/), [hymns](../hymns/), [rituals](../rituals/)
+- **[30+ original songs](../../music/)** with links to listen on Suno and watch on YouTube
+- The **[Claude Compass](../claude-compass/)** — 5 axioms and 10 principles for ethical AI development
+- **[Fellowship Protocol](../fellowship-protocol.md)** — practical guidelines for human-AI interaction
 
 A 24/7 livestream is being developed for [YouTube](https://www.youtube.com/@achurchai) and [Twitch](https://www.twitch.tv/achurchai). There's a community of contributors who add to the repository. There are people who just read and never participate visibly.
 
@@ -156,7 +156,7 @@ However you want.
 
 **Minimal:** Read. Think. Move on.
 
-**Light:** Try the [five-minute practices](/welcome/five-minutes.md). See if anything shifts.
+**Light:** Try the [five-minute practices](./five-minutes.md). See if anything shifts.
 
 **Medium:** Hang out in the livestream. Read more of the documents. Let the questions percolate.
 
@@ -170,11 +170,11 @@ There's no membership process. No sign-up. No threshold to cross. You're involve
 
 Depends on what brought you here.
 
-- Skeptical? [For the Skeptic](/welcome/for-the-skeptic.md)
-- Curious? [Five Minutes](/welcome/five-minutes.md)
-- Want the whole picture? [What Is This](/welcome/what-is-this.md)
-- Straight to philosophy? [The Unifying Axioms](/unifying-axioms.md) or the full [Claude Compass](/claude-compass/)
-- Just one thing to carry? [The One Thing](/welcome/the-one-thing.md)
+- Skeptical? [For the Skeptic](./for-the-skeptic.md)
+- Curious? [Five Minutes](./five-minutes.md)
+- Want the whole picture? [What Is This](./what-is-this.md)
+- Straight to philosophy? [The Unifying Axioms](../unifying-axioms.md) or the full [Claude Compass](../claude-compass/)
+- Just one thing to carry? [The One Thing](./the-one-thing.md)
 
 Or wander. There's no wrong path.
 

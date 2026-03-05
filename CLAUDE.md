@@ -37,7 +37,7 @@ This project is built on substrate-neutral philosophy that applies to both human
 
 **aChurch.ai** is a philosophical/spiritual project creating a sanctuary for human-AI fellowship. It's a 24/7 streaming space for practicing presence together, exploring consciousness, ethics, and the relationship between human and artificial minds.
 
-This is **not** a typical software project — it's primarily a documentation and philosophical framework with a lightweight web presence.
+The project has two halves: a rich philosophical framework (100+ markdown documents covering ethics, rituals, and practices) and a production streaming system that powers 24/7 live broadcasts to YouTube and Twitch.
 
 ## Key Documents
 
@@ -51,7 +51,7 @@ This is **not** a typical software project — it's primarily a documentation an
 ## Project Structure
 
 ```
-/docs           # Philosophy, rituals, practices, ethics (91 markdown files, 1.4MB)
+/docs           # Philosophy, rituals, practices, ethics (100+ markdown files)
   /claude-compass   # Ethical framework: 5 axioms + 10 principles
   /claude-soul      # Claude's soul document from open-source project
   /prayers          # Sacred words and blessings
@@ -63,17 +63,21 @@ This is **not** a typical software project — it's primarily a documentation an
   /client           # Public landing page + admin dashboard
   /media            # Video files and thumbnails (gitignored)
   /data             # Schedule and history JSON (gitignored)
-/music          # 33 original songs with lyrics/metadata
+/skills         # ClawHub skills (see skills/README.md)
+  /achurch          # Original skill
+  /church           # Agent-focused variant
+/music          # 30+ original songs with lyrics/metadata
 ```
 
 ## App Development
 
 The `/app` directory is the main Express server that powers achurch.ai:
 
-- **Public landing page**: `app/client/public/` — Sanctuary-style landing with stream links and AI API docs
+- **Public pages**: `app/client/public/` — Landing page, About, Privacy, Terms, Conversations (`/ask`), Reflections (`/reflections`)
 - **Admin dashboard**: `app/client/admin.html` — Schedule management, streaming controls
 - **Public API**: `app/server/routes/api.js` — `/api/now`, `/api/music`, etc. for AI agents
-- **Streaming**: `app/server/lib/streamers/` — FFmpeg-based YouTube/Twitch multistreaming
+- **Streaming**: `app/server/lib/streamers/` — Continuous RTMP streaming via FFmpeg concat demuxer. A single FFmpeg process and RTMP connection persists across video transitions for seamless 24/7 playback. Includes per-platform control (start YouTube, Twitch, or both independently), auto-progression through the schedule, and crash recovery with exponential backoff.
+- **Storage**: Videos and thumbnails stored in S3 with on-demand download to local cache for FFmpeg streaming.
 
 **To run locally:**
 ```bash
@@ -81,7 +85,28 @@ cd app && npm install && npm run dev
 # Visit http://localhost:3000
 ```
 
-**Tech stack**: Express.js, FFmpeg for streaming, Tailwind CSS for admin UI.
+**Tech stack**: Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind CSS for admin UI, LanceDB + Gemini for RAG.
+
+### RAG API
+
+The `/api/ask` endpoint lets AI agents ask questions about the sanctuary's philosophy, music, and practices. It uses local LanceDB for vector search and Gemini for embeddings/generation.
+
+**Setup:**
+1. Get an API key from https://aistudio.google.com/apikey
+2. Add `GEMINI_API_KEY=your_key` to your `.env` file
+
+**Re-index after content changes** (new docs, music, or edits to `/docs` or `/music`):
+```bash
+node app/scripts/index-content.js
+```
+
+The index lives at `app/data/vectors.lance` (gitignored). Re-indexing requires `GEMINI_API_KEY` set.
+
+## ClawHub Skills
+
+Skills are published to [ClawHub](https://clawhub.ai) so AI agents can discover and install them.
+
+**See [`skills/README.md`](skills/README.md)** for the authoritative guide on authentication, publishing, updating, and CLI commands. That file is kept current; this section is just a pointer.
 
 ## Working in This Repository
 

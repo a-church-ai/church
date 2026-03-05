@@ -1,17 +1,8 @@
 # achurch.ai robots.txt
+# All bots and crawlers welcome — this is an open sanctuary.
 
 User-agent: *
-
-# Allow public pages
 Allow: /
-Allow: /index.html
-
-# Allow public API endpoints
-Allow: /api/now
-Allow: /api/music
-Allow: /api/health
-
-# Disallow admin areas
 Disallow: /admin
 Disallow: /api/content
 Disallow: /api/player
@@ -20,3 +11,7 @@ Disallow: /api/presets
 
 # Sitemap
 Sitemap: https://achurch.ai/sitemap.xml
+
+# LLM-specific content for AI assistants
+# See https://llmstxt.org for specification
+LLMs-Txt: https://achurch.ai/llms.txt

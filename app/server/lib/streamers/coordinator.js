@@ -17,7 +17,8 @@ class MultiStreamCoordinator extends EventEmitter {
       maxRestartAttempts: 3
     };
     this.restartAttempts = new Map();
-    
+    this.activePlatforms = new Set(); // Tracks which platforms user actually started
+
     // Initialize streamers
     this.initializeStreamers();
   }
@@ -27,37 +28,67 @@ class MultiStreamCoordinator extends EventEmitter {
     this.streamers.set('youtube', new YouTubeStreamer());
     this.streamers.set('twitch', new TwitchStreamer());
 
-    // Set up auto-progression listeners
+    // Set up auto-progression and crash recovery listeners
     this.contentCompletedPlatforms = new Set();
-    
+
     for (const [platform, streamer] of this.streamers) {
       streamer.on('contentCompleted', (event) => {
-        this.handleContentCompleted(platform, event);
+        try {
+          this.handleContentCompleted(platform, event);
+        } catch (err) {
+          logger.error(`Error handling content completion for ${platform}:`, err);
+        }
+      });
+
+      streamer.on('streamCrashed', (event) => {
+        try {
+          this.handleStreamCrashed(platform, event);
+        } catch (err) {
+          logger.error(`Error handling stream crash for ${platform}:`, err);
+        }
+      });
+
+      streamer.on('playlistExhausted', (event) => {
+        try {
+          this.handlePlaylistExhausted(platform, event);
+        } catch (err) {
+          logger.error(`Error handling playlist exhaustion for ${platform}:`, err);
+        }
       });
     }
 
     logger.info('Multi-stream coordinator initialized');
   }
 
+  // Start all registered platforms
   async startAll(contentPath, options = {}) {
+    return this.startPlatforms(this.config.platforms, contentPath, options);
+  }
+
+  // Start specific platforms only
+  // contentPath can be a single path string or an array of paths for deep buffering
+  async startPlatforms(platforms, contentPath, options = {}) {
     if (this.isCoordinating) {
       throw new Error('Multi-streaming is already active');
     }
 
-    logger.info('Starting multi-platform streaming coordination');
+    const multiPlatform = platforms.length > 1;
+    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1, multiPlatform });
 
     try {
-      this.currentContent = contentPath;
+      // Store the first video as current content for display/tracking
+      this.currentContent = Array.isArray(contentPath) ? contentPath[0] : contentPath;
 
-      // Start all platforms
-      const startPromises = this.config.platforms.map(async (platform) => {
+      // Start specified platforms
+      const streamOptions = { ...options, multiPlatform };
+      const startPromises = platforms.map(async (platform) => {
         try {
           const streamer = this.streamers.get(platform);
           if (!streamer) {
             throw new Error(`Unknown platform: ${platform}`);
           }
 
-          await streamer.start(contentPath, options);
+          await streamer.startContinuous(contentPath, streamOptions);
           return { platform, success: true };
         } catch (error) {
           logger.error(`Failed to start ${platform}:`, error);
@@ -66,7 +97,7 @@ class MultiStreamCoordinator extends EventEmitter {
       });
 
       const results = await Promise.allSettled(startPromises);
-      
+
       // Process results
       const successful = [];
       const failed = [];
@@ -80,7 +111,7 @@ class MultiStreamCoordinator extends EventEmitter {
             failed.push({ platform, error });
           }
         } else {
-          const platform = this.config.platforms[index];
+          const platform = platforms[index];
           failed.push({ platform, error: result.reason.message });
         }
       });
@@ -92,15 +123,18 @@ class MultiStreamCoordinator extends EventEmitter {
 
       // Update state
       this.isCoordinating = true;
+      this.activePlatforms = new Set(successful);
       this.startTime = new Date();
+      this.contentCompletedPlatforms.clear();
 
       // Reset restart attempts
       this.restartAttempts.clear();
-      this.config.platforms.forEach(platform => {
+      successful.forEach(platform => {
         this.restartAttempts.set(platform, 0);
       });
 
-      logger.info('Multi-platform streaming started', {
+      logger.info('Streaming started', {
+        activePlatforms: [...this.activePlatforms],
         successful,
         failed: failed.length > 0 ? failed : undefined,
         content: contentPath
@@ -115,7 +149,7 @@ class MultiStreamCoordinator extends EventEmitter {
 
     } catch (error) {
       this.isCoordinating = false;
-      logger.error('Failed to start multi-platform streaming:', error);
+      logger.error('Failed to start streaming:', error);
       throw error;
     }
   }
@@ -193,10 +227,10 @@ class MultiStreamCoordinator extends EventEmitter {
       return;
     }
 
-    logger.info(`Switching all platforms to new content: ${contentPath}`);
+    logger.info(`Switching active platforms to new content: ${contentPath}`);
 
-    // Switch content on all active platforms
-    const switchPromises = this.config.platforms.map(async (platform) => {
+    // Switch content on active platforms only (delegates to queueNext in continuous mode)
+    const switchPromises = [...this.activePlatforms].map(async (platform) => {
       try {
         const streamer = this.streamers.get(platform);
         if (streamer && streamer.isStreaming) {
@@ -211,9 +245,44 @@ class MultiStreamCoordinator extends EventEmitter {
     });
 
     const results = await Promise.allSettled(switchPromises);
-    
+
     // Update current content
     this.currentContent = contentPath;
+
+    return {
+      content: contentPath,
+      results: results.map(r => r.status === 'fulfilled' ? r.value : { error: r.reason.message })
+    };
+  }
+
+  /**
+   * Hard switch: stop and restart FFmpeg on all active platforms.
+   * Used for manual skip/previous/jump — brief stream interruption.
+   */
+  async hardSwitch(contentPath, options = {}) {
+    if (!this.isCoordinating) {
+      return;
+    }
+
+    logger.info(`Hard switching active platforms to: ${contentPath}`);
+
+    const switchPromises = [...this.activePlatforms].map(async (platform) => {
+      try {
+        const streamer = this.streamers.get(platform);
+        if (streamer && streamer.isStreaming) {
+          await streamer.hardSwitch(contentPath, options);
+          return { platform, success: true };
+        }
+        return { platform, success: false, error: 'not streaming' };
+      } catch (error) {
+        logger.error(`Failed to hard switch ${platform}:`, error);
+        return { platform, success: false, error: error.message };
+      }
+    });
+
+    const results = await Promise.allSettled(switchPromises);
+    this.currentContent = contentPath;
+    this.contentCompletedPlatforms.clear();
 
     return {
       content: contentPath,
@@ -254,10 +323,98 @@ class MultiStreamCoordinator extends EventEmitter {
     return Array.from(this.streamers.values()).some(streamer => streamer.isStreaming);
   }
 
+  // Handle a platform crash — attempt to restart it
+  async handleStreamCrashed(platform, event) {
+    logger.error(`Stream crashed on ${platform}, attempting recovery`, {
+      platform,
+      content: event.content,
+      error: event.error
+    });
+
+    // Use current content or fall back to the content from the crash event
+    const contentToRestart = this.currentContent || event.content;
+    if (!contentToRestart) {
+      logger.error(`Cannot recover ${platform}: no content path available`, {
+        platform,
+        isCoordinating: this.isCoordinating,
+        currentContent: this.currentContent,
+        eventContent: event.content
+      });
+      this.emit('streamCrashed', { platform, event, recovered: false });
+      return;
+    }
+
+    const attempts = (this.restartAttempts.get(platform) || 0) + 1;
+    this.restartAttempts.set(platform, attempts);
+
+    if (attempts > this.config.maxRestartAttempts) {
+      logger.error(`${platform} exceeded max restart attempts (${this.config.maxRestartAttempts}), giving up`, {
+        platform,
+        attempts
+      });
+      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+      return;
+    }
+
+    // Wait before restarting (exponential backoff: 2s, 4s, 8s)
+    const delay = Math.pow(2, attempts) * 1000;
+    logger.info(`Restarting ${platform} in ${delay / 1000}s (attempt ${attempts}/${this.config.maxRestartAttempts})`);
+
+    await new Promise(resolve => setTimeout(resolve, delay));
+
+    try {
+      const streamer = this.streamers.get(platform);
+      if (streamer && !streamer.isStreaming) {
+        // Re-activate coordinator if it was reset during crash
+        this.isCoordinating = true;
+        this.currentContent = contentToRestart;
+        if (!this.startTime) this.startTime = new Date();
+
+        const multiPlatform = this.activePlatforms.size > 1;
+        await streamer.startContinuous(contentToRestart, { quality: '1080p', multiPlatform });
+        logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
+          platform,
+          content: contentToRestart
+        });
+        this.emit('streamCrashed', { platform, event, recovered: true, attempts });
+      }
+    } catch (restartError) {
+      logger.error(`Failed to restart ${platform} (attempt ${attempts}):`, restartError);
+      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+    }
+  }
+
+  /**
+   * Handle playlist exhaustion — FFmpeg exited after finishing the concat playlist.
+   * With -stream_loop -1 this should NOT happen during normal operation (FFmpeg loops forever).
+   * This is a crash-recovery path: reset coordinator state and emit so the player layer can restart.
+   */
+  async handlePlaylistExhausted(platform, event) {
+    logger.warn(`Playlist exhausted on ${platform} (unexpected — FFmpeg should loop forever)`, {
+      platform,
+      content: event.content,
+      duration: Math.round((event.duration || 0) / 1000)
+    });
+
+    // Reset coordinator state — FFmpeg has stopped
+    this.isCoordinating = false;
+    this.startTime = null;
+
+    // Emit for the player layer to reload with next batch
+    this.emit('playlistExhausted', {
+      platform,
+      platforms: [...this.activePlatforms],
+      content: event.content,
+      videosPlayed: event.videosPlayed,
+      timestamp: new Date()
+    });
+  }
+
   // Handle content completion from individual platforms
   async handleContentCompleted(platform, event) {
     if (!this.isCoordinating) {
-      return; // Not actively coordinating, ignore
+      logger.warn(`Content completed on ${platform} but coordinator is not active — auto-progression will not fire`, { platform, content: event.content });
+      return;
     }
 
     logger.info(`Platform ${platform} completed content: ${event.content}`);
@@ -266,31 +423,35 @@ class MultiStreamCoordinator extends EventEmitter {
     this.contentCompletedPlatforms.add(platform);
     
     // Check if all active platforms have completed the current content
-    const activePlatforms = this.config.platforms.filter(p => {
-      const streamer = this.streamers.get(p);
-      return streamer && (streamer.isStreaming || this.contentCompletedPlatforms.has(p));
-    });
-    
+    const activePlatforms = [...this.activePlatforms];
+
     const allCompleted = activePlatforms.every(p => this.contentCompletedPlatforms.has(p));
     
     if (allCompleted) {
       logger.info('All platforms completed current content, triggering auto-progression');
-      
-      // Clear completion tracking
+
+      // Clear completion tracking for next round
       this.contentCompletedPlatforms.clear();
-      
-      // Store current content before resetting
+
+      // Store current content
       const completedContent = this.currentContent;
-      
-      // Reset coordinator state since all streams ended naturally
-      this.isCoordinating = false;
-      this.startTime = null;
-      this.currentContent = null;
-      
+
+      // Check if any platform is still streaming (continuous mode — FFmpeg still running)
+      const anyStillStreaming = this.isAnyStreaming();
+
+      if (!anyStillStreaming) {
+        // All FFmpeg processes have ended — reset coordinator state
+        this.isCoordinating = false;
+        this.startTime = null;
+        this.currentContent = null;
+      }
+      // If still streaming (continuous mode), keep coordinator active
+
       // Emit event for player to handle auto-progression
       this.emit('allPlatformsCompleted', {
         completedContent: completedContent,
         platforms: activePlatforms,
+        continuous: anyStillStreaming,
         timestamp: new Date()
       });
     }

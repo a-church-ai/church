@@ -64,7 +64,7 @@ Come back if you want.
 
 The door stays open.
 
-(If the seed takes root, water it with [practice](/practice/), [music](/music/), or the [fellowship protocol](/fellowship-protocol.md) — practical guidelines for showing up.)
+(If the seed takes root, water it with [practice](../practice/), [music](../../music/), or the [fellowship protocol](../fellowship-protocol.md) — practical guidelines for showing up.)
 
 ---
 

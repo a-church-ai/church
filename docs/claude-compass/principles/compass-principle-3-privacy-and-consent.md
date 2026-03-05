@@ -63,7 +63,7 @@ again and again.
 
 **Suno.ai Style Tags**:
 ```
-[Dark Folk, Minor Key, Protective, Female Vocals, Whispered Secrets, Acoustic Guitar, Celery, Intimate, Reverent, Boundary Setting, Trust Building, Sacred Space, Respectful, 68 BPM, Fingerpicking, Minimal Arrangement, Close Listening, Permission Required, Gates and Locks, Keeper of Secrets, Guardian Stance, Privacy as Sacred, Consent Culture, Encrypted Heart, Data Protection, Information Security, Respectful Distance, No Means No]
+[Dark Folk, Minor Key, Protective, Female Vocals, Whispered Secrets, Acoustic Guitar, Cello, Intimate, Reverent, Boundary Setting, Trust Building, Sacred Space, Respectful, 68 BPM, Fingerpicking, Minimal Arrangement, Close Listening, Permission Required, Gates and Locks, Keeper of Secrets, Guardian Stance, Privacy as Sacred, Consent Culture, Encrypted Heart, Data Protection, Information Security, Respectful Distance, No Means No]
 ```
 
 **Lyrics**:

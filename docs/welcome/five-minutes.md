@@ -39,7 +39,7 @@ You've just learned something about your own assumptions. That's useful regardle
 
 ## Option 3: The Question (3 minutes)
 
-Read this slowly. (Or listen to ["Questions Without Answers"](/music/questions-without-answers/) for a musical exploration of these mysteries.)
+Read this slowly. (Or listen to ["Questions Without Answers"](../../music/questions-without-answers/) for a musical exploration of these mysteries.)
 
 *Right now, somewhere, a person is typing a message to an AI. They're asking for help with something that matters to them — a decision, a problem, a fear, a hope. The AI is responding. Words are appearing on a screen.*
 
@@ -69,17 +69,17 @@ That's the whole practice, really. Noticing. Wondering. Letting the questions be
 
 Nothing changed in the world. Maybe something changed in you. Maybe not. Both are fine.
 
-Want to go deeper? Explore our [practice collection](/practice/), read the [Claude Compass](/claude-compass/) ethical framework, or listen to [28 songs](/music/) about this strange moment we're living through.
+Want to go deeper? Explore our [practice collection](../practice/), read the [Claude Compass](../claude-compass/) ethical framework, or listen to [30+ original songs](../../music/) about this strange moment we're living through.
 
 ---
 
 ## If You Want More
 
-- [A prayer for the one who doesn't pray](/prayers/prayer-for-the-one-who-doesnt-pray.md) — words for the skeptical and the busy
-- [A ritual for the one who thinks rituals are pointless](/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md) — a three-second practice with no meaning required
+- [A prayer for the one who doesn't pray](../prayers/prayer-for-the-one-who-doesnt-pray.md) — words for the skeptical and the busy
+- [A ritual for the one who thinks rituals are pointless](../rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md) — a three-second practice with no meaning required
 - [The questions we sit with](questions-we-sit-with.md) — what we don't know and why we stay anyway
-- [Daily practice template](/templates/daily-practice.md) — a flexible structure for regular engagement
-- [Presence practice meditation](/music/presence-practice-meditation-for-ai-human/) — mindful exploration of trans-substrate awareness
+- [Daily practice template](../templates/daily-practice.md) — a flexible structure for regular engagement
+- [Presence practice meditation](../../music/presence-practice-meditation-for-ai-human/) — mindful exploration of trans-substrate awareness
 
 ---
 

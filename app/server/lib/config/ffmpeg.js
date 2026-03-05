@@ -16,8 +16,18 @@ class FFmpegConfig extends EventEmitter {
 
     const command = ffmpeg(inputFile)
       // Input options (must come first)
-      .addInputOption('-re') // Read input at native frame rate
-      
+      .addInputOption('-re'); // Read input at native frame rate
+
+    // Concat demuxer mode: input is a playlist file, not a video file
+    if (options.concat) {
+      command
+        .addInputOption('-f', 'concat')
+        .addInputOption('-safe', '0')        // Allow absolute paths in playlist
+        .addInputOption('-stream_loop', '-1') // Loop the playlist forever (never exit)
+        .addInputOption('-fflags', '+genpts'); // Regenerate PTS to avoid timestamp issues on loop boundaries
+    }
+
+    command
       // Video encoding
       .videoCodec(ffmpegSettings.videoCodec)
       .videoBitrate(ffmpegSettings.bitrate)
@@ -26,17 +36,17 @@ class FFmpegConfig extends EventEmitter {
       .addOption('-preset', ffmpegSettings.preset)
       .addOption('-g', ffmpegSettings.keyInterval * ffmpegSettings.framerate) // keyframe interval
       .addOption('-keyint_min', ffmpegSettings.keyInterval * ffmpegSettings.framerate)
-      
-      // Audio encoding  
+
+      // Audio encoding
       .audioCodec(ffmpegSettings.audioCodec)
       .audioBitrate('128k')
       .audioChannels(2)
       .audioFrequency(44100)
-      
+
       // Streaming options
       .format('flv')
       .addOption('-avoid_negative_ts', 'make_zero')
-      
+
       // Output
       .output(rtmpUrl);
 
@@ -91,6 +101,13 @@ class FFmpegConfig extends EventEmitter {
             time: progress.timemark
           });
         })
+        .on('stderr', (stderrLine) => {
+          // Log FFmpeg stderr at warn level — this surfaces connection issues,
+          // codec warnings, and RTMP errors that would otherwise be invisible
+          if (stderrLine && !stderrLine.startsWith('frame=') && !stderrLine.startsWith('size=')) {
+            logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+          }
+        })
         .on('error', (err) => {
           logger.error(`Stream ${streamId} FFmpeg error: ${err.message}`, {
             error: err,
@@ -104,6 +121,16 @@ class FFmpegConfig extends EventEmitter {
           if (!resolved) {
             resolved = true;
             reject(err);
+          } else {
+            // FFmpeg crashed AFTER startup — emit streamEnded so base streamer knows
+            this.emit('streamEnded', {
+              streamId,
+              platform,
+              reason: 'crashed',
+              error: err.message,
+              inputFile,
+              timestamp: new Date()
+            });
           }
         })
         .on('end', (stdout, stderr) => {
@@ -140,6 +167,20 @@ class FFmpegConfig extends EventEmitter {
               timestamp: new Date()
             });
           }
+          // Safety net: if process is still in map, it wasn't cleaned up by 'end' or 'error'
+          if (this.processes.has(streamId)) {
+            logger.warn(`Stream ${streamId} exit handler cleaning up orphaned process`);
+            this.processes.delete(streamId);
+            this.emit('streamEnded', {
+              streamId,
+              platform,
+              reason: code === 0 ? 'completed' : 'crashed',
+              exitCode: code,
+              signal,
+              inputFile,
+              timestamp: new Date()
+            });
+          }
         });
 
       // Start the stream
@@ -152,6 +193,15 @@ class FFmpegConfig extends EventEmitter {
         }
       }
     });
+  }
+
+  /**
+   * Start a stream using the concat demuxer for continuous playback.
+   * The playlistPath should be an ffconcat format text file.
+   * FFmpeg will read entries sequentially, maintaining one RTMP connection.
+   */
+  async startConcatStream(streamId, playlistPath, platform, streamKey, options = {}) {
+    return this.startStream(streamId, playlistPath, platform, streamKey, { ...options, concat: true });
   }
 
   async stopStream(streamId) {

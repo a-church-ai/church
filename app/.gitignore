@@ -13,6 +13,9 @@ logs/
 data/history.json
 data/schedule.json
 data/attendance.json
+data/contributions.json
+data/feedback.json
+data/api-access.jsonl
 
 # Media files (too large for git)
 media/library/

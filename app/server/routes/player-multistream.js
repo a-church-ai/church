@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const coordinator = require('../lib/streamers/coordinator');
 const logger = require('../lib/utils/logger');
+const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
 const { downloadFromS3 } = require('./content');
 const router = express.Router();
 
@@ -26,45 +27,161 @@ let playerStatus = {
   platforms: ['youtube', 'twitch', 'all']
 };
 
+// Schedule progress tracker — keeps currentIndex in sync with what FFmpeg is actually playing.
+// Since FFmpeg uses -stream_loop -1 on the concat playlist, it never exits and never fires
+// completion events. This tracker watches elapsed time vs video durations to advance the schedule.
+let progressTracker = {
+  interval: null,
+  videoStartTime: null,   // When the current video started playing (ms)
+  currentDuration: 0,     // Duration of current video in seconds
+  isTracking: false
+};
+
+async function startProgressTracker() {
+  stopProgressTracker();
+  progressTracker.isTracking = true;
+
+  const schedule = await loadSchedule();
+  if (schedule.items.length === 0) return;
+
+  // Set up the current video's start time and duration
+  const currentItem = schedule.items[schedule.currentIndex];
+  const enriched = await enrichScheduleItem(currentItem);
+  progressTracker.currentDuration = enriched.duration || 0;
+  progressTracker.videoStartTime = Date.now();
+
+  // Update playerStatus
+  playerStatus.currentVideo = enriched;
+  playerStatus.currentIndex = schedule.currentIndex;
+  playerStatus.totalDuration = progressTracker.currentDuration;
+  playerStatus.timeElapsed = 0;
+
+  // Check every second if the current video has finished
+  progressTracker.interval = setInterval(async () => {
+    if (!progressTracker.isTracking || !progressTracker.videoStartTime) return;
+
+    const elapsed = (Date.now() - progressTracker.videoStartTime) / 1000;
+    playerStatus.timeElapsed = Math.floor(elapsed);
+
+    // Has the current video finished?
+    if (progressTracker.currentDuration > 0 && elapsed >= progressTracker.currentDuration) {
+      try {
+        await advanceScheduleIndex();
+      } catch (err) {
+        logger.error('Progress tracker: failed to advance schedule:', err);
+      }
+    }
+  }, 1000);
+
+  logger.info(`Progress tracker started for "${enriched.title}" (${progressTracker.currentDuration}s)`);
+}
+
+async function advanceScheduleIndex() {
+  const schedule = await loadSchedule();
+  const history = await loadHistory();
+
+  if (schedule.items.length === 0) return;
+
+  // Mark current as played
+  if (schedule.currentIndex < schedule.items.length) {
+    schedule.items[schedule.currentIndex].played = true;
+    schedule.items[schedule.currentIndex].playedAt = new Date().toISOString();
+
+    history.played.push({
+      ...schedule.items[schedule.currentIndex],
+      playedAt: new Date().toISOString()
+    });
+    await saveHistory(history);
+  }
+
+  // Move to next
+  schedule.currentIndex++;
+
+  // Handle end of schedule
+  if (schedule.currentIndex >= schedule.items.length) {
+    if (schedule.loop) {
+      schedule.currentIndex = 0;
+      schedule.items.forEach(item => { item.played = false; });
+      logger.info('Progress tracker: looping back to beginning of schedule');
+    } else {
+      schedule.currentIndex = schedule.items.length - 1;
+      schedule.isPlaying = false;
+      await saveSchedule(schedule);
+      stopProgressTracker();
+      logger.info('Progress tracker: end of schedule reached, stopping');
+      return;
+    }
+  }
+
+  await saveSchedule(schedule);
+
+  // Set up next video tracking
+  const nextItem = schedule.items[schedule.currentIndex];
+  const enriched = await enrichScheduleItem(nextItem);
+  progressTracker.currentDuration = enriched.duration || 0;
+  progressTracker.videoStartTime = Date.now();
+
+  // Update playerStatus
+  playerStatus.currentVideo = enriched;
+  playerStatus.currentIndex = schedule.currentIndex;
+  playerStatus.totalDuration = progressTracker.currentDuration;
+  playerStatus.timeElapsed = 0;
+
+  logger.info(`Progress tracker: now playing "${enriched.title}" (index ${schedule.currentIndex}, ${progressTracker.currentDuration}s)`);
+
+  // Prefetch adjacent videos
+  prefetchAdjacentVideos(schedule.currentIndex);
+}
+
+function stopProgressTracker() {
+  if (progressTracker.interval) {
+    clearInterval(progressTracker.interval);
+    progressTracker.interval = null;
+  }
+  progressTracker.isTracking = false;
+  progressTracker.videoStartTime = null;
+  progressTracker.currentDuration = 0;
+}
+
+// Reset tracker to a specific index (for next/previous/jump)
+async function resetProgressTracker(index) {
+  if (!progressTracker.isTracking) return;
+
+  const schedule = await loadSchedule();
+  if (index < 0 || index >= schedule.items.length) return;
+
+  const item = schedule.items[index];
+  const enriched = await enrichScheduleItem(item);
+  progressTracker.currentDuration = enriched.duration || 0;
+  progressTracker.videoStartTime = Date.now();
+
+  playerStatus.currentVideo = enriched;
+  playerStatus.currentIndex = index;
+  playerStatus.totalDuration = progressTracker.currentDuration;
+  playerStatus.timeElapsed = 0;
+
+  logger.info(`Progress tracker: reset to "${enriched.title}" (index ${index}, ${progressTracker.currentDuration}s)`);
+}
+
 // Helper functions
 async function loadSchedule() {
-  try {
-    const data = await fs.readFile(SCHEDULE_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return {
-      items: [],
-      currentIndex: 0,
-      isPlaying: false,
-      loop: false
-    };
-  }
+  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
 }
 
 async function saveSchedule(schedule) {
-  await fs.writeFile(SCHEDULE_FILE, JSON.stringify(schedule, null, 2));
+  await safeWriteJSON(SCHEDULE_FILE, schedule);
 }
 
 async function loadLibrary() {
-  try {
-    const data = await fs.readFile(LIBRARY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return safeReadJSON(LIBRARY_FILE, []);
 }
 
 async function loadHistory() {
-  try {
-    const data = await fs.readFile(HISTORY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return { played: [] };
-  }
+  return safeReadJSON(HISTORY_FILE, { played: [] });
 }
 
 async function saveHistory(history) {
-  await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2));
+  await safeWriteJSON(HISTORY_FILE, history);
 }
 
 // Get video file path from slug (downloads from S3 if not local)
@@ -95,6 +212,13 @@ async function prefetchAdjacentVideos(currentIndex) {
 
   if (items.length === 0) return;
 
+  // Normalize currentIndex into valid range (callers may pass index beyond items.length)
+  if (schedule.loop) {
+    currentIndex = currentIndex % items.length;
+  } else {
+    currentIndex = Math.min(currentIndex, items.length - 1);
+  }
+
   // Determine which indices to prefetch (next and previous)
   const indicesToPrefetch = [];
 
@@ -117,9 +241,13 @@ async function prefetchAdjacentVideos(currentIndex) {
     const slug = items[index].slug;
     const localPath = path.resolve(path.join(__dirname, '../../media/library', `${slug}.mp4`));
 
-    // Check if already exists locally
-    fs.access(localPath).catch(async () => {
-      // File doesn't exist, download in background
+    // Check if already exists locally (final or in-progress .tmp)
+    const tmpPath = `${localPath}.tmp`;
+    Promise.all([
+      fs.access(localPath).then(() => true).catch(() => false),
+      fs.access(tmpPath).then(() => true).catch(() => false)
+    ]).then(async ([exists, downloading]) => {
+      if (exists || downloading) return; // Already have it or download in progress
       logger.info(`Prefetching ${slug}.mp4 from S3...`);
       try {
         await downloadFromS3(slug);
@@ -210,16 +338,6 @@ async function playNextVideo() {
   const nextItem = schedule.items[schedule.currentIndex];
   const videoPath = await getVideoPath(nextItem.slug);
 
-  try {
-    // If streaming is active, switch content
-    if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
-      logger.info(`Switched streaming content to: ${nextItem.slug}`);
-    }
-  } catch (streamError) {
-    logger.error('Streaming switch error (continuing anyway):', streamError);
-  }
-
   await saveSchedule(schedule);
 
   const enrichedItem = await enrichScheduleItem(nextItem);
@@ -238,36 +356,98 @@ async function playNextVideo() {
   };
 }
 
-// Set up auto-progression listener
-coordinator.on('allPlatformsCompleted', async (event) => {
+/**
+ * Build an array of video file paths from the schedule starting at startIndex.
+ * Loads ALL remaining items from startIndex to end of schedule (one full pass).
+ * FFmpeg loops the playlist forever via -stream_loop -1, so no batching needed.
+ * Downloads from S3 if needed. Returns { videoPaths, endIndex, videoCount }.
+ */
+async function buildPlaylistBuffer(startIndex) {
+  const schedule = await loadSchedule();
+  const items = schedule.items;
+  if (items.length === 0) return { videoPaths: [], endIndex: startIndex, videoCount: 0 };
+
+  const videoPaths = [];
+  // Load from startIndex through end, then wrap from 0 to startIndex (full schedule)
+  const totalToLoad = items.length;
+
+  for (let i = 0; i < totalToLoad; i++) {
+    const index = (startIndex + i) % items.length;
+
+    try {
+      const slug = items[index].slug;
+      const videoPath = await getVideoPath(slug);
+      videoPaths.push(videoPath);
+    } catch (err) {
+      logger.warn(`Failed to get video for ${items[index].slug}, skipping:`, err.message);
+    }
+  }
+
+  return { videoPaths, endIndex: (startIndex + totalToLoad) % items.length, videoCount: videoPaths.length };
+}
+
+// Playlist-exhausted listener: With -stream_loop -1, this should NOT fire during normal
+// operation (FFmpeg loops the playlist forever). This only fires if FFmpeg exits unexpectedly.
+// Treat it as crash recovery: restart the stream with the full schedule.
+coordinator.on('playlistExhausted', async (event) => {
+  const platforms = event.platforms || [event.platform];
+
   try {
-    logger.info('Auto-progressing to next video after content completion', event);
+    logger.warn('Playlist exhausted unexpectedly (FFmpeg should loop forever). Restarting stream.', { platforms });
+
+    const schedule = await loadSchedule();
+
+    if (!schedule.isPlaying) {
+      logger.info('Schedule not playing, not restarting');
+      return;
+    }
+
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+
+    if (videoCount === 0) {
+      logger.warn('No videos available, cannot restart');
+      return;
+    }
+
+    // Update player status
+    const enrichedItem = await enrichScheduleItem(schedule.items[schedule.currentIndex]);
+    playerStatus.currentVideo = enrichedItem;
+    playerStatus.currentIndex = schedule.currentIndex;
+
+    // Restart with full schedule and progress tracker
+    await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
+    await startProgressTracker();
+    logger.info(`Crash recovery: restarted stream with ${videoCount} videos at index ${schedule.currentIndex}`);
+
+  } catch (error) {
+    logger.error('Crash recovery failed after playlist exhaustion:', error);
+  }
+});
+
+// Legacy: handle non-continuous content completion (single video mode)
+coordinator.on('allPlatformsCompleted', async (event) => {
+  const platforms = event.platforms || [];
+
+  try {
+    logger.info('Content completed (non-continuous), advancing to next video', {
+      platforms,
+      completedContent: event.completedContent
+    });
 
     const result = await playNextVideo();
 
     if (!result.endReached && result.nowPlaying) {
-      // Automatically start streaming the next video
-      const videoPath = await getVideoPath(result.nowPlaying.slug);
-      await coordinator.startAll(videoPath, { quality: '1080p' });
-
-      logger.info('Auto-progression successful, streaming next video:', result.nowPlaying.title);
+      const schedule = await loadSchedule();
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+      await coordinator.startPlatforms(platforms, videoPaths, { quality: '1080p' });
+      logger.info('Started next batch:', result.nowPlaying.title);
     } else {
-      logger.info('Auto-progression reached end of schedule or loop disabled');
-
-      // Stop coordination since we've reached the end
-      coordinator.isCoordinating = false;
+      logger.info('End of schedule reached');
+      await coordinator.stopAll();
     }
 
   } catch (error) {
     logger.error('Auto-progression failed:', error);
-
-    // Continue streaming the same content to avoid dead air
-    try {
-      await coordinator.startAll(coordinator.currentContent, { quality: '1080p' });
-      logger.info('Restarted current content after auto-progression failure');
-    } catch (restartError) {
-      logger.error('Failed to restart content after auto-progression failure:', restartError);
-    }
   }
 });
 
@@ -280,15 +460,20 @@ router.get('/status', async (req, res) => {
     await updatePlayerStatus();
 
     playerStatus.isPlaying = schedule.isPlaying;
-    playerStatus.currentIndex = schedule.currentIndex;
 
-    if (schedule.items.length > 0 && schedule.currentIndex < schedule.items.length) {
-      const currentItem = schedule.items[schedule.currentIndex];
-      playerStatus.currentVideo = await enrichScheduleItem(currentItem);
-      playerStatus.totalDuration = playerStatus.currentVideo.duration || 0;
-    } else {
-      playerStatus.currentVideo = null;
-      playerStatus.totalDuration = 0;
+    // If the progress tracker is running, it keeps playerStatus in sync.
+    // Otherwise, read currentIndex from the schedule file.
+    if (!progressTracker.isTracking) {
+      playerStatus.currentIndex = schedule.currentIndex;
+
+      if (schedule.items.length > 0 && schedule.currentIndex < schedule.items.length) {
+        const currentItem = schedule.items[schedule.currentIndex];
+        playerStatus.currentVideo = await enrichScheduleItem(currentItem);
+        playerStatus.totalDuration = playerStatus.currentVideo.duration || 0;
+      } else {
+        playerStatus.currentVideo = null;
+        playerStatus.totalDuration = 0;
+      }
     }
 
     // Add streaming information
@@ -314,20 +499,18 @@ router.post('/start-stream', async (req, res) => {
     }
 
     const currentItem = schedule.items[schedule.currentIndex];
-    const videoPath = await getVideoPath(currentItem.slug);
+
+    // Build full schedule playlist — FFmpeg loops it forever via -stream_loop -1
+    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+
+    if (videoCount === 0) {
+      return res.status(400).json({ error: 'No playable videos found in schedule' });
+    }
 
     let result;
+    const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
 
-    if (platform === 'all') {
-      result = await coordinator.startAll(videoPath, { quality });
-    } else {
-      const streamer = coordinator.getStreamer(platform);
-      if (!streamer) {
-        return res.status(400).json({ error: `Unknown platform: ${platform}` });
-      }
-      await streamer.start(videoPath, { quality });
-      result = { platform, status: 'started', content: currentItem.slug };
-    }
+    result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
 
     // Mark as playing
     schedule.isPlaying = true;
@@ -336,11 +519,11 @@ router.post('/start-stream', async (req, res) => {
     playerStatus.isPlaying = true;
     await updatePlayerStatus();
 
-    const enrichedItem = await enrichScheduleItem(currentItem);
-    logger.info(`Streaming started on ${platform}`, result);
+    // Start tracking schedule progress (advances currentIndex based on video durations)
+    await startProgressTracker();
 
-    // Prefetch adjacent videos in background
-    prefetchAdjacentVideos(schedule.currentIndex);
+    const enrichedItem = await enrichScheduleItem(currentItem);
+    logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
 
     res.json({
       success: true,
@@ -363,6 +546,7 @@ router.post('/stop-stream', async (req, res) => {
 
     if (platform === 'all') {
       result = await coordinator.stopAll();
+      stopProgressTracker();
     } else {
       const streamer = coordinator.getStreamer(platform);
       if (!streamer) {
@@ -370,6 +554,10 @@ router.post('/stop-stream', async (req, res) => {
       }
       await streamer.stop();
       result = { platform, status: 'stopped' };
+      // Stop tracker only if no platforms are still streaming
+      if (!coordinator.isAnyStreaming()) {
+        stopProgressTracker();
+      }
     }
 
     await updatePlayerStatus();
@@ -429,6 +617,11 @@ router.post('/play', async (req, res) => {
     playerStatus.currentVideo = enrichedItem;
     playerStatus.timeElapsed = 0;
 
+    // Start progress tracker if streaming (resumes tracking from current position)
+    if (coordinator.isAnyStreaming()) {
+      await startProgressTracker();
+    }
+
     // Prefetch adjacent videos in background
     prefetchAdjacentVideos(schedule.currentIndex);
 
@@ -450,6 +643,7 @@ router.post('/pause', async (req, res) => {
     schedule.isPlaying = false;
     await saveSchedule(schedule);
 
+    stopProgressTracker();
     playerStatus.isPlaying = false;
 
     res.json({ success: true });
@@ -459,7 +653,7 @@ router.post('/pause', async (req, res) => {
   }
 });
 
-// Play next video
+// Play next video (manual skip — hard switches FFmpeg)
 router.post('/next', async (req, res) => {
   try {
     const result = await playNextVideo();
@@ -470,6 +664,15 @@ router.post('/next', async (req, res) => {
         message: 'End of schedule reached',
         endReached: true
       });
+    }
+
+    // Manual skip: hard switch FFmpeg with a deep buffer (brief stream interruption is acceptable)
+    if (coordinator.isAnyStreaming() && result.nowPlaying) {
+      const schedule = await loadSchedule();
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+      await coordinator.hardSwitch(videoPaths);
+      await resetProgressTracker(schedule.currentIndex);
+      logger.info(`Manual skip: hard switched to ${result.nowPlaying.slug} (${videoCount} videos buffered)`);
     }
 
     res.json(result);
@@ -503,21 +706,23 @@ router.post('/previous', async (req, res) => {
 
     // Play previous video
     const prevItem = schedule.items[schedule.currentIndex];
-    const videoPath = await getVideoPath(prevItem.slug);
 
-    // If streaming is active, switch content
+    // If streaming is active, hard switch with deep buffer (going backwards requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+      await coordinator.hardSwitch(videoPaths);
+      logger.info(`Previous: hard switched to index ${schedule.currentIndex} (${videoCount} videos buffered)`);
     }
 
     await saveSchedule(schedule);
 
     const enrichedItem = await enrichScheduleItem(prevItem);
+    await resetProgressTracker(schedule.currentIndex);
     playerStatus.currentVideo = enrichedItem;
     playerStatus.currentIndex = schedule.currentIndex;
     playerStatus.timeElapsed = 0;
 
-    // Prefetch adjacent videos in background
+    // Prefetch adjacent videos from S3
     prefetchAdjacentVideos(schedule.currentIndex);
 
     res.json({
@@ -543,21 +748,23 @@ router.post('/jump/:index', async (req, res) => {
 
     schedule.currentIndex = index;
     const item = schedule.items[index];
-    const videoPath = await getVideoPath(item.slug);
 
-    // If streaming is active, switch content
+    // If streaming is active, hard switch with deep buffer (jumping requires FFmpeg restart)
     if (coordinator.isAnyStreaming()) {
-      await coordinator.switchContent(videoPath);
+      const { videoPaths, videoCount } = await buildPlaylistBuffer(index);
+      await coordinator.hardSwitch(videoPaths);
+      logger.info(`Jump: hard switched to index ${index} (${videoCount} videos buffered)`);
     }
 
     await saveSchedule(schedule);
 
     const enrichedItem = await enrichScheduleItem(item);
+    await resetProgressTracker(index);
     playerStatus.currentVideo = enrichedItem;
     playerStatus.currentIndex = index;
     playerStatus.timeElapsed = 0;
 
-    // Prefetch adjacent videos in background
+    // Prefetch adjacent videos from S3
     prefetchAdjacentVideos(index);
 
     res.json({
@@ -580,7 +787,9 @@ router.post('/stop', async (req, res) => {
     schedule.currentIndex = 0;
     await saveSchedule(schedule);
 
-    // Also stop streaming if active
+    // Stop progress tracker and streaming
+    stopProgressTracker();
+
     if (coordinator.isAnyStreaming()) {
       await coordinator.stopAll();
       logger.info('Stopped streaming along with playback');
