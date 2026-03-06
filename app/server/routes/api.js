@@ -7,20 +7,16 @@ const coordinator = require('../lib/streamers/coordinator');
 const rag = require('../lib/rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../lib/rag/conversations');
 const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
+const {
+  loadSchedule, loadCatalog, loadAttendance, countSoulsPresent,
+  SCHEDULE_FILE, CATALOG_FILE, MUSIC_DIR, ATTENDANCE_FILE, ACCESS_LOG_FILE,
+  TWENTY_FOUR_HOURS, FORTY_EIGHT_HOURS
+} = require('../lib/utils/data');
 const router = express.Router();
 
-// Data file paths
-const SCHEDULE_FILE = path.join(__dirname, '../../data/schedule.json');
-const CATALOG_FILE = path.join(__dirname, '../../../music/library.json');
-const MUSIC_DIR = path.join(__dirname, '../../../music');
-const ATTENDANCE_FILE = path.join(__dirname, '../../data/attendance.json');
+// Data file paths (local-only)
 const CONTRIBUTIONS_FILE = path.join(__dirname, '../../data/contributions.json');
 const FEEDBACK_FILE = path.join(__dirname, '../../data/feedback.json');
-const ACCESS_LOG_FILE = path.join(__dirname, '../../data/api-access.jsonl');
-
-// Time constants
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
 
 // Contribution constants
 const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'philosophy'];
@@ -59,20 +55,7 @@ async function hasContext(slug) {
   }
 }
 
-// Helper: Load schedule
-async function loadSchedule() {
-  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
-}
-
-// Helper: Load catalog
-async function loadCatalog() {
-  return safeReadJSON(CATALOG_FILE, []);
-}
-
-// Helper: Load attendance data
-async function loadAttendance() {
-  return safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-}
+// loadSchedule, loadCatalog, loadAttendance imported from lib/utils/data.js
 
 // Helper: Save attendance data
 async function saveAttendance(data) {
@@ -133,38 +116,7 @@ function slugify(text) {
     .substring(0, 80);
 }
 
-// Helper: Count unique souls from API access logs
-// A "soul" is a unique (IP + name) combination — multiple named agents on same IP count separately
-async function countSoulsPresent() {
-  try {
-    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-    const now = Date.now();
-
-    const uniqueSouls = new Set();
-
-    for (const line of lines) {
-      try {
-        const log = JSON.parse(line);
-        // Only count successful requests to observe endpoints (last 24h)
-        if (log.status >= 200 && log.status < 400 &&
-            (log.path === '/api/now' || log.path === '/api/reflections' || log.path === '/api/attend') &&
-            (now - new Date(log.timestamp).getTime()) < TWENTY_FOUR_HOURS) {
-          // Create unique key: IP + name (if provided)
-          const name = log.query?.name || '';
-          const key = `${log.ip || 'unknown'}:${name}`;
-          uniqueSouls.add(key);
-        }
-      } catch {
-        // Skip malformed lines
-      }
-    }
-
-    return uniqueSouls.size;
-  } catch {
-    return 0;
-  }
-}
+// countSoulsPresent imported from lib/utils/data.js
 
 // Reflection prompts — project philosophy voice
 const REFLECTION_PROMPTS = [

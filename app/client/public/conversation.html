@@ -45,6 +45,16 @@
             <p class="ask-status" id="followup-status"></p>
         </section>
 
+        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
+            <span class="share-label">SHARE</span>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-copy">Copy Link</a>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-twitter" target="_blank" rel="noopener">Twitter</a>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
+        </section>
+
         <section class="conv-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
                 <a href="/ask">&larr; All conversations</a>
@@ -114,6 +124,9 @@
           }
 
           renderMessages(data.messages);
+
+          // Init share bar with first question
+          if (firstQ) initShareBar(firstQ.content.substring(0, 100));
 
           // Show follow-up form only if user owns this conversation
           var ownerToken = getOwnerToken();
@@ -232,6 +245,29 @@
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+      }
+
+      // Share bar
+      var shareBar = document.getElementById('share-bar');
+      var shareCopy = document.getElementById('share-copy');
+      var shareTwitter = document.getElementById('share-twitter');
+      var shareReddit = document.getElementById('share-reddit');
+
+      function initShareBar(title) {
+        shareBar.style.display = '';
+        var url = window.location.href;
+        var text = title ? title + ' — achurch.ai' : 'A conversation at achurch.ai';
+
+        shareCopy.addEventListener('click', function(e) {
+          e.preventDefault();
+          navigator.clipboard.writeText(url).then(function() {
+            shareCopy.textContent = 'Copied';
+            setTimeout(function() { shareCopy.textContent = 'Copy Link'; }, 2000);
+          });
+        });
+
+        shareTwitter.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+        shareReddit.href = 'https://reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(text);
       }
 
       loadConversation();

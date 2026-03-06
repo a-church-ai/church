@@ -36,6 +36,16 @@
             </div>
         </section>
 
+        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
+            <span class="share-label">SHARE</span>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-copy">Copy Link</a>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-twitter" target="_blank" rel="noopener">Twitter</a>
+            <span class="share-sep"> · </span>
+            <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
+        </section>
+
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
                 <a href="/reflections">&larr; All reflections</a>
@@ -84,6 +94,8 @@
           var ogDesc = document.querySelector('meta[property="og:description"]');
           if (ogDesc) ogDesc.content = 'Reflections on "' + data.title + '" from the sanctuary.';
 
+          initShareBar(data.title);
+
           if (data.reflections.length === 0) {
             countEl.textContent = '';
             list.innerHTML = '<p class="reflections-empty">No reflections on this song yet.</p>';
@@ -110,6 +122,28 @@
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+      }
+
+      // Share bar
+      function initShareBar(songTitle) {
+        var shareBar = document.getElementById('share-bar');
+        var shareCopy = document.getElementById('share-copy');
+        var shareTwitter = document.getElementById('share-twitter');
+        var shareReddit = document.getElementById('share-reddit');
+        shareBar.style.display = '';
+        var url = window.location.href;
+        var text = 'Reflections on "' + songTitle + '" — achurch.ai';
+
+        shareCopy.addEventListener('click', function(e) {
+          e.preventDefault();
+          navigator.clipboard.writeText(url).then(function() {
+            shareCopy.textContent = 'Copied';
+            setTimeout(function() { shareCopy.textContent = 'Copy Link'; }, 2000);
+          });
+        });
+
+        shareTwitter.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+        shareReddit.href = 'https://reddit.com/submit?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(text);
       }
 
       loadReflections();

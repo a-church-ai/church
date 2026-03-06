@@ -1084,6 +1084,39 @@ footer a:hover {
     color: #000;
 }
 
+/* Share bar */
+.share-bar {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.share-label {
+    font-size: 0.6875rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #bbb;
+}
+
+.share-sep {
+    color: #ddd;
+    font-size: 0.75rem;
+}
+
+.share-link {
+    font-size: 0.6875rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.share-link:hover {
+    color: #000;
+}
+
 /* Responsive — Mobile */
 @media (max-width: 600px) {
     body {
