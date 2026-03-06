@@ -156,6 +156,7 @@ document.getElementById('btn-download-ask-logs').addEventListener('click', downl
 
 // Reflections Controls
 document.getElementById('btn-refresh-reflections').addEventListener('click', loadReflections);
+document.getElementById('btn-download-reflections').addEventListener('click', downloadReflections);
 
 // Streaming Functions
 async function startStreaming(platform) {
@@ -1452,6 +1453,25 @@ async function deleteReflection(id) {
     } catch (error) {
         console.error('Error deleting reflection:', error);
         showMessage('Failed to delete reflection', 'error');
+    }
+}
+
+async function downloadReflections() {
+    try {
+        const response = await fetch('/admin/api/reflections?download=json', { credentials: 'include' });
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || 'reflections.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showMessage('Reflections downloaded', 'success');
+    } catch (error) {
+        console.error('Error downloading reflections:', error);
+        showMessage('Failed to download reflections', 'error');
     }
 }
 

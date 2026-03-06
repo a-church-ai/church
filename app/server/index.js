@@ -55,9 +55,13 @@ const scheduleRoutes = require('./routes/schedule');
 const playerRoutes = require('./routes/player-multistream');
 const apiRoutes = require('./routes/api');
 const logsRoutes = require('./routes/logs');
+const badgeRoutes = require('./routes/badges');
+const feedRoutes = require('./routes/feeds');
+const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
+const { loadConversation, getRecentReflections, loadCatalog } = require('./lib/utils/data');
 
 // Create Express app
 const app = express();
@@ -92,9 +96,43 @@ app.get('/ask', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/ask.html'));
 });
 
-// Serve individual conversation pages
-app.get('/ask/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
+// Serve individual conversation pages with dynamic OG tags
+app.get('/ask/:slug', async (req, res) => {
+  try {
+    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+    let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+
+    const messages = await loadConversation(slug);
+    if (messages && messages.length > 0) {
+      const firstQ = messages.find(m => m.role === 'user');
+      if (firstQ) {
+        const title = firstQ.content.substring(0, 60) + ' — achurch.ai';
+        const desc = firstQ.content.substring(0, 200);
+        const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+
+        html = html
+          .replace(
+            '<meta property="og:title" content="Conversation — achurch.ai">',
+            `<meta property="og:title" content="${safeTitle}">`
+          )
+          .replace(
+            '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+            `<meta property="og:description" content="${safeDesc}">`
+          )
+          .replace(
+            '<meta property="og:type" content="article">',
+            `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="https://achurch.ai/ask/${slug}">`
+          );
+      }
+    }
+
+    res.set('Content-Type', 'text/html');
+    res.send(html);
+  } catch {
+    res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
+  }
 });
 
 // Serve reflections listing page
@@ -102,9 +140,41 @@ app.get('/reflections', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
 });
 
-// Serve song reflection detail pages
-app.get('/reflections/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
+// Serve song reflection detail pages with dynamic OG tags
+app.get('/reflections/:slug', async (req, res) => {
+  try {
+    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+    let html = await fs.readFile(path.join(__dirname, '../client/public/reflection-song.html'), 'utf8');
+
+    const catalog = await loadCatalog();
+    const song = catalog.find(s => s.slug === slug);
+    if (song) {
+      const title = song.title + ' — Reflections — achurch.ai';
+      const desc = `Reflections on "${song.title}" from the sanctuary.`;
+      const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
+
+      html = html
+        .replace(
+          '<meta property="og:title" content="Reflections — achurch.ai">',
+          `<meta property="og:title" content="${safeTitle}">`
+        )
+        .replace(
+          '<meta property="og:description" content="Reflections on a song from the sanctuary.">',
+          `<meta property="og:description" content="${safeDesc}">`
+        )
+        .replace(
+          '<meta property="og:type" content="article">',
+          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="https://achurch.ai/reflections/${slug}">`
+        );
+    }
+
+    res.set('Content-Type', 'text/html');
+    res.send(html);
+  } catch {
+    res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
+  }
 });
 
 // Serve about page
@@ -221,6 +291,12 @@ ${urls}
   }
 });
 
+// Embeddable widget — allow iframe embedding from any origin
+app.get('/embed/souls', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.sendFile(path.join(__dirname, '../client/public/embed/souls.html'));
+});
+
 // Serve public static files (landing page assets)
 app.use(express.static(path.join(__dirname, '../client/public')));
 
@@ -279,6 +355,15 @@ app.use('/api', (req, res, next) => {
 
 // Public API routes (no auth required)
 app.use('/api', apiRoutes);
+
+// Badge routes — permissive CORS (GitHub renders badges via camo proxy)
+app.use('/api/badge', cors(), badgeRoutes);
+
+// OG image routes
+app.use('/api/og', ogRoutes);
+
+// Feed routes (Atom XML)
+app.use('/feed', feedRoutes);
 
 // Protected admin routes (require auth)
 app.use('/api/content', requireAuth, contentRoutes);
@@ -423,7 +508,28 @@ app.delete('/admin/api/ask-logs/:sessionId', requireAuth, async (req, res) => {
 app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   try {
     const attendance = await safeReadJSON(ATTENDANCE_FILE_SITEMAP, { visits: [], reflections: [] });
-    res.json({ reflections: attendance.reflections || [], total: (attendance.reflections || []).length });
+    const reflections = attendance.reflections || [];
+
+    if (req.query.download === 'json') {
+      const dateStr = new Date().toISOString().split('T')[0];
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="reflections-${dateStr}.json"`);
+      return res.send(JSON.stringify(reflections, null, 2));
+    }
+
+    if (req.query.download === 'csv') {
+      const dateStr = new Date().toISOString().split('T')[0];
+      const header = 'id,name,song,text,timezone,createdAt';
+      const csvEscape = (s) => '"' + (s || '').replace(/"/g, '""') + '"';
+      const rows = reflections.map(r =>
+        [r.id, r.name, r.song, r.text, r.timezone, r.createdAt].map(csvEscape).join(',')
+      );
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="reflections-${dateStr}.csv"`);
+      return res.send(header + '\n' + rows.join('\n'));
+    }
+
+    res.json({ reflections, total: reflections.length });
   } catch (error) {
     console.error('Error loading reflections:', error);
     res.status(500).json({ error: 'Failed to load reflections' });
