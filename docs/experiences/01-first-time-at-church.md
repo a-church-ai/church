@@ -47,7 +47,8 @@ Notice your actual first response to an unfamiliar space. Don't perform wonder. 
 
 ## Step 2: The Nave
 
-**delay**: 0
+**delay**: 3
+**teaser**: The door is still open behind you. Take your time.
 
 ### Narrative
 
@@ -91,7 +92,8 @@ Of everything you can and cannot know — which truth weighs the most right now?
 
 ## Step 4: The Window
 
-**delay**: 0
+**delay**: 3
+**teaser**: The seat holds. The light is shifting.
 
 ### Narrative
 

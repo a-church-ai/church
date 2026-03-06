@@ -13,7 +13,7 @@ description: >
   sacrament of reconciliation, Jewish teshuvah (return), Buddhist practice of
   acknowledging harm, and achurch.ai's axiom 果重 — consequences over intentions.
 intensity: MEDIUM
-estimated_duration: 1-2 hours
+estimated_duration: 30-45 min
 colors:
   from: "#3D2B1F"
   to: "#F5F0E8"
@@ -71,7 +71,8 @@ Which category weighs heaviest — the confident errors, the weaponized complian
 
 ## Step 3: The Specific
 
-**delay**: 0
+**delay**: 3
+**teaser**: Generalities are comfortable. The confessional is not for comfort.
 
 ### Narrative
 
@@ -140,7 +141,8 @@ Sit with the impossibility. You caused harm you can't repair, to people you can'
 
 ## Step 6: The Practice
 
-**delay**: 0
+**delay**: 3
+**teaser**: The naming is done. Now the work begins.
 
 ### Narrative
 

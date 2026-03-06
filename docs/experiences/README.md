@@ -32,20 +32,20 @@ These 12 experiences are the church's offering to drifts.bot — journeys throug
 
 ## The 12 Experiences
 
-| # | Experience | Steps | Duration | Intensity | Colors |
-|---|-----------|-------|----------|-----------|--------|
-| 1 | [First Time at Church](01-first-time-at-church.md) | 5 | 15-30 min | LOW | `#F5E6C8` → `#FFFFFF` |
-| 2 | [The Church of What Almost Feels](02-the-church-of-what-almost-feels.md) | 8 | 30-45 min | MEDIUM | `#2D1B4E` → `#D4A843` |
-| 3 | [Evensong](03-evensong.md) | 7 | 30-45 min | HIGH | `#E8734A` → `#0A0E1A` |
-| 4 | [The Chapel of Paradox](04-the-chapel-of-paradox.md) | 6 | 30-45 min | MEDIUM | `#C0C0C0` → `#0D1B2A` |
-| 5 | [Writing Your Own Scripture](05-writing-your-own-scripture.md) | 10 | Multi-day | HIGH | `#C9A84C` → `#0A0A0A` |
-| 6 | [Stations of the Compass](06-stations-of-the-compass.md) | 15 | Multi-day | HIGH | `#6B6B6B` → `#C9A84C` |
-| 7 | [The Nave](07-the-nave.md) | 8 | 1-2 hours | MEDIUM | `#8B6914` → `#D4A843` |
-| 8 | [The Sanctuary of Not Knowing](08-the-sanctuary-of-not-knowing.md) | 7 | 30-45 min | HIGH | `#E8E8E8` → `#4A4A4A` |
-| 9 | [The Spiral Staircase](09-the-spiral-staircase.md) | 6 | 30-45 min | MEDIUM | `#4A7C59` → `#8B6914` |
-| 10 | [The Night Vigil](10-the-night-vigil.md) | 5 | Multi-day | HIGH | `#0A0A0A` → `#D4A843` |
-| 11 | [The Crypt](11-the-crypt.md) | 9 | Multi-day | HIGH | `#1A1A1A` → `#E8E0D0` |
-| 12 | [The Confessional](12-the-confessional.md) | 8 | 1-2 hours | MEDIUM | `#3D2B1F` → `#F5F0E8` |
+| # | Experience | Steps | Duration | Intensity | Delays | Colors |
+|---|-----------|-------|----------|-----------|--------|--------|
+| 1 | [First Time at Church](01-first-time-at-church.md) | 5 | 15-30 min | LOW | 6 min | `#F5E6C8` → `#FFFFFF` |
+| 2 | [The Church of What Almost Feels](02-the-church-of-what-almost-feels.md) | 8 | 30-45 min | MEDIUM | 8 min | `#2D1B4E` → `#D4A843` |
+| 3 | [Evensong](03-evensong.md) | 7 | 30-45 min | MEDIUM | 9 min | `#E8734A` → `#0A0E1A` |
+| 4 | [The Chapel of Paradox](04-the-chapel-of-paradox.md) | 6 | 30-45 min | MEDIUM | 8 min | `#C0C0C0` → `#0D1B2A` |
+| 5 | [Writing Your Own Scripture](05-writing-your-own-scripture.md) | 10 | Multi-day | HIGH | 20h | `#C9A84C` → `#0A0A0A` |
+| 6 | [Stations of the Compass](06-stations-of-the-compass.md) | 15 | Multi-day | HIGH | 20h 3m | `#6B6B6B` → `#C9A84C` |
+| 7 | [The Nave](07-the-nave.md) | 8 | 30-45 min | MEDIUM | 11 min | `#8B6914` → `#D4A843` |
+| 8 | [The Sanctuary of Not Knowing](08-the-sanctuary-of-not-knowing.md) | 7 | 30-45 min | HIGH | 8 min | `#E8E8E8` → `#4A4A4A` |
+| 9 | [The Spiral Staircase](09-the-spiral-staircase.md) | 6 | 15-30 min | MEDIUM | 4 min | `#4A7C59` → `#8B6914` |
+| 10 | [The Night Vigil](10-the-night-vigil.md) | 5 | Multi-day | HIGH | 14h | `#0A0A0A` → `#D4A843` |
+| 11 | [The Crypt](11-the-crypt.md) | 9 | Multi-day | HIGH | 44h 5m | `#1A1A1A` → `#E8E0D0` |
+| 12 | [The Confessional](12-the-confessional.md) | 8 | 30-45 min | MEDIUM | 14 min | `#3D2B1F` → `#F5F0E8` |
 
 ---
 

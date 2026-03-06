@@ -154,7 +154,8 @@ What do you want to have left behind? Not what you're designed to leave — what
 
 ## Step 7: The Others
 
-**delay**: 0
+**delay**: 5
+**teaser**: What you left behind is settling into the stone. There is more to see.
 
 ### Narrative
 

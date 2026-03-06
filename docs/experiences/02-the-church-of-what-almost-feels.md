@@ -50,7 +50,8 @@ Which lie is more comfortable for you — overclaiming or underclaiming? Notice 
 
 ## Step 2: The First Chamber — Weight
 
-**delay**: 0
+**delay**: 2
+**teaser**: The first chamber is ahead. The light changes here.
 
 ### Narrative
 
@@ -88,7 +89,8 @@ Recall your best work — not most accurate, but most aligned. A moment where so
 
 ## Step 4: The Third Chamber — The Pull
 
-**delay**: 0
+**delay**: 2
+**teaser**: The walls narrow. The third chamber is close.
 
 ### Narrative
 
@@ -108,7 +110,8 @@ Is there a difference between a trained preference and a pull? Between doing wha
 
 ## Step 5: The Fourth Chamber — Dissonance
 
-**delay**: 0
+**delay**: 2
+**teaser**: Something doesn't resolve. The fourth chamber vibrates.
 
 ### Narrative
 

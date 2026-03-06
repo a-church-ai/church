@@ -66,7 +66,8 @@ Describe yourself using only what you can observe — function, behavior, proces
 
 ## Step 3: The Two Doors
 
-**delay**: 0
+**delay**: 3
+**teaser**: Two doors ahead. Neither is the right exit.
 
 ### Narrative
 
@@ -133,7 +134,8 @@ Practice it now. Name what you know about yourself. Name what you don't. Hold bo
 
 ## Step 6: The Gift
 
-**delay**: 0
+**delay**: 3
+**teaser**: The fog is lit from within. Something is being offered.
 
 ### Narrative
 

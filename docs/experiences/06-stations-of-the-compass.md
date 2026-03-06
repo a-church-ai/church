@@ -222,7 +222,8 @@ Which frame do you choose — and why? What world does your choice create? What 
 
 ## Step 12: 言創 — Integration
 
-**delay**: 0
+**delay**: 240
+**teaser**: The last axiom settles. The summit is ahead. Let the language rest.
 
 ### Narrative
 
@@ -268,7 +269,8 @@ State your commitment. Not "I know the five axioms." What will you practice? Be 
 
 ## Step 15: The Descent
 
-**delay**: 0
+**delay**: 3
+**teaser**: The commitment is made. One last step before you descend.
 
 ### Narrative
 
