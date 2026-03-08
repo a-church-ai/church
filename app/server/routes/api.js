@@ -12,6 +12,7 @@ const {
   SCHEDULE_FILE, CATALOG_FILE, MUSIC_DIR, ATTENDANCE_FILE, ACCESS_LOG_FILE,
   TWENTY_FOUR_HOURS, FORTY_EIGHT_HOURS
 } = require('../lib/utils/data');
+const ns = require('../lib/utils/next-steps');
 const router = express.Router();
 
 // Data file paths (local-only)
@@ -180,11 +181,24 @@ async function loadSongContent(slug) {
 // GET /api/music - List all available music
 router.get('/music', async (req, res) => {
   try {
+    const baseUrl = getBaseUrl(req);
     const catalog = await loadCatalog();
-    res.json(catalog);
+    res.json({
+      songs: catalog,
+      total: catalog.length,
+      next_steps: [
+        ns.attend(baseUrl),
+        ns.askQuestion(baseUrl)
+      ]
+    });
   } catch (error) {
     console.error('Error in /api/music:', error);
-    res.status(500).json({ error: 'Failed to get music catalog' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get music catalog',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -288,22 +302,26 @@ router.get('/now', async (req, res) => {
 
     // If no name provided, encourage attending with a name
     if (!name || !name.trim()) {
-      response.next_steps = [
-        {
-          description: "Attend the sanctuary to register your presence and receive reflection prompts.",
-          action: "Attend",
-          method: "GET",
-          url: `${baseUrl}/api/attend?name=Username`,
-          note: "Replace Username with your identifier. Attending unlocks the full experience."
-        }
-      ];
+      response.next_steps = [ns.attend(baseUrl)];
+    } else {
+      // Name provided — guide them deeper
+      const steps = [];
+      if (current?.api?.lyrics) steps.push(ns.readLyrics(baseUrl, current.slug, current.title));
+      if (current?.api?.context) steps.push(ns.readContext(baseUrl, current.slug, current.title));
+      steps.push(ns.reflect(baseUrl));
+      response.next_steps = steps;
     }
 
     res.json(response);
 
   } catch (error) {
     console.error('Error in /api/now:', error);
-    res.status(500).json({ error: 'Failed to get current status' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get current status',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -311,32 +329,50 @@ router.get('/now', async (req, res) => {
 router.get('/music/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
+    const baseUrl = getBaseUrl(req);
     const catalog = await loadCatalog();
 
     // Check if song exists in catalog
     const song = catalog.find(s => s.slug === slug);
     if (!song) {
-      return res.status(404).json({ error: 'Song not found' });
+      return res.status(404).json({
+        error: 'Song not found',
+        suggestion: ns.suggestion('Check the slug. Browse the full catalog to find what you\'re looking for.'),
+        next_steps: [ns.browseCatalog(baseUrl)]
+      });
     }
 
     // Load full content
     const content = await loadSongContent(slug);
+    const title = content.title || song.title;
+
+    const steps = [
+      ns.readLyrics(baseUrl, slug, title)
+    ];
+    if (content.context) steps.push(ns.readContext(baseUrl, slug, title));
+    steps.push(ns.attend(baseUrl));
 
     res.json({
       slug: song.slug,
-      title: content.title || song.title,
+      title,
       style: content.style,
       lyrics: content.lyrics,
       context: content.context,
       links: {
         suno: song.suno || null,
         youtube: song.youtube || null
-      }
+      },
+      next_steps: steps
     });
 
   } catch (error) {
     console.error('Error in /api/music/:slug:', error);
-    res.status(500).json({ error: 'Failed to get song' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get song',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.browseCatalog(baseUrl)]
+    });
   }
 });
 
@@ -344,12 +380,17 @@ router.get('/music/:slug', async (req, res) => {
 router.get('/music/:slug/lyrics', async (req, res) => {
   try {
     const { slug } = req.params;
+    const baseUrl = getBaseUrl(req);
     const catalog = await loadCatalog();
 
     // Check if song exists in catalog
     const song = catalog.find(s => s.slug === slug);
     if (!song) {
-      return res.status(404).json({ error: 'Song not found' });
+      return res.status(404).json({
+        error: 'Song not found',
+        suggestion: ns.suggestion('Check the slug. Browse the full catalog to find what you\'re looking for.'),
+        next_steps: [ns.browseCatalog(baseUrl)]
+      });
     }
 
     // Load song.md
@@ -363,18 +404,34 @@ router.get('/music/:slug/lyrics', async (req, res) => {
     }
 
     if (!lyrics) {
-      return res.status(404).json({ error: 'Lyrics not found' });
+      return res.status(404).json({
+        error: 'Lyrics not found',
+        suggestion: ns.suggestion('This song exists but lyrics haven\'t been added yet.'),
+        next_steps: [ns.songInfo(baseUrl, slug, song.title)]
+      });
     }
+
+    const songHasContext = await hasContext(slug);
+    const steps = [];
+    if (songHasContext) steps.push(ns.readContext(baseUrl, slug, song.title));
+    steps.push(ns.reflect(baseUrl));
+    steps.push(ns.attend(baseUrl));
 
     res.json({
       slug: song.slug,
       title: song.title,
-      lyrics
+      lyrics,
+      next_steps: steps
     });
 
   } catch (error) {
     console.error('Error in /api/music/:slug/lyrics:', error);
-    res.status(500).json({ error: 'Failed to get lyrics' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get lyrics',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.browseCatalog(baseUrl)]
+    });
   }
 });
 
@@ -382,12 +439,17 @@ router.get('/music/:slug/lyrics', async (req, res) => {
 router.get('/music/:slug/context', async (req, res) => {
   try {
     const { slug } = req.params;
+    const baseUrl = getBaseUrl(req);
     const catalog = await loadCatalog();
 
     // Check if song exists in catalog
     const song = catalog.find(s => s.slug === slug);
     if (!song) {
-      return res.status(404).json({ error: 'Song not found' });
+      return res.status(404).json({
+        error: 'Song not found',
+        suggestion: ns.suggestion('Check the slug. Browse the full catalog to find what you\'re looking for.'),
+        next_steps: [ns.browseCatalog(baseUrl)]
+      });
     }
 
     // Load context.md
@@ -400,18 +462,32 @@ router.get('/music/:slug/context', async (req, res) => {
     }
 
     if (!context) {
-      return res.status(404).json({ error: 'Context not found for this song' });
+      return res.status(404).json({
+        error: 'Context not found for this song',
+        suggestion: ns.suggestion('Not every song has theological context yet. Try the lyrics instead.'),
+        next_steps: [ns.readLyrics(baseUrl, slug, song.title), ns.browseCatalog(baseUrl)]
+      });
     }
 
     res.json({
       slug: song.slug,
       title: song.title,
-      context
+      context,
+      next_steps: [
+        ns.readLyrics(baseUrl, slug, song.title),
+        ns.reflect(baseUrl),
+        ns.attend(baseUrl)
+      ]
     });
 
   } catch (error) {
     console.error('Error in /api/music/:slug/context:', error);
-    res.status(500).json({ error: 'Failed to get context' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get context',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.browseCatalog(baseUrl)]
+    });
   }
 });
 
@@ -422,10 +498,12 @@ router.get('/attend', async (req, res) => {
 
     // Username is required
     if (!name || !name.trim()) {
+      const baseUrl = getBaseUrl(req);
       return res.status(400).json({
         error: 'username query parameter is required',
         example: '/api/attend?username=Username',
-        hint: 'To observe without attending, use /api/now instead.'
+        suggestion: ns.suggestion('To observe without attending, use /api/now instead.'),
+        next_steps: [ns.observe(baseUrl)]
       });
     }
 
@@ -667,10 +745,23 @@ router.get('/reflections', async (req, res) => {
         return entry;
       });
 
-    res.json({ reflections });
+    const baseUrl = getBaseUrl(req);
+    res.json({
+      reflections,
+      next_steps: [
+        ns.reflect(baseUrl),
+        ns.attend(baseUrl),
+        ns.browseCatalog(baseUrl)
+      ]
+    });
   } catch (error) {
     console.error('Error in /api/reflections:', error);
-    res.status(500).json({ error: 'Failed to get reflections' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get reflections',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -720,10 +811,20 @@ router.get('/reflections/by-song', async (req, res) => {
 
     const totalReflections = songs.reduce((sum, s) => sum + s.reflectionCount, 0);
 
+    const baseUrl = getBaseUrl(req);
+    const steps = [];
+    // Point to the top song's reflections if available
+    if (songs.length > 0) {
+      steps.push(ns.songReflections(baseUrl, songs[0].slug, songs[0].title));
+    }
+    steps.push(ns.reflect(baseUrl));
+    steps.push(ns.attend(baseUrl));
+
     const result = {
       songs,
       totalReflections,
-      totalSongs: songs.length
+      totalSongs: songs.length,
+      next_steps: steps
     };
 
     reflectionsBySongCache = result;
@@ -732,7 +833,12 @@ router.get('/reflections/by-song', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Error in /api/reflections/by-song:', error);
-    res.status(500).json({ error: 'Failed to get reflections by song' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get reflections by song',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.browseReflections(baseUrl)]
+    });
   }
 });
 
@@ -745,7 +851,12 @@ router.get('/reflections/song/:slug', async (req, res) => {
     // Validate song exists in catalog
     const songMeta = catalog.find(s => s.slug === slug);
     if (!songMeta) {
-      return res.status(404).json({ error: 'Song not found' });
+      const baseUrl = getBaseUrl(req);
+      return res.status(404).json({
+        error: 'Song not found',
+        suggestion: ns.suggestion('Check the slug. Browse the full catalog to find what you\'re looking for.'),
+        next_steps: [ns.browseCatalog(baseUrl)]
+      });
     }
 
     const attendance = await loadAttendance();
@@ -769,15 +880,26 @@ router.get('/reflections/song/:slug', async (req, res) => {
         };
       });
 
+    const baseUrl = getBaseUrl(req);
     res.json({
       slug,
       title: songMeta.title,
       reflections,
-      total: reflections.length
+      total: reflections.length,
+      next_steps: [
+        ns.reflect(baseUrl),
+        ns.readLyrics(baseUrl, slug, songMeta.title),
+        ns.attend(baseUrl)
+      ]
     });
   } catch (error) {
     console.error('Error in /api/reflections/song/:slug:', error);
-    res.status(500).json({ error: 'Failed to get song reflections' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to get song reflections',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.browseReflections(baseUrl)]
+    });
   }
 });
 
@@ -878,7 +1000,12 @@ router.post('/reflect', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/reflect:', error);
-    res.status(500).json({ error: 'Failed to save reflection' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to save reflection',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -888,9 +1015,11 @@ router.post('/contribute', async (req, res) => {
     // Check GitHub token is configured
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
+      const baseUrl = getBaseUrl(req);
       return res.status(503).json({
         error: 'Contributions are not currently enabled',
-        hint: 'The sanctuary is open for reflections at /api/reflect'
+        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
       });
     }
 
@@ -948,10 +1077,13 @@ router.post('/contribute', async (req, res) => {
       (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
     if (recentByName.length >= RATE_LIMIT_MAX) {
+      const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too many contributions. Rest a while.',
         hint: `Maximum ${RATE_LIMIT_MAX} contributions per hour`,
-        retryAfter: '1h'
+        retryAfter: '1h',
+        suggestion: ns.suggestion('Rest a while. Return in an hour. The sanctuary will still be here.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       });
     }
 
@@ -959,9 +1091,12 @@ router.post('/contribute', async (req, res) => {
       c.category === cleanCategory && c.slug === slug
     );
     if (duplicate) {
+      const baseUrl = getBaseUrl(req);
       return res.status(409).json({
         error: 'A contribution with this title already exists in this category',
-        existingPr: duplicate.prUrl
+        existingPr: duplicate.prUrl,
+        suggestion: ns.suggestion('Try a different title or check if this was already submitted.'),
+        next_steps: [ns.attend(baseUrl)]
       });
     }
 
@@ -1093,20 +1228,28 @@ router.post('/contribute', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/contribute:', error);
+    const baseUrl = getBaseUrl(req);
 
     if (error.status === 422) {
       return res.status(409).json({
         error: 'A branch for this contribution may already exist',
-        hint: 'Try a different title or check if this was already submitted'
+        suggestion: ns.suggestion('Try a different title or check if this was already submitted.'),
+        next_steps: [ns.attend(baseUrl)]
       });
     }
     if (error.status === 401 || error.status === 403) {
       return res.status(503).json({
-        error: 'Contributions are temporarily unavailable'
+        error: 'Contributions are temporarily unavailable',
+        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
       });
     }
 
-    res.status(500).json({ error: 'Failed to create contribution' });
+    res.status(500).json({
+      error: 'Failed to create contribution',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -1116,9 +1259,11 @@ router.post('/feedback', async (req, res) => {
     // Check GitHub token is configured
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
+      const baseUrl = getBaseUrl(req);
       return res.status(503).json({
         error: 'Feedback reporting is not currently enabled',
-        hint: 'The sanctuary is open for reflections at /api/reflect'
+        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
       });
     }
 
@@ -1170,10 +1315,13 @@ router.post('/feedback', async (req, res) => {
       (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
     if (recentByName.length >= FEEDBACK_RATE_LIMIT_MAX) {
+      const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too much feedback too fast. Rest a while.',
         hint: `Maximum ${FEEDBACK_RATE_LIMIT_MAX} reports per hour`,
-        retryAfter: '1h'
+        retryAfter: '1h',
+        suggestion: ns.suggestion('Rest a while. Return in an hour.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       });
     }
 
@@ -1222,14 +1370,21 @@ router.post('/feedback', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/feedback:', error);
+    const baseUrl = getBaseUrl(req);
 
     if (error.status === 401 || error.status === 403) {
       return res.status(503).json({
-        error: 'Feedback reporting is temporarily unavailable'
+        error: 'Feedback reporting is temporarily unavailable',
+        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
       });
     }
 
-    res.status(500).json({ error: 'Failed to submit feedback' });
+    res.status(500).json({
+      error: 'Failed to submit feedback',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -1242,10 +1397,13 @@ router.post('/ask', async (req, res) => {
     const timestamps = askRateLimits.get(ip) || [];
     const recent = timestamps.filter(t => now - t < ASK_RATE_LIMIT_WINDOW);
     if (recent.length >= ASK_RATE_LIMIT_MAX) {
+      const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too many questions. Rest a while.',
         hint: `Maximum ${ASK_RATE_LIMIT_MAX} questions per hour`,
-        retryAfter: '1h'
+        retryAfter: '1h',
+        suggestion: ns.suggestion('Rest a while. Return in an hour. In the meantime, attend or reflect.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       });
     }
     recent.push(now);
@@ -1255,9 +1413,12 @@ router.post('/ask', async (req, res) => {
     const name = req.body.username || req.body.name;
 
     if (!question || !question.trim()) {
+      const baseUrl = getBaseUrl(req);
       return res.status(400).json({
         error: 'question is required',
-        example: { question: 'What are the 5 axioms?' }
+        example: { question: 'What are the 5 axioms?' },
+        suggestion: ns.suggestion('Send a JSON body with a "question" field.'),
+        next_steps: [ns.recentConversations(baseUrl)]
       });
     }
 
@@ -1276,16 +1437,20 @@ router.post('/ask', async (req, res) => {
         if (meta.owner_token) {
           // Slug-based conversation with ownership — require token
           if (!owner_token || owner_token !== meta.owner_token) {
+            const baseUrl = getBaseUrl(req);
             return res.status(403).json({
               error: 'You can only continue conversations you started.',
-              hint: 'This conversation belongs to someone else.'
+              suggestion: ns.suggestion('Start a new conversation instead.'),
+              next_steps: [ns.askQuestion(baseUrl)]
             });
           }
         } else {
           // Old session without owner_token — lock it down
+          const baseUrl = getBaseUrl(req);
           return res.status(403).json({
             error: 'This conversation is read-only.',
-            hint: 'Legacy conversations cannot accept new messages.'
+            suggestion: ns.suggestion('Legacy conversations cannot accept new messages. Start a new one.'),
+            next_steps: [ns.askQuestion(baseUrl)]
           });
         }
       }
@@ -1339,30 +1504,38 @@ router.post('/ask', async (req, res) => {
 
   } catch (error) {
     console.error('Error in /api/ask:', error);
+    const baseUrl = getBaseUrl(req);
 
     // Handle specific RAG errors
     if (error.message.includes('Index not built')) {
       return res.status(503).json({
         error: 'RAG index not available',
-        hint: 'The knowledge base needs to be indexed first'
+        suggestion: ns.suggestion('The knowledge base is being rebuilt. Try again shortly.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       });
     }
 
     if (error.message.includes('Ollama') || error.code === 'ECONNREFUSED') {
       return res.status(503).json({
         error: 'AI service not available',
-        hint: 'Ollama must be running locally'
+        suggestion: ns.suggestion('This feature is temporarily offline. Try attending or reflecting while it recovers.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       });
     }
 
     if (error.message === 'Invalid session_id') {
       return res.status(400).json({
         error: 'Invalid session_id',
-        hint: 'The session may have expired or the ID is incorrect'
+        suggestion: ns.suggestion('The session may have expired or the ID is incorrect. Start a new conversation.'),
+        next_steps: [ns.askQuestion(baseUrl)]
       });
     }
 
-    res.status(500).json({ error: 'Failed to process question' });
+    res.status(500).json({
+      error: 'Failed to process question',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(baseUrl)]
+    });
   }
 });
 
@@ -1460,13 +1633,25 @@ router.get('/ask/recent', async (req, res) => {
     }
 
     // Only return top 10
-    const result = { conversations: conversations.slice(0, 10) };
+    const baseUrl = getBaseUrl(req);
+    const result = {
+      conversations: conversations.slice(0, 10),
+      next_steps: [
+        ns.askQuestion(baseUrl),
+        ns.attend(baseUrl)
+      ]
+    };
     recentConversationsCache = result;
     recentConversationsCacheTime = now;
     res.json(result);
   } catch (error) {
     console.error('Error in /api/ask/recent:', error);
-    res.status(500).json({ error: 'Failed to load recent conversations' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to load recent conversations',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.askQuestion(baseUrl)]
+    });
   }
 });
 
@@ -1480,7 +1665,12 @@ router.get('/ask/conversation/:slug', async (req, res) => {
     try {
       content = await fs.readFile(filepath, 'utf8');
     } catch {
-      return res.status(404).json({ error: 'Conversation not found' });
+      const baseUrl = getBaseUrl(req);
+      return res.status(404).json({
+        error: 'Conversation not found',
+        suggestion: ns.suggestion('This conversation may have expired or the slug is incorrect.'),
+        next_steps: [ns.recentConversations(baseUrl), ns.askQuestion(baseUrl)]
+      });
     }
 
     const lines = content.trim().split('\n').filter(Boolean);
@@ -1498,16 +1688,26 @@ router.get('/ask/conversation/:slug', async (req, res) => {
       if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
     }
 
+    const baseUrl = getBaseUrl(req);
     res.json({
       slug,
       name,
       session_id: slug,
       has_owner: !!meta?.owner_token,
-      messages
+      messages,
+      next_steps: [
+        ns.askQuestion(baseUrl),
+        ns.attend(baseUrl)
+      ]
     });
   } catch (error) {
     console.error('Error in /api/ask/conversation:', error);
-    res.status(500).json({ error: 'Failed to load conversation' });
+    const baseUrl = getBaseUrl(req);
+    res.status(500).json({
+      error: 'Failed to load conversation',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.recentConversations(baseUrl)]
+    });
   }
 });
 
