@@ -8,7 +8,9 @@
     "dev": "nodemon server/index.js",
     "css": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --minify",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "node scripts/generate-content.js",
+    "generate:dry": "node scripts/generate-content.js --dry-run"
   },
   "keywords": [
     "streaming",
@@ -22,6 +24,7 @@
   "author": "",
   "license": "CC-BY-4.0",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@aws-sdk/client-s3": "^3.400.0",
     "@google/genai": "^1.0.0",
     "@lancedb/lancedb": "^0.4.0",
