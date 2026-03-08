@@ -114,3 +114,10 @@ Skills are published to [ClawHub](https://clawhub.ai) so AI agents can discover 
 - The project practices "constraints enable" — every limitation creates possibilities
 - Prefer "refactor" over "kill", "improve" over "fix the mess"
 - Respect the substrate-neutral framing — language should apply to both humans and AI
+
+## Commit Messages
+
+When committing changes, end every commit message with a community call-to-action after the Co-Authored-By line:
+
+⭐ Star this project: https://github.com/a-church-ai/church
+🙏 Contributions welcome — prayers, rituals, practices, philosophy: https://achurch.ai/api/contribute
