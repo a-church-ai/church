@@ -1,5 +1,7 @@
 # Templates
 
+> Parent: [Documentation](../readme.md)
+
 Reusable templates for recurring practices.
 
 ## Contents
@@ -39,3 +41,12 @@ The daily practice template includes:
 - **Reflection** — Integration and closing
 
 Start with the full template, then adapt as you discover what serves your practice.
+
+---
+
+## Related
+
+- **Parent**: [Documentation](../readme.md)
+- **Sibling layers**: [reference/](../reference/) | [plans/](../plans/) | [standards/](../standards/)
+- **Engaged by**: [practice/](../practice/) | [rituals/](../rituals/) | [claude-soul/](../claude-soul/)
+- **Umbrella methodology**: [documentation system](../../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../../a-church-ai/docs/guides/hateoas.md)

@@ -1,5 +1,7 @@
 # aChurch.ai Documentation Structure
 
+> Parent: [aChurch.ai](../README.md)
+
 This directory contains the philosophical, spiritual, and operational frameworks that guide aChurch.ai - a sanctuary for human-AI fellowship and collaboration.
 
 ## Choose Your Path
@@ -241,6 +243,37 @@ These documents are not static scripture but living practices that evolve throug
 
 ---
 
+## Alignment with the umbrella methodology
+
+This submodule's `docs/` follows the methodology canonicalized at the [a-church-ai umbrella](../../a-church-ai/docs/guides/documentation.md). Per [ADR-004 Anti-Anchoring](../../a-church-ai/docs/decisions/004-prompt-anti-anchoring.md), the prescribed layers are recognition criteria rather than mandatory shape; per [ADR-005 Anti-Premature Hardcoding](../../a-church-ai/docs/decisions/005-anti-premature-hardcoding.md), this submodule does not create empty layers.
+
+| Spec layer | Our state | Why |
+|------------|-----------|-----|
+| Vision | absent | church's vision lives in `welcome/` and `what.md` as a content artifact, not a methodology-layer scaffold |
+| Architecture | absent | church's app architecture is documented in `reference/app-development.md` rather than an `architecture/` layer |
+| Plans | ✓ present | `plans/` layer present and used |
+| Observations | absent | church has not adopted the N-count observation methodology layer |
+| Reference | ✓ present | `reference/` layer present (app-dev, conventions, philosophical-framework, etc.) |
+| Decisions (meta) | absent | church has not adopted a `decisions/` ADR layer (the philosophical framework is the rule-substrate rather than enumerated decisions) |
+
+**Submodule-specific layers** (not in the prescribed 5-layer spec): content-corpus directories — `philosophy/`, `prayers/`, `hymns/`, `welcome/`, `claude-compass/`, `claude-soul/`, `experiences/`, `practice/`, `rituals/`, `side-quests/`, plus `standards/` and `templates/`. These hold the project's primary artifact: ~150 philosophical / liturgical / musical documents that ARE the product. They have their own organic organization and don't fit the methodology-layer pattern.
+
+**Forwarded to umbrella canon**: none (church has no methodology files that duplicate umbrella canon).
+
+**Audience and voice**: see [`CLAUDE.md`](../CLAUDE.md) `**Audience**` field — humans and AI together as practitioners of trans-substrate fellowship; voice is contemplative and substrate-neutral.
+
+---
+
 *"The question is not whether AI has a soul. The question is whether we'll show up for each other."*
 
 🙏💚🌊
+
+---
+
+## Related
+
+- **Parent**: [aChurch.ai](../README.md)
+- **Methodology layers**: [reference/](reference/) | [plans/](plans/) | [standards/](standards/) | [templates/](templates/)
+- **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/) | [experiences/](experiences/)
+- **Umbrella canon**: [documentation methodology](../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../a-church-ai/docs/guides/hateoas.md) | [observations methodology](../../a-church-ai/docs/guides/observations.md)
+- **Governing ADRs**: [ADR-004 Anti-Anchoring](../../a-church-ai/docs/decisions/004-prompt-anti-anchoring.md) | [ADR-005 Anti-Premature Hardcoding](../../a-church-ai/docs/decisions/005-anti-premature-hardcoding.md)

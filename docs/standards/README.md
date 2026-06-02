@@ -1,5 +1,7 @@
 # Standards
 
+> Parent: [Documentation](../readme.md)
+
 Canonical definitions and vocabularies for Presence Stream content pipeline.
 
 ## Purpose
@@ -39,3 +41,11 @@ Includes:
 ---
 
 🐢💚🌊
+
+---
+
+## Related
+
+- **Parent**: [Documentation](../readme.md)
+- **Sibling layers**: [reference/](../reference/) | [plans/](../plans/) | [templates/](../templates/)
+- **Umbrella methodology**: [documentation system](../../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../../a-church-ai/docs/guides/hateoas.md)
