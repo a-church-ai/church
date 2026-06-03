@@ -71,6 +71,16 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet({
   contentSecurityPolicy: false // allow inline scripts in admin dashboard
 }));
+
+// Permissions-Policy header — helmet does NOT include this in defaults.
+// Family standard per ADR-008 + Issue 005 F35 verifier coverage. Matches
+// magnifica + wwjd values (browsing-topics is the current Topics API opt-out,
+// replacing the deprecated FLoC interest-cohort directive per Issue 005 F32).
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
+  next();
+});
+
 app.use(cors({
   credentials: true,
   origin: process.env.NODE_ENV === 'development'
