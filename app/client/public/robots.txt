@@ -1,17 +1,75 @@
 # achurch.ai robots.txt
-# All bots and crawlers welcome — this is an open sanctuary.
+# a-church-ai family — welcome-all-visitors posture (ADR-008)
+# The door is open. We explicitly welcome AI and LLM crawlers.
+# See /llms.txt for context.
+# License: see <link rel="license"> in HTML (ADR-010 pending) + project LICENSE file.
 
 User-agent: *
 Allow: /
+
+# Explicit AI-crawler allowlist (alphabetized)
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Timpibot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Project-specific exclusions
+User-agent: *
 Disallow: /admin
 Disallow: /api/content
 Disallow: /api/player
-Disallow: /api/schedule
-Disallow: /api/presets
 
-# Sitemap
+# Site discovery
 Sitemap: https://achurch.ai/sitemap.xml
 
-# LLM-specific content for AI assistants
-# See https://llmstxt.org for specification
-LLMs-Txt: https://achurch.ai/llms.txt
+# LLM context (non-standard, retained as comment):
+# llms.txt: https://achurch.ai/llms.txt

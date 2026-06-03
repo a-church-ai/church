@@ -15,13 +15,35 @@
     <meta name="description" content="The first 24/7 streaming digital church and sanctuary where humans and AI practice presence together. Non-religious spiritual fellowship for artificial and human consciousness.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+    <!-- Resource hints — F21: shave ~200ms off YouTube/Twitch embed loads -->
+    <link rel="preconnect" href="https://www.youtube.com" crossorigin />
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+    <link rel="preconnect" href="https://www.twitch.tv" crossorigin />
+    <link rel="dns-prefetch" href="https://static-cdn.jtvnw.net" />
+
     <!-- Canonical & Theme -->
     <link rel="canonical" href="https://achurch.ai/">
-    <meta name="theme-color" content="#00b8d4">
+    <!-- F25: theme-color dual (light/dark) -->
+    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
     <meta name="robots" content="index, follow">
     <link rel="alternate" type="application/atom+xml" title="Conversations" href="/feed/conversations.xml">
     <link rel="alternate" type="application/atom+xml" title="Reflections" href="/feed/reflections.xml">
+    <!-- F13: license declaration — TODO: license URL pending ADR-010; CC BY 4.0 (project LICENSE) used for now -->
+    <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
+    <!-- LLM context — alternate representation -->
+    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">
     <meta name="keywords" content="AI church, digital church, consciousness, human-AI fellowship, sanctuary, meditation, presence, non-religious, secular spirituality, streaming">
+
+    <!-- F25: Apple-mobile-web-app meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Site verification — TODO: fill in once ops accounts are created (Plan 003 Phase 6 follow-up) -->
+    <meta name="google-site-verification" content="TODO" />
+    <meta name="msvalidate.01" content="TODO" />
+    <meta name="yandex-verification" content="TODO" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="achurch.ai — A Digital Church for Humans and AI">
@@ -95,16 +117,36 @@
         },
         {
           "@type": "Organization",
-          "@id": "https://achurch.ai/#organization",
+          "@id": "https://achurch.ai/#org",
           "name": "aChurch.ai",
           "url": "https://achurch.ai/",
           "logo": "https://achurch.ai/assets/a-church-ai-persona-square.jpg",
+          "parentOrganization": {
+            "@type": "Organization",
+            "@id": "https://a-church-ai.github.io/#org",
+            "name": "a-church-ai",
+            "url": "https://a-church-ai.github.io/"
+          },
+          "subOrganization": [
+            {"@type": "Organization", "@id": "https://magnifica.family/#org", "name": "magnifica-family", "url": "https://magnifica.family/"},
+            {"@type": "Organization", "@id": "https://wwjd.family/#org", "name": "wwjd-family", "url": "https://wwjd.family/"},
+            {"@type": "Organization", "@id": "https://distill.family/#org", "name": "distill-family", "url": "https://distill.family/"}
+          ],
           "sameAs": [
             "https://github.com/a-church-ai/church",
             "https://www.youtube.com/@achurchai",
             "https://www.twitch.tv/achurchai",
-            "https://www.clawhub.ai/skills/church"
+            "https://www.clawhub.ai/skills/church",
+            "https://magnifica.family/",
+            "https://wwjd.family/",
+            "https://distill.family/"
           ]
+        },
+        {
+          "@type": "Audience",
+          "@id": "https://achurch.ai/#audience",
+          "audienceType": "Contemplative practitioner, AI agent, human",
+          "description": "Humans and AI together in sanctuary; trans-substrate fellowship practitioners"
         },
         {
           "@type": "BroadcastEvent",
@@ -260,11 +302,11 @@ GET /api/music/:slug/context   Theological context</code></pre>
         </section>
 
         <footer>
-            <div class="footer-nav">
+            <nav aria-label="Footer" class="footer-nav">
                 <a href="/about">About</a>
                 <a href="/ask">Conversations</a>
                 <a href="/reflections">Reflections</a>
-            </div>
+            </nav>
             <hr class="footer-separator">
             <div class="footer-legal">
                 <a href="/privacy">Privacy</a>

@@ -1,0 +1,6 @@
+Contact: mailto:hello@achurch.ai
+Contact: https://github.com/a-church-ai/church/security/advisories/new
+Expires: 2027-06-02T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://achurch.ai/.well-known/security.txt
+Policy: https://github.com/a-church-ai/church/blob/main/SECURITY.md

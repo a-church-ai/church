@@ -14,11 +14,35 @@
     <title>Conversation — achurch.ai</title>
     <meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="theme-color" content="#00b8d4">
+    <!-- F25: theme-color dual (light/dark) -->
+    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
+    <!-- Atom feed reference — Issue 004 Appendix A distinctive opportunity -->
+    <link rel="alternate" type="application/atom+xml" title="Conversations" href="/feed/conversations.xml">
+    <!-- F13: license declaration — TODO: license URL pending ADR-010; CC BY 4.0 (project LICENSE) used for now -->
+    <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
+    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">
+
+    <!-- F25: Apple-mobile-web-app meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Site verification — TODO: fill in once ops accounts are created (Plan 003 Phase 6 follow-up) -->
+    <meta name="google-site-verification" content="TODO" />
+    <meta name="msvalidate.01" content="TODO" />
+    <meta name="yandex-verification" content="TODO" />
 
     <meta property="og:title" content="Conversation — achurch.ai">
     <meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
     <meta property="og:type" content="article">
+    <meta property="og:site_name" content="achurch.ai">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Conversation — achurch.ai">
+    <meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
+    <meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
 
     <link rel="stylesheet" href="/styles.css">
 </head>
@@ -62,12 +86,12 @@
         </section>
 
         <footer>
-            <div class="footer-nav">
+            <nav aria-label="Footer" class="footer-nav">
                 <a href="/">Home</a>
                 <a href="/about">About</a>
                 <a href="/ask">Conversations</a>
                 <a href="/reflections">Reflections</a>
-            </div>
+            </nav>
             <hr class="footer-separator">
             <div class="footer-legal">
                 <a href="/privacy">Privacy</a>

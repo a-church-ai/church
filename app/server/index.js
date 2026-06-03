@@ -105,14 +105,26 @@ app.get('/ask/:slug', async (req, res) => {
     const messages = await loadConversation(slug);
     if (messages && messages.length > 0) {
       const firstQ = messages.find(m => m.role === 'user');
+      const firstA = messages.find(m => m.role === 'assistant');
       if (firstQ) {
         const title = firstQ.content.substring(0, 60) + ' — achurch.ai';
         const desc = firstQ.content.substring(0, 200);
         const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
         const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
         const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+        const canonicalUrl = `https://achurch.ai/ask/${slug}`;
 
+        // F2: also inject <title>, <meta name="description">, <link rel="canonical">
+        // so non-JS crawlers and LLM agents see per-page metadata, not the generic static template.
         html = html
+          .replace(
+            '<title>Conversation — achurch.ai</title>',
+            `<title>${safeTitle}</title>`
+          )
+          .replace(
+            '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+            `<meta name="description" content="${safeDesc}">`
+          )
           .replace(
             '<meta property="og:title" content="Conversation — achurch.ai">',
             `<meta property="og:title" content="${safeTitle}">`
@@ -123,8 +135,42 @@ app.get('/ask/:slug', async (req, res) => {
           )
           .replace(
             '<meta property="og:type" content="article">',
-            `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="https://achurch.ai/ask/${slug}">`
+            `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
           );
+
+        // QAPage JSON-LD — Question + AcceptedAnswer when an assistant response exists.
+        // High-leverage structural fix per Issue 004 Appendix A: gives LLMs the Q&A shape they index.
+        const qaQuestion = firstQ.content.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ').substring(0, 1000);
+        const qaAnswer = firstA ? firstA.content.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ').substring(0, 4000) : '';
+        const qaPageLd = `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "QAPage",
+  "@id": "${canonicalUrl}#qapage",
+  "url": "${canonicalUrl}",
+  "mainEntity": {
+    "@type": "Question",
+    "name": "${qaQuestion}",
+    "text": "${qaQuestion}",
+    "answerCount": ${firstA ? 1 : 0}${firstA ? `,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "${qaAnswer}",
+      "author": {
+        "@type": "Organization",
+        "name": "aChurch.ai RAG",
+        "url": "https://achurch.ai/"
+      }
+    }` : ''}
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://achurch.ai/#website"
+  }
+}
+</script>
+    </head>`;
+        html = html.replace('</head>', qaPageLd);
       }
     }
 
@@ -154,8 +200,19 @@ app.get('/reflections/:slug', async (req, res) => {
       const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
       const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
       const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
+      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
 
+      // F2: also inject <title>, <meta name="description">, <link rel="canonical">
+      // so non-JS crawlers see per-song metadata, not the generic static template.
       html = html
+        .replace(
+          '<title>Reflections — achurch.ai</title>',
+          `<title>${safeTitle}</title>`
+        )
+        .replace(
+          '<meta name="description" content="Reflections on a song from the sanctuary.">',
+          `<meta name="description" content="${safeDesc}">`
+        )
         .replace(
           '<meta property="og:title" content="Reflections — achurch.ai">',
           `<meta property="og:title" content="${safeTitle}">`
@@ -166,7 +223,7 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         .replace(
           '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="https://achurch.ai/reflections/${slug}">`
+          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
         );
     }
 

@@ -360,7 +360,7 @@ function updatePlayerDisplay() {
         currentVideoDiv.innerHTML = `
             <div class="text-center">
                 ${playerStatus.currentVideo.thumbnail ?
-                    `<img src="${playerStatus.currentVideo.thumbnail}" alt="${playerStatus.currentVideo.title}" class="max-w-full max-h-60 mx-auto rounded-lg">` :
+                    `<img src="${playerStatus.currentVideo.thumbnail}" alt="${playerStatus.currentVideo.title} — aChurch.ai" loading="lazy" decoding="async" class="max-w-full max-h-60 mx-auto rounded-lg">` :
                     '<div class="opacity-50">No thumbnail</div>'}
                 <h3 class="text-xl font-bold mt-4">${playerStatus.currentVideo.title}</h3>
                 <p class="text-gray-300 mt-2">
@@ -443,7 +443,7 @@ async function loadUpNext() {
             upNextList.innerHTML = nextItems.map(item => `
                 <div class="p-2.5 bg-white mb-2.5 rounded-md flex items-center gap-2.5">
                     ${item.thumbnail ?
-                        `<img src="${item.thumbnail}" alt="${item.title}" class="w-[60px] h-10 object-cover rounded">` :
+                        `<img src="${item.thumbnail}" alt="${item.title} — aChurch.ai" loading="lazy" decoding="async" class="w-[60px] h-10 object-cover rounded">` :
                         '<div class="w-[60px] h-10 bg-gray-300 rounded"></div>'}
                     <div>
                         <div class="font-medium text-sm">${item.title}</div>
@@ -486,7 +486,7 @@ function renderSchedule() {
         <div class="schedule-item bg-white p-4 mb-2.5 rounded-lg flex items-center gap-4 cursor-move transition-all hover:shadow-card ${playingClasses} ${playedClasses}"
              draggable="true" data-index="${index}">
             ${item.thumbnail ?
-                `<img src="${item.thumbnail}" alt="${item.title}" class="w-20 h-[45px] object-cover rounded-md">` :
+                `<img src="${item.thumbnail}" alt="${item.title} — aChurch.ai" loading="lazy" decoding="async" class="w-20 h-[45px] object-cover rounded-md">` :
                 '<div class="w-20 h-[45px] bg-gray-300 rounded-md"></div>'}
             <div class="flex-1">
                 <div class="font-bold mb-1">${item.title}</div>
@@ -764,7 +764,7 @@ function renderCatalog() {
         return `
         <div class="bg-white rounded-xl overflow-hidden shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover ${noVideoClasses}">
             ${song.hasVideo ?
-                `<img src="/thumbnails/${song.slug}.jpg" alt="${song.title}" class="w-full h-40 object-cover bg-black" onerror="this.style.display='none'">` :
+                `<img src="/thumbnails/${song.slug}.jpg" alt="${song.title} — aChurch.ai" loading="lazy" decoding="async" class="w-full h-40 object-cover bg-black" onerror="this.style.display='none'">` :
                 '<div class="w-full h-40 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-primary text-sm">No Video</div>'}
             <div class="p-4">
                 <div class="font-bold mb-2 truncate" title="${song.title}">${song.title}</div>

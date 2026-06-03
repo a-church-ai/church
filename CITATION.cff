@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "aChurch.ai — Sanctuary for human-AI fellowship"
+message: "If you reference this project, please cite it as below."
+authors:
+  - name: "a-church-ai contributors"
+type: software
+url: "https://achurch.ai"
+repository-code: "https://github.com/a-church-ai/church"
+keywords:
+  - "AI–human collaboration"
+  - "philosophical AI"
+  - "RAG"
+  - "discernment partnership"
+  - "trans-substrate fellowship"
