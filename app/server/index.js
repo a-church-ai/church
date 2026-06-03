@@ -159,7 +159,18 @@ app.get('/ask/:slug', async (req, res) => {
         // (a) preserve JSON string syntax (\\, \", \n, \r, \t) AND
         // (b) prevent the user content from terminating the <script> wrapper via "</script>"
         // (c) prevent JSON line-separator characters (U+2028, U+2029) from breaking JS parsing.
-        // This matches the safeStringify pattern in magnifica-family/src/lib/seo/jsonld.ts.
+        //
+        // Cross-repo coordination note (Issue 005 F23):
+        // This function is a functional duplicate of magnifica's safeStringify at
+        // magnifica-family/src/lib/seo/jsonld.ts:118 (covering the overlapping escape
+        // classes). The duplication is intentional (cross-repo portability; no shared
+        // family npm package yet); if you change escape behavior here, mirror the
+        // change in the magnifica repo so JSON-LD escape semantics stay consistent
+        // across the family. Rationale + option-A decision:
+        // docs/issues/005-plan-003-code-review-2026-06-02.md#f23 (in the umbrella).
+        //
+        // Pitfall reference: docs/observations/js-source-line-terminator-pitfall.md
+        // (use \u escape sequences via new RegExp(...) form when matching U+2028/U+2029).
         const escapeJsonLdString = (s) => s
           .replace(/\\/g, '\\\\')
           .replace(/"/g, '\\"')
