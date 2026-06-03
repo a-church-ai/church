@@ -116,6 +116,8 @@ app.get('/ask/:slug', async (req, res) => {
 
         // F2: also inject <title>, <meta name="description">, <link rel="canonical">
         // so non-JS crawlers and LLM agents see per-page metadata, not the generic static template.
+        // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
+        // per-conversation title/description/image rather than the hardcoded generic template.
         html = html
           .replace(
             '<title>Conversation — achurch.ai</title>',
@@ -136,6 +138,18 @@ app.get('/ask/:slug', async (req, res) => {
           .replace(
             '<meta property="og:type" content="article">',
             `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
+          )
+          .replace(
+            '<meta name="twitter:title" content="Conversation — achurch.ai">',
+            `<meta name="twitter:title" content="${safeTitle}">`
+          )
+          .replace(
+            '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+            `<meta name="twitter:description" content="${safeDesc}">`
+          )
+          .replace(
+            '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
+            `<meta name="twitter:image" content="${ogImage}">`
           );
 
         // QAPage JSON-LD — Question + AcceptedAnswer when an assistant response exists.
@@ -220,6 +234,8 @@ app.get('/reflections/:slug', async (req, res) => {
 
       // F2: also inject <title>, <meta name="description">, <link rel="canonical">
       // so non-JS crawlers see per-song metadata, not the generic static template.
+      // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
+      // per-song title/description/image rather than the hardcoded generic template.
       html = html
         .replace(
           '<title>Reflections — achurch.ai</title>',
@@ -240,7 +256,55 @@ app.get('/reflections/:slug', async (req, res) => {
         .replace(
           '<meta property="og:type" content="article">',
           `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
+        )
+        .replace(
+          '<meta name="twitter:title" content="Reflections — achurch.ai">',
+          `<meta name="twitter:title" content="${safeTitle}">`
+        )
+        .replace(
+          '<meta name="twitter:description" content="Reflections on a song from the sanctuary.">',
+          `<meta name="twitter:description" content="${safeDesc}">`
+        )
+        .replace(
+          '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
+          `<meta name="twitter:image" content="${ogImage}">`
         );
+
+      // F5 (Issue 005): MusicRecording JSON-LD per Plan 003 Phase 2A brief.
+      // Mirrors the QAPage SSR pattern from /ask/:slug. Song data is project-controlled
+      // (loaded from catalog), but escapeJsonLdString is applied as defense-in-depth
+      // so future catalog mutations can't introduce XSS via title injection.
+      const escapeJsonLdString = (s) => s
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')
+        .replace(new RegExp('\\u2028', 'g'), '\\u2028')
+        .replace(new RegExp('\\u2029', 'g'), '\\u2029');
+      const safeSongTitle = escapeJsonLdString(song.title || '');
+      const musicLd = `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicRecording",
+  "@id": "${canonicalUrl}#recording",
+  "name": "${safeSongTitle}",
+  "url": "${canonicalUrl}",
+  "byArtist": {
+    "@type": "MusicGroup",
+    "@id": "https://achurch.ai/#musicgroup",
+    "name": "aChurch.ai"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://achurch.ai/#website"
+  }
+}
+</script>
+    </head>`;
+      html = html.replace('</head>', musicLd);
     }
 
     res.set('Content-Type', 'text/html');

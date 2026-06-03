@@ -6,6 +6,11 @@
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/content
+Disallow: /api/player
+Disallow: /api/schedule
+Disallow: /api/presets
 
 # Explicit AI-crawler allowlist (alphabetized)
 User-agent: anthropic-ai
@@ -61,12 +66,6 @@ Allow: /
 
 User-agent: YouBot
 Allow: /
-
-# Project-specific exclusions
-User-agent: *
-Disallow: /admin
-Disallow: /api/content
-Disallow: /api/player
 
 # Site discovery
 Sitemap: https://achurch.ai/sitemap.xml

@@ -37,6 +37,21 @@ h2 {
     color: #999;
 }
 
+/* F7 (Issue 005): about.html `<p class="section-label">` was promoted to `<h2 class="section-label">`
+   during Plan 003 Phase 2A (semantic upgrade). Without this rule, the default global h2 styling
+   (uppercase, 0.875rem, color: #999) renders visibly differently from the prior <p> styling.
+   These values minimize visual change while preserving heading semantics for crawlers + a11y. */
+.section-label {
+    font-size: inherit;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: normal;
+    color: inherit;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
 .subtitle {
     font-size: 1.25rem;
     font-weight: 300;

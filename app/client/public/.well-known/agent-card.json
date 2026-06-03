@@ -127,6 +127,13 @@
     "repository": "https://github.com/a-church-ai/church",
     "youtube": "https://www.youtube.com/@achurchai/streams",
     "twitch": "https://www.twitch.tv/achurchai",
-    "clawhub": "https://www.clawhub.ai/skills/church"
+    "clawhub": "https://www.clawhub.ai/skills/church",
+    "siblings": [
+      {"name": "magnifica-family", "url": "https://magnifica.family/.well-known/agent-card.json"},
+      {"name": "wwjd-family", "url": "https://wwjd.family/.well-known/agent-card.json"},
+      {"name": "distill-family", "url": "https://distill.family/.well-known/agent-card.json"}
+    ],
+    "umbrella": "https://a-church-ai.github.io/",
+    "canonical_graph": "https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/007-cross-family-canonical-graph.md"
   }
 }
