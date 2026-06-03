@@ -81,6 +81,35 @@ app.use((req, res, next) => {
   next();
 });
 
+// Cache-Control — family-wide policy per Plan 04a Task #4.
+// Ensures consistent cache behavior across deploys and avoids stale-review issues.
+// Express pattern: set headers early, before response is sent.
+app.use((req, res, next) => {
+  const p = req.path;
+
+  // Discovery files — short cache so updates propagate quickly after deploy
+  if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
+    res.set('Cache-Control', 'public, max-age=600, must-revalidate, stale-while-revalidate=3600');
+  }
+  // Static assets — daily cache with revalidation
+  else if (p === '/og-image.png' || p === '/favicon.svg' || p === '/manifest.webmanifest') {
+    res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
+  }
+  // .well-known — daily cache with revalidation
+  else if (p.startsWith('/.well-known/')) {
+    res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
+  }
+  // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
+  // Catches routes without extensions or .html/.htm (but not /api/ or /media/ or /thumbnails/)
+  else if (!p.startsWith('/api/') && !p.startsWith('/media/') && !p.startsWith('/thumbnails/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
+  }
+  // Note: /api/ endpoints have their own caching handled in their route handlers
+  // Note: /media/ and /thumbnails/ are served via express.static without cache-control override
+
+  next();
+});
+
 app.use(cors({
   credentials: true,
   origin: process.env.NODE_ENV === 'development'
