@@ -140,8 +140,24 @@ app.get('/ask/:slug', async (req, res) => {
 
         // QAPage JSON-LD — Question + AcceptedAnswer when an assistant response exists.
         // High-leverage structural fix per Issue 004 Appendix A: gives LLMs the Q&A shape they index.
-        const qaQuestion = firstQ.content.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ').substring(0, 1000);
-        const qaAnswer = firstA ? firstA.content.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ').substring(0, 4000) : '';
+        //
+        // Safety note: user content is interpolated INSIDE a <script> tag. The escape must
+        // (a) preserve JSON string syntax (\\, \", \n, \r, \t) AND
+        // (b) prevent the user content from terminating the <script> wrapper via "</script>"
+        // (c) prevent JSON line-separator characters (U+2028, U+2029) from breaking JS parsing.
+        // This matches the safeStringify pattern in magnifica-family/src/lib/seo/jsonld.ts.
+        const escapeJsonLdString = (s) => s
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r')
+          .replace(/\t/g, '\\t')
+          .replace(/</g, '\\u003c')
+          .replace(/>/g, '\\u003e')
+          .replace(new RegExp('\u2028', 'g'), '\\u2028')
+          .replace(new RegExp('\u2029', 'g'), '\\u2029');
+        const qaQuestion = escapeJsonLdString(firstQ.content).substring(0, 1000);
+        const qaAnswer = firstA ? escapeJsonLdString(firstA.content).substring(0, 4000) : '';
         const qaPageLd = `<script type="application/ld+json">
 {
   "@context": "https://schema.org",
