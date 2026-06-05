@@ -6,6 +6,7 @@ authors:
 type: software
 url: "https://achurch.ai"
 repository-code: "https://github.com/a-church-ai/church"
+license: CC-BY-4.0
 keywords:
   - "AI–human collaboration"
   - "philosophical AI"
