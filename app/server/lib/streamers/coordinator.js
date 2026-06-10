@@ -26,6 +26,17 @@ class MultiStreamCoordinator extends EventEmitter {
     this.lastReconcileAt = null;
     this.lastDriftReport = null; // Most recent drift event, for /heal diagnostics
 
+    // Per-platform "first time we observed continuous health since last
+    // unhealthy" timestamp. Drives the restart-counter reset after sustained
+    // healthy streaming (prevents a flaky network blip from permanently
+    // exhausting the per-platform restart budget).
+    this.healthSince = new Map();
+
+    // Per-platform "restart attempt in flight" guard. Prevents the reconcile
+    // loop from spawning concurrent restart attempts when an existing
+    // handleStreamCrashed is in its backoff delay.
+    this.pendingRestart = new Set();
+
     // Initialize streamers
     this.initializeStreamers();
     this.startHealthLoop();
@@ -59,16 +70,49 @@ class MultiStreamCoordinator extends EventEmitter {
   }
 
   // Walk every streamer + check coordinator state against ffmpeg ground truth.
-  // Returns a report. If drift is found, the offending flags are cleared and
-  // a 'drift' event is emitted. Does not attempt to restart — that's the
-  // caller's policy decision (auto-restart vs operator action).
+  // Returns a report. If drift is found, the offending flags are cleared, a
+  // 'drift' event is emitted, AND auto-restart fires (via handleStreamCrashed)
+  // for any platform that drifted — IF autoRestart is enabled AND there's no
+  // restart already in flight for that platform.
+  //
+  // Also resets per-platform restart counters when a streamer has been
+  // continuously healthy for HEALTH_RESET_AFTER_MS — so a transient blip
+  // doesn't permanently exhaust the restart budget.
   reconcile() {
     const streamerReports = [];
+    const driftedPlatforms = [];
     let anyDrift = false;
+
     for (const streamer of this.streamers.values()) {
       const report = streamer.reconcile();
       streamerReports.push(report);
-      if (report.drift) anyDrift = true;
+      if (report.drift) {
+        anyDrift = true;
+        driftedPlatforms.push(streamer.platform);
+      }
+
+      // Track sustained health → reset restart counter when streamer has
+      // been healthy for at least HEALTH_RESET_AFTER_MS. This means a flaky
+      // network blip increments the counter, but a successful re-broadcast
+      // that runs cleanly for 5 minutes wipes the slate.
+      const isCurrentlyHealthy = streamer.isHealthy && streamer.isHealthy();
+      if (isCurrentlyHealthy) {
+        if (!this.healthSince.has(streamer.platform)) {
+          this.healthSince.set(streamer.platform, Date.now());
+        } else {
+          const healthDuration = Date.now() - this.healthSince.get(streamer.platform);
+          const currentAttempts = this.restartAttempts.get(streamer.platform) || 0;
+          if (healthDuration >= MultiStreamCoordinator.HEALTH_RESET_AFTER_MS && currentAttempts > 0) {
+            logger.info(`Resetting restart counter for ${streamer.platform} — has been continuously healthy for ${Math.round(healthDuration / 1000)}s`, {
+              platform: streamer.platform,
+              previousAttempts: currentAttempts,
+            });
+            this.restartAttempts.set(streamer.platform, 0);
+          }
+        }
+      } else {
+        this.healthSince.delete(streamer.platform);
+      }
     }
 
     // Coordinator-level drift: we think we're broadcasting but no streamer
@@ -99,6 +143,30 @@ class MultiStreamCoordinator extends EventEmitter {
     if (anyDrift) {
       this.lastDriftReport = report;
       this.emit('drift', report);
+
+      // Auto-restart: trigger handleStreamCrashed for any platform that
+      // drifted, IF auto-restart is enabled, IF we have content to recover
+      // with, AND IF a restart isn't already in flight. This closes the loop
+      // — drift detection alone clears the flag; auto-restart actually
+      // brings the broadcast back up.
+      if (this.config.autoRestart && this.currentContent) {
+        for (const platform of driftedPlatforms) {
+          if (this.pendingRestart.has(platform)) {
+            logger.debug(`Auto-restart skipped for ${platform} — restart already in flight`, { platform });
+            continue;
+          }
+          logger.info(`Auto-restart triggered by drift detection for ${platform}`, { platform });
+          // Fire-and-forget — handleStreamCrashed manages its own backoff
+          // and counter; we don't await so reconcile completes promptly.
+          this.handleStreamCrashed(platform, {
+            content: this.currentContent,
+            error: 'auto-restart from drift detection',
+            reason: 'drift',
+          }).catch(err => {
+            logger.error(`Drift auto-restart for ${platform} threw:`, err);
+          });
+        }
+      }
     }
     return report;
   }
@@ -553,64 +621,79 @@ class MultiStreamCoordinator extends EventEmitter {
     return Array.from(this.streamers.values()).some(streamer => streamer.isStreaming);
   }
 
-  // Handle a platform crash — attempt to restart it
+  // Handle a platform crash — attempt to restart it.
+  //
+  // Concurrency: the pendingRestart guard prevents overlap when this is
+  // triggered from BOTH the streamer's 'streamCrashed' event AND the
+  // reconcile loop's drift detection in the same window. Without the guard,
+  // we'd race two restart attempts for the same platform.
   async handleStreamCrashed(platform, event) {
-    logger.error(`Stream crashed on ${platform}, attempting recovery`, {
-      platform,
-      content: event.content,
-      error: event.error
-    });
-
-    // Use current content or fall back to the content from the crash event
-    const contentToRestart = this.currentContent || event.content;
-    if (!contentToRestart) {
-      logger.error(`Cannot recover ${platform}: no content path available`, {
-        platform,
-        isCoordinating: this.isCoordinating,
-        currentContent: this.currentContent,
-        eventContent: event.content
-      });
-      this.emit('streamCrashed', { platform, event, recovered: false });
+    if (this.pendingRestart.has(platform)) {
+      logger.debug(`handleStreamCrashed for ${platform} skipped — restart already in flight`, { platform });
       return;
     }
-
-    const attempts = (this.restartAttempts.get(platform) || 0) + 1;
-    this.restartAttempts.set(platform, attempts);
-
-    if (attempts > this.config.maxRestartAttempts) {
-      logger.error(`${platform} exceeded max restart attempts (${this.config.maxRestartAttempts}), giving up`, {
-        platform,
-        attempts
-      });
-      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
-      return;
-    }
-
-    // Wait before restarting (exponential backoff: 2s, 4s, 8s)
-    const delay = Math.pow(2, attempts) * 1000;
-    logger.info(`Restarting ${platform} in ${delay / 1000}s (attempt ${attempts}/${this.config.maxRestartAttempts})`);
-
-    await new Promise(resolve => setTimeout(resolve, delay));
+    this.pendingRestart.add(platform);
 
     try {
-      const streamer = this.streamers.get(platform);
-      if (streamer && !streamer.isStreaming) {
-        // Re-activate coordinator if it was reset during crash
-        this.isCoordinating = true;
-        this.currentContent = contentToRestart;
-        if (!this.startTime) this.startTime = new Date();
+      logger.error(`Stream crashed on ${platform}, attempting recovery`, {
+        platform,
+        content: event.content,
+        error: event.error
+      });
 
-        const multiPlatform = this.activePlatforms.size > 1;
-        await streamer.startContinuous(contentToRestart, { quality: '1080p', multiPlatform });
-        logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
+      // Use current content or fall back to the content from the crash event
+      const contentToRestart = this.currentContent || event.content;
+      if (!contentToRestart) {
+        logger.error(`Cannot recover ${platform}: no content path available`, {
           platform,
-          content: contentToRestart
+          isCoordinating: this.isCoordinating,
+          currentContent: this.currentContent,
+          eventContent: event.content
         });
-        this.emit('streamCrashed', { platform, event, recovered: true, attempts });
+        this.emit('streamCrashed', { platform, event, recovered: false });
+        return;
       }
-    } catch (restartError) {
-      logger.error(`Failed to restart ${platform} (attempt ${attempts}):`, restartError);
-      this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+
+      const attempts = (this.restartAttempts.get(platform) || 0) + 1;
+      this.restartAttempts.set(platform, attempts);
+
+      if (attempts > this.config.maxRestartAttempts) {
+        logger.error(`${platform} exceeded max restart attempts (${this.config.maxRestartAttempts}), giving up`, {
+          platform,
+          attempts
+        });
+        this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+        return;
+      }
+
+      // Wait before restarting (exponential backoff: 2s, 4s, 8s)
+      const delay = Math.pow(2, attempts) * 1000;
+      logger.info(`Restarting ${platform} in ${delay / 1000}s (attempt ${attempts}/${this.config.maxRestartAttempts})`);
+
+      await new Promise(resolve => setTimeout(resolve, delay));
+
+      try {
+        const streamer = this.streamers.get(platform);
+        if (streamer && !streamer.isStreaming) {
+          // Re-activate coordinator if it was reset during crash
+          this.isCoordinating = true;
+          this.currentContent = contentToRestart;
+          if (!this.startTime) this.startTime = new Date();
+
+          const multiPlatform = this.activePlatforms.size > 1;
+          await streamer.startContinuous(contentToRestart, { quality: '1080p', multiPlatform });
+          logger.info(`Successfully restarted ${platform} after crash (attempt ${attempts})`, {
+            platform,
+            content: contentToRestart
+          });
+          this.emit('streamCrashed', { platform, event, recovered: true, attempts });
+        }
+      } catch (restartError) {
+        logger.error(`Failed to restart ${platform} (attempt ${attempts}):`, restartError);
+        this.emit('streamCrashed', { platform, event, recovered: false, attempts });
+      }
+    } finally {
+      this.pendingRestart.delete(platform);
     }
   }
 
@@ -694,5 +777,12 @@ class MultiStreamCoordinator extends EventEmitter {
 // stream has to be silent for at least one interval+threshold combo to be
 // declared drift, so transient hiccups don't cause false positives.
 MultiStreamCoordinator.HEALTH_CHECK_INTERVAL_MS = 30 * 1000;
+
+// How long a streamer must stay continuously healthy before its restart
+// counter resets. Tuned against the burst pattern: 3 attempts in 2+4+8=14
+// seconds. If 5 minutes pass cleanly after that, the underlying problem
+// was transient and we shouldn't punish the next crash with a depleted
+// budget.
+MultiStreamCoordinator.HEALTH_RESET_AFTER_MS = 5 * 60 * 1000;
 
 module.exports = new MultiStreamCoordinator();

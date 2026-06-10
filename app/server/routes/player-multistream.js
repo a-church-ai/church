@@ -487,48 +487,56 @@ router.get('/status', async (req, res) => {
   }
 });
 
+// Core start-streaming flow extracted from the route handler so it can be
+// invoked both from /api/player/start-stream AND from the Node-boot auto-
+// resume path (see attemptAutoResume in server/index.js).
+//
+// Returns { ok, status, result?, nowPlaying?, error? } so callers can branch
+// on outcome without needing to catch.
+async function startStreamingFromSchedule({ platform = 'all', quality = '1080p' } = {}) {
+  const schedule = await loadSchedule();
+
+  if (schedule.items.length === 0) {
+    return { ok: false, status: 'empty_schedule', error: 'Schedule is empty - add content first' };
+  }
+
+  const currentItem = schedule.items[schedule.currentIndex];
+  const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+
+  if (videoCount === 0) {
+    return { ok: false, status: 'no_playable_videos', error: 'No playable videos found in schedule' };
+  }
+
+  const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
+  const result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
+
+  // Persist isPlaying so boot auto-resume can pick it back up next time
+  schedule.isPlaying = true;
+  await saveSchedule(schedule);
+  playerStatus.isPlaying = true;
+  await updatePlayerStatus();
+
+  await startProgressTracker();
+  const enrichedItem = await enrichScheduleItem(currentItem);
+  logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
+
+  return { ok: true, status: 'started', result, nowPlaying: enrichedItem, videoCount };
+}
+
 // Start streaming (replaces OBS connect)
 router.post('/start-stream', async (req, res) => {
   try {
     const { platform = 'all', quality = '1080p' } = req.body;
-    const schedule = await loadSchedule();
+    const outcome = await startStreamingFromSchedule({ platform, quality });
 
-    // Get current video
-    if (schedule.items.length === 0) {
-      return res.status(400).json({ error: 'Schedule is empty - add content first' });
+    if (!outcome.ok) {
+      return res.status(400).json({ error: outcome.error });
     }
-
-    const currentItem = schedule.items[schedule.currentIndex];
-
-    // Build full schedule playlist — FFmpeg loops it forever via -stream_loop -1
-    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
-
-    if (videoCount === 0) {
-      return res.status(400).json({ error: 'No playable videos found in schedule' });
-    }
-
-    let result;
-    const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
-
-    result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
-
-    // Mark as playing
-    schedule.isPlaying = true;
-    await saveSchedule(schedule);
-
-    playerStatus.isPlaying = true;
-    await updatePlayerStatus();
-
-    // Start tracking schedule progress (advances currentIndex based on video durations)
-    await startProgressTracker();
-
-    const enrichedItem = await enrichScheduleItem(currentItem);
-    logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
 
     res.json({
       success: true,
-      streaming: result,
-      nowPlaying: enrichedItem
+      streaming: outcome.result,
+      nowPlaying: outcome.nowPlaying
     });
 
   } catch (error) {
@@ -841,3 +849,5 @@ router.post('/stop', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.startStreamingFromSchedule = startStreamingFromSchedule;
+module.exports.loadSchedule = loadSchedule;

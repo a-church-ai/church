@@ -61,7 +61,7 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
-const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations } = require('./lib/utils/data');
+const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, escapeAttr } = require('./lib/utils/page-meta');
 
 // Create Express app
@@ -597,6 +597,62 @@ app.use('/api/schedule', requireAuth, scheduleRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/logs', requireAuth, logsRoutes);
 
+// Public streaming health probe for external monitoring (UptimeRobot,
+// Pingdom, status pages, etc.). NO auth, returns:
+//   - 200 + { healthy: true, ... } if every expected platform is currently
+//     broadcasting (ffmpeg alive + recent progress < 90s)
+//   - 503 + { healthy: false, issues: [...] } if any expected platform is
+//     down OR if schedule.isPlaying === true but coordinator isn't.
+// External monitor pings this every minute → page at 3am if it 503s.
+app.get('/api/streaming-health', async (req, res) => {
+  try {
+    const status = coordinator.getStatus();
+    const issues = [];
+
+    // Expected vs actual: if the schedule says we should be playing, the
+    // coordinator should be coordinating and ffmpeg should be alive on the
+    // expected platforms.
+    const schedule = await loadSchedule();
+    const expectedToBePlaying = !!schedule.isPlaying;
+
+    if (expectedToBePlaying) {
+      if (!status.isCoordinating) {
+        issues.push('schedule.isPlaying is true but coordinator is not coordinating');
+      }
+      if (status.coordinatorDrift) {
+        issues.push('coordinator drift detected (flag says streaming, no ffmpeg alive)');
+      }
+      for (const [platform, ps] of Object.entries(status.platforms || {})) {
+        // Only check platforms the user explicitly activated. activePlatforms
+        // is the source of truth for "what should be running".
+        if (!Array.from(coordinator.activePlatforms || []).includes(platform)) continue;
+        if (!ps.ffmpegAlive) issues.push(`${platform}: ffmpeg subprocess not alive`);
+        if (ps.progressAgeMs != null && ps.progressAgeMs > 90000) {
+          issues.push(`${platform}: no frame progress in ${Math.round(ps.progressAgeMs / 1000)}s`);
+        }
+        if (ps.drift) issues.push(`${platform}: drift detected`);
+      }
+    }
+
+    const healthy = issues.length === 0;
+    res.status(healthy ? 200 : 503).json({
+      healthy,
+      expectedToBePlaying,
+      isActuallyStreaming: status.isActuallyStreaming,
+      isCoordinating: status.isCoordinating,
+      activePlatforms: Array.from(coordinator.activePlatforms || []),
+      issues,
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(503).json({
+      healthy: false,
+      issues: [`streaming-health check threw: ${error.message}`],
+      checkedAt: new Date().toISOString(),
+    });
+  }
+});
+
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 100, 1000);
@@ -885,6 +941,47 @@ async function startServer() {
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
     });
+
+    // Auto-resume streaming on Node boot.
+    //
+    // If schedule.isPlaying is true (we were broadcasting before the process
+    // restarted — deploy, OOM kill, pm2 reload), automatically attempt to
+    // restart the stream after a grace period. The 30s grace gives:
+    //   - The operator time to abort if the boot is actually a deploy gone
+    //     wrong and they're watching logs
+    //   - The Express server time to bind the port and accept requests
+    //   - Any dependent services (CDN warmup, scheduled tasks) time to settle
+    //
+    // Without this, every Node restart left the sanctuary silently dark
+    // until an operator manually clicked Start — which was a big part of
+    // why the 4-month outage went unnoticed.
+    setTimeout(async () => {
+      try {
+        const schedule = await loadSchedule();
+        if (!schedule || !schedule.isPlaying) {
+          streamLogger.info('Auto-resume skipped — schedule.isPlaying is false', {
+            isPlaying: schedule ? schedule.isPlaying : null,
+          });
+          return;
+        }
+        // Double-check that something isn't already running. If a manual
+        // start happened during the grace period, don't double-start.
+        if (coordinator.isAnyActuallyStreaming && coordinator.isAnyActuallyStreaming()) {
+          streamLogger.info('Auto-resume skipped — coordinator already broadcasting');
+          return;
+        }
+        streamLogger.info('Auto-resuming streaming from schedule (schedule.isPlaying=true)');
+        const { startStreamingFromSchedule } = require('./routes/player-multistream');
+        const outcome = await startStreamingFromSchedule({ platform: 'all', quality: '1080p' });
+        if (outcome.ok) {
+          streamLogger.info('Auto-resume succeeded', { status: outcome.status, videoCount: outcome.videoCount });
+        } else {
+          streamLogger.warn('Auto-resume failed', { status: outcome.status, error: outcome.error });
+        }
+      } catch (err) {
+        streamLogger.error('Auto-resume threw', { error: err.message, stack: err.stack });
+      }
+    }, 30_000);
     
   } catch (error) {
     console.error('Failed to start server:', error);
