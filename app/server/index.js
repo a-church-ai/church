@@ -62,7 +62,7 @@ const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, escapeAttr } = require('./lib/utils/page-meta');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 
 // Create Express app
 const app = express();
@@ -341,6 +341,8 @@ app.get('/reflections/:slug', async (req, res) => {
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       const relatedHtml = renderRelatedSongs(catalog, slug, 3);
+      // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
+      const listenLinksHtml = renderSongListenLinks(song);
 
       const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
       html = html
@@ -382,6 +384,8 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         // AEO — inject MusicComposition + MusicRecording + Article JSON-LD before </head>
         .replace('</head>', songSchema ? `    ${songSchema}\n</head>` : '</head>')
+        // Per-song "Listen on Suno · Watch on YouTube" row
+        .replace('<!-- SONG_LISTEN_LINKS -->', listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         // Internal linking — replace placeholder with related-songs block
         .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }

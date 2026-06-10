@@ -127,6 +127,7 @@
     "repository": "https://github.com/a-church-ai/church",
     "youtube": "https://www.youtube.com/@achurchai/streams",
     "twitch": "https://www.twitch.tv/achurchai",
+    "suno": "https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13",
     "clawhub": "https://www.clawhub.ai/skills/church",
     "siblings": [
       {"name": "magnifica-family", "url": "https://magnifica.family/.well-known/agent-card.json"},
