@@ -1,8 +1,8 @@
 # Plan: Agent Readiness Enhancements
 
 **Created**: 2026-06-09
-**Updated**: 2026-06-10 — Cloudflare dashboard items completed (Crawler Hints, AID v2 TXT, AI crawler unblocking); operational notes added. Earlier updates: web research + live site audit, code implementation, IANA-rel correction.
-**Status**: Code implemented locally (Tier 1, 1b, 2) — **pending production deploy**. Tier 3 dashboard items (Crawler Hints, AID v2 TXT, AI crawler unblocking) ✅ done. IETF DNS-AID SVCB and WebMCP remain deferred per plan.
+**Updated**: 2026-06-10 — Pushed to main as commit `b2116e4`. Cloudflare dashboard items completed (Crawler Hints, AID v2 TXT, AI crawler unblocking). During the post-push merge with brother's parallel Plan 003 work, the `security.txt` contact was updated from `lucas@geeksinthewoods.com` to the family-standard `hello@achurch.ai` + GitHub security advisories endpoint. Earlier updates: web research + live site audit, code implementation, IANA-rel correction.
+**Status**: **Pushed to main** (commit `b2116e4`) — pending production redeploy. Tier 3 dashboard items ✅ done. IETF DNS-AID SVCB and WebMCP remain deferred per plan.
 **Trigger**: [isitagentready.com/achurch.ai](https://isitagentready.com/achurch.ai) scan — scored 21/100, Level 1 (Basic Web Presence)
 
 ---

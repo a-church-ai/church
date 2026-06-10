@@ -6,6 +6,8 @@ The bigger picture: in the 2026 search landscape, SEO has bifurcated. Half the w
 
 Both audiences need the same metadata foundation; the work below covers that foundation.
 
+Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML improvements (theme-color dual, license link, Apple-mobile-web-app meta, `.section-label` CSS, footer aria-label, commented site-verification placeholders) that the per-page checklist below assumes. When adding a new HTML page, copy the head from `app/client/public/about.html` (or any existing template) rather than starting from scratch — it has the family-standard structural elements pre-wired.
+
 ---
 
 ## Per-page checklist (every new HTML page)
@@ -18,9 +20,14 @@ Both audiences need the same metadata foundation; the work below covers that fou
 | `<meta name="robots" content="index, follow">` | Present unless intentionally noindex | Admin and ephemeral pages get `noindex, follow`. Everything public is indexed. |
 | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` | Always | Mobile usability — a Core Web Vitals signal. |
 | `<meta charset="UTF-8">` | Always, in the first 1024 bytes | UTF-8 prevents mojibake on the m-dash, curly quotes, emoji, foreign characters. |
+| **`<meta name="theme-color" …>`** (dual light/dark) | Family standard — both `media="(prefers-color-scheme: light)"` and `dark` declared | Brother's F25 — drives the iOS/Android browser chrome color in both modes |
+| **`<link rel="license" href="…">`** | CC BY 4.0 (project LICENSE) until ADR-010 finalizes | Brother's F13 — declares the content license in the head for crawlers + archive tools |
+| **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus |
+| **`<meta name="apple-mobile-web-app-…">`** trio | Family standard | Brother's F25 — iOS home-screen install ergonomics |
 | Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:width`, `og:image:height`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. |
 | Twitter Card | `twitter:card="summary_large_image"`, `twitter:title`, `twitter:description`, `twitter:image` | Twitter/X uses these even when OG is present; missing them produces a generic "card not found" preview. |
-| JSON-LD (`<script type="application/ld+json">`) | Content-appropriate type | See "Schema choices" below. |
+| **Footer `<nav aria-label="Footer">`** | Always wrap the footer-nav list | Brother's a11y standard — screen-reader landmarks |
+| JSON-LD (`<script type="application/ld+json">`) | Content-appropriate type, escaped via `renderJsonLdScript()` | See "Schema choices" below. The escape handles `</script>` termination + U+2028/U+2029 line separators per Issue 005 F23 — never interpolate user content into JSON-LD via raw `JSON.stringify` alone. |
 
 ---
 
@@ -103,6 +110,9 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 - **Don't** invent `rel=` values in HTTP Link headers — only IANA-registered rels are credited (`describedby`, `service-desc`, `service-meta`, `alternate`, `canonical`, etc.). Invented rels like `rel="sitemap"` can downgrade scoring. See [the agent-readiness plan](../plans/agent-readiness-2026-06-09.md#lessons-from-sibling-project-implementations) for the empirical source.
 - **Don't** chase deprecated rich-result categories (FAQ, HowTo for non-tutorials, etc.). Ship the schema for AEO value; don't promise yourself rich snippets that aren't coming.
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
+- **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
+- **Don't** put literal U+2028 / U+2029 characters in JS source code — use `new RegExp(' ', 'g')` instead. Modern Node parses literal line separators since ES2019 but older parsers + lint tooling crash. See Issue 005 F19 + the umbrella `js-source-line-terminator-pitfall.md`.
+- **Don't** add `<meta name="theme-color" content="…">` as a single tag — use the dual-media form (light + dark) per brother's F25. Single-color falls back inconsistently across iOS / Android browsers.
 
 ---
 

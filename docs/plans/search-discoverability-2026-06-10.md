@@ -1,8 +1,8 @@
 # Plan: Search Snippet & Rich Result Improvements
 
 **Created**: 2026-06-10
-**Updated**: 2026-06-10 — substantially revised after research + live audit. Original draft assumed pre-2024 SEO playbook; current draft accounts for AI Overviews, FAQPage deprecation (May 2026), confirmed "achurch" brand-hijack, and the actual production state of per-page metadata. Implementation landed and verified end-to-end against dev server. Bing Webmaster Tools baseline (12 AI citations / 3mo, 4.62% CTR) folded in.
-**Status**: **Implemented (pending production deploy)** — Tier 1 (per-page metadata), Tier 2 (QAPage + MusicComposition+MusicRecording+Article schemas), Tier 3 mechanical items (sitemap lastmod, internal linking), plus 6 post-audit gap fixes (canonical URLs on dynamic pages, OG images on static pages, Twitter Card tags, description/title length tightening). Final audit: 8/8 pages pass full SEO checklist. Editorial work (answer-first ledes) and GSC AI report enablement remain.
+**Updated**: 2026-06-10 — substantially revised after research + live audit, then integrated post-push with brother's parallel Plan 003 / Issue 005 work (see "Merge integration" section below).
+**Status**: **Pushed to main** (commit `9a3e0b3`) — pending production redeploy of the Express stack on EC2. Tier 1 (per-page metadata), Tier 2 (QAPage + MusicComposition+MusicRecording+Article schemas), Tier 3 mechanical items (sitemap lastmod, internal linking, IndexNow key file), plus 6 post-audit gap fixes. Final audit: 8/8 pages pass full SEO checklist. Editorial work (answer-first ledes) and GSC AI report enablement remain.
 **Trigger**: Google Search Console export 2026-06-10 — over the prior 3 months (Mar 8 – Jun 7) the site received **585 impressions, 17 clicks (2.9% CTR)**. Initial signature was "achurch" 160 impressions / 0 clicks at position 6.76; deeper investigation reframed this as a brand-hijack situation, not a snippet failure.
 
 ---
@@ -568,6 +568,71 @@ print('og:image :', 'set' if 'property=\"og:image\"' in html else 'MISSING')
 print('twitter  :', 'set' if 'name=\"twitter:card\"' in html else 'MISSING')
 "
 ```
+
+---
+
+## Merge integration (2026-06-10, post-push)
+
+When the three commits from this plan (streaming stability, agent-readiness, search-discoverability) were ready to push, `origin/main` had **9 commits ahead** from brother's parallel Plan 003 / Issue 005 work that landed earlier the same day. The two work streams overlapped substantially on the SEO/discoverability surface. The merge preserved both — neither was discarded.
+
+### Brother's commits that overlapped with this plan
+
+| Commit | What it did |
+|---|---|
+| [`0c1c1be`](https://github.com/a-church-ai/church/commit/0c1c1be) feat: Plan 003 Phase 2A — SEO/LLM/agent/human sweep | Per-page SSR title/canonical/description on /ask/:slug + /reflections/:slug, robots.txt allowlist (20 AI bots), `.well-known/security.txt`, `llms-full.txt`, theme-color dual, Apple meta, license link, footer aria-label, governance files |
+| [`28e57c3`](https://github.com/a-church-ai/church/commit/28e57c3) fix: Issue 005 Round 2 — church polish sweep | MusicRecording JSON-LD on /reflections/:slug, Twitter Card SSR on inner pages, .section-label CSS rule, robots.txt User-agent consolidation, agent-card.json sibling links, dynamic-sitemap shadowing fix |
+| [`49f4870`](https://github.com/a-church-ai/church/commit/49f4870) fix(security): stored XSS in QAPage JSON-LD via `</script>` in user content | `escapeJsonLdString()` covering `<`, `>`, U+2028, U+2029 in addition to JSON syntax — defense against the script-tag-termination XSS vector that JSON.stringify alone doesn't prevent |
+| [`0065351`](https://github.com/a-church-ai/church/commit/0065351) fix: add Permissions-Policy header — helmet doesn't include it by default | `camera=(), microphone=(), geolocation=(), browsing-topics=()` — family-standard directive |
+| [`7e03327`](https://github.com/a-church-ai/church/commit/7e03327) feat(plan-04a): Cache-Control middleware for F-OUT-CACHE-1 | Per-path policy: HTML s-maxage=300, `.well-known/*` 86400, llms.txt 600 |
+
+### What was preserved from brother's work
+
+- `.well-known/security.txt` — brother's family-standard contact (`hello@achurch.ai` + GitHub security advisories) preferred over the personal-email version in my draft. Updated agent-readiness plan to match.
+- `robots.txt` — brother's comprehensive AI-crawler allowlist (anthropic-ai, GPTBot, ClaudeBot, PerplexityBot, …) kept as the structural foundation; my `Content-Signal: search=yes, ai-input=yes, ai-train=yes` directive added on top of the `User-agent: *` block.
+- All 8 HTML pages — brother's complete versions kept (theme-color dual, Apple-mobile-web-app meta, license link, atom feed alternates, llms.txt markdown alternate, footer `<nav aria-label>`, commented site verification placeholders, `.section-label` CSS rule).
+- `escapeJsonLdString` semantics — **adopted into `app/server/lib/utils/page-meta.js renderJsonLdScript()`** so all schema generation uses the same safe escape (`<`, `>`, ` `, ` `). The line terminators are matched via `new RegExp(' ', 'g')` form per Issue 005 F19 (literal U+2028 in source crashes older parsers).
+- Cache-Control middleware (per-path policy).
+- Permissions-Policy header.
+- `app/client/public/llms-full.txt` (concatenated corpus brother shipped).
+- `agent-card.json` sibling links to magnifica + wwjd + distill.
+- Governance files (CITATION.cff, CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.yml).
+
+### What this plan adds on top of brother's foundation
+
+- Streaming stability (drift detection, self-heal, additive starts, /heal endpoint) — fully isolated, no overlap.
+- `.well-known/agent-skills/index.json` + the on-disk generator + npm pre-hooks (brother's work didn't include the skill manifest).
+- `.well-known/mcp.json`, `api-catalog`, `agents.json`, `tdmrep.json` — new discovery files.
+- `AGENTS.md` at repo root, `auth.md`, `openapi.json`.
+- IANA-registered Link headers middleware on `/` (4 entries: describedby + service-desc×2 + service-meta).
+- Markdown negotiation middleware (`Accept: text/markdown` → serves llms.txt).
+- Routes for `/.well-known/api-catalog` (linkset+json content-type), `/.well-known/agent-skills/:name/SKILL.md`, `/AGENTS.md`, `/auth.md`.
+- `<!-- RELATED_LINKS -->` placeholder system + `renderRelatedConversations` and `renderRelatedSongs` server-side injection for thematic internal linking.
+- `MusicComposition` + `Article` schemas layered alongside brother's `MusicRecording` — the `/reflections/[slug]` pages now serve a 3-node `@graph` instead of a single MusicRecording node.
+- Twitter Card `image` substitution per-slug (brother shipped title/description, mine added image).
+- Canonical URL substitution per-slug on dynamic templates.
+- Sitemap `<lastmod>` for reflection pages.
+- IndexNow key file at `/894b124b…txt`.
+- This plan + agent-readiness plan + seo-conventions reference doc.
+
+### Conflict resolution log
+
+| File | Resolution |
+|---|---|
+| `.well-known/security.txt` | Took brother's (family-standard contact) |
+| `robots.txt` | Brother's allowlist + Disallow rules + my Content-Signal directive (both kept) |
+| 6 static HTMLs | Brother's complete version preserved |
+| `conversation.html`, `reflection-song.html` | Manual merge — brother's structural additions + my canonical/robots-meta/twitter:image + my `<!-- RELATED_LINKS -->` placeholder + my client-side title-clobber removal |
+| `server/index.js` | My version preserved (uses page-meta.js helpers) + manually re-added brother's Permissions-Policy + Cache-Control middleware |
+| `page-meta.js renderJsonLdScript()` | Strengthened with brother's full XSS-safe escape pattern (the F23 family-wide rule) |
+| `docs/plans/README.md` | Auto-merged (both sides added different index entries) |
+
+### Cross-references
+
+For the family-level context behind brother's work, see:
+- `docs/issues/005-plan-003-code-review-2026-06-02.md` (umbrella) — F23 rationale for the JSON-LD escape pattern
+- `docs/observations/js-source-line-terminator-pitfall.md` (umbrella) — F19 line-terminator pitfall
+- `docs/decisions/008-ai-crawler-posture.md` (umbrella) — ADR-008 surfaces
+- [`docs/reference/dashboard-state.md`](../reference/dashboard-state.md) — CDN/edge state snapshot
 
 ---
 
