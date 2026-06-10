@@ -102,9 +102,36 @@ class FFmpegConfig extends EventEmitter {
           });
         })
         .on('stderr', (stderrLine) => {
-          // Log FFmpeg stderr at warn level — this surfaces connection issues,
-          // codec warnings, and RTMP errors that would otherwise be invisible
-          if (stderrLine && !stderrLine.startsWith('frame=') && !stderrLine.startsWith('size=')) {
+          // FFmpeg writes both diagnostics AND routine startup info to stderr
+          // (that's how the binary is designed — stderr is its primary
+          // diagnostic channel, not a failure channel). We want to surface
+          // real warnings/errors/RTMP issues without burying them in routine
+          // codec/format metadata at every stream startup.
+          //
+          // Three buckets:
+          //   1. Per-frame progress (`frame=`, `size=`) — already filtered,
+          //      handled by the 'progress' event with structured fields.
+          //   2. Routine startup metadata (indented blocks, Input/Output
+          //      headers, version banner, codec descriptors) — log at debug
+          //      level; useful when diagnosing locally, noise in prod.
+          //   3. Everything else (warnings, errors, RTMP failures,
+          //      authentication rejections, network drops) — log at warn
+          //      level so they show up where they belong.
+          if (!stderrLine) return;
+          if (stderrLine.startsWith('frame=') || stderrLine.startsWith('size=')) return;
+
+          const isRoutineMetadata = (
+            // Indented metadata blocks (handler_name, encoder, vendor_id, Side data, cpb:, etc.)
+            /^\s{4,}/.test(stderrLine) ||
+            // Stream descriptors and Input/Output info
+            /^(Input|Output|Stream\s+(mapping|#\d)|Press \[q\])/.test(stderrLine) ||
+            // ffmpeg/ffprobe version banner + libav* config lines
+            /^(ffmpeg|configuration|libav[a-z]+|libpost|libsw[a-z]+|built with)/i.test(stderrLine)
+          );
+
+          if (isRoutineMetadata) {
+            logger.debug(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+          } else {
             logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
           }
         })

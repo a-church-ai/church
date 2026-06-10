@@ -119,6 +119,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// JSON parse-error handler. body-parser throws SyntaxError on malformed JSON
+// bodies; without this catch, the default Express handler logs the full stack
+// at error level — which floods the error log with routine client mistakes
+// and bot probing, masking real server errors. Reclassify as a client error
+// (info level), capture context for diagnostics, return 400 cleanly.
+//
+// Express 4 error-handling middleware requires the 4-arg signature, even
+// when `next` is unused.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const isJsonParseFailure = err && (
+    err.type === 'entity.parse.failed' ||
+    (err instanceof SyntaxError && 'body' in err)
+  );
+  if (!isJsonParseFailure) return next(err);
+
+  const jsonErrLogger = require('./lib/utils/logger');
+  jsonErrLogger.info('Rejected malformed JSON body', {
+    method: req.method,
+    path: req.path,
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+    bodyPreview: (err.body || '').toString().slice(0, 200),
+    parseError: err.message,
+  });
+  return res.status(400).json({
+    error: 'Invalid JSON body',
+    suggestion: 'Send a valid JSON object as the request body.',
+  });
+});
+
 // Agent-readiness: Link headers + Markdown negotiation on the homepage.
 // Scan reference: isitagentready.com. Plan: docs/plans/agent-readiness-2026-06-09.md
 //
