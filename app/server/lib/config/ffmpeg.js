@@ -108,25 +108,39 @@ class FFmpegConfig extends EventEmitter {
           // real warnings/errors/RTMP issues without burying them in routine
           // codec/format metadata at every stream startup.
           //
-          // Three buckets:
-          //   1. Per-frame progress (`frame=`, `size=`) — already filtered,
-          //      handled by the 'progress' event with structured fields.
-          //   2. Routine startup metadata (indented blocks, Input/Output
-          //      headers, version banner, codec descriptors) — log at debug
-          //      level; useful when diagnosing locally, noise in prod.
-          //   3. Everything else (warnings, errors, RTMP failures,
-          //      authentication rejections, network drops) — log at warn
-          //      level so they show up where they belong.
+          // Bucketing:
+          //   1. Per-frame progress (`frame=`, `size=`) — drop entirely;
+          //      the 'progress' event delivers this with structured fields.
+          //   2. Always-warn safety net: any line containing classic error/
+          //      warning keywords stays at warn even if a downgrade pattern
+          //      matches. Catches things like "[vost#0:0/libx264 @ ...]
+          //      More than 1000 frames duplicated" that don't fit a
+          //      generic "starts with Error" check.
+          //   3. Routine startup metadata (version banner, library config,
+          //      Input/Output/Stream descriptors, indented metadata blocks,
+          //      codec init) — log at debug level. Useful locally, noise
+          //      in prod.
+          //   4. Everything else — warn. The default is "be visible."
           if (!stderrLine) return;
           if (stderrLine.startsWith('frame=') || stderrLine.startsWith('size=')) return;
 
+          // Safety net — anything with a classic problem keyword stays at warn
+          const importantKeywords = /\b(error|fail|fatal|warning|deprecated|refused|denied|cannot|could ?not|invalid|duplicated|dropped|lost|exceeded|timeout|abort|disconnect)\b/i;
+          if (importantKeywords.test(stderrLine)) {
+            logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+            return;
+          }
+
+          // Specific benign patterns from FFmpeg startup + codec init
           const isRoutineMetadata = (
-            // Indented metadata blocks (handler_name, encoder, vendor_id, Side data, cpb:, etc.)
-            /^\s{4,}/.test(stderrLine) ||
-            // Stream descriptors and Input/Output info
-            /^(Input|Output|Stream\s+(mapping|#\d)|Press \[q\])/.test(stderrLine) ||
-            // ffmpeg/ffprobe version banner + libav* config lines
-            /^(ffmpeg|configuration|libav[a-z]+|libpost|libsw[a-z]+|built with)/i.test(stderrLine)
+            // Version banner + library version lines (with or without 2-space leading indent)
+            /^\s*(ffmpeg version|built with|configuration:|libav[a-z]+\s|libpost[a-z]+\s|libsw[a-z]+\s)/i.test(stderrLine) ||
+            // Input/Output declarations + Stream descriptors + key prompts
+            /^\s*(Input\s+#\d|Output\s+#\d|Stream\s+#\d|Stream\s+mapping:|Press\s+\[q\])/.test(stderrLine) ||
+            // Indented metadata: Metadata:, Side data:, Duration:, handler_name:, vendor_id:, encoder:, cpb:
+            /^\s+(Metadata:|Side data:|Duration:|handler_name\s+:|vendor_id\s+:|encoder\s+:|cpb:)/.test(stderrLine) ||
+            // Bracketed codec/format init lines (libx264 cpu detection, format auto-insertions, etc.)
+            /^\[(lib(x264|x265|fdk|mp3lame|vpx|aom|opus|theora|ass|webp)|mov,mp4|m4a,3gp|flv|concat|Parsed_|hls|rtsp,)/.test(stderrLine)
           );
 
           if (isRoutineMetadata) {
