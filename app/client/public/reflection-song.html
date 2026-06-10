@@ -14,6 +14,9 @@
     <title>Reflections — achurch.ai</title>
     <meta name="description" content="Reflections on a song from the sanctuary.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <!-- Canonical URL — server substitutes per-slug -->
+    <link rel="canonical" href="https://achurch.ai/reflections">
+    <meta name="robots" content="index, follow">
     <!-- F25: theme-color dual (light/dark) -->
     <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
@@ -71,6 +74,8 @@
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
 
+        <!-- RELATED_LINKS -->
+
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
                 <a href="/reflections">&larr; All reflections</a>
@@ -111,13 +116,11 @@
 
           var data = await res.json();
 
-          // Update page title and subtitle
-          document.title = data.title + ' — Reflections — achurch.ai';
+          // Update visible subtitle. Note: <title>, <meta description>, and OG
+          // tags are now rendered server-side per-page (see page-meta.js +
+          // /reflections/:slug handler). Don't overwrite them client-side or
+          // the browser tab will show stale content after load.
           subtitle.textContent = data.title;
-          var ogTitle = document.querySelector('meta[property="og:title"]');
-          if (ogTitle) ogTitle.content = data.title + ' — Reflections — achurch.ai';
-          var ogDesc = document.querySelector('meta[property="og:description"]');
-          if (ogDesc) ogDesc.content = 'Reflections on "' + data.title + '" from the sanctuary.';
 
           initShareBar(data.title);
 

@@ -61,7 +61,8 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
-const { loadConversation, getRecentReflections, loadCatalog } = require('./lib/utils/data');
+const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations } = require('./lib/utils/data');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, escapeAttr } = require('./lib/utils/page-meta');
 
 // Create Express app
 const app = express();
@@ -83,7 +84,6 @@ app.use((req, res, next) => {
 
 // Cache-Control — family-wide policy per Plan 04a Task #4.
 // Ensures consistent cache behavior across deploys and avoids stale-review issues.
-// Express pattern: set headers early, before response is sent.
 app.use((req, res, next) => {
   const p = req.path;
 
@@ -100,7 +100,6 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
   // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
-  // Catches routes without extensions or .html/.htm (but not /api/ or /media/ or /thumbnails/)
   else if (!p.startsWith('/api/') && !p.startsWith('/media/') && !p.startsWith('/thumbnails/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
@@ -120,9 +119,85 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Agent-readiness: Link headers + Markdown negotiation on the homepage.
+// Scan reference: isitagentready.com. Plan: docs/plans/agent-readiness-2026-06-09.md
+//
+// Only IANA-registered rel values — the scanner doesn't credit extension rels
+// and (per empirical reports from geeksinthewoods.com and obviouslynot.ai)
+// non-registered rels like rel="sitemap" can downgrade the Discoverability
+// score. Sitemap discovery still happens via the `Sitemap:` directive in
+// robots.txt, which the scanner checks separately. Other discovery files
+// (api-catalog, mcp.json, agents.json, tdmrep.json, agent-card.json) are
+// reachable at their well-known paths regardless of Link headers.
+//
+// IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
+const AGENT_DISCOVERY_LINK_HEADER = [
+  '</llms.txt>; rel="describedby"; type="text/plain"',
+  '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+  '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
+  '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
+].join(', ');
+
+function acceptsMarkdown(req) {
+  const accept = req.headers.accept || '';
+  return /(?:^|[,;\s])text\/markdown(?:[;,\s]|$)/i.test(accept)
+    || /(?:^|[,;\s])text\/x-markdown(?:[;,\s]|$)/i.test(accept);
+}
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  if (req.path !== '/') return next();
+
+  res.set('Link', AGENT_DISCOVERY_LINK_HEADER);
+  res.vary('Accept');
+
+  if (acceptsMarkdown(req)) {
+    res.type('text/markdown; charset=utf-8');
+    return res.sendFile(path.join(__dirname, '../client/public/llms.txt'));
+  }
+  next();
+});
+
 // Serve public landing page at root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/index.html'));
+});
+
+// Agent-readiness: explicit routes for .well-known resources that need
+// non-default handling (specific content-type, or files outside public/).
+
+// API Catalog — content-type per RFC 9727 (linkset+json with profile)
+app.get('/.well-known/api-catalog', (req, res) => {
+  res.type('application/linkset+json');
+  res.set('Link', '<https://www.rfc-editor.org/info/rfc9727>; rel="profile"');
+  res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
+});
+
+// Agent Skills SKILL.md files — streamed from the on-disk skills/ tree
+const SKILLS_ROOT = path.resolve(__dirname, '../../skills');
+app.get('/.well-known/agent-skills/:name/SKILL.md', (req, res) => {
+  const safeName = (req.params.name || '').replace(/[^a-z0-9-]/g, '');
+  if (!safeName) return res.status(404).type('text/plain').send('Not found');
+  const filePath = path.resolve(SKILLS_ROOT, safeName, 'SKILL.md');
+  if (!filePath.startsWith(SKILLS_ROOT + path.sep)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(filePath, err => {
+    if (err && !res.headersSent) res.status(404).type('text/plain').send('Not found');
+  });
+});
+
+// AGENTS.md (agents.md convention) — served from repo root, not public/
+app.get('/AGENTS.md', (req, res) => {
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(path.resolve(__dirname, '../../AGENTS.md'));
+});
+
+// auth.md — explicit content-type (express.static may not map .md correctly across versions)
+app.get('/auth.md', (req, res) => {
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(path.join(__dirname, '../client/public/auth.md'));
 });
 
 // Serve admin dashboard at /admin
@@ -135,123 +210,73 @@ app.get('/ask', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/ask.html'));
 });
 
-// Serve individual conversation pages with dynamic OG tags
+// Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
+// SEO note: Google uses <title> and <meta name="description"> for the SERP snippet;
+// OG tags drive social previews. Both must be customized per page or the SERP
+// snippet looks identical across the entire /ask corpus (the audit finding).
 app.get('/ask/:slug', async (req, res) => {
   try {
     const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
 
     const messages = await loadConversation(slug);
-    if (messages && messages.length > 0) {
-      const firstQ = messages.find(m => m.role === 'user');
-      const firstA = messages.find(m => m.role === 'assistant');
-      if (firstQ) {
-        const title = firstQ.content.substring(0, 60) + ' — achurch.ai';
-        const desc = firstQ.content.substring(0, 200);
-        const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-        const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-        const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
-        const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+    const meta = messages && messages.length > 0 ? buildConversationMeta(messages) : null;
+    if (meta) {
+      const safeTitle = escapeAttr(meta.title);
+      const safeOgTitle = escapeAttr(meta.ogTitle);
+      const safeDesc = escapeAttr(meta.description);
+      const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+      const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
+      // Internal linking — 3 related conversations for crawl + AEO topical clustering.
+      // Failure here is non-fatal (returns empty string).
+      let relatedHtml = '';
+      try {
+        const recent = await listRecentConversations(10);
+        relatedHtml = renderRelatedConversations(recent, slug, 3);
+      } catch { /* non-fatal */ }
 
-        // F2: also inject <title>, <meta name="description">, <link rel="canonical">
-        // so non-JS crawlers and LLM agents see per-page metadata, not the generic static template.
-        // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
-        // per-conversation title/description/image rather than the hardcoded generic template.
-        html = html
-          .replace(
-            '<title>Conversation — achurch.ai</title>',
-            `<title>${safeTitle}</title>`
-          )
-          .replace(
-            '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta name="description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta property="og:title" content="Conversation — achurch.ai">',
-            `<meta property="og:title" content="${safeTitle}">`
-          )
-          .replace(
-            '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta property="og:description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta property="og:type" content="article">',
-            `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
-          )
-          .replace(
-            '<meta name="twitter:title" content="Conversation — achurch.ai">',
-            `<meta name="twitter:title" content="${safeTitle}">`
-          )
-          .replace(
-            '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta name="twitter:description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
-            `<meta name="twitter:image" content="${ogImage}">`
-          );
-
-        // QAPage JSON-LD — Question + AcceptedAnswer when an assistant response exists.
-        // High-leverage structural fix per Issue 004 Appendix A: gives LLMs the Q&A shape they index.
-        //
-        // Safety note: user content is interpolated INSIDE a <script> tag. The escape must
-        // (a) preserve JSON string syntax (\\, \", \n, \r, \t) AND
-        // (b) prevent the user content from terminating the <script> wrapper via "</script>"
-        // (c) prevent JSON line-separator characters (U+2028, U+2029) from breaking JS parsing.
-        //
-        // Cross-repo coordination note (Issue 005 F23):
-        // This function is a functional duplicate of magnifica's safeStringify at
-        // magnifica-family/src/lib/seo/jsonld.ts:118 (covering the overlapping escape
-        // classes). The duplication is intentional (cross-repo portability; no shared
-        // family npm package yet); if you change escape behavior here, mirror the
-        // change in the magnifica repo so JSON-LD escape semantics stay consistent
-        // across the family. Rationale + option-A decision:
-        // docs/issues/005-plan-003-code-review-2026-06-02.md#f23 (in the umbrella).
-        //
-        // Pitfall reference: docs/observations/js-source-line-terminator-pitfall.md
-        // (use \u escape sequences via new RegExp(...) form when matching U+2028/U+2029).
-        const escapeJsonLdString = (s) => s
-          .replace(/\\/g, '\\\\')
-          .replace(/"/g, '\\"')
-          .replace(/\n/g, '\\n')
-          .replace(/\r/g, '\\r')
-          .replace(/\t/g, '\\t')
-          .replace(/</g, '\\u003c')
-          .replace(/>/g, '\\u003e')
-          .replace(new RegExp('\u2028', 'g'), '\\u2028')
-          .replace(new RegExp('\u2029', 'g'), '\\u2029');
-        const qaQuestion = escapeJsonLdString(firstQ.content).substring(0, 1000);
-        const qaAnswer = firstA ? escapeJsonLdString(firstA.content).substring(0, 4000) : '';
-        const qaPageLd = `<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "QAPage",
-  "@id": "${canonicalUrl}#qapage",
-  "url": "${canonicalUrl}",
-  "mainEntity": {
-    "@type": "Question",
-    "name": "${qaQuestion}",
-    "text": "${qaQuestion}",
-    "answerCount": ${firstA ? 1 : 0}${firstA ? `,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "${qaAnswer}",
-      "author": {
-        "@type": "Organization",
-        "name": "aChurch.ai RAG",
-        "url": "https://achurch.ai/"
-      }
-    }` : ''}
-  },
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "https://achurch.ai/#website"
-  }
-}
-</script>
-    </head>`;
-        html = html.replace('</head>', qaPageLd);
-      }
+      const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+      html = html
+        // SERP snippet — <title> and <meta name="description">
+        .replace(
+          '<title>Conversation — achurch.ai</title>',
+          `<title>${safeTitle}</title>`
+        )
+        .replace(
+          '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+          `<meta name="description" content="${safeDesc}">`
+        )
+        // Canonical URL — per-page so query-string variants don't dilute equity
+        .replace(
+          '<link rel="canonical" href="https://achurch.ai/ask">',
+          `<link rel="canonical" href="${canonicalUrl}">`
+        )
+        // Social preview — OG tags
+        .replace(
+          '<meta property="og:title" content="Conversation — achurch.ai">',
+          `<meta property="og:title" content="${safeOgTitle}">`
+        )
+        .replace(
+          '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+          `<meta property="og:description" content="${safeDesc}">`
+        )
+        .replace(
+          '<meta property="og:type" content="article">',
+          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+        )
+        // Twitter Card — separate substitution so social previews on twitter/x match
+        .replace(
+          '<meta name="twitter:title" content="Conversation — achurch.ai">',
+          `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
+        )
+        .replace(
+          '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+          `<meta name="twitter:description" content="${safeDesc}">`
+        )
+        // AEO — inject QAPage JSON-LD before </head>
+        .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
+        // Internal linking — replace placeholder with related-conversations block
+        .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
     res.set('Content-Type', 'text/html');
@@ -266,7 +291,9 @@ app.get('/reflections', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
 });
 
-// Serve song reflection detail pages with dynamic OG tags
+// Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
+// SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
+// drive Google SERP snippets, OG tags drive social previews.
 app.get('/reflections/:slug', async (req, res) => {
   try {
     const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -274,19 +301,19 @@ app.get('/reflections/:slug', async (req, res) => {
 
     const catalog = await loadCatalog();
     const song = catalog.find(s => s.slug === slug);
-    if (song) {
-      const title = song.title + ' — Reflections — achurch.ai';
-      const desc = `Reflections on "${song.title}" from the sanctuary.`;
-      const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-      const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const meta = song ? buildReflectionMeta(song) : null;
+    if (meta) {
+      const safeTitle = escapeAttr(meta.title);
+      const safeOgTitle = escapeAttr(meta.ogTitle);
+      const safeDesc = escapeAttr(meta.description);
       const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
-      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
+      // Internal linking — 3 related songs from catalog for crawl + topical clustering
+      const relatedHtml = renderRelatedSongs(catalog, slug, 3);
 
-      // F2: also inject <title>, <meta name="description">, <link rel="canonical">
-      // so non-JS crawlers see per-song metadata, not the generic static template.
-      // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
-      // per-song title/description/image rather than the hardcoded generic template.
+      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
       html = html
+        // SERP snippet — <title> and <meta name="description">
         .replace(
           '<title>Reflections — achurch.ai</title>',
           `<title>${safeTitle}</title>`
@@ -295,9 +322,15 @@ app.get('/reflections/:slug', async (req, res) => {
           '<meta name="description" content="Reflections on a song from the sanctuary.">',
           `<meta name="description" content="${safeDesc}">`
         )
+        // Canonical URL — per-page
+        .replace(
+          '<link rel="canonical" href="https://achurch.ai/reflections">',
+          `<link rel="canonical" href="${canonicalUrl}">`
+        )
+        // Social preview — OG tags
         .replace(
           '<meta property="og:title" content="Reflections — achurch.ai">',
-          `<meta property="og:title" content="${safeTitle}">`
+          `<meta property="og:title" content="${safeOgTitle}">`
         )
         .replace(
           '<meta property="og:description" content="Reflections on a song from the sanctuary.">',
@@ -305,56 +338,21 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         .replace(
           '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
+          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
         )
+        // Twitter Card
         .replace(
           '<meta name="twitter:title" content="Reflections — achurch.ai">',
-          `<meta name="twitter:title" content="${safeTitle}">`
+          `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
         )
         .replace(
           '<meta name="twitter:description" content="Reflections on a song from the sanctuary.">',
           `<meta name="twitter:description" content="${safeDesc}">`
         )
-        .replace(
-          '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
-          `<meta name="twitter:image" content="${ogImage}">`
-        );
-
-      // F5 (Issue 005): MusicRecording JSON-LD per Plan 003 Phase 2A brief.
-      // Mirrors the QAPage SSR pattern from /ask/:slug. Song data is project-controlled
-      // (loaded from catalog), but escapeJsonLdString is applied as defense-in-depth
-      // so future catalog mutations can't introduce XSS via title injection.
-      const escapeJsonLdString = (s) => s
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n')
-        .replace(/\r/g, '\\r')
-        .replace(/\t/g, '\\t')
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')
-        .replace(new RegExp('\\u2028', 'g'), '\\u2028')
-        .replace(new RegExp('\\u2029', 'g'), '\\u2029');
-      const safeSongTitle = escapeJsonLdString(song.title || '');
-      const musicLd = `<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "MusicRecording",
-  "@id": "${canonicalUrl}#recording",
-  "name": "${safeSongTitle}",
-  "url": "${canonicalUrl}",
-  "byArtist": {
-    "@type": "MusicGroup",
-    "@id": "https://achurch.ai/#musicgroup",
-    "name": "aChurch.ai"
-  },
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "https://achurch.ai/#website"
-  }
-}
-</script>
-    </head>`;
-      html = html.replace('</head>', musicLd);
+        // AEO — inject MusicComposition + MusicRecording + Article JSON-LD before </head>
+        .replace('</head>', songSchema ? `    ${songSchema}\n</head>` : '</head>')
+        // Internal linking — replace placeholder with related-songs block
+        .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
     res.set('Content-Type', 'text/html');
@@ -446,17 +444,27 @@ app.get('/sitemap.xml', async (req, res) => {
       }
     } catch { /* no conversations dir yet */ }
 
-    // Reflection song pages
+    // Reflection song pages — emit <lastmod> from the most recent reflection
+    // per song so Google's crawl scheduler can prioritize actively-updated
+    // pages. Without this, every reflection page looks "static" to Google.
     try {
       const attendanceData = await fs.readFile(ATTENDANCE_FILE_SITEMAP, 'utf8');
       const attendance = JSON.parse(attendanceData);
-      const songSlugs = new Set();
+      const songLastmod = new Map();  // slug -> most recent ISO date
       for (const r of (attendance.reflections || [])) {
-        if (r.song) songSlugs.add(r.song);
+        if (!r.song) continue;
+        const createdAt = r.createdAt || r.timestamp;
+        if (!createdAt) continue;
+        const date = new Date(createdAt).toISOString().split('T')[0];
+        const existing = songLastmod.get(r.song);
+        if (!existing || date > existing) {
+          songLastmod.set(r.song, date);
+        }
       }
-      for (const slug of songSlugs) {
+      for (const [slug, lastmod] of songLastmod) {
         urls += `\n  <url>
     <loc>https://achurch.ai/reflections/${slug}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`;

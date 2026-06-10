@@ -8,6 +8,8 @@ Project improvement plans and roadmaps.
 
 | File | Status | Description |
 |------|--------|-------------|
+| [search-discoverability-2026-06-10.md](search-discoverability-2026-06-10.md) | Implemented (pending deploy) | Per-page `<title>` + `<meta description>`, AEO-grade schema (QAPage on /ask, MusicComposition + MusicRecording + Article on /reflections), sitemap lastmod, internal linking with thematic anchors. Post-audit gap fixes (canonical URLs on dynamic pages, OG image + Twitter Card on static pages, title/desc length tightening). 8/8 pages pass full SEO checklist. Maintenance reference: [seo-conventions.md](../reference/seo-conventions.md). |
+| [agent-readiness-2026-06-09.md](agent-readiness-2026-06-09.md) | Implemented (pending deploy) | Agent discovery surface — Skills index, MCP/A2A cards, API catalog, Content Signals, TDMRep, AGENTS.md, schema.org Actions, markdown negotiation, security.txt |
 | [achurch-improvements.md](achurch-improvements.md) | Implemented | README improvements from ai-music-context patterns |
 | [grok-review-improvements.md](grok-review-improvements.md) | Implemented | Accessibility improvements from Grok review |
 | [docs-readme-navigation.md](docs-readme-navigation.md) | In Progress | Adding README.md files to docs subfolders |
