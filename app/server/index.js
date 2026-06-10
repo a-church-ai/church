@@ -189,9 +189,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve public landing page at root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+// Serve public landing page at root with dynamic catalog-count substitution.
+// The JSON-LD MusicAlbum's numTracks gets hardcoded if left to a static file;
+// Google reads structured data for rich results so we want this accurate.
+// Description text uses "30+ original songs" wording (timeless) so only the
+// numTracks integer needs server substitution. Failure to load the catalog
+// falls back to serving the static file unchanged.
+app.get('/', async (req, res) => {
+  try {
+    const [html, catalog] = await Promise.all([
+      fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
+      loadCatalog().catch(() => null),
+    ]);
+    const rendered = catalog && Array.isArray(catalog) && catalog.length > 0
+      ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
+      : html;
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.send(rendered);
+  } catch (err) {
+    // Filesystem failure or some other fatal — fall back to the static file
+    res.sendFile(path.join(__dirname, '../client/public/index.html'));
+  }
 });
 
 // Agent-readiness: explicit routes for .well-known resources that need
