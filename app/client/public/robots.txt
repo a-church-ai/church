@@ -5,6 +5,7 @@
 # License: see <link rel="license"> in HTML (ADR-010 pending) + project LICENSE file.
 
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /admin
 Disallow: /api/content
@@ -72,3 +73,7 @@ Sitemap: https://achurch.ai/sitemap.xml
 
 # LLM context (non-standard, retained as comment):
 # llms.txt: https://achurch.ai/llms.txt
+
+# Content Signals (contentsignals.org)
+# Declared above on the User-agent: * block — search=yes, ai-input=yes, ai-train=yes.
+# Open sanctuary: all three signals affirmative.

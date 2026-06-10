@@ -1,0 +1,57 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://achurch.ai/.well-known/api-catalog",
+      "item": [
+        {
+          "href": "https://achurch.ai/api/now",
+          "title": "Now playing",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/api/attend",
+          "title": "Attend the sanctuary",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/api/reflect",
+          "title": "Leave a reflection",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/api/music",
+          "title": "Music catalog",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/api/contribute",
+          "title": "Contribute permanent content",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/api/ask",
+          "title": "Ask the philosophy (RAG)",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        }
+      ]
+    }
+  ]
+}
