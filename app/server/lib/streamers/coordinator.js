@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const YouTubeStreamer = require('./youtube');
 const TwitchStreamer = require('./twitch');
+const BaseStreamer = require('./base');
+const ffmpegConfig = require('../config/ffmpeg');
 const logger = require('../utils/logger');
 
 class MultiStreamCoordinator extends EventEmitter {
@@ -19,8 +21,132 @@ class MultiStreamCoordinator extends EventEmitter {
     this.restartAttempts = new Map();
     this.activePlatforms = new Set(); // Tracks which platforms user actually started
 
+    // Health/reconciliation loop — see startHealthLoop().
+    this.healthCheckTimer = null;
+    this.lastReconcileAt = null;
+    this.lastDriftReport = null; // Most recent drift event, for /heal diagnostics
+
     // Initialize streamers
     this.initializeStreamers();
+    this.startHealthLoop();
+  }
+
+  // Periodic reconciliation. Every interval we walk every streamer, ask each
+  // to compare its flag against ffmpeg ground truth, and clear the
+  // coordinator's own isCoordinating flag if no platform is actually
+  // broadcasting. Drift is logged loud and emitted as a 'drift' event so
+  // anything wired to it (alerting, /heal diagnostics, recovery) can react.
+  startHealthLoop() {
+    if (this.healthCheckTimer) return;
+    this.healthCheckTimer = setInterval(() => {
+      try {
+        this.reconcile();
+      } catch (err) {
+        logger.error('Health-loop reconcile threw:', err);
+      }
+    }, MultiStreamCoordinator.HEALTH_CHECK_INTERVAL_MS);
+    // Don't keep the event loop alive solely for the health timer (matters
+    // for graceful shutdown and tests).
+    if (this.healthCheckTimer.unref) this.healthCheckTimer.unref();
+    logger.info(`Streaming health loop running every ${MultiStreamCoordinator.HEALTH_CHECK_INTERVAL_MS / 1000}s`);
+  }
+
+  stopHealthLoop() {
+    if (this.healthCheckTimer) {
+      clearInterval(this.healthCheckTimer);
+      this.healthCheckTimer = null;
+    }
+  }
+
+  // Walk every streamer + check coordinator state against ffmpeg ground truth.
+  // Returns a report. If drift is found, the offending flags are cleared and
+  // a 'drift' event is emitted. Does not attempt to restart — that's the
+  // caller's policy decision (auto-restart vs operator action).
+  reconcile() {
+    const streamerReports = [];
+    let anyDrift = false;
+    for (const streamer of this.streamers.values()) {
+      const report = streamer.reconcile();
+      streamerReports.push(report);
+      if (report.drift) anyDrift = true;
+    }
+
+    // Coordinator-level drift: we think we're broadcasting but no streamer
+    // actually is. This was the 4-month silent failure mode.
+    const anyActuallyStreaming = this.isAnyActuallyStreaming();
+    const coordinatorDrift = this.isCoordinating && !anyActuallyStreaming;
+    if (coordinatorDrift) {
+      logger.error('Coordinator state drift detected: isCoordinating=true but no platform is actually broadcasting. Resetting coordinator state.', {
+        activePlatforms: [...this.activePlatforms],
+        currentContent: this.currentContent,
+        startTime: this.startTime,
+      });
+      this.isCoordinating = false;
+      this.startTime = null;
+      this.activePlatforms.clear();
+      anyDrift = true;
+    }
+
+    this.lastReconcileAt = new Date();
+    const report = {
+      timestamp: this.lastReconcileAt,
+      isCoordinating: this.isCoordinating,
+      coordinatorDrift,
+      streamers: streamerReports,
+      anyDrift,
+    };
+
+    if (anyDrift) {
+      this.lastDriftReport = report;
+      this.emit('drift', report);
+    }
+    return report;
+  }
+
+  // Truth-checking version of isAnyStreaming — verifies ffmpeg subprocesses
+  // are actually alive, not just that flags say streaming. Used for drift
+  // detection and self-healing start.
+  isAnyActuallyStreaming() {
+    for (const streamer of this.streamers.values()) {
+      if (!streamer.isStreaming || !streamer.streamId) continue;
+      if (ffmpegConfig.isProcessAlive(streamer.streamId)) {
+        const ageMs = ffmpegConfig.getLastProgressAge(streamer.streamId);
+        if (ageMs !== null && ageMs < BaseStreamer.MAX_PROGRESS_STALE_MS) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Force a clean coordinator state. Stops any ffmpeg subprocesses we know
+  // about and clears every flag. Idempotent and safe to call when nothing is
+  // actually running. Used by startPlatforms when drift is detected.
+  async forceCleanup() {
+    logger.warn('Force-cleaning streaming state');
+    // Stop every streamer that thinks it's streaming. If the stop() itself
+    // throws because the underlying ffmpeg process is already dead, that's
+    // fine — we still want the flags reset.
+    for (const streamer of this.streamers.values()) {
+      if (streamer.isStreaming) {
+        try {
+          await streamer.stop();
+        } catch (err) {
+          logger.warn(`Force-stop on ${streamer.platform} threw (likely already dead): ${err.message}`);
+        }
+      }
+      // Belt-and-suspenders flag reset in case stop() didn't get there.
+      streamer.isStreaming = false;
+      streamer.isContinuous = false;
+      streamer.streamId = null;
+      streamer.currentContent = null;
+      streamer.startTime = null;
+    }
+    this.isCoordinating = false;
+    this.startTime = null;
+    this.currentContent = null;
+    this.activePlatforms.clear();
+    this.contentCompletedPlatforms.clear();
   }
 
   initializeStreamers() {
@@ -65,15 +191,76 @@ class MultiStreamCoordinator extends EventEmitter {
     return this.startPlatforms(this.config.platforms, contentPath, options);
   }
 
-  // Start specific platforms only
-  // contentPath can be a single path string or an array of paths for deep buffering
+  // Start specific platforms only.
+  //
+  // Three cases:
+  //
+  // 1. Nothing currently coordinating → fresh start (the original path).
+  // 2. Coordinating but no platform actually broadcasting (drift) → force
+  //    cleanup and fall through to a fresh start.
+  // 3. Coordinating AND at least one platform actually broadcasting →
+  //    intersect the requested set with the actually-broadcasting set:
+  //      - if every requested platform is already running, throw
+  //        ALREADY_RUNNING (true no-op).
+  //      - otherwise, start ONLY the platforms that aren't running yet,
+  //        leaving the in-progress streamers untouched. This is the
+  //        "user clicked Start All while Twitch was already live" case.
+  //
+  // contentPath can be a single path string or an array of paths for deep
+  // buffering.
   async startPlatforms(platforms, contentPath, options = {}) {
+    let additive = false;
+    let preExistingActive = new Set();
+
     if (this.isCoordinating) {
-      throw new Error('Multi-streaming is already active');
+      if (this.isAnyActuallyStreaming()) {
+        // Partition the request against ffmpeg ground truth.
+        preExistingActive = new Set(
+          platforms.filter(p => {
+            const s = this.streamers.get(p);
+            return s && s.isStreaming && s.streamId && ffmpegConfig.isProcessAlive(s.streamId);
+          })
+        );
+        const needToStart = platforms.filter(p => !preExistingActive.has(p));
+
+        if (needToStart.length === 0) {
+          const err = new Error('Multi-streaming is already active');
+          err.code = 'ALREADY_RUNNING';
+          err.currentState = this.getStatus();
+          throw err;
+        }
+
+        // Additive path: at least one requested platform isn't broadcasting
+        // yet. Start ONLY the missing ones; don't touch the live streamers.
+        logger.info(`Adding platforms to active coordination`, {
+          currentlyActive: [...this.activePlatforms],
+          requested: platforms,
+          alreadyRunning: [...preExistingActive],
+          willStart: needToStart,
+        });
+        platforms = needToStart;
+        additive = true;
+      } else {
+        // Drift recovery: flag says coordinating, ffmpeg truth says no.
+        // This was the 4-month silent outage signature.
+        logger.error('startPlatforms called with isCoordinating=true but ffmpeg ground truth shows nothing is broadcasting. Forcing cleanup and proceeding with fresh start.', {
+          requestedPlatforms: platforms,
+          activePlatforms: [...this.activePlatforms],
+        });
+        await this.forceCleanup();
+        this.emit('drift', {
+          timestamp: new Date(),
+          source: 'startPlatforms',
+          recovered: true,
+          message: 'Stale isCoordinating flag cleared by start request',
+        });
+      }
     }
 
-    const multiPlatform = platforms.length > 1;
-    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1, multiPlatform });
+    const multiPlatform = additive
+      ? (preExistingActive.size + platforms.length) > 1
+      : platforms.length > 1;
+    logger.info('Starting streaming coordination', { platforms, videoCount: Array.isArray(contentPath) ? contentPath.length : 1, multiPlatform, additive });
 
     try {
       // Store the first video as current content for display/tracking
@@ -121,7 +308,33 @@ class MultiStreamCoordinator extends EventEmitter {
         throw new Error(`All platforms failed to start: ${failed.map(f => `${f.platform}: ${f.error}`).join(', ')}`);
       }
 
-      // Update state
+      if (additive) {
+        // Add to existing coordination — don't reset startTime, don't clear
+        // contentCompletedPlatforms (mid-stream playback state for the
+        // already-running platforms), don't reset restart counters for
+        // platforms that didn't restart.
+        this.isCoordinating = true; // idempotent (already true)
+        successful.forEach(p => this.activePlatforms.add(p));
+        successful.forEach(p => this.restartAttempts.set(p, 0));
+
+        logger.info('Streaming added to active coordination', {
+          activePlatforms: [...this.activePlatforms],
+          newlyStarted: successful,
+          previouslyActive: [...preExistingActive],
+          failed: failed.length > 0 ? failed : undefined,
+          content: contentPath
+        });
+
+        return {
+          successful,
+          alreadyRunning: [...preExistingActive],
+          failed: failed.length > 0 ? failed : undefined,
+          content: contentPath,
+          status: 'added'
+        };
+      }
+
+      // Fresh-start path — clobbers prior state
       this.isCoordinating = true;
       this.activePlatforms = new Set(successful);
       this.startTime = new Date();
@@ -148,7 +361,12 @@ class MultiStreamCoordinator extends EventEmitter {
       };
 
     } catch (error) {
-      this.isCoordinating = false;
+      // If this was an additive start that failed, the pre-existing streamers
+      // are still running — don't clear isCoordinating. Otherwise (fresh
+      // start that failed), clear it like before.
+      if (!additive) {
+        this.isCoordinating = false;
+      }
       logger.error('Failed to start streaming:', error);
       throw error;
     }
@@ -292,24 +510,36 @@ class MultiStreamCoordinator extends EventEmitter {
 
   getStatus() {
     const platformStatuses = {};
-    
+
     for (const [platform, streamer] of this.streamers) {
+      const streamerStatus = streamer.getStatus();
+      const ffmpegAlive = streamer.streamId ? ffmpegConfig.isProcessAlive(streamer.streamId) : false;
+      const progressAge = streamer.streamId ? ffmpegConfig.getLastProgressAge(streamer.streamId) : null;
       platformStatuses[platform] = {
         isStreaming: streamer.isStreaming,
         isHealthy: streamer.isHealthy(),
         errorCount: streamer.getErrorCount(),
         restartAttempts: this.restartAttempts.get(platform) || 0,
-        status: streamer.getStatus()
+        ffmpegAlive,
+        progressAgeMs: progressAge,
+        // Drift = flag says streaming, but ffmpeg truth disagrees
+        drift: streamer.isStreaming && (!ffmpegAlive || (progressAge !== null && progressAge > BaseStreamer.MAX_PROGRESS_STALE_MS)),
+        status: streamerStatus,
       };
     }
 
+    const anyActuallyStreaming = this.isAnyActuallyStreaming();
     return {
       isCoordinating: this.isCoordinating,
+      isActuallyStreaming: anyActuallyStreaming,
+      coordinatorDrift: this.isCoordinating && !anyActuallyStreaming,
       startTime: this.startTime,
       duration: this.startTime ? Date.now() - this.startTime.getTime() : 0,
       currentContent: this.currentContent,
       platforms: platformStatuses,
-      config: this.config
+      lastReconcileAt: this.lastReconcileAt,
+      lastDriftReport: this.lastDriftReport,
+      config: this.config,
     };
   }
 
@@ -457,5 +687,12 @@ class MultiStreamCoordinator extends EventEmitter {
     }
   }
 }
+
+// Reconciliation interval. 30s catches drift within roughly one playback
+// progression window (most schedule tracks are 1–8 min) without flooding
+// logs. Tuned together with BaseStreamer.MAX_PROGRESS_STALE_MS (90s): a
+// stream has to be silent for at least one interval+threshold combo to be
+// declared drift, so transient hiccups don't cause false positives.
+MultiStreamCoordinator.HEALTH_CHECK_INTERVAL_MS = 30 * 1000;
 
 module.exports = new MultiStreamCoordinator();

@@ -24,6 +24,15 @@ class BaseStreamer extends EventEmitter {
         this.handleStreamEnded(event);
       }
     });
+
+    // Default 'error' listener. Without this, the emit('error', ...) calls
+    // inside start()/startContinuous()/stop() catch blocks would trigger
+    // Node's ERR_UNHANDLED_ERROR — because the error path is already
+    // communicated by the throw that follows the emit, the emit itself only
+    // exists as a hook for callers who want to subscribe. The throw remains
+    // the source of truth; this listener just satisfies EventEmitter
+    // semantics so the throw isn't masked by an unhandled-error error.
+    this.on('error', () => { /* intentional no-op; throw is authoritative */ });
   }
 
   async validateStreamKey() {
@@ -381,14 +390,73 @@ class BaseStreamer extends EventEmitter {
     this.startTime = null;
   }
 
-  // Health check method
+  // Truth-based health check.
+  //
+  // A stream is "healthy" only when:
+  //   1. We think we're streaming (isStreaming flag)
+  //   2. FFmpeg subprocess is alive (PID exists)
+  //   3. FFmpeg has reported progress (a frame) recently — within MAX_PROGRESS_STALE_MS
+  //   4. Recent error rate is below threshold
+  //
+  // The flag alone is not enough: this is the lesson from the 4-month silent
+  // outage where isStreaming stayed true while FFmpeg was dead. Truth lives
+  // in the ffmpeg subprocess, not in our state machine.
   isHealthy() {
+    if (!this.isStreaming || !this.streamId) return false;
+    if (!ffmpegConfig.isProcessAlive(this.streamId)) return false;
+    const progressAge = ffmpegConfig.getLastProgressAge(this.streamId);
+    if (progressAge === null || progressAge > BaseStreamer.MAX_PROGRESS_STALE_MS) return false;
     const recentErrors = this.errors.filter(
       err => Date.now() - err.timestamp.getTime() < 300000 // Last 5 minutes
     );
+    return recentErrors.length < 3;
+  }
 
-    return recentErrors.length < 3; // Healthy if less than 3 errors in 5 minutes
+  // Reconcile the flag with FFmpeg ground truth.
+  //
+  // Returns a result describing what was found and what (if anything) was
+  // corrected. Called periodically by the coordinator and on demand by the
+  // /heal endpoint. Does NOT attempt recovery — it just brings the flag in
+  // line with reality. Recovery is the coordinator's job.
+  reconcile() {
+    const flagSaysStreaming = this.isStreaming;
+    const hasStreamId = Boolean(this.streamId);
+    const ffmpegAlive = hasStreamId && ffmpegConfig.isProcessAlive(this.streamId);
+    const progressAge = hasStreamId ? ffmpegConfig.getLastProgressAge(this.streamId) : null;
+    const progressFresh = progressAge !== null && progressAge < BaseStreamer.MAX_PROGRESS_STALE_MS;
+
+    // Drift: flag says streaming, but ffmpeg is dead or hasn't pushed a frame
+    // in a long time. Both conditions get the flag cleared.
+    if (flagSaysStreaming && (!ffmpegAlive || !progressFresh)) {
+      logger.error(`${this.platform} state drift detected — flag was streaming but ffmpeg ${ffmpegAlive ? 'was hung (no frames)' : 'process was dead'}. Clearing flag.`, {
+        platform: this.platform,
+        streamId: this.streamId,
+        ffmpegAlive,
+        progressAgeMs: progressAge,
+        threshold: BaseStreamer.MAX_PROGRESS_STALE_MS,
+      });
+      this.errors.push({
+        timestamp: new Date(),
+        error: `Drift detected: ffmpeg ${ffmpegAlive ? 'hung' : 'died'} without notifying us`,
+      });
+      const previousStreamId = this.streamId;
+      this.isStreaming = false;
+      this.isContinuous = false;
+      this.streamId = null;
+      this.currentContent = null;
+      this.startTime = null;
+      return { platform: this.platform, drift: true, previousStreamId, ffmpegAlive, progressAgeMs: progressAge };
+    }
+
+    // No drift; flag and reality agree.
+    return { platform: this.platform, drift: false, isStreaming: flagSaysStreaming, ffmpegAlive, progressAgeMs: progressAge };
   }
 }
+
+// How stale the last ffmpeg progress frame can be before we declare drift.
+// FFmpeg pushes a progress event roughly per second under normal operation.
+// 90s gives enough buffer for transient hiccups (network blip, codec stall)
+// without papering over a genuinely dead stream.
+BaseStreamer.MAX_PROGRESS_STALE_MS = 90 * 1000;
 
 module.exports = BaseStreamer;

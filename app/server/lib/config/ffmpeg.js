@@ -245,18 +245,57 @@ class FFmpegConfig extends EventEmitter {
   }
 
   getStreamStatus(streamId) {
-    const process = this.processes.get(streamId);
-    if (!process) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec) {
       return { status: 'stopped' };
     }
 
     return {
-      status: process.status,
-      platform: process.platform,
-      startTime: process.startTime,
-      inputFile: process.inputFile,
-      duration: Date.now() - process.startTime.getTime()
+      status: procRec.status,
+      platform: procRec.platform,
+      startTime: procRec.startTime,
+      inputFile: procRec.inputFile,
+      duration: Date.now() - procRec.startTime.getTime(),
+      lastProgressUpdate: procRec.lastProgressUpdate,
+      pid: this.getProcessPid(streamId),
+      isAlive: this.isProcessAlive(streamId),
+      lastProgressAgeMs: this.getLastProgressAge(streamId),
     };
+  }
+
+  // Ground truth: is the FFmpeg subprocess actually alive?
+  // fluent-ffmpeg exposes the underlying child via `.ffmpegProc`. We probe with
+  // signal 0, which doesn't send a signal but reports whether the PID is alive
+  // (and we have permission to signal it). Returns true only when we have a
+  // PID AND it's reachable.
+  isProcessAlive(streamId) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec) return false;
+    const pid = procRec.command?.ffmpegProc?.pid;
+    if (!pid) return false;
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (err) {
+      // ESRCH = no such process. EPERM = process exists but we can't signal it
+      // (still alive from our perspective). Anything else = treat as dead.
+      return err.code === 'EPERM';
+    }
+  }
+
+  // How stale is the last progress frame from FFmpeg, in milliseconds?
+  // Returns null if the stream isn't tracked. Useful for detecting hung
+  // ffmpeg processes that are alive (PID exists) but not pushing frames —
+  // typically RTMP server stopped accepting input.
+  getLastProgressAge(streamId) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec || !procRec.lastProgressUpdate) return null;
+    return Date.now() - procRec.lastProgressUpdate.getTime();
+  }
+
+  getProcessPid(streamId) {
+    const procRec = this.processes.get(streamId);
+    return procRec?.command?.ffmpegProc?.pid ?? null;
   }
 
   getAllStreams() {

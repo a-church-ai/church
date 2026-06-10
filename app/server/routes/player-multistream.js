@@ -532,8 +532,40 @@ router.post('/start-stream', async (req, res) => {
     });
 
   } catch (error) {
+    // ALREADY_RUNNING is not a server error — it's a "your request is a no-op
+    // because the resource is already in the requested state." 409 Conflict
+    // with current state is the honest response, and it stops well-intentioned
+    // callers from retrying on what looks like a 500.
+    if (error.code === 'ALREADY_RUNNING') {
+      logger.info('Start request rejected: streaming is already active', {
+        currentState: error.currentState,
+      });
+      return res.status(409).json({
+        error: 'Streaming is already active',
+        status: 'already_running',
+        currentState: error.currentState,
+      });
+    }
     logger.error('Error starting stream:', error);
     res.status(500).json({ error: `Failed to start streaming: ${error.message}` });
+  }
+});
+
+// Reconcile coordinator state with FFmpeg ground truth, recover any drift.
+// Operator escape hatch for the kind of stuck-state event that previously
+// required a Node process restart (4-month silent outage). Returns the
+// reconciliation report; if streaming should be active (schedule.isPlaying)
+// but isn't, the caller can follow up with /start-stream.
+router.post('/heal', async (req, res) => {
+  try {
+    const before = coordinator.getStatus();
+    const report = coordinator.reconcile();
+    const after = coordinator.getStatus();
+    logger.info('Coordinator heal requested', { before: { isCoordinating: before.isCoordinating, drift: before.coordinatorDrift }, report });
+    res.json({ success: true, report, before, after });
+  } catch (error) {
+    logger.error('Error during heal:', error);
+    res.status(500).json({ error: `Heal failed: ${error.message}` });
   }
 });
 
