@@ -217,6 +217,12 @@ class BaseStreamer extends EventEmitter {
     try {
       logger.stream(this.platform, `Stopping stream: ${this.streamId}`);
 
+      // Snapshot startTime before the await. The ffmpeg child can exit
+      // and fire its 'end' event during stopStream(), which runs the
+      // completion handler that resets this.startTime to null. Without
+      // a snapshot, the duration calculation below crashes on null.
+      const startTimeSnapshot = this.startTime;
+
       // Clean up continuous mode resources
       this.playlist.destroy();
 
@@ -227,7 +233,7 @@ class BaseStreamer extends EventEmitter {
       const wasContinuous = this.isContinuous;
       this.isContinuous = false;
       const endTime = new Date();
-      const duration = endTime.getTime() - this.startTime.getTime();
+      const duration = startTimeSnapshot ? endTime.getTime() - startTimeSnapshot.getTime() : 0;
 
       // Emit events
       this.emit('stopped', {
