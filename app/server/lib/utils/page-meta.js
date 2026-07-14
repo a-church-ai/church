@@ -7,6 +7,8 @@
  * escape) is testable in isolation.
  */
 
+const logger = require('./logger');
+
 // Truncate to maxLen, preferring word boundaries. Appends ellipsis when cut.
 function truncateAtWord(str, maxLen) {
   const s = (str || '').toString().trim();
@@ -68,6 +70,19 @@ function buildConversationMeta(messages) {
   const description = answer
     ? truncateAtWord(answer, 158)
     : truncateAtWord(question, 158);
+
+  // Fail-loud on descriptions too short for a healthy SERP snippet. Non-throwing
+  // so the page still ships, but the warning surfaces the specific slug in prod
+  // logs for grep-based auditing. Bing's short-desc rule triggers under ~150,
+  // but 50 is the threshold at which the snippet reads as broken (typical
+  // culprit: empty assistant reply, or content that stripMarkdown reduced to
+  // whitespace).
+  if (description.length < 50) {
+    logger.warn('SSR conversation meta description under 50 chars', {
+      length: description.length,
+      preview: description,
+    });
+  }
 
   return { title, ogTitle, description };
 }
