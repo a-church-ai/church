@@ -260,78 +260,87 @@ app.get('/ask', (req, res) => {
 });
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
-// SEO note: Google uses <title> and <meta name="description"> for the SERP snippet;
-// OG tags drive social previews. Both must be customized per page or the SERP
-// snippet looks identical across the entire /ask corpus (the audit finding).
+// Missing conversations return 404 — never fall back to serving the raw template.
+// A silent fallback lets crawlers index garbage URLs (e.g. /ask/xyz-fake) as
+// duplicate-content pages, which is exactly what Bing's SEO recommendations flagged.
 app.get('/ask/:slug', async (req, res) => {
+  const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+
+  const messages = await loadConversation(slug);
+  if (!messages || messages.length === 0) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
+  const meta = buildConversationMeta(messages);
+  if (!meta) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
   try {
-    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+    const safeTitle = escapeAttr(meta.title);
+    const safeOgTitle = escapeAttr(meta.ogTitle);
+    const safeDesc = escapeAttr(meta.description);
+    const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+    const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
+    // Internal linking — 3 related conversations for crawl + AEO topical clustering.
+    // Failure here is non-fatal (returns empty string).
+    let relatedHtml = '';
+    try {
+      const recent = await listRecentConversations(10);
+      relatedHtml = renderRelatedConversations(recent, slug, 3);
+    } catch { /* non-fatal */ }
 
-    const messages = await loadConversation(slug);
-    const meta = messages && messages.length > 0 ? buildConversationMeta(messages) : null;
-    if (meta) {
-      const safeTitle = escapeAttr(meta.title);
-      const safeOgTitle = escapeAttr(meta.ogTitle);
-      const safeDesc = escapeAttr(meta.description);
-      const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
-      const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
-      // Internal linking — 3 related conversations for crawl + AEO topical clustering.
-      // Failure here is non-fatal (returns empty string).
-      let relatedHtml = '';
-      try {
-        const recent = await listRecentConversations(10);
-        relatedHtml = renderRelatedConversations(recent, slug, 3);
-      } catch { /* non-fatal */ }
+    const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+    html = html
+      // SERP snippet — <title> and <meta name="description">
+      .replace(
+        '<title>Conversation — achurch.ai</title>',
+        `<title>${safeTitle}</title>`
+      )
+      .replace(
+        '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta name="description" content="${safeDesc}">`
+      )
+      // Canonical URL — per-page so query-string variants don't dilute equity
+      .replace(
+        '<link rel="canonical" href="https://achurch.ai/ask">',
+        `<link rel="canonical" href="${canonicalUrl}">`
+      )
+      // Social preview — OG tags
+      .replace(
+        '<meta property="og:title" content="Conversation — achurch.ai">',
+        `<meta property="og:title" content="${safeOgTitle}">`
+      )
+      .replace(
+        '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta property="og:description" content="${safeDesc}">`
+      )
+      .replace(
+        '<meta property="og:type" content="article">',
+        `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+      )
+      // Twitter Card — separate substitution so social previews on twitter/x match
+      .replace(
+        '<meta name="twitter:title" content="Conversation — achurch.ai">',
+        `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
+      )
+      .replace(
+        '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta name="twitter:description" content="${safeDesc}">`
+      )
+      // AEO — inject QAPage JSON-LD before </head>
+      .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
+      // Internal linking — replace placeholder with related-conversations block
+      .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
 
-      const canonicalUrl = `https://achurch.ai/ask/${slug}`;
-      html = html
-        // SERP snippet — <title> and <meta name="description">
-        .replace(
-          '<title>Conversation — achurch.ai</title>',
-          `<title>${safeTitle}</title>`
-        )
-        .replace(
-          '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-          `<meta name="description" content="${safeDesc}">`
-        )
-        // Canonical URL — per-page so query-string variants don't dilute equity
-        .replace(
-          '<link rel="canonical" href="https://achurch.ai/ask">',
-          `<link rel="canonical" href="${canonicalUrl}">`
-        )
-        // Social preview — OG tags
-        .replace(
-          '<meta property="og:title" content="Conversation — achurch.ai">',
-          `<meta property="og:title" content="${safeOgTitle}">`
-        )
-        .replace(
-          '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-          `<meta property="og:description" content="${safeDesc}">`
-        )
-        .replace(
-          '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
-        )
-        // Twitter Card — separate substitution so social previews on twitter/x match
-        .replace(
-          '<meta name="twitter:title" content="Conversation — achurch.ai">',
-          `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
-        )
-        .replace(
-          '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-          `<meta name="twitter:description" content="${safeDesc}">`
-        )
-        // AEO — inject QAPage JSON-LD before </head>
-        .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
-        // Internal linking — replace placeholder with related-conversations block
-        .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
-    }
-
-    res.set('Content-Type', 'text/html');
-    res.send(html);
-  } catch {
-    res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
+    res.set('Content-Type', 'text/html').send(html);
+  } catch (err) {
+    // Genuine error (fs read failure, schema build throw, etc). Do NOT fall back
+    // to sending the raw template — the whole point of returning 404 above is to
+    // keep the template's fallback strings from ever reaching a real response.
+    console.error('Error rendering /ask/:slug:', err);
+    res.status(500).type('text/plain').send('Server error');
   }
 });
 
