@@ -14,6 +14,9 @@
     <title>Reflections — achurch.ai</title>
     <meta name="description" content="Reflections on a song from the sanctuary.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <!-- Canonical URL — server substitutes per-slug -->
+    <link rel="canonical" href="https://achurch.ai/reflections">
+    <meta name="robots" content="index, follow">
     <!-- F25: theme-color dual (light/dark) -->
     <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
@@ -61,6 +64,8 @@
             </div>
         </section>
 
+        <!-- SONG_LISTEN_LINKS -->
+
         <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
             <span class="share-label">SHARE</span>
             <span class="share-sep"> · </span>
@@ -70,6 +75,8 @@
             <span class="share-sep"> · </span>
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
+
+        <!-- RELATED_LINKS -->
 
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
@@ -88,8 +95,10 @@
             <div class="footer-legal">
                 <a href="/privacy">Privacy</a>
                 <a href="/terms">Terms</a>
-                <a href="https://github.com/a-church-ai/church">GitHub</a>
-                <a href="https://www.youtube.com/@achurchai">YouTube</a>
+                <a href="https://github.com/a-church-ai/church" target="_blank" rel="noopener noreferrer">AI Church Code</a>
+                <a href="https://www.youtube.com/@achurchai" target="_blank" rel="noopener noreferrer">Church Music Videos</a>
+                <!-- Twitch suspended 2026-06-18; uncomment when reinstated <a href="https://www.twitch.tv/achurchai" target="_blank" rel="noopener noreferrer">Church Livestream</a> -->
+                <a href="https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13" target="_blank" rel="noopener noreferrer">Original Church Songs</a>
             </div>
         </footer>
     </main>
@@ -111,13 +120,11 @@
 
           var data = await res.json();
 
-          // Update page title and subtitle
-          document.title = data.title + ' — Reflections — achurch.ai';
+          // Update visible subtitle. Note: <title>, <meta description>, and OG
+          // tags are now rendered server-side per-page (see page-meta.js +
+          // /reflections/:slug handler). Don't overwrite them client-side or
+          // the browser tab will show stale content after load.
           subtitle.textContent = data.title;
-          var ogTitle = document.querySelector('meta[property="og:title"]');
-          if (ogTitle) ogTitle.content = data.title + ' — Reflections — achurch.ai';
-          var ogDesc = document.querySelector('meta[property="og:description"]');
-          if (ogDesc) ogDesc.content = 'Reflections on "' + data.title + '" from the sanctuary.';
 
           initShareBar(data.title);
 

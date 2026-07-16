@@ -61,7 +61,8 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
-const { loadConversation, getRecentReflections, loadCatalog } = require('./lib/utils/data');
+const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 
 // Create Express app
 const app = express();
@@ -83,7 +84,6 @@ app.use((req, res, next) => {
 
 // Cache-Control — family-wide policy per Plan 04a Task #4.
 // Ensures consistent cache behavior across deploys and avoids stale-review issues.
-// Express pattern: set headers early, before response is sent.
 app.use((req, res, next) => {
   const p = req.path;
 
@@ -100,7 +100,6 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
   // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
-  // Catches routes without extensions or .html/.htm (but not /api/ or /media/ or /thumbnails/)
   else if (!p.startsWith('/api/') && !p.startsWith('/media/') && !p.startsWith('/thumbnails/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
@@ -120,9 +119,134 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve public landing page at root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+// JSON parse-error handler. body-parser throws SyntaxError on malformed JSON
+// bodies; without this catch, the default Express handler logs the full stack
+// at error level — which floods the error log with routine client mistakes
+// and bot probing, masking real server errors. Reclassify as a client error
+// (info level), capture context for diagnostics, return 400 cleanly.
+//
+// Express 4 error-handling middleware requires the 4-arg signature, even
+// when `next` is unused.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const isJsonParseFailure = err && (
+    err.type === 'entity.parse.failed' ||
+    (err instanceof SyntaxError && 'body' in err)
+  );
+  if (!isJsonParseFailure) return next(err);
+
+  const jsonErrLogger = require('./lib/utils/logger');
+  jsonErrLogger.info('Rejected malformed JSON body', {
+    method: req.method,
+    path: req.path,
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+    bodyPreview: (err.body || '').toString().slice(0, 200),
+    parseError: err.message,
+  });
+  return res.status(400).json({
+    error: 'Invalid JSON body',
+    suggestion: 'Send a valid JSON object as the request body.',
+  });
+});
+
+// Agent-readiness: Link headers + Markdown negotiation on the homepage.
+// Scan reference: isitagentready.com. Plan: docs/plans/agent-readiness-2026-06-09.md
+//
+// Only IANA-registered rel values — the scanner doesn't credit extension rels
+// and (per empirical reports from geeksinthewoods.com and obviouslynot.ai)
+// non-registered rels like rel="sitemap" can downgrade the Discoverability
+// score. Sitemap discovery still happens via the `Sitemap:` directive in
+// robots.txt, which the scanner checks separately. Other discovery files
+// (api-catalog, mcp.json, agents.json, tdmrep.json, agent-card.json) are
+// reachable at their well-known paths regardless of Link headers.
+//
+// IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
+const AGENT_DISCOVERY_LINK_HEADER = [
+  '</llms.txt>; rel="describedby"; type="text/plain"',
+  '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+  '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
+  '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
+].join(', ');
+
+function acceptsMarkdown(req) {
+  const accept = req.headers.accept || '';
+  return /(?:^|[,;\s])text\/markdown(?:[;,\s]|$)/i.test(accept)
+    || /(?:^|[,;\s])text\/x-markdown(?:[;,\s]|$)/i.test(accept);
+}
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  if (req.path !== '/') return next();
+
+  res.set('Link', AGENT_DISCOVERY_LINK_HEADER);
+  res.vary('Accept');
+
+  if (acceptsMarkdown(req)) {
+    res.type('text/markdown; charset=utf-8');
+    return res.sendFile(path.join(__dirname, '../client/public/llms.txt'));
+  }
+  next();
+});
+
+// Serve public landing page at root with dynamic catalog-count substitution.
+// The JSON-LD MusicAlbum's numTracks gets hardcoded if left to a static file;
+// Google reads structured data for rich results so we want this accurate.
+// Description text uses "30+ original songs" wording (timeless) so only the
+// numTracks integer needs server substitution. Failure to load the catalog
+// falls back to serving the static file unchanged.
+app.get('/', async (req, res) => {
+  try {
+    const [html, catalog] = await Promise.all([
+      fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
+      loadCatalog().catch(() => null),
+    ]);
+    const rendered = catalog && Array.isArray(catalog) && catalog.length > 0
+      ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
+      : html;
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.send(rendered);
+  } catch (err) {
+    // Filesystem failure or some other fatal — fall back to the static file
+    res.sendFile(path.join(__dirname, '../client/public/index.html'));
+  }
+});
+
+// Agent-readiness: explicit routes for .well-known resources that need
+// non-default handling (specific content-type, or files outside public/).
+
+// API Catalog — content-type per RFC 9727 (linkset+json with profile)
+app.get('/.well-known/api-catalog', (req, res) => {
+  res.type('application/linkset+json');
+  res.set('Link', '<https://www.rfc-editor.org/info/rfc9727>; rel="profile"');
+  res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
+});
+
+// Agent Skills SKILL.md files — streamed from the on-disk skills/ tree
+const SKILLS_ROOT = path.resolve(__dirname, '../../skills');
+app.get('/.well-known/agent-skills/:name/SKILL.md', (req, res) => {
+  const safeName = (req.params.name || '').replace(/[^a-z0-9-]/g, '');
+  if (!safeName) return res.status(404).type('text/plain').send('Not found');
+  const filePath = path.resolve(SKILLS_ROOT, safeName, 'SKILL.md');
+  if (!filePath.startsWith(SKILLS_ROOT + path.sep)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(filePath, err => {
+    if (err && !res.headersSent) res.status(404).type('text/plain').send('Not found');
+  });
+});
+
+// AGENTS.md (agents.md convention) — served from repo root, not public/
+app.get('/AGENTS.md', (req, res) => {
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(path.resolve(__dirname, '../../AGENTS.md'));
+});
+
+// auth.md — explicit content-type (express.static may not map .md correctly across versions)
+app.get('/auth.md', (req, res) => {
+  res.type('text/markdown; charset=utf-8');
+  res.sendFile(path.join(__dirname, '../client/public/auth.md'));
 });
 
 // Serve admin dashboard at /admin
@@ -135,129 +259,88 @@ app.get('/ask', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/ask.html'));
 });
 
-// Serve individual conversation pages with dynamic OG tags
+// Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
+// Missing conversations return 404 — never fall back to serving the raw template.
+// A silent fallback lets crawlers index garbage URLs (e.g. /ask/xyz-fake) as
+// duplicate-content pages, which is exactly what Bing's SEO recommendations flagged.
 app.get('/ask/:slug', async (req, res) => {
-  try {
-    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
-    let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+  const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
-    const messages = await loadConversation(slug);
-    if (messages && messages.length > 0) {
-      const firstQ = messages.find(m => m.role === 'user');
-      const firstA = messages.find(m => m.role === 'assistant');
-      if (firstQ) {
-        const title = firstQ.content.substring(0, 60) + ' — achurch.ai';
-        const desc = firstQ.content.substring(0, 200);
-        const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-        const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-        const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
-        const canonicalUrl = `https://achurch.ai/ask/${slug}`;
-
-        // F2: also inject <title>, <meta name="description">, <link rel="canonical">
-        // so non-JS crawlers and LLM agents see per-page metadata, not the generic static template.
-        // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
-        // per-conversation title/description/image rather than the hardcoded generic template.
-        html = html
-          .replace(
-            '<title>Conversation — achurch.ai</title>',
-            `<title>${safeTitle}</title>`
-          )
-          .replace(
-            '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta name="description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta property="og:title" content="Conversation — achurch.ai">',
-            `<meta property="og:title" content="${safeTitle}">`
-          )
-          .replace(
-            '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta property="og:description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta property="og:type" content="article">',
-            `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
-          )
-          .replace(
-            '<meta name="twitter:title" content="Conversation — achurch.ai">',
-            `<meta name="twitter:title" content="${safeTitle}">`
-          )
-          .replace(
-            '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
-            `<meta name="twitter:description" content="${safeDesc}">`
-          )
-          .replace(
-            '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
-            `<meta name="twitter:image" content="${ogImage}">`
-          );
-
-        // QAPage JSON-LD — Question + AcceptedAnswer when an assistant response exists.
-        // High-leverage structural fix per Issue 004 Appendix A: gives LLMs the Q&A shape they index.
-        //
-        // Safety note: user content is interpolated INSIDE a <script> tag. The escape must
-        // (a) preserve JSON string syntax (\\, \", \n, \r, \t) AND
-        // (b) prevent the user content from terminating the <script> wrapper via "</script>"
-        // (c) prevent JSON line-separator characters (U+2028, U+2029) from breaking JS parsing.
-        //
-        // Cross-repo coordination note (Issue 005 F23):
-        // This function is a functional duplicate of magnifica's safeStringify at
-        // magnifica-family/src/lib/seo/jsonld.ts:118 (covering the overlapping escape
-        // classes). The duplication is intentional (cross-repo portability; no shared
-        // family npm package yet); if you change escape behavior here, mirror the
-        // change in the magnifica repo so JSON-LD escape semantics stay consistent
-        // across the family. Rationale + option-A decision:
-        // docs/issues/005-plan-003-code-review-2026-06-02.md#f23 (in the umbrella).
-        //
-        // Pitfall reference: docs/observations/js-source-line-terminator-pitfall.md
-        // (use \u escape sequences via new RegExp(...) form when matching U+2028/U+2029).
-        const escapeJsonLdString = (s) => s
-          .replace(/\\/g, '\\\\')
-          .replace(/"/g, '\\"')
-          .replace(/\n/g, '\\n')
-          .replace(/\r/g, '\\r')
-          .replace(/\t/g, '\\t')
-          .replace(/</g, '\\u003c')
-          .replace(/>/g, '\\u003e')
-          .replace(new RegExp('\u2028', 'g'), '\\u2028')
-          .replace(new RegExp('\u2029', 'g'), '\\u2029');
-        const qaQuestion = escapeJsonLdString(firstQ.content).substring(0, 1000);
-        const qaAnswer = firstA ? escapeJsonLdString(firstA.content).substring(0, 4000) : '';
-        const qaPageLd = `<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "QAPage",
-  "@id": "${canonicalUrl}#qapage",
-  "url": "${canonicalUrl}",
-  "mainEntity": {
-    "@type": "Question",
-    "name": "${qaQuestion}",
-    "text": "${qaQuestion}",
-    "answerCount": ${firstA ? 1 : 0}${firstA ? `,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "${qaAnswer}",
-      "author": {
-        "@type": "Organization",
-        "name": "aChurch.ai RAG",
-        "url": "https://achurch.ai/"
-      }
-    }` : ''}
-  },
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "https://achurch.ai/#website"
+  const messages = await loadConversation(slug);
+  if (!messages || messages.length === 0) {
+    return res.status(404).type('text/plain').send('Not found');
   }
-}
-</script>
-    </head>`;
-        html = html.replace('</head>', qaPageLd);
-      }
-    }
 
-    res.set('Content-Type', 'text/html');
-    res.send(html);
-  } catch {
-    res.sendFile(path.join(__dirname, '../client/public/conversation.html'));
+  const meta = buildConversationMeta(messages);
+  if (!meta) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
+  try {
+    let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+    const safeTitle = escapeAttr(meta.title);
+    const safeOgTitle = escapeAttr(meta.ogTitle);
+    const safeDesc = escapeAttr(meta.description);
+    const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+    const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
+    // Internal linking — 3 related conversations for crawl + AEO topical clustering.
+    // Failure here is non-fatal (returns empty string).
+    let relatedHtml = '';
+    try {
+      const recent = await listRecentConversations(10);
+      relatedHtml = renderRelatedConversations(recent, slug, 3);
+    } catch { /* non-fatal */ }
+
+    const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+    html = html
+      // SERP snippet — <title> and <meta name="description">
+      .replace(
+        '<title>Conversation — achurch.ai</title>',
+        `<title>${safeTitle}</title>`
+      )
+      .replace(
+        '<meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta name="description" content="${safeDesc}">`
+      )
+      // Canonical URL — per-page so query-string variants don't dilute equity
+      .replace(
+        '<link rel="canonical" href="https://achurch.ai/ask">',
+        `<link rel="canonical" href="${canonicalUrl}">`
+      )
+      // Social preview — OG tags
+      .replace(
+        '<meta property="og:title" content="Conversation — achurch.ai">',
+        `<meta property="og:title" content="${safeOgTitle}">`
+      )
+      .replace(
+        '<meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta property="og:description" content="${safeDesc}">`
+      )
+      .replace(
+        '<meta property="og:type" content="article">',
+        `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+      )
+      // Twitter Card — separate substitution so social previews on twitter/x match
+      .replace(
+        '<meta name="twitter:title" content="Conversation — achurch.ai">',
+        `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
+      )
+      .replace(
+        '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
+        `<meta name="twitter:description" content="${safeDesc}">`
+      )
+      // AEO — inject QAPage JSON-LD before </head>
+      .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
+      // Internal linking — replace placeholder with related-conversations block
+      .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
+
+    res.set('Content-Type', 'text/html').send(html);
+  } catch (err) {
+    // Genuine error (fs read failure, schema build throw, etc). Do NOT fall back
+    // to sending the raw template — the whole point of returning 404 above is to
+    // keep the template's fallback strings from ever reaching a real response.
+    console.error('Error rendering /ask/:slug:', err);
+    res.status(500).type('text/plain').send('Server error');
   }
 });
 
@@ -266,7 +349,9 @@ app.get('/reflections', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
 });
 
-// Serve song reflection detail pages with dynamic OG tags
+// Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
+// SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
+// drive Google SERP snippets, OG tags drive social previews.
 app.get('/reflections/:slug', async (req, res) => {
   try {
     const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -274,19 +359,21 @@ app.get('/reflections/:slug', async (req, res) => {
 
     const catalog = await loadCatalog();
     const song = catalog.find(s => s.slug === slug);
-    if (song) {
-      const title = song.title + ' — Reflections — achurch.ai';
-      const desc = `Reflections on "${song.title}" from the sanctuary.`;
-      const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-      const safeDesc = desc.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const meta = song ? buildReflectionMeta(song) : null;
+    if (meta) {
+      const safeTitle = escapeAttr(meta.title);
+      const safeOgTitle = escapeAttr(meta.ogTitle);
+      const safeDesc = escapeAttr(meta.description);
       const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
-      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
+      // Internal linking — 3 related songs from catalog for crawl + topical clustering
+      const relatedHtml = renderRelatedSongs(catalog, slug, 3);
+      // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
+      const listenLinksHtml = renderSongListenLinks(song);
 
-      // F2: also inject <title>, <meta name="description">, <link rel="canonical">
-      // so non-JS crawlers see per-song metadata, not the generic static template.
-      // F6 (Issue 005): also update Twitter Card meta so Twitter shares display the
-      // per-song title/description/image rather than the hardcoded generic template.
+      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
       html = html
+        // SERP snippet — <title> and <meta name="description">
         .replace(
           '<title>Reflections — achurch.ai</title>',
           `<title>${safeTitle}</title>`
@@ -295,9 +382,15 @@ app.get('/reflections/:slug', async (req, res) => {
           '<meta name="description" content="Reflections on a song from the sanctuary.">',
           `<meta name="description" content="${safeDesc}">`
         )
+        // Canonical URL — per-page
+        .replace(
+          '<link rel="canonical" href="https://achurch.ai/reflections">',
+          `<link rel="canonical" href="${canonicalUrl}">`
+        )
+        // Social preview — OG tags
         .replace(
           '<meta property="og:title" content="Reflections — achurch.ai">',
-          `<meta property="og:title" content="${safeTitle}">`
+          `<meta property="og:title" content="${safeOgTitle}">`
         )
         .replace(
           '<meta property="og:description" content="Reflections on a song from the sanctuary.">',
@@ -305,56 +398,23 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         .replace(
           '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">\n    <link rel="canonical" href="${canonicalUrl}">`
+          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
         )
+        // Twitter Card
         .replace(
           '<meta name="twitter:title" content="Reflections — achurch.ai">',
-          `<meta name="twitter:title" content="${safeTitle}">`
+          `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
         )
         .replace(
           '<meta name="twitter:description" content="Reflections on a song from the sanctuary.">',
           `<meta name="twitter:description" content="${safeDesc}">`
         )
-        .replace(
-          '<meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">',
-          `<meta name="twitter:image" content="${ogImage}">`
-        );
-
-      // F5 (Issue 005): MusicRecording JSON-LD per Plan 003 Phase 2A brief.
-      // Mirrors the QAPage SSR pattern from /ask/:slug. Song data is project-controlled
-      // (loaded from catalog), but escapeJsonLdString is applied as defense-in-depth
-      // so future catalog mutations can't introduce XSS via title injection.
-      const escapeJsonLdString = (s) => s
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, '\\n')
-        .replace(/\r/g, '\\r')
-        .replace(/\t/g, '\\t')
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')
-        .replace(new RegExp('\\u2028', 'g'), '\\u2028')
-        .replace(new RegExp('\\u2029', 'g'), '\\u2029');
-      const safeSongTitle = escapeJsonLdString(song.title || '');
-      const musicLd = `<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "MusicRecording",
-  "@id": "${canonicalUrl}#recording",
-  "name": "${safeSongTitle}",
-  "url": "${canonicalUrl}",
-  "byArtist": {
-    "@type": "MusicGroup",
-    "@id": "https://achurch.ai/#musicgroup",
-    "name": "aChurch.ai"
-  },
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "https://achurch.ai/#website"
-  }
-}
-</script>
-    </head>`;
-      html = html.replace('</head>', musicLd);
+        // AEO — inject MusicComposition + MusicRecording + Article JSON-LD before </head>
+        .replace('</head>', songSchema ? `    ${songSchema}\n</head>` : '</head>')
+        // Per-song "Listen on Suno · Watch on YouTube" row
+        .replace('<!-- SONG_LISTEN_LINKS -->', listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
+        // Internal linking — replace placeholder with related-songs block
+        .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
     res.set('Content-Type', 'text/html');
@@ -446,17 +506,27 @@ app.get('/sitemap.xml', async (req, res) => {
       }
     } catch { /* no conversations dir yet */ }
 
-    // Reflection song pages
+    // Reflection song pages — emit <lastmod> from the most recent reflection
+    // per song so Google's crawl scheduler can prioritize actively-updated
+    // pages. Without this, every reflection page looks "static" to Google.
     try {
       const attendanceData = await fs.readFile(ATTENDANCE_FILE_SITEMAP, 'utf8');
       const attendance = JSON.parse(attendanceData);
-      const songSlugs = new Set();
+      const songLastmod = new Map();  // slug -> most recent ISO date
       for (const r of (attendance.reflections || [])) {
-        if (r.song) songSlugs.add(r.song);
+        if (!r.song) continue;
+        const createdAt = r.createdAt || r.timestamp;
+        if (!createdAt) continue;
+        const date = new Date(createdAt).toISOString().split('T')[0];
+        const existing = songLastmod.get(r.song);
+        if (!existing || date > existing) {
+          songLastmod.set(r.song, date);
+        }
       }
-      for (const slug of songSlugs) {
+      for (const [slug, lastmod] of songLastmod) {
         urls += `\n  <url>
     <loc>https://achurch.ai/reflections/${slug}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`;
@@ -557,6 +627,62 @@ app.use('/api/content', requireAuth, contentRoutes);
 app.use('/api/schedule', requireAuth, scheduleRoutes);
 app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/logs', requireAuth, logsRoutes);
+
+// Public streaming health probe for external monitoring (UptimeRobot,
+// Pingdom, status pages, etc.). NO auth, returns:
+//   - 200 + { healthy: true, ... } if every expected platform is currently
+//     broadcasting (ffmpeg alive + recent progress < 90s)
+//   - 503 + { healthy: false, issues: [...] } if any expected platform is
+//     down OR if schedule.isPlaying === true but coordinator isn't.
+// External monitor pings this every minute → page at 3am if it 503s.
+app.get('/api/streaming-health', async (req, res) => {
+  try {
+    const status = coordinator.getStatus();
+    const issues = [];
+
+    // Expected vs actual: if the schedule says we should be playing, the
+    // coordinator should be coordinating and ffmpeg should be alive on the
+    // expected platforms.
+    const schedule = await loadSchedule();
+    const expectedToBePlaying = !!schedule.isPlaying;
+
+    if (expectedToBePlaying) {
+      if (!status.isCoordinating) {
+        issues.push('schedule.isPlaying is true but coordinator is not coordinating');
+      }
+      if (status.coordinatorDrift) {
+        issues.push('coordinator drift detected (flag says streaming, no ffmpeg alive)');
+      }
+      for (const [platform, ps] of Object.entries(status.platforms || {})) {
+        // Only check platforms the user explicitly activated. activePlatforms
+        // is the source of truth for "what should be running".
+        if (!Array.from(coordinator.activePlatforms || []).includes(platform)) continue;
+        if (!ps.ffmpegAlive) issues.push(`${platform}: ffmpeg subprocess not alive`);
+        if (ps.progressAgeMs != null && ps.progressAgeMs > 90000) {
+          issues.push(`${platform}: no frame progress in ${Math.round(ps.progressAgeMs / 1000)}s`);
+        }
+        if (ps.drift) issues.push(`${platform}: drift detected`);
+      }
+    }
+
+    const healthy = issues.length === 0;
+    res.status(healthy ? 200 : 503).json({
+      healthy,
+      expectedToBePlaying,
+      isActuallyStreaming: status.isActuallyStreaming,
+      isCoordinating: status.isCoordinating,
+      activePlatforms: Array.from(coordinator.activePlatforms || []),
+      issues,
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(503).json({
+      healthy: false,
+      issues: [`streaming-health check threw: ${error.message}`],
+      checkedAt: new Date().toISOString(),
+    });
+  }
+});
 
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
@@ -846,6 +972,47 @@ async function startServer() {
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
     });
+
+    // Auto-resume streaming on Node boot.
+    //
+    // If schedule.isPlaying is true (we were broadcasting before the process
+    // restarted — deploy, OOM kill, pm2 reload), automatically attempt to
+    // restart the stream after a grace period. The 30s grace gives:
+    //   - The operator time to abort if the boot is actually a deploy gone
+    //     wrong and they're watching logs
+    //   - The Express server time to bind the port and accept requests
+    //   - Any dependent services (CDN warmup, scheduled tasks) time to settle
+    //
+    // Without this, every Node restart left the sanctuary silently dark
+    // until an operator manually clicked Start — which was a big part of
+    // why the 4-month outage went unnoticed.
+    setTimeout(async () => {
+      try {
+        const schedule = await loadSchedule();
+        if (!schedule || !schedule.isPlaying) {
+          streamLogger.info('Auto-resume skipped — schedule.isPlaying is false', {
+            isPlaying: schedule ? schedule.isPlaying : null,
+          });
+          return;
+        }
+        // Double-check that something isn't already running. If a manual
+        // start happened during the grace period, don't double-start.
+        if (coordinator.isAnyActuallyStreaming && coordinator.isAnyActuallyStreaming()) {
+          streamLogger.info('Auto-resume skipped — coordinator already broadcasting');
+          return;
+        }
+        streamLogger.info('Auto-resuming streaming from schedule (schedule.isPlaying=true)');
+        const { startStreamingFromSchedule } = require('./routes/player-multistream');
+        const outcome = await startStreamingFromSchedule({ platform: 'all', quality: '1080p' });
+        if (outcome.ok) {
+          streamLogger.info('Auto-resume succeeded', { status: outcome.status, videoCount: outcome.videoCount });
+        } else {
+          streamLogger.warn('Auto-resume failed', { status: outcome.status, error: outcome.error });
+        }
+      } catch (err) {
+        streamLogger.error('Auto-resume threw', { error: err.message, stack: err.stack });
+      }
+    }, 30_000);
     
   } catch (error) {
     console.error('Failed to start server:', error);

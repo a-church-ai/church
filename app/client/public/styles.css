@@ -138,6 +138,61 @@ h2 {
     color: #666;
 }
 
+/* Suno playlist link — small, subordinate to the live-stream CTAs above */
+.suno-playlist-link {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #999;
+    letter-spacing: 0.01em;
+}
+
+.suno-playlist-link a {
+    color: #999;
+    text-decoration: none;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.suno-playlist-link a:hover {
+    color: #666;
+    border-bottom-color: #999;
+}
+
+.suno-playlist-link .suno-icon {
+    font-size: 1rem;
+    margin-right: 0.2em;
+    opacity: 0.85;
+}
+
+/* Per-song "Listen on" row on /reflections/[slug] pages */
+.song-listen-row {
+    margin: 1.25rem 0 0;
+    font-size: 0.875rem;
+    color: #999;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+
+.song-listen-row a {
+    color: #888;
+    text-decoration: none;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 1px;
+    margin: 0 0.4em;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.song-listen-row a:hover {
+    color: #555;
+    border-bottom-color: #999;
+}
+
+.song-listen-row .listen-sep {
+    color: #ccc;
+    margin: 0 0.2em;
+}
+
 /* Sanctuary — live now playing + congregation */
 .sanctuary {
     text-align: center;

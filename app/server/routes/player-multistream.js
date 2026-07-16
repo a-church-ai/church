@@ -487,53 +487,93 @@ router.get('/status', async (req, res) => {
   }
 });
 
+// Core start-streaming flow extracted from the route handler so it can be
+// invoked both from /api/player/start-stream AND from the Node-boot auto-
+// resume path (see attemptAutoResume in server/index.js).
+//
+// Returns { ok, status, result?, nowPlaying?, error? } so callers can branch
+// on outcome without needing to catch.
+async function startStreamingFromSchedule({ platform = 'all', quality = '1080p' } = {}) {
+  const schedule = await loadSchedule();
+
+  if (schedule.items.length === 0) {
+    return { ok: false, status: 'empty_schedule', error: 'Schedule is empty - add content first' };
+  }
+
+  const currentItem = schedule.items[schedule.currentIndex];
+  const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
+
+  if (videoCount === 0) {
+    return { ok: false, status: 'no_playable_videos', error: 'No playable videos found in schedule' };
+  }
+
+  const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
+  const result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
+
+  // Persist isPlaying so boot auto-resume can pick it back up next time
+  schedule.isPlaying = true;
+  await saveSchedule(schedule);
+  playerStatus.isPlaying = true;
+  await updatePlayerStatus();
+
+  await startProgressTracker();
+  const enrichedItem = await enrichScheduleItem(currentItem);
+  logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
+
+  return { ok: true, status: 'started', result, nowPlaying: enrichedItem, videoCount };
+}
+
 // Start streaming (replaces OBS connect)
 router.post('/start-stream', async (req, res) => {
   try {
     const { platform = 'all', quality = '1080p' } = req.body;
-    const schedule = await loadSchedule();
+    const outcome = await startStreamingFromSchedule({ platform, quality });
 
-    // Get current video
-    if (schedule.items.length === 0) {
-      return res.status(400).json({ error: 'Schedule is empty - add content first' });
+    if (!outcome.ok) {
+      return res.status(400).json({ error: outcome.error });
     }
-
-    const currentItem = schedule.items[schedule.currentIndex];
-
-    // Build full schedule playlist — FFmpeg loops it forever via -stream_loop -1
-    const { videoPaths, videoCount } = await buildPlaylistBuffer(schedule.currentIndex);
-
-    if (videoCount === 0) {
-      return res.status(400).json({ error: 'No playable videos found in schedule' });
-    }
-
-    let result;
-    const platforms = platform === 'all' ? ['youtube', 'twitch'] : [platform];
-
-    result = await coordinator.startPlatforms(platforms, videoPaths, { quality });
-
-    // Mark as playing
-    schedule.isPlaying = true;
-    await saveSchedule(schedule);
-
-    playerStatus.isPlaying = true;
-    await updatePlayerStatus();
-
-    // Start tracking schedule progress (advances currentIndex based on video durations)
-    await startProgressTracker();
-
-    const enrichedItem = await enrichScheduleItem(currentItem);
-    logger.info(`Streaming started on ${platform} with ${videoCount} videos (loops forever)`, result);
 
     res.json({
       success: true,
-      streaming: result,
-      nowPlaying: enrichedItem
+      streaming: outcome.result,
+      nowPlaying: outcome.nowPlaying
     });
 
   } catch (error) {
+    // ALREADY_RUNNING is not a server error — it's a "your request is a no-op
+    // because the resource is already in the requested state." 409 Conflict
+    // with current state is the honest response, and it stops well-intentioned
+    // callers from retrying on what looks like a 500.
+    if (error.code === 'ALREADY_RUNNING') {
+      logger.info('Start request rejected: streaming is already active', {
+        currentState: error.currentState,
+      });
+      return res.status(409).json({
+        error: 'Streaming is already active',
+        status: 'already_running',
+        currentState: error.currentState,
+      });
+    }
     logger.error('Error starting stream:', error);
     res.status(500).json({ error: `Failed to start streaming: ${error.message}` });
+  }
+});
+
+// Reconcile coordinator state with FFmpeg ground truth, recover any drift.
+// Operator escape hatch for the kind of stuck-state event that previously
+// required a Node process restart (4-month silent outage). Returns the
+// reconciliation report; if streaming should be active (schedule.isPlaying)
+// but isn't, the caller can follow up with /start-stream.
+router.post('/heal', async (req, res) => {
+  try {
+    const before = coordinator.getStatus();
+    const report = coordinator.reconcile();
+    const after = coordinator.getStatus();
+    logger.info('Coordinator heal requested', { before: { isCoordinating: before.isCoordinating, drift: before.coordinatorDrift }, report });
+    res.json({ success: true, report, before, after });
+  } catch (error) {
+    logger.error('Error during heal:', error);
+    res.status(500).json({ error: `Heal failed: ${error.message}` });
   }
 });
 
@@ -809,3 +849,5 @@ router.post('/stop', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.startStreamingFromSchedule = startStreamingFromSchedule;
+module.exports.loadSchedule = loadSchedule;

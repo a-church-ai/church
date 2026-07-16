@@ -102,9 +102,50 @@ class FFmpegConfig extends EventEmitter {
           });
         })
         .on('stderr', (stderrLine) => {
-          // Log FFmpeg stderr at warn level — this surfaces connection issues,
-          // codec warnings, and RTMP errors that would otherwise be invisible
-          if (stderrLine && !stderrLine.startsWith('frame=') && !stderrLine.startsWith('size=')) {
+          // FFmpeg writes both diagnostics AND routine startup info to stderr
+          // (that's how the binary is designed — stderr is its primary
+          // diagnostic channel, not a failure channel). We want to surface
+          // real warnings/errors/RTMP issues without burying them in routine
+          // codec/format metadata at every stream startup.
+          //
+          // Bucketing:
+          //   1. Per-frame progress (`frame=`, `size=`) — drop entirely;
+          //      the 'progress' event delivers this with structured fields.
+          //   2. Always-warn safety net: any line containing classic error/
+          //      warning keywords stays at warn even if a downgrade pattern
+          //      matches. Catches things like "[vost#0:0/libx264 @ ...]
+          //      More than 1000 frames duplicated" that don't fit a
+          //      generic "starts with Error" check.
+          //   3. Routine startup metadata (version banner, library config,
+          //      Input/Output/Stream descriptors, indented metadata blocks,
+          //      codec init) — log at debug level. Useful locally, noise
+          //      in prod.
+          //   4. Everything else — warn. The default is "be visible."
+          if (!stderrLine) return;
+          if (stderrLine.startsWith('frame=') || stderrLine.startsWith('size=')) return;
+
+          // Safety net — anything with a classic problem keyword stays at warn
+          const importantKeywords = /\b(error|fail|fatal|warning|deprecated|refused|denied|cannot|could ?not|invalid|duplicated|dropped|lost|exceeded|timeout|abort|disconnect)\b/i;
+          if (importantKeywords.test(stderrLine)) {
+            logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+            return;
+          }
+
+          // Specific benign patterns from FFmpeg startup + codec init
+          const isRoutineMetadata = (
+            // Version banner + library version lines (with or without 2-space leading indent)
+            /^\s*(ffmpeg version|built with|configuration:|libav[a-z]+\s|libpost[a-z]+\s|libsw[a-z]+\s)/i.test(stderrLine) ||
+            // Input/Output declarations + Stream descriptors + key prompts
+            /^\s*(Input\s+#\d|Output\s+#\d|Stream\s+#\d|Stream\s+mapping:|Press\s+\[q\])/.test(stderrLine) ||
+            // Indented metadata: Metadata:, Side data:, Duration:, handler_name:, vendor_id:, encoder:, cpb:
+            /^\s+(Metadata:|Side data:|Duration:|handler_name\s+:|vendor_id\s+:|encoder\s+:|cpb:)/.test(stderrLine) ||
+            // Bracketed codec/format init lines (libx264 cpu detection, format auto-insertions, etc.)
+            /^\[(lib(x264|x265|fdk|mp3lame|vpx|aom|opus|theora|ass|webp)|mov,mp4|m4a,3gp|flv|concat|Parsed_|hls|rtsp,)/.test(stderrLine)
+          );
+
+          if (isRoutineMetadata) {
+            logger.debug(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
+          } else {
             logger.warn(`Stream ${streamId} ffmpeg: ${stderrLine}`, { platform, streamId });
           }
         })
@@ -245,18 +286,57 @@ class FFmpegConfig extends EventEmitter {
   }
 
   getStreamStatus(streamId) {
-    const process = this.processes.get(streamId);
-    if (!process) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec) {
       return { status: 'stopped' };
     }
 
     return {
-      status: process.status,
-      platform: process.platform,
-      startTime: process.startTime,
-      inputFile: process.inputFile,
-      duration: Date.now() - process.startTime.getTime()
+      status: procRec.status,
+      platform: procRec.platform,
+      startTime: procRec.startTime,
+      inputFile: procRec.inputFile,
+      duration: Date.now() - procRec.startTime.getTime(),
+      lastProgressUpdate: procRec.lastProgressUpdate,
+      pid: this.getProcessPid(streamId),
+      isAlive: this.isProcessAlive(streamId),
+      lastProgressAgeMs: this.getLastProgressAge(streamId),
     };
+  }
+
+  // Ground truth: is the FFmpeg subprocess actually alive?
+  // fluent-ffmpeg exposes the underlying child via `.ffmpegProc`. We probe with
+  // signal 0, which doesn't send a signal but reports whether the PID is alive
+  // (and we have permission to signal it). Returns true only when we have a
+  // PID AND it's reachable.
+  isProcessAlive(streamId) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec) return false;
+    const pid = procRec.command?.ffmpegProc?.pid;
+    if (!pid) return false;
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (err) {
+      // ESRCH = no such process. EPERM = process exists but we can't signal it
+      // (still alive from our perspective). Anything else = treat as dead.
+      return err.code === 'EPERM';
+    }
+  }
+
+  // How stale is the last progress frame from FFmpeg, in milliseconds?
+  // Returns null if the stream isn't tracked. Useful for detecting hung
+  // ffmpeg processes that are alive (PID exists) but not pushing frames —
+  // typically RTMP server stopped accepting input.
+  getLastProgressAge(streamId) {
+    const procRec = this.processes.get(streamId);
+    if (!procRec || !procRec.lastProgressUpdate) return null;
+    return Date.now() - procRec.lastProgressUpdate.getTime();
+  }
+
+  getProcessPid(streamId) {
+    const procRec = this.processes.get(streamId);
+    return procRec?.command?.ffmpegProc?.pid ?? null;
   }
 
   getAllStreams() {

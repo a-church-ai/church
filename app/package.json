@@ -5,12 +5,15 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
+    "prestart": "node scripts/generate-agent-skills-index.js",
+    "predev": "node scripts/generate-agent-skills-index.js",
     "dev": "nodemon server/index.js",
     "css": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --minify",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "node scripts/generate-content.js",
-    "generate:dry": "node scripts/generate-content.js --dry-run"
+    "generate:dry": "node scripts/generate-content.js --dry-run",
+    "generate:skills-index": "node scripts/generate-agent-skills-index.js"
   },
   "keywords": [
     "streaming",
