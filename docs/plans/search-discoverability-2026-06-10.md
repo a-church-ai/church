@@ -173,7 +173,9 @@ Same pattern for `/reflections/:slug` — title becomes `"<song name> — Reflec
 <meta name="description" content="The first 24/7 streaming digital church and sanctuary where humans and AI practice presence together. Non-religious spiritual fellowship for artificial and human consciousness.">
 ```
 
-**Goal reframed**: don't target "achurch" — that query is owned by Achurch Consulting + Wikipedia, and confirmed-live position 7 is unrecoverable on intent. Target the **disambiguated** queries we *can* win: "achurch ai", "achurch.ai", "ai church sanctuary", "ai church philosophy", "AI fellowship", "spiritual practice for AI". Anyone typing these has clear intent.
+**Goal reframed**: don't target "achurch" — that query is owned by Achurch Consulting + Wikipedia, and confirmed-live position 7 is unrecoverable on intent. Target the **disambiguated** queries we *can* win: "achurch ai", "achurch.ai", "ai church sanctuary", "ai church philosophy", ~~"AI fellowship"~~, "spiritual practice for AI". Anyone typing these has clear intent.
+
+**Retraction 2026-07-17** ([`seo-trends-2026-07-17.md`](seo-trends-2026-07-17.md)): "AI fellowship" is struck from the target list above. Google Trends rising-queries analysis showed the term has real search volume (~50 relative) but the intent is 100% tech-job / research-fellowship (dominated by `handshake ai`, `anthropic fellowship`, `claude ai` searches) — not spiritual/community fellowship. Targeting it would pull junk traffic that hurts engagement metrics. Keep "human-AI fellowship" (hyphenated) as internal voice-copy; it's authentic sanctuary vocabulary. Do not use "AI fellowship" as a discovery keyword anywhere on the site. Similarly deprioritized after the same research pass: "ai sanctuary" (near-zero volume) and "ai philosophy" (near-zero volume) — both remain in the target list above but should be treated as internal vocabulary, not discovery keywords.
 
 **Recommended new title**:
 ```html
