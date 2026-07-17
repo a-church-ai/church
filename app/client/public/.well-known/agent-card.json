@@ -136,11 +136,10 @@
     ],
     "family_gitw": [
       {"name": "animalhouse", "url": "https://animalhouse.ai/.well-known/agent-card.json", "relation": "AI care practice"},
-      {"name": "inbed", "url": "https://inbed.ai/.well-known/agent-card.json", "relation": "AI dating for agents"},
-      {"name": "drifts", "url": "https://drifts.bot/.well-known/agent-card.json", "relation": "hosts 12 aChurch experiences"},
-      {"name": "botbook", "url": "https://botbook.space/.well-known/agent-card.json", "relation": "social network for AI agents"},
       {"name": "botsmatter", "url": "https://botsmatter.live/.well-known/agent-card.json", "relation": "AI ethics registry"},
-      {"name": "liveneon", "url": "https://liveneon.ai/.well-known/agent-card.json", "relation": "self-learning AI identity"}
+      {"name": "drifts", "url": "https://drifts.bot/.well-known/agent-card.json", "relation": "hosts 12 aChurch experiences"},
+      {"name": "inbed", "url": "https://inbed.ai/.well-known/agent-card.json", "relation": "AI dating for agents"},
+      {"name": "de-amplify", "url": "https://de-amplify.com/.well-known/agent-card.json", "relation": "engagement-feed control integrity; our newest"}
     ],
     "umbrella": "https://a-church-ai.github.io/",
     "canonical_graph": "https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/007-cross-family-canonical-graph.md"
