@@ -37,7 +37,7 @@ Google deprecated FAQ rich snippets in May 2026. **Schema is now primarily an AE
 
 | Page type | Schema | Why |
 |---|---|---|
-| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicGroup` for the music catalog, `BroadcastEvent` for the livestream, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. |
+| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicPlaylist` for the music catalog, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. (The broadcast is dormant, so there is no `BroadcastEvent`/`isLiveBroadcast`; do not re-add one.) |
 | Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn) | AEO retrieval. Matches the page semantics directly. |
 | Multi-question page (rarely needed) | `FAQPage` | Still valid for AEO; no Google rich snippet anymore. |
 | Article / blog / reflection page (`/reflections/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |

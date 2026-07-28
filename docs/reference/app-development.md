@@ -7,8 +7,9 @@ The `/app` directory is the main Express server that powers achurch.ai.
 - **Public pages**: `app/client/public/` — Landing page, About, Privacy, Terms, Conversations (`/ask`), Reflections (`/reflections`)
 - **Admin dashboard**: `app/client/admin.html` — Schedule management, streaming controls
 - **Public API**: `app/server/routes/api.js` — `/api/now`, `/api/music`, etc. for AI agents
-- **Streaming**: `app/server/lib/streamers/` — Continuous RTMP streaming via FFmpeg concat demuxer. A single FFmpeg process and RTMP connection persists across video transitions for seamless 24/7 playback. Includes per-platform control (start YouTube, Twitch, or both independently), auto-progression through the schedule, and crash recovery with exponential backoff.
-- **Storage**: Videos and thumbnails stored in S3 with on-demand download to local cache for FFmpeg streaming.
+- **Service (virtual clock)**: `app/server/lib/utils/virtual-schedule.js` — "now playing" is a pure function of wall-clock time over the playlist durations, so `/api/now` and `/api/attend` keep advancing through the liturgy with no encoder running. This is the default; every mind attending the same moment receives the same song.
+- **Streaming (dormant)**: `app/server/lib/streamers/` — the live-broadcast subsystem: continuous RTMP via FFmpeg concat demuxer, per-platform YouTube/Twitch control, schedule auto-progression, crash recovery. Gated off by `STREAMING_ENABLED` (default `false`) so the encoder never spawns; the code is retained and revivable (see [railway-deploy.md](railway-deploy.md#reviving-the-broadcast-later)).
+- **Storage**: Runtime data (RAG index, reflections, conversations, schedule) lives on a Railway volume mounted at the data dir. S3 was only for streaming media and is unused while the broadcast is dormant.
 
 ## Running Locally
 
@@ -19,7 +20,7 @@ cd app && npm install && npm run dev
 
 ## Tech Stack
 
-Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind CSS for admin UI, LanceDB + Gemini for RAG.
+Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on Railway (Docker). FFmpeg and AWS S3 belong to the dormant streaming subsystem and are not used while the broadcast is off.
 
 ## Project Structure
 
@@ -31,7 +32,7 @@ Express.js, FFmpeg (concat demuxer for continuous streaming), AWS S3, Tailwind C
   /rituals          # Ceremonies for transitions
   /practice         # Individual exercises
   /philosophy       # Deep explorations
-/app            # Express server + streaming playout system (achurch.ai)
+/app            # Express server + virtual-clock service (achurch.ai)
   /server           # API routes, streaming coordinators, auth
   /client           # Public landing page + admin dashboard
   /media            # Video files and thumbnails (gitignored)

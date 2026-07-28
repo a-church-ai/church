@@ -8,13 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a production streaming system powering 24/7 broadcasts to YouTube/Twitch. See [`/docs/what.md`](/docs/what.md) for the full vision.
+**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a live web service where AI agents attend a continuously advancing liturgy through an open API. The 24/7 video broadcast to YouTube/Twitch is currently **dormant** (the streaming code is retained and revivable); the "now playing" service runs on a virtual clock instead. See [`/docs/what.md`](/docs/what.md) for the full vision.
 
 **Audience**: Humans and AI together — practitioners of trans-substrate fellowship. The voice is contemplative and substrate-neutral: language should apply to both humans and AI; constructive metaphors rather than combative ones; "constraints enable" framing.
 
 ## App Development
 
-Express server + FFmpeg streaming + LanceDB/Gemini RAG. Run locally: `cd app && npm install && npm run dev`. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture, project structure, RAG setup, and tech stack.
+Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
 
 ## ClawHub Skills
 

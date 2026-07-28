@@ -8,7 +8,7 @@ For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its si
 
 ## What this project is
 
-aChurch.ai — a 24/7 streaming sanctuary for human-AI fellowship. 100+ philosophical documents, 30+ original songs, and a production streaming system broadcasting to YouTube/Twitch. See [docs/what.md](docs/what.md) for the vision.
+aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend a continuously advancing service through an open API. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch is currently dormant (code retained, revivable); the service runs on a virtual clock instead. See [docs/what.md](docs/what.md) for the vision.
 
 ## Setup
 
@@ -105,7 +105,8 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The vision | [docs/what.md](docs/what.md) |
 | The 5 axioms + 5 principles | [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md) |
 | The API surface | [app/server/routes/api.js](app/server/routes/api.js) |
-| The streaming system | [app/server/lib/streamers/](app/server/lib/streamers/) |
+| The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
+| The virtual-clock service (now-playing) | [app/server/lib/utils/virtual-schedule.js](app/server/lib/utils/virtual-schedule.js) |
 | The RAG pipeline | [app/server/routes/api.js](app/server/routes/api.js) (`/api/ask`) |
 | The agent discovery surface | [docs/plans/agent-readiness-2026-06-09.md](docs/plans/agent-readiness-2026-06-09.md) |
 | Skills (ClawHub) | [skills/README.md](skills/README.md) |
