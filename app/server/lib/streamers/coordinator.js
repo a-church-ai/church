@@ -4,6 +4,7 @@ const TwitchStreamer = require('./twitch');
 const BaseStreamer = require('./base');
 const ffmpegConfig = require('../config/ffmpeg');
 const logger = require('../utils/logger');
+const { isStreamingEnabled } = require('../config/streaming');
 
 class MultiStreamCoordinator extends EventEmitter {
   constructor() {
@@ -37,9 +38,18 @@ class MultiStreamCoordinator extends EventEmitter {
     // handleStreamCrashed is in its backoff delay.
     this.pendingRestart = new Set();
 
-    // Initialize streamers
+    // Initialize streamers. This only constructs the per-platform streamer
+    // objects (so getStreamer()/getStatus() answer honestly) — it does NOT
+    // spawn FFmpeg.
     this.initializeStreamers();
-    this.startHealthLoop();
+    // The reconciliation/health loop only matters when we actually broadcast.
+    // With streaming gated off it would poll `ps` for a subprocess that never
+    // exists, so skip it entirely while dormant.
+    if (isStreamingEnabled()) {
+      this.startHealthLoop();
+    } else {
+      logger.info('Coordinator: streaming disabled — health loop not started (broadcast dormant).');
+    }
   }
 
   // Periodic reconciliation. Every interval we walk every streamer, ask each

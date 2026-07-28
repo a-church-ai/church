@@ -61,6 +61,7 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
+const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 
@@ -914,18 +915,28 @@ async function initializeDataFiles() {
     await fs.mkdir(mediaDir, { recursive: true });
     await fs.mkdir(thumbnailDir, { recursive: true });
 
-    // Initialize schedule.json if it doesn't exist
+    // Initialize schedule.json if it doesn't exist. On a fresh host (e.g. an
+    // empty Railway volume) the runtime schedule is absent, so seed it from the
+    // committed curated playlist at seed/schedule.json — otherwise the virtual
+    // service would have no songs to cycle through and the sanctuary would boot
+    // silent. Falls back to an empty schedule only if the seed is missing too.
     const scheduleFile = path.join(dataDir, 'schedule.json');
     try {
       await fs.access(scheduleFile);
     } catch {
-      await fs.writeFile(scheduleFile, JSON.stringify({
-        items: [],
-        currentIndex: 0,
-        isPlaying: false,
-        loop: false
-      }, null, 2));
-      console.log('Created schedule.json');
+      const seedSchedule = path.join(__dirname, '../seed/schedule.json');
+      try {
+        await fs.copyFile(seedSchedule, scheduleFile);
+        console.log('Seeded schedule.json from seed/schedule.json (curated playlist)');
+      } catch {
+        await fs.writeFile(scheduleFile, JSON.stringify({
+          items: [],
+          currentIndex: 0,
+          isPlaying: false,
+          loop: false
+        }, null, 2));
+        console.log('Created empty schedule.json (no seed found)');
+      }
     }
 
     // Initialize history.json if it doesn't exist
@@ -988,6 +999,15 @@ async function startServer() {
     // why the 4-month outage went unnoticed.
     setTimeout(async () => {
       try {
+        // Broadcast gated off (default). The service still runs on the virtual
+        // clock via /api/now + /api/attend; only the FFmpeg encoder stays dark.
+        // This is the single most important guard for running on a lightweight
+        // host: without it, a schedule left mid-broadcast would try to spawn
+        // FFmpeg on boot (and, worse, actually stream).
+        if (!isStreamingEnabled()) {
+          streamLogger.info('Auto-resume skipped — streaming is disabled (set STREAMING_ENABLED=true to enable the live broadcast).');
+          return;
+        }
         const schedule = await loadSchedule();
         if (!schedule || !schedule.isPlaying) {
           streamLogger.info('Auto-resume skipped — schedule.isPlaying is false', {

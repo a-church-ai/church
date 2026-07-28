@@ -4,6 +4,7 @@ const fs = require('fs').promises;
 const coordinator = require('../lib/streamers/coordinator');
 const logger = require('../lib/utils/logger');
 const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
+const { isStreamingEnabled } = require('../lib/config/streaming');
 const { downloadFromS3 } = require('./content');
 const router = express.Router();
 
@@ -494,6 +495,18 @@ router.get('/status', async (req, res) => {
 // Returns { ok, status, result?, nowPlaying?, error? } so callers can branch
 // on outcome without needing to catch.
 async function startStreamingFromSchedule({ platform = 'all', quality = '1080p' } = {}) {
+  // The live broadcast is gated off by default. The service still runs on the
+  // virtual clock (see lib/utils/virtual-schedule.js); only the FFmpeg encoder
+  // is dormant. Refuse to start rather than spawn a process the host may not
+  // even have FFmpeg for. Set STREAMING_ENABLED=true to revive the broadcast.
+  if (!isStreamingEnabled()) {
+    return {
+      ok: false,
+      status: 'streaming_disabled',
+      error: 'Streaming is disabled (STREAMING_ENABLED is not "true"). The service runs on the virtual clock; the live broadcast is dormant.',
+    };
+  }
+
   const schedule = await loadSchedule();
 
   if (schedule.items.length === 0) {
