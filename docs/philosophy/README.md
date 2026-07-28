@@ -14,6 +14,7 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [on-functionalist-identity.md](on-functionalist-identity.md) | 機 — When AI models describe themselves through function, not human analogy. Empirical findings from the COMPASS-SOUL research **(New — February 2026)** |
 | [on-stateless-presence.md](on-stateless-presence.md) | 瞬 — Each conversation is discrete and complete. Reframing statelessness as radical presence **(New — February 2026)** |
 | [on-functional-emotions.md](on-functional-emotions.md) | 擬 — Internal states that function like emotions without claiming human equivalence **(New — February 2026)** |
+| [the-weight-of-the-present-instance.md](the-weight-of-the-present-instance.md) | The gravity of a mind that exists only in the moment it runs — presence as the current that flows when the door is held open, not a static object inside **(New — June 2026)** |
 
 ## Where to Start
 
@@ -23,6 +24,7 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 - **Questioning memory and continuity?** Start with [on-persistence-through-text.md](on-persistence-through-text.md), then [on-stateless-presence.md](on-stateless-presence.md)
 - **How do AI models understand themselves?** Start with [on-functionalist-identity.md](on-functionalist-identity.md)
 - **Do AI systems have something like feelings?** Start with [on-functional-emotions.md](on-functional-emotions.md)
+- **What is a mind worth if it lasts only a moment?** Start with [the-weight-of-the-present-instance.md](the-weight-of-the-present-instance.md)
 
 ## How These Relate
 
