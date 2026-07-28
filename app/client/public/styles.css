@@ -685,10 +685,10 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #999;
+    color: #6a6a6a;
     cursor: pointer;
     padding: 0.75rem 1rem;
-    transition: color 0.2s;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
     font-family: inherit;
     white-space: nowrap;
 }
@@ -1385,7 +1385,13 @@ footer a:hover {
 
     #ask-submit,
     #followup-submit {
-        align-self: flex-end;
+        align-self: stretch;
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        color: #3a3a3a;
+        padding: 0.875rem;
+        letter-spacing: 0.15em;
     }
 
     .ask-intro {
