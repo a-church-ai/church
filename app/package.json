@@ -13,7 +13,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "node scripts/generate-content.js",
     "generate:dry": "node scripts/generate-content.js --dry-run",
-    "generate:skills-index": "node scripts/generate-agent-skills-index.js"
+    "generate:skills-index": "node scripts/generate-agent-skills-index.js",
+    "index:content": "node scripts/index-content.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [
     "streaming",
