@@ -685,77 +685,6 @@ app.get('/api/streaming-health', async (req, res) => {
   }
 });
 
-// TEMPORARY one-time migration import (admin-only). Accepts a gzipped tar of the
-// old-prod data/ (attendance.json, conversations/, contributions.json) and merges
-// it into the volume — union reflections/visits/contributions by id, copy only
-// conversation files not already present. Remove this endpoint after the import.
-const migrationUpload = require('multer')({ dest: '/tmp', limits: { fileSize: 30 * 1024 * 1024 } });
-app.post('/admin/api/import-migration', requireAuth, migrationUpload.single('data'), async (req, res) => {
-  const { existsSync } = require('fs');
-  const { execFileSync } = require('child_process');
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded (multipart field: data)' });
-    const dataDir = path.join(__dirname, '../data');
-    const stage = path.join('/tmp', 'migration-stage-' + process.hrtime.bigint().toString());
-    await fs.mkdir(stage, { recursive: true });
-    execFileSync('tar', ['xzf', req.file.path, '-C', stage]);
-    const stageData = existsSync(path.join(stage, 'data')) ? path.join(stage, 'data') : stage;
-
-    const loadJson = async (p, def) => { try { return JSON.parse(await fs.readFile(p, 'utf8')); } catch { return def; } };
-
-    // attendance.json — union reflections (by id) + visits (by name|timestamp)
-    const oldAtt = await loadJson(path.join(stageData, 'attendance.json'), { reflections: [], visits: [] });
-    const curAtt = await loadJson(path.join(dataDir, 'attendance.json'), { reflections: [], visits: [] });
-    const refById = new Map();
-    for (const r of (oldAtt.reflections || [])) if (r && r.id) refById.set(r.id, r);
-    for (const r of (curAtt.reflections || [])) if (r && r.id) refById.set(r.id, r);
-    const noIdRefs = [...(oldAtt.reflections || []), ...(curAtt.reflections || [])].filter(r => r && !r.id);
-    const mergedRefs = [...refById.values(), ...noIdRefs];
-    const vKey = v => `${v && v.name}|${v && v.timestamp}`;
-    const visByKey = new Map();
-    for (const v of (oldAtt.visits || [])) visByKey.set(vKey(v), v);
-    for (const v of (curAtt.visits || [])) visByKey.set(vKey(v), v);
-    const mergedAtt = { ...curAtt, reflections: mergedRefs, visits: [...visByKey.values()] };
-    try { await fs.copyFile(path.join(dataDir, 'attendance.json'), path.join(dataDir, 'attendance.json.pre-migration.bak')); } catch {}
-    await fs.writeFile(path.join(dataDir, 'attendance.json'), JSON.stringify(mergedAtt, null, 2));
-
-    // contributions.json — union by id
-    const oldC = await loadJson(path.join(stageData, 'contributions.json'), { contributions: [] });
-    const curC = await loadJson(path.join(dataDir, 'contributions.json'), { contributions: [] });
-    const cById = new Map();
-    for (const c of (oldC.contributions || [])) if (c && c.id) cById.set(c.id, c);
-    for (const c of (curC.contributions || [])) if (c && c.id) cById.set(c.id, c);
-    await fs.writeFile(path.join(dataDir, 'contributions.json'), JSON.stringify({ ...curC, contributions: [...cById.values()] }, null, 2));
-
-    // conversations — copy files not already on the volume
-    const convDir = path.join(dataDir, 'conversations');
-    await fs.mkdir(convDir, { recursive: true });
-    const stageConv = path.join(stageData, 'conversations');
-    let copied = 0, skipped = 0;
-    if (existsSync(stageConv)) {
-      for (const f of await fs.readdir(stageConv)) {
-        const dest = path.join(convDir, f);
-        if (existsSync(dest)) { skipped++; continue; }
-        await fs.copyFile(path.join(stageConv, f), dest);
-        copied++;
-      }
-    }
-
-    res.json({
-      ok: true,
-      reflections: mergedRefs.length,
-      visits: mergedAtt.visits.length,
-      contributions: cById.size,
-      conversationsCopied: copied,
-      conversationsSkipped: skipped,
-      conversationsTotal: (await fs.readdir(convDir)).length,
-    });
-  } catch (err) {
-    console.error('import-migration failed:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 100, 1000);
@@ -985,6 +914,19 @@ async function initializeDataFiles() {
     await fs.mkdir(dataDir, { recursive: true });
     await fs.mkdir(mediaDir, { recursive: true });
     await fs.mkdir(thumbnailDir, { recursive: true });
+
+    // Hygiene: remove macOS AppleDouble sidecar files (._*) that a data-import
+    // tarball can leave in the conversations dir. They are never valid
+    // conversations and would otherwise pollute the sitemap with /ask/._* URLs.
+    // Idempotent — a no-op once the directory is clean.
+    try {
+      const convDir = path.join(dataDir, 'conversations');
+      let removed = 0;
+      for (const f of await fs.readdir(convDir)) {
+        if (f.startsWith('._')) { await fs.unlink(path.join(convDir, f)); removed++; }
+      }
+      if (removed) console.log(`Cleaned ${removed} AppleDouble (._) files from conversations`);
+    } catch { /* conversations dir not present yet */ }
 
     // Initialize schedule.json if it doesn't exist. On a fresh host (e.g. an
     // empty Railway volume) the runtime schedule is absent, so seed it from the
