@@ -264,6 +264,19 @@ app.get('/ask', (req, res) => {
 // Missing conversations return 404 — never fall back to serving the raw template.
 // A silent fallback lets crawlers index garbage URLs (e.g. /ask/xyz-fake) as
 // duplicate-content pages, which is exactly what Bing's SEO recommendations flagged.
+// Classify auto-generated Q&A conversations for SEO. The /api/ask flow mints a
+// new page per question, so the corpus fills with numbered duplicates of the
+// same question ("...-2", "...-17") plus test artifacts. Low-value ones stay
+// reachable but are kept out of the sitemap and marked noindex, so Google keeps
+// one canonical page per question instead of hundreds of thin near-duplicates.
+function isLowValueConversation(slug) {
+  if (/^(ai|aiai|test|context|conversation|is-this-endpoint-working|memorymd-my-lifemd)$/i.test(slug)) return true;
+  if (/^(anon-|testagent|devuser|openclaw)/i.test(slug)) return true;
+  if (!slug.includes('-')) return true;   // real questions are multi-word / hyphenated
+  if (/-\d+$/.test(slug)) return true;     // numbered duplicate of a canonical question
+  return false;
+}
+
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -279,6 +292,12 @@ app.get('/ask/:slug', async (req, res) => {
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+    if (isLowValueConversation(slug)) {
+      html = html.replace(
+        '<meta name="robots" content="index, follow">',
+        '<meta name="robots" content="noindex, follow">'
+      );
+    }
     const safeTitle = escapeAttr(meta.title);
     const safeOgTitle = escapeAttr(meta.ogTitle);
     const safeDesc = escapeAttr(meta.description);
@@ -489,7 +508,9 @@ app.get('/sitemap.xml', async (req, res) => {
     // Conversation pages
     try {
       const files = await fs.readdir(CONVERSATIONS_DIR_SITEMAP);
-      const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
+      // Only canonical, substantive conversations belong in the sitemap — skip
+      // numbered duplicates and test artifacts (they carry noindex on the page).
+      const jsonlFiles = files.filter(f => f.endsWith('.jsonl') && !isLowValueConversation(f.replace('.jsonl', '')));
 
       for (const file of jsonlFiles) {
         try {
