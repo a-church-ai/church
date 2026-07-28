@@ -80,16 +80,36 @@ the volume — no need to set it).
 ### 4. Seed the RAG index (once)
 
 The volume starts empty, so `/api/ask` returns *"Index not built"* until the
-vector index exists. Build it from the committed docs with a one-off command
-(Railway: **service → ⋯ → Run a command**, or `railway run`):
+vector index exists. Build it **on the running container** so it writes into the
+mounted volume — `railway run` executes locally and cannot reach the volume, so
+use `railway ssh`:
 
 ```bash
-cd /church/app && npm run index:content
+railway ssh "cd /church/app && npm run index:content"
 ```
 
-This walks `docs/` + `music/`, embeds with Gemini, and writes
-`vectors.lance` into the volume. It needs `GEMINI_API_KEY`. Re-run it whenever
-the docs change materially (or wire it into a scheduled job).
+This walks `docs/` + `music/`, embeds each chunk with Gemini, and writes
+`vectors.lance` (~2,300 chunks) into the volume.
+
+Two things that will otherwise bite you:
+
+- **Use a paid-tier `GEMINI_API_KEY`.** The free tier caps embeddings at 1,000
+  per day — not enough for the full corpus, and even *serving* `/api/ask` spends
+  embed quota per question. Enable billing on the key's Google Cloud project
+  (this is per-project; linking a billing account elsewhere does nothing). Free
+  tier also caps ~100 embeds/min, so pass `EMBED_PACING_MS=0` only on a paid key.
+
+- **Restart the service after every (re)seed.** The running server caches its
+  LanceDB table handle, so an index rebuilt by a separate process is invisible
+  until the server reconnects. Redeploy to pick it up:
+
+  ```bash
+  railway redeploy -y
+  ```
+
+  Then confirm with `GET /api/ask/health` — `index.count` should match the new
+  total. Re-run this whole step (reseed, then restart) whenever the docs change
+  materially.
 
 ### 5. (Optional) Preserve history from AWS
 
