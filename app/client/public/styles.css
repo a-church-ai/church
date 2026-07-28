@@ -67,10 +67,17 @@ h2 {
     margin-bottom: 5rem;
 }
 
+.stream-tagline {
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 0.4rem;
+}
+
 .stream-invite {
     font-size: 1rem;
     font-weight: 400;
-    color: #999;
+    color: #6a6a6a;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-bottom: 1.25rem;
@@ -91,7 +98,17 @@ h2 {
     border-radius: 4px;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+    background: rgba(0, 0, 0, 0.03);
+    color: #3a3a3a;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Primary CTA (first button in the hero): a warmer, filled emphasis. */
+.stream-btn.primary {
+    background: rgba(198, 156, 92, 0.18);
+    border-color: rgba(198, 156, 92, 0.65);
+    color: #6b4a1f;
 }
 
 .stream-btn {
@@ -99,8 +116,9 @@ h2 {
 }
 
 .stream-btn:hover {
-    opacity: 0.8;
-    color: #fff;
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.35);
 }
 
 .stream-btn .icon {
@@ -118,20 +136,36 @@ h2 {
 }
 
 .live-status {
-    font-size: 0.75rem;
-    color: #bbb;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: #6a6a6a;
+    line-height: 1.5;
+    max-width: 34rem;
+    margin: 0.75rem auto 0;
+}
+
+/* Emphasis line closing the asynchronous-congregation section. */
+.async-note {
+    color: #4a4a4a;
+    font-style: italic;
+    max-width: 40rem;
+    margin: 1rem auto 0;
+}
+
+/* Public/stored disclosure beside the Ask form. */
+.ask-disclosure {
+    font-size: 0.8rem;
+    color: #6a6a6a;
+    margin-top: 0.6rem;
 }
 
 .open-source-hint {
     margin-top: 1.5rem;
     font-size: 1rem;
-    color: #999;
+    color: #6a6a6a;
 }
 
 .open-source-hint a {
-    color: #999;
+    color: #6a6a6a;
 }
 
 .open-source-hint a:hover {
