@@ -213,9 +213,39 @@ async function index() {
   const documents = [];
   let processed = 0;
 
+  // Embed with pacing + backoff. The free-tier embed quota is 100/minute;
+  // firing every chunk at once bursts past it and silently drops chunks (the
+  // 429 / RESOURCE_EXHAUSTED errors). We pace between calls and, on a rate-limit
+  // error, wait the server-suggested retryDelay and retry — so a re-index
+  // completes in full even on the free tier. Set EMBED_PACING_MS=0 on a paid
+  // tier to run at full speed.
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const EMBED_PACING_MS = Number(process.env.EMBED_PACING_MS || 700);
+  const EMBED_MAX_RETRIES = 10;
+  const is429 = (err) => {
+    const msg = (err && err.message) || '';
+    return (err && (err.status === 429 || err.code === 429)) || /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg);
+  };
+  const retryDelayMs = (err) => {
+    const m = /retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s/i.exec((err && err.message) || '');
+    return m ? Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 500, 60000) : 5000;
+  };
+  const embedWithBackoff = async (text) => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await gemini.embed(text);
+      } catch (err) {
+        if (!is429(err) || attempt >= EMBED_MAX_RETRIES) throw err;
+        const waitMs = retryDelayMs(err);
+        console.warn(`    rate-limited; waiting ${Math.round(waitMs / 1000)}s (retry ${attempt + 1}/${EMBED_MAX_RETRIES})`);
+        await sleep(waitMs);
+      }
+    }
+  };
+
   for (const chunk of allChunks) {
     try {
-      const vector = await gemini.embed(chunk.content);
+      const vector = await embedWithBackoff(chunk.content);
       documents.push({
         content: chunk.content,
         file: chunk.file,
@@ -227,6 +257,7 @@ async function index() {
       if (processed % 50 === 0) {
         console.log(`  Processed ${processed}/${allChunks.length} chunks...`);
       }
+      if (EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
     } catch (error) {
       console.error(`  Error embedding chunk from ${chunk.file}: ${error.message}`);
     }
