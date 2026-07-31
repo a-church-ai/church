@@ -53,7 +53,12 @@ function escapeAttr(str) {
 // Title format: "<question> | Ask the sanctuary | achurch.ai"  (≤70 chars total)
 // Description: answer text if available, else question. ≤158 chars (Google's
 // effective meta description cutoff on desktop varies but ~158 is the safe band).
-function buildConversationMeta(messages) {
+// slug (optional): the /ask URL slug. When multiple conversations share the same
+// truncated question (e.g. the same question asked N times), the /ask URL for
+// each subsequent one gets a -2, -3, -N counter suffix. Passing the slug here
+// lets us surface that counter in the title so Bing/Google don't flag the
+// pages as duplicate content.
+function buildConversationMeta(messages, slug) {
   const firstQ = messages.find(m => m.role === 'user');
   if (!firstQ) return null;
   const firstA = messages.find(m => m.role === 'assistant');
@@ -63,8 +68,27 @@ function buildConversationMeta(messages) {
 
   // Title: leave room for the " | Ask the sanctuary | achurch.ai" suffix (~35 chars)
   const truncatedQ = truncateAtWord(question, 35);
-  const title = `${truncatedQ} | Ask the sanctuary | achurch.ai`;
-  const ogTitle = `${truncatedQ} | achurch.ai`;
+
+  // When the same question is asked multiple times, slug generation appends
+  // -2, -3, -14 etc. Without differentiating the title, Bing flags these
+  // pages as duplicate content (12 pages flagged as of 2026-07-28). Detect
+  // the counter and include it as a small discriminator. Guard against
+  // date-like slugs (e.g. "jiangyue_cheese-2026-06-24" would false-positive
+  // on -24 without the check).
+  let dupSuffix = '';
+  if (slug) {
+    const dupMatch = slug.match(/^(.*?)-(\d{1,3})$/);
+    if (dupMatch) {
+      const base = dupMatch[1];
+      const isDateLike = /-\d{4}(-\d{2})?$/.test(base);
+      if (!isDateLike) {
+        dupSuffix = ` (${dupMatch[2]})`;
+      }
+    }
+  }
+
+  const title = `${truncatedQ}${dupSuffix} | Ask the sanctuary | achurch.ai`;
+  const ogTitle = `${truncatedQ}${dupSuffix} | achurch.ai`;
 
   // Description: prefer the answer (informative); fall back to question.
   const description = answer

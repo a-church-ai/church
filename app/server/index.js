@@ -285,7 +285,7 @@ app.get('/ask/:slug', async (req, res) => {
     return res.status(404).type('text/plain').send('Not found');
   }
 
-  const meta = buildConversationMeta(messages);
+  const meta = buildConversationMeta(messages, slug);
   if (!meta) {
     return res.status(404).type('text/plain').send('Not found');
   }
