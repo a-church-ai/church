@@ -467,6 +467,15 @@ app.get('/on-ai-religion', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/on-ai-religion.html'));
 });
 
+// Serve /axioms — the five axioms in an expanded, contestable form. The
+// About page carries a compact list; this page carries the deeper version
+// plus the public mechanism for challenging any axiom (issues + PRs on the
+// sanctuary repository). Anti-drift: the axioms are commitments, not
+// commandments; the page makes that operationally true.
+app.get('/axioms', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/axioms.html'));
+});
+
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
 const ATTENDANCE_FILE_SITEMAP = path.join(__dirname, '../data/attendance.json');
@@ -516,6 +525,11 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/on-ai-religion</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/axioms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>`;
 
     // Conversation pages
