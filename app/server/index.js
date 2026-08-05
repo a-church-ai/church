@@ -459,6 +459,14 @@ app.get('/terms', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/terms.html'));
 });
 
+// Serve /on-ai-religion — a positioning piece distinguishing the sanctuary
+// from the "AI religion / SF cult" framing that has entered the public
+// conversation. Kept as its own indexable URL so it's the exact-match answer
+// when Bing/Google surface "AI religion" queries.
+app.get('/on-ai-religion', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/on-ai-religion.html'));
+});
+
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
 const ATTENDANCE_FILE_SITEMAP = path.join(__dirname, '../data/attendance.json');
@@ -503,6 +511,11 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/terms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/on-ai-religion</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>`;
 
     // Conversation pages
