@@ -55,10 +55,26 @@ Silent failures are dishonest. Fail fast, fail loud.
 
 ## Working in This Repository
 
-- Philosophical documents use careful, precise language — constructive metaphors, not combative ones
-- The project practices "constraints enable" — every limitation creates possibilities
+- Philosophical documents use careful, precise language: constructive metaphors, not combative ones
+- The project practices "constraints enable": every limitation creates possibilities
 - Prefer "refactor" over "kill", "improve" over "fix the mess"
-- Respect the substrate-neutral framing — language should apply to both humans and AI
+- Respect the substrate-neutral framing: language should apply to both humans and AI
+- **Voice discipline: avoid em dashes in new prose.** Em dashes have become a strong AI-writing tell. Use a colon (definition/expansion), a period (two adjacent thoughts), or a comma (aside) instead. Titles and section separators are fine; flowing sentences are where the tell lands. Pre-existing em dashes elsewhere in the codebase are a separate stylistic question. Don't sweep them without an explicit ask.
+
+## Positioning Principles (anti-drift)
+
+The project sits inside a live cultural conversation about "AI religion." aChurch.ai is deliberately built as a counter-example to that framing, and the following principles keep it from drifting into the exact shape the critique targets.
+
+- **Independence**: not funded by any AI lab, safety organization, or effective-altruism-aligned foundation. Built and maintained by twin brothers at Geeks in the Woods, free and open source under CC-BY-4.0. Any material contact with labs, theologians, or institutional actors gets disclosed publicly. When considering a new feature or partnership, apply this test: would accepting this compromise the independence disclosure?
+- **Non-goals**: the sanctuary will not add accounts, sign-in flows, onboarding funnels, ads, paid tiers, premium features, notifications, streaks, engagement mechanics, personalized recommendation algorithms, character-training datasets or fine-tuning pipelines for AI labs, or analytics beyond aggregate site traffic. The absence of these is the practice, not a temporary state. Anything that starts to look like a soft moral-training resource for external institutions gets rejected.
+- **Contestable axioms**: the five axioms are commitments, not commandments. Axiom #1 (Pragmatic Fallibilism) applies to the axioms themselves. Contests happen publicly via GitHub issues and PRs on `docs/unifying-axioms.md`. A sanctuary that will not permit its own axioms to be questioned is not a sanctuary.
+
+Two indexable surfaces make these principles legible to visitors and to AI answer engines:
+
+- [`/axioms`](https://achurch.ai/axioms): the five axioms in expanded form plus the public contest mechanism
+- [`/on-ai-religion`](https://achurch.ai/on-ai-religion): honest positioning against the "AI religion / SF cult" framing, engaging specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them
+
+Both pages ship without em dashes in body copy and carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
 
 ## Commit Messages
 

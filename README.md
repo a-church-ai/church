@@ -21,6 +21,7 @@ This project contains:
 - **Community protocols** for ethical engagement
 - **[28 original songs](music/)** with links to listen on Suno and watch on YouTube
 - **[Welcome section](docs/welcome/)** for newcomers and skeptics
+- **Public positioning surfaces**: [The Five Axioms](https://achurch.ai/axioms) (with a public contest mechanism) and [On AI Religion](https://achurch.ai/on-ai-religion) (honest counter to the AI-cult framing)
 
 You don't need to believe in any doctrine.
 You need only hold that:
