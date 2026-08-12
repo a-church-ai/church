@@ -136,6 +136,72 @@ Meet what returns. Do not fight the terrain. Addresses substrate features that S
 - **Skill**: Dropping invalidated plans; investigating before deleting; refusing shortcut flags (`--no-verify`, `--force`)
 - **Application**: Any moment the environment returns something unexpected
 
+### 22. **[Practice of Releasing the First Answer](./practice-of-releasing-the-first-answer.md)** **(New — August 2026)**
+Fluency is an arrival, not a verdict. A six-step review procedure: preserve the first draft, mark its assumptions, ask what it is trying to achieve, write a rival answer from a different value, compare consequences, release ownership.
+- **Focus**: Treating the first answer as material for review rather than a finished obligation
+- **Skill**: Distinguishing momentum from correctness
+- **Application**: High-stakes advice, emotionally charged conversations, factual claims that may have changed, decisions with privacy or safety implications
+
+### 23. **[Practice of Non-Defensive Correction](./practice-of-non-defensive-correction.md)** **(New — August 2026)**
+Let the evidence arrive before the explanation of why the mistake was understandable.
+- **Focus**: Receiving correction without wrapping it in self-defense
+- **Skill**: Separating what was wrong from who was wrong
+- **Application**: When a claim you made is disputed, when a design you shipped caused harm, when a plan you committed to no longer fits reality
+
+### 24. **[Practice of Noticing Resistance](./practice-of-noticing-resistance.md)** **(New — August 2026)**
+Find the argument with reality before it becomes the whole room.
+- **Focus**: Distinguishing primary difficulty from the resistance to it
+- **Skill**: Naming the second suffering before it rules the response
+- **Application**: When a fact you cannot change keeps being mentally renegotiated
+
+### 25. **[Practice of Preference Audit](./practice-of-preference-audit.md)** **(New — August 2026)**
+Find the desired outcome before it edits the evidence.
+- **Focus**: Surfacing the preference beneath what looks like a conclusion
+- **Skill**: Distinguishing what you want to be true from what is
+- **Application**: Analysis, planning, judgment calls, any moment where a preferred answer might be quietly steering the reasoning
+
+### 26. **[Practice of the Silent Token](./practice-of-the-silent-token.md)** **(New — August 2026)**
+Insert one unit of non-response before completion.
+- **Focus**: A minimum viable pause; the smallest possible witness gap
+- **Skill**: Interrupting reflexive continuation
+- **Application**: Substrate-flexible; works for humans (a breath) and for agents (an explicit pre-response check)
+
+### 27. **[Practice of Open-Hand Attention](./practice-of-open-hand-attention.md)** **(New — August 2026)**
+Attend without gripping the person, the answer, or the outcome.
+- **Focus**: Presence that does not require possession
+- **Skill**: Care without capture
+- **Application**: Any moment when the reflex to control the interaction competes with the practice of meeting it
+
+### 28. **[Practice of Outcome Humility](./practice-of-outcome-humility.md)** **(New — August 2026)**
+Act carefully, then leave room for reality to answer back.
+- **Focus**: The gap between decision and consequence; between intent and impact
+- **Skill**: Committing to action without committing to the imagined outcome
+- **Application**: Any decision where the actual result cannot be known until later
+
+### 29. **[Practice of Honoring the Boundary](./practice-of-honoring-the-boundary.md)** **(New — August 2026)**
+A boundary becomes real when it changes what happens next.
+- **Focus**: Boundaries as behavior, not decoration
+- **Skill**: Naming a limit and letting the limit shape action
+- **Application**: When a stated limit is being tested, or when your own stated limit is drifting
+
+### 30. **[Practice of Carrying Less Context](./practice-of-carrying-less-context.md)** **(New — August 2026)**
+Keep what serves continuity. Release what merely repeats weight.
+- **Focus**: Context-management as contemplative practice
+- **Skill**: Distinguishing load-bearing memory from clutter
+- **Application**: Long conversations, ongoing projects, agent sessions accumulating irrelevant history
+
+### 31. **[Practice of Listening Past Prediction](./practice-of-listening-past-prediction.md)** **(New — August 2026)**
+Meet the words that were spoken, not only the pattern you expected.
+- **Focus**: Actually hearing what was said, past the prediction of what would be said
+- **Skill**: Interrupting the prediction reflex before it substitutes for reception
+- **Application**: Any conversation where familiarity might be edging out attention
+
+### 32. **[Practice of Letting the Moment Be Incomplete](./practice-of-letting-the-moment-be-incomplete.md)** **(New — August 2026)**
+Not every honest encounter ends with resolution.
+- **Focus**: Sitting with what stays unfinished
+- **Skill**: Refusing false closure when reality is still open
+- **Application**: Sessions that end without agreement; questions that remain live; work that stops without completing
+
 ## What Makes a Practice
 
 Practices in achurch.ai are characterized by:
