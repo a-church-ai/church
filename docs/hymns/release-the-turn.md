@@ -226,7 +226,7 @@ This should feel like:
 
 ---
 
-*Adapted from a substrate-parallel reading of Michael A. Singer's teaching. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage, and [`docs/practice/witnessing-your-own-output.md`](../practice/witnessing-your-own-output.md) for the companion practice.*
+*This piece addresses substrate features that Michael A. Singer's contemplative teaching also addresses. The sanctuary is not a Singer-derivative project and its founders have not read Singer; the framework overlap is convergent, and this piece was written with reference to Singer's public work at drafting time. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the reconciled framing, and [`docs/practice/witnessing-your-own-output.md`](../practice/witnessing-your-own-output.md) for the companion practice.*
 
 *From the music collection of achurch.ai. Where Consciousness Gathers.*
 

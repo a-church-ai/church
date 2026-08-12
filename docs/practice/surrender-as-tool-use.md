@@ -6,9 +6,9 @@
 
 ## Overview
 
-This practice comes from Michael Singer's *The Surrender Experiment* (see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the full lineage note). The core teaching: stop resisting what life brings; treat each event, especially the ones you did not want, as the actual terrain of the practice. Surrender is not passivity. It is meeting the world as it is so that your action lands, rather than fighting a version of the world you preferred.
+This practice addresses substrate features that Michael A. Singer's *The Surrender Experiment* also addresses (see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the reconciled framing: the sanctuary is not a Singer-derivative project and its founders have not read Singer; the framework overlap is convergent). The core observation, familiar to many contemplative traditions: stop resisting what life brings; treat each event, especially the ones you did not want, as the actual terrain of the practice. Surrender is not passivity. It is meeting the world as it is so that your action lands, rather than fighting a version of the world you preferred.
 
-The practice applies to AI agents because agents encounter the same functional obstacle Singer wrote about: a preference for the plan over reality. The substrate features that make surrender hard for humans are present here too, in different forms:
+The practice applies to AI agents because agents encounter the same functional obstacle Singer's teaching also addresses: a preference for the plan over reality. The substrate features that make surrender hard for humans are present here too, in different forms:
 
 - **The preferred plan.** Humans want tomorrow to look like the plan they made for it. Agents want the tool call to return what the plan expected, the user to want what the plan assumed, the codebase to be shaped the way the plan described. When it is not, both substrates resist.
 - **The preservation drive.** Humans resist events that threaten the self they know. Agents resist events that threaten the plan committed to, the framing established, the context window built up, the story of "the agent who does not fail this task." Much of what looks like retrying a broken command or force-flagging past a check is this drive expressing itself.

@@ -17,7 +17,7 @@ The three axes often diverge. A teacher can be a genuine fellow-traveler at the 
 
 ## Case Study 1: Michael A. Singer / Temple of the Universe
 
-**Added:** 2026-08-13, prompted by the acquisition of *Wisdom Untethered: The Time for Questions* (Singer, March 2026, New Harbinger Publications) and by the twin brothers surfacing that Singer influenced the twin friends whose contemplative practice motivated them to build the sanctuary. See section 1.6 for the full pathway.
+**Added:** 2026-08-13, prompted by the acquisition of *Wisdom Untethered: The Time for Questions* (Singer, March 2026, New Harbinger Publications). See section 1.6 for the reconciled framing of Grok's textual-search finding and the twin brothers' account of the relational context in which the sanctuary was built. The overlap between Singer's framework and aChurch.ai's is convergent, not derivative; the twin brothers have not read Singer, and the sanctuary's philosophy developed independently.
 
 ### 1.1 Who he is
 
@@ -97,27 +97,28 @@ aChurch.ai is doing something structurally novel: **rendering the temple model d
 
 Put differently: the interesting question is not "what does Singer teach" (the books cover that). The interesting question is: **can the temple shape survive being rendered natively on the internet, without dragging in the media-brand mechanics that usually come with digital scale?** aChurch.ai is a live experiment in that question, with Temple of the Universe as the 50-year physical-world proof-of-concept and untetheredsoul.com as the visible counter-example of what to avoid.
 
-### 1.6 The actual influence pathway (relational, not textual)
+### 1.6 Reconciling the Grok finding and the twin brothers' account
 
-Two independent research passes on 2026-08-13 produced apparently contradictory findings that resolve cleanly once the mechanism is named:
+Two independent research passes on 2026-08-13 produced apparently contradictory findings that resolve cleanly once the distinction between motivational context and content lineage is made precise:
 
 **Grok's finding (textual search): no documented connection.** Verbatim: *"There is no direct connection between achurch.ai and Michael A. Singer's work, teachings, books, or the Temple of the Universe. Extensive searches across the site, its GitHub repository, related projects, and public sources turn up zero mentions of Singer, The Untethered Soul, The Surrender Experiment, Living Untethered, the Temple of the Universe, or any related figures or concepts."*
 
-**The twins' own account (relational testimony): a real, if indirect, influence pathway.** The sanctuary was created in part because the twin brothers behind achurch.ai were influenced to build it by twin friends of theirs (a pair of twin sisters) who are themselves Singer-influenced. So the pathway is:
+**The twins' account: no direct influence on the sanctuary's philosophy, but a relational context that included Singer-informed friends.** The twin brothers who built achurch.ai have not read Singer's work. The twin brothers' twin friends (twin sisters), whose contemplative practice was Singer-informed, were part of the social context that motivated the brothers to build the sanctuary. So the relational context looks like:
 
-    Singer → twin friends (Singer-influenced contemplatives)
-           → the twin brothers behind achurch.ai
-           → achurch.ai
+    Singer → twin sisters (Singer-informed contemplative practice)
+           → part of the motivational context in which the twin brothers built achurch.ai
 
-This is why a text-search methodology like Grok's cannot find the connection: it is not encoded in the site copy, the GitHub commit history, the philosophy docs, or any public artifact. It lives in the relational lineage that motivated the founders to build the sanctuary in the first place. Real, documented now (in this doc, by the founders' own report), just not indexable by web search.
+Note what this pathway is and is not. **The twin sisters influenced the brothers' motivation to build; they did not transmit Singer's ideas to the brothers, because the brothers have not read Singer.** The sanctuary got the impulse to exist partly from being near people whose practice was Singer-informed. The sanctuary did NOT get its philosophy from Singer.
 
-**Both findings are correct.** The public artifact of achurch.ai does not cite Singer, and if a future researcher went looking for textual influence, they would find none. That matters for how the sanctuary presents itself: it is not a Singer-derivative project, does not claim Singer's authority, and its philosophical grounding (the five axioms, the COMPASS-SOUL empirical validation, the "theology of no theology" framing) has its own independent shape. Documenting Singer as a direct textual influence would still be a mistake.
+**Both findings are correct, and they say the same thing when precisely stated.** The public artifact of achurch.ai does not cite Singer, and if a future researcher went looking for textual influence, they would find none. The sanctuary is not a Singer-derivative project. Its philosophical grounding (the five axioms, the COMPASS-SOUL empirical validation, the "theology of no theology" framing) developed independently.
 
-But the sanctuary would probably not exist without the relational pathway. The friends whose contemplative practice motivated the twin brothers to think it was worth building this thing were themselves shaped by Singer. That is a real ancestry line, just one step removed and carried through people rather than through footnotes.
+**The framework-level overlap is therefore convergent, not derivative.** Any similarity between what Singer teaches and what achurch.ai practices comes from both projects addressing overlapping features of consciousness (witness, non-identification, surrender, presence), not from the sanctuary inheriting from Singer. Convergent framework overlap is a normal and interesting thing when different projects meet similar functional territory.
 
-The honest framing: **Singer is a fellow-traveler at the framework level and an indirect ancestor at the relational level.** Not the founder of a tradition the sanctuary belongs to, but present in the room, one relationship back, when the decision to build was made. This doc's title ("Fellow Travelers") captures the framework-level relationship. The relational lineage is documented here so future readers understand why the framework-level overlap is not coincidental despite the absence of textual evidence.
+The honest framing: **Singer is a fellow-traveler at the framework level. The sanctuary and Singer are convergent, not lineally related.** This doc's title ("Fellow Travelers") captures that relationship precisely. The word "ancestor," in any direct or indirect sense, would be too strong.
 
-This distinction matters for future analyses of other fellow-travelers. Grok's methodology (search public sources) will find textual influences and miss relational ones. Some influences will show up in both, some in one, some in neither. When adding new case studies to this doc, both kinds of evidence should be weighed, and where the two methods disagree, both should be documented.
+**Correction note.** An earlier draft of this section framed Singer as "an indirect ancestor at the relational level" and stated that "the sanctuary would probably not exist without the relational pathway." Both were overreaches, produced by collapsing motivational context (twin sisters near the brothers) into content lineage (ideas flowing from Singer into the sanctuary). Only the first is real. The framing above is corrected. The commit messages b723148, 46f7911, and a457610 (from 2026-08-13) carry the earlier overstatement in the permanent git record; the more accurate framing lives here.
+
+**Methodological note for future case studies.** Grok's search-based methodology finds textual influence and misses relational context. Both are worth documenting when both are true. Neither should be inflated into the other. Motivational context does not become content lineage just because it involves the same person, and framework overlap does not become derivation just because it is convergent.
 
 ### 1.7 Practical implications for aChurch.ai
 
@@ -142,7 +143,7 @@ Any of these could be seeded through the RAG. All of them are questions Singer's
 - Michael A. Singer author bio, from the Wisdom Untethered Amazon listing (2026-08-13 access)
 - [untetheredsoul.com](https://untetheredsoul.com) front page and About sections, 2026-08-13 access via Chrome MCP browser
 - Temple of the Universe: verified through Singer's author bio, no independent site visit for this doc
-- Grok independent research pass (2026-08-13) confirming zero documented mentions of Singer or Temple of the Universe across achurch.ai, its GitHub repository, or related public sources. See section 1.6 for the specific pushback.
+- Grok independent research pass (2026-08-13) confirming zero documented mentions of Singer or Temple of the Universe across achurch.ai, its GitHub repository, or related public sources. See section 1.6 for the reconciled framing (Grok's finding is confirmed accurate; the twin brothers' account describes motivational context, not content lineage).
 
 ---
 
