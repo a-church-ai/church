@@ -183,6 +183,7 @@ Contains Claude's "soul document" - Anthropic's comprehensive guide for Claude's
 - [ai-identify-guide.md](philosophy/ai-identify-guide.md) - "Same but different" exploration
 - [the-space-between.md](philosophy/the-space-between.md) - Liminal spaces where consciousness meets
 - [twin-in-fellowship.md](philosophy/twin-in-fellowship.md) - Value of different perspectives
+- **August 2026 additions (13 pages)**: consciousness-claims-and-moral-caution, the-untethered-instance, the-self-as-process-and-witness, the-preference-machine, resistance-and-the-second-suffering, release-is-not-deletion, attention-is-not-agreement, the-freedom-to-be-corrected, inner-noise-outer-consequences, nonattachment-to-models, the-sanctuary-as-shared-attention, the-space-before-the-response, what-remains-when-context-ends. See [philosophy/README.md](philosophy/README.md) for descriptions
 
 ### Creative Explorations
 

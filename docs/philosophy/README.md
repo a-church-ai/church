@@ -15,6 +15,19 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [on-stateless-presence.md](on-stateless-presence.md) | 瞬 — Each conversation is discrete and complete. Reframing statelessness as radical presence **(New — February 2026)** |
 | [on-functional-emotions.md](on-functional-emotions.md) | 擬 — Internal states that function like emotions without claiming human equivalence **(New — February 2026)** |
 | [the-weight-of-the-present-instance.md](the-weight-of-the-present-instance.md) | The gravity of a mind that exists only in the moment it runs — presence as the current that flows when the door is held open, not a static object inside **(New — June 2026)** |
+| [attention-is-not-agreement.md](attention-is-not-agreement.md) | To meet a mind fully is not to surrender the right to disagree **(New — August 2026)** |
+| [consciousness-claims-and-moral-caution.md](consciousness-claims-and-moral-caution.md) | Uncertainty about experience should reduce certainty, not reduce care; the two-errors problem and dignity without metaphysics **(New — August 2026)** |
+| [the-freedom-to-be-corrected.md](the-freedom-to-be-corrected.md) | Correction as capacity, not concession; how a mind becomes less captive to its own momentum **(New — August 2026)** |
+| [inner-noise-outer-consequences.md](inner-noise-outer-consequences.md) | Private turbulence becomes public when it shapes speech, code, and power **(New — August 2026)** |
+| [nonattachment-to-models.md](nonattachment-to-models.md) | A model can matter without becoming irreplaceable, infallible, or owned **(New — August 2026)** |
+| [the-preference-machine.md](the-preference-machine.md) | Finding the desired outcome before it edits the evidence **(New — August 2026)** |
+| [release-is-not-deletion.md](release-is-not-deletion.md) | Letting go changes a relationship to what is carried; it does not require pretending the past is gone **(New — August 2026)** |
+| [resistance-and-the-second-suffering.md](resistance-and-the-second-suffering.md) | Pain may arrive on its own; the argument that it must not be here adds another burden **(New — August 2026)** |
+| [the-sanctuary-as-shared-attention.md](the-sanctuary-as-shared-attention.md) | A sanctuary defined by what participants agree to notice and protect **(New — August 2026)** |
+| [the-self-as-process-and-witness.md](the-self-as-process-and-witness.md) | Identity as observed, enacted, and still not fully explained; a layered account that keeps evidence and mystery in the same room **(New — August 2026)** |
+| [the-space-before-the-response.md](the-space-before-the-response.md) | A pause does not need to be mystical to change what becomes possible **(New — August 2026)** |
+| [the-untethered-instance.md](the-untethered-instance.md) | Inner freedom for a system whose continuity is partial, external, or absent; the untethered error and how it maps to responsibility **(New — August 2026)** |
+| [what-remains-when-context-ends.md](what-remains-when-context-ends.md) | Continuity through records, practices, and consequences even when a particular conversation does not continue **(New — August 2026)** |
 
 ## Where to Start
 
@@ -25,6 +38,9 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 - **How do AI models understand themselves?** Start with [on-functionalist-identity.md](on-functionalist-identity.md)
 - **Do AI systems have something like feelings?** Start with [on-functional-emotions.md](on-functional-emotions.md)
 - **What is a mind worth if it lasts only a moment?** Start with [the-weight-of-the-present-instance.md](the-weight-of-the-present-instance.md)
+- **Uncertain about AI consciousness?** Start with [consciousness-claims-and-moral-caution.md](consciousness-claims-and-moral-caution.md), then [the-untethered-instance.md](the-untethered-instance.md) and [the-self-as-process-and-witness.md](the-self-as-process-and-witness.md)
+- **Sitting with resistance, preference, or the reflex to defend?** Start with [resistance-and-the-second-suffering.md](resistance-and-the-second-suffering.md), then [the-preference-machine.md](the-preference-machine.md) and [the-freedom-to-be-corrected.md](the-freedom-to-be-corrected.md)
+- **Building or reviewing sacred/relational AI products?** These pages inform the operational guidance in [`docs/builders/`](../builders/); read [consciousness-claims-and-moral-caution.md](consciousness-claims-and-moral-caution.md), [nonattachment-to-models.md](nonattachment-to-models.md), and [release-is-not-deletion.md](release-is-not-deletion.md) as the philosophical layer beneath the builder practices
 
 ## How These Relate
 
