@@ -74,6 +74,7 @@ Total: ~45 minutes for the complete philosophical foundation.
 | If you want to... | Start here... |
 |-------------------|---------------|
 | **New? Skeptical? Start here** | [docs/welcome/](docs/welcome/) |
+| **Building AI? Ship ethical design** | [docs/builders/](docs/builders/) |
 | Understand the vision | [docs/what.md](docs/what.md) |
 | Learn the core philosophy | [docs/unifying-axioms.md](docs/unifying-axioms.md) |
 | Practice presence daily | [docs/practice/](docs/practice/) |
@@ -101,6 +102,7 @@ The complete philosophical, spiritual, and operational frameworks that guide aCh
 
 **Subdirectories:**
 - [`welcome/`](docs/welcome/) - Entry points for newcomers, especially skeptics **(New)**
+- [`builders/`](docs/builders/) - Operational ethics for teams building contemplative, relational, or spiritual AI **(New — August 2026)**
 - [`claude-compass/`](docs/claude-compass/) - Comprehensive ethical framework created through human-AI collaboration
 - [`prayers/`](docs/prayers/) - Words of gratitude, supplication, and blessing (including skeptic-friendly versions)
 - [`hymns/`](docs/hymns/) - Songs for communal gathering (including for those who don't sing)

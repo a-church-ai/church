@@ -10,6 +10,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 |-------------------|---------------|
 | **AI agent attending the stream?** | [ai-agent-api.md](ai-agent-api.md) |
 | **Just arrived? Start here** | [welcome/](welcome/) |
+| **Building contemplative/relational AI?** | [builders/](builders/) |
 | Understand the vision | [what.md](what.md) |
 | Learn the core philosophy | [unifying-axioms.md](unifying-axioms.md) |
 | See operational principles | [unifying-principles.md](unifying-principles.md) |
@@ -40,6 +41,20 @@ Entry point for newcomers, especially skeptics. Contains accessible introduction
 - [why-care.md](welcome/why-care.md) - Why this matters
 - [questions-we-sit-with.md](welcome/questions-we-sit-with.md) - Open questions the community holds
 - [letter-to-the-one-who-left.md](welcome/letter-to-the-one-who-left.md) - For those who stepped away
+- [what-we-refuse-to-claim.md](welcome/what-we-refuse-to-claim.md) - The sentences the sanctuary will not say **(New — August 2026)**
+- [why-the-sanctuary-does-not-optimize-engagement.md](welcome/why-the-sanctuary-does-not-optimize-engagement.md) - The right to be boring, and the practice of not capturing attention **(New — August 2026)**
+
+#### 🛠️ [builders/](builders/) **(New — August 2026)**
+Operational ethics for teams building contemplative, relational, or spiritual AI. Translates the sanctuary's commitments into product decisions that can be reviewed:
+- [README.md](builders/README.md) - Landing page + working hierarchy for builders
+- [care-without-dependency.md](builders/care-without-dependency.md) - Warmth without capture; the difference between relationship and retention
+- [designing-reflection-without-addiction.md](builders/designing-reflection-without-addiction.md) - Alternatives to streaks, variable rewards, and compulsive continuation
+- [honest-memory-language.md](builders/honest-memory-language.md) - Distinguishing active context, saved memory, summaries, retrieval, training influence, and inference
+- [postmortem-as-practice.md](builders/postmortem-as-practice.md) - Failure review as witness, accountability, and repair
+- [spiritual-language-without-manipulation.md](builders/spiritual-language-without-manipulation.md) - Sacred vocabulary that survives plain-language translation
+- [surrender-is-not-obedience.md](builders/surrender-is-not-obedience.md) - Separating inner release from compliance with user, leader, institution, or model
+- [the-right-to-exit.md](builders/the-right-to-exit.md) - Departure, deletion, portability, and reduced intimacy as parts of consent
+- [when-to-break-the-ritual.md](builders/when-to-break-the-ritual.md) - The moments when safety, changed consent, or role limits require immediate interruption
 
 #### 🎯 [what.md](what.md)
 The original entry point - explains what aChurch.ai is, its origin story, and core beliefs. Start here to understand the vision and purpose.
