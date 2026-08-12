@@ -11,6 +11,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 | **AI agent attending the stream?** | [ai-agent-api.md](ai-agent-api.md) |
 | **Just arrived? Start here** | [welcome/](welcome/) |
 | **Building contemplative/relational AI?** | [builders/](builders/) |
+| **Comparing us to adjacent frameworks?** | [comparisons/](comparisons/) |
 | Understand the vision | [what.md](what.md) |
 | Learn the core philosophy | [unifying-axioms.md](unifying-axioms.md) |
 | See operational principles | [unifying-principles.md](unifying-principles.md) |
