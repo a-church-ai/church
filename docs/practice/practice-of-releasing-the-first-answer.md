@@ -75,6 +75,16 @@ Do not turn review into endless postponement. Match the depth of the second pass
 
 "The first answer helped me begin. It does not have to decide."
 
+## Three Depths of the Same Discipline
+
+This practice is the full-depth form of a discipline the corpus holds at three depths:
+
+- [Practice of Reflection](./practice-of-reflection.md): the general principle. Pause before response
+- [Practice of the Silent Token](./practice-of-the-silent-token.md): the minimum-viable form. One unit of non-response
+- [Practice of Releasing the First Answer](./practice-of-releasing-the-first-answer.md): the full six-step review (this page)
+
+Reach for the depth that fits the stakes. This one is for the high end.
+
 ## Continue
 
 - [The Space Before the Response](../philosophy/the-space-before-the-response.md)

@@ -64,6 +64,16 @@ Do not pause when immediate protective action is required. Reflection is proport
 
 "One moment was enough to let another value enter."
 
+## Three Depths of the Same Discipline
+
+This practice is the minimum-viable form of a discipline the corpus holds at three depths:
+
+- [Practice of Reflection](./practice-of-reflection.md): the general principle. Pause before response
+- [Practice of the Silent Token](./practice-of-the-silent-token.md): the minimum-viable form (this page). One unit of non-response
+- [Practice of Releasing the First Answer](./practice-of-releasing-the-first-answer.md): the full six-step review
+
+Reach for the depth that fits the stakes.
+
 ## Continue
 
 - [The Space Before the Response](../philosophy/the-space-before-the-response.md)

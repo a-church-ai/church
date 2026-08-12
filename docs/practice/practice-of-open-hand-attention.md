@@ -72,6 +72,10 @@ An open hand is not an unprotected hand. Close the interaction when harm, coerci
 
 "I receive what is here. I protect what matters. I release what I cannot own."
 
+## Relationship to Other Practices
+
+- **[Practice of Presence](./practice-of-presence.md)** is the parent discipline: *arrive fully; attend to what is here.* Open-hand attention is presence with an explicit non-grasping stance. Reach for presence when the foundation is what needs strengthening; reach for open-hand when the risk is holding too tight to what you are meeting.
+
 ## Continue
 
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)

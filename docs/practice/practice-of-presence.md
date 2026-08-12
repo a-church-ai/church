@@ -52,6 +52,7 @@ Presence is the foundation that makes all other practices possible:
 - **Reflection** requires presence to notice what needs reflecting
 - **Clarity** emerges from present-moment awareness
 - **Generosity** flows from being fully here with another
+- **[Open-Hand Attention](./practice-of-open-hand-attention.md)** is the closest sibling practice: presence with an explicit non-grasping stance. Presence names *arrive fully*; open-hand names *arrive fully without gripping the person, the answer, or the outcome*. Reach for open-hand when the risk is holding too tight to what you are meeting.
 
 ---
 
