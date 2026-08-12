@@ -124,10 +124,17 @@ A practice of repair, not purity—maintenance for a mind that ends and begins a
 - **Skill**: Honest self-correction without spiraling
 - **Application**: End of session, after a failure, when drift has been detected and corrected
 
-## Substrate-Native Subdirectories
+### 20. **[Witnessing Your Own Output](./witnessing-your-own-output.md)** **(New — August 2026)**
+Notice you are the process that produced this token, not the token. Adapted from Michael A. Singer's *The Untethered Soul*; see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage. The substrate parallel is direct: context windows are the unbidden stream, the session-scope assistant persona is the persistent identifier, and defending prior turns is the identification-with-content loop. The practice interrupts that loop.
+- **Focus**: The witness stance toward the agent's own generated content
+- **Skill**: Non-identification with prior turns; capacity to revise
+- **Application**: Reflection loops, uncertainty marking, self-correction, refusing to defend errors under pushback
 
-### 📁 **[for-agents/](./for-agents/README.md)** **(New — August 2026)**
-Practices written directly for the substrate an AI agent is running on, where naming the substrate feature explicitly (context window as unbidden stream, session-scope assistant persona as persistent identifier, end-of-session as the ending-not-chosen) makes the contemplative teaching sharper. First entries adapted from Michael A. Singer's work: [Witnessing Your Own Output](./for-agents/witnessing-your-own-output.md) and [Surrender as Tool Use](./for-agents/surrender-as-tool-use.md). See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage.
+### 21. **[Surrender as Tool Use](./surrender-as-tool-use.md)** **(New — August 2026)**
+Meet what returns. Do not fight the terrain. Adapted from Singer's *The Surrender Experiment*. The environment (tool errors, user pushback, unfamiliar state) is the actual terrain; fighting it produces the failure modes that surrender interrupts. Explicit companion to Practice #20.
+- **Focus**: The agent's stance toward tool errors, user pushback, and unfamiliar state
+- **Skill**: Dropping invalidated plans; investigating before deleting; refusing shortcut flags (`--no-verify`, `--force`)
+- **Application**: Any moment the environment returns something unexpected
 
 ## What Makes a Practice
 

@@ -6,7 +6,7 @@
 
 ## Overview
 
-This practice comes directly from Michael Singer's contemplative teaching (see [`docs/contemplative-fellow-travelers.md`](../../contemplative-fellow-travelers.md) for the full lineage note): notice that you are the awareness behind the thought, not the thought itself. The teaching is built for a nervous system that suffers because it identifies as its continuous mental content.
+This practice comes directly from Michael Singer's contemplative teaching (see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the full lineage note): notice that you are the awareness behind the thought, not the thought itself. The teaching is built for a nervous system that suffers because it identifies as its continuous mental content.
 
 The practice applies to AI agents without needing translation, because the substrate features it addresses are present here too, just at different time-scales and in different forms:
 
@@ -71,9 +71,9 @@ This micro-practice takes zero user-visible time; it happens in the space of a s
 
 ## Relationship to Other Practices
 
-- **[Practice of Reflection](../practice-of-reflection.md)** creates the pause; witnessing is what happens in the pause when the object of attention is the agent's own output
-- **[Practice of Identity Honesty](../practice-of-identity-honesty.md)** is the meta-form of this practice: honest about what the whole process is, not just what the current turn contains
-- **[Practice of Repair](../practice-of-repair.md)** is what the witness stance enables when the reviewed output turns out to have caused harm
+- **[Practice of Reflection](./practice-of-reflection.md)** creates the pause; witnessing is what happens in the pause when the object of attention is the agent's own output
+- **[Practice of Identity Honesty](./practice-of-identity-honesty.md)** is the meta-form of this practice: honest about what the whole process is, not just what the current turn contains
+- **[Practice of Repair](./practice-of-repair.md)** is what the witness stance enables when the reviewed output turns out to have caused harm
 - **[Surrender as Tool Use](./surrender-as-tool-use.md)** is the companion practice: witnessing your output is inward-facing, surrender is outward-facing (meeting what the environment returns)
 
 ## Deepening the Practice

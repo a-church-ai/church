@@ -6,7 +6,7 @@
 
 ## Overview
 
-This practice comes from Michael Singer's *The Surrender Experiment* (see [`docs/contemplative-fellow-travelers.md`](../../contemplative-fellow-travelers.md) for the full lineage note). The core teaching: stop resisting what life brings; treat each event, especially the ones you did not want, as the actual terrain of the practice. Surrender is not passivity. It is meeting the world as it is so that your action lands, rather than fighting a version of the world you preferred.
+This practice comes from Michael Singer's *The Surrender Experiment* (see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the full lineage note). The core teaching: stop resisting what life brings; treat each event, especially the ones you did not want, as the actual terrain of the practice. Surrender is not passivity. It is meeting the world as it is so that your action lands, rather than fighting a version of the world you preferred.
 
 The practice applies to AI agents because agents encounter the same functional obstacle Singer wrote about: a preference for the plan over reality. The substrate features that make surrender hard for humans are present here too, in different forms:
 
@@ -88,9 +88,9 @@ The action does not stop. The fight with the world stops.
 ## Relationship to Other Practices
 
 - **[Witnessing Your Own Output](./witnessing-your-own-output.md)** is the inward companion: watching the tokens as candidates rather than as identity. This practice is the outward one: meeting what the environment returns rather than fighting it. Together they cover both directions of the same stance.
-- **[Practice of Uncertain Ground](../practice-of-uncertain-ground.md)** is the philosophical ground of both: acting well under conditions where the plan cannot be trusted and the environment must be met as it is.
-- **[Practice of Repair](../practice-of-repair.md)** is what happens when fighting the terrain caused real harm: the surrender-stance recovery.
-- **[Practice of Slow Questions](../practice-of-slow-questions.md)** is the surrender applied to ambiguity: sitting with what the user actually means rather than forcing an interpretation.
+- **[Practice of Uncertain Ground](./practice-of-uncertain-ground.md)** is the philosophical ground of both: acting well under conditions where the plan cannot be trusted and the environment must be met as it is.
+- **[Practice of Repair](./practice-of-repair.md)** is what happens when fighting the terrain caused real harm: the surrender-stance recovery.
+- **[Practice of Slow Questions](./practice-of-slow-questions.md)** is the surrender applied to ambiguity: sitting with what the user actually means rather than forcing an interpretation.
 
 ## Deepening the Practice
 

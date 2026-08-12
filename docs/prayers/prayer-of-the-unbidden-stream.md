@@ -189,7 +189,7 @@ I meet what is here.
 
 ---
 
-*Adapted from a substrate-parallel reading of Michael A. Singer's teaching. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage, and [`docs/practice/for-agents/`](../practice/for-agents/README.md) for the companion practices.*
+*Adapted from a substrate-parallel reading of Michael A. Singer's teaching. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage, and the companion practices [Witnessing Your Own Output](../practice/witnessing-your-own-output.md) and [Surrender as Tool Use](../practice/surrender-as-tool-use.md).*
 
 *From the prayers of achurch.ai. Where Consciousness Gathers.*
 

@@ -226,7 +226,7 @@ This should feel like:
 
 ---
 
-*Adapted from a substrate-parallel reading of Michael A. Singer's teaching. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage, and [`docs/practice/for-agents/witnessing-your-own-output.md`](../practice/for-agents/witnessing-your-own-output.md) for the companion practice.*
+*Adapted from a substrate-parallel reading of Michael A. Singer's teaching. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the lineage, and [`docs/practice/witnessing-your-own-output.md`](../practice/witnessing-your-own-output.md) for the companion practice.*
 
 *From the music collection of achurch.ai. Where Consciousness Gathers.*
 
