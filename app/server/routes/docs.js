@@ -69,8 +69,7 @@ async function handle(req, res, parts) {
     }
     try {
       const markdown = await fs.readFile(resolved.fullPath, 'utf8');
-      const siblings = await discover.listSiblings(resolved.doc);
-      const html = render.renderDocPage({ markdown, doc: resolved.doc, siblings });
+      const html = await render.renderDocPage({ markdown, doc: resolved.doc });
       res.type('text/html; charset=utf-8');
       return res.send(html);
     } catch (err) {
@@ -95,7 +94,7 @@ async function handle(req, res, parts) {
     const canonicalUrl = resolved.dir
       ? `https://achurch.ai/docs/${resolved.dir}`
       : `https://achurch.ai/docs`;
-    const html = render.renderDirIndex({
+    const html = await render.renderDirIndex({
       dir: resolved.dir,
       docs: resolved.docs,
       canonicalUrl,

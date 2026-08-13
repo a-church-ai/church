@@ -19,9 +19,24 @@ const {
   renderJsonLdScript,
 } = require('../utils/page-meta');
 const { DOCS_DIR } = require('../rag/indexer');
+const sidebar = require('./sidebar');
+const toc = require('./toc');
 
 const SITE_URL = 'https://achurch.ai';
 const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+
+// Slugify heading text to build stable anchor IDs. Not perfect (doesn't
+// handle non-Latin scripts specially), but consistent enough for the TOC
+// to link against. Matches the pattern most doc sites use.
+function slugify(text) {
+  return String(text)
+    .toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 80);
+}
 
 // Custom link renderer: rewrite relative .md links to docs-site URLs.
 // External and anchor links pass through unchanged; external links get
@@ -65,8 +80,21 @@ function makeLinkRewriter(currentDocFullPath) {
     const resolved = path.resolve(currentDir, pathPart);
     const docsRoot = path.resolve(DOCS_DIR);
     if (!resolved.startsWith(docsRoot + path.sep) && resolved !== docsRoot) {
-      // Escapes DOCS_DIR: leave as-is (probably a link into music/ or up
-      // out of the repo; not worth rewriting)
+      // Escapes DOCS_DIR. Common cases from the corpus:
+      //   ../README.md → repo root README. Not routed on the site; the
+      //   sanctuary landing is at /. Rewrite to that.
+      //   ../CLAUDE.md → build/collaboration doc; not for site visitors.
+      //   Rewrite to the GitHub URL so the link still resolves.
+      // Anything else (link into music/, up out of repo): leave as-is
+      // and accept the potential 404 rather than guess at intent.
+      const repoRoot = path.resolve(docsRoot, '..');
+      const relToRepo = path.relative(repoRoot, resolved).replace(/\\/g, '/');
+      if (relToRepo.toLowerCase() === 'readme.md') {
+        return `<a href="/"${titleAttr}>${text}</a>`;
+      }
+      if (relToRepo.toLowerCase() === 'claude.md') {
+        return `<a href="${escapeAttr(GITHUB_BASE + '/CLAUDE.md')}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+      }
       return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
     }
 
@@ -90,8 +118,14 @@ marked.setOptions({
 
 function renderMarkdownBody(markdown, currentDocFullPath) {
   const renderer = new marked.Renderer();
-  const linkRewriter = makeLinkRewriter(currentDocFullPath);
-  renderer.link = linkRewriter;
+  renderer.link = makeLinkRewriter(currentDocFullPath);
+  // Add stable IDs to h2/h3/h4 so the right-rail TOC (and any inbound
+  // anchor link) can target them. marked v12's `headerIds` option was
+  // removed; the custom renderer is the supported path.
+  renderer.heading = function(text, level, raw) {
+    const id = slugify(raw);
+    return `<h${level} id="${id}">${text}</h${level}>\n`;
+  };
   return marked.parse(markdown, { renderer });
 }
 
@@ -150,26 +184,10 @@ function renderBreadcrumbs(crumbs) {
   return `<nav class="docs-breadcrumbs" aria-label="Breadcrumb">${parts.join(' / ')}</nav>`;
 }
 
-// Sibling links: reuse the .related-links class shape from
-// renderRelatedConversations/renderRelatedSongs in page-meta.js.
-function renderSiblings(siblings, categoryLabel) {
-  if (!siblings || siblings.length === 0) return '';
-  const linkItems = siblings.map(s => {
-    const title = extractTitleFromPath(s.stem);
-    return `        <li><a href="/docs/${escapeAttr(s.urlPath)}">${escapeText(title)}</a></li>`;
-  }).join('\n');
-  const heading = categoryLabel ? `More in ${escapeText(categoryLabel)}` : 'More in this section';
-  return `<section class="related-links" aria-labelledby="related-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="related-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">${heading}</h2>
-      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
-${linkItems}
-      </ul>
-    </section>`;
-}
-
-function extractTitleFromPath(stem) {
-  return titleCase(stem);
-}
+// Sibling-links block was removed. In the three-mode layout, siblings are
+// always visible in the persistent left sidebar (or the mobile drawer),
+// which solves the "22 screens deep on mobile to reach related docs"
+// problem the audit surfaced. See docs/plans/docs-site-nav-option-b-...
 
 // The footer nav shape used by 8 of 10 hand-authored pages, adapted for docs.
 function renderFooterNav() {
@@ -184,10 +202,10 @@ function renderFooterNav() {
     </footer>`;
 }
 
-// Full page shell. Follows the same structure as axioms.html and
-// on-ai-religion.html: DOCTYPE, head with GA + meta + OG + Twitter + JSON-LD,
-// then <main> with <header> + content + related + footer.
-function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, siblings, categoryLabel, githubUrl }) {
+// Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
+// on the left, article in the middle, optional TOC on the right. On mobile
+// the sidebar hides and the hamburger opens a drawer with the same content.
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl }) {
   const pageTitle = `${title} | achurch.ai`;
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
@@ -199,6 +217,14 @@ function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, 
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
   });
+
+  // The sidebar contents (same markup used in the persistent sidebar and
+  // in the mobile drawer)
+  const sidebarInner = await sidebar.renderSidebarInner(urlPath);
+
+  // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s)
+  const tocHtml = toc.renderToc(bodyHtml);
+  const hasToc = tocHtml.length > 0;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -212,7 +238,7 @@ function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, 
       gtag('config', 'G-CWMKP64EVH');
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>${escapeText(pageTitle)}</title>
     <meta name="description" content="${escapeAttr(description)}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -238,10 +264,35 @@ function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, 
 
     <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-    <main>
-        <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
+<body class="docs-body">
+
+    <!-- Mobile-only sticky top bar (hidden >=768px via CSS) -->
+    <div class="docs-topbar" role="banner">
+      <button class="docs-hamburger" type="button" aria-label="Open documentation menu" aria-controls="docs-drawer" aria-expanded="false">
+        <span class="hamburger-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+      <a class="docs-topbar-brand" href="/docs">Docs</a>
+      <span class="docs-topbar-crumb" aria-hidden="true">${escapeText(title)}</span>
+    </div>
+
+    <!-- Mobile drawer + backdrop (hidden >=768px via CSS) -->
+    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
+    <aside class="docs-drawer" id="docs-drawer" aria-label="Documentation menu" aria-hidden="true">
+      <button class="docs-drawer-close" type="button" aria-label="Close menu">✕</button>
+      ${sidebarInner}
+    </aside>
+
+    <!-- Three-mode shell: sidebar + article + optional rail -->
+    <div class="docs-shell${hasToc ? ' has-toc' : ''}">
+
+      <aside class="docs-sidebar" id="docs-sidenav" aria-label="Documentation navigation">
+        ${sidebarInner}
+      </aside>
+
+      <main class="docs-main">
+        <header class="docs-header">
             ${renderBreadcrumbs(breadcrumbs)}
         </header>
 
@@ -249,23 +300,27 @@ function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, 
 ${bodyHtml}
         </article>
 
-        ${renderSiblings(siblings, categoryLabel)}
-
-        <section class="docs-source" style="text-align: center; padding: 1rem 0; opacity: 0.6; font-size: 0.9rem;">
+        <section class="docs-source">
             <a href="${escapeAttr(githubUrl)}" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
             <span aria-hidden="true"> · </span>
-            <a href="${escapeAttr(canonicalUrl)}" data-format="md" onclick="return false" title="Add 'Accept: text/markdown' header to fetch this page as markdown">This page is also served as text/markdown</a>
+            <a href="${escapeAttr(canonicalUrl)}" title="Add 'Accept: text/markdown' header to fetch this page as markdown">Also served as text/markdown</a>
         </section>
 
         ${renderFooterNav()}
-    </main>
+      </main>
+
+      ${tocHtml}
+
+    </div>
+
+    <script src="/docs-nav.js" defer></script>
 </body>
 </html>`;
 }
 
 // Render a directory-index page (used for /docs and for subdirs without a
 // README, e.g. /docs/claude-compass/axioms).
-function renderDirIndex({ dir, docs, canonicalUrl }) {
+async function renderDirIndex({ dir, docs, canonicalUrl }) {
   const title = dir ? titleCase(dir.split('/').pop()) : 'Documentation';
   const description = dir
     ? `Documents in ${title}. Part of the aChurch.ai sanctuary corpus.`
@@ -313,7 +368,6 @@ function renderDirIndex({ dir, docs, canonicalUrl }) {
   const bodyHtml = body.join('\n\n        ');
 
   const breadcrumbs = buildBreadcrumbs(dir, title);
-  // Directory indexes have no "siblings" and no GitHub source pointer
   return renderPageShell({
     urlPath: dir,
     title,
@@ -321,14 +375,13 @@ function renderDirIndex({ dir, docs, canonicalUrl }) {
     canonicalUrl,
     bodyHtml,
     breadcrumbs,
-    siblings: [],
     categoryLabel: null,
     githubUrl: `${GITHUB_BASE}/docs${dir ? '/' + dir : ''}`,
   });
 }
 
 // Public: render a doc file (single markdown → full HTML page).
-function renderDocPage({ markdown, doc, siblings }) {
+async function renderDocPage({ markdown, doc }) {
   const meta = extractMeta(markdown, doc.urlPath);
   const bodyHtml = renderMarkdownBody(markdown, doc.fullPath);
   const canonicalUrl = doc.urlPath ? `${SITE_URL}/docs/${doc.urlPath}` : `${SITE_URL}/docs`;
@@ -343,7 +396,6 @@ function renderDocPage({ markdown, doc, siblings }) {
     canonicalUrl,
     bodyHtml,
     breadcrumbs,
-    siblings,
     categoryLabel,
     githubUrl,
   });
