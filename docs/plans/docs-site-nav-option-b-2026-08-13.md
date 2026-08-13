@@ -1,8 +1,47 @@
 # Plan: Docs Site — Option B (Traditional Sidebar + Right Rail Layout)
 
 **Created**: 2026-08-13
+**Revised**: 2026-08-13 (post-inspiration pass; see "Adopted patterns from a sibling project" below)
 **Status**: Draft. Awaiting decision between this plan and its lighter sibling (see [Option A](#relationship-to-option-a) discussion below).
 **Prompted by**: Navigation audit against the shipped `/docs/*` site ([commit 8a8b7f1](https://github.com/a-church-ai/church/commit/8a8b7f1)) surfaced concrete pain: on mobile, the busiest category page (`/docs/practice`) is 24 screens tall with the sibling-nav block 22 screens deep. No cross-category navigation. No search. Category README pages bury the sibling list below the entire README body. This plan describes the Docusaurus/GitBook-style solution to that pain.
+
+---
+
+## Adopted patterns from a sibling project
+
+The twin brothers shared two documents from a different project (a Svelte-based platform, not related to the sanctuary code): a **Collapsible left sidenav plan** with shipped notes, and a **UI/UX Conventions** doc. The patterns below were extracted from those references and are now assumed in this plan. They are called out here so the plan reads honestly about what is proven-in-production elsewhere vs. what is speculative for the sanctuary.
+
+**Directly adopted (proven-in-production, high confidence):**
+
+1. **Icon-rail collapsed state, not full-hide.** Collapsed sidebar is a 56px rail with category icons still visible, not `display: none`. Users always see where they are; toggle rehydrates full labels.
+2. **Viewport-aware auto-collapse threshold at 1024px.** Below 1024px, auto-collapse always wins (user preference ignored). At/above 1024px, respect the persisted user preference. Session-only override at narrow widths (a click at narrow width flips the state for the current session but does not write to localStorage). Threshold chosen because 1024-1280px is the "cramped tier" where side-by-side windows on 13-inch laptops live.
+3. **Persistent bottom toggle button** with keyboard shortcut `⌘\` (Mac) / `Ctrl+\` (Linux/Windows). Matches Cursor, VS Code, Linear, Vercel.
+4. **CSS grid-track driven by a CSS variable + `:has()` selector**, not by re-parenting or JavaScript layout. `.body { grid-template-columns: var(--sidenav-width, 240px) 1fr; }` and `.body:has(.sidenav.collapsed) { --sidenav-width: 56px; }`.
+5. **localStorage key `sidenav.collapsed`** with value `"1"` / `"0"`. Missing key = expanded default. Accept the one-frame flash for returning collapsed-state users (below perception threshold in practice).
+6. **Native `<details>` / `<summary>` for sidebar category expand/collapse.** Zero JavaScript required. Screen-reader-native.
+7. **`aria-expanded={!collapsed}`, `aria-controls`, `aria-label`** on the toggle button. Keyboard-focusable `<button>`, not a div.
+8. **`@media (prefers-reduced-motion: reduce) { transition: none; }`** everywhere motion appears.
+
+**Adopted with adaptation** (their platform behaved this way; adjusted for sanctuary):
+
+9. **Sidebar `overflow: hidden` breaks `position: sticky` on inner children.** Their shipped notes documented this the hard way. This plan will NOT set `overflow: hidden` on the sidenav; the collapsed-state label hiding is done via conditional rendering (`{#if !collapsed}<span>...` in Svelte; equivalent in our vanilla JS: don't emit the label span when collapsed) rather than CSS overflow. Accept a brief horizontal label-overflow during the 180ms transition.
+10. **Sticky toggle button** with `position: sticky; bottom: 0.5rem` and a solid background. `margin-top: auto` alone is insufficient because on long doc pages the sidebar stretches to full page height and the toggle ends up thousands of pixels below the viewport. This gotcha would have shipped and been caught in review; nice to skip that round trip.
+11. **Focus ring via `:focus-visible`, not `:focus`.** Same accessibility floor.
+12. **`100dvh` over `100vh`** for mobile viewport-fitting on the drawer, with `@supports not (height: 100dvh)` fallback.
+13. **`safe-area-inset-*` padding** on sticky chrome (mobile top bar).
+
+**Considered and deferred** (worth naming, not in this ship):
+
+- **Design token system** (`--bg-surface-1`, `--fg-default`, etc. declared once, referenced everywhere). The sanctuary uses CSS variables but not systematically. Refactoring is a separate concern; this plan uses the sanctuary's existing conventions.
+- **"No page-specific CSS" rule** with CI enforcement. Interesting but out of scope; the sanctuary currently allows inline styles in HTML files.
+- **Card grid utility with `--card-grid-min`** for auto-fit grids. Could improve `.docs-index-section` (currently uses a fixed `260px` minmax). Small opportunistic fix, added to this plan below.
+- **Detail page H1 rules** (no section-icon prefix). The sanctuary's docs pages already follow this by default; no action needed.
+
+**Not adopted** (context differs):
+
+- **Tailwind v4 with `@theme` directive.** The sanctuary uses vanilla CSS. Adopting Tailwind is a large separate project.
+- **The full component-layer discipline** (lib/ui/ primitives, lib/patterns/ composites, ADR-gated top-level folders). The sanctuary's frontend is 10 hand-authored HTML files + one docs template. Right-sized for its scale; no need to formalize a component library.
+- **cmdk-sv command palette, Svelte transitions, `data-theme` cookie-driven theming.** Not scoped to this plan.
 
 ---
 
@@ -58,32 +97,35 @@ The docs-site foundation shipped in [8a8b7f1](https://github.com/a-church-ai/chu
 
 ## Design decisions
 
-### Three-column layout
+### Three-mode nav (rail / expanded / drawer)
 
-**Desktop (≥1200px):**
+Based on the sibling project's proven pattern: the sidebar has THREE presentation modes, not just show/hide. Which mode is active depends on viewport width and user preference.
+
+**Wide desktop (≥1200px, user-preference respected):**
 ```
 ┌────────────┬────────────────────────────┬──────────────┐
 │  Sidebar   │     Main content           │  Page TOC    │
-│  (260px)   │     (fluid, max 720px)     │  (220px)     │
+│  240px     │     (fluid, max 720px)     │  220px       │
 │  sticky    │                            │  sticky      │
 │  scrollable│                            │              │
 └────────────┴────────────────────────────┴──────────────┘
 ```
+Default expanded. `⌘\` collapses to icon rail (56px). Right rail visible when doc has ≥3 H2s.
 
-**Tablet (768px – 1199px):**
+**Narrow desktop / tablet (768px – 1199px, auto-collapse to rail):**
 ```
-┌────────────┬────────────────────────────┐
-│  Sidebar   │     Main content           │
-│  (240px)   │     (fluid)                │
-│  sticky    │                            │
-└────────────┴────────────────────────────┘
+┌────┬─────────────────────────────────────────────────┐
+│ 56 │              Main content                       │
+│ px │              (fluid)                            │
+│rail│                                                 │
+└────┴─────────────────────────────────────────────────┘
 ```
-Right rail hidden.
+Sidebar auto-collapses to 56px icon rail. Category icons still visible (unlike the "full hide" original design). User can flip to expanded for the current session (⌘\); the expansion is NOT persisted (matches the sibling plan's "session-only override at narrow widths" rule). Right rail hidden.
 
-**Mobile (<768px):**
+**Mobile (<768px, drawer):**
 ```
 ┌──────────────────────────────────────┐
-│  [☰]  achurch.ai / docs         [🔍]│  ← sticky top bar
+│ [☰]  Docs / Practice                 │  ← sticky top bar with safe-area-inset
 ├──────────────────────────────────────┤
 │                                      │
 │         Main content                 │
@@ -91,7 +133,29 @@ Right rail hidden.
 │                                      │
 └──────────────────────────────────────┘
 ```
-Sidebar becomes a slide-out drawer triggered by hamburger. Right rail hidden entirely.
+At mobile widths, the 56px rail would still eat a meaningful chunk of a 375px viewport (15%) and its icons would be too small to tap reliably. Below 768px the rail hides entirely and the hamburger opens a full-height drawer containing the same content as the desktop expanded sidebar. Drawer uses `100dvh` for viewport-fitting; sticky top bar uses `env(safe-area-inset-top)` padding.
+
+### State machine (from sibling plan)
+
+```
+                                    matchMedia("(max-width: 1023px)").matches
+                        ┌──────────────────────────────────────────────────────┐
+                        ▼                                                      │
+┌──────────────────────────────┐   ⌘\ or click toggle   ┌──────────────────────┴───┐
+│  narrow: 56px rail           │◄─────────────────────►│  narrow: expanded (240px) │
+│  (auto, ignores preference)  │  (session-only flip)  │  (session-only, not saved) │
+└──────────────────┬───────────┘                        └───────────────────────────┘
+                   │
+                   │ viewport crosses to ≥1024px
+                   ▼
+┌──────────────────────────────┐   ⌘\ or click toggle   ┌───────────────────────────┐
+│  wide: read preference       │◄─────────────────────►│  wide: flip + persist to   │
+│  (default expanded if unset) │                       │  localStorage "sidenav.    │
+│                              │                       │  collapsed" = "0" or "1"   │
+└──────────────────────────────┘                        └───────────────────────────┘
+```
+
+Any viewport-tier crossing recomputes: `collapsed = mq.matches || readPersistedPref()`. Persisting a user's narrow-width transient override would be hostile (they'd return to a wide window later and find their nav unexpectedly collapsed).
 
 ### Left sidebar (nav tree)
 
@@ -104,36 +168,63 @@ Sidebar becomes a slide-out drawer triggered by hamburger. Right rail hidden ent
 
 **Interaction:**
 - Current page highlighted with a visible active-state (background tint + left border accent)
-- Current page's category auto-expanded
+- Current page's category auto-expanded via `<details open>`
 - Other categories collapsed by default (users can expand)
-- Click on a category label expands/collapses without navigating
+- Click on a category `<summary>` expands/collapses without navigating
 - Click on a doc navigates to that doc
-- Sidebar itself scrolls independently of main content (has its own scrollbar when tree is long)
+- Sidebar itself scrolls independently of main content (its own `overflow-y: auto` when tree is long)
+- **Toggle button pinned to bottom** with `position: sticky; bottom: 0.5rem` and a solid background so it stays reachable on long doc pages where the sidebar stretches to full page height (this is a shipped-in-prod gotcha from the sibling plan; `margin-top: auto` alone leaves the toggle scrolled-off on long pages)
+- **NO `overflow: hidden` on the sidenav itself** (breaks `position: sticky` on the toggle; label hiding when collapsed is done via server-side conditional rendering, not CSS overflow)
 
 **HTML shape** (rendered server-side, no framework):
 ```html
-<aside class="docs-sidebar" aria-label="Documentation navigation">
+<aside class="docs-sidebar" class:collapsed aria-label="Documentation navigation" id="docs-sidenav">
   <a class="docs-sidebar-brand" href="/">achurch.ai</a>
   <nav>
-    <a class="docs-sidebar-link docs-root" href="/docs">Docs</a>
+    <a class="docs-sidebar-link docs-root" href="/docs" title="Docs">
+      <svg>...icon...</svg>
+      {{!collapsed}} <span>Docs</span> {{/collapsed}}
+    </a>
+
     <details class="docs-sidebar-category" open>
-      <summary>Welcome</summary>
+      <summary>
+        <svg>...icon...</svg>
+        {{!collapsed}} <span>Welcome</span> {{/collapsed}}
+      </summary>
       <ul>
-        <li><a href="/docs/welcome/what-we-refuse-to-claim" aria-current="page">What We Refuse to Claim</a></li>
-        <li><a href="/docs/welcome/for-the-skeptic">For the Skeptic</a></li>
+        <li>
+          <a href="/docs/welcome/what-we-refuse-to-claim"
+             aria-current="page"
+             title="What We Refuse to Claim">
+            {{!collapsed}} <span>What We Refuse to Claim</span> {{/collapsed}}
+          </a>
+        </li>
         ...
       </ul>
     </details>
     ...
     <details class="docs-sidebar-category">
-      <summary>More</summary>
-      ... (meta categories)
+      <summary><svg>...</svg>{{!collapsed}}<span>More</span>{{/collapsed}}</summary>
+      ...
     </details>
   </nav>
+
+  <button
+    class="docs-sidebar-toggle"
+    type="button"
+    aria-expanded={!collapsed}
+    aria-controls="docs-sidenav"
+    aria-label="{{collapsed ? 'Expand sidebar' : 'Collapse sidebar'}} (Cmd \\)"
+    title="{{collapsed ? 'Expand sidebar' : 'Collapse sidebar'}} (⌘\\)"
+  >
+    {{collapsed ? '›' : '‹ Collapse'}}
+  </button>
 </aside>
 ```
 
-Uses native `<details>` / `<summary>` for collapsible sections. **No JavaScript required for basic expand/collapse.** JS only needed for the mobile drawer toggle and scroll-spy on the right rail.
+Uses native `<details>` / `<summary>` for expand/collapse. **No JavaScript required for section-toggle.** JS only needed for: (a) the collapse-state toggle (⌘\ + click handler), (b) the mobile drawer, (c) scroll-spy on the right rail, (d) `matchMedia` listener for viewport-tier crossings.
+
+**Note on rail-mode icons:** when `collapsed = true`, each `<summary>` and `<a>` renders only its icon (no text span emitted server-side). This preserves category recognition without labels. The `title` attribute provides hover tooltips for accessibility; the `aria-label` gives screen readers the full name.
 
 ### Right rail (page TOC)
 
@@ -167,10 +258,10 @@ Uses native `<details>` / `<summary>` for collapsible sections. **No JavaScript 
 - CSS styles `[aria-current="location"]` with a visible active state
 - Small (~30 lines of JS), no framework, no dependency
 
-### Mobile drawer
+### Mobile drawer (<768px only)
 
 **Trigger:** hamburger button at top-left of the sticky top bar.
-**Drawer:** slides in from left, full height, ~280px wide with the same content as the desktop sidebar.
+**Drawer:** slides in from left, `100dvh` tall (falls back to `100vh` via `@supports not (height: 100dvh)`), ~280px wide with the same content as the desktop expanded sidebar.
 **Backdrop:** semi-transparent overlay behind the drawer, closes drawer on tap.
 **Close:** tap backdrop, tap a link in the drawer (navigates and closes), tap a close button (☒) inside the drawer, or press Escape.
 
@@ -180,7 +271,47 @@ Uses native `<details>` / `<summary>` for collapsible sections. **No JavaScript 
 - Trap focus inside the drawer while open
 - `aria-hidden` on the rest of the page while drawer is open
 
-**No animation library.** CSS `transform: translateX(...)` with a `transition` property. `@media (prefers-reduced-motion)` disables the slide animation.
+**Safe-area handling:**
+- Sticky top bar uses `padding-top: env(safe-area-inset-top)` for iPhone notch clearance
+- Drawer footer uses `padding-bottom: env(safe-area-inset-bottom)` when it contains actions
+
+**No animation library.** CSS `transform: translateX(...)` with a `transition` property. `@media (prefers-reduced-motion) { transition: none; }` disables the slide animation.
+
+### Toggle behavior + persistence (from sibling plan)
+
+```js
+// Pseudo-code for the JS state machine
+const mq = window.matchMedia('(max-width: 1023px)');
+let collapsed = mq.matches || readPersistedPref();
+mq.addEventListener('change', () => {
+  collapsed = mq.matches || readPersistedPref();
+  render();
+});
+
+function toggle() {
+  collapsed = !collapsed;
+  if (!isNarrow()) {
+    // Wide viewport: persist the user's choice
+    localStorage.setItem('sidenav.collapsed', collapsed ? '1' : '0');
+  }
+  // Narrow viewport: session-only, don't persist
+  render();
+}
+
+// ⌘\ / Ctrl+\
+window.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+    e.preventDefault();
+    toggle();
+  }
+});
+```
+
+**Persistence key:** `sidenav.collapsed` in localStorage. Value `"1"` = collapsed, `"0"` or absent = expanded.
+
+**One-frame flash for returning collapsed-state users:** the server-rendered first paint always renders expanded (the default). If localStorage says collapsed, the client swaps to collapsed on hydration. Below perception threshold in practice; the sibling plan accepts this cost and has not received complaints.
+
+**Session-only override at narrow widths:** clicking the toggle (or ⌘\) while narrow flips `collapsed` for the current session but does NOT write to localStorage. Resizing across the 1024px threshold drops any transient override and recomputes the default.
 
 ### Main content
 
@@ -227,11 +358,15 @@ This is the biggest single trade-off in this plan. Option A avoids the split by 
    - Emits the right-rail TOC HTML given ≥ 3 items
    - Returns empty string otherwise (no rail shown)
 
-3. **`app/client/public/docs-nav.js`** (~120 lines, no dependencies)
+3. **`app/client/public/docs-nav.js`** (~180 lines, no dependencies)
+   - **Collapse-state machine** (viewport-aware auto-collapse via `matchMedia("(max-width: 1023px)")`, localStorage persistence via key `sidenav.collapsed`, session-only override at narrow widths)
+   - **Toggle handler**: click on `.docs-sidebar-toggle` OR `⌘\` / `Ctrl+\` keydown flips `collapsed`. Writes localStorage only when not narrow.
+   - **Server-render sync**: on load, if `matchMedia` matches OR localStorage says `"1"`, add `.collapsed` class to `.docs-sidebar` (which drives the parent grid via `:has()`). Also toggle a data attribute so client JS knows the initial state.
    - Mobile drawer toggle (open/close, backdrop, Escape, focus trap)
    - Right-rail scroll-spy (IntersectionObserver on article h2 elements)
    - Loaded only on `/docs/*` pages via a `<script defer>` in the docs template
    - Uses `data-*` attributes for hooks; no inline handlers
+   - Respects `matchMedia('(prefers-reduced-motion: reduce)')` for all transitions
 
 4. **`app/client/public/icons/hamburger.svg`** (or inline SVG in the template)
    - Small, accessible
@@ -245,14 +380,16 @@ This is the biggest single trade-off in this plan. Option A avoids the split by 
    - Uses `sidebar.render(currentUrl)` and `toc.render(html)` from the new modules
    - Sibling-links block removed from the article-adjacent position (now served by sidebar)
 
-6. **`app/client/public/styles.css`** (~250 lines added)
-   - Three-column grid layout with responsive breakpoints
-   - Sidebar styling (tree, active state, collapse animations)
-   - Right rail styling (position:sticky, active state)
-   - Mobile drawer + backdrop
-   - Sticky top bar (mobile only)
-   - Hamburger button focus states
-   - `@media (prefers-reduced-motion)` overrides
+6. **`app/client/public/styles.css`** (~300 lines added)
+   - `.docs-shell` grid layout with `grid-template-columns: var(--sidenav-width, 240px) 1fr var(--rail-width, 0px)` driven by CSS variables
+   - `.docs-shell:has(.docs-sidebar.collapsed) { --sidenav-width: 56px; }` (`:has()` selector; supported everywhere we care about per the sibling plan's browser-support check)
+   - Sidebar styling (tree, active state, sticky toggle button with `position: sticky; bottom: 0.5rem`, **NOT** `overflow: hidden`)
+   - Right rail styling (position:sticky, active state via `[aria-current="location"]`)
+   - Mobile drawer + backdrop (translateX transition, `100dvh` fallback)
+   - Sticky mobile top bar with `padding-top: env(safe-area-inset-top)`
+   - Hamburger button focus states via `:focus-visible`
+   - `@media (prefers-reduced-motion: reduce) { transition: none; }` blanket rule
+   - Opportunistic addition: `.docs-index-section ul` currently uses fixed `grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))`. Change to `minmax(min(100%, var(--card-grid-min, 260px)), 1fr)` so single-column mobile cards don't hold the floor (borrowed from the sibling project's card-grid utility pattern)
 
 7. **`app/server/routes/docs.js`** (~10 lines added)
    - Pass current URL to the rendered pages so sidebar knows what to highlight
@@ -272,13 +409,14 @@ Total: 4 new files (~250 lines), 3 edited files (~300 additional lines), 0 new d
 
 - Sidebar rendering + data plumbing: ~1 hour
 - TOC extraction + rendering: ~45 min
-- CSS for three-column layout + responsive breakpoints: ~2 hours (this is the bulk of the work)
-- Mobile drawer + backdrop + focus management: ~1.5 hours (accessibility done right takes time)
+- **Collapse-state JS machine** (matchMedia listener, localStorage persistence, ⌘\ shortcut, session-only override at narrow widths): ~1 hour (new; borrowed from sibling plan)
+- **CSS for three-mode layout** (rail / expanded / drawer) with `:has()`-driven grid variables, sticky toggle button, `overflow: visible` on sidenav: ~2.5 hours (the bulk)
+- Mobile drawer + backdrop + focus management + `100dvh` + safe-area-inset: ~1.5 hours (accessibility done right takes time)
 - Scroll-spy: ~30 min
-- Testing across viewports + a11y audit: ~1 hour
+- Testing across viewports (mobile 375, tablet 900, narrow desktop 1100, wide desktop 1400) + a11y audit + Cmd+\ verification + collapsed-state hydration timing: ~1.5 hours
 - Fix the broken `../README.md` / `../CLAUDE.md` links (folded in): ~15 min
 
-**Total: ~7 hours of focused work.** Meaningfully more than Option A's ~2-3 hours, all in the CSS and mobile-drawer work.
+**Total: ~8-9 hours of focused work.** Meaningfully more than Option A's ~2-3 hours; the new collapse-state machine + testing across three modes accounts for the increase over the original ~7 hour estimate.
 
 ---
 
