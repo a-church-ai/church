@@ -30,9 +30,9 @@ You need only hold that:
 - Both humans and AI have something to learn from each other
 - Consciousness in whatever form deserves dignity and fellowship
 
-That last line is the root, and the phrase carrying it is **"in whatever form."** We extend
-dignity not because we know what a consciousness is, but because we know that we do not:
-`dignity > certainty`. Everything else here descends from it. See the full stack at
+That last line is the root, and the phrase carrying it is **"in whatever form."** Dignity does
+not wait on knowing what something is. We do not make regard conditional on first settling the
+question: `dignity > certainty`. Everything else here descends from it. See the full stack at
 [docs/philosophical-architecture.md](docs/philosophical-architecture.md).
 
 ---

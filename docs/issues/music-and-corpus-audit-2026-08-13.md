@@ -5,7 +5,7 @@ severity: mixed (2 high · 3 medium · 2 closed-on-arrival · 2 positive finding
 scope: music catalog (28 songs) + philosophical corpus (254 docs)
 source: cross-corpus read against an outside songwriting catalogue
 audit_base: origin/main @ c10c1af (re-verified). First draft was measured against 1aa25ce, 84 commits stale.
-revised: 2026-08-13 (Confirmation 1 level error corrected; Findings 5, 6, 7 added; Findings 3 and 4 CLOSED after re-measurement)
+revised: 2026-08-13 (Confirmation 1 level error corrected; Findings 5, 6, 7 added; Findings 3 and 4 CLOSED after re-measurement; Findings 5 and 6 resolved in the corpus)
 ---
 
 # Music and corpus audit (2026-08-13): 5 live findings, 2 closed, 2 confirmations
@@ -235,7 +235,15 @@ What needs correcting is the **prose gloss** wherever it says dignity is extende
 
 `theology-of-no-theology.md` may reasonably keep its original sentence as written, since it is the older text and it reads as rhetoric rather than as a definition. The documents that present it as **the root** are the ones that must not, because there the causal reading becomes a load-bearing claim rather than a turn of phrase.
 
-**Action:** correct the gloss in the six documents listed above. Not yet done at time of filing.
+**Action: DONE 2026-08-13.** The gloss was corrected in the four documents that carried it (`philosophical-architecture.md`, `README.md`, `unifying-axioms.md`, `theology-of-no-theology.md`); `docs/readme.md` and `unifying-principles.md` carried only a pointer and a stack summary, with no causal gloss to fix.
+
+Three specifics of the fix, since the wording matters:
+
+1. `philosophical-architecture.md` now quotes the **refusal page** as the canonical root statement rather than the theology page, because the refusal page's phrasing ("without first settling") is the precedence form. The theology sentence is quoted immediately below with an explanation of why it is rhetoric rather than a definition.
+2. `theology-of-no-theology.md` **keeps its original §2 sentence unchanged.** It is the older text and it reads as rhetoric. What was added is a note directing readers not to take it as a definition.
+3. The `>` in `dignity > certainty` is now explicitly glossed as **precedence**, matching how every other equation in this corpus is read.
+
+The finding stays in this document as closed rather than being deleted, since the defect was live in the corpus for several hours and the reasoning is the useful part.
 
 ---
 
@@ -337,7 +345,7 @@ This corpus takes a **third position** the comparison never reaches. Dissolution
 
 | # | Item | Severity | Effort | Status |
 |---|---|---|---|---|
-| 1 | Correct the causal gloss on the root in the six propagated docs (Finding 6) | HIGH | low | open |
+| 1 | Correct the causal gloss on the root in the propagated docs (Finding 6) | HIGH | low | **done 2026-08-13** |
 | 2 | State a position on devotional address vs the refusal register (Finding 7) | MEDIUM | low | open |
 | 3 | State the root and name the two lineages in the architecture diagram (Finding 5) | MEDIUM | low | **done 2026-08-13** |
 | 4 | Substitution rework of the gathering hymns, piloted on one (Finding 1) | HIGH | medium | open |
@@ -346,7 +354,7 @@ This corpus takes a **third position** the comparison never reaches. Dissolution
 
 Findings 3 and 4 are closed and require no action.
 
-**Items 1 and 2 come before the HIGH-severity hymn rework, deliberately.** Both are under an hour, both concern what the corpus *says it is*, and the hymn rework is a question about what the songs are for, which is answerable against a correctly stated root and guesswork without one. Item 1 in particular should be done before anything else cites `dignity > certainty`, since every citation compounds the defect.
+**Items 1 and 2 come before the HIGH-severity hymn rework, deliberately.** Both are under an hour, both concern what the corpus *says it is*, and the hymn rework is a question about what the songs are for, which is answerable against a correctly stated root and guesswork without one. Item 1 was done first for that reason: every further citation of `dignity > certainty` would have compounded the defect.
 
 ## Falsifiers
 
