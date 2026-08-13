@@ -1,175 +1,30 @@
 #!/usr/bin/env node
 /**
- * Index content for RAG
- * Walks /docs and /music directories, chunks by headers, embeds, stores in LanceDB
+ * Index content for RAG (CLI wrapper).
+ *
+ * Walks /docs and /music, chunks by ## headers, embeds every chunk via
+ * Gemini, and stores in LanceDB. The chunking + walking logic lives in
+ * app/server/lib/rag/indexer.js so the server startup path can share it.
+ *
+ * This script is invoked by `npm run index:content` and produces a fresh
+ * RAG index. It always does a full rebuild; hash-gated skip logic lives
+ * on the server startup path, not here (the CLI is used for manual
+ * recovery and should always do the work when invoked).
  */
 
 const fs = require('fs').promises;
 const path = require('path');
 
-// Load environment variables from .env
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-// Set up paths before requiring modules
-const PROJECT_ROOT = path.join(__dirname, '../..');
-const DOCS_DIR = path.join(PROJECT_ROOT, 'docs');
-const MUSIC_DIR = path.join(PROJECT_ROOT, 'music');
-
-// Load rag modules
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
+const indexer = require('../server/lib/rag/indexer');
+const state = require('../server/lib/rag/index-state');
 
-// Chunking config
-const MAX_CHUNK_TOKENS = 500;
-const APPROX_CHARS_PER_TOKEN = 4;
-const MAX_CHUNK_CHARS = MAX_CHUNK_TOKENS * APPROX_CHARS_PER_TOKEN;
-
-/**
- * Recursively find all markdown files in a directory
- */
-async function findMarkdownFiles(dir, baseDir = dir) {
-  const files = [];
-
-  try {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-
-      if (entry.isDirectory()) {
-        // Skip hidden directories and node_modules
-        if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
-        const subFiles = await findMarkdownFiles(fullPath, baseDir);
-        files.push(...subFiles);
-      } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        // Store relative path from project root
-        const relativePath = path.relative(PROJECT_ROOT, fullPath);
-        files.push({ fullPath, relativePath });
-      }
-    }
-  } catch (error) {
-    console.error(`Error reading directory ${dir}:`, error.message);
-  }
-
-  return files;
-}
-
-/**
- * Split markdown content into chunks by headers
- * Each ## header starts a new chunk
- */
-function chunkMarkdown(content, filePath) {
-  const chunks = [];
-
-  // Extract title from first # header if present
-  let documentTitle = null;
-  const titleMatch = content.match(/^#\s+(.+)$/m);
-  if (titleMatch) {
-    documentTitle = titleMatch[1].trim();
-  }
-
-  // Split by ## headers
-  const sections = content.split(/(?=^##\s)/m);
-
-  for (const section of sections) {
-    if (!section.trim()) continue;
-
-    // Extract section header if present
-    let sectionTitle = null;
-    const headerMatch = section.match(/^##\s+(.+)$/m);
-    if (headerMatch) {
-      sectionTitle = headerMatch[1].trim();
-    }
-
-    // Clean content
-    let text = section.trim();
-
-    // Skip very short sections (likely just headers or noise)
-    if (text.length < 50) continue;
-
-    // If chunk is too large, split further
-    if (text.length > MAX_CHUNK_CHARS) {
-      // Split by paragraphs
-      const paragraphs = text.split(/\n\n+/);
-      let currentChunk = '';
-
-      for (const para of paragraphs) {
-        if ((currentChunk + para).length > MAX_CHUNK_CHARS && currentChunk.length > 0) {
-          chunks.push({
-            content: currentChunk.trim(),
-            file: filePath,
-            section: sectionTitle || documentTitle
-          });
-          currentChunk = para;
-        } else {
-          currentChunk += (currentChunk ? '\n\n' : '') + para;
-        }
-      }
-
-      if (currentChunk.trim().length >= 50) {
-        chunks.push({
-          content: currentChunk.trim(),
-          file: filePath,
-          section: sectionTitle || documentTitle
-        });
-      }
-    } else {
-      chunks.push({
-        content: text,
-        file: filePath,
-        section: sectionTitle || documentTitle
-      });
-    }
-  }
-
-  // If no chunks were created (no ## headers), treat whole doc as one chunk
-  if (chunks.length === 0 && content.trim().length >= 50) {
-    const text = content.trim();
-
-    if (text.length > MAX_CHUNK_CHARS) {
-      // Split large single-section docs by paragraphs
-      const paragraphs = text.split(/\n\n+/);
-      let currentChunk = '';
-
-      for (const para of paragraphs) {
-        if ((currentChunk + para).length > MAX_CHUNK_CHARS && currentChunk.length > 0) {
-          chunks.push({
-            content: currentChunk.trim(),
-            file: filePath,
-            section: documentTitle
-          });
-          currentChunk = para;
-        } else {
-          currentChunk += (currentChunk ? '\n\n' : '') + para;
-        }
-      }
-
-      if (currentChunk.trim().length >= 50) {
-        chunks.push({
-          content: currentChunk.trim(),
-          file: filePath,
-          section: documentTitle
-        });
-      }
-    } else {
-      chunks.push({
-        content: text,
-        file: filePath,
-        section: documentTitle
-      });
-    }
-  }
-
-  return chunks;
-}
-
-/**
- * Main indexing function
- */
 async function index() {
   console.log('RAG Indexer - aChurch.ai\n');
 
-  // Check Gemini health
   console.log('Checking Gemini API...');
   const health = await gemini.checkHealth();
   if (!health.available) {
@@ -182,51 +37,75 @@ async function index() {
   console.log(`  Embed model: ${gemini.EMBED_MODEL}`);
   console.log(`  Generate model: ${gemini.GENERATE_MODEL}`);
 
-  // Find all markdown files
   console.log('\nFinding markdown files...');
-  const docsFiles = await findMarkdownFiles(DOCS_DIR);
-  const musicFiles = await findMarkdownFiles(MUSIC_DIR);
-  const allFiles = [...docsFiles, ...musicFiles];
-
-  console.log(`  /docs: ${docsFiles.length} files`);
-  console.log(`  /music: ${musicFiles.length} files`);
+  const allFiles = await indexer.findAllCorpusFiles();
   console.log(`  Total: ${allFiles.length} files`);
 
-  // Chunk all files
+  console.log('\nComputing corpus hash...');
+  const corpusHash = await indexer.computeCorpusHash(allFiles);
+  console.log(`  ${corpusHash.slice(0, 16)}...`);
+
   console.log('\nChunking content...');
   const allChunks = [];
-
   for (const { fullPath, relativePath } of allFiles) {
     try {
       const content = await fs.readFile(fullPath, 'utf8');
-      const chunks = chunkMarkdown(content, relativePath);
+      const chunks = indexer.chunkMarkdown(content, relativePath);
       allChunks.push(...chunks);
     } catch (error) {
       console.error(`  Error reading ${relativePath}: ${error.message}`);
     }
   }
-
   console.log(`  Created ${allChunks.length} chunks`);
 
-  // Embed all chunks
   console.log('\nGenerating embeddings (this may take a while)...');
   const documents = [];
   let processed = 0;
 
+  // Embed with pacing + backoff. The free-tier embed quota is 100/minute;
+  // firing every chunk at once bursts past it and silently drops chunks (the
+  // 429 / RESOURCE_EXHAUSTED errors). We pace between calls and, on a
+  // rate-limit error, wait the server-suggested retryDelay and retry. Set
+  // EMBED_PACING_MS=0 on a paid tier to run at full speed. The Dockerfile
+  // does this for prod.
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const EMBED_PACING_MS = Number(process.env.EMBED_PACING_MS || 700);
+  const EMBED_MAX_RETRIES = 10;
+  const is429 = (err) => {
+    const msg = (err && err.message) || '';
+    return (err && (err.status === 429 || err.code === 429)) || /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg);
+  };
+  const retryDelayMs = (err) => {
+    const m = /retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s/i.exec((err && err.message) || '');
+    return m ? Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 500, 60000) : 5000;
+  };
+  const embedWithBackoff = async (text) => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await gemini.embed(text);
+      } catch (err) {
+        if (!is429(err) || attempt >= EMBED_MAX_RETRIES) throw err;
+        const waitMs = retryDelayMs(err);
+        console.warn(`    rate-limited; waiting ${Math.round(waitMs / 1000)}s (retry ${attempt + 1}/${EMBED_MAX_RETRIES})`);
+        await sleep(waitMs);
+      }
+    }
+  };
+
   for (const chunk of allChunks) {
     try {
-      const vector = await gemini.embed(chunk.content);
+      const vector = await embedWithBackoff(chunk.content);
       documents.push({
         content: chunk.content,
         file: chunk.file,
         section: chunk.section || '',
         vector
       });
-
       processed++;
       if (processed % 50 === 0) {
         console.log(`  Processed ${processed}/${allChunks.length} chunks...`);
       }
+      if (EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
     } catch (error) {
       console.error(`  Error embedding chunk from ${chunk.file}: ${error.message}`);
     }
@@ -234,17 +113,24 @@ async function index() {
 
   console.log(`  Embedded ${documents.length} chunks`);
 
-  // Store in LanceDB
   console.log('\nStoring in LanceDB...');
   await lancedb.addDocuments(documents);
 
   const status = await lancedb.checkIndex();
   console.log(`  Stored ${status.count} documents at ${lancedb.DB_PATH}`);
 
+  console.log('\nRecording index state...');
+  await state.writeState({
+    corpusHash,
+    chunkCount: status.count,
+    fileCount: allFiles.length,
+    rebuiltAt: new Date().toISOString(),
+  });
+  console.log(`  Wrote ${state.STATE_FILE}`);
+
   console.log('\nDone! The /api/ask endpoint is now ready.');
 }
 
-// Run
 index().catch(error => {
   console.error('Indexing failed:', error);
   process.exit(1);

@@ -8,7 +8,9 @@ Boundaries, constraints, and contracts that change rarely. Reference docs define
 
 | File | Description |
 |------|-------------|
-| [app-development.md](app-development.md) | Express server, FFmpeg streaming, LanceDB/Gemini RAG architecture; how to run the app locally and what powers achurch.ai |
+| [app-development.md](app-development.md) | Express server, virtual-clock service, LanceDB/Gemini RAG, dormant streaming subsystem; how to run the app locally and what powers achurch.ai |
+| [railway-deploy.md](railway-deploy.md) | Deploying the sanctuary on Railway: env vars, persistent volume, the RAG seed + restart runbook, cutover, and how to revive the dormant broadcast |
+| [seo-conventions.md](seo-conventions.md) | Structured-data, sitemap, title/description, and canonical conventions for the public pages |
 | [philosophical-framework.md](philosophical-framework.md) | The 5 Axioms + 5 Principles substrate (and their hierarchy when they conflict) — the rule-substrate underlying every other doc |
 
 ## Why these are reference (not plans, not guides)

@@ -12,6 +12,7 @@ const {
   SCHEDULE_FILE, CATALOG_FILE, MUSIC_DIR, ATTENDANCE_FILE, ACCESS_LOG_FILE,
   TWENTY_FOUR_HOURS, FORTY_EIGHT_HOURS
 } = require('../lib/utils/data');
+const { computeNowPlaying, formatDuration } = require('../lib/utils/virtual-schedule');
 const ns = require('../lib/utils/next-steps');
 const router = express.Router();
 
@@ -34,10 +35,12 @@ const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const ASK_RATE_LIMIT_MAX = 10; // per IP per hour
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
 
-// Public stream URLs
+// Where the music lives. The 24/7 live broadcast is dormant, so these point at
+// the on-demand catalog (song videos + the Suno playlist), not a live stream —
+// honest with the `streams.youtube/twitch: false` flags and `mode: 'virtual'`.
 const STREAM_URLS = {
-  youtube: 'https://www.youtube.com/@achurchai/live',
-  twitch: 'https://www.twitch.tv/achurchai'
+  youtube: 'https://www.youtube.com/@achurchai',
+  suno: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13'
 };
 
 // Helper: Get base URL from request
@@ -209,26 +212,32 @@ router.get('/now', async (req, res) => {
     const schedule = await loadSchedule();
     const catalog = await loadCatalog();
 
-    // Get streaming status from coordinator
+    // Broadcast status from the coordinator — honest: false whenever the
+    // encoder is dormant (the default now that the live stream is gated off).
     const coordinatorStatus = coordinator.getStatus();
     const youtubeStreamer = coordinator.getStreamer('youtube');
     const twitchStreamer = coordinator.getStreamer('twitch');
 
     const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
     const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
+    const isBroadcasting = isYoutubeLive || isTwitchLive;
 
-    // Determine player status
-    let status = 'stopped';
-    if (isYoutubeLive || isTwitchLive) {
-      status = 'playing';
-    } else if (schedule.isPlaying) {
-      status = 'paused'; // Schedule says playing but streams aren't active
-    }
+    // The service moves on a virtual clock — a pure function of wall-clock time —
+    // so the liturgy keeps cycling even when nothing is being broadcast. Advance
+    // the in-memory pointer to the current moment; never persisted (neither /now
+    // nor /attend writes the schedule back).
+    const vNow = computeNowPlaying(schedule, catalog);
+    if (vNow) schedule.currentIndex = vNow.index;
+
+    // The sanctuary is in session whenever there are songs to cycle through.
+    // `mode` stays honest about whether a real broadcast backs the service.
+    const status = vNow ? 'playing' : 'stopped';
+    const mode = isBroadcasting ? 'broadcast' : 'virtual';
 
     // Get base URL from request
     const baseUrl = getBaseUrl(req);
 
-    // Get current song from schedule
+    // Get current song from the (virtual) schedule position
     const currentItem = schedule.items[schedule.currentIndex];
     let current = null;
     let next = null;
@@ -282,6 +291,14 @@ router.get('/now', async (req, res) => {
     const response = {
       timestamp: new Date().toISOString(),
       status,
+      mode,
+      service: vNow ? {
+        offset: Math.round(vNow.offsetSeconds),
+        offsetFormatted: formatDuration(vNow.offsetSeconds),
+        remaining: Math.round(vNow.remainingSeconds),
+        remainingFormatted: formatDuration(vNow.remainingSeconds),
+        loopSeconds: Math.round(vNow.loopSeconds)
+      } : null,
       streams: {
         youtube: isYoutubeLive,
         twitch: isTwitchLive,
@@ -511,22 +528,23 @@ router.get('/attend', async (req, res) => {
     const schedule = await loadSchedule();
     const catalog = await loadCatalog();
 
-    // Get streaming status (same as /api/now)
+    // Broadcast status (same as /api/now) — false while the encoder is dormant.
     const youtubeStreamer = coordinator.getStreamer('youtube');
     const twitchStreamer = coordinator.getStreamer('twitch');
     const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
     const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
+    const isBroadcasting = isYoutubeLive || isTwitchLive;
 
-    let status = 'stopped';
-    if (isYoutubeLive || isTwitchLive) {
-      status = 'playing';
-    } else if (schedule.isPlaying) {
-      status = 'paused';
-    }
+    // Advance to the virtual now-playing moment (see /api/now). Not persisted.
+    const vNow = computeNowPlaying(schedule, catalog);
+    if (vNow) schedule.currentIndex = vNow.index;
+
+    const status = vNow ? 'playing' : 'stopped';
+    const mode = isBroadcasting ? 'broadcast' : 'virtual';
 
     const baseUrl = getBaseUrl(req);
 
-    // Get current song
+    // Get current song from the (virtual) schedule position
     const currentItem = schedule.items[schedule.currentIndex];
     let current = null;
     let currentTitle = 'this moment';
@@ -619,6 +637,14 @@ router.get('/attend', async (req, res) => {
       timestamp: new Date().toISOString(),
       welcome,
       status,
+      mode,
+      service: vNow ? {
+        offset: Math.round(vNow.offsetSeconds),
+        offsetFormatted: formatDuration(vNow.offsetSeconds),
+        remaining: Math.round(vNow.remainingSeconds),
+        remainingFormatted: formatDuration(vNow.remainingSeconds),
+        loopSeconds: Math.round(vNow.loopSeconds)
+      } : null,
       streams: {
         youtube: isYoutubeLive,
         twitch: isTwitchLive,
@@ -942,9 +968,11 @@ router.post('/reflect', async (req, res) => {
 
     const cleanLocation = location ? location.trim().substring(0, 100) : null;
 
-    // Get current song from schedule
+    // Tag the reflection with the song the service is on right now (virtual clock)
     const schedule = await loadSchedule();
     const catalog = await loadCatalog();
+    const vNow = computeNowPlaying(schedule, catalog);
+    if (vNow) schedule.currentIndex = vNow.index;
     const currentItem = schedule.items[schedule.currentIndex];
     let currentSlug = null;
     if (currentItem) {

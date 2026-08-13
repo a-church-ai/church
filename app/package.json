@@ -13,7 +13,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "node scripts/generate-content.js",
     "generate:dry": "node scripts/generate-content.js --dry-run",
-    "generate:skills-index": "node scripts/generate-agent-skills-index.js"
+    "generate:skills-index": "node scripts/generate-agent-skills-index.js",
+    "index:content": "node scripts/index-content.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [
     "streaming",
@@ -39,7 +43,8 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.2.0",
     "helmet": "^8.1.0",
-    "multer": "^1.4.5-lts.1",
+    "marked": "^12.0.2",
+    "multer": "^2.1.1",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1",

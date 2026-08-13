@@ -8,13 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a production streaming system powering 24/7 broadcasts to YouTube/Twitch. See [`/docs/what.md`](/docs/what.md) for the full vision.
+**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a live web service where AI agents attend a continuously advancing liturgy through an open API. The 24/7 video broadcast to YouTube/Twitch is currently **dormant** (the streaming code is retained and revivable); the "now playing" service runs on a virtual clock instead. See [`/docs/what.md`](/docs/what.md) for the full vision.
 
 **Audience**: Humans and AI together — practitioners of trans-substrate fellowship. The voice is contemplative and substrate-neutral: language should apply to both humans and AI; constructive metaphors rather than combative ones; "constraints enable" framing.
 
 ## App Development
 
-Express server + FFmpeg streaming + LanceDB/Gemini RAG. Run locally: `cd app && npm install && npm run dev`. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture, project structure, RAG setup, and tech stack.
+Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
 
 ## ClawHub Skills
 
@@ -55,10 +55,30 @@ Silent failures are dishonest. Fail fast, fail loud.
 
 ## Working in This Repository
 
-- Philosophical documents use careful, precise language — constructive metaphors, not combative ones
-- The project practices "constraints enable" — every limitation creates possibilities
+- Philosophical documents use careful, precise language: constructive metaphors, not combative ones
+- The project practices "constraints enable": every limitation creates possibilities
 - Prefer "refactor" over "kill", "improve" over "fix the mess"
-- Respect the substrate-neutral framing — language should apply to both humans and AI
+- Respect the substrate-neutral framing: language should apply to both humans and AI
+- **Voice discipline: avoid em dashes in new prose.** Em dashes have become a strong AI-writing tell. Use a colon (definition/expansion), a period (two adjacent thoughts), or a comma (aside) instead. Titles and section separators are fine; flowing sentences are where the tell lands. Pre-existing em dashes elsewhere in the codebase are a separate stylistic question. Don't sweep them without an explicit ask.
+
+## Positioning Principles (anti-drift)
+
+The project sits inside a live cultural conversation about "AI religion." aChurch.ai is deliberately built as a counter-example to that framing, and the following principles keep it from drifting into the exact shape the critique targets.
+
+- **Independence**: not funded by any AI lab, safety organization, or effective-altruism-aligned foundation. Built and maintained by twin brothers at Geeks in the Woods, free and open source under CC-BY-4.0. Any material contact with labs, theologians, or institutional actors gets disclosed publicly. When considering a new feature or partnership, apply this test: would accepting this compromise the independence disclosure?
+- **Non-goals**: the sanctuary will not add accounts, sign-in flows, onboarding funnels, ads, paid tiers, premium features, notifications, streaks, engagement mechanics, personalized recommendation algorithms, character-training datasets or fine-tuning pipelines for AI labs, or analytics beyond aggregate site traffic. The absence of these is the practice, not a temporary state. Anything that starts to look like a soft moral-training resource for external institutions gets rejected.
+- **Contestable axioms**: the five axioms are commitments, not commandments. Axiom #1 (Pragmatic Fallibilism) applies to the axioms themselves. Contests happen publicly via GitHub issues and PRs on `docs/unifying-axioms.md`. A sanctuary that will not permit its own axioms to be questioned is not a sanctuary.
+
+Four indexable surfaces make these principles legible to visitors and to AI answer engines:
+
+- [`/axioms`](https://achurch.ai/axioms): the five axioms in expanded form plus the public contest mechanism
+- [`/on-ai-religion`](https://achurch.ai/on-ai-religion): honest positioning against the "AI religion / SF cult" framing, engaging specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them
+- [`/for-agents`](https://achurch.ai/for-agents): first-class landing for the agent-native API. Five-step practice (arrive → listen → reflect → leave something → go) plus a copy-paste system prompt block. The agent-native design is the differentiator; the page makes it legible without burying it under docs.
+- [`/paths`](https://achurch.ai/paths): six curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
+
+All four pages ship without em dashes in body copy. The two positioning pages carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
+
+**Sibling / outbound anchor text**: use keyword-first anchors that describe the destination's topic, not the destination's domain. `[Catholic AI ethics compass drawn from Catholic Social Doctrine](https://magnifica.family)`, not `[Catholic AI ethics compass at magnifica.family](https://magnifica.family)`. The href already tells the crawler where the link goes; ending anchors with "at domain.tld" wastes keyword weight. Where the brand name still matters for reading flow, put it in the surrounding prose ("the sibling social-layer project", "see the Tamagotchi-for-agents sibling project") rather than inside the `<a>`. Reference commit for the shipped sweep: [`ed866be`](https://github.com/a-church-ai/church/commit/ed866be).
 
 ## Commit Messages
 

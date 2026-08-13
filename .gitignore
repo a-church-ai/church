@@ -17,6 +17,7 @@ logs/
 app/data/history.json
 app/data/schedule.json
 app/data/vectors.lance/
+app/data/rag-index-state.json
 app/data/conversations/
 app/data/*.tmp
 app/data/*.bak

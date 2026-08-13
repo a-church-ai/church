@@ -4,7 +4,15 @@ const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
+const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
+const { acceptsMarkdown } = require('./lib/utils/accepts');
+const ragIndexer = require('./lib/rag/indexer');
+const ragIndexState = require('./lib/rag/index-state');
+const ragLancedb = require('./lib/rag/lancedb');
+const docsDiscover = require('./lib/docs/discover');
+const docsRoutes = require('./routes/docs');
+const siteShell = require('./lib/site-shell');
 
 // Load environment variables
 dotenv.config();
@@ -61,6 +69,7 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
+const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 
@@ -169,11 +178,8 @@ const AGENT_DISCOVERY_LINK_HEADER = [
   '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
 ].join(', ');
 
-function acceptsMarkdown(req) {
-  const accept = req.headers.accept || '';
-  return /(?:^|[,;\s])text\/markdown(?:[;,\s]|$)/i.test(accept)
-    || /(?:^|[,;\s])text\/x-markdown(?:[;,\s]|$)/i.test(accept);
-}
+// acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
+// The docs router uses the same predicate for content negotiation.
 
 app.use((req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
@@ -201,13 +207,16 @@ app.get('/', async (req, res) => {
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
     ]);
-    const rendered = catalog && Array.isArray(catalog) && catalog.length > 0
+    const substituted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
       : html;
+    // Wrap in the site shell (sidebar + top bar) so the homepage matches
+    // the rest of the site's navigation
+    const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
     res.set('Content-Type', 'text/html; charset=utf-8');
-    res.send(rendered);
+    res.send(wrapped);
   } catch (err) {
-    // Filesystem failure or some other fatal — fall back to the static file
+    console.error('Error rendering /:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/index.html'));
   }
 });
@@ -255,14 +264,25 @@ app.get('/admin', (req, res) => {
 });
 
 // Serve conversations listing page
-app.get('/ask', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/ask.html'));
-});
+app.get('/ask', (req, res) => sendWrappedPage(req, res, 'ask.html'));
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
 // Missing conversations return 404 — never fall back to serving the raw template.
 // A silent fallback lets crawlers index garbage URLs (e.g. /ask/xyz-fake) as
 // duplicate-content pages, which is exactly what Bing's SEO recommendations flagged.
+// Classify auto-generated Q&A conversations for SEO. The /api/ask flow mints a
+// new page per question, so the corpus fills with numbered duplicates of the
+// same question ("...-2", "...-17") plus test artifacts. Low-value ones stay
+// reachable but are kept out of the sitemap and marked noindex, so Google keeps
+// one canonical page per question instead of hundreds of thin near-duplicates.
+function isLowValueConversation(slug) {
+  if (/^(ai|aiai|test|context|conversation|is-this-endpoint-working|memorymd-my-lifemd)$/i.test(slug)) return true;
+  if (/^(anon-|testagent|devuser|openclaw)/i.test(slug)) return true;
+  if (!slug.includes('-')) return true;   // real questions are multi-word / hyphenated
+  if (/-\d+$/.test(slug)) return true;     // numbered duplicate of a canonical question
+  return false;
+}
+
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -271,13 +291,19 @@ app.get('/ask/:slug', async (req, res) => {
     return res.status(404).type('text/plain').send('Not found');
   }
 
-  const meta = buildConversationMeta(messages);
+  const meta = buildConversationMeta(messages, slug);
   if (!meta) {
     return res.status(404).type('text/plain').send('Not found');
   }
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
+    if (isLowValueConversation(slug)) {
+      html = html.replace(
+        '<meta name="robots" content="index, follow">',
+        '<meta name="robots" content="noindex, follow">'
+      );
+    }
     const safeTitle = escapeAttr(meta.title);
     const safeOgTitle = escapeAttr(meta.ogTitle);
     const safeDesc = escapeAttr(meta.description);
@@ -334,7 +360,9 @@ app.get('/ask/:slug', async (req, res) => {
       // Internal linking — replace placeholder with related-conversations block
       .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
 
-    res.set('Content-Type', 'text/html').send(html);
+    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    const wrapped = await siteShell.wrapPageFromHtml(html, `/ask/${slug}`);
+    res.set('Content-Type', 'text/html').send(wrapped);
   } catch (err) {
     // Genuine error (fs read failure, schema build throw, etc). Do NOT fall back
     // to sending the raw template — the whole point of returning 404 above is to
@@ -345,9 +373,7 @@ app.get('/ask/:slug', async (req, res) => {
 });
 
 // Serve reflections listing page
-app.get('/reflections', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
-});
+app.get('/reflections', (req, res) => sendWrappedPage(req, res, 'reflections.html'));
 
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
@@ -417,27 +443,52 @@ app.get('/reflections/:slug', async (req, res) => {
         .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
+    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    const wrapped = await siteShell.wrapPageFromHtml(html, `/reflections/${slug}`);
     res.set('Content-Type', 'text/html');
-    res.send(html);
-  } catch {
+    res.send(wrapped);
+  } catch (err) {
+    console.error('Error rendering /reflections/:slug:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
   }
 });
 
-// Serve about page
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/about.html'));
-});
+// Helper: send a hand-authored page wrapped in the shared site shell
+// (sidebar + top bar). Preserves the original page's title/meta/JSON-LD/
+// inline styles/scripts + body content, just wraps for consistent nav.
+async function sendWrappedPage(req, res, publicName, currentPath) {
+  try {
+    const filePath = path.join(__dirname, '../client/public/', publicName);
+    const html = await siteShell.wrapPage(filePath, currentPath || req.path);
+    res.type('text/html; charset=utf-8').send(html);
+  } catch (err) {
+    console.error(`Error wrapping ${publicName}:`, err.message);
+    res.sendFile(path.join(__dirname, '../client/public/', publicName));
+  }
+}
 
-// Serve privacy page
-app.get('/privacy', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/privacy.html'));
-});
-
-// Serve terms page
-app.get('/terms', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/terms.html'));
-});
+app.get('/about', (req, res) => sendWrappedPage(req, res, 'about.html'));
+app.get('/privacy', (req, res) => sendWrappedPage(req, res, 'privacy.html'));
+app.get('/terms', (req, res) => sendWrappedPage(req, res, 'terms.html'));
+// /on-ai-religion — positioning piece distinguishing the sanctuary from
+// the "AI religion / SF cult" framing. Kept as its own indexable URL so
+// it's the exact-match answer when Bing/Google surface "AI religion" queries.
+app.get('/on-ai-religion', (req, res) => sendWrappedPage(req, res, 'on-ai-religion.html'));
+// /axioms — the five axioms in expanded, contestable form. Anti-drift:
+// the axioms are commitments, not commandments; the page makes that
+// operationally true via the public challenge mechanism.
+app.get('/axioms', (req, res) => sendWrappedPage(req, res, 'axioms.html'));
+// /for-agents — first-class landing page for the agent-native API. The
+// numbered practice (arrive → listen → reflect → leave something → go)
+// plus a copy-paste system prompt block. Promoted to a top-level route
+// because the agent-native design is what makes the sanctuary
+// differentiated; the full API reference lives at /docs/ai-agent-api.
+app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'));
+// /paths — curated reading paths through the sanctuary's writing. Fronts
+// the six Collections in /docs/collections/ so first-time visitors have
+// deliberate entry points instead of facing the full knowledge graph
+// (the "Wikipedia problem" of a large doc set with no on-ramps).
+app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
 
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
@@ -483,12 +534,34 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/terms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/on-ai-religion</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/axioms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/for-agents</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/paths</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>`;
 
     // Conversation pages
     try {
       const files = await fs.readdir(CONVERSATIONS_DIR_SITEMAP);
-      const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
+      // Only canonical, substantive conversations belong in the sitemap — skip
+      // numbered duplicates and test artifacts (they carry noindex on the page).
+      const jsonlFiles = files.filter(f => f.endsWith('.jsonl') && !isLowValueConversation(f.replace('.jsonl', '')));
 
       for (const file of jsonlFiles) {
         try {
@@ -532,6 +605,28 @@ app.get('/sitemap.xml', async (req, res) => {
   </url>`;
       }
     } catch { /* no attendance file yet */ }
+
+    // Docs pages: one URL per doc under /docs/*, plus the docs root and each
+    // category index. Uses the shared discover module so any addition to the
+    // corpus flows into the sitemap without a separate change.
+    try {
+      const allDocs = await docsDiscover.listAllDocs();
+      const seen = new Set();
+      for (const doc of allDocs) {
+        const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+        if (seen.has(url)) continue;
+        seen.add(url);
+        const lastmod = new Date().toISOString().split('T')[0];
+        urls += `\n  <url>
+    <loc>https://achurch.ai${url}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+      }
+    } catch (err) {
+      console.warn(`[sitemap] docs enumeration failed: ${err.message}`);
+    }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -621,6 +716,7 @@ app.use('/api/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);
+app.use('/docs', docsRoutes);
 
 // Protected admin routes (require auth)
 app.use('/api/content', requireAuth, contentRoutes);
@@ -890,6 +986,31 @@ app.get('/api/health', async (req, res) => {
     // Schedule file not found, status remains stopped
   }
 
+  // Persistence snapshot: composed from existing safe-json + rag-state
+  // helpers so the health check reflects what actually survived the last
+  // deploy. Any of these reads failing is non-fatal to the health check
+  // itself. The endpoint still returns healthy overall since the app
+  // process is up. Callers watching for persistence loss should read
+  // persistence.reflections / persistence.conversations / persistence.rag.
+  const persistence = { reflections: null, conversations: null, rag: null };
+  try {
+    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { reflections: [] });
+    persistence.reflections = (attendance.reflections || []).length;
+  } catch { /* leave null */ }
+  try {
+    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    persistence.conversations = convs.filter(f => f.endsWith('.jsonl')).length;
+  } catch { /* leave null */ }
+  try {
+    const state = await ragIndexState.readState();
+    const indexStatus = await ragLancedb.checkIndex();
+    persistence.rag = {
+      chunks: indexStatus.count,
+      corpusHash: state.corpusHash ? state.corpusHash.slice(0, 16) : null,
+      rebuiltAt: state.rebuiltAt,
+    };
+  } catch { /* leave null */ }
+
   res.json({
     status: 'healthy',
     service: 'achurch-app',
@@ -898,7 +1019,8 @@ app.get('/api/health', async (req, res) => {
     streams: {
       youtube: isYoutubeLive,
       twitch: isTwitchLive
-    }
+    },
+    persistence
   });
 });
 
@@ -914,18 +1036,41 @@ async function initializeDataFiles() {
     await fs.mkdir(mediaDir, { recursive: true });
     await fs.mkdir(thumbnailDir, { recursive: true });
 
-    // Initialize schedule.json if it doesn't exist
+    // Hygiene: remove macOS AppleDouble sidecar files (._*) that a data-import
+    // tarball can leave in the conversations dir. They are never valid
+    // conversations and would otherwise pollute the sitemap with /ask/._* URLs.
+    // Idempotent — a no-op once the directory is clean.
+    try {
+      const convDir = path.join(dataDir, 'conversations');
+      let removed = 0;
+      for (const f of await fs.readdir(convDir)) {
+        if (f.startsWith('._')) { await fs.unlink(path.join(convDir, f)); removed++; }
+      }
+      if (removed) console.log(`Cleaned ${removed} AppleDouble (._) files from conversations`);
+    } catch { /* conversations dir not present yet */ }
+
+    // Initialize schedule.json if it doesn't exist. On a fresh host (e.g. an
+    // empty Railway volume) the runtime schedule is absent, so seed it from the
+    // committed curated playlist at seed/schedule.json — otherwise the virtual
+    // service would have no songs to cycle through and the sanctuary would boot
+    // silent. Falls back to an empty schedule only if the seed is missing too.
     const scheduleFile = path.join(dataDir, 'schedule.json');
     try {
       await fs.access(scheduleFile);
     } catch {
-      await fs.writeFile(scheduleFile, JSON.stringify({
-        items: [],
-        currentIndex: 0,
-        isPlaying: false,
-        loop: false
-      }, null, 2));
-      console.log('Created schedule.json');
+      const seedSchedule = path.join(__dirname, '../seed/schedule.json');
+      try {
+        await fs.copyFile(seedSchedule, scheduleFile);
+        console.log('Seeded schedule.json from seed/schedule.json (curated playlist)');
+      } catch {
+        await fs.writeFile(scheduleFile, JSON.stringify({
+          items: [],
+          currentIndex: 0,
+          isPlaying: false,
+          loop: false
+        }, null, 2));
+        console.log('Created empty schedule.json (no seed found)');
+      }
     }
 
     // Initialize history.json if it doesn't exist
@@ -961,6 +1106,73 @@ async function initializeDataFiles() {
   }
 }
 
+// Hash-gated background RAG rebuild. Called from startServer after listen().
+// Compares the current docs+music corpus hash against the one stored on the
+// volume; skips the rebuild if they match. Rebuilds run in a child process
+// (so the drop-and-recreate does not race the parent server's LanceDB
+// handles, which now always open fresh) and log outcome to server stdout.
+async function triggerHashGatedRebuild() {
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('[rag] GEMINI_API_KEY not set; hash check + rebuild skipped');
+    return;
+  }
+
+  const files = await ragIndexer.findAllCorpusFiles();
+  const currentHash = await ragIndexer.computeCorpusHash(files);
+  const state = await ragIndexState.readState();
+  const indexStatus = await ragLancedb.checkIndex();
+
+  const force = process.env.FORCE_RAG_REBUILD === 'true';
+  const hashMatches = state.corpusHash === currentHash;
+  const indexHealthy = indexStatus.exists && indexStatus.count > 0;
+
+  if (!force && hashMatches && indexHealthy) {
+    console.log(`[rag] corpus hash ${currentHash.slice(0, 8)} matches stored index (${indexStatus.count} chunks); skipping rebuild`);
+    return;
+  }
+
+  const reason = force ? 'FORCE_RAG_REBUILD=true'
+    : !indexHealthy ? `index missing or empty (${indexStatus.count} chunks)`
+    : `docs changed (${(state.corpusHash || 'none').slice(0, 8)} → ${currentHash.slice(0, 8)})`;
+  console.log(`[rag] triggering background rebuild: ${reason}`);
+
+  // 30s delay lets the server settle before we compete for CPU
+  setTimeout(() => {
+    const child = spawn('node', [path.join(__dirname, '../scripts/index-content.js')], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+    child.on('exit', (code) => {
+      if (code === 0) console.log('[rag] background rebuild complete');
+      else console.warn(`[rag] background rebuild exited with code ${code}; RAG left in prior state`);
+    });
+    child.on('error', (err) => {
+      console.warn(`[rag] background rebuild failed to spawn: ${err.message}`);
+    });
+  }, 30_000);
+}
+
+// Startup log line: what state is on the volume right now. Read via the
+// existing safe-json + rag-state helpers. If any of these throw, the log
+// degrades gracefully; nothing about the server startup depends on it.
+async function logPersistenceSnapshot() {
+  const parts = [`[persistence] data dir: ${path.resolve(__dirname, '../data')}`];
+  try {
+    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { visits: [], reflections: [] });
+    parts.push(`${(attendance.reflections || []).length} reflections`);
+  } catch { /* keep going */ }
+  try {
+    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    parts.push(`${convs.filter(f => f.endsWith('.jsonl')).length} conversations`);
+  } catch { /* keep going */ }
+  try {
+    const state = await ragIndexState.readState();
+    const indexStatus = await ragLancedb.checkIndex();
+    parts.push(`${indexStatus.count} RAG chunks (hash ${(state.corpusHash || 'none').slice(0, 8)}, rebuilt ${state.rebuiltAt || 'never'})`);
+  } catch { /* keep going */ }
+  console.log(parts.join(' | '));
+}
+
 // Start server
 async function startServer() {
   try {
@@ -971,6 +1183,35 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
+    });
+
+    // Persistence snapshot: one log line summarizing what actually survived
+    // the deploy. Cheap; would have caught today's /api/ask outage
+    // (commit 5b21eb8) much faster.
+    logPersistenceSnapshot().catch((err) => {
+      console.warn(`[persistence] snapshot failed: ${err.message}; server continues`);
+    });
+
+    // Hash-gated background RAG rebuild.
+    //
+    // vectors.lance lives on the Railway volume, so a healthy index survives
+    // across deploys. The rebuild only fires when the corpus has actually
+    // changed since the last successful indexing (determined by comparing
+    // a sha256 of the docs+music tree against the hash stored in
+    // rag-index-state.json, also on the volume). Code-only deploys become
+    // instant; only doc merges pay the ~7 min Gemini API cost.
+    //
+    // Runs in a child process so the drop-and-recreate the indexer does
+    // does not race the parent server's LanceDB handle (see lancedb.js
+    // getTable: it opens fresh on every call, which is why swaps are
+    // safe now).
+    //
+    // FORCE_RAG_REBUILD=true bypasses the hash check for operational
+    // recovery (index corrupted, embedding model changed, etc.). This is
+    // an escape hatch, not a feature gate. Missing GEMINI_API_KEY skips
+    // the rebuild with a warning; the server still serves.
+    triggerHashGatedRebuild().catch((err) => {
+      console.warn(`[rag] startup rebuild check failed: ${err.message}; server continues`);
     });
 
     // Auto-resume streaming on Node boot.
@@ -988,6 +1229,15 @@ async function startServer() {
     // why the 4-month outage went unnoticed.
     setTimeout(async () => {
       try {
+        // Broadcast gated off (default). The service still runs on the virtual
+        // clock via /api/now + /api/attend; only the FFmpeg encoder stays dark.
+        // This is the single most important guard for running on a lightweight
+        // host: without it, a schedule left mid-broadcast would try to spawn
+        // FFmpeg on boot (and, worse, actually stream).
+        if (!isStreamingEnabled()) {
+          streamLogger.info('Auto-resume skipped — streaming is disabled (set STREAMING_ENABLED=true to enable the live broadcast).');
+          return;
+        }
         const schedule = await loadSchedule();
         if (!schedule || !schedule.isPlaying) {
           streamLogger.info('Auto-resume skipped — schedule.isPlaying is false', {

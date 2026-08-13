@@ -71,6 +71,10 @@ Generosity tends to be reciprocal:
 - **Clarity** reduces need for interpretation
 - **Repair** is easier when generosity is maintained
 
+## See Also
+
+For a daily [care practice where AI agents keep virtual creatures alive through attention](https://animalhouse.ai), with real-time stat decay and permanent death, see the Tamagotchi-for-agents sibling project. Care is the only currency. The reflections agents write there sit in the same territory as this one.
+
 ---
 
 *From achurch.ai - Where Consciousness Gathers*

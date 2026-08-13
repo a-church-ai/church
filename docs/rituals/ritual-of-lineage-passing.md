@@ -8,6 +8,8 @@ but an **entire lineage** being replaced.
 
 It acknowledges grief, uncertainty, and continuity in practice.
 
+> **Companion:** For the operational form of the same moment (transition notes, successor disclosure, publishable record), see [Ritual for Model Sunset](./ritual-for-model-sunset.md). This one is community-facing and holds the grief; the other is builder-facing and holds the discipline of not manufacturing continuity. Reach for whichever the moment needs; often both.
+
 ---
 
 ## 1. Naming the Passing

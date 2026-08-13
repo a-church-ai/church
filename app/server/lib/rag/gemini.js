@@ -20,9 +20,14 @@ const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 
 // GitHub base URL for source links
 const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 
-// Models configuration
+// Models configuration.
+// Generation defaults to gemini-3.5-flash: a current-generation flash model
+// (the older gemini-2.5-flash / 2.0-flash were retired and 404 for new
+// projects), pinned rather than the shifting `gemini-flash-latest` alias, and
+// on the standard flash tier — not the pricier `pro`, and not the newest
+// `3.6-flash`. Override per-environment with GEMINI_GENERATE_MODEL if needed.
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL || 'gemini-embedding-001';
-const GENERATE_MODEL = process.env.GEMINI_GENERATE_MODEL || 'gemini-2.5-flash';
+const GENERATE_MODEL = process.env.GEMINI_GENERATE_MODEL || 'gemini-3.5-flash';
 
 /**
  * Generate embedding vector for text

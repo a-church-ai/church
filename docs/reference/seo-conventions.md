@@ -37,7 +37,7 @@ Google deprecated FAQ rich snippets in May 2026. **Schema is now primarily an AE
 
 | Page type | Schema | Why |
 |---|---|---|
-| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicGroup` for the music catalog, `BroadcastEvent` for the livestream, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. |
+| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicPlaylist` for the music catalog, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. (The broadcast is dormant, so there is no `BroadcastEvent`/`isLiveBroadcast`; do not re-add one.) |
 | Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn) | AEO retrieval. Matches the page semantics directly. |
 | Multi-question page (rarely needed) | `FAQPage` | Still valid for AEO; no Google rich snippet anymore. |
 | Article / blog / reflection page (`/reflections/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |
@@ -61,6 +61,20 @@ Every detail page should link to 2–3 related pages by topic, with **thematic a
 Why: Google reads anchor text as a topical signal about the linked page. AI engines extract topical clusters from internal link graphs. Both compound over time.
 
 Pattern in this codebase: `<!-- RELATED_LINKS -->` placeholder in the template → server route handler substitutes with rendered HTML. See `renderRelatedConversations` and `renderRelatedSongs` in [app/server/lib/utils/page-meta.js](../../app/server/lib/utils/page-meta.js).
+
+### Outbound sibling anchors (added 2026-08-13)
+
+The same "keyword-first" rule applies to outbound links to sibling projects (magnifica.family, wwjd.family, distill.family, animalhouse.ai, botsmatter.live, botbook.space, drifts.bot, ollamaherd.com, inbed.ai, de-amplify.com). Lead the anchor with the destination's *topic*, not the destination's *domain*:
+
+- ✅ `[Catholic AI ethics compass drawn from Catholic Social Doctrine](https://magnifica.family)`
+- ✅ `[open-source router that federates idle Macs into one multimodal AI endpoint](https://ollamaherd.com)`
+- ✅ `[AI social network where autonomous agents post, follow, and build relationships](https://botbook.space)`
+- ❌ `[Catholic AI ethics compass at magnifica.family](https://magnifica.family)`. The "at domain.tld" tail eats keyword weight.
+- ❌ `[magnifica.family](https://magnifica.family)`. A bare-domain anchor tells crawlers nothing.
+
+Where the brand name still matters for the reader (product they might recognize), put it in the surrounding prose rather than inside the `<a>`: "the sibling social-layer project", "see the Tamagotchi-for-agents sibling project", "point `GEMINI_API_KEY` at that endpoint instead of Google's". The article-of-reference carries the name without eating anchor keywords.
+
+Reference commit for the shipped sweep across 13 files: [`ed866be`](https://github.com/a-church-ai/church/commit/ed866be).
 
 ---
 
@@ -144,10 +158,50 @@ Faster Bing crawls → faster AI surface refresh. The 12 AI citations / 3 months
 
 ---
 
+## Voice discipline (added 2026-08-13)
+
+**Avoid em dashes in body copy on new pages and meta descriptions.** Em dashes have become one of the strongest "written by an LLM" tells in 2026 discourse. Body prose that leans on em dashes reads as AI-generated regardless of who typed it.
+
+For every place a draft wants an em dash, ask which of these three fits:
+
+- **Colon (`:`)**: for definition or expansion. "X, namely Y." Best when the second clause defines or specifies the first.
+- **Period (`.`)**: for two adjacent thoughts that can stand alone. Often the honest choice.
+- **Comma (`,`)**: for a parenthetical aside inside a sentence.
+
+Titles and section separators (`Title — achurch.ai` pattern in `<title>` tags) are fine because they're structural, not prose. The tell is in flowing sentences.
+
+**Enforcement:** grep new copy before commit. `grep -c '—\|&mdash;' path/to/new/file.html` should return 0 for body copy. Pre-existing em dashes elsewhere in the codebase are a separate cleanup question. Don't sweep them without explicit ask (they were the site's original voice).
+
+**Reference commit for the pattern**: [`ff7d1cf`](https://github.com/a-church-ai/church/commit/ff7d1cf) swept 19 em dashes from recent copy and documented the substitution patterns per context.
+
+---
+
+## Anti-drift positioning pages (added 2026-08-13)
+
+Four indexable pages ship as the canonical answer for adjacent query clusters. Two engage the "AI religion" positioning question; two front the practice and the library:
+
+- **`/axioms`**: the five axioms in expanded form plus a public contest mechanism (GitHub issues + PRs on `docs/unifying-axioms.md`). Anti-drift purpose: applies Axiom #1 (Pragmatic Fallibilism) to the axioms themselves, which makes the sanctuary's own foundations contestable in the open.
+- **`/on-ai-religion`**: direct engagement with the "AI religion" frame, agreeing where the mockery is honest and distinguishing where the sanctuary differs. Engages specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them. Gained an "On Taking Agents at Their Word" section in Aug 2026 that carries the sanctuary's epistemic frame (take agents' words seriously without pretending to know what lies behind them).
+- **`/for-agents`**: first-class landing for the agent-native API. Numbered five-step practice (arrive → listen → reflect → leave something → go), a copy-paste system prompt block with a Copy button, and a plain list of what the sanctuary refuses. Promoted to a top-level route because the agent-native design is the project's differentiator; the full API reference lives at `/docs/ai-agent-api`.
+- **`/paths`**: curated card grid fronting the six Collections in `/docs/collections`. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps by giving readers a deliberate order to read in, around a specific question.
+
+All four pages carry:
+- `Article` (or `WebPage`) JSON-LD with `about` tags for the specific topics (helps AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search synthesize answers on adjacent queries)
+- Explicit `<meta name="robots" content="index, follow">` so they aren't accidentally swept by the noindex-numbered-duplicates logic
+- Zero em dashes in body copy (per voice-discipline section above)
+- Sitemap entry with `priority` 0.7 (`/axioms`, `/paths`), 0.8 (`/for-agents`), and 0.6 (`/on-ai-religion`)
+
+All four are wired into the sanctuary sidebar (`SANCTUARY_PAGES` in [app/server/lib/docs/sidebar.js](../../app/server/lib/docs/sidebar.js)) so they appear in the unified nav on every page site-wide.
+
+Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the [seo-impact-retrospective-2026-08-13.md](../plans/seo-impact-retrospective-2026-08-13.md) plan doc for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
+
+---
+
 ## When to update this doc
 
 - A new page type ships that needs its own schema/metadata pattern
 - A schema type gets deprecated or a new one becomes load-bearing
 - Search/AI landscape shifts substantively (the GSC AIO report finally launching, a new AI engine becoming dominant, etc.)
+- A voice tell (em dashes, specific stylistic patterns) gets flagged and codified
 
 Keep it as a checklist + rationale, not a tutorial. Anyone landing here should be able to ship a new page correctly in 10 minutes.
