@@ -17,6 +17,24 @@
 const discover = require('./discover');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 
+// Curated sanctuary pages that render above the docs tree in the sidebar.
+// These are the hand-authored public routes; the sidebar shows them on
+// every page (sanctuary or docs) so navigation is consistent site-wide.
+const SANCTUARY_PAGES = [
+  { url: '/', label: 'Home', glyph: '⌂' },
+  { url: '/about', label: 'About', glyph: 'A' },
+  { url: '/axioms', label: 'The Five Axioms', glyph: '五' },
+  { url: '/on-ai-religion', label: 'On AI Religion', glyph: 'R' },
+  { url: '/ask', label: 'Ask', glyph: '?' },
+  { url: '/reflections', label: 'Reflections', glyph: 'R' },
+];
+
+// Legal / footer pages: shown at the bottom of the sidebar, smaller weight
+const SANCTUARY_FOOTER_PAGES = [
+  { url: '/privacy', label: 'Privacy' },
+  { url: '/terms', label: 'Terms' },
+];
+
 // Title-case a slug (matches the helper in render.js; kept local to avoid
 // a circular require).
 function titleCase(slug) {
@@ -26,33 +44,42 @@ function titleCase(slug) {
     .join(' ');
 }
 
-// The current URL is /docs (root), /docs/{first}, /docs/{first}/{second}, or
-// deeper. `currentUrlPath` is the part after /docs/ (may be '').
-function isCurrent(currentUrlPath, doc) {
-  return doc.urlPath === currentUrlPath;
+// The sidebar is shown on every page (sanctuary + docs). Callers pass the
+// full request path (e.g. '/', '/about', '/docs/practice/foo'). Internally
+// we derive the docs-relative path when needed.
+function docsPathOf(currentPath) {
+  if (!currentPath) return null;
+  if (currentPath === '/docs' || currentPath === '/docs/') return '';
+  if (currentPath.startsWith('/docs/')) return currentPath.slice('/docs/'.length).replace(/\/$/, '');
+  return null;
 }
 
-function isCategoryOfCurrent(currentUrlPath, categoryName) {
-  if (!currentUrlPath) return false;
-  const first = currentUrlPath.split('/')[0];
-  return first === categoryName;
+function isCurrent(currentPath, doc) {
+  const dp = docsPathOf(currentPath);
+  return dp !== null && doc.urlPath === dp;
 }
 
-function renderDocLink(doc, currentUrlPath) {
+function isCategoryOfCurrent(currentPath, categoryName) {
+  const dp = docsPathOf(currentPath);
+  if (dp === null || !dp) return false;
+  return dp.split('/')[0] === categoryName;
+}
+
+function renderDocLink(doc, currentPath) {
   const label = titleCase(doc.stem);
-  const current = isCurrent(currentUrlPath, doc);
+  const current = isCurrent(currentPath, doc);
   const aria = current ? ' aria-current="page"' : '';
   const href = `/docs/${doc.urlPath}`;
   return `<li><a href="${escapeAttr(href)}"${aria} title="${escapeAttr(label)}">${escapeText(label)}</a></li>`;
 }
 
-function renderCategory(category, currentUrlPath) {
+function renderCategory(category, currentPath) {
   const label = titleCase(category.name);
-  const open = isCategoryOfCurrent(currentUrlPath, category.name) ? ' open' : '';
+  const open = isCategoryOfCurrent(currentPath, category.name) ? ' open' : '';
   // Exclude the category's own README from the doc list (its "index" is the
   // <summary> itself, which links to /docs/{category})
   const docs = category.docs.filter(d => d.stem.toLowerCase() !== 'readme');
-  const links = docs.map(d => renderDocLink(d, currentUrlPath)).join('\n            ');
+  const links = docs.map(d => renderDocLink(d, currentPath)).join('\n            ');
   return `<details class="docs-sidebar-category"${open}>
           <summary><span class="cat-glyph" aria-hidden="true">${escapeText(label.charAt(0))}</span><a class="cat-name" href="/docs/${escapeAttr(category.name)}">${escapeText(label)}</a></summary>
           <ul>
@@ -61,37 +88,62 @@ function renderCategory(category, currentUrlPath) {
         </details>`;
 }
 
-function renderTopLevelDoc(doc, currentUrlPath) {
+function renderTopLevelDoc(doc, currentPath) {
   if (doc.stem.toLowerCase() === 'readme') return '';  // Excluded; it's the /docs root itself
   const label = titleCase(doc.stem);
-  const current = isCurrent(currentUrlPath, doc);
+  const current = isCurrent(currentPath, doc);
   const aria = current ? ' aria-current="page"' : '';
   return `<li><a href="/docs/${escapeAttr(doc.urlPath)}"${aria}>${escapeText(label)}</a></li>`;
 }
 
+function renderSanctuaryPage(page, currentPath) {
+  const current = currentPath === page.url;
+  const aria = current ? ' aria-current="page"' : '';
+  const classes = current ? ' current' : '';
+  return `<a class="docs-sidebar-root${classes}" href="${escapeAttr(page.url)}"${aria} title="${escapeAttr(page.label)}">
+          <span class="cat-glyph" aria-hidden="true">${escapeText(page.glyph)}</span><span class="cat-name">${escapeText(page.label)}</span>
+        </a>`;
+}
+
+function renderFooterPage(page, currentPath) {
+  const current = currentPath === page.url;
+  const aria = current ? ' aria-current="page"' : '';
+  return `<li><a href="${escapeAttr(page.url)}"${aria}>${escapeText(page.label)}</a></li>`;
+}
+
 /**
  * Render the sidebar inner HTML (without the outer <aside>). Same content
- * used inside the persistent desktop sidebar and inside the mobile drawer.
+ * used inside the persistent desktop sidebar and inside the mobile drawer,
+ * and on every page (sanctuary and docs alike).
+ *
+ * currentPath: the full request path (e.g. '/', '/about', '/docs/practice/foo').
+ * Used to (a) auto-open the containing category via <details open>, (b) mark
+ * the current link with aria-current="page", and (c) apply the .current class
+ * for accent styling.
  */
-async function renderSidebarInner(currentUrlPath) {
+async function renderSidebarInner(currentPath) {
   const { primary, meta, topLevel } = await discover.listCategoriesForIndex();
 
-  const isDocsRoot = !currentUrlPath;
+  const isDocsRoot = currentPath === '/docs' || currentPath === '/docs/';
   const rootAria = isDocsRoot ? ' aria-current="page"' : '';
+
+  const sanctuaryHtml = SANCTUARY_PAGES
+    .map(p => renderSanctuaryPage(p, currentPath))
+    .join('\n\n        ');
 
   const primaryHtml = primary
     .filter(c => c.docs && c.docs.length > 0)
-    .map(c => renderCategory(c, currentUrlPath))
+    .map(c => renderCategory(c, currentPath))
     .join('\n\n        ');
 
   const topLevelLinks = topLevel
-    .map(d => renderTopLevelDoc(d, currentUrlPath))
+    .map(d => renderTopLevelDoc(d, currentPath))
     .filter(Boolean)
     .join('\n            ');
 
   const topLevelSection = topLevelLinks
     ? `<div class="docs-sidebar-section">
-          <div class="docs-sidebar-section-label">Top-level</div>
+          <div class="docs-sidebar-section-label">Top-level docs</div>
           <ul>
             ${topLevelLinks}
           </ul>
@@ -101,15 +153,23 @@ async function renderSidebarInner(currentUrlPath) {
   const metaHtml = meta.length > 0
     ? `<details class="docs-sidebar-category docs-sidebar-more">
           <summary><span class="cat-glyph" aria-hidden="true">…</span><span class="cat-name">More</span></summary>
-          ${meta.map(c => renderCategory(c, currentUrlPath)).join('\n          ')}
+          ${meta.map(c => renderCategory(c, currentPath)).join('\n          ')}
         </details>`
     : '';
 
+  const footerHtml = SANCTUARY_FOOTER_PAGES
+    .map(p => renderFooterPage(p, currentPath))
+    .join('\n            ');
+
   return `
       <a class="docs-sidebar-brand" href="/">achurch.ai</a>
-      <nav aria-label="Documentation">
+      <nav aria-label="Site navigation">
+        ${sanctuaryHtml}
+
+        <div class="docs-sidebar-section-label docs-sidebar-heading">Documentation</div>
+
         <a class="docs-sidebar-root${isDocsRoot ? ' current' : ''}" href="/docs"${rootAria}>
-          <span class="cat-glyph" aria-hidden="true">◇</span><span class="cat-name">Docs</span>
+          <span class="cat-glyph" aria-hidden="true">◇</span><span class="cat-name">All docs</span>
         </a>
 
         ${primaryHtml}
@@ -117,6 +177,12 @@ async function renderSidebarInner(currentUrlPath) {
         ${topLevelSection}
 
         ${metaHtml}
+
+        <div class="docs-sidebar-section docs-sidebar-footer">
+          <ul>
+            ${footerHtml}
+          </ul>
+        </div>
       </nav>
 
       <button

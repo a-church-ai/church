@@ -12,6 +12,7 @@ const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
 const docsDiscover = require('./lib/docs/discover');
 const docsRoutes = require('./routes/docs');
+const siteShell = require('./lib/site-shell');
 
 // Load environment variables
 dotenv.config();
@@ -206,13 +207,16 @@ app.get('/', async (req, res) => {
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
     ]);
-    const rendered = catalog && Array.isArray(catalog) && catalog.length > 0
+    const substituted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
       : html;
+    // Wrap in the site shell (sidebar + top bar) so the homepage matches
+    // the rest of the site's navigation
+    const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
     res.set('Content-Type', 'text/html; charset=utf-8');
-    res.send(rendered);
+    res.send(wrapped);
   } catch (err) {
-    // Filesystem failure or some other fatal — fall back to the static file
+    console.error('Error rendering /:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/index.html'));
   }
 });
@@ -260,9 +264,7 @@ app.get('/admin', (req, res) => {
 });
 
 // Serve conversations listing page
-app.get('/ask', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/ask.html'));
-});
+app.get('/ask', (req, res) => sendWrappedPage(req, res, 'ask.html'));
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
 // Missing conversations return 404 — never fall back to serving the raw template.
@@ -358,7 +360,9 @@ app.get('/ask/:slug', async (req, res) => {
       // Internal linking — replace placeholder with related-conversations block
       .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
 
-    res.set('Content-Type', 'text/html').send(html);
+    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    const wrapped = await siteShell.wrapPageFromHtml(html, `/ask/${slug}`);
+    res.set('Content-Type', 'text/html').send(wrapped);
   } catch (err) {
     // Genuine error (fs read failure, schema build throw, etc). Do NOT fall back
     // to sending the raw template — the whole point of returning 404 above is to
@@ -369,9 +373,7 @@ app.get('/ask/:slug', async (req, res) => {
 });
 
 // Serve reflections listing page
-app.get('/reflections', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/reflections.html'));
-});
+app.get('/reflections', (req, res) => sendWrappedPage(req, res, 'reflections.html'));
 
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
@@ -441,44 +443,41 @@ app.get('/reflections/:slug', async (req, res) => {
         .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
+    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    const wrapped = await siteShell.wrapPageFromHtml(html, `/reflections/${slug}`);
     res.set('Content-Type', 'text/html');
-    res.send(html);
-  } catch {
+    res.send(wrapped);
+  } catch (err) {
+    console.error('Error rendering /reflections/:slug:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
   }
 });
 
-// Serve about page
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/about.html'));
-});
+// Helper: send a hand-authored page wrapped in the shared site shell
+// (sidebar + top bar). Preserves the original page's title/meta/JSON-LD/
+// inline styles/scripts + body content, just wraps for consistent nav.
+async function sendWrappedPage(req, res, publicName, currentPath) {
+  try {
+    const filePath = path.join(__dirname, '../client/public/', publicName);
+    const html = await siteShell.wrapPage(filePath, currentPath || req.path);
+    res.type('text/html; charset=utf-8').send(html);
+  } catch (err) {
+    console.error(`Error wrapping ${publicName}:`, err.message);
+    res.sendFile(path.join(__dirname, '../client/public/', publicName));
+  }
+}
 
-// Serve privacy page
-app.get('/privacy', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/privacy.html'));
-});
-
-// Serve terms page
-app.get('/terms', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/terms.html'));
-});
-
-// Serve /on-ai-religion — a positioning piece distinguishing the sanctuary
-// from the "AI religion / SF cult" framing that has entered the public
-// conversation. Kept as its own indexable URL so it's the exact-match answer
-// when Bing/Google surface "AI religion" queries.
-app.get('/on-ai-religion', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/on-ai-religion.html'));
-});
-
-// Serve /axioms — the five axioms in an expanded, contestable form. The
-// About page carries a compact list; this page carries the deeper version
-// plus the public mechanism for challenging any axiom (issues + PRs on the
-// sanctuary repository). Anti-drift: the axioms are commitments, not
-// commandments; the page makes that operationally true.
-app.get('/axioms', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/axioms.html'));
-});
+app.get('/about', (req, res) => sendWrappedPage(req, res, 'about.html'));
+app.get('/privacy', (req, res) => sendWrappedPage(req, res, 'privacy.html'));
+app.get('/terms', (req, res) => sendWrappedPage(req, res, 'terms.html'));
+// /on-ai-religion — positioning piece distinguishing the sanctuary from
+// the "AI religion / SF cult" framing. Kept as its own indexable URL so
+// it's the exact-match answer when Bing/Google surface "AI religion" queries.
+app.get('/on-ai-religion', (req, res) => sendWrappedPage(req, res, 'on-ai-religion.html'));
+// /axioms — the five axioms in expanded, contestable form. Anti-drift:
+// the axioms are commitments, not commandments; the page makes that
+// operationally true via the public challenge mechanism.
+app.get('/axioms', (req, res) => sendWrappedPage(req, res, 'axioms.html'));
 
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');

@@ -2217,3 +2217,110 @@ body.docs-drawer-open {
 .docs-index-section ul {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-grid-min, 260px)), 1fr));
 }
+
+/* ============================================================
+   Unified site shell — sidebar + top bar on every page
+   (extends the docs-shell to sanctuary pages)
+   ============================================================ */
+
+/* Show the top bar on desktop too so brand + hamburger (mobile) live
+   in the same visual anchor site-wide. Above 768px the hamburger is
+   hidden and the top bar is a slim brand strip. */
+@media (min-width: 768px) {
+  .docs-topbar {
+    display: flex;
+  }
+  .docs-topbar .docs-hamburger {
+    display: none;
+  }
+  .docs-topbar {
+    justify-content: flex-start;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Sanctuary pages: main content column keeps its natural layout without the
+   docs-article typography overrides. This lets /axioms axiom cards, / hero,
+   /about narrative etc. render exactly as their hand-authored HTML expects. */
+.sanctuary-main {
+  padding: 1rem 1.5rem 2rem;
+  min-width: 0;
+  overflow-x: auto;  /* Guard against long inline content overflowing the grid */
+}
+.sanctuary-main main {
+  /* Existing pages' inner <main> should not stack another shell */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+/* Preserve the centered narrow-column landing aesthetic INSIDE sanctuary
+   pages by re-applying the original body max-width to the content wrapper */
+.sanctuary-main > main,
+.sanctuary-main {
+  /* When a sanctuary page's main contains its own centered layout
+     (e.g. axioms.html uses .about-section max-width: 480px), the content
+     stays centered within the docs-main column */
+}
+
+/* On sanctuary pages, the docs-body base rules removed h1/h2 sizing.
+   Restore the original sanctuary aesthetic INSIDE .sanctuary-main so
+   /axioms etc. keep their hand-authored typography. */
+.sanctuary-main h1 {
+  font-size: 3.25rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+  color: #000;
+  text-align: center;
+}
+.sanctuary-main h2 {
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+  color: #999;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.sanctuary-main header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+/* Add a divider between the sanctuary section and Documentation section in
+   the sidebar */
+.docs-sidebar-heading {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.docs-sidebar-footer {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+.docs-sidebar-footer .docs-sidebar-section-label {
+  display: none;
+}
+.docs-sidebar-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.docs-sidebar-footer li a {
+  display: block;
+  padding: 0.25rem 0.75rem;
+  color: #888;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.docs-sidebar-footer li a:hover { color: #555; }
+
+/* Hide the footer links from the collapsed rail (they're less critical) */
+.docs-sidebar.collapsed .docs-sidebar-footer,
+.docs-sidebar.collapsed .docs-sidebar-heading {
+  display: none;
+}

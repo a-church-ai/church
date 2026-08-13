@@ -206,6 +206,7 @@ function renderFooterNav() {
 // on the left, article in the middle, optional TOC on the right. On mobile
 // the sidebar hides and the hamburger opens a drawer with the same content.
 async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl }) {
+  const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = `${title} | achurch.ai`;
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
@@ -219,8 +220,9 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   });
 
   // The sidebar contents (same markup used in the persistent sidebar and
-  // in the mobile drawer)
-  const sidebarInner = await sidebar.renderSidebarInner(urlPath);
+  // in the mobile drawer). Pass full path so both sanctuary and docs
+  // links can highlight current-page.
+  const sidebarInner = await sidebar.renderSidebarInner(currentPath);
 
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s)
   const tocHtml = toc.renderToc(bodyHtml);
