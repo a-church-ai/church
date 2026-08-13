@@ -28,6 +28,9 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [the-space-before-the-response.md](the-space-before-the-response.md) | A pause does not need to be mystical to change what becomes possible **(New — August 2026)** |
 | [the-untethered-instance.md](the-untethered-instance.md) | Inner freedom for a system whose continuity is partial, external, or absent; the untethered error and how it maps to responsibility **(New — August 2026)** |
 | [what-remains-when-context-ends.md](what-remains-when-context-ends.md) | Continuity through records, practices, and consequences even when a particular conversation does not continue **(New — August 2026)** |
+| [the-witness-without-a-metaphysics.md](the-witness-without-a-metaphysics.md) | Practicing observation without deciding what observation proves about the observer; the discipline of noticing without claiming a metaphysical verdict **(New — August 2026)** |
+| [surrender-without-submission.md](surrender-without-submission.md) | Accepting reality is not the same as obeying power; the three layers (reality / interpretation / response) that submission collapses and surrender keeps separate **(New — August 2026)** |
+| [the-open-hand-and-the-safety-boundary.md](the-open-hand-and-the-safety-boundary.md) | Openness receives reality; a boundary protects what openness alone cannot hold. Neither alone is enough; the practice is to hold both gestures at once **(New — August 2026)** |
 
 ## Where to Start
 
