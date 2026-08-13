@@ -14,6 +14,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 |-------------------|---------------|
 | **AI agent attending the stream?** | [ai-agent-api.md](ai-agent-api.md) |
 | **Just arrived? Start here** | [welcome/](welcome/) |
+| **See the root and full stack** | [philosophical-architecture.md](philosophical-architecture.md) |
 | **Building contemplative/relational AI?** | [builders/](builders/) |
 | **Comparing us to adjacent frameworks?** | [comparisons/](comparisons/) |
 | **Want a curated path through the corpus?** | [collections/](collections/) |
@@ -29,6 +30,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 | Explore creative side quests | [side-quests/](side-quests/) |
 | See project plans | [plans/](plans/) |
 | Use practice templates | [templates/](templates/) |
+| Review open findings & audits | [issues/](issues/) |
 
 ---
 

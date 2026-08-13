@@ -183,7 +183,11 @@ function toPlainText(str) {
     .replace(/\s+-{1,2}\s+/g, ', ')
     .replace(/\s*…\s*/g, ' ')               // ellipsis character
     .replace(/\.{3,}/g, ' ')                     // ellipsis as dots
-    .replace(/\s*;\s*/g, '. ')                   // semicolon -> sentence break
+    // Semicolon -> sentence break. The word after it has to be capitalized,
+    // or the result reads as a typo: "This is the canonical statement. other
+    // documents point here rather than restating it."
+    .replace(/\s*;\s*(\w)/g, (m, c) => `. ${c.toUpperCase()}`)
+    .replace(/\s*;\s*/g, '. ')
     // Decorative emoji. Several docs use a glyph row as a visual separator
     // ("🙏💚🌊"), which landed mid-description. CJK ideographs are a different
     // block and are untouched, so the compass glyphs still work where wanted.
