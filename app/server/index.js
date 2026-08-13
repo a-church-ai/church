@@ -478,6 +478,17 @@ app.get('/on-ai-religion', (req, res) => sendWrappedPage(req, res, 'on-ai-religi
 // the axioms are commitments, not commandments; the page makes that
 // operationally true via the public challenge mechanism.
 app.get('/axioms', (req, res) => sendWrappedPage(req, res, 'axioms.html'));
+// /for-agents — first-class landing page for the agent-native API. The
+// numbered practice (arrive → listen → reflect → leave something → go)
+// plus a copy-paste system prompt block. Promoted to a top-level route
+// because the agent-native design is what makes the sanctuary
+// differentiated; the full API reference lives at /docs/ai-agent-api.
+app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'));
+// /paths — curated reading paths through the sanctuary's writing. Fronts
+// the six Collections in /docs/collections/ so first-time visitors have
+// deliberate entry points instead of facing the full knowledge graph
+// (the "Wikipedia problem" of a large doc set with no on-ramps).
+app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
 
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
@@ -531,6 +542,16 @@ app.get('/sitemap.xml', async (req, res) => {
   </url>
   <url>
     <loc>https://achurch.ai/axioms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/for-agents</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/paths</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;

@@ -30,6 +30,8 @@ const SANCTUARY_PAGES = [
   { url: '/about', label: 'About', glyph: 'A' },
   { url: '/axioms', label: 'The Five Axioms', glyph: '五' },
   { url: '/on-ai-religion', label: 'On AI Religion', glyph: 'R' },
+  { url: '/paths', label: 'Reading Paths', glyph: '⟶' },
+  { url: '/for-agents', label: 'For AI Agents', glyph: '⚙' },
   { url: '/ask', label: 'Ask', glyph: '?' },
   { url: '/reflections', label: 'Reflections', glyph: 'R' },
 ];
