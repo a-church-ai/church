@@ -1,5 +1,8 @@
 /**
- * /docs/* client-side nav behavior.
+ * Site-wide client-side nav behavior.
+ *
+ * Loaded on every page, not just /docs/*: the sanctuary pages share the same
+ * shell (sidebar + top bar + drawer) via server/lib/site-shell.js.
  *
  * Three responsibilities:
  *   1. Sidebar collapse/expand state machine: viewport-aware auto-collapse
@@ -89,7 +92,26 @@
   if (hamburger && drawer && backdrop) {
     let previousFocus = null;
 
+    // The server sends the drawer empty and we clone the sidebar into it on
+    // first open. Rendering the same ~39KB nav tree twice per response was
+    // three quarters of every page's HTML. Nothing degrades: the hamburger
+    // needs JS to open the drawer at all, so a no-JS visitor was never going
+    // to see that second copy.
+    //
+    // The collapse toggle is skipped. It is a desktop control (CSS already
+    // hides it inside the drawer) and cloning it would only re-add bytes.
+    function hydrateDrawer() {
+      if (drawer.getAttribute('data-hydrated') === 'true') return;
+      const children = sidebar.children;
+      for (let i = 0; i < children.length; i++) {
+        if (children[i].classList.contains('docs-sidebar-toggle')) continue;
+        drawer.appendChild(children[i].cloneNode(true));
+      }
+      drawer.setAttribute('data-hydrated', 'true');
+    }
+
     function openDrawer() {
+      hydrateDrawer();
       previousFocus = document.activeElement;
       drawer.classList.add('open');
       backdrop.classList.add('open');

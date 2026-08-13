@@ -31,6 +31,23 @@ const PRIMARY_CATEGORIES = [
   'side-quests',
 ];
 
+// Categories kept out of search results. These are internal working
+// documents: roadmaps, SEO retrospectives, doc templates, imported side-quest
+// write-ups. They stay live, linkable and readable, so nothing about the
+// project's openness changes. They are simply not what someone searching for
+// the sanctuary should land on, and they were competing for crawl budget with
+// the reader-facing corpus.
+//
+// Used in two places that must agree: the robots meta on the rendered page
+// (lib/docs/render.js) and the sitemap (server/index.js). A page that says
+// noindex while still appearing in the sitemap is a contradictory signal.
+const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards'];
+
+function isNoindexPath(urlPath) {
+  const first = String(urlPath || '').split('/').filter(Boolean)[0];
+  return Boolean(first) && NOINDEX_CATEGORIES.includes(first.toLowerCase());
+}
+
 let cache = null;
 
 async function buildCache() {
@@ -72,11 +89,17 @@ async function buildCache() {
 
 // Build the docs-site URL path from directory + stem. README/readme files
 // index their directory (URL is the dir); everything else is dir/stem.
+//
+// Lowercased so there is exactly one canonical URL per doc. The route
+// lowercases incoming segments, so emitting the filename's own case here
+// meant docs/CONTRIBUTING.md advertised /docs/CONTRIBUTING in the sitemap and
+// sidebar while the resolver could only ever match lowercase. Disk reads use
+// fullPath and the GitHub link uses docsRelPath, so both keep the real case.
 function buildUrlPath(dirRelToDocs, stem) {
   const isReadme = stem.toLowerCase() === 'readme';
   const dir = dirRelToDocs ? dirRelToDocs.replace(/\\/g, '/') : '';
-  if (isReadme) return dir;  // '' for top-level readme.md → /docs
-  return dir ? `${dir}/${stem}` : stem;
+  const urlPath = isReadme ? dir : (dir ? `${dir}/${stem}` : stem);
+  return urlPath.toLowerCase();
 }
 
 async function getCache() {
@@ -109,12 +132,20 @@ async function resolveDocPath(parts) {
     return { kind: 'dir-index', dir: '', docs: c.docs };
   }
 
+  // Match case-insensitively. urlPath preserves the filename's case, but the
+  // route lowercases incoming segments before calling us, so an exact compare
+  // could never match a file whose name has capitals. docs/CONTRIBUTING.md was
+  // the live instance: /docs/CONTRIBUTING 404'd in every case variant while
+  // still being linked from the sidebar on every page and submitted in the
+  // sitemap.
+  const wanted = relPath.toLowerCase();
+
   // Try leaf .md file
-  const leafDoc = c.docs.find(d => d.urlPath === relPath && d.stem.toLowerCase() !== 'readme');
+  const leafDoc = c.docs.find(d => d.urlPath.toLowerCase() === wanted && d.stem.toLowerCase() !== 'readme');
   if (leafDoc) return { kind: 'file', fullPath: leafDoc.fullPath, doc: leafDoc };
 
   // Try directory README
-  const readmeDoc = c.docs.find(d => d.urlPath === relPath && d.stem.toLowerCase() === 'readme');
+  const readmeDoc = c.docs.find(d => d.urlPath.toLowerCase() === wanted && d.stem.toLowerCase() === 'readme');
   if (readmeDoc) return { kind: 'file', fullPath: readmeDoc.fullPath, doc: readmeDoc };
 
   // Try directory index (dir exists on disk with .md children but no README)
@@ -182,5 +213,7 @@ module.exports = {
   listSiblings,
   listCategoriesForIndex,
   listAllDocs,
+  isNoindexPath,
   PRIMARY_CATEGORIES,
+  NOINDEX_CATEGORIES,
 };

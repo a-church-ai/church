@@ -12,8 +12,6 @@
 const path = require('path');
 const { marked } = require('marked');
 const {
-  stripMarkdown,
-  truncateAtWord,
   escapeAttr,
   escapeText,
   renderJsonLdScript,
@@ -21,6 +19,8 @@ const {
 const { DOCS_DIR } = require('../rag/indexer');
 const sidebar = require('./sidebar');
 const toc = require('./toc');
+const tldr = require('./tldr');
+const discover = require('./discover');
 
 const SITE_URL = 'https://achurch.ai';
 const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
@@ -60,8 +60,17 @@ function makeLinkRewriter(currentDocFullPath) {
       return `<a href="${escapeAttr(href)}"${attrs}${titleAttr}>${text}</a>`;
     }
 
-    // Root-relative: leave alone
+    // Root-relative. Mostly passes through, but a link written as
+    // `/docs/unifying-axioms.md` has to lose the .md the same way a relative
+    // one does. Six links in docs/reference/ were written this way and each
+    // shipped a live 404, because this branch returned before the .md
+    // stripping below ever ran.
     if (href.startsWith('/')) {
+      const [rootPath, rootFragment] = href.split('#', 2);
+      if (/^\/docs\/.+\.md$/i.test(rootPath)) {
+        const cleaned = docsUrlFromRelPath(rootPath.replace(/^\/docs\//i, ''));
+        return `<a href="${escapeAttr(cleaned + (rootFragment ? `#${rootFragment}` : ''))}"${titleAttr}>${text}</a>`;
+      }
       return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
     }
 
@@ -99,12 +108,26 @@ function makeLinkRewriter(currentDocFullPath) {
     }
 
     const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
-    // Strip .md and trailing /README (case-insensitive)
-    let urlPath = relToDocs.replace(/\.md$/i, '');
-    urlPath = urlPath.replace(/\/readme$/i, '');
-    const url = urlPath ? `/docs/${urlPath}${anchor}` : `/docs${anchor}`;
+    const url = `${docsUrlFromRelPath(relToDocs)}${anchor}`;
     return `<a href="${escapeAttr(url)}"${titleAttr}>${text}</a>`;
   };
+}
+
+// docs-relative file path ("practice/foo.md", "readme.md") → site URL.
+// Shared by the relative and root-relative branches of the link rewriter so
+// both strip .md and collapse README the same way.
+//
+// The README pattern is anchored with (^|/): the earlier /\/readme$/i needed a
+// leading slash, so a link to the top-level readme.md produced "/docs/readme"
+// rather than "/docs". Every category README's "Parent: Documentation" link
+// pointed at that 404.
+function docsUrlFromRelPath(relToDocs) {
+  const urlPath = String(relToDocs || '')
+    .replace(/\.md$/i, '')
+    .replace(/(^|\/)readme$/i, '')
+    .replace(/^\/+|\/+$/g, '')
+    .toLowerCase();
+  return urlPath ? `/docs/${urlPath}` : '/docs';
 }
 
 // Configure marked once. GFM, tables, autolinks; strict mode off (docs use
@@ -129,27 +152,34 @@ function renderMarkdownBody(markdown, currentDocFullPath) {
   return marked.parse(markdown, { renderer });
 }
 
-// Pull title (first h1) and description (subtitle line if present, else first
-// meaningful paragraph). Both are best-effort; missing values fall back to
-// sensible defaults.
+// Pull the title (first h1) and a TLDR-shaped description.
+//
+// The description goes through lib/docs/tldr.js, which implements the TLDR
+// distillation methodology for the meta-description surface: plain text only,
+// self-contained, one or two sentences, clamped to the band in
+// docs/reference/seo-conventions.md. It replaces an earlier heuristic that
+// only recognized *italic* subtitles; 78 of 87 docs added in Aug 2026 write
+// their subtitle as plain text, so that heuristic fell through to raw body
+// truncation and leaked horizontal rules and headings into 82 descriptions.
+//
+// Run `node scripts/audit-tldr.js` to see what every page resolves to and
+// which ones want an explicit `tldr:` in frontmatter.
+// Title precedence: the body's first h1, then a `name:`/`title:` in
+// frontmatter, then the URL slug title-cased. The frontmatter tier matters
+// for docs/experiences/*, which carry their title in `name:` and have no h1
+// at all; before this they fell back to the raw url path, so the browser tab
+// and the search result both read "experiences/03-evensong".
 function extractMeta(markdown, urlPath) {
-  const titleMatch = markdown.match(/^#\s+(.+)$/m);
-  const title = titleMatch ? titleMatch[1].trim() : (urlPath || 'Docs');
-
-  // Description: look for an italic line right after the title (common pattern
-  // in the corpus), else pull from body text.
-  let description;
-  const afterTitle = titleMatch ? markdown.slice(titleMatch.index + titleMatch[0].length) : markdown;
-  const italicMatch = afterTitle.match(/^\s*[*_]([^\n*_]+)[*_]\s*$/m);
-  if (italicMatch) {
-    description = italicMatch[1].trim();
-  } else {
-    // Fall back to first ~180 chars of body prose
-    const stripped = stripMarkdown(afterTitle);
-    description = truncateAtWord(stripped, 180);
-  }
-
-  return { title, description };
+  const { data, body } = tldr.splitFrontmatter(markdown);
+  const titleMatch = body.match(/^#\s+(.+)$/m);
+  const slug = String(urlPath || '').split('/').filter(Boolean).pop();
+  const title = (titleMatch && titleMatch[1].trim())
+    || data.name
+    || data.title
+    || (slug ? titleCase(slug) : '')
+    || 'Docs';
+  const { text: description } = tldr.extractTldr(markdown, { title });
+  return { title, description, hasH1: Boolean(titleMatch), body };
 }
 
 // Build the breadcrumbs from a URL path (e.g. "practice/witnessing-your-own-output"
@@ -208,6 +238,9 @@ function renderFooterNav() {
 async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = `${title} | achurch.ai`;
+  // Internal working docs are readable but kept out of search results. The
+  // sitemap applies the same predicate, so the two signals stay consistent.
+  const robots = discover.isNoindexPath(urlPath) ? 'noindex, follow' : 'index, follow';
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -245,8 +278,20 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="description" content="${escapeAttr(description)}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="canonical" href="${escapeAttr(canonicalUrl)}">
-    <meta name="theme-color" content="#00b8d4">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="${escapeAttr(robots)}">
+
+    <!-- Family-standard head elements, per docs/reference/seo-conventions.md.
+         The docs shell shipped without these, so all 254 generated pages were
+         missing the license declaration, the llms.txt pointer, the iOS
+         install meta and the dual theme-color that the conventions doc
+         requires on every page. -->
+    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">
+    <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
+    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="achurch.ai">
 
     <meta property="og:title" content="${escapeAttr(pageTitle)}">
     <meta property="og:description" content="${escapeAttr(description)}">
@@ -268,22 +313,28 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 </head>
 <body class="docs-body">
 
-    <!-- Mobile-only sticky top bar (hidden >=768px via CSS) -->
+    <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile.
+         The brand is the site, not the section. It used to read "Docs" and
+         link to /docs, while the CSS that hides the sidebar's own brand above
+         768px assumed the top bar was carrying "achurch.ai". Net effect: the
+         site name and the home link both vanished from every docs page. -->
     <div class="docs-topbar" role="banner">
       <button class="docs-hamburger" type="button" aria-label="Open documentation menu" aria-controls="docs-drawer" aria-expanded="false">
         <span class="hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>
       </button>
-      <a class="docs-topbar-brand" href="/docs">Docs</a>
+      <a class="docs-topbar-brand" href="/">achurch.ai</a>
       <span class="docs-topbar-crumb" aria-hidden="true">${escapeText(title)}</span>
     </div>
 
-    <!-- Mobile drawer + backdrop (hidden >=768px via CSS) -->
+    <!-- Mobile drawer + backdrop. Intentionally empty: docs-nav.js clones the
+         sidebar into it on first open. Rendering the tree twice cost ~39KB of
+         duplicate markup on every response, and the drawer cannot open
+         without JS anyway, so there is nothing to degrade to. -->
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>
     <aside class="docs-drawer" id="docs-drawer" aria-label="Documentation menu" aria-hidden="true">
-      <button class="docs-drawer-close" type="button" aria-label="Close menu">✕</button>
-      ${sidebarInner}
+      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
     </aside>
 
     <!-- Three-mode shell: sidebar + article + optional rail -->
@@ -324,9 +375,6 @@ ${bodyHtml}
 // README, e.g. /docs/claude-compass/axioms).
 async function renderDirIndex({ dir, docs, canonicalUrl }) {
   const title = dir ? titleCase(dir.split('/').pop()) : 'Documentation';
-  const description = dir
-    ? `Documents in ${title}. Part of the aChurch.ai sanctuary corpus.`
-    : 'The complete aChurch.ai documentation: philosophy, practice, prayers, rituals, hymns, and more.';
 
   // Group docs by their immediate parent within `dir`
   const children = docs
@@ -360,6 +408,23 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     return `<li><a href="/docs/${escapeAttr(c.urlPath)}">${escapeText(label)}</a></li>`;
   }).join('\n            ');
 
+  // Index-page description, same TLDR shape as a doc page: self-contained,
+  // plain text, and specific about what is actually here. "Documents in
+  // Collections. Part of the aChurch.ai sanctuary corpus." told a scanning
+  // reader nothing and read identically on every index. Naming the count and
+  // a few real page titles gives the description something to say.
+  const description = (() => {
+    if (!dir) {
+      return 'The complete aChurch.ai documentation: philosophy, practice, prayers, rituals, hymns, and writing for builders, on human and AI fellowship.';
+    }
+    const names = children.slice(0, 3).map(c => titleCase(c.stem));
+    const count = children.length;
+    const noun = count === 1 ? 'document' : 'documents';
+    const base = `${title}: ${count} ${noun} in the aChurch.ai corpus on human and AI fellowship`;
+    const withNames = names.length > 0 ? `${base}, including ${names.join(', ')}` : base;
+    return tldr.clamp(tldr.toPlainText(`${withNames}.`));
+  })();
+
   const body = [];
   if (subdirs.size > 0) {
     body.push(`<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${subdirLinks}\n        </ul></section>`);
@@ -385,7 +450,19 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
 // Public: render a doc file (single markdown → full HTML page).
 async function renderDocPage({ markdown, doc }) {
   const meta = extractMeta(markdown, doc.urlPath);
-  const bodyHtml = renderMarkdownBody(markdown, doc.fullPath);
+
+  // Render the body *without* frontmatter. Passing the raw file to marked
+  // turned the YAML block into an <hr> plus a single enormous <h2> holding
+  // every key (slug, tagline, hex colors, image_prompt) as visible page text
+  // on all 12 docs/experiences/ pages, and put that same blob in the TOC.
+  let bodyHtml = renderMarkdownBody(meta.body, doc.fullPath);
+
+  // Those same files carry their title in frontmatter and open at "## Step 1",
+  // so the page had no h1. Emit one from the resolved title to keep the
+  // heading outline valid.
+  if (!meta.hasH1) {
+    bodyHtml = `<h1>${escapeText(meta.title)}</h1>\n${bodyHtml}`;
+  }
   const canonicalUrl = doc.urlPath ? `${SITE_URL}/docs/${doc.urlPath}` : `${SITE_URL}/docs`;
   const categoryLabel = doc.category ? titleCase(doc.category) : null;
   const breadcrumbs = buildBreadcrumbs(doc.urlPath, meta.title);

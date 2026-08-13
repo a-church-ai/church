@@ -2050,9 +2050,13 @@ footer a:hover {
     font-weight: 500;
 }
 
-/* --- Mobile top bar + drawer --- */
+/* --- Top bar + drawer --- */
 .docs-topbar {
-    display: none;  /* Hidden by default; shown < 768px via media query below */
+    /* Shown at every width. Below 768px it carries the hamburger; above, the
+       hamburger is hidden and this is a slim brand strip (see the min-width
+       block further down). Kept `none` here so it only appears once the
+       breakpoint rules opt it in. */
+    display: none;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;

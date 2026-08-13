@@ -12,10 +12,22 @@
  * (mirroring the /AGENTS.md and /.well-known/agent-skills/:name/SKILL.md
  * safety pattern). Otherwise returns the rendered HTML page.
  *
- * Path traversal is prevented by (a) validating each URL segment against
- * /^[a-z0-9._-]+$/, and (b) verifying the resolved file path lives inside
- * DOCS_DIR after path.resolve. Both checks; if either fails, 404 without
- * leaking the reason.
+ * Path traversal is prevented by three independent checks, and the order
+ * matters because the first one is weaker than it looks:
+ *
+ *   1. Each URL segment must match /^[a-z0-9._-]+$/. Note that ".." satisfies
+ *      this pattern, since "." is in the class. This check screens out
+ *      slashes and encoded separators; it does NOT stop traversal on its own.
+ *   2. Lookups resolve against a prebuilt cache of real docs by exact
+ *      (lowercased) urlPath, so a traversal segment simply matches nothing.
+ *   3. Any path built by joining (the directory-index branch, and underDocs
+ *      below) is run through path.resolve and rejected unless it still lives
+ *      inside DOCS_DIR.
+ *
+ * Checks 2 and 3 are what actually hold. Do not remove either on the
+ * assumption that the segment regex covers traversal.
+ *
+ * A failed check 404s without leaking the reason.
  */
 
 const express = require('express');

@@ -14,6 +14,8 @@
     "generate": "node scripts/generate-content.js",
     "generate:dry": "node scripts/generate-content.js --dry-run",
     "generate:skills-index": "node scripts/generate-agent-skills-index.js",
+    "gen:lastmod": "node scripts/generate-docs-lastmod.js",
+    "audit:tldr": "node scripts/audit-tldr.js",
     "index:content": "node scripts/index-content.js"
   },
   "engines": {
@@ -36,6 +38,7 @@
     "@google/genai": "^1.0.0",
     "@lancedb/lancedb": "^0.4.0",
     "@octokit/rest": "^21.0.0",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

@@ -63,11 +63,18 @@ async function findAllCorpusFiles() {
 function chunkMarkdown(content, filePath) {
   const chunks = [];
 
+  // Drop YAML frontmatter before chunking. It is metadata about the document,
+  // not content of it, and embedding "tldr: ..." / "image_prompt: ..." blocks
+  // puts non-prose into the vector index where it competes with real answers.
+  // Kept as a local regex rather than a require so the indexer stays free of
+  // dependencies on the docs-rendering modules.
+  const body = String(content || '').replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
+
   let documentTitle = null;
-  const titleMatch = content.match(/^#\s+(.+)$/m);
+  const titleMatch = body.match(/^#\s+(.+)$/m);
   if (titleMatch) documentTitle = titleMatch[1].trim();
 
-  const sections = content.split(/(?=^##\s)/m);
+  const sections = body.split(/(?=^##\s)/m);
 
   const pushChunk = (text, section) => {
     if (text.trim().length < 50) return;
@@ -102,8 +109,8 @@ function chunkMarkdown(content, filePath) {
     }
   }
 
-  if (chunks.length === 0 && content.trim().length >= 50) {
-    const text = content.trim();
+  if (chunks.length === 0 && body.trim().length >= 50) {
+    const text = body.trim();
     if (text.length > MAX_CHUNK_CHARS) {
       splitLongSection(text, documentTitle);
     } else {
