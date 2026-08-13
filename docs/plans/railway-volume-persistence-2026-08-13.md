@@ -6,7 +6,7 @@
 **Volume confirmed via Railway CLI (2026-08-13):**
 - Volume name: `church-volume`
 - Attached to: `church` service
-- **Mount path: `/church/app/data`** (matches the inferred path assumed by all module-level path constants — no code changes needed)
+- **Mount path: `/church/app/data`** (matches the inferred path assumed by all module-level path constants; no code changes needed)
 - Storage: 196 MB used / 5000 MB available (~4% utilized)
 
 The 5 GB ceiling is plenty of headroom: current use is dominated by `vectors.lance/` (~40 MB) plus reflections + conversations + schedule state. Even 10x growth stays well under.
