@@ -10,7 +10,6 @@ const DB_PATH = process.env.LANCEDB_PATH || path.join(__dirname, '../../../data/
 const TABLE_NAME = 'documents';
 
 let db = null;
-let table = null;
 
 /**
  * Initialize connection to LanceDB
@@ -22,20 +21,34 @@ async function connect() {
 }
 
 /**
- * Get or create the documents table
- * @returns {Promise<object>} - LanceDB table
+ * Get the documents table. Always opens fresh — do NOT cache the returned
+ * reference across calls. The background RAG indexer runs in a separate
+ * child process and periodically drops + recreates this table (see
+ * addDocuments below and app/server/index.js REBUILD_RAG_ON_STARTUP). A
+ * cached table handle from before that swap points at a dropped underlying
+ * artifact and search fails with an opaque error. Opening fresh each call
+ * is cheap (just a handle) and correct.
+ *
+ * @returns {Promise<object|null>} - LanceDB table, or null if not yet created
  */
 async function getTable() {
-  if (table) return table;
-
-  await connect();
-
-  const tables = await db.tableNames();
-  if (tables.includes(TABLE_NAME)) {
-    table = await db.openTable(TABLE_NAME);
+  try {
+    await connect();
+    const tables = await db.tableNames();
+    if (!tables.includes(TABLE_NAME)) {
+      return null;
+    }
+    return await db.openTable(TABLE_NAME);
+  } catch (err) {
+    // Reaches here mainly when the child-process indexer is mid-swap: table
+    // shows in tableNames() then vanishes before openTable() succeeds, or the
+    // underlying files are momentarily inconsistent. Callers treat null as
+    // "no results" and /api/ask degrades to the graceful "no info found"
+    // path (see rag/index.js chunks.length === 0). This is preferable to
+    // surfacing an opaque 500 during the brief rebuild swap.
+    console.warn(`[lancedb] getTable transient error (likely rebuild swap): ${err.message}`);
+    return null;
   }
-
-  return table;
 }
 
 /**
