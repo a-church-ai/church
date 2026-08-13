@@ -1,7 +1,21 @@
 # Plan: Railway Volume Persistence
 
 **Created**: 2026-08-13
-**Status**: Steps 2-4 shipped. Step 0 (dashboard confirm) + Step 1 (targeted persistence test) still open. Original draft plan revised in-place after code audit; see the "revised sequencing" that shipped in the same PR as the code changes.
+**Status**: Steps 0, 2, 3, 4 confirmed done. Step 1 (targeted persistence test) is now a formality (see below). Original draft plan revised in-place after code audit; see the "revised sequencing" that shipped in the same PR as the code changes.
+
+**Volume confirmed via Railway CLI (2026-08-13):**
+- Volume name: `church-volume`
+- Attached to: `church` service
+- **Mount path: `/church/app/data`** (matches the inferred path assumed by all module-level path constants — no code changes needed)
+- Storage: 196 MB used / 5000 MB available (~4% utilized)
+
+The 5 GB ceiling is plenty of headroom: current use is dominated by `vectors.lance/` (~40 MB) plus reflections + conversations + schedule state. Even 10x growth stays well under.
+
+**Step 1 is now a formality** because we have stronger evidence than the targeted test would provide:
+- `/api/health` returns 426 reflections + 680 conversations, both accumulated across multiple deploys this session
+- After the ae5d471 deploy, the hash-gated rebuild wrote `rag-index-state.json` to the volume; the next `/api/health` read pulled the fresh hash + timestamp back out (verified in a poll that fired at 05:39:43Z with hash `a5cf931e...`). Round-trip through the volume works.
+
+Any future deploy will now log the persistence snapshot on startup, so ongoing verification is passive rather than something that requires a scheduled test.
 **Prompted by**: `/api/ask` outage today (commit 5b21eb8) surfaced that vectors.lance was being rebuilt every deploy, plus the twin brothers' broader question about which app state actually persists
 
 ---
