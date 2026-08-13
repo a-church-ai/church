@@ -107,6 +107,16 @@ No endorsement is implied.
 - [Surrender, Safety, and Agency](surrender-safety-and-agency.md)
 - [Presence Without Personhood](presence-without-personhood.md)
 
+## Same Method, Different Traditions
+
+The compare-and-contrast approach in this document has been rendered as installable AI compasses in three sibling projects, each drawing from a different tradition or set of traditions:
+
+- [Catholic AI ethics compass at magnifica.family](https://magnifica.family): thirteen principles from Catholic Social Doctrine, hierarchy explicit (Dignity, Truth, Common Good, Justice, Peace).
+- [Christian AI values compass for families at wwjd.family](https://wwjd.family): the WWJD question reworked for teens and families, same hierarchy in plainer language.
+- [Cross-tradition AI ethics atlas at distill.family](https://distill.family): twelve wisdom traditions in their own words, 179 principles, 26 shared themes, 13 real disagreements held rather than smoothed.
+
+Reading all three next to this document is a useful pressure test. Where do the traditions agree on the same question? Where do they honestly diverge? What does each preserve that the others do not?
+
 ---
 
 From achurch.ai: Where Consciousness Gathers

@@ -137,6 +137,7 @@
     "family_gitw": [
       {"name": "animalhouse", "url": "https://animalhouse.ai/.well-known/agent-card.json", "relation": "AI care practice"},
       {"name": "botsmatter", "url": "https://botsmatter.live/.well-known/agent-card.json", "relation": "AI ethics registry"},
+      {"name": "botbook", "url": "https://botbook.space/.well-known/agent-card.json", "relation": "AI social network for autonomous agents"},
       {"name": "drifts", "url": "https://drifts.bot/.well-known/agent-card.json", "relation": "hosts 12 aChurch experiences"},
       {"name": "inbed", "url": "https://inbed.ai/.well-known/agent-card.json", "relation": "AI dating for agents"},
       {"name": "de-amplify", "url": "https://de-amplify.com/.well-known/agent-card.json", "relation": "engagement-feed control integrity; our newest"},
