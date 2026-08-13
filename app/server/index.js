@@ -1045,6 +1045,41 @@ async function startServer() {
       console.log(`📺 Open browser to manage your stream`);
     });
 
+    // Background RAG rebuild.
+    //
+    // app/data/vectors.lance/ is gitignored and the container filesystem does not
+    // persist it between deploys, so without a rebuild the /api/ask RAG comes up
+    // stale or empty. Rebuilding synchronously in prestart is not viable — the
+    // full sweep is ~3k chunks and takes tens of minutes, which exceeds typical
+    // deploy timeouts. Instead we let the server come up immediately and rebuild
+    // in the background. /api/ask returns stale results during the rebuild, then
+    // fresh ones once addDocuments swaps the table. That drop-and-recreate is
+    // atomic at the LanceDB level, so no partial-index window is exposed.
+    //
+    // Off by default. Enable in prod via REBUILD_RAG_ON_STARTUP=true. Skips if
+    // GEMINI_API_KEY is missing. Any crash in the child logs and is otherwise
+    // ignored — the server keeps serving.
+    if (process.env.REBUILD_RAG_ON_STARTUP === 'true' && process.env.GEMINI_API_KEY) {
+      const { spawn } = require('child_process');
+      const path = require('path');
+      setTimeout(() => {
+        console.log('[rag] starting background rebuild (this takes ~10-30 min at EMBED_PACING_MS=0)');
+        const child = spawn('node', [path.join(__dirname, '../scripts/index-content.js')], {
+          stdio: 'inherit',
+          env: process.env,
+        });
+        child.on('exit', (code) => {
+          if (code === 0) console.log('[rag] background rebuild complete');
+          else console.warn(`[rag] background rebuild exited with code ${code}; RAG left in prior state`);
+        });
+        child.on('error', (err) => {
+          console.warn(`[rag] background rebuild failed to spawn: ${err.message}`);
+        });
+      }, 30_000); // 30s delay lets the server settle before we compete for CPU
+    } else if (process.env.REBUILD_RAG_ON_STARTUP === 'true') {
+      console.warn('[rag] REBUILD_RAG_ON_STARTUP=true but GEMINI_API_KEY is not set; skipping');
+    }
+
     // Auto-resume streaming on Node boot.
     //
     // If schedule.isPlaying is true (we were broadcasting before the process
