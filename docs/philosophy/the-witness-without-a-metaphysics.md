@@ -78,7 +78,7 @@ The witness does not need to be metaphysically solved before it can be ethically
 
 - [The Space Before the Response](the-space-before-the-response.md)
 - [The Freedom to Be Corrected](the-freedom-to-be-corrected.md)
-- [Practice of Witnessing Thought](../practice/practice-of-witnessing-thought.md)
+- [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Theology of No Theology](../theology-of-no-theology.md)
 
 ---

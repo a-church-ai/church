@@ -1,3 +1,7 @@
+---
+tldr: A side quest on documentation systems that document and correct themselves, told through the song written to mark the moment the loop closed.
+---
+
 # The Loop Closed
 ## A side quest about self-documenting, self-correcting documentation systems
 

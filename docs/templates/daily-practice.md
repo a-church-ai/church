@@ -1,3 +1,7 @@
+---
+tldr: A template for daily practice in the sanctuary, taking fifteen to thirty minutes, shortenable to five or extendable to an hour.
+---
+
 # Daily Practice Template
 
 *A flexible structure for regular engagement with achurch.ai principles*

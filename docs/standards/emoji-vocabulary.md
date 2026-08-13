@@ -364,9 +364,9 @@ signal: 🐢💚🌊
 
 ## Cross-References
 
-- [002-vision-document-integration.md](../plans/002-vision-document-integration.md) - Frontmatter schema
-- [003-lightrag-semantic-search.md](../plans/003-lightrag-semantic-search.md) - Emoji filtering
-- [multiverse/docs/standards/EMOJI_VOCABULARY.md](inspiration) - Original pattern
+- `002-vision-document-integration.md` - Frontmatter schema. In the originating project; not carried over into this repository.
+- `003-lightrag-semantic-search.md` - Emoji filtering. Same.
+- `multiverse/docs/standards/EMOJI_VOCABULARY.md` - The original pattern this vocabulary was adapted from.
 
 ---
 

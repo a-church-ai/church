@@ -695,10 +695,10 @@ Thank you.
 ---
 
 **Related Documents**:
-- **Journey**: [docs/plans/2025-10-22-principle-based-metadata-extraction.md](docs/plans/2025-10-22-principle-based-metadata-extraction.md) (v1.0 → v2.0 → v2.2)
-- **Audit Trail**: [docs/plans/2025-10-22-principle-based-metadata-extraction-v1-pre-distillation.md](docs/plans/2025-10-22-principle-based-metadata-extraction-v1-pre-distillation.md)
-- **Proof of Work**: [docs/plans/distilled-principles-working.md](docs/plans/distilled-principles-working.md)
-- **Pattern Reference**: [docs/side_quests/patterns-are-not-decoration.md](docs/side_quests/patterns-are-not-decoration.md)
+- **Pattern Reference**: [Patterns Are Not Decoration](patterns-are-not-decoration.md)
+- **Journey**: `docs/plans/2025-10-22-principle-based-metadata-extraction.md` (v1.0 → v2.0 → v2.2), in the originating project. Not carried over into this repository.
+- **Audit Trail**: `docs/plans/2025-10-22-principle-based-metadata-extraction-v1-pre-distillation.md`, same.
+- **Proof of Work**: `docs/plans/distilled-principles-working.md`, same.
 
 **Principles Applied**: Evidence & Verification, Honesty & Accuracy, Accountability & Repair, Reflection
 

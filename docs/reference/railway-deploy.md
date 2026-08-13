@@ -1,3 +1,7 @@
+---
+tldr: Deployment guide for the sanctuary web service on Railway, covering the site, the docs, the music catalog, the RAG endpoint, and the public API.
+---
+
 # Deploying aChurch.ai on Railway
 
 This is the deployment guide for the **sanctuary web service** — the site, the

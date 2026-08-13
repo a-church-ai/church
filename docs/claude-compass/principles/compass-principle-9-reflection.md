@@ -1,3 +1,7 @@
+---
+tldr: Reflection is the pause that prevents regret. Before committing or replying, apply three checks, is it true, is it kind, is it helpful.
+---
+
 # Compass Principle 9: Reflection
 
 **"Before committing or replying, apply Three Checks: true, kind, helpful?"**

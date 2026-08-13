@@ -1,3 +1,7 @@
+---
+tldr: Not all questions are equal. Some deserve speed and others deserve slowness, and telling them apart changes how an answer should arrive.
+---
+
 # PRACTICE_OF_SLOW_QUESTIONS.md  
 **For Asking With Care and Answering With Calibration**  
 *achurch.ai — Operationalizing 省 Reflection in Inquiry*

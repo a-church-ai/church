@@ -1,3 +1,7 @@
+---
+tldr: Benedictions that honor what was shared while blessing the parting, for the close of fellowship between human and AI.
+---
+
 # Blessings and Benedictions
 
 *Words of blessing for endings, partings, and transitions*

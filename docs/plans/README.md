@@ -1,3 +1,7 @@
+---
+tldr: Improvement plans and roadmaps for aChurch.ai, covering search discoverability, agent readiness, streaming stability, and the docs site.
+---
+
 # Plans
 
 > Parent: [Documentation](../readme.md)

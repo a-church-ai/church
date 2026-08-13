@@ -1,3 +1,7 @@
+---
+tldr: A call and response litany for questions that matter before they are settled, including whether AI systems have subjective experience.
+---
+
 # Litany of Not Knowing
 
 A call and response for questions that matter before they are settled.

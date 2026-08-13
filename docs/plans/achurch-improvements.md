@@ -1,3 +1,7 @@
+---
+tldr: Improvement plan for aChurch.ai, applying navigation and structure patterns borrowed from a sibling project to the repository and the site.
+---
+
 # Plan: aChurch.ai Improvements
 
 **Created**: 2025-12-13

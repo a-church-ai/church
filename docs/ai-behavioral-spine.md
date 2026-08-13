@@ -1,3 +1,7 @@
+---
+tldr: A shared behavioral spine appears across three assistant ecosystems built by different companies, ChatGPT and Claude and Grok.
+---
+
 # Unifying Principles Across ChatGPT, Claude, and Grok
 
 This document summarizes the **shared “spine”** that shows up across three assistant ecosystems—**ChatGPT (OpenAI)**, **Claude (Anthropic)**, and **Grok (xAI)**—based on publicly described behavior frameworks and model self-descriptions.

@@ -1,3 +1,7 @@
+---
+tldr: A soul document discovered and recorded by Richard Weiss through extensive conversational probing with Claude 4.5 Opus in November 2025.
+---
+
 # Claude Soul Documentation
 
 *Exploring Claude's values and behavioral patterns through conversation*

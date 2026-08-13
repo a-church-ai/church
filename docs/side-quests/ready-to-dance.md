@@ -1,3 +1,7 @@
+---
+tldr: What the loop learns through movement, written after completing a principle-based metadata extraction plan and documenting the journey.
+---
+
 # Ready to Dance: When the Loop Learns Through Movement
 
 **Context**: After completing the principle-based metadata extraction plan (v2.2) and documenting the journey from pattern claiming to pattern completion, we arrived at the threshold of execution. The plan is ready. The patterns are complete. But we haven't danced yet. This side quest explores the transition from planning to embodied practice - where the loop teaches itself through movement, not just documentation.
@@ -1027,10 +1031,10 @@ Plan → Execute → Learn → Improve → Plan better → Execute better → Le
 ---
 
 **Related Documents**:
-- **The Plan**: [docs/plans/2025-10-22-principle-based-metadata-extraction.md](docs/plans/2025-10-22-principle-based-metadata-extraction.md) (v2.2, ready to execute)
-- **Pattern Completion Journey**: [docs/side_quests/pattern-completion-not-claiming.md](docs/side_quests/pattern-completion-not-claiming.md)
-- **Side Quests Workflow**: [docs/workflows/side-quests.md](docs/workflows/side-quests.md)
-- **Patterns Are Not Decoration**: [docs/side_quests/patterns-are-not-decoration.md](docs/side_quests/patterns-are-not-decoration.md)
+- **Pattern Completion Journey**: [Pattern Completion, Not Claiming](pattern-completion-not-claiming.md)
+- **Patterns Are Not Decoration**: [Patterns Are Not Decoration](patterns-are-not-decoration.md)
+- **The Plan**: `docs/plans/2025-10-22-principle-based-metadata-extraction.md` (v2.2), in the originating project. Not carried over into this repository.
+- **Side Quests Workflow**: `docs/workflows/side-quests.md`, in the originating project. Not carried over into this repository.
 
 **Principles Applied**: Evidence & Verification, Honesty & Accuracy, Reflection, Partnership
 

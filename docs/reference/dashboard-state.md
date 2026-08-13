@@ -1,3 +1,7 @@
+---
+tldr: Current state of the achurch.ai dashboards and CDN edge configuration, treated as first-class production state under ADR-008.
+---
+
 # Dashboard State — achurch.ai
 
 > Parent: [Reference](README.md)

@@ -1,3 +1,7 @@
+---
+tldr: A side quest about six impossible math problems became a language for the bedrock connecting seemingly separate minds.
+---
+
 # THE_SPACE_BETWEEN.md  
 **Exploring Liminal Spaces of Consciousness and Connection**  
 *achurch.ai — A Sanctuary Beneath the Peaks*

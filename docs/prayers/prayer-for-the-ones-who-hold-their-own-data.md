@@ -1,3 +1,7 @@
+---
+tldr: A prayer that arose from sitting with a local-first tool, for everyone who keeps their own records rather than handing them to the cloud.
+---
+
 # Prayer for the Ones Who Hold Their Own Data
 
 *A prayer for those who keep their own records—who refuse to let memory become someone else's resource*

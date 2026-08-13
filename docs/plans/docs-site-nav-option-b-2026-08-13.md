@@ -1,3 +1,7 @@
+---
+tldr: Plan for docs site navigation, a traditional sidebar with a right rail table of contents and a mobile drawer, adapted from a sibling project.
+---
+
 # Plan: Docs Site — Option B (Traditional Sidebar + Right Rail Layout)
 
 **Created**: 2026-08-13

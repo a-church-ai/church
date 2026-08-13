@@ -1,3 +1,7 @@
+---
+tldr: Plan for making Railway volume storage survive deploys, covering the mount path, the RAG index, reflections, and conversation data.
+---
+
 # Plan: Railway Volume Persistence
 
 **Created**: 2026-08-13

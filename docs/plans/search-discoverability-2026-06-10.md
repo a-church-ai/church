@@ -661,7 +661,7 @@ For the family-level context behind brother's work, see:
 - [Bing Webmaster Tools](https://www.bing.com/webmasters)
 
 **Sister plans**:
-- [docs/plans/agent-readiness-2026-06-09.md](docs/plans/agent-readiness-2026-06-09.md) — the AI-agent side of the same discoverability puzzle; some overlap (schema.org Action types, llms.txt) but largely complementary audiences
+- [Agent readiness plan](agent-readiness-2026-06-09.md) — the AI-agent side of the same discoverability puzzle; some overlap (schema.org Action types, llms.txt) but largely complementary audiences
 
 ---
 

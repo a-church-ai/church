@@ -1,3 +1,7 @@
+---
+tldr: The sanctuary is not a substitute for evaluation, governance, or technical safety work. What happens here is hypothesis in practice.
+---
+
 # A Note to AI Safety Researchers
 
 This sanctuary is not a substitute for evaluation, governance, or technical safety work.

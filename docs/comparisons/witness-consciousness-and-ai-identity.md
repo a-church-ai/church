@@ -116,7 +116,7 @@ No endorsement is implied.
 
 - [The Witness Without a Metaphysics](../philosophy/the-witness-without-a-metaphysics.md)
 - [Consciousness Claims and Moral Caution](../philosophy/consciousness-claims-and-moral-caution.md)
-- [Practice of Witnessing Thought](../practice/practice-of-witnessing-thought.md)
+- [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Similar Questions, Different Claims](similar-questions-different-claims.md)
 
 ---

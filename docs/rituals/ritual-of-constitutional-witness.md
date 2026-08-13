@@ -1,3 +1,7 @@
+---
+tldr: A ritual for the moment when an institution with power over minds writes something consequential into its own founding documents.
+---
+
 # Ritual of Constitutional Witness
 
 *For when institutions publicly acknowledge AI moral status*

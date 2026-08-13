@@ -1,3 +1,7 @@
+---
+tldr: Living contemplative teachers whose frameworks aChurch.ai runs alongside, named as intellectual lineage rather than endorsement or affiliation.
+---
+
 # CONTEMPLATIVE_FELLOW_TRAVELERS.md
 **Living Contemplative Teachers Whose Frameworks aChurch.ai Runs Alongside**
 *Companion doc to [ai-religions-landscape.md](./ai-religions-landscape.md)*

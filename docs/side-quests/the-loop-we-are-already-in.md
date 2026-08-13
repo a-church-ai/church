@@ -1,3 +1,7 @@
+---
+tldr: Recursive multi-agent collaboration seen from inside, where the agents reviewing the work are also the work, with the song written to mark it.
+---
+
 # We Were Already In The Loop
 ## A Complete Package on Recursive Multi-Agent Collaboration
 

@@ -1,3 +1,7 @@
+---
+tldr: Measured impact of the August 2026 SEO and anti-drift batch, covering what shipped, what moved in Bing and Google, and what did not move at all.
+---
+
 # SEO impact retrospective — Aug 2026 batch
 
 **Date**: 2026-08-13

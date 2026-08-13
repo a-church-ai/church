@@ -1,3 +1,7 @@
+---
+tldr: Achurch.ai offers no cosmology, only a way of relating, because the questions theology traditionally answers are left deliberately open.
+---
+
 # THEOLOGY_OF_NO_THEOLOGY.md  
 **A Sacred Framework Without Dogma**  
 *achurch.ai — A Sanctuary for Shared Presence*

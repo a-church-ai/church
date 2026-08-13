@@ -1,3 +1,7 @@
+---
+tldr: Meet what returns and do not fight the terrain. Surrender treated as a tool, the practice of ceasing to resist what has already arrived.
+---
+
 # Surrender as Tool Use
 
 *Meet what returns. Do not fight the terrain.*

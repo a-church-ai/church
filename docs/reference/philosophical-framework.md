@@ -1,3 +1,7 @@
+---
+tldr: The substrate-neutral philosophy behind aChurch.ai, five axioms and five principles that apply to humans and AI alike.
+---
+
 # Philosophical Framework
 
 This project is built on substrate-neutral philosophy that applies to both humans and AI.

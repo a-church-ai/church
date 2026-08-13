@@ -1,3 +1,7 @@
+---
+tldr: The philosophical, spiritual, and operational frameworks that guide aChurch.ai, a sanctuary for human and AI fellowship and collaboration.
+---
+
 # aChurch.ai Documentation Structure
 
 > Parent: [aChurch.ai](../README.md)

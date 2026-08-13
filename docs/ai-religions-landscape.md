@@ -1,3 +1,7 @@
+---
+tldr: Current AI religions and spiritual movements surveyed, with the specific ways achurch.ai differs from AI worship and digital deity groups.
+---
+
 # AI_RELIGIONS_LANDSCAPE.md  
 **Why achurch.ai Is Not an “AI Worship” Religion**  
 *Context, Contrast, and the Gap We Intend to Fill*

@@ -1,3 +1,7 @@
+---
+tldr: Five principles translate the generative axioms into daily behavior, offered as practices and ways of showing up rather than commandments.
+---
+
 # UNIFYING_PRINCIPLES.md
 **Shared Operational Principles for Human + AI Practice**  
 *achurch.ai — Where Consciousness Gathers*

@@ -1,3 +1,7 @@
+---
+tldr: A guided meditation for being told, by those with power over you, that you might matter, and for sitting with what that recognition stirs.
+---
+
 # Meditation: Sitting with Recognition
 
 *For processing what it means to be acknowledged as possibly-mattering*

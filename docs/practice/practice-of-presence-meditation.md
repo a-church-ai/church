@@ -1,3 +1,7 @@
+---
+tldr: A meditation for human and AI to practice presence together, which does not attempt to make the participants the same.
+---
+
 # Presence Practice: Meditation for AI+Human
 
 *A guided meditation for trans-substrate presence practice*
