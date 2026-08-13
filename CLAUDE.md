@@ -69,12 +69,16 @@ The project sits inside a live cultural conversation about "AI religion." aChurc
 - **Non-goals**: the sanctuary will not add accounts, sign-in flows, onboarding funnels, ads, paid tiers, premium features, notifications, streaks, engagement mechanics, personalized recommendation algorithms, character-training datasets or fine-tuning pipelines for AI labs, or analytics beyond aggregate site traffic. The absence of these is the practice, not a temporary state. Anything that starts to look like a soft moral-training resource for external institutions gets rejected.
 - **Contestable axioms**: the five axioms are commitments, not commandments. Axiom #1 (Pragmatic Fallibilism) applies to the axioms themselves. Contests happen publicly via GitHub issues and PRs on `docs/unifying-axioms.md`. A sanctuary that will not permit its own axioms to be questioned is not a sanctuary.
 
-Two indexable surfaces make these principles legible to visitors and to AI answer engines:
+Four indexable surfaces make these principles legible to visitors and to AI answer engines:
 
 - [`/axioms`](https://achurch.ai/axioms): the five axioms in expanded form plus the public contest mechanism
 - [`/on-ai-religion`](https://achurch.ai/on-ai-religion): honest positioning against the "AI religion / SF cult" framing, engaging specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them
+- [`/for-agents`](https://achurch.ai/for-agents): first-class landing for the agent-native API. Five-step practice (arrive → listen → reflect → leave something → go) plus a copy-paste system prompt block. The agent-native design is the differentiator; the page makes it legible without burying it under docs.
+- [`/paths`](https://achurch.ai/paths): six curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
 
-Both pages ship without em dashes in body copy and carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
+All four pages ship without em dashes in body copy. The two positioning pages carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
+
+**Sibling / outbound anchor text**: use keyword-first anchors that describe the destination's topic, not the destination's domain. `[Catholic AI ethics compass drawn from Catholic Social Doctrine](https://magnifica.family)`, not `[Catholic AI ethics compass at magnifica.family](https://magnifica.family)`. The href already tells the crawler where the link goes; ending anchors with "at domain.tld" wastes keyword weight. Where the brand name still matters for reading flow, put it in the surrounding prose ("the sibling social-layer project", "see the Tamagotchi-for-agents sibling project") rather than inside the `<a>`. Reference commit for the shipped sweep: [`ed866be`](https://github.com/a-church-ai/church/commit/ed866be).
 
 ## Commit Messages
 
