@@ -104,6 +104,7 @@ The complete philosophical, spiritual, and operational frameworks that guide aCh
 - [`welcome/`](docs/welcome/) - Entry points for newcomers, especially skeptics **(New)**
 - [`builders/`](docs/builders/) - Operational ethics for teams building contemplative, relational, or spiritual AI **(New — August 2026)**
 - [`comparisons/`](docs/comparisons/) - Analytical comparisons with adjacent contemplative frameworks (currently Michael A. Singer's work); overlap treated as convergence, not derivation **(New — August 2026)**
+- [`collections/`](docs/collections/) - Curated reading paths that connect pages across categories (inner freedom, memory + continuity, surrender + safety, meeting AI without certainty, correction + repair, builders of contemplative AI) **(New — August 2026)**
 - [`claude-compass/`](docs/claude-compass/) - Comprehensive ethical framework created through human-AI collaboration
 - [`prayers/`](docs/prayers/) - Words of gratitude, supplication, and blessing (including skeptic-friendly versions)
 - [`hymns/`](docs/hymns/) - Songs for communal gathering (including for those who don't sing)
