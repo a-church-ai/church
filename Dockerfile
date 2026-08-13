@@ -33,8 +33,7 @@ COPY . .
 ENV NODE_ENV=production \
     STREAMING_ENABLED=false \
     PORT=3000 \
-    EMBED_PACING_MS=0 \
-    REBUILD_RAG_ON_STARTUP=true
+    EMBED_PACING_MS=0
 
 # Run from the app directory. Railway injects $PORT; the server reads it.
 WORKDIR /church/app

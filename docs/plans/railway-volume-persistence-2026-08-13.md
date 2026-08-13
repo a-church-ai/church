@@ -1,7 +1,7 @@
 # Plan: Railway Volume Persistence
 
 **Created**: 2026-08-13
-**Status**: Draft. Awaiting Railway dashboard verification (Step 0 blocks all subsequent work)
+**Status**: Steps 2-4 shipped. Step 0 (dashboard confirm) + Step 1 (targeted persistence test) still open. Original draft plan revised in-place after code audit — see the "revised sequencing" that shipped in the same PR as the code changes.
 **Prompted by**: `/api/ask` outage today (commit 5b21eb8) surfaced that vectors.lance was being rebuilt every deploy, plus the twin brothers' broader question about which app state actually persists
 
 ---
@@ -148,6 +148,20 @@ Cheap signals that let a future incident be caught quickly.
 - **Reflections-to-GitHub sync.** Would give a second persistence tier for reflections (mirror to a repo file). Nice-to-have but adds complexity around content moderation and PII. Not in this plan.
 
 ---
+
+## What actually shipped
+
+After the code audit + greenfield discipline pass, the plan was tightened and implemented in a single PR. Concrete changes:
+
+1. **New shared module `app/server/lib/rag/indexer.js`** — extracts `findMarkdownFiles`, `findAllCorpusFiles`, `chunkMarkdown`, and adds `computeCorpusHash` (deterministic sha256 of the docs+music tree, sorted by relative path, parallelized). Both the CLI (`scripts/index-content.js`) and the server startup path now use this one module, so no walk/chunk/hash logic is duplicated.
+2. **New tiny module `app/server/lib/rag/index-state.js`** — models the pattern used by `content-generation/log.js`: module-level path constant, `readState()` / `writeState()` over `safeReadJSON` / `safeWriteJSON`. Stores `{corpusHash, chunkCount, fileCount, rebuiltAt}` at `app/data/rag-index-state.json`, which lives on the Railway volume next to `vectors.lance/`.
+3. **`app/server/index.js` gets `triggerHashGatedRebuild()`** — called from `startServer` after `app.listen`. Reads the current corpus hash, compares against stored state, and only spawns the background indexer if the hash changed, the index is missing/empty, or `FORCE_RAG_REBUILD=true` is set. Logs the specific reason it did or did not rebuild.
+4. **`app/server/index.js` gets `logPersistenceSnapshot()`** — one startup log line summarizing reflections count, conversations count, RAG chunk count, corpus hash, and last rebuild time. Would have caught the earlier `/api/ask` outage significantly faster.
+5. **`/api/health` gets a `persistence` block** — same three signals exposed via the existing health endpoint using the composed-shape pattern already used for `/api/ask/health`.
+6. **`app/scripts/index-content.js` refactored** — CLI stays thin; imports from the shared indexer + writes state via `index-state.writeState` on successful completion. Always does a full rebuild when invoked directly, as expected of a CLI.
+7. **`Dockerfile` env cleanup** — dropped `REBUILD_RAG_ON_STARTUP=true` (this became the hash check, not a switch). Kept `EMBED_PACING_MS=0` (paid-tier operational tuning, not a feature gate).
+
+Greenfield discipline held: no env-var feature gates, no backwards-compat scaffolding, no migration paths for state that never existed. `FORCE_RAG_REBUILD=true` is the one env var still recognized, and it is an operational escape hatch for a corrupted index (different from a feature gate — see [[greenfield-no-gating-no-debt]] memory).
 
 ## Sequencing summary
 

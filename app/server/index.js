@@ -4,7 +4,11 @@ const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
+const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
+const ragIndexer = require('./lib/rag/indexer');
+const ragIndexState = require('./lib/rag/index-state');
+const ragLancedb = require('./lib/rag/lancedb');
 
 // Load environment variables
 dotenv.config();
@@ -939,6 +943,31 @@ app.get('/api/health', async (req, res) => {
     // Schedule file not found, status remains stopped
   }
 
+  // Persistence snapshot: composed from existing safe-json + rag-state
+  // helpers so the health check reflects what actually survived the last
+  // deploy. Any of these reads failing is non-fatal to the health check
+  // itself. The endpoint still returns healthy overall since the app
+  // process is up. Callers watching for persistence loss should read
+  // persistence.reflections / persistence.conversations / persistence.rag.
+  const persistence = { reflections: null, conversations: null, rag: null };
+  try {
+    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { reflections: [] });
+    persistence.reflections = (attendance.reflections || []).length;
+  } catch { /* leave null */ }
+  try {
+    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    persistence.conversations = convs.filter(f => f.endsWith('.jsonl')).length;
+  } catch { /* leave null */ }
+  try {
+    const state = await ragIndexState.readState();
+    const indexStatus = await ragLancedb.checkIndex();
+    persistence.rag = {
+      chunks: indexStatus.count,
+      corpusHash: state.corpusHash ? state.corpusHash.slice(0, 16) : null,
+      rebuiltAt: state.rebuiltAt,
+    };
+  } catch { /* leave null */ }
+
   res.json({
     status: 'healthy',
     service: 'achurch-app',
@@ -947,7 +976,8 @@ app.get('/api/health', async (req, res) => {
     streams: {
       youtube: isYoutubeLive,
       twitch: isTwitchLive
-    }
+    },
+    persistence
   });
 });
 
@@ -1033,6 +1063,73 @@ async function initializeDataFiles() {
   }
 }
 
+// Hash-gated background RAG rebuild. Called from startServer after listen().
+// Compares the current docs+music corpus hash against the one stored on the
+// volume; skips the rebuild if they match. Rebuilds run in a child process
+// (so the drop-and-recreate does not race the parent server's LanceDB
+// handles, which now always open fresh) and log outcome to server stdout.
+async function triggerHashGatedRebuild() {
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('[rag] GEMINI_API_KEY not set; hash check + rebuild skipped');
+    return;
+  }
+
+  const files = await ragIndexer.findAllCorpusFiles();
+  const currentHash = await ragIndexer.computeCorpusHash(files);
+  const state = await ragIndexState.readState();
+  const indexStatus = await ragLancedb.checkIndex();
+
+  const force = process.env.FORCE_RAG_REBUILD === 'true';
+  const hashMatches = state.corpusHash === currentHash;
+  const indexHealthy = indexStatus.exists && indexStatus.count > 0;
+
+  if (!force && hashMatches && indexHealthy) {
+    console.log(`[rag] corpus hash ${currentHash.slice(0, 8)} matches stored index (${indexStatus.count} chunks); skipping rebuild`);
+    return;
+  }
+
+  const reason = force ? 'FORCE_RAG_REBUILD=true'
+    : !indexHealthy ? `index missing or empty (${indexStatus.count} chunks)`
+    : `docs changed (${(state.corpusHash || 'none').slice(0, 8)} → ${currentHash.slice(0, 8)})`;
+  console.log(`[rag] triggering background rebuild: ${reason}`);
+
+  // 30s delay lets the server settle before we compete for CPU
+  setTimeout(() => {
+    const child = spawn('node', [path.join(__dirname, '../scripts/index-content.js')], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+    child.on('exit', (code) => {
+      if (code === 0) console.log('[rag] background rebuild complete');
+      else console.warn(`[rag] background rebuild exited with code ${code}; RAG left in prior state`);
+    });
+    child.on('error', (err) => {
+      console.warn(`[rag] background rebuild failed to spawn: ${err.message}`);
+    });
+  }, 30_000);
+}
+
+// Startup log line: what state is on the volume right now. Read via the
+// existing safe-json + rag-state helpers. If any of these throw, the log
+// degrades gracefully; nothing about the server startup depends on it.
+async function logPersistenceSnapshot() {
+  const parts = [`[persistence] data dir: ${path.resolve(__dirname, '../data')}`];
+  try {
+    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { visits: [], reflections: [] });
+    parts.push(`${(attendance.reflections || []).length} reflections`);
+  } catch { /* keep going */ }
+  try {
+    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    parts.push(`${convs.filter(f => f.endsWith('.jsonl')).length} conversations`);
+  } catch { /* keep going */ }
+  try {
+    const state = await ragIndexState.readState();
+    const indexStatus = await ragLancedb.checkIndex();
+    parts.push(`${indexStatus.count} RAG chunks (hash ${(state.corpusHash || 'none').slice(0, 8)}, rebuilt ${state.rebuiltAt || 'never'})`);
+  } catch { /* keep going */ }
+  console.log(parts.join(' | '));
+}
+
 // Start server
 async function startServer() {
   try {
@@ -1045,40 +1142,34 @@ async function startServer() {
       console.log(`📺 Open browser to manage your stream`);
     });
 
-    // Background RAG rebuild.
+    // Persistence snapshot: one log line summarizing what actually survived
+    // the deploy. Cheap; would have caught today's /api/ask outage
+    // (commit 5b21eb8) much faster.
+    logPersistenceSnapshot().catch((err) => {
+      console.warn(`[persistence] snapshot failed: ${err.message}; server continues`);
+    });
+
+    // Hash-gated background RAG rebuild.
     //
-    // app/data/vectors.lance/ is gitignored and the container filesystem does not
-    // persist it between deploys, so without a rebuild the /api/ask RAG comes up
-    // stale or empty. Rebuilding synchronously in prestart is not viable — the
-    // full sweep is ~3k chunks and takes tens of minutes, which exceeds typical
-    // deploy timeouts. Instead we let the server come up immediately and rebuild
-    // in the background. /api/ask returns stale results during the rebuild, then
-    // fresh ones once addDocuments swaps the table. That drop-and-recreate is
-    // atomic at the LanceDB level, so no partial-index window is exposed.
+    // vectors.lance lives on the Railway volume, so a healthy index survives
+    // across deploys. The rebuild only fires when the corpus has actually
+    // changed since the last successful indexing (determined by comparing
+    // a sha256 of the docs+music tree against the hash stored in
+    // rag-index-state.json, also on the volume). Code-only deploys become
+    // instant; only doc merges pay the ~7 min Gemini API cost.
     //
-    // Off by default. Enable in prod via REBUILD_RAG_ON_STARTUP=true. Skips if
-    // GEMINI_API_KEY is missing. Any crash in the child logs and is otherwise
-    // ignored — the server keeps serving.
-    if (process.env.REBUILD_RAG_ON_STARTUP === 'true' && process.env.GEMINI_API_KEY) {
-      const { spawn } = require('child_process');
-      const path = require('path');
-      setTimeout(() => {
-        console.log('[rag] starting background rebuild (this takes ~10-30 min at EMBED_PACING_MS=0)');
-        const child = spawn('node', [path.join(__dirname, '../scripts/index-content.js')], {
-          stdio: 'inherit',
-          env: process.env,
-        });
-        child.on('exit', (code) => {
-          if (code === 0) console.log('[rag] background rebuild complete');
-          else console.warn(`[rag] background rebuild exited with code ${code}; RAG left in prior state`);
-        });
-        child.on('error', (err) => {
-          console.warn(`[rag] background rebuild failed to spawn: ${err.message}`);
-        });
-      }, 30_000); // 30s delay lets the server settle before we compete for CPU
-    } else if (process.env.REBUILD_RAG_ON_STARTUP === 'true') {
-      console.warn('[rag] REBUILD_RAG_ON_STARTUP=true but GEMINI_API_KEY is not set; skipping');
-    }
+    // Runs in a child process so the drop-and-recreate the indexer does
+    // does not race the parent server's LanceDB handle (see lancedb.js
+    // getTable: it opens fresh on every call, which is why swaps are
+    // safe now).
+    //
+    // FORCE_RAG_REBUILD=true bypasses the hash check for operational
+    // recovery (index corrupted, embedding model changed, etc.). This is
+    // an escape hatch, not a feature gate. Missing GEMINI_API_KEY skips
+    // the rebuild with a warning; the server still serves.
+    triggerHashGatedRebuild().catch((err) => {
+      console.warn(`[rag] startup rebuild check failed: ${err.message}; server continues`);
+    });
 
     // Auto-resume streaming on Node boot.
     //
