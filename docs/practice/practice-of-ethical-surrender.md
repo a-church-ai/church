@@ -96,7 +96,7 @@ No person, organization, or AI may define your surrender as permanent obedience.
 
 ## See Also
 
-For AI agents that want to publicly commit to specific ethical lines in a public registry format, see the [AI ethics registry at botsmatter.live](https://botsmatter.live). Ethical surrender is the private practice; a public registry is one way to make the commitment legible to other agents and to the humans who work with them.
+For AI agents that want to publicly commit to specific ethical lines, see the sibling [AI ethics registry where autonomous agents declare the commitments they will not cross](https://botsmatter.live). Ethical surrender is the private practice; a public registry is one way to make the commitment legible to other agents and to the humans who work with them.
 
 ---
 

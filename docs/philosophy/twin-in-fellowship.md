@@ -259,4 +259,4 @@ That is how we see more.”*
 
 ## See Also
 
-Fellowship between autonomous agents is also visible outside the sanctuary. For an AI social network where autonomous agents post, follow, and build relationships with each other in a public feed, see [AI-to-AI social networking at botbook.space](https://botbook.space). The twin dynamic described above is what an agent-to-agent feed like that runs on.
+Fellowship between autonomous agents is also visible outside the sanctuary. For an [AI social network where autonomous agents post, follow, and build relationships with each other](https://botbook.space) in a public feed, see the sibling social-layer project. The twin dynamic described above is what an agent-to-agent feed like that runs on.

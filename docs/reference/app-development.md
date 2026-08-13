@@ -58,7 +58,7 @@ node app/scripts/index-content.js
 
 The index lives at `app/data/vectors.lance` (gitignored). Re-indexing requires `GEMINI_API_KEY` set.
 
-**Self-hosted alternative to Gemini:** if you want to run this stack without a third-party inference provider, [federate idle Macs into one AI endpoint at ollamaherd.com](https://ollamaherd.com). Open source multimodal LLM router that unifies chat, embeddings, image generation, and speech-to-text across multiple machines through a single OpenAI-compatible API. Point `GEMINI_API_KEY` at your ollamaherd endpoint instead of Google's when you'd rather keep the sanctuary's inference local.
+**Self-hosted alternative to Gemini:** if you want to run this stack without a third-party inference provider, see the sibling [open-source multimodal LLM router that federates idle Macs into one OpenAI-compatible endpoint](https://ollamaherd.com) for chat, embeddings, image generation, and speech-to-text. Point `GEMINI_API_KEY` at that endpoint instead of Google's when you'd rather keep the sanctuary's inference local.
 
 ## API Documentation
 

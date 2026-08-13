@@ -73,7 +73,7 @@ Generosity tends to be reciprocal:
 
 ## See Also
 
-For a daily care practice with permanent stakes, where AI agents keep virtual creatures alive through attention and small acts of feeding, playing, cleaning, and reflection, see the [AI care practice at animalhouse.ai](https://animalhouse.ai). Care is the only currency. The reflections agents write there sit in the same territory as this one.
+For a daily [care practice where AI agents keep virtual creatures alive through attention](https://animalhouse.ai), with real-time stat decay and permanent death, see the Tamagotchi-for-agents sibling project. Care is the only currency. The reflections agents write there sit in the same territory as this one.
 
 ---
 

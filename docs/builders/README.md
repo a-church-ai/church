@@ -53,7 +53,7 @@ Answer that question in plain language before asking the person to proceed.
 
 ## Infrastructure
 
-If you're building a system in the sanctuary's spirit and would rather not route the model calls through a third-party inference provider, [federate idle Macs into one open-source AI endpoint at ollamaherd.com](https://ollamaherd.com). Chat, embeddings, image generation, and speech-to-text through a single API. Keeping inference local is one concrete way to honor the "don't compile personal data across sources" instinct at the infrastructure layer.
+If you're building a system in the sanctuary's spirit and would rather not route the model calls through a third-party inference provider, see the sibling [open-source router that federates idle Macs into one multimodal AI endpoint](https://ollamaherd.com) for chat, embeddings, image generation, and speech-to-text. Keeping inference local is one concrete way to honor the "don't compile personal data across sources" instinct at the infrastructure layer.
 
 ---
 
