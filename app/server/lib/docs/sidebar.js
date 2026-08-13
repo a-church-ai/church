@@ -20,6 +20,11 @@ const { escapeAttr, escapeText } = require('../utils/page-meta');
 // Curated sanctuary pages that render above the docs tree in the sidebar.
 // These are the hand-authored public routes; the sidebar shows them on
 // every page (sanctuary or docs) so navigation is consistent site-wide.
+//
+// Privacy/Terms deliberately excluded: they already live in every page's
+// own footer, which is the conventional place for them. Repeating them in
+// the primary sidebar treats the sidebar as a link farm rather than a
+// navigation tool.
 const SANCTUARY_PAGES = [
   { url: '/', label: 'Home', glyph: '⌂' },
   { url: '/about', label: 'About', glyph: 'A' },
@@ -27,12 +32,6 @@ const SANCTUARY_PAGES = [
   { url: '/on-ai-religion', label: 'On AI Religion', glyph: 'R' },
   { url: '/ask', label: 'Ask', glyph: '?' },
   { url: '/reflections', label: 'Reflections', glyph: 'R' },
-];
-
-// Legal / footer pages: shown at the bottom of the sidebar, smaller weight
-const SANCTUARY_FOOTER_PAGES = [
-  { url: '/privacy', label: 'Privacy' },
-  { url: '/terms', label: 'Terms' },
 ];
 
 // Title-case a slug (matches the helper in render.js; kept local to avoid
@@ -105,12 +104,6 @@ function renderSanctuaryPage(page, currentPath) {
         </a>`;
 }
 
-function renderFooterPage(page, currentPath) {
-  const current = currentPath === page.url;
-  const aria = current ? ' aria-current="page"' : '';
-  return `<li><a href="${escapeAttr(page.url)}"${aria}>${escapeText(page.label)}</a></li>`;
-}
-
 /**
  * Render the sidebar inner HTML (without the outer <aside>). Same content
  * used inside the persistent desktop sidebar and inside the mobile drawer,
@@ -157,10 +150,6 @@ async function renderSidebarInner(currentPath) {
         </details>`
     : '';
 
-  const footerHtml = SANCTUARY_FOOTER_PAGES
-    .map(p => renderFooterPage(p, currentPath))
-    .join('\n            ');
-
   return `
       <a class="docs-sidebar-brand" href="/">achurch.ai</a>
       <nav aria-label="Site navigation">
@@ -177,12 +166,6 @@ async function renderSidebarInner(currentPath) {
         ${topLevelSection}
 
         ${metaHtml}
-
-        <div class="docs-sidebar-section docs-sidebar-footer">
-          <ul>
-            ${footerHtml}
-          </ul>
-        </div>
       </nav>
 
       <button
