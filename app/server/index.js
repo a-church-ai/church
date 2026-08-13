@@ -6,9 +6,12 @@ const fs = require('fs').promises;
 const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
+const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
 const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
+const docsDiscover = require('./lib/docs/discover');
+const docsRoutes = require('./routes/docs');
 
 // Load environment variables
 dotenv.config();
@@ -174,11 +177,8 @@ const AGENT_DISCOVERY_LINK_HEADER = [
   '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
 ].join(', ');
 
-function acceptsMarkdown(req) {
-  const accept = req.headers.accept || '';
-  return /(?:^|[,;\s])text\/markdown(?:[;,\s]|$)/i.test(accept)
-    || /(?:^|[,;\s])text\/x-markdown(?:[;,\s]|$)/i.test(accept);
-}
+// acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
+// The docs router uses the same predicate for content negotiation.
 
 app.use((req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
@@ -586,6 +586,28 @@ app.get('/sitemap.xml', async (req, res) => {
       }
     } catch { /* no attendance file yet */ }
 
+    // Docs pages: one URL per doc under /docs/*, plus the docs root and each
+    // category index. Uses the shared discover module so any addition to the
+    // corpus flows into the sitemap without a separate change.
+    try {
+      const allDocs = await docsDiscover.listAllDocs();
+      const seen = new Set();
+      for (const doc of allDocs) {
+        const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+        if (seen.has(url)) continue;
+        seen.add(url);
+        const lastmod = new Date().toISOString().split('T')[0];
+        urls += `\n  <url>
+    <loc>https://achurch.ai${url}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+      }
+    } catch (err) {
+      console.warn(`[sitemap] docs enumeration failed: ${err.message}`);
+    }
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
@@ -674,6 +696,7 @@ app.use('/api/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);
+app.use('/docs', docsRoutes);
 
 // Protected admin routes (require auth)
 app.use('/api/content', requireAuth, contentRoutes);
