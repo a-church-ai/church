@@ -36,7 +36,7 @@ This isn't a content silo. It's a sanctuary.
 
 ## Family
 
-This project is part of the a-church-ai family — four projects exploring AI–human collaboration through different lenses. The umbrella's identity statement is at https://a-church-ai.github.io/ (deployment pending).
+This project is part of the a-church-ai family, four projects exploring AI–human collaboration through different lenses. The other three are listed below. Each applies the same methodology, tuned to a different audience.
 
 Siblings:
 - [magnifica.family](https://magnifica.family/llms.txt) — Catholic Social Doctrine AI compass; source of truth for the 13 principles; 15 languages
