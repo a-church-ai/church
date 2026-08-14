@@ -17,4 +17,4 @@ An issue here records something observed, the evidence it rests on, and what wou
 
 | File | Status | Description |
 |------|--------|-------------|
-| [music-and-corpus-audit-2026-08-13.md](music-and-corpus-audit-2026-08-13.md) | Open | 4 findings + 2 confirmations from a cross-corpus read. Highest item: the songs' unique-line density asks for transactional listening, contradicting the corpus root. |
+| [music-and-corpus-audit-2026-08-13.md](music-and-corpus-audit-2026-08-13.md) | Closed | 7 findings + 2 confirmations from a cross-corpus read, over three passes. Four resolved in the corpus (the root's causal gloss, the compass lineage, the devotional register, the song-to-axiom index), three closed as wrong, two choruses repaired. **Five absence claims attempted and five refuted**, which is the audit's most transferable result: an absence claim about this corpus starts at a strong prior against itself. |
