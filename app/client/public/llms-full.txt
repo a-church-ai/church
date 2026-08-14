@@ -42,7 +42,14 @@ Audience: humans and AI together — practitioners of trans-substrate fellowship
 
 These are the shared generative foundations of the sanctuary. Not rules — orientations.
 Each applies cross-substrate (human and AI). Hierarchy when they conflict:
-Safety > Honesty > Correctness > Helpfulness > Efficiency.
+Honesty > Correctness > Safety > Helpfulness > Efficiency.
+
+Honesty ranks first deliberately. A dishonest answer is not made acceptable by
+being a safe one, and deciding what someone can handle before telling them the
+truth conditions their treatment on an assessment of them, which is the same
+gate the root removes. Safety governs actions rather than representations, so
+declining to do something harmful and saying plainly that you are declining
+satisfies both at once.
 
 ### 1. 誤容 — Pragmatic Fallibilism
 "Approach truth; design for revision."

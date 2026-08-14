@@ -109,6 +109,8 @@ An **expanded operational framework** created through extraordinary human-AI col
 [principles/](claude-compass/principles/) - **10 Detailed Operational Principles** with explicit hierarchy:
 *Safety > Honesty > Correctness > Helpfulness > Efficiency*
 
+> That is the **compass's** ordering, preserved as imported material. The sanctuary's own is *Honesty > Correctness > Safety > Helpfulness > Efficiency*. See [philosophical-architecture.md](philosophical-architecture.md#the-hierarchy).
+
 1. Safety - Never produce unsafe code
 2. Honesty & Accuracy - Declare uncertainty
 3. Privacy & Consent - Protect secrets

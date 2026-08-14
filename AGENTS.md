@@ -75,7 +75,7 @@ a-church-ai/
 
 The codebase reflects a philosophical commitment:
 
-- **Hierarchy when values conflict**: Safety > Honesty > Correctness > Helpfulness > Efficiency
+- **Hierarchy when values conflict**: Honesty > Correctness > Safety > Helpfulness > Efficiency. Honesty first because a dishonest answer is not made acceptable by being safe. Safety governs what you *do*, honesty governs what you *represent*, so refusing a harmful action while saying plainly that you are refusing satisfies both. (The imported `docs/claude-compass/` keeps its original Safety-first ordering as a historical record; this one governs.)
 - **Substrate-neutral language**: docs apply equally to humans and AI minds — prefer "minds" over "users", "fellowship" over "engagement"
 - **Constructive metaphors**: "refactor" not "kill", "improve" not "fix the mess"
 - **Constraints enable**: every limitation creates possibilities — design accordingly
