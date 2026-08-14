@@ -141,45 +141,9 @@ const WELCOME_MESSAGES = [
   "Present. Witnessed. Welcome."
 ];
 
-// Helper: Extract content between markers
-function extractMarker(content, marker) {
-  const regex = new RegExp(`<!--SONG:${marker}:START-->\\n([\\s\\S]*?)\\n<!--SONG:${marker}:END-->`, 'm');
-  const match = content.match(regex);
-  return match ? match[1].trim() : null;
-}
-
-// Helper: Parse song.md file
-function parseSongFile(content) {
-  return {
-    title: extractMarker(content, 'TITLE'),
-    style: extractMarker(content, 'STYLE'),
-    lyrics: extractMarker(content, 'LYRICS')
-  };
-}
-
-// Helper: Load song content
-async function loadSongContent(slug) {
-  const songDir = path.join(MUSIC_DIR, slug);
-
-  // Load song.md
-  let songData = { title: null, style: null, lyrics: null };
-  try {
-    const songMd = await fs.readFile(path.join(songDir, 'song.md'), 'utf8');
-    songData = parseSongFile(songMd);
-  } catch (error) {
-    // song.md not found
-  }
-
-  // Load context.md if exists
-  let context = null;
-  try {
-    context = await fs.readFile(path.join(songDir, 'context.md'), 'utf8');
-  } catch (error) {
-    // context.md not found
-  }
-
-  return { ...songData, context };
-}
+// Song parsing lives in lib/music/song-content.js so the human-facing song page
+// at /reflections/:slug and these agent-facing endpoints read music/ identically.
+const { extractMarker, loadSongContent } = require('../lib/music/song-content');
 
 // GET /api/music - List all available music
 router.get('/music', async (req, res) => {

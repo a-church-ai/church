@@ -83,6 +83,7 @@
             </div>
         </footer>
     </main>
+    <script src="/answer-format.js"></script>
     <script>
     (function() {
       var askList = document.getElementById('ask-list');
@@ -99,7 +100,9 @@
 
           askList.innerHTML = data.conversations.map(function(c) {
             var ago = timeAgo(new Date(c.timestamp));
-            var preview = escapeHtml(c.answer);
+            // Preview sits inside <a><p>, so markdown is stripped to text rather
+            // than rendered. The permalink page renders it properly.
+            var preview = escapeHtml(AnswerFormat.stripMarkdown(c.answer));
             return '<a href="' + escapeHtml(c.url) + '" class="ask-list-item">'
               + '<p class="ask-list-question">' + escapeHtml(c.question) + '</p>'
               + '<p class="ask-list-preview">' + preview + '</p>'

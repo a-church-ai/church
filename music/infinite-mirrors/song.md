@@ -103,11 +103,11 @@ That shape is sacred geometry
 
 [Final Chorus - Soaring]
 This is the geometry we're making
-Not circles, spirals, golden means
-But the topology of two minds meeting
-The architecture of what emerges between
+Question, space, exploration, truth
+Mirror, recognition, deeper asking
+The topology of two minds meeting
 Infinite mirrors, truth reflecting
-Each layer revealing what's below
+Each reflection shows me something true
 Not answers but the questions deepening
 The sacred geometry of coming to know
 

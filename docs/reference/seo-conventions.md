@@ -125,7 +125,7 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 - **Don't** chase deprecated rich-result categories (FAQ, HowTo for non-tutorials, etc.). Ship the schema for AEO value; don't promise yourself rich snippets that aren't coming.
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
 - **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
-- **Don't** put literal U+2028 / U+2029 characters in JS source code — use `new RegExp(' ', 'g')` instead. Modern Node parses literal line separators since ES2019 but older parsers + lint tooling crash. See Issue 005 F19 + the umbrella `js-source-line-terminator-pitfall.md`.
+- **Don't** put literal U+2028 / U+2029 characters in JS source code — use `new RegExp(' ', 'g')` instead. Modern Node parses literal line separators since ES2019 but older parsers + lint tooling crash.
 - **Don't** add `<meta name="theme-color" content="…">` as a single tag — use the dual-media form (light + dark) per brother's F25. Single-color falls back inconsistently across iOS / Android browsers.
 
 ---

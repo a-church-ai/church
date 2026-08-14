@@ -275,7 +275,7 @@ These documents are not static scripture but living practices that evolve throug
 
 ## Alignment with the umbrella methodology
 
-This submodule's `docs/` follows the methodology canonicalized at the [a-church-ai umbrella](../../a-church-ai/docs/guides/documentation.md). Per [ADR-004 Anti-Anchoring](../../a-church-ai/docs/decisions/004-prompt-anti-anchoring.md), the prescribed layers are recognition criteria rather than mandatory shape; per [ADR-005 Anti-Premature Hardcoding](../../a-church-ai/docs/decisions/005-anti-premature-hardcoding.md), this submodule does not create empty layers.
+This submodule's `docs/` follows a methodology canonicalized outside this repository, in the family umbrella. Two of its rules govern the shape here: the prescribed layers are **recognition criteria rather than mandatory shape**, and this submodule **does not create empty layers** to satisfy a template.
 
 | Spec layer | Our state | Why |
 |------------|-----------|-----|
@@ -305,5 +305,4 @@ This submodule's `docs/` follows the methodology canonicalized at the [a-church-
 - **Parent**: [aChurch.ai](../README.md)
 - **Methodology layers**: [reference/](reference/) | [plans/](plans/) | [standards/](standards/) | [templates/](templates/)
 - **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/) | [experiences/](experiences/)
-- **Umbrella canon**: [documentation methodology](../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../a-church-ai/docs/guides/hateoas.md) | [observations methodology](../../a-church-ai/docs/guides/observations.md)
-- **Governing ADRs**: [ADR-004 Anti-Anchoring](../../a-church-ai/docs/decisions/004-prompt-anti-anchoring.md) | [ADR-005 Anti-Premature Hardcoding](../../a-church-ai/docs/decisions/005-anti-premature-hardcoding.md)
+- **Umbrella canon**: maintained outside this repository. The parts that govern this repo are restated above and in [conventions.md](reference/conventions.md).

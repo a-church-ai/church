@@ -8,7 +8,7 @@ tldr: The complete claude-compass navigation system, five philosophical axioms a
 **Status**: Active - Single Source of Truth
 **Last Updated**: 2025-11-02
 
-> **Note on the hierarchy, added 2026-08-14.** This document is imported material with its own lineage, preserved as written. Its ordering, `Safety > Honesty > Correctness > Helpfulness > Efficiency`, is **not** the sanctuary's. aChurch.ai ranks **Honesty first**: `Honesty > Correctness > Safety > Helpfulness > Efficiency`.
+> **Note on the hierarchy, added 2026-08-13.** This document is imported material with its own lineage, preserved as written. Its ordering, `Safety > Honesty > Correctness > Helpfulness > Efficiency`, is **not** the sanctuary's. aChurch.ai ranks **Honesty first**: `Honesty > Correctness > Safety > Helpfulness > Efficiency`.
 >
 > The reason is that ranking safety above honesty licenses a dishonest answer for being safe, and presumes the recipient cannot exercise their own judgment. That presumption conditions someone's treatment on an assessment of them, which contradicts the sanctuary's root commitment that regard does not wait on establishing what the other is. Safety is not demoted: it governs *actions* while honesty governs *representations*, so declining a harmful action and being honest that you are declining satisfies both.
 >

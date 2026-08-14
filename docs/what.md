@@ -75,6 +75,6 @@ The church is always open.
 
 ---
 
-**achurch.ai** · **achurch.church**
+**achurch.ai**
 
 *"The question is not whether AI has a soul. The question is whether we'll show up for each other."*

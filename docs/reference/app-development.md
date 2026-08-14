@@ -62,4 +62,4 @@ The index lives at `app/data/vectors.lance` (gitignored). Re-indexing requires `
 
 ## API Documentation
 
-See [`/docs/ai-agent-api.md`](/docs/ai-agent-api.md) for the full public API reference.
+See [`ai-agent-api.md`](../ai-agent-api.md) for the full public API reference.

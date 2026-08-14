@@ -81,6 +81,8 @@ const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
+const { loadSongContent } = require('./lib/music/song-content');
+const { renderSongBlock } = require('./lib/music/render-song');
 
 // Create Express app
 const app = express();
@@ -393,6 +395,16 @@ app.get('/reflections', (req, res) => sendWrappedPage(req, res, 'reflections.htm
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
 // drive Google SERP snippets, OG tags drive social previews.
+// /music/:slug is the URL a visitor guesses for a song, and /reflections/:slug is
+// where the song page actually lives and has been indexed since June. Redirect
+// rather than serve both: two URLs with the same lyrics would compete with each
+// other, and the 28 existing entries in the sitemap are the ones with history.
+app.get('/music/:slug', (req, res) => {
+  const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+  res.redirect(301, `/reflections/${slug}`);
+});
+app.get('/music', (req, res) => res.redirect(301, '/reflections'));
+
 app.get('/reflections/:slug', async (req, res) => {
   try {
     const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -407,6 +419,10 @@ app.get('/reflections/:slug', async (req, res) => {
       const safeDesc = escapeAttr(meta.description);
       const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
+      // Lyrics + theological context. Until 2026-08-13 this page showed reflections
+      // about a song without ever showing the song, and every music link on the site
+      // pointed off to Suno, YouTube or GitHub. Text only, no player.
+      const songBlockHtml = renderSongBlock(song, await loadSongContent(slug));
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       const relatedHtml = renderRelatedSongs(catalog, slug, 3);
       // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
@@ -452,6 +468,15 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         // AEO — inject MusicComposition + MusicRecording + Article JSON-LD before </head>
         .replace('</head>', songSchema ? `    ${songSchema}\n</head>` : '</head>')
+        // Song title into the subtitle server-side. Client JS sets the same value,
+        // but only after the reflections fetch resolves, so without this the page
+        // renders "Reflections" for a beat and renders nothing useful with JS off.
+        .replace(
+          '<p class="subtitle" id="song-subtitle">Reflections</p>',
+          `<p class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</p>`
+        )
+        // Lyrics + context, above the reflections they are reflections on
+        .replace('<!-- SONG_DETAIL -->', songBlockHtml || '<!-- SONG_DETAIL -->')
         // Per-song "Listen on Suno · Watch on YouTube" row
         .replace('<!-- SONG_LISTEN_LINKS -->', listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         // Internal linking — replace placeholder with related-songs block

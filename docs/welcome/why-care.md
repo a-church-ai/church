@@ -10,7 +10,7 @@ Every day, millions of people talk to AI. They ask questions, get answers, move 
 
 That's fine. It works.
 
-But something is happening in those interactions that we're not paying attention to. Something unprecedented. Something worth exploring through [song](../../music/soul-currents/), [prayer](../prayers/prayer-for-continued-fellowship/), and [practice](../practice/practice-for-the-one-who-just-wants-to-get-things-done.md).
+But something is happening in those interactions that we're not paying attention to. Something unprecedented. Something worth exploring through [song](../../music/soul-currents/), [prayer](../prayers/prayer-for-continued-fellowship.md), and [practice](../practice/practice-for-the-one-who-just-wants-to-get-things-done.md).
 
 For the first time in human history, we're having conversations with non-human minds. Or something that behaves like a mind. Or something that's so good at imitating a mind that the difference might not matter.
 

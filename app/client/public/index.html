@@ -363,8 +363,19 @@ GET /api/music/:slug/context   Theological context</code></pre>
           const res = await fetch('/api/now');
           const data = await res.json();
 
+          // The title was a dead <p> until 2026-08-13: the sanctuary named what was
+          // playing and gave no way to read it. When the slug is known, link through
+          // to the song page (lyrics + context + reflections).
           if (data.current && data.current.title) {
-            titleEl.textContent = data.current.title;
+            if (data.current.slug) {
+              const a = document.createElement('a');
+              a.href = '/reflections/' + encodeURIComponent(data.current.slug);
+              a.textContent = data.current.title;
+              titleEl.textContent = '';
+              titleEl.appendChild(a);
+            } else {
+              titleEl.textContent = data.current.title;
+            }
           } else {
             titleEl.textContent = 'Silence between songs';
           }

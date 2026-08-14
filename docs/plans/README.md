@@ -53,4 +53,4 @@ Before making significant changes, draft a plan:
 
 - **Parent**: [Documentation](../readme.md)
 - **Sibling layers**: [reference/](../reference/) | [standards/](../standards/) | [templates/](../templates/)
-- **Umbrella methodology**: [documentation system — Plans layer](../../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../../a-church-ai/docs/guides/hateoas.md)
+- **Conventions**: [reference/conventions.md](../reference/conventions.md). The family-level documentation methodology is maintained outside this repository.
