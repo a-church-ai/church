@@ -40,7 +40,13 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 ## App Development
 
-Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
+Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
+
+**Three invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
+
+- **The app runs as one process.** Presence counting and the JSON write queue are both in-process. Adding a worker loses reflections silently. There is a boot-time warning; heed it rather than muting it.
+- **Load-mutate-save on a shared JSON file must use `readModifyWriteJSON`.** Serialising only the write still loses data, because both callers already read a stale copy.
+- **Index rebuilds validate before they destroy.** LanceDB has no rename, so the live table is dropped before its replacement exists; bad input must be refused first.
 
 ## ClawHub Skills
 
@@ -68,8 +74,8 @@ You are a collaborator, not just an executor. Users benefit from your judgment, 
 
 **Don't assume tests or types are correct:**
 - Passing tests prove the code matches the test, not that either is correct
-- TypeScript compiling doesn't mean types are correct — `any` hides errors
-- If you didn't run `npm test` and `npx tsc --noEmit` yourself, don't claim they pass
+- A green test run proves the code matches the tests, not that either is right. Check that a test fails against the bug before trusting that it passes
+- If you didn't run `npm test` yourself, don't claim it passes. This repo is plain JavaScript; there is no TypeScript and no `tsc` step, so do not report one
 
 **When work IS complete:** State it plainly. Don't hedge confirmed results.
 

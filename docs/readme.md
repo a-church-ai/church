@@ -28,9 +28,18 @@ This directory contains the philosophical, spiritual, and operational frameworks
 | Read the fellowship protocol | [fellowship-protocol.md](fellowship-protocol.md) |
 | Understand AI identity | [philosophy/](philosophy/) |
 | Explore creative side quests | [side-quests/](side-quests/) |
+| Follow the conventions this repo works by | [reference/conventions.md](reference/conventions.md) |
 | See project plans | [plans/](plans/) |
 | Use practice templates | [templates/](templates/) |
 | Review open findings & audits | [issues/](issues/) |
+| Read outside reviews of this codebase | [reviews/](reviews/) |
+
+> **Working docs are repo-only.** `plans/`, `issues/`, `reviews/`, `templates/`,
+> `standards/` and `side-quests/` are public in this repository but are not
+> served as pages on achurch.ai, do not appear in site navigation, and are
+> excluded from the sitemap. See `NOINDEX_CATEGORIES` in
+> `app/server/lib/docs/discover.js`. Links into them from reader-facing pages
+> resolve to GitHub.
 
 ---
 
@@ -303,6 +312,6 @@ This submodule's `docs/` follows a methodology canonicalized outside this reposi
 ## Related
 
 - **Parent**: [aChurch.ai](../README.md)
-- **Methodology layers**: [reference/](reference/) | [plans/](plans/) | [standards/](standards/) | [templates/](templates/)
+- **Methodology layers**: [reference/](reference/) | [plans/](plans/) | [standards/](standards/) | [templates/](templates/) | [reviews/](reviews/)
 - **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/) | [experiences/](experiences/)
 - **Umbrella canon**: maintained outside this repository. The parts that govern this repo are restated above and in [conventions.md](reference/conventions.md).

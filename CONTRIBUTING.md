@@ -25,6 +25,7 @@ Contemplative, substrate-neutral. Constructive metaphors not combative ones ("co
 ## Before you submit
 
 - Open an issue first for substantial changes.
+- Run the tests: `cd app && npm test`. They cover the behaviours that fail silently when broken, so a green run is worth more than it looks.
 - Verify the server starts and key routes render.
 - Watch for the SSR title/canonical/description injection pattern in `app/server/index.js`. These are load-bearing. See [seo-conventions.md](docs/reference/seo-conventions.md).
 - Follow the HATEOAS pattern for any new doc.

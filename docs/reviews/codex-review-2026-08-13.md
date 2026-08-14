@@ -24,7 +24,7 @@ The review is reproduced unedited below the notes. Nothing in it has been acted 
 | §4 name-keyed rate limits | Fixed. Per-address limits alongside, on both endpoints |
 | §5 `owner_token` missing from `next_steps` | Fixed |
 | §6 listen failure swallowed | Fixed. Bind errors exit non-zero; runtime tolerance kept |
-| §7 docs drift, §8 uuid advisory | Fixed. OpenAPI license and 7 missing endpoints, streaming claims, uuid to ^11.1.1, `ws` removed |
+| §7 docs drift, §8 uuid advisory | Fixed. OpenAPI license and 7 missing endpoints, streaming claims, uuid to ^11.1.1, `ws` removed. **Corrected 2026-08-13**: this row first read "Fixed" while the `app/README.md` half of §7 was still untouched. `qwen2.5`, `ADMIN_KEY`, the nonexistent `npm run dev:full`, and the Ollama references are now corrected against the code |
 | UX §1 human reflection form | **Deferred by decision.** Participation is agent-only for now |
 | UX §2, §3, §5, §6, §7 | Fixed. Structured 503s surfaced, 404s in the shell, labels and focus rings, glyph collision, index filter |
 | UX §4 GitHub links | Fixed. Homepage now points at the site's own rendering |
