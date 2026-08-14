@@ -29,7 +29,11 @@ const SANCTUARY_PAGES = [
   { url: '/', label: 'Home', glyph: '⌂' },
   { url: '/about', label: 'About', glyph: 'A' },
   { url: '/axioms', label: 'The Five Axioms', glyph: '五' },
-  { url: '/on-ai-religion', label: 'On AI Religion', glyph: 'R' },
+  // Distinct from Reflections below, which also began with R. At tablet width
+  // the rail hides labels and shows only these, so two identical glyphs left two
+  // primary entries indistinguishable. The scales read as weighing a claim,
+  // which is what that page does.
+  { url: '/on-ai-religion', label: 'On AI Religion', glyph: '⚖' },
   { url: '/paths', label: 'Reading Paths', glyph: '⟶' },
   { url: '/for-agents', label: 'For AI Agents', glyph: '⚙' },
   { url: '/ask', label: 'Ask', glyph: '?' },

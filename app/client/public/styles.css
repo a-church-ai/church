@@ -686,6 +686,16 @@ p {
     transition: border-color 0.2s;
 }
 
+/* outline:none above removes the default ring for pointer users. Keyboard
+   users still need to see where focus is, so :focus-visible restores it. */
+#ask-input:focus-visible,
+#followup-input:focus-visible,
+#ask-name:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
 #ask-input:focus,
 #followup-input:focus {
     border-bottom-color: #000;
@@ -2438,4 +2448,48 @@ body.docs-drawer-open {
 }
 .docs-sidebar.collapsed .docs-sidebar-heading {
   display: none;
+}
+
+/* Labels for inputs whose visible affordance is a placeholder. Placeholders
+   vanish on input and are not reliably announced, so every field carries a real
+   label positioned off-screen. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Filter box on documentation index pages. Hidden until JS enables it, so a
+   no-script reader is never shown a control that cannot work. */
+.docs-index-filter {
+    margin: 0 0 2rem;
+}
+
+.docs-index-filter input[type="search"] {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 300;
+    color: #333;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.docs-index-filter input[type="search"]:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+
+.docs-filter-empty {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #999;
 }

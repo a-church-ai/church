@@ -304,6 +304,82 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s)
   const tocHtml = toc.renderToc(bodyHtml);
+
+  // A filter for pages that are mostly a list of links. Category READMEs are
+  // the real index pages here (docs/practice/README.md lists all 33 practice
+  // documents), and they render through renderDocPage like any other doc, so
+  // keying off the rendered body rather than off the route is what actually
+  // reaches them. An earlier attempt put this in renderDirIndex, which only
+  // runs for directories with no README, so it appeared on nothing.
+  //
+  // /paths already names this problem and answers it with six curated routes.
+  // This is the other half, for a reader who knows roughly what they want.
+  // Progressive enhancement: the control is hidden until script enables it, so
+  // a reader without JavaScript never sees a box that cannot work.
+  // Count the document links in the article, not the list items. Four of the
+  // largest category indexes (practice, philosophy, prayers, rituals) present
+  // their contents as headings with links rather than as bullet lists, so a
+  // list-item count found 0 on exactly the pages a filter helps most.
+  const docLinkCount = (bodyHtml.match(/<a href="\/docs\//g) || []).length;
+  const filterHtml = docLinkCount >= 12 ? `
+        <section class="docs-index-filter" hidden>
+          <label for="docs-filter" class="visually-hidden">Filter this page's links by title</label>
+          <input type="search" id="docs-filter" placeholder="Filter ${docLinkCount} entries by title..." autocomplete="off">
+          <p class="docs-filter-empty" id="docs-filter-empty" hidden>Nothing here matches. <a href="/paths">Try a reading path</a> instead.</p>
+        </section>` : '';
+  const filterScript = docLinkCount >= 12 ? `
+    <script>
+    (function () {
+      var wrap = document.querySelector('.docs-index-filter');
+      var input = document.getElementById('docs-filter');
+      var empty = document.getElementById('docs-filter-empty');
+      var article = document.querySelector('.docs-content');
+      if (!wrap || !input || !article) return;
+
+      // An "entry" is a link plus whatever describes it. Two shapes appear in
+      // this corpus: a bullet (the link's <li>), and a heading followed by a
+      // paragraph or two (the heading plus its siblings up to the next heading
+      // of the same or higher level). Hiding only the link would leave orphaned
+      // descriptions behind.
+      function groupFor(a) {
+        var li = a.closest('li');
+        if (li) return [li];
+        var h = a.closest('h2, h3, h4, h5');
+        if (h) {
+          var level = Number(h.tagName.slice(1));
+          var nodes = [h];
+          var n = h.nextElementSibling;
+          while (n) {
+            var m = /^H([2-5])$/.exec(n.tagName);
+            if (m && Number(m[1]) <= level) break;
+            nodes.push(n);
+            n = n.nextElementSibling;
+          }
+          return nodes;
+        }
+        var p = a.closest('p');
+        return p ? [p] : [a];
+      }
+
+      var entries = [].slice.call(article.querySelectorAll('a[href^="/docs/"]'))
+        .map(function (a) { return { text: '', nodes: groupFor(a) }; });
+      entries.forEach(function (e) {
+        e.text = e.nodes.map(function (n) { return n.textContent; }).join(' ').toLowerCase();
+      });
+
+      wrap.hidden = false;
+      input.addEventListener('input', function () {
+        var q = input.value.trim().toLowerCase();
+        var shown = 0;
+        entries.forEach(function (e) {
+          var hit = !q || e.text.indexOf(q) !== -1;
+          e.nodes.forEach(function (n) { n.hidden = !hit; });
+          if (hit) shown++;
+        });
+        empty.hidden = shown !== 0;
+      });
+    })();
+    </script>` : '';
   const hasToc = tocHtml.length > 0;
 
   return `<!DOCTYPE html>
@@ -395,7 +471,9 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
             ${renderBreadcrumbs(breadcrumbs)}
         </header>
 
-        <article class="docs-article">
+        ${filterHtml}
+
+        <article class="docs-article docs-content">
 ${bodyHtml}
         </article>
 
@@ -407,6 +485,7 @@ ${bodyHtml}
 
         ${renderFooterNav()}
       </main>
+    ${filterScript}
 
       ${tocHtml}
 
@@ -472,12 +551,14 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
   })();
 
   const body = [];
+
   if (subdirs.size > 0) {
     body.push(`<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${subdirLinks}\n        </ul></section>`);
   }
   if (children.length > 0) {
     body.push(`<section class="docs-index-section"><h2>Pages</h2><ul>\n            ${childLinks}\n        </ul></section>`);
   }
+
   const bodyHtml = body.join('\n\n        ');
 
   const breadcrumbs = buildBreadcrumbs(dir, title);

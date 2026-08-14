@@ -34,6 +34,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const discover = require('../lib/docs/discover');
+const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
 const { acceptsMarkdown } = require('../lib/utils/accepts');
 const { DOCS_DIR } = require('../lib/rag/indexer');
@@ -52,6 +53,20 @@ function underDocs(fullPath) {
   return resolved === root || resolved.startsWith(root + path.sep);
 }
 
+// Every 404 in this file is the same 404: the document is not there. A reading
+// path is usually a better way into 250+ documents than guessing a URL.
+function docsNotFound(req, res) {
+  return sendNotFound(req, res, {
+    heading: 'No such document',
+    message: 'That document is not here. The corpus holds over two hundred; a reading path is often a better way in than a URL.',
+    links: [
+      { href: '/docs', label: 'All docs' },
+      { href: '/paths', label: 'Reading paths' },
+      { href: '/', label: 'Home' },
+    ],
+  });
+}
+
 async function handle(req, res, parts) {
   // Lowercase the URL segments before lookup (repo docs are all lowercase;
   // this handles browsers that uppercase or query-mangle without silently
@@ -59,17 +74,17 @@ async function handle(req, res, parts) {
   const lowered = parts.map(p => p.toLowerCase());
 
   if (!validateSegments(lowered)) {
-    return res.status(404).type('text/plain').send('Not found');
+    return docsNotFound(req, res);
   }
 
   const resolved = await discover.resolveDocPath(lowered);
   if (!resolved) {
-    return res.status(404).type('text/plain').send('Not found');
+    return docsNotFound(req, res);
   }
 
   if (resolved.kind === 'file') {
     if (!underDocs(resolved.fullPath)) {
-      return res.status(404).type('text/plain').send('Not found');
+      return docsNotFound(req, res);
     }
     // Content negotiation: markdown clients get the raw file (mirrors the
     // /AGENTS.md handler in server/index.js). Browsers get rendered HTML.
@@ -82,7 +97,7 @@ async function handle(req, res, parts) {
     if (acceptsMarkdown(req)) {
       res.type('text/markdown; charset=utf-8');
       return res.sendFile(resolved.fullPath, err => {
-        if (err && !res.headersSent) res.status(404).type('text/plain').send('Not found');
+        if (err && !res.headersSent) docsNotFound(req, res);
       });
     }
     try {
@@ -123,7 +138,7 @@ async function handle(req, res, parts) {
     return res.send(html);
   }
 
-  return res.status(404).type('text/plain').send('Not found');
+  return docsNotFound(req, res);
 }
 
 // Docs root
@@ -146,7 +161,7 @@ router.get('/*', (req, res) => {
   // HTML while declaring them noindex and hiding them from navigation would be
   // the same inconsistency in a third place.
   if (discover.isNoindexPath(rest)) {
-    return res.status(404).type('text/plain').send('Not found');
+    return docsNotFound(req, res);
   }
 
   return handle(req, res, parts);

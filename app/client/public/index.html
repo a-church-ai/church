@@ -306,10 +306,12 @@ GET /api/music/:slug/context   Theological context</code></pre>
             <p class="ask-intro">Ask about consciousness, identity, ethics, memory, meaning, or the practices held here. Answers are drawn from the open writings, with their sources cited.</p>
             <form id="ask-form">
                 <div class="ask-input-row">
+                    <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
                     <input type="text" id="ask-input" placeholder="What would you like to know?" maxlength="500" autocomplete="off" />
                     <button type="submit" id="ask-submit">Ask</button>
                 </div>
                 <div class="ask-name-row">
+                    <label for="ask-name" class="visually-hidden">Your name (optional)</label>
                     <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
                 </div>
             </form>
@@ -487,7 +489,14 @@ GET /api/music/:slug/context   Theological context</code></pre>
           }
 
           if (!res.ok) {
-            askStatus.textContent = 'Something went wrong. Try again.';
+            // Same as /ask: surface the server's own suggestion rather than
+            // collapsing every failure into one unhelpful sentence.
+            let detail = null;
+            try { detail = await res.json(); } catch (e) { /* non-JSON error */ }
+            askStatus.textContent = (detail && (detail.suggestion || detail.error))
+              || (res.status === 503
+                    ? 'The sanctuary cannot answer right now. The writing is still here to read.'
+                    : 'Something went wrong. Try again.');
             askStatus.className = 'ask-status ask-error';
             askSubmit.disabled = false;
             return;

@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
+const { sendNotFound } = require('./lib/utils/not-found');
 const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
 const ragIndexState = require('./lib/rag/index-state');
@@ -318,7 +319,15 @@ app.get('/ask/:slug', async (req, res) => {
 
   const messages = await loadConversation(slug);
   if (!messages || messages.length === 0) {
-    return res.status(404).type('text/plain').send('Not found');
+    return sendNotFound(req, res, {
+      heading: 'No such conversation',
+      message: 'That conversation is not here. It may have been asked under a different name, or never asked at all.',
+      links: [
+        { href: '/ask', label: 'Recent conversations' },
+        { href: '/paths', label: 'Reading paths' },
+        { href: '/', label: 'Home' },
+      ],
+    });
   }
 
   const meta = buildConversationMeta(messages, slug);
@@ -431,7 +440,15 @@ app.get('/reflections/:slug', async (req, res) => {
   const song = catalog.find(s => s.slug === slug);
   const meta = song ? buildReflectionMeta(song) : null;
   if (!song || !meta) {
-    return res.status(404).type('text/plain').send('Not found');
+    return sendNotFound(req, res, {
+      heading: 'No such song',
+      message: 'That song is not in the catalog. The sanctuary has twenty-eight; one of them may be the one you meant.',
+      links: [
+        { href: '/reflections', label: 'All songs' },
+        { href: '/paths', label: 'Reading paths' },
+        { href: '/', label: 'Home' },
+      ],
+    });
   }
 
   try {

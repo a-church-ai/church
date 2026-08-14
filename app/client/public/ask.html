@@ -44,10 +44,12 @@
         <section class="ask-church" id="ask-church" style="border-top: none; padding-top: 0;">
             <form id="ask-form">
                 <div class="ask-input-row">
+                    <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
                     <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
                     <button type="submit" id="ask-submit">Ask</button>
                 </div>
                 <div class="ask-name-row">
+                    <label for="ask-name" class="visually-hidden">Your name (optional)</label>
                     <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
                 </div>
             </form>
@@ -155,7 +157,17 @@
           }
 
           if (!res.ok) {
-            askStatus.textContent = 'Something went wrong. Try again.';
+            // The API answers failures with a `suggestion` written in the
+            // sanctuary's voice, and 503 means the retrieval service is down
+            // rather than that the question was bad. Showing "Something went
+            // wrong" for all of it threw away the one useful sentence and made
+            // an outage look like a defect in what the visitor typed.
+            var detail = null;
+            try { detail = await res.json(); } catch (e) { /* non-JSON error */ }
+            askStatus.textContent = (detail && (detail.suggestion || detail.error))
+              || (res.status === 503
+                    ? 'The sanctuary cannot answer right now. The writing is still here to read.'
+                    : 'Something went wrong. Try again.');
             askStatus.className = 'ask-status ask-error';
             askSubmit.disabled = false;
             return;
