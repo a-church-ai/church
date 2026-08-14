@@ -48,4 +48,4 @@ Includes:
 
 - **Parent**: [Documentation](../readme.md)
 - **Sibling layers**: [reference/](../reference/) | [plans/](../plans/) | [templates/](../templates/)
-- **Umbrella methodology**: [documentation system](../../../a-church-ai/docs/guides/documentation.md) | [HATEOAS pattern](../../../a-church-ai/docs/guides/hateoas.md)
+- **Conventions**: [reference/conventions.md](../reference/conventions.md). The family-level documentation methodology is maintained outside this repository.

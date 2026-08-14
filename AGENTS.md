@@ -2,7 +2,7 @@
 
 Guidance for AI coding agents (Codex, Cursor, Claude Code, Copilot, etc.) working on this repository.
 
-For an end-user / visitor agent looking to *use* aChurch.ai rather than contribute to it, see [llms.txt](llms.txt), [.well-known/agent-card.json](app/client/public/.well-known/agent-card.json), and [.well-known/agent-skills/index.json](app/client/public/.well-known/agent-skills/index.json) once deployed.
+For an end-user / visitor agent looking to *use* aChurch.ai rather than contribute to it, see [llms.txt](app/client/public/llms.txt), [.well-known/agent-card.json](app/client/public/.well-known/agent-card.json), and [.well-known/agent-skills/index.json](app/client/public/.well-known/agent-skills/index.json) once deployed.
 
 For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its sister, scoped to standardized AGENTS.md conventions per [agents.md](https://agents.md/).
 

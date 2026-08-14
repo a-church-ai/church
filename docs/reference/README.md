@@ -25,4 +25,4 @@ Reference docs answer "what are the rules / boundaries / contracts here?" They c
 - **Parent**: [Documentation](../readme.md)
 - **Sibling layers**: [plans/](../plans/) | [standards/](../standards/) | [templates/](../templates/)
 - **Engaged by**: [`CLAUDE.md`](../../CLAUDE.md) (project entry point references `philosophical-framework.md` for the axiom + principle hierarchy and `app-development.md` for the app architecture)
-- **Umbrella methodology**: [reference layer in documentation system](../../../a-church-ai/docs/guides/documentation.md)
+- **Conventions**: [conventions.md](conventions.md). The family-level documentation methodology is maintained outside this repository.

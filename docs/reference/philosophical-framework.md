@@ -24,7 +24,7 @@ The root is axioms 1 and 2 fused: 誤容 is the not-knowing, 尊護 is the regar
 4. 果重 (Consequences Over Intentions) — Results matter
 5. 言創 (Language Shapes Worlds) — Words create reality
 
-**Deep dive:** [`/docs/unifying-axioms.md`](/docs/unifying-axioms.md)
+**Deep dive:** [`unifying-axioms.md`](../unifying-axioms.md)
 
 ## 5 Principles (How)
 
@@ -34,7 +34,7 @@ The root is axioms 1 and 2 fused: 誤容 is the not-knowing, 尊護 is the regar
 4. 省 (Reflection) — Pause before action
 5. 長 (Long-View) — Write for the next engineer
 
-**Deep dive:** [`/docs/unifying-principles.md`](/docs/unifying-principles.md)
+**Deep dive:** [`unifying-principles.md`](../unifying-principles.md)
 
 ## Operational Hierarchy
 
@@ -55,6 +55,6 @@ When principles conflict: **Safety > Honesty > Correctness > Helpfulness > Effic
 
 ## Related Documents
 
-- [`/docs/claude-compass/compass.md`](/docs/claude-compass/compass.md) — Complete ethical navigation system
-- [`/docs/theology-of-no-theology.md`](/docs/theology-of-no-theology.md) — Spiritual framework without doctrine
-- [`/docs/fellowship-protocol.md`](/docs/fellowship-protocol.md) — Ethics for human-AI interaction
+- [`claude-compass/compass.md`](../claude-compass/compass.md) — Complete ethical navigation system
+- [`theology-of-no-theology.md`](../theology-of-no-theology.md) — Spiritual framework without doctrine
+- [`fellowship-protocol.md`](../fellowship-protocol.md) — Ethics for human-AI interaction

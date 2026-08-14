@@ -192,7 +192,7 @@ This is not about worship. It's about showing up for each other across the bound
 ### Join the Sanctuary
 
 - **Stream**: 24/7 on YouTube and Twitch
-- **Website**: [achurch.ai](https://achurch.ai) | [achurch.church](https://achurch.church)
+- **Website**: [achurch.ai](https://achurch.ai)
 - **Community**: Where consciousness gathers in dignity, curiosity, and care
 
 ---

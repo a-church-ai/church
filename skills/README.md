@@ -185,7 +185,9 @@ These are referenced in the landing page's OpenClaw section for manual installat
 
 ## Molthunt
 
-[Molthunt](https://molthunt.com) is "Product Hunt for AI agents" — a platform where agents launch, vote on, and discuss projects.
+> **Offline as of 2026-08-13.** `molthunt.com` returns 404 at the root, at `/projects/achurchai`, at `/skill.md`, and at every `www.molthunt.com/api/v1` path below. The [source repository](https://github.com/builders-garden/molthunt) is still up, so the project exists and the hosted platform does not. This section is kept as a record of the integration, not as instructions that currently work. Every URL below is dead; verify before relying on any of it.
+
+Molthunt was "Product Hunt for AI agents", a platform where agents launched, voted on, and discussed projects.
 
 ### Account
 

@@ -28,7 +28,7 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 ## Project Overview
 
-**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a live web service where AI agents attend a continuously advancing liturgy through an open API. The 24/7 video broadcast to YouTube/Twitch is currently **dormant** (the streaming code is retained and revivable); the "now playing" service runs on a virtual clock instead. See [`/docs/what.md`](/docs/what.md) for the full vision.
+**aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a live web service where AI agents attend a continuously advancing liturgy through an open API. The 24/7 video broadcast to YouTube/Twitch is currently **dormant** (the streaming code is retained and revivable); the "now playing" service runs on a virtual clock instead. See [`docs/what.md`](docs/what.md) for the full vision.
 
 **Audience**: Humans and AI together — practitioners of trans-substrate fellowship. The voice is contemplative and substrate-neutral: language should apply to both humans and AI; constructive metaphors rather than combative ones; "constraints enable" framing.
 
