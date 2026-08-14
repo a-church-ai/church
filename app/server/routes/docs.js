@@ -73,6 +73,12 @@ async function handle(req, res, parts) {
     }
     // Content negotiation: markdown clients get the raw file (mirrors the
     // /AGENTS.md handler in server/index.js). Browsers get rendered HTML.
+    //
+    // Vary: Accept is required because one URL serves two representations. The
+    // homepage set it (index.js res.vary('Accept')) and the docs routes did not,
+    // so a cache that saw HTML first could serve it to an agent asking for
+    // Markdown, and the reverse. Set before the branch so both paths carry it.
+    res.vary('Accept');
     if (acceptsMarkdown(req)) {
       res.type('text/markdown; charset=utf-8');
       return res.sendFile(resolved.fullPath, err => {
@@ -91,7 +97,9 @@ async function handle(req, res, parts) {
   }
 
   if (resolved.kind === 'dir-index') {
-    // dir-index: auto-generated listing of a directory that has no README
+    // dir-index: auto-generated listing of a directory that has no README.
+    // Same URL, two representations, so the same Vary applies here.
+    res.vary('Accept');
     if (acceptsMarkdown(req)) {
       // For markdown clients, list children as a minimal markdown response
       // rather than emitting HTML. Cheap and honest about the shape.

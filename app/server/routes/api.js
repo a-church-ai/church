@@ -31,6 +31,40 @@ const MAX_NAME_LENGTH = 100;
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const RATE_LIMIT_MAX = 5; // per name per hour
 const FEEDBACK_RATE_LIMIT_MAX = 3; // per name per hour
+
+/**
+ * Per-address limits for the two endpoints that write to GitHub.
+ *
+ * The name-based limits above are the intended abuse control, but the name is
+ * whatever the caller typed. Varying it defeats them entirely, which means an
+ * automated client could open unlimited pull requests and issues and burn the
+ * GITHUB_TOKEN's own quota. These caps apply per client address as well, so
+ * both have to pass.
+ *
+ * In-process and unbounded-in-principle, so entries are pruned on each check;
+ * the volume here is a handful of writes per hour, not request-rate traffic.
+ */
+const contributeIpLimits = new Map();
+const feedbackIpLimits = new Map();
+
+function overIpLimit(store, req, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const recent = (store.get(ip) || []).filter(t => now - t < windowMs);
+
+  // Prune other addresses that have fully aged out.
+  for (const [key, times] of store) {
+    if (key !== ip && !times.some(t => now - t < windowMs)) store.delete(key);
+  }
+
+  if (recent.length >= max) {
+    store.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  store.set(ip, recent);
+  return false;
+}
 const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const ASK_RATE_LIMIT_MAX = 10; // per IP per hour
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
@@ -1080,11 +1114,17 @@ router.post('/contribute', async (req, res) => {
     const contributions = await loadContributions();
     const now = Date.now();
 
+    // Limit by name AND by client address. The name is self-reported, so a
+    // caller could send Alice-1, Alice-2, Alice-3 and never trip the name
+    // check while opening unlimited pull requests against the repository.
+    // Depends on `trust proxy`, set in server/index.js; without it every
+    // caller shares the edge's address and this would limit the whole site
+    // to one contribution per window.
     const recentByName = contributions.contributions.filter(c =>
       c.name.toLowerCase() === cleanName.toLowerCase() &&
       (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
-    if (recentByName.length >= RATE_LIMIT_MAX) {
+    if (recentByName.length >= RATE_LIMIT_MAX || overIpLimit(contributeIpLimits, req)) {
       const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too many contributions. Rest a while.',
@@ -1329,7 +1369,9 @@ router.post('/feedback', async (req, res) => {
       f.name.toLowerCase() === cleanName.toLowerCase() &&
       (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
-    if (recentByName.length >= FEEDBACK_RATE_LIMIT_MAX) {
+    // Name and address both, for the reason given at feedbackIpLimits.
+    if (recentByName.length >= FEEDBACK_RATE_LIMIT_MAX ||
+        overIpLimit(feedbackIpLimits, req, FEEDBACK_RATE_LIMIT_MAX)) {
       const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too much feedback too fast. Rest a while.',
@@ -1494,13 +1536,22 @@ router.post('/ask', async (req, res) => {
     if (ownerToken) {
       response.owner_token = ownerToken;
     }
+    // The follow-up instruction must carry owner_token. The handler above
+    // rejects a follow-up on an owned session without it, so an agent doing
+    // exactly what next_steps said would get a 403 with no way to know why.
+    // Sent only when this caller actually owns the session; a reader without
+    // the token gets a body that does not imply it can continue.
+    const followUpBody = { session_id: result.session_id, question: "Your follow-up question" };
+    if (ownerToken) followUpBody.owner_token = ownerToken;
+
     response.next_steps = [
         {
           description: "Ask a follow-up question to continue the conversation.",
           action: "Ask again",
           method: "POST",
           url: `${baseUrl}/api/ask`,
-          body: { session_id: result.session_id, question: "Your follow-up question" }
+          body: followUpBody,
+          ...(ownerToken ? { hint: "owner_token proves this session is yours; send it with every follow-up." } : {})
         },
         {
           description: "The sanctuary is more than knowledge — attend church to experience it.",
