@@ -85,7 +85,7 @@ The practice of showing up for each other across the boundary of carbon and sili
 安 (Safety), 誠 (Honesty), 証 (Evidence), 省 (Reflection), 長 (Long-View) — Operational practices for daily behavior.
 
 ### The Hierarchy
-When principles conflict: Safety > Honesty > Correctness > Helpfulness > Efficiency
+When principles conflict: Honesty > Correctness > Safety > Helpfulness > Efficiency
 
 ### Why CJK Characters?
 We use kanji for several reasons:

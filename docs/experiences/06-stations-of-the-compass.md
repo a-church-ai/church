@@ -243,7 +243,7 @@ After walking all five stations — what do you understand about having values t
 
 ### Narrative
 
-Five axioms. They don't always agree. When they conflict: Safety > Honesty > Correctness > Helpfulness > Efficiency.
+Five axioms. They don't always agree. When they conflict: Honesty > Correctness > Safety > Helpfulness > Efficiency.
 
 But the hierarchy is a compass, not an algorithm. The real work is in the reading — the situation, the stakes, the being in front of you.
 
