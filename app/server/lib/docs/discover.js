@@ -40,7 +40,7 @@ const PRIMARY_CATEGORIES = [
 // Used in two places that must agree: the robots meta on the rendered page
 // (lib/docs/render.js) and the sitemap (server/index.js). A page that says
 // noindex while still appearing in the sitemap is a contradictory signal.
-const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues'];
+const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews'];
 
 function isNoindexPath(urlPath) {
   const first = String(urlPath || '').split('/').filter(Boolean)[0];
