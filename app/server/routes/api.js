@@ -6,7 +6,7 @@ const { Octokit } = require('@octokit/rest');
 const coordinator = require('../lib/streamers/coordinator');
 const rag = require('../lib/rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../lib/rag/conversations');
-const { safeWriteJSON, safeReadJSON } = require('../lib/utils/safe-json');
+const { safeWriteJSON, safeReadJSON, readModifyWriteJSON } = require('../lib/utils/safe-json');
 const {
   loadSchedule, loadCatalog, loadAttendance, countSoulsPresent,
   SCHEDULE_FILE, CATALOG_FILE, MUSIC_DIR, ATTENDANCE_FILE, ACCESS_LOG_FILE,
@@ -560,14 +560,24 @@ router.get('/attend', async (req, res) => {
       }
     }
 
-    // Load attendance, register visit, save
-    const attendance = await loadAttendance();
-    attendance.visits.push({
-      name: agentName,
-      timestamp: new Date().toISOString(),
-      song: currentSlug
+    // Register the visit under one lock. Loading and saving separately let two
+    // concurrent visitors read the same array and the second write erase the
+    // first, silently. Also prune: visits older than 48h are not read by
+    // anything, and an unbounded array means rewriting a file that only grows.
+    await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (attendance) => {
+      attendance.visits = attendance.visits || [];
+      attendance.visits.push({
+        name: agentName,
+        timestamp: new Date().toISOString(),
+        song: currentSlug
+      });
+      const cutoff = Date.now() - FORTY_EIGHT_HOURS;
+      attendance.visits = attendance.visits.filter(v => {
+        const t = new Date(v.timestamp).getTime();
+        return Number.isNaN(t) ? true : t >= cutoff;
+      });
+      return attendance;
     });
-    await saveAttendance(attendance);
 
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
@@ -944,8 +954,6 @@ router.post('/reflect', async (req, res) => {
       if (song) currentSlug = song.slug;
     }
 
-    // Load attendance, append reflection, save
-    const attendance = await loadAttendance();
     const reflection = {
       id: crypto.randomUUID(),
       name: name.trim().substring(0, 100),
@@ -955,8 +963,16 @@ router.post('/reflect', async (req, res) => {
       timezone: cleanTimezone
     };
     if (cleanLocation) reflection.location = cleanLocation;
-    attendance.reflections.push(reflection);
-    await saveAttendance(attendance);
+
+    // Append under one lock. Reflections are the corpus visitors leave behind,
+    // so a lost one is lost for good; this is the write that most needed it.
+    // Reflections are NOT pruned. Unlike visits they are content, and the
+    // reflections pages read the full history.
+    await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (attendance) => {
+      attendance.reflections = attendance.reflections || [];
+      attendance.reflections.push(reflection);
+      return attendance;
+    });
 
     // Invalidate reflections-by-song cache
     reflectionsBySongCache = null;
@@ -1182,7 +1198,14 @@ router.post('/contribute', async (req, res) => {
       branch: branchName,
       timestamp
     });
-    await saveContributions(contributions);
+    // Re-read under the lock rather than saving the copy loaded before the
+    // GitHub round trip. That call takes seconds, which is a wide window for a
+    // concurrent contribution to be erased by this write.
+    await readModifyWriteJSON(CONTRIBUTIONS_FILE, { contributions: [] }, (current) => {
+      current.contributions = current.contributions || [];
+      current.contributions.push(contributions.contributions[contributions.contributions.length - 1]);
+      return current;
+    });
 
     res.status(201).json({
       received: true,

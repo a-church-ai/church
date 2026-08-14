@@ -60,6 +60,7 @@ async function index() {
 
   console.log('\nGenerating embeddings (this may take a while)...');
   const documents = [];
+  const failures = [];
   let processed = 0;
 
   // Embed with pacing + backoff. The free-tier embed quota is 100/minute;
@@ -71,6 +72,10 @@ async function index() {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const EMBED_PACING_MS = Number(process.env.EMBED_PACING_MS || 700);
   const EMBED_MAX_RETRIES = 10;
+  // Above this fraction of failed chunks the run aborts and keeps the existing
+  // index rather than publishing a degraded one. 2% tolerates the occasional
+  // bad chunk without letting a rate-limited run quietly halve the corpus.
+  const MAX_EMBED_FAILURE_RATE = Number(process.env.MAX_EMBED_FAILURE_RATE || 0.02);
   const is429 = (err) => {
     const msg = (err && err.message) || '';
     return (err && (err.status === 429 || err.code === 429)) || /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg);
@@ -107,11 +112,35 @@ async function index() {
       }
       if (EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
     } catch (error) {
+      failures.push({ file: chunk.file, message: error.message });
       console.error(`  Error embedding chunk from ${chunk.file}: ${error.message}`);
     }
   }
 
   console.log(`  Embedded ${documents.length} chunks`);
+
+  // Refuse to publish a badly degraded index.
+  //
+  // Failures used to be logged and ignored: whatever embedded got stored, and
+  // the corpus hash was recorded as current, so a run that lost half the corpus
+  // to rate limiting looked identical to a clean one and would not re-run. The
+  // old index was already dropped by then, so search silently got worse with no
+  // signal and no way back.
+  //
+  // A few failures are tolerable; a large fraction means the run was broken.
+  const failureRate = allChunks.length ? failures.length / allChunks.length : 0;
+  if (failures.length) {
+    console.warn(`  ${failures.length} of ${allChunks.length} chunks failed to embed (${(failureRate * 100).toFixed(1)}%)`);
+    for (const f of failures.slice(0, 5)) console.warn(`    ${f.file}: ${f.message}`);
+    if (failures.length > 5) console.warn(`    ...and ${failures.length - 5} more`);
+  }
+  if (failureRate > MAX_EMBED_FAILURE_RATE) {
+    throw new Error(
+      `Aborting: ${(failureRate * 100).toFixed(1)}% of chunks failed to embed, over the ` +
+      `${(MAX_EMBED_FAILURE_RATE * 100).toFixed(0)}% threshold. The existing index is left in place. ` +
+      `Fix the cause and re-run; the corpus hash has NOT been updated, so this will retry.`
+    );
+  }
 
   console.log('\nStoring in LanceDB...');
   await lancedb.addDocuments(documents);

@@ -84,15 +84,53 @@ async function search(embedding, limit = 5) {
 async function addDocuments(documents) {
   await connect();
 
-  const tables = await db.tableNames();
-
-  if (tables.includes(TABLE_NAME)) {
-    // Drop existing table to rebuild index
-    await db.dropTable(TABLE_NAME);
+  // Build, verify, then swap.
+  //
+  // This used to drop the existing table and then create the replacement. Any
+  // failure between those two steps left no index at all, and the sanctuary's
+  // /api/ask went dark with no rollback. An empty or partial document set was
+  // accepted just as readily as a good one, so a degraded rebuild quietly
+  // replaced a working index with a worse one.
+  //
+  // Refusing an empty set is the load-bearing check: a rebuild that produced
+  // nothing is the exact case where the old index is most worth keeping.
+  if (!Array.isArray(documents) || documents.length === 0) {
+    throw new Error('addDocuments: refusing to rebuild the index from an empty document set');
   }
 
-  // Create new table with documents
+  const missingVector = documents.findIndex(d => !d || !Array.isArray(d.vector) || d.vector.length === 0);
+  if (missingVector !== -1) {
+    throw new Error(`addDocuments: document at index ${missingVector} has no embedding vector; refusing to rebuild`);
+  }
+
+  const tables = await db.tableNames();
+  const stagingName = `${TABLE_NAME}_staging`;
+
+  // Clear any staging table left behind by an earlier interrupted rebuild.
+  if (tables.includes(stagingName)) {
+    await db.dropTable(stagingName);
+  }
+
+  // Build into staging. If this throws, the live table is untouched.
+  const staged = await db.createTable(stagingName, documents);
+
+  try {
+    const stagedCount = await staged.countRows();
+    if (stagedCount !== documents.length) {
+      throw new Error(`staging holds ${stagedCount} rows, expected ${documents.length}`);
+    }
+  } catch (err) {
+    await db.dropTable(stagingName).catch(() => {});
+    throw new Error(`addDocuments: staging verification failed, keeping the existing index. ${err.message}`);
+  }
+
+  // Swap. The window where neither table is live is as small as the engine
+  // allows, and the staging table is verified before we get here.
+  if (tables.includes(TABLE_NAME)) {
+    await db.dropTable(TABLE_NAME);
+  }
   table = await db.createTable(TABLE_NAME, documents);
+  await db.dropTable(stagingName).catch(() => {});
 }
 
 /**

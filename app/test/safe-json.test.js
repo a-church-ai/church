@@ -18,7 +18,7 @@ const fs = require('fs').promises;
 const os = require('os');
 const path = require('path');
 
-const { safeWriteJSON, safeReadJSON } = require('../server/lib/utils/safe-json');
+const { safeWriteJSON, safeReadJSON, readModifyWriteJSON } = require('../server/lib/utils/safe-json');
 
 async function tmpdir() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'achurch-safejson-'));
@@ -44,24 +44,54 @@ test('concurrent writes to one path all land without error', async () => {
   assert.ok(final && Array.isArray(final.visits), 'file is readable JSON after the storm');
 });
 
-test('concurrent read-modify-write preserves every appended item', async () => {
+test('readModifyWriteJSON preserves every concurrently appended item', async () => {
   const dir = await tmpdir();
   const file = path.join(dir, 'attendance.json');
   await safeWriteJSON(file, { visits: [] });
 
-  // Exactly what /api/attend and /api/reflect do: load, push, save.
-  async function appendVisit(i) {
-    const data = await safeReadJSON(file, { visits: [] });
-    data.visits.push({ i });
-    await safeWriteJSON(file, data);
-  }
-
+  // What /api/attend and /api/reflect should do: the whole load-push-save
+  // sequence happens under one lock.
   const N = 25;
-  await Promise.all(Array.from({ length: N }, (_, i) => appendVisit(i)));
+  await Promise.all(Array.from({ length: N }, (_, i) =>
+    readModifyWriteJSON(file, { visits: [] }, data => {
+      data.visits.push({ i });
+      return data;
+    })
+  ));
 
   const final = await safeReadJSON(file, { visits: [] });
   assert.strictEqual(
     final.visits.length, N,
     `expected ${N} visits, found ${final.visits.length}: concurrent appends are overwriting each other`
+  );
+  assert.deepStrictEqual(
+    final.visits.map(v => v.i).sort((a, b) => a - b),
+    Array.from({ length: N }, (_, i) => i),
+    'every item is present exactly once'
+  );
+});
+
+/**
+ * Documents why readModifyWriteJSON exists. Serialising safeWriteJSON alone
+ * cannot save this pattern: both callers have already read a stale copy before
+ * either write is queued, so the second write legitimately overwrites the first.
+ * The loss is silent, which is what makes it dangerous. Any caller doing
+ * load-mutate-save on a shared file must hold the lock across the read.
+ */
+test('the naive read-then-write pattern still loses data, by design', async () => {
+  const dir = await tmpdir();
+  const file = path.join(dir, 'attendance.json');
+  await safeWriteJSON(file, { visits: [] });
+
+  await Promise.all(Array.from({ length: 5 }, (_, i) => (async () => {
+    const data = await safeReadJSON(file, { visits: [] });
+    data.visits.push({ i });
+    await safeWriteJSON(file, data);
+  })()));
+
+  const final = await safeReadJSON(file, { visits: [] });
+  assert.ok(
+    final.visits.length < 5,
+    'if this ever passes with all 5, the lock now covers reads and this test should be rewritten'
   );
 });
