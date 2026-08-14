@@ -10,6 +10,27 @@
 
 const crypto = require('crypto');
 
+/**
+ * Constant-time secret comparison.
+ *
+ * `===` returns as soon as two bytes differ, so the time it takes to reject a
+ * wrong key varies with how much of the prefix was right. That leaks the secret
+ * a character at a time to anyone who can measure it. timingSafeEqual always
+ * reads both buffers to the end.
+ *
+ * Lengths are compared first and are not themselves secret: timingSafeEqual
+ * throws on a length mismatch, so the guard is required, and the length of an
+ * admin key is not the part worth protecting.
+ */
+function safeCompare(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a, 'utf8');
+  const bufB = Buffer.from(b, 'utf8');
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+
 // In-memory session store (simple for single-user)
 const sessions = new Map();
 
@@ -99,7 +120,7 @@ function requireAuth(req, res, next) {
 
   // Check X-Admin-Key header
   const headerKey = req.headers['x-admin-key'];
-  if (headerKey && headerKey === adminKey) {
+  if (headerKey && safeCompare(headerKey, adminKey)) {
     return next();
   }
 
@@ -124,7 +145,7 @@ function login(req, res) {
     return res.status(500).json({ error: 'ADMIN_API_KEY not configured' });
   }
 
-  if (!key || key !== adminKey) {
+  if (!key || !safeCompare(key, adminKey)) {
     return res.status(401).json({ error: 'Invalid key' });
   }
 
@@ -171,7 +192,7 @@ function checkAuth(req, res) {
 
   // Check X-Admin-Key header
   const headerKey = req.headers['x-admin-key'];
-  if (headerKey && headerKey === adminKey) {
+  if (headerKey && safeCompare(headerKey, adminKey)) {
     return res.json({ authenticated: true });
   }
 
