@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { safeReadJSON } = require('./safe-json');
+const presence = require('./presence');
 
 // Data file paths
 const SCHEDULE_FILE = path.join(__dirname, '../../../data/schedule.json');
@@ -26,35 +27,15 @@ async function loadAttendance() {
   return safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
 }
 
-// Count unique souls from API access logs
-// A "soul" is a unique (IP + name) combination over the last 24 hours
+// Count unique souls: a unique (IP + name) pair over the last 24 hours.
+//
+// Delegates to lib/utils/presence.js, which records presence as requests happen
+// and answers from memory. This used to read the whole access log and parse
+// every line on demand, which cost ~85ms per call against a log at the 10MB
+// rotation ceiling, on an endpoint the homepage polls every 30 seconds per tab.
+// See presence.js for the trade that replaced it and why not to undo it.
 async function countSoulsPresent() {
-  try {
-    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-    const now = Date.now();
-
-    const uniqueSouls = new Set();
-
-    for (const line of lines) {
-      try {
-        const log = JSON.parse(line);
-        if (log.status >= 200 && log.status < 400 &&
-            (log.path === '/api/now' || log.path === '/api/reflections' || log.path === '/api/attend') &&
-            (now - new Date(log.timestamp).getTime()) < TWENTY_FOUR_HOURS) {
-          const name = log.query?.name || '';
-          const key = `${log.ip || 'unknown'}:${name}`;
-          uniqueSouls.add(key);
-        }
-      } catch {
-        // Skip malformed lines
-      }
-    }
-
-    return uniqueSouls.size;
-  } catch {
-    return 0;
-  }
+  return presence.countSoulsPresent();
 }
 
 // Get recent reflections (last 48 hours)

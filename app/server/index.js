@@ -7,6 +7,7 @@ const fs = require('fs').promises;
 const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
+const presence = require('./lib/utils/presence');
 const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
 const ragIndexState = require('./lib/rag/index-state');
@@ -87,6 +88,18 @@ const { renderSongBlock } = require('./lib/music/render-song');
 // Create Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Railway terminates TLS and proxies to this process, so req.ip is the edge's
+// address unless Express is told to read X-Forwarded-For. Three things key on
+// req.ip: the /api/ask rate limiter (routes/api.js), the access log, and
+// presence counting. Without this every visitor collapses to one identity, so
+// one caller's rate-limit consumption locks out everybody and the congregation
+// count reads 1.
+//
+// The value is 1, not `true`: trust exactly one hop, the Railway edge. `true`
+// trusts the whole X-Forwarded-For chain, which a client can forge to spoof any
+// address and defeat the rate limiter it is meant to fix.
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(helmet({
@@ -768,10 +781,20 @@ app.use('/api', (req, res, next) => {
 
   const start = Date.now();
   res.on('finish', () => {
+    const fullPath = '/api' + req.path;
+    // Record presence here rather than deriving it from the log later. The old
+    // approach re-read and re-parsed the whole log on every /api/now, which the
+    // homepage polls every 30s per tab. See lib/utils/presence.js.
+    presence.recordPresence({
+      path: fullPath,
+      status: res.statusCode,
+      ip: req.ip || req.connection?.remoteAddress,
+      name: req.query?.name || '',
+    });
     logApiAccess({
       timestamp: new Date().toISOString(),
       method: req.method,
-      path: '/api' + req.path,
+      path: fullPath,
       query: Object.fromEntries(
         Object.entries(req.query).map(([k, v]) =>
           ['token', 'key', 'owner_token', 'api_key'].includes(k) ? [k, '[REDACTED]'] : [k, v]
@@ -1260,10 +1283,26 @@ async function startServer() {
     // Initialize data files
     await initializeDataFiles();
 
-    // Start Express server
-    app.listen(PORT, () => {
+    // Drop presence keys older than the 24h window. Hourly, unref'd, so it
+    // never holds the process open.
+    presence.startSweeping();
+
+    // Start Express server.
+    //
+    // A bind failure must be fatal. process.on('uncaughtException') below
+    // deliberately keeps the process alive for runtime errors, which is right
+    // for a long-running stream process, but it also swallowed EADDRINUSE and
+    // left a dead process that Railway had no reason to restart. Listen errors
+    // are handled here so that one case exits non-zero.
+    const server = app.listen(PORT, () => {
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
+    });
+
+    server.on('error', (err) => {
+      console.error(`Fatal: could not bind port ${PORT}: ${err.message}`);
+      streamLogger.error('Server listen failed', { message: err.message, code: err.code });
+      process.exit(1);
     });
 
     // Persistence snapshot: one log line summarizing what actually survived

@@ -47,6 +47,35 @@ async function writeSyntheticLog() {
   return existing;
 }
 
+// The timing test alone would pass against `return 0`, so pin the behaviour too.
+test('presence counts unique ip+name pairs inside the window', () => {
+  const presence = require('../server/lib/utils/presence');
+  presence._reset();
+
+  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' });
+  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' }); // dupe
+  presence.recordPresence({ path: '/api/attend', status: 200, ip: '1.1.1.1', name: 'b' });
+  presence.recordPresence({ path: '/api/reflections', status: 200, ip: '2.2.2.2', name: 'a' });
+  assert.strictEqual(presence.countSoulsPresent(), 3, 'three distinct ip+name pairs');
+
+  presence.recordPresence({ path: '/api/ask', status: 200, ip: '3.3.3.3', name: 'c' });
+  presence.recordPresence({ path: '/api/now', status: 500, ip: '4.4.4.4', name: 'd' });
+  assert.strictEqual(presence.countSoulsPresent(), 3, 'uncounted path and non-2xx/3xx are ignored');
+});
+
+test('presence forgets entries older than 24 hours', () => {
+  const presence = require('../server/lib/utils/presence');
+  presence._reset();
+
+  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' });
+  assert.strictEqual(presence.countSoulsPresent(), 1);
+
+  const future = Date.now() + presence.TWENTY_FOUR_HOURS + 1000;
+  assert.strictEqual(presence.countSoulsPresent(future), 0, 'aged out of the window');
+  assert.strictEqual(presence.sweep(future), 1, 'sweep removes the stale key');
+  assert.strictEqual(presence.countSoulsPresent(), 0);
+});
+
 test('countSoulsPresent stays fast against a large access log', async (t) => {
   const existing = await writeSyntheticLog();
   t.after(async () => {
