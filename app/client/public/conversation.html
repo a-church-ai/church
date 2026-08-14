@@ -109,6 +109,7 @@
             </div>
         </footer>
     </main>
+    <script src="/answer-format.js"></script>
     <script>
     (function() {
       var slug = window.location.pathname.replace('/ask/', '');
@@ -177,7 +178,7 @@
           var time = m.timestamp ? formatTime(new Date(m.timestamp)) : '';
           return '<div class="conv-message ' + cls + '">'
             + '<p class="conv-message-label">' + label + (time ? ' · ' + time : '') + '</p>'
-            + '<div class="conv-message-content">' + escapeHtml(m.content) + '</div>'
+            + '<div class="conv-message-content">' + renderContent(m.role, m.content) + '</div>'
             + '</div>';
         }).join('');
       }
@@ -189,7 +190,7 @@
         var div = document.createElement('div');
         div.className = 'conv-message ' + cls;
         div.innerHTML = '<p class="conv-message-label">' + label + ' · ' + time + '</p>'
-          + '<div class="conv-message-content">' + escapeHtml(content) + '</div>';
+          + '<div class="conv-message-content">' + renderContent(role, content) + '</div>';
         thread.appendChild(div);
         div.scrollIntoView({ behavior: 'smooth' });
       }
@@ -267,6 +268,14 @@
           month: 'short', day: 'numeric', year: 'numeric',
           hour: 'numeric', minute: '2-digit'
         });
+      }
+
+      // The model answers in markdown; questions are typed by a person and are not
+      // markdown, so only answers are formatted. Both paths escape before anything
+      // is inserted. See /answer-format.js for why escaping comes first.
+      function renderContent(role, content) {
+        if (role === 'user') return escapeHtml(content);
+        return AnswerFormat.formatAnswer(content);
       }
 
       function escapeHtml(str) {

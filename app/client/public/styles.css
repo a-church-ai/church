@@ -257,6 +257,20 @@ h2 {
     margin-bottom: 0.75rem;
 }
 
+/* The now-playing title links to the song page. Underlined on hover only, so the
+   banner still reads as a statement of what is happening rather than as a button. */
+.now-title a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 2px;
+}
+
+.now-title a:hover,
+.now-title a:focus-visible {
+    border-bottom-color: #999;
+}
+
 .now-congregation {
     font-size: 0.8125rem;
     font-weight: 400;
@@ -852,6 +866,9 @@ p {
     line-height: 1.6;
 }
 
+/* Answers are rendered from markdown into real block elements as of 2026-08-13.
+   pre-wrap was correct while the answer was inserted as raw text; with <p> and
+   <ul> present it doubles every gap, so spacing is handled by the blocks. */
 .conv-message-assistant .conv-message-content {
     font-size: 1rem;
     font-weight: 300;
@@ -859,7 +876,55 @@ p {
     line-height: 1.8;
     padding-left: 1rem;
     border-left: 2px solid #eee;
-    white-space: pre-wrap;
+}
+
+.conv-message-content p { margin: 0 0 1rem; }
+.conv-message-content p:last-child { margin-bottom: 0; }
+
+.conv-message-content h4,
+.conv-message-content h5,
+.conv-message-content h6 {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #333;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.conv-message-content ul,
+.conv-message-content ol {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+}
+
+.conv-message-content li { margin-bottom: 0.5rem; }
+.conv-message-content strong { font-weight: 500; color: #333; }
+.conv-message-content em { font-style: italic; }
+
+.conv-message-content code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875em;
+    background: #f6f6f6;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+}
+
+.conv-message-content pre {
+    background: #f6f6f6;
+    padding: 0.875rem 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0 0 1rem;
+}
+
+.conv-message-content pre code { background: none; padding: 0; }
+
+.conv-message-content blockquote {
+    margin: 0 0 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid #e5e5e5;
+    color: #666;
 }
 
 .conv-loading,
@@ -965,6 +1030,74 @@ p {
     color: #999;
     font-weight: 300;
     padding: 3rem 0;
+}
+
+/* Song detail: lyrics + theological context, rendered above the reflections on
+   /reflections/:slug. Text only by design, no player. Matches the reflections
+   column width so the page reads as one measure. */
+.song-detail {
+    max-width: 480px;
+    margin: 0 auto 2.5rem;
+}
+
+.song-axiom {
+    text-align: center;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #bbb;
+    margin: 0 0 2rem;
+}
+
+.song-axiom a { color: inherit; }
+
+.song-heading {
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #bbb;
+    text-align: center;
+    margin: 2.5rem 0 1.25rem;
+}
+
+/* Performance markers ([Chorus - Full Harmonies]) are part of the authored song,
+   kept visible but set back so the words carry the eye. */
+.song-section {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #ccc;
+    margin: 1.75rem 0 0.5rem;
+}
+
+.song-stanza {
+    line-height: 1.9;
+    margin: 0 0 0.25rem;
+    color: #333;
+}
+
+.song-context {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #444;
+}
+
+.song-context h2,
+.song-context h3,
+.song-context h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 2rem 0 0.5rem;
+}
+
+.song-context p { margin: 0 0 1rem; }
+.song-context ul { padding-left: 1.25rem; margin: 0 0 1rem; }
+.song-context li { margin-bottom: 0.4rem; }
+.song-context strong { font-weight: 500; }
+
+@media (max-width: 600px) {
+    .song-stanza { line-height: 1.8; }
 }
 
 /* Reflections detail page */
