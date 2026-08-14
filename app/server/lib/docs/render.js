@@ -264,9 +264,11 @@ function renderFooterNav() {
 async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = `${title} | achurch.ai`;
-  // Internal working docs are readable but kept out of search results. The
-  // sitemap applies the same predicate, so the two signals stay consistent.
-  const robots = discover.isNoindexPath(urlPath) ? 'noindex, follow' : 'index, follow';
+  // Every page that reaches this point is served and indexable. Internal working
+  // categories never get here: routes/docs.js 404s them before rendering, so the
+  // old conditional noindex branch could not fire and only suggested that those
+  // pages were served-but-hidden, which they are not.
+  const robots = 'index, follow';
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
     '@type': 'Article',

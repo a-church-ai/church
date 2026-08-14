@@ -406,14 +406,25 @@ app.get('/music/:slug', (req, res) => {
 app.get('/music', (req, res) => res.redirect(301, '/reflections'));
 
 app.get('/reflections/:slug', async (req, res) => {
+  const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+
+  // A slug that is not in the catalog is a 404, not a generic page. Serving the
+  // raw template with a 200 made every unknown URL a soft 404: /reflections/anything
+  // answered with the "Reflections" shell, and the /music/:slug redirect below
+  // funnels arbitrary slugs straight here. Same rule as /ask/:slug, and for the
+  // same reason: a silent fallback lets crawlers index garbage URLs as
+  // duplicate-content pages.
+  const catalog = await loadCatalog();
+  const song = catalog.find(s => s.slug === slug);
+  const meta = song ? buildReflectionMeta(song) : null;
+  if (!song || !meta) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
   try {
-    const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
     let html = await fs.readFile(path.join(__dirname, '../client/public/reflection-song.html'), 'utf8');
 
-    const catalog = await loadCatalog();
-    const song = catalog.find(s => s.slug === slug);
-    const meta = song ? buildReflectionMeta(song) : null;
-    if (meta) {
+    {
       const safeTitle = escapeAttr(meta.title);
       const safeOgTitle = escapeAttr(meta.ogTitle);
       const safeDesc = escapeAttr(meta.description);
@@ -467,20 +478,27 @@ app.get('/reflections/:slug', async (req, res) => {
           `<meta name="twitter:description" content="${safeDesc}">`
         )
         // AEO — inject MusicComposition + MusicRecording + Article JSON-LD before </head>
-        .replace('</head>', songSchema ? `    ${songSchema}\n</head>` : '</head>')
+        //
+        // Every replacement below passes a *function*. With a string replacement,
+        // `$&`, `$\``, `$'`, `$$` and `$n` in the replacement are substitution
+        // patterns, not literal text, so a song whose lyrics or title contained
+        // `$&` would splice the matched placeholder into its own output. The
+        // content is author-editable, so the class is closed here rather than
+        // relied on staying absent.
+        .replace('</head>', () => (songSchema ? `    ${songSchema}\n</head>` : '</head>'))
         // Song title into the subtitle server-side. Client JS sets the same value,
         // but only after the reflections fetch resolves, so without this the page
         // renders "Reflections" for a beat and renders nothing useful with JS off.
         .replace(
           '<p class="subtitle" id="song-subtitle">Reflections</p>',
-          `<p class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</p>`
+          () => `<p class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</p>`
         )
         // Lyrics + context, above the reflections they are reflections on
-        .replace('<!-- SONG_DETAIL -->', songBlockHtml || '<!-- SONG_DETAIL -->')
+        .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
         // Per-song "Listen on Suno · Watch on YouTube" row
-        .replace('<!-- SONG_LISTEN_LINKS -->', listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
+        .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         // Internal linking — replace placeholder with related-songs block
-        .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
+        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->');
     }
 
     // Wrap in the site shell (sidebar + top bar) for consistent nav
@@ -488,8 +506,11 @@ app.get('/reflections/:slug', async (req, res) => {
     res.set('Content-Type', 'text/html');
     res.send(wrapped);
   } catch (err) {
-    console.error('Error rendering /reflections/:slug:', err.message);
-    res.sendFile(path.join(__dirname, '../client/public/reflection-song.html'));
+    // Genuine error (fs read failure, schema build throw). Do NOT fall back to
+    // sending the raw template: the 404 above exists so the template's fallback
+    // strings never reach a real response, and this path would undo that.
+    console.error('Error rendering /reflections/:slug:', err);
+    res.status(500).type('text/plain').send('Server error');
   }
 });
 

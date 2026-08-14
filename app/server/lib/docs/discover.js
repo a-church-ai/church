@@ -28,7 +28,6 @@ const PRIMARY_CATEGORIES = [
   'builders',
   'comparisons',
   'collections',
-  'side-quests',
 ];
 
 // Categories kept out of search results. These are internal working
@@ -162,19 +161,6 @@ async function resolveDocPath(parts) {
 }
 
 /**
- * Siblings for the related-links block: other docs in the same directory as
- * `doc`, excluding the doc itself and the directory's README.
- */
-async function listSiblings(doc) {
-  const c = await getCache();
-  return c.docs.filter(d =>
-    d.dirRelPath === doc.dirRelPath &&
-    d.fullPath !== doc.fullPath &&
-    d.stem.toLowerCase() !== 'readme'
-  );
-}
-
-/**
  * Categorized listing for the /docs index. Primary categories first
  * (in curated order), then meta categories alphabetized.
  */
@@ -185,13 +171,12 @@ async function listCategoriesForIndex() {
 
   // Internal working categories are not served as pages and do not appear in
   // navigation. They live in the public repository and are reached from there.
-  // This is the third consumer of isNoindexPath, after the robots meta and the
-  // sitemap: a category declared not-reader-facing should not be offered to a
-  // reader in the sidebar of every page either.
+  // This is the second consumer of isNoindexPath, alongside the sitemap: a
+  // category declared not-reader-facing should not be offered to a reader in the
+  // sidebar of every page either.
   //
-  // Note this excludes side-quests, which was listed in both PRIMARY_CATEGORIES
-  // and NOINDEX_CATEGORIES. Being simultaneously a top-tier reader-facing
-  // category and material hidden from search was a contradiction; noindex wins.
+  // The guard stays even though PRIMARY_CATEGORIES no longer lists any noindex
+  // category, so that adding one to NOINDEX_CATEGORIES is sufficient on its own.
   const seen = new Set();
   for (const catName of PRIMARY_CATEGORIES) {
     if (isNoindexPath(catName)) continue;
@@ -220,7 +205,6 @@ async function listAllDocs() {
 
 module.exports = {
   resolveDocPath,
-  listSiblings,
   listCategoriesForIndex,
   listAllDocs,
   isNoindexPath,

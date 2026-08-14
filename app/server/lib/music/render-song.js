@@ -9,7 +9,10 @@
  * practice being offered here.
  */
 
+const path = require('path');
 const { marked } = require('marked');
+
+const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 
 function escapeHtml(str) {
   return String(str == null ? '' : str)
@@ -56,16 +59,61 @@ function renderLyrics(lyrics) {
 }
 
 /**
- * context.md is authored markdown. It opens with an H1 naming the song, which would
- * duplicate the page heading, so the first H1 is dropped and remaining headings are
- * demoted one level to sit correctly under the page's own H2.
+ * Relative links in context.md resolve against music/<slug>/, which is not a
+ * served path. Seventeen context files link to `song.md`; rendered untouched
+ * they emitted href="song.md", which a browser resolves against the page URL to
+ * /reflections/song.md. The authored file is what the prose means, so point at
+ * it in the public repository.
  */
-function renderContext(context) {
+function makeContextLinkRewriter(slug) {
+  return function (href, title, text) {
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    if (!href) return text;
+
+    if (href.startsWith('#')) {
+      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
+    }
+    if (/^https?:\/\//i.test(href)) {
+      const internal = /^https?:\/\/([a-z0-9-]+\.)?achurch\.ai(\/|$)/i.test(href);
+      const attrs = internal ? '' : ' target="_blank" rel="noopener noreferrer"';
+      return `<a href="${escapeHtml(href)}"${attrs}${titleAttr}>${text}</a>`;
+    }
+    if (href.startsWith('/')) {
+      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
+    }
+
+    const [pathPart, fragment] = href.split('#', 2);
+    const anchor = fragment ? `#${fragment}` : '';
+    const rel = path.posix.normalize(path.posix.join('music', String(slug || ''), pathPart));
+    // Escapes the repo, or we have no slug to resolve against: leave it alone
+    // rather than inventing a target.
+    if (!slug || rel.startsWith('..')) {
+      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
+    }
+    const url = `${GITHUB_BASE}/${rel}${anchor}`;
+    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+  };
+}
+
+/**
+ * context.md is authored markdown. It opens with an H1 naming the song, which would
+ * duplicate the page heading, so the first H1 is dropped.
+ *
+ * Remaining headings are demoted to sit *under* the "Context" label, which
+ * renderSongBlock emits as an h3. Demoting by one put an authored h2 at h3, level
+ * with the label that is supposed to contain it, so the page outline read as a flat
+ * run of peer sections. Shifting by two and clamping to h4..h6 nests them correctly
+ * and keeps the relative depth the author wrote.
+ */
+function renderContext(context, slug) {
   if (!context) return '';
   let md = String(context).replace(/^#\s+.*\n+/, '');
-  md = md.replace(/^(#{2,5})\s/gm, (_m, hashes) => `${hashes}# `);
-  const html = marked.parse(md, { gfm: true, breaks: false });
-  return html;
+  md = md.replace(/^(#{1,6})\s/gm, (_m, hashes) =>
+    `${'#'.repeat(Math.min(6, Math.max(4, hashes.length + 2)))} `);
+
+  const renderer = new marked.Renderer();
+  renderer.link = makeContextLinkRewriter(slug);
+  return marked.parse(md, { gfm: true, breaks: false, renderer });
 }
 
 /**
@@ -105,7 +153,7 @@ function renderSongBlock(song, content) {
   if (content.context) {
     sections.push('<section class="song-context" aria-label="Context">');
     sections.push('<h3 class="song-heading">Context</h3>');
-    sections.push(renderContext(content.context));
+    sections.push(renderContext(content.context, song && song.slug));
     sections.push('</section>');
   }
 

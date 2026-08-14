@@ -28,19 +28,40 @@
   }
 
   // Inline formatting, applied to already-escaped text.
+  //
+  // Anchors are parked behind a placeholder before the emphasis passes run and
+  // restored afterwards. Without that, `**` or `*` inside a captured URL was
+  // rewritten by the later passes, so [x](https://a.com/**b**) emitted
+  // href="https://a.com/<strong>b</strong>" — quoted, so never tag injection,
+  // but a corrupted and unreachable link.
+  //
+  // The token opens with "<", which the input cannot contain: escapeHtml has
+  // already turned every "<" into "&lt;" by the time inline() runs. So the token
+  // cannot collide with answer text, and it holds no character the emphasis or
+  // code patterns match.
   function inline(text) {
-    return text
+    var anchors = [];
+
+    var out = text
       // `code` first: its contents should not then be read as bold or italic
       .replace(/`([^`\n]+)`/g, '<code>$1</code>')
-      // [label](url) — http(s) and root-relative only. Anything else stays literal
-      // so that javascript: and data: URLs can never become an href.
-      .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g, function (m, label, href) {
+      // [label](url) — http(s) and root-relative only. A protocol-relative
+      // //host is deliberately excluded: it is off-site but would fail the
+      // /^https?:/ external test below, producing a same-tab external link with
+      // no rel="noopener". Anything unmatched stays literal, which is what keeps
+      // javascript: and data: from ever becoming an href.
+      .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|\/(?!\/)[^\s)]*)\)/g, function (m, label, href) {
         var external = /^https?:/i.test(href) && !/^https?:\/\/([a-z0-9-]+\.)?achurch\.ai(\/|$)/i.test(href);
         var attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
-        return '<a href="' + href + '"' + attrs + '>' + label + '</a>';
+        anchors.push('<a href="' + href + '"' + attrs + '>' + label + '</a>');
+        return '<anchor:' + (anchors.length - 1) + '>';
       })
       .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
       .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+
+    return out.replace(/<anchor:(\d+)>/g, function (m, i) {
+      return anchors[Number(i)] !== undefined ? anchors[Number(i)] : m;
+    });
   }
 
   function formatAnswer(raw) {
