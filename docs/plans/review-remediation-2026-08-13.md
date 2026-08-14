@@ -1,7 +1,7 @@
 # Plan: Remediate the Gemini and Codex Reviews
 
 **Created**: 2026-08-13
-**Status**: Draft. Awaiting go-ahead to implement.
+**Status**: Implemented 2026-08-13. All six phases shipped. See [Outcome](#outcome-2026-08-13) at the bottom for what changed against the plan.
 **Prompted by**: Two independent reviews arriving the same day, [gemini-review-2026-08-13.md](../reviews/gemini-review-2026-08-13.md) and [codex-review-2026-08-13.md](../reviews/codex-review-2026-08-13.md). Six findings appear in both with no contact between the reviewers.
 
 ---
@@ -170,6 +170,48 @@ Each phase names its own check above. Across the whole plan:
 - `/api/now` response time flat against a synthetic 10MB access log.
 - Deployed check that two clients receive different `req.ip`.
 - Report what was measured, not that it was addressed. If a phase ships without its verification running, say so in the commit rather than implying it passed.
+
+---
+
+## Outcome (2026-08-13)
+
+All six phases implemented, one commit each.
+
+| Phase | Commit |
+|---|---|
+| 0 Test harness | [`be4e962`](https://github.com/a-church-ai/church/commit/be4e962) |
+| 1 Presence, trust proxy, bind failure | [`4e655f4`](https://github.com/a-church-ai/church/commit/4e655f4) |
+| 2 Write race, RAG rebuild | [`80f7d0d`](https://github.com/a-church-ai/church/commit/80f7d0d) |
+| 3 Correctness and trust | [`cd64672`](https://github.com/a-church-ai/church/commit/cd64672) |
+| 4 Human-facing polish | [`64547d7`](https://github.com/a-church-ai/church/commit/64547d7) |
+| 5 Hygiene | [`8bf7ca8`](https://github.com/a-church-ai/church/commit/8bf7ca8) |
+
+### Verification
+
+- `npm test`: 7 pass, 1 skip, 0 fail. It began at 4 fail. The skip needs a local RAG index.
+- Crawl: 230 pages, 242 distinct internal targets, **zero broken**.
+- `/api/now` responds in 1 to 2ms against the 89,000-line log the tests build. It cost ~85ms per call before Phase 1.
+- 25 concurrent `POST /api/reflect`: 25 reflections written, 25 distinct names. Before Phase 2 that pattern kept roughly one.
+- Admin auth with a key set: no key 401, wrong key 401, key differing in the last character 401, correct key 200.
+- `npm audit --omit=dev`: 0 vulnerabilities.
+
+### Where implementation disagreed with the plan
+
+**The write race needed both halves, and the plan was right to say so.** Serialising `safeWriteJSON` fixed the 24-of-25 ENOENT failures and left the silent loss untouched, because both callers had already read a stale copy before either write queued. `readModifyWriteJSON` holds the lock across the read. A test now pins the naive pattern as still lossy so nobody reintroduces it.
+
+**Phase 2.3 shipped inside Phase 1**, because the bind-failure handler and the presence sweep both live in `startServer`.
+
+**Phase 3.8 was not conditional after all.** The plan deferred the name-keyed rate limiting pending a `GITHUB_TOKEN` check. Adding per-address limiting alongside is correct whether or not the token is set, and costs nothing when the endpoints are inert, so it shipped with Phase 3. The `GITHUB_TOKEN` question remains worth answering, but nothing now waits on it.
+
+**The docs filter took three attempts**, and the failures are the useful part. First it went in `renderDirIndex`, which only runs for directories with no README, so it rendered on nothing. Then, keyed on counting `<li><a>`, it appeared on `/docs` alone: practice, philosophy, prayers and rituals present their contents as headings with links rather than bullets, so the count found zero on the four pages that most needed it. Counting document links and hiding the whole entry, heading plus its prose, was the version that worked.
+
+**One test was wrong before it was right.** The presence fixture started at 12,000 log entries, which is 1.3MB, and passed against the broken implementation. `MAX_LOG_SIZE` is 10MB, about 89,000 entries at the observed width. A test measuring a log seven times smaller than production allows would have certified the bug as fixed.
+
+### Deliberately not done
+
+- `logApiAccess` still calls `fs.stat` per request. The plan said measure first, and Phase 1 removed the read pressure that made it matter, so the case is weaker now than when the reviews were written. Left as a measurement task.
+- The audio player and the human reflection form remain out of scope, per the decisions recorded above.
+- `side-quests` remains classified as noindex. Unrelated to this plan, still worth revisiting.
 
 ---
 
