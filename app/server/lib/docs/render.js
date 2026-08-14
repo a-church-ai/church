@@ -79,6 +79,21 @@ function makeLinkRewriter(currentDocFullPath) {
     const [pathPart, fragment] = href.split('#', 2);
     const anchor = fragment ? `#${fragment}` : '';
 
+    // Directory-style link into an internal working category ("plans/",
+    // "side-quests/"). These do not end in .md so they never reached the
+    // rewriting below, and after those categories stopped being served they
+    // resolved to a 404. Point them at the directory in the public repo.
+    if (pathPart.endsWith('/')) {
+      const dirRel = path.relative(
+        path.resolve(DOCS_DIR),
+        path.resolve(currentDir, pathPart)
+      ).replace(/\\/g, '/');
+      if (dirRel && !dirRel.startsWith('..') && discover.isNoindexPath(dirRel)) {
+        const ghTree = `${GITHUB_BASE.replace('/blob/', '/tree/')}/docs/${dirRel}`;
+        return `<a href="${escapeAttr(ghTree)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+      }
+    }
+
     // Non-.md relative link (image, other file): leave as-is
     if (!pathPart.toLowerCase().endsWith('.md')) {
       return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
@@ -108,6 +123,17 @@ function makeLinkRewriter(currentDocFullPath) {
     }
 
     const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
+
+    // Internal working categories (plans, issues, templates, standards,
+    // side-quests) are no longer served as pages. Thirty reader-facing links
+    // point into them, including core documents citing the corpus audit, so
+    // they resolve to the public repository rather than to a 404. The material
+    // stays readable; it just is not a page on the site.
+    if (discover.isNoindexPath(relToDocs)) {
+      const gh = `${GITHUB_BASE}/docs/${relToDocs}${anchor}`;
+      return `<a href="${escapeAttr(gh)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+    }
+
     const url = `${docsUrlFromRelPath(relToDocs)}${anchor}`;
     return `<a href="${escapeAttr(url)}"${titleAttr}>${text}</a>`;
   };

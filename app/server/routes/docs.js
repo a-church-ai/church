@@ -132,6 +132,15 @@ router.get('/*', (req, res) => {
     return res.redirect(301, `/docs/${rest.replace(/\/+$/, '')}`);
   }
   const parts = rest ? rest.split('/').filter(Boolean) : [];
+
+  // Internal working categories are not pages on this site. They remain in the
+  // public repository, which is where links to them now point. Serving them as
+  // HTML while declaring them noindex and hiding them from navigation would be
+  // the same inconsistency in a third place.
+  if (discover.isNoindexPath(rest)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
+
   return handle(req, res, parts);
 });
 
