@@ -29,6 +29,18 @@ When family-level material governs something here, **restate the governing part 
 
 **Outbound anchors to sibling projects are keyword-first**, describing the destination's topic rather than its domain. Put the brand name in the surrounding prose instead. Reference sweep: [`ed866be`](https://github.com/a-church-ai/church/commit/ed866be).
 
+## Navigation
+
+**Load the links relevant to this visitor, not all of them.**
+
+That is the whole rule, and it is a statement about what a reader is served rather than an SEO tactic. It does not need a search engine to justify it. A page that ships 226 navigation links so a reader can use ten has made the other 216 the reader's problem: weight to download, noise to scan past, and markup to maintain.
+
+Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commit/89bb803): the docs sidebar renders a category's documents only when the reader is inside that category. Collapsed categories are a link to the category index. The homepage went from 258 document links to 32, and from 68KB to 35KB, with the rendered page unchanged, because those links were already hidden behind a collapsed `<details>` and no reader could see them.
+
+**Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
+
+**Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents.
+
 ## Document shape
 
 **HATEOAS.** Every document carries a `> Parent:` line under its title and a `## Related` section before the closing line, so a reader arriving cold can navigate out in both directions.

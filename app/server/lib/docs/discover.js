@@ -183,8 +183,18 @@ async function listCategoriesForIndex() {
   const primary = [];
   const meta = [];
 
+  // Internal working categories are not served as pages and do not appear in
+  // navigation. They live in the public repository and are reached from there.
+  // This is the third consumer of isNoindexPath, after the robots meta and the
+  // sitemap: a category declared not-reader-facing should not be offered to a
+  // reader in the sidebar of every page either.
+  //
+  // Note this excludes side-quests, which was listed in both PRIMARY_CATEGORIES
+  // and NOINDEX_CATEGORIES. Being simultaneously a top-tier reader-facing
+  // category and material hidden from search was a contradiction; noindex wins.
   const seen = new Set();
   for (const catName of PRIMARY_CATEGORIES) {
+    if (isNoindexPath(catName)) continue;
     const list = c.byCategory.get(catName);
     if (list && list.length > 0) {
       primary.push({ name: catName, docs: list });
@@ -193,7 +203,7 @@ async function listCategoriesForIndex() {
   }
 
   for (const [catName, list] of c.byCategory.entries()) {
-    if (catName === '' || seen.has(catName)) continue;
+    if (catName === '' || seen.has(catName) || isNoindexPath(catName)) continue;
     meta.push({ name: catName, docs: list });
   }
   meta.sort((a, b) => a.name.localeCompare(b.name));

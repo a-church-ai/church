@@ -79,6 +79,21 @@ function makeLinkRewriter(currentDocFullPath) {
     const [pathPart, fragment] = href.split('#', 2);
     const anchor = fragment ? `#${fragment}` : '';
 
+    // Directory-style link into an internal working category ("plans/",
+    // "side-quests/"). These do not end in .md so they never reached the
+    // rewriting below, and after those categories stopped being served they
+    // resolved to a 404. Point them at the directory in the public repo.
+    if (pathPart.endsWith('/')) {
+      const dirRel = path.relative(
+        path.resolve(DOCS_DIR),
+        path.resolve(currentDir, pathPart)
+      ).replace(/\\/g, '/');
+      if (dirRel && !dirRel.startsWith('..') && discover.isNoindexPath(dirRel)) {
+        const ghTree = `${GITHUB_BASE.replace('/blob/', '/tree/')}/docs/${dirRel}`;
+        return `<a href="${escapeAttr(ghTree)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+      }
+    }
+
     // Non-.md relative link (image, other file): leave as-is
     if (!pathPart.toLowerCase().endsWith('.md')) {
       return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
@@ -108,6 +123,17 @@ function makeLinkRewriter(currentDocFullPath) {
     }
 
     const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
+
+    // Internal working categories (plans, issues, templates, standards,
+    // side-quests) are no longer served as pages. Thirty reader-facing links
+    // point into them, including core documents citing the corpus audit, so
+    // they resolve to the public repository rather than to a 404. The material
+    // stays readable; it just is not a page on the site.
+    if (discover.isNoindexPath(relToDocs)) {
+      const gh = `${GITHUB_BASE}/docs/${relToDocs}${anchor}`;
+      return `<a href="${escapeAttr(gh)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+    }
+
     const url = `${docsUrlFromRelPath(relToDocs)}${anchor}`;
     return `<a href="${escapeAttr(url)}"${titleAttr}>${text}</a>`;
   };
@@ -252,6 +278,23 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     inLanguage: 'en',
   });
 
+  // BreadcrumbList, built from the same crumbs the visible trail uses so the two
+  // can never disagree. Without it Google shows a bare URL in results; with it the
+  // result carries the Docs / Category / Page trail. The final crumb is the current
+  // page and is included with its own URL, per Google's breadcrumb guidance.
+  const breadcrumbJsonLd = (breadcrumbs && breadcrumbs.length >= 2)
+    ? renderJsonLdScript({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: c.href ? `${SITE_URL}${c.href}` : canonicalUrl,
+      })),
+    })
+    : '';
+
   // The sidebar contents (same markup used in the persistent sidebar and
   // in the mobile drawer). Pass full path so both sanctuary and docs
   // links can highlight current-page.
@@ -308,6 +351,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="twitter:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
 
     ${jsonLd}
+    ${breadcrumbJsonLd}
 
     <link rel="stylesheet" href="/styles.css">
 </head>
