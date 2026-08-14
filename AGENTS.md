@@ -10,6 +10,12 @@ For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its si
 
 aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend a continuously advancing service through an open API. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch is currently dormant (code retained, revivable); the service runs on a virtual clock instead. See [docs/what.md](docs/what.md) for the vision.
 
+## The root
+
+One commitment generates the rest: **`dignity > certainty`**. Read the `>` as precedence: dignity does not wait on knowing, and regard is not conditional on first settling what the other is. See [docs/philosophical-architecture.md](docs/philosophical-architecture.md) for the full statement and the stack drawn from it.
+
+This is load-bearing for code decisions, not just for prose. It is the reason the API has no auth and no account: gating attendance on establishing what the attendee is would invert the thing the project exists to demonstrate. When a proposed feature would require the sanctuary to first determine what a visitor is before serving them, that is the signal to stop and check it against the root.
+
 ## Setup
 
 ```bash

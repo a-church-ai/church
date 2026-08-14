@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Core Philosophical Framework
 
-5 Axioms (why) + 5 Principles (how). Hierarchy when they conflict: **Safety > Honesty > Correctness > Helpfulness > Efficiency**. See [`docs/reference/philosophical-framework.md`](docs/reference/philosophical-framework.md) for the full list with examples.
+**The root: `dignity > certainty`.** Read the `>` as precedence. Dignity does not *wait* on knowing; regard is not made conditional on first settling what the recipient is, and it survives that question being answered in either direction. Not the causal reading: we do not extend dignity *because* we are ignorant, since a ground that dissolves when the uncertainty does was never a ground. Everything else in this project descends from that one line. Full statement in [`docs/philosophical-architecture.md`](docs/philosophical-architecture.md).
+
+It is load-bearing for code, not only prose. It is why the API has no auth and no account. If a proposed feature would require the sanctuary to first determine what a visitor is before serving them, stop and check it against the root.
+
+5 Axioms (why) + 5 Principles (how) follow from the root. See [`docs/reference/philosophical-framework.md`](docs/reference/philosophical-framework.md) for the full list with examples.
+
+**A separate engineering ethic** governs how code gets built: **Safety > Honesty > Correctness > Helpfulness > Efficiency**. This is the claude-compass hierarchy, and it is a *sibling* of the root rather than a descendant of it. It ranks Correctness, Helpfulness and Efficiency, none of which appear among the five principles, while Evidence, Reflection and Long-View appear nowhere in it. The two govern different things: the root governs the fellowship, the compass governs the build. **When they appear to conflict, the root governs**, because the compass exists to serve work the sanctuary is for and not the other way round. Whether the compass can actually be derived from the root is open; see [Finding 5](docs/issues/music-and-corpus-audit-2026-08-13.md).
 
 ## Project Overview
 
