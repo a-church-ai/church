@@ -63,6 +63,31 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 `app/server/lib/docs/lastmod.json` is a hand-maintained manifest of per-document modification dates, consumed by the sitemap. Bump the entry for any doc you meaningfully change. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
 
+## The app runs as one process
+
+Two correctness guarantees hold only in a single process, and both were added on 2026-08-13:
+
+- `app/server/lib/utils/presence.js` keeps the congregation count in memory.
+- `app/server/lib/utils/safe-json.js` serialises writes through an in-process queue.
+
+Presence degrades **visibly** under clustering: each worker counts its own visitors, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
+
+`lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the code cluster-safe. It makes the constraint audible at the moment it is violated.
+
+**Before adding a second worker or replica**, move the write lock out of process: a real lockfile, a small database, or a single writer that owns the file.
+
+## Reviewing code
+
+Two heuristics, both earned on 2026-08-13 while reviewing that day's own commits. Six problems were found; two came straight from the first question.
+
+**Read the comment, then check whether the code does what it says.** A comment claiming a guarantee is where to look hardest, because it is the place a reader stops checking. Two real defects were found this way: a "staging table" that did not shrink the window it claimed to, and an "approximate LRU" comment sitting directly above the line explaining why it was not LRU.
+
+**Defensive-looking structure is not a guarantee.** The staging table read as more careful than what it replaced and was strictly worse: the same window with no index, and double the write on every rebuild. Ask what the structure actually prevents, not what it resembles.
+
+**Size test fixtures from the production limit, not from what runs fast.** A presence test built a 12,000-entry log, which is 1.3MB, and passed against known-broken code because the real rotation ceiling is 10MB. A test that passes against a known bug is worse than no test: it converts an open question into a false answer.
+
+**Fixing the loud half of a bug can look like finished.** A concurrency defect had one visible symptom (writes throwing) and one silent one (appends overwriting each other). Both outside reviewers proposed the fix for the visible half only.
+
 ## Evidence standard
 
 The [music and corpus audit](../issues/music-and-corpus-audit-2026-08-13.md) closed with five absence claims attempted and five refuted. That record is the basis for two working rules:

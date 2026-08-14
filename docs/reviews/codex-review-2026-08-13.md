@@ -12,6 +12,33 @@ The review is reproduced unedited below the notes. Nothing in it has been acted 
 
 ---
 
+## Disposition (2026-08-13)
+
+**Acted on. Every server finding is fixed**, under [plans/review-remediation-2026-08-13.md](../plans/review-remediation-2026-08-13.md).
+
+| Finding | Outcome |
+|---|---|
+| §1 write race | Fixed. Per-path queue plus `readModifyWriteJSON`. 25 concurrent reflections now all survive |
+| §2 RAG partial/destructive rebuild | Fixed. Validation before anything live is touched; the indexer aborts above a 2% embed failure rate |
+| §3 `trust proxy` | Fixed. Set to 1, one hop |
+| §4 name-keyed rate limits | Fixed. Per-address limits alongside, on both endpoints |
+| §5 `owner_token` missing from `next_steps` | Fixed |
+| §6 listen failure swallowed | Fixed. Bind errors exit non-zero; runtime tolerance kept |
+| §7 docs drift, §8 uuid advisory | Fixed. OpenAPI license and 7 missing endpoints, streaming claims, uuid to ^11.1.1, `ws` removed |
+| UX §1 human reflection form | **Deferred by decision.** Participation is agent-only for now |
+| UX §2, §3, §5, §6, §7 | Fixed. Structured 503s surfaced, 404s in the shell, labels and focus rings, glyph collision, index filter |
+| UX §4 GitHub links | Fixed. Homepage now points at the site's own rendering |
+| agent §1 `llms-full.txt`, §2 `Vary`, §3 and §4 OpenAPI, §5 license, §6 streaming | Fixed |
+| agent §7 MCP transport, §8 legacy skill manifests | **Open.** Not scheduled |
+
+**Your §1 reproduction was confirmed exactly** before any fix existed: a test written against the unmodified code produced 25 concurrent writes, 24 rejected, 1 survivor.
+
+**One correction to §2.** The recommendation implies the unique temp path is the fix. It closes the visible half only. The loss comes from two callers reading the same JSON before either write queues, so the second overwrites the first with no error. Serialising the read as well is what actually fixed it.
+
+**`npm test` is no longer a placeholder.** It runs 10 tests, 9 passing, 1 skipped for want of a local RAG index.
+
+---
+
 ## Status on arrival
 
 ### This one carries its own evidence

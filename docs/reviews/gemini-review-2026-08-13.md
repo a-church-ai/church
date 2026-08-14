@@ -12,6 +12,33 @@ The review is reproduced unedited below the notes. Nothing in it has been acted 
 
 ---
 
+## Disposition (2026-08-13)
+
+**Acted on**, under [plans/review-remediation-2026-08-13.md](../plans/review-remediation-2026-08-13.md).
+
+| Finding | Outcome |
+|---|---|
+| §1 `countSoulsPresent` event-loop blocking | Fixed, and it was **worse than reported**. You attributed it to `/api/attend`; it is also on `/api/now`, which the homepage polls every 30 seconds per tab. Now answers from memory: ~85ms per call became 1 to 2ms |
+| §2 `trust proxy` | Fixed. Set to 1 rather than `true`, so only the Railway hop is trusted and a client cannot forge the chain |
+| §3 unbounded `attendance.json` | Fixed. Writes serialised, visits pruned at 48h. Reflections deliberately not pruned: they are content |
+| §4 name-keyed rate limits | Fixed. Per-address limits alongside |
+| §5 `logApiAccess` `fs.stat` per request | **Not done, deliberately.** Phase 1 removed the read pressure that made this urgent. Left as a measurement task rather than a rewrite on a guess |
+| §6 unused `ws` | Fixed, removed |
+| §7 timing-safe comparison | Fixed. `crypto.timingSafeEqual` behind a length guard |
+| human §1 GitHub links | Fixed. Homepage points at the site's own rendering |
+| human §2 audio player | **Decided against.** Humans do not get playback for now |
+| human §3 wayfinding | Already present on both detail pages; docs pages gained `BreadcrumbList` |
+| human §4 human contribution channel | **Deferred**, same decision as the reflection form |
+| human §5 CJK cognitive load | **Open.** Not scheduled |
+| human §6 table, `/docs` 2-clicks | **Chosen, not a defect.** The sidebar renders a category's documents only when the reader is inside it. The adjacent suggestion became a filter on index pages |
+| agent §1 `llms-full.txt` | Fixed, linked from `llms.txt` |
+| agent §2 GET `/api/ask` with CDN caching | **Open.** Worth considering; not scheduled |
+| agent §3 `$schema` validator flags | **Open.** Note that the adjacent prior decision, that `$schema` need not resolve, does not answer this |
+
+**Your four spot-checkable claims all held**, which is why the rest were taken seriously.
+
+---
+
 ## Status on arrival
 
 ### Spot-checked, all four confirmed

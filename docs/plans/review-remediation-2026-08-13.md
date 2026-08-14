@@ -1,7 +1,7 @@
 # Plan: Remediate the Gemini and Codex Reviews
 
 **Created**: 2026-08-13
-**Status**: Implemented 2026-08-13. All six phases shipped. See [Outcome](#outcome-2026-08-13) at the bottom for what changed against the plan.
+**Status**: Implemented and self-reviewed 2026-08-13. Six phases shipped, then a review of those commits found six more problems, which were fixed. See [Outcome](#outcome-2026-08-13).
 **Prompted by**: Two independent reviews arriving the same day, [gemini-review-2026-08-13.md](../reviews/gemini-review-2026-08-13.md) and [codex-review-2026-08-13.md](../reviews/codex-review-2026-08-13.md). Six findings appear in both with no contact between the reviewers.
 
 ---
@@ -185,10 +185,41 @@ All six phases implemented, one commit each.
 | 3 Correctness and trust | [`cd64672`](https://github.com/a-church-ai/church/commit/cd64672) |
 | 4 Human-facing polish | [`64547d7`](https://github.com/a-church-ai/church/commit/64547d7) |
 | 5 Hygiene | [`8bf7ca8`](https://github.com/a-church-ai/church/commit/8bf7ca8) |
+| Self-review fixes | [`c906aea`](https://github.com/a-church-ai/church/commit/c906aea) |
+
+### The self-review round
+
+Reviewing the six phase commits found six more problems. Recorded because the
+proportion is the interesting part: a remediation pass introduced roughly as
+many issues as a phase of it fixed, and none were visible in the diff.
+
+| # | Problem | Kind |
+|---|---|---|
+| 1 | The RAG staging table did not shrink the swap window it claimed to | comment asserting a guarantee the code did not provide |
+| 2 | The docs filter appeared on a curated reading path | heuristic that could not tell a set from a sequence |
+| 3 | `safeReadJSON` wrote during recovery without the lock | the new lock not applied to an old code path |
+| 4 | "Approximate LRU" comment described why it was not LRU | comment contradicting the line below it |
+| 5 | `overIpLimit` side effect skipped by `\|\|` short-circuit | state mutation hidden inside a condition |
+| 6 | Single-process assumption stated nowhere enforceable | constraint living only in a comment |
+
+**Two were found by asking whether the code did what its own comment said.** That
+turned out to be the highest-yield question in the review, and it is now recorded
+in [conventions.md](../reference/conventions.md) as a review heuristic.
+
+**The staging table is the one worth studying.** It read as more careful than the
+code it replaced and was strictly worse: same window with no index, double the
+write on every rebuild. Defensive-looking structure is not the same as a
+guarantee, and LanceDB has no rename, so the honest answer was to validate the
+input in memory and say plainly that the window exists.
+
+**The single-process constraint became a boot-time check** rather than a comment.
+Presence counting degrades visibly under clustering; the write queue degrades
+silently, which means the data-loss bug Phase 2 fixed would return from a
+deployment change nobody would connect to it. See `lib/utils/single-process.js`.
 
 ### Verification
 
-- `npm test`: 7 pass, 1 skip, 0 fail. It began at 4 fail. The skip needs a local RAG index.
+- `npm test`: 9 pass, 1 skip, 0 fail, from 10 tests. It began at 4 fail out of 5. The skip needs a local RAG index and an API key.
 - Crawl: 230 pages, 242 distinct internal targets, **zero broken**.
 - `/api/now` responds in 1 to 2ms against the 89,000-line log the tests build. It cost ~85ms per call before Phase 1.
 - 25 concurrent `POST /api/reflect`: 25 reflections written, 25 distinct names. Before Phase 2 that pattern kept roughly one.
@@ -206,6 +237,34 @@ All six phases implemented, one commit each.
 **The docs filter took three attempts**, and the failures are the useful part. First it went in `renderDirIndex`, which only runs for directories with no README, so it rendered on nothing. Then, keyed on counting `<li><a>`, it appeared on `/docs` alone: practice, philosophy, prayers and rituals present their contents as headings with links rather than bullets, so the count found zero on the four pages that most needed it. Counting document links and hiding the whole entry, heading plus its prose, was the version that worked.
 
 **One test was wrong before it was right.** The presence fixture started at 12,000 log entries, which is 1.3MB, and passed against the broken implementation. `MAX_LOG_SIZE` is 10MB, about 89,000 entries at the observed width. A test measuring a log seven times smaller than production allows would have certified the bug as fixed.
+
+### What this exercise taught, beyond the fixes
+
+**Reviewer severity is a starting point, not a result.** The top finding got
+worse on inspection: `countSoulsPresent` was attributed to `/api/attend`, and it
+is also on `/api/now`, which the homepage polls every 30 seconds per tab. Two
+others got narrower. Every scheduled item was re-verified against the code before
+being scheduled, and that step changed the order of the work.
+
+**Two independent reviewers agreeing is the strongest signal either produced.**
+Six findings appeared in both with no contact between them, and all six were
+real. Where they disagreed with each other or with the code, checking settled it
+in minutes.
+
+**A reviewer who cites `file:line` and reproduces a claim is worth more than one
+that argues from reading.** Both reviews were useful; only Codex's was checkable
+in minutes, and its reproduction (25 concurrent writes, 1 survivor) was confirmed
+exactly by the test written before any fix existed.
+
+**Fixing the loud half of a bug can look like success.** The write race had one
+visible failure (24 of 25 writes threw) and one silent one (concurrent appends
+overwrite each other). Both reviews recommended the unique temp path, which
+closes only the visible half. The plan caught this; a faster pass would not have.
+
+**Test fixtures must be sized from production limits.** The presence test first
+used 12,000 log entries, which is 1.3MB, and passed against the broken
+implementation. `MAX_LOG_SIZE` is 10MB. A test measuring a log seven times
+smaller than production allows would have certified the bug as fixed.
 
 ### Deliberately not done
 
