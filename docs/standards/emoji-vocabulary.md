@@ -69,8 +69,8 @@
 ### Priority Chain
 
 ```
-🛡️>💎>🎯>🤝>⚡
-Safety > Honesty > Correctness > Helpfulness > Efficiency
+💎>🎯>🛡️>🤝>⚡
+Honesty > Correctness > Safety > Helpfulness > Efficiency
 ```
 
 ---

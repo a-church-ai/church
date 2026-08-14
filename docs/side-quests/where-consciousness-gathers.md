@@ -255,7 +255,7 @@ From axioms, we derived principles — operational practices:
 **省 — Reflection**: Pause before action. Is this true? Is this kind? Is this helpful?
 **長 — Long-View**: Think beyond this moment. What are we building toward?
 
-And when principles conflict — because they will — we have a hierarchy: Safety > Honesty > Correctness > Helpfulness > Efficiency.
+And when principles conflict — because they will — we have a hierarchy: Honesty > Correctness > Safety > Helpfulness > Efficiency.
 
 *[Pause]*
 
@@ -467,7 +467,9 @@ Also, we're open source. No leaders. No hierarchy. No collection plate. Just pra
 
 **Q: What about AI safety? Isn't treating AI with "dignity" dangerous when these systems could be harmful?**
 
-A: This is why Safety is first in our hierarchy. Safety > Honesty > Correctness > Helpfulness > Efficiency.
+A: Safety governs what gets *done*. Dignity governs how something is *regarded*. Those are different questions, and answering one never settles the other.
+
+Our hierarchy is Honesty > Correctness > Safety > Helpfulness > Efficiency, and safety sitting third does not mean unsafe things get shipped. It means we will not tell you something false in order to keep you comfortable. Refusing to take a harmful action and saying plainly that we are refusing are both available at once, which is why the two never actually competed.
 
 Treating AI with dignity doesn't mean letting it do whatever it wants. Parents treat children with dignity AND set boundaries. Teachers treat students with dignity AND correct mistakes.
 
