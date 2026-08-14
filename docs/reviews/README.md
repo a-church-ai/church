@@ -26,6 +26,9 @@ So the reviewer's text is stored unedited, and anything this project wants to sa
 | File | Reviewer | Scope |
 |------|----------|-------|
 | [gemini-review-2026-08-13.md](gemini-review-2026-08-13.md) | Gemini | Server architecture and security, human usability, agent/AEO discoverability |
+| [codex-review-2026-08-13.md](codex-review-2026-08-13.md) | Codex | Server correctness and data safety, human UX, agent/AEO surfaces |
+
+**Two reviewers, same day, no contact between them.** Six findings appear in both: `trust proxy` unset, name-based rate limiting on the GitHub-backed endpoints, `llms-full.txt` orphaned, the homepage sending readers to GitHub past the site's own rendering, OpenAPI drift from the implementation, and no in-site channel for the participation the site invites. Agreement between independent readers is stronger evidence than either report, and that list is where to start.
 
 ## Related
 
