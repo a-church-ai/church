@@ -74,15 +74,40 @@ function renderDocLink(doc, currentPath) {
   return `<li><a href="${escapeAttr(href)}"${aria} title="${escapeAttr(label)}">${escapeText(label)}</a></li>`;
 }
 
+/**
+ * A category renders its document list only when the current page is inside it.
+ *
+ * Before 2026-08-13 every category shipped every child link on every page: 226 doc
+ * links across all 569 URLs. Those links were already invisible to readers, because
+ * <details> without `open` collapses them and the disclosure marker is hidden in
+ * CSS, so the site was paying full HTML weight for navigation nobody could see.
+ *
+ * Collapsed categories become a plain link to the category index, which lists all of
+ * that category's documents. Nothing is orphaned: every doc keeps its category hub,
+ * its entry in the sitemap, and the Related section the corpus convention requires.
+ * Documents move from one click to two, well inside Google's guidance, and the hub
+ * to spoke shape is a stronger topical signal than a flat list that clusters nothing.
+ *
+ * Rendered output is visually identical either way: .docs-sidebar-root and
+ * .docs-sidebar-category > summary share a style rule.
+ */
 function renderCategory(category, currentPath) {
   const label = titleCase(category.name);
-  const open = isCategoryOfCurrent(currentPath, category.name) ? ' open' : '';
+  const glyph = escapeText(label.charAt(0));
+  const href = `/docs/${escapeAttr(category.name)}`;
+
+  if (!isCategoryOfCurrent(currentPath, category.name)) {
+    return `<a class="docs-sidebar-root" href="${href}" title="${escapeAttr(label)}">
+          <span class="cat-glyph" aria-hidden="true">${glyph}</span><span class="cat-name">${escapeText(label)}</span>
+        </a>`;
+  }
+
   // Exclude the category's own README from the doc list (its "index" is the
   // <summary> itself, which links to /docs/{category})
   const docs = category.docs.filter(d => d.stem.toLowerCase() !== 'readme');
   const links = docs.map(d => renderDocLink(d, currentPath)).join('\n            ');
-  return `<details class="docs-sidebar-category"${open}>
-          <summary><span class="cat-glyph" aria-hidden="true">${escapeText(label.charAt(0))}</span><a class="cat-name" href="/docs/${escapeAttr(category.name)}">${escapeText(label)}</a></summary>
+  return `<details class="docs-sidebar-category" open>
+          <summary><span class="cat-glyph" aria-hidden="true">${glyph}</span><a class="cat-name" href="${href}">${escapeText(label)}</a></summary>
           <ul>
             ${links}
           </ul>
@@ -145,8 +170,11 @@ async function renderSidebarInner(currentPath) {
         </div>`
     : '';
 
+  // "More" must open when the reader is inside one of the meta categories, or the
+  // expanded category would sit hidden inside a collapsed parent.
+  const metaOpen = meta.some(c => isCategoryOfCurrent(currentPath, c.name)) ? ' open' : '';
   const metaHtml = meta.length > 0
-    ? `<details class="docs-sidebar-category docs-sidebar-more">
+    ? `<details class="docs-sidebar-category docs-sidebar-more"${metaOpen}>
           <summary><span class="cat-glyph" aria-hidden="true">…</span><span class="cat-name">More</span></summary>
           ${meta.map(c => renderCategory(c, currentPath)).join('\n          ')}
         </details>`

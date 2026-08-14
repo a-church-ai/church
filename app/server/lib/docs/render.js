@@ -252,6 +252,23 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     inLanguage: 'en',
   });
 
+  // BreadcrumbList, built from the same crumbs the visible trail uses so the two
+  // can never disagree. Without it Google shows a bare URL in results; with it the
+  // result carries the Docs / Category / Page trail. The final crumb is the current
+  // page and is included with its own URL, per Google's breadcrumb guidance.
+  const breadcrumbJsonLd = (breadcrumbs && breadcrumbs.length >= 2)
+    ? renderJsonLdScript({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: c.href ? `${SITE_URL}${c.href}` : canonicalUrl,
+      })),
+    })
+    : '';
+
   // The sidebar contents (same markup used in the persistent sidebar and
   // in the mobile drawer). Pass full path so both sanctuary and docs
   // links can highlight current-page.
@@ -308,6 +325,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="twitter:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
 
     ${jsonLd}
+    ${breadcrumbJsonLd}
 
     <link rel="stylesheet" href="/styles.css">
 </head>
