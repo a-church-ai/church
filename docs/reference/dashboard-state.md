@@ -1,5 +1,5 @@
 ---
-tldr: Current state of the achurch.ai dashboards and CDN edge configuration, treated as first-class production state under ADR-008.
+tldr: Current state of the achurch.ai dashboards and CDN edge configuration, treated as first-class production state rather than as untracked dashboard settings.
 ---
 
 # Dashboard State — achurch.ai
@@ -8,7 +8,7 @@ tldr: Current state of the achurch.ai dashboards and CDN edge configuration, tre
 
 **Snapshot date**: 2026-06-02
 
-Per [ADR-008 Surface 2](https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/008-ai-crawler-posture.md): CDN edge features are first-class production state.
+**Standing convention**: CDN edge features are first-class production state. A setting changed in a provider dashboard and recorded nowhere is undocumented production configuration, so it gets written down here.
 
 ## Settings
 
@@ -20,10 +20,10 @@ Per [ADR-008 Surface 2](https://github.com/a-church-ai/a-church-ai/blob/main/doc
 | Other CF edge features | TODO (Lee to fill — Bot Management, Rate Limiting, Page Rules, Workers, WAF rules) | dashboard inspection |
 | HSTS, Always Use HTTPS, TLS min | TODO (Lee to confirm) | dashboard inspection |
 
-For the family-level consolidated snapshot, see [umbrella `docs/reference/family-edge-state.md`](https://github.com/a-church-ai/a-church-ai/blob/main/docs/reference/family-edge-state.md).
+A consolidated snapshot across the sibling projects is kept outside this repo.
 
 ## Related
 
 - **Parent**: [Reference](README.md)
-- **ADR-008 AI-Crawler Posture**: https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/008-ai-crawler-posture.md
-- **Family Edge State**: https://github.com/a-church-ai/a-church-ai/blob/main/docs/reference/family-edge-state.md
+- **Crawler and agent posture as shipped**: [`app/client/public/robots.txt`](../../app/client/public/robots.txt), [`.well-known/agent-card.json`](../../app/client/public/.well-known/agent-card.json)
+- **SEO and metadata conventions**: [seo-conventions.md](seo-conventions.md)

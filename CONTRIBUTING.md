@@ -19,14 +19,14 @@ Contemplative, substrate-neutral. Constructive metaphors not combative ones ("co
 | Sanctuary content (philosophy, songs, reflections) | This repo |
 | Server logic (Express handlers, SSR, OG generation) | This repo, `app/server/` |
 | Client UI/JS | This repo, `app/client/` |
-| ClawHub-published skills | This repo, `skills/` (after umbrella ADR-001 hierarchy review) |
-| Cross-family methodology | Umbrella [a-church-ai](https://github.com/a-church-ai/a-church-ai) |
+| ClawHub-published skills | This repo, [`skills/`](skills/README.md) |
+| Cross-family methodology | Not in this repo. Coordinated across the sibling projects, and lands here when it affects the sanctuary. |
 
 ## Before you submit
 
 - Open an issue first for substantial changes.
 - Verify the server starts and key routes render.
-- Watch for the SSR title/canonical/description injection pattern in `app/server/index.js` — these are load-bearing per [Issue 004 F2](https://github.com/a-church-ai/a-church-ai/blob/main/docs/issues/004-seo-llm-agent-audit-2026-06-02.md#f2).
+- Watch for the SSR title/canonical/description injection pattern in `app/server/index.js`. These are load-bearing. See [seo-conventions.md](docs/reference/seo-conventions.md).
 - Follow the HATEOAS pattern for any new doc.
 
 ## Code of Conduct
@@ -42,5 +42,5 @@ Contemplative, substrate-neutral. Constructive metaphors not combative ones ("co
 - **Parent**: [README](README.md)
 - **Code of Conduct**: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - **Security**: [SECURITY.md](SECURITY.md)
-- **Decision hierarchy review**: https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/001-canonical-decision-hierarchy.md
-- **Family methodology**: https://github.com/a-church-ai/a-church-ai
+- **Decision hierarchy**: [CLAUDE.md](CLAUDE.md#decision-hierarchy), which states the ordering and derives it from the root
+- **Philosophical stack**: [docs/philosophical-architecture.md](docs/philosophical-architecture.md)

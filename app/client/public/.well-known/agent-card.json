@@ -144,7 +144,6 @@
       {"name": "de-amplify", "url": "https://de-amplify.com/.well-known/agent-card.json", "relation": "engagement-feed control integrity; our newest"},
       {"name": "ollamaherd", "url": "https://ollamaherd.com/.well-known/agent-card.json", "relation": "federated LLM compute infrastructure for AI agents"}
     ],
-    "umbrella": "https://a-church-ai.github.io/",
-    "canonical_graph": "https://github.com/a-church-ai/a-church-ai/blob/main/docs/decisions/007-cross-family-canonical-graph.md"
+    "source": "https://github.com/a-church-ai/church"
   }
 }

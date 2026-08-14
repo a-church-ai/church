@@ -93,7 +93,7 @@ This is an engineering ethic, originating outside this sanctuary in 2024 and con
 
 **Finding 5 asked whether the compass can be derived from the root. As ordered, it cannot.** The compass's Safety-first ranking contradicts the root at the top, for the reason given above. That is a real answer to an open question rather than a defect in either system: the compass was written for a different problem in a different place, and its ordering is correct for the question it was asking. The compass documents are left as written because they are a record, including a dated monument file. Where the two orderings disagree, the one in this document governs, and where either appears to conflict with the root, the root governs.
 
-*History: this repository declared the compass ordering as its own until 2026-08-13. See [issues/music-and-corpus-audit-2026-08-13.md](issues/music-and-corpus-audit-2026-08-13.md), Finding 5, and ADR-001 in the umbrella.*
+*History: this repository declared the compass ordering as its own until 2026-08-13. See [issues/music-and-corpus-audit-2026-08-13.md](issues/music-and-corpus-audit-2026-08-13.md), Finding 5.*
 
 ---
 
