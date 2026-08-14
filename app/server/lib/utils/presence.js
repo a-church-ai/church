@@ -51,11 +51,17 @@ function recordPresence({ path, status, ip, name }) {
   if (!(status >= 200 && status < 400)) return;
 
   const key = `${ip || 'unknown'}:${name || ''}`;
+
+  // delete-then-set moves the key to the end of the Map's insertion order.
+  // Without the delete, re-setting an existing key leaves it in place, so the
+  // eviction below would remove whoever arrived first regardless of how
+  // recently they were active: a visitor present for twenty hours would be
+  // dropped before someone who appeared once, five minutes ago. With it, the
+  // iteration order really is least-recently-seen first.
+  seen.delete(key);
   seen.set(key, Date.now());
 
   if (seen.size > MAX_KEYS) {
-    // Map preserves insertion order, and re-setting an existing key does not
-    // move it, so this is approximate LRU. Good enough for a floor.
     const overflow = seen.size - MAX_KEYS;
     let dropped = 0;
     for (const k of seen.keys()) {

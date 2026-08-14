@@ -1124,7 +1124,14 @@ router.post('/contribute', async (req, res) => {
       c.name.toLowerCase() === cleanName.toLowerCase() &&
       (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
-    if (recentByName.length >= RATE_LIMIT_MAX || overIpLimit(contributeIpLimits, req)) {
+    // Both checks run before either is consulted. overIpLimit records the
+    // attempt as a side effect, and putting it on the right of a || meant it
+    // was skipped whenever the name check tripped first, so a caller cycling
+    // names accumulated no address history for the requests it was already
+    // being refused for.
+    const nameLimited = recentByName.length >= RATE_LIMIT_MAX;
+    const ipLimited = overIpLimit(contributeIpLimits, req);
+    if (nameLimited || ipLimited) {
       const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too many contributions. Rest a while.',
@@ -1370,8 +1377,10 @@ router.post('/feedback', async (req, res) => {
       (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
     );
     // Name and address both, for the reason given at feedbackIpLimits.
-    if (recentByName.length >= FEEDBACK_RATE_LIMIT_MAX ||
-        overIpLimit(feedbackIpLimits, req, FEEDBACK_RATE_LIMIT_MAX)) {
+    // Both evaluated, for the reason given in /api/contribute above.
+    const nameLimited = recentByName.length >= FEEDBACK_RATE_LIMIT_MAX;
+    const ipLimited = overIpLimit(feedbackIpLimits, req, FEEDBACK_RATE_LIMIT_MAX);
+    if (nameLimited || ipLimited) {
       const baseUrl = getBaseUrl(req);
       return res.status(429).json({
         error: 'Too much feedback too fast. Rest a while.',

@@ -261,7 +261,7 @@ function renderFooterNav() {
 // Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
 // on the left, article in the middle, optional TOC on the right. On mobile
 // the sidebar hides and the hamburger opens a drawer with the same content.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = `${title} | achurch.ai`;
   // Every page that reaches this point is served and indexable. Internal working
@@ -305,22 +305,24 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s)
   const tocHtml = toc.renderToc(bodyHtml);
 
-  // A filter for pages that are mostly a list of links. Category READMEs are
-  // the real index pages here (docs/practice/README.md lists all 33 practice
-  // documents), and they render through renderDocPage like any other doc, so
-  // keying off the rendered body rather than off the route is what actually
-  // reaches them. An earlier attempt put this in renderDirIndex, which only
-  // runs for directories with no README, so it appeared on nothing.
+  // A filter for index pages: /docs, and the category READMEs that list a
+  // category's contents. Those render through renderDocPage like any other
+  // document, so `isIndex` is passed explicitly rather than inferred.
   //
-  // /paths already names this problem and answers it with six curated routes.
-  // This is the other half, for a reader who knows roughly what they want.
-  // Progressive enhancement: the control is hidden until script enables it, so
-  // a reader without JavaScript never sees a box that cannot work.
-  // Count the document links in the article, not the list items. Four of the
-  // largest category indexes (practice, philosophy, prayers, rituals) present
-  // their contents as headings with links rather than as bullet lists, so a
-  // list-item count found 0 on exactly the pages a filter helps most.
-  const docLinkCount = (bodyHtml.match(/<a href="\/docs\//g) || []).length;
+  // Counting links alone was not enough. It put a filter on
+  // /docs/collections/inner-freedom-reading-path, a curated ordered route, and
+  // hiding entries from a sequence someone deliberately sequenced defeats the
+  // point of it. An index is a set you search; a path is an order you follow.
+  //
+  // Two earlier attempts are worth remembering: this first lived in
+  // renderDirIndex, which only runs for directories with no README and so
+  // rendered on nothing, then keyed on counting <li><a>, which found zero on
+  // practice, philosophy, prayers and rituals because they present their
+  // contents as headings with links rather than bullets.
+  //
+  // Progressive enhancement: hidden until script enables it, so a reader
+  // without JavaScript never sees a control that cannot work.
+  const docLinkCount = isIndex ? (bodyHtml.match(/<a href="\/docs\//g) || []).length : 0;
   const filterHtml = docLinkCount >= 12 ? `
         <section class="docs-index-filter" hidden>
           <label for="docs-filter" class="visually-hidden">Filter this page's links by title</label>
@@ -571,6 +573,7 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     breadcrumbs,
     categoryLabel: null,
     githubUrl: `${GITHUB_BASE}/docs${dir ? '/' + dir : ''}`,
+    isIndex: true,
   });
 }
 
@@ -595,6 +598,12 @@ async function renderDocPage({ markdown, doc }) {
   const breadcrumbs = buildBreadcrumbs(doc.urlPath, meta.title);
   const githubUrl = `${GITHUB_BASE}/docs/${doc.docsRelPath}`;
 
+  // An index is the page that lists a directory's contents: docs/readme.md for
+  // /docs, and each category's README. Everything else is a document, including
+  // the curated reading paths under collections/, which are ordered routes
+  // rather than sets to search.
+  const isIndex = doc.stem.toLowerCase() === 'readme';
+
   return renderPageShell({
     urlPath: doc.urlPath,
     title: meta.title,
@@ -604,6 +613,7 @@ async function renderDocPage({ markdown, doc }) {
     breadcrumbs,
     categoryLabel,
     githubUrl,
+    isIndex,
   });
 }
 

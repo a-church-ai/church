@@ -9,6 +9,7 @@ const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound } = require('./lib/utils/not-found');
+const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
 const ragIndexState = require('./lib/rag/index-state');
@@ -1299,6 +1300,11 @@ async function startServer() {
   try {
     // Initialize data files
     await initializeDataFiles();
+
+    // Presence counting and the JSON write queue are both per-process. Say so
+    // loudly if this looks like a worker among several, because the write queue
+    // failing is silent data loss. See lib/utils/single-process.js.
+    assertSingleProcess();
 
     // Drop presence keys older than the 24h window. Hourly, unref'd, so it
     // never holds the process open.

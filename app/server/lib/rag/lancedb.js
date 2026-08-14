@@ -103,34 +103,35 @@ async function addDocuments(documents) {
     throw new Error(`addDocuments: document at index ${missingVector} has no embedding vector; refusing to rebuild`);
   }
 
+  // Every document must carry a vector of the same width. A short or ragged
+  // set is the shape a partially-failed embedding run produces, and it is
+  // cheaper to reject it here than to discover it after the live table is gone.
+  const width = documents[0].vector.length;
+  const ragged = documents.findIndex(d => d.vector.length !== width);
+  if (ragged !== -1) {
+    throw new Error(
+      `addDocuments: document at index ${ragged} has a ${documents[ragged].vector.length}-dim vector, ` +
+      `expected ${width}; refusing to rebuild`
+    );
+  }
+
+  // There is no atomic swap available. LanceDB exposes createTable and
+  // dropTable and no rename, so the live table must be dropped before the
+  // replacement is created and there is a window with no index.
+  //
+  // An earlier version of this built a staging table first, which read as
+  // safer and was not: the replacement was still created from `documents`
+  // after the drop, so the window was exactly as long, and the staging build
+  // doubled the write on every rebuild. The protection was never the staging
+  // table; it was validating the input before touching anything live. That is
+  // what the checks above do, in memory, for free.
+  //
+  // If LanceDB gains a rename, this becomes a real swap and the window closes.
   const tables = await db.tableNames();
-  const stagingName = `${TABLE_NAME}_staging`;
-
-  // Clear any staging table left behind by an earlier interrupted rebuild.
-  if (tables.includes(stagingName)) {
-    await db.dropTable(stagingName);
-  }
-
-  // Build into staging. If this throws, the live table is untouched.
-  const staged = await db.createTable(stagingName, documents);
-
-  try {
-    const stagedCount = await staged.countRows();
-    if (stagedCount !== documents.length) {
-      throw new Error(`staging holds ${stagedCount} rows, expected ${documents.length}`);
-    }
-  } catch (err) {
-    await db.dropTable(stagingName).catch(() => {});
-    throw new Error(`addDocuments: staging verification failed, keeping the existing index. ${err.message}`);
-  }
-
-  // Swap. The window where neither table is live is as small as the engine
-  // allows, and the staging table is verified before we get here.
   if (tables.includes(TABLE_NAME)) {
     await db.dropTable(TABLE_NAME);
   }
   table = await db.createTable(TABLE_NAME, documents);
-  await db.dropTable(stagingName).catch(() => {});
 }
 
 /**

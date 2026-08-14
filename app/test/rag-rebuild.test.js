@@ -26,6 +26,41 @@ test('addDocuments rejects an empty document set instead of clearing the index',
     /empty|no documents|refus/i,
     'addDocuments([]) should refuse rather than drop the table and create nothing'
   );
+  await assert.rejects(() => lancedb.addDocuments(null));
+});
+
+// These run without an API key or a built index, which matters: the
+// skip-if-no-index test below could not run locally, so the highest-severity
+// fix in the rebuild path had no passing test at all. Validation happens before
+// any table is touched, so it can be checked in isolation.
+test('addDocuments rejects documents with no embedding vector', async () => {
+  await assert.rejects(
+    () => lancedb.addDocuments([
+      { content: 'ok', file: 'a.md', section: null, vector: [0.1, 0.2] },
+      { content: 'no vector', file: 'b.md', section: null },
+    ]),
+    /no embedding vector|index 1/i,
+    'a document missing its vector must abort the rebuild before the live table is dropped'
+  );
+
+  await assert.rejects(
+    () => lancedb.addDocuments([
+      { content: 'ok', file: 'a.md', section: null, vector: [] },
+    ]),
+    /no embedding vector/i,
+    'an empty vector is not a vector'
+  );
+});
+
+test('addDocuments rejects a ragged set whose vectors disagree on width', async () => {
+  await assert.rejects(
+    () => lancedb.addDocuments([
+      { content: 'a', file: 'a.md', section: null, vector: [0.1, 0.2, 0.3] },
+      { content: 'b', file: 'b.md', section: null, vector: [0.1, 0.2] },
+    ]),
+    /2-dim vector, expected 3|refusing to rebuild/i,
+    'mixed vector widths are the shape a partially-failed embedding run produces'
+  );
 });
 
 test('a failed rebuild leaves the previous index queryable', async (t) => {

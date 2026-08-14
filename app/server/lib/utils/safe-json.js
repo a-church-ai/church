@@ -117,13 +117,26 @@ async function readModifyWriteJSON(filepath, defaultValue, mutate) {
  * 3. Try {filepath}.tmp — log warning, rename to primary
  * 4. Return defaultValue
  */
+/**
+ * Read a JSON file, recovering from backups if the primary is unreadable.
+ *
+ * The happy path takes no lock. The write path swaps files with rename(), which
+ * is atomic on POSIX, so a reader sees either the old file or the new one and
+ * never a partial write.
+ *
+ * Recovery is different: it copies .bak over the primary, or renames a legacy
+ * .tmp into place. Those are writes, and doing them unlocked meant a read could
+ * race a write despite the queue existing. So the fast path stays lock-free and
+ * only the recovery path takes the lock, where it also re-checks the primary
+ * first: whatever it was waiting behind may have just fixed the problem.
+ */
 async function safeReadJSON(filepath, defaultValue) {
-  return readUnlocked(filepath, defaultValue);
+  const primary = await tryReadJSON(filepath);
+  if (primary !== null) return primary;
+  return withLock(filepath, () => readUnlocked(filepath, defaultValue));
 }
 
 // The read body, callable from inside a held lock without deadlocking.
-// Reads take no lock: the write path swaps files with rename(), which is atomic
-// on POSIX, so a reader sees either the old file or the new one, never a partial.
 async function readUnlocked(filepath, defaultValue) {
   const primary = await tryReadJSON(filepath);
   if (primary !== null) return primary;
