@@ -1,8 +1,17 @@
 # Dependencies
 node_modules/
 
-# Environment variables (contains secrets)
+# Secrets. See the root .gitignore for why the patterns are this wide.
+# .env.example stays tracked: it is the template and holds only placeholders.
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+service-account*.json
+secrets.json
 
 # Logs
 logs/
@@ -16,6 +25,8 @@ data/attendance.json
 data/contributions.json
 data/feedback.json
 data/api-access.jsonl
+data/content-generation-log.json
+data/rag-index-state.json
 
 # Media files (too large for git)
 media/library/

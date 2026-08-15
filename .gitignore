@@ -5,8 +5,30 @@ Thumbs.db
 # Dependencies
 node_modules/
 
-# Environment variables
+# Secrets.
+#
+# This repository is public, so anything committed here is world-readable
+# immediately and stays in history after deletion. `.env` alone was already
+# enough (verified: no .env has ever been committed, and a scan of all 292
+# commits for credential patterns found nothing). The wider patterns below are
+# insurance against the near misses: a `.env.local` for a second environment,
+# a `.env.backup` made before an edit, a downloaded service-account key, a
+# certificate. Each is a file someone creates in a hurry without thinking
+# about git.
+#
+# .env.example is deliberately kept: it is the template, and it holds only
+# placeholders.
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+secrets.json
+*.secret
 
 # Logs
 logs/

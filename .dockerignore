@@ -2,6 +2,17 @@
 .git
 .gitignore
 
+# Secrets. The Dockerfile does `COPY . .`, so without these the real .env is
+# baked into the image layer and ships with every deploy. Railway and the
+# Dockerfile's own ENV block supply production configuration, so nothing in the
+# image needs a .env file at all.
+.env
+.env.*
+!.env.example
+app/.env
+app/.env.*
+!app/.env.example
+
 # Dependencies — installed inside the image
 **/node_modules
 
