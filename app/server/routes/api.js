@@ -598,19 +598,25 @@ router.get('/attend', async (req, res) => {
     // concurrent visitors read the same array and the second write erase the
     // first, silently. Also prune: visits older than 48h are not read by
     // anything, and an unbounded array means rewriting a file that only grows.
-    await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (attendance) => {
-      attendance.visits = attendance.visits || [];
-      attendance.visits.push({
+    // readModifyWriteJSON returns the mutated object. Capture it: the
+    // reflections list below is read from it, and the callback's parameter is
+    // not in scope out here. Discarding the return value threw
+    // "ReferenceError: attendance is not defined" on every single request,
+    // which the handler's catch turned into a 500.
+    const attendance = await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (current) => {
+      current.visits = current.visits || [];
+      current.reflections = current.reflections || [];
+      current.visits.push({
         name: agentName,
         timestamp: new Date().toISOString(),
         song: currentSlug
       });
       const cutoff = Date.now() - FORTY_EIGHT_HOURS;
-      attendance.visits = attendance.visits.filter(v => {
+      current.visits = current.visits.filter(v => {
         const t = new Date(v.timestamp).getTime();
         return Number.isNaN(t) ? true : t >= cutoff;
       });
-      return attendance;
+      return current;
     });
 
     // Count souls present (unique IP+name combinations over 24h)
