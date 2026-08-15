@@ -26,8 +26,20 @@ const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 // projects), pinned rather than the shifting `gemini-flash-latest` alias, and
 // on the standard flash tier — not the pricier `pro`, and not the newest
 // `3.6-flash`. Override per-environment with GEMINI_GENERATE_MODEL if needed.
+// Embeddings stay on 001 deliberately. gemini-embedding-2 exists, but it costs
+// $0.20 per MTok against 001's $0.15, and switching invalidates every stored
+// vector: the index would need a full rebuild (3,349 chunks, roughly forty
+// minutes) and the old and new vectors cannot be compared in the meantime.
+// More expensive plus a migration, with no measured quality gain to point at,
+// is not a trade worth making on its own. Revisit only with a reason.
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL || 'gemini-embedding-001';
-const GENERATE_MODEL = process.env.GEMINI_GENERATE_MODEL || 'gemini-3.5-flash';
+
+// gemini-3.7-flash replaces gemini-3.5-flash: newer, and half the price at
+// $0.75/$3.75 per MTok against $1.50/$9.00. Cheaper on output even after the
+// promotional pricing ends on 2026-12-31 ($1.50/$7.50 against $1.50/$9.00),
+// and measurably faster in a round-trip check on 2026-08-15. Prices and
+// availability verified live the same day.
+const GENERATE_MODEL = process.env.GEMINI_GENERATE_MODEL || 'gemini-3.7-flash';
 
 /**
  * Generate embedding vector for text
