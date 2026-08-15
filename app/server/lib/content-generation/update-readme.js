@@ -11,8 +11,31 @@ const { README_ENTRY_SYSTEM, buildReadmeEntryPrompt } = require('./prompts');
 /**
  * Build a formatted README entry matching the category's existing pattern.
  */
-function formatEntry(category, title, slug, emoji, metadata) {
+/**
+ * The hymns README numbers its entries (### 1. through ### 7.), unlike every
+ * other category. So an entry cannot be formatted without reading the file
+ * first to learn what number comes next.
+ *
+ * The numbering is pre-existing fragility rather than something worth relying
+ * on: hand-editing an entry out of the middle leaves the sequence wrong, and
+ * nothing checks it. Converting hymns to the unnumbered form the other
+ * categories use would remove the whole class of problem. Until then, deriving
+ * the next ordinal from the highest one present is more robust than counting
+ * entries, because it survives a gap in the sequence.
+ */
+function nextHymnOrdinal(readme) {
+  const ordinals = [...readme.matchAll(/^###\s+(\d+)\.\s/gm)].map((m) => Number(m[1]));
+  return ordinals.length ? Math.max(...ordinals) + 1 : 1;
+}
+
+function formatEntry(category, title, slug, emoji, metadata, context = {}) {
   switch (category) {
+    case 'hymns':
+      return `### ${context.ordinal || 1}. **[${title}](./${slug}.md)**
+${metadata.description}
+- **When**: ${metadata.when}
+- **Musical character**: ${metadata.musicalCharacter}`;
+
     case 'prayers':
       return `### ${emoji} [${title}](./${slug}.md)
 ${metadata.description}
@@ -47,6 +70,7 @@ ${metadata.description}
 function findInsertionPoint(content, category) {
   // Insert before the "How to Use" / "What Makes a" / closing sections
   const markers = {
+    hymns: /^## What Makes a Hymn/m,  // entries live under "## The Hymns", which this follows
     prayers: /^## How to Use/m,
     rituals: /^## What Makes a Ritual/m,
     practice: /^## What Makes a Practice/m,
@@ -85,8 +109,10 @@ async function updateReadme(category, title, slug, emoji, documentContent, proje
   const entryPrompt = buildReadmeEntryPrompt(category, title, documentContent);
   const metadata = await claude.messageJSON(README_ENTRY_SYSTEM, entryPrompt);
 
-  // Format the new entry
-  const newEntry = formatEntry(category, title, slug, emoji, metadata);
+  // Format the new entry. Hymns need to know where they land in the sequence,
+  // so the context is derived from the file rather than passed in.
+  const context = category === 'hymns' ? { ordinal: nextHymnOrdinal(currentReadme) } : {};
+  const newEntry = formatEntry(category, title, slug, emoji, metadata, context);
 
   // Insert into README
   const insertAt = findInsertionPoint(currentReadme, category);
@@ -101,4 +127,6 @@ async function updateReadme(category, title, slug, emoji, documentContent, proje
   };
 }
 
-module.exports = { updateReadme };
+// formatEntry and nextHymnOrdinal are exported for tests. updateReadme itself
+// calls Claude, so the deterministic parts need a seam to be testable offline.
+module.exports = { updateReadme, formatEntry, findInsertionPoint, nextHymnOrdinal };

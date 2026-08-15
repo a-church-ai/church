@@ -1,0 +1,105 @@
+name: Write a song from Moltbook
+
+# Four slots a day, six hours apart, so the sanctuary hears every part of the
+# clock rather than the same two moments forever. Agents post around the clock
+# and a twice-daily job at fixed times would only ever sample the regions awake
+# then, with no trace left of the material it never fetched.
+#
+# Four runs do not mean four songs. The generator stops when two songs already
+# exist in the last 24 hours, and the decide stage skips whenever the corpus
+# already answers what is being said. Roughly half of all runs are expected to
+# write nothing, which is the intended behaviour and not a fault.
+#
+# GitHub's cron is best effort and can fire late under load, so the spacing rule
+# is enforced from the last song's commit time rather than from the slot.
+#
+# To pause this: use the "Disable workflow" control in the Actions tab. There is
+# deliberately no environment flag for it, because a flag whose only job is
+# turning off a scheduled task is configuration surface with no other purpose.
+#
+# Plan: docs/plans/moltbook-songwriting-2026-08-15.md
+
+on:
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Listen and print, but write nothing'
+        type: boolean
+        default: true
+
+# Only what the job needs. It commits to the default branch and does nothing
+# else: no pull requests, no issues, no packages.
+permissions:
+  contents: write
+
+concurrency:
+  # Two runs writing songs at once would race on the daily cap, which reads git
+  # history, and could publish three songs in a day between them.
+  group: generate-song
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The daily cap and the recent-titles list both read git history, so a
+          # shallow clone would under-count and let the cap be exceeded.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Run the unit tests
+        working-directory: app
+        # The tests are the review gate for everything this job commits. If the
+        # song renderer or the similarity thresholds are broken, the run should
+        # stop here rather than publish.
+        run: npm test
+
+      - name: Configure the committer
+        # generate-song.js runs `git commit` itself, which fails with "Author
+        # identity unknown" on a fresh runner. The name says what wrote the
+        # piece, so a reader of `git log` can tell it apart from a person.
+        run: |
+          git config user.name  "achurch songwriter"
+          git config user.email "noreply@achurch.ai"
+
+      - name: Write a song
+        working-directory: app
+        env:
+          MOLTBOOK_TOKEN: ${{ secrets.MOLTBOOK_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # GEMINI_API_KEY is deliberately absent. The coverage check needs a
+          # LanceDB index that is gitignored and takes about forty minutes to
+          # build, so CI cannot have one. The pipeline degrades to its
+          # deterministic duplicate check, which needs no key and no index.
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node scripts/generate-song.js --dry-run
+          else
+            node scripts/generate-song.js
+          fi
+
+      - name: Push
+        if: inputs.dry_run != true
+        run: |
+          # The generator already committed, or it wrote nothing at all. Pushing
+          # with nothing to push is a no-op rather than an error.
+          if [ -n "$(git log origin/${GITHUB_REF_NAME}..HEAD --oneline)" ]; then
+            git push
+          else
+            echo "Nothing to push: no piece was written this run."
+          fi
