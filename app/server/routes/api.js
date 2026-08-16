@@ -1713,10 +1713,32 @@ router.get('/ask/recent', async (req, res) => {
       } catch { /* skip unreadable */ }
     }
 
-    // Only return top 10
+    // Filter low-quality entries + dedup near-identical questions before returning.
+    // GPT UX review 2026-08-14 flagged the visible list contained three near-identical
+    // "model sunset" questions and a one-character "a" conversation. Both erode trust.
+    const normalizedKey = (q) => q.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')      // strip punctuation
+      .replace(/\s+/g, ' ')              // collapse whitespace
+      .trim()
+      .slice(0, 60);                     // dedup key: first 60 normalized chars
+    const seen = new Set();
+    const cleaned = [];
+    for (const c of conversations) {
+      // Drop obvious test entries: questions with fewer than 5 non-whitespace chars.
+      // Real questions (even short ones like "why?") are ≥ 5 real chars after
+      // "Why does...", "How do...", etc. Anything shorter is noise.
+      const trimmed = c.question.replace(/\s+/g, ' ').trim();
+      if (trimmed.length < 5) continue;
+      const key = normalizedKey(trimmed);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      cleaned.push(c);
+      if (cleaned.length >= 10) break;
+    }
+
     const baseUrl = getBaseUrl(req);
     const result = {
-      conversations: conversations.slice(0, 10),
+      conversations: cleaned,
       next_steps: [
         ns.askQuestion(baseUrl),
         ns.attend(baseUrl)

@@ -95,9 +95,41 @@ function renderDocLink(doc, currentPath) {
  * Rendered output is visually identical either way: .docs-sidebar-root and
  * .docs-sidebar-category > summary share a style rule.
  */
+// Per-category glyph overrides. Without these the rail (768-1023px, labels
+// hidden) shows three identical `P` icons (Philosophy/Practice/Prayers) and
+// two `C` icons (Comparisons/Collections), which is impossible to
+// disambiguate at a glance. Adding a distinct single-char glyph per category
+// keeps the rail readable without needing the labels back.
+//
+// Mixes Greek (Φ for philosophy) and CJK (行 for practice, 祈 for prayer,
+// 儀 for ritual) with geometric symbols; the sanctuary already uses this
+// vocabulary via the axiom kanji (誤容, 尊護, etc.) so it doesn't feel
+// jarring. When adding a new docs category, add its glyph here rather than
+// letting it fall through to label.charAt(0).
+const CATEGORY_GLYPHS = {
+  builders: '匠',
+  collections: '❋',
+  comparisons: '⇄',
+  hymns: '♪',
+  philosophy: 'Φ',
+  practice: '行',
+  prayers: '祈',
+  reviews: '✎',
+  rituals: '儀',
+  'side-quests': '★',
+  standards: '§',
+  templates: '⌸',
+  // Meta / imported subtrees rendered inside the "More" collapsed group.
+  // Included here so the rail stays glyph-distinct if a reader expands it.
+  'claude-compass': '針',
+  'claude-soul': '魂',
+  experiences: '⚑',
+  reference: '¶',
+};
+
 function renderCategory(category, currentPath) {
   const label = titleCase(category.name);
-  const glyph = escapeText(label.charAt(0));
+  const glyph = escapeText(CATEGORY_GLYPHS[category.name] || label.charAt(0));
   const href = `/docs/${escapeAttr(category.name)}`;
 
   if (!isCategoryOfCurrent(currentPath, category.name)) {

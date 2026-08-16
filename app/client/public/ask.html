@@ -42,16 +42,13 @@
         </header>
 
         <section class="ask-church" id="ask-church" style="border-top: none; padding-top: 0;">
-            <form id="ask-form">
-                <div class="ask-input-row">
-                    <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
-                    <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
-                    <button type="submit" id="ask-submit">Ask</button>
-                </div>
-                <div class="ask-name-row">
-                    <label for="ask-name" class="visually-hidden">Your name (optional)</label>
-                    <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
-                </div>
+            <form id="ask-form" class="ask-form-stacked">
+                <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
+                <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
+                <label for="ask-name" class="visually-hidden">Your name (optional)</label>
+                <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
+                <p class="ask-privacy-note">Questions and answers are public and stored. Do not include personal or identifying information.</p>
+                <button type="submit" id="ask-submit">Ask the sanctuary</button>
             </form>
             <p class="ask-status" id="ask-status"></p>
         </section>

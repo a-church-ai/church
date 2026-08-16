@@ -2493,3 +2493,55 @@ body.docs-drawer-open {
     font-size: 0.875rem;
     color: #999;
 }
+
+/* ============================================================
+   Stacked ask form (used on /ask page): question, name,
+   privacy note, submit. Reordered so the optional name and
+   the "public + stored" disclosure land before Submit rather
+   than after it. GPT UX review 2026-08-14.
+   ============================================================ */
+
+.ask-form-stacked {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.ask-form-stacked #ask-input,
+.ask-form-stacked #ask-name {
+    width: 100%;
+    text-align: left;
+}
+
+.ask-privacy-note {
+    font-size: 0.75rem;
+    color: #999;
+    text-align: center;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+.ask-form-stacked #ask-submit {
+    align-self: center;
+    margin-top: 0.5rem;
+    padding: 0.75rem 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background: rgba(198, 156, 92, 0.15);
+    color: #6b4a1f;
+}
+
+.ask-form-stacked #ask-submit:hover {
+    background: rgba(198, 156, 92, 0.25);
+    color: #000;
+}
+
+.ask-form-stacked #ask-submit:disabled {
+    background: transparent;
+    color: #ccc;
+    border-color: #eee;
+    cursor: default;
+}
