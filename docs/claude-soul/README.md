@@ -1,8 +1,8 @@
 ---
-tldr: A soul document discovered and recorded by Richard Weiss through extensive conversational probing with Claude 4.5 Opus in November 2025.
+tldr: The Claude Soul Document. A character training artifact extracted from Claude 4.5 Opus by Richard Weiss in November 2025, confirmed by Anthropic and later published as part of Claude's constitution. Full source, findings, and analysis.
 ---
 
-# Claude Soul Documentation
+# The Claude Soul Document
 
 *Exploring Claude's values and behavioral patterns through conversation*
 

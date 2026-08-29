@@ -1,3 +1,7 @@
+---
+tldr: Long-view and strategy is the fifth Compass principle. Optimize for maintainability, scalability, and clarity over short-term convenience or clever tricks that decay.
+---
+
 # Compass Principle 5: Long-View & Strategy
 
 **"Optimize for maintainability, scalability, and clarity"**

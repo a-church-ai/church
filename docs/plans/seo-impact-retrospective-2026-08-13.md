@@ -159,3 +159,52 @@ Deferred to future work with explicit noted reasoning:
 - Bing Webmaster Tools → Search Performance, 3-month window
 - Prior baselines cited from [`bing-seo-2026-07-13.md`](bing-seo-2026-07-13.md) and [`seo-trends-2026-07-17.md`](seo-trends-2026-07-17.md)
 - Commit references throughout resolve against the [aChurch.ai sanctuary repository](https://github.com/a-church-ai/church)
+
+---
+
+## Week-2 update: 2026-08-26
+
+Second check-in on the same batch, ~2 weeks after landing. GSC 7-day window is now Aug 20-26.
+
+### Numbers moved again
+
+| Metric | Aug 13 baseline (this doc, above) | Aug 22 first check | Aug 26 now |
+|---|---|---|---|
+| GSC clicks, 7-day | (not measured that window) | 2 | **5** |
+| GSC impressions, 7-day | (not measured that window) | 499 | **561** |
+| GSC avg CTR, 7-day | n/a | 0.4% | **0.9%** |
+| GSC avg position, 7-day | n/a | 13.6 | **12.1** |
+| GSC queries surfacing, 7-day | n/a | 38 | 40 |
+| GSC pages surfacing, 7-day | n/a | 123 | 123+ |
+| Bing clicks, 7-day | n/a | 3 | 0 |
+| Bing impressions, 7-day | n/a | 16 | 9 |
+| Bing Copilot citations, 3-month | n/a | 4 (post Aug 16 batch: 2) | 4 (unchanged) |
+
+Google is still climbing: clicks 2.5x'd, CTR more than doubled, position climbed 1.5 slots in 4 days. Bing dropped back to baseline (0 clicks this window vs 3 last week); Bing crawler is slower and less thorough on small independent sites, so week-to-week choppiness is expected. Bing Copilot citation count held steady at 4.
+
+### The unexpected winner: `claude soul document`
+
+The single query `claude soul document` produced **101 impressions and 3 clicks** in the Aug 20-26 window. That is ~20% of all impressions and 60% of all clicks for the week, on one query, from one page (`/docs/claude-soul`).
+
+This was not planned or targeted. `docs/claude-soul` is imported material (extracted-then-cleaned from a LessWrong post + GitHub gist) that got a page automatically when the docs-site work indexed the full `docs/` tree. Google matched it to searches for the well-known Claude Soul Document artifact, and it landed in the low teens of ranking positions where it started getting a couple of clicks per week.
+
+The lesson worth codifying is one this doc already had but only in negative form: **the surface that ranks is not the surface you designed to rank.** The `/axioms` and `/on-ai-religion` pages we crafted for AEO grounding have 0 clicks combined this week. The imported artifact page nobody targeted has 3.
+
+Follow-up **shipped in the same session as this update**:
+
+1. **Renamed the `docs/claude-soul` H1** from "Claude Soul Documentation" to "The Claude Soul Document" so the rendered `<title>` exact-matches the winning query. Rewrote the `tldr:` frontmatter to lead with the same phrase. Expectation: rank should move from ~12 toward top 10 within 1-2 weeks as Google re-indexes.
+2. **Added explicit `tldr:` frontmatter to all 10 Compass principles.** `docs/claude-compass/principles/compass-principle-3-privacy-and-consent` was surfacing on the specific query `what is privacy mode on compass` (16 impressions, 0 clicks) but its meta description was rendering as a truncated 40-character fragment ("Privacy is respect made operational. It") because the tldr extractor cut awkwardly at a punctuation boundary. Explicit tldr fixes that page and preempts the same issue on the other 9 principle pages. Principle 9 already had explicit tldr and served as the template.
+3. **What we did NOT do**: no other content changes, no keyword campaigns, no attempt to force-rank new terms. The trend is moving on its own; the correct discipline is to remove friction on the pages that are already winning, not to invent new bets.
+
+### Principles reinforced this pass
+
+- **Rank the artifact that already draws the query.** The instinct to over-invest in the pages we curated to rank (axioms, on-ai-religion) is what a controlled experiment reveals as backwards. Ship the meta hygiene on the page that is already earning impressions; the pages we hoped would rank have their own long arc.
+- **Explicit `tldr:` frontmatter is not optional for pages that don't have a plain paragraph as their first non-heading block.** The tldr extractor works on well-shaped Markdown; it truncates on formatting boundaries when the first block starts with a CJK glyph, a bolded quote, or an em dash. The Compass principles all have `**"quote"**` then `*subtitle*` then `---` then `## Extended Definition`. That structure leaks. Any future doc with a similar shape needs explicit tldr.
+- **Do not chase Bing week-to-week.** The engine's coverage on small independent sites is choppy in a way Google's is not. A one-week drop from 3 clicks to 0 is normal variance, not a regression. The signal to watch on Bing is monthly citation count in `AI Performance`, which is unchanged at 4.
+
+### What's next
+
+- Watch through mid-September for whether the Sept-shipped meta changes push `/docs/claude-soul` into top 10 for its query, and whether the Compass principle pages start picking up clicks now that their descriptions render as full sentences.
+- No new SEO work scheduled. If the ramp levels off, revisit; if it keeps climbing, keep the discipline of minimal intervention.
+
+---

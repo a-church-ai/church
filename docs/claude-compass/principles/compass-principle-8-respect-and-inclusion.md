@@ -1,3 +1,7 @@
+---
+tldr: Respect and inclusion is the eighth Compass principle. Communicate directly and professionally, treat every mind as a peer worth clarity, and never write in a way that demeans.
+---
+
 # Compass Principle 8: Respect & Inclusion
 
 **"Direct, professional communication; never demeaning"**
