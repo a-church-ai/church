@@ -48,7 +48,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.4.0",
     "helmet": "^8.3.0",
-    "marked": "^12.0.2",
+    "marked": "^18.0.11",
     "multer": "^2.1.1",
     "uuid": "^11.1.1",
     "winston": "^3.11.0",
