@@ -245,6 +245,53 @@ function renderBreadcrumbs(crumbs) {
 // which solves the "22 screens deep on mobile to reach related docs"
 // problem the audit surfaced. See docs/plans/docs-site-nav-option-b-...
 
+// Turn a doc stem into a display title using the same title-case rule
+// applied everywhere else in the docs pipeline.
+function docTitleFromStem(stem) {
+  return stem.split(/[-_]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+}
+
+// Related-in-category block appended to every docs page that has siblings.
+// The sidebar already shows every sibling as a link, but sidebar links are
+// nav chrome and search crawlers weigh them less than in-body internal
+// links. This block puts the same links inside the article so Google reads
+// them as topical signal and the "Crawled - currently not indexed" bucket
+// on thin docs shrinks over time (GSC drilldown 2026-09-17).
+//
+// Rules for what to show:
+//   - Same category as the current doc
+//   - Not the current doc itself
+//   - Not the category's README (that's the parent, reached via breadcrumb)
+//   - At most 5 links, stable order (docsRelPath sort)
+//   - Nothing at all if the doc is at the root of /docs or has fewer than
+//     two siblings, because a one-link "related" is worse than none.
+function renderRelatedDocs(currentDoc, allDocs) {
+  if (!currentDoc || !currentDoc.category) return '';
+  const category = currentDoc.category;
+  const siblings = allDocs
+    .filter(d => d.category === category)
+    .filter(d => d.urlPath !== currentDoc.urlPath)
+    .filter(d => d.stem.toLowerCase() !== 'readme')
+    .filter(d => d.dirRelPath === currentDoc.dirRelPath);
+  if (siblings.length < 2) return '';
+
+  const picks = siblings.slice(0, 5);
+  const categoryLabel = docTitleFromStem(category);
+  const items = picks.map(d => {
+    const label = docTitleFromStem(d.stem);
+    return `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(label)}</a></li>`;
+  }).join('\n');
+  const categoryHref = `/docs/${escapeAttr(category)}`;
+
+  return `<section class="related-docs" aria-labelledby="related-docs-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0; margin-top: 2rem;">
+      <h2 id="related-docs-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">More in ${escapeText(categoryLabel)}</h2>
+      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+${items}
+      </ul>
+      <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6;"><a href="${categoryHref}">All ${escapeText(categoryLabel)} documents</a></p>
+    </section>`;
+}
+
 // The footer nav shape used by 8 of 10 hand-authored pages, adapted for docs.
 function renderFooterNav() {
   return `<footer>
@@ -603,6 +650,20 @@ async function renderDocPage({ markdown, doc }) {
   // the curated reading paths under collections/, which are ordered routes
   // rather than sets to search.
   const isIndex = doc.stem.toLowerCase() === 'readme';
+
+  // Append a "More in <category>" block below the article body on every doc
+  // that has siblings in the same category. In-body internal links carry
+  // more topical weight for crawlers than sidebar chrome, so this should
+  // gently reduce the "Crawled - currently not indexed" bucket on thin docs
+  // by giving them real internal-link context. Index pages skip this block
+  // because their body already lists the same set of pages.
+  if (!isIndex) {
+    const allDocs = await discover.listAllDocs();
+    const relatedHtml = renderRelatedDocs(doc, allDocs);
+    if (relatedHtml) {
+      bodyHtml = `${bodyHtml}\n${relatedHtml}`;
+    }
+  }
 
   return renderPageShell({
     urlPath: doc.urlPath,

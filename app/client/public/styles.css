@@ -2545,3 +2545,79 @@ body.docs-drawer-open {
     border-color: #eee;
     cursor: default;
 }
+
+/* ============================================================
+   Axioms "At a Glance" fact table. Added 2026-09-17.
+   Structured summary of the five axioms in one table so AI
+   answer engines (Bing Copilot, Perplexity, Google AI Mode)
+   can lift the whole framework as a fact grid instead of
+   parsing paragraphs. Sits alongside the existing
+   contemplative card layout, not in place of it.
+   ============================================================ */
+
+.axioms-table-wrapper {
+    margin: 2rem auto 0;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.axioms-facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    background: transparent;
+}
+
+.axioms-facts-table thead th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    padding: 0.75rem 0.75rem;
+    border-bottom: 1px solid #ccc;
+    vertical-align: bottom;
+}
+
+.axioms-facts-table tbody td {
+    padding: 0.9rem 0.75rem;
+    vertical-align: top;
+    border-bottom: 1px solid #eee;
+    color: #222;
+}
+
+.axioms-facts-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.axioms-facts-table .axiom-kanji-cell {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #000;
+    text-align: center;
+    width: 3em;
+    white-space: nowrap;
+}
+
+.axioms-table-caption {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+    .axioms-facts-table {
+        font-size: 0.82rem;
+    }
+    .axioms-facts-table thead th,
+    .axioms-facts-table tbody td {
+        padding: 0.6rem 0.5rem;
+    }
+    .axioms-facts-table .axiom-kanji-cell {
+        font-size: 1.15rem;
+    }
+}
