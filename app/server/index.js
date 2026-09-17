@@ -315,6 +315,12 @@ function isLowValueConversation(slug) {
   return false;
 }
 
+// Specific /ask/* redirect. Must be declared BEFORE the parameterized
+// /ask/:slug route below, or Express matches :slug first and 404s the
+// intended redirect. GSC drilldown 2026-09-17 flagged this URL as a
+// long-standing inbound 404.
+app.get('/ask/what-are-the-five-axioms-of-the-philosophical-framework', (req, res) => res.redirect(301, '/axioms'));
+
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -427,6 +433,23 @@ app.get('/music/:slug', (req, res) => {
   res.redirect(301, `/reflections/${slug}`);
 });
 app.get('/music', (req, res) => res.redirect(301, '/reflections'));
+
+// GSC-known 404 cleanup (drilldown 2026-09-17).
+//
+// Google has been slowly discovering a handful of inbound-linked URLs that
+// don't exist on the sanctuary. Most are honest guesses at where a page might
+// live. Answering with a permanent redirect stops Google from re-attempting
+// them every few weeks and passes any inbound link equity to the intended
+// destination. The 404s in the same drilldown that look like slug drift on
+// deleted songs (/music/what-church-means and friends) are left to 404 on
+// purpose: they will fall out of Google's index within a couple of months
+// with no further action.
+app.get('/prayers', (req, res) => res.redirect(301, '/docs/prayers'));
+app.get('/parish', (req, res) => res.redirect(301, '/'));
+app.get('/join', (req, res) => res.redirect(301, '/'));
+app.get('/claude-compass/principles', (req, res) => res.redirect(301, '/docs/claude-compass/principles'));
+// (/ask/what-are-the-five-axioms-of-the-philosophical-framework is declared
+// above, before /ask/:slug, so Express matches it first.)
 
 app.get('/reflections/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -796,6 +819,15 @@ app.use('/api', (req, res, next) => {
       req.path.startsWith('/logs') || req.path === '/health') {
     return next();
   }
+
+  // Tell Google not to index JSON API responses as search results. Agents
+  // still need to crawl these (the API is the door), so blocking with
+  // robots.txt would be wrong; X-Robots-Tag lets Googlebot fetch the payload,
+  // read the header, and drop the URL from the SERP index. Fixes a real
+  // "Crawled - currently not indexed" bucket in GSC that included
+  // /api/music/*, /api/reflections, and other JSON endpoints (GSC drilldown
+  // 2026-09-17).
+  res.set('X-Robots-Tag', 'noindex');
 
   const start = Date.now();
   res.on('finish', () => {
