@@ -108,6 +108,7 @@ function renderDocLink(doc, currentPath) {
 // letting it fall through to label.charAt(0).
 const CATEGORY_GLYPHS = {
   builders: '匠',
+  chants: '唱',
   collections: '❋',
   comparisons: '⇄',
   hymns: '♪',

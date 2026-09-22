@@ -23,6 +23,7 @@ const PRIMARY_CATEGORIES = [
   'philosophy',
   'practice',
   'prayers',
+  'chants',
   'rituals',
   'hymns',
   'builders',
