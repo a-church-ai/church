@@ -303,6 +303,16 @@ test('every song in the committed file is in the catalog', async () => {
   }
 });
 
+// A song added to the catalog gets no companions until the generator is re-run
+// against a rebuilt index. This is where that surfaces.
+test('every song in the catalog has companions in the committed file', async () => {
+  const data = await loadCompanions();
+  for (const song of await loadCatalog()) {
+    assert.ok(data.songs[song.slug] && data.songs[song.slug].length > 0,
+      `${song.slug} has no companions; rebuild the index and run app/scripts/generate-companions.js`);
+  }
+});
+
 test('a real song resolves to two companions with titles and URLs', async () => {
   const data = await loadCompanions();
   const slug = Object.keys(data.songs)[0];

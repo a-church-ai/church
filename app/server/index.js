@@ -1279,14 +1279,6 @@ async function triggerHashGatedRebuild() {
   const files = await ragIndexer.findAllCorpusFiles();
   const currentHash = await ragIndexer.computeCorpusHash(files);
 
-  // Song companions are generated offline from this same corpus. A different
-  // hash means documents or songs changed since; any edit counts, so this is a
-  // note, not an alarm. Links stay safe regardless: a companion whose document
-  // no longer resolves is skipped at request time.
-  const companionsFile = await loadCompanions();
-  if (companionsFile.corpusHash && companionsFile.corpusHash !== currentHash) {
-    console.log(`[companions] generated from corpus ${companionsFile.corpusHash.slice(0, 8)}, now ${currentHash.slice(0, 8)}; if songs or documents were added or renamed, run app/scripts/generate-companions.js`);
-  }
 
   const state = await ragIndexState.readState();
   const indexStatus = await ragLancedb.checkIndex();

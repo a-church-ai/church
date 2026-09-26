@@ -21,7 +21,6 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const lancedb = require('../server/lib/rag/lancedb');
-const indexer = require('../server/lib/rag/indexer');
 const discover = require('../server/lib/docs/discover');
 const companions = require('../server/lib/music/companions');
 const { loadCatalog, COMPANIONS_FILE } = require('../server/lib/utils/data');
@@ -88,9 +87,8 @@ async function main() {
     categoryOf
   );
 
-  const corpusHash = await indexer.computeCorpusHash(await indexer.findAllCorpusFiles());
   const songs = Object.fromEntries(Object.keys(shortlists).sort().map(slug => [slug, shortlists[slug]]));
-  const output = { corpusHash, songs };
+  const output = { songs };
 
   await fs.writeFile(COMPANIONS_FILE, JSON.stringify(output, null, 2) + '\n');
 

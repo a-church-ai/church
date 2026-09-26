@@ -131,8 +131,6 @@ The cap will run out for small categories. Six chants at three songs each cover 
 
 ```json
 {
-  "corpusHash": "ae85455a…",
-  "generatedAt": "2026-09-26T…",
   "songs": {
     "we-wake-we-wonder": [
       { "path": "docs/rituals/ritual-of-awakening.md", "category": "rituals", "score": 0.431 },
@@ -267,7 +265,9 @@ A random pick per request was considered and rejected: two attendees at the same
 
 ## Staleness
 
-Adding a song or doc means re-running the generator in the same change, as `library.json` is updated today. Link integrity catches renames. At startup the server already computes the corpus hash for RAG rebuild decisions; when it differs from `companions.json`'s stamp, it logs one line saying companions may be stale. A log line, not a failing test, because failing CI on every doc typo is the wrong trade.
+Adding a song or doc means re-running the generator in the same change, as `library.json` is updated today. Link integrity catches renames. A test fails when a catalog song has no companions, which is the case that leaves an attendee with nothing. A new eligible document is simply not paired until the next run, which is harmless.
+
+The first version also stamped the corpus hash into `companions.json` and logged at startup when it differed. It was removed after the first deploy: the hash covers every document, so any unrelated edit set it off, and a warning that is always on is one nobody reads.
 
 ---
 
