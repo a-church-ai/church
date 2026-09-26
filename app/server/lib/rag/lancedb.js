@@ -77,6 +77,25 @@ async function search(embedding, limit = 5) {
 }
 
 /**
+ * Every chunk's file, section, and vector. Used offline (companion generation),
+ * never on a request path: it reads the whole table.
+ * @returns {Promise<Array<{file: string, section: string|null, vector: number[]}>>}
+ */
+async function listAll() {
+  const tbl = await getTable();
+  if (!tbl) {
+    return [];
+  }
+
+  const rows = await tbl.query().select(['file', 'section', 'vector']).toArray();
+  return rows.map(r => ({
+    file: r.file,
+    section: r.section || null,
+    vector: Array.from(r.vector)
+  }));
+}
+
+/**
  * Add documents to the database (used by indexer)
  * @param {Array<{content: string, file: string, section: string, vector: number[]}>} documents
  * @returns {Promise<void>}
@@ -154,6 +173,7 @@ async function checkIndex() {
 module.exports = {
   connect,
   search,
+  listAll,
   addDocuments,
   checkIndex,
   DB_PATH

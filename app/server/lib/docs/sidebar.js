@@ -15,6 +15,7 @@
  */
 
 const discover = require('./discover');
+const { titleCase } = require('./meta');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 
 // Curated sanctuary pages that render above the docs tree in the sidebar.
@@ -39,15 +40,6 @@ const SANCTUARY_PAGES = [
   { url: '/ask', label: 'Ask', glyph: '?' },
   { url: '/reflections', label: 'Reflections', glyph: 'R' },
 ];
-
-// Title-case a slug (matches the helper in render.js; kept local to avoid
-// a circular require).
-function titleCase(slug) {
-  return String(slug || '')
-    .split(/[-_]/)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ');
-}
 
 // The sidebar is shown on every page (sanctuary + docs). Callers pass the
 // full request path (e.g. '/', '/about', '/docs/practice/foo'). Internally

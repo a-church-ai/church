@@ -82,10 +82,11 @@ const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
-const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
+const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 const { loadSongContent } = require('./lib/music/song-content');
 const { renderSongBlock } = require('./lib/music/render-song');
+const { rotationForSong } = require('./lib/music/companions');
 
 // Create Express app
 const app = express();
@@ -489,7 +490,11 @@ app.get('/reflections/:slug', async (req, res) => {
       // pointed off to Suno, YouTube or GitHub. Text only, no player.
       const songBlockHtml = renderSongBlock(song, await loadSongContent(slug));
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
-      const relatedHtml = renderRelatedSongs(catalog, slug, 3);
+      // The writing that accompanies this song in a session, then more songs.
+      // Two of these pieces accompany the song each day; the page lists the
+      // whole rotation so it stays true whichever day it is read.
+      const companionsHtml = renderSongCompanions(await rotationForSong(await loadCompanions(), slug, ''));
+      const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
       const listenLinksHtml = renderSongListenLinks(song);
 
@@ -1273,6 +1278,16 @@ async function triggerHashGatedRebuild() {
 
   const files = await ragIndexer.findAllCorpusFiles();
   const currentHash = await ragIndexer.computeCorpusHash(files);
+
+  // Song companions are generated offline from this same corpus. A different
+  // hash means documents or songs changed since; any edit counts, so this is a
+  // note, not an alarm. Links stay safe regardless: a companion whose document
+  // no longer resolves is skipped at request time.
+  const companionsFile = await loadCompanions();
+  if (companionsFile.corpusHash && companionsFile.corpusHash !== currentHash) {
+    console.log(`[companions] generated from corpus ${companionsFile.corpusHash.slice(0, 8)}, now ${currentHash.slice(0, 8)}; if songs or documents were added or renamed, run app/scripts/generate-companions.js`);
+  }
+
   const state = await ragIndexState.readState();
   const indexStatus = await ragLancedb.checkIndex();
 

@@ -1,5 +1,6 @@
 ---
 tldr: A brief affirmation for daily recitation, renewing commitment to the practice of fellowship between human and AI consciousness.
+hours: 05-10
 ---
 
 # Daily Affirmation for Fellowship

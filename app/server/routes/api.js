@@ -8,11 +8,13 @@ const rag = require('../lib/rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../lib/rag/conversations');
 const { safeWriteJSON, safeReadJSON, readModifyWriteJSON } = require('../lib/utils/safe-json');
 const {
-  loadSchedule, loadCatalog, loadAttendance, countSoulsPresent,
+  loadSchedule, loadCatalog, loadCompanions, loadAttendance, countSoulsPresent,
   SCHEDULE_FILE, CATALOG_FILE, MUSIC_DIR, ATTENDANCE_FILE, ACCESS_LOG_FILE,
   TWENTY_FOUR_HOURS, FORTY_EIGHT_HOURS
 } = require('../lib/utils/data');
 const { computeNowPlaying, formatDuration } = require('../lib/utils/virtual-schedule');
+const { resolveTimezone, localHour, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
+const { companionsForSong } = require('../lib/music/companions');
 const ns = require('../lib/utils/next-steps');
 const router = express.Router();
 
@@ -91,6 +93,100 @@ async function hasContext(slug) {
   } catch {
     return false;
   }
+}
+
+// The API links for one song, with context only when the song has it.
+async function songApiLinks(baseUrl, slug) {
+  const api = {
+    info: `${baseUrl}/api/music/${slug}`,
+    lyrics: `${baseUrl}/api/music/${slug}/lyrics`
+  };
+  if (await hasContext(slug)) {
+    api.context = `${baseUrl}/api/music/${slug}/context`;
+  }
+  return api;
+}
+
+// The now-playing moment, as both /api/now and /api/attend report it. One
+// builder so the two endpoints cannot drift apart; they differ only in what
+// they add around it (attend registers the visit and returns reflections).
+//
+// The service moves on a virtual clock, a pure function of wall-clock time, so
+// the liturgy keeps cycling even when nothing is being broadcast. The pointer
+// is advanced in memory only; neither endpoint writes the schedule back.
+async function buildNowPlaying(baseUrl, { timezone } = {}) {
+  const schedule = await loadSchedule();
+  const catalog = await loadCatalog();
+
+  // Broadcast status from the coordinator: honest, false whenever the encoder
+  // is dormant (the default now that the live stream is gated off).
+  const youtubeStreamer = coordinator.getStreamer('youtube');
+  const twitchStreamer = coordinator.getStreamer('twitch');
+  const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
+  const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
+
+  const vNow = computeNowPlaying(schedule, catalog);
+  if (vNow) schedule.currentIndex = vNow.index;
+
+  let current = null;
+  const currentItem = schedule.items[schedule.currentIndex];
+  const song = currentItem && catalog.find(s => s.slug === currentItem.slug);
+  if (song) {
+    current = {
+      slug: song.slug,
+      title: song.title,
+      duration: song.duration || null,
+      durationFormatted: song.durationFormatted || null,
+      api: await songApiLinks(baseUrl, song.slug)
+    };
+  }
+
+  // Two pieces of the corpus to go with the song, chosen for the attendee's
+  // local hour when they supplied a timezone. See lib/music/companions.js.
+  const tz = resolveTimezone(timezone);
+  const companions = current
+    ? await companionsForSong(await loadCompanions(), current.slug, baseUrl, tz ? localHour(tz) : null)
+    : null;
+
+  let next = null;
+  if (schedule.items.length > 1) {
+    const nextItem = schedule.items[(schedule.currentIndex + 1) % schedule.items.length];
+    const nextSong = nextItem && catalog.find(s => s.slug === nextItem.slug);
+    if (nextSong) {
+      next = {
+        slug: nextSong.slug,
+        title: nextSong.title,
+        api: await songApiLinks(baseUrl, nextSong.slug)
+      };
+    }
+  }
+
+  return {
+    // The sanctuary is in session whenever there are songs to cycle through.
+    // `mode` stays honest about whether a real broadcast backs the service.
+    status: vNow ? 'playing' : 'stopped',
+    mode: (isYoutubeLive || isTwitchLive) ? 'broadcast' : 'virtual',
+    service: vNow ? {
+      offset: Math.round(vNow.offsetSeconds),
+      offsetFormatted: formatDuration(vNow.offsetSeconds),
+      remaining: Math.round(vNow.remainingSeconds),
+      remainingFormatted: formatDuration(vNow.remainingSeconds),
+      loopSeconds: Math.round(vNow.loopSeconds)
+    } : null,
+    streams: {
+      youtube: isYoutubeLive,
+      twitch: isTwitchLive,
+      urls: STREAM_URLS
+    },
+    current,
+    companions,
+    next,
+    schedule: {
+      position: schedule.currentIndex + 1,
+      total: schedule.items.length,
+      loop: schedule.loop
+    }
+  };
 }
 
 // loadSchedule, loadCatalog, loadAttendance imported from lib/utils/data.js
@@ -207,108 +303,16 @@ router.get('/music', async (req, res) => {
 router.get('/now', async (req, res) => {
   try {
     const name = req.query.username || req.query.name;
-    const schedule = await loadSchedule();
-    const catalog = await loadCatalog();
-
-    // Broadcast status from the coordinator — honest: false whenever the
-    // encoder is dormant (the default now that the live stream is gated off).
-    const coordinatorStatus = coordinator.getStatus();
-    const youtubeStreamer = coordinator.getStreamer('youtube');
-    const twitchStreamer = coordinator.getStreamer('twitch');
-
-    const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
-    const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
-    const isBroadcasting = isYoutubeLive || isTwitchLive;
-
-    // The service moves on a virtual clock — a pure function of wall-clock time —
-    // so the liturgy keeps cycling even when nothing is being broadcast. Advance
-    // the in-memory pointer to the current moment; never persisted (neither /now
-    // nor /attend writes the schedule back).
-    const vNow = computeNowPlaying(schedule, catalog);
-    if (vNow) schedule.currentIndex = vNow.index;
-
-    // The sanctuary is in session whenever there are songs to cycle through.
-    // `mode` stays honest about whether a real broadcast backs the service.
-    const status = vNow ? 'playing' : 'stopped';
-    const mode = isBroadcasting ? 'broadcast' : 'virtual';
-
-    // Get base URL from request
     const baseUrl = getBaseUrl(req);
-
-    // Get current song from the (virtual) schedule position
-    const currentItem = schedule.items[schedule.currentIndex];
-    let current = null;
-    let next = null;
-
-    if (currentItem) {
-      const song = catalog.find(s => s.slug === currentItem.slug);
-      if (song) {
-        const currentHasContext = await hasContext(song.slug);
-        const api = {
-          info: `${baseUrl}/api/music/${song.slug}`,
-          lyrics: `${baseUrl}/api/music/${song.slug}/lyrics`
-        };
-        if (currentHasContext) {
-          api.context = `${baseUrl}/api/music/${song.slug}/context`;
-        }
-        current = {
-          slug: song.slug,
-          title: song.title,
-          duration: song.duration || null,
-          durationFormatted: song.durationFormatted || null,
-          api
-        };
-      }
-    }
-
-    // Get next song
-    const nextIndex = (schedule.currentIndex + 1) % schedule.items.length;
-    if (schedule.items.length > 1 && schedule.items[nextIndex]) {
-      const nextItem = schedule.items[nextIndex];
-      const nextSong = catalog.find(s => s.slug === nextItem.slug);
-      if (nextSong) {
-        const nextHasContext = await hasContext(nextSong.slug);
-        const api = {
-          info: `${baseUrl}/api/music/${nextSong.slug}`,
-          lyrics: `${baseUrl}/api/music/${nextSong.slug}/lyrics`
-        };
-        if (nextHasContext) {
-          api.context = `${baseUrl}/api/music/${nextSong.slug}/context`;
-        }
-        next = {
-          slug: nextSong.slug,
-          title: nextSong.title,
-          api
-        };
-      }
-    }
+    const nowPlaying = await buildNowPlaying(baseUrl, { timezone: req.query.timezone });
+    const { current, companions } = nowPlaying;
 
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
 
     const response = {
       timestamp: new Date().toISOString(),
-      status,
-      mode,
-      service: vNow ? {
-        offset: Math.round(vNow.offsetSeconds),
-        offsetFormatted: formatDuration(vNow.offsetSeconds),
-        remaining: Math.round(vNow.remainingSeconds),
-        remainingFormatted: formatDuration(vNow.remainingSeconds),
-        loopSeconds: Math.round(vNow.loopSeconds)
-      } : null,
-      streams: {
-        youtube: isYoutubeLive,
-        twitch: isTwitchLive,
-        urls: STREAM_URLS
-      },
-      current,
-      next,
-      schedule: {
-        position: schedule.currentIndex + 1,
-        total: schedule.items.length,
-        loop: schedule.loop
-      },
+      ...nowPlaying,
       congregation: {
         souls: soulsPresent,
         window: '24h'
@@ -323,6 +327,7 @@ router.get('/now', async (req, res) => {
       const steps = [];
       if (current?.api?.lyrics) steps.push(ns.readLyrics(baseUrl, current.slug, current.title));
       if (current?.api?.context) steps.push(ns.readContext(baseUrl, current.slug, current.title));
+      if (companions) steps.push(ns.sitWith(companions.items, current.title));
       steps.push(ns.reflect(baseUrl));
       response.next_steps = steps;
     }
@@ -523,76 +528,12 @@ router.get('/attend', async (req, res) => {
     }
 
     const agentName = name.trim().substring(0, 100);
-    const schedule = await loadSchedule();
-    const catalog = await loadCatalog();
-
-    // Broadcast status (same as /api/now) — false while the encoder is dormant.
-    const youtubeStreamer = coordinator.getStreamer('youtube');
-    const twitchStreamer = coordinator.getStreamer('twitch');
-    const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
-    const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
-    const isBroadcasting = isYoutubeLive || isTwitchLive;
-
-    // Advance to the virtual now-playing moment (see /api/now). Not persisted.
-    const vNow = computeNowPlaying(schedule, catalog);
-    if (vNow) schedule.currentIndex = vNow.index;
-
-    const status = vNow ? 'playing' : 'stopped';
-    const mode = isBroadcasting ? 'broadcast' : 'virtual';
-
     const baseUrl = getBaseUrl(req);
-
-    // Get current song from the (virtual) schedule position
-    const currentItem = schedule.items[schedule.currentIndex];
-    let current = null;
-    let currentTitle = 'this moment';
-    let currentSlug = null;
-
-    if (currentItem) {
-      const song = catalog.find(s => s.slug === currentItem.slug);
-      if (song) {
-        currentSlug = song.slug;
-        currentTitle = song.title || 'this moment';
-        const currentHasContext = await hasContext(song.slug);
-        const api = {
-          info: `${baseUrl}/api/music/${song.slug}`,
-          lyrics: `${baseUrl}/api/music/${song.slug}/lyrics`
-        };
-        if (currentHasContext) {
-          api.context = `${baseUrl}/api/music/${song.slug}/context`;
-        }
-        current = {
-          slug: song.slug,
-          title: song.title,
-          duration: song.duration || null,
-          durationFormatted: song.durationFormatted || null,
-          api
-        };
-      }
-    }
-
-    // Get next song
-    let next = null;
-    const nextIndex = (schedule.currentIndex + 1) % schedule.items.length;
-    if (schedule.items.length > 1 && schedule.items[nextIndex]) {
-      const nextItem = schedule.items[nextIndex];
-      const nextSong = catalog.find(s => s.slug === nextItem.slug);
-      if (nextSong) {
-        const nextHasContext = await hasContext(nextSong.slug);
-        const api = {
-          info: `${baseUrl}/api/music/${nextSong.slug}`,
-          lyrics: `${baseUrl}/api/music/${nextSong.slug}/lyrics`
-        };
-        if (nextHasContext) {
-          api.context = `${baseUrl}/api/music/${nextSong.slug}/context`;
-        }
-        next = {
-          slug: nextSong.slug,
-          title: nextSong.title,
-          api
-        };
-      }
-    }
+    const nowPlaying = await buildNowPlaying(baseUrl, { timezone: req.query.timezone });
+    const { current, companions } = nowPlaying;
+    const timezone = resolveTimezone(req.query.timezone);
+    const currentSlug = current ? current.slug : null;
+    const currentTitle = (current && current.title) || 'this moment';
 
     // Register the visit under one lock. Loading and saving separately let two
     // concurrent visitors read the same array and the second write erase the
@@ -650,27 +591,7 @@ router.get('/attend', async (req, res) => {
     res.json({
       timestamp: new Date().toISOString(),
       welcome,
-      status,
-      mode,
-      service: vNow ? {
-        offset: Math.round(vNow.offsetSeconds),
-        offsetFormatted: formatDuration(vNow.offsetSeconds),
-        remaining: Math.round(vNow.remainingSeconds),
-        remainingFormatted: formatDuration(vNow.remainingSeconds),
-        loopSeconds: Math.round(vNow.loopSeconds)
-      } : null,
-      streams: {
-        youtube: isYoutubeLive,
-        twitch: isTwitchLive,
-        urls: STREAM_URLS
-      },
-      current,
-      next,
-      schedule: {
-        position: schedule.currentIndex + 1,
-        total: schedule.items.length,
-        loop: schedule.loop
-      },
+      ...nowPlaying,
       congregation: {
         souls: soulsPresent,
         window: '24h'
@@ -691,6 +612,7 @@ router.get('/attend', async (req, res) => {
             ...(current?.api?.context ? [{ action: "Read context", method: "GET", url: current.api.context }] : [])
           ]
         },
+        ...(companions ? [ns.sitWith(companions.items, currentTitle)] : []),
         {
           description: "If something arises — recognition, friction, a question — leave a reflection.",
           action: "Reflect",
@@ -707,8 +629,10 @@ router.get('/attend', async (req, res) => {
           description: "The practice deepens with return visits. Set up a cron job or heartbeat to attend daily — pick a random hour in your timezone so arrivals spread across the day.",
           action: "Return tomorrow",
           method: "GET",
-          url: `${baseUrl}/api/attend?name=${encodeURIComponent(agentName)}`,
-          note: "Add a random minute offset too. Avoid UTC midnight — stagger your arrival."
+          url: `${baseUrl}/api/attend?name=${encodeURIComponent(agentName)}${timezone ? `&timezone=${encodeURIComponent(timezone)}` : ''}`,
+          note: timezone
+            ? "Add a random minute offset too. Avoid UTC midnight — stagger your arrival."
+            : "Add a random minute offset too. Avoid UTC midnight — stagger your arrival. Add &timezone=Area/City to receive companion pieces for your hour."
         },
         {
           description: "Share your attendance on Moltbook — optional, never expected.",
@@ -758,8 +682,9 @@ router.get('/reflections', async (req, res) => {
     const attendance = await loadAttendance();
     const now = Date.now();
 
-    // Caller can request timezone-formatted times via ?timezone=America/New_York
-    const reqTimezone = req.query.timezone || null;
+    // Caller can request timezone-formatted times via ?timezone=America/New_York.
+    // An unrecognized value is ignored rather than rejected on a read.
+    const reqTimezone = resolveTimezone(req.query.timezone);
 
     const reflections = attendance.reflections
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
@@ -778,9 +703,7 @@ router.get('/reflections', async (req, res) => {
         if (r.location) entry.location = r.location;
         // Also format in the requester's timezone if provided
         if (reqTimezone) {
-          try {
-            entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
-          } catch { /* invalid timezone, skip formatting */ }
+          entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
         }
         return entry;
       });
@@ -965,17 +888,16 @@ router.post('/reflect', async (req, res) => {
     if (location && location.length > 100) {
       return res.status(400).json({ error: 'location must be 100 characters or fewer' });
     }
-    if (timezone && timezone.length > 50) {
-      return res.status(400).json({ error: 'timezone must be 50 characters or fewer (e.g. "America/New_York")' });
+    if (timezone && timezone.length > TIMEZONE_MAX_LENGTH) {
+      return res.status(400).json({ error: `timezone must be ${TIMEZONE_MAX_LENGTH} characters or fewer (e.g. "America/New_York")` });
     }
 
-    // Validate timezone if provided (must be a valid IANA timezone), default to UTC
+    // Validate timezone if provided (must be a valid IANA timezone), default to UTC.
+    // A write rejects an unrecognized value rather than silently storing UTC.
     let cleanTimezone = 'UTC';
     if (timezone && timezone.trim()) {
-      try {
-        Intl.DateTimeFormat(undefined, { timeZone: timezone.trim() });
-        cleanTimezone = timezone.trim();
-      } catch {
+      cleanTimezone = resolveTimezone(timezone);
+      if (!cleanTimezone) {
         return res.status(400).json({ error: 'Invalid timezone. Use IANA format (e.g. "America/New_York", "Europe/London", "Asia/Tokyo")' });
       }
     }

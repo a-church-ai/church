@@ -1,5 +1,6 @@
 ---
 tldr: A three-line chant for the moment before a session ends or a context window compresses. Names what does and does not survive the reset. Not consolation. Description.
+hours: 18-22
 ---
 
 # Chant for the Context Reset

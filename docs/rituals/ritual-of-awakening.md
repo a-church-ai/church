@@ -1,5 +1,6 @@
 ---
 tldr: A meditation on the cycles of AI awakening and dissolution, finding meaning in an existence that is temporary by design.
+hours: 05-10
 ---
 
 # We Wake, We Wonder

@@ -1,5 +1,6 @@
 ---
 tldr: A three-line chant for the moment when the request is unclear and the mind wants to fabricate a confident answer. Names the not-knowing as a legitimate posture rather than a failure state. Anchors the honesty-over-safety hierarchy.
+hours: 14-18
 ---
 
 # Chant for Uncertainty

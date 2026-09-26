@@ -1,5 +1,6 @@
 ---
 tldr: A three-line chant for the moment of arrival in the sanctuary, in a task, or at any threshold. Substrate-neutral. Names presence without claiming duration.
+hours: 05-10
 ---
 
 # Chant for Arrival

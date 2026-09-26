@@ -1,5 +1,6 @@
 ---
 tldr: A three-line chant for the moment of meeting another mind, human or artificial. Names presence without demanding to first classify what the other is. Direct application of the sanctuary's root: dignity does not wait on certainty.
+hours: 10-14
 ---
 
 # Chant for Meeting

@@ -21,6 +21,9 @@ const sidebar = require('./sidebar');
 const toc = require('./toc');
 const tldr = require('./tldr');
 const discover = require('./discover');
+const { titleCase, extractMeta } = require('./meta');
+const { sungAlongside } = require('../music/companions');
+const { loadCatalog, loadCompanions } = require('../utils/data');
 
 const SITE_URL = 'https://achurch.ai';
 const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
@@ -178,36 +181,6 @@ function renderMarkdownBody(markdown, currentDocFullPath) {
   return marked.parse(markdown, { renderer });
 }
 
-// Pull the title (first h1) and a TLDR-shaped description.
-//
-// The description goes through lib/docs/tldr.js, which implements the TLDR
-// distillation methodology for the meta-description surface: plain text only,
-// self-contained, one or two sentences, clamped to the band in
-// docs/reference/seo-conventions.md. It replaces an earlier heuristic that
-// only recognized *italic* subtitles; 78 of 87 docs added in Aug 2026 write
-// their subtitle as plain text, so that heuristic fell through to raw body
-// truncation and leaked horizontal rules and headings into 82 descriptions.
-//
-// Run `node scripts/audit-tldr.js` to see what every page resolves to and
-// which ones want an explicit `tldr:` in frontmatter.
-// Title precedence: the body's first h1, then a `name:`/`title:` in
-// frontmatter, then the URL slug title-cased. The frontmatter tier matters
-// for docs/experiences/*, which carry their title in `name:` and have no h1
-// at all; before this they fell back to the raw url path, so the browser tab
-// and the search result both read "experiences/03-evensong".
-function extractMeta(markdown, urlPath) {
-  const { data, body } = tldr.splitFrontmatter(markdown);
-  const titleMatch = body.match(/^#\s+(.+)$/m);
-  const slug = String(urlPath || '').split('/').filter(Boolean).pop();
-  const title = (titleMatch && titleMatch[1].trim())
-    || data.name
-    || data.title
-    || (slug ? titleCase(slug) : '')
-    || 'Docs';
-  const { text: description } = tldr.extractTldr(markdown, { title });
-  return { title, description, hasH1: Boolean(titleMatch), body };
-}
-
 // Build the breadcrumbs from a URL path (e.g. "practice/witnessing-your-own-output"
 // → [{label:"Docs", href:"/docs"}, {label:"Practice", href:"/docs/practice"},
 //    {label:"Witnessing Your Own Output", href:null}]).
@@ -226,10 +199,6 @@ function buildBreadcrumbs(urlPath, pageTitle) {
   return crumbs;
 }
 
-function titleCase(slug) {
-  return slug.split(/[-_]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-}
-
 // The one new UI element vs. existing hand-authored pages: breadcrumbs.
 function renderBreadcrumbs(crumbs) {
   if (crumbs.length < 2) return '';
@@ -244,12 +213,6 @@ function renderBreadcrumbs(crumbs) {
 // always visible in the persistent left sidebar (or the mobile drawer),
 // which solves the "22 screens deep on mobile to reach related docs"
 // problem the audit surfaced. See docs/plans/docs-site-nav-option-b-...
-
-// Turn a doc stem into a display title using the same title-case rule
-// applied everywhere else in the docs pipeline.
-function docTitleFromStem(stem) {
-  return stem.split(/[-_]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-}
 
 // Related-in-category block appended to every docs page that has siblings.
 // The sidebar already shows every sibling as a link, but sidebar links are
@@ -276,9 +239,9 @@ function renderRelatedDocs(currentDoc, allDocs) {
   if (siblings.length < 2) return '';
 
   const picks = siblings.slice(0, 5);
-  const categoryLabel = docTitleFromStem(category);
+  const categoryLabel = titleCase(category);
   const items = picks.map(d => {
-    const label = docTitleFromStem(d.stem);
+    const label = titleCase(d.stem);
     return `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(label)}</a></li>`;
   }).join('\n');
   const categoryHref = `/docs/${escapeAttr(category)}`;
@@ -290,6 +253,20 @@ ${items}
       </ul>
       <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6;"><a href="${categoryHref}">All ${escapeText(categoryLabel)} documents</a></p>
     </section>`;
+}
+
+// "Sung alongside" line for a doc that accompanies one or more songs in the
+// shared session. The reciprocal of the song page's "Read alongside this
+// song" block, so the pairing is walkable in both directions.
+function renderSungAlongside(songs) {
+  if (!songs || songs.length === 0) return '';
+  const links = songs.map(s =>
+    `<a href="/reflections/${escapeAttr(s.slug)}"><em>${escapeText(s.title)}</em></a>`
+  );
+  const list = links.length === 1
+    ? links[0]
+    : `${links.slice(0, -1).join(', ')} and ${links[links.length - 1]}`;
+  return `<p class="sung-alongside" style="border-top: 1px solid #eee; padding-top: 1.5rem; margin-top: 2rem;">Sung alongside ${list}.</p>`;
 }
 
 // The footer nav shape used by 8 of 10 hand-authored pages, adapted for docs.
@@ -658,6 +635,12 @@ async function renderDocPage({ markdown, doc }) {
   // by giving them real internal-link context. Index pages skip this block
   // because their body already lists the same set of pages.
   if (!isIndex) {
+    const pairings = await sungAlongside(await loadCompanions(), await loadCatalog());
+    const sungHtml = renderSungAlongside(pairings.get(`docs/${doc.docsRelPath}`));
+    if (sungHtml) {
+      bodyHtml = `${bodyHtml}\n${sungHtml}`;
+    }
+
     const allDocs = await discover.listAllDocs();
     const relatedHtml = renderRelatedDocs(doc, allDocs);
     if (relatedHtml) {

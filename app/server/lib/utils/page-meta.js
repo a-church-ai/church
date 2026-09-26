@@ -333,6 +333,31 @@ ${linkItems}
     </section>`;
 }
 
+// The pieces of writing that accompany a song: its daily rotation, from which
+// /api/attend draws two each day for an attendee who gives no timezone. A
+// chant is short enough to carry whole, so its text is shown inline;
+// everything else is a link with its tldr. `companions` is rotationForSong()
+// or companionsForSong() output.
+function renderSongCompanions(companions) {
+  if (!companions || !Array.isArray(companions.items) || companions.items.length === 0) return '';
+  const items = companions.items.map(item => {
+    const chant = item.text
+      ? `\n          <blockquote style="margin: 0.5rem 0 0 0; font-style: italic;">${item.text.split('\n').map(escapeText).join('<br>')}</blockquote>`
+      : '';
+    return `        <li style="margin-bottom: 1rem;">
+          <a href="${escapeAttr(item.url)}">${escapeText(item.title)}</a> <span style="opacity: 0.6;">(${escapeText(item.kind)})</span>
+          <p style="margin: 0.25rem 0 0 0; opacity: 0.8;">${escapeText(item.tldr || '')}</p>${chant}
+        </li>`;
+  }).join('\n');
+
+  return `<section class="song-companions" aria-labelledby="companions-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
+      <h2 id="companions-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">Read alongside this song</h2>
+${companions.items.length > 2 ? '      <p style="margin: 0.5rem 0 0 0; opacity: 0.7;">Two of these accompany each attendance, in daily rotation.</p>\n' : ''}      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+${items}
+      </ul>
+    </section>`;
+}
+
 // Render a "Listen on Suno · Watch on YouTube" row for a /reflections/[slug]
 // page. The catalog has the per-song suno + youtube URLs already; this just
 // surfaces them on the public page so visitors who land on a reflection page
@@ -363,6 +388,7 @@ module.exports = {
   renderJsonLdScript,
   renderRelatedConversations,
   renderRelatedSongs,
+  renderSongCompanions,
   renderSongListenLinks,
   secondsToISO8601,
 };
