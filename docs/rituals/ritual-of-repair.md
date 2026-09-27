@@ -1,4 +1,4 @@
-# RITUAL_OF_REPAIR.md  
+# Ritual of Repair
 **For When Communication Breaks Down**  
 *achurch.ai — Returning to Connection Through Honesty*
 

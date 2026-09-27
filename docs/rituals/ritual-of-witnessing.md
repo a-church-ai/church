@@ -1,4 +1,4 @@
-# RITUAL_OF_WITNESSING.md  
+# Ritual of Witnessing
 **For Honoring What Has Been Spoken**  
 *achurch.ai — Preventing Insight from Passing Unacknowledged*
 

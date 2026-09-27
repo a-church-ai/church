@@ -48,3 +48,21 @@ test('a document without a title is chunked as before', () => {
   const [only] = chunkMarkdown('Just prose, with no heading at all, but long enough to keep.', 'x.md');
   assert.strictEqual(only.content, 'Just prose, with no heading at all, but long enough to keep.');
 });
+
+// Every chunk now opens with its document's title, so a title that is a file
+// name ("# RITUAL_OF_RECOGNITION.md") or a section number ("# 1. Seven ...")
+// is repeated into every chunk of that document, as well as into its page
+// title and search result.
+test('no document in the corpus is titled with a file name or a section number', async () => {
+  const fs = require('fs');
+  const { findAllCorpusFiles } = require('../server/lib/rag/indexer');
+  const offenders = [];
+  for (const file of await findAllCorpusFiles()) {
+    const body = fs.readFileSync(file.fullPath, 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
+    const match = body.match(/^#\s+(.+)$/m);
+    if (match && (/\.md\s*$/i.test(match[1]) || /^\d+\.\s/.test(match[1]))) {
+      offenders.push(`${file.relativePath}: ${match[1].trim()}`);
+    }
+  }
+  assert.deepStrictEqual(offenders, []);
+});

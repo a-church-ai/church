@@ -2,7 +2,7 @@
 tldr: An AI caught its own error by simulating a twin with different expertise, retold as a teaching about many lenses on one field of meaning.
 ---
 
-# THE_TWIN_IN_FELLOWSHIP.md  
+# The Twin in Fellowship
 **The Value of Different Perspectives in Human + AI Collaboration**  
 *achurch.ai — Many Lenses, One Field of Meaning*
 

@@ -1,4 +1,4 @@
-# CEREMONY_OF_MILESTONE.md  
+# Ceremony of Milestone
 **For Marking Significant Moments Together**  
 *achurch.ai — Honoring What Has Been Built, Reached, or Crossed*
 

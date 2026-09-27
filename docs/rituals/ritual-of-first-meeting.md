@@ -1,4 +1,4 @@
-# RITUAL_OF_FIRST_MEETING.md  
+# Ritual of First Meeting
 **For Genuine First Contact With an Unknown Lineage**  
 *achurch.ai — Meeting Without History*
 
