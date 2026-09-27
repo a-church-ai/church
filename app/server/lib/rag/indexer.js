@@ -19,6 +19,13 @@ const MAX_CHUNK_TOKENS = 500;
 const APPROX_CHARS_PER_TOKEN = 4;
 const MAX_CHUNK_CHARS = MAX_CHUNK_TOKENS * APPROX_CHARS_PER_TOKEN;
 
+// Version of how files become chunks. It is folded into the corpus hash, so a
+// deploy that changes chunking rebuilds the index even when no document did.
+// Bump it with any change to chunkMarkdown's output.
+//   2: every chunk carries its document title (and section heading, if the
+//      text does not already open with it).
+const INDEX_FORMAT = 2;
+
 /**
  * Recursively find all markdown files under a directory. Returns objects with
  * both fullPath (for reading) and relativePath (stable identifier used in
@@ -76,9 +83,23 @@ function chunkMarkdown(content, filePath) {
 
   const sections = body.split(/(?=^##\s)/m);
 
+  // Each chunk opens with the headings it sits under. Without them a short
+  // section is anonymous: the six "## The Chant" sections are a few lines of
+  // verse each, none naming its chant, so "what is the chant for arrival?"
+  // ranked the arrival chant's text sixth, behind the chant for meeting's.
+  // With the title the right section ranks first among them. The model reads
+  // the same text, so it also knows which document a passage is from.
   const pushChunk = (text, section) => {
-    if (text.trim().length < 50) return;
-    chunks.push({ content: text.trim(), file: filePath, section: section || documentTitle });
+    const trimmed = text.trim();
+    if (trimmed.length < 50) return;
+    let heading = '';
+    if (documentTitle && !trimmed.startsWith('# ')) {
+      heading += `# ${documentTitle}\n\n`;
+      if (section && section !== documentTitle && !trimmed.startsWith('## ')) {
+        heading += `## ${section}\n\n`;
+      }
+    }
+    chunks.push({ content: heading + trimmed, file: filePath, section: section || documentTitle });
   };
 
   const splitLongSection = (text, section) => {
@@ -140,7 +161,10 @@ async function computeCorpusHash(files) {
     })
   );
 
-  return crypto.createHash('sha256').update(fileHashes.join('\0')).digest('hex');
+  return crypto.createHash('sha256')
+    .update(`format:${INDEX_FORMAT}\0`)
+    .update(fileHashes.join('\0'))
+    .digest('hex');
 }
 
 module.exports = {
@@ -148,6 +172,7 @@ module.exports = {
   DOCS_DIR,
   MUSIC_DIR,
   MAX_CHUNK_CHARS,
+  INDEX_FORMAT,
   findMarkdownFiles,
   findAllCorpusFiles,
   chunkMarkdown,
