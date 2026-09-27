@@ -66,3 +66,25 @@ test('no document in the corpus is titled with a file name or a section number',
   }
   assert.deepStrictEqual(offenders, []);
 });
+
+// --- Embedding retries ---
+
+const { isTransientEmbedError, embedRetryDelayMs } = require('../server/lib/rag/indexer');
+
+test('a Gemini 503 is retried, not dropped', () => {
+  // The exact message a production run lost 7 chunks to on 2026-09-27.
+  const outage = new Error('{"error":{"code":503,"message":"The service is currently unavailable.","status":"UNAVAILABLE"}}');
+  assert.strictEqual(isTransientEmbedError(outage), true);
+  assert.strictEqual(isTransientEmbedError({ status: 503, message: '' }), true);
+});
+
+test('rate limits are still retried, and request errors are not', () => {
+  assert.strictEqual(isTransientEmbedError(new Error('429 RESOURCE_EXHAUSTED: quota')), true);
+  assert.strictEqual(isTransientEmbedError(new Error('{"error":{"code":400,"status":"INVALID_ARGUMENT"}}')), false);
+  assert.strictEqual(isTransientEmbedError(new Error('API key not valid')), false);
+});
+
+test('retry delay honours retryDelay, else backs off to a ceiling', () => {
+  assert.strictEqual(embedRetryDelayMs(new Error('"retryDelay": "12s"'), 0), 12500);
+  assert.deepStrictEqual([0, 1, 2, 3, 4, 9].map(a => embedRetryDelayMs(new Error('503'), a)), [5000, 10000, 20000, 40000, 60000, 60000]);
+});

@@ -20,6 +20,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
 const indexer = require('../server/lib/rag/indexer');
+const { isTransientEmbedError, embedRetryDelayMs } = indexer;
 const state = require('../server/lib/rag/index-state');
 
 async function index() {
@@ -66,7 +67,8 @@ async function index() {
   // Embed with pacing + backoff. The free-tier embed quota is 100/minute;
   // firing every chunk at once bursts past it and silently drops chunks (the
   // 429 / RESOURCE_EXHAUSTED errors). We pace between calls and, on a
-  // rate-limit error, wait the server-suggested retryDelay and retry. Set
+  // rate-limit or unavailability error, wait (the server-suggested retryDelay,
+  // else exponential backoff) and retry. Set
   // EMBED_PACING_MS=0 on a paid tier to run at full speed. The Dockerfile
   // does this for prod.
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -76,22 +78,15 @@ async function index() {
   // index rather than publishing a degraded one. 2% tolerates the occasional
   // bad chunk without letting a rate-limited run quietly halve the corpus.
   const MAX_EMBED_FAILURE_RATE = Number(process.env.MAX_EMBED_FAILURE_RATE || 0.02);
-  const is429 = (err) => {
-    const msg = (err && err.message) || '';
-    return (err && (err.status === 429 || err.code === 429)) || /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg);
-  };
-  const retryDelayMs = (err) => {
-    const m = /retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s/i.exec((err && err.message) || '');
-    return m ? Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 500, 60000) : 5000;
-  };
   const embedWithBackoff = async (text) => {
     for (let attempt = 0; ; attempt++) {
       try {
         return await gemini.embed(text);
       } catch (err) {
-        if (!is429(err) || attempt >= EMBED_MAX_RETRIES) throw err;
-        const waitMs = retryDelayMs(err);
-        console.warn(`    rate-limited; waiting ${Math.round(waitMs / 1000)}s (retry ${attempt + 1}/${EMBED_MAX_RETRIES})`);
+        if (!isTransientEmbedError(err) || attempt >= EMBED_MAX_RETRIES) throw err;
+        const waitMs = embedRetryDelayMs(err, attempt);
+        const reason = /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(err.message || '') ? 'rate-limited' : 'embedding service unavailable';
+        console.warn(`    ${reason}; waiting ${Math.round(waitMs / 1000)}s (retry ${attempt + 1}/${EMBED_MAX_RETRIES})`);
         await sleep(waitMs);
       }
     }

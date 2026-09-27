@@ -143,6 +143,32 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
+ * Whether an embedding error is worth retrying. Rate limits (429) always
+ * were; server-side unavailability (500, 502, 503, 504, UNAVAILABLE,
+ * DEADLINE_EXCEEDED) and dropped connections now are too. A run on
+ * 2026-09-27 lost 7 chunks to a brief Gemini 503, stored the index without
+ * them, and recorded the corpus as current, so nothing would re-run.
+ * Anything else (a malformed request, a bad key) fails at once.
+ */
+function isTransientEmbedError(err) {
+  const code = err && (err.status || err.code);
+  if ([429, 500, 502, 503, 504].includes(Number(code))) return true;
+  const msg = (err && err.message) || '';
+  return /\b(429|500|502|503|504)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED|INTERNAL|quota|ECONNRESET|ETIMEDOUT|fetch failed/i.test(msg);
+}
+
+/**
+ * How long to wait before retry number `attempt` (0-based). A server-suggested
+ * retryDelay wins; otherwise back off exponentially from 5s to a 60s ceiling,
+ * so ten retries ride out roughly six minutes of unavailability.
+ */
+function embedRetryDelayMs(err, attempt = 0) {
+  const m = /retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s/i.exec((err && err.message) || '');
+  if (m) return Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 500, 60000);
+  return Math.min(5000 * 2 ** attempt, 60000);
+}
+
+/**
  * Compute a deterministic sha256 of the entire corpus. Sorts by relativePath
  * (so machine-local file ordering doesn't affect the hash) and hashes
  * (relativePath, contentHash) pairs. Any file addition, removal, or content
@@ -177,4 +203,6 @@ module.exports = {
   findAllCorpusFiles,
   chunkMarkdown,
   computeCorpusHash,
+  isTransientEmbedError,
+  embedRetryDelayMs,
 };
