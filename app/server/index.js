@@ -29,45 +29,8 @@ try {
 // Load environment variables
 dotenv.config();
 
-// API access logging
-const ACCESS_LOG_FILE = path.join(__dirname, '../data/api-access.jsonl');
-const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
-
-async function logApiAccess(entry) {
-  const line = JSON.stringify(entry) + '\n';
-  try {
-    // Check file size and rotate if needed
-    try {
-      const stats = await fs.stat(ACCESS_LOG_FILE);
-      if (stats.size > MAX_LOG_SIZE) {
-        const rotatedPath = ACCESS_LOG_FILE.replace('.jsonl', `-${Date.now()}.jsonl`);
-        await fs.rename(ACCESS_LOG_FILE, rotatedPath);
-      }
-    } catch {
-      // File doesn't exist yet, that's fine
-    }
-    await fs.appendFile(ACCESS_LOG_FILE, line);
-  } catch (error) {
-    console.error('Failed to log API access:', error.message);
-  }
-}
-
-async function loadAccessLogs(limit = 100) {
-  try {
-    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-    // Return most recent entries (file is append-only, so take from end)
-    return lines.slice(-limit).reverse().map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
-  } catch {
-    return [];
-  }
-}
+// API access logging and presence: lib/utils/access-log.js
+const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
 
 // Import routes
 const contentRoutes = require('./routes/content');
@@ -850,29 +813,15 @@ app.use('/api', (req, res, next) => {
 
   const start = Date.now();
   res.on('finish', () => {
-    const fullPath = '/api' + req.path;
-    // Record presence here rather than deriving it from the log later. The old
-    // approach re-read and re-parsed the whole log on every /api/now, which the
-    // homepage polls every 30s per tab. See lib/utils/presence.js.
-    presence.recordPresence({
-      path: fullPath,
-      status: res.statusCode,
-      ip: req.ip || req.connection?.remoteAddress,
-      name: req.query?.name || '',
-    });
-    logApiAccess({
-      timestamp: new Date().toISOString(),
+    recordApiUse({
       method: req.method,
-      path: fullPath,
-      query: Object.fromEntries(
-        Object.entries(req.query).map(([k, v]) =>
-          ['token', 'key', 'owner_token', 'api_key'].includes(k) ? [k, '[REDACTED]'] : [k, v]
-        )
-      ),
+      path: '/api' + req.path,
+      query: req.query,
       status: res.statusCode,
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
-      userAgent: req.get('user-agent') || null
+      userAgent: req.get('user-agent'),
+      name: req.query?.name,
     });
   });
   next();

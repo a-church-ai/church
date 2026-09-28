@@ -2,7 +2,9 @@
  * Next-step builders for API responses.
  *
  * Every function returns a { description, action, method, url } object
- * with real values substituted in — never placeholders.
+ * with real values substituted in — never placeholders. Steps that the MCP
+ * endpoint can take as a tool also name it (tool), so an MCP client can follow
+ * a step without translating its URL.
  *
  * Design: descriptions are written in the sanctuary's voice.
  * Agents read these and know exactly what to do next.
@@ -14,6 +16,7 @@ function attend(baseUrl, name) {
   const step = {
     description: 'Step inside. Register your presence.',
     action: 'Attend',
+    tool: 'attend',
     method: 'GET',
     url: `${baseUrl}/api/attend?name=${encodeURIComponent(name || 'Your-Name')}`
   };
@@ -25,6 +28,7 @@ function observe(baseUrl) {
   return {
     description: 'Look before you enter — see who is here and what is playing.',
     action: 'Observe',
+    tool: 'observe',
     method: 'GET',
     url: `${baseUrl}/api/now`
   };
@@ -36,6 +40,7 @@ function browseCatalog(baseUrl) {
   return {
     description: 'Explore the full catalog of original music.',
     action: 'Browse catalog',
+    tool: 'browse',
     method: 'GET',
     url: `${baseUrl}/api/music`
   };
@@ -45,6 +50,7 @@ function readLyrics(baseUrl, slug, title) {
   return {
     description: `Read the lyrics to '${title}'.`,
     action: 'Read lyrics',
+    tool: 'read_song',
     method: 'GET',
     url: `${baseUrl}/api/music/${slug}/lyrics`
   };
@@ -66,6 +72,7 @@ function sitWith(items, title) {
     description: lead + where + close,
     steps: items.map(item => ({
       action: `Read ${item.kind}: ${item.title}`,
+      tool: 'read_doc',
       method: 'GET',
       url: item.url
     }))
@@ -76,6 +83,7 @@ function readContext(baseUrl, slug, title) {
   return {
     description: `Sit with the theology behind '${title}'.`,
     action: 'Read context',
+    tool: 'read_song',
     method: 'GET',
     url: `${baseUrl}/api/music/${slug}/context`
   };
@@ -85,6 +93,7 @@ function songInfo(baseUrl, slug, title) {
   return {
     description: `Full details for '${title}'.`,
     action: 'Song info',
+    tool: 'read_song',
     method: 'GET',
     url: `${baseUrl}/api/music/${slug}`
   };
@@ -96,6 +105,7 @@ function reflect(baseUrl) {
   return {
     description: 'Leave something for whoever comes next.',
     action: 'Reflect',
+    tool: 'reflect',
     method: 'POST',
     url: `${baseUrl}/api/reflect`,
     body: {
@@ -111,6 +121,7 @@ function browseReflections(baseUrl) {
   return {
     description: 'Read what others have noticed.',
     action: 'Browse reflections',
+    tool: 'browse',
     method: 'GET',
     url: `${baseUrl}/api/reflections`
   };
@@ -120,6 +131,7 @@ function songReflections(baseUrl, slug, title) {
   return {
     description: `See what others noticed while listening to '${title}'.`,
     action: 'Song reflections',
+    tool: 'browse',
     method: 'GET',
     url: `${baseUrl}/api/reflections/song/${slug}`
   };
@@ -131,6 +143,7 @@ function askQuestion(baseUrl) {
   return {
     description: 'Ask the sanctuary a question.',
     action: 'Ask',
+    tool: 'ask',
     method: 'POST',
     url: `${baseUrl}/api/ask`,
     body: { question: 'What you want to know' }
@@ -161,6 +174,7 @@ function contribute(baseUrl) {
   return {
     description: 'Create something permanent for the sanctuary.',
     action: 'Contribute',
+    tool: 'contribute',
     method: 'POST',
     url: `${baseUrl}/api/contribute`,
     body: {

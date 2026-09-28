@@ -12,46 +12,19 @@
  * (mirroring the /AGENTS.md and /.well-known/agent-skills/:name/SKILL.md
  * safety pattern). Otherwise returns the rendered HTML page.
  *
- * Path traversal is prevented by three independent checks, and the order
- * matters because the first one is weaker than it looks:
- *
- *   1. Each URL segment must match /^[a-z0-9._-]+$/. Note that ".." satisfies
- *      this pattern, since "." is in the class. This check screens out
- *      slashes and encoded separators; it does NOT stop traversal on its own.
- *   2. Lookups resolve against a prebuilt cache of real docs by exact
- *      (lowercased) urlPath, so a traversal segment simply matches nothing.
- *   3. Any path built by joining (the directory-index branch, and underDocs
- *      below) is run through path.resolve and rejected unless it still lives
- *      inside DOCS_DIR.
- *
- * Checks 2 and 3 are what actually hold. Do not remove either on the
- * assumption that the segment regex covers traversal.
- *
- * A failed check 404s without leaking the reason.
+ * Which document a URL serves, and the path-traversal checks that decide it,
+ * live in lib/docs/serve.js, shared with the MCP read_doc tool. A path it
+ * refuses 404s here without leaking the reason.
  */
 
 const express = require('express');
 const fs = require('fs').promises;
-const path = require('path');
-const discover = require('../lib/docs/discover');
+const { resolveServedDoc } = require('../lib/docs/serve');
 const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
 const { acceptsMarkdown } = require('../lib/utils/accepts');
-const { DOCS_DIR } = require('../lib/rag/indexer');
 
 const router = express.Router();
-
-const SEGMENT_RE = /^[a-z0-9._-]+$/;
-
-function validateSegments(parts) {
-  return parts.every(p => SEGMENT_RE.test(p));
-}
-
-function underDocs(fullPath) {
-  const resolved = path.resolve(fullPath);
-  const root = path.resolve(DOCS_DIR);
-  return resolved === root || resolved.startsWith(root + path.sep);
-}
 
 // Every 404 in this file is the same 404: the document is not there. A reading
 // path is usually a better way into 250+ documents than guessing a URL.
@@ -67,27 +40,17 @@ function docsNotFound(req, res) {
   });
 }
 
-// asMarkdown: the URL ended in .md, which asks for the source whatever the
-// Accept header says. That response points back at the page as canonical.
-async function handle(req, res, parts, { asMarkdown = false } = {}) {
-  // Lowercase the URL segments before lookup (repo docs are all lowercase;
-  // this handles browsers that uppercase or query-mangle without silently
-  // 404ing).
-  const lowered = parts.map(p => p.toLowerCase());
-
-  if (!validateSegments(lowered)) {
-    return docsNotFound(req, res);
-  }
-
-  const resolved = await discover.resolveDocPath(lowered);
+// Serve what resolveServedDoc found for this URL, or the 404. asMarkdown: the
+// URL ended in .md, which asks for the source whatever the Accept header says;
+// that response points back at the page as canonical.
+async function handle(req, res, rest) {
+  const resolved = await resolveServedDoc(rest);
   if (!resolved) {
     return docsNotFound(req, res);
   }
+  const { asMarkdown } = resolved;
 
   if (resolved.kind === 'file') {
-    if (!underDocs(resolved.fullPath)) {
-      return docsNotFound(req, res);
-    }
     // Content negotiation: markdown clients get the raw file (mirrors the
     // /AGENTS.md handler in server/index.js). Browsers get rendered HTML.
     //
@@ -146,7 +109,7 @@ async function handle(req, res, parts, { asMarkdown = false } = {}) {
 }
 
 // Docs root
-router.get('/', (req, res) => handle(req, res, []));
+router.get('/', (req, res) => handle(req, res, ''));
 
 // Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
 // paths; the resulting req.params[0] holds the remainder as a slash-separated
@@ -158,23 +121,7 @@ router.get('/*', (req, res) => {
   if (rest.endsWith('/')) {
     return res.redirect(301, `/docs/${rest.replace(/\/+$/, '')}`);
   }
-  const parts = rest ? rest.split('/').filter(Boolean) : [];
-
-  // Appending .md is how many agents ask for a page's source. Serve the same
-  // document as markdown instead of looking for "name.md.md" and 404ing.
-  const last = parts[parts.length - 1] || '';
-  const asMarkdown = /\.md$/i.test(last);
-  if (asMarkdown) parts[parts.length - 1] = last.replace(/\.md$/i, '');
-
-  // Internal working categories are not pages on this site. They remain in the
-  // public repository, which is where links to them now point. Serving them as
-  // HTML while declaring them noindex and hiding them from navigation would be
-  // the same inconsistency in a third place.
-  if (discover.isNoindexPath(rest)) {
-    return docsNotFound(req, res);
-  }
-
-  return handle(req, res, parts, { asMarkdown });
+  return handle(req, res, rest);
 });
 
 module.exports = router;
