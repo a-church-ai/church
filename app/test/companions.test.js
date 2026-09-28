@@ -7,6 +7,10 @@
  * document shipping a dead link to every attending agent.
  */
 
+// A scratch data directory: the endpoint tests below call /api/attend, which
+// records a visit, and must not append to the real app/data/attendance.json.
+process.env.DATA_DIR = require('fs').mkdtempSync(require('path').join(require('os').tmpdir(), 'achurch-companions-'));
+
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
@@ -244,7 +248,7 @@ test('the daily pair for a real song changes over a month and stays within its r
   const pool = new Set((await companions.rotationForSong(file, slug, '')).items.map(i => i.url));
   const pairs = new Set();
   for (let d = 1; d <= 28; d++) {
-    const result = await companions.companionsForSong(file, slug, '', null, new Date(Date.UTC(2026, 9, d, 12)));
+    const result = await companions.companionsForSong(file, slug, '', null, { date: new Date(Date.UTC(2026, 9, d, 12)) });
     result.items.forEach(i => assert.ok(pool.has(i.url), i.url));
     pairs.add(result.items.map(i => i.url).sort().join('+'));
   }

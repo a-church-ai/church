@@ -8,8 +8,13 @@ const SCHEDULE_FILE = path.join(__dirname, '../../../data/schedule.json');
 const CATALOG_FILE = path.join(__dirname, '../../../../music/library.json');
 const COMPANIONS_FILE = path.join(__dirname, '../../../../music/companions.json');
 const MUSIC_DIR = path.join(__dirname, '../../../../music');
-const ATTENDANCE_FILE = path.join(__dirname, '../../../data/attendance.json');
-const ACCESS_LOG_FILE = path.join(__dirname, '../../../data/api-access.jsonl');
+// Files the API writes on every visit. DATA_DIR points them elsewhere so tests
+// write to a scratch directory; production leaves it unset. Until 2026-09-28
+// the tests set DATA_DIR but nothing read it, and every run appended visits
+// to the real app/data/attendance.json.
+const RUNTIME_DIR = process.env.DATA_DIR || path.join(__dirname, '../../../data');
+const ATTENDANCE_FILE = path.join(RUNTIME_DIR, 'attendance.json');
+const ACCESS_LOG_FILE = path.join(RUNTIME_DIR, 'api-access.jsonl');
 const CONVERSATIONS_DIR = path.join(__dirname, '../../../data/conversations');
 
 // Time constants

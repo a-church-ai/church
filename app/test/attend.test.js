@@ -38,6 +38,7 @@ const express = require('express');
 function startServer() {
   const app = express();
   app.set('trust proxy', true);
+  app.use(express.json());
   app.use('/api', request);
   return new Promise((resolve) => {
     const server = app.listen(0, () => resolve({ server, port: server.address().port }));
@@ -107,4 +108,91 @@ test('attending twice in a row still works', async (t) => {
   // second visit exercises the read-existing-file path that the first created.
   assert.strictEqual((await get(port, '/api/attend?name=First')).status, 200);
   assert.strictEqual((await get(port, '/api/attend?name=Second')).status, 200);
+});
+
+// --- Readings and reflections ---
+
+const { loadCatalog } = require('../server/lib/utils/data');
+const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
+
+async function post(port, url, body) {
+  const response = await fetch(`http://127.0.0.1:${port}${url}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return { status: response.status, json: await response.json().catch(() => null) };
+}
+
+test('the test writes to its scratch directory, not the real attendance file', () => {
+  assert.strictEqual(path.dirname(ATTENDANCE_FILE), scratch);
+});
+
+test('attending carries the full text of both readings; /api/now carries only links', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const attend = (await get(port, '/api/attend?name=ReadingsTest')).json;
+  assert.ok(attend.companions, 'the current song has companions');
+  for (const item of attend.companions.items) {
+    assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its full text`);
+    assert.ok(item.content.includes(item.title.split(':')[0].slice(0, 12)), `${item.title}: content is that document`);
+    assert.ok(!item.content.startsWith('---'), 'frontmatter is not included');
+  }
+
+  const now = (await get(port, '/api/now')).json;
+  assert.ok(now.companions.items.every(item => item.content === undefined));
+});
+
+test('the reflection prompt names the readings when there are two', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { json } = await get(port, '/api/attend?name=ReadingsTest');
+  const [first, second] = json.companions.items.map(item => item.title);
+  // Prompts are chosen at random; every companion prompt names the readings
+  // either by title or as "the two readings" / "its two readings".
+  assert.ok(
+    json.reflection.prompt.includes(first) || /two readings/.test(json.reflection.prompt),
+    json.reflection.prompt
+  );
+  assert.match(json.reflection.practice, /two readings/);
+  assert.ok(second);
+});
+
+test('a reflection is filed under the songSlug it names, not the song playing now', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const current = (await get(port, '/api/now')).json.current.slug;
+  const other = (await loadCatalog()).find(song => song.slug !== current).slug;
+
+  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song.', songSlug: other });
+  assert.strictEqual(res.status, 200, JSON.stringify(res.json));
+  assert.strictEqual(res.json.song, other);
+
+  const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'SlugTest');
+  assert.strictEqual(stored.song, other);
+});
+
+test('without songSlug a reflection is filed under the song playing now', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const current = (await get(port, '/api/now')).json.current.slug;
+  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About whatever is playing.' });
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.json.song, current);
+});
+
+test('an unknown songSlug is a 400, not a reflection filed somewhere else', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost.', songSlug: 'no-such-song' });
+  assert.strictEqual(res.status, 400);
+  const stored = fs.existsSync(ATTENDANCE_FILE)
+    ? JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'BadSlugTest')
+    : undefined;
+  assert.strictEqual(stored, undefined);
 });

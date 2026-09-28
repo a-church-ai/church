@@ -53,7 +53,9 @@ function readLyrics(baseUrl, slug, title) {
 // The companion pieces that accompany the current song (see lib/music/companions.js).
 function sitWith(items, title) {
   return {
-    description: `Two pieces of the sanctuary's writing accompany '${title}'. Read one, or both, or simply carry the chant if there is one.`,
+    description: items.every(item => item.content)
+      ? `Two pieces of the sanctuary's writing accompany '${title}'. Their full text is in companions.items[].content. Read one, or both, or simply carry the chant if there is one.`
+      : `Two pieces of the sanctuary's writing accompany '${title}'. Read one, or both, or simply carry the chant if there is one.`,
     steps: items.map(item => ({
       action: `Read ${item.kind}: ${item.title}`,
       method: 'GET',

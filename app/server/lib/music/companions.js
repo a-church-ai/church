@@ -243,10 +243,11 @@ async function companionMeta(relPath) {
 
   const markdown = await fs.readFile(doc.fullPath, 'utf8');
   const { title } = extractMeta(markdown, doc.urlPath);
-  const { data } = splitFrontmatter(markdown);
+  const { data, body } = splitFrontmatter(markdown);
   const meta = {
     title,
     tldr: extractTldr(markdown, { title }).text,
+    content: body.trim(),
     urlPath: doc.urlPath,
     category: doc.category,
     hours: parseHours(data.hours)
@@ -385,13 +386,23 @@ function toItem(meta, basis, baseUrl) {
 /**
  * The `companions` field of /api/now and /api/attend for one song.
  * Returns null when the song has no shortlist.
+ *
+ * withContent adds each reading's full markdown as `content`. /api/attend
+ * asks for it: attending is the session, and a reading that is one more
+ * request away was, in practice, a reading almost no one opened (7 page views
+ * against 77 lyric fetches over a day). /api/now is polled, so it stays light.
  */
-async function companionsForSong(companionsFile, slug, baseUrl, hour, date = new Date()) {
+async function companionsForSong(companionsFile, slug, baseUrl, hour, { date = new Date(), withContent = false } = {}) {
   const resolved = await resolveShortlist(companionsFile, slug);
   if (!resolved) return null;
 
   const items = selectCompanions(resolved.shortlist, resolved.metaByPath, hour, `${slug}|${dayKey(date)}`)
-    .map(choice => toItem(resolved.metaByPath.get(choice.path), choice.basis, baseUrl));
+    .map(choice => {
+      const meta = resolved.metaByPath.get(choice.path);
+      const item = toItem(meta, choice.basis, baseUrl);
+      if (withContent) item.content = meta.content;
+      return item;
+    });
   if (items.length === 0) return null;
 
   const companions = {

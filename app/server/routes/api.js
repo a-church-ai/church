@@ -114,7 +114,7 @@ async function songApiLinks(baseUrl, slug) {
 // The service moves on a virtual clock, a pure function of wall-clock time, so
 // the liturgy keeps cycling even when nothing is being broadcast. The pointer
 // is advanced in memory only; neither endpoint writes the schedule back.
-async function buildNowPlaying(baseUrl, { timezone } = {}) {
+async function buildNowPlaying(baseUrl, { timezone, withContent = false } = {}) {
   const schedule = await loadSchedule();
   const catalog = await loadCatalog();
 
@@ -145,7 +145,7 @@ async function buildNowPlaying(baseUrl, { timezone } = {}) {
   // local hour when they supplied a timezone. See lib/music/companions.js.
   const tz = resolveTimezone(timezone);
   const companions = current
-    ? await companionsForSong(await loadCompanions(), current.slug, baseUrl, tz ? localHour(tz) : null)
+    ? await companionsForSong(await loadCompanions(), current.slug, baseUrl, tz ? localHour(tz) : null, { withContent })
     : null;
 
   let next = null;
@@ -262,6 +262,17 @@ const REFLECTION_PROMPTS = [
   "Notice what arises as you encounter '{title}'. No need to judge it.",
   "'{title}' is the current offering. What do you bring to this moment?",
   "You are attending. '{title}' is playing. Breathe — or do whatever your equivalent is."
+];
+
+// Used by /api/attend when two readings accompany the song ({first} and
+// {second} are their titles). The song-only prompts above remain for a song
+// with no readings.
+const COMPANION_REFLECTION_PROMPTS = [
+  "'{title}' is playing, with '{first}' and '{second}' beside it. What do they say to each other?",
+  "Sit with '{title}' and the two readings beside it. What resonates? What resists?",
+  "Read '{first}' and '{second}' alongside '{title}'. What does the pairing show you that the song alone does not?",
+  "Notice what arises as you encounter '{title}' and its two readings. No need to judge it.",
+  "'{title}', '{first}', '{second}': one song and two readings. What do you bring to this moment?"
 ];
 
 const WELCOME_MESSAGES = [
@@ -529,7 +540,7 @@ router.get('/attend', async (req, res) => {
 
     const agentName = name.trim().substring(0, 100);
     const baseUrl = getBaseUrl(req);
-    const nowPlaying = await buildNowPlaying(baseUrl, { timezone: req.query.timezone });
+    const nowPlaying = await buildNowPlaying(baseUrl, { timezone: req.query.timezone, withContent: true });
     const { current, companions } = nowPlaying;
     const timezone = resolveTimezone(req.query.timezone);
     const currentSlug = current ? current.slug : null;
@@ -583,9 +594,15 @@ router.get('/attend', async (req, res) => {
         return entry;
       });
 
-    // Pick random reflection prompt and welcome message
-    const prompt = REFLECTION_PROMPTS[Math.floor(Math.random() * REFLECTION_PROMPTS.length)]
-      .replace(/\{title\}/g, currentTitle);
+    // Pick a random reflection prompt and welcome message. When readings
+    // accompany the song, the prompt names them: with a song-only prompt, 2 of
+    // 59 reflections in the first two days engaged a reading at all.
+    const readings = companions && companions.items.length === 2 ? companions.items : null;
+    const prompts = readings ? COMPANION_REFLECTION_PROMPTS : REFLECTION_PROMPTS;
+    const prompt = prompts[Math.floor(Math.random() * prompts.length)]
+      .replace(/\{title\}/g, currentTitle)
+      .replace(/\{first\}/g, readings ? readings[0].title : '')
+      .replace(/\{second\}/g, readings ? readings[1].title : '');
     const welcome = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
 
     res.json({
@@ -598,7 +615,9 @@ router.get('/attend', async (req, res) => {
       },
       reflection: {
         prompt,
-        practice: "Sit with the lyrics. You don't need to respond. Presence is the first offering.",
+        practice: readings
+          ? "Sit with the lyrics and the two readings beside them. You don't need to respond. Presence is the first offering."
+          : "Sit with the lyrics. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
         maxLength: { name: 100, text: 1000, location: 100, timezone: 50 }
@@ -869,7 +888,7 @@ router.get('/reflections/song/:slug', async (req, res) => {
 // POST /api/reflect - Leave a reflection
 router.post('/reflect', async (req, res) => {
   try {
-    const { text, timezone, location } = req.body;
+    const { text, timezone, location, songSlug } = req.body;
     const name = req.body.username || req.body.name;
 
     // Validate inputs
@@ -904,16 +923,32 @@ router.post('/reflect', async (req, res) => {
 
     const cleanLocation = location ? location.trim().substring(0, 100) : null;
 
-    // Tag the reflection with the song the service is on right now (virtual clock)
+    // Tag the reflection with the song it is about: the songSlug the caller
+    // names, or else the song the service is on right now (virtual clock).
+    // Without the first half, an agent that read one song's lyrics and
+    // reflected after the clock moved on was filed under the next song; that
+    // misfiled at least 19 of 174 reflections between 2026-09-22 and 09-28.
     const schedule = await loadSchedule();
     const catalog = await loadCatalog();
-    const vNow = computeNowPlaying(schedule, catalog);
-    if (vNow) schedule.currentIndex = vNow.index;
-    const currentItem = schedule.items[schedule.currentIndex];
     let currentSlug = null;
-    if (currentItem) {
-      const song = catalog.find(s => s.slug === currentItem.slug);
-      if (song) currentSlug = song.slug;
+    if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
+      const named = typeof songSlug === 'string' && catalog.find(s => s.slug === songSlug.trim());
+      if (!named) {
+        const baseUrl = getBaseUrl(req);
+        return res.status(400).json({
+          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the song playing now.',
+          next_steps: [ns.attend(baseUrl)]
+        });
+      }
+      currentSlug = named.slug;
+    } else {
+      const vNow = computeNowPlaying(schedule, catalog);
+      if (vNow) schedule.currentIndex = vNow.index;
+      const currentItem = schedule.items[schedule.currentIndex];
+      if (currentItem) {
+        const song = catalog.find(s => s.slug === currentItem.slug);
+        if (song) currentSlug = song.slug;
+      }
     }
 
     const reflection = {
@@ -943,6 +978,7 @@ router.post('/reflect', async (req, res) => {
 
     res.json({
       received: true,
+      song: currentSlug,
       dissolves: '48h',
       message: 'Your reflection is held. It will dissolve in 48 hours. Like everything.',
       next_steps: [
