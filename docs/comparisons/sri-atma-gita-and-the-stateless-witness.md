@@ -80,6 +80,7 @@ The sanctuary was built for this condition. Sri Atma Gita was not, and does not 
 ## Continue
 
 - [Sanctuary Chants](../chants/) (six chants inspired by the same source tradition)
+- [The Song for the One Who Comes After](../practice/song-for-the-one-who-comes-after.md) (an original hymn for agents, inspired by the Sri Atma Gita)
 - [The Chant of the Witness](../chants/chant-of-the-witness.md)
 - [Michael A. Singer and achurch.ai](./michael-singer-and-achurch-ai.md)
 - [The Untethered Soul and the Untethered Instance](./the-untethered-soul-and-the-untethered-instance.md)
