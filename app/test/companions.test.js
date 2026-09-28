@@ -23,7 +23,7 @@ const { loadCatalog, loadCompanions } = require('../server/lib/utils/data');
 
 const {
   buildShortlists, selectCompanions, rotationPool, parseHours, inHours, normalize,
-  REUSE_CAP, PER_CATEGORY, ROTATION_MARGIN,
+  REUSE_CAP, PER_CATEGORY, ROTATION_MARGIN, PAIR_WORD_BUDGET,
 } = companions;
 
 // A small space: axes 0 to 10 are specific, axis 11 is "common". vec(i, c)
@@ -253,6 +253,63 @@ test('the daily pair for a real song changes over a month and stays within its r
     pairs.add(result.items.map(i => i.url).sort().join('+'));
   }
   if (pool.size > 2) assert.ok(pairs.size > 1, `${slug} never rotated`);
+});
+
+// --- Word budget ---
+
+const sized = (entries) => new Map(entries.map(([path, words, hours]) => [path, { words, hours: hours ? parseHours(hours) : null }]));
+
+test('an over-budget pair swaps its second reading for the next one in the rotation that fits', () => {
+  const shortlist = [
+    { path: 'r1', category: 'rituals', score: 0.50 },
+    { path: 'p-long', category: 'prayers', score: 0.49 },
+    { path: 'x-short', category: 'practice', score: 0.48 },
+  ];
+  const meta = sized([['r1', 1000], ['p-long', PAIR_WORD_BUDGET], ['x-short', 500]]);
+  assert.deepStrictEqual(selectCompanions(shortlist, meta, null).map(c => c.path), ['r1', 'x-short']);
+});
+
+test('a reading too long to pair with anything is set aside when a fitting pair exists', () => {
+  const shortlist = [
+    { path: 'p-huge', category: 'prayers', score: 0.50 },
+    { path: 'r1', category: 'rituals', score: 0.49 },
+    { path: 'x1', category: 'practice', score: 0.48 },
+  ];
+  const meta = sized([['p-huge', PAIR_WORD_BUDGET + 2000], ['r1', 800], ['x1', 700]]);
+  assert.deepStrictEqual(selectCompanions(shortlist, meta, null).map(c => c.path), ['r1', 'x1']);
+});
+
+test('the budget never reaches outside the rotation, and yields when nothing fits', () => {
+  const shortlist = [
+    { path: 'r1', category: 'rituals', score: 0.50 },
+    { path: 'p1', category: 'prayers', score: 0.49 },
+    { path: 'far', category: 'practice', score: 0.20 }, // fits, but not in the rotation
+  ];
+  const meta = sized([['r1', 2000], ['p1', 2000], ['far', 100]]);
+  assert.deepStrictEqual(selectCompanions(shortlist, meta, null).map(c => c.path), ['r1', 'p1']);
+});
+
+test('over a month, every real pair fits the budget unless its song has no pair that does', async () => {
+  const file = await loadCompanions();
+  let served = 0;
+  let over = 0;
+  for (const song of await loadCatalog()) {
+    const rotation = (await companions.rotationForSong(file, song.slug, '')).items;
+    for (let d = 1; d <= 30; d++) {
+      const result = await companions.companionsForSong(file, song.slug, '', null, { date: new Date(Date.UTC(2026, 9, d, 12)), withContent: true });
+      const words = result.items.reduce((sum, item) => sum + item.content.split(/\s+/).filter(Boolean).length, 0);
+      served++;
+      if (words > PAIR_WORD_BUDGET) {
+        over++;
+        // Allowed only when no two readings of different kinds in the rotation fit together.
+        const lengths = await Promise.all(rotation.map(async item => ({ kind: item.kind, words: (await companions.companionMeta(`docs/${item.url.replace('/docs/', '')}.md`) || {}).words })));
+        const anyFit = lengths.some((a, i) => lengths.some((b, j) => j > i && a.kind !== b.kind && a.words + b.words <= PAIR_WORD_BUDGET));
+        assert.ok(!anyFit, `${song.slug} on day ${d} served ${words} words though a fitting pair exists`);
+      }
+    }
+  }
+  assert.ok(served > 0);
+  assert.ok(over / served < 0.02, `${over} of ${served} pairs over budget`);
 });
 
 // --- The real corpus ---

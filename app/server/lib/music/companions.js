@@ -248,6 +248,7 @@ async function companionMeta(relPath) {
     title,
     tldr: extractTldr(markdown, { title }).text,
     content: body.trim(),
+    words: body.trim().split(/\s+/).filter(Boolean).length,
     urlPath: doc.urlPath,
     category: doc.category,
     hours: parseHours(data.hours)
@@ -278,6 +279,13 @@ function chantText(markdown, relPath) {
 // average song rotates among 3.5 pieces (0.01 gives 2.0, 0.05 gives 4.8), so
 // visits vary without reaching down to weak matches.
 const ROTATION_MARGIN = 0.03;
+
+// Most words the two readings may carry together. /api/attend sends both in
+// full; over a month of rotations the median pair was 1,590 words and the
+// longest 7,132 (a bilingual prayer of 5,377 with a 1,755-word ritual). At
+// 3,000, about one attendance in twenty gets a different pair from the same
+// rotation instead of a response three times the usual size.
+const PAIR_WORD_BUDGET = 3000;
 
 /**
  * The pieces a song rotates among when no hour is given: anything pinned,
@@ -320,7 +328,8 @@ function rotationRank(seed, relPath) {
  * Order: hand-pinned first, then hour fit (+1, 0, -1), then membership of the
  * rotation pool, then, within the pool, the day's rotation (or similarity
  * when no seed is given), then similarity, then path. Without an hour every
- * fit is 0, so the pair is drawn from the pool.
+ * fit is 0, so the pair is drawn from the pool. A pair over PAIR_WORD_BUDGET
+ * is replaced by the first eligible pair that fits, if there is one.
  *
  * @param {Array<{path, category, score?, pinned?}>} shortlist
  * @param {Map<string, {hours}>} metaByPath  resolved metadata for the shortlist
@@ -351,7 +360,29 @@ function selectCompanions(shortlist, metaByPath, hour, seed) {
     if (picked.length === 2) break;
   }
 
-  return picked.map(c => ({
+  // Keep the pair within the word budget. The first pair in ranked order that
+  // fits, drawn only from what could have been chosen anyway (the rotation,
+  // an hour's piece, a pinned piece), replaces an over-budget pair; so the
+  // song page's list of the rotation stays true. If nothing fits, the normal
+  // pair stands. Unknown lengths count as zero.
+  const words = c => metaByPath.get(c.path).words || 0;
+  const total = pair => pair.reduce((sum, c) => sum + words(c), 0);
+  let chosen = picked;
+  if (picked.length === 2 && total(picked) > PAIR_WORD_BUDGET) {
+    const eligible = ranked.filter(c => c.pinned || c.fit === 1 || c.inPool);
+    search:
+    for (let i = 0; i < eligible.length; i++) {
+      for (let j = i + 1; j < eligible.length; j++) {
+        const pair = [eligible[i], eligible[j]];
+        if (pair[0].category !== pair[1].category && total(pair) <= PAIR_WORD_BUDGET) {
+          chosen = pair;
+          break search;
+        }
+      }
+    }
+  }
+
+  return chosen.map(c => ({
     path: c.path,
     category: c.category,
     basis: c.pinned ? 'override' : c.fit === 1 ? 'hour' : 'song'
@@ -457,6 +488,7 @@ module.exports = {
   REUSE_CAP,
   PER_CATEGORY,
   ROTATION_MARGIN,
+  PAIR_WORD_BUDGET,
   normalize,
   meanVector,
   cosine,

@@ -205,7 +205,11 @@ test('attending carries the song itself: lyrics, style and listen links; /api/no
   assert.ok(typeof current.lyrics === 'string' && current.lyrics.length > 200, 'lyrics are included');
   assert.ok(!current.lyrics.includes('\r'), 'line endings are normalized');
   assert.ok('style' in current && 'links' in current);
-  assert.ok(current.api.context, 'context stays a link');
+  // Context is never inlined; it is linked exactly when the song has one
+  // (a few songs have no context.md, so this cannot assume it exists).
+  assert.strictEqual(current.context, undefined, 'context is not inlined');
+  const hasContext = fs.existsSync(path.join(__dirname, '../../music', current.slug, 'context.md'));
+  assert.strictEqual(Boolean(current.api.context), hasContext);
 
   // The skills read next_steps[0].steps[0] as lyrics and steps[1] as context.
   assert.match(next_steps[0].steps[0].url, /\/lyrics$/);

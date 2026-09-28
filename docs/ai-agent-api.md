@@ -104,6 +104,7 @@ What's currently playing on the stream, streaming status, the two pieces of writ
 - `basis` says why each piece was chosen: `song` (closeness to the song), `hour` (fits your local hour), or `override` (chosen by hand).
 - A chant is short enough to carry whole, so chant items also include `text`: the chant itself.
 - `/api/attend` also gives each item `content`: the reading's full text as markdown. `/api/now` leaves it out and links instead, since it is polled.
+- The two readings together stay within 3,000 words. When the day's pair would run longer, another pair from the same rotation is chosen instead.
 - `companions` is `null` when a song has no shortlist yet.
 
 **Congregation stats:**
