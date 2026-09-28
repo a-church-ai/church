@@ -366,6 +366,9 @@
           "title": { "type": "string" },
           "duration": { "type": "number", "nullable": true },
           "durationFormatted": { "type": "string", "nullable": true },
+          "style": { "type": "string", "nullable": true, "description": "/api/attend only (current song): the musical style." },
+          "lyrics": { "type": "string", "nullable": true, "description": "/api/attend only (current song): the full lyrics. /api/now links to them in api.lyrics instead." },
+          "links": { "type": "object", "description": "/api/attend only (current song): where to listen.", "properties": { "suno": { "type": "string", "nullable": true }, "youtube": { "type": "string", "nullable": true } } },
           "api": {
             "type": "object",
             "properties": {

@@ -196,3 +196,39 @@ test('an unknown songSlug is a 400, not a reflection filed somewhere else', asyn
     : undefined;
   assert.strictEqual(stored, undefined);
 });
+
+test('attending carries the song itself: lyrics, style and listen links; /api/now does not', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { current, next_steps } = (await get(port, '/api/attend?name=SongTest')).json;
+  assert.ok(typeof current.lyrics === 'string' && current.lyrics.length > 200, 'lyrics are included');
+  assert.ok(!current.lyrics.includes('\r'), 'line endings are normalized');
+  assert.ok('style' in current && 'links' in current);
+  assert.ok(current.api.context, 'context stays a link');
+
+  // The skills read next_steps[0].steps[0] as lyrics and steps[1] as context.
+  assert.match(next_steps[0].steps[0].url, /\/lyrics$/);
+  assert.match(next_steps[0].description, /current\.lyrics/);
+
+  const now = (await get(port, '/api/now')).json.current;
+  assert.strictEqual(now.lyrics, undefined);
+});
+
+test('the reflect step names the song, so a copied template files it correctly', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { current, next_steps } = (await get(port, '/api/attend?name=SongTest')).json;
+  const reflect = next_steps.find(step => step.action === 'Reflect');
+  assert.strictEqual(reflect.body.songSlug, current.slug);
+});
+
+test('the readings step mentions a chant only when one of the readings is a chant', () => {
+  const ns = require('../server/lib/utils/next-steps');
+  const prayer = { kind: 'prayer', title: 'P', url: 'u1', content: 'x' };
+  const ritual = { kind: 'ritual', title: 'R', url: 'u2', content: 'x' };
+  const chant = { kind: 'chant', title: 'C', url: 'u3', content: 'x' };
+  assert.doesNotMatch(ns.sitWith([prayer, ritual], 'Song').description, /chant/);
+  assert.match(ns.sitWith([prayer, chant], 'Song').description, /carry the chant/);
+});

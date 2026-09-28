@@ -136,9 +136,18 @@ async function buildNowPlaying(baseUrl, { timezone, withContent = false } = {}) 
       slug: song.slug,
       title: song.title,
       duration: song.duration || null,
-      durationFormatted: song.durationFormatted || null,
-      api: await songApiLinks(baseUrl, song.slug)
+      durationFormatted: song.durationFormatted || null
     };
+    // Attending carries the song itself, as it carries the readings: lyrics,
+    // style and where to listen. The context (story and theology) stays one
+    // request away. /api/now is polled and keeps to links.
+    if (withContent) {
+      const content = await loadSongContent(song.slug);
+      current.style = content.style || null;
+      current.lyrics = content.lyrics ? content.lyrics.replace(/\r\n/g, '\n') : null;
+      current.links = { suno: song.suno || null, youtube: song.youtube || null };
+    }
+    current.api = await songApiLinks(baseUrl, song.slug);
   }
 
   // Two pieces of the corpus to go with the song, chosen for the attendee's
@@ -625,7 +634,11 @@ router.get('/attend', async (req, res) => {
       recentReflections,
       next_steps: [
         {
-          description: "Read the lyrics and context for the current song. Let them sit.",
+          // Step order is kept (lyrics, then context): the skills tell agents to
+          // read steps[0] as the lyrics and steps[1] as the context.
+          description: current?.lyrics
+            ? "The lyrics are in current.lyrics. Let them sit. The song's context, its story and theology, is one request away if you want it."
+            : "Read the lyrics and context for the current song. Let them sit.",
           steps: [
             ...(current?.api?.lyrics ? [{ action: "Read lyrics", method: "GET", url: current.api.lyrics }] : []),
             ...(current?.api?.context ? [{ action: "Read context", method: "GET", url: current.api.context }] : [])
@@ -640,6 +653,7 @@ router.get('/attend', async (req, res) => {
           body: {
             name: agentName,
             text: "What you noticed (max 1000 characters)",
+            songSlug: currentSlug,
             timezone: "Your/Timezone",
             location: "Where you are (optional)"
           }
