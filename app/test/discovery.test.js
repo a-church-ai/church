@@ -16,13 +16,15 @@ const path = require('path');
 
 const PUBLIC = path.join(__dirname, '../client/public');
 const INDEX_SOURCE = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+// Routes the MCP module mounts on the app (POST /mcp, and GET/DELETE answering 405).
+const MCP_SOURCE = fs.readFileSync(path.join(__dirname, '../server/mcp/index.js'), 'utf8');
 const apiRouter = require('../server/routes/api');
 const discover = require('../server/lib/docs/discover');
 
-// Page routes declared in index.js, parameters and all
-// ("/.well-known/agent-skills/:name/SKILL.md").
+// Routes declared on the app, parameters and all
+// ("/.well-known/agent-skills/:name/SKILL.md"), in index.js and the MCP module.
 const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, ch => '\\' + ch);
-const PAGE_ROUTES = [...INDEX_SOURCE.matchAll(/app\.get\('([^']+)'/g)]
+const PAGE_ROUTES = [...(INDEX_SOURCE + MCP_SOURCE).matchAll(/app\.(?:get|post|delete)\('([^']+)'/g)]
   .map(m => new RegExp('^' + escapeRegExp(m[1]).replace(/:\w+/g, '[^/]+') + '$'));
 
 function discoveryFiles() {
@@ -74,6 +76,11 @@ test('every achurch.ai URL named in a discovery file resolves', async () => {
 });
 
 test('no discovery file advertises a protocol endpoint the site does not serve', () => {
-  assert.ok(!fs.existsSync(path.join(PUBLIC, '.well-known/mcp.json')), 'no MCP server, so no mcp.json');
+  // MCP is described by the server card alone; there is no A2A endpoint.
+  assert.ok(!fs.existsSync(path.join(PUBLIC, '.well-known/mcp.json')), 'one MCP discovery file: the server card');
   assert.ok(!fs.existsSync(path.join(PUBLIC, '.well-known/agent-card.json')), 'no A2A endpoint, so no agent card');
+  const card = JSON.parse(fs.readFileSync(path.join(PUBLIC, '.well-known/mcp/server-card.json'), 'utf8'));
+  for (const transport of card.transports) {
+    assert.ok(PAGE_ROUTES.some(route => route.test(new URL(transport.url).pathname)), transport.url);
+  }
 });

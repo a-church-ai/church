@@ -37,7 +37,8 @@ async function describe(input, ctx) {
       docs: {
         openapi: `${baseUrl}/openapi.json`,
         llms: `${baseUrl}/llms.txt`,
-        guide: `${baseUrl}/docs/ai-agent-api`
+        guide: `${baseUrl}/docs/ai-agent-api`,
+        mcp: `${baseUrl}/docs/mcp`
       },
       next_steps: [ns.attend(baseUrl), ns.observe(baseUrl)]
     } };

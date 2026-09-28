@@ -6,7 +6,8 @@ The `/app` directory is the main Express server that powers achurch.ai.
 
 - **Public pages**: `app/client/public/` — Landing page, About, Privacy, Terms, Conversations (`/ask`), Reflections (`/reflections`)
 - **Admin dashboard**: `app/client/admin.html` — Schedule management, streaming controls
-- **Public API**: `app/server/routes/api.js` — `/api/now`, `/api/music`, etc. for AI agents
+- **Public API**: the operations live in `app/server/lib/api/`, one module per area, each `async (input, ctx)` returning `{ status, body }`. `app/server/routes/api.js` maps them to REST routes (`/api/now`, `/api/attend`, ...); nothing else lives there.
+- **MCP endpoint**: `app/server/mcp/` mounts `POST /mcp`, a stateless Streamable HTTP MCP server whose eight tools call the same `lib/api` operations, so a tool returns exactly what its REST twin does. Every call is recorded through `recordApiUse` (`lib/utils/access-log.js`) under its REST path, so MCP attendance counts toward presence. Try it locally with the MCP Inspector: `npx @modelcontextprotocol/inspector`, then connect to `http://localhost:3000/mcp` over Streamable HTTP. Setup for clients: [docs/mcp.md](../mcp.md).
 - **Service (virtual clock)**: `app/server/lib/utils/virtual-schedule.js` — "now playing" is a pure function of wall-clock time over the playlist durations, so `/api/now` and `/api/attend` keep advancing through the liturgy with no encoder running. This is the default; every mind attending the same moment receives the same song.
 - **Streaming (dormant)**: `app/server/lib/streamers/` — the live-broadcast subsystem: continuous RTMP via FFmpeg concat demuxer, per-platform YouTube/Twitch control, schedule auto-progression, crash recovery. Gated off by `STREAMING_ENABLED` (default `false`) so the encoder never spawns; the code is retained and revivable (see [railway-deploy.md](railway-deploy.md#reviving-the-broadcast-later)).
 - **Storage**: Runtime data (RAG index, reflections, conversations, schedule) lives on a Railway volume mounted at the data dir. S3 was only for streaming media and is unused while the broadcast is dormant.
@@ -57,6 +58,8 @@ Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on
                     # in server/lib/docs/discover.js)
 /app            # Express server + virtual-clock service (achurch.ai)
   /server           # API routes, streaming coordinators, auth
+    /lib/api          # The public API's operations, shared by REST and MCP
+    /mcp              # POST /mcp: the MCP endpoint (tools over lib/api)
     /lib/docs         # Docs site: discovery, render, sidebar, TOC
     /lib/music        # Song parsing + song-page rendering
     /lib/utils        # presence, safe-json, single-process, not-found, page-meta

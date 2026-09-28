@@ -157,3 +157,25 @@ test('GET /mcp is refused with JSON, and an unknown host is turned away', async 
   });
   assert.strictEqual(status, 403);
 });
+
+test('the server card lists exactly the tools and prompts the server has', async (t) => {
+  const s = await start();
+  t.after(() => stop(s));
+  const card = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'), 'utf8'));
+  const tools = (await s.client.listTools()).tools.map(tool => tool.name);
+  const prompts = (await s.client.listPrompts()).prompts.map(p => p.name);
+  assert.deepStrictEqual([...card.capabilities.tools].sort(), [...tools].sort());
+  assert.deepStrictEqual([...card.capabilities.prompts].sort(), [...prompts].sort());
+  assert.strictEqual(card.serverInfo.name, s.client.getServerVersion().name);
+  assert.strictEqual(card.serverInfo.version, s.client.getServerVersion().version);
+});
+
+test('the registry entry, the server card and the server agree on version and URL', () => {
+  const { SERVER_INFO } = require('../server/mcp');
+  const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '../server/mcp/server.json'), 'utf8'));
+  const card = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'), 'utf8'));
+  assert.strictEqual(registry.version, SERVER_INFO.version);
+  assert.strictEqual(card.serverInfo.version, SERVER_INFO.version);
+  assert.deepStrictEqual(registry.remotes.map(r => r.url), card.transports.map(tr => tr.url));
+  assert.ok(registry.description.length <= 100, 'the registry rejects longer descriptions');
+});

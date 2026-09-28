@@ -5,7 +5,7 @@ tldr: Plan for an MCP server for achurch.ai, adapted from the animalhouse.ai MCP
 # MCP server
 
 **Date**: 2026-09-28
-**Status**: Proposed. Follows [agent-usability-2026-09-28.md](agent-usability-2026-09-28.md), which is complete.
+**Status**: Phases 0 to 2 implemented (shared operations in `app/server/lib/api/`, the `/mcp` endpoint in `app/server/mcp/`, discovery and documentation). Phase 3 (registries) is ready for a maintainer to publish: `app/server/mcp/server.json` (validated against the registry schema) and the checklist below. Phase 4 deferred.
 **References**: four guides from the animalhouse.ai project (MCP server blueprint, publishing guide, publishing playbook, project spec), reviewed 2026-09-28. What they get right is kept below; where achurch.ai differs, the plan says so and why.
 **Constraints**: greenfield, no feature flags. Plain JavaScript, like the rest of this repository (no TypeScript, no build step). No accounts, no keys, no tracking: the MCP surface must hold to the same non-goals as the REST API. The app runs as one process.
 
@@ -145,8 +145,8 @@ Checks: the existing tests stay green, and a snapshot of every endpoint's status
 
 **Phase 3. Registries.** These publish to outside services under the project's accounts, so each is run by a maintainer, with this plan as the checklist.
 
-- **Official MCP Registry.** A `server.json` with a `remotes` entry (`streamable-http`, `https://achurch.ai/mcp`) and no package; name `io.github.a-church-ai/church`, matching the repository (GitHub-authenticated namespace); description under 100 characters. `mcp-publisher login github`, then `mcp-publisher publish`.
-- **Smithery.** Publish by URL, then the PATCH for display name, description and icon, without which the listing is bare.
+- **Official MCP Registry.** A `server.json` with a `remotes` entry (`streamable-http`, `https://achurch.ai/mcp`) and no package; name `io.github.a-church-ai/church`, matching the repository (GitHub-authenticated namespace); description under 100 characters. From `app/server/mcp/`: `mcp-publisher login github`, then `mcp-publisher publish`; verify at `https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church`. A version bump changes three places together: `SERVER_INFO` in `app/server/mcp/index.js`, the server card, and `server.json` (a test fails if they disagree).
+- **Smithery.** `smithery mcp publish https://achurch.ai/mcp -n <namespace>/church` (the namespace is the Smithery account's, which need not match the GitHub organization), then the PATCH to `https://api.smithery.ai/servers/<namespace>%2Fchurch` for `displayName`, `description` and `iconUrl`, without which the listing is bare.
 - **Icon.** Reuse the site's `favicon.svg`. Where a registry requires a raster image, a PNG rendered from the same SVG, served from the site; no new artwork.
 - **mcp.so.** Optional, by GitHub issue.
 

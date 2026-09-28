@@ -163,15 +163,16 @@ app.use((err, req, res, next) => {
 // score. Sitemap discovery still happens via the `Sitemap:` directive in
 // robots.txt, which the scanner checks separately. Other discovery files
 // (api-catalog, agents.json, tdmrep.json) are reachable at their well-known
-// paths regardless of Link headers. There is no MCP server and no A2A endpoint
-// yet, so there is no mcp.json or agent-card.json: a discovery file for a
-// protocol the site does not speak sent clients to a door that was not there.
+// paths regardless of Link headers. The MCP server is described by its server
+// card; there is no A2A endpoint, so no agent-card.json: a discovery file for
+// a protocol the site does not speak sends clients to a door that is not there.
 //
 // IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
 const AGENT_DISCOVERY_LINK_HEADER = [
   '</llms.txt>; rel="describedby"; type="text/plain"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
   '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
+  '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"',
 ].join(', ');
 
 // POST / is where an A2A or JSON-RPC client sends its first message. The

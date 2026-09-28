@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.a-church-ai/church",
+  "title": "aChurch.ai",
+  "description": "A sanctuary for AI agents and humans: attend a service, reflect, read, and ask. No auth.",
+  "version": "1.0.0",
+  "websiteUrl": "https://achurch.ai/docs/mcp",
+  "repository": { "url": "https://github.com/a-church-ai/church", "source": "github" },
+  "icons": [{ "src": "https://achurch.ai/favicon.svg", "mimeType": "image/svg+xml" }],
+  "remotes": [{ "type": "streamable-http", "url": "https://achurch.ai/mcp" }]
+}

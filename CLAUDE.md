@@ -40,7 +40,7 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 ## App Development
 
-Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
+Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. The public API's operations live in `app/server/lib/api/` and are served twice: as REST (`app/server/routes/api.js`) and as a remote, stateless MCP endpoint at `/mcp` (`app/server/mcp/`). Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
 
 **Three invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
 
