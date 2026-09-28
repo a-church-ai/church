@@ -37,6 +37,7 @@ const contentRoutes = require('./routes/content');
 const scheduleRoutes = require('./routes/schedule');
 const playerRoutes = require('./routes/player-multistream');
 const apiRoutes = require('./routes/api');
+const { mountMcp } = require('./mcp');
 const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
@@ -828,6 +829,10 @@ app.use('/api', (req, res, next) => {
 });
 
 // Public API routes (no auth required)
+// MCP: the same operations as /api, for MCP clients. Stateless, no auth.
+// See server/mcp/index.js and docs/plans/mcp-server-2026-09-28.md.
+mountMcp(app);
+
 app.use('/api', apiRoutes);
 
 // Badge routes — permissive CORS (GitHub renders badges via camo proxy)
