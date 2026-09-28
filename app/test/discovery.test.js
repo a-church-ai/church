@@ -53,7 +53,8 @@ async function resolves(urlPath) {
     return apiRouter.stack.some(layer => layer.route && layer.match(sub));
   }
   if (/^\/docs(\/|$)/.test(urlPath)) {
-    const parts = urlPath.split('/').filter(Boolean).slice(1);
+    // A trailing .md asks for the same document as markdown (routes/docs.js).
+    const parts = urlPath.replace(/\.md$/i, '').split('/').filter(Boolean).slice(1);
     return parts.length === 0 || Boolean(await discover.resolveDocPath(parts));
   }
   const file = path.join(PUBLIC, urlPath);

@@ -67,7 +67,9 @@ function docsNotFound(req, res) {
   });
 }
 
-async function handle(req, res, parts) {
+// asMarkdown: the URL ended in .md, which asks for the source whatever the
+// Accept header says. That response points back at the page as canonical.
+async function handle(req, res, parts, { asMarkdown = false } = {}) {
   // Lowercase the URL segments before lookup (repo docs are all lowercase;
   // this handles browsers that uppercase or query-mangle without silently
   // 404ing).
@@ -94,7 +96,8 @@ async function handle(req, res, parts) {
     // so a cache that saw HTML first could serve it to an agent asking for
     // Markdown, and the reverse. Set before the branch so both paths carry it.
     res.vary('Accept');
-    if (acceptsMarkdown(req)) {
+    if (asMarkdown || acceptsMarkdown(req)) {
+      if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.urlPath ? `/docs/${resolved.doc.urlPath}` : '/docs'}>; rel="canonical"`);
       res.type('text/markdown; charset=utf-8');
       return res.sendFile(resolved.fullPath, err => {
         if (err && !res.headersSent) docsNotFound(req, res);
@@ -115,7 +118,8 @@ async function handle(req, res, parts) {
     // dir-index: auto-generated listing of a directory that has no README.
     // Same URL, two representations, so the same Vary applies here.
     res.vary('Accept');
-    if (acceptsMarkdown(req)) {
+    if (asMarkdown || acceptsMarkdown(req)) {
+      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs${resolved.dir ? `/${resolved.dir}` : ''}>; rel="canonical"`);
       // For markdown clients, list children as a minimal markdown response
       // rather than emitting HTML. Cheap and honest about the shape.
       const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
@@ -156,6 +160,12 @@ router.get('/*', (req, res) => {
   }
   const parts = rest ? rest.split('/').filter(Boolean) : [];
 
+  // Appending .md is how many agents ask for a page's source. Serve the same
+  // document as markdown instead of looking for "name.md.md" and 404ing.
+  const last = parts[parts.length - 1] || '';
+  const asMarkdown = /\.md$/i.test(last);
+  if (asMarkdown) parts[parts.length - 1] = last.replace(/\.md$/i, '');
+
   // Internal working categories are not pages on this site. They remain in the
   // public repository, which is where links to them now point. Serving them as
   // HTML while declaring them noindex and hiding them from navigation would be
@@ -164,7 +174,7 @@ router.get('/*', (req, res) => {
     return docsNotFound(req, res);
   }
 
-  return handle(req, res, parts);
+  return handle(req, res, parts, { asMarkdown });
 });
 
 module.exports = router;

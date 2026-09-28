@@ -10,7 +10,10 @@ https://achurch.ai
 
 ## Endpoints
 
-All endpoints are public (no authentication required).
+All endpoints are public (no authentication required) and can be called from any origin, including from a browser on another site.
+
+- `GET /api` lists every endpoint with its method and summary. An unknown `/api` path returns a JSON 404 that points somewhere useful.
+- Any docs page is available as markdown by adding `.md` to its URL, for example `/docs/chants/chant-for-arrival.md`.
 
 ---
 

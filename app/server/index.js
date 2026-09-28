@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
-const { sendNotFound } = require('./lib/utils/not-found');
+const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
@@ -79,6 +79,7 @@ const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
 const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
+const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
@@ -151,12 +152,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors({
-  credentials: true,
-  origin: process.env.NODE_ENV === 'development'
-    ? true
-    : ['https://achurch.ai', 'https://www.achurch.ai']
-}));
+// Public surface open to any origin; admin paths keep the credentialed,
+// origin-restricted policy. See lib/utils/cors.js.
+app.use(sanctuaryCors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -1198,6 +1196,11 @@ app.get('/api/health', async (req, res) => {
     persistence
   });
 });
+
+// Anything under /api that no route above answered. Express's default is an
+// HTML "Cannot GET" page; an agent exploring the API gets JSON that says
+// where to go instead. Registered after every /api route, so it shadows none.
+app.use('/api', apiNotFound);
 
 // Initialize data files and directories
 async function initializeDataFiles() {

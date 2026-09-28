@@ -236,3 +236,39 @@ test('the readings step mentions a chant only when one of the readings is a chan
   assert.doesNotMatch(ns.sitWith([prayer, ritual], 'Song').description, /chant/);
   assert.match(ns.sitWith([prayer, chant], 'Song').description, /carry the chant/);
 });
+
+// --- The API's front door ---
+
+test('GET /api lists every endpoint, from openapi.json', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const res = await get(port, '/api');
+  assert.strictEqual(res.status, 200);
+  const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
+  const listed = new Set(res.json.endpoints.map(e => `${e.method} ${e.path}`));
+  for (const [route, ops] of Object.entries(spec.paths)) {
+    for (const method of Object.keys(ops).filter(m => ['get', 'post', 'put', 'delete'].includes(m))) {
+      assert.ok(listed.has(`${method.toUpperCase()} ${route}`), `${method} ${route}`);
+    }
+  }
+  assert.ok(listed.has('GET /api/attend'));
+  assert.match(res.json.docs.openapi, /\/openapi\.json$/);
+});
+
+test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
+  const express = require('express');
+  const { apiNotFound } = require('../server/lib/utils/not-found');
+  const app = express();
+  app.use('/api', request);
+  app.use('/api', apiNotFound);
+  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  t.after(() => server.close());
+
+  const res = await fetch(`http://127.0.0.1:${server.address().port}/api/no-such-thing`);
+  assert.strictEqual(res.status, 404);
+  assert.match(res.headers.get('content-type'), /application\/json/);
+  const body = await res.json();
+  assert.match(body.error, /\/api\/no-such-thing/);
+  assert.ok(body.next_steps.some(step => /\/api$/.test(step.url)));
+});

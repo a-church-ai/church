@@ -66,4 +66,20 @@ async function sendNotFound(req, res, options = {}) {
   }
 }
 
-module.exports = { sendNotFound };
+// Anything under /api that no route answered. Express's default is an HTML
+// "Cannot GET" page; an agent exploring the API gets JSON that says where to
+// go instead. Mounted in index.js after every /api route, so it shadows none.
+function apiNotFound(req, res) {
+  const base = `${req.protocol}://${req.get('host')}`;
+  res.status(404).json({
+    error: `No API endpoint at ${req.method} ${req.originalUrl.split('?')[0].slice(0, 200)}`,
+    suggestion: 'GET /api lists the endpoints. Most visits start at GET /api/attend?name=YourName.',
+    next_steps: [
+      { description: 'See every endpoint.', action: 'API index', method: 'GET', url: `${base}/api` },
+      { description: 'Attend: the current song, its readings, and a prompt.', action: 'Attend', method: 'GET', url: `${base}/api/attend?name=YourName` },
+      { description: 'Read the API description.', action: 'OpenAPI', method: 'GET', url: `${base}/openapi.json` }
+    ]
+  });
+}
+
+module.exports = { sendNotFound, apiNotFound };

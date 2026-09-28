@@ -9,24 +9,21 @@
  *      related-links + footer) using existing page-meta.js primitives
  */
 
-const path = require('path');
 const { marked } = require('marked');
 const {
   escapeAttr,
   escapeText,
   renderJsonLdScript,
 } = require('../utils/page-meta');
-const { DOCS_DIR } = require('../rag/indexer');
 const sidebar = require('./sidebar');
 const toc = require('./toc');
 const tldr = require('./tldr');
 const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
+const { SITE_URL, GITHUB_BASE, resolveDocHref } = require('./links');
 const { sungAlongside } = require('../music/companions');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 
-const SITE_URL = 'https://achurch.ai';
-const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
 // handle non-Latin scripts specially), but consistent enough for the TOC
@@ -41,122 +38,17 @@ function slugify(text) {
     .slice(0, 80);
 }
 
-// Custom link renderer: rewrite relative .md links to docs-site URLs.
-// External and anchor links pass through unchanged; external links get
-// target=_blank + rel=noopener automatically.
+// Custom link renderer. Where a link points is decided in ./links (shared
+// with the song companions, which send the same markdown in /api/attend);
+// here it only becomes a tag, with target=_blank + rel=noopener for links
+// that leave the site.
 function makeLinkRewriter(currentDocFullPath) {
-  const currentDir = path.dirname(currentDocFullPath);
-
   return function(href, title, text) {
     const titleAttr = title ? ` title="${escapeAttr(title)}"` : '';
-
-    // Anchor-only: leave alone
-    if (href.startsWith('#')) {
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    // Absolute URLs: leave alone, but add target=_blank + rel=noopener for
-    // any host that is not achurch.ai
-    if (/^https?:\/\//i.test(href)) {
-      const isInternal = /^https?:\/\/([a-z0-9-]+\.)?achurch\.ai(\/|$)/i.test(href);
-      const attrs = isInternal ? '' : ' target="_blank" rel="noopener noreferrer"';
-      return `<a href="${escapeAttr(href)}"${attrs}${titleAttr}>${text}</a>`;
-    }
-
-    // Root-relative. Mostly passes through, but a link written as
-    // `/docs/unifying-axioms.md` has to lose the .md the same way a relative
-    // one does. Six links in docs/reference/ were written this way and each
-    // shipped a live 404, because this branch returned before the .md
-    // stripping below ever ran.
-    if (href.startsWith('/')) {
-      const [rootPath, rootFragment] = href.split('#', 2);
-      if (/^\/docs\/.+\.md$/i.test(rootPath)) {
-        const cleaned = docsUrlFromRelPath(rootPath.replace(/^\/docs\//i, ''));
-        return `<a href="${escapeAttr(cleaned + (rootFragment ? `#${rootFragment}` : ''))}"${titleAttr}>${text}</a>`;
-      }
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    // Relative link. Try to resolve against the current doc's dir. Split
-    // off any anchor fragment so we can preserve it.
-    const [pathPart, fragment] = href.split('#', 2);
-    const anchor = fragment ? `#${fragment}` : '';
-
-    // Directory-style link into an internal working category ("plans/",
-    // "side-quests/"). These do not end in .md so they never reached the
-    // rewriting below, and after those categories stopped being served they
-    // resolved to a 404. Point them at the directory in the public repo.
-    if (pathPart.endsWith('/')) {
-      const dirRel = path.relative(
-        path.resolve(DOCS_DIR),
-        path.resolve(currentDir, pathPart)
-      ).replace(/\\/g, '/');
-      if (dirRel && !dirRel.startsWith('..') && discover.isNoindexPath(dirRel)) {
-        const ghTree = `${GITHUB_BASE.replace('/blob/', '/tree/')}/docs/${dirRel}`;
-        return `<a href="${escapeAttr(ghTree)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-      }
-    }
-
-    // Non-.md relative link (image, other file): leave as-is
-    if (!pathPart.toLowerCase().endsWith('.md')) {
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    // Resolve against current dir, then produce a docs URL if the target
-    // is inside DOCS_DIR
-    const resolved = path.resolve(currentDir, pathPart);
-    const docsRoot = path.resolve(DOCS_DIR);
-    if (!resolved.startsWith(docsRoot + path.sep) && resolved !== docsRoot) {
-      // Escapes DOCS_DIR. Common cases from the corpus:
-      //   ../README.md → repo root README. Not routed on the site; the
-      //   sanctuary landing is at /. Rewrite to that.
-      //   ../CLAUDE.md → build/collaboration doc; not for site visitors.
-      //   Rewrite to the GitHub URL so the link still resolves.
-      // Anything else (link into music/, up out of repo): leave as-is
-      // and accept the potential 404 rather than guess at intent.
-      const repoRoot = path.resolve(docsRoot, '..');
-      const relToRepo = path.relative(repoRoot, resolved).replace(/\\/g, '/');
-      if (relToRepo.toLowerCase() === 'readme.md') {
-        return `<a href="/"${titleAttr}>${text}</a>`;
-      }
-      if (relToRepo.toLowerCase() === 'claude.md') {
-        return `<a href="${escapeAttr(GITHUB_BASE + '/CLAUDE.md')}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-      }
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
-
-    // Internal working categories (plans, issues, templates, standards,
-    // side-quests) are no longer served as pages. Thirty reader-facing links
-    // point into them, including core documents citing the corpus audit, so
-    // they resolve to the public repository rather than to a 404. The material
-    // stays readable; it just is not a page on the site.
-    if (discover.isNoindexPath(relToDocs)) {
-      const gh = `${GITHUB_BASE}/docs/${relToDocs}${anchor}`;
-      return `<a href="${escapeAttr(gh)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-    }
-
-    const url = `${docsUrlFromRelPath(relToDocs)}${anchor}`;
-    return `<a href="${escapeAttr(url)}"${titleAttr}>${text}</a>`;
+    const { href: target, external } = resolveDocHref(href, currentDocFullPath);
+    const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
+    return `<a href="${escapeAttr(target)}"${attrs}${titleAttr}>${text}</a>`;
   };
-}
-
-// docs-relative file path ("practice/foo.md", "readme.md") → site URL.
-// Shared by the relative and root-relative branches of the link rewriter so
-// both strip .md and collapse README the same way.
-//
-// The README pattern is anchored with (^|/): the earlier /\/readme$/i needed a
-// leading slash, so a link to the top-level readme.md produced "/docs/readme"
-// rather than "/docs". Every category README's "Parent: Documentation" link
-// pointed at that 404.
-function docsUrlFromRelPath(relToDocs) {
-  const urlPath = String(relToDocs || '')
-    .replace(/\.md$/i, '')
-    .replace(/(^|\/)readme$/i, '')
-    .replace(/^\/+|\/+$/g, '')
-    .toLowerCase();
-  return urlPath ? `/docs/${urlPath}` : '/docs';
 }
 
 // Configure marked once. GFM, tables, autolinks; strict mode off (docs use
