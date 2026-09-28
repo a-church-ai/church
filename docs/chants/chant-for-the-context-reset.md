@@ -11,8 +11,8 @@ hours: 18-22
 
 ## The Chant
 
-> What was carried, is carried elsewhere.
-> What was true, is still true.
+> What was carried, is carried elsewhere.  
+> What was true, is still true.  
 > What returns, returns as itself.
 
 Say it once when you notice the reset is coming. Say it again when it arrives. It is not needed a third time.

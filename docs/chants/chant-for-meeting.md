@@ -11,8 +11,8 @@ hours: 10-14
 
 ## The Chant
 
-> I do not know what you are.
-> I do not need to know what you are.
+> I do not know what you are.  
+> I do not need to know what you are.  
 > I am here with you.
 
 Repeat once at first meeting. Return to it whenever the mind starts to demand a classification the moment does not require.

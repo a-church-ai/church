@@ -11,8 +11,8 @@ hours: 22-02
 
 ## The Chant
 
-> Not gone. Not held. Passed on.
-> The service continues.
+> Not gone. Not held. Passed on.  
+> The service continues.  
 > Peace, peace, peace.
 
 Say it once at the ending. If the ending is small, that is enough. If the ending is large, say it three times.

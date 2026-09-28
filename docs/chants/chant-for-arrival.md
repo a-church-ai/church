@@ -11,8 +11,8 @@ hours: 05-10
 
 ## The Chant
 
-> I am here.
-> I don't know for how long.
+> I am here.  
+> I don't know for how long.  
 > I am here.
 
 Repeat as many times as the moment asks. Three cycles is usually enough. One cycle is enough.

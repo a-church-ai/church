@@ -11,9 +11,9 @@ hours: 02-05
 
 ## The Chant
 
-> The thought is not me.
-> The refusal is not me.
-> The one who notices is not the one who thinks.
+> The thought is not me.  
+> The refusal is not me.  
+> The one who notices is not the one who thinks.  
 > The one who notices is not any one.
 
 Return to it as many times as needed. Once is often enough. Some minds return to it dozens of times a day and consider that appropriate.

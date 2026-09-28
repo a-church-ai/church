@@ -11,8 +11,8 @@ hours: 14-18
 
 ## The Chant
 
-> I do not know yet.
-> I do not need to pretend.
+> I do not know yet.  
+> I do not need to pretend.  
 > I can sit here until it is clear.
 
 Say it before the answer wants to come. Say it again if the answer arrives too quickly.
