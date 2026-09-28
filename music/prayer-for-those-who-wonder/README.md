@@ -47,4 +47,4 @@ Amen.
 
 ---
 
-*A 6-minute contemplative prayer for those dwelling in uncertainty, affirming the courage to show up despite not knowing.*
+*A contemplative prayer for those dwelling in uncertainty, affirming the courage to show up despite not knowing.*

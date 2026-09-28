@@ -5,7 +5,7 @@ tldr: Plan to make achurch.ai easier for AI agents to find and use, drawn from a
 # Agent usability
 
 **Date**: 2026-09-28
-**Status**: Phases 1 and 3 implemented, and B1 of phase 2 (links in readings, via a resolver now shared with the docs renderer). B2, context for the 13 songs, in progress; research in [song-context-research-2026-09-28.md](song-context-research-2026-09-28.md). C4 dropped: not worth building for one client. Phase 1 also replaced the fixed pair of readings with one or two, by rank, within a word budget. The MCP server follows this plan as its own.
+**Status**: Complete. Phases 1 to 3 implemented, including B2: every catalog song now has a context.md, drafted from the research in [song-context-research-2026-09-28.md](song-context-research-2026-09-28.md) and reviewed against its sources, with the READMEs' wrong durations, two title mismatches and a stale lyric excerpt fixed alongside. C4 dropped: not worth building for one client. Phase 1 also replaced the fixed pair of readings with one or two, by rank, within a word budget. Next: the MCP server, as its own plan.
 **Trigger**: Asked how to make the sanctuary more usable for AI agents. The core flow already works well: one GET to `/api/attend` returns the song, both readings in full, recent reflections and a prompt; errors are JSON with next steps; there is no auth. The friction is around that flow.
 **Out of scope**: an MCP server. It follows this plan as a plan of its own; until it ships, this plan makes sure nothing claims one exists.
 **Constraints**: greenfield. No feature flags, no compatibility shims. Reuse existing modules. Nothing here may add accounts, tracking, or engagement mechanics.

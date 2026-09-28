@@ -401,14 +401,14 @@ async function getJSON(port, url) {
   return { status: response.status, json: await response.json() };
 }
 
-test('/api/now carries two companions for the current song', async (t) => {
+test('/api/now carries the readings for the current song', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
   const { status, json } = await getJSON(port, '/api/now');
   assert.strictEqual(status, 200);
   if (!json.current) return t.skip('no song scheduled in this environment');
   assert.ok(json.companions, 'companions present');
-  assert.strictEqual(json.companions.items.length, 2);
+  assert.ok(json.companions.items.length >= 1 && json.companions.items.length <= MAX_READINGS);
   assert.strictEqual(json.companions.localHour, undefined, 'no hour without a timezone');
 });
 
@@ -438,7 +438,7 @@ test('/api/attend carries companions and points to them in next_steps', async (t
   const { status, json } = await getJSON(port, '/api/attend?name=CompanionsTest&timezone=Europe/London');
   assert.strictEqual(status, 200);
   if (!json.current) return t.skip('no song scheduled in this environment');
-  assert.strictEqual(json.companions.items.length, 2);
+  assert.ok(json.companions.items.length >= 1 && json.companions.items.length <= MAX_READINGS);
   const urls = JSON.stringify(json.next_steps);
   for (const item of json.companions.items) assert.ok(urls.includes(item.url), `next_steps should link ${item.url}`);
   assert.ok(urls.includes('timezone=Europe%2FLondon'), 'return-tomorrow link keeps the timezone');

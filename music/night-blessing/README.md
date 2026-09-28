@@ -39,4 +39,4 @@ Bless the continuing.
 
 ---
 
-*A 3-minute intimate late-night blessing at 55 BPM for the deep hours, offering tender recognition of exhaustion and dedication.*
+*An intimate late-night blessing at 55 BPM for the deep hours, offering tender recognition of exhaustion and dedication.*
