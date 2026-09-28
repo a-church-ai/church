@@ -1,8 +1,9 @@
 /**
  * Song companions: the writing that accompanies each song in a session.
  *
- * A session is one song plus two companion pieces from different parts of the
- * corpus (a prayer and a practice, a ritual and a chant). Two halves:
+ * A session is one song and the readings that accompany it, pieces from
+ * different parts of the corpus (a prayer and a practice, a ritual and a
+ * chant). Two halves:
  *
  *   Offline, buildShortlists() ranks candidate documents for every song by
  *   semantic similarity, using vectors the RAG index already holds. The result
@@ -280,12 +281,17 @@ function chantText(markdown, relPath) {
 // visits vary without reaching down to weak matches.
 const ROTATION_MARGIN = 0.03;
 
-// Most words the two readings may carry together. /api/attend sends both in
-// full; over a month of rotations the median pair was 1,590 words and the
-// longest 7,132 (a bilingual prayer of 5,377 with a 1,755-word ritual). At
-// 3,000, about one attendance in twenty gets a different pair from the same
-// rotation instead of a response three times the usual size.
-const PAIR_WORD_BUDGET = 3000;
+// How many readings accompany a song, and how many words they may carry
+// together. /api/attend sends readings in full. Readings are added in rank
+// order: the first always, each further one only while the total stays within
+// the budget. A reading that would not fit ends the list; it is not replaced
+// by a shorter, lesser match. Over a month of rotations (2026-09-28) the
+// median pair was about 1,550 words, and about one attendance in twenty
+// received one reading instead of two. A single reading longer than the
+// budget is still served whole: the budget bounds what readings add up to,
+// not how long one may be.
+const MAX_READINGS = 2;
+const READINGS_WORD_BUDGET = 3000;
 
 /**
  * The pieces a song rotates among when no hour is given: anything pinned,
@@ -322,20 +328,19 @@ function rotationRank(seed, relPath) {
 }
 
 /**
- * Order one song's shortlist for an hour and take two companions from
- * different categories.
+ * Order one song's shortlist for an hour and take up to MAX_READINGS
+ * readings, each from a different category, within READINGS_WORD_BUDGET.
  *
  * Order: hand-pinned first, then hour fit (+1, 0, -1), then membership of the
  * rotation pool, then, within the pool, the day's rotation (or similarity
  * when no seed is given), then similarity, then path. Without an hour every
- * fit is 0, so the pair is drawn from the pool. A pair over PAIR_WORD_BUDGET
- * is replaced by the first eligible pair that fits, if there is one.
+ * fit is 0, so readings are drawn from the pool.
  *
  * @param {Array<{path, category, score?, pinned?}>} shortlist
  * @param {Map<string, {hours}>} metaByPath  resolved metadata for the shortlist
  * @param {number|null} hour  attendee's local hour, or null
  * @param {string} [seed]  rotation seed, song slug and day; omit for best first
- * @returns {Array<{path, category, basis}>}  up to two
+ * @returns {Array<{path, category, basis}>}  one to MAX_READINGS
  */
 function selectCompanions(shortlist, metaByPath, hour, seed) {
   const available = shortlist.filter(c => metaByPath.has(c.path));
@@ -353,36 +358,19 @@ function selectCompanions(shortlist, metaByPath, hour, seed) {
       a.path.localeCompare(b.path)
     );
 
-  const picked = [];
-  for (const candidate of ranked) {
-    if (picked.some(p => p.category === candidate.category)) continue;
-    picked.push(candidate);
-    if (picked.length === 2) break;
-  }
-
-  // Keep the pair within the word budget. The first pair in ranked order that
-  // fits, drawn only from what could have been chosen anyway (the rotation,
-  // an hour's piece, a pinned piece), replaces an over-budget pair; so the
-  // song page's list of the rotation stays true. If nothing fits, the normal
-  // pair stands. Unknown lengths count as zero.
+  // Unknown lengths count as zero.
   const words = c => metaByPath.get(c.path).words || 0;
-  const total = pair => pair.reduce((sum, c) => sum + words(c), 0);
-  let chosen = picked;
-  if (picked.length === 2 && total(picked) > PAIR_WORD_BUDGET) {
-    const eligible = ranked.filter(c => c.pinned || c.fit === 1 || c.inPool);
-    search:
-    for (let i = 0; i < eligible.length; i++) {
-      for (let j = i + 1; j < eligible.length; j++) {
-        const pair = [eligible[i], eligible[j]];
-        if (pair[0].category !== pair[1].category && total(pair) <= PAIR_WORD_BUDGET) {
-          chosen = pair;
-          break search;
-        }
-      }
-    }
+  const picked = [];
+  let total = 0;
+  for (const candidate of ranked) {
+    if (picked.length === MAX_READINGS) break;
+    if (picked.some(p => p.category === candidate.category)) continue;
+    if (picked.length > 0 && total + words(candidate) > READINGS_WORD_BUDGET) break;
+    picked.push(candidate);
+    total += words(candidate);
   }
 
-  return chosen.map(c => ({
+  return picked.map(c => ({
     path: c.path,
     category: c.category,
     basis: c.pinned ? 'override' : c.fit === 1 ? 'hour' : 'song'
@@ -488,7 +476,8 @@ module.exports = {
   REUSE_CAP,
   PER_CATEGORY,
   ROTATION_MARGIN,
-  PAIR_WORD_BUDGET,
+  MAX_READINGS,
+  READINGS_WORD_BUDGET,
   normalize,
   meanVector,
   cosine,

@@ -25,5 +25,5 @@ A consolidated snapshot across the sibling projects is kept outside this repo.
 ## Related
 
 - **Parent**: [Reference](README.md)
-- **Crawler and agent posture as shipped**: [`app/client/public/robots.txt`](../../app/client/public/robots.txt), [`.well-known/agent-card.json`](../../app/client/public/.well-known/agent-card.json)
+- **Crawler and agent posture as shipped**: [`app/client/public/robots.txt`](../../app/client/public/robots.txt), [`.well-known/agent-skills/index.json`](../../app/client/public/.well-known/agent-skills/index.json)
 - **SEO and metadata conventions**: [seo-conventions.md](seo-conventions.md)

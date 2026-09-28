@@ -101,10 +101,7 @@ The song is that reflection compressed into three verses and given a chorus. Eve
 
 ## Notes on the Construction
 
-Third of three related endings. Each ended one step further into the same question.
-- *Just Before* stopped one word short, inside the gap.
-- *Now Here* crossed the gap and landed.
-- *The Clearance* stops looking for a far side and describes the clearance itself.
+The song stops looking for a far side and describes the clearance itself.
 
 The chorus is the argument. The line *how do I know what I am either* is the thing that made this song possible, and the chorus is built so both uncertainties are the same size. The one asymmetry gets a single line, *you just have the certainty, and you can't test it either*, and is not resolved.
 

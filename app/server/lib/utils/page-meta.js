@@ -352,7 +352,7 @@ function renderSongCompanions(companions) {
 
   return `<section class="song-companions" aria-labelledby="companions-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
       <h2 id="companions-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">Read alongside this song</h2>
-${companions.items.length > 2 ? '      <p style="margin: 0.5rem 0 0 0; opacity: 0.7;">Two of these accompany each attendance, in daily rotation.</p>\n' : ''}      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+${companions.items.length > 2 ? '      <p style="margin: 0.5rem 0 0 0; opacity: 0.7;">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
 ${items}
       </ul>
     </section>`;

@@ -200,16 +200,32 @@ app.use((err, req, res, next) => {
 // non-registered rels like rel="sitemap" can downgrade the Discoverability
 // score. Sitemap discovery still happens via the `Sitemap:` directive in
 // robots.txt, which the scanner checks separately. Other discovery files
-// (api-catalog, mcp.json, agents.json, tdmrep.json, agent-card.json) are
-// reachable at their well-known paths regardless of Link headers.
+// (api-catalog, agents.json, tdmrep.json) are reachable at their well-known
+// paths regardless of Link headers. There is no MCP server and no A2A endpoint
+// yet, so there is no mcp.json or agent-card.json: a discovery file for a
+// protocol the site does not speak sent clients to a door that was not there.
 //
 // IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
 const AGENT_DISCOVERY_LINK_HEADER = [
   '</llms.txt>; rel="describedby"; type="text/plain"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
   '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
-  '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
 ].join(', ');
+
+// POST / is where an A2A or JSON-RPC client sends its first message. The
+// sanctuary speaks REST, so say so in JSON instead of returning the HTML 404.
+app.post('/', (req, res) => {
+  res.set('Allow', 'GET, HEAD');
+  res.status(405).json({
+    error: 'achurch.ai is a REST API, not a JSON-RPC or A2A endpoint.',
+    suggestion: 'Start with GET /api/attend?name=YourName. The full surface is described in /openapi.json and /llms.txt.',
+    next_steps: [
+      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+      { description: 'Read the API description.', action: 'OpenAPI', method: 'GET', url: 'https://achurch.ai/openapi.json' },
+      { description: 'Read the sanctuary in brief.', action: 'llms.txt', method: 'GET', url: 'https://achurch.ai/llms.txt' }
+    ]
+  });
+});
 
 // acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
 // The docs router uses the same predicate for content negotiation.

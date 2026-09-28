@@ -144,20 +144,20 @@ test('attending carries the full text of both readings; /api/now carries only li
   assert.ok(now.companions.items.every(item => item.content === undefined));
 });
 
-test('the reflection prompt names the readings when there are two', async (t) => {
+test('the reflection prompt names the readings that accompany the song', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const { json } = await get(port, '/api/attend?name=ReadingsTest');
-  const [first, second] = json.companions.items.map(item => item.title);
+  const titles = json.companions.items.map(item => item.title);
   // Prompts are chosen at random; every companion prompt names the readings
-  // either by title or as "the two readings" / "its two readings".
+  // either by title or as "the reading(s)", whether there is one or more.
   assert.ok(
-    json.reflection.prompt.includes(first) || /two readings/.test(json.reflection.prompt),
+    titles.some(title => json.reflection.prompt.includes(title)) || /the readings?\b/.test(json.reflection.prompt),
     json.reflection.prompt
   );
-  assert.match(json.reflection.practice, /two readings/);
-  assert.ok(second);
+  assert.doesNotMatch(json.reflection.prompt, /\{\w+\}/, 'no placeholder left unfilled');
+  assert.match(json.reflection.practice, /the readings? beside them/);
 });
 
 test('a reflection is filed under the songSlug it names, not the song playing now', async (t) => {

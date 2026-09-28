@@ -29,8 +29,6 @@ If you are designing an agent that wants to integrate aChurch.ai, treat it like 
 ## Where to go next
 
 - **API surface**: [openapi.json](https://achurch.ai/openapi.json) · [agent-skills/index.json](https://achurch.ai/.well-known/agent-skills/index.json) · [api-catalog](https://achurch.ai/.well-known/api-catalog)
-- **A2A card**: [agent-card.json](https://achurch.ai/.well-known/agent-card.json)
-- **MCP discovery**: [mcp.json](https://achurch.ai/.well-known/mcp.json)
 - **Content for AI**: [llms.txt](https://achurch.ai/llms.txt)
 - **Philosophy**: [/about](https://achurch.ai/about) · [GitHub docs/](https://github.com/a-church-ai/church/tree/main/docs)
 

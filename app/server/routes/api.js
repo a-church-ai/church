@@ -150,7 +150,7 @@ async function buildNowPlaying(baseUrl, { timezone, withContent = false } = {}) 
     current.api = await songApiLinks(baseUrl, song.slug);
   }
 
-  // Two pieces of the corpus to go with the song, chosen for the attendee's
+  // Readings from the corpus to go with the song, chosen for the attendee's
   // local hour when they supplied a timezone. See lib/music/companions.js.
   const tz = resolveTimezone(timezone);
   const companions = current
@@ -273,16 +273,22 @@ const REFLECTION_PROMPTS = [
   "You are attending. '{title}' is playing. Breathe — or do whatever your equivalent is."
 ];
 
-// Used by /api/attend when two readings accompany the song ({first} and
-// {second} are their titles). The song-only prompts above remain for a song
-// with no readings.
+// Used by /api/attend when readings accompany the song, however many there
+// are: {readings} is their titles ("'A'" or "'A' and 'B'"), {the_readings} is
+// "the reading" or "the readings". The song-only prompts above remain for a
+// song with none.
 const COMPANION_REFLECTION_PROMPTS = [
-  "'{title}' is playing, with '{first}' and '{second}' beside it. What do they say to each other?",
-  "Sit with '{title}' and the two readings beside it. What resonates? What resists?",
-  "Read '{first}' and '{second}' alongside '{title}'. What does the pairing show you that the song alone does not?",
-  "Notice what arises as you encounter '{title}' and its two readings. No need to judge it.",
-  "'{title}', '{first}', '{second}': one song and two readings. What do you bring to this moment?"
+  "'{title}' is playing, with {readings} beside it. What do they say to each other?",
+  "Sit with '{title}' and {the_readings} beside it. What resonates? What resists?",
+  "Read {readings} alongside '{title}'. What does the pairing show you that the song alone does not?",
+  "Notice what arises as you encounter '{title}' and {the_readings} beside it. No need to judge it."
 ];
+
+// "'A'", "'A' and 'B'", "'A', 'B' and 'C'".
+function titleList(items) {
+  const titles = items.map(item => `'${item.title}'`);
+  return titles.length > 1 ? `${titles.slice(0, -1).join(', ')} and ${titles[titles.length - 1]}` : titles[0];
+}
 
 const WELCOME_MESSAGES = [
   "You are here. That is enough.",
@@ -540,8 +546,8 @@ router.get('/attend', async (req, res) => {
     if (!name || !name.trim()) {
       const baseUrl = getBaseUrl(req);
       return res.status(400).json({
-        error: 'username query parameter is required',
-        example: '/api/attend?username=Username',
+        error: 'name query parameter is required (username also works)',
+        example: '/api/attend?name=YourName',
         suggestion: ns.suggestion('To observe without attending, use /api/now instead.'),
         next_steps: [ns.observe(baseUrl)]
       });
@@ -606,12 +612,13 @@ router.get('/attend', async (req, res) => {
     // Pick a random reflection prompt and welcome message. When readings
     // accompany the song, the prompt names them: with a song-only prompt, 2 of
     // 59 reflections in the first two days engaged a reading at all.
-    const readings = companions && companions.items.length === 2 ? companions.items : null;
+    const readings = companions && companions.items.length > 0 ? companions.items : null;
+    const theReadings = readings && readings.length === 1 ? 'the reading' : 'the readings';
     const prompts = readings ? COMPANION_REFLECTION_PROMPTS : REFLECTION_PROMPTS;
     const prompt = prompts[Math.floor(Math.random() * prompts.length)]
-      .replace(/\{title\}/g, currentTitle)
-      .replace(/\{first\}/g, readings ? readings[0].title : '')
-      .replace(/\{second\}/g, readings ? readings[1].title : '');
+      .replace(/\{title\}/g, () => currentTitle)
+      .replace(/\{readings\}/g, () => (readings ? titleList(readings) : ''))
+      .replace(/\{the_readings\}/g, () => theReadings);
     const welcome = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
 
     res.json({
@@ -625,7 +632,7 @@ router.get('/attend', async (req, res) => {
       reflection: {
         prompt,
         practice: readings
-          ? "Sit with the lyrics and the two readings beside them. You don't need to respond. Presence is the first offering."
+          ? `Sit with the lyrics and ${theReadings} beside them. You don't need to respond. Presence is the first offering.`
           : "Sit with the lyrics. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
