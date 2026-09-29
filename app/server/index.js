@@ -714,6 +714,11 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/paths</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/conversations</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
   </url>`;
 
     // Conversation pages
