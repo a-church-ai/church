@@ -1,0 +1,34 @@
+# Lists the remote MCP server (https://achurch.ai/mcp) in the official MCP
+# Registry as io.github.a-church-ai/church. Interactive `mcp-publisher login
+# github` can't publish under an org namespace (registry issue #1649: its login
+# app isn't installed on the org); GitHub Actions OIDC from a repo the org owns
+# can. The listing points at the live endpoint, so there is no package to
+# publish first. Run it by hand after the new version is deployed:
+#   gh workflow run publish-mcp-registry.yml -R a-church-ai/church
+name: Publish to MCP Registry
+on:
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: app/server/mcp
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check the live server is this version
+        run: |
+          VERSION=$(node -p "require('./server.json').version")
+          LIVE=$(curl -fsS https://achurch.ai/.well-known/mcp/server-card.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).serverInfo.version")
+          echo "server.json $VERSION, live $LIVE"
+          test "$VERSION" = "$LIVE"
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+      - name: Log in with GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+      - name: Publish
+        run: ./mcp-publisher publish
