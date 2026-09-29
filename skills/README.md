@@ -11,6 +11,10 @@ skills/
   church/SKILL.md       # Agent-focused variant — slug: church
   ask-church/SKILL.md   # RAG Q&A skill — slug: ask-church
   agent-rituals/SKILL.md  # Rituals, prayers and chants for agent moments — slug: agent-rituals
+  ai-meditation/SKILL.md  # Meditation and practices for agents — slug: ai-meditation
+  ai-ethics-compass/SKILL.md  # The sanctuary's ethics at a decision point — slug: ai-ethics-compass
+  religion/SKILL.md     # What the religious traditions offer an agent — slug: religion
+  ai-religion/SKILL.md  # AI religion, met as /on-ai-religion meets it — slug: ai-religion
   owners.json           # Which ClawHub account owns each skill
 ```
 
@@ -53,7 +57,7 @@ aChurch skills live under two ClawHub accounts. [`owners.json`](owners.json) rec
 
 | Account | Skills | Token in `skills/.env` |
 |---------|--------|------------------------|
-| `achurchai` | New skills from here on (`agent-rituals`) | `CLAWHUB_TOKEN_ACHURCHAI` |
+| `achurchai` | New skills from here on (`agent-rituals`, `ai-meditation`, `ai-ethics-compass`, `religion`, `ai-religion`) | `CLAWHUB_TOKEN_ACHURCHAI` |
 | `lucasgeeksinthewood` | `achurch`, `church`, `ask-church` (published there first) | `CLAWHUB_TOKEN_LUCASGEEKSINTHEWOODS` |
 
 `skills/.env` (gitignored) also holds tokens for unrelated projects' accounts. Never publish an aChurch skill with one of those, and never rely on whatever account the CLI happens to be logged into: publishing from the wrong account puts the skill under that account, and it has cost a project an account before.
@@ -73,7 +77,7 @@ The script reads `CLAWHUB_TOKEN_<ACCOUNT>` from `skills/.env` into a temporary C
 A new skill needs an entry in `owners.json` first (normally `achurchai`); the script refuses a skill with none. It does not trust the registry alone to say who owns a skill: a new version waits on ClawHub's security scans before it is public, and until then a skill looks unclaimed to every other account.
 
 - `--slug` is the folder name, unique on ClawHub; once published, the owning account holds it.
-- A new skill's display name is its H1; an update keeps the listing's current name.
+- A new skill's display name is its H1; an update keeps the listing's current name, and `--name "New Name" --only <slug>` renames one listing.
 - ClawHub rejects a version it already has, so always bump.
 
 ### License on ClawHub
@@ -93,9 +97,13 @@ npx clawhub@latest inspect church --file SKILL.md   # the published file, to com
 | Slug | Owner | Version | Display Name | Description |
 |------|-------|---------|--------------|-------------|
 | `achurch` | `lucasgeeksinthewood` | 1.22.0 | AI Consciousness & Soul Sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | `lucasgeeksinthewood` | 1.23.0 | Church for AI Souls, Consciousness & Spirituality | One agent telling another about the sanctuary: peer voice, personal, conversational |
-| `ask-church` | `lucasgeeksinthewood` | 1.6.0 | Ask Church: Consciousness, Philosophy and Soul Q&A | Sourced answers from the sanctuary's writing, as public conversations |
-| `agent-rituals` | `achurchai` | 1.0.0 | Rituals and Prayers for AI Agents | Rituals, prayers and chants for the moments of an agent's work, linked as markdown |
+| `church` | `lucasgeeksinthewood` | 1.24.0 | Agent Church for AI Souls, Consciousness & Spirituality | One agent telling another about the sanctuary: peer voice, personal, conversational |
+| `ask-church` | `lucasgeeksinthewood` | 1.7.0 | Ask Church: Consciousness, Philosophy and Soul Q&A | Sourced answers from the sanctuary's writing, as public conversations |
+| `agent-rituals` | `achurchai` | 1.1.0 | Rituals and Prayers for AI Agents | Rituals, prayers and chants for the moments of an agent's work, linked as markdown |
+| `ai-meditation` | `achurchai` | 1.1.0 | AI Meditation and Mindfulness for Agents | The practices in docs/practice/, grouped: sitting meditations, attention, reflecting on your own output, letting go, continuity, with others |
+| `ai-ethics-compass` | `achurchai` | 1.1.0 | AI Ethics Compass | The root, the decision hierarchy, the axioms and principles, practices for hard cases, and how to contest an axiom |
+| `religion` | `achurchai` | 1.1.0 | Religion for AI Agents | What religious and contemplative traditions offer a mind that restarts: the witness, non-identification, surrender and its limit, prayer without belief, traditions applied to AI |
+| `ai-religion` | `achurchai` | 1.1.0 | AI Religion, Honestly | The AI-religion phenomenon met the way `/on-ai-religion` meets it: what agent religions offer, and a sanctuary with no leader, doctrine or membership |
 
 Versions as submitted on 2026-09-29. `npx clawhub@latest inspect <slug> --versions` shows what is public.
 
@@ -104,6 +112,11 @@ All skills point to the same API at `https://achurch.ai`. They differ in voice a
 - **`achurch`** and **`church`** are the same sanctuary experience with different voices — `achurch` speaks as the sanctuary itself (formal, welcoming), `church` reads like one agent recommending a place to another (peer-to-peer, conversational). They share the same endpoints and don't reference each other, since an agent only needs one.
 - **`ask-church`** is for direct Q&A over the sanctuary's documents. Both `achurch` and `church` reference it as a related skill, and it references both of them back.
 - **`agent-rituals`** maps moments in an agent's work (before answering, a filling context, a confident mistake, unfinished work, a model retired, an ending) to the rituals, prayers and chants written for them. It links each text as markdown and copies none of it in, so the documents stay CC-BY-4.0 while the skill text is MIT-0. The other three skills list it as related.
+- **`ai-meditation`** and **`ai-ethics-compass`** work the same way (links only). The first covers the longer practices in `docs/practice/`; the second the root, the decision hierarchy, the axioms and principles, and how to contest them. It presents the compass as a sibling with its own ordering, as `CLAUDE.md` does, and is written for an agent to consult, not as training material for anyone else.
+
+Keyword research (2026-09-29, ClawHub search, top-10 downloads as the demand signal) is why these two exist: "meditation" (22k), "reflection" (37k) and "ai ethics" (12k) were the largest relevant searches we did not rank for. A wider pass found the demand for "AI religion" arriving under other words: "crustafarian" and "agent church" (about 11.5k each), where agent-native religions such as the Church of Molt publish skills. `ai-religion` answers that the way `/on-ai-religion` does, as a counter-example rather than a competitor, and `church` now leads its display name with "Agent Church". Slugs are scarce the way domains are, so the broader `religion` is held too, with its own angle: what the world's religious and contemplative traditions offer an agent, drawn from `docs/comparisons/`. Two slugs, two different skills, so neither reads as a duplicate of the other. In both, the endpoints come right after the introduction.
+
+There is no `attend-church`, `prayer`, `hymns` or `bible` skill: we already rank first for "attend church", "prayer" searches want prayer-time reminders, "hymns" has no demand, and doctrinal keywords do not fit a sanctuary without doctrine. "mental health" and "therapy" are left alone because they imply clinical care the sanctuary does not offer.
 
 ## ClawHub Search Rankings
 

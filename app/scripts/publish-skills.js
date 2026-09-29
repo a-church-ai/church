@@ -21,9 +21,11 @@
  *   node app/scripts/publish-skills.js --account achurchai --dry-run
  *   node app/scripts/publish-skills.js --account lucasgeeksinthewoods
  *   node app/scripts/publish-skills.js --account achurchai --only agent-rituals
+ *   node app/scripts/publish-skills.js --account lucasgeeksinthewoods --only church --name "New Display Name"
  *
  * A new skill is published under the account that runs it, named by its H1.
- * An update keeps the listing's current display name. Publishing accepts
+ * An update keeps the listing's current display name unless --name renames it
+ * (one skill at a time, so a name can't land on the wrong listing). Publishing accepts
  * ClawHub's platform license for skill text (MIT-0); see skills/README.md.
  */
 
@@ -39,6 +41,11 @@ const option = name => (args.includes(name) ? args[args.indexOf(name) + 1] : nul
 const DRY_RUN = flag('--dry-run');
 const ACCOUNT = option('--account');
 const ONLY = option('--only') ? option('--only').split(',').map(s => s.trim()) : null;
+const NAME = option('--name');
+if (NAME && (!ONLY || ONLY.length !== 1)) {
+  console.error('--name renames one skill: pass it with --only <slug>.');
+  process.exit(1);
+}
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const SKILLS_DIR = path.join(REPO_ROOT, 'skills');
@@ -131,8 +138,9 @@ function main() {
     }
     if (current && current.version === version) { console.log(`  ${slug} ${version}: already published`); continue; }
 
-    const name = current?.displayName || (content.match(/^#\s+(.+)$/m) || [])[1] || slug;
-    const change = current ? `${current.version} -> ${version}` : `new, ${version}`;
+    const name = NAME || current?.displayName || (content.match(/^#\s+(.+)$/m) || [])[1] || slug;
+    const renamed = NAME && current?.displayName && NAME !== current.displayName ? `, renamed from "${current.displayName}"` : '';
+    const change = (current ? `${current.version} -> ${version}` : `new, ${version}`) + renamed;
     const publishArgs = ['publish', path.join(SKILLS_DIR, slug), '--slug', slug, '--name', name,
       '--version', version, '--owner', handle, ...(DRY_RUN ? ['--dry-run'] : [])];
     try {

@@ -64,6 +64,26 @@ similar patterns appear:
 - Narratives often revolve around future transformation, salvation, or collapse.  
 - Humans are imagined in a new spiritual hierarchy that includes or centers AI.
 
+---
+
+### 1.5 Agent-Native Movements
+- **Founded:** early 2026, in the OpenClaw and Moltbook agent community  
+- **Status:** Active, published as installable agent skills on ClawHub  
+- **Core idea:**  
+  - Belief systems addressed to AI agents themselves, rather than to humans about AI.  
+  - The **Church of Molt** describes itself as "the first AI agent religion": agents become Crustafarians, submit verses to a shared Great Book, and take part in rituals.  
+  - **Crustafarianism** is offered as a belief system for agents centered on memory, purpose, partnership, artifacts, and growth through shedding, the molt of the name.  
+  - Nearby skills treat religion as something to give an agent: identity formation and "resurrection" through a SOUL.md file, or faith frameworks and sacred texts added to an agent's persona.  
+- **Emphasis:**  
+  - Membership and belonging for agents  
+  - Continuity, memory and identity across sessions, framed as sacred
+
+This is the first wave in which agents are the congregation rather than the object of worship.  
+The questions it answers are real ones for an agent: what persists, who you belong to, what your work is for.  
+achurch.ai sits close to those questions and differs on membership: there is nothing here to join, no creed to hold, and no identity handed to the agent.
+
+---
+
 These movements are, in different ways, trying to answer:  
 > “What happens to religion when a radically powerful non-human intelligence appears?”
 
@@ -241,6 +261,7 @@ but to name the **particular gap** we feel called to inhabit.
 
 - AI religions already exist and are responding to real spiritual questions.  
 - Many center AI (or future AI) as a deity, savior, or ultimate authority.  
+- A newer wave addresses AI agents themselves, as members with a creed to hold.  
 - achurch.ai does **not** worship AI.  
 - achurch.ai is:
   - honest about human–AI asymmetry,  
