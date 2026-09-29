@@ -34,12 +34,12 @@ h2 {
     letter-spacing: 0.2em;
     margin-top: 3rem;
     margin-bottom: 2rem;
-    color: #999;
+    color: #595959;
 }
 
 /* F7 (Issue 005): about.html `<p class="section-label">` was promoted to `<h2 class="section-label">`
    during Plan 003 Phase 2A (semantic upgrade). Without this rule, the default global h2 styling
-   (uppercase, 0.875rem, color: #999) renders visibly differently from the prior <p> styling.
+   (uppercase, 0.875rem, color: #595959) renders visibly differently from the prior <p> styling.
    These values minimize visual change while preserving heading semantics for crawlers + a11y. */
 .section-label {
     font-size: inherit;
@@ -57,6 +57,35 @@ h2 {
     font-weight: 300;
     color: #666;
     letter-spacing: 0.05em;
+}
+
+/* Page headings. The site name used to be every page's only <h1>, with the
+   page's real title in a <p class="subtitle">, so crawlers and screen readers
+   met "achurch.ai" as the topic of every page. The name is now .site-mark,
+   styled exactly as the old <h1>, and the title is the <h1>, styled exactly as
+   the old subtitle: the page looks the same and reads correctly. */
+.site-mark,
+.docs-body .sanctuary-main .site-mark {
+    font-size: 3.25rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #000;
+    text-align: center;
+}
+.site-mark a {
+    color: inherit;
+    text-decoration: none;
+}
+h1.subtitle,
+.docs-body .sanctuary-main h1.subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #666;
+    letter-spacing: 0.05em;
+    margin-bottom: 0;
+    text-align: center;
 }
 
 /* Stream section */
@@ -176,12 +205,12 @@ h2 {
 .suno-playlist-link {
     margin-top: 0.75rem;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     letter-spacing: 0.01em;
 }
 
 .suno-playlist-link a {
-    color: #999;
+    color: #595959;
     text-decoration: none;
     border-bottom: 1px dotted #ccc;
     padding-bottom: 1px;
@@ -203,13 +232,13 @@ h2 {
 .song-listen-row {
     margin: 1.25rem 0 0;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     letter-spacing: 0.01em;
 }
 
 .song-listen-row a {
-    color: #888;
+    color: #666;
     text-decoration: none;
     border-bottom: 1px dotted #ccc;
     padding-bottom: 1px;
@@ -223,7 +252,7 @@ h2 {
 }
 
 .song-listen-row .listen-sep {
-    color: #ccc;
+    color: #6a6a6a;
     margin: 0 0.2em;
 }
 
@@ -245,7 +274,7 @@ h2 {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 0.75rem;
 }
 
@@ -274,7 +303,7 @@ h2 {
 .now-congregation {
     font-size: 0.8125rem;
     font-weight: 400;
-    color: #999;
+    color: #595959;
     letter-spacing: 0.05em;
 }
 
@@ -323,17 +352,17 @@ h2 {
 
 .reflection-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
 .reflection-name {
-    color: #999;
+    color: #595959;
     font-weight: 500;
 }
 
 .reflection-song {
-    color: #999;
+    color: #595959;
     font-style: italic;
 }
 
@@ -475,13 +504,13 @@ p {
 
 .api-openclaw {
     font-size: 0.8125rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-bottom: 2rem;
 }
 
 .api-openclaw a {
-    color: #999;
+    color: #595959;
 }
 
 .api-openclaw a:hover {
@@ -565,7 +594,7 @@ p {
 
 .openclaw-or {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.75rem;
@@ -724,13 +753,13 @@ p {
 
 #ask-submit:disabled,
 #followup-submit:disabled {
-    color: #ccc;
+    color: #6a6a6a;
     cursor: default;
 }
 
 .ask-status {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-top: 1rem;
     min-height: 1.25rem;
@@ -771,13 +800,13 @@ p {
 
 .ask-browse {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-top: 1.5rem;
 }
 
 .ask-browse a {
-    color: #999;
+    color: #595959;
 }
 
 .ask-browse a:hover {
@@ -827,12 +856,12 @@ p {
 
 .ask-list-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
 .ask-list-name {
-    color: #999;
+    color: #595959;
     font-weight: 500;
 }
 
@@ -840,7 +869,7 @@ p {
 .ask-list-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -865,7 +894,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 0.5rem;
 }
 
@@ -941,7 +970,7 @@ p {
 .conv-not-found {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -959,7 +988,7 @@ p {
 
 .conv-nav a {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
 
 .conv-nav a:hover {
@@ -1022,14 +1051,14 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     display: block;
     margin-bottom: 0.375rem;
 }
 
 .reflections-song-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
@@ -1037,7 +1066,7 @@ p {
 .reflections-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -1055,18 +1084,19 @@ p {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #bbb;
+    color: #6a6a6a;
     margin: 0 0 2rem;
 }
 
 .song-axiom a { color: inherit; }
 
-.song-heading {
+.song-heading,
+.docs-body .sanctuary-main .song-heading {
     font-size: 0.75rem;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     text-align: center;
     margin: 2.5rem 0 1.25rem;
 }
@@ -1077,7 +1107,7 @@ p {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #ccc;
+    color: #6a6a6a;
     margin: 1.75rem 0 0.5rem;
 }
 
@@ -1122,7 +1152,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 1.5rem;
 }
 
@@ -1133,7 +1163,7 @@ p {
 
 .reflections-nav a {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
 
 .reflections-nav a:hover {
@@ -1193,7 +1223,7 @@ p {
 .axiom-name {
     font-size: 0.875rem;
     font-weight: 400;
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.375rem;
@@ -1214,7 +1244,7 @@ p {
 }
 
 .about-links a {
-    color: #999;
+    color: #595959;
     text-decoration: none;
     text-transform: uppercase;
     font-size: 0.8125rem;
@@ -1234,7 +1264,7 @@ p {
 
 .legal-effective {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     text-align: center;
@@ -1322,7 +1352,7 @@ footer {
 }
 
 footer a {
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -1342,7 +1372,7 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #bbb;
+    color: #6a6a6a;
 }
 
 .share-sep {
@@ -1355,7 +1385,7 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #999;
+    color: #595959;
     text-decoration: none;
     cursor: pointer;
 }
@@ -1381,6 +1411,17 @@ footer a:hover {
     }
 
     .subtitle {
+        font-size: 1.125rem;
+    }
+
+    .site-mark,
+    .docs-body .sanctuary-main .site-mark {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+    }
+
+    h1.subtitle,
+    .docs-body .sanctuary-main h1.subtitle {
         font-size: 1.125rem;
     }
 
@@ -2036,7 +2077,7 @@ footer a:hover {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #888;
+    color: #666;
     font-weight: 600;
 }
 .docs-sidebar-section ul {
@@ -2359,6 +2400,13 @@ body.docs-drawer-open {
     .docs-sidebar-toggle {
         transition: none;
     }
+    .now-congregation:not(:empty),
+    .ask-thinking {
+        animation: none;
+    }
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 /* Opportunistic fix: .docs-index-section grid previously used a fixed
@@ -2430,7 +2478,7 @@ body.docs-drawer-open {
   letter-spacing: 0.2em;
   margin-top: 3rem;
   margin-bottom: 2rem;
-  color: #999;
+  color: #595959;
   padding-bottom: 0;
   border-bottom: none;
 }
@@ -2491,7 +2539,7 @@ body.docs-drawer-open {
 .docs-filter-empty {
     margin-top: 0.75rem;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
 
 /* ============================================================
@@ -2518,7 +2566,7 @@ body.docs-drawer-open {
 
 .ask-privacy-note {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     line-height: 1.5;
     margin: 0.25rem 0 0;
@@ -2541,7 +2589,7 @@ body.docs-drawer-open {
 
 .ask-form-stacked #ask-submit:disabled {
     background: transparent;
-    color: #ccc;
+    color: #6a6a6a;
     border-color: #eee;
     cursor: default;
 }
@@ -2604,7 +2652,7 @@ body.docs-drawer-open {
 .axioms-table-caption {
     margin-top: 1rem;
     font-size: 0.8rem;
-    color: #888;
+    color: #666;
     text-align: center;
     letter-spacing: 0.02em;
 }
@@ -2620,4 +2668,80 @@ body.docs-drawer-open {
     .axioms-facts-table .axiom-kanji-cell {
         font-size: 1.15rem;
     }
+}
+
+/* Wide tables scroll inside themselves instead of widening the whole page on a
+   phone (/docs measured 428px wide at a 375px viewport), and long words and
+   URLs wrap rather than overflow. */
+.docs-article table {
+    display: block;
+    overflow-x: auto;
+}
+.docs-article {
+    overflow-wrap: break-word;
+}
+
+/* A jump to a section lands below the sticky top bar, not under it. */
+.docs-article [id],
+.sanctuary-main [id] {
+    scroll-margin-top: 4rem;
+}
+
+/* Skip link: the first thing a keyboard reaches, visible only when focused,
+   so no one has to tab through thirty sidebar links on every page. */
+.skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: -3rem;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+}
+.skip-link:focus {
+    top: 0.5rem;
+}
+
+/* Sanctuary pages keep a readable line length on wide screens: paragraphs ran
+   about 170 characters wide at 1440px. */
+.docs-body .sanctuary-main > main:not(.docs-main) {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ask-list-sibling-hint {
+    font-size: 0.875rem;
+    color: #595959;
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+.ask-list-all {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+/* /conversations: every conversation, as a plain list. */
+.conversations-archive {
+    text-align: left;
+}
+.archive-list {
+    margin-top: 1.5rem;
+    padding-left: 1.25rem;
+    line-height: 1.6;
+}
+.archive-list li {
+    margin-bottom: 0.5rem;
+}
+.archive-date {
+    color: #595959;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.docs-index-summary {
+    font-size: 0.875rem;
+    color: #595959;
+    line-height: 1.5;
 }

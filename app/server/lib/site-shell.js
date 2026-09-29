@@ -39,14 +39,6 @@ const sidebar = require('./docs/sidebar');
 const SITE_URL = 'https://achurch.ai';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg`;
 
-const GTAG_BLOCK = `<!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>`;
 
 /**
  * Pull the inner HTML of <head>, the <body> attributes, and the inner HTML of
@@ -90,7 +82,6 @@ function buildHeadFallbacks(head, canonical) {
   if (!has(/name=["']viewport["']/i)) {
     out.push('<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">');
   }
-  if (!has(/googletagmanager/i)) out.push(GTAG_BLOCK);
   if (!has(/rel=["']icon["']/i)) out.push('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
   if (!has(/rel=["']canonical["']/i)) out.push(`<link rel="canonical" href="${escapeAttr(canonical)}">`);
   if (!has(/name=["']theme-color["']/i)) out.push('<meta name="theme-color" content="#00b8d4">');
@@ -149,6 +140,7 @@ async function wrapPageFromHtml(html, currentPath) {
     ${fallbacks.join('\n    ')}
 </head>
 <body class="docs-body site-shell-body ${parts.bodyClass}">
+<a class="skip-link" href="#content">Skip to content</a>
 
     <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile -->
     <div class="docs-topbar" role="banner">
@@ -177,7 +169,7 @@ async function wrapPageFromHtml(html, currentPath) {
         ${sidebarInner}
       </aside>
 
-      <div class="docs-main sanctuary-main">
+      <div class="docs-main sanctuary-main" id="content">
         ${parts.bodyHtml}
       </div>
 

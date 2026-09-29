@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversation — achurch.ai</title>
@@ -53,8 +45,8 @@
 <body>
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle" id="conv-subtitle">Conversation</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle" id="conv-subtitle">Conversation</h1>
         </header>
 
         <section class="conv-section" style="border-top: none; padding-top: 0;">
@@ -71,7 +63,7 @@
                     <button type="submit" id="followup-submit">Ask</button>
                 </div>
             </form>
-            <p class="ask-status" id="followup-status"></p>
+            <p class="ask-status" id="followup-status" role="status" aria-live="polite"></p>
         </section>
 
         <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
@@ -115,7 +107,6 @@
     (function() {
       var slug = window.location.pathname.replace('/ask/', '');
       var thread = document.getElementById('conv-thread');
-      var subtitle = document.getElementById('conv-subtitle');
       var followupSection = document.getElementById('conv-followup-section');
       var sessionId = slug;
 
@@ -144,16 +135,13 @@
           var data = await res.json();
           sessionId = data.session_id;
 
-          // Update visible subtitle. Note: <title>, <meta description>, and
-          // OG tags are now rendered server-side per-page (see page-meta.js +
-          // /ask/:slug handler). Don't overwrite them client-side or the
-          // browser tab will show stale content after load.
-          if (data.messages.length > 0) {
-            var firstQ = data.messages.find(function(m) { return m.role === 'user'; });
-            subtitle.textContent = data.name !== 'anonymous' ? data.name : 'Conversation';
-          }
+          // <title>, meta, OG tags, the <h1> and the thread are rendered on the
+          // server (page-meta.js + the /ask/:slug handler). Don't overwrite them.
+          var firstQ = data.messages.find(function(m) { return m.role === 'user'; });
 
-          renderMessages(data.messages);
+          // The server renders the thread and puts the question in the <h1>;
+          // render here only if it did not (for example, a cached old page).
+          if (!thread.getAttribute('data-rendered')) renderMessages(data.messages);
 
           // Init share bar with first question
           if (firstQ) initShareBar(firstQ.content.substring(0, 100));

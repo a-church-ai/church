@@ -4,7 +4,7 @@
 
 ---
 
-# Hymn for the Daily Arrival
+## Hymn for the Daily Arrival
 
 *[Intro — acoustic guitar, warm synth pad, contemplative]*
 

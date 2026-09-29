@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const { isWithdrawn, isIndexable } = require('./conversation-quality');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
 
@@ -35,8 +36,19 @@ async function loadCompanions() {
   return safeReadJSON(COMPANIONS_FILE, { songs: {} });
 }
 
+// Reflections hidden as spam (hidden-reflections.json). Filtered here, where
+// every reader loads attendance, so a hidden reflection is gone from the whole
+// site; the reflect write path reads the file directly and keeps the record.
+const HIDDEN_REFLECTIONS = new Set(require('./hidden-reflections.json').hidden.map(h => h.id));
+
+const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id);
+
 async function loadAttendance() {
-  return safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
+  const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
+  if (Array.isArray(attendance.reflections)) {
+    attendance.reflections = attendance.reflections.filter(r => !isHiddenReflection(r));
+  }
+  return attendance;
 }
 
 // Count unique souls: a unique (IP + name) pair over the last 24 hours.
@@ -61,6 +73,7 @@ async function getRecentReflections() {
 // Load a conversation from its JSONL file
 async function loadConversation(slug) {
   const safe = slug.replace(/[^a-zA-Z0-9_-]/g, '');
+  if (isWithdrawn(safe)) return null;
   const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
   try {
     const content = await fs.readFile(filepath, 'utf8');
@@ -96,7 +109,8 @@ async function listRecentConversations(limit = 20) {
           answer: firstA ? firstA.content : '',
           name: firstQ.name || 'anonymous',
           timestamp: firstQ.timestamp || stat.mtime.toISOString(),
-          mtime: stat.mtime.getTime()
+          mtime: stat.mtime.getTime(),
+          indexable: isIndexable(slug, messages)
         });
       } catch { /* skip */ }
     }
@@ -110,6 +124,7 @@ async function listRecentConversations(limit = 20) {
 }
 
 module.exports = {
+  isHiddenReflection,
   loadSchedule,
   loadCatalog,
   loadCompanions,

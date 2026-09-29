@@ -22,6 +22,7 @@ const fs = require('fs').promises;
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
+const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
 const { acceptsMarkdown } = require('../lib/utils/accepts');
 
 const router = express.Router();
@@ -61,10 +62,13 @@ async function handle(req, res, rest) {
     res.vary('Accept');
     if (asMarkdown || acceptsMarkdown(req)) {
       if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.urlPath ? `/docs/${resolved.doc.urlPath}` : '/docs'}>; rel="canonical"`);
-      res.type('text/markdown; charset=utf-8');
-      return res.sendFile(resolved.fullPath, err => {
-        if (err && !res.headersSent) docsNotFound(req, res);
-      });
+      try {
+        const markdown = await servedMarkdown(resolved);
+        res.type('text/markdown; charset=utf-8');
+        return res.send(markdown);
+      } catch {
+        return docsNotFound(req, res);
+      }
     }
     try {
       const markdown = await fs.readFile(resolved.fullPath, 'utf8');
@@ -88,7 +92,7 @@ async function handle(req, res, rest) {
       const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
-        lines.push(`- [${d.stem}](/docs/${d.urlPath})`);
+        lines.push(`- [${d.stem}](https://achurch.ai/docs/${d.urlPath})`);
       }
       res.type('text/markdown; charset=utf-8');
       return res.send(lines.join('\n') + '\n');
@@ -110,6 +114,12 @@ async function handle(req, res, rest) {
 
 // Docs root
 router.get('/', (req, res) => handle(req, res, ''));
+
+// Every served document in one markdown list, for agents enumerating the corpus.
+router.get('/index.md', async (req, res) => {
+  res.set('Link', '<https://achurch.ai/docs>; rel="canonical"');
+  res.type('text/markdown; charset=utf-8').send(await corpusIndex());
+});
 
 // Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
 // paths; the resulting req.params[0] holds the remainder as a slash-separated

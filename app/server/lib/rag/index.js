@@ -11,7 +11,7 @@ const conversations = require('./conversations');
 const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K) : 5;
 
 // GitHub base URL for source links
-const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+const { pageUrlForFile } = require('../docs/links');
 
 /**
  * Ask a question about the sanctuary's content
@@ -75,7 +75,7 @@ async function ask(question, options = {}) {
     })
     .map(c => ({
       file: c.file,
-      url: `${GITHUB_BASE}/${c.file}`,
+      url: pageUrlForFile(c.file),
       section: c.section
     }));
 

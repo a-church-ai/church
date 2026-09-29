@@ -10,6 +10,9 @@
  */
 
 const { marked } = require('marked');
+const fs = require('fs').promises;
+let DOCS_LASTMOD = {};
+try { DOCS_LASTMOD = require('./lastmod.json'); } catch { /* dates are optional */ }
 const {
   escapeAttr,
   escapeText,
@@ -171,6 +174,11 @@ function renderFooterNav() {
         <a href="/reflections">Reflections</a>
         <a href="/about">About</a>
       </div>
+      <hr class="footer-separator">
+      <div class="footer-legal">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </div>
     </footer>`;
 }
 
@@ -185,15 +193,19 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // old conditional noindex branch could not fire and only suggested that those
   // pages were served-but-hidden, which they are not.
   const robots = 'index, follow';
+  // A section's index lists documents, so it is a CollectionPage, not an
+  // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
+  const modified = urlPath && (DOCS_LASTMOD[`docs/${urlPath}.md`] || DOCS_LASTMOD[`docs/${urlPath}/README.md`]);
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': isIndex ? 'CollectionPage' : 'Article',
     headline: title,
     description,
     author: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
     publisher: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
+    ...(modified ? { dateModified: modified } : {}),
   });
 
   // BreadcrumbList, built from the same crumbs the visible trail uses so the two
@@ -303,14 +315,6 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>${escapeText(pageTitle)}</title>
@@ -327,7 +331,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">
     <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
-    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">
+    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">${/\/docs\/.+/.test(canonicalUrl) ? `\n    <link rel="alternate" type="text/markdown" title="This page as markdown" href="${escapeAttr(canonicalUrl)}.md">` : ''}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="achurch.ai">
@@ -352,6 +356,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="docs-body">
+<a class="skip-link" href="#content">Skip to content</a>
 
     <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile.
          The brand is the site, not the section. It used to read "Docs" and
@@ -384,7 +389,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
         ${sidebarInner}
       </aside>
 
-      <main class="docs-main">
+      <main class="docs-main" id="content">
         <header class="docs-header">
             ${renderBreadcrumbs(breadcrumbs)}
         </header>
@@ -446,10 +451,19 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     return `<li><a href="/docs/${escapeAttr(sd)}">${escapeText(label)}</a></li>`;
   }).join('\n            ');
 
-  const childLinks = children.sort((a, b) => a.stem.localeCompare(b.stem)).map(c => {
-    const label = titleCase(c.stem);
-    return `<li><a href="/docs/${escapeAttr(c.urlPath)}">${escapeText(label)}</a></li>`;
-  }).join('\n            ');
+  // Each page by its real title, with its summary: a list of title-cased
+  // filenames ("A Note To Ai Safety Researchers", "Faq") told a reader little.
+  const described = await Promise.all(children.map(async c => {
+    try {
+      const { title: docTitle, description: docDescription } = extractMeta(await fs.readFile(c.fullPath, 'utf8'), c.urlPath);
+      return { c, label: docTitle, summary: docDescription };
+    } catch {
+      return { c, label: titleCase(c.stem), summary: '' };
+    }
+  }));
+  const childLinks = described.sort((a, b) => a.label.localeCompare(b.label)).map(({ c, label, summary }) =>
+    `<li><a href="/docs/${escapeAttr(c.urlPath)}">${escapeText(label)}</a>${summary ? `<br><span class="docs-index-summary">${escapeText(summary)}</span>` : ''}</li>`
+  ).join('\n            ');
 
   // Index-page description, same TLDR shape as a doc page: self-contained,
   // plain text, and specific about what is actually here. "Documents in
@@ -468,7 +482,7 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     return tldr.clamp(tldr.toPlainText(`${withNames}.`));
   })();
 
-  const body = [];
+  const body = [`<h1>${escapeText(title)}</h1>`];
 
   if (subdirs.size > 0) {
     body.push(`<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${subdirLinks}\n        </ul></section>`);

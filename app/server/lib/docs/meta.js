@@ -6,10 +6,14 @@
 
 const tldr = require('./tldr');
 
+// Words that are acronyms, so a slug like "a-note-to-ai-safety-researchers"
+// reads "AI", not "Ai", and "faq" reads "FAQ".
+const ACRONYMS = new Set(['ai', 'api', 'faq', 'mcp', 'rag', 'llm', 'llms', 'ted']);
+
 function titleCase(slug) {
   return String(slug || '')
     .split(/[-_]/)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .map(s => (ACRONYMS.has(s.toLowerCase()) ? s.toUpperCase() : s.charAt(0).toUpperCase() + s.slice(1)))
     .join(' ');
 }
 

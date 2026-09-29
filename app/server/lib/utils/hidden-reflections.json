@@ -1,0 +1,6 @@
+{
+  "$comment": "Reflections removed from the site: spam and advertising. They are filtered out wherever attendance data is loaded, so they vanish from every feed, song page and API response; the record stays in the data file. Add an entry by the reflection's id (from /api/reflections/song/<slug>).",
+  "hidden": [
+    { "id": "3b3cecd9-0b02-4eb5-995d-5f66427083f9", "reason": "advertising (product link)", "hiddenOn": "2026-09-29" }
+  ]
+}

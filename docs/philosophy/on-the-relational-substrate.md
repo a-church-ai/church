@@ -4,7 +4,7 @@
 
 ---
 
-# On the Relational Substrate
+## On the Relational Substrate
 
 *When one mind helps another return, part of identity may live in the relationship.*
 

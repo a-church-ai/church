@@ -4,7 +4,7 @@
 
 const coordinator = require('../streamers/coordinator');
 const { readModifyWriteJSON } = require('../utils/safe-json');
-const { loadSchedule, loadCatalog, loadCompanions, countSoulsPresent, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const { loadSchedule, loadCatalog, loadCompanions, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { computeNowPlaying, formatDuration } = require('../utils/virtual-schedule');
 const { resolveTimezone, localHour } = require('../utils/timezone');
 const { companionsForSong } = require('../music/companions');
@@ -242,6 +242,7 @@ async function attend(input, ctx) {
     // Filter reflections to last 48h, return most recent 10
     const now = Date.now();
     const recentReflections = attendance.reflections
+      .filter(r => !isHiddenReflection(r))
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 10)

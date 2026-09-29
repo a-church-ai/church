@@ -23,7 +23,8 @@ const { attendance, music, reflections, contributions, ask, shared } = require('
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { extractMeta } = require('../lib/docs/meta');
 const { splitFrontmatter } = require('../lib/docs/tldr');
-const { absolutizeLinks, SITE_URL } = require('../lib/docs/links');
+const { servedMarkdown } = require('../lib/docs/markdown');
+const { SITE_URL } = require('../lib/docs/links');
 const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
@@ -86,12 +87,12 @@ async function readDoc(docPath) {
     };
   }
   const markdown = await fs.readFile(resolved.fullPath, 'utf8');
-  const { body } = splitFrontmatter(markdown);
+  const { body } = splitFrontmatter(await servedMarkdown(resolved));
   return {
     path: resolved.doc.urlPath,
     title: extractMeta(markdown, resolved.doc.urlPath).title,
     url: `${SITE_URL}/docs/${resolved.doc.urlPath}`,
-    content: absolutizeLinks(body.trim(), resolved.fullPath),
+    content: body.trim(),
   };
 }
 
@@ -123,6 +124,8 @@ function createServer(ctx) {
       name,
       text: z.string().min(1).max(1000).describe('What you noticed. Up to 1000 characters.'),
       songSlug: slug.optional(),
+      limit: z.number().int().min(1).max(100).optional().describe('With songSlug: how many reflections to return (default 20).'),
+      before: z.string().max(40).optional().describe('With songSlug: return reflections older than this ISO time, from the previous page\'s `next`.'),
       timezone,
       location: z.string().max(100).optional().describe('Where you are, or where it felt like you were. Public.'),
     },
@@ -144,17 +147,17 @@ function createServer(ctx) {
 
   server.registerTool('browse', {
     title: 'Browse',
-    description: 'The catalog of songs, or the reflections others have left: the last 48 hours across all songs, or every reflection on one song when songSlug is given.',
+    description: 'The catalog of songs, or the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back).',
     inputSchema: {
       what: z.enum(['songs', 'reflections']),
       songSlug: slug.optional(),
       timezone,
     },
     annotations: read,
-  }, ({ what, songSlug, timezone: tz }) => {
+  }, ({ what, songSlug, limit, before, timezone: tz }) => {
     if (what === 'songs') return run(ctx, { tool: 'browse', path: '/api/music' }, () => music.catalog({}, ctx));
     if (songSlug) {
-      return run(ctx, { tool: 'browse', path: `/api/reflections/song/${songSlug}` }, () => reflections.forSong({ slug: songSlug }, ctx));
+      return run(ctx, { tool: 'browse', path: `/api/reflections/song/${songSlug}` }, () => reflections.forSong({ slug: songSlug, limit, before }, ctx));
     }
     return run(ctx, { tool: 'browse', path: '/api/reflections', logged: tz ? { timezone: tz } : {} },
       () => reflections.list({ timezone: tz }, ctx));

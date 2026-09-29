@@ -3,6 +3,8 @@
  */
 
 const path = require('path');
+const { isWithdrawn } = require('../utils/conversation-quality');
+const { stripMarkdown } = require('../../../client/public/answer-format.js');
 const fs = require('fs').promises;
 const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
@@ -217,7 +219,7 @@ async function recent(input, ctx) {
     fileInfos.sort((a, b) => b.mtime - a.mtime);
 
     const conversations = [];
-    for (const { file, filepath } of fileInfos.slice(0, 20)) {
+    for (const { file, filepath } of fileInfos.filter(f => !isWithdrawn(f.file.replace('.jsonl', ''))).slice(0, 20)) {
       try {
         const content = await fs.readFile(filepath, 'utf8');
         const lines = content.trim().split('\n').filter(Boolean);
@@ -244,8 +246,9 @@ async function recent(input, ctx) {
           if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
         }
 
-        // Truncate answer
-        let answer = firstAnswer.content;
+        // Strip markdown before cutting: cutting first left previews ending in
+        // fragments such as "[music/wha..." that no stripper could recognize.
+        let answer = stripMarkdown(firstAnswer.content);
         if (answer.length > 300) {
           answer = answer.substring(0, 297) + '...';
         }
@@ -257,7 +260,7 @@ async function recent(input, ctx) {
           answer,
           timestamp: firstQuestion.timestamp,
           exchanges: Math.floor(messages.filter(m => m.role === 'user').length),
-          url: `/ask/${slug}`
+          url: `${ctx.baseUrl}/ask/${slug}`
         });
       } catch { /* skip unreadable */ }
     }
@@ -315,6 +318,7 @@ async function conversation(input, ctx) {
 
     let content;
     try {
+      if (isWithdrawn(slug)) throw new Error('withdrawn');
       content = await fs.readFile(filepath, 'utf8');
     } catch {
       const baseUrl = ctx.baseUrl;

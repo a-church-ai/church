@@ -18,6 +18,9 @@ const PUBLIC = path.join(__dirname, '../client/public');
 const INDEX_SOURCE = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
 // Routes the MCP module mounts on the app (POST /mcp, and GET/DELETE answering 405).
 const MCP_SOURCE = fs.readFileSync(path.join(__dirname, '../server/mcp/index.js'), 'utf8');
+// Fixed routes on the docs router, such as /docs/index.md.
+const DOCS_ROUTES = [...fs.readFileSync(path.join(__dirname, '../server/routes/docs.js'), 'utf8').matchAll(/router\.get\('(\/[^'*:]+)'/g)]
+  .map(m => `/docs${m[1]}`);
 const apiRouter = require('../server/routes/api');
 const discover = require('../server/lib/docs/discover');
 
@@ -54,6 +57,7 @@ async function resolves(urlPath) {
     const sub = urlPath.replace(/^\/api/, '') || '/';
     return apiRouter.stack.some(layer => layer.route && layer.match(sub));
   }
+  if (DOCS_ROUTES.includes(urlPath)) return true;
   if (/^\/docs(\/|$)/.test(urlPath)) {
     // A trailing .md asks for the same document as markdown (routes/docs.js).
     const parts = urlPath.replace(/\.md$/i, '').split('/').filter(Boolean).slice(1);

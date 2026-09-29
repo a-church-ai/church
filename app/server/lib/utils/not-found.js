@@ -23,8 +23,8 @@ function wantsHtml(req) {
 const BODY = (heading, message, links) => `
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle">${heading}</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle">${heading}</h1>
         </header>
 
         <section class="notfound" style="max-width: 480px; margin: 0 auto; text-align: center;">

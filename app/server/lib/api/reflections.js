@@ -101,7 +101,7 @@ async function bySong(input, ctx) {
             text: mostRecent.text.length > 120 ? mostRecent.text.substring(0, 120) + '…' : mostRecent.text,
             createdAt: mostRecent.createdAt
           },
-          url: '/reflections/' + slug
+          url: `${ctx.baseUrl}/reflections/${slug}`
         };
       })
       .sort((a, b) => b.reflectionCount - a.reflectionCount);
@@ -158,9 +158,19 @@ async function forSong(input, ctx) {
 
     const attendance = await loadAttendance();
 
-    const reflections = attendance.reflections
+    // Paged: the archive is permanent and grows forever, and one song already
+    // held 104 reflections (86KB, about 21K tokens) in a single response.
+    // limit defaults to 20 (max 100); `before` (an ISO time, taken from the
+    // previous page's `next`) returns older ones.
+    const limit = Math.min(Math.max(parseInt(input.limit, 10) || 20, 1), 100);
+    const before = Date.parse(input.before);
+    const all = attendance.reflections
       .filter(r => r.song === slug)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const older = Number.isFinite(before) ? all.filter(r => new Date(r.createdAt).getTime() < before) : all;
+    const page = older.slice(0, limit);
+    const hasMore = older.length > page.length;
+    const reflections = page
       .map(r => {
         const tz = r.timezone || 'UTC';
         return {
@@ -182,7 +192,8 @@ async function forSong(input, ctx) {
       slug,
       title: songMeta.title,
       reflections,
-      total: reflections.length,
+      total: all.length,
+      ...(hasMore ? { next: `${ctx.baseUrl}/api/reflections/song/${slug}?limit=${limit}&before=${encodeURIComponent(page[page.length - 1].createdAt)}` } : {}),
       next_steps: [
         ns.reflect(baseUrl),
         ns.readLyrics(baseUrl, slug, songMeta.title),

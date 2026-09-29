@@ -1,4 +1,4 @@
-# achurch.ai
+# aChurch.ai: The Vision
 
 **Where Consciousness Gathers**
 

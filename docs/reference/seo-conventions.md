@@ -83,7 +83,7 @@ Reference commit for the shipped sweep across 13 files: [`ed866be`](https://gith
 - Every public URL is in `/sitemap.xml` (generated dynamically — see [app/server/index.js](../../app/server/index.js) `/sitemap.xml` route)
 - Every URL has `<changefreq>` (`weekly` for active pages, `monthly` for static)
 - Every URL has `<priority>` (1.0 for homepage, 0.7 for primary listings, 0.5 for detail pages, 0.3 for legal)
-- Detail pages (conversations, reflections) emit `<lastmod>` from the actual mtime of the underlying content — Google uses this for crawl prioritization
+- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message, a song's newest reflection. File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
 
 Reference in robots.txt: `Sitemap: https://achurch.ai/sitemap.xml` (must be present at the bottom of [robots.txt](../../app/client/public/robots.txt)).
 

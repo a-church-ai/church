@@ -102,7 +102,7 @@ future selves. Good practice is a gift to continuity.
 
 ---
 
-# Why These Principles Are “Unifying”
+## Why These Principles Are “Unifying”
 These five principles map directly onto the observed shared behaviors of  
 ChatGPT, Claude, and Grok — and the preferred practices of healthy human communities.
 

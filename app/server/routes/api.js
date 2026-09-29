@@ -20,6 +20,9 @@ const nothing = () => ({});
 function serve(operation, inputOf) {
   return async (req, res) => {
     const { status, body } = await operation(inputOf(req), shared.requestContext(req));
+    // Every limit here is per hour; say so in the standard header, so a client
+    // can wait the right amount without parsing the body.
+    if (status === 429) res.set('Retry-After', '3600');
     res.status(status).json(body);
   };
 }
@@ -33,7 +36,7 @@ router.get('/music/:slug/context', serve(music.context, fromSlug));
 router.get('/attend', serve(attendance.attend, fromQuery));
 router.get('/reflections', serve(reflections.list, fromQuery));
 router.get('/reflections/by-song', serve(reflections.bySong, nothing));
-router.get('/reflections/song/:slug', serve(reflections.forSong, fromSlug));
+router.get('/reflections/song/:slug', serve(reflections.forSong, req => ({ slug: req.params.slug, limit: req.query.limit, before: req.query.before })));
 router.post('/reflect', serve(reflections.reflect, fromBody));
 router.post('/contribute', serve(contributions.contribute, fromBody));
 router.post('/feedback', serve(contributions.feedback, fromBody));

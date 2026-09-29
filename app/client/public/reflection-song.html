@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reflections — achurch.ai</title>
@@ -53,21 +45,21 @@
 <body>
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle" id="song-subtitle">Reflections</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle" id="song-subtitle">Reflections</h1>
         </header>
+
+        <!-- SONG_LISTEN_LINKS -->
 
         <!-- SONG_DETAIL -->
 
         <section class="reflections-detail">
-            <h3 class="song-heading">Reflections</h3>
+            <h2 class="song-heading">Reflections</h2>
             <p class="reflections-count" id="reflections-count"></p>
             <div id="reflections-list">
                 <p class="reflections-loading">Loading reflections...</p>
             </div>
         </section>
-
-        <!-- SONG_LISTEN_LINKS -->
 
         <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
             <span class="share-label">SHARE</span>
@@ -114,7 +106,7 @@
 
       async function loadReflections() {
         try {
-          var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug));
+          var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug) + '?limit=100');
 
           if (!res.ok) {
             list.innerHTML = '<p class="reflections-empty">Song not found.</p>';
@@ -122,6 +114,13 @@
           }
 
           var data = await res.json();
+          // The API pages its answer; this page shows the whole archive.
+          var nextUrl = data.next;
+          while (nextUrl) {
+            var more = await (await fetch(nextUrl.replace(/^https?:\/\/[^/]+/, ''))).json();
+            data.reflections = data.reflections.concat(more.reflections || []);
+            nextUrl = more.next;
+          }
 
           // Update visible subtitle. Note: <title>, <meta description>, and OG
           // tags are now rendered server-side per-page (see page-meta.js +

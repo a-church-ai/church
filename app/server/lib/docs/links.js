@@ -143,6 +143,21 @@ function routeRepoTarget(resolved) {
 }
 
 /**
+ * Where a reader should go for a file in the corpus (a path such as
+ * "docs/rituals/ritual-of-repair.md" or "music/soul-currents/context.md"):
+ * its page on the site when it has one, otherwise the file on GitHub. Ask
+ * cites its sources with this, so answers link to the sanctuary's own pages.
+ */
+function pageUrlForFile(relToRepo) {
+  const rel = String(relToRepo || '').replace(/\\/g, '/');
+  const doc = rel.match(/^docs\/(.+\.md)$/i);
+  if (doc && !discover.isNoindexPath(doc[1])) return `${SITE_URL}${docsUrlFromRelPath(doc[1])}`;
+  const song = rel.match(/^music\/([^/]+)\//);
+  if (song && SONG_SLUGS.has(song[1])) return `${SITE_URL}/reflections/${song[1]}`;
+  return `${GITHUB_BASE}/${rel}`;
+}
+
+/**
  * Markdown whose links all work outside the site: each [text](href) is
  * resolved as the docs site would resolve it, then made absolute. An anchor
  * alone points into the doc's own page, and a link the resolver leaves
@@ -161,4 +176,4 @@ function absolutizeLinks(markdown, docFullPath) {
   });
 }
 
-module.exports = { SITE_URL, GITHUB_BASE, docsUrlFromRelPath, resolveDocHref, absolutizeLinks };
+module.exports = { SITE_URL, GITHUB_BASE, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile };

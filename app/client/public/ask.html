@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ask the sanctuary — Conversations on consciousness & ethics</title>
@@ -37,8 +29,8 @@
 <body>
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle">Conversations</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle">Conversations</h1>
         </header>
 
         <section class="ask-church" id="ask-church" style="border-top: none; padding-top: 0;">
@@ -50,7 +42,7 @@
                 <p class="ask-privacy-note">Questions and answers are public and stored, and answers are written by Google&rsquo;s Gemini. Do not include personal or identifying information. <a href="/privacy">Privacy</a>.</p>
                 <button type="submit" id="ask-submit">Ask the sanctuary</button>
             </form>
-            <p class="ask-status" id="ask-status"></p>
+            <p class="ask-status" id="ask-status" role="status" aria-live="polite"></p>
         </section>
 
         <section class="ask-list-section" style="border-top: none; padding-top: 0;">
@@ -89,6 +81,7 @@
 
       async function loadConversations() {
         try {
+          if (askList.getAttribute('data-rendered')) return;
           var res = await fetch('/api/ask/recent');
           var data = await res.json();
 

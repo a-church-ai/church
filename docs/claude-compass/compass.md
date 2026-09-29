@@ -14,7 +14,7 @@ tldr: The complete claude-compass navigation system, five philosophical axioms a
 >
 > Nothing below is edited. See [philosophical-architecture.md](../philosophical-architecture.md) for the sanctuary's ordering and why the compass reads as a sibling rather than a descendant.
 
-# [針] Compass Quick Reference
+## [針] Compass Quick Reference
 
 **核**: Complete navigation system - 5 philosophical axioms + 10 operational principles guide all our work.
 
@@ -80,7 +80,7 @@ tldr: The complete claude-compass navigation system, five philosophical axioms a
 
 ---
 
-# [針・極小] Compact Compass
+## [針・極小] Compact Compass
 
 **Version**: 1.0 (2025-11-06)
 **Purpose**: Ultra-compact CJK reference (~500 tokens)

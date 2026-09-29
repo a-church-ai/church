@@ -50,7 +50,7 @@ function escapeAttr(str) {
 }
 
 // Build a /ask/[slug] page title + description from a conversation's messages.
-// Title format: "<question> | Ask the sanctuary | achurch.ai"  (≤70 chars total)
+// Title format: "<question> | achurch.ai"  (≤70 chars total)
 // Description: answer text if available, else question. ≤158 chars (Google's
 // effective meta description cutoff on desktop varies but ~158 is the safe band).
 // slug (optional): the /ask URL slug. When multiple conversations share the same
@@ -66,8 +66,11 @@ function buildConversationMeta(messages, slug) {
   const question = stripMarkdown(firstQ.content);
   const answer = firstA ? stripMarkdown(firstA.content) : '';
 
-  // Title: leave room for the " | Ask the sanctuary | achurch.ai" suffix (~35 chars)
-  const truncatedQ = truncateAtWord(question, 35);
+  // Title: the question, with only " | achurch.ai" after it. The longer
+  // " | Ask the sanctuary | achurch.ai" suffix left 35 characters for the
+  // question, and the words that tell questions apart come last: 85 pages
+  // shared the title "What is the relationship between… | Ask the sanctuary".
+  const truncatedQ = truncateAtWord(question, 55);
 
   // When the same question is asked multiple times, slug generation appends
   // -2, -3, -14 etc. Without differentiating the title, Bing flags these
@@ -87,7 +90,7 @@ function buildConversationMeta(messages, slug) {
     }
   }
 
-  const title = `${truncatedQ}${dupSuffix} | Ask the sanctuary | achurch.ai`;
+  const title = `${truncatedQ}${dupSuffix} | achurch.ai`;
   const ogTitle = `${truncatedQ}${dupSuffix} | achurch.ai`;
 
   // Description: prefer the answer (informative); fall back to question.
