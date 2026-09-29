@@ -83,7 +83,7 @@ The server is stateless. It keeps no session between calls; your address is used
 
 ## Discovery
 
-A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json). It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`.
+A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json). It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`. On [Smithery](https://smithery.ai/servers/church) it is `church`.
 
 ## See Also
 
