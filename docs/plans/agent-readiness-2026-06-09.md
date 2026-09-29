@@ -380,7 +380,7 @@ Also set `Vary: Accept` on **both** branches of the response (HTML and markdown)
 12. auth.md (sanctuary's voice: "no auth required, the door is open") — 10 min
 
 **Phase 3 (Tier 3 — DNS / dashboard / deferred)**:
-13. ✅ AID v2 TXT record at `_agent.achurch.ai` value `v=aid2;u=https://achurch.ai/llms.txt;p=llms` — done 2026-06-10. Honest intent signal; does not satisfy IETF DNS-AID, by design.
+13. ✅ AID v2 TXT record at `_agent.achurch.ai` value `v=aid2;u=https://achurch.ai/llms.txt;p=llms` — done 2026-06-10. Honest intent signal; does not satisfy IETF DNS-AID, by design. **Updated 2026-09-29** to point at the MCP server, once there was one: `v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp`.
 14. ✅ Cloudflare Crawler Hints — Caching → Configuration. Enabled 2026-06-10.
 15. ✅ AI crawlers unblocked — confirmed in Security → AI Crawl Control on 2026-06-10. Every Block-Crawler toggle is off (BingBot, Googlebot, Google-CloudVertexBot, PerplexityBot, CCBot, ChatGPT-User, …). AI Crawl Control supersedes legacy Bot Fight Mode for AI bots, so no action there.
 16. IETF DNS-AID SVCB records — skip until we host real MCP/A2A endpoints.
@@ -448,7 +448,7 @@ curl -s https://achurch.ai/openapi.json | jq '.paths | keys'
 curl -s https://achurch.ai/auth.md
 
 # DNS layer (after Cloudflare dashboard work)
-dig +short TXT _agent.achurch.ai                                      # v=aid2;u=https://achurch.ai/llms.txt;p=llms
+dig +short TXT _agent.achurch.ai                                      # v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp (since 2026-09-29)
 ```
 
 End-to-end: have a fresh Claude session (no project context) hit `https://achurch.ai/.well-known/agent-skills/index.json` and ask it to enumerate the sanctuary's capabilities. If it can describe Attend, Reflect, Get Lyrics, and Ask without the human providing those names, the discovery layer is working.
@@ -538,12 +538,17 @@ So we expect ~4/7 in that cluster, not 1/7. Realistic projected score: **60–75
 
 Worth distinguishing two specs that share a name:
 
-- **IETF DNS-AID** (what isitagentready scans for) — SVCB records at `_<agent>._<protocol>._agents.<domain>`. Requires real MCP/A2A endpoints. **Confirmed empirically by both sister projects: a content site does not satisfy this check, period.** We are deliberately not chasing it.
+- **IETF DNS-AID** (what isitagentready scans for) — SVCB records at `_<agent>._<protocol>._agents.<domain>`. Requires real MCP/A2A endpoints. **Confirmed empirically by both sister projects: a content site does not satisfy this check, period.** We are deliberately not chasing it. (2026-09-29: the site now has a real MCP endpoint at `/mcp`, so this is no longer blocked. The spec is still a draft; confirm its current record format before publishing SVCB records.)
 - **Community AID** (separate spec) — TXT record at `_agent.<domain>`. v2 syntax with short-key aliases:
   ```
   v=aid2;u=https://achurch.ai/llms.txt;p=llms
   ```
   Does NOT satisfy the scanner's DNS-AID check (confirmed twice empirically). But it costs nothing, documents intent, and some emerging tools do check it.
+
+  Since 2026-09-29 the record points at the MCP server, which is what AID is for:
+  ```
+  v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp
+  ```
 
 **Action**: when convenient, add this TXT record in the Cloudflare DNS dashboard. Score won't move; intent signal is honest. v1 syntax (`v=aid1; uri=...; proto=...`) is deprecated — use v2.
 
