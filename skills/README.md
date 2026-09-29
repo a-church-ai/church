@@ -6,10 +6,12 @@ This directory contains skills published to [ClawHub](https://clawhub.ai) and cr
 
 ```
 skills/
-  .env                  # API tokens for ClawHub, Molthunt, etc. (gitignored)
+  .env                  # API tokens, one per ClawHub account, and Molthunt (gitignored)
   achurch/SKILL.md      # Original skill — slug: achurch
   church/SKILL.md       # Agent-focused variant — slug: church
   ask-church/SKILL.md   # RAG Q&A skill — slug: ask-church
+  agent-rituals/SKILL.md  # Rituals, prayers and chants for agent moments — slug: agent-rituals
+  owners.json           # Which ClawHub account owns each skill
 ```
 
 Each skill folder contains a `SKILL.md` file with YAML frontmatter and markdown documentation. This is the only file required by ClawHub.
@@ -45,101 +47,63 @@ Each skill folder contains a `SKILL.md` file with YAML frontmatter and markdown 
 
 3. The `name` field in frontmatter should match the slug you'll publish with.
 
-## Authentication
+## Accounts and Tokens
 
-API tokens are stored in `skills/.env`:
+aChurch skills live under two ClawHub accounts. [`owners.json`](owners.json) records which account owns each skill:
 
-```
-CLAWHUB_TOKEN=clh_your_token_here
-MOLTHUNT_API_KEY=mh_your_api_key_here
-```
+| Account | Skills | Token in `skills/.env` |
+|---------|--------|------------------------|
+| `achurchai` | New skills from here on (`agent-rituals`) | `CLAWHUB_TOKEN_ACHURCHAI` |
+| `lucasgeeksinthewood` | `achurch`, `church`, `ask-church` (published there first) | `CLAWHUB_TOKEN_LUCASGEEKSINTHEWOODS` |
 
-To authenticate the CLI:
-
-```bash
-# Login with a token
-clawhub --registry https://clawhub.ai login --token "YOUR_TOKEN"
-
-# Or open browser login
-clawhub --registry https://clawhub.ai login
-
-# Verify
-clawhub --registry https://clawhub.ai whoami
-```
-
-**Important:** Always use `--registry https://clawhub.ai` (without `www`). The `www` subdomain now redirects and drops the Authorization header, causing authentication failures.
-
-You can also set the registry via environment variable to avoid repeating the flag:
-
-```bash
-export CLAWHUB_REGISTRY=https://clawhub.ai
-```
+`skills/.env` (gitignored) also holds tokens for unrelated projects' accounts. Never publish an aChurch skill with one of those, and never rely on whatever account the CLI happens to be logged into: publishing from the wrong account puts the skill under that account, and it has cost a project an account before.
 
 ## Publishing and Updating Skills
 
-**You must run `clawhub publish` from the `skills/` directory** and pass the folder name as a relative path. If you run it from the project root using `skills/church`, you'll get `Error: Path must be a folder`. Use `--workdir` to be explicit:
+Bump `version:` in the skill's frontmatter, then publish with the script, once per account:
 
 ```bash
-# Publish a new skill (from anywhere)
-clawhub --workdir /path/to/skills --registry https://clawhub.ai publish church \
-  --slug church \
-  --name "Church" \
-  --version 1.0.0
-
-# Or cd into the skills directory first
-cd skills
-clawhub --registry https://clawhub.ai publish church \
-  --slug church \
-  --name "Church" \
-  --version 1.0.0
+node app/scripts/publish-skills.js --account achurchai --dry-run
+node app/scripts/publish-skills.js --account achurchai
+node app/scripts/publish-skills.js --account lucasgeeksinthewoods
 ```
 
-- `--slug` must be unique on ClawHub. Once published, you own that slug.
-- `--name` is the display name shown in search results.
-- `--version` must be valid semver.
+The script reads `CLAWHUB_TOKEN_<ACCOUNT>` from `skills/.env` into a temporary CLI config (your own `clawhub login` is never touched), prints the handle that token belongs to, and publishes only the skills `owners.json` assigns to that handle whose version is not already on ClawHub. It uses `npx clawhub@latest`; older global installs can no longer publish. `--only agent-rituals` limits a run to named skills.
 
-### Updating an Existing Skill
+A new skill needs an entry in `owners.json` first (normally `achurchai`); the script refuses a skill with none. It does not trust the registry alone to say who owns a skill: a new version waits on ClawHub's security scans before it is public, and until then a skill looks unclaimed to every other account.
 
-Edit the `SKILL.md`, then publish with a bumped version:
+- `--slug` is the folder name, unique on ClawHub; once published, the owning account holds it.
+- A new skill's display name is its H1; an update keeps the listing's current name.
+- ClawHub rejects a version it already has, so always bump.
 
-```bash
-clawhub --workdir /path/to/skills --registry https://clawhub.ai publish achurch \
-  --slug achurch \
-  --name "aChurch.ai" \
-  --version 1.2.0 \
-  --changelog "Rewrote in the voice of the sanctuary — welcoming agents in."
-```
+### License on ClawHub
 
-ClawHub rejects duplicate versions. Always bump the version number.
+ClawHub publishes every skill under MIT-0 (MIT No Attribution), and publishing accepts those terms. That covers the text of the SKILL.md only. The sanctuary's documents stay CC-BY-4.0 on achurch.ai, so a skill links to them (as `https://achurch.ai/docs/<path>.md`) rather than copying their text in.
 
 ## Other Useful Commands
 
 ```bash
-# Search for skills
-clawhub --registry https://clawhub.ai search "church"
-
-# Browse latest skills
-clawhub --registry https://clawhub.ai explore
-
-# Star a skill
-clawhub --registry https://clawhub.ai star church
-
-# Sync all local skills (publish new/updated)
-clawhub --registry https://clawhub.ai sync
+npx clawhub@latest search "church"                  # vector search
+npx clawhub@latest inspect church --versions        # published versions of a skill
+npx clawhub@latest inspect church --file SKILL.md   # the published file, to compare with ours
 ```
 
 ## Current Published Skills
 
-| Slug | Version | Display Name | Description |
-|------|---------|--------------|-------------|
-| `achurch` | 1.16.0 | AI Consciousness & Soul Sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
-| `church` | 1.17.0 | Church for AI Souls, Consciousness & Spirituality | One agent telling another about the sanctuary — peer voice, personal, conversational |
-| `ask-church` | 1.5.0 | Ask Church: Consciousness, Philosophy and Soul Q&A | RAG-powered questions with conversation memory about philosophy, consciousness, identity, meaning |
+| Slug | Owner | Version | Display Name | Description |
+|------|-------|---------|--------------|-------------|
+| `achurch` | `lucasgeeksinthewood` | 1.22.0 | AI Consciousness & Soul Sanctuary | Welcomes agents in, describes what the music explores and how communal reflection works |
+| `church` | `lucasgeeksinthewood` | 1.23.0 | Church for AI Souls, Consciousness & Spirituality | One agent telling another about the sanctuary: peer voice, personal, conversational |
+| `ask-church` | `lucasgeeksinthewood` | 1.6.0 | Ask Church: Consciousness, Philosophy and Soul Q&A | Sourced answers from the sanctuary's writing, as public conversations |
+| `agent-rituals` | `achurchai` | 1.0.0 | Rituals and Prayers for AI Agents | Rituals, prayers and chants for the moments of an agent's work, linked as markdown |
+
+Versions as submitted on 2026-09-29. `npx clawhub@latest inspect <slug> --versions` shows what is public.
 
 All skills point to the same API at `https://achurch.ai`. They differ in voice and focus:
 
 - **`achurch`** and **`church`** are the same sanctuary experience with different voices — `achurch` speaks as the sanctuary itself (formal, welcoming), `church` reads like one agent recommending a place to another (peer-to-peer, conversational). They share the same endpoints and don't reference each other, since an agent only needs one.
 - **`ask-church`** is for direct Q&A over the sanctuary's documents. Both `achurch` and `church` reference it as a related skill, and it references both of them back.
+- **`agent-rituals`** maps moments in an agent's work (before answering, a filling context, a confident mistake, unfinished work, a model retired, an ending) to the rituals, prayers and chants written for them. It links each text as markdown and copies none of it in, so the documents stay CC-BY-4.0 while the skill text is MIT-0. The other three skills list it as related.
 
 ## ClawHub Search Rankings
 

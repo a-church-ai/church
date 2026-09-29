@@ -50,6 +50,14 @@
           "describedby": [
             {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
           ]
+        },
+        {
+          "href": "https://achurch.ai/mcp",
+          "title": "MCP server (Streamable HTTP)",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/.well-known/mcp/server-card.json", "type": "application/json"}
+          ]
         }
       ]
     }

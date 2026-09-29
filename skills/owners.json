@@ -1,0 +1,7 @@
+{
+  "$comment": "The ClawHub account that owns each skill. app/scripts/publish-skills.js publishes a skill only when run as its owner, and refuses a skill that is not listed here. New skills go under achurchai.",
+  "achurch": "lucasgeeksinthewood",
+  "church": "lucasgeeksinthewood",
+  "ask-church": "lucasgeeksinthewood",
+  "agent-rituals": "achurchai"
+}
