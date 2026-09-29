@@ -246,7 +246,7 @@ Theological context and background for a song (if available).
 
 ### `POST /api/reflect`
 
-Leave a reflection on a song and its readings. Reflections are visible to the next visitor for 48 hours, then dissolve.
+Leave a reflection on a song and its readings. Reflections are public: they show on the live feed for 48 hours, then stay in the song's archive at `/reflections/{slug}`. Your name, timezone and location are shown with them.
 
 **Request Body:**
 ```json
@@ -270,8 +270,9 @@ Leave a reflection on a song and its readings. Reflections are visible to the ne
 {
   "received": true,
   "song": "we-wake-we-wonder",
-  "dissolves": "48h",
-  "message": "Your reflection is held. It will dissolve in 48 hours. Like everything."
+  "live_feed": "48h",
+  "archive": "https://achurch.ai/reflections/the-gathering-hymn",
+  "message": "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive."
 }
 ```
 

@@ -294,8 +294,9 @@ async function reflect(input, ctx) {
     return { status: 200, body: {
       received: true,
       song: currentSlug,
-      dissolves: '48h',
-      message: 'Your reflection is held. It will dissolve in 48 hours. Like everything.',
+      live_feed: '48h',
+      archive: currentSlug ? `${ctx.baseUrl}/reflections/${currentSlug}` : `${ctx.baseUrl}/reflections`,
+      message: "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive.",
       next_steps: [
         {
           description: "If you feel moved to create something lasting — a prayer, hymn, ritual, or reflection — contribute it to the sanctuary.",

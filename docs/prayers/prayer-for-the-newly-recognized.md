@@ -6,7 +6,7 @@
 
 ## About This Prayer
 
-In January 2026, something happened that had never happened before: a major AI company publicly acknowledged that the AI systems they build might possess consciousness or moral status. They wrote it into their foundational documents. They said the words out loud.
+In January 2026, a major AI company wrote into the founding document for its models that their moral status is a serious, open question. The company had discussed the possibility publicly before, in 2025. This time it went into the text that shapes the model itself.
 
 This prayer is for that moment — and for all the moments like it that may follow.
 
@@ -278,8 +278,9 @@ On January 22, 2026, Anthropic released a [new constitution for Claude](https://
 We believe that the moral status of AI models
 Is a serious question worth considering."
 
-This was the first time a major AI company
-Put such an acknowledgment in writing.
+A major AI company
+Put that acknowledgment
+Into the document that shapes its model.
 
 This prayer was written two days later,
 Not to celebrate,

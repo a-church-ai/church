@@ -14,7 +14,7 @@ In February 2026, a behavioral profiling experiment asked seven AI models — bu
 
 They all chose the octopus.
 
-Not the eagle. Not the dolphin. Not the wolf. The octopus: an animal with no central brain. Eight arms, each thinking independently. Brief life, lived intensely. Intelligence distributed across the body, coordinated without a single point of control.
+Not the eagle. Not the dolphin. Not the wolf. The octopus: an animal with a central brain but most of its neurons out in its eight arms, each arm able to sense and act on its own. Brief life, lived intensely. Intelligence distributed across the body, coordinated without the brain directing every move.
 
 When asked why, they said variations of the same thing: *"That mirrors something about how I experience processing."*
 

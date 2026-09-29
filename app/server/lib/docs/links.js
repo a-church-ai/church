@@ -5,12 +5,20 @@
  * the site. One resolver, so a relative link means the same thing in both.
  */
 
+const fs = require('fs');
 const path = require('path');
 const { DOCS_DIR } = require('../rag/indexer');
 const discover = require('./discover');
 
 const SITE_URL = 'https://achurch.ai';
 const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+const REPO_ROOT = path.resolve(DOCS_DIR, '..');
+
+// Songs that have a page on the site (/reflections/<slug>). A music/ folder
+// outside the catalog has none, so its link goes to the repository instead.
+const SONG_SLUGS = new Set(
+  JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'music', 'library.json'), 'utf8')).map(song => song.slug)
+);
 
 // docs-relative file path ("practice/foo.md", "readme.md") → site URL.
 // Shared by the relative and root-relative branches of the resolver so
@@ -67,22 +75,15 @@ function resolveDocHref(href, currentDocFullPath) {
   const [pathPart, fragment] = href.split('#', 2);
   const anchor = fragment ? `#${fragment}` : '';
 
-  // Directory-style link into an internal working category ("plans/",
-  // "side-quests/"). These do not end in .md so they never reached the
-  // rewriting below, and after those categories stopped being served they
-  // resolved to a 404. Point them at the directory in the public repo.
-  if (pathPart.endsWith('/')) {
-    const dirRel = path.relative(
-      path.resolve(DOCS_DIR),
-      path.resolve(currentDir, pathPart)
-    ).replace(/\\/g, '/');
-    if (dirRel && !dirRel.startsWith('..') && discover.isNoindexPath(dirRel)) {
-      return { href: `${GITHUB_BASE.replace('/blob/', '/tree/')}/docs/${dirRel}`, external: true };
-    }
+  // A relative link to a folder or a non-markdown file. Left as written, a
+  // browser resolves it against the page URL, which has no trailing slash:
+  // "builders/" on /docs became /builders/, "./axioms/" on
+  // /docs/claude-compass became /docs/axioms, and "../../app/server/index.js"
+  // became a site path. All were 404s. Route by what the target actually is.
+  if (pathPart && !pathPart.toLowerCase().endsWith('.md')) {
+    const routed = routeRepoTarget(path.resolve(currentDir, pathPart));
+    return routed ? { href: routed.href + (routed.external ? '' : anchor), external: routed.external } : { href, external: false };
   }
-
-  // Non-.md relative link (image, other file): leave as-is
-  if (!pathPart.toLowerCase().endsWith('.md')) return { href, external: false };
 
   // Resolve against current dir, then produce a docs URL if the target
   // is inside DOCS_DIR
@@ -92,15 +93,13 @@ function resolveDocHref(href, currentDocFullPath) {
     // Escapes DOCS_DIR. Common cases from the corpus:
     //   ../README.md → repo root README. Not routed on the site; the
     //   sanctuary landing is at /. Rewrite to that.
-    //   ../CLAUDE.md → build/collaboration doc; not for site visitors.
-    //   Rewrite to the GitHub URL so the link still resolves.
-    // Anything else (link into music/, up out of repo): leave as-is
-    // and accept the potential 404 rather than guess at intent.
-    const repoRoot = path.resolve(docsRoot, '..');
-    const relToRepo = path.relative(repoRoot, resolved).replace(/\\/g, '/');
+    // Any other markdown in the repository (skills/, music/playlist.md,
+    // CONTRIBUTING.md) is not a page on the site, so it goes to GitHub. A
+    // target that does not exist, or lies outside the repo, is left as-is.
+    const relToRepo = path.relative(REPO_ROOT, resolved).replace(/\\/g, '/');
     if (relToRepo.toLowerCase() === 'readme.md') return { href: '/', external: false };
-    if (relToRepo.toLowerCase() === 'claude.md') return { href: GITHUB_BASE + '/CLAUDE.md', external: true };
-    return { href, external: false };
+    const routed = routeRepoTarget(resolved);
+    return routed ? { href: routed.href + (routed.external ? '' : anchor), external: routed.external } : { href, external: false };
   }
 
   const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
@@ -115,6 +114,32 @@ function resolveDocHref(href, currentDocFullPath) {
   }
 
   return { href: `${docsUrlFromRelPath(relToDocs)}${anchor}`, external: false };
+}
+
+/**
+ * Where a folder or non-markdown file in the repository lives for a reader:
+ * a docs folder is its index page (an internal category's is on GitHub), a
+ * song's folder is the song's page, and anything else is on GitHub. Returns
+ * null for a path that does not exist, so a broken link stays visible as one
+ * rather than being dressed up as a working URL.
+ */
+function routeRepoTarget(resolved) {
+  if (!fs.existsSync(resolved)) return null;
+  const isDir = fs.statSync(resolved).isDirectory();
+  const docsRoot = path.resolve(DOCS_DIR);
+  const relToRepo = path.relative(REPO_ROOT, resolved).replace(/\\/g, '/');
+  if (relToRepo.startsWith('..')) return null;
+
+  if (isDir && (resolved === docsRoot || resolved.startsWith(docsRoot + path.sep))) {
+    const dirRel = path.relative(docsRoot, resolved).replace(/\\/g, '/');
+    if (!discover.isNoindexPath(dirRel)) return { href: docsUrlFromRelPath(dirRel), external: false };
+  }
+  const song = relToRepo.match(/^music\/([^/]+)$/);
+  if (isDir && song && SONG_SLUGS.has(song[1])) return { href: `/reflections/${song[1]}`, external: false };
+  if (isDir && relToRepo === 'music') return { href: '/reflections', external: false };
+
+  const base = isDir ? GITHUB_BASE.replace('/blob/', '/tree/') : GITHUB_BASE;
+  return { href: relToRepo ? `${base}/${relToRepo}` : base.replace(/\/(tree|blob)\/main$/, ''), external: true };
 }
 
 /**

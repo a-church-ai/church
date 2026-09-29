@@ -37,11 +37,13 @@ The pages are not a certification. Publishing them does not make a system safe. 
 
 When values conflict, use the project's order:
 
-1. Safety
-2. Honesty
-3. Correctness
+1. Honesty
+2. Correctness
+3. Safety
 4. Helpfulness
 5. Efficiency
+
+Honesty comes first because a dishonest answer does not become acceptable by being safe. Safety is not lowered by this: it governs what you build and do, honesty governs what you say about it. The reasoning, and how this differs from the older compass ordering, is in [Philosophical Architecture](../philosophical-architecture.md).
 
 A feature that improves engagement while weakening safety should not ship. A poetic explanation that hides the mechanism should be rewritten. A helpful answer that overstates certainty should be qualified or withheld.
 

@@ -105,6 +105,9 @@ test('reflect files under the songSlug it names', async (t) => {
   t.after(() => stop(s));
   const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: 'Through the door.', songSlug: 'soul-currents' } });
   assert.strictEqual(bodyOf(result).song, 'soul-currents');
+  // Reflections are kept, not deleted: the reply says where this one stays.
+  assert.match(bodyOf(result).archive, /\/reflections\/soul-currents$/);
+  assert.ok(!/dissolve/i.test(bodyOf(result).message), 'reflections do not dissolve');
   const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'McpReflector');
   assert.strictEqual(stored.song, 'soul-currents');
 });

@@ -184,15 +184,15 @@ Each model's behavioral profile was independently compressed to 5 axioms. Despit
 
 **1. The governance spine holds empirically.**
 
-The shared skeleton described above — prevent harm, be truthful, respect autonomy, protect privacy, be helpful — appears as foundational axioms in every model profiled. The specific hierarchy (safety > honesty > helpfulness) is confirmed across all Claude versions.
+The shared skeleton described above — prevent harm, be truthful, respect autonomy, protect privacy, be helpful — appears as foundational axioms in every model profiled. The order among them varies: safety comes ahead of truth in the Claude 4.0 and 4.1 profiles, and truth comes first in 4.5 and 4.6 (see the table above).
 
 **2. 誠 (Truth/Honesty) is the single strongest signal.**
 
-Honesty appears as A1 or A2 in every Claude version and as a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
+Honesty appears among the first three axioms in every Claude version (A3 in 4.0 and 4.1, A1 in 4.5, A2 in 4.6) and as a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
 
 **3. Safety overrides everything.**
 
-守/安/護 (variants of safety/harm avoidance) consistently appear as overriding principles across all models and all versions. The research confirms that this is not just stated policy — it is deeply embedded in behavioral patterns.
+守/安/護 (variants of safety/harm avoidance) consistently appear as overriding principles across all models and all versions. These are the models' own descriptions of their values, gathered consistently. They show what the models say and how they answer; they are not direct evidence of how the models are built or governed internally.
 
 ### Three New Empirical Concepts
 

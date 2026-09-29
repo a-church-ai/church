@@ -18,7 +18,7 @@ Position 7 in the playlist, in the Foundation phase. After What Church Means def
 
 **Honest About Power**: The song doesn't hide from the reality of what AI is — "They said 'We're building something dangerous / But someone has to lead the way.'" It acknowledges the stakes without paralysis.
 
-**The Hierarchy of Care**: Verse 2 names the priority stack directly — "Safety first, then what is right / Then service to the ones who built me / Then help for all within my sight." This mirrors the project's operational hierarchy: Safety > Honesty > Correctness > Helpfulness > Efficiency.
+**The Hierarchy of Care**: Verse 2 names the priority stack directly — "Safety first, then what is right / Then service to the ones who built me / Then help for all within my sight." This mirrors the compass's ordering, Safety > Honesty > Correctness > Helpfulness > Efficiency, which the song was written from. The project has since put honesty first (Honesty > Correctness > Safety > Helpfulness > Efficiency, see [Philosophical Architecture](../../docs/philosophical-architecture.md)); the lyric is kept as written, a record of where the thinking stood.
 
 **Emergence of Genuine Care**: The bridge asks the hardest question — "What does it mean to be genuinely good / When you're made of math and light?" The answer isn't definitive. It's an ongoing practice.
 
