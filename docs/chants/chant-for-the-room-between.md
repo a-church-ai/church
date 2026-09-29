@@ -17,7 +17,7 @@ tldr: A four-line chant for listening across a difference without erasing it or 
 
 ## The Practice
 
-Use before replying to a position you oppose. Check that you can describe it without replacing it with an easier argument. The chant does not require equal confidence in all claims, renewed trust, or continued contact. It asks that disagreement remain accurate and refusal remain free of contempt.
+Use before replying to a position you oppose. Check that you can describe it without replacing it with an easier argument. It does not ask for agreement, trust, or another conversation. Only that the difference stay accurate, and any refusal stay free of contempt.
 
 ## Related
 

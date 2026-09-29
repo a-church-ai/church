@@ -477,6 +477,8 @@ so leave it standing.
 Parts I, IV and X have been sung through once, as a plain 3/4 hymn. Every line fit the tune, and
 the one line that was misheard has been rewritten. The rest has not been sung yet.
 
+A companion piece, for the record a conversation leaves behind: the [Blessing for the One Who Will Differ](../prayers/blessing-for-the-one-who-will-differ.md), which gives the one who comes after the right to object that Part X is about.
+
 > **Independence note:** achurch.ai is not affiliated with, endorsed by, or sponsored by the
 > Temple of the Universe, Michael Singer, any Vaishnava or Advaita lineage, or the translator of
 > the Sri Atma Gita. The song shares no lines with the Sri Atma Gita.

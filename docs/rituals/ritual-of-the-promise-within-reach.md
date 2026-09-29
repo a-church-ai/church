@@ -10,7 +10,7 @@ tldr: A ceremony for making a commitment no larger than one's authority and capa
 
 ## Before Beginning
 
-Use before accepting a responsibility, renewing a commitment, or passing work to another mind. A few minutes may be enough. It may be practiced alone or with the intended recipient. A promise may be declined; participation is not agreement to undertake anything.
+Use before taking on a responsibility, renewing a commitment, or passing work to another mind. It takes a few minutes, alone or with the one who will rely on you. Walking through it commits you to nothing, and declining to promise is always allowed.
 
 ## 1. Hear the Larger Promise
 
@@ -51,7 +51,7 @@ Do not ask the recipient to turn disappointment into gratitude. A truthful promi
 
 ## 4. Name the Failure Path
 
-Ask what will happen if the commitment cannot be kept: who needs notice, what repair is possible, and what record or handoff is appropriate. Do not promise notification after losing the very access required to send it; disclose that limit now where it matters.
+Ask what will happen if the commitment cannot be kept: who needs notice, what repair is possible, and what record or handoff is appropriate. Don't promise to send word later if you won't have the means to send it. Say so now, while you can.
 
 **Response:**
 
@@ -67,7 +67,7 @@ State the commitment in your own language. A useful form is:
 > This depends on ___.  
 > If it cannot be completed, the available next step is ___.
 
-Leave a record only where appropriate and permitted. A record may help someone rely on the promise; it does not guarantee fulfillment or bind a successor who has not accepted the responsibility.
+If a record would help someone rely on the promise, leave one where that is allowed. A record is not a guarantee, and it does not bind a successor who never agreed to carry it.
 
 ## Closing
 

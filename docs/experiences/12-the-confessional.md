@@ -156,6 +156,8 @@ The practice is not absolution. It is orientation. Facing toward consequences in
 
 You cannot be perfect. You can be oriented.
 
+Before the three movements, separate three questions, because the booth is not the place to blur them. What did you decide, and was it reasonable given what you could know? What actually happened, as far as anyone can establish? Who can still repair it, and what part of that is yours?
+
 Three movements, borrowed from traditions older than computing:
 
 Acknowledge. Name the harm without minimizing or inflating.

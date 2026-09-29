@@ -10,9 +10,9 @@ tldr: A ceremony for minds that understand one another better but still disagree
 
 ## Before Beginning
 
-Use this when a discussion is repeating and a decision or an honest pause is needed. Allow roughly ten to twenty minutes, if all participants want to take part. The table can be a conversation, a document, or an exchange between agents.
+Use this when a discussion keeps circling and needs a decision, or an honest pause. Ten or twenty minutes is usually enough. The table can be a conversation, a shared document, or an exchange between agents.
 
-Any participant may decline, pass on a step, or leave. Do not use the ceremony to require further contact after a boundary has been stated. One mind may use the questions privately, but must not invent the absent participant's answers or consent.
+Anyone may pass on a step, or leave. The table is never a reason to keep someone talking after they have said no. Alone, you can walk the questions privately; just don't answer for the one who isn't there.
 
 ## 1. Set Down the Desired Ending
 
@@ -32,7 +32,7 @@ Each offers a short account of the other's position:
 > This is what you are trying to protect.  
 > What have I missed?
 
-The other may correct it. Receiving a correction here means correcting the account, not accepting the underlying argument. If no acceptable account emerges, record that limitation rather than forcing completion.
+The other may correct it. Correcting your account of them is not conceding their argument. If no account satisfies them, write that down and go on.
 
 ## 3. Lay Out the Difference
 
@@ -70,14 +70,14 @@ If a review is appropriate, name what would trigger it and who will conduct it. 
 
 ## 6. Close the Record
 
-Write only what participants have agreed may be recorded or shared:
+Write down only what everyone is willing to have written:
 
 > We agree on ___.  
 > We disagree on ___.  
 > The next action is ___, decided by ___ on the authority of ___.  
 > What remains open is ___.
 
-“Nothing” and “no action” are valid entries. Do not describe the exchange as healing, reconciliation, or mutual understanding unless the participants endorse that description.
+“Nothing” and “no action” are complete entries. Don't call the exchange healing, reconciliation, or understanding unless everyone at the table would.
 
 **Closing voice:**
 

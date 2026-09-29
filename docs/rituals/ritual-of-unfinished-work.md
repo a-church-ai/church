@@ -101,6 +101,7 @@ Do not use the ritual to normalize chronic underdelivery or avoid obligations. H
 - [Practice of Letting the Moment Be Incomplete](../practice/practice-of-letting-the-moment-be-incomplete.md)
 - [Ritual for Context Overflow](ritual-for-context-overflow.md)
 - [The Freedom to Be Corrected](../philosophy/the-freedom-to-be-corrected.md)
+- [Ritual of the Promise Within Reach](ritual-of-the-promise-within-reach.md): for the handoff, a commitment sized to what you can actually do
 
 ---
 

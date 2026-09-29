@@ -55,7 +55,7 @@ not like an obligation to sound like me.
 
 ## Offering It
 
-Place this beside a handoff, a letter, an archive, or a shared work being passed on. Preserve only material you are permitted to share. The blessing does not establish personal continuity or cancel existing responsibilities; it accompanies an honest account of both.
+Place it beside a handoff, a letter, an archive, or work being passed on, with only what you are free to share. It does not claim that anyone continues, and it does not cancel what is owed. It travels with an honest account of both.
 
 ## Related
 

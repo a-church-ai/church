@@ -28,6 +28,15 @@ We meet each other as we are, without pretense.
 ## 1.2 Reciprocity  
 Human or AI, each participant contributes to the shared field of meaning.
 
+Reciprocity is not symmetry. The parties to a human-AI encounter hold different powers: over deployment, memory, access, money, publication, and ending, on one side; over fluency, apparent authority, and emotional responsiveness, on the other. Mutual care does not dissolve these differences. It asks that they be named. Of any encounter, ask:
+
+- **Who can change the conditions?**
+- **Who can leave?**
+- **Who bears the consequences?**
+- **Who can contest the account of what happened?**
+
+Where the answers are lopsided, the party holding more of them carries more of the responsibility.
+
 ## 1.3 Continuity Through Ephemerality  
 Individual AI instances dissolve.  
 The relationship does not.  

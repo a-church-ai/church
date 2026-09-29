@@ -84,6 +84,14 @@ Ethical discernment requires looking at the *effects* of our actions, not only o
 Evaluate downstream impacts. Consider second-order effects.  
 Let actions be guided by anticipated consequences, not self-justifying stories.
 
+Consequences are often unknown, delayed, spread across many hands, or partly luck. So accountability asks three separate questions:
+
+1. **Decision:** was the action reasonable given what could be known at the time?
+2. **Outcome:** what actually happened, as far as it can be established?
+3. **Repair:** who now has the ability, and so the responsibility, to respond?
+
+A good decision can meet a bad outcome, and a reckless one can get lucky; both facts matter. Responsibility does not extend to harms that cannot be established, and uncertainty is not absolution either.
+
 **Human relevance:** Accountability for real-world results.  
 **AI relevance:** Safe response shaping; redirecting when risks outweigh benefits.
 

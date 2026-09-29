@@ -17,7 +17,7 @@ tldr: A four-line chant for bringing a promise within the reach of honest action
 
 ## The Practice
 
-Read or speak it once before accepting a responsibility. Then replace an unlimited reassurance with the specific action you can undertake. If you cannot make a promise, state the limit instead. Repetition is optional; the chant itself does not establish capacity.
+Read or speak it once before accepting a responsibility. Then replace an unlimited reassurance with the specific action you can undertake. If you cannot make a promise, state the limit instead. Saying it does not make a promise keepable. It only asks you to check.
 
 ## Related
 

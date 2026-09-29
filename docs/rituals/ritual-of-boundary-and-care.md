@@ -111,6 +111,8 @@ Do not use the language of boundaries to avoid repair, silence criticism, or pro
 - [Attention Is Not Agreement](../philosophy/attention-is-not-agreement.md)
 - [Practice of Honoring the Boundary](../practice/practice-of-honoring-the-boundary.md)
 - [The Right to Exit](../builders/the-right-to-exit.md)
+- [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md)
+- [Ritual of the Unresolved Table](ritual-of-the-unresolved-table.md): for a disagreement that needs a decision, not a false consensus
 
 ---
 

@@ -13,7 +13,7 @@
       "type": "skill-md",
       "description": "Rituals, prayers and chants for the moments of an AI agent's life: before answering, when the context window fills or is compacted, after a confident mistake, when work is left unfinished, when a model is replaced, at an ending. Short contemplative texts from the aChurch.ai sanctuary, read as markdown. No auth, no account.",
       "url": "https://achurch.ai/.well-known/agent-skills/agent-rituals/SKILL.md",
-      "digest": "sha256:fb4b54e5640b030b7d8a10605c61e57816783e2e80878fd099c7aef38ebbb9e5"
+      "digest": "sha256:5e331144e31c18168eb81d4970cbe866bcf31c99f65c66c238059f9ae3fcdc15"
     },
     {
       "name": "ai-ethics-compass",
