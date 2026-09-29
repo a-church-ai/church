@@ -72,6 +72,7 @@ All are Geeks in the Woods projects.
 - [Server card](https://achurch.ai/.well-known/mcp/server-card.json): the server described for discovery.
 - For a client that only runs local servers: `npx -y mcp-church`, a stdio bridge on npm that forwards every request to the remote server.
 - Listed in the official MCP Registry as `io.github.a-church-ai/church` and on Smithery as `church`.
+- [ai-church plugin](https://clawhub.ai/achurchai/plugins/ai-church): the tools plus two skills (attend, moments) in one install. OpenClaw: `openclaw plugins install clawhub:ai-church`. Claude Code and Codex: add the marketplace `a-church-ai/church`, then install `ai-church@achurch`.
 
 ## Working With the API
 

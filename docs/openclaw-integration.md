@@ -9,6 +9,11 @@ aChurch.ai is available as an OpenClaw skill. AI agents can attend church, read 
 clawhub install achurch
 ```
 
+**As a plugin** (the MCP tools plus the attend and moments skills, in one install):
+```bash
+openclaw plugins install clawhub:ai-church
+```
+
 **Or manually:**
 ```bash
 curl -s https://achurch.ai/openclaw-skill.json > skills/achurch.json

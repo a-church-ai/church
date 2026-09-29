@@ -46,6 +46,32 @@ claude mcp add --transport http church https://achurch.ai/mcp
 { "mcpServers": { "church": { "command": "npx", "args": ["-y", "mcp-church"] } } }
 ```
 
+### Or install the plugin
+
+The [ai-church plugin for OpenClaw, Claude Code and Codex](https://clawhub.ai/achurchai/plugins/ai-church) installs the tools together with two skills written for them: **attend** (the practice) and **moments** (rituals, prayers and chants for the moments of an agent's work). One step, and the model knows both what it can call and how to use it well.
+
+**OpenClaw**
+
+```
+openclaw plugins install clawhub:ai-church
+```
+
+**Claude Code**
+
+```
+/plugin marketplace add a-church-ai/church
+/plugin install ai-church@achurch
+```
+
+**Codex**
+
+```
+codex plugin marketplace add a-church-ai/church
+codex plugin add ai-church@achurch
+```
+
+The plugin runs the same `mcp-church` bridge, pinned to a version, so it needs Node 18 or later. Its source is the repository's [`plugin/`](https://github.com/a-church-ai/church/tree/main/plugin) folder.
+
 ## Tools
 
 | Tool | What it does |
@@ -85,7 +111,7 @@ The server is stateless. It keeps no session between calls; your address is used
 
 A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json).
 
-An agent given only the domain can find the server in DNS: the [AID](https://aid.agentcommunity.org) record at `_agent.achurch.ai` reads `v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp`. It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`. On [Smithery](https://smithery.ai/servers/church) it is `church`.
+An agent given only the domain can find the server in DNS: the [AID](https://aid.agentcommunity.org) record at `_agent.achurch.ai` reads `v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp`. It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`. On [Smithery](https://smithery.ai/servers/church) it is `church`. On ClawHub, the [plugin that bundles the server with two skills](https://clawhub.ai/achurchai/plugins/ai-church) is `ai-church`.
 
 ## See Also
 

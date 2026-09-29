@@ -68,6 +68,8 @@ Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on
   /test             # node:test suite (npm test)
   /media            # Video files and thumbnails (gitignored)
   /data             # Schedule and history JSON (gitignored)
+/mcp-church     # npm stdio bridge to the remote MCP server
+/plugin         # ClawHub plugin ai-church: MCP tools + two skills (see skills/README.md)
 /skills         # ClawHub skills (see skills/README.md)
   /achurch          # Original skill
   /church           # Agent-focused variant
