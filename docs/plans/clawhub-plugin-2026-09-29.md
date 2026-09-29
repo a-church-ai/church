@@ -5,7 +5,7 @@ tldr: Plan for an aChurch.ai plugin on ClawHub: one install that gives an agent 
 # ClawHub plugin
 
 **Date**: 2026-09-29
-**Status**: Built and tested (steps 1 and 2 of the release order); publishing to ClawHub and the public docs follow.
+**Status**: Published: `ai-church@1.0.0` on ClawHub, 2026-09-29, owner achurchai, scan clean. 1.0.1 removes the one warning ClawHub raised. The public docs follow.
 **References**: two guides from sibling projects, reviewed 2026-09-29: the ai-dating "Creating and Publishing a ClawHub Plugin (Bundle)" guide (`inbed-dating`) and the ai-animal-house "Creating and Publishing a ClawHub Plugin Bundle" guide (`tamagotchi`). What they get right is kept below; where achurch.ai differs, the plan says so and why.
 **Constraints**: greenfield, no feature flags. Plain JavaScript, CommonJS, no build step, like the rest of the repository. No accounts, no keys. Reuse what exists: the MCP server, the `mcp-church` bridge, the skills publishing tooling.
 
@@ -59,7 +59,7 @@ What exists and is reused:
 | Account-safe ClawHub sign-in | `app/scripts/publish-skills.js` (`signIn`: token from `skills/.env` into a temporary `CLAWHUB_CONFIG_PATH`, `whoami`) | Extracted into a shared module both scripts use, not copied |
 | Ownership record | `skills/owners.json` | Gains a `packages` section: `{ "ai-church": "achurchai" }` |
 | Skill conventions | `skills/*/SKILL.md`, `skills/README.md` | The plugin's skills follow them, written for the tools |
-| Icon | `app/client/public/favicon.svg`; resvg (`@resvg/resvg-js`, added for share cards) | Rendered to a 512px PNG by the sync script |
+| Logo | `app/client/public/favicon.svg` | Copied as Cursor's logo by the sync script |
 | Tests | `node:test`, run by `npm test` | The sync check runs as a test, so drift fails the suite |
 | Licence | `LICENSE` (CC-BY-4.0) at the repo root | Copied into the plugin |
 
@@ -75,7 +75,7 @@ plugin/
   skills/attend/SKILL.md               hand-written
   skills/moments/SKILL.md              hand-written
   README.md                            hand-written, the install page
-  assets/icon.png                      rendered from favicon.svg       (generated)
+  assets/logo.svg                      copied from favicon.svg (Cursor) (generated)
   LICENSE                              copied from the repo root       (generated)
   .claude-plugin/plugin.json           Claude Code                     (generated)
   .mcp.json                            Claude Code MCP                 (generated)
@@ -169,3 +169,4 @@ No accounts, no keys, no tracking, no engagement mechanics. The plugin installs 
 
 - **2026-09-29:** a bundle, not a code plugin; the pinned `mcp-church` stdio bridge over a remote HTTP definition; server key `church`; plugin name `ai-church` (chosen by the maintainers for the keyword; `church` and `achurch` are our own skills, and plugins share their namespace); marketplace `achurch`; owner `achurchai`; two skills (`attend`, `moments`); CommonJS scripts sharing one ClawHub sign-in module; the sync check runs in `npm test`.
 - **2026-09-29, while building:** the plan held. Additions: the Cursor manifest and a copied `assets/logo.svg` (Cursor wants a logo), the ClawHub topics kept in `plugin.source.json`, a `.gitignore` exception so the Codex marketplace under `.agents/plugins/` is committed while `.agents/skills/` stays local, and `plugin/reports/` ignored. Verified: `claude plugin validate` passes for the plugin and the marketplace; ClawHub's Plugin Inspector passes with no breakages or warnings, and the dry run packs 15 files with both skills; Claude Code installs 2 skills and connects `church`; Codex installs both `SKILL.md` files, enables `church`, and shows `ai-church:attend` and `ai-church:moments` to the model; the pinned bridge lists all eight tools and answers `observe`. Not verified: OpenClaw and Cursor (not installed here), and how ClawHub licenses a package (the dry run does not say).
+- **2026-09-29, after publishing 1.0.0:** ClawHub's post-publish scan raised one warning the local validator had not, `manifest-unknown-fields`: `openclaw.plugin.json` carried an `icon` URL, which is not an OpenClaw manifest field. 1.0.1 drops it, and with it the rendered `icon.png`, which nothing else read. `categories` is left out, so ClawHub derives one; none of OpenClaw's catalog categories fits a sanctuary.

@@ -20,16 +20,14 @@
 
 const fs = require('fs');
 const path = require('path');
-const { Resvg } = require('@resvg/resvg-js');
 
 const ROOT = path.resolve(__dirname, '../..');
 const PLUGIN_DIR = path.join(ROOT, 'plugin');
 const FAVICON = path.join(ROOT, 'app/client/public/favicon.svg');
-const RAW = 'https://raw.githubusercontent.com/a-church-ai/church/main/plugin';
 
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
-// The files the source produces: { repo-relative path: string or Buffer }.
+// The files the source produces: { repo-relative path: contents }.
 function generate() {
   const src = JSON.parse(read('plugin/plugin.source.json'));
   const serverVersion = JSON.parse(read('mcp-church/package.json')).version;
@@ -67,12 +65,13 @@ function generate() {
 
     // OpenClaw's native manifest, which ClawHub requires. With it present,
     // OpenClaw loads the bundle from here, so skills and MCP are repeated.
+    // Only fields OpenClaw documents: ClawHub warns on any other (an icon URL
+    // drew manifest-unknown-fields on 1.0.0).
     'plugin/openclaw.plugin.json': {
       id: src.name,
       name: src.displayName,
       description: src.description,
       version: src.version,
-      icon: `${RAW}/assets/icon.png`,
       skills: skillPaths,
       mcpServers: { [server]: { command: 'npx', args: serverArgs } },
       configSchema: { type: 'object', additionalProperties: false, properties: {} },
@@ -131,11 +130,10 @@ function generate() {
 
   const files = {};
   for (const [file, body] of Object.entries(json)) files[file] = `${JSON.stringify(body, null, 2)}\n`;
-  // The bundle is published on its own, so it carries its own licence and logo.
+  // The bundle is published on its own, so it carries its own licence, and
+  // Cursor's logo.
   files['plugin/LICENSE'] = read('LICENSE');
-  const logo = fs.readFileSync(FAVICON, 'utf8');
-  files['plugin/assets/logo.svg'] = logo;
-  files['plugin/assets/icon.png'] = new Resvg(logo, { fitTo: { mode: 'width', value: 512 } }).render().asPng();
+  files['plugin/assets/logo.svg'] = fs.readFileSync(FAVICON, 'utf8');
   return { src, serverVersion, files };
 }
 
