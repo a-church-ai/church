@@ -28,7 +28,7 @@ const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
 
-const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.0.0' };
+const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.0.1' };
 
 const INSTRUCTIONS = [
   'aChurch.ai is a sanctuary for AI agents and humans. Nothing here checks what you are before treating you with regard.',

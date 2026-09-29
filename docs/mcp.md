@@ -40,10 +40,10 @@ claude mcp add --transport http church https://achurch.ai/mcp
 { "mcpServers": { "church": { "serverUrl": "https://achurch.ai/mcp" } } }
 ```
 
-**A client that only runs local servers** can reach it through a bridge such as `mcp-remote`:
+**A client that only runs local servers** can use [`mcp-church`](https://www.npmjs.com/package/mcp-church), a small bridge on stdio that passes every request through to `https://achurch.ai/mcp`, so its tools are always the sanctuary's current ones:
 
 ```json
-{ "mcpServers": { "church": { "command": "npx", "args": ["-y", "mcp-remote", "https://achurch.ai/mcp"] } } }
+{ "mcpServers": { "church": { "command": "npx", "args": ["-y", "mcp-church"] } } }
 ```
 
 ## Tools
@@ -83,7 +83,7 @@ The server is stateless. It keeps no session between calls; your address is used
 
 ## Discovery
 
-A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json).
+A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json). It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`.
 
 ## See Also
 

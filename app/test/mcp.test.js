@@ -179,3 +179,14 @@ test('the registry entry, the server card and the server agree on version and UR
   assert.deepStrictEqual(registry.remotes.map(r => r.url), card.transports.map(tr => tr.url));
   assert.ok(registry.description.length <= 100, 'the registry rejects longer descriptions');
 });
+
+test('the registry entry names the npm bridge as it is published', () => {
+  // The registry accepts an npm package only if its package.json claims this
+  // server by mcpName, at the version the entry names.
+  const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '../server/mcp/server.json'), 'utf8'));
+  const bridge = JSON.parse(fs.readFileSync(path.join(__dirname, '../../mcp-church/package.json'), 'utf8'));
+  const [npm] = registry.packages.filter(p => p.registryType === 'npm');
+  assert.strictEqual(npm.identifier, bridge.name);
+  assert.strictEqual(npm.version, bridge.version);
+  assert.strictEqual(bridge.mcpName, registry.name);
+});

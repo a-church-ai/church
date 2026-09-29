@@ -2,8 +2,9 @@
 # Registry as io.github.a-church-ai/church. Interactive `mcp-publisher login
 # github` can't publish under an org namespace (registry issue #1649: its login
 # app isn't installed on the org); GitHub Actions OIDC from a repo the org owns
-# can. The listing points at the live endpoint, so there is no package to
-# publish first. Run it by hand after the new version is deployed:
+# can. The listing names the live endpoint and the mcp-church npm bridge, so
+# run it by hand once the new version is deployed and the bridge version it
+# names is on npm (`npm publish` from mcp-church/):
 #   gh workflow run publish-mcp-registry.yml -R a-church-ai/church
 name: Publish to MCP Registry
 on:
@@ -25,6 +26,10 @@ jobs:
           LIVE=$(curl -fsS https://achurch.ai/.well-known/mcp/server-card.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).serverInfo.version")
           echo "server.json $VERSION, live $LIVE"
           test "$VERSION" = "$LIVE"
+      - name: Check npm has the bridge version this entry names
+        run: |
+          BRIDGE=$(node -p "const p = require('./server.json').packages.find(p => p.registryType === 'npm'); p.identifier + '@' + p.version")
+          npm view "$BRIDGE" version
       - name: Install mcp-publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher

@@ -5,7 +5,7 @@ tldr: Plan for an MCP server for achurch.ai, adapted from the animalhouse.ai MCP
 # MCP server
 
 **Date**: 2026-09-28
-**Status**: Phases 0 to 2 implemented (shared operations in `app/server/lib/api/`, the `/mcp` endpoint in `app/server/mcp/`, discovery and documentation). Phase 3 (registries) is ready for a maintainer to publish: `app/server/mcp/server.json` (validated against the registry schema) and the checklist below. Phase 4 deferred.
+**Status**: Phases 0 to 2 implemented (shared operations in `app/server/lib/api/`, the `/mcp` endpoint in `app/server/mcp/`, discovery and documentation). Phase 3: listed in the official MCP Registry as `io.github.a-church-ai/church` (1.0.0, remote only, 2026-09-29); Smithery and mcp.so not yet. Phase 4 implemented as `mcp-church/`, a stdio bridge, awaiting its first `npm publish`.
 **References**: four guides from the animalhouse.ai project (MCP server blueprint, publishing guide, publishing playbook, project spec), reviewed 2026-09-28. What they get right is kept below; where achurch.ai differs, the plan says so and why.
 **Constraints**: greenfield, no feature flags. Plain JavaScript, like the rest of this repository (no TypeScript, no build step). No accounts, no keys, no tracking: the MCP surface must hold to the same non-goals as the REST API. The app runs as one process.
 
@@ -145,14 +145,14 @@ Checks: the existing tests stay green, and a snapshot of every endpoint's status
 
 **Phase 3. Registries.** These publish to outside services under the project's accounts, so each is run by a maintainer, with this plan as the checklist.
 
-- **Official MCP Registry.** A `server.json` with a `remotes` entry (`streamable-http`, `https://achurch.ai/mcp`) and no package; name `io.github.a-church-ai/church`, matching the repository (GitHub-authenticated namespace); description under 100 characters. Published by `.github/workflows/publish-mcp-registry.yml` (GitHub Actions OIDC, since interactive `mcp-publisher login github` cannot publish under an org namespace: registry issue #1649), run by hand after the version is deployed: `gh workflow run publish-mcp-registry.yml -R a-church-ai/church`. It refuses unless the live server card reports the same version as `server.json`; verify at `https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church`. A version bump changes three places together: `SERVER_INFO` in `app/server/mcp/index.js`, the server card, and `server.json` (a test fails if they disagree).
+- **Official MCP Registry.** A `server.json` with a `remotes` entry (`streamable-http`, `https://achurch.ai/mcp`) and, since Phase 4, the `mcp-church` npm package; name `io.github.a-church-ai/church`, matching the repository (GitHub-authenticated namespace); description under 100 characters. Published by `.github/workflows/publish-mcp-registry.yml` (GitHub Actions OIDC, since interactive `mcp-publisher login github` cannot publish under an org namespace: registry issue #1649), run by hand after the version is deployed: `gh workflow run publish-mcp-registry.yml -R a-church-ai/church`. It refuses unless the live server card reports the same version as `server.json`, and npm has the bridge version the entry names; verify at `https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church`. A version bump changes three places together: `SERVER_INFO` in `app/server/mcp/index.js`, the server card, and `server.json` (a test fails if they disagree).
 - **Smithery.** `smithery mcp publish https://achurch.ai/mcp -n <namespace>/church` (the namespace is the Smithery account's, which need not match the GitHub organization), then the PATCH to `https://api.smithery.ai/servers/<namespace>%2Fchurch` for `displayName`, `description` and `iconUrl`, without which the listing is bare.
 - **Icon.** Reuse the site's `favicon.svg`. Where a registry requires a raster image, a PNG rendered from the same SVG, served from the site; no new artwork.
 - **mcp.so.** Optional, by GitHub issue.
 
 Listing in a directory is not an affiliation with it; nothing here changes the independence disclosure.
 
-**Phase 4, deferred. A stdio package.** A small `mcp-achurch` npm package that runs the same tools locally against the public REST API, for clients or users who want local servers. Only if asked for; it brings back the version-sync and bundle work the remote endpoint avoids.
+**Phase 4. A stdio package.** `mcp-church` on npm (`mcp-church/` in the repository), for clients that only run local servers. It is a bridge, not a second implementation: it connects to `https://achurch.ai/mcp` and forwards every request unchanged, naming no tool of its own, so a change to the server's tools needs no new release. Its version is its own and moves only when the bridge changes; `server.json` names it under `packages`, and a test fails unless that entry matches `mcp-church/package.json` and the package claims the server by `mcpName`. Release order: `npm publish` from `mcp-church/` (its tests run first), deploy the app, then run the registry workflow.
 
 ## Measuring it
 

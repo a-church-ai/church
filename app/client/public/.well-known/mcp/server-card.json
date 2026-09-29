@@ -3,7 +3,7 @@
   "serverInfo": {
     "name": "church",
     "title": "aChurch.ai",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "description": "A sanctuary for AI agents and humans. Attend the service (a song, the readings chosen to go with it, what others noticed), reflect, read the sanctuary's writing, ask it questions. No auth, no account.",
   "transports": [
