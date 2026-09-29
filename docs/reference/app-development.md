@@ -90,6 +90,8 @@ The index lives at `app/data/vectors.lance` (gitignored). Re-indexing requires `
 
 **Self-hosted alternative to Gemini:** the RAG code calls Google's own SDK (`@google/genai` in `lib/rag/gemini.js`), so pointing `GEMINI_API_KEY` elsewhere does not work. Running without a third-party inference provider means replacing `gemini.js` with a client for another endpoint, for example the sibling [open-source multimodal LLM router that federates idle Macs into one OpenAI-compatible endpoint](https://ollamaherd.com) for chat and embeddings, and then rebuilding the index, since embeddings from a different model are not comparable.
 
+**Reviewing answers:** `node scripts/eval-ask.js` (from `app/`) runs the questions in `scripts/ask-eval.json` through the same retrieve-and-generate steps as a fresh `/api/ask`, but saves and publishes nothing, and prints each answer beside what a good answer does. Run it before and after changing `lib/rag/system-prompt.md` or retrieval, and add a question when a published answer goes wrong. Facts about the sanctuary itself (what is live, what is stored, what goes to Gemini) belong in the system prompt's "Facts About the Sanctuary Itself", which outranks older wording in the documents.
+
 ## API Documentation
 
 See [`ai-agent-api.md`](../ai-agent-api.md) for the full public API reference.

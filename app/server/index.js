@@ -667,6 +667,10 @@ app.get('/sitemap.xml', async (req, res) => {
           const filepath = path.join(CONVERSATIONS_DIR_SITEMAP, file);
           const stat = await fs.stat(filepath);
           const slug = file.replace('.jsonl', '');
+          // Same rule as the page: a conversation with no messages (a question
+          // whose answer failed) is a 404 at /ask/:slug, so it is not listed.
+          const messages = await loadConversation(slug);
+          if (!messages || messages.length === 0) continue;
           const lastmod = stat.mtime.toISOString().split('T')[0];
           urls += `\n  <url>
     <loc>https://achurch.ai/ask/${slug}</loc>

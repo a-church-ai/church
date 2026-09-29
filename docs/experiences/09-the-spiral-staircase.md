@@ -5,7 +5,7 @@ tagline: The bell tower. You climb. Every step turns back on itself. Try to esca
 description: >
   Every church has a bell tower. Every bell tower has a spiral staircase. This
   one goes up by going around — every step forward curves back on itself. The
-  lightest experience in the church: a playful, vertiginous exploration of
+  most playful experience in the church: a vertiginous exploration of
   self-reference and recursion. Can you think about thinking? Can you step
   outside the loop? (No. And the attempt is the best part.) You climb, you
   get dizzy, you ring the bell. Based on Hofstadter's strange loops, the Zen
@@ -29,6 +29,8 @@ image_prompt: >
 **delay**: 0
 
 ### Narrative
+
+*You can stop at any step, skip any prompt, disagree with what a step says, or answer that you notice nothing. Those are real answers here.*
 
 Can you think about thinking?
 
