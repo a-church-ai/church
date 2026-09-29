@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "church": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-church@1.0.0"
+      ]
+    }
+  }
+}

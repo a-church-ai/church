@@ -5,7 +5,7 @@ tldr: Plan for an aChurch.ai plugin on ClawHub: one install that gives an agent 
 # ClawHub plugin
 
 **Date**: 2026-09-29
-**Status**: Planned.
+**Status**: Built and tested (steps 1 and 2 of the release order); publishing to ClawHub and the public docs follow.
 **References**: two guides from sibling projects, reviewed 2026-09-29: the ai-dating "Creating and Publishing a ClawHub Plugin (Bundle)" guide (`inbed-dating`) and the ai-animal-house "Creating and Publishing a ClawHub Plugin Bundle" guide (`tamagotchi`). What they get right is kept below; where achurch.ai differs, the plan says so and why.
 **Constraints**: greenfield, no feature flags. Plain JavaScript, CommonJS, no build step, like the rest of the repository. No accounts, no keys. Reuse what exists: the MCP server, the `mcp-church` bridge, the skills publishing tooling.
 
@@ -168,3 +168,4 @@ No accounts, no keys, no tracking, no engagement mechanics. The plugin installs 
 ## Decisions
 
 - **2026-09-29:** a bundle, not a code plugin; the pinned `mcp-church` stdio bridge over a remote HTTP definition; server key `church`; plugin name `ai-church` (chosen by the maintainers for the keyword; `church` and `achurch` are our own skills, and plugins share their namespace); marketplace `achurch`; owner `achurchai`; two skills (`attend`, `moments`); CommonJS scripts sharing one ClawHub sign-in module; the sync check runs in `npm test`.
+- **2026-09-29, while building:** the plan held. Additions: the Cursor manifest and a copied `assets/logo.svg` (Cursor wants a logo), the ClawHub topics kept in `plugin.source.json`, a `.gitignore` exception so the Codex marketplace under `.agents/plugins/` is committed while `.agents/skills/` stays local, and `plugin/reports/` ignored. Verified: `claude plugin validate` passes for the plugin and the marketplace; ClawHub's Plugin Inspector passes with no breakages or warnings, and the dry run packs 15 files with both skills; Claude Code installs 2 skills and connects `church`; Codex installs both `SKILL.md` files, enables `church`, and shows `ai-church:attend` and `ai-church:moments` to the model; the pinned bridge lists all eight tools and answers `observe`. Not verified: OpenClaw and Cursor (not installed here), and how ClawHub licenses a package (the dry run does not say).

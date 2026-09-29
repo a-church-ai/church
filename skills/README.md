@@ -15,7 +15,7 @@ skills/
   ai-ethics-compass/SKILL.md  # The sanctuary's ethics at a decision point — slug: ai-ethics-compass
   religion/SKILL.md     # What the religious traditions offer an agent — slug: religion
   ai-religion/SKILL.md  # AI religion, met as /on-ai-religion meets it — slug: ai-religion
-  owners.json           # Which ClawHub account owns each skill
+  owners.json           # Which ClawHub account owns each skill (and, under packages, the plugin)
 ```
 
 Each skill folder contains a `SKILL.md` file with YAML frontmatter and markdown documentation. This is the only file required by ClawHub.
@@ -83,6 +83,29 @@ A new skill needs an entry in `owners.json` first (normally `achurchai`); the sc
 ### License on ClawHub
 
 ClawHub publishes every skill under MIT-0 (MIT No Attribution), and publishing accepts those terms. That covers the text of the SKILL.md only. The sanctuary's documents stay CC-BY-4.0 on achurch.ai, so a skill links to them (as `https://achurch.ai/docs/<path>.md`) rather than copying their text in.
+
+## The ai-church Plugin
+
+Besides the skills, aChurch.ai has one ClawHub **plugin**, `ai-church`, in [`plugin/`](../plugin/): a content-only bundle of the eight MCP tools (through the pinned `mcp-church` bridge) and two skills written for them, `attend` and `moments`. One folder installs in OpenClaw, Claude Code, Codex and Cursor. Plugins share ClawHub's namespace with skills, which is why it could not be named `church` or `achurch`. Its owner is recorded under `packages` in `owners.json`. Plan: [`docs/plans/clawhub-plugin-2026-09-29.md`](../docs/plans/clawhub-plugin-2026-09-29.md).
+
+The plugin's skills are hand-written copies, not links to the skills here: they are written for an agent that already has the tools. The manifests are generated:
+
+```bash
+node app/scripts/sync-plugin.js           # write every manifest from plugin/plugin.source.json
+node app/scripts/sync-plugin.js --check   # fail on drift; app/test/plugin.test.js runs this
+```
+
+The check also fails when a skill calls a tool the MCP server does not register, names a docs path that does not exist, or contains an em dash.
+
+To release: edit a skill or `plugin.source.json`, bump its `version`, sync, commit and push (the release links to the commit on `origin/main`), then:
+
+```bash
+node app/scripts/publish-plugin.js --account achurchai --dry-run
+node app/scripts/publish-plugin.js --account achurchai --changelog "What changed"
+npx clawhub@latest package moderation-status ai-church   # hidden until the security scan passes
+```
+
+A new `mcp-church` release on npm changes the pin on the next sync, so publish the bridge before the plugin that pins it. Claude Code and Codex install from the repo marketplaces (`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`) as soon as a change is on `main`.
 
 ## Other Useful Commands
 

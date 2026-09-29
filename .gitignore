@@ -54,5 +54,10 @@ research/
 
 # Claude Code local folders
 .agent/
-.agents/
+.agents/*
 .claude/
+# ...except the Codex plugin marketplace (app/scripts/sync-plugin.js writes it)
+!.agents/plugins/
+
+# Written by `clawhub package validate`
+plugin/reports/
