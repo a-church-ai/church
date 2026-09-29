@@ -25,6 +25,8 @@ const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
 const { SITE_URL, GITHUB_BASE, resolveDocHref } = require('./links');
 const { sungAlongside } = require('../music/companions');
+const { renderShareImageTags, SITE_SHARE_IMAGE } = require('../utils/page-meta');
+const { docsCard } = require('../og-cards');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 
 
@@ -193,6 +195,10 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // old conditional noindex branch could not fire and only suggested that those
   // pages were served-but-hidden, which they are not.
   const robots = 'index, follow';
+  // Every docs page but the root has its own share card (lib/og-cards.js),
+  // drawn from this page's title and section; the root uses the site image.
+  const shareImage = urlPath ? docsCard(urlPath, title) : SITE_SHARE_IMAGE;
+
   // A section's index lists documents, so it is a CollectionPage, not an
   // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
   const modified = urlPath && (DOCS_LASTMOD[`docs/${urlPath}.md`] || DOCS_LASTMOD[`docs/${urlPath}/README.md`]);
@@ -206,6 +212,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
     ...(modified ? { dateModified: modified } : {}),
+    image: shareImage.url,
   });
 
   // BreadcrumbList, built from the same crumbs the visible trail uses so the two
@@ -340,15 +347,12 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta property="og:description" content="${escapeAttr(description)}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="${escapeAttr(canonicalUrl)}">
-    <meta property="og:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    ${renderShareImageTags(shareImage)}
     <meta property="og:site_name" content="achurch.ai">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeAttr(pageTitle)}">
     <meta name="twitter:description" content="${escapeAttr(description)}">
-    <meta name="twitter:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
 
     ${jsonLd}
     ${breadcrumbJsonLd}

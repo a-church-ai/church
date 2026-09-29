@@ -49,7 +49,7 @@ const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
 const { loadSongContent } = require('./lib/music/song-content');
 const { renderSongBlock } = require('./lib/music/render-song');
 const { rotationForSong } = require('./lib/music/companions');
@@ -99,8 +99,13 @@ app.use((req, res, next) => {
   if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
     res.set('Cache-Control', 'public, max-age=600, must-revalidate, stale-while-revalidate=3600');
   }
+  // Share cards (routes/og.js) — a card's copy is its page's fixed title or
+  // question, and the URL carries a design version, so a week is safe
+  else if (p.startsWith('/og/')) {
+    res.set('Cache-Control', 'public, max-age=604800');
+  }
   // Static assets — daily cache with revalidation
-  else if (p === '/og-image.png' || p === '/favicon.svg' || p === '/manifest.webmanifest') {
+  else if (p === '/favicon.svg' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
   // .well-known — daily cache with revalidation
@@ -324,6 +329,7 @@ app.get('/conversations', async (req, res) => {
 const { isLowValueSlug: isLowValueConversation, isIndexable } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
 const pageLists = require('./lib/utils/page-lists');
+const { askCard, songCard } = require('./lib/og-cards');
 const apiOps = { ask: apiAsk, reflections: apiReflections };
 
 // The conversation, rendered on the server. It used to arrive only by fetch,
@@ -381,9 +387,9 @@ app.get('/ask/:slug', async (req, res) => {
     const safeTitle = escapeAttr(meta.title);
     const safeOgTitle = escapeAttr(meta.ogTitle);
     const safeDesc = escapeAttr(meta.description);
-    // The site's JPG share image. The per-page SVGs at /api/og/* are not shown
-    // by Facebook, X, LinkedIn, Slack or iMessage, which need a raster image.
-    const ogImage = 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg';
+    // The conversation's own share card (lib/og-cards.js), with tags that
+    // describe it; its alt text is the card's copy.
+    const shareTags = renderShareImageTags(askCard(slug, (messages.find(m => m.role === 'user') || {}).content));
     const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
     // Internal linking — 3 related conversations for crawl + AEO topical clustering.
     // Failure here is non-fatal (returns empty string).
@@ -420,7 +426,7 @@ app.get('/ask/:slug', async (req, res) => {
       )
       .replace(
         '<meta property="og:type" content="article">',
-        `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+        `<meta property="og:type" content="article">\n    ${shareTags}\n    <meta property="og:url" content="${canonicalUrl}">`
       )
       // Twitter Card — separate substitution so social previews on twitter/x match
       .replace(
@@ -523,7 +529,7 @@ app.get('/reflections/:slug', async (req, res) => {
       const safeTitle = escapeAttr(meta.title);
       const safeOgTitle = escapeAttr(meta.ogTitle);
       const safeDesc = escapeAttr(meta.description);
-      const ogImage = 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg'; // raster: see the /ask/:slug note
+      const shareTags = renderShareImageTags(songCard(song)); // the song's own card, see the /ask/:slug note
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
@@ -565,7 +571,7 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         .replace(
           '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+          `<meta property="og:type" content="article">\n    ${shareTags}\n    <meta property="og:url" content="${canonicalUrl}">`
         )
         // Twitter Card
         .replace(
@@ -914,7 +920,7 @@ app.use('/api', apiRoutes);
 app.use('/api/badge', cors(), badgeRoutes);
 
 // OG image routes
-app.use('/api/og', ogRoutes);
+app.use('/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);

@@ -143,6 +143,43 @@ function buildReflectionMeta(song) {
 // Perplexity, Claude, Gemini, Google AI Overviews all parse it). QAPage is the
 // better fit than FAQPage for single-question conversations because it
 // matches the page semantics directly (one question, one or more answers).
+// Share images. Conversations, songs and docs pages each have their own card,
+// drawn by lib/og-cards.js and served at /og/v1/<type>/<key>.png; every other
+// page shares the site image. One builder emits the tags for both, so the
+// og:image:* description always matches the image it points at.
+const SITE_SHARE_IMAGE = {
+  url: 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg',
+  type: 'image/jpeg',
+  width: 1200,
+  height: 630,
+  alt: 'aChurch.ai: an always-open sanctuary for AI agents and humans',
+};
+
+function shareCardUrl(type, key) {
+  const path = String(key).split('/').map(encodeURIComponent).join('/');
+  return `https://achurch.ai/og/v1/${type}/${path}.png`;
+}
+
+// A card: what it draws (label, text), and the share image that describes it,
+// whose alt text is the card's own copy.
+function shareCard(type, key, { label, text }) {
+  return { label, text, url: shareCardUrl(type, key), type: 'image/png', width: 1200, height: 630, alt: `${label}: ${text}` };
+}
+
+function renderShareImageTags(image = SITE_SHARE_IMAGE) {
+  const url = escapeAttr(image.url);
+  const alt = escapeAttr(image.alt);
+  return [
+    `<meta property="og:image" content="${url}">`,
+    `<meta property="og:image:type" content="${image.type}">`,
+    `<meta property="og:image:width" content="${image.width}">`,
+    `<meta property="og:image:height" content="${image.height}">`,
+    `<meta property="og:image:alt" content="${alt}">`,
+    `<meta name="twitter:image" content="${url}">`,
+    `<meta name="twitter:image:alt" content="${alt}">`,
+  ].join('\n    ');
+}
+
 function buildQAPageSchema(messages, slug) {
   if (!Array.isArray(messages) || messages.length === 0) return null;
   const firstQ = messages.find(m => m.role === 'user');
@@ -170,6 +207,7 @@ function buildQAPageSchema(messages, slug) {
   return {
     '@context': 'https://schema.org',
     '@type': 'QAPage',
+    image: shareCardUrl('ask', slug),
     mainEntity: {
       '@type': 'Question',
       name: truncateAtWord(question, 200),
@@ -220,6 +258,7 @@ function buildSongSchemaGraph(song, slug) {
     name: song.title,
     composer: sanctuary,
     inLanguage: 'en',
+    image: shareCardUrl('song', slug),
   };
 
   const recording = {
@@ -380,6 +419,10 @@ function renderSongListenLinks(song) {
 }
 
 module.exports = {
+  SITE_SHARE_IMAGE,
+  shareCardUrl,
+  shareCard,
+  renderShareImageTags,
   truncateAtWord,
   stripMarkdown,
   escapeAttr,

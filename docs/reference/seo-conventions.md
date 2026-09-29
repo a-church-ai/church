@@ -24,12 +24,22 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 | **`<link rel="license" href="…">`** | CC BY 4.0 (project LICENSE) until ADR-010 finalizes | Brother's F13 — declares the content license in the head for crawlers + archive tools |
 | **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus |
 | **`<meta name="apple-mobile-web-app-…">`** trio | Family standard | Brother's F25 — iOS home-screen install ergonomics |
-| Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:width`, `og:image:height`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. |
+| Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. The `og:image:*` tags must describe the image actually linked; see Share cards below. |
 | Twitter Card | `twitter:card="summary_large_image"`, `twitter:title`, `twitter:description`, `twitter:image` | Twitter/X uses these even when OG is present; missing them produces a generic "card not found" preview. |
 | **Footer `<nav aria-label="Footer">`** | Always wrap the footer-nav list | Brother's a11y standard — screen-reader landmarks |
 | JSON-LD (`<script type="application/ld+json">`) | Content-appropriate type, escaped via `renderJsonLdScript()` | See "Schema choices" below. The escape handles `</script>` termination + U+2028/U+2029 line separators per Issue 005 F23 — never interpolate user content into JSON-LD via raw `JSON.stringify` alone. |
 
 ---
+
+## Share cards
+
+Every conversation, song and docs page has its own share card: a 1200×630 PNG drawn by `app/server/lib/og-cards.js` and served at `/og/v1/<type>/<key>.png` (`ask`, `song`, `docs`). Every other page uses the site image (`/assets/a-church-digital-ai-humans-social.jpg`). Plan and design: [docs/plans/og-share-cards-2026-09-29.md](../plans/og-share-cards-2026-09-29.md).
+
+- **Tags come from one builder**, `renderShareImageTags()` in `app/server/lib/utils/page-meta.js`: `og:image`, `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `twitter:image`, `twitter:image:alt`. A page with the site image gets the same set from the shell's defaults (`SITE_SHARE_IMAGE`). Don't hand-write them.
+- **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
+- **A card exists only for a page that exists.** It resolves through the page's own loader, and 404s wherever the page would. Nothing is ever drawn from the request.
+- **Changing the design means changing the version** (`/og/v1/` → `/og/v2/`): platforms cache share images for weeks, and a new URL is the only reliable way to make them fetch the new card.
+- **Check a card** with `curl -sI https://achurch.ai/og/v1/ask/<slug>.png` (200, `image/png`, a week's cache), then the Facebook Sharing Debugger or LinkedIn Post Inspector.
 
 ## Schema choices (when to use which JSON-LD type)
 

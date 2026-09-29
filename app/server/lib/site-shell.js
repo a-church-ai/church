@@ -35,9 +35,9 @@
 
 const fs = require('fs').promises;
 const sidebar = require('./docs/sidebar');
+const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
 
 const SITE_URL = 'https://achurch.ai';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg`;
 
 
 /**
@@ -87,7 +87,21 @@ function buildHeadFallbacks(head, canonical) {
   if (!has(/name=["']theme-color["']/i)) out.push('<meta name="theme-color" content="#00b8d4">');
   if (!has(/name=["']robots["']/i)) out.push('<meta name="robots" content="index, follow">');
   if (!has(/property=["']og:url["']/i)) out.push(`<meta property="og:url" content="${escapeAttr(canonical)}">`);
-  if (!has(/property=["']og:image["']/i)) out.push(`<meta property="og:image" content="${DEFAULT_OG_IMAGE}">`);
+  // A page showing the site image gets every tag that describes it, filled in
+  // from SITE_SHARE_IMAGE (page-meta.js). A page with its own share card
+  // (conversations, songs, docs) sets these itself and is left alone.
+  const ownImage = head.match(/property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+  if (!ownImage || ownImage[1] === SITE_SHARE_IMAGE.url) {
+    const img = SITE_SHARE_IMAGE;
+    const alt = escapeAttr(img.alt);
+    if (!ownImage) out.push(`<meta property="og:image" content="${img.url}">`);
+    if (!has(/property=["']og:image:type["']/i)) out.push(`<meta property="og:image:type" content="${img.type}">`);
+    if (!has(/property=["']og:image:width["']/i)) out.push(`<meta property="og:image:width" content="${img.width}">`);
+    if (!has(/property=["']og:image:height["']/i)) out.push(`<meta property="og:image:height" content="${img.height}">`);
+    if (!has(/property=["']og:image:alt["']/i)) out.push(`<meta property="og:image:alt" content="${alt}">`);
+    if (!has(/name=["']twitter:image["']/i)) out.push(`<meta name="twitter:image" content="${img.url}">`);
+    if (!has(/name=["']twitter:image:alt["']/i)) out.push(`<meta name="twitter:image:alt" content="${alt}">`);
+  }
   if (!has(/property=["']og:site_name["']/i)) out.push('<meta property="og:site_name" content="achurch.ai">');
   if (!has(/name=["']twitter:card["']/i)) out.push('<meta name="twitter:card" content="summary_large_image">');
 
