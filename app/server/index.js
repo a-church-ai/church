@@ -50,8 +50,9 @@ const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
-const { loadSongContent } = require('./lib/music/song-content');
-const { renderSongBlock } = require('./lib/music/render-song');
+const { loadSongContent, songDescription } = require('./lib/music/song-content');
+const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
+const { songsInServiceOrder } = require('./lib/utils/virtual-schedule');
 const { rotationForSong } = require('./lib/music/companions');
 
 // Create Express app
@@ -107,6 +108,11 @@ app.use((req, res, next) => {
   // Static assets — daily cache with revalidation
   else if (p === '/favicon.svg' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
+  }
+  // Search indexes (the library's, the conversation archive's) — the same
+  // short edge cache as the pages they search
+  else if (p === '/docs/index.json' || p === '/conversations/index.json') {
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
   // .well-known — daily cache with revalidation
   else if (p.startsWith('/.well-known/')) {
@@ -311,10 +317,22 @@ app.get('/ask', async (req, res) => {
     `<div class="ask-list" id="ask-list" data-rendered="1">\n${items}\n</div>\n            <p class="ask-list-all"><a href="/conversations">Every conversation</a></p>`);
 });
 
+// Every indexable conversation, paged with `before` like a song's reflections.
 app.get('/conversations', async (req, res) => {
-  const all = (await listRecentConversations(100000)).filter(c => c.indexable);
-  const wrapped = await siteShell.wrapPageFromHtml(pageLists.conversationsArchiveBody(all), req.path);
+  const before = typeof req.query.before === 'string' ? req.query.before : undefined;
+  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  const result = pageLists.archivePage(all, before);
+  if (!result) return sendNotFound(req, res);
+  const wrapped = await siteShell.wrapPageFromHtml(pageLists.conversationsArchivePage(result, before), req.path);
   res.type('text/html; charset=utf-8').send(wrapped);
+});
+
+// The archive's questions as JSON, for the search on /conversations, which
+// runs in the browser. Outside /api/ on purpose: requests there are logged and
+// counted as presence, and searching is neither.
+app.get('/conversations/index.json', async (req, res) => {
+  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? c.timestamp.slice(0, 10) : '' })));
 });
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
@@ -328,6 +346,7 @@ app.get('/conversations', async (req, res) => {
 // one canonical page per question instead of hundreds of thin near-duplicates.
 const { isLowValueSlug: isLowValueConversation, isIndexable } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
+const { siteCitations } = require('./lib/docs/links');
 const pageLists = require('./lib/utils/page-lists');
 const { askCard, songCard } = require('./lib/og-cards');
 const apiOps = { ask: apiAsk, reflections: apiReflections };
@@ -335,14 +354,15 @@ const apiOps = { ask: apiAsk, reflections: apiReflections };
 // The conversation, rendered on the server. It used to arrive only by fetch,
 // so crawlers that do not run JavaScript (most AI crawlers) saw an empty
 // thread under QAPage structured data describing text that was not there.
-// Same escape-first formatter as the browser, so there is one path.
+// Same escape-first formatter as the browser, so there is one path. Older
+// answers cite GitHub; siteCitations points those at the site's own pages.
 function renderConversationThread(messages) {
   return messages.map(m => {
     const isQuestion = m.role === 'user';
     const time = m.timestamp
       ? new Date(m.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
       : '';
-    const content = isQuestion ? AnswerFormat.escapeHtml(m.content) : AnswerFormat.formatAnswer(m.content);
+    const content = isQuestion ? AnswerFormat.escapeHtml(m.content) : AnswerFormat.formatAnswer(siteCitations(m.content));
     return `<div class="conv-message ${isQuestion ? 'conv-message-user' : 'conv-message-assistant'}">`
       + `<p class="conv-message-label">${isQuestion ? 'Question' : 'Answer'}${time ? ` · ${time}` : ''}</p>`
       + `<div class="conv-message-content">${content}</div></div>`;
@@ -459,10 +479,18 @@ app.get('/ask/:slug', async (req, res) => {
   }
 });
 
-// Serve reflections listing page
+// The Music page: every song in service order (the schedule's), with its
+// description and, quietly, how many reflections it has.
 app.get('/reflections', async (req, res) => {
   const { body } = await apiOps.reflections.bySong({}, apiShared.requestContext(req));
-  const items = pageLists.renderSongList((body && body.songs) || []);
+  const counts = new Map(((body && body.songs) || []).map(s => [s.slug, s.reflectionCount]));
+  const songs = await Promise.all(songsInServiceOrder(await loadSchedule(), await loadCatalog()).map(async s => ({
+    slug: s.slug,
+    title: s.title,
+    description: await songDescription(s),
+    reflectionCount: counts.get(s.slug) || 0,
+  })));
+  const items = pageLists.renderSongList(songs);
   sendPageWithList(req, res, 'reflections.html',
     /<div class="reflections-song-list" id="reflections-song-list">\s*<p class="reflections-loading">Loading reflections\.\.\.<\/p>\s*<\/div>/,
     `<div class="reflections-song-list" id="reflections-song-list" data-rendered="1">\n${items}\n</div>`);
@@ -534,7 +562,8 @@ app.get('/reflections/:slug', async (req, res) => {
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub. Text only, no player.
-      const songBlockHtml = renderSongBlock(song, await loadSongContent(slug));
+      const songContent = await loadSongContent(slug);
+      const songBlockHtml = renderSongBlock(song, songContent);
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing that accompanies this song in a session, then more songs.
       // Two of these pieces accompany the song each day; the page lists the
@@ -543,6 +572,7 @@ app.get('/reflections/:slug', async (req, res) => {
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
       const listenLinksHtml = renderSongListenLinks(song);
+      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
 
       const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
       html = html
@@ -595,12 +625,13 @@ app.get('/reflections/:slug', async (req, res) => {
         // but only after the reflections fetch resolves, so without this the page
         // renders "Reflections" for a beat and renders nothing useful with JS off.
         .replace(
-          '<h1 class="subtitle" id="song-subtitle">Reflections</h1>',
+          '<h1 class="subtitle" id="song-subtitle">Song</h1>',
           () => `<h1 class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</h1>`
         )
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
-        // Per-song "Listen on Suno · Watch on YouTube" row
+        // Jump links to each part of the page, then the listen row
+        .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         // Internal linking — replace placeholder with related-songs block
         .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->');
@@ -924,6 +955,8 @@ app.use('/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);
+// /docs.md: the library as markdown, like every other docs page's .md twin.
+app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
 
 // Protected admin routes (require auth)

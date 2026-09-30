@@ -21,9 +21,8 @@ const { hostHeaderValidation } = require('@modelcontextprotocol/sdk/server/middl
 
 const { attendance, music, reflections, contributions, ask, shared } = require('../lib/api');
 const { resolveServedDoc } = require('../lib/docs/serve');
-const { extractMeta } = require('../lib/docs/meta');
 const { splitFrontmatter } = require('../lib/docs/tldr');
-const { servedMarkdown } = require('../lib/docs/markdown');
+const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
 const { SITE_URL } = require('../lib/docs/links');
 const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
@@ -75,6 +74,8 @@ function docsRest(docPath) {
 // document, its links made absolute, or null when the site does not serve it.
 async function readDoc(docPath) {
   const rest = docsRest(docPath);
+  // The docs root is the library, as on the site: every served document.
+  if (!rest) return { path: '', title: 'The Library', url: `${SITE_URL}/docs`, content: (await corpusIndex()).trim() };
   const resolved = await resolveServedDoc(rest);
   if (!resolved) return null;
   if (resolved.kind === 'dir-index') {
@@ -83,14 +84,13 @@ async function readDoc(docPath) {
       url: `${SITE_URL}/docs${resolved.dir ? `/${resolved.dir}` : ''}`,
       documents: resolved.docs
         .filter(d => d.stem.toLowerCase() !== 'readme')
-        .map(d => ({ path: d.urlPath, url: `${SITE_URL}/docs/${d.urlPath}` })),
+        .map(d => ({ path: d.urlPath, title: d.title, url: `${SITE_URL}/docs/${d.urlPath}` })),
     };
   }
-  const markdown = await fs.readFile(resolved.fullPath, 'utf8');
   const { body } = splitFrontmatter(await servedMarkdown(resolved));
   return {
     path: resolved.doc.urlPath,
-    title: extractMeta(markdown, resolved.doc.urlPath).title,
+    title: resolved.doc.title,
     url: `${SITE_URL}/docs/${resolved.doc.urlPath}`,
     content: body.trim(),
   };

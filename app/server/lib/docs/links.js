@@ -158,6 +158,73 @@ function pageUrlForFile(relToRepo) {
 }
 
 /**
+ * The links a document's markdown makes, in order, each resolved as the docs
+ * site resolves it: [{ href, target, external }]. Code blocks and code spans
+ * are rendered as code, not links, so they are skipped; so are mail, phone
+ * and same-page anchor links. Used to walk every link in the corpus (the
+ * link test) and to read a reading path's sequence.
+ */
+function documentLinks(markdown, docFullPath) {
+  const text = String(markdown).replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+  const links = [];
+  for (const [, href] of text.matchAll(/\]\(([^)\s]+)/g)) {
+    if (/^(mailto|tel):|^#/.test(href)) continue;
+    const { href: target, external } = resolveDocHref(href, docFullPath);
+    links.push({ href, target, external });
+  }
+  return links;
+}
+
+/**
+ * A reading path's sequence: the documents a collection
+ * (docs/collections/<name>.md) links to, in the order it first mentions each,
+ * as docs URL paths. Only documents count: a link to a whole section is a
+ * pointer, not a reading. The collection page is the one place a path is
+ * written; this only reads it. Docs change only by deploy, so each is read
+ * once. Call after the discover walk is built (the docs renderer does).
+ */
+const sequences = new Map();
+
+function readingSequence(collection) {
+  const name = String(collection || '');
+  if (!/^[a-z0-9-]+$/.test(name)) return null;
+  if (sequences.has(name)) return sequences.get(name);
+  const file = path.join(DOCS_DIR, 'collections', `${name}.md`);
+  let sequence = null;
+  if (fs.existsSync(file)) {
+    const own = `/docs/collections/${name}`;
+    sequence = [];
+    for (const { target } of documentLinks(fs.readFileSync(file, 'utf8'), file)) {
+      const urlPath = target.split('#')[0];
+      if (!/^\/docs\/./.test(urlPath) || urlPath === own) continue;
+      const rel = urlPath.slice('/docs/'.length);
+      const doc = discover.docAt(rel);
+      if (!doc || doc.stem.toLowerCase() === 'readme') continue;
+      if (!sequence.includes(rel)) sequence.push(rel);
+    }
+  }
+  sequences.set(name, sequence);
+  return sequence;
+}
+
+/**
+ * Text whose links to this repository's files on GitHub point at the site's
+ * own pages instead, wherever the file has one. Answers stored before Ask
+ * cited sources with pageUrlForFile carry GitHub URLs in their text; this is
+ * applied where a stored answer leaves the server, so the stored words stay
+ * as they were written. A file with no page (an internal document, a
+ * repository file) keeps its GitHub URL.
+ */
+const GITHUB_FILE_RE = /https:\/\/github\.com\/a-church-ai\/church\/blob\/main\/([^\s)\]"'<>#]+)(#[^\s)\]"'<>]*)?/g;
+
+function siteCitations(text) {
+  return String(text || '').replace(GITHUB_FILE_RE, (whole, rel, anchor = '') => {
+    const url = pageUrlForFile(decodeURIComponent(rel));
+    return url.startsWith(GITHUB_BASE) ? whole : url + anchor;
+  });
+}
+
+/**
  * Markdown whose links all work outside the site: each [text](href) is
  * resolved as the docs site would resolve it, then made absolute. An anchor
  * alone points into the doc's own page, and a link the resolver leaves
@@ -176,4 +243,4 @@ function absolutizeLinks(markdown, docFullPath) {
   });
 }
 
-module.exports = { SITE_URL, GITHUB_BASE, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile };
+module.exports = { SITE_URL, GITHUB_BASE, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile, siteCitations, documentLinks, readingSequence };

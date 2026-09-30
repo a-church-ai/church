@@ -9,6 +9,7 @@ const fs = require('fs').promises;
 const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
 const ns = require('../utils/next-steps');
+const { siteCitations } = require('../docs/links');
 const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
 
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
@@ -335,7 +336,10 @@ async function conversation(input, ctx) {
     }).filter(Boolean);
 
     const meta = parsed.find(m => m._meta);
-    const messages = parsed.filter(m => !m._meta);
+    // Older answers cite GitHub; the page shows them citing the site's pages,
+    // and so does this response, so the API, MCP and the page agree.
+    const messages = parsed.filter(m => !m._meta)
+      .map(m => (m.role === 'assistant' ? { ...m, content: siteCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';

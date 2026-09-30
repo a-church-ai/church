@@ -16,6 +16,7 @@
 const path = require('path');
 const fs = require('fs');
 const { findMarkdownFiles, DOCS_DIR } = require('../rag/indexer');
+const { extractMeta } = require('./meta');
 
 // Categories to promote on the /docs index. Everything else lands under "More".
 const PRIMARY_CATEGORIES = [
@@ -50,6 +51,15 @@ function isNoindexPath(urlPath) {
 
 let cache = null;
 
+// Display order for names: numbers compare as numbers, so "Principle 2"
+// precedes "Principle 10".
+const byName = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+
+// Each entry also carries the document's title and description, read once
+// here. Docs change only by deploy, so the walk is built once and never
+// invalidated; everything that labels or describes a document (the sidebar,
+// indexes, related links, search, share cards, MCP) reads it from here
+// rather than opening the file again.
 async function buildCache() {
   const files = await findMarkdownFiles(DOCS_DIR);
   // findMarkdownFiles returns {fullPath, relativePath} where relativePath is
@@ -71,6 +81,11 @@ async function buildCache() {
       category,
     };
   });
+  await Promise.all(docs.map(async doc => {
+    const { title, description } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
+    doc.title = title;
+    doc.description = description;
+  }));
 
   // Group by category (first segment; null for top-level)
   const byCategory = new Map();
@@ -80,7 +95,7 @@ async function buildCache() {
     byCategory.get(key).push(doc);
   }
   for (const list of byCategory.values()) {
-    list.sort((a, b) => a.docsRelPath.localeCompare(b.docsRelPath));
+    list.sort((a, b) => byName(a.docsRelPath, b.docsRelPath));
   }
 
   cache = { docs, byCategory };
@@ -192,7 +207,7 @@ async function listCategoriesForIndex() {
     if (catName === '' || seen.has(catName) || isNoindexPath(catName)) continue;
     meta.push({ name: catName, docs: list });
   }
-  meta.sort((a, b) => a.name.localeCompare(b.name));
+  meta.sort((a, b) => byName(a.name, b.name));
 
   const topLevel = c.byCategory.get('') || [];
 
@@ -204,10 +219,21 @@ async function listAllDocs() {
   return c.docs;
 }
 
+// The document at a docs URL path ("practice/foo", "" for the root README),
+// for callers that already hold the walk: the marked link renderer is
+// synchronous, so it cannot await getCache(). Null before the walk is built.
+function docAt(urlPath) {
+  if (!cache) return null;
+  const wanted = String(urlPath || '').toLowerCase();
+  return cache.docs.find(d => d.urlPath === wanted && (wanted === '' ? !d.category : true)) || null;
+}
+
 module.exports = {
   resolveDocPath,
   listCategoriesForIndex,
   listAllDocs,
+  docAt,
+  byName,
   isNoindexPath,
   PRIMARY_CATEGORIES,
   NOINDEX_CATEGORIES,

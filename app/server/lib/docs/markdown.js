@@ -11,22 +11,27 @@
 
 const fs = require('fs').promises;
 const discover = require('./discover');
-const { extractMeta } = require('./meta');
 const { absolutizeLinks, SITE_URL } = require('./links');
 
-async function describe(doc) {
-  const markdown = await fs.readFile(doc.fullPath, 'utf8');
-  const { title, description } = extractMeta(markdown, doc.urlPath);
-  return { title, description, url: `${SITE_URL}/docs/${doc.urlPath}`, urlPath: doc.urlPath, dir: doc.dirRelPath };
-}
+const { byName } = discover;
 
-// Served documents (internal categories excluded), described, optionally filtered.
+const describe = doc => ({
+  title: doc.title,
+  description: doc.description,
+  url: `${SITE_URL}/docs/${doc.urlPath}`,
+  urlPath: doc.urlPath,
+  dir: doc.dirRelPath,
+  category: doc.category || '',
+});
+
+// Served documents (internal categories excluded), described, optionally
+// filtered. Titles and descriptions come from the discover walk.
 async function servedDocs(filter = () => true) {
-  const docs = (await discover.listAllDocs())
+  return (await discover.listAllDocs())
     .filter(d => !discover.isNoindexPath(d.docsRelPath))
     .filter(d => d.stem.toLowerCase() !== 'readme')
-    .filter(filter);
-  return Promise.all(docs.map(describe));
+    .filter(filter)
+    .map(describe);
 }
 
 const listLine = d => `- [${d.title}](${d.url})${d.description ? `: ${d.description}` : ''}`;
@@ -39,17 +44,16 @@ async function servedMarkdown(resolved) {
   if (doc.stem.toLowerCase() !== 'readme' || !doc.dirRelPath) return markdown;
   const inSection = await servedDocs(d => d.dirRelPath === doc.dirRelPath);
   if (!inSection.length) return markdown;
-  inSection.sort((a, b) => a.title.localeCompare(b.title));
+  inSection.sort((a, b) => byName(a.title, b.title));
   return `${markdown.trimEnd()}\n\n## Every document in this section\n\n${inSection.map(listLine).join('\n')}\n`;
 }
 
+// Built once: the walk it reads is built once too (docs change only by deploy).
 let indexCache = null;
-let indexCacheTime = 0;
-const INDEX_TTL = 10 * 60 * 1000;
 
 // Every served document, grouped by section: /docs/index.md.
 async function corpusIndex() {
-  if (indexCache && Date.now() - indexCacheTime < INDEX_TTL) return indexCache;
+  if (indexCache) return indexCache;
   const all = await servedDocs();
   const sections = new Map();
   for (const d of all) {
@@ -62,12 +66,11 @@ async function corpusIndex() {
     '',
     `All ${all.length} documents the site serves, by section. Each is also available as markdown by adding \`.md\` to its URL. Machine-readable overview: ${SITE_URL}/llms.txt`,
   ];
-  for (const key of [...sections.keys()].sort()) {
-    const docs = sections.get(key).sort((a, b) => a.title.localeCompare(b.title));
+  for (const key of [...sections.keys()].sort(byName)) {
+    const docs = sections.get(key).sort((a, b) => byName(a.title, b.title));
     lines.push('', `## ${key || 'Top level'}`, '', ...docs.map(listLine));
   }
   indexCache = lines.join('\n') + '\n';
-  indexCacheTime = Date.now();
   return indexCache;
 }
 

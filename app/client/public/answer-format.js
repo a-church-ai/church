@@ -96,6 +96,19 @@
       return null;
     }
 
+    // The heading levels this answer uses, in order, mapped onto h2, h3, h4...
+    // so the answer's top level sits directly under the page's h1 (the
+    // question) and no level is skipped: "###" and "####" become h2 and h3.
+    var usedLevels = [];
+    var scanFence = false;
+    lines.forEach(function (l) {
+      var s = l.trim();
+      if (/^```/.test(s)) { scanFence = !scanFence; return; }
+      var hm = !scanFence && s.match(/^(#{1,6})\s+/);
+      if (hm && usedLevels.indexOf(hm[1].length) === -1) usedLevels.push(hm[1].length);
+    });
+    usedLevels.sort();
+
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       var t = line.trim();
@@ -122,8 +135,7 @@
       var h = t.match(/^(#{1,6})\s+(.*)$/);
       if (h) {
         flushPara(); flushList();
-        // Model headings render as h4+ so they sit under the page's own headings
-        var level = Math.min(6, h[1].length + 3);
+        var level = Math.min(6, 2 + usedLevels.indexOf(h[1].length));
         out.push('<h' + level + '>' + inline(h[2]) + '</h' + level + '>');
         continue;
       }

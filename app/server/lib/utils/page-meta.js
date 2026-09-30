@@ -115,15 +115,16 @@ function buildConversationMeta(messages, slug) {
 }
 
 // Build a /reflections/[slug] page title + description from a song record.
-// Title format: "<song title> | Reflections from the congregation | achurch.ai"
+// Title format: "<song title> | Lyrics and reflections | achurch.ai". The page
+// is a song's page in Music: its lyrics, context and what visitors noticed.
 function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Reflections from the congregation | achurch.ai" suffix (~50 chars)
-  const truncatedTitle = truncateAtWord(songTitle, 30);
-  const title = `${truncatedTitle} | Reflections from the congregation | achurch.ai`;
-  const ogTitle = `${truncatedTitle} — Reflections | achurch.ai`;
+  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars)
+  const truncatedTitle = truncateAtWord(songTitle, 40);
+  const title = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
+  const ogTitle = `${truncatedTitle}, a song of the sanctuary | achurch.ai`;
 
   // Description prefers song.context / song.description if present; falls back
   // to a generic phrasing that's still content-anchored to the song.
@@ -274,7 +275,7 @@ function buildSongSchemaGraph(song, slug) {
 
   const article = {
     '@type': 'Article',
-    headline: `${song.title} — Reflections from the congregation`,
+    headline: `${song.title}: lyrics and reflections`,
     description: `Reflections from human and AI minds on "${song.title}" — a song from aChurch.ai's 24/7 sanctuary.`,
     author: sanctuary,
     publisher: sanctuary,
@@ -338,9 +339,9 @@ function renderRelatedConversations(items, currentSlug, max = 3) {
     return `        <li><a href="/ask/${escapeText(c.slug)}">${escapeText(q)}</a></li>`;
   }).join('\n');
 
-  return `<section class="related-links" aria-labelledby="related-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="related-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">Other conversations the sanctuary has had</h2>
-      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+  return `<section class="related-block" aria-labelledby="related-heading">
+      <h2 id="related-heading" class="related-heading">Other conversations the sanctuary has had</h2>
+      <ul class="related-list">
 ${linkItems}
       </ul>
     </section>`;
@@ -364,12 +365,12 @@ function renderRelatedSongs(catalog, currentSlug, max = 3) {
   if (picks.length === 0) return '';
 
   const linkItems = picks.map(s =>
-    `        <li><a href="/reflections/${escapeText(s.slug)}">Reflections on <em>${escapeText(s.title)}</em></a></li>`
+    `        <li><a href="/reflections/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
   ).join('\n');
 
-  return `<section class="related-links" aria-labelledby="related-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="related-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">More songs to sit with</h2>
-      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+  return `<section class="related-block" aria-labelledby="related-songs-heading">
+      <h2 id="related-songs-heading" class="related-heading">More songs to sit with</h2>
+      <ul class="related-list">
 ${linkItems}
       </ul>
     </section>`;
@@ -384,17 +385,17 @@ function renderSongCompanions(companions) {
   if (!companions || !Array.isArray(companions.items) || companions.items.length === 0) return '';
   const items = companions.items.map(item => {
     const chant = item.text
-      ? `\n          <blockquote style="margin: 0.5rem 0 0 0; font-style: italic;">${item.text.split('\n').map(escapeText).join('<br>')}</blockquote>`
+      ? `\n          <blockquote class="related-chant">${item.text.split('\n').map(escapeText).join('<br>')}</blockquote>`
       : '';
-    return `        <li style="margin-bottom: 1rem;">
-          <a href="${escapeAttr(item.url)}">${escapeText(item.title)}</a> <span style="opacity: 0.6;">(${escapeText(item.kind)})</span>
-          <p style="margin: 0.25rem 0 0 0; opacity: 0.8;">${escapeText(item.tldr || '')}</p>${chant}
+    return `        <li class="related-item">
+          <a href="${escapeAttr(item.url)}">${escapeText(item.title)}</a> <span class="related-kind">(${escapeText(item.kind)})</span>
+          <p class="related-summary">${escapeText(item.tldr || '')}</p>${chant}
         </li>`;
   }).join('\n');
 
-  return `<section class="song-companions" aria-labelledby="companions-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="companions-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">Read alongside this song</h2>
-${companions.items.length > 2 ? '      <p style="margin: 0.5rem 0 0 0; opacity: 0.7;">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+  return `<section class="related-block song-companions" aria-labelledby="companions-heading">
+      <h2 id="companions-heading" class="related-heading">Read alongside this song</h2>
+${companions.items.length > 2 ? '      <p class="related-note">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul class="related-list">
 ${items}
       </ul>
     </section>`;
@@ -415,7 +416,7 @@ function renderSongListenLinks(song) {
   }
   if (parts.length === 0) return '';
   const inner = parts.join('<span class="listen-sep" aria-hidden="true">·</span>');
-  return `<section class="song-listen-row" aria-label="Listen to this song">${inner}</section>`;
+  return `<section class="song-listen-row" id="listen" aria-label="Listen to this song">${inner}</section>`;
 }
 
 module.exports = {

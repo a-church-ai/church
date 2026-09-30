@@ -2,7 +2,10 @@
  * Docs routes.
  *
  * URL structure:
- *   /docs                            → docs/readme.md
+ *   /docs                            → the library (render.renderLibrary),
+ *                                      generated; /docs/index.md and
+ *                                      /docs/index.json are the same list for
+ *                                      agents and for search
  *   /docs/{category}                 → docs/{category}/README.md (or auto-index)
  *   /docs/{category}/{name}          → docs/{category}/{name}.md
  *   /docs/{name}                     → docs/{name}.md (top-level docs)
@@ -22,8 +25,9 @@ const fs = require('fs').promises;
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
-const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
+const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
 const { acceptsMarkdown } = require('../lib/utils/accepts');
+const { titleCase } = require('../lib/docs/meta');
 
 const router = express.Router();
 
@@ -72,7 +76,10 @@ async function handle(req, res, rest) {
     }
     try {
       const markdown = await fs.readFile(resolved.fullPath, 'utf8');
-      const html = await render.renderDocPage({ markdown, doc: resolved.doc });
+      // ?path=<reading path> shows where this reading sits in that path. It
+      // changes nothing else, and the canonical URL never carries it.
+      const readingPath = typeof req.query.path === 'string' ? req.query.path : undefined;
+      const html = await render.renderDocPage({ markdown, doc: resolved.doc, readingPath });
       res.type('text/html; charset=utf-8');
       return res.send(html);
     } catch (err) {
@@ -92,7 +99,7 @@ async function handle(req, res, rest) {
       const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
-        lines.push(`- [${d.stem}](https://achurch.ai/docs/${d.urlPath})`);
+        lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
       }
       res.type('text/markdown; charset=utf-8');
       return res.send(lines.join('\n') + '\n');
@@ -112,13 +119,35 @@ async function handle(req, res, rest) {
   return docsNotFound(req, res);
 }
 
-// Docs root
-router.get('/', (req, res) => handle(req, res, ''));
+// The library: every served document, for readers. Agents asking for markdown
+// get the same list as markdown. docs/README.md is the repository's map for
+// contributors and is not a page here; the library links to it on GitHub.
+async function library(req, res) {
+  res.vary('Accept');
+  if (acceptsMarkdown(req)) return libraryMarkdown(req, res);
+  try {
+    res.type('text/html; charset=utf-8').send(await render.renderLibrary());
+  } catch (err) {
+    console.error(`[docs] library render failed: ${err.message}`);
+    res.status(500).type('text/plain').send('Internal error');
+  }
+}
 
 // Every served document in one markdown list, for agents enumerating the corpus.
-router.get('/index.md', async (req, res) => {
+async function libraryMarkdown(req, res) {
   res.set('Link', '<https://achurch.ai/docs>; rel="canonical"');
   res.type('text/markdown; charset=utf-8').send(await corpusIndex());
+}
+
+router.get('/', library);
+router.get('/index.md', libraryMarkdown);
+
+// The same list as JSON, for the library's search, which runs in the browser.
+// Here rather than under /api/: requests there are logged and counted as
+// presence, and searching is neither.
+router.get('/index.json', async (req, res) => {
+  const docs = await servedDocs();
+  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? titleCase(d.category) : '' })));
 });
 
 // Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
@@ -135,3 +164,4 @@ router.get('/*', (req, res) => {
 });
 
 module.exports = router;
+module.exports.libraryMarkdown = libraryMarkdown;

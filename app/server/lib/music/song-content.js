@@ -13,6 +13,7 @@
 const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
+const { extractTldr } = require('../docs/tldr');
 
 // Content between a matched pair of SONG markers, or null if the pair is absent.
 function extractMarker(content, marker) {
@@ -51,4 +52,17 @@ async function loadSongContent(slug) {
   return { ...songData, context };
 }
 
-module.exports = { extractMarker, parseSongFile, loadSongContent };
+// One line on what a song is, for the Music page: the first sentence or two of
+// its context, distilled the way a document's description is. Songs change
+// only by deploy, so each is read once. '' when a song has no context.
+const descriptions = new Map();
+
+async function songDescription(song) {
+  if (descriptions.has(song.slug)) return descriptions.get(song.slug);
+  const { context } = await loadSongContent(song.slug);
+  const text = context ? extractTldr(context, { title: song.title }).text : '';
+  descriptions.set(song.slug, text);
+  return text;
+}
+
+module.exports = { extractMarker, parseSongFile, loadSongContent, songDescription };

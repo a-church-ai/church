@@ -10,8 +10,8 @@
  * to (a) auto-open the containing category via <details open>, and (b) mark
  * the current doc's link with aria-current="page".
  *
- * Rendered once per request per page. Cheap; discover.js caches its walk at
- * module load, so this is just string concatenation.
+ * Rendered once per request per page. Cheap: discover.js builds its walk once
+ * (titles included) and holds it, so this is just string concatenation.
  */
 
 const discover = require('./discover');
@@ -30,15 +30,15 @@ const SANCTUARY_PAGES = [
   { url: '/', label: 'Home', glyph: '⌂' },
   { url: '/about', label: 'About', glyph: 'A' },
   { url: '/axioms', label: 'The Five Axioms', glyph: '五' },
-  // Distinct from Reflections below, which also began with R. At tablet width
-  // the rail hides labels and shows only these, so two identical glyphs left two
-  // primary entries indistinguishable. The scales read as weighing a claim,
-  // which is what that page does.
+  // At tablet width the rail hides labels and shows only these glyphs, so no
+  // two may match (Music's ♫ is distinct from the Hymns category's ♪). The
+  // scales read as weighing a claim, which is what that page does.
   { url: '/on-ai-religion', label: 'On AI Religion', glyph: '⚖' },
   { url: '/paths', label: 'Reading Paths', glyph: '⟶' },
   { url: '/for-agents', label: 'For AI Agents', glyph: '⚙' },
   { url: '/ask', label: 'Ask', glyph: '?' },
-  { url: '/reflections', label: 'Reflections', glyph: 'R' },
+  // Named as in every footer and the page's own heading (site-shell.js).
+  { url: '/reflections', label: 'Music', glyph: '♫' },
 ];
 
 // The sidebar is shown on every page (sanctuary + docs). Callers pass the
@@ -63,7 +63,7 @@ function isCategoryOfCurrent(currentPath, categoryName) {
 }
 
 function renderDocLink(doc, currentPath) {
-  const label = titleCase(doc.stem);
+  const label = doc.title;
   const current = isCurrent(currentPath, doc);
   const aria = current ? ' aria-current="page"' : '';
   const href = `/docs/${doc.urlPath}`;
@@ -145,10 +145,10 @@ function renderCategory(category, currentPath) {
 
 function renderTopLevelDoc(doc, currentPath) {
   if (doc.stem.toLowerCase() === 'readme') return '';  // Excluded; it's the /docs root itself
-  const label = titleCase(doc.stem);
+  const label = doc.title;
   const current = isCurrent(currentPath, doc);
   const aria = current ? ' aria-current="page"' : '';
-  return `<li><a href="/docs/${escapeAttr(doc.urlPath)}"${aria}>${escapeText(label)}</a></li>`;
+  return `<li><a href="/docs/${escapeAttr(doc.urlPath)}"${aria} title="${escapeAttr(label)}">${escapeText(label)}</a></li>`;
 }
 
 function renderSanctuaryPage(page, currentPath) {
@@ -217,7 +217,7 @@ async function renderSidebarInner(currentPath) {
         <div class="docs-sidebar-section-label docs-sidebar-heading">Documentation</div>
 
         <a class="docs-sidebar-root${isDocsRoot ? ' current' : ''}" href="/docs"${rootAria}>
-          <span class="cat-glyph" aria-hidden="true">◇</span><span class="cat-name">All docs</span>
+          <span class="cat-glyph" aria-hidden="true">◇</span><span class="cat-name">Library</span>
         </a>
 
         ${primaryHtml}

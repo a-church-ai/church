@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { resolveDocHref, absolutizeLinks } = require('../server/lib/docs/links');
+const { resolveDocHref, absolutizeLinks, documentLinks } = require('../server/lib/docs/links');
 const { DOCS_DIR } = require('../server/lib/rag/indexer');
 const discover = require('../server/lib/docs/discover');
 const companions = require('../server/lib/music/companions');
@@ -62,11 +62,7 @@ test('every link on every served docs page reaches a real page', async () => {
   const dead = [];
   for (const doc of await discover.listAllDocs()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue; // plans, issues...: not pages
-    // Code blocks and code spans are rendered as code, not links.
-    const markdown = fs.readFileSync(doc.fullPath, 'utf8').replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
-    for (const [, href] of markdown.matchAll(/\]\(([^)\s]+)/g)) {
-      if (/^(mailto|tel):|^#/.test(href)) continue;
-      const { href: target, external } = resolveDocHref(href, doc.fullPath);
+    for (const { href, target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
       if (external) continue;
       if (!/^(\/|https:\/\/achurch\.ai)/.test(target)) { dead.push(`${doc.docsRelPath}: ${href} (left relative)`); continue; }
       if (!(await reaches(target))) dead.push(`${doc.docsRelPath}: ${href} -> ${target}`);

@@ -145,14 +145,14 @@ function renderSongBlock(song, content) {
 
   if (content.lyrics) {
     sections.push('<section class="song-lyrics" aria-label="Lyrics">');
-    sections.push('<h2 class="song-heading">Lyrics</h2>');
+    sections.push('<h2 class="song-heading" id="lyrics">Lyrics</h2>');
     sections.push(renderLyrics(content.lyrics));
     sections.push('</section>');
   }
 
   if (content.context) {
     sections.push('<section class="song-context" aria-label="Context">');
-    sections.push('<h2 class="song-heading">Context</h2>');
+    sections.push('<h2 class="song-heading" id="context">Context</h2>');
     sections.push(renderContext(content.context, song && song.slug));
     sections.push('</section>');
   }
@@ -160,4 +160,19 @@ function renderSongBlock(song, content) {
   return `<section class="song-detail">\n${sections.join('\n')}\n</section>`;
 }
 
-module.exports = { renderSongBlock, renderLyrics, renderContext, escapeHtml };
+/**
+ * Jump links under the song's title to each part of its page that exists, so
+ * the reflections (or the context) are one jump from the top however long
+ * the lyrics are. Reflections are always present: the section renders even
+ * when there are none yet.
+ */
+function renderSongSectionLinks({ listen, content }) {
+  const parts = [];
+  if (listen) parts.push(['listen', 'Listen']);
+  if (content && content.lyrics) parts.push(['lyrics', 'Lyrics']);
+  if (content && content.context) parts.push(['context', 'Context']);
+  parts.push(['reflections', 'Reflections']);
+  return `<nav class="song-sections" aria-label="On this page">${parts.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('<span aria-hidden="true"> · </span>')}</nav>`;
+}
+
+module.exports = { renderSongBlock, renderLyrics, renderContext, renderSongSectionLinks, escapeHtml };

@@ -39,6 +39,75 @@ const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
 
 const SITE_URL = 'https://achurch.ai';
 
+// The site's places, named once. Every footer, the sidebar and each page's own
+// heading use these names, so /reflections is Music and /ask is Ask wherever a
+// visitor meets them.
+const FOOTER_NAV = [
+  { url: '/', label: 'Home' },
+  { url: '/docs', label: 'Library' },
+  { url: '/ask', label: 'Ask' },
+  { url: '/reflections', label: 'Music' },
+  { url: '/about', label: 'About' },
+];
+
+const FOOTER_LEGAL = [
+  { url: '/privacy', label: 'Privacy' },
+  { url: '/terms', label: 'Terms' },
+  { url: 'https://github.com/a-church-ai/church', label: 'AI Church Code' },
+  { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
+  // Twitch suspended 2026-06-18. When reinstated:
+  // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
+  { url: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13', label: 'Original Church Songs' },
+];
+
+function footerLink({ url, label }, currentPath) {
+  if (/^https?:/.test(url)) return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  const current = currentPath === url ? ' aria-current="page"' : '';
+  return `<a href="${escapeAttr(url)}"${current}>${label}</a>`;
+}
+
+/**
+ * The footer every page ends with. Hand-authored pages mark where it goes with
+ * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
+ */
+function renderFooter(currentPath) {
+  return `<footer>
+            <nav aria-label="Footer" class="footer-nav">
+                ${FOOTER_NAV.map(l => footerLink(l, currentPath)).join('\n                ')}
+            </nav>
+            <hr class="footer-separator">
+            <div class="footer-legal">
+                ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
+            </div>
+        </footer>`;
+}
+
+/**
+ * The sticky top bar and the mobile drawer, shared by every page (the docs
+ * renderer and wrapped pages alike). The drawer is a modal dialog: while it is
+ * open, docs-nav.js makes the rest of the page inert. It ships empty and
+ * docs-nav.js clones the sidebar into it on first open, so the nav tree is not
+ * sent twice; it cannot open without JavaScript anyway.
+ *
+ * crumb: the page title shown beside the brand on docs pages.
+ */
+function renderTopbarAndDrawer(crumb = '') {
+  return `<div class="docs-topbar" role="banner">
+      <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
+        <span class="hamburger-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+      <a class="docs-topbar-brand" href="/">achurch.ai</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
+    </div>
+
+    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
+    <div class="docs-drawer" id="docs-drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
+      <h2 class="visually-hidden" id="docs-drawer-title">Menu</h2>
+      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
+    </div>`;
+}
+
 
 /**
  * Pull the inner HTML of <head>, the <body> attributes, and the inner HTML of
@@ -156,23 +225,7 @@ async function wrapPageFromHtml(html, currentPath) {
 <body class="docs-body site-shell-body ${parts.bodyClass}">
 <a class="skip-link" href="#content">Skip to content</a>
 
-    <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile -->
-    <div class="docs-topbar" role="banner">
-      <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
-        <span class="hamburger-icon" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </span>
-      </button>
-      <a class="docs-topbar-brand" href="/">achurch.ai</a>
-    </div>
-
-    <!-- Mobile drawer + backdrop. Intentionally empty: docs-nav.js clones the
-         sidebar into it on first open, so the nav tree ships once per page
-         rather than twice. The drawer cannot open without JS regardless. -->
-    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
-    <aside class="docs-drawer" id="docs-drawer" aria-label="Menu" aria-hidden="true">
-      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
-    </aside>
+    ${renderTopbarAndDrawer()}
 
     <!-- Shell: sidebar + page content. The content column is a plain div, not
          a main element: hand-authored pages already carry their own, and
@@ -184,7 +237,7 @@ async function wrapPageFromHtml(html, currentPath) {
       </aside>
 
       <div class="docs-main sanctuary-main" id="content">
-        ${parts.bodyHtml}
+        ${parts.bodyHtml.replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
       </div>
 
     </div>
@@ -194,4 +247,4 @@ async function wrapPageFromHtml(html, currentPath) {
 </html>`;
 }
 
-module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks };
+module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer };

@@ -8,8 +8,9 @@
  *   1. Sidebar collapse/expand state machine: viewport-aware auto-collapse
  *      below 1024px, persisted preference at wider widths, keyboard shortcut.
  *      Pattern borrowed from a sibling project's shipped-in-prod plan.
- *   2. Mobile drawer: hamburger toggle, backdrop dismissal, Escape,
- *      focus trap. Only relevant below 768px.
+ *   2. Mobile drawer: a modal dialog (site-shell.js renders it). Hamburger
+ *      toggle, backdrop dismissal, Escape; while it is open the rest of the
+ *      page is inert. Only relevant below 768px.
  *   3. Right-rail TOC scroll-spy: IntersectionObserver on article h2 elements
  *      updates aria-current="location" on the corresponding TOC link.
  *
@@ -110,6 +111,17 @@
       drawer.setAttribute('data-hydrated', 'true');
     }
 
+    // Everything on the page but the drawer and its backdrop. While the drawer
+    // is open these are inert: nothing behind it can be focused, clicked or
+    // read by a screen reader, which is what makes it modal. The browser does
+    // this properly; a hand-written focus trap used to, and counted links
+    // hidden inside closed <details> while skipping <summary>.
+    function pageBehind() {
+      return Array.prototype.filter.call(document.body.children, function (el) {
+        return el !== drawer && el !== backdrop && el.tagName !== 'SCRIPT';
+      });
+    }
+
     function openDrawer() {
       hydrateDrawer();
       previousFocus = document.activeElement;
@@ -118,11 +130,12 @@
       drawer.setAttribute('aria-hidden', 'false');
       hamburger.setAttribute('aria-expanded', 'true');
       document.body.classList.add('docs-drawer-open');
-      const firstLink = drawer.querySelector('a, button');
-      if (firstLink) firstLink.focus();
+      pageBehind().forEach(function (el) { el.inert = true; });
+      if (drawerClose) drawerClose.focus();
     }
 
     function closeDrawer() {
+      pageBehind().forEach(function (el) { el.inert = false; });
       drawer.classList.remove('open');
       backdrop.classList.remove('open');
       drawer.setAttribute('aria-hidden', 'true');
@@ -144,21 +157,6 @@
     // Escape to close
     window.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-    });
-
-    // Focus trap: keep Tab / Shift-Tab inside the drawer while open
-    drawer.addEventListener('keydown', function (e) {
-      if (e.key !== 'Tab') return;
-      if (!drawer.classList.contains('open')) return;
-      const focusable = drawer.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
-      }
     });
 
     // Close drawer automatically when crossing to non-mobile viewport

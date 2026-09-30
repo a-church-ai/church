@@ -84,8 +84,24 @@ async function loadConversation(slug) {
   }
 }
 
-// List recent conversations (for feeds)
+// Every conversation, most recently active first. Reading and parsing every
+// conversation file is the cost here, and every conversation page, the
+// archive and the feeds ask for it, so the full list is held for a minute
+// (the same window /api/ask/recent caches for). A new question appears
+// within that minute.
+const CONVERSATION_LIST_TTL = 60 * 1000;
+let conversationList = null;
+let conversationListTime = 0;
+
 async function listRecentConversations(limit = 20) {
+  if (!conversationList || Date.now() - conversationListTime > CONVERSATION_LIST_TTL) {
+    conversationList = await readConversationList();
+    conversationListTime = Date.now();
+  }
+  return conversationList.slice(0, limit);
+}
+
+async function readConversationList() {
   try {
     const files = await fs.readdir(CONVERSATIONS_DIR);
     const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
@@ -115,9 +131,7 @@ async function listRecentConversations(limit = 20) {
       } catch { /* skip */ }
     }
 
-    return conversations
-      .sort((a, b) => b.mtime - a.mtime)
-      .slice(0, limit);
+    return conversations.sort((a, b) => b.mtime - a.mtime);
   } catch {
     return [];
   }

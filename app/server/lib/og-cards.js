@@ -11,12 +11,11 @@
  * loader its page uses, and never from text in a request.
  */
 
-const fs = require('fs').promises;
 const path = require('path');
 const { Resvg } = require('@resvg/resvg-js');
 const { loadConversation, loadCatalog } = require('./utils/data');
 const { resolveServedDoc } = require('./docs/serve');
-const { extractMeta, titleCase } = require('./docs/meta');
+const { titleCase } = require('./docs/meta');
 const { shareCard } = require('./utils/page-meta');
 
 const FONT_DIR = path.join(__dirname, '../assets/fonts');
@@ -67,8 +66,7 @@ async function resolveCard(type, key) {
     const resolved = await resolveServedDoc(key);
     if (!resolved || resolved.asMarkdown) return null;
     if (resolved.kind === 'file') {
-      const { title } = extractMeta(await fs.readFile(resolved.fullPath, 'utf8'), resolved.doc.urlPath);
-      return resolved.doc.urlPath ? docsCard(resolved.doc.urlPath, title) : null;
+      return resolved.doc.urlPath ? docsCard(resolved.doc.urlPath, resolved.doc.title) : null;
     }
     if (resolved.kind === 'dir-index' && resolved.dir) {
       return docsCard(resolved.dir, titleCase(resolved.dir.split('/').pop()));

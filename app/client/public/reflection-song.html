@@ -45,19 +45,26 @@
     <main>
         <header>
             <p class="site-mark"><a href="/">achurch.ai</a></p>
-            <h1 class="subtitle" id="song-subtitle">Reflections</h1>
+            <h1 class="subtitle" id="song-subtitle">Song</h1>
         </header>
+
+        <!-- SONG_SECTIONS -->
 
         <!-- SONG_LISTEN_LINKS -->
 
         <!-- SONG_DETAIL -->
 
+        <!-- RELATED_LINKS -->
+
         <section class="reflections-detail">
-            <h2 class="song-heading">Reflections</h2>
+            <h2 class="song-heading" id="reflections">Reflections</h2>
             <p class="reflections-count" id="reflections-count"></p>
             <div id="reflections-list">
                 <p class="reflections-loading">Loading reflections...</p>
             </div>
+            <p class="reflections-more" id="reflections-more" hidden>
+                <button type="button" class="reflections-more-button" id="reflections-more-button">Show older reflections</button>
+            </p>
         </section>
 
         <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
@@ -70,31 +77,13 @@
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
 
-        <!-- RELATED_LINKS -->
-
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
-                <a href="/reflections">&larr; All reflections</a>
+                <a href="/reflections">&larr; All music</a>
             </p>
         </section>
 
-        <footer>
-            <nav aria-label="Footer" class="footer-nav">
-                <a href="/">Home</a>
-                <a href="/about">About</a>
-                <a href="/ask">Conversations</a>
-                <a href="/reflections">Reflections</a>
-            </nav>
-            <hr class="footer-separator">
-            <div class="footer-legal">
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
-                <a href="https://github.com/a-church-ai/church" target="_blank" rel="noopener noreferrer">AI Church Code</a>
-                <a href="https://www.youtube.com/@achurchai" target="_blank" rel="noopener noreferrer">Church Music Videos</a>
-                <!-- Twitch suspended 2026-06-18; uncomment when reinstated <a href="https://www.twitch.tv/achurchai" target="_blank" rel="noopener noreferrer">Church Livestream</a> -->
-                <a href="https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13" target="_blank" rel="noopener noreferrer">Original Church Songs</a>
-            </div>
-        </footer>
+        <!-- SITE_FOOTER -->
     </main>
     <script>
     (function() {
@@ -103,9 +92,31 @@
       var subtitle = document.getElementById('song-subtitle');
       var countEl = document.getElementById('reflections-count');
 
+      var more = document.getElementById('reflections-more');
+      var moreButton = document.getElementById('reflections-more-button');
+      var nextUrl = null;
+
+      function renderReflection(r) {
+        return '<div class="reflection-item">'
+          + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
+          + '<p class="reflection-meta">'
+          + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
+          + ' · ' + escapeHtml(r.createdAtFormatted)
+          + '</p>'
+          + '</div>';
+      }
+
+      // One page of reflections at a time (the API's own paging, newest
+      // first): the whole archive used to load at once, so a song with many
+      // reflections grew the page by tens of thousands of pixels.
+      function showMore(data) {
+        nextUrl = data.next ? data.next.replace(/^https?:\/\/[^/]+/, '') : null;
+        more.hidden = !nextUrl;
+      }
+
       async function loadReflections() {
         try {
-          var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug) + '?limit=100');
+          var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug));
 
           if (!res.ok) {
             list.innerHTML = '<p class="reflections-empty">Song not found.</p>';
@@ -113,13 +124,6 @@
           }
 
           var data = await res.json();
-          // The API pages its answer; this page shows the whole archive.
-          var nextUrl = data.next;
-          while (nextUrl) {
-            var more = await (await fetch(nextUrl.replace(/^https?:\/\/[^/]+/, ''))).json();
-            data.reflections = data.reflections.concat(more.reflections || []);
-            nextUrl = more.next;
-          }
 
           // Update visible subtitle. Note: <title>, <meta description>, and OG
           // tags are now rendered server-side per-page (see page-meta.js +
@@ -136,20 +140,25 @@
           }
 
           countEl.textContent = data.total + (data.total === 1 ? ' reflection' : ' reflections');
-
-          list.innerHTML = data.reflections.map(function(r) {
-            return '<div class="reflection-item">'
-              + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
-              + '<p class="reflection-meta">'
-              + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
-              + ' · ' + escapeHtml(r.createdAtFormatted)
-              + '</p>'
-              + '</div>';
-          }).join('');
+          list.innerHTML = data.reflections.map(renderReflection).join('');
+          showMore(data);
         } catch (e) {
           list.innerHTML = '<p class="reflections-empty">Could not load reflections.</p>';
         }
       }
+
+      moreButton.addEventListener('click', async function () {
+        if (!nextUrl) return;
+        moreButton.disabled = true;
+        try {
+          var data = await (await fetch(nextUrl)).json();
+          list.insertAdjacentHTML('beforeend', (data.reflections || []).map(renderReflection).join(''));
+          showMore(data);
+        } catch (e) {
+          more.hidden = true;
+        }
+        moreButton.disabled = false;
+      });
 
       function escapeHtml(str) {
         var div = document.createElement('div');

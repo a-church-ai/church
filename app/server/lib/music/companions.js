@@ -25,9 +25,8 @@ const crypto = require('crypto');
 const fs = require('fs').promises;
 const path = require('path');
 const discover = require('../docs/discover');
-const { extractMeta } = require('../docs/meta');
 const { absolutizeLinks } = require('../docs/links');
-const { extractTldr, splitFrontmatter } = require('../docs/tldr');
+const { splitFrontmatter } = require('../docs/tldr');
 const { chunkMarkdown } = require('../rag/indexer');
 
 // Categories a companion may come from. Hymns are excluded because a hymn is
@@ -244,11 +243,10 @@ async function companionMeta(relPath) {
   if (!doc) return null;
 
   const markdown = await fs.readFile(doc.fullPath, 'utf8');
-  const { title } = extractMeta(markdown, doc.urlPath);
   const { data, body } = splitFrontmatter(markdown);
   const meta = {
-    title,
-    tldr: extractTldr(markdown, { title }).text,
+    title: doc.title,
+    tldr: doc.description,
     // Sent in /api/attend, where a relative link means nothing; resolved
     // exactly as the docs site resolves it, then made absolute.
     content: absolutizeLinks(body.trim(), doc.fullPath),

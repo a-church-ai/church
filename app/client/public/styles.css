@@ -920,6 +920,8 @@ p {
 .conv-message-content p { margin: 0 0 1rem; }
 .conv-message-content p:last-child { margin-bottom: 0; }
 
+.conv-message-content h2,
+.conv-message-content h3,
 .conv-message-content h4,
 .conv-message-content h5,
 .conv-message-content h6 {
@@ -2542,6 +2544,41 @@ body.docs-drawer-open {
     color: #595959;
 }
 
+.docs-filter-count {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.docs-filter-count:empty { display: none; }
+
+/* Related links under an article, a song or a conversation ("Elsewhere in",
+   "Read alongside this song", "More songs to sit with", "Sung alongside").
+   One look, set here; the blocks used to carry it as inline styles. */
+.related-block,
+.sung-alongside {
+    border-top: 1px solid #eee;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+}
+.related-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+}
+.related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0 0;
+}
+.related-item { margin-bottom: 1rem; }
+.related-kind { opacity: 0.6; }
+.related-summary { margin: 0.25rem 0 0 0; opacity: 0.8; }
+.related-chant { margin: 0.5rem 0 0 0; font-style: italic; }
+.related-note { margin: 0.5rem 0 0 0; opacity: 0.7; }
+.related-more { margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6; }
+
 /* ============================================================
    Stacked ask form (used on /ask page): question, name,
    privacy note, submit. Reordered so the optional name and
@@ -2744,4 +2781,176 @@ body.docs-drawer-open {
     font-size: 0.875rem;
     color: #595959;
     line-height: 1.5;
+}
+
+/* ============================================================
+   Navigation and reading (docs/plans/navigation-and-reading-2026-09-30.md)
+   ============================================================ */
+
+/* Lists of documents with their descriptions: the library, section pages,
+   directory indexes. One column, so a description sits under its title. */
+.docs-index-section ul.docs-entry-list {
+    display: block;
+}
+.docs-entry-list li {
+    margin-bottom: 1rem;
+}
+.docs-entry-list li a {
+    display: inline;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    font-weight: 500;
+}
+.docs-entry-list li a:hover {
+    background: none;
+    text-decoration: underline;
+}
+.docs-index-section h2 a {
+    color: inherit;
+    text-decoration: none;
+}
+.section-summary {
+    color: #595959;
+}
+
+/* A section page's own essay on its form, below its entries, closed. */
+.section-about {
+    max-width: 720px;
+    margin: 2.5rem auto 0;
+    padding: 0 1rem;
+    text-align: left;
+}
+.section-about > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    padding: 0.5rem 0;
+}
+
+/* The library's ways in. */
+.library-entrances {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    line-height: 1.8;
+}
+.library-source {
+    margin-top: 3rem;
+    font-size: 0.875rem;
+    color: #595959;
+}
+
+/* Search over a JSON index, in the browser (site-search.js). */
+.site-search {
+    margin: 1.5rem 0 2rem;
+    text-align: left;
+}
+.site-search input[type="search"] {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 300;
+    color: #333;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+.site-search input[type="search"]:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+.site-search-status {
+    margin: 0.5rem 0 0;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.site-search-status:empty { display: none; }
+.site-search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+}
+.site-search-results:empty { display: none; }
+.site-search-results li { margin-bottom: 0.75rem; }
+.site-search-label {
+    font-size: 0.8125rem;
+    color: #595959;
+}
+
+/* Where a reading sits in the reading path it was opened from. */
+.path-bar {
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+.path-bar p { margin: 0; }
+.path-bar-steps { margin-top: 0.35rem !important; }
+.path-bar-step {
+    color: #595959;
+    white-space: nowrap;
+    margin-left: 0.5rem;
+}
+.path-next {
+    border-top: 1px solid #eee;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+}
+
+/* Contents for screens too narrow for the rail: shown below 1200px, where
+   the rail is hidden, and hidden above it. */
+.docs-toc-inline {
+    margin: 0 0 1.5rem;
+    padding: 0.5rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+.docs-toc-inline > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+}
+.docs-toc-inline ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0.25rem;
+    line-height: 1.8;
+}
+@media (min-width: 1200px) {
+    .docs-shell.has-toc .docs-toc-inline { display: none; }
+}
+
+/* Song pages: jump links to each part, and older reflections on request. */
+.song-sections {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    text-align: center;
+    color: #595959;
+}
+.reflections-more {
+    text-align: center;
+    margin: 1.5rem 0 0;
+}
+.reflections-more-button {
+    font: inherit;
+    font-size: 0.875rem;
+    color: #007a91;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+.reflections-more-button:disabled { opacity: 0.6; cursor: wait; }
+
+/* The conversation archive's next page. */
+.archive-more {
+    margin-top: 1.5rem;
 }
