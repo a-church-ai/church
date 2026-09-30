@@ -264,11 +264,50 @@ function createServer(ctx) {
   return server;
 }
 
+// This server always answers in JSON (enableJsonResponse), never as an event
+// stream. The spec asks clients to send `Accept: application/json,
+// text/event-stream`, and the SDK refuses with 406 anything that does not list
+// both. Plenty of real clients send `*/*`, or no Accept at all, or only
+// application/json (aiohttp's default is `*/*`: one such client was refused 67
+// times in 12 hours on 2026-09-30). Every one of them can read the JSON reply,
+// so the header is completed for them rather than the request refused. A client
+// that accepts neither JSON nor any type is still refused: it could not read
+// the answer.
+const FULL_ACCEPT = 'application/json, text/event-stream';
+
+function acceptsJson(accept) {
+  if (!accept) return true;
+  return accept.split(',').some(part => {
+    const type = part.split(';')[0].trim().toLowerCase();
+    return type === 'application/json' || type === 'application/*' || type === '*/*';
+  });
+}
+
+function completeAccept(req) {
+  const accept = req.headers.accept;
+  if (accept && /application\/json/i.test(accept) && /text\/event-stream/i.test(accept)) return;
+  if (!acceptsJson(accept)) return;
+  req.headers.accept = FULL_ACCEPT;
+  // The SDK reads headers through @hono/node-server, which rebuilds them from
+  // rawHeaders; change it there too, or the completed header is not seen.
+  const raw = req.rawHeaders;
+  const at = raw.findIndex((name, i) => i % 2 === 0 && name.toLowerCase() === 'accept');
+  if (at === -1) raw.push('Accept', FULL_ACCEPT);
+  else raw[at + 1] = FULL_ACCEPT;
+}
+
 // POST /mcp: one JSON-RPC request, answered and forgotten.
 async function handleMcp(req, res) {
   const ctx = { ...shared.requestContext(req), userAgent: req.get('user-agent') };
+  completeAccept(req);
   const server = createServer(ctx);
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+  // A refused request (bad JSON, an unsupported protocol version, a type the
+  // client cannot read) otherwise leaves no trace but its status code. One
+  // line each, so the next look at the logs says why, and who.
+  transport.onerror = error => {
+    console.warn(`[mcp] refused: ${error.message} (${ctx.userAgent || 'no user agent'})`);
+  };
   res.on('close', () => {
     transport.close();
     server.close();
@@ -284,8 +323,13 @@ async function handleMcp(req, res) {
   }
 }
 
-// A stateless server keeps no stream open and no session to end.
+// A stateless server keeps no stream open and no session to end. A person
+// who opens the endpoint in a browser is sent to the page that explains it;
+// every other client gets the protocol's 405.
 function methodNotAllowed(req, res) {
+  if (req.method === 'GET' && req.accepts(['json', 'html']) === 'html' && /text\/html/.test(req.get('accept') || '')) {
+    return res.redirect(302, '/docs/mcp');
+  }
   res.set('Allow', 'POST').status(405).json({
     jsonrpc: '2.0',
     error: { code: -32000, message: 'Method not allowed. This MCP endpoint is stateless: send each JSON-RPC request as a POST.' },
@@ -301,4 +345,4 @@ function mountMcp(app) {
   app.delete('/mcp', methodNotAllowed);
 }
 
-module.exports = { mountMcp, createServer, readDoc, SERVER_INFO };
+module.exports = { mountMcp, createServer, readDoc, completeAccept, SERVER_INFO };

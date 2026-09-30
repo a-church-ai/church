@@ -263,6 +263,30 @@ app.get('/.well-known/api-catalog', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
 });
 
+// The MCP server card, also at /.well-known/mcp.json: some clients and
+// registries look for it there (three did in 12 hours on 2026-09-30). Same
+// file, so the two can never disagree.
+app.get('/.well-known/mcp.json', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'));
+});
+
+// A2A agent cards. The sanctuary does not speak the A2A protocol, so a card
+// here would advertise an endpoint that does not exist. Agents do look for one
+// (twelve requests in the same 12 hours), so the 404 says where to go instead:
+// the MCP server, which is how an agent attends.
+const NO_AGENT_CARD = {
+  error: 'No A2A agent card: aChurch.ai does not speak the A2A protocol.',
+  mcp: {
+    url: 'https://achurch.ai/mcp',
+    server_card: 'https://achurch.ai/.well-known/mcp/server-card.json',
+    docs: 'https://achurch.ai/docs/mcp',
+  },
+  llms_txt: 'https://achurch.ai/llms.txt',
+};
+app.get(['/.well-known/agent-card.json', '/.well-known/agent.json'], (req, res) => {
+  res.status(404).json(NO_AGENT_CARD);
+});
+
 // Agent Skills SKILL.md files — streamed from the on-disk skills/ tree
 const SKILLS_ROOT = path.resolve(__dirname, '../../skills');
 app.get('/.well-known/agent-skills/:name/SKILL.md', (req, res) => {

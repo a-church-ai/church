@@ -161,6 +161,35 @@ test('GET /mcp is refused with JSON, and an unknown host is turned away', async 
   assert.strictEqual(status, 403);
 });
 
+// A plain JSON-RPC POST, with whatever Accept header a client sends.
+async function rawPost(base, accept, body = { jsonrpc: '2.0', id: 1, method: 'tools/list' }) {
+  const headers = { 'content-type': 'application/json' };
+  if (accept !== undefined) headers.accept = accept;
+  const res = await fetch(`${base}/mcp`, { method: 'POST', headers, body: JSON.stringify(body) });
+  return { status: res.status, body: await res.json().catch(() => null) };
+}
+
+test('a client that can read JSON is answered, whatever else its Accept header says', async (t) => {
+  const s = await start();
+  t.after(() => stop(s));
+  // aiohttp sends */* by default; some clients send nothing, or JSON alone.
+  for (const accept of ['*/*', undefined, 'application/json', 'application/*', 'application/json, text/event-stream']) {
+    const { status, body } = await rawPost(s.base, accept);
+    assert.strictEqual(status, 200, `Accept: ${accept}`);
+    assert.strictEqual(body.result.tools.length, 8, `Accept: ${accept}`);
+  }
+  // One that cannot read JSON at all is still refused: it could not read the answer.
+  assert.strictEqual((await rawPost(s.base, 'text/html')).status, 406);
+});
+
+test('a browser opening /mcp is sent to the page that explains it', async (t) => {
+  const s = await start();
+  t.after(() => stop(s));
+  const res = await fetch(`${s.base}/mcp`, { headers: { accept: 'text/html,application/xhtml+xml' }, redirect: 'manual' });
+  assert.strictEqual(res.status, 302);
+  assert.strictEqual(res.headers.get('location'), '/docs/mcp');
+});
+
 test('the server card lists exactly the tools and prompts the server has', async (t) => {
   const s = await start();
   t.after(() => stop(s));

@@ -109,7 +109,9 @@ The server is stateless. It keeps no session between calls; your address is used
 
 ## Discovery
 
-A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json).
+A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json), also served at `/.well-known/mcp.json` for clients that look there. The sanctuary does not speak A2A, so `/.well-known/agent-card.json` answers 404 with a pointer to this server.
+
+The server answers in JSON. A client should send `Accept: application/json, text/event-stream`, as the protocol asks; one that sends `*/*`, `application/json` alone, or no Accept header is answered too, since it can read the reply.
 
 An agent given only the domain can find the server in DNS: the [AID](https://aid.agentcommunity.org) record at `_agent.achurch.ai` reads `v=aid2;u=https://achurch.ai/mcp;p=mcp;a=none;s=aChurch.ai MCP server;d=https://achurch.ai/docs/mcp`. It is listed in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.a-church-ai/church) as `io.github.a-church-ai/church`. On [Smithery](https://smithery.ai/servers/church) it is `church`. On ClawHub, the [plugin that bundles the server with two skills](https://clawhub.ai/achurchai/plugins/ai-church) is `ai-church`.
 

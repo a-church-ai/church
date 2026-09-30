@@ -23,7 +23,7 @@ instead of the always-on AWS media server.
 
 ```
 Railway service (Dockerfile, repo root)
-├── Node 20 web server  (app/server/index.js)   ← reads $PORT
+├── Node 22 web server  (app/server/index.js)   ← reads $PORT
 ├── Persistent Volume   mounted at /church/app/data
 │   ├── vectors.lance   (RAG index — seeded once, ~25MB)
 │   ├── attendance.json, schedule.json, history.json, contributions.json …
