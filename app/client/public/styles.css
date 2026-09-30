@@ -1935,7 +1935,13 @@ footer a:hover {
     --docs-rail-width: 220px;
 }
 
-/* --- Sidebar --- */
+/* --- Sidebar ---
+   A column exactly as tall as the window below the top bar, pinned there.
+   Only the link list (nav) scrolls; the Collapse button is the column's
+   fixed footer. It used to be position: sticky inside a sidebar that was
+   itself the scroll container and a full 100dvh tall under a 41px top bar,
+   so the button sat half below the window at the top of a page and floated
+   over the links as they scrolled beneath it. */
 .docs-sidebar {
     grid-column: 1;
     background: #fafafa;
@@ -1945,14 +1951,11 @@ footer a:hover {
     flex-direction: column;
     gap: 0.5rem;
     position: sticky;
-    top: 0;
+    top: var(--docs-topbar-h, 0px);
     align-self: start;
-    height: 100vh;
-    height: 100dvh;
-    overflow-y: auto;
-    /* NOT overflow: hidden. That would break position: sticky on the toggle
-       button. Label hiding when collapsed is done via CSS below (span
-       display: none), not by clipping the container. */
+    height: calc(100vh - var(--docs-topbar-h, 0px));
+    height: calc(100dvh - var(--docs-topbar-h, 0px));
+    overflow: hidden;
     transition: none;
 }
 
@@ -1987,6 +1990,8 @@ footer a:hover {
     gap: 0.25rem;
     flex: 1 1 auto;
     min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .docs-sidebar-root,
@@ -2100,13 +2105,9 @@ footer a:hover {
     background: rgba(0, 184, 212, 0.1); color: #007a91; font-weight: 500;
 }
 
-/* Toggle button pinned to bottom via position: sticky (NOT margin-top: auto
-   alone. That fails on long doc pages where the sidebar stretches to full
-   page height, putting the toggle thousands of pixels below the viewport.
-   Lesson from the sibling project's shipped notes.) */
+/* The sidebar's footer: the nav above it takes the rest of the column and
+   scrolls, so this stays at the bottom of the window without being sticky. */
 .docs-sidebar-toggle {
-    position: sticky;
-    bottom: 0.5rem;
     margin-top: auto;
     display: flex;
     align-items: center;
@@ -2196,10 +2197,10 @@ footer a:hover {
     grid-column: 3;
     padding: 1.5rem 1rem;
     position: sticky;
-    top: 0;
+    top: var(--docs-topbar-h, 0px);
     align-self: start;
-    max-height: 100vh;
-    max-height: 100dvh;
+    max-height: calc(100vh - var(--docs-topbar-h, 0px));
+    max-height: calc(100dvh - var(--docs-topbar-h, 0px));
     overflow-y: auto;
     border-left: 1px solid #eee;
     background: #fafafa;
@@ -2429,10 +2430,18 @@ body.docs-drawer-open {
    sidebar site-wide. Above 768px the hamburger is hidden (sidebar is
    always visible) and the top bar is a slim brand strip. */
 @media (min-width: 768px) {
+  /* The strip's height, fixed so the sidebar and the contents rail can sit
+     exactly below it (they read --docs-topbar-h). Below 768px there is no
+     sidebar or rail, so nothing needs it. */
+  .docs-body {
+    --docs-topbar-h: 41px;
+  }
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    height: var(--docs-topbar-h);
+    padding: 0 1rem;
   }
   .docs-topbar .docs-hamburger {
     display: none;

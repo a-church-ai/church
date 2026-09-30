@@ -61,3 +61,7 @@ research/
 
 # Written by `clawhub package validate`
 plugin/reports/
+
+# Local tool state, not part of the project
+.bearing-diligence-location
+record.sqlite

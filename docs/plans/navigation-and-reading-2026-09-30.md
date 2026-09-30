@@ -173,8 +173,16 @@ No accounts, no tracking, no personalization, no engagement mechanics. Path posi
   - The Music page lists songs in service order with descriptions.
   - A song page's sections run: section links, listen, lyrics and context, related, reflections.
   - The drawer at 375px: `role="dialog"`, labelled "Menu", focus on Close. Skip link, top bar and page are inert while it is open. 40 Tab and 45 Shift-Tab presses never left it. Escape closes it and returns focus to the menu button.
-- **Not verified yet:**
-  - A VoiceOver pass.
-  - "Show older reflections" against a song with more than 20 reflections (no local song has that many; the API's paging is tested).
-  - The audit's seven tasks on production after deploy.
+- **Verified on production, 2026-09-30, after deploy:**
+  - "Show older reflections" on We Wake, We Wonder (105 reflections): 20, then 40, then all 105, none repeated, and the button leaves at the end. The page starts about 17,800px tall; the audit measured about 45,000px before its related readings.
+  - The audit's tasks:
+    1. "Start here" is the library's first entrance.
+    2. "context ending" finds What Remains When Context Ends first, without asking anything.
+    3. A path's first reading shows Reading 1 of 10; its next link opens Reading 2 of 10; both link back to the path; the canonical carries no query.
+    4. "disagree" finds Prayer for the One I Cannot Persuade and Ritual of the Unresolved Table.
+    5. A song's lyrics, context and reflections are one jump from its title, and related readings come before the reflections.
+    6. At 375px, "On this page" jumps to a section; the menu opens as a dialog with the page inert, and Escape closes it with the reader still at the same place.
+    7. /llms.txt, /docs.md, /docs/index.md, the MCP server card and /for-agents all answer.
+  - An old conversation citing GitHub (who-is-god-and-how-begun-life-in-the-universe) now links the site's pages; no GitHub file links remain on it.
+- **Not verified yet:** a VoiceOver pass.
 

@@ -88,6 +88,23 @@
     toggleCollapsed();
   });
 
+  // ------ Current page in view ------
+
+  // Only the sidebar's link list scrolls (styles.css), so a page deep in a
+  // long category would open with its own link below the fold of the list.
+  // Scroll the list, not the page, until the current link shows.
+  if (sidebar) {
+    const list = sidebar.querySelector('nav');
+    const current = list && list.querySelector('[aria-current="page"]');
+    if (current) {
+      const listBox = list.getBoundingClientRect();
+      const linkBox = current.getBoundingClientRect();
+      if (linkBox.bottom > listBox.bottom || linkBox.top < listBox.top) {
+        list.scrollTop += linkBox.top - listBox.top - listBox.height / 3;
+      }
+    }
+  }
+
   // ------ Mobile drawer ------
 
   if (hamburger && drawer && backdrop) {
