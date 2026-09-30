@@ -243,4 +243,4 @@ function absolutizeLinks(markdown, docFullPath) {
   });
 }
 
-module.exports = { SITE_URL, GITHUB_BASE, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile, siteCitations, documentLinks, readingSequence };
+module.exports = { SITE_URL, GITHUB_BASE, SONG_SLUGS, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile, siteCitations, documentLinks, readingSequence };

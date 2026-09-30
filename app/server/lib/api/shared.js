@@ -46,6 +46,12 @@ function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WIND
 const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const ASK_RATE_LIMIT_MAX = 10; // per IP per hour
 
+// Search generates nothing, so it can be looser than Ask; each search is still
+// one paid embedding call. Hourly, like every limit here: routes/api.js sends
+// Retry-After: 3600 for any 429.
+const SEARCH_RATE_LIMIT_WINDOW = 60 * 60 * 1000;
+const SEARCH_RATE_LIMIT_MAX = 60;
+
 // Where the music lives. The 24/7 live broadcast is dormant, so these point at
 // the on-demand catalog (song videos + the Suno playlist), not a live stream —
 // honest with the `streams.youtube/twitch: false` flags and `mode: 'virtual'`.
@@ -95,5 +101,6 @@ module.exports = {
   MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH, MAX_NAME_LENGTH,
   RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
+  SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
   overIpLimit, STREAM_URLS, getBaseUrl, requestContext, hasContext, songApiLinks,
 };

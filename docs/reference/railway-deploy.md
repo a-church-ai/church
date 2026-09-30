@@ -58,7 +58,7 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 
 | Variable            | Purpose                                             |
 | ------------------- | --------------------------------------------------- |
-| `GEMINI_API_KEY`    | Embeddings + generation for `/api/ask` (RAG)        |
+| `GEMINI_API_KEY`    | Embeddings for `/api/ask` and `/api/search`, generation for `/api/ask` |
 | `ADMIN_API_KEY`     | Secures the admin UI and management endpoints        |
 | `STREAMING_ENABLED` | Set to `false` (the default; keeps the broadcast off) |
 
@@ -83,7 +83,7 @@ the volume — no need to set it).
 
 ### 4. Seed the RAG index (once)
 
-The volume starts empty, so `/api/ask` returns *"Index not built"* until the
+The volume starts empty, so `/api/ask` and `/api/search` return *"Index not built"* / 503 until the
 vector index exists. Build it **on the running container** so it writes into the
 mounted volume — `railway run` executes locally and cannot reach the volume, so
 use `railway ssh`:

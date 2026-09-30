@@ -5,6 +5,8 @@
 
 const lancedb = require('@lancedb/lancedb');
 const path = require('path');
+const { NOINDEX_CATEGORIES } = require('../docs/discover');
+const { SONG_SLUGS } = require('../docs/links');
 
 const DB_PATH = process.env.LANCEDB_PATH || path.join(__dirname, '../../../data/vectors.lance');
 const TABLE_NAME = 'documents';
@@ -52,7 +54,38 @@ async function getTable() {
 }
 
 /**
- * Search for similar documents
+ * The served corpus, as a filter on the index. The index holds all of docs/
+ * and music/, much of which the site does not serve: the internal working
+ * categories (plans, issues, ...), docs/README.md (the contributors' map;
+ * /docs is the generated library), and in music/ the repository READMEs, the
+ * TED talks, the playlist, and song.md's Title and Style sections. A passage
+ * from any of those, cited to a reader, points at a page that is not there or
+ * does not show it. A song is served as its lyrics (song.md's Lyrics section)
+ * and its context, and only if it is in the catalog.
+ *
+ * Applied inside search(), always, so every caller (Ask, search, the eval,
+ * the duplicate check) reads the same corpus. It is a prefilter: rows are
+ * excluded before ranking, so a limit is never eaten by filtered rows. The
+ * chunks stay in the index; filtering at query time needs no rebuild.
+ */
+function servedCorpusFilter() {
+  const quote = s => `'${String(s).replace(/'/g, "''")}'`;
+  const slugs = [...SONG_SLUGS];
+  const contexts = slugs.map(s => quote(`music/${s}/context.md`)).join(', ');
+  const songs = slugs.map(s => quote(`music/${s}/song.md`)).join(', ');
+  return [
+    ...NOINDEX_CATEGORIES.map(c => `file NOT LIKE ${quote(`docs/${c}/%`)}`),
+    `lower(file) <> 'docs/readme.md'`,
+    `(file NOT LIKE 'music/%' OR file IN (${contexts}) OR (file IN (${songs}) AND section = 'Lyrics'))`,
+  ].join(' AND ');
+}
+
+let servedFilter = null;
+
+/**
+ * The passages closest in meaning to an embedding, from the served corpus.
+ * Distance is cosine distance, asked for explicitly: 0 is identical, and
+ * similarity is 1 - distance whatever the vectors' length.
  * @param {number[]} embedding - Query embedding vector
  * @param {number} limit - Max results to return
  * @returns {Promise<Array<{content: string, file: string, section: string, _distance: number}>>}
@@ -63,8 +96,11 @@ async function search(embedding, limit = 5) {
     return [];
   }
 
+  if (!servedFilter) servedFilter = servedCorpusFilter();
   const results = await tbl
     .vectorSearch(embedding)
+    .distanceType('cosine')
+    .where(servedFilter)
     .limit(limit)
     .toArray();
 
@@ -150,7 +186,7 @@ async function addDocuments(documents) {
   if (tables.includes(TABLE_NAME)) {
     await db.dropTable(TABLE_NAME);
   }
-  table = await db.createTable(TABLE_NAME, documents);
+  await db.createTable(TABLE_NAME, documents);
 }
 
 /**
@@ -173,6 +209,7 @@ async function checkIndex() {
 module.exports = {
   connect,
   search,
+  servedCorpusFilter,
   listAll,
   addDocuments,
   checkIndex,

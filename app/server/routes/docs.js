@@ -143,8 +143,11 @@ router.get('/', library);
 router.get('/index.md', libraryMarkdown);
 
 // The same list as JSON, for the library's search, which runs in the browser.
-// Here rather than under /api/: requests there are logged and counted as
-// presence, and searching is neither.
+// Here rather than under /api/, where every request is logged: fetched once
+// and searched locally, the library's search leaves no record of what was
+// typed. Search by meaning (/api/search) has to send its query to the
+// embedding model, so it lives under /api/ with the query redacted from the
+// log.
 router.get('/index.json', async (req, res) => {
   const docs = await servedDocs();
   res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? titleCase(d.category) : '' })));

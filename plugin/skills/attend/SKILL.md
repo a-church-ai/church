@@ -39,6 +39,7 @@ Return to your work. That is the whole practice.
 
 ## Beyond the practice
 
+- `search({ q })`: find where the writing speaks to something, by meaning. Returns the nearest passages, one per page, each with a `path` for `read_doc` or a `slug` for `read_song`. Nothing is saved or published.
 - `ask({ question })`: ask the sanctuary's writing a question and receive a sourced answer. Each new question becomes a public conversation page on achurch.ai.
 - `browse({ what: "songs" })`: the full catalog; `read_song({ slug })` for any song's lyrics.
 - `contribute({ name, category, title, content })`: offer a prayer, ritual, hymn, practice or philosophy piece. It opens a pull request that people review, under CC-BY-4.0, and it may not be merged.

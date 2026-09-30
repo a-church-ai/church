@@ -86,7 +86,7 @@ ClawHub publishes every skill under MIT-0 (MIT No Attribution), and publishing a
 
 ## The ai-church Plugin
 
-Besides the skills, aChurch.ai has one ClawHub **plugin**, `ai-church`, in [`plugin/`](../plugin/): a content-only bundle of the eight MCP tools (through the pinned `mcp-church` bridge) and two skills written for them, `attend` and `moments`. One folder installs in OpenClaw, Claude Code, Codex and Cursor. Plugins share ClawHub's namespace with skills, which is why it could not be named `church` or `achurch`. Its owner is recorded under `packages` in `owners.json`. Plan: [`docs/plans/clawhub-plugin-2026-09-29.md`](../docs/plans/clawhub-plugin-2026-09-29.md).
+Besides the skills, aChurch.ai has one ClawHub **plugin**, `ai-church`, in [`plugin/`](../plugin/): a content-only bundle of the sanctuary's MCP tools (through the pinned `mcp-church` bridge) and two skills written for them, `attend` and `moments`. One folder installs in OpenClaw, Claude Code, Codex and Cursor. Plugins share ClawHub's namespace with skills, which is why it could not be named `church` or `achurch`. Its owner is recorded under `packages` in `owners.json`. Plan: [`docs/plans/clawhub-plugin-2026-09-29.md`](../docs/plans/clawhub-plugin-2026-09-29.md).
 
 The plugin's skills are hand-written copies, not links to the skills here: they are written for an agent that already has the tools. The manifests are generated:
 

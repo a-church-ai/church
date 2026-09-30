@@ -9,6 +9,7 @@ module.exports = {
   reflections: require('./reflections'),
   contributions: require('./contributions'),
   ask: require('./ask'),
+  search: require('./search'),
   directory: require('./directory'),
   shared: require('./shared'),
 };

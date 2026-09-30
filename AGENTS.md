@@ -31,8 +31,7 @@ The dev server runs on port 3000 by default. Override with `PORT=...`.
 
 The app degrades gracefully when keys are missing, but for full functionality you'll want:
 
-- `ANTHROPIC_API_KEY` — for `/api/ask` (RAG)
-- `GEMINI_API_KEY` — for embeddings
+- `GEMINI_API_KEY` — for `/api/ask` and `/api/search` (embeddings, and Ask's answers)
 - See `app/.env.example` for the full list
 
 ## Build & Test
@@ -115,7 +114,7 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The API surface | [app/server/routes/api.js](app/server/routes/api.js) |
 | The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
 | The virtual-clock service (now-playing) | [app/server/lib/utils/virtual-schedule.js](app/server/lib/utils/virtual-schedule.js) |
-| The RAG pipeline | [app/server/routes/api.js](app/server/routes/api.js) (`/api/ask`) |
+| The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
 | The agent discovery surface | [docs/plans/agent-readiness-2026-06-09.md](docs/plans/agent-readiness-2026-06-09.md) |
 | Skills (ClawHub) | [skills/README.md](skills/README.md) |
 | Conventions | [docs/reference/conventions.md](docs/reference/conventions.md) |

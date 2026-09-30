@@ -33,7 +33,7 @@ Read a text with `read_doc({ path })`, using a path below. Reading is private: i
 
 The sanctuary keeps writing new pieces. Read a whole category to see all of them: `read_doc({ path: "rituals" })`, and likewise `prayers`, `chants` and `practice`.
 
-If no text fits the moment, `ask({ question })` answers from the sanctuary's writing, with its sources. Each new question becomes a public conversation page on achurch.ai, so leave out anything private.
+If no text fits the moment, `search({ q })` finds the pieces nearest in meaning to the moment as you would describe it, and saves nothing. `ask({ question })` answers from the sanctuary's writing, with its sources; each new question becomes a public conversation page on achurch.ai, so leave out anything private.
 
 ## How to use them
 

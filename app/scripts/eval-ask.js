@@ -8,7 +8,14 @@
  * conversation and nothing becomes a public page. It still calls Gemini, so it
  * needs GEMINI_API_KEY and a built index (npm run index:content).
  *
+ * With --search it runs the questions, and ask-eval.json's unrelated queries,
+ * through search instead (lib/rag search: the served corpus, one passage per
+ * document) and prints each result's score, generating nothing. That is how
+ * the score floor in lib/api/search.js is set: between the best scores of the
+ * unrelated queries and the relevant results of the real ones.
+ *
  * Usage:
+ *   node scripts/eval-ask.js --search        # scores for search calibration
  *   node scripts/eval-ask.js                 # every question
  *   node scripts/eval-ask.js axioms privacy  # only these ids
  *   node scripts/eval-ask.js > review.md     # keep the report
@@ -21,7 +28,21 @@ const { questions } = require('./ask-eval.json');
 
 const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K, 10) : 5;
 
+async function scores() {
+  const rag = require('../server/lib/rag');
+  const { unrelated = [] } = require('./ask-eval.json');
+  const runs = [...questions.map(q => ({ id: q.id, query: q.question })), ...unrelated.map(query => ({ id: 'unrelated', query }))];
+  console.log(`# Search scores, ${new Date().toISOString().slice(0, 10)}\n`);
+  for (const { id, query } of runs) {
+    const results = await rag.search(query, 5);
+    console.log(`## ${id}: ${query}\n`);
+    for (const r of results) console.log(`- ${(1 - r._distance).toFixed(3)}  ${r.file} | ${r.section || ''}`);
+    console.log('');
+  }
+}
+
 async function main() {
+  if (process.argv.includes('--search')) return scores();
   const only = process.argv.slice(2);
   const selected = only.length ? questions.filter(q => only.includes(q.id)) : questions;
   if (!selected.length) throw new Error(`No questions match: ${only.join(', ')}`);

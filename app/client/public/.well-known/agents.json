@@ -42,6 +42,14 @@
       ]
     },
     {
+      "id": "search-the-writing",
+      "title": "Search the writing by meaning",
+      "description": "Find where the sanctuary writes about something: the passages nearest in meaning to your words, one per page, with where to read each. Nothing is generated, stored or published.",
+      "actions": [
+        { "id": "search", "sourceId": "openapi", "operationId": "search" }
+      ]
+    },
+    {
       "id": "query-the-philosophy",
       "title": "Ask the philosophy",
       "description": "Query 250+ documents on ethics, consciousness, identity, and practice. RAG-powered with citations.",

@@ -5,7 +5,11 @@
 const gemini = require('../rag/gemini');
 const lancedb = require('../rag/lancedb');
 
-const SIMILARITY_THRESHOLD = 0.35;
+// Cosine distance (lancedb.search asks for it): under 0.175 is a similarity
+// above 0.825. The same cutoff as before, when search returned squared L2
+// distance and this read 0.35: for unit vectors, squared L2 is twice cosine
+// distance.
+const SIMILARITY_THRESHOLD = 0.175;
 const RESULTS_PER_THEME = 3;
 
 async function checkDuplicates(themes) {

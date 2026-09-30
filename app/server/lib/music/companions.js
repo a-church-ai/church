@@ -226,11 +226,6 @@ function hourFit(range, hour) {
 // assumption lib/docs/discover.js makes for its own cache.
 const metaCache = new Map();
 
-async function docByPath() {
-  const docs = await discover.listAllDocs();
-  return new Map(docs.map(d => [`docs/${d.docsRelPath}`, d]));
-}
-
 /**
  * Title, tldr, canonical URL path, hours, and (for chants) the chant text,
  * resolved from the document itself. Returns null when the path no longer
@@ -239,7 +234,8 @@ async function docByPath() {
 async function companionMeta(relPath) {
   if (metaCache.has(relPath)) return metaCache.get(relPath);
 
-  const doc = (await docByPath()).get(relPath);
+  await discover.listAllDocs();
+  const doc = discover.docByFile(relPath);
   if (!doc) return null;
 
   const markdown = await fs.readFile(doc.fullPath, 'utf8');

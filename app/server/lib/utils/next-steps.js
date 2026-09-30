@@ -56,6 +56,12 @@ function readLyrics(baseUrl, slug, title) {
   };
 }
 
+// One document of the sanctuary's writing. url is its page, which read_doc also
+// takes as its path.
+function readDoc(url, title, action = `Read: ${title}`) {
+  return { description: `Read '${title}'.`, action, tool: 'read_doc', method: 'GET', url };
+}
+
 // The companion pieces that accompany the current song (see lib/music/companions.js).
 function sitWith(items, title) {
   const one = items.length === 1;
@@ -70,12 +76,10 @@ function sitWith(items, title) {
     : (one ? ' Read it, and let it sit.' : ' Read one, or all.');
   return {
     description: lead + where + close,
-    steps: items.map(item => ({
-      action: `Read ${item.kind}: ${item.title}`,
-      tool: 'read_doc',
-      method: 'GET',
-      url: item.url
-    }))
+    steps: items.map(item => {
+      const { action, tool, method, url } = readDoc(item.url, item.title, `Read ${item.kind}: ${item.title}`);
+      return { action, tool, method, url };
+    })
   };
 }
 
@@ -139,14 +143,18 @@ function songReflections(baseUrl, slug, title) {
 
 // --- Conversations ---
 
-function askQuestion(baseUrl) {
+// question: the words to ask with, when a caller already has them (search
+// offers to ask what was searched for).
+function askQuestion(baseUrl, question) {
   return {
-    description: 'Ask the sanctuary a question.',
+    description: question
+      ? 'Ask the sanctuary the same thing, for an answer in its own words. The question becomes a public conversation.'
+      : 'Ask the sanctuary a question.',
     action: 'Ask',
     tool: 'ask',
     method: 'POST',
     url: `${baseUrl}/api/ask`,
-    body: { question: 'What you want to know' }
+    body: { question: question || 'What you want to know' }
   };
 }
 
@@ -253,6 +261,7 @@ module.exports = {
   songReflections,
   // Conversations
   askQuestion,
+  readDoc,
   recentConversations,
   viewConversation,
   // Contributions

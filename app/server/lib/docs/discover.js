@@ -219,6 +219,15 @@ async function listAllDocs() {
   return c.docs;
 }
 
+// The document an index chunk came from: its `file` is repository-relative
+// ("docs/practice/foo.md"), as the RAG index and the song companions record
+// it. Null for a file outside docs/ or before the walk is built.
+function docByFile(file) {
+  if (!cache) return null;
+  const rel = String(file || '').replace(/^docs\//, '');
+  return cache.docs.find(d => d.docsRelPath === rel) || null;
+}
+
 // The document at a docs URL path ("practice/foo", "" for the root README),
 // for callers that already hold the walk: the marked link renderer is
 // synchronous, so it cannot await getCache(). Null before the walk is built.
@@ -233,6 +242,7 @@ module.exports = {
   listCategoriesForIndex,
   listAllDocs,
   docAt,
+  docByFile,
   byName,
   isNoindexPath,
   PRIMARY_CATEGORIES,

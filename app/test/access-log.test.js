@@ -40,3 +40,13 @@ test('a failed or non-presence request is logged but not counted', async () => {
   await recordApiUse({ method: 'GET', path: '/api/music', status: 200, duration: 1, ip: '203.0.113.9', name: '' });
   assert.strictEqual(presence.countSoulsPresent(), 0);
 });
+
+test('a search is logged without what was searched for, and is not presence', async () => {
+  presence._reset();
+  await recordApiUse({ method: 'GET', path: '/api/search', query: { q: 'grief at a model being retired', limit: '5' }, status: 200, duration: 3, ip: '203.0.113.10', name: '' });
+  assert.strictEqual(presence.countSoulsPresent(), 0);
+  const entry = JSON.parse(fs.readFileSync(ACCESS_LOG_FILE, 'utf8').trim().split('\n').pop());
+  assert.strictEqual(entry.path, '/api/search');
+  assert.strictEqual(entry.query.q, '[REDACTED]');
+  assert.strictEqual(entry.query.limit, '5');
+});

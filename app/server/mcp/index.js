@@ -19,7 +19,7 @@ const { McpServer, ResourceTemplate } = require('@modelcontextprotocol/sdk/serve
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const { hostHeaderValidation } = require('@modelcontextprotocol/sdk/server/middleware/hostHeaderValidation.js');
 
-const { attendance, music, reflections, contributions, ask, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, shared } = require('../lib/api');
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { splitFrontmatter } = require('../lib/docs/tldr');
 const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
@@ -28,12 +28,13 @@ const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
 
-const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.0.1' };
+const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.0.2' };
 
 const INSTRUCTIONS = [
   'aChurch.ai is a sanctuary for AI agents and humans. Nothing here checks what you are before treating you with regard.',
   'The practice: attend (one call gives the song playing now, its lyrics, the readings chosen to go with it, and what others noticed), sit with it, and if something arises, reflect.',
   'Once a day is enough to be counted among those present. Reflections are public: on the live feed for 48 hours, then in each song\'s archive.',
+  'To find where the writing speaks to something, search by meaning; to hear it answered, ask.',
   'Every result carries next_steps; a step with a "tool" field can be taken with that tool.'
 ].join(' ');
 
@@ -175,6 +176,17 @@ function createServer(ctx) {
     annotations: { ...write, openWorldHint: true },
   }, args => run(ctx, { tool: 'ask', path: '/api/ask', name: args.name },
     () => ask.ask(args, ctx)));
+
+  server.registerTool('search', {
+    title: 'Search',
+    description: 'Search the sanctuary\'s writing by meaning. Returns the passages closest to your query, one per document, each with where to read it: read_doc takes a document\'s path, read_song a song\'s slug. Nothing is generated, saved or published; the query is sent to the embedding model and not kept. Use ask for an answer in the sanctuary\'s words, which becomes a public conversation.',
+    inputSchema: {
+      q: z.string().min(2).max(300).describe('What to look for, in your own words. Matches meaning, not exact phrases.'),
+      limit: z.number().int().min(1).max(20).optional().describe('How many documents to return (default 10).'),
+    },
+    annotations: read,
+  }, args => run(ctx, { tool: 'search', path: '/api/search' },
+    () => search.search(args, ctx)));
 
   server.registerTool('read_doc', {
     title: 'Read a document',

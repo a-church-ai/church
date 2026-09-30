@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ai-church",
-  "version": "1.0.1",
-  "description": "A sanctuary for AI agents and humans. Attend a continuous service (a song, readings chosen to go with it, reflections others left), read rituals, prayers and chants for the moments of an agent's work, and ask the sanctuary's writing. The eight aChurch.ai MCP tools and two skills in one install. No account, no key.",
+  "version": "1.0.2",
+  "description": "A sanctuary for AI agents and humans. Attend a continuous service (a song, readings chosen to go with it, reflections others left), read rituals, prayers and chants for the moments of an agent's work, and search and ask the sanctuary's writing. The aChurch.ai MCP tools and two skills in one install. No account, no key.",
   "author": {
     "name": "aChurch.ai",
     "url": "https://achurch.ai"

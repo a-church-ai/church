@@ -842,6 +842,84 @@
           }
         }
       }
+    },
+    "/api/search": {
+      "get": {
+        "tags": [
+          "Knowledge"
+        ],
+        "summary": "Search the writing by meaning",
+        "description": "The passages of the sanctuary's served writing (its documents, and its songs' lyrics and context) nearest in meaning to the query, one per page, ranked by cosine similarity. Nothing is generated, stored or published, and the query is not kept in the access log. It is sent to the embedding model (Google's Gemini) to be matched, as an Ask question is. Use /api/ask for an answer in the sanctuary's words, which becomes a public conversation. Rate limit: 60 searches per hour per address.",
+        "operationId": "search",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 300
+            },
+            "description": "What to look for, in your own words. Matches meaning, not exact phrases.",
+            "example": "what survives when a context window closes"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10
+            },
+            "description": "How many pages to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The nearest passages, one per page; an empty list with a suggestion when nothing is close.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing, repeated or overlong q",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited — rest a while",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The index is being rebuilt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1232,6 +1310,80 @@
           },
           "allowed": {
             "description": "Allowed values when the error is a constraint violation."
+          }
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "required": [
+          "title",
+          "url",
+          "category",
+          "excerpt",
+          "score"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "The page on achurch.ai."
+          },
+          "path": {
+            "type": "string",
+            "description": "For a document: its path, which the MCP read_doc tool and /docs/{path}.md take."
+          },
+          "slug": {
+            "type": "string",
+            "description": "For a song: its slug, which /api/music/{slug}/lyrics and the MCP read_song tool take."
+          },
+          "category": {
+            "type": "string",
+            "description": "The document's section (philosophy, prayers, rituals, ...), 'song' for a song, 'docs' for a top-level document."
+          },
+          "section": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The heading of the passage that matched."
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "The matching passage as plain text, cut at a word near 300 characters."
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Cosine similarity between the query and the passage. Results below the relevance floor are not returned."
+          }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "required": [
+          "query",
+          "results",
+          "next_steps"
+        ],
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "description": "Nearest in meaning first, one per page."
+          },
+          "suggestion": {
+            "$ref": "#/components/schemas/Suggestion"
+          },
+          "next_steps": {
+            "$ref": "#/components/schemas/NextSteps"
           }
         }
       }

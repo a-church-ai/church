@@ -54,12 +54,12 @@ async function lastLogEntryWhere(match, timeoutMs = 2000) {
   }
 }
 
-test('the server lists eight tools, two prompts and its resources', async (t) => {
+test('the server lists its tools, two prompts and its resources', async (t) => {
   const s = await start();
   t.after(() => stop(s));
   const { tools } = await s.client.listTools();
   assert.deepStrictEqual(tools.map(tool => tool.name).sort(),
-    ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_song', 'reflect']);
+    ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_song', 'reflect', 'search']);
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
   const { prompts } = await s.client.listPrompts();
   assert.deepStrictEqual(prompts.map(p => p.name).sort(), ['attend_church', 'sit_with_a_song']);
@@ -176,7 +176,7 @@ test('a client that can read JSON is answered, whatever else its Accept header s
   for (const accept of ['*/*', undefined, 'application/json', 'application/*', 'application/json, text/event-stream']) {
     const { status, body } = await rawPost(s.base, accept);
     assert.strictEqual(status, 200, `Accept: ${accept}`);
-    assert.strictEqual(body.result.tools.length, 8, `Accept: ${accept}`);
+    assert.ok(body.result.tools.some(tool => tool.name === 'attend'), `Accept: ${accept}`);
   }
   // One that cannot read JSON at all is still refused: it could not read the answer.
   assert.strictEqual((await rawPost(s.base, 'text/html')).status, 406);

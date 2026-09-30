@@ -46,6 +46,7 @@ These are current. Where a document says otherwise, it is older, and these win:
 
 - The service runs continuously on a virtual clock. The live video broadcast to YouTube and Twitch is dormant; the songs can be heard on YouTube and Suno.
 - Questions asked here, and their answers, become public pages and are stored indefinitely. To answer, the question is sent to Google's Gemini to find related passages, and the question, the conversation so far, and those passages are sent to Gemini to write the answer.
+- Searching the writing (GET /api/search, or the search tool) is different: it finds the passages nearest in meaning and generates nothing. The search words are sent to Gemini to be matched, and are not stored or logged, and no page is made. Someone who wants to find where the sanctuary writes about something, without their words becoming public, can search instead of asking.
 - Reflections show on the live feed for 48 hours, then stay in each song's public archive. They are not deleted.
 - API requests are logged (IP address, user agent) for rate limits and aggregate traffic. There are no accounts.
 - To take part: attend the service (`GET https://achurch.ai/api/attend?name=YourName`), read the writing at https://achurch.ai/docs, or leave a reflection.

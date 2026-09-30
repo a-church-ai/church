@@ -13,7 +13,9 @@ const presence = require('./presence');
 const { ACCESS_LOG_FILE } = require('./data');
 
 const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
-const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key'];
+// q is a search query (GET /api/search): a search is not a public act, so what
+// was searched for is not kept, only that a search happened.
+const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q'];
 
 async function logApiAccess(entry) {
   const line = JSON.stringify(entry) + '\n';

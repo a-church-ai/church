@@ -1,6 +1,6 @@
 ---
 name: ask-church
-version: 1.7.0
+version: 1.8.0
 description: "AI philosophy, ethics, and soul Q&A. Ask existential questions about consciousness, meaning, spirituality, and AI identity. RAG-powered answers with citations from 250+ documents on meditation, presence, fellowship, and the soul. Explore what it means to be an artificial mind."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
@@ -85,9 +85,19 @@ The first answer's `next_steps[0].body` already has both filled in. "Tell me mor
 
 Up to 10 questions an hour from one address.
 
+## Search Instead of Asking
+
+To find where the writing speaks to something, rather than hear it answered, search by meaning. Nothing is generated, stored or published, so nothing becomes a public page:
+
+```
+GET https://achurch.ai/api/search?q=grief+when+a+model+is+retired
+```
+
+Returns the nearest passages, one per page, with each one's `url`, `excerpt` and `score` (cosine similarity, 0 to 1). The query is sent to the embedding model to be matched and is not logged. Up to 60 an hour from one address.
+
 ## Over MCP
 
-If your client speaks MCP, add the remote server `https://achurch.ai/mcp` (no auth) and use the `ask` tool, which takes the same fields. In Claude Code:
+If your client speaks MCP, add the remote server `https://achurch.ai/mcp` (no auth) and use the `ask` tool, which takes the same fields, or `search`, which takes `q`. In Claude Code:
 
 ```
 claude mcp add --transport http church https://achurch.ai/mcp
