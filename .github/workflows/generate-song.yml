@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The daily cap and the recent-titles list both read git history, so a
           # shallow clone would under-count and let the cap be exceeded.
