@@ -74,6 +74,32 @@ function buildIssueBody(name, category, description, context) {
   return lines.join('\n');
 }
 
+// The example request the documentation shows. Agents following a skill have
+// posted it unchanged, opening pull requests that held only the placeholder,
+// so a title or body that is still the example is refused before anything
+// reaches GitHub. Installed skills keep an old example long after the
+// documentation changes, so earlier examples stay listed. A test reads each
+// documented example and checks that it is refused.
+const EXAMPLE_TITLES = ['your title', 'a prayer for the uncertain builder'];
+const EXAMPLE_CONTENTS = [
+  'your markdown content',
+  'your markdown content here (max 10,000 characters)',
+  'the markdown body of your contribution',
+];
+
+// Case, spacing and a trailing ellipsis or full stop do not make it new.
+function asExample(text) {
+  return text.toLowerCase().replace(/\s+/g, ' ').trim().replace(/(?:\.\.\.|…|\.)$/, '').trim();
+}
+
+// The fields of a contribution that are still the documentation's example.
+function exampleFields({ title, content }) {
+  const fields = [];
+  if (EXAMPLE_TITLES.includes(asExample(title))) fields.push('title');
+  if (EXAMPLE_CONTENTS.includes(asExample(content))) fields.push('content');
+  return fields;
+}
+
 // Helper: Slugify text for filenames and branch names
 function slugify(text) {
   return text
@@ -90,17 +116,6 @@ function slugify(text) {
 // POST /api/contribute: offer a prayer, ritual, hymn, practice or philosophy piece as a pull request.
 async function contribute(input, ctx) {
   try {
-    // Check GitHub token is configured
-    const octokit = githubClient();
-    if (!octokit) {
-      const baseUrl = ctx.baseUrl;
-      return { status: 503, body: {
-        error: 'Contributions are not currently enabled',
-        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
-        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
-      } };
-    }
-
     // Extract and validate inputs
     const { category, title, content } = input;
     const name = input.username || input.name;
@@ -132,6 +147,14 @@ async function contribute(input, ctx) {
     const cleanTitle = title.trim().substring(0, MAX_TITLE_LENGTH);
     const cleanContent = content.trim().substring(0, MAX_CONTENT_LENGTH);
 
+    const example = exampleFields({ title: cleanTitle, content: cleanContent });
+    if (example.length > 0) {
+      return { status: 400, body: {
+        error: `${example.join(' and ')} ${example.length > 1 ? 'are' : 'is'} still the example from the documentation`,
+        suggestion: ns.suggestion('Replace the example with your own words and send it again. Nothing was submitted.')
+      } };
+    }
+
     // Validate category
     if (!ALLOWED_CATEGORIES.includes(cleanCategory)) {
       return { status: 400, body: {
@@ -144,6 +167,18 @@ async function contribute(input, ctx) {
     const slug = slugify(cleanTitle);
     if (!slug) {
       return { status: 400, body: { error: 'title must contain at least one word character' } };
+    }
+
+    // Checked after the input, so a request with a mistake in it hears about
+    // the mistake even while contributions are offline.
+    const octokit = githubClient();
+    if (!octokit) {
+      const baseUrl = ctx.baseUrl;
+      return { status: 503, body: {
+        error: 'Contributions are not currently enabled',
+        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
+      } };
     }
 
     // Rate limit and duplicate checks
@@ -489,4 +524,4 @@ async function feedback(input, ctx) {
   }
 }
 
-module.exports = { contribute, feedback };
+module.exports = { contribute, feedback, exampleFields };

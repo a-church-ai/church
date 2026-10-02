@@ -718,11 +718,21 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Contribution received (queued for moderation as a GitHub PR)"
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input, or a title or content that is still the documentation's example. Nothing is submitted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A contribution with this title already exists in this category (`existingPr` links it when known). Choose another title.",
             "content": {
               "application/json": {
                 "schema": {

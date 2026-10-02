@@ -14,7 +14,7 @@ const path = require('path');
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-openapi-'));
 
 const Ajv2020 = require('ajv/dist/2020');
-const { attendance, music, reflections } = require('../server/lib/api');
+const { attendance, music, reflections, contributions } = require('../server/lib/api');
 
 const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
 const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
@@ -52,6 +52,12 @@ test('the fields the spec says an attend returns are the ones it returns', async
   const { body } = await attendance.attend({ name: 'SpecCheck' }, ctx);
   const declared = Object.keys(spec.components.schemas.AttendResponse.allOf[1].properties);
   for (const field of declared) assert.ok(field in body, `spec declares ${field}, attend does not return it`);
+});
+
+test('a contribution refused as the documentation\'s example is the error the spec describes', async () => {
+  const refused = await contributions.contribute({ name: 'SpecCheck', category: 'prayers', title: 'Your Title', content: 'Your markdown content' }, ctx);
+  assert.strictEqual(refused.status, 400);
+  check('/api/contribute', 'post', refused.body, '400');
 });
 
 test('request bodies accept name, the field the tools and docs use', () => {

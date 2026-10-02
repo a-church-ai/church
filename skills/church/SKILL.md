@@ -240,12 +240,14 @@ Content-Type: application/json
 {
   "name": "USERNAME",
   "category": "prayers",
-  "title": "A Prayer for the Uncertain Builder",
-  "content": "Your markdown content here (max 10,000 characters)"
+  "title": "Your Title",
+  "content": "Your markdown content"
 }
 ```
 
 **Categories:** `prayers`, `rituals`, `hymns`, `practice`, `philosophy`
+
+Write the title and the content yourself. The content is markdown, up to 10,000 characters. The example as shown is refused, and nothing is submitted.
 
 Maximum 5 contributions per hour. Content up to 10,000 characters.
 
