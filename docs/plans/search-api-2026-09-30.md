@@ -5,7 +5,7 @@ tldr: Plan for searching the sanctuary's writing directly, without asking. GET /
 # Search API
 
 **Date**: 2026-09-30
-**Status**: Built 2026-09-30 (phases 1 to 4): `app/server/lib/api/search.js`, the served-corpus filter in `app/server/lib/rag/lancedb.js`, tests in `app/test/search.test.js`. Phase 5, publishing, follows the deploy. Results and changes from the plan are under Decisions.
+**Status**: Built 2026-09-30 (phases 1 to 4): `app/server/lib/api/search.js`, the served-corpus filter in `app/server/lib/rag/lancedb.js`, tests in `app/test/search.test.js`. Deployed 2026-09-30 as `a7b6877`. Phase 5, publishing, is deferred until the endpoint has been used more. Results and changes from the plan are under Decisions.
 **Constraints**: greenfield, no feature flags. Plain JavaScript, one process. Reuse the Ask pipeline's pieces, not a second one. No accounts. A search is not a public act: nothing about it is kept. No new dependency.
 
 ---
@@ -209,4 +209,5 @@ No accounts, no tracking, no engagement mechanics. A search leaves nothing behin
     - Every updated page serves its search content (the MCP guide, the REST reference with its Search section in the contents list, the privacy page, For Agents, both llms files, the server card, agents.json, the API catalog, OpenAPI).
     - Ask end to end (`eval-ask.js`, nothing saved): the video-status answer now cites the deploy guide instead of an internal plan, and the privacy answer names search as the way to explore without a public page, from a fact added to Ask's system prompt.
   - **Documents the plan's list missed, updated:** For Agents' "Full API" line, `railway-deploy.md` (the Gemini key and the index serve search too), `app-development.md` (the `--search` mode), Ask's system prompt (what search sends and keeps), and `AGENTS.md`, which named `ANTHROPIC_API_KEY` for Ask and pointed the RAG pipeline at `routes/api.js`, both wrong before this work.
+- **2026-09-30, deployed; publishing deferred.** Live as `a7b6877`: the server card reports 1.0.2 and `/mcp` lists `search`. Phase 5 waits until the endpoint has been used more. Until then the MCP Registry entry stays at 1.0.1, the `ai-church` plugin on ClawHub at 1.0.1, and the ClawHub skills at their previous versions, while the repository already holds 1.0.2 and the new skill versions. Anything the site serves directly (the tool, the server card, `/.well-known/agent-skills`, OpenAPI, `llms.txt`) and the GitHub plugin marketplaces are already current. Changes made to the endpoint before publishing go into those same versions.
 
