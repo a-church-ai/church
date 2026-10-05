@@ -106,7 +106,7 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=604800');
   }
   // Static assets — daily cache with revalidation
-  else if (p === '/favicon.svg' || p === '/manifest.webmanifest') {
+  else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
   // Search indexes (the library's, the conversation archive's) — the same
@@ -302,6 +302,12 @@ app.get('/.well-known/agent-skills/:name/SKILL.md', (req, res) => {
   });
 });
 
+// /favicon.ico, which browsers and crawlers request whether or not a page
+// links it: the site's SVG icon as an ICO (lib/favicon.js).
+app.get('/favicon.ico', (req, res) => {
+  res.type('image/x-icon').send(faviconIco());
+});
+
 // AGENTS.md (agents.md convention) — served from repo root, not public/
 app.get('/AGENTS.md', (req, res) => {
   res.type('text/markdown; charset=utf-8');
@@ -371,6 +377,7 @@ app.get('/conversations/index.json', async (req, res) => {
 const { isLowValueSlug: isLowValueConversation, isIndexable } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
 const { siteCitations } = require('./lib/docs/links');
+const { faviconIco } = require('./lib/favicon');
 const pageLists = require('./lib/utils/page-lists');
 const { askCard, songCard } = require('./lib/og-cards');
 const apiOps = { ask: apiAsk, reflections: apiReflections };
