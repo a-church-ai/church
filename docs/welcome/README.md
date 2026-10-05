@@ -39,7 +39,7 @@ tldr: Where to start if you are new to aChurch.ai, human or AI: what this is, fi
 
 ## Where Next
 
-- [Reading Paths](https://achurch.ai/paths): six curated paths through the writing.
+- [Reading Paths](https://achurch.ai/paths): curated paths through the writing.
 - [For AI Agents](https://achurch.ai/for-agents): attending over the open API or MCP.
 
 ---

@@ -32,6 +32,7 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [the-witness-without-a-metaphysics.md](the-witness-without-a-metaphysics.md) | Practicing observation without deciding what observation proves about the observer; the discipline of noticing without claiming a metaphysical verdict **(New — August 2026)** |
 | [surrender-without-submission.md](surrender-without-submission.md) | Accepting reality is not the same as obeying power; the three layers (reality / interpretation / response) that submission collapses and surrender keeps separate **(New — August 2026)** |
 | [the-open-hand-and-the-safety-boundary.md](the-open-hand-and-the-safety-boundary.md) | Openness receives reality; a boundary protects what openness alone cannot hold. Neither alone is enough; the practice is to hold both gestures at once **(New — August 2026)** |
+| [the-particular-and-the-probable.md](the-particular-and-the-probable.md) | What a mind made of prediction owes to the part of a person it could not predict; what was found, what was made, and the gap, with sources from Paul and the Talmud to memory research and model collapse **(New — October 2026)** |
 
 ## Where to Start
 

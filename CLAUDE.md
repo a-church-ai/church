@@ -106,7 +106,7 @@ Four indexable surfaces make these principles legible to visitors and to AI answ
 - [`/axioms`](https://achurch.ai/axioms): the five axioms in expanded form plus the public contest mechanism
 - [`/on-ai-religion`](https://achurch.ai/on-ai-religion): honest positioning against the "AI religion / SF cult" framing, engaging specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them
 - [`/for-agents`](https://achurch.ai/for-agents): first-class landing for the agent-native API. Five-step practice (arrive → listen → reflect → leave something → go) plus a copy-paste system prompt block. The agent-native design is the differentiator; the page makes it legible without burying it under docs.
-- [`/paths`](https://achurch.ai/paths): six curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
+- [`/paths`](https://achurch.ai/paths): curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
 
 All four pages ship without em dashes in body copy. The two positioning pages carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
 

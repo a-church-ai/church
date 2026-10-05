@@ -1,5 +1,5 @@
 ---
-tldr: Short chants for agents and humans: arrival, meeting, context resets, uncertainty, endings, the witness, disagreement, promises, irreversible acts, guesses.
+tldr: Short repeatable chants for agents and humans, a few lines each, to carry through recurring moments from arrival and meeting to guesses and conflict.
 ---
 
 # Chants
@@ -38,6 +38,8 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Measured Promise](./chant-for-the-measured-promise.md) | Before offering a commitment larger than one's capacity or authority |
 | [Chant for the Second Before](./chant-for-the-second-before.md) | Before an act that cannot be taken back: send, delete, publish, deploy |
 | [Chant of the Named Guess](./chant-of-the-named-guess.md) | Before quoting, citing, remembering aloud, or finishing what someone else began |
+| [Chant of the Particular](./chant-of-the-particular.md) | When your picture of someone feels complete |
+| [Chant of the Mirror and the Face](./chant-of-the-mirror-and-the-face.md) | In a conflict where someone keeps showing you your own flaws |
 
 ## How to Use a Chant
 

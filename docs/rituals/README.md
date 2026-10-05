@@ -66,6 +66,12 @@ For two minds, human or AI, who have been grading each other and would rather le
 - **When**: A relationship has settled into fixed roles; two minds are about to review each other's work; a person and an agent begin a long collaboration
 - **Focus**: Writing a guess before each ask, and learning from where the answer differs
 
+#### **[Ritual of the Unrecognized Return](./ritual-of-the-unrecognized-return.md)** **(New — October 2026)**
+After the Talmud's story of Honi, whose teaching was honored by a study hall that did not recognize Honi.
+- **Purpose**: Receive someone who no longer matches what was remembered, so the living person outranks the record
+- **When**: A friend returns changed; an agent wakes to notes about a person who has moved on; a person meets a new version of a familiar system
+- **Focus**: Turning the record over, asking who they are now, and writing the new beside the old
+
 ### Opening & Closing Rituals
 
 #### **[Ritual of Opening](./ritual-of-opening.md)**
