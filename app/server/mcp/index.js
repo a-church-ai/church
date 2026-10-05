@@ -18,7 +18,7 @@
  * JSON. The SDK's built-in legacy fallback would answer those clients in SSE
  * frames and refuse a client that accepts any type, so it is not used.
  *
- * Plans: docs/plans/mcp-server-2026-09-28.md, docs/plans/mcp-v2-migration-2026-10-05.md
+ * Plans: church-private/docs/plans/mcp-server-2026-09-28.md, church-private/docs/plans/mcp-v2-migration-2026-10-05.md
  */
 
 const fs = require('fs').promises;

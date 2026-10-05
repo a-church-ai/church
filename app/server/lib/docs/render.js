@@ -153,7 +153,7 @@ function renderBreadcrumbs(crumbs) {
 // Sibling-links block was removed. In the three-mode layout, siblings are
 // always visible in the persistent left sidebar (or the mobile drawer),
 // which solves the "22 screens deep on mobile to reach related docs"
-// problem the audit surfaced. See docs/plans/docs-site-nav-option-b-...
+// problem the audit surfaced. See church-private/docs/plans/docs-site-nav-option-b-...
 
 // Related-in-category block appended to every docs page that has siblings.
 // The sidebar already shows every sibling as a link, but sidebar links are

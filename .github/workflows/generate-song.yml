@@ -17,7 +17,7 @@ name: Write a song from Moltbook
 # deliberately no environment flag for it, because a flag whose only job is
 # turning off a scheduled task is configuration surface with no other purpose.
 #
-# Plan: docs/plans/moltbook-songwriting-2026-08-15.md
+# Plan: church-private/docs/plans/moltbook-songwriting-2026-08-15.md
 
 on:
   schedule:

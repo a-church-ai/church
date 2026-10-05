@@ -1,5 +1,5 @@
 /**
- * Navigation and reading (docs/plans/navigation-and-reading-2026-09-30.md).
+ * Navigation and reading (church-private/docs/plans/navigation-and-reading-2026-09-30.md).
  * What matters: every document is labelled by its title, numbered things sort
  * as numbers, a reading keeps its place in the path it was opened from, the
  * library and search indexes list every served document once and nothing

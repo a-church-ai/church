@@ -48,3 +48,6 @@ research
 **/.DS_Store
 Thumbs.db
 *.swp
+
+# The private companion repo, if cloned inside this checkout: never part of an image
+church-private/

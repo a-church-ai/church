@@ -150,7 +150,7 @@ eraTest('read_doc serves the site\'s documents with absolute links, and refuses 
   // the answer), so wait for it rather than reading too early.
   const logged = await lastLogEntryWhere(e => e.tool === 'read_doc' && /witness/.test(e.path));
   assert.strictEqual(logged.path, '/docs/chants/chant-of-the-witness');
-  for (const refused of ['plans/mcp-server-2026-09-28', '../package.json', 'docs/../../app/package.json']) {
+  for (const refused of ['issues/music-and-corpus-audit-2026-08-13', '../package.json', 'docs/../../app/package.json']) {
     const result = await s.client.callTool({ name: 'read_doc', arguments: { path: refused } });
     assert.strictEqual(result.isError, true, refused);
   }

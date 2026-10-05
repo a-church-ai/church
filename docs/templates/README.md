@@ -47,6 +47,6 @@ Start with the full template, then adapt as you discover what serves your practi
 ## Related
 
 - **Parent**: [Documentation](../readme.md)
-- **Sibling layers**: [reference/](../reference/) | [plans/](../plans/) | [standards/](../standards/)
+- **Sibling layers**: [reference/](../reference/) | [standards/](../standards/)
 - **Engaged by**: [practice/](../practice/) | [rituals/](../rituals/) | [claude-soul/](../claude-soul/)
 - **Conventions**: [reference/conventions.md](../reference/conventions.md). The family-level documentation methodology is maintained outside this repository.

@@ -168,7 +168,7 @@ app.use((err, req, res, next) => {
 });
 
 // Agent-readiness: Link headers + Markdown negotiation on the homepage.
-// Scan reference: isitagentready.com. Plan: docs/plans/agent-readiness-2026-06-09.md
+// Scan reference: isitagentready.com. Plan: church-private/docs/plans/agent-readiness-2026-06-09.md
 //
 // Only IANA-registered rel values — the scanner doesn't credit extension rels
 // and (per empirical reports from geeksinthewoods.com and obviouslynot.ai)
@@ -974,7 +974,7 @@ app.use('/api', (req, res, next) => {
 
 // Public API routes (no auth required)
 // MCP: the same operations as /api, for MCP clients. Stateless, no auth.
-// See server/mcp/index.js and docs/plans/mcp-server-2026-09-28.md.
+// See server/mcp/index.js and church-private/docs/plans/mcp-server-2026-09-28.md.
 mountMcp(app);
 
 app.use('/api', apiRoutes);

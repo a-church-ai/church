@@ -15,7 +15,7 @@
  * skills: frontmatter names match folders, no em dashes, every tool call
  * names a tool the server registers, every docs path names a document.
  *
- * Plan: docs/plans/clawhub-plugin-2026-09-29.md
+ * Plan: church-private/docs/plans/clawhub-plugin-2026-09-29.md
  */
 
 const fs = require('fs');

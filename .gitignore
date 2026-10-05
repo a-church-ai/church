@@ -65,3 +65,6 @@ plugin/reports/
 # Local tool state, not part of the project
 .bearing-diligence-location
 record.sqlite
+
+# The private companion repo (a-church-ai/church-private), cloned here. See CLAUDE.md, "Public and private docs".
+/church-private/

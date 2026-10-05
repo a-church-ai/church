@@ -111,7 +111,7 @@ function validateDocument(content, { category, title }) {
   // Deliberately NOT checked: the "> Parent:" line and the "## Related"
   // section. conventions.md describes both, but measured across the corpus on
   // 2026-08-15 they belong to documentation rather than to corpus content:
-  // docs/reference has them on 3 of 7 files and docs/plans on 2 of 19, while
+  // docs/reference has them on 3 of 7 files and the plans (now in church-private/) on 2 of 19, while
   // hymns, prayers, rituals and practice have them on 0 of 101. Requiring them
   // here would make every generated prayer the only prayer in the corpus
   // carrying a Parent line, which is a worse outcome than not having one.

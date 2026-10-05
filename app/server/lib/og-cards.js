@@ -1,6 +1,6 @@
 /**
  * Share cards: the 1200x630 image a conversation, song or docs page shows when
- * its link is shared. docs/plans/og-share-cards-2026-09-29.md has the design.
+ * its link is shared. church-private/docs/plans/og-share-cards-2026-09-29.md has the design.
  *
  * Drawn here, from copy the page already publishes, as an SVG template
  * rasterized to PNG by resvg. The fonts ship in app/server/assets/fonts and

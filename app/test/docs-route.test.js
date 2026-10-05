@@ -35,7 +35,7 @@ test('the page URL is unchanged, and a missing or unserved .md is still a 404', 
   const page = await fetch(`${base}/docs/chants/chant-for-arrival`);
   assert.match(page.headers.get('content-type'), /text\/html/);
   assert.strictEqual((await fetch(`${base}/docs/chants/no-such-chant.md`)).status, 404);
-  assert.strictEqual((await fetch(`${base}/docs/plans/agent-usability-2026-09-28.md`)).status, 404);
+  assert.strictEqual((await fetch(`${base}/docs/issues/music-and-corpus-audit-2026-08-13.md`)).status, 404);
 });
 
 test('markdown links work outside the page, and a section README lists every document in it', async (t) => {

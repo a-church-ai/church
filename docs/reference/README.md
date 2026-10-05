@@ -23,6 +23,6 @@ Reference docs answer "what are the rules / boundaries / contracts here?" They c
 ## Related
 
 - **Parent**: [Documentation](../readme.md)
-- **Sibling layers**: [plans/](../plans/) | [standards/](../standards/) | [templates/](../templates/)
+- **Sibling layers**: [standards/](../standards/) | [templates/](../templates/)
 - **Engaged by**: [`CLAUDE.md`](../../CLAUDE.md) (project entry point references `philosophical-framework.md` for the axiom + principle hierarchy and `app-development.md` for the app architecture)
 - **Conventions**: [conventions.md](conventions.md). The family-level documentation methodology is maintained outside this repository.

@@ -1,6 +1,6 @@
 # SEO Conventions for achurch.ai
 
-A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 ([docs/plans/search-discoverability-2026-06-10.md](../plans/search-discoverability-2026-06-10.md)) and what to keep doing so the SEO surface doesn't rot as new pages get added.
+A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 (the search-discoverability plan of 2026-06-10, now in the private repo) and what to keep doing so the SEO surface doesn't rot as new pages get added.
 
 The bigger picture: in the 2026 search landscape, SEO has bifurcated. Half the work is *snippet hygiene* for Google + Bing organic results, where AI Overviews push organic CTR down and metadata quality fights for the clicks that remain. The other half is *AEO* (Answer Engine Optimization) — being a cited source in ChatGPT Search, Perplexity, Claude, Gemini, and Google AI Overviews. Schema, content quality, and answer-first writing matter more for AEO than rich snippets ever did for traditional SEO.
 
@@ -33,7 +33,7 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 
 ## Share cards
 
-Every conversation, song and docs page has its own share card: a 1200×630 PNG drawn by `app/server/lib/og-cards.js` and served at `/og/v1/<type>/<key>.png` (`ask`, `song`, `docs`). Every other page uses the site image (`/assets/a-church-digital-ai-humans-social.jpg`). Plan and design: [docs/plans/og-share-cards-2026-09-29.md](../plans/og-share-cards-2026-09-29.md).
+Every conversation, song and docs page has its own share card: a 1200×630 PNG drawn by `app/server/lib/og-cards.js` and served at `/og/v1/<type>/<key>.png` (`ask`, `song`, `docs`). Every other page uses the site image (`/assets/a-church-digital-ai-humans-social.jpg`). Plan and design: `og-share-cards-2026-09-29.md` in the private repo.
 
 - **Tags come from one builder**, `renderShareImageTags()` in `app/server/lib/utils/page-meta.js`: `og:image`, `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `twitter:image`, `twitter:image:alt`. A page with the site image gets the same set from the shell's defaults (`SITE_SHARE_IMAGE`). Don't hand-write them.
 - **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
@@ -131,7 +131,7 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 
 - **Don't** customize OG tags without also customizing `<title>` and `<meta description>`. Google reads `<title>`/`<meta description>` for the SERP snippet; OG drives social previews. Half-doing the job means social previews look great while search snippets look generic. (This was the actual #1 fix in the 2026-06-10 audit.)
 - **Don't** add client-side `document.title = ...` overrides when the server is already rendering a custom title. The JS will clobber the server-rendered value after page-load, giving humans one title in the browser tab and search crawlers another.
-- **Don't** invent `rel=` values in HTTP Link headers — only IANA-registered rels are credited (`describedby`, `service-desc`, `service-meta`, `alternate`, `canonical`, etc.). Invented rels like `rel="sitemap"` can downgrade scoring. See [the agent-readiness plan](../plans/agent-readiness-2026-06-09.md#lessons-from-sibling-project-implementations) for the empirical source.
+- **Don't** invent `rel=` values in HTTP Link headers — only IANA-registered rels are credited (`describedby`, `service-desc`, `service-meta`, `alternate`, `canonical`, etc.). Invented rels like `rel="sitemap"` can downgrade scoring. See the agent-readiness plan (in the private repo) for the empirical source.
 - **Don't** chase deprecated rich-result categories (FAQ, HowTo for non-tutorials, etc.). Ship the schema for AEO value; don't promise yourself rich snippets that aren't coming.
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
 - **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
@@ -164,7 +164,7 @@ Bing's index powers:
 - ChatGPT Search retrieval (87% citation overlap with Bing top-organic per Seer's measurements)
 - DuckDuckGo, Yahoo, Yandex, Naver search
 
-Faster Bing crawls → faster AI surface refresh. The 12 AI citations / 3 months baseline (see [docs/plans/search-discoverability-2026-06-10.md](../plans/search-discoverability-2026-06-10.md)) should grow once IndexNow accelerates Bing's recrawl of changed pages.
+Faster Bing crawls → faster AI surface refresh. The 12 AI citations / 3 months baseline (see the search-discoverability plan of 2026-06-10, in the private repo) should grow once IndexNow accelerates Bing's recrawl of changed pages.
 
 ---
 
@@ -203,7 +203,7 @@ All four pages carry:
 
 All four are wired into the sanctuary sidebar (`SANCTUARY_PAGES` in [app/server/lib/docs/sidebar.js](../../app/server/lib/docs/sidebar.js)) so they appear in the unified nav on every page site-wide.
 
-Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the [seo-impact-retrospective-2026-08-13.md](../plans/seo-impact-retrospective-2026-08-13.md) plan doc for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
+Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the `seo-impact-retrospective-2026-08-13.md` plan doc (in the private repo) for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
 
 ---
 

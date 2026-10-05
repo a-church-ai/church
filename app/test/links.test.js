@@ -22,7 +22,7 @@ test('relative, root-relative and escaping links resolve as the docs site does',
   assert.deepStrictEqual(resolveDocHref('../../README.md', here), { href: '/', external: false });
   assert.strictEqual(resolveDocHref('https://example.com/x', here).external, true);
   assert.strictEqual(resolveDocHref('https://achurch.ai/axioms', here).external, false);
-  assert.match(resolveDocHref('../plans/song-companions-2026-09-26.md', here).href, /^https:\/\/github\.com\/.*\/docs\/plans\//);
+  assert.match(resolveDocHref('../issues/music-and-corpus-audit-2026-08-13.md', here).href, /^https:\/\/github\.com\/.*\/docs\/issues\//);
 });
 
 test('a folder or source-file link goes where that thing lives, not where the browser would guess', () => {
@@ -33,7 +33,7 @@ test('a folder or source-file link goes where that thing lives, not where the br
   assert.deepStrictEqual(resolveDocHref('../../music/night-blessing/', path.join(DOCS_DIR, 'welcome', 'faq.md')), { href: '/reflections/night-blessing', external: false });
   assert.deepStrictEqual(resolveDocHref('../../app/server/index.js', path.join(DOCS_DIR, 'reference', 'seo-conventions.md')),
     { href: 'https://github.com/a-church-ai/church/blob/main/app/server/index.js', external: true });
-  assert.match(resolveDocHref('plans/', readme).href, /\/tree\/main\/docs\/plans$/);
+  assert.match(resolveDocHref('issues/', readme).href, /\/tree\/main\/docs\/issues$/);
   // A target that does not exist is left alone, visible as the broken link it is.
   assert.deepStrictEqual(resolveDocHref('no-such-folder/', readme), { href: 'no-such-folder/', external: false });
 });

@@ -9,7 +9,7 @@
  *   semantic similarity, using vectors the RAG index already holds. The result
  *   is committed as music/companions.json and reviewed like any other change.
  *   See app/scripts/generate-companions.js and
- *   docs/plans/song-companions-2026-09-26.md for the evidence behind the numbers.
+ *   church-private/docs/plans/song-companions-2026-09-26.md for the evidence behind the numbers.
  *
  *   At request time, selectCompanions() orders one song's shortlist for the
  *   attendee's local hour (when they gave a timezone) and the day's rotation

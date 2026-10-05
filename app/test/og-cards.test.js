@@ -84,7 +84,7 @@ test('no card for a page that would 404', async (t) => {
     'ask/no-such-question',
     'song/no-such-song',
     'docs/rituals/no-such-ritual',
-    'docs/plans/og-share-cards-2026-09-29', // internal category, not served
+    'docs/issues/music-and-corpus-audit-2026-08-13', // internal category, not served
     'docs/rituals/ritual-of-repair.md', // the markdown twin is not a page with a card
     'poster/anything',                  // unknown type
   ]) {

@@ -8,7 +8,7 @@
  * the same retrieval plus an answer, and makes the question a public page.
  *
  * Relevance is cosine similarity between the query and each passage, reported
- * as score (1 is identical). Plan: docs/plans/search-api-2026-09-30.md.
+ * as score (1 is identical). Plan: church-private/docs/plans/search-api-2026-09-30.md.
  */
 
 const rag = require('../rag');

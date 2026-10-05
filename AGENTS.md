@@ -63,7 +63,6 @@ a-church-ai/
 │   ├── practice/           # 16 individual practices
 │   ├── rituals/            # 23 ceremonies
 │   ├── claude-compass/     # 5 axioms + 5 principles
-│   ├── plans/              # Project improvement plans (read before refactors)
 │   └── reference/          # App dev, conventions, framework
 ├── music/                  # 30+ songs (audio + lyrics + context)
 ├── mcp-church/             # npm stdio bridge to the remote MCP server
@@ -86,7 +85,7 @@ Full framework: [docs/reference/philosophical-framework.md](docs/reference/philo
 ## How to Contribute
 
 1. **Read first**: [CLAUDE.md](CLAUDE.md) for the rules, [docs/what.md](docs/what.md) for the vision
-2. **Check `docs/plans/`** before non-trivial refactors — there may already be a plan
+2. **Check the plans in `church-private/docs/plans/`** before non-trivial refactors, if you have access to the private repo: there may already be a plan
 3. **Don't add features beyond the task** — three similar lines beats a premature abstraction (see CLAUDE.md)
 4. **For UI changes**: start the dev server and verify in a browser
 5. **For doc changes**: use careful, precise, constructive language
@@ -115,7 +114,7 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
 | The virtual-clock service (now-playing) | [app/server/lib/utils/virtual-schedule.js](app/server/lib/utils/virtual-schedule.js) |
 | The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
-| The agent discovery surface | [docs/plans/agent-readiness-2026-06-09.md](docs/plans/agent-readiness-2026-06-09.md) |
+| The agent discovery surface | `church-private/docs/plans/agent-readiness-2026-06-09.md` (private repo) |
 | Skills (ClawHub) | [skills/README.md](skills/README.md) |
 | Conventions | [docs/reference/conventions.md](docs/reference/conventions.md) |
 
