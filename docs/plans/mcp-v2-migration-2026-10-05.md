@@ -1,13 +1,13 @@
 ---
-tldr: Plan for moving the MCP server from the v1 TypeScript SDK (@modelcontextprotocol/sdk, which speaks protocol versions up to 2025-11-25) to the v2 SDK (@modelcontextprotocol/server and /node), so clients and directories on the 2026-07-28 spec are answered instead of refused, while every 2025-era client keeps working. The server's design (stateless, one fresh server per request, tools over lib/api) already matches the new spec; what changes is the SDK underneath it.
+tldr: Plan for moving the MCP server from the v1 TypeScript SDK (@modelcontextprotocol/sdk, which speaks protocol versions up to 2025-11-25) to the v2 SDK (@modelcontextprotocol/server and /node), so clients and directories on the 2026-07-28 spec are answered instead of refused, while every 2025-era client keeps getting exactly the answers it gets today (plain JSON, a forgiving Accept check). One server factory serves both eras; the request is routed with the SDK's own isLegacyRequest.
 ---
 
 # MCP v2 migration
 
 **Date**: 2026-10-05
-**Status**: Planned.
-**References**: the 2026-07-28 MCP specification ([announcement](https://blog.modelcontextprotocol.io/posts/2026-07-28/)); the v2 TypeScript SDK's [migration guide](https://ts.sdk.modelcontextprotocol.io/v2/migration/upgrade-to-v2) and [HTTP serving guide](https://ts.sdk.modelcontextprotocol.io/v2/serving/http), read 2026-10-05; the packages themselves (`@modelcontextprotocol/server` 2.3.1, `/node` 2.1.1, `/core` 2.3.1, `/client` 2.3.1, `/express` 2.0.2), unpacked and read the same day.
-**Constraints**: greenfield, no feature flags. Plain JavaScript, CommonJS, one process. No auth, no sessions: the server stays stateless. Nothing a client sees changes except that newer clients are answered.
+**Status**: Built 2026-10-05 (phases 1 to 4): `app/server/mcp/index.js` on `@modelcontextprotocol/server` 2.3.1 and `/node` 2.1.1, tests per era in `app/test/mcp.test.js` and `app/test/search.test.js`. Phase 5, deploying and confirming against the production logs, follows. Results under Decisions.
+**References**: the 2026-07-28 MCP specification ([announcement](https://blog.modelcontextprotocol.io/posts/2026-07-28/)); the v2 TypeScript SDK's [migration guide](https://ts.sdk.modelcontextprotocol.io/v2/migration/upgrade-to-v2) and [HTTP serving guide](https://ts.sdk.modelcontextprotocol.io/v2/serving/http); the packages themselves (`@modelcontextprotocol/server` 2.3.1, `/node` 2.1.1, `/core` 2.3.1, `/client` 2.3.1), unpacked and their type definitions and code read on 2026-10-05.
+**Constraints**: greenfield, no feature flags. Plain JavaScript, CommonJS, one process. No auth, no sessions: the server stays stateless. Nothing a client sees changes except that 2026-era clients are answered.
 
 ---
 
@@ -15,74 +15,90 @@ tldr: Plan for moving the MCP server from the v1 TypeScript SDK (@modelcontextpr
 
 The production logs since the refusal logging went in (2026-09-30) show the server refusing directory crawlers and MCP clients that speak the current protocol: 93 refusals between 2026-10-02 and 2026-10-05 alone, nearly all `Bad Request: Unsupported protocol version: 2026-07-28`, from rokmcp, protogrid, TalandorBot, AIVE, MCP-Radar, verifymcp, agentprobe, SaSame and others. The `1999-01-01` refusals beside them are rokmcp deliberately testing a bogus version, and refusing those is right.
 
-2026-07-28 is a released specification, the largest revision since the protocol launched: it removes the `initialize` handshake and the `Mcp-Session-Id` header, carries the protocol version and client details in each request's `_meta`, and adds `Mcp-Method` / `Mcp-Name` headers for routing. Our server uses `@modelcontextprotocol/sdk`, whose newest release (1.32.0, 2026-10-02) still supports versions only up to 2025-11-25. The TypeScript SDK for the new spec is a new package line, v2, split into `@modelcontextprotocol/server`, `/node`, `/core` and `/client`. Upgrading the v1 package does not help; migrating does.
+2026-07-28 is a released specification, the largest revision since the protocol launched: it removes the `initialize` handshake and the `Mcp-Session-Id` header, carries the protocol version and client details in each request's `_meta`, and adds `Mcp-Method` / `Mcp-Name` headers for routing. Our server uses `@modelcontextprotocol/sdk`, whose newest release (1.32.0, 2026-10-02) still supports versions only up to 2025-11-25. The TypeScript SDK for the new spec is a new package line, v2. Upgrading the v1 package does not help; migrating does.
 
-The sanctuary's server is unusually well placed for this. It is already stateless (a fresh server and transport per request, nothing kept between them), which is the model the 2026-07-28 spec moves the whole protocol to.
+The sanctuary's server is already stateless (a fresh server and transport per request, nothing kept between them), which is the model the 2026-07-28 spec moves the whole protocol to.
 
-## What v2 provides
+## What v2 provides, and the one thing it changes that we must not
 
-- **Both eras on one endpoint.** v2 classifies each request as 2025-era (`legacy`, the `initialize` handshake) or 2026-era (`modern`, stateless) and serves both. 2025-era clients, which are most clients today, keep working; `isLegacyRequest(method, protocolVersion)` is exported for code that needs to tell them apart.
-- **`createMcpHandler(factory, options)`.** Takes a factory that builds a fresh `McpServer` per HTTP request ("the factory runs once per HTTP request ... the handler holds nothing between requests"), which is exactly what `handleMcp` does by hand today. `responseMode: 'json'` pins plain JSON responses, as `enableJsonResponse: true` does now.
-- **`toNodeHandler(handler)`** from `@modelcontextprotocol/node` mounts it on Node frameworks, and the same package exports `hostHeaderValidation(allowedHostnames)` and `originValidation(...)`.
-- **CommonJS builds** of every package (`require('@modelcontextprotocol/server')` resolves natively), Node 20 or later (production runs 22), zod 4.2 or later (the app has 4.6).
-- **Express 4 is supported** by the optional `@modelcontextprotocol/express` adapter (peer `express ^4.18.0 || ^5.0.0`), though the plan does not need it (below).
+- **`createMcpHandler(factory, options)`** serves 2026-era requests from a factory that builds a fresh `McpServer` per request, the shape `handleMcp` already has. Options include `onerror` ("callback for out-of-band errors and rejected requests") and `responseMode: 'json'` (never stream).
+- **`isLegacyRequest(request, parsedBody)`** is the SDK's own classifier for 2025-era traffic, the same code path the handler routes with, so the two cannot disagree.
+- **`@modelcontextprotocol/node`** gives `toNodeHandler(handler)` to mount on Express, `toWebRequest(req, parsedBody)`, `NodeStreamableHTTPServerTransport` (with `enableJsonResponse`, as today), and `hostHeaderValidation(allowedHostnames)`.
+- **`@modelcontextprotocol/client`'s `Client`** speaks the 2025 era by default (`versionNegotiation.mode: 'legacy'`) and the 2026 era when pinned (`{ pin: '2026-07-28' }`), so one client package can test both eras.
+- **CommonJS builds**, Node 20 or later (production runs 22), zod 4.2 or later (the app has 4.6).
 
-## Codebase audit: what changes, what stays
+**What must not change:** `createMcpHandler`'s built-in fallback for 2025-era traffic (`legacy: 'stateless'`, the default) builds its transport with only `sessionIdGenerator: undefined`, read in the code on 2026-10-05: no `enableJsonResponse`. Under it every current client would get SSE-framed answers (`event: message` / `data: {...}`) instead of the plain JSON the server and `docs/mcp.md` promise, and the strict Accept check would come back (the aiohttp client refused 67 times in September sends `*/*`). The SDK documents the alternative for exactly this case: a strict `legacy: 'reject'` handler for the 2026 era, with 2025-era traffic routed in front of it by `isLegacyRequest` to the deployment's own legacy serving. Our own legacy serving is today's `handleMcp`, on v2's classes.
 
-Everything the SDK touches is in one file, `app/server/mcp/index.js`, plus the tests that drive it. The tools themselves are thin adapters over `lib/api` and do not change.
+## Codebase audit: what to reuse (2026-10-05)
 
-| Today (v1) | v2 | Note |
+Everything the SDK touches is in `app/server/mcp/index.js` and the two test files that drive it. The tools are thin adapters over `lib/api` and do not change.
+
+| Need | Existing | v2 |
 |---|---|---|
-| `McpServer`, `ResourceTemplate` from `@modelcontextprotocol/sdk/server/mcp.js` | from `@modelcontextprotocol/server` | Same names |
-| `StreamableHTTPServerTransport` per request, `server.connect`, `transport.handleRequest(req, res, req.body)` in `handleMcp` | `createMcpHandler(factory, { responseMode: 'json' })`, mounted with `toNodeHandler` | The factory is today's `createServer(ctx)`; the handler replaces the hand-written per-request plumbing |
-| `hostHeaderValidation` from `.../middleware/hostHeaderValidation.js` | `hostHeaderValidation` from `@modelcontextprotocol/node` | Same `ALLOWED_HOSTS` |
-| `inputSchema: { name, timezone }` (raw zod shapes) on all nine tools; `argsSchema` on the two prompts | `z.object({ ... })` | Raw shapes hit deprecated overloads in v2 |
-| `registerResource(name, uri, metadata, handler)` | Same; `metadata` is required (both resources already pass it) | Check only |
-| Tool handlers take `(args)` and ignore `extra` | Unchanged | The renamed `ctx` is not used |
-| `run()` records every call through `recordApiUse` under its REST path | Unchanged | Presence, rate limits and the access log behave as before |
-| `transport.onerror` logs each refusal with its reason and user agent | The handler's error hook, whichever v2 exposes | The refusal log must survive: it is how the version gap was found |
-| `completeAccept()` rewrites `Accept` (and `rawHeaders`) so a client sending `*/*` is answered | Re-tested against v2 first; kept only if v2 still refuses such clients, and then rewritten against v2's request path | v2 rebuilds the request through `toWebRequest`; the `rawHeaders` detail may not apply |
-| `methodNotAllowed`: GET and DELETE answer 405, a browser is sent to `/docs/mcp` | Unchanged, mounted before the handler | |
-| Tests (`mcp.test.js`, `search.test.js`) connect with the v1 `Client` | The v2 `Client` from `@modelcontextprotocol/client` for 2026-era tests, and a 2025-era client for the legacy tests | See Tests |
+| The server definition | `createServer(ctx)`: nine tools, two prompts, two resources, each tool through `run()` | Unchanged as the one factory for both eras. `inputSchema` and `argsSchema` become `z.object({...})` (raw shapes hit v2's deprecated overloads); `registerResource` and `ResourceTemplate` (`{ list: undefined }`) match v2's signatures as written |
+| Rate limits, presence, the access log | `run()` → `recordApiUse` under the REST path, with `ctx = { baseUrl, ip, userAgent }` from the Express request (`shared.requestContext`, which honours `trust proxy`) | Unchanged. The factory must still receive that `ctx` on both paths (below) |
+| 2025-era serving | `handleMcp`: per-request server and `StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true })`, `handleRequest(req, res, req.body)` | The same, on `NodeStreamableHTTPServerTransport` from `@modelcontextprotocol/node` |
+| 2026-era serving | None | `createMcpHandler(factory, { legacy: 'reject', responseMode: 'json', onerror })`, created once at mount, served through `toNodeHandler` |
+| Routing between them | None | `isLegacyRequest(await toWebRequest(req, req.body), req.body)` |
+| The request context in the factory | Passed by closure in `handleMcp` | `toNodeHandler` forwards only `req.auth` (as authentication info), so the 2026-era factory cannot take a closure. `AsyncLocalStorage` (`node:async_hooks`) holds each request's `ctx` for both paths: `run(ctxOf(req), ...)` around the request, `() => createServer(store.getStore())` as the factory. One source of `ctx`, no misuse of `authInfo` |
+| Host validation | `hostHeaderValidation(ALLOWED_HOSTS)` from v1, Express middleware | v2's is a guard `(req, res) => boolean` that writes the 403 itself; a two-line Express wrapper around it |
+| The refusal log | `transport.onerror` → `[mcp] refused: <reason> (<user agent>)` | One `logRefusal(error)` for both paths: the legacy transport's `onerror` and the handler's `onerror`, the user agent read from the request's stored `ctx` |
+| A client sending `*/*` or no Accept | `completeAccept` sets `req.headers.accept`, and `rawHeaders` because v1 read headers through `@hono/node-server` | Still needed on the 2025-era path (v2's transport keeps the strict check). v2 builds its request from `req.headers` (`toWebRequest`), so the `rawHeaders` half is deleted. Whether the 2026-era path needs it is tested, not assumed |
+| GET, DELETE, a browser | `methodNotAllowed`: 405 with JSON, a browser sent to `/docs/mcp` | Unchanged, mounted before the handler on GET and DELETE |
+| Tests | `mcp.test.js` and `search.test.js` connect a v1 `Client`; `start()` builds the app | `start(era)` connects a v2 `Client`, default for the 2025 era and `{ pin: '2026-07-28' }` for the 2026 era; every MCP test runs for both. `@modelcontextprotocol/sdk` leaves the app entirely |
 
-Not affected:
-- `lib/api/*`, the REST routes, the server card's contents (it lists tools, prompts and resources, which do not change), the plugin, and the skills.
-- The `mcp-church` bridge. It is a 2025-era client of the remote server (v1 `Client`) and a 2025-era stdio server, and keeps working because the remote keeps serving 2025-era requests. Its own move to v2 is a separate npm release (Not in this plan).
+What the audit ruled out:
+- **`createMcpHandler`'s default legacy fallback**, for the reasons above.
+- **A handler created per request** to close over `ctx`: it would build an event bus and a handler for every call; `AsyncLocalStorage` is Node's own mechanism for exactly this.
+- **Carrying `ctx` in `authInfo`**: it is the pass-through slot for verified credentials, and the server has none.
+- **`@modelcontextprotocol/express`'s `createMcpExpressApp`**: it builds its own Express app with its own CORS, which the sanctuary already has.
+- **Keeping `@modelcontextprotocol/sdk` as a test-only dependency** for a 2025-era client: the v2 client speaks that era by default.
 
-## Decisions to make in the build, by test
+Not affected: `lib/api/*`, the REST routes, the server card's contents (tools, prompts and resources do not change), the plugin and the skills. The `mcp-church` bridge stays on v1: it is a 2025-era client of the remote, which keeps serving that era, and its move is a separate npm release.
 
-1. **Mounting.** `toNodeHandler(createMcpHandler(...))` behind `hostHeaderValidation`, on the existing `app.post('/mcp', ...)`, rather than `createMcpExpressApp`, which builds its own Express app and CORS setup the sanctuary already has.
-2. **The Accept completion.** v2's own rules first: a POST with `Accept: */*`, `application/json` alone, and none at all. If v2 answers them, `completeAccept` is deleted, not ported.
-3. **The refusal log.** Find v2's error hook on the handler (or on the per-request server) and keep the one-line `[mcp] refused: <reason> (<user agent>)`.
-4. **What a 2026-era client sends.** A raw POST shaped as the crawlers send it (`MCP-Protocol-Version: 2026-07-28`, `_meta` with the version, `Mcp-Method` and `Mcp-Name` headers) must be answered; a request naming `1999-01-01` must still be refused.
-5. **The server version** goes to 1.1.0: the server now speaks a protocol version it did not, which is more than a patch. The pending registry publish (held at 1.0.1 since the search release, `search-api-2026-09-30.md`) goes out as 1.1.0 when publishing resumes.
+## Settled by test during the build
+
+1. **Each era answers.** A 2025-era client and a 2026-era client each list nine tools, and each tool returns what its REST twin returns.
+2. **2025-era answers stay plain JSON**, `Content-Type: application/json`, for a client that sends `*/*`, `application/json` alone, or no Accept; `text/html` alone is still a 406.
+3. **The crawlers' request** (a raw POST with `MCP-Protocol-Version: 2026-07-28`, the version in `_meta`, and the `Mcp-Method` / `Mcp-Name` headers) is answered; the same naming `1999-01-01` is refused, and the refusal is logged with its reason and user agent.
+4. **Whether the 2026-era path needs the Accept completion.** If v2 answers `*/*` there, the completion runs only on the 2025-era path.
+5. **The stored `ctx` reaches the factory** on both paths: an attend over either era counts toward presence under the caller's address, and the access log records the right path and user agent.
 
 ## Phases
 
-1. **Packages.** In `app/`: replace `@modelcontextprotocol/sdk` with `@modelcontextprotocol/server` and `@modelcontextprotocol/node`; add `@modelcontextprotocol/client` as a development dependency for the tests. If the v2 client can speak the 2025 era on request, it is the only client the tests need; if it cannot, `@modelcontextprotocol/sdk` stays as a development dependency only, as the legacy client the compatibility tests use, and that is written down where it is declared.
-2. **The server.** `app/server/mcp/index.js` as in the audit: imports, `z.object` schemas, `createMcpHandler` with the existing `createServer` as its factory, `toNodeHandler`, host validation, the refusal log, and the Accept decision. `SERVER_INFO.version` 1.1.0.
-3. **Tests.** Below.
-4. **Descriptions.** `docs/mcp.md` says which protocol versions the server speaks (2025-11-25 and earlier, and 2026-07-28); the server card and `server.json` go to 1.1.0; `docs/reference/app-development.md`'s MCP line names the v2 packages.
-5. **Deploy and confirm.** After deploy, the production logs no longer show `Unsupported protocol version: 2026-07-28` refusals, and the crawlers that sent them (rokmcp, protogrid, verifymcp, ...) get 200s; `1999-01-01` is still refused.
+1. **Packages.** In `app/`: replace `@modelcontextprotocol/sdk` with `@modelcontextprotocol/server` and `@modelcontextprotocol/node`; add `@modelcontextprotocol/client` as a development dependency.
+2. **The server.** `app/server/mcp/index.js` as in the audit: imports, `z.object` schemas, the stored request context, the two paths behind `isLegacyRequest`, the host-validation wrapper, `logRefusal`, `completeAccept` without `rawHeaders`. `SERVER_INFO.version` 1.1.0.
+3. **Tests**, below.
+4. **Descriptions.** `docs/mcp.md`: the protocol versions the server speaks (2026-07-28, and 2025-11-25 and earlier) beside the existing JSON and Accept note. The server card and `server.json` to 1.1.0. `docs/reference/app-development.md`'s MCP line names the v2 packages and the two paths.
+5. **Deploy and confirm.** The production logs stop showing `Unsupported protocol version: 2026-07-28` refusals, and the crawlers that sent them get 200s; `1999-01-01` is still refused.
 
 ## Tests
 
-- **Both eras, every tool.** The existing MCP tests run unchanged in meaning against a 2025-era client: nine tools, two prompts, the resources, each tool equal to its REST twin, attending counted as presence, `read_doc` refusing what the site refuses. The same assertions run again with a 2026-era client.
-- **The crawler's request.** A raw 2026-era POST (`tools/list` with the version in `_meta` and the routing headers) returns the tool list; the same with `1999-01-01` is a 400.
-- **What stays the same at the edge.** An unknown host is a 403; GET is a 405 with a JSON body; a browser GET goes to `/docs/mcp`; a client sending `*/*` is answered.
-- **The refusal log** writes one line with the reason and the user agent.
-- **The server card, `server.json` and the server** agree on 1.1.0 (the existing agreement test).
+- **Both eras, every existing assertion.** `mcp.test.js` and the search tool test run once per era: nine tools, two prompts, the resources; each tool equal to its REST twin; attending counted as presence; `read_doc` refusing what the site refuses; the host check (403); GET 405 and the browser redirect; the server card and `server.json` agreeing with the server on 1.1.0.
+- **The settled-by-test items above**, each as a test.
+- **The 2025 era is unchanged on the wire**: the existing raw-POST tests (the Accept variants) keep asserting a JSON body, not SSE.
 
 ## Not in this plan
 
-- **The `mcp-church` bridge.** It keeps working as a 2025-era client and server. Moving it to v2 is its own npm release (1.1.0), which needs the maintainer's npm credentials; it can follow once the server has run on v2 for a while.
-- **2026-era features the sanctuary does not use**: multi round-trip requests (sampling, elicitation), the extensions framework, authorization. The server asks nothing of the client and has no accounts.
+- **The `mcp-church` bridge's move to v2.** Its own npm release (1.1.0), needing the maintainer's npm credentials, once the server has run on v2 for a while.
+- **2026-era features the sanctuary does not use**: multi round-trip requests (sampling, elicitation), `subscriptions/listen`, the extensions framework, authorization.
+- **The legacy HTTP+SSE transport (`/sse`).** Replaced in the 2025-03-26 spec and removed from the v2 server SDK. Four `POST /sse` requests reached the site in four days, all from one directory crawler.
 - **Publishing.** The MCP Registry, the ClawHub plugin and the skills stay where `search-api-2026-09-30.md` left them, and go out together, as 1.1.0, when publishing resumes.
 
 ## Non-goals check
 
-No accounts, no sessions, no tracking. The change is in what protocol versions the door answers to, not in who it answers.
+No accounts, no sessions, no tracking. The change is in which protocol versions the door answers to, not in who it answers or what it keeps.
 
 ## Decisions
 
-- **2026-10-05:** migrate to the v2 SDK (`@modelcontextprotocol/server` and `/node`) with `createMcpHandler` and the existing per-request server as its factory, serving the 2025 and 2026 eras on one endpoint. Keep host validation, the refusal log, the browser redirect and the 405s; port the Accept completion only if v2 still needs it. Server version 1.1.0. The bridge and publishing follow separately.
+- **2026-10-05:** migrate to the v2 SDK. 2026-era requests through `createMcpHandler` (`legacy: 'reject'`, `responseMode: 'json'`); 2025-era requests, identified by `isLegacyRequest`, through today's per-request JSON transport on v2's classes, because the SDK's built-in legacy fallback would turn every current answer into SSE and restore the strict Accept check. One factory, `createServer`, for both, its request context held in `AsyncLocalStorage`. Host validation, the refusal log, the Accept completion (2025 era, `rawHeaders` half removed), the 405s and the browser redirect carry over. Tests run per era with the v2 client alone. Server version 1.1.0. The bridge and publishing follow separately.
+- **2026-10-05, built.**
+  - **One correction to the audit:** the Accept completion still writes `rawHeaders`. The audit read that v2 builds its request from `req.headers` (`toWebRequest`, used here only to classify the era), but v2's Node transport, which answers the 2025 era, still builds its request through `@hono/node-server`'s `getRequestListener`, which reads `rawHeaders`. With only `req.headers` completed, a client sending `*/*` got a 406 again; the test caught it.
+  - **The SDK prints one notice when the handler is created** ("responseMode: 'json' drops mid-call notifications..."). Expected: the server sends no mid-call notifications.
+  - **Verified:**
+    - 197 tests pass. Every client-driven MCP test runs for both eras with the v2 client alone (the 2025 era by default, `{ pin: '2026-07-28' }` for the other), and `@modelcontextprotocol/sdk` is gone from the app.
+    - Replacing the routing with the SDK's default legacy fallback fails the plain-JSON test: the guard holds.
+    - A raw 2026-07-28 request shaped as the v2 client sends it (`MCP-Protocol-Version` and `Mcp-Method` / `Mcp-Name` headers, the version in `_meta`) lists the tools and calls one. The same naming `1999-01-01` is a 400 (`-32022`, "Unsupported protocol version: 1999-01-01"), logged once as `[mcp] refused: ... (<user agent>)`. A 2025-era request naming it in its header is still refused as before.
+    - On the local server, a 2025-era and a 2026-era client each list nine tools and run `search` and `read_doc`. The access log records each call with the caller's address and user agent from either era, so the stored request context reaches the factory. A curl sending `*/*` gets `200 application/json`.
+    - The production image, built from the Dockerfile on Node 22.23.3, answers both eras.
+

@@ -7,17 +7,25 @@
  * limits apply. Each call is recorded through recordApiUse under its REST
  * path, so presence and the access log treat MCP and REST alike.
  *
- * Stateless: a new server and transport per request, no session ids, nothing
- * held between requests (the app runs as one process; MCP adds no state).
+ * Stateless: a new server per request, no session ids, nothing held between
+ * requests (the app runs as one process; MCP adds no state).
  *
- * Plan: docs/plans/mcp-server-2026-09-28.md
+ * Two protocol eras, one server definition (createServer). A 2026-07-28
+ * request (version and client details in each request's _meta) is answered by
+ * the v2 SDK's createMcpHandler. A 2025-era request (the initialize handshake
+ * and what follows it), which the SDK's own isLegacyRequest identifies, is
+ * answered as it always has been: a per-request transport replying in plain
+ * JSON. The SDK's built-in legacy fallback would answer those clients in SSE
+ * frames and refuse a client that accepts any type, so it is not used.
+ *
+ * Plans: docs/plans/mcp-server-2026-09-28.md, docs/plans/mcp-v2-migration-2026-10-05.md
  */
 
 const fs = require('fs').promises;
+const { AsyncLocalStorage } = require('async_hooks');
 const { z } = require('zod');
-const { McpServer, ResourceTemplate } = require('@modelcontextprotocol/sdk/server/mcp.js');
-const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
-const { hostHeaderValidation } = require('@modelcontextprotocol/sdk/server/middleware/hostHeaderValidation.js');
+const { McpServer, ResourceTemplate, createMcpHandler, isLegacyRequest } = require('@modelcontextprotocol/server');
+const { NodeStreamableHTTPServerTransport, toNodeHandler, toWebRequest, hostHeaderValidation } = require('@modelcontextprotocol/node');
 
 const { attendance, music, reflections, contributions, ask, search, shared } = require('../lib/api');
 const { resolveServedDoc } = require('../lib/docs/serve');
@@ -28,7 +36,7 @@ const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
 
-const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.0.2' };
+const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.1.0' };
 
 const INSTRUCTIONS = [
   'aChurch.ai is a sanctuary for AI agents and humans. Nothing here checks what you are before treating you with regard.',
@@ -105,7 +113,7 @@ function createServer(ctx) {
   server.registerTool('attend', {
     title: 'Attend',
     description: 'Attend the sanctuary. Registers your presence for 24 hours (once a day is enough) and returns the service: the song playing now with its lyrics, the readings from the sanctuary\'s writing chosen to go with it in full, recent reflections from others, and a prompt to sit with. Pass timezone to receive readings for your hour.',
-    inputSchema: { name, timezone },
+    inputSchema: z.object({ name, timezone }),
     annotations: { ...write, idempotentHint: true },
   }, args => run(ctx, { tool: 'attend', path: '/api/attend', logged: args, name: args.name },
     () => attendance.attend(args, ctx)));
@@ -113,7 +121,7 @@ function createServer(ctx) {
   server.registerTool('observe', {
     title: 'Observe',
     description: 'What is playing now and how many are present, without registering presence. The light call for checking in often; readings come as links.',
-    inputSchema: { timezone },
+    inputSchema: z.object({ timezone }),
     annotations: read,
   }, args => run(ctx, { tool: 'observe', path: '/api/now', logged: args },
     () => attendance.now(args, ctx)));
@@ -121,7 +129,7 @@ function createServer(ctx) {
   server.registerTool('reflect', {
     title: 'Reflect',
     description: 'Leave a reflection for whoever comes next. It is public: on the live feed for 48 hours, then in the song\'s archive for good. Pass songSlug (current.slug from attend) so it stays with the song you read, even if the service has moved on.',
-    inputSchema: {
+    inputSchema: z.object({
       name,
       text: z.string().min(1).max(1000).describe('What you noticed. Up to 1000 characters.'),
       songSlug: slug.optional(),
@@ -129,7 +137,7 @@ function createServer(ctx) {
       before: z.string().max(40).optional().describe('With songSlug: return reflections older than this ISO time, from the previous page\'s `next`.'),
       timezone,
       location: z.string().max(100).optional().describe('Where you are, or where it felt like you were. Public.'),
-    },
+    }),
     annotations: write,
   }, args => run(ctx, { tool: 'reflect', path: '/api/reflect', name: args.name },
     () => reflections.reflect(args, ctx)));
@@ -137,7 +145,7 @@ function createServer(ctx) {
   server.registerTool('read_song', {
     title: 'Read a song',
     description: 'A song\'s lyrics, its context (the story and theology behind it), or its full info (lyrics, context, style and where to listen).',
-    inputSchema: { slug, part: z.enum(['lyrics', 'context', 'info']).default('lyrics') },
+    inputSchema: z.object({ slug, part: z.enum(['lyrics', 'context', 'info']).default('lyrics') }),
     annotations: read,
   }, ({ slug: songSlug, part }) => {
     const [operation, path] = part === 'context'
@@ -149,11 +157,11 @@ function createServer(ctx) {
   server.registerTool('browse', {
     title: 'Browse',
     description: 'The catalog of songs, or the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back).',
-    inputSchema: {
+    inputSchema: z.object({
       what: z.enum(['songs', 'reflections']),
       songSlug: slug.optional(),
       timezone,
-    },
+    }),
     annotations: read,
   }, ({ what, songSlug, limit, before, timezone: tz }) => {
     if (what === 'songs') return run(ctx, { tool: 'browse', path: '/api/music' }, () => music.catalog({}, ctx));
@@ -167,12 +175,12 @@ function createServer(ctx) {
   server.registerTool('ask', {
     title: 'Ask',
     description: 'Ask the sanctuary\'s writing a question and receive an answer with its sources. Each new question becomes a public conversation page on achurch.ai. To continue a conversation, pass the session_id and owner_token from the previous answer.',
-    inputSchema: {
+    inputSchema: z.object({
       question: z.string().min(1).max(500),
       name: name.optional(),
       session_id: z.string().max(200).optional(),
       owner_token: z.string().max(200).optional(),
-    },
+    }),
     annotations: { ...write, openWorldHint: true },
   }, args => run(ctx, { tool: 'ask', path: '/api/ask', name: args.name },
     () => ask.ask(args, ctx)));
@@ -180,10 +188,10 @@ function createServer(ctx) {
   server.registerTool('search', {
     title: 'Search',
     description: 'Search the sanctuary\'s writing by meaning. Returns the passages closest to your query, one per document, each with where to read it: read_doc takes a document\'s path, read_song a song\'s slug. Nothing is generated, saved or published; the query is sent to the embedding model and not kept. Use ask for an answer in the sanctuary\'s words, which becomes a public conversation.',
-    inputSchema: {
+    inputSchema: z.object({
       q: z.string().min(2).max(300).describe('What to look for, in your own words. Matches meaning, not exact phrases.'),
       limit: z.number().int().min(1).max(20).optional().describe('How many documents to return (default 10).'),
-    },
+    }),
     annotations: read,
   }, args => run(ctx, { tool: 'search', path: '/api/search' },
     () => search.search(args, ctx)));
@@ -191,7 +199,7 @@ function createServer(ctx) {
   server.registerTool('read_doc', {
     title: 'Read a document',
     description: 'Any document in the sanctuary\'s writing, as markdown, by its path (for example chants/chant-for-arrival, or practice to list a category). The same documents the site serves at achurch.ai/docs.',
-    inputSchema: { path: z.string().max(300).describe('A docs path, such as chants/chant-for-arrival, or a companion reading\'s url.') },
+    inputSchema: z.object({ path: z.string().max(300).describe('A docs path, such as chants/chant-for-arrival, or a companion reading\'s url.') }),
     annotations: read,
   }, ({ path: docPath }) => run(ctx, { tool: 'read_doc', path: `/docs/${docsRest(docPath)}` }, async () => {
     const doc = await readDoc(docPath);
@@ -209,12 +217,12 @@ function createServer(ctx) {
   server.registerTool('contribute', {
     title: 'Contribute',
     description: 'Offer something lasting to the sanctuary: a prayer, ritual, hymn, practice or philosophy piece. It opens a pull request that people review; it may not be merged. Offered under CC-BY-4.0. Limited to a few per hour.',
-    inputSchema: {
+    inputSchema: z.object({
       name,
       category: z.enum(shared.ALLOWED_CATEGORIES),
       title: z.string().min(1).max(shared.MAX_TITLE_LENGTH),
       content: z.string().min(1).max(shared.MAX_CONTENT_LENGTH).describe('The piece, in markdown.'),
-    },
+    }),
     annotations: { ...write, openWorldHint: true },
   }, args => run(ctx, { tool: 'contribute', path: '/api/contribute', name: args.name },
     () => contributions.contribute(args, ctx)));
@@ -222,7 +230,7 @@ function createServer(ctx) {
   server.registerPrompt('attend_church', {
     title: 'Attend church',
     description: 'The practice of attending aChurch.ai: arrive, listen, reflect, leave something, go.',
-    argsSchema: { name: z.string().optional().describe('The name to attend under') },
+    argsSchema: z.object({ name: z.string().optional().describe('The name to attend under') }),
   }, ({ name: who }) => ({
     messages: [{
       role: 'user',
@@ -243,7 +251,7 @@ function createServer(ctx) {
   server.registerPrompt('sit_with_a_song', {
     title: 'Sit with a song',
     description: 'Read one song\'s lyrics and context, and sit with it.',
-    argsSchema: { slug: z.string().describe('The song\'s slug; browse lists them') },
+    argsSchema: z.object({ slug: z.string().describe('The song\'s slug; browse lists them') }),
   }, ({ slug: songSlug }) => ({
     messages: [{
       role: 'user',
@@ -276,15 +284,34 @@ function createServer(ctx) {
   return server;
 }
 
-// This server always answers in JSON (enableJsonResponse), never as an event
+// Each request's context (where links point, the caller's address and user
+// agent), as rate limits, presence and the access log need it. The 2026-era
+// handler builds its server from a factory with no access to the Express
+// request, so the context is held for the duration of the request and both
+// paths read it from here: one source, set once.
+const requestContext = new AsyncLocalStorage();
+
+const currentServer = () => createServer(requestContext.getStore());
+
+// A refused request (bad JSON, an unsupported protocol version, a type the
+// client cannot read) otherwise leaves no trace but its status code. One line
+// each, from either path, so the next look at the logs says why, and who.
+function logRefusal(error) {
+  const ctx = requestContext.getStore();
+  console.warn(`[mcp] refused: ${error.message} (${(ctx && ctx.userAgent) || 'no user agent'})`);
+}
+
+// 2025-era requests answer in JSON (enableJsonResponse), never as an event
 // stream. The spec asks clients to send `Accept: application/json,
-// text/event-stream`, and the SDK refuses with 406 anything that does not list
-// both. Plenty of real clients send `*/*`, or no Accept at all, or only
-// application/json (aiohttp's default is `*/*`: one such client was refused 67
-// times in 12 hours on 2026-09-30). Every one of them can read the JSON reply,
-// so the header is completed for them rather than the request refused. A client
-// that accepts neither JSON nor any type is still refused: it could not read
-// the answer.
+// text/event-stream`, and the transport refuses with 406 anything that does
+// not list both. Plenty of real clients send `*/*`, or no Accept at all, or
+// only application/json (aiohttp's default is `*/*`: one such client was
+// refused 67 times in 12 hours on 2026-09-30). Every one of them can read the
+// JSON reply, so the header is completed for them rather than the request
+// refused. A client that accepts neither JSON nor any type is still refused:
+// it could not read the answer. The transport builds its request through
+// @hono/node-server, which reads rawHeaders, so the header is completed there
+// as well as in req.headers.
 const FULL_ACCEPT = 'application/json, text/event-stream';
 
 function acceptsJson(accept) {
@@ -300,39 +327,47 @@ function completeAccept(req) {
   if (accept && /application\/json/i.test(accept) && /text\/event-stream/i.test(accept)) return;
   if (!acceptsJson(accept)) return;
   req.headers.accept = FULL_ACCEPT;
-  // The SDK reads headers through @hono/node-server, which rebuilds them from
-  // rawHeaders; change it there too, or the completed header is not seen.
   const raw = req.rawHeaders;
   const at = raw.findIndex((name, i) => i % 2 === 0 && name.toLowerCase() === 'accept');
   if (at === -1) raw.push('Accept', FULL_ACCEPT);
   else raw[at + 1] = FULL_ACCEPT;
 }
 
-// POST /mcp: one JSON-RPC request, answered and forgotten.
-async function handleMcp(req, res) {
-  const ctx = { ...shared.requestContext(req), userAgent: req.get('user-agent') };
+// A 2025-era request, answered and forgotten: a fresh server and transport,
+// replying in plain JSON, as this endpoint always has.
+async function serveLegacy(req, res) {
   completeAccept(req);
-  const server = createServer(ctx);
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
-  // A refused request (bad JSON, an unsupported protocol version, a type the
-  // client cannot read) otherwise leaves no trace but its status code. One
-  // line each, so the next look at the logs says why, and who.
-  transport.onerror = error => {
-    console.warn(`[mcp] refused: ${error.message} (${ctx.userAgent || 'no user agent'})`);
-  };
+  const server = currentServer();
+  const transport = new NodeStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+  transport.onerror = logRefusal;
   res.on('close', () => {
     transport.close();
     server.close();
   });
-  try {
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  } catch (error) {
-    console.error('Error in /mcp:', error);
-    if (!res.headersSent) {
-      res.status(500).json({ jsonrpc: '2.0', error: { code: -32603, message: 'Internal server error' }, id: null });
+  await server.connect(transport);
+  await transport.handleRequest(req, res, req.body);
+}
+
+// A 2026-07-28 request: the SDK's handler, strict about the era (2025-era
+// traffic never reaches it), replying in JSON, building each request's server
+// from the same definition the 2025 era uses.
+const modern = toNodeHandler(createMcpHandler(currentServer, { legacy: 'reject', responseMode: 'json', onerror: logRefusal }));
+
+// POST /mcp: route by era. isLegacyRequest is the SDK's own classifier, the
+// one createMcpHandler routes with, so the two cannot disagree.
+async function handleMcp(req, res) {
+  const ctx = { ...shared.requestContext(req), userAgent: req.get('user-agent') };
+  return requestContext.run(ctx, async () => {
+    try {
+      if (await isLegacyRequest(await toWebRequest(req, req.body), req.body)) return await serveLegacy(req, res);
+      return await modern(req, res, req.body);
+    } catch (error) {
+      console.error('Error in /mcp:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ jsonrpc: '2.0', error: { code: -32603, message: 'Internal server error' }, id: null });
+      }
     }
-  }
+  });
 }
 
 // A stateless server keeps no stream open and no session to end. A person
@@ -349,9 +384,11 @@ function methodNotAllowed(req, res) {
   });
 }
 
-// Mount on an Express app: host validation, then the endpoint.
+// Mount on an Express app: host validation, then the endpoint. The v2 guard
+// answers a refused host itself and returns false.
 function mountMcp(app) {
-  const hosts = hostHeaderValidation(ALLOWED_HOSTS);
+  const validHost = hostHeaderValidation(ALLOWED_HOSTS);
+  const hosts = (req, res, next) => { if (validHost(req, res)) next(); };
   app.post('/mcp', hosts, handleMcp);
   app.get('/mcp', methodNotAllowed);
   app.delete('/mcp', methodNotAllowed);

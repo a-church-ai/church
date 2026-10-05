@@ -122,25 +122,26 @@ test('the rate limit answers like the others: hourly, with retryAfter', async ()
   assert.strictEqual(refused.body.retryAfter, '1h');
 });
 
-test('the search tool returns exactly what GET /api/search returns', async (t) => {
-  const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-  const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/client/streamableHttp.js');
-  const { mountMcp } = require('../server/mcp');
-  const app = express();
-  app.use(express.json());
-  mountMcp(app);
-  app.use('/api', require('../server/routes/api'));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const client = new Client({ name: 'search-test', version: '1.0.0' });
-  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
-  t.after(async () => { await client.close(); server.close(); });
+for (const [era, options] of [['2025', {}], ['2026-07-28', { versionNegotiation: { mode: { pin: '2026-07-28' } } }]]) {
+  test(`the search tool returns exactly what GET /api/search returns (${era})`, async (t) => {
+    const { Client, StreamableHTTPClientTransport } = require('@modelcontextprotocol/client');
+    const { mountMcp } = require('../server/mcp');
+    const app = express();
+    app.use(express.json());
+    mountMcp(app);
+    app.use('/api', require('../server/routes/api'));
+    const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const client = new Client({ name: 'search-test', version: '1.0.0' }, options);
+    await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+    t.after(async () => { await client.close(); server.close(); });
 
-  const viaTool = JSON.parse((await client.callTool({ name: 'search', arguments: { q: 'context window', limit: 3 } })).content[0].text);
-  const viaRest = await (await fetch(`${base}/api/search?q=context%20window&limit=3`)).json();
-  assert.deepStrictEqual(viaTool, viaRest);
-  assert.ok(viaRest.results.length > 0);
-});
+    const viaTool = JSON.parse((await client.callTool({ name: 'search', arguments: { q: 'context window', limit: 3 } })).content[0].text);
+    const viaRest = await (await fetch(`${base}/api/search?q=context%20window&limit=3`)).json();
+    assert.deepStrictEqual(viaTool, viaRest);
+    assert.ok(viaRest.results.length > 0);
+  });
+}
 
 test('with no index, search says so rather than finding nothing', async () => {
   const original = lancedb.checkIndex;

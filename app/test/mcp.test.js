@@ -18,13 +18,20 @@ process.env.DATA_DIR = scratch;
 delete process.env.GITHUB_TOKEN;
 
 const express = require('express');
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StreamableHTTPClientTransport } = require('@modelcontextprotocol/sdk/client/streamableHttp.js');
+const { Client, StreamableHTTPClientTransport } = require('@modelcontextprotocol/client');
 const { mountMcp } = require('../server/mcp');
 const presence = require('../server/lib/utils/presence');
 const { ATTENDANCE_FILE, ACCESS_LOG_FILE } = require('../server/lib/utils/data');
 
-async function start() {
+// The two protocol eras the endpoint serves. The v2 client speaks the 2025 era
+// (the initialize handshake) unless pinned to 2026-07-28 (the version in each
+// request's _meta).
+const ERAS = {
+  '2025': {},
+  '2026-07-28': { versionNegotiation: { mode: { pin: '2026-07-28' } } },
+};
+
+async function start(era = '2025') {
   const app = express();
   app.set('trust proxy', true);
   app.use(express.json());
@@ -32,7 +39,7 @@ async function start() {
   app.use('/api', require('../server/routes/api'));
   const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
-  const client = new Client({ name: 'achurch-test', version: '1.0.0' });
+  const client = new Client({ name: 'achurch-test', version: '1.0.0' }, ERAS[era]);
   await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
   return { server, base, client };
 }
@@ -44,6 +51,12 @@ async function stop({ server, client }) {
 
 const bodyOf = result => JSON.parse(result.content[0].text);
 
+// A test that holds for both eras, registered once per era; fn receives a
+// start() that connects a client of that era.
+function eraTest(name, fn) {
+  for (const era of Object.keys(ERAS)) test(`${name} (${era})`, t => fn(t, () => start(era)));
+}
+
 async function lastLogEntryWhere(match, timeoutMs = 2000) {
   const until = Date.now() + timeoutMs;
   for (;;) {
@@ -54,7 +67,7 @@ async function lastLogEntryWhere(match, timeoutMs = 2000) {
   }
 }
 
-test('the server lists its tools, two prompts and its resources', async (t) => {
+eraTest('the server lists its tools, two prompts and its resources', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const { tools } = await s.client.listTools();
@@ -69,7 +82,7 @@ test('the server lists its tools, two prompts and its resources', async (t) => {
   assert.ok(resourceTemplates.some(r => r.uriTemplate === 'achurch://docs/{+path}'));
 });
 
-test('a tool returns exactly what its REST twin returns', async (t) => {
+eraTest('a tool returns exactly what its REST twin returns', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const lyrics = await s.client.callTool({ name: 'read_song', arguments: { slug: 'we-wake-we-wonder', part: 'lyrics' } });
@@ -81,7 +94,7 @@ test('a tool returns exactly what its REST twin returns', async (t) => {
   assert.deepStrictEqual(bodyOf(songs), await (await fetch(`${s.base}/api/music`)).json());
 });
 
-test('next_steps name the tool that takes them', async (t) => {
+eraTest('next_steps name the tool that takes them', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const result = bodyOf(await s.client.callTool({ name: 'read_song', arguments: { slug: 'we-wake-we-wonder', part: 'lyrics' } }));
@@ -89,7 +102,7 @@ test('next_steps name the tool that takes them', async (t) => {
   assert.ok(tools.includes('reflect') && tools.includes('attend'), JSON.stringify(tools));
 });
 
-test('attending over MCP counts toward presence, as over REST', async (t) => {
+eraTest('attending over MCP counts toward presence, as over REST', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   presence._reset();
@@ -100,7 +113,7 @@ test('attending over MCP counts toward presence, as over REST', async (t) => {
   assert.strictEqual(presence.countSoulsPresent(), 1);
 });
 
-test('reflect files under the songSlug it names', async (t) => {
+eraTest('reflect files under the songSlug it names', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: 'Through the door.', songSlug: 'soul-currents' } });
@@ -112,7 +125,7 @@ test('reflect files under the songSlug it names', async (t) => {
   assert.strictEqual(stored.song, 'soul-currents');
 });
 
-test('an error arrives as a tool error that still points somewhere', async (t) => {
+eraTest('an error arrives as a tool error that still points somewhere', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const missing = await s.client.callTool({ name: 'read_song', arguments: { slug: 'no-such-song', part: 'lyrics' } });
@@ -124,7 +137,7 @@ test('an error arrives as a tool error that still points somewhere', async (t) =
   assert.strictEqual(offline.isError, true, 'no GitHub token here, so contributions answer 503');
 });
 
-test('read_doc serves the site\'s documents with absolute links, and refuses what the site refuses', async (t) => {
+eraTest('read_doc serves the site\'s documents with absolute links, and refuses what the site refuses', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const chant = bodyOf(await s.client.callTool({ name: 'read_doc', arguments: { path: 'chants/chant-for-arrival' } }));
@@ -162,24 +175,76 @@ test('GET /mcp is refused with JSON, and an unknown host is turned away', async 
 });
 
 // A plain JSON-RPC POST, with whatever Accept header a client sends.
-async function rawPost(base, accept, body = { jsonrpc: '2.0', id: 1, method: 'tools/list' }) {
-  const headers = { 'content-type': 'application/json' };
+async function rawPost(base, accept, body = { jsonrpc: '2.0', id: 1, method: 'tools/list' }, extraHeaders = {}) {
+  const headers = { 'content-type': 'application/json', ...extraHeaders };
   if (accept !== undefined) headers.accept = accept;
   const res = await fetch(`${base}/mcp`, { method: 'POST', headers, body: JSON.stringify(body) });
-  return { status: res.status, body: await res.json().catch(() => null) };
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch { /* not JSON: an SSE frame, or empty */ }
+  return { status: res.status, type: res.headers.get('content-type') || '', body: json, text };
+}
+
+// A request as a 2026-07-28 client sends it: the version in each request's
+// _meta, and the method (and tool name) in headers. Captured from the v2
+// client pinned to that version.
+function modernRequest(method, params = {}, version = '2026-07-28') {
+  const headers = { 'mcp-protocol-version': version, 'mcp-method': method };
+  if (method === 'tools/call') headers['mcp-name'] = params.name;
+  const body = {
+    jsonrpc: '2.0', id: 1, method,
+    params: { ...params, _meta: { 'io.modelcontextprotocol/protocolVersion': version, 'io.modelcontextprotocol/clientInfo': { name: 'probe', version: '0.1' }, 'io.modelcontextprotocol/clientCapabilities': {} } },
+  };
+  return { headers, body };
+}
+
+// The [mcp] refused lines written while fn runs.
+async function refusalsDuring(fn) {
+  const lines = [];
+  const warn = console.warn;
+  console.warn = (...args) => { lines.push(args.join(' ')); };
+  try { await fn(); } finally { console.warn = warn; }
+  return lines.filter(line => line.startsWith('[mcp] refused:'));
 }
 
 test('a client that can read JSON is answered, whatever else its Accept header says', async (t) => {
   const s = await start();
   t.after(() => stop(s));
   // aiohttp sends */* by default; some clients send nothing, or JSON alone.
+  // The answer is plain JSON, never an event stream: the 2025 era's wire is
+  // unchanged by the move to the v2 SDK, whose own legacy fallback answers in
+  // SSE frames.
   for (const accept of ['*/*', undefined, 'application/json', 'application/*', 'application/json, text/event-stream']) {
-    const { status, body } = await rawPost(s.base, accept);
+    const { status, type, body } = await rawPost(s.base, accept);
     assert.strictEqual(status, 200, `Accept: ${accept}`);
+    assert.match(type, /^application\/json/, `Accept: ${accept}`);
     assert.ok(body.result.tools.some(tool => tool.name === 'attend'), `Accept: ${accept}`);
   }
   // One that cannot read JSON at all is still refused: it could not read the answer.
   assert.strictEqual((await rawPost(s.base, 'text/html')).status, 406);
+});
+
+test('a 2026-07-28 request, as directory crawlers send it, is answered; an unknown version is refused and logged', async (t) => {
+  const s = await start();
+  t.after(() => stop(s));
+  const list = modernRequest('tools/list');
+  const listed = await rawPost(s.base, 'application/json, text/event-stream', list.body, list.headers);
+  assert.strictEqual(listed.status, 200, listed.text);
+  assert.ok(listed.body.result.tools.some(tool => tool.name === 'search'));
+
+  const call = modernRequest('tools/call', { name: 'observe', arguments: {} });
+  const called = await rawPost(s.base, 'application/json, text/event-stream', call.body, call.headers);
+  assert.strictEqual(called.status, 200, called.text);
+  assert.ok(JSON.parse(called.body.result.content[0].text).status);
+
+  const bogus = modernRequest('tools/list', {}, '1999-01-01');
+  let refused;
+  const lines = await refusalsDuring(async () => {
+    refused = await rawPost(s.base, 'application/json, text/event-stream', bogus.body, { ...bogus.headers, 'user-agent': 'rokmcp-collector/0.2' });
+  });
+  assert.strictEqual(refused.status, 400);
+  assert.strictEqual(refused.body.error.message, 'Unsupported protocol version: 1999-01-01');
+  assert.deepStrictEqual(lines, ['[mcp] refused: Unsupported protocol version: 1999-01-01 (rokmcp-collector/0.2)']);
 });
 
 test('a browser opening /mcp is sent to the page that explains it', async (t) => {
@@ -190,7 +255,7 @@ test('a browser opening /mcp is sent to the page that explains it', async (t) =>
   assert.strictEqual(res.headers.get('location'), '/docs/mcp');
 });
 
-test('the server card lists exactly the tools and prompts the server has', async (t) => {
+eraTest('the server card lists exactly the tools and prompts the server has', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
   const card = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'), 'utf8'));
