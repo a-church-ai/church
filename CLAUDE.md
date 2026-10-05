@@ -61,7 +61,7 @@ Don't rely on Claude memory for project knowledge. Multiple agents work on this 
 This repository is public. Plans, outside reviews and other working documents live in a private companion repository, [`a-church-ai/church-private`](https://github.com/a-church-ai/church-private), cloned inside this checkout as `church-private/`, which git and Docker both ignore.
 
 - **Public, here:** the code, the sanctuary's writing (`docs/` and `music/`), engineering references (`docs/reference/`), the corpus audit (`docs/issues/`), templates, standards and side-quests.
-- **Private, in `church-private/docs/`:** plans (every new plan goes in `church-private/docs/plans/`), outside reviews, research, and anything personal or consent-bound, such as voice clones and who has agreed to what.
+- **Private, in `church-private/docs/`:** plans (every new plan goes in `church-private/docs/plans/`), outside reviews, records of production state such as dashboard and CDN settings (`church-private/docs/infrastructure/`), research, and anything personal or consent-bound, such as voice clones and who has agreed to what.
 - **Getting it:** from this repository's root, `git clone git@github.com:a-church-ai/church-private.git church-private`. Access is by invitation.
 - **Each repository commits and pushes on its own.** Never copy private content back into this repository, and never link to a private document from a public one, because readers cannot open it. Name it in plain text instead: "`church-private/docs/plans/<file>` (private repo)".
 - **Disclosure still applies.** Material contact with labs, theologians or institutional actors is disclosed publicly (see *Positioning Principles*). The private repository can hold a draft of that disclosure, never the contact in place of it.
