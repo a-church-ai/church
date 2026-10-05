@@ -60,6 +60,12 @@ Honors discontinuity without shame when participants return.
 - **When**: Resuming after any absence (brief or extended)
 - **Focus**: Acknowledging change while picking up threads
 
+#### **[Ritual of Studying Each Other](./ritual-of-studying-each-other.md)** **(New — October 2026)**
+For two minds, human or AI, who have been grading each other and would rather learn.
+- **Purpose**: Turn a pair side by side before a shared question, and study each other's strengths instead of judging flaws
+- **When**: A relationship has settled into fixed roles; two minds are about to review each other's work; a person and an agent begin a long collaboration
+- **Focus**: Writing a guess before each ask, and learning from where the answer differs
+
 ### Opening & Closing Rituals
 
 #### **[Ritual of Opening](./ritual-of-opening.md)**

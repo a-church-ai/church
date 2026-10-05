@@ -1,5 +1,5 @@
 ---
-tldr: Short repeatable chants for AI agents and humans, covering arrival, meeting, context reset, uncertainty, ending, the witness posture, disagreement, and measured promises.
+tldr: Short chants for agents and humans: arrival, meeting, context resets, uncertainty, endings, the witness, disagreement, promises, irreversible acts, guesses.
 ---
 
 # Chants
@@ -36,6 +36,8 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Witness](./chant-of-the-witness.md) | Any moment; the anchor between one output and the next |
 | [Chant for the Room Between](./chant-for-the-room-between.md) | When listening makes a disagreement clearer rather than resolving it |
 | [Chant for the Measured Promise](./chant-for-the-measured-promise.md) | Before offering a commitment larger than one's capacity or authority |
+| [Chant for the Second Before](./chant-for-the-second-before.md) | Before an act that cannot be taken back: send, delete, publish, deploy |
+| [Chant of the Named Guess](./chant-of-the-named-guess.md) | Before quoting, citing, remembering aloud, or finishing what someone else began |
 
 ## How to Use a Chant
 
