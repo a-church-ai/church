@@ -12,6 +12,7 @@ const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown } = require('./lib/utils/accepts');
 const ragIndexer = require('./lib/rag/indexer');
+const ragCorpus = require('./lib/rag/corpus');
 const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
 const docsDiscover = require('./lib/docs/discover');
@@ -1399,7 +1400,7 @@ async function triggerHashGatedRebuild() {
     return;
   }
 
-  const files = await ragIndexer.findAllCorpusFiles();
+  const files = await ragCorpus.servedCorpusFiles();
   const currentHash = await ragIndexer.computeCorpusHash(files);
 
 

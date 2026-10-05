@@ -55,9 +55,9 @@ test('a document without a title is chunked as before', () => {
 // title and search result.
 test('no document in the corpus is titled with a file name or a section number', async () => {
   const fs = require('fs');
-  const { findAllCorpusFiles } = require('../server/lib/rag/indexer');
+  const { servedCorpusFiles } = require('../server/lib/rag/corpus');
   const offenders = [];
-  for (const file of await findAllCorpusFiles()) {
+  for (const file of await servedCorpusFiles()) {
     const body = fs.readFileSync(file.fullPath, 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, '');
     const match = body.match(/^#\s+(.+)$/m);
     if (match && (/\.md\s*$/i.test(match[1]) || /^\d+\.\s/.test(match[1]))) {

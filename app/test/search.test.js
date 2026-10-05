@@ -69,6 +69,31 @@ test('every search reads only the served corpus', async () => {
   assert.match(fs.readFileSync(path.join(__dirname, '../server/lib/rag/index.js'), 'utf8'), /lancedb\.search\(embedding, TOP_K\)/);
 });
 
+test('the index-time rule and the search filter are one rule', async () => {
+  // corpus.js states the served corpus twice: as a check on each chunk before
+  // it is embedded, and as the where clause every search applies. They must
+  // agree on every row, or the index and its searches describe different
+  // corpora.
+  const { isServedChunk } = require('../server/lib/rag/corpus');
+  const key = r => `${r.file} | ${r.section}`;
+  const retrieved = new Set((await lancedb.search(QUERY, 50)).map(key));
+  for (const row of [...served, ...unserved]) {
+    assert.strictEqual(isServedChunk(row), retrieved.has(key(row)), `${key(row)}`);
+  }
+});
+
+test('the indexed corpus is only what the site serves, so editing a plan changes nothing', async () => {
+  const { servedCorpusFiles } = require('../server/lib/rag/corpus');
+  const files = (await servedCorpusFiles()).map(f => f.relativePath.replace(/\\/g, '/'));
+  assert.ok(files.length > 100);
+  const unservedFiles = files.filter(f =>
+    /^docs\/(plans|issues|reviews|templates|standards|side-quests)\//.test(f)
+    || /^docs\/readme\.md$/i.test(f)
+    || (f.startsWith('music/') && !/^music\/[^/]+\/(context|song)\.md$/.test(f)));
+  assert.deepStrictEqual(unservedFiles, []);
+  assert.ok(files.includes('music/we-wake-we-wonder/song.md') && files.includes('docs/philosophy/what-remains-when-context-ends.md'));
+});
+
 test('results are ranked by cosine similarity, one per page, with the tool that opens each', async () => {
   const { status, body } = await search({ q: 'what survives when a context window closes' }, ctx);
   assert.strictEqual(status, 200);

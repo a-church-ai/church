@@ -20,6 +20,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
 const indexer = require('../server/lib/rag/indexer');
+const corpus = require('../server/lib/rag/corpus');
 const { isTransientEmbedError, embedRetryDelayMs } = indexer;
 const state = require('../server/lib/rag/index-state');
 
@@ -39,7 +40,7 @@ async function index() {
   console.log(`  Generate model: ${gemini.GENERATE_MODEL}`);
 
   console.log('\nFinding markdown files...');
-  const allFiles = await indexer.findAllCorpusFiles();
+  const allFiles = await corpus.servedCorpusFiles();
   console.log(`  Total: ${allFiles.length} files`);
 
   console.log('\nComputing corpus hash...');
@@ -52,7 +53,7 @@ async function index() {
     try {
       const content = await fs.readFile(fullPath, 'utf8');
       const chunks = indexer.chunkMarkdown(content, relativePath);
-      allChunks.push(...chunks);
+      allChunks.push(...chunks.filter(corpus.isServedChunk));
     } catch (error) {
       console.error(`  Error reading ${relativePath}: ${error.message}`);
     }

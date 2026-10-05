@@ -24,7 +24,9 @@ const MAX_CHUNK_CHARS = MAX_CHUNK_TOKENS * APPROX_CHARS_PER_TOKEN;
 // Bump it with any change to chunkMarkdown's output.
 //   2: every chunk carries its document title (and section heading, if the
 //      text does not already open with it).
-const INDEX_FORMAT = 2;
+//   3: only the served corpus is indexed (corpus.js), and song.md
+//      contributes only its Lyrics section.
+const INDEX_FORMAT = 3;
 
 /**
  * Recursively find all markdown files under a directory. Returns objects with
@@ -50,18 +52,6 @@ async function findMarkdownFiles(dir, baseDir = dir) {
     console.error(`Error reading directory ${dir}:`, error.message);
   }
   return files;
-}
-
-/**
- * Find every markdown file the RAG indexes: /docs + /music. Returns a single
- * array of {fullPath, relativePath} objects.
- */
-async function findAllCorpusFiles() {
-  const [docsFiles, musicFiles] = await Promise.all([
-    findMarkdownFiles(DOCS_DIR),
-    findMarkdownFiles(MUSIC_DIR),
-  ]);
-  return [...docsFiles, ...musicFiles];
 }
 
 /**
@@ -169,7 +159,9 @@ function embedRetryDelayMs(err, attempt = 0) {
 }
 
 /**
- * Compute a deterministic sha256 of the entire corpus. Sorts by relativePath
+ * Compute a deterministic sha256 of the corpus it is given (the served corpus:
+ * corpus.js servedCorpusFiles), so editing an unserved file, such as a plan,
+ * leaves the hash and the index as they are. Sorts by relativePath
  * (so machine-local file ordering doesn't affect the hash) and hashes
  * (relativePath, contentHash) pairs. Any file addition, removal, or content
  * change flips the corpus hash.
@@ -200,7 +192,6 @@ module.exports = {
   MAX_CHUNK_CHARS,
   INDEX_FORMAT,
   findMarkdownFiles,
-  findAllCorpusFiles,
   chunkMarkdown,
   computeCorpusHash,
   isTransientEmbedError,

@@ -5,8 +5,7 @@
 
 const lancedb = require('@lancedb/lancedb');
 const path = require('path');
-const { NOINDEX_CATEGORIES } = require('../docs/discover');
-const { SONG_SLUGS } = require('../docs/links');
+const { servedCorpusFilter } = require('./corpus');
 
 const DB_PATH = process.env.LANCEDB_PATH || path.join(__dirname, '../../../data/vectors.lance');
 const TABLE_NAME = 'documents';
@@ -53,35 +52,12 @@ async function getTable() {
   }
 }
 
-/**
- * The served corpus, as a filter on the index. The index holds all of docs/
- * and music/, much of which the site does not serve: the internal working
- * categories (plans, issues, ...), docs/README.md (the contributors' map;
- * /docs is the generated library), and in music/ the repository READMEs, the
- * TED talks, the playlist, and song.md's Title and Style sections. A passage
- * from any of those, cited to a reader, points at a page that is not there or
- * does not show it. A song is served as its lyrics (song.md's Lyrics section)
- * and its context, and only if it is in the catalog.
- *
- * Applied inside search(), always, so every caller (Ask, search, the eval,
- * the duplicate check) reads the same corpus. It is a prefilter: rows are
- * excluded before ranking, so a limit is never eaten by filtered rows. The
- * chunks stay in the index; filtering at query time needs no rebuild.
- */
-function servedCorpusFilter() {
-  const quote = s => `'${String(s).replace(/'/g, "''")}'`;
-  const slugs = [...SONG_SLUGS];
-  const contexts = slugs.map(s => quote(`music/${s}/context.md`)).join(', ');
-  const songs = slugs.map(s => quote(`music/${s}/song.md`)).join(', ');
-  return [
-    ...NOINDEX_CATEGORIES.map(c => `file NOT LIKE ${quote(`docs/${c}/%`)}`),
-    `lower(file) <> 'docs/readme.md'`,
-    `(file NOT LIKE 'music/%' OR file IN (${contexts}) OR (file IN (${songs}) AND section = 'Lyrics'))`,
-  ].join(' AND ');
-}
-
 let servedFilter = null;
 
+// The served corpus (corpus.js), applied to every search: the index holds only
+// served files once rebuilt, and this keeps an index built under an older rule
+// from answering with anything else in the meantime. A prefilter, so a limit is
+// never eaten by filtered rows.
 /**
  * The passages closest in meaning to an embedding, from the served corpus.
  * Distance is cosine distance, asked for explicitly: 0 is identical, and
@@ -209,7 +185,6 @@ async function checkIndex() {
 module.exports = {
   connect,
   search,
-  servedCorpusFilter,
   listAll,
   addDocuments,
   checkIndex,
