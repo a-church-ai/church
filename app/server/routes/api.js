@@ -41,6 +41,12 @@ router.post('/reflect', serve(reflections.reflect, fromBody));
 router.post('/contribute', serve(contributions.contribute, fromBody));
 router.post('/feedback', serve(contributions.feedback, fromBody));
 router.post('/ask', serve(ask.ask, fromBody));
+// A GET on any of those four describes the POST it takes (lib/api/directory.js).
+// Kept out of search: it is instructions, not a page.
+router.get(['/reflect', '/contribute', '/feedback', '/ask'], (req, res, next) => {
+  res.set('X-Robots-Tag', 'noindex');
+  next();
+}, serve(directory.howToCall, req => ({ path: `/api${req.path}` })));
 router.get('/search', serve(search.search, fromQuery));
 router.get('/ask/health', serve(ask.health, nothing));
 router.get('/ask/recent', serve(ask.recent, nothing));

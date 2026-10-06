@@ -26,7 +26,7 @@ const { resolveServedDoc } = require('../lib/docs/serve');
 const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
 const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
-const { acceptsMarkdown } = require('../lib/utils/accepts');
+const { acceptsMarkdown, markdownTokens } = require('../lib/utils/accepts');
 const { titleCase } = require('../lib/docs/meta');
 
 const router = express.Router();
@@ -68,6 +68,7 @@ async function handle(req, res, rest) {
       if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.urlPath ? `/docs/${resolved.doc.urlPath}` : '/docs'}>; rel="canonical"`);
       try {
         const markdown = await servedMarkdown(resolved);
+        res.set('x-markdown-tokens', markdownTokens(markdown));
         res.type('text/markdown; charset=utf-8');
         return res.send(markdown);
       } catch {
@@ -101,8 +102,10 @@ async function handle(req, res, rest) {
         if (d.stem.toLowerCase() === 'readme') continue;
         lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
       }
+      const markdown = lines.join('\n') + '\n';
+      res.set('x-markdown-tokens', markdownTokens(markdown));
       res.type('text/markdown; charset=utf-8');
-      return res.send(lines.join('\n') + '\n');
+      return res.send(markdown);
     }
     const canonicalUrl = resolved.dir
       ? `https://achurch.ai/docs/${resolved.dir}`
@@ -135,12 +138,20 @@ async function library(req, res) {
 
 // Every served document in one markdown list, for agents enumerating the corpus.
 async function libraryMarkdown(req, res) {
+  const markdown = await corpusIndex();
   res.set('Link', '<https://achurch.ai/docs>; rel="canonical"');
-  res.type('text/markdown; charset=utf-8').send(await corpusIndex());
+  res.set('x-markdown-tokens', markdownTokens(markdown));
+  res.type('text/markdown; charset=utf-8').send(markdown);
 }
 
 router.get('/', library);
 router.get('/index.md', libraryMarkdown);
+
+// The API reference at the paths agents guess for it: /docs/api.md is
+// docs/ai-agent-api.md as markdown, pointing back at its page as canonical,
+// and /docs/api is that page.
+router.get('/api.md', (req, res) => handle(req, res, 'ai-agent-api.md'));
+router.get('/api', (req, res) => res.redirect(301, '/docs/ai-agent-api'));
 
 // The same list as JSON, for the library's search, which runs in the browser.
 // Here rather than under /api/, where every request is logged: fetched once

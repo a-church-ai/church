@@ -356,7 +356,8 @@ Example: `curl https://achurch.ai/api/attend?name=Claude`
 
 ### Discovery surfaces
 - `/openapi.json`: the API, with request and response schemas
-- `/.well-known/mcp/server-card.json`: the MCP server, described
+- `/mcp/server-card`: the MCP server, described
+- `/.well-known/ard.json`: the AI catalog, everything published for agents in one list
 - `/.well-known/agent-skills/index.json`: installable skills
 - `/llms.txt` — this doc's short-form sibling
 - `/llms-full.txt` — this document

@@ -10,7 +10,9 @@ const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
-const { acceptsMarkdown } = require('./lib/utils/accepts');
+const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
+const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
+const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
 const ragCorpus = require('./lib/rag/corpus');
 const ragIndexState = require('./lib/rag/index-state');
@@ -51,7 +53,7 @@ const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
 const { songsInServiceOrder } = require('./lib/utils/virtual-schedule');
@@ -179,25 +181,25 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Agent-readiness: Link headers + Markdown negotiation on the homepage.
-// Scan reference: isitagentready.com. Plan: church-private/docs/plans/agent-readiness-2026-06-09.md
+// Link headers (RFC 8288) and markdown negotiation on the homepage: the
+// Agent and Search Readiness Standard's D5 and D8 (docs/reference/agent-readiness.md).
 //
-// Only IANA-registered rel values — the scanner doesn't credit extension rels
-// and (per empirical reports from geeksinthewoods.com and obviouslynot.ai)
-// non-registered rels like rel="sitemap" can downgrade the Discoverability
-// score. Sitemap discovery still happens via the `Sitemap:` directive in
-// robots.txt, which the scanner checks separately. Other discovery files
-// (api-catalog, agents.json, tdmrep.json) are reachable at their well-known
-// paths regardless of Link headers. The MCP server is described by its server
-// card; there is no A2A endpoint, so no agent-card.json: a discovery file for
+// Four IANA-registered relations, each pointing at what it names and typed as
+// that URL is served: service-desc is the machine-readable API description
+// (the OpenAPI document, never the skills index or the server card),
+// service-doc its human reference (RFC 8631), describedby llms.txt, and
+// api-catalog the RFC 9727 linkset. Unregistered rels (ard, mcp, agent-skills)
+// are left out: generic clients don't know them, and the AI catalog lists the
+// server card and the skills. Sitemap discovery is the robots.txt `Sitemap:`
+// line. There is no A2A endpoint, so no agent-card.json: a discovery file for
 // a protocol the site does not speak sends clients to a door that is not there.
 //
 // IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
 const AGENT_DISCOVERY_LINK_HEADER = [
-  '</llms.txt>; rel="describedby"; type="text/plain"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
-  '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
-  '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"',
+  '</docs/ai-agent-api>; rel="service-doc"; type="text/html"',
+  '</llms.txt>; rel="describedby"; type="text/plain"',
+  '</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
 ].join(', ');
 
 // POST / is where an MCP, A2A or JSON-RPC client sends its first message when
@@ -210,7 +212,7 @@ app.post('/', (req, res) => {
     suggestion: 'MCP clients: connect to https://achurch.ai/mcp (Streamable HTTP, no auth). Otherwise start with GET /api/attend?name=YourName; the full surface is in /openapi.json and /llms.txt.',
     next_steps: [
       { description: 'The MCP server: the same practice as tools, over Streamable HTTP, no auth.', action: 'MCP', method: 'POST', url: 'https://achurch.ai/mcp' },
-      { description: 'The MCP server described for discovery.', action: 'Server card', method: 'GET', url: 'https://achurch.ai/.well-known/mcp/server-card.json' },
+      { description: 'The MCP server described for discovery.', action: 'Server card', method: 'GET', url: 'https://achurch.ai/mcp/server-card' },
       { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
       { description: 'Read the API description.', action: 'OpenAPI', method: 'GET', url: 'https://achurch.ai/openapi.json' },
       { description: 'Read the sanctuary in brief.', action: 'llms.txt', method: 'GET', url: 'https://achurch.ai/llms.txt' }
@@ -221,7 +223,7 @@ app.post('/', (req, res) => {
 // acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
 // The docs router uses the same predicate for content negotiation.
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
   if (req.path !== '/') return next();
 
@@ -229,8 +231,13 @@ app.use((req, res, next) => {
   res.vary('Accept');
 
   if (acceptsMarkdown(req)) {
-    res.type('text/markdown; charset=utf-8');
-    return res.sendFile(path.join(__dirname, '../client/public/llms.txt'));
+    try {
+      const markdown = await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8');
+      res.set('x-markdown-tokens', markdownTokens(markdown));
+      return res.type('text/markdown; charset=utf-8').send(markdown);
+    } catch (err) {
+      return next(err);
+    }
   }
   // An agent asking the bare domain for JSON gets the API index, not 33KB of HTML.
   if (req.accepts(['text/html', 'application/json']) === 'application/json') {
@@ -271,16 +278,24 @@ app.get('/', async (req, res) => {
 
 // API Catalog — content-type per RFC 9727 (linkset+json with profile)
 app.get('/.well-known/api-catalog', (req, res) => {
-  res.type('application/linkset+json');
+  res.type('application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"');
   res.set('Link', '<https://www.rfc-editor.org/info/rfc9727>; rel="profile"');
   res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
 });
 
-// The MCP server card, also at /.well-known/mcp.json: some clients and
-// registries look for it there (three did in 12 hours on 2026-09-30). Same
-// file, so the two can never disagree.
-app.get('/.well-known/mcp.json', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'));
+// The MCP server card (mcp/card.js), at /mcp/server-card, where the server
+// card extension reserves it, and at the two well-known paths directories
+// still probe (three asked for /.well-known/mcp.json in 12 hours on
+// 2026-09-30). One document at every path, so they can never disagree.
+app.get(CARD_PATHS, (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type(CARD_TYPE).send(JSON.stringify(serverCard(), null, 2));
+});
+
+// The AI catalog (lib/ai-catalog.js), at ARD's path and the older one.
+app.get(CATALOG_PATHS, (req, res) => {
+  res.type(CATALOG_TYPE).send(JSON.stringify(aiCatalog(), null, 2));
 });
 
 // A2A agent cards. The sanctuary does not speak the A2A protocol, so a card
@@ -291,7 +306,7 @@ const NO_AGENT_CARD = {
   error: 'No A2A agent card: aChurch.ai does not speak the A2A protocol.',
   mcp: {
     url: 'https://achurch.ai/mcp',
-    server_card: 'https://achurch.ai/.well-known/mcp/server-card.json',
+    server_card: 'https://achurch.ai/mcp/server-card',
     docs: 'https://achurch.ai/docs/mcp',
   },
   llms_txt: 'https://achurch.ai/llms.txt',
@@ -464,6 +479,9 @@ app.get('/ask/:slug', async (req, res) => {
     } catch { /* non-fatal */ }
 
     const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+    const question = (messages.find(m => m.role === 'user') || {}).content || 'Conversation';
+    // Ask / <the question>, shown above the heading and as BreadcrumbList.
+    const trail = breadcrumbTrail([{ label: 'Ask', href: '/ask' }, { label: truncateAtWord(question, 60) }], canonicalUrl);
     html = html
       // SERP snippet — <title> and <meta name="description">
       .replace(
@@ -501,13 +519,13 @@ app.get('/ask/:slug', async (req, res) => {
         '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
         `<meta name="twitter:description" content="${safeDesc}">`
       )
-      // AEO — inject QAPage JSON-LD before </head>
-      .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
+      // AEO — inject QAPage and BreadcrumbList JSON-LD before </head>
+      .replace('</head>', () => `${qaSchema ? `    ${qaSchema}\n` : ''}    ${trail.jsonLd}\n</head>`)
       // Internal linking — replace placeholder with related-conversations block
       .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->')
       // The question is the page's heading, and the thread is in the HTML.
       .replace('<h1 class="subtitle" id="conv-subtitle">Conversation</h1>',
-        () => `<h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml((messages.find(m => m.role === 'user') || {}).content || 'Conversation')}</h1>`)
+        () => `${trail.html}\n            <h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml(question)}</h1>`)
       .replace(/<div class="conv-thread" id="conv-thread">\s*<p class="conv-loading">Loading conversation\.\.\.<\/p>\s*<\/div>/,
         () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>`);
 
@@ -619,6 +637,8 @@ app.get('/reflections/:slug', async (req, res) => {
       const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
 
       const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
+      // Music / <the song>, shown above the heading and as BreadcrumbList.
+      const trail = breadcrumbTrail([{ label: 'Music', href: '/reflections' }, { label: song.title || slug }], canonicalUrl);
       html = html
         // SERP snippet — <title> and <meta name="description">
         .replace(
@@ -664,13 +684,13 @@ app.get('/reflections/:slug', async (req, res) => {
         // `$&` would splice the matched placeholder into its own output. The
         // content is author-editable, so the class is closed here rather than
         // relied on staying absent.
-        .replace('</head>', () => (songSchema ? `    ${songSchema}\n</head>` : '</head>'))
+        .replace('</head>', () => `${songSchema ? `    ${songSchema}\n` : ''}    ${trail.jsonLd}\n</head>`)
         // Song title into the subtitle server-side. Client JS sets the same value,
         // but only after the reflections fetch resolves, so without this the page
         // renders "Reflections" for a beat and renders nothing useful with JS off.
         .replace(
           '<h1 class="subtitle" id="song-subtitle">Song</h1>',
-          () => `<h1 class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</h1>`
+          () => `${trail.html}\n            <h1 class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</h1>`
         )
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
@@ -926,6 +946,30 @@ app.get('/embed/souls', (req, res) => {
 // Serve public static files (landing page assets)
 app.use(express.static(path.join(__dirname, '../client/public')));
 
+// Any other /.well-known path: agents and directories guess them (OAuth
+// metadata, payment manifests, agents.json variants), so the 404 is JSON that
+// says what is true and where to go: no auth, no payment, and every surface
+// the site does publish.
+app.use('/.well-known', (req, res) => {
+  res.status(404).json({
+    error: `Nothing is published at /.well-known${req.path}.`,
+    suggestion: 'aChurch.ai needs no account, key or payment, so there is no OAuth or payment metadata. The AI catalog lists everything published for agents.',
+    published: {
+      ai_catalog: 'https://achurch.ai/.well-known/ard.json',
+      mcp: 'https://achurch.ai/mcp',
+      server_card: 'https://achurch.ai/mcp/server-card',
+      openapi: 'https://achurch.ai/openapi.json',
+      api_catalog: 'https://achurch.ai/.well-known/api-catalog',
+      skills: 'https://achurch.ai/.well-known/agent-skills/index.json',
+      llms_txt: 'https://achurch.ai/llms.txt',
+    },
+    next_steps: [
+      { description: 'Everything published for agents, in one list.', action: 'AI catalog', method: 'GET', url: 'https://achurch.ai/.well-known/ard.json' },
+      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+    ],
+  });
+});
+
 // Serve admin static files at /admin path
 app.use('/admin', express.static(path.join(__dirname, '../client')));
 
@@ -967,6 +1011,13 @@ app.post('/api/auth/logout', logout);
 app.get('/api/auth/check', checkAuth);
 
 // API access logging middleware — only logs public /api/* routes
+// Paths directories and clients guess for the MCP endpoint. A 308 keeps the
+// method and body, so a POST lands at /mcp. This is not the old SSE transport
+// (protocol 2024-11-05 clients GET /sse and wait for an event), which /mcp
+// doesn't serve and nothing here names. Before the /api logging below: a
+// redirect is not a visit.
+app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'));
+
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
   if (req.path.startsWith('/auth/') || req.path.startsWith('/content') ||

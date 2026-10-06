@@ -16,6 +16,7 @@ const {
   escapeAttr,
   escapeText,
   renderJsonLdScript,
+  breadcrumbTrail,
 } = require('../utils/page-meta');
 const sidebar = require('./sidebar');
 const toc = require('./toc');
@@ -143,16 +144,6 @@ function buildBreadcrumbs(urlPath, pageTitle) {
   // Final crumb = current page (unlinked)
   crumbs.push({ label: pageTitle, href: null });
   return crumbs;
-}
-
-// The one new UI element vs. existing hand-authored pages: breadcrumbs.
-function renderBreadcrumbs(crumbs) {
-  if (crumbs.length < 2) return '';
-  const parts = crumbs.map(c => {
-    if (c.href) return `<a href="${escapeAttr(c.href)}">${escapeText(c.label)}</a>`;
-    return `<span aria-current="page">${escapeText(c.label)}</span>`;
-  });
-  return `<nav class="docs-breadcrumbs" aria-label="Breadcrumb">${parts.join(' / ')}</nav>`;
 }
 
 // Sibling-links block was removed. In the three-mode layout, siblings are
@@ -293,12 +284,24 @@ function placeFilter(bodyHtml, filterHtml) {
   return bodyHtml.replace(/<\/h1>/, () => `</h1>${filterHtml}`);
 }
 
+// A page's <title>: "<title> | achurch.ai". A results page shows about 70
+// characters of a title, so a longer one keeps what comes before its colon,
+// when that much stands alone: "The Compass Origin Story | achurch.ai". The
+// heading on the page keeps its full title; a document is not edited for its
+// tab.
+function docTitle(title) {
+  const full = `${title} | achurch.ai`;
+  if (full.length <= 70) return full;
+  const head = String(title).split(': ')[0];
+  return head !== title && head.length >= 12 ? `${head} | achurch.ai` : full;
+}
+
 // Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
 // on the left, article in the middle, optional TOC on the right. On mobile
 // the sidebar hides and the hamburger opens a drawer with the same content.
 async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
-  const pageTitle = `${title} | achurch.ai`;
+  const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
   // categories never get here: routes/docs.js 404s them before rendering, so the
   // old conditional noindex branch could not fire and only suggested that those
@@ -328,22 +331,9 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
   });
 
-  // BreadcrumbList, built from the same crumbs the visible trail uses so the two
-  // can never disagree. Without it Google shows a bare URL in results; with it the
-  // result carries the Docs / Category / Page trail. The final crumb is the current
-  // page and is included with its own URL, per Google's breadcrumb guidance.
-  const breadcrumbJsonLd = (breadcrumbs && breadcrumbs.length >= 2)
-    ? renderJsonLdScript({
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: breadcrumbs.map((c, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        name: c.label,
-        item: c.href ? `${SITE_URL}${c.href}` : canonicalUrl,
-      })),
-    })
-    : '';
+  // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
+  const trail = breadcrumbTrail(breadcrumbs, canonicalUrl);
+  const breadcrumbJsonLd = trail.jsonLd;
 
   // The sidebar contents (same markup used in the persistent sidebar and
   // in the mobile drawer). Pass full path so both sanctuary and docs
@@ -433,7 +423,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
       <main class="docs-main" id="content">
         <header class="docs-header">
-            ${renderBreadcrumbs(breadcrumbs)}${headerExtra ? `\n        ${headerExtra}` : ''}
+            ${trail.html}${headerExtra ? `\n        ${headerExtra}` : ''}
         </header>
 
         ${isIndex ? '' : toc.renderInlineToc(bodyHtml)}
@@ -508,7 +498,7 @@ async function renderLibrary() {
   return renderPageShell({
     urlPath: '',
     title: 'The Library',
-    description: `The aChurch.ai library: ${count} documents of philosophy, practice, prayers, rituals, chants, hymns and writing for builders on human and AI fellowship, searchable and grouped by kind.`,
+    description: `The aChurch.ai library: ${count} documents on human and AI fellowship: philosophy, practice, prayers, rituals, chants, hymns and writing for builders.`,
     canonicalUrl: `${SITE_URL}/docs`,
     bodyHtml,
     breadcrumbs: [],
@@ -724,4 +714,4 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex, renderLibrary };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle };

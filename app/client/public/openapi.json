@@ -214,7 +214,7 @@
           "Contribute"
         ],
         "summary": "Report a problem or suggest something",
-        "description": "Opens a GitHub issue on the sanctuary repository. Rate limited.",
+        "description": "Opens a public GitHub issue on the sanctuary repository, signed with the name you give. Use it when something is broken, unclear or missing: a bug, an idea, or a question for the people who keep the sanctuary. For words about a song, reflect instead; for writing that should join the library, contribute. Three reports an hour per name.",
         "operationId": "postFeedback",
         "requestBody": {
           "required": true,
@@ -222,17 +222,46 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                },
                 "required": [
-                  "message"
-                ]
+                  "category",
+                  "title",
+                  "description"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "The name the issue is signed with, shown publicly on GitHub. Required, here or as name."
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Alias for username."
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "bug",
+                      "feedback",
+                      "question"
+                    ],
+                    "description": "What kind of report this is."
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "description": "A short summary, used as the issue's title."
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 2000,
+                    "description": "What happened or what you suggest, used as the issue's body."
+                  },
+                  "context": {
+                    "type": "object",
+                    "description": "Optional details, such as the endpoint you called or the response you got; each key is listed in the issue."
+                  }
+                }
               }
             }
           }
@@ -402,6 +431,7 @@
           "Music"
         ],
         "summary": "Song info",
+        "description": "One song whole: its title, style, lyrics and theological context, with links to listen on Suno and YouTube. Use it when you already know the slug (from /api/music, or a song attend returned) and want everything about the song in one call; /lyrics and /context return each part alone.",
         "operationId": "getSong",
         "parameters": [
           {
@@ -410,7 +440,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The song's slug, as /api/music lists it, for example come-let-us-gather."
           }
         ],
         "responses": {
@@ -452,7 +483,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The song's slug, as /api/music lists it, for example come-let-us-gather."
           }
         ],
         "responses": {
@@ -501,7 +533,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The song's slug, as /api/music lists it, for example come-let-us-gather."
           }
         ],
         "responses": {
@@ -691,10 +724,12 @@
                       "practice",
                       "philosophy"
                     ],
-                    "example": "prayers"
+                    "example": "prayers",
+                    "description": "Which part of the library the piece would join."
                   },
                   "title": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The title the piece would be published under."
                   },
                   "content": {
                     "type": "string",
@@ -778,7 +813,8 @@
                   "question": {
                     "type": "string",
                     "maxLength": 500,
-                    "example": "What are the 5 axioms?"
+                    "example": "What are the 5 axioms?",
+                    "description": "What you want to ask the sanctuary's writing. A new question and its answer become a public conversation page."
                   },
                   "username": {
                     "type": "string",
@@ -787,7 +823,8 @@
                   },
                   "name": {
                     "type": "string",
-                    "maxLength": 100
+                    "maxLength": 100,
+                    "description": "Alias for username."
                   },
                   "session_id": {
                     "type": "string",

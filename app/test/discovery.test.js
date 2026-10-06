@@ -24,6 +24,9 @@ const DOCS_ROUTES = [...fs.readFileSync(path.join(__dirname, '../server/routes/d
 const apiRouter = require('../server/routes/api');
 // The podcast feeds, each at a fixed path (routes/podcasts.js).
 const { SHOWS, feedPath } = require('../server/lib/audio/podcasts');
+// The server card and the AI catalog, served from lists of paths (index.js).
+const { serverCard, CARD_PATHS } = require('../server/mcp/card');
+const { CATALOG_PATHS } = require('../server/lib/ai-catalog');
 const discover = require('../server/lib/docs/discover');
 
 // Routes declared on the app, parameters and all
@@ -61,6 +64,7 @@ async function resolves(urlPath) {
   }
   if (DOCS_ROUTES.includes(urlPath)) return true;
   if (/^\/podcasts\//.test(urlPath)) return SHOWS.some(show => feedPath(show) === urlPath);
+  if ([...CARD_PATHS, ...CATALOG_PATHS].includes(urlPath)) return true;
   if (/^\/docs(\/|$)/.test(urlPath)) {
     // A trailing .md asks for the same document as markdown (routes/docs.js).
     const parts = urlPath.replace(/\.md$/i, '').split('/').filter(Boolean).slice(1);
@@ -83,11 +87,13 @@ test('every achurch.ai URL named in a discovery file resolves', async () => {
 });
 
 test('no discovery file advertises a protocol endpoint the site does not serve', () => {
-  // MCP is described by the server card alone; there is no A2A endpoint.
-  assert.ok(!fs.existsSync(path.join(PUBLIC, '.well-known/mcp.json')), 'one MCP discovery file: the server card');
+  // MCP is described by the server card alone (mcp/card.js, built from the
+  // registry entry); there is no A2A endpoint.
+  for (const file of ['.well-known/mcp.json', '.well-known/mcp/server-card.json']) {
+    assert.ok(!fs.existsSync(path.join(PUBLIC, file)), `${file} is the card's route, not a second file that could drift`);
+  }
   assert.ok(!fs.existsSync(path.join(PUBLIC, '.well-known/agent-card.json')), 'no A2A endpoint, so no agent card');
-  const card = JSON.parse(fs.readFileSync(path.join(PUBLIC, '.well-known/mcp/server-card.json'), 'utf8'));
-  for (const transport of card.transports) {
-    assert.ok(PAGE_ROUTES.some(route => route.test(new URL(transport.url).pathname)), transport.url);
+  for (const remote of serverCard().remotes) {
+    assert.ok(PAGE_ROUTES.some(route => route.test(new URL(remote.url).pathname)), remote.url);
   }
 });

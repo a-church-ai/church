@@ -118,12 +118,14 @@
           var data = await res.json();
           sessionId = data.session_id;
 
-          // <title>, meta, OG tags, the <h1> and the thread are rendered on the
-          // server (page-meta.js + the /ask/:slug handler). Don't overwrite them.
+          // The title, meta and OG tags, the heading and the thread are rendered
+          // on the server (page-meta.js + the /ask/:slug handler). Don't
+          // overwrite them.
           var firstQ = data.messages.find(function(m) { return m.role === 'user'; });
 
-          // The server renders the thread and puts the question in the <h1>;
-          // render here only if it did not (for example, a cached old page).
+          // The server renders the thread and puts the question in the page's
+          // heading; render here only if it did not (for example, a cached old
+          // page).
           if (!thread.getAttribute('data-rendered')) renderMessages(data.messages);
 
           // Init share bar with first question

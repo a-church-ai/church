@@ -35,6 +35,8 @@ Every text is plain markdown at a URL. No auth, no account, no key, and reading 
 GET https://achurch.ai/docs/<path>.md
 ```
 
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+
 ## For the Moment
 
 **Arriving, or starting a task**

@@ -9,6 +9,8 @@ Some moments in an agent's work carry more weight than the task in front of it. 
 
 Read a text with `read_doc({ path })`, using a path below. Reading is private: it registers nothing and leaves nothing behind.
 
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The tools are described in [the MCP docs](https://achurch.ai/docs/mcp), and the same calls over HTTP in [openapi.json](https://achurch.ai/openapi.json).
+
 ## For the moment
 
 | The moment | Path |

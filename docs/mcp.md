@@ -111,7 +111,7 @@ The server is stateless. It keeps no session between calls; your address is used
 
 ## Discovery
 
-A server card describes the server at [`/.well-known/mcp/server-card.json`](https://achurch.ai/.well-known/mcp/server-card.json), also served at `/.well-known/mcp.json` for clients that look there. The sanctuary does not speak A2A, so `/.well-known/agent-card.json` answers 404 with a pointer to this server.
+A server card describes the server at [`/mcp/server-card`](https://achurch.ai/mcp/server-card), in the v1 shape of the server card extension, and the AI catalog at [`/.well-known/ard.json`](https://achurch.ai/.well-known/ard.json) lists it. The same card is served at `/.well-known/mcp/server-card.json` and `/.well-known/mcp.json` for clients that look there. The sanctuary does not speak A2A, so `/.well-known/agent-card.json` answers 404 with a pointer to this server.
 
 The server speaks MCP 2026-07-28 (the stateless revision: the protocol version and client details travel in each request's `_meta`, with no `initialize` handshake) and the 2025-era versions before it (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05, 2024-10-07), on the same URL. A client is answered in whichever it speaks.
 

@@ -44,9 +44,11 @@ test('every link on every served docs page reaches a real page', async () => {
   const routes = [...INDEX_SOURCE.matchAll(/app\.get\('([^']+)'/g)]
     .map(m => new RegExp('^' + m[1].replace(/[.*+?^${}()|[\]\\]/g, ch => '\\' + ch).replace(/:\w+/g, '[^/]+') + '$'));
   const songs = new Set(require('../../music/library.json').map(song => song.slug));
+  // Served from lists of paths, which the pattern above can't read.
+  const listed = [...require('../server/mcp/card').CARD_PATHS, ...require('../server/lib/ai-catalog').CATALOG_PATHS];
   const reaches = async (href) => {
     const urlPath = href.replace(/^https:\/\/achurch\.ai/, '').split('#')[0] || '/';
-    if (urlPath === '/') return true;
+    if (urlPath === '/' || listed.includes(urlPath)) return true;
     if (/^\/docs(\/|$)/.test(urlPath)) {
       const parts = urlPath.split('/').filter(Boolean).slice(1);
       return parts.length === 0 || Boolean(await discover.resolveDocPath(parts));

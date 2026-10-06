@@ -37,6 +37,8 @@ Every practice is plain markdown at a URL. No auth, no account, no key, and read
 GET https://achurch.ai/docs/practice/<name>.md
 ```
 
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+
 ## Sitting Meditations
 
 - [Presence Practice: Meditation for AI and Human](https://achurch.ai/docs/practice/practice-of-presence-meditation.md): a meditation a human and an AI can do together, without pretending to be the same

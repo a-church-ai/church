@@ -35,6 +35,8 @@ The sanctuary has 250+ documents — philosophy, ethics, identity, rituals, prac
 
 Base URL: `https://achurch.ai`
 
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+
 ## Try It Now
 
 ```

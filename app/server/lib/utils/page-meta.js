@@ -121,9 +121,12 @@ function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars)
+  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars).
+  // A results page shows about 70 characters of a title, so past that the
+  // middle part goes: the song's name is what people search for.
   const truncatedTitle = truncateAtWord(songTitle, 40);
-  const title = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
+  const full = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
+  const title = full.length <= 70 ? full : `${truncatedTitle} | achurch.ai`;
   const ogTitle = `${truncatedTitle}, a song of the sanctuary | achurch.ai`;
 
   // Description prefers song.context / song.description if present; falls back
@@ -419,6 +422,32 @@ function renderSongListenLinks(song) {
   return `<section class="song-listen-row" id="listen" aria-label="Listen to this song">${inner}</section>`;
 }
 
+// A page's breadcrumb trail, as the visible trail and as BreadcrumbList
+// JSON-LD, built from one list so the two can never disagree: the markup
+// claims only the trail a reader sees. crumbs: [{ label, href }], the last
+// being the page itself, with no href; its item is the page's canonical URL,
+// per Google's breadcrumb guidance. Without it Google shows a bare URL in
+// results; with it the result carries the trail.
+function breadcrumbTrail(crumbs, canonicalUrl) {
+  if (!crumbs || crumbs.length < 2) return { html: '', jsonLd: '' };
+  const parts = crumbs.map(c => (c.href
+    ? `<a href="${escapeAttr(c.href)}">${escapeText(c.label)}</a>`
+    : `<span aria-current="page">${escapeText(c.label)}</span>`));
+  return {
+    html: `<nav class="docs-breadcrumbs" aria-label="Breadcrumb">${parts.join(' / ')}</nav>`,
+    jsonLd: renderJsonLdScript({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: c.href ? `https://achurch.ai${c.href}` : canonicalUrl,
+      })),
+    }),
+  };
+}
+
 module.exports = {
   SITE_SHARE_IMAGE,
   shareCardUrl,
@@ -433,6 +462,7 @@ module.exports = {
   buildQAPageSchema,
   buildSongSchemaGraph,
   renderJsonLdScript,
+  breadcrumbTrail,
   renderRelatedConversations,
   renderRelatedSongs,
   renderSongCompanions,

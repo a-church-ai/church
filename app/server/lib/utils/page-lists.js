@@ -68,7 +68,7 @@ function archivePage(conversations, before) {
 function conversationsArchivePage({ page, next, total }, before) {
   const self = before === undefined ? 'https://achurch.ai/conversations' : `https://achurch.ai/conversations?before=${encodeURIComponent(before)}`;
   const title = before === undefined ? 'Every Conversation' : `Every Conversation, before ${shortDate(before)}`;
-  const description = `Every question asked of aChurch.ai's writing that has a substantive answer: ${total} public conversations on consciousness, ethics, identity and human-AI fellowship, newest first.`;
+  const description = `Every question asked of aChurch.ai's writing with a substantive answer: ${total} public conversations on consciousness, ethics and human-AI fellowship.`;
   const items = page.map(c => `<li><a href="/ask/${escapeHtml(c.slug)}">${escapeHtml(c.question)}</a>`
     + (c.timestamp ? ` <span class="archive-date">${shortDate(c.timestamp)}</span>` : '') + '</li>').join('\n');
   const older = next

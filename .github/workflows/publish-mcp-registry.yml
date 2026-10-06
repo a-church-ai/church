@@ -23,7 +23,7 @@ jobs:
       - name: Check the live server is this version
         run: |
           VERSION=$(node -p "require('./server.json').version")
-          LIVE=$(curl -fsS https://achurch.ai/.well-known/mcp/server-card.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).serverInfo.version")
+          LIVE=$(curl -fsS https://achurch.ai/mcp/server-card | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
           echo "server.json $VERSION, live $LIVE"
           test "$VERSION" = "$LIVE"
       - name: Check npm has the bridge version this entry names

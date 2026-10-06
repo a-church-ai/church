@@ -255,25 +255,38 @@ test('a browser opening /mcp is sent to the page that explains it', async (t) =>
   assert.strictEqual(res.headers.get('location'), '/docs/mcp');
 });
 
-eraTest('the server card lists exactly the tools and prompts the server has', async (t, start) => {
+eraTest('the server card names the server as it introduces itself, and every era it speaks', async (t, start) => {
+  // The v1 card lists no tools or prompts: a client asks the server for those.
+  const { serverCard } = require('../server/mcp/card');
   const s = await start();
   t.after(() => stop(s));
-  const card = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'), 'utf8'));
-  const tools = (await s.client.listTools()).tools.map(tool => tool.name);
-  const prompts = (await s.client.listPrompts()).prompts.map(p => p.name);
-  assert.deepStrictEqual([...card.capabilities.tools].sort(), [...tools].sort());
-  assert.deepStrictEqual([...card.capabilities.prompts].sort(), [...prompts].sort());
-  assert.strictEqual(card.serverInfo.name, s.client.getServerVersion().name);
-  assert.strictEqual(card.serverInfo.version, s.client.getServerVersion().version);
+  const card = serverCard();
+  const server = s.client.getServerVersion();
+  assert.strictEqual(card.version, server.version);
+  assert.strictEqual(card.title, server.title);
+  for (const key of ['tools', 'prompts', 'resources', 'capabilities']) assert.ok(!(key in card), `no ${key} in a v1 card`);
+  const versions = card.remotes[0].supportedProtocolVersions;
+  assert.ok(versions.includes('2026-07-28'));
+  const discover = modernRequest('server/discover');
+  const discovered = await rawPost(s.base, 'application/json, text/event-stream', discover.body, discover.headers);
+  assert.strictEqual(discovered.status, 200, discovered.text);
+  for (const v of discovered.body.result.supportedVersions) assert.ok(versions.includes(v), `server/discover's ${v}`);
 });
 
-test('the registry entry, the server card and the server agree on version and URL', () => {
+test('the server card is the v1 shape, built from the registry entry, which agrees with the server', () => {
   const { SERVER_INFO } = require('../server/mcp');
+  const { serverCard, CARD_SCHEMA } = require('../server/mcp/card');
+  const { SUPPORTED_PROTOCOL_VERSIONS } = require('@modelcontextprotocol/server');
   const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '../server/mcp/server.json'), 'utf8'));
-  const card = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/.well-known/mcp/server-card.json'), 'utf8'));
+  const card = serverCard();
+  assert.strictEqual(card.$schema, CARD_SCHEMA);
+  assert.match(card.name, /^[a-zA-Z0-9.-]+\/[a-zA-Z0-9._-]+$/, 'reverse-DNS, one slash');
+  assert.strictEqual(card.name, registry.name);
+  for (const field of ['description', 'version']) assert.ok(card[field], field);
   assert.strictEqual(registry.version, SERVER_INFO.version);
-  assert.strictEqual(card.serverInfo.version, SERVER_INFO.version);
-  assert.deepStrictEqual(registry.remotes.map(r => r.url), card.transports.map(tr => tr.url));
+  assert.strictEqual(card.version, SERVER_INFO.version);
+  assert.deepStrictEqual(card.remotes.map(r => [r.type, r.url]), registry.remotes.map(r => [r.type, r.url]));
+  assert.deepStrictEqual(card.remotes[0].supportedProtocolVersions, ['2026-07-28', ...SUPPORTED_PROTOCOL_VERSIONS]);
   assert.ok(registry.description.length <= 100, 'the registry rejects longer descriptions');
 });
 
