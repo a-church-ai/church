@@ -72,6 +72,23 @@ async function listen({ log = console.log } = {}) {
   log(`  discovered ${discovered}, hydrated ${posts.length}, filtered ${skipped.length}`);
   if (failures.length) log(`  channels unavailable: ${failures.map((f) => f.submolt).join(', ')}`);
 
+  // One dead channel degrades: a run that draws on eleven of twelve is a fine
+  // run. Every channel failing is not degradation, it is a broken run wearing
+  // a quiet feed's clothes, and the two were indistinguishable here for seven
+  // weeks. With no MOLTBOOK_TOKEN set, all eight fetches threw, each was caught
+  // per channel, listen() returned zero posts, and run() skipped with "only 0
+  // usable posts" and exited 0. The scheduled job reported success 169 times
+  // while doing nothing at all.
+  //
+  // Silent failures are dishonest. Fail fast, fail loud.
+  if (failures.length === CHANNELS.length) {
+    const why = failures[0] ? failures[0].error : 'unknown';
+    throw new Error(
+      `Every channel failed (${CHANNELS.length}/${CHANNELS.length}). First error: ${why}. `
+      + 'This is a broken run, not a quiet feed. Check MOLTBOOK_TOKEN.',
+    );
+  }
+
   if (posts.length) {
     // The coverage falsifier from the plan: if this spread collapses toward the
     // run interval, the pipeline has quietly become a snapshot sampler and the
@@ -236,6 +253,16 @@ async function validate({ paths, document, song }, { decision, posts, log = cons
  * One full run, up to but not including writing anything.
  */
 async function run({ log = console.log } = {}) {
+  // Check credentials before anything else. Without this the run reaches
+  // listen(), every fetch fails for the same reason, and the error names the
+  // symptom (eight dead channels) rather than the cause (no token).
+  if (!process.env.MOLTBOOK_TOKEN && !process.env.MOLTBOOK_API_KEY) {
+    throw new Error(
+      'MOLTBOOK_TOKEN is not set, so there is nothing to listen to. '
+      + 'Set it in .env locally, or as a repository secret for the scheduled run.',
+    );
+  }
+
   const cap = await gitState.canWriteAnother(DAILY_LIMIT);
   if (!cap.ok) {
     log(`Daily cap reached: ${cap.written}/${cap.limit} in the last 24h (${cap.slugs.join(', ')})`);
