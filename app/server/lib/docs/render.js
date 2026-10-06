@@ -32,6 +32,7 @@ const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderRecording, renderPathListen, trackFor } = require('../audio/markup');
+const { showForSection, feedPath } = require('../audio/podcasts');
 const { assetUrl, playerHead } = require('../utils/assets');
 
 
@@ -306,6 +307,9 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // Every docs page but the root has its own share card (lib/og-cards.js),
   // drawn from this page's title and section; the root uses the site image.
   const shareImage = urlPath ? docsCard(urlPath, title) : SITE_SHARE_IMAGE;
+  // A section with a podcast (lib/audio/podcasts.js) names its feed, so an
+  // app given the page's address can find the show.
+  const show = urlPath ? showForSection(urlPath.split('/')[0]) : null;
 
   // A section's index lists documents, so it is a CollectionPage, not an
   // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
@@ -382,7 +386,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="description" content="${escapeAttr(description)}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="canonical" href="${escapeAttr(canonicalUrl)}">
-    <meta name="robots" content="${escapeAttr(robots)}">
+    <meta name="robots" content="${escapeAttr(robots)}">${show ? `
+    <link rel="alternate" type="application/rss+xml" title="${escapeAttr(show.title)}" href="${feedPath(show)}">` : ''}
 
     <!-- Family-standard head elements, per docs/reference/seo-conventions.md.
          The docs shell shipped without these, so all 254 generated pages were

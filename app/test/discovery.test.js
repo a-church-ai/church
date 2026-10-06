@@ -22,6 +22,8 @@ const MCP_SOURCE = fs.readFileSync(path.join(__dirname, '../server/mcp/index.js'
 const DOCS_ROUTES = [...fs.readFileSync(path.join(__dirname, '../server/routes/docs.js'), 'utf8').matchAll(/router\.get\('(\/[^'*:]+)'/g)]
   .map(m => `/docs${m[1]}`);
 const apiRouter = require('../server/routes/api');
+// The podcast feeds, each at a fixed path (routes/podcasts.js).
+const { SHOWS, feedPath } = require('../server/lib/audio/podcasts');
 const discover = require('../server/lib/docs/discover');
 
 // Routes declared on the app, parameters and all
@@ -58,6 +60,7 @@ async function resolves(urlPath) {
     return apiRouter.stack.some(layer => layer.route && layer.match(sub));
   }
   if (DOCS_ROUTES.includes(urlPath)) return true;
+  if (/^\/podcasts\//.test(urlPath)) return SHOWS.some(show => feedPath(show) === urlPath);
   if (/^\/docs(\/|$)/.test(urlPath)) {
     // A trailing .md asks for the same document as markdown (routes/docs.js).
     const parts = urlPath.replace(/\.md$/i, '').split('/').filter(Boolean).slice(1);

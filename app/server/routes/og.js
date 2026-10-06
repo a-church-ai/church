@@ -13,7 +13,7 @@
  */
 
 const express = require('express');
-const { resolveCard, cardPng, squarePng } = require('../lib/og-cards');
+const { resolveCard, cardPng, squarePng, podcastCoverPng } = require('../lib/og-cards');
 const { sendNotFound } = require('../lib/utils/not-found');
 
 const router = express.Router();
@@ -22,6 +22,13 @@ const router = express.Router();
 // per voiced section.
 router.get(/^\/v1\/square\/([a-z]+)\.png$/, (req, res) => {
   const png = squarePng(req.params[0]);
+  if (!png) return sendNotFound(req, res);
+  res.type('image/png').send(png);
+});
+
+// A podcast's 3000px cover, one per show (lib/audio/podcasts.js).
+router.get(/^\/v1\/podcast\/([a-z-]+)\.png$/, (req, res) => {
+  const png = podcastCoverPng(req.params[0]);
   if (!png) return sendNotFound(req, res);
   res.type('image/png').send(png);
 });

@@ -294,15 +294,23 @@ async function recordPiece(piece, stats) {
   const checks = jobs.map(j => readJSON(checkFile(j.key)));
   const wrong = checks.filter(c => !takePasses(c));
   stats.wrong.push(...wrong.map(c => ({ source, ...c })));
+  const now = new Date();
+  const previous = loadManifest()[source];
   await saveRecording(source, {
     file,
     seconds: Math.round(seconds * 10) / 10,
+    // The enclosure length in the podcast feeds, which apps size their
+    // download by, so it is the file's own size and never an estimate.
+    bytes: fs.statSync(path.join(CACHE_DIR, file)).size,
     voices: voicesIn(takes, script.pair),
     model: SPEECH.model,
     sourceHash: piece.sourceHash,
     renderKey: piece.renderKey,
     characters: jobs.reduce((n, j) => n + j.text.length, 0),
-    rendered: new Date().toISOString().slice(0, 10),
+    // When the piece first went out. A re-render keeps it, so its podcast
+    // episode keeps its date rather than coming back as new.
+    published: previous ? previous.published : now.toISOString(),
+    rendered: now.toISOString().slice(0, 10),
     heard: {
       words: checks.reduce((n, c) => n + c.words, 0),
       errors: checks.reduce((n, c) => n + c.errors, 0),

@@ -39,6 +39,7 @@ Every conversation, song and docs page has its own share card: a 1200×630 PNG d
 - **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
 - **A card exists only for a page that exists.** It resolves through the page's own loader, and 404s wherever the page would. Nothing is ever drawn from the request.
 - **Changing the design means changing the version** (`/og/v1/` → `/og/v2/`): platforms cache share images for weeks, and a new URL is the only reliable way to make them fetch the new card.
+- **The same route draws two squares that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), and each podcast's 3000px cover (`/og/v1/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork). The version rule holds for both, most strictly for the covers: Spotify keeps a show's artwork by its URL, so a redesigned cover must ship at a new version or it is never fetched.
 - **Check a card** with `curl -sI https://achurch.ai/og/v1/ask/<slug>.png` (200, `image/png`, a week's cache), then the Facebook Sharing Debugger or LinkedIn Post Inspector.
 
 ## Schema choices (when to use which JSON-LD type)

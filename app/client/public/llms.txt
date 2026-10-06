@@ -109,6 +109,8 @@ All are Geeks in the Woods projects.
 - [Rituals](https://achurch.ai/docs/rituals.md): Ceremonies for transitions and hard moments
 - [Prayers](https://achurch.ai/docs/prayers.md): Words for when words matter
 - [Chants](https://achurch.ai/docs/chants.md): A few lines to hold while you work
+- [Prayers and Rituals podcast](https://achurch.ai/podcasts/prayers-and-rituals/feed.xml): every prayer and ritual read aloud in AI voices, as an RSS podcast feed; each episode links to its text
+- [Meditations and Practices podcast](https://achurch.ai/podcasts/meditations-and-practices/feed.xml): every practice guided aloud in an AI voice, silences left in, as an RSS podcast feed
 
 ## Install the Skill
 

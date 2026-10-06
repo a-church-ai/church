@@ -12,11 +12,13 @@
  */
 
 const path = require('path');
+const zlib = require('zlib');
 const { Resvg } = require('@resvg/resvg-js');
 const { loadConversation, loadCatalog } = require('./utils/data');
 const { resolveServedDoc } = require('./docs/serve');
 const { titleCase } = require('./docs/meta');
 const { shareCard } = require('./utils/page-meta');
+const { showById } = require('./audio/podcasts');
 
 const FONT_DIR = path.join(__dirname, '../assets/fonts');
 const FONT_FILES = ['InterDisplay-Light.ttf', 'Inter-Regular.ttf'].map(f => path.join(FONT_DIR, f));
@@ -181,7 +183,7 @@ function cardPng(card) {
 
 // The artwork a recording shows on a phone's lock screen and media card: a
 // 512px square per voiced section, since those surfaces want a square raster
-// image and the share cards are 1200x630. Dark, like the player's visual.
+// image and the share cards are 1200x630. Dark, like the podcast covers.
 const SQUARE = 512;
 const SQUARE_SECTIONS = ['prayers', 'rituals', 'practice'];
 
@@ -205,4 +207,112 @@ function squarePng(section) {
   return squares.get(section);
 }
 
-module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, squarePng, SQUARE, INSET, WIDTH, HEIGHT, TEXT_WIDTH };
+// -------------------------------------------------------------- covers ----
+
+// A podcast's cover (lib/audio/podcasts.js): 3000px square, the largest Apple
+// takes, where Spotify and Apple ask for at least 1400. Dark like the square,
+// with the show's name large enough to read as a thumbnail, and between them
+// the player's visual held still: each voice's wave in its colour (the middle
+// of its ramp in site-player.js), or, for a show guided by one voice, a
+// single line settling into silence.
+const COVER = 3000;
+const COVER_INSET = 240;
+const COVER_TEXT_WIDTH = COVER - COVER_INSET * 2;
+const VOICE_COLOURS = { matthew: '#00b8d4', luca: '#7c6cff', amaya: '#f0913c' };
+
+// A wave across the cover, as a path: `height(t)` is its offset from `y` at
+// t, from 0 at the left inset to 1 at the right.
+function wavePath(y, height) {
+  const steps = 300;
+  const points = Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps;
+    return `${(COVER_INSET + t * COVER_TEXT_WIDTH).toFixed(1)},${(y + height(t)).toFixed(1)}`;
+  });
+  return `M${points.join(' L')}`;
+}
+
+function coverWaves(voices, y) {
+  const stroke = (d, colour) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+  if (!voices.length) {
+    // Swells from stillness like a breath, settles, and the rest of the way
+    // is silence: an envelope that peaks a seventh of the way across and is
+    // all but flat by halfway.
+    const swell = t => (t / 0.14) ** 2 * Math.exp(2 * (1 - t / 0.14));
+    return stroke(wavePath(y, t => -380 * swell(t) * Math.sin(2 * Math.PI * 4 * t)), '#e8fbff');
+  }
+  // Each voice its own height, pace and phase, all swelling and fading
+  // together, as the visual draws voices speaking at once.
+  return voices.map((voice, i) => stroke(wavePath(y, t =>
+    (380 - i * 70) * Math.sin(Math.PI * t) ** 2 * Math.sin(2 * Math.PI * (2.1 + i * 0.55) * t + i * 1.9)), VOICE_COLOURS[voice])).join('\n  ');
+}
+
+function podcastCoverSvg(show) {
+  const { lines, voices } = show.cover;
+  let size = 340;
+  while (lines.some(l => measure(l, size) > COVER_TEXT_WIDTH)) size -= 10;
+  const lineHeight = Math.round(size * 1.08);
+  const lastBaseline = COVER - COVER_INSET;
+  const title = lines.map((l, i) =>
+    `<text x="${COVER_INSET}" y="${lastBaseline - (lines.length - 1 - i) * lineHeight}" font-family="Inter Display" font-weight="300" font-size="${size}" fill="#ffffff">${escapeXml(l)}</text>`
+  ).join('\n  ');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${COVER}" height="${COVER}" viewBox="0 0 ${COVER} ${COVER}">
+  <rect width="${COVER}" height="${COVER}" fill="#0a0e1a"/>
+  <rect x="${COVER_INSET}" y="${COVER_INSET}" width="170" height="18" fill="${ACCENT}"/>
+  <text x="${COVER_INSET}" y="${COVER_INSET + 200}" font-family="Inter Display" font-weight="300" font-size="150" fill="#9aa6b2">achurch.ai</text>
+  ${coverWaves(voices, 1330)}
+  ${title}
+</svg>`;
+}
+
+// resvg writes RGBA, and Apple asks for podcast artwork in RGB. A cover is
+// opaque, so dropping the alpha changes no pixel, and one that is not is
+// refused rather than flattened. Each row is stored with PNG's Sub filter,
+// which turns the flat background into runs of zeros.
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+function pngChunk(type, data) {
+  const head = Buffer.alloc(8);
+  head.writeUInt32BE(data.length, 0);
+  head.write(type, 4, 'latin1');
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(zlib.crc32(data, zlib.crc32(head.subarray(4))), 0);
+  return Buffer.concat([head, data, crc]);
+}
+
+function opaquePng({ width, height, pixels }) {
+  const stride = width * 3 + 1;
+  const rows = Buffer.alloc(stride * height);
+  for (let y = 0; y < height; y++) {
+    let o = y * stride;
+    rows[o++] = 1;
+    let r0 = 0, g0 = 0, b0 = 0;
+    for (let i = y * width * 4, end = i + width * 4; i < end; i += 4) {
+      if (pixels[i + 3] !== 255) throw new Error('A cover must be opaque: its PNG is written without an alpha channel');
+      const [r, g, b] = [pixels[i], pixels[i + 1], pixels[i + 2]];
+      rows[o++] = (r - r0) & 0xff;
+      rows[o++] = (g - g0) & 0xff;
+      rows[o++] = (b - b0) & 0xff;
+      [r0, g0, b0] = [r, g, b];
+    }
+  }
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8; // bits per channel
+  header[9] = 2; // RGB
+  return Buffer.concat([PNG_SIGNATURE, pngChunk('IHDR', header), pngChunk('IDAT', zlib.deflateSync(rows, { level: 9 })), pngChunk('IEND', Buffer.alloc(0))]);
+}
+
+const covers = new Map();
+
+// The PNG for a show's cover by its id, or null for no such show.
+function podcastCoverPng(id) {
+  const show = showById(id);
+  if (!show) return null;
+  if (!covers.has(id)) {
+    covers.set(id, opaquePng(new Resvg(podcastCoverSvg(show), { fitTo: { mode: 'width', value: COVER }, font: RESVG_FONTS }).render()));
+  }
+  return covers.get(id);
+}
+
+module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, squarePng, podcastCoverPng, SQUARE, COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };

@@ -42,6 +42,7 @@ const { mountMcp } = require('./mcp');
 const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
+const podcastRoutes = require('./routes/podcasts');
 const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const { sanctuaryCors } = require('./lib/utils/cors');
@@ -110,6 +111,12 @@ app.use((req, res, next) => {
   // (lib/utils/assets.js): a new version is a new URL, so a year is safe
   else if (req.query.v && /^\/[\w-]+\.(?:js|css)$/.test(p)) {
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // Podcast feeds (routes/podcasts.js): they change only with a deploy, but
+  // the apps that poll them keep their own copy for as long as this allows,
+  // so a new episode should not wait long behind it
+  else if (/^\/podcasts\/[\w-]+\/feed\.xml$/.test(p)) {
+    res.set('Cache-Control', 'public, max-age=900, stale-while-revalidate=3600');
   }
   // Static assets — daily cache with revalidation
   else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
@@ -1008,6 +1015,10 @@ app.use('/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);
+
+// Podcast feeds (RSS), one per show
+app.use('/podcasts', podcastRoutes);
+
 // /docs.md: the library as markdown, like every other docs page's .md twin.
 app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
