@@ -9,6 +9,14 @@
  * Luca's "Wants:" as "Once" in four takes of six; whisper-1 heard "Wants" in
  * all six. A retake costs speech characters from a shared quota, and a
  * second opinion costs a fraction of a cent.
+ *
+ * A rare phrase can pull both toward a common one. On 2026-10-06 both heard
+ * the title "Chant of the Named Guess." as "Named Guests" (once "Guest") in
+ * three takes of three, while the same voice's "Write your guess." was heard
+ * right. Cut free of its title, the last word was heard as "Guess", and the
+ * take ends in one unbroken /s/ with no stop for a t: the takes were right.
+ * A miss that repeats on one rare phrase is worth hearing alone before a
+ * retake is spent.
  */
 
 const MODEL = 'gpt-4o-mini-transcribe';
