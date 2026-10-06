@@ -98,13 +98,15 @@ async function writeLocked(filepath, json) {
  *   });
  *
  * `mutate` may return the object or mutate it in place; both work. It may be
- * async. Returns whatever was written.
+ * async. Returns whatever was written. `serialize` turns it into the file's
+ * text, for a file committed to git that should diff cleanly
+ * (audio/manifest.json keeps number arrays on one line).
  */
-async function readModifyWriteJSON(filepath, defaultValue, mutate) {
+async function readModifyWriteJSON(filepath, defaultValue, mutate, serialize = data => JSON.stringify(data, null, 2)) {
   return withLock(filepath, async () => {
     const current = await readUnlocked(filepath, defaultValue);
     const next = (await mutate(current)) ?? current;
-    await writeLocked(filepath, JSON.stringify(next, null, 2));
+    await writeLocked(filepath, serialize(next));
     return next;
   });
 }

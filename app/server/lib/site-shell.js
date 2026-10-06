@@ -36,6 +36,7 @@
 const fs = require('fs').promises;
 const sidebar = require('./docs/sidebar');
 const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
+const { assetUrl, versionAssets, playerHead } = require('./utils/assets');
 
 const SITE_URL = 'https://achurch.ai';
 
@@ -219,8 +220,9 @@ async function wrapPageFromHtml(html, currentPath) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    ${parts.head}
+    ${versionAssets(parts.head)}
     ${fallbacks.join('\n    ')}
+    ${playerHead()}
 </head>
 <body class="docs-body site-shell-body ${parts.bodyClass}">
 <a class="skip-link" href="#content">Skip to content</a>
@@ -237,12 +239,12 @@ async function wrapPageFromHtml(html, currentPath) {
       </aside>
 
       <div class="docs-main sanctuary-main" id="content">
-        ${parts.bodyHtml.replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
+        ${versionAssets(parts.bodyHtml).replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
       </div>
 
     </div>
 
-    <script src="/docs-nav.js" defer></script>
+    <script src="${assetUrl('docs-nav.js')}" defer></script>
 </body>
 </html>`;
 }

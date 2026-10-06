@@ -4,7 +4,7 @@ Spoken recordings of the sanctuary's prayers, rituals and practices, played on e
 
 - `house-sound.json`: the cast, three voices from the ElevenLabs voice library, with the speech model and how lines are spaced and leveled.
 - `scripts/`: each document adapted for the ear, one JSON file per document. Every line names a role, not a voice. A line not marked `adapted` is the document's own words, and that is checked in code. A `hold` is a silence, in seconds.
-- `manifest.json`: every published recording, with its file, length and voices, and the hashes that say whether it is current.
+- `manifest.json`: every published recording, with its file, length and voices, the hashes that say whether it is current, and what its player draws: 128 waveform peaks, the file of the visual's frames (a `.bin` beside the recording in S3), and cues saying which voices speak when.
 
 The voices are AI voices, and every player says so.
 

@@ -106,6 +106,11 @@ app.use((req, res, next) => {
   else if (p.startsWith('/og/')) {
     res.set('Cache-Control', 'public, max-age=604800');
   }
+  // The site's own scripts and stylesheet, asked for by version
+  // (lib/utils/assets.js): a new version is a new URL, so a year is safe
+  else if (req.query.v && /^\/[\w-]+\.(?:js|css)$/.test(p)) {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
   // Static assets — daily cache with revalidation
   else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');

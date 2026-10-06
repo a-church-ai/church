@@ -53,28 +53,70 @@ async function seconds(file) {
   return Number(stdout.trim());
 }
 
-// parts: [{ clips: [{ file, gainDb }] } | { silence: seconds }], in order.
-// Writes outFile and returns its length in seconds.
-async function assemble(parts, workDir, outFile) {
+// A WAV's length from its own header: the data chunk's size over mono 16-bit
+// at 44.1 kHz. FFmpeg writes a LIST chunk first, so the chunks are walked
+// rather than assuming the 44-byte header.
+function wavSeconds(file) {
+  const fd = fs.openSync(file, 'r');
+  try {
+    const head = Buffer.alloc(4096);
+    const read = fs.readSync(fd, head, 0, head.length, 0);
+    for (let at = 12; at + 8 <= read;) {
+      const id = head.toString('ascii', at, at + 4);
+      const size = head.readUInt32LE(at + 4);
+      if (id === 'data') return size / 2 / 44100;
+      at += 8 + size + (size % 2);
+    }
+    throw new Error(`No data chunk in ${file}`);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+// Each part as a WAV, in order, and when each starts and ends. The timeline is
+// exact: it is what the concatenation joins, before loudness normalization,
+// which changes levels and not lengths.
+async function buildParts(parts, workDir) {
   await fs.promises.rm(workDir, { recursive: true, force: true });
   await fs.promises.mkdir(workDir, { recursive: true });
   const list = [];
+  const timeline = [];
   const silences = new Map();
+  let at = 0;
   for (const [i, part] of parts.entries()) {
+    let file;
     if ('silence' in part) {
       const ms = Math.round(part.silence * 1000);
       if (!silences.has(ms)) {
-        const file = path.join(workDir, `silence-${ms}.wav`);
-        await silenceWav(ms / 1000, file);
-        silences.set(ms, file);
+        const made = path.join(workDir, `silence-${ms}.wav`);
+        await silenceWav(ms / 1000, made);
+        silences.set(ms, made);
       }
-      list.push(silences.get(ms));
+      file = silences.get(ms);
     } else {
-      const file = path.join(workDir, `line-${String(i).padStart(4, '0')}.wav`);
+      file = path.join(workDir, `line-${String(i).padStart(4, '0')}.wav`);
       await lineWav(part.clips, file);
-      list.push(file);
     }
+    const length = wavSeconds(file);
+    timeline.push({ start: at, end: at + length });
+    at += length;
+    list.push(file);
   }
+  return { list, timeline };
+}
+
+// When each part starts and ends, without making the recording: for timings
+// of a recording made before assemble() returned them.
+async function measure(parts, workDir) {
+  const { timeline } = await buildParts(parts, workDir);
+  await fs.promises.rm(workDir, { recursive: true, force: true });
+  return timeline;
+}
+
+// parts: [{ clips: [{ file, gainDb }] } | { silence: seconds }], in order.
+// Writes outFile and returns its length in seconds and each part's timing.
+async function assemble(parts, workDir, outFile) {
+  const { list, timeline } = await buildParts(parts, workDir);
   const listFile = path.join(workDir, 'list.txt');
   await fs.promises.writeFile(listFile, list.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'));
   const joined = path.join(workDir, 'joined.wav');
@@ -97,7 +139,7 @@ async function assemble(parts, workDir, outFile) {
   if (peak > CLIP_DB) {
     throw new Error(`${path.basename(outFile)} peaks at ${peak.toFixed(2)} dBFS once encoded, over ${CLIP_DB}. Raise the bitrate or lower the true-peak target in audio/house-sound.json.`);
   }
-  return seconds(outFile);
+  return { seconds: await seconds(outFile), timeline };
 }
 
-module.exports = { assemble };
+module.exports = { assemble, measure };

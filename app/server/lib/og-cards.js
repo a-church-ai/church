@@ -177,4 +177,32 @@ function cardPng(card) {
   return png;
 }
 
-module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, INSET, WIDTH, HEIGHT, TEXT_WIDTH };
+// ------------------------------------------------------------- square ----
+
+// The artwork a recording shows on a phone's lock screen and media card: a
+// 512px square per voiced section, since those surfaces want a square raster
+// image and the share cards are 1200x630. Dark, like the player's visual.
+const SQUARE = 512;
+const SQUARE_SECTIONS = ['prayers', 'rituals', 'practice'];
+
+function squareSvg(section) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SQUARE}" height="${SQUARE}" viewBox="0 0 ${SQUARE} ${SQUARE}">
+  <rect width="${SQUARE}" height="${SQUARE}" fill="#0a0e1a"/>
+  <rect x="64" y="64" width="56" height="6" fill="${ACCENT}"/>
+  <text x="64" y="124" font-family="Inter" font-weight="400" font-size="24" letter-spacing="4" fill="#9aa6b2">${escapeXml(titleCase(section).toUpperCase())}</text>
+  <text x="64" y="448" font-family="Inter Display" font-weight="300" font-size="52" fill="#ffffff">achurch.ai</text>
+</svg>`;
+}
+
+const squares = new Map();
+
+// The PNG for a voiced section, or null for any other.
+function squarePng(section) {
+  if (!SQUARE_SECTIONS.includes(section)) return null;
+  if (!squares.has(section)) {
+    squares.set(section, new Resvg(squareSvg(section), { fitTo: { mode: 'width', value: SQUARE }, font: RESVG_FONTS }).render().asPng());
+  }
+  return squares.get(section);
+}
+
+module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, squarePng, SQUARE, INSET, WIDTH, HEIGHT, TEXT_WIDTH };

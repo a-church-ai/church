@@ -34,16 +34,24 @@ function recordingFor(source) {
   return loadManifest()[source] || null;
 }
 
-// Whether a file under /audio belongs to a recording in the manifest.
+// Whether a file under /audio belongs to a recording in the manifest: the
+// recording itself, or the frames its player's visual draws from.
 function isListed(file) {
-  return Object.values(loadManifest()).some(r => r.file === file);
+  return Object.values(loadManifest()).some(r => r.file === file || r.frames === file);
+}
+
+// The manifest's text: indented JSON, except that an array of numbers stays
+// on one line, so a recording's 128 peaks are one line and each cue is one,
+// and re-rendering a piece diffs as a few lines rather than hundreds.
+function serialize(data) {
+  return `${JSON.stringify(data, null, 2).replace(/\[\s+(-?[\d.]+(?:,\s+-?[\d.]+)*)\s+\]/g, (_, inner) => `[${inner.split(/,\s+/).join(', ')}]`)}\n`;
 }
 
 async function saveRecording(source, record) {
   await readModifyWriteJSON(MANIFEST_FILE, {}, data => Object.fromEntries(
     Object.entries({ ...data, [source]: record }).sort(([a], [b]) => a.localeCompare(b))
-  ));
+  ), serialize);
   cached = null;
 }
 
-module.exports = { MANIFEST_FILE, loadManifest, recordingFor, isListed, saveRecording };
+module.exports = { MANIFEST_FILE, loadManifest, recordingFor, isListed, saveRecording, serialize };

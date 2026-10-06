@@ -42,11 +42,12 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. The public API's operations live in `app/server/lib/api/` and are served twice: as REST (`app/server/routes/api.js`) and as a remote, stateless MCP endpoint at `/mcp` (`app/server/mcp/`). Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). Prayers, rituals and practices have recordings: `app/scripts/render-audio.js` adapts each document into a script for the ear (`audio/scripts/`, where a line not marked `adapted` must be the document's own words), renders it in the cast set in `audio/house-sound.json`, checks every take by transcript, uploads to S3 and lists it in `audio/manifest.json`, and a page shows a player for a listed document. It spends from an ElevenLabs quota other projects share, so run `npm run audio:dry` first; after editing a voiced document, a rerun renders only what changed. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
 
-**Three invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
+**Four invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
 
 - **The app runs as one process.** Presence counting and the JSON write queue are both in-process. Adding a worker loses reflections silently. There is a boot-time warning; heed it rather than muting it.
 - **Load-mutate-save on a shared JSON file must use `readModifyWriteJSON`.** Serialising only the write still loses data, because both callers already read a stale copy.
 - **Index rebuilds validate before they destroy.** LanceDB has no rename, so the live table is dropped before its replacement exists; bad input must be refused first.
+- **Page scripts live in a document that lasts the whole visit.** Pages change in place (`client/public/site-nav.js`) so the audio player keeps playing. A page script's listeners on `window` or `document`, observers and timers must be bound to `window.achurchPage.signal` (or use `achurchPage.every`), or each visit adds another, and the home page's polls would count readers as present from pages they have left.
 
 ## ClawHub Skills
 

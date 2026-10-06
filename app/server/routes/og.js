@@ -13,10 +13,18 @@
  */
 
 const express = require('express');
-const { resolveCard, cardPng } = require('../lib/og-cards');
+const { resolveCard, cardPng, squarePng } = require('../lib/og-cards');
 const { sendNotFound } = require('../lib/utils/not-found');
 
 const router = express.Router();
+
+// The 512px square a recording shows on a lock screen (site-player.js), one
+// per voiced section.
+router.get(/^\/v1\/square\/([a-z]+)\.png$/, (req, res) => {
+  const png = squarePng(req.params[0]);
+  if (!png) return sendNotFound(req, res);
+  res.type('image/png').send(png);
+});
 
 router.get(/^\/v1\/(ask|song|docs)\/(.+)\.png$/, async (req, res) => {
   const [type, key] = [req.params[0], req.params[1]];

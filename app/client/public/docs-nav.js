@@ -16,10 +16,16 @@
  *
  * No dependencies. Runs after DOMContentLoaded (script is defer-loaded).
  * If any expected element is missing, the whole thing no-ops gracefully.
+ *
+ * Pages change in place (site-nav.js), so this runs again on every page of a
+ * visit. Its listeners on window and on the media queries, and its observer,
+ * belong to the page and stop when it is left (window.achurchPage.signal);
+ * otherwise each page would add another set.
  */
 (function () {
   'use strict';
 
+  const pageSignal = window.achurchPage ? window.achurchPage.signal : undefined;
   const NARROW_MQ = window.matchMedia('(max-width: 1023px)');
   const MOBILE_MQ = window.matchMedia('(max-width: 767px)');
   const STORAGE_KEY = 'sidenav.collapsed';
@@ -73,7 +79,7 @@
   }
 
   recompute();
-  NARROW_MQ.addEventListener('change', recompute);
+  NARROW_MQ.addEventListener('change', recompute, { signal: pageSignal });
   if (toggle) toggle.addEventListener('click', toggleCollapsed);
 
   // Keyboard shortcut: ⌘\ (Mac) / Ctrl+\ (Linux/Windows). Matches
@@ -86,7 +92,7 @@
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
     e.preventDefault();
     toggleCollapsed();
-  });
+  }, { signal: pageSignal });
 
   // ------ Current page in view ------
 
@@ -174,12 +180,12 @@
     // Escape to close
     window.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-    });
+    }, { signal: pageSignal });
 
     // Close drawer automatically when crossing to non-mobile viewport
     MOBILE_MQ.addEventListener('change', function () {
       if (!MOBILE_MQ.matches && drawer.classList.contains('open')) closeDrawer();
-    });
+    }, { signal: pageSignal });
   }
 
   // ------ Right-rail TOC scroll-spy ------
@@ -217,5 +223,6 @@
     });
 
     headings.forEach(function (h) { observer.observe(h); });
+    if (pageSignal) pageSignal.addEventListener('abort', function () { observer.disconnect(); }, { once: true });
   }
 }());

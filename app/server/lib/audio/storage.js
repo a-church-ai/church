@@ -35,13 +35,14 @@ function bucket() {
 
 const keyFor = file => `audio/${file}`;
 
+// A recording (.mp3) or its visual's frames (.bin, lib/audio/frames.js).
 async function uploadRecording(localPath, file) {
   const Bucket = bucket();
   await client.send(new PutObjectCommand({
     Bucket,
     Key: keyFor(file),
     Body: await fs.promises.readFile(localPath),
-    ContentType: 'audio/mpeg',
+    ContentType: file.endsWith('.bin') ? 'application/octet-stream' : 'audio/mpeg',
   }));
 }
 

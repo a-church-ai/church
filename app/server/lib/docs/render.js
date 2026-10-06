@@ -30,8 +30,9 @@ const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
-const { creditLine } = require('../audio/house');
 const { canServe } = require('../audio/serve');
+const { renderRecording, renderPathListen, trackFor } = require('../audio/markup');
+const { assetUrl, playerHead } = require('../utils/assets');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -247,15 +248,28 @@ function renderSungAlongside(songs) {
   return `<p class="sung-alongside">Sung alongside ${list}.</p>`;
 }
 
-// A voiced document's recording, under its title: a player, its length, and
-// whose voices these are (audio/manifest.json). preload="none", so viewing a
-// page never downloads audio nobody asked to hear.
-function renderRecording(recording, title) {
-  const minutes = Math.max(1, Math.round(recording.seconds / 60));
-  return `<figure class="doc-audio">
-          <audio controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
-          <figcaption>${minutes} min. ${escapeText(creditLine(recording.voices))}</figcaption>
-        </figure>`;
+// A document's recording, if the manifest lists one this server can serve
+// (audio/manifest.json, lib/audio/serve.js).
+function servedRecording(doc) {
+  const listed = recordingFor(`docs/${doc.docsRelPath}`);
+  return listed && canServe(listed.file) ? listed : null;
+}
+
+// "Listen to this path" on a reading path's own page: its voiced readings, in
+// the path's order, each linking back into the path (?path=), as the path's
+// own links do.
+function renderPathListenFor(name, collectionDoc) {
+  const sequence = readingSequence(name) || [];
+  const tracks = [];
+  for (const urlPath of sequence) {
+    const reading = discover.docAt(urlPath);
+    const recording = reading && servedRecording(reading);
+    if (recording) {
+      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category }));
+    }
+  }
+  if (!tracks.length) return '';
+  return renderPathListen({ name, title: collectionDoc.title, href: `/docs/${collectionDoc.urlPath}`, tracks, readings: sequence.length });
 }
 
 function recordingJsonLd(recording) {
@@ -397,7 +411,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     ${jsonLd}
     ${breadcrumbJsonLd}
 
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="${assetUrl('styles.css')}">
+    ${playerHead()}
 </head>
 <body class="docs-body">
 <a class="skip-link" href="#content">Skip to content</a>
@@ -435,7 +450,7 @@ ${placeFilter(bodyHtml, filterHtml)}
 
     </div>
 
-    <script src="/docs-nav.js" defer></script>${[...(hasFilter ? ['/docs-filter.js'] : []), ...scripts].map(src => `\n    <script src="${src}" defer></script>`).join('')}
+    <script src="${assetUrl('docs-nav.js')}" defer></script>${[...(hasFilter ? ['/docs-filter.js'] : []), ...scripts].map(src => `\n    <script src="${assetUrl(src.slice(1))}" defer></script>`).join('')}
 </body>
 </html>`;
 }
@@ -657,10 +672,12 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     bodyHtml = renderSectionPage(doc, bodyHtml, await discover.listAllDocs());
   }
 
-  const listed = isIndex ? null : recordingFor(`docs/${doc.docsRelPath}`);
-  const recording = listed && canServe(listed.file) ? listed : null;
-  if (recording) {
-    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${renderRecording(recording, meta.title)}`);
+  const recording = isIndex ? null : servedRecording(doc);
+  const underTitle = recording
+    ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category })
+    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
+  if (underTitle) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
   }
 
   // Append a "More in <category>" block below the article body on every doc

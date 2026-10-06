@@ -8,12 +8,16 @@
  *   2. render every line in the house cast on ElevenLabs, transcribe each take,
  *      and take again any line whose words came out wrong, keeping the best of
  *      three;
- *   3. assemble the recording, upload it to S3, and record it in
- *      audio/manifest.json, which puts a player on the document's page.
+ *   3. assemble the recording, measure what its player draws (the waveform's
+ *      peaks, the visual's frames, and when each voice speaks), upload the
+ *      recording and its frames to S3, and record it in audio/manifest.json,
+ *      which puts a player on the document's page.
  *
  * Everything is cached, so running it again does only what is new: a script
  * lasts until its document changes, a take until its words, voice or
  * neighbors change, and a recording until its script or the house sound does.
+ * A recording made before its player drew from it gets its peaks, frames and
+ * cues on the next run, without rendering any speech.
  *
  * Usage, from app/:
  *   node scripts/render-audio.js                    everything that needs it
@@ -37,8 +41,10 @@ const { adapt, ADAPT_MODEL } = require('../server/lib/audio/adapt');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
-const { assemble } = require('../server/lib/audio/assemble');
-const { uploadRecording, bucket } = require('../server/lib/audio/storage');
+const { assemble, measure } = require('../server/lib/audio/assemble');
+const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
+const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frames');
+const { uploadRecording, downloadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
 
@@ -243,6 +249,33 @@ function voicesIn(takes, pair) {
   return [SPEECH.leader, ...pair].filter(v => used.has(v));
 }
 
+// When each spoken line starts and ends, and who speaks it: [start, end,
+// mask], where bit i of the mask is the house's i-th voice
+// (Object.keys(SPEECH.voices)). The visual colours each voice by these.
+function cuesFor(parts, timeline, takes) {
+  const order = Object.keys(SPEECH.voices);
+  const round = n => Math.round(n * 100) / 100;
+  const cues = [];
+  let spoken = 0;
+  parts.forEach((part, i) => {
+    if (!part.clips) return;
+    const mask = takes[spoken].voices.reduce((m, v) => m | (1 << order.indexOf(v.voice)), 0);
+    cues.push([round(timeline[i].start), round(timeline[i].end), mask]);
+    spoken++;
+  });
+  return cues;
+}
+
+// What the player draws from a recording: its waveform's peaks, and its
+// visual's frames, written beside it as <name>.bin and uploaded with it.
+async function describe(file) {
+  const local = path.join(CACHE_DIR, file);
+  const frames = file.replace(/\.mp3$/, '.bin');
+  fs.writeFileSync(path.join(CACHE_DIR, frames), framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE)));
+  await uploadRecording(path.join(CACHE_DIR, frames), frames);
+  return { peaks: await peaksFromFile(local), frames };
+}
+
 async function recordPiece(piece, stats) {
   const { doc, script, source } = piece;
   const takes = piece.takes;
@@ -251,10 +284,12 @@ async function recordPiece(piece, stats) {
 
   const stem = doc.docsRelPath.replace(/\.md$/, '');
   const draft = path.join(CACHE_DIR, `${stem}.draft.mp3`);
-  const seconds = await assemble(partsFor(script, takes), path.join(WORK_DIR, stem), draft);
+  const parts = partsFor(script, takes);
+  const { seconds, timeline } = await assemble(parts, path.join(WORK_DIR, stem), draft);
   const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   fs.renameSync(draft, path.join(CACHE_DIR, file));
   await uploadRecording(path.join(CACHE_DIR, file), file);
+  const { peaks, frames } = await describe(file);
 
   const checks = jobs.map(j => readJSON(checkFile(j.key)));
   const wrong = checks.filter(c => !takePasses(c));
@@ -272,6 +307,9 @@ async function recordPiece(piece, stats) {
       words: checks.reduce((n, c) => n + c.words, 0),
       errors: checks.reduce((n, c) => n + c.errors, 0),
     },
+    peaks,
+    frames,
+    cues: cuesFor(parts, timeline, takes),
   });
   const m = Math.floor(seconds / 60);
   console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}`);
@@ -348,7 +386,14 @@ async function main() {
     }
   }
   const characters = [...fresh.values()].reduce((a, b) => a + b, 0);
+  // Recordings that are current but were made before the player drew from
+  // them: they get peaks, frames and cues from what is already on disk.
+  const undescribed = ready.filter(p => {
+    const record = manifest[p.source];
+    return record && record.renderKey === p.renderKey && !(record.peaks && record.frames && record.cues);
+  });
   console.log(`${toRecord.length} recordings to make, ${ready.length - toRecord.length} up to date. ${fresh.size} takes to render: ${characters.toLocaleString('en-US')} characters, plus any retakes.`);
+  if (undescribed.length) console.log(`${undescribed.length} recordings need their peaks, frames and cues measured; no speech is rendered for them.`);
   if (opts.dryRun) {
     toRecord.forEach(p => console.log(`  ${p.source}`));
     return report({ failures });
@@ -356,7 +401,25 @@ async function main() {
   if (characters > opts.maxCharacters) {
     throw new Error(`This run would render ${characters.toLocaleString('en-US')} characters, over --max-characters ${opts.maxCharacters.toLocaleString('en-US')}. Raise the ceiling to go ahead.`);
   }
-  if (toRecord.length) bucket();
+  if (toRecord.length || undescribed.length) bucket();
+
+  for (const piece of undescribed) {
+    const record = manifest[piece.source];
+    try {
+      const local = path.join(CACHE_DIR, record.file);
+      if (!fs.existsSync(local)) await downloadRecording(record.file, local);
+      const parts = partsFor(piece.script, piece.takes);
+      const missing = piece.takes.flatMap(t => t.voices).filter(v => !fs.existsSync(takeFile(v.key)));
+      if (missing.length) throw new Error(`${missing.length} of its takes are not on this machine, so its cues cannot be measured`);
+      const timeline = await measure(parts, path.join(WORK_DIR, piece.doc.docsRelPath.replace(/\.md$/, '')));
+      const { peaks, frames } = await describe(record.file);
+      await saveRecording(piece.source, { ...record, peaks, frames, cues: cuesFor(parts, timeline, piece.takes) });
+      console.log(`[described] ${piece.source}`);
+    } catch (err) {
+      failures.push({ source: piece.source, message: err.message });
+      console.error(`[describe failed] ${piece.source}: ${err.message}`);
+    }
+  }
 
   // 3. Record, one piece at a time, so each finished piece is published. A
   // piece that fails is reported and the rest go on; a fatal error (a spent

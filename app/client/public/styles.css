@@ -2889,22 +2889,408 @@ body.docs-drawer-open {
     color: #595959;
 }
 
-/* A voiced document's recording, under its title (lib/docs/render.js). */
+/* ------------------------------------------------------------------
+   The player: a document's recording (lib/audio/markup.js), the bar that
+   keeps playing across pages (site-player.js), and "Listen to this path".
+   ------------------------------------------------------------------ */
+
+/* A voiced document's recording, under its title. Without a script: the
+   waveform and the native controls. With one (.is-enhanced): a play button,
+   the waveform as the progress bar, the time, and the visual above. */
 .doc-audio {
     margin: 0.75rem 0 1.5rem;
     padding: 0.75rem 1rem;
     background: #fafafa;
     border: 1px solid #eee;
-    border-radius: 4px;
+    border-radius: 6px;
 }
-.doc-audio audio {
+.doc-audio-visual {
+    display: none;
+}
+.doc-audio.is-enhanced .doc-audio-visual {
     display: block;
     width: 100%;
+    height: 96px;
+    margin-bottom: 0.75rem;
+    background: #0a0e1a;
+    border-radius: 4px;
+}
+.doc-audio-player {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.doc-audio-native {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+.doc-audio.is-enhanced .doc-audio-native {
+    display: none;
 }
 .doc-audio figcaption {
     margin-top: 0.5rem;
     font-size: 0.8125rem;
     color: #595959;
+}
+.doc-audio-play {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #00b8d4;
+    color: #fff;
+    cursor: pointer;
+}
+.doc-audio-play:hover {
+    background: #00a3bd;
+}
+.doc-audio-play:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+}
+.doc-audio-play svg,
+.pb-btn svg,
+.path-listen-play svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+}
+.icon-pause {
+    display: none;
+}
+.doc-audio.is-playing .doc-audio-play .icon-play,
+#site-player.is-playing .pb-play .icon-play,
+.path-listen.is-playing .icon-play {
+    display: none;
+}
+.doc-audio.is-playing .doc-audio-play .icon-pause,
+#site-player.is-playing .pb-play .icon-pause,
+.path-listen.is-playing .icon-pause {
+    display: inline;
+}
+
+/* The waveform: a row of bars measured when the recording was made. The
+   played part fills from one variable, --progress (0 to 1), set on the row;
+   each bar knows its index (--i) and its row's count (--n). */
+.doc-audio-wave {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 2.5rem;
+    touch-action: none;
+    cursor: pointer;
+}
+.doc-audio-wave:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+.doc-audio-bars {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    height: 100%;
+}
+.doc-audio-bars > span {
+    position: relative;
+    flex: 1;
+    min-width: 1px;
+    overflow: hidden;
+    border-radius: 1px;
+    background: rgba(0, 0, 0, 0.18);
+}
+.doc-audio-bars > span > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: clamp(0%, calc((var(--progress, 0) * var(--n) - var(--i)) * 100%), 100%);
+    background: #00b8d4;
+}
+.doc-audio-bars-narrow {
+    display: none;
+}
+@media (max-width: 639px) {
+    .doc-audio-bars-wide {
+        display: none;
+    }
+    .doc-audio-bars-narrow {
+        display: flex;
+    }
+}
+.doc-audio-time,
+.pb-time {
+    flex: none;
+    font-size: 0.8125rem;
+    color: #595959;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The bar at the bottom of every page, once something plays. */
+#site-player[hidden] {
+    display: none;
+}
+.player-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e5e5e5;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+.pb-line {
+    display: none;
+}
+.pb-controls {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.25rem;
+}
+.pb-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #222;
+    font: inherit;
+    cursor: pointer;
+}
+.pb-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+.pb-btn:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+.pb-btn[disabled] {
+    opacity: 0.35;
+    cursor: default;
+}
+.pb-btn[hidden] {
+    display: none;
+}
+.pb-play {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #00b8d4;
+    color: #fff;
+}
+.pb-play:hover {
+    background: #00a3bd;
+}
+.pb-text {
+    display: flex;
+    flex: 0 1 16rem;
+    flex-direction: column;
+    min-width: 0;
+}
+.pb-title {
+    overflow: hidden;
+    color: #111;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.pb-title:hover {
+    text-decoration: underline;
+}
+.pb-sub {
+    overflow: hidden;
+    color: #595959;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.player-bar .pb-wave {
+    flex: 1 1 auto;
+    height: 2rem;
+}
+.pb-rate {
+    width: auto;
+    min-width: 2.5rem;
+    padding: 0 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.pb-more {
+    display: none;
+}
+.pb-wave-line {
+    display: block;
+    position: relative;
+    top: 50%;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.12);
+}
+.pb-wave-line > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--progress, 0) * 100%);
+    border-radius: 2px;
+    background: #00b8d4;
+}
+
+/* Phones: one compact row with a progress line; the full controls are in a
+   sheet (a native <dialog>: focus kept inside, Escape closes it). */
+@media (max-width: 639px) {
+    .player-bar {
+        gap: 0.5rem;
+        padding-top: 0.625rem;
+    }
+    .pb-line {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.08);
+    }
+    .pb-line span {
+        display: block;
+        width: 0;
+        height: 100%;
+        background: #00b8d4;
+    }
+    .player-bar .pb-back,
+    .player-bar .pb-fwd,
+    .player-bar .pb-prev,
+    .player-bar .pb-next,
+    .player-bar .pb-wave,
+    .player-bar .pb-time,
+    .player-bar .pb-rate {
+        display: none;
+    }
+    .player-bar .pb-text {
+        flex: 1 1 auto;
+    }
+    .pb-more {
+        display: inline-flex;
+    }
+}
+.pb-sheet {
+    width: min(32rem, 100vw);
+    max-width: 100vw;
+    margin: auto auto 0;
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    border: 0;
+    border-radius: 12px 12px 0 0;
+    background: #fff;
+}
+.pb-sheet::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+.pb-sheet-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.pb-sheet-head .pb-text {
+    flex: 1;
+}
+.pb-sheet .pb-wave {
+    height: 3rem;
+    margin: 1rem 0 0.25rem;
+}
+.pb-sheet .pb-time {
+    display: block;
+    text-align: right;
+}
+.pb-sheet .pb-controls {
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+}
+.pb-sheet .pb-play {
+    width: 3.25rem;
+    height: 3.25rem;
+}
+.pb-sheet .pb-rate {
+    display: flex;
+    margin: 0 auto;
+}
+
+/* The page leaves room for the bar, so the footer stays reachable and a
+   focused element is never hidden under it (WCAG 2.4.11). site-player.js
+   measures the bar into --player-bar-height. */
+html.has-player {
+    scroll-padding-bottom: var(--player-bar-height, 0px);
+}
+html.has-player body {
+    padding-bottom: var(--player-bar-height, 0px);
+}
+html.has-player .docs-sidebar {
+    height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+}
+html.has-player .docs-toc {
+    max-height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+}
+
+/* "Listen to this path", on a reading path with voiced readings. */
+.path-listen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.75rem 0 1.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    background: #fafafa;
+}
+.path-listen[hidden] {
+    display: none;
+}
+.path-listen-play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    border: 0;
+    border-radius: 2rem;
+    background: #00b8d4;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.path-listen-play:hover {
+    background: #00a3bd;
+}
+.path-listen-play:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+}
+.path-listen-note {
+    margin: 0;
+    color: #595959;
+    font-size: 0.875rem;
 }
 
 /* Where a reading sits in the reading path it was opened from. */

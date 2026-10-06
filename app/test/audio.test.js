@@ -170,7 +170,8 @@ test('a voiced page plays its recording under its title; an unvoiced page has no
   const base = `http://127.0.0.1:${server.address().port}`;
   const [source, rec] = voiced;
   const page = await (await fetch(`${base}/docs/${source.replace(/^docs\//, '').replace(/\.md$/, '')}`)).text();
-  assert.match(page, new RegExp(`</h1>\\s*<figure class="doc-audio">\\s*<audio controls preload="none" src="/audio/${rec.file}" aria-label="Listen to [^"]+">`));
+  assert.match(page, /<\/h1>\s*<figure class="doc-audio( has-wave)?">/);
+  assert.match(page, new RegExp(`<audio class="doc-audio-native" controls preload="none" src="/audio/${rec.file}" aria-label="Listen to [^"]+">`));
   assert.match(page, /"audio": \{\s*"@type": "AudioObject"/);
   const essay = await (await fetch(`${base}/docs/philosophy/the-particular-and-the-probable`)).text();
   assert.doesNotMatch(essay, /doc-audio/);
