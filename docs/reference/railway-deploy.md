@@ -37,6 +37,14 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 `skills/`) at the repo root, so the build runs from the **repo root** via the
 [`Dockerfile`](../../Dockerfile). FFmpeg is intentionally not installed.
 
+The container runs `node server/index.js` itself (the Dockerfile's `CMD` and
+`railway.json`'s `startCommand`), never `npm start`. A redeploy stops the old
+container with SIGTERM. Under npm, the signal killed the shell npm runs
+scripts in, node never heard it and was killed seconds later, and npm exited
+1, which Railway reported as a crash, with an email, on every deploy. Run
+directly, the server stops taking connections, finishes its JSON writes and
+exits 0. The skills index that npm's `prestart` made is made in the build.
+
 ## One-time setup
 
 ### 1. Create the service

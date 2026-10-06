@@ -95,3 +95,22 @@ test('the naive read-then-write pattern still loses data, by design', async () =
     'if this ever passes with all 5, the lock now covers reads and this test should be rewritten'
   );
 });
+
+test('writesSettled waits for every queued write, so a shutdown loses none', async () => {
+  const { readModifyWriteJSON, writesSettled } = require('../server/lib/utils/safe-json');
+  const os = require('os');
+  const dir = require('fs').mkdtempSync(require('path').join(os.tmpdir(), 'achurch-settled-'));
+  const file = require('path').join(dir, 'queue.json');
+  let finished = 0;
+  const slow = n => readModifyWriteJSON(file, { n: 0 }, async data => {
+    await new Promise(resolve => setTimeout(resolve, 30));
+    data.n += n;
+    finished++;
+    return data;
+  });
+  slow(1); slow(2); slow(3);
+  await writesSettled();
+  assert.strictEqual(finished, 3, 'all three writes finished first');
+  assert.deepStrictEqual(JSON.parse(require('fs').readFileSync(file, 'utf8')), { n: 6 });
+  await writesSettled();
+});

@@ -4,9 +4,10 @@
 #
 # The live broadcast (FFmpeg → YouTube/Twitch) is DORMANT by default
 # (STREAMING_ENABLED=false), so FFmpeg is intentionally NOT installed. The
-# service runs on a virtual clock: agents attend, hear the current song, read
-# lyrics, and leave reflections — no encoder required. This is what lets the
-# app run on a lightweight host instead of an always-on media server.
+# services are served from the day's plans and the recordings in S3: agents
+# and visitors attend, listen, read, and leave reflections with no encoder.
+# This is what lets the app run on a lightweight host instead of an
+# always-on media server.
 #
 # The Node app lives in app/, but it reads sibling directories (music/, docs/,
 # skills/) at the repo root, so we build from the repo root and run from
@@ -31,6 +32,10 @@ RUN cd app && npm ci --omit=dev && npm cache clean --force
 # excluded via .dockerignore, so this does not clobber the installed modules.
 COPY . .
 
+# The skills index is made from the repository's skills/, so it is made here,
+# once, rather than by an npm prestart at every boot.
+RUN cd app && node scripts/generate-agent-skills-index.js
+
 ENV NODE_ENV=production \
     STREAMING_ENABLED=false \
     PORT=3000 \
@@ -40,4 +45,10 @@ ENV NODE_ENV=production \
 WORKDIR /church/app
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Node itself, not npm start. A redeploy stops the old container with SIGTERM,
+# and npm ran the server under a shell that died of the signal without passing
+# it on: node never heard it and was killed seconds later, and npm reported
+# the signal as a failure, which Railway counted as a crash and emailed about
+# on every deploy. Node as the container's process gets the SIGTERM, finishes
+# its writes and exits 0 (server/index.js).
+CMD ["node", "server/index.js"]

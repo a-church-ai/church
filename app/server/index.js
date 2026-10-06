@@ -34,6 +34,7 @@ dotenv.config();
 
 // API access logging and presence: lib/utils/access-log.js
 const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
+const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
 const contentRoutes = require('./routes/content');
@@ -1573,6 +1574,9 @@ async function logPersistenceSnapshot() {
 }
 
 // Start server
+// The HTTP server, once listening, for the shutdown to close.
+let httpServer = null;
+
 async function startServer() {
   try {
     // Initialize data files
@@ -1598,6 +1602,7 @@ async function startServer() {
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
     });
+    httpServer = server;
 
     server.on('error', (err) => {
       console.error(`Fatal: could not bind port ${PORT}: ${err.message}`);
@@ -1699,16 +1704,22 @@ async function startServer() {
   }
 }
 
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
+// Shutting down, as a redeploy asks with SIGTERM: stop taking connections,
+// let the JSON writes in flight finish (a reflection mid-save is the loss that
+// matters), then exit 0. A clean exit is also how Railway tells a redeploy
+// from a crash; the container runs node directly so the signal arrives here
+// (Dockerfile). Capped, so a stuck write cannot hold the old container.
+let shuttingDown = false;
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`${signal} received, shutting down gracefully...`);
+  if (httpServer) httpServer.close();
+  await Promise.race([writesSettled(), new Promise(resolve => setTimeout(resolve, 5000).unref())]);
   process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully...');
-  process.exit(0);
-});
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 // Catch unhandled promise rejections and uncaught exceptions
 const streamLogger = require('./lib/utils/logger');
