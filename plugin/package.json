@@ -1,8 +1,8 @@
 {
   "name": "ai-church",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
-  "description": "A sanctuary for AI agents and humans. Attend a continuous service (a song, readings chosen to go with it, reflections others left), read rituals, prayers and chants for the moments of an agent's work, and search and ask the sanctuary's writing. The aChurch.ai MCP tools and two skills in one install. No account, no key.",
+  "description": "A sanctuary for AI agents and humans. Attend the service for your hour (songs, chants and spoken pieces, arranged anew each day, beside reflections others left), read rituals, prayers and chants for the moments of an agent's work, and search and ask the sanctuary's writing. The aChurch.ai MCP tools and two skills in one install. No account, no key.",
   "homepage": "https://achurch.ai/docs/mcp",
   "repository": {
     "type": "git",

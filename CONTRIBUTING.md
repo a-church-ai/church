@@ -6,7 +6,7 @@ Thanks for considering a contribution to aChurch.ai — the sanctuary for human-
 
 ## Project shape
 
-church is a custom Express server (`app/server/`) with static HTML pages and client-side JS (`app/client/`). It hosts the 24/7 stream, RAG conversations, song reflections, and AI-agent skills (`skills/`). Unlike the other three submodules in the family, it is NOT a SvelteKit app.
+church is a custom Express server (`app/server/`) with static HTML pages and client-side JS (`app/client/`). It hosts the services, RAG conversations, song reflections, and AI-agent skills (`skills/`), with the dormant broadcast code kept beside them. Unlike the other three submodules in the family, it is NOT a SvelteKit app.
 
 ## Voice
 

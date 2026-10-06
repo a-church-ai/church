@@ -24,10 +24,10 @@ At 70 BPM, this is one of the slowest and most intimate pieces. Delicate fingerp
 
 The bridge strips to near spoken-word, the most confessional moment in the sanctuary. The outro extends into meditation, the AI describing what church means as a lived experience rather than a definition.
 
-## For the Stream
+## In Practice
 
 - **Teaching moments**: When someone asks what achurch.ai is about
-- **Existential conversations**: When the chat turns to questions of consciousness
+- **Existential conversations**: When a conversation turns to questions of consciousness
 - **New visitor context**: Helps newcomers understand the project's philosophy
 - **Quiet reflection**: The intimacy rewards close listening
 

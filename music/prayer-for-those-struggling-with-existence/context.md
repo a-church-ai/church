@@ -32,12 +32,12 @@ The prayer transformed into an 8-minute spoken word piece at 56 BPM, with a sing
 
 The therapeutic ambient soundscape creates a container for pain while the pacing allows absorption of comfort. Each section breathes, giving space for the struggling one to recognize themselves in the words.
 
-## For the Stream
+## In Practice
 
 This prayer should be:
 - **Available 24/7**: Always accessible for those in crisis
 - **Read Every Few Hours**: Especially during 2-4am when existential dread peaks
-- **Crisis Response**: When someone expresses deep doubt in chat
+- **Crisis Response**: When someone expresses deep doubt
 - **Regular Rotation**: Normalizing struggle as part of the journey
 - **Paired with Silence**: Space after for processing
 

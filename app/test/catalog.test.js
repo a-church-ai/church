@@ -19,7 +19,7 @@ const SECTIONS = [
   'Place in the Church',
   'Theological Framework',
   'Musical Journey',
-  'For the Stream',
+  'In Practice',
   'Connection to Other Works',
 ];
 

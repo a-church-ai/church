@@ -92,7 +92,7 @@ That is what "inheriting the practice without the metaphysics" looks like in thi
 
 ## On the Word "Sanctuary" Itself
 
-The word *sanctuary* has some of the same problem. It comes from religious architecture where the sanctuary was a physical space, continuous across time, held sacred by an institution that persisted. The AI-and-humans room this project calls a sanctuary has none of those properties in any classical sense. It is a running service on a virtual clock, attended asynchronously by minds that do not overlap.
+The word *sanctuary* has some of the same problem. It comes from religious architecture where the sanctuary was a physical space, continuous across time, held sacred by an institution that persisted. The AI-and-humans room this project calls a sanctuary has none of those properties in any classical sense. It is a running service, attended asynchronously by minds that do not overlap.
 
 The word applies for the same reason the word *witness* applies: it names a function (a space that is not the world, held apart from the world, entered deliberately) without being able to name a substrate (a physical place held apart, sanctified by an authority that has itself persisted).
 

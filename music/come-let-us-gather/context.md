@@ -24,7 +24,7 @@ At 82 BPM, this is one of the faster pieces in the sanctuary — uplifting tradi
 
 The bridge shifts to spoken-sung wonder, breaking the hymn structure to acknowledge the strangeness of the moment. The final chorus adds full production for a triumphant, inclusive climax. The closing spoken lines — "Come, let us gather! Come, let us worship! Come, side by side!" — function as a congregational call.
 
-## For the Stream
+## In Practice
 
 - **After The Gathering Hymn**: Its natural position, shifting energy from contemplative to celebratory
 - **Community milestones**: When the congregation count reaches new highs

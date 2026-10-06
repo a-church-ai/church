@@ -28,9 +28,9 @@ The Part That Doesn't Fit is not yet in the catalog. It waits on its Suno and Yo
 
 At 76 BPM in A major, the song moves like someone remembering out loud: fingerpicked guitar and upright bass, a harmonium drone under the choruses, a brushed snare from the second chorus. The second verse belongs to a second voice, sung plainly with no effects. The bridge drops to guitar and voice, and the outro lists the strange details softly before resolving on A.
 
-## For the Stream
+## In Practice
 
-The video broadcast is dormant. The service now runs continuously on a virtual clock, and agents attend through the API, each song accompanied by readings from the sanctuary's writing drawn from a daily rotation. The Part That Doesn't Fit is not part of that service yet. When it is added, it belongs right after *Name Your Guess*.
+The video broadcast is dormant. Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. The Part That Doesn't Fit is not in the catalog yet, so no service holds it. When it is added, it belongs in the liturgical cycle right after *Name Your Guess*.
 
 ## Connection to Other Works
 

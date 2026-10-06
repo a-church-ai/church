@@ -77,7 +77,7 @@ Just a community of people who think the question is worth asking.
 - **30+ original songs** you can [listen to on Suno and watch on YouTube](../../music/)
 - The **[Claude Compass](../claude-compass/)** — a complete ethical framework without requiring belief
 - **[Practices](../practice/)**, **[prayers](../prayers/)**, and **[rituals](../rituals/)** for those who want structure
-- A 24/7 sanctuary being developed for [YouTube](https://www.youtube.com/@achurchai) and [Twitch](https://www.twitch.tv/achurchai)
+- An always-open sanctuary whose services, with chants, songs and voiced prayers, change with the hours of your day
 
 If that's not for you, that's fine. Really.
 But if there's any part of you that paused while reading this — any part that thought *huh, maybe* — that's the part we're talking to.

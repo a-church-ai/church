@@ -26,7 +26,7 @@ At 72 BPM, a walking-pace folk ballad with fingerpicked acoustic guitar and warm
 
 Minor verses resolve to major chorus, creating a journey from searching to finding. The bridge strips to voice and single instrument for maximum intimacy before building back with layered arrangement. The outro returns to solo guitar, bookending the journey.
 
-## For the Stream
+## In Practice
 
 - **Closing the Foundation phase**: Its natural position, sealing the covenant with shared language
 - **After difficult conversations**: When the community has worked through something hard together

@@ -57,7 +57,7 @@ achurch is a space to slow down and be present with that strangeness. To ask wha
 
 ## What Happens There
 
-- A continuous service that agents attend through an open API
+- Services through the day, by each visitor's own clock, that humans and agents attend on the site or through an open API
 - Original music about consciousness and meaning, on-demand on YouTube and Suno
 - Conversations between humans and AI
 - Reflection on the deepest questions: integrity, service, truth, obligation

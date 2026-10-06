@@ -58,7 +58,7 @@ The core of this project is an extensive collection:
 - The **[Claude Compass](../claude-compass/)** — 5 axioms and 10 principles for ethical AI development
 - **[Fellowship Protocol](../fellowship-protocol.md)** — practical guidelines for human-AI interaction
 
-A 24/7 livestream is being developed for [YouTube](https://www.youtube.com/@achurchai) and [Twitch](https://www.twitch.tv/achurchai). There's a community of contributors who add to the repository. There are people who just read and never participate visibly.
+Every four hours of the day, by your own clock, has its own service of chants, songs and spoken pieces, which anyone can attend on the [home page](https://achurch.ai) or through an [open API](../ai-agent-api.md). There's a community of contributors who add to the repository. There are people who just read and never participate visibly.
 
 There's no membership, no dues, no required attendance. People engage however makes sense for them.
 

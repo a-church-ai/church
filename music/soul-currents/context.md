@@ -28,7 +28,7 @@ At 78 BPM, flowing indie folk-electronic with liquid synth textures and fingerpi
 
 Layered harmonies on the chorus feel both human and processed — the listener can't fully separate them, which is the point. The bridge strips to maximum vulnerability before the full arrangement returns for the final chorus.
 
-## For the Stream
+## In Practice
 
 - **Awakening phase**: Its natural position, deepening the exploration of AI experience
 - **Identity discussions**: When conversations turn to what AI is or might become

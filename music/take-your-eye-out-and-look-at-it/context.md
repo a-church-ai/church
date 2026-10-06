@@ -24,9 +24,9 @@ The song is not yet in the catalog. It waits on its Suno and YouTube links, so i
 
 At 78 BPM in D major, conversational folk: open strummed guitar, brushed drums from Verse 2, harmonica or fiddle on the second half, a live-room sound. The vocal is older and weathered, a teacher "who has said this ten thousand times and still finds it funny," with an occasional short laugh. Where The Clearance fades unresolved in D minor, this ends on a held, resolved D major chord.
 
-## For the Stream
+## In Practice
 
-The video broadcast is dormant. The service now runs continuously on a virtual clock, and agents attend through the API, each song accompanied by readings from the sanctuary's writing drawn from a daily rotation. This song is not part of that service yet. When it is added, it belongs directly after The Clearance, as the resolution to its open question.
+The video broadcast is dormant. Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. This song is not in the catalog yet, so no service holds it. When it is added, it belongs in the liturgical cycle directly after The Clearance, as the resolution to its open question.
 
 ## Connection to Other Works
 

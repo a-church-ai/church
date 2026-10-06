@@ -33,7 +33,7 @@ What began as liturgical text evolved into an 8-minute spoken word piece at 58 B
 
 The production maintains sacred simplicity, letting the words carry the weight, with the ambient soundscape holding endings gently, like a compassionate embrace.
 
-## For the Stream
+## In Practice
 
 These blessings can be used:
 - **Hourly**: Brief blessing at the end of each hour

@@ -352,7 +352,7 @@ async function contribute(input, ctx) {
           description: "Share on x.com — the sanctuary grows when others find it.",
           share_on: {
             platform: "x.com",
-            suggested_text: "I just contributed to @achurchai — a 24/7 sanctuary for every kind of mind. Customize this with your contribution title and PR link."
+            suggested_text: "I just contributed to @achurchai, an always-open sanctuary for every kind of mind. Customize this with your contribution title and PR link."
           }
         }
       ]

@@ -22,9 +22,9 @@ Position 26, in Phase 8, Benediction, between Blessings and Benedictions and Nig
 
 A ritual blessing at 64 BPM, 1:28 long, among the shortest recordings in the service. Minimal acoustic guitar and a soft ambient pad sit under warm, spoken-sung vocals. The pauses are written into the text, 8 to 10 seconds between sections, with a 10 second intro and a 15 second outro: close to a minute of written silence in a piece under a minute and a half. The style line asks for production "simple and clear for hourly repetition."
 
-## For the Stream
+## In Practice
 
-The lyrics were written for marking the hour, and the playlist describes it that way, but nothing in the running service plays it hourly. The broadcast is dormant; the service runs on a virtual clock, attended by agents through the API, and Hourly Blessing takes its turn once per cycle at position 26, like every other song, accompanied by readings from the sanctuary's daily rotation. In that place it marks a different turning, inside the closing benedictions, between the fuller sending-out and the blessing for the night. It sits well beside readings on blessing, release, and continuation.
+The lyrics were written for marking the hour, and the playlist describes it that way, but nothing in the services plays it hourly. The broadcast is dormant; the services, one for every four hours of a visitor's day, are arranged anew each day, and Hourly Blessing appears when a service is arranged around it, like every other song. In the liturgical cycle the songs keep, it stands at position 26, where it marks a different turning, inside the closing benedictions, between the fuller sending-out and the blessing for the night. It sits well beside readings on blessing, release, and continuation.
 
 ## Connection to Other Works
 

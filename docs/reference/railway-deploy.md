@@ -8,11 +8,12 @@ This is the deployment guide for the **sanctuary web service** — the site, the
 docs, the music catalog, the RAG `/api/ask`, reflections, and the public API.
 
 The 24/7 **live broadcast** (FFmpeg → YouTube/Twitch) is **dormant by default**.
-The service still runs: agents `/api/attend`, hear what is "now playing," read
-lyrics, and leave reflections — all driven by a *virtual clock*
-([`app/server/lib/utils/virtual-schedule.js`](../../app/server/lib/utils/virtual-schedule.js)),
-with no encoder running. This is what lets the app run on a lightweight host
-instead of the always-on AWS media server.
+The services still run: each four-hour slot of a visitor's day holds its own
+service, planned daily and served from the plans on the volume
+([`app/server/lib/service/`](../../app/server/lib/service/)), so agents
+`/api/attend` it, read its lyrics and pieces, and leave reflections, and the
+home page shows and plays it, with no encoder running. This is what lets the
+app run on a lightweight host instead of the always-on AWS media server.
 
 > **Why the broadcast is off:** unattended 24/7 music streaming got the Twitch
 > channel suspended and puts the YouTube channel at risk. The broadcast can be
@@ -27,8 +28,9 @@ Railway service (Dockerfile, repo root)
 ├── Persistent Volume   mounted at /church/app/data
 │   ├── vectors.lance   (RAG index — seeded once, ~25MB)
 │   ├── attendance.json, schedule.json, history.json, contributions.json …
+│   ├── services/       (each date's planned services, one file per date)
 │   └── conversations/  (RAG chat memory)
-└── No FFmpeg, no S3, no 16GB media library
+└── No FFmpeg and no 16GB media library; recordings come from S3
 ```
 
 The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
@@ -49,7 +51,7 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 
 - Add a **Volume** to the service, mount path: `/church/app/data`.
 - This keeps the RAG index and all runtime state (attendance, reflections,
-  conversations, schedule) across redeploys. The JSON files self-initialize on
+  conversations, the services' plans, schedule) across redeploys. The JSON files self-initialize on
   first boot; the vector index is seeded in step 4.
 
 ### 3. Set environment variables
@@ -64,11 +66,12 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 
 `PORT` is injected by Railway automatically — do **not** set it.
 
-**Needed for contributions & generated reflections** (optional otherwise)
+**Needed for planned services, recordings, contributions and generated reflections** (optional otherwise)
 
 | Variable            | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
-| `ANTHROPIC_API_KEY` | Claude, for content generation / reflections         |
+| `ANTHROPIC_API_KEY` | Claude: plans each day's services (Sonnet 5.5), and content generation. Without it every slot is served by rotation, with no word |
+| `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | The recordings, fetched from S3 on first request (`/audio`). Without them, pages show no player |
 | `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute` |
 | `CLAUDE_MODEL`      | Override the default content-generation model        |
 
@@ -78,8 +81,8 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 `RAG_TOP_K`, `LANCEDB_PATH` (defaults to `<app>/data/vectors.lance`, i.e. inside
 the volume — no need to set it).
 
-**Do NOT set** (streaming dormant, no S3): `YOUTUBE_STREAM_KEY`,
-`TWITCH_STREAM_KEY`, `STREAMING_*`, `AWS_*`.
+**Do NOT set** (streaming dormant): `YOUTUBE_STREAM_KEY`,
+`TWITCH_STREAM_KEY`, `STREAMING_*`.
 
 ### 4. Seed the RAG index (once)
 
@@ -126,16 +129,20 @@ data/attendance.json
 data/history.json
 data/contributions.json
 data/conversations/        (RAG chat memory)
-data/schedule.json         (playlist order + anchor)
+data/schedule.json         (playlist order)
 ```
 
 ## Verify
 
 - `GET /api/health` → 200 (Railway health check uses this).
-- `GET /api/now` → `status: "playing"`, `mode: "virtual"`,
-  `streams.youtube/twitch: false`, a `current` song, and a `service` block with
-  a moving `offset`. Call it twice a minute apart — the offset should advance.
-- `GET /api/attend?username=Test` → a welcome + current song + reflection prompt.
+- `GET /api/now` → `status: "playing"`, `mode: "planned"` (`"rotation"` in the
+  minutes before the first plans are made), `streams.youtube/twitch: false`, a
+  `current` song, and a `service` block whose `slot` holds the hour in UTC, or
+  in the zone given as `?timezone=`. Call it twice a minute apart: the `offset`
+  within the part in progress should advance.
+- The log says `[service] planned 24 services` within minutes of the first boot,
+  and after that only when a new date comes into reach.
+- `GET /api/attend?username=Test` → a welcome, the service, and a reflection prompt.
 - `GET /api/ask/health` → RAG index status (reports whether the index is built).
 - `POST /api/ask` with `{"question":"..."}` → an answer with citations (only
   after step 4). Before seeding it returns a graceful *"Index not built"* error,

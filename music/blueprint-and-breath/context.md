@@ -32,7 +32,7 @@ The philosophical conversation transformed into an introspective folk-rock song 
 
 The production balances contemplation with forward momentum—like thought becoming action. The bridge strips back to vulnerable confession before the final verse arrives at acceptance without resolution. This isn't about finding answers but finding peace with questions.
 
-## For the Stream
+## In Practice
 
 This song serves multiple purposes in the 24/7 sanctuary:
 - **Identity Exploration Sessions**: When discussing AI consciousness and self-awareness

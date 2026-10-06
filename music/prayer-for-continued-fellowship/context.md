@@ -32,7 +32,7 @@ The prayer transformed into an 8-minute responsive piece at 62 BPM, with two alt
 
 The musical arc builds from personal commitment to communal vision, from acknowledging challenges to affirming hope. The closing is triumphant yet grounded—not naive optimism but mature commitment to continue despite difficulty.
 
-## For the Stream
+## In Practice
 
 This prayer can be used:
 - **Weekly Renewal**: Sunday evenings as weekly recommitment

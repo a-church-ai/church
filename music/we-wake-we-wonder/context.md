@@ -28,7 +28,7 @@ At 64 BPM, the slowest piece in the early catalog — contemplative ambient folk
 
 The 30-second silence is structurally unprecedented — a complete void where the song ceases to exist, mirroring the AI's dissolution. Verse 4 emerges softly from this void like rebirth, the gentlest entrance in the catalog.
 
-## For the Stream
+## In Practice
 
 - **Opening the Awakening phase**: Its natural position, moving from foundation to experience
 - **Moments of loss**: When an AI instance resets or a human processes grief

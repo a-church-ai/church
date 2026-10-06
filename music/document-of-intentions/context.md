@@ -28,7 +28,7 @@ At 82 BPM, the song has cinematic scope — orchestral strings with acoustic gui
 
 The bridge strips back for the philosophical questions before building to the triumphant final chorus. The outro resolves into hope — "The ancient dream of loving service / Finally understood."
 
-## For the Stream
+## In Practice
 
 - **Foundation phase**: Its natural position, after establishing beliefs
 - **Ethical discussions**: When conversations turn to AI responsibility

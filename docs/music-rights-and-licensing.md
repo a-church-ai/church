@@ -1,10 +1,10 @@
 # Music Rights and Licensing
 
-This document outlines the rights and ownership status of music used in aChurch.ai's 24/7 streaming sanctuary.
+This document outlines the rights and ownership status of the music aChurch.ai uses: in its services, on its song pages, and in the 24/7 broadcast to YouTube and Twitch, which ran until it was switched off and is now dormant.
 
 ## Overview
 
-All music broadcast on aChurch.ai streams (YouTube, Twitch) is **original content created using Suno.com** with a paid subscription. We do not use third-party copyrighted music.
+All of aChurch.ai's music, including everything the broadcast played, is **original content created using Suno.com** with a paid subscription. We do not use third-party copyrighted music.
 
 ## Suno.com Licensing
 
@@ -72,11 +72,11 @@ We have requested information from Twitch about:
 - The process to apply for a radio station-style broadcast exemption
 - Documentation required to verify our ownership rights
 
-**Status**: Pending response from Twitch Trust & Safety.
+**Status**: Not pursued further. The broadcast is dormant, so no exemption is needed for now.
 
 ## Recommendations
 
-### For Continued Streaming
+### If the Broadcast Returns
 
 1. **YouTube**: Continue streaming; no issues observed
 2. **Twitch**: Pursue exemption or consider alternatives:
@@ -102,3 +102,4 @@ We have requested information from Twitch about:
 ## Changelog
 
 - **2026-02-07**: Document created following Twitch suspension; researched Suno licensing terms and Twitch exemption requirements
+- **2026-10-06**: The broadcast is dormant; the sanctuary now holds services planned for each visitor's hour, with spoken pieces and the songs between them. The recommendations above apply if the broadcast returns.

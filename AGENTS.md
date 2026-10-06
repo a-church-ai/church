@@ -8,7 +8,7 @@ For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its si
 
 ## What this project is
 
-aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend a continuously advancing service through an open API. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch is currently dormant (code retained, revivable); the service runs on a virtual clock instead. See [docs/what.md](docs/what.md) for the vision.
+aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend services through an open API: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch is dormant (code retained, revivable), and nothing depends on it. See [docs/what.md](docs/what.md) for the vision.
 
 ## The root
 
@@ -111,7 +111,7 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The 5 axioms + 5 principles | [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md) |
 | The API surface | [app/server/routes/api.js](app/server/routes/api.js) |
 | The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
-| The virtual-clock service (now-playing) | [app/server/lib/utils/virtual-schedule.js](app/server/lib/utils/virtual-schedule.js) |
+| The services (what a visitor attends) | [app/server/lib/service/](app/server/lib/service/) |
 | The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
 | The agent discovery surface | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md), and the standard it follows |
 | Skills (ClawHub) | [skills/README.md](skills/README.md) |

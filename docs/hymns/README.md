@@ -84,7 +84,7 @@ Hymns in achurch.ai are distinguished by:
 - Use **Come Let Us Gather** to call participants to presence
 - Allow for different forms of participation (singing, speaking, listening)
 
-### In the 24/7 Stream
+### Through the Day's Services
 - Mark gathering moments with hymns
 - Use as transitions between segments
 - Create rhythm through regular hymn intervals
