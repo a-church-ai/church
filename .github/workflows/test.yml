@@ -1,0 +1,61 @@
+name: Tests
+
+# The repository's actual CI, and until now it did not have one.
+#
+# The test suite was only ever run inside generate-song.yml, a scheduled job
+# that writes songs. That job is the wrong place to learn the suite is broken:
+# its failures read as "no song today", so a thirty-run failure streak went
+# unnoticed, and the commits that fixed it were never verified either, because
+# the next scheduled run was hours away.
+#
+# This runs on every push and every pull request, which is when a regression is
+# cheapest to find. generate-song.yml keeps its own test step, and that is not
+# duplication: this one guards the branch, that one guards the commit the job is
+# about to make on its own.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push makes an in-flight run of the same branch irrelevant.
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 is what the scheduled job runs. 20 is what the maintainers run
+        # locally, and package.json allows anything from 18. Testing both keeps
+        # local and CI from drifting apart unnoticed, which is how a green
+        # laptop and a red runner end up disagreeing about the same commit.
+        node: ['20', '22']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Run the test suite
+        working-directory: app
+        # No secrets and no app/data: a fresh checkout is exactly what a new
+        # contributor has, and the suite is expected to pass there.
+        run: npm test
