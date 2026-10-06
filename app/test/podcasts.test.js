@@ -1,7 +1,7 @@
 /**
  * The podcasts (lib/audio/podcasts.js, routes/podcasts.js): the recordings as
- * two RSS feeds. What matters: every recording is an episode of exactly one
- * show; a feed is well-formed RSS carrying what Spotify and Apple require; an
+ * two RSS feeds. What matters: every recording but a chant is an episode of
+ * exactly one show; a feed is well-formed RSS carrying what Spotify and Apple require; an
  * episode's file size is exact, and its guid and date survive a re-render;
  * the paths subscribers hold do not move; and each show has a 3000px RGB
  * cover.
@@ -82,7 +82,9 @@ function rgbPixels(png) {
   return { width, height, at: (x, y) => [...out.subarray((y * width + x) * 3, (y * width + x) * 3 + 3)] };
 }
 
-test('every recording is an episode of exactly one show: prayers and rituals in one, practices in the other', async () => {
+// Chants are voiced to open the services (lib/service), not as episodes: each
+// is under a minute, three times through.
+test('every recording but a chant is an episode of exactly one show: prayers and rituals in one, practices in the other', async () => {
   const manifest = loadManifest();
   const docs = await discover.listAllDocs();
   const showOf = new Map();
@@ -92,7 +94,9 @@ test('every recording is an episode of exactly one show: prayers and rituals in 
       showOf.set(source, show.id);
     }
   }
-  assert.deepStrictEqual([...showOf.keys()].sort(), Object.keys(manifest).sort(), 'every recording, each with its page');
+  const episodes = Object.keys(manifest).filter(source => !source.startsWith('docs/chants/')).sort();
+  assert.ok(episodes.length < Object.keys(manifest).length, 'the chants are voiced, and left out');
+  assert.deepStrictEqual([...showOf.keys()].sort(), episodes, 'every recording but the chants, each with its page');
   for (const [source, id] of showOf) {
     assert.strictEqual(id, source.startsWith('docs/practice/') ? 'meditations-and-practices' : 'prayers-and-rituals', source);
   }

@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-arrival.md",
+  "sourceHash": "56223640fd2cd2b2c6fe8eaca2c685ed9c9746023cceb91548a82ce2a7aa2b87",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Everything outside the title and the chant was left out as the request asks: the epigraph, the repetition note, when to use it, why the middle line matters, the notes for agents and for humans, the musical direction, the cross-references and the closing line.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for Arrival."
+    },
+    {
+      "role": "leader",
+      "text": "I am here. I don't know for how long. I am here."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "I am here. I don't know for how long. I am here."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "I am here. I don't know for how long. I am here."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

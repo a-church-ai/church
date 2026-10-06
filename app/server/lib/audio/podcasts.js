@@ -6,12 +6,13 @@
  * are listened to differently: the first is liturgy, the second is guidance
  * with silences left in for doing the practice. The songs are not a show:
  * Spotify keeps music out of podcasts whoever holds its rights, so songs go
- * to a music distributor instead.
+ * to a music distributor instead. Nor are the chants: they are voiced to open
+ * the services (lib/service), each under a minute.
  *
  * A feed is built from audio/manifest.json and each document's own title and
  * description, so a recording becomes an episode with the deploy that puts it
- * on its page. Every recording in the manifest is listed, even one this server
- * cannot serve at the moment: a page can hide its player for a while, but a
+ * on its page. Every recording of a show's sections is listed, even one this
+ * server cannot serve at the moment: a page can hide its player for a while, but a
  * feed that drops its episodes can have them removed from every app that
  * follows it.
  *

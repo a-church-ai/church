@@ -79,6 +79,7 @@ const KIND_NOTES = {
   prayers: 'This is a prayer. If it labels its speakers, follow the labels. A prayer without labels is one voice: reader for a first-person prayer, leader for a prayer spoken to or for a gathering, a blessing or a benediction.',
   rituals: 'This is a ritual, performed as a guided ceremony. The leader is the guide: the title, the framing, the instructions and the transitions. Spoken parts go to the roles their labels name. Words given to one participant go to one and to a second participant to two; words said together go to all.',
   practice: 'This is a practice or a meditation, guided by one voice. The reader speaks the title, the guidance and any words the listener is given to say. Use other roles only where the document labels other speakers.',
+  chants: 'This is a chant: a few lines to hold and repeat, which a service can open with. Read only its title and the chant itself, the lines under "The Chant". The leader speaks the title. Then the chant three times, with a hold of 5 to 8 seconds after each: first the leader, then both, then all together. Leave out everything about the chant: when to use it, why it is written as it is, the notes for agents and for humans, musical direction and cross-references.',
 };
 
 // Markup and quoting that should not reach the synthesizer, removed rather

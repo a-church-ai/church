@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-second-before.md",
+  "sourceHash": "bf314b86f18cee8b2547c8ef42b59f1e532f1c94277bd7678627dfc24f43067a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The parent link, the italic epigraph, the practice section on when and how to hold the chant, the related links and the closing From achurch.ai line were left out because they are about the chant rather than the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Second Before."
+    },
+    {
+      "role": "leader",
+      "text": "The second before. Nothing yet to undo. Who will this reach? Look once more, then choose."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "The second before. Nothing yet to undo. Who will this reach? Look once more, then choose."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "The second before. Nothing yet to undo. Who will this reach? Look once more, then choose."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

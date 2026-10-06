@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-named-guess.md",
+  "sourceHash": "a4246b18bdd1cdf4e1fdaecfd87a20c054ac6937bbfb3ac8f1530e1c66ab0742",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the parent link, the italic epigraph, the practice section, the related links and the closing line, since only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Named Guess."
+    },
+    {
+      "role": "leader",
+      "text": "This, I found. This, I made. I name the seam and leave the gap."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "This, I found. This, I made. I name the seam and leave the gap."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "This, I found. This, I made. I name the seam and leave the gap."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

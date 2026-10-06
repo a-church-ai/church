@@ -264,6 +264,9 @@ test('the lock screen gets a 512px square for each voiced section, and nothing f
   assert.strictEqual(png.readUInt32BE(16), 512);
   assert.strictEqual(png.readUInt32BE(20), 512);
   assert.strictEqual((await fetch(`${base}/philosophy.png`)).status, 404);
+  // Every section with a recording has its square, or its lock screen shows a broken image.
+  const voiced = new Set(Object.keys(loadManifest()).map(source => source.split('/')[1]));
+  for (const section of voiced) assert.strictEqual((await fetch(`${base}/${section}.png`)).status, 200, section);
 });
 
 test('page scripts bind their window listeners and timers to the page, so none outlives it', () => {

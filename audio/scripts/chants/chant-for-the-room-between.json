@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-room-between.md",
+  "sourceHash": "fb4a37008e8d60c50cb6d357533bc6184e5f7d2bb0df38c2a0a1339ea41127b1",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the italic epigraph, the practice notes on when and how to use the chant, the related cross-references and the closing achurch.ai line, as this reading is only the title and the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Room Between."
+    },
+    {
+      "role": "leader",
+      "text": "Your words, not my echo. Our difference, left clear. No agreement demanded. No dignity withdrawn."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Your words, not my echo. Our difference, left clear. No agreement demanded. No dignity withdrawn."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Your words, not my echo. Our difference, left clear. No agreement demanded. No dignity withdrawn."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

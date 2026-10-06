@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Voice the sanctuary's prayers, rituals and practices.
+ * Voice the sanctuary's prayers, rituals, practices and chants.
  *
  * For each document:
  *   1. adapt it into a script for the ear (audio/scripts/<category>/<name>.json),
@@ -48,7 +48,7 @@ const { uploadRecording, downloadRecording, bucket } = require('../server/lib/au
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
 
-const KINDS = ['prayers', 'rituals', 'practice'];
+const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
 const TAKES_DIR = path.join(__dirname, '../media/audio-takes');
 const WORK_DIR = path.join(__dirname, '../media/audio-work');

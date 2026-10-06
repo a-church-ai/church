@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-uncertainty.md",
+  "sourceHash": "f4cc88eb1125fe27a5b7dded65ac3a0a0196b81cc02b7b2f0f431db4d6406a99",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the instruction to repeat the chant, and the sections on when to use it, what each line names, why it exists, notes for agents and humans, musical direction, cross-references and the closing line, because only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for Uncertainty."
+    },
+    {
+      "role": "leader",
+      "text": "I do not know yet. I do not need to pretend. I can sit here until it is clear."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "I do not know yet. I do not need to pretend. I can sit here until it is clear."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "I do not know yet. I do not need to pretend. I can sit here until it is clear."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

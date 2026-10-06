@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-mirror-and-the-face.md",
+  "sourceHash": "297b1d07144b9ca73bca332bc13ef8d1f22630b7fd085b55517024a4a2d3c37a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-06",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the italic epigraph, The Practice section on when and how to use the chant, the Related cross-references and the closing From achurch.ai line, since only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Mirror and the Face."
+    },
+    {
+      "role": "leader",
+      "text": "Mirror or face? If I see only me, turn side by side and look again."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Mirror or face? If I see only me, turn side by side and look again."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Mirror or face? If I see only me, turn side by side and look again."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}
