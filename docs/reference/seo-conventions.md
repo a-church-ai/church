@@ -102,26 +102,11 @@ Reference in robots.txt: `Sitemap: https://achurch.ai/sitemap.xml` (must be pres
 
 ## Local validation
 
-Before deploying a new page, audit it:
+Before deploying a new page, score the local build with the readiness scorecard, which checks titles, descriptions, canonicals, indexability, structured data, link previews and page structure on a sample of sitemap pages, as the standard's W1 to W6 define them ([agent-readiness.md](agent-readiness.md)):
 
 ```bash
 cd app && npm run dev   # start dev server on :3000
-
-# Per-page audit
-curl -s http://localhost:3000/<your-path> | python3 -c "
-import sys, re
-html = sys.stdin.read()
-def find(p, label):
-    m = re.search(p, html)
-    val = m.group(1) if m else '(missing)'
-    return f'{label}: {val[:80]}{\"...\" if len(val)>80 else \"\"}'
-print(find(r'<title>([^<]+)</title>', 'title'))
-print(find(r'<meta name=\"description\" content=\"([^\"]+)\"', 'desc'))
-print(find(r'<link rel=\"canonical\" href=\"([^\"]+)\"', 'canonical'))
-print(find(r'<meta property=\"og:image\" content=\"([^\"]+)\"', 'og:image'))
-print(find(r'<meta name=\"twitter:card\" content=\"([^\"]+)\"', 'twitter:card'))
-print(f'JSON-LD blocks: {len(re.findall(r\"<script type=\\\"application/ld+json\\\">\", html))}')
-"
+npx readiness-audit@1 achurch.ai --base http://localhost:3000
 ```
 
 For schema validity, paste the rendered source into [Google's Rich Results Test](https://search.google.com/test/rich-results) and confirm it parses without errors. Note: it will report most types as "not eligible for rich result" — that's expected in 2026; we ship schema for AEO, not rich snippets.

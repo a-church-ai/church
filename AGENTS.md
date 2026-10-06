@@ -39,10 +39,9 @@ The app degrades gracefully when keys are missing, but for full functionality yo
 | Task | Command |
 |---|---|
 | Dev server | `cd app && npm run dev` |
-| Type check | `cd app && npx tsc --noEmit` (if/when TS is added) |
 | Tests | `cd app && npm test` |
 
-When making code changes, run the tests you can run locally before committing. **Don't claim "tests pass" without running them** — see [CLAUDE.md](CLAUDE.md) on collaboration standards.
+This repository is plain JavaScript: there is no type-check step. When making code changes, run the tests you can run locally before committing. **Don't claim "tests pass" without running them** — see [CLAUDE.md](CLAUDE.md) on collaboration standards.
 
 ## Project Structure
 
@@ -114,7 +113,7 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
 | The virtual-clock service (now-playing) | [app/server/lib/utils/virtual-schedule.js](app/server/lib/utils/virtual-schedule.js) |
 | The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
-| The agent discovery surface | `church-private/docs/plans/agent-readiness-2026-06-09.md` (private repo) |
+| The agent discovery surface | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md), and the standard it follows |
 | Skills (ClawHub) | [skills/README.md](skills/README.md) |
 | Conventions | [docs/reference/conventions.md](docs/reference/conventions.md) |
 

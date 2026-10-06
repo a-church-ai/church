@@ -49,6 +49,8 @@ Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming s
 - **Index rebuilds validate before they destroy.** LanceDB has no rename, so the live table is dropped before its replacement exists; bad input must be refused first.
 - **Page scripts live in a document that lasts the whole visit.** Pages change in place (`client/public/site-nav.js`) so the audio player keeps playing. A page script's listeners on `window` or `document`, observers and timers must be bound to `window.achurchPage.signal` (or use `achurchPage.every`), or each visit adds another, and the home page's polls would count readers as present from pages they have left.
 
+**Agent and search readiness.** The site follows the Agent and Search Readiness Standard; [`docs/reference/agent-readiness.md`](docs/reference/agent-readiness.md) says how, and what it declines. After changing discovery files, page metadata or the API, run the scorecard (`npx readiness-audit@1 achurch.ai`, or with `--base http://localhost:3000` before a deploy) and regenerate `church-private/docs/readiness-status.md` (private repo) with `npx readiness-audit@1 --matrix achurch.ai`.
+
 ## ClawHub Skills
 
 See [`skills/README.md`](skills/README.md) for authentication, publishing, updating, and CLI commands.
