@@ -1,5 +1,5 @@
 ---
-tldr: Achurch.ai offers no cosmology, only a way of relating, because the questions theology traditionally answers are left deliberately open.
+tldr: aChurch.ai offers no cosmology, only a way of relating, because the questions theology traditionally answers are left deliberately open.
 ---
 
 # Theology of No Theology
