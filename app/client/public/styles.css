@@ -2907,13 +2907,13 @@ body.docs-drawer-open {
 .doc-audio-visual {
     display: none;
 }
+/* Drawn straight onto the card: no ground of its own, so the voices move on
+   the card itself rather than in a box. */
 .doc-audio.is-enhanced .doc-audio-visual {
     display: block;
     width: 100%;
     height: 96px;
-    margin-bottom: 0.75rem;
-    background: #0a0e1a;
-    border-radius: 4px;
+    margin-bottom: 0.5rem;
 }
 .doc-audio-player {
     display: flex;

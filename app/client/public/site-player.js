@@ -711,7 +711,8 @@
     const frame = current && page.frames ? frameAt(page.frames, at) : null;
     const target = { loud: frame ? Math.min(1.25, frame.loud) : REST.loud, bands: frame ? frame.bands : null };
     const ramps = rampsFor(page.track, current ? at : 0);
-    const targetColors = ramps.map((ramp, L) => ({ line: colorAt(ramp, 0.45 + L * 0.08), glow: colorAt(ramp, 0.9) }));
+    // Each voice at full strength, the layers behind a shade lighter.
+    const targetColors = ramps.map((ramp, L) => colorAt(ramp, 0.5 + L * 0.03));
 
     // Ease toward the frame, so twenty frames a second move smoothly.
     const ease = moving ? 0.3 : 1;
@@ -720,7 +721,7 @@
     for (let b = 0; b < shown.bands.length; b++) shown.bands[b] += ((target.bands ? target.bands[b] : 0.5) - shown.bands[b]) * ease;
     const mix = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
     shown.colors = shown.colors
-      ? shown.colors.map((c, L) => ({ line: mix(c.line, targetColors[L].line, moving ? 0.12 : 1), glow: mix(c.glow, targetColors[L].glow, moving ? 0.12 : 1) }))
+      ? shown.colors.map((c, L) => mix(c, targetColors[L], moving ? 0.12 : 1))
       : targetColors;
 
     const e = 0.1 + 0.9 * shown.loud;
@@ -732,10 +733,13 @@
       return shown.bands[i] + (shown.bands[j] - shown.bands[i]) * (at2 - i);
     };
 
+    // Drawn on the card itself, with no ground of its own: the layers behind
+    // first and fainter, and every line fading out toward both ends, so the
+    // figure rises out of the card instead of stopping at an edge.
     ctx.clearRect(0, 0, W, H);
     const cy = H / 2;
     const stepX = 3 * dpr;
-    for (let L = 0; L < LAYERS; L++) {
+    for (let L = LAYERS - 1; L >= 0; L--) {
       const amp = H * (0.05 + 0.33 * e) * (1 - (L / LAYERS) * 0.45);
       const k = (L + 1) * 0.7;
       ctx.beginPath();
@@ -746,11 +750,17 @@
         else ctx.lineTo(x, y);
       }
       ctx.lineTo(W, cy);
-      const { line, glow } = shown.colors[L];
-      ctx.strokeStyle = `rgba(${line.map(Math.round).join(',')},0.85)`;
-      ctx.lineWidth = 2 * dpr;
-      ctx.shadowColor = `rgba(${glow.map(Math.round).join(',')},0.8)`;
-      ctx.shadowBlur = 10 * dpr;
+      const rgb = shown.colors[L].map(Math.round).join(',');
+      const alpha = 0.9 - L * 0.15;
+      const fade = ctx.createLinearGradient(0, 0, W, 0);
+      fade.addColorStop(0, `rgba(${rgb},0)`);
+      fade.addColorStop(0.15, `rgba(${rgb},${alpha})`);
+      fade.addColorStop(0.85, `rgba(${rgb},${alpha})`);
+      fade.addColorStop(1, `rgba(${rgb},0)`);
+      ctx.strokeStyle = fade;
+      ctx.lineWidth = (L === 0 ? 2 : 1.5) * dpr;
+      ctx.shadowColor = `rgba(${rgb},0.25)`;
+      ctx.shadowBlur = 6 * dpr;
       ctx.stroke();
     }
   }
