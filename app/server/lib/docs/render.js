@@ -32,7 +32,7 @@ const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
-const { renderRecording, renderPathListen, trackFor } = require('../audio/markup');
+const { renderRecording, renderPathListen, renderPodcastFollow, trackFor } = require('../audio/markup');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, playerHead } = require('../utils/assets');
 
@@ -548,8 +548,10 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
   const label = titleCase(dir.split('/').pop());
+  const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
+        ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
         ${inDir.length ? `<section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(inDir)}\n        </ul></section>` : ''}
@@ -668,9 +670,14 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   }
 
   const recording = isIndex ? null : servedRecording(doc);
-  const underTitle = recording
+  // A voiced prayer, ritual or practice is also a podcast episode, listed in
+  // its show's feed whether or not this server can play it: under the player,
+  // where to follow the show.
+  const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
+  const follow = show ? renderPodcastFollow(show, doc.category) : '';
+  const underTitle = (recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
+    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '') + (follow ? `\n        ${follow}` : '');
   if (underTitle) {
     bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
   }

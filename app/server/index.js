@@ -59,7 +59,7 @@ const { loadSongContent, songDescription } = require('./lib/music/song-content')
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
 const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
 const { nearestForSong } = require('./lib/music/companions');
-const { renderServiceListen, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
+const { renderServiceListen, renderPodcasts, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
 const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
@@ -272,7 +272,9 @@ app.get('/', async (req, res) => {
       : html;
     // The service panel's listen box, drawn where every player's markup is
     // (lib/audio/markup.js); the page fills it from /api/now.
-    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen());
+    // And the podcasts, drawn from lib/audio/podcasts.js, where each show's
+    // Spotify page and feed are kept.
+    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts());
     // Wrap in the site shell (sidebar + top bar) so the homepage matches
     // the rest of the site's navigation
     const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');

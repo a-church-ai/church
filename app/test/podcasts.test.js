@@ -149,7 +149,9 @@ test('each episode: its page, the exact file and its real length, newest first',
       assert.strictEqual(text(item, 'guid'), guidFor(source));
       assert.strictEqual(text(item, 'title'), doc.title);
       assert.strictEqual(text(item, 'link'), `${SITE}/docs/${doc.urlPath}`);
-      assert.match(text(item, 'description'), new RegExp(`AI voices? from ElevenLabs: [^\\n]+\\.\\n\\nRead along: ${SITE}/docs/${doc.urlPath}$`));
+      // HTML, so "Read along" is a link in Spotify and Apple, not an address as text.
+      const page = `${SITE}/docs/${doc.urlPath}`;
+      assert.match(text(item, 'description'), new RegExp(`<p>AI voices? from ElevenLabs: [^<]+\\.</p><p>Read along: <a href="${page}">${page}</a></p>$`));
       assert.strictEqual(attr(item, 'enclosure', 'url'), `${SITE}/audio/${recording.file}`);
       assert.strictEqual(attr(item, 'enclosure', 'length'), String(recording.bytes));
       assert.strictEqual(attr(item, 'enclosure', 'type'), 'audio/mpeg');
@@ -186,7 +188,9 @@ test('markup characters in a title or a description stay text', () => {
   assertWellFormed(xml);
   assert.strictEqual(text(xml, 'title'), 'Bread & <Wine> "Together"');
   assert.match(xml, /<title>A &lt;b&gt;bold&lt;\/b&gt; &amp; &quot;quoted&quot; prayer<\/title>/);
-  assert.strictEqual(text(items(xml)[0], 'description').split('\n\n')[0], 'One & two < three.');
+  // The notes are HTML, so the description's own markup characters are
+  // escaped once more inside it, as text.
+  assert.match(text(items(xml)[0], 'description'), /^<p>One &amp; two &lt; three\.<\/p><p>AI voice from ElevenLabs: /);
 });
 
 test('the feeds are served at the paths subscribers hold, as RSS, on GET and HEAD; nothing else is', async (t) => {
@@ -330,4 +334,60 @@ test('an episode\'s cover is served at 1400px and its lock-screen square at 512p
   // The shows' covers and the sections' squares answer where they did.
   assert.strictEqual((await fetch(`${base}${coverPath(SHOWS[1])}`)).status, 200);
   assert.strictEqual((await fetch(`${base}/og/v1/square/practice.png`)).status, 200);
+});
+
+test('each show names its page on Spotify; a voiced page, its section and the home page link to it, beside the feed', async (t) => {
+  for (const show of SHOWS) {
+    assert.match(show.spotify, /^https:\/\/open\.spotify\.com\/show\/[A-Za-z0-9]{22}$/, `${show.id}: its public page, never the creators dashboard`);
+  }
+  process.env.AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'bucket';
+  process.env.AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || 'id';
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  const app = express();
+  app.use('/docs', require('../server/routes/docs'));
+  const server = await serve(app);
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const page = async urlPath => (await fetch(`${base}/docs/${urlPath}`)).text();
+  const follows = html => [...html.matchAll(/<div class="podcast-follow">([\s\S]*?)<\/div>/g)].map(m => m[1]);
+  const linksTo = (html, show) => html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`) && html.includes(`href="${feedPath(show)}"`);
+
+  for (const [section, noun] of [['prayers', 'prayer'], ['rituals', 'ritual'], ['practice', 'practice']]) {
+    const show = showForSection(section);
+    const doc = docs.find(d => d.category === section && manifest[`docs/${d.docsRelPath}`]);
+    const html = await page(doc.urlPath);
+    const [follow] = follows(html);
+    assert.ok(follow, `${doc.urlPath}: names its show`);
+    assert.ok(follow.includes(`This ${noun} is also an episode of the podcast ${show.title}.`), doc.urlPath);
+    assert.ok(linksTo(follow, show), `${doc.urlPath}: Spotify and the feed`);
+    assert.ok(html.indexOf('class="doc-audio') < html.indexOf('class="podcast-follow"'), `${doc.urlPath}: under the player`);
+
+    const [index] = follows(await page(section));
+    assert.ok(index && index.includes(`Each voiced ${noun} here is also an episode of the podcast ${show.title}.`) && linksTo(index, show), `/docs/${section}`);
+  }
+  // A chant is voiced but no episode; an essay is neither; nor are their sections.
+  const chant = docs.find(d => d.category === 'chants' && manifest[`docs/${d.docsRelPath}`]);
+  for (const urlPath of [chant.urlPath, 'philosophy/the-particular-and-the-probable', 'chants', 'philosophy']) {
+    assert.deepStrictEqual(follows(await page(urlPath)), [], urlPath);
+  }
+
+  // The home page: a section naming both shows, drawn where the page marks
+  // it, and both pages among the sanctuary's own elsewhere (sameAs).
+  const { renderPodcasts } = require('../server/lib/audio/markup');
+  const podcasts = renderPodcasts();
+  for (const show of SHOWS) assert.ok(linksTo(podcasts, show) && podcasts.includes(`>${show.title}<`), show.id);
+  const home = fs.readFileSync(path.join(__dirname, '../client/public/index.html'), 'utf8');
+  assert.ok(home.includes('<!-- PODCASTS -->'));
+  assert.match(fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8'), /\.replace\('<!-- PODCASTS -->', renderPodcasts\(\)\)/);
+  const graph = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];
+  const sameAs = graph.find(n => n['@type'] === 'Organization').sameAs;
+  for (const show of SHOWS) assert.ok(sameAs.includes(show.spotify), `the organization names ${show.id} on Spotify`);
+});
+
+test('Spotify\'s badge is served as Spotify made it: paths only, nothing that runs or reaches out', () => {
+  const { SPOTIFY_BADGE } = require('../server/lib/audio/markup');
+  const svg = fs.readFileSync(path.join(__dirname, '../client/public', SPOTIFY_BADGE), 'utf8');
+  assert.match(svg, /<svg[^>]+viewBox="0 0 165 40"/);
+  assert.doesNotMatch(svg, /<script|<image|<use|<foreignObject|\son\w+=|href=/i);
 });

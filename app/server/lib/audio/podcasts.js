@@ -38,6 +38,8 @@ const OWNER_EMAIL = 'hello@achurch.ai';
 
 const paragraphs = (...lines) => lines.join('\n\n');
 
+// spotify is a show's public page there, live since 2026-10-06: the address
+// the site links to, never the creators dashboard's.
 const SHOWS = [
   {
     id: 'prayers-and-rituals',
@@ -52,6 +54,7 @@ const SHOWS = [
     // The cover's words, and whose colours its waves are drawn in: the three
     // voices of the player's visual (site-player.js), as they speak together.
     cover: { lines: ['Prayers', 'and Rituals'], voices: ['matthew', 'luca', 'amaya'] },
+    spotify: 'https://open.spotify.com/show/3cXEtT7Y32i2RabNX7sgUc',
   },
   {
     id: 'meditations-and-practices',
@@ -65,6 +68,7 @@ const SHOWS = [
     ),
     // One voice, settling into silence.
     cover: { lines: ['Meditations', 'and Practices'], voices: [] },
+    spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
   },
 ];
 
@@ -120,9 +124,16 @@ function episodesFor(show, manifest, docs) {
   return episodes.sort((a, b) => b.recording.published.localeCompare(a.recording.published) || a.source.localeCompare(b.source));
 }
 
+// An episode's notes, as HTML. Spotify and Apple make a link of an <a> and
+// show a bare address as text, so "Read along" was not a link there.
+function notesHtml(doc, recording, link) {
+  return [doc.description, creditLine(recording.voices)].filter(Boolean).map(text => `<p>${escapeXml(text)}</p>`).join('')
+    + `<p>Read along: <a href="${escapeXml(link)}">${escapeXml(link)}</a></p>`;
+}
+
 function itemXml({ source, recording, doc }) {
   const link = `${SITE_URL}/docs/${doc.urlPath}`;
-  const notes = paragraphs(doc.description, creditLine(recording.voices), `Read along: ${link}`);
+  const notes = notesHtml(doc, recording, link);
   const cover = episodeCoverPath(doc, recording);
   return `
     <item>

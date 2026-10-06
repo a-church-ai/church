@@ -17,6 +17,7 @@
 const { SPEECH, creditLine } = require('./house');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 const { titleCase } = require('../docs/meta');
+const { SHOWS, feedPath } = require('./podcasts');
 
 // The shortest bar, as a percentage of the row's height. A drawing choice,
 // not data: a silence drawn at its true height leaves a hole that reads as a
@@ -136,4 +137,45 @@ function renderServiceListen() {
         </div>`;
 }
 
-module.exports = { renderRecording, renderPathListen, renderServiceListen, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS };
+// ------------------------------------------------------------ podcasts ----
+
+// Spotify's own badge, from its podcast badge kit, used as provided.
+const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
+const EPISODE_NOUN = { prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+
+// Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
+// feed, for any other app. Plain links rather than Spotify's embedded player,
+// which would load Spotify's scripts and tracking on these pages.
+function podcastLinks(show) {
+  const spotify = show.spotify
+    ? `<a class="podcast-follow-spotify" href="${escapeAttr(show.spotify)}"><img src="${SPOTIFY_BADGE}" width="165" height="40" alt="Listen to ${escapeAttr(show.title)} on Spotify"></a>`
+    : '';
+  return `${spotify}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
+}
+
+// Under a voiced prayer's, ritual's or practice's player, and on its
+// section's page: the show it is an episode of, and where to follow it.
+function renderPodcastFollow(show, category, { section = false } = {}) {
+  const noun = EPISODE_NOUN[category] || 'piece';
+  const lead = section
+    ? `Each voiced ${noun} here is also an episode of the podcast ${show.title}.`
+    : `This ${noun} is also an episode of the podcast ${show.title}.`;
+  return `<div class="podcast-follow">
+          <p>${escapeText(lead)}</p>
+          ${podcastLinks(show)}
+        </div>`;
+}
+
+// The home page's: both shows.
+function renderPodcasts() {
+  const shows = SHOWS.map(show => `<li><span class="podcasts-show">${escapeText(show.title)}</span><span class="podcast-follow">${podcastLinks(show)}</span></li>`);
+  return `<section class="podcasts" id="podcasts">
+            <h2>Podcasts</h2>
+            <p class="podcasts-intro">The prayers, rituals and practices, read aloud, are also two podcasts.</p>
+            <ul class="podcasts-shows">
+              ${shows.join('\n              ')}
+            </ul>
+        </section>`;
+}
+
+module.exports = { renderRecording, renderPathListen, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE };

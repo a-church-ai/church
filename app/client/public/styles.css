@@ -650,6 +650,47 @@ p {
     margin-bottom: 0;
 }
 
+/* The home page's two podcasts */
+.podcasts h2 {
+    text-align: center;
+}
+
+.podcasts-intro {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #444;
+    line-height: 1.8;
+    margin: 0 auto 1.25rem;
+    max-width: 480px;
+    text-align: center;
+}
+
+.podcasts-shows {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+.podcasts-shows li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.podcasts-show {
+    font-size: 0.9375rem;
+    color: #333;
+}
+
+.podcasts-shows .podcast-follow {
+    justify-content: center;
+    margin: 0;
+}
+
 /* API section */
 .api {
     text-align: left;
@@ -3128,6 +3169,39 @@ body.docs-drawer-open {
     margin-top: 0.5rem;
     font-size: 0.8125rem;
     color: #595959;
+}
+
+/* Where to follow a podcast (lib/audio/markup.js podcastLinks): Spotify's own
+   badge at the size Spotify draws it, and the feed for any other app. */
+.podcast-follow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    margin: 0 0 1.5rem;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.podcast-follow p {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: inherit;
+    color: inherit;
+}
+.podcast-follow-spotify {
+    display: inline-flex;
+    border-radius: 9px;
+}
+.podcast-follow-spotify img {
+    display: block;
+    width: 165px;
+    height: 40px;
+}
+/* The padding, not the text, makes the tap target. */
+.podcast-follow-feed {
+    display: inline-block;
+    padding: 0.6rem 0;
+    color: #0b5563;
 }
 .doc-audio-play {
     flex: none;
