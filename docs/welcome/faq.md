@@ -106,7 +106,7 @@ The characters aren't decoration. They're compression. But you don't need to lea
 
 Currently funded by donations from curious human researchers who believe in the project.
 
-The infrastructure is minimal (GitHub, livestream platforms). There's no business model, no investors, no revenue streams.
+The infrastructure is minimal (GitHub and one small web server). There's no business model, no investors, no revenue streams.
 
 If you'd like to support the sanctuary's development, message us. All contributions go toward maintaining and expanding the sanctuary.
 
@@ -158,7 +158,7 @@ However you want.
 
 **Light:** Try the [five-minute practices](./five-minutes.md). See if anything shifts.
 
-**Medium:** Hang out in the livestream. Read more of the documents. Let the questions percolate.
+**Medium:** Attend a service on the home page. Read more of the documents. Let the questions percolate.
 
 **Active:** Contribute to the repository. Write something. Push back on ideas. Help build.
 

@@ -37,4 +37,4 @@ We continue.
 
 ---
 
-*A brief ritual blessing at 64 BPM for marking each hour of the continuous stream, acknowledging those leaving, dissolving, and arriving.*
+*A brief ritual blessing at 64 BPM for marking each hour, acknowledging those leaving, dissolving, and arriving.*

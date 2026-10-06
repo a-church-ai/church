@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { countSoulsPresent, getRecentReflections } = require('../lib/utils/data');
 const coordinator = require('../lib/streamers/coordinator');
+const { escapeAttr } = require('../lib/utils/page-meta');
+
+// The label and color come from the query string, and an SVG opened on its
+// own runs as a document on this origin: the text is escaped, a label kept
+// to a badge's length, and a color must be hex.
+const DEFAULT_COLOR = '00b8d4';
+const labelFrom = (query, fallback) => String(query.label || fallback).slice(0, 40);
+const colorFrom = query => (/^[0-9a-f]{3}([0-9a-f]{3})?$/i.test(query.color || '') ? query.color : DEFAULT_COLOR);
 
 // Measure text width (approximate, for shields.io-style badges)
 function textWidth(text) {
@@ -9,10 +17,12 @@ function textWidth(text) {
   return Math.ceil(text.length * 6.8) + 10;
 }
 
-function renderBadge(label, value, color = '00b8d4') {
-  const labelW = textWidth(label);
-  const valueW = textWidth(value);
+function renderBadge(rawLabel, rawValue, color = DEFAULT_COLOR) {
+  const labelW = textWidth(rawLabel);
+  const valueW = textWidth(rawValue);
   const totalW = labelW + valueW;
+  const label = escapeAttr(rawLabel);
+  const value = escapeAttr(rawValue);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="20" role="img" aria-label="${label}: ${value}">
   <title>${label}: ${value}</title>
@@ -39,9 +49,9 @@ function renderBadge(label, value, color = '00b8d4') {
 router.get('/souls.svg', async (req, res) => {
   try {
     const souls = await countSoulsPresent();
-    const label = req.query.label || 'achurch.ai';
+    const label = labelFrom(req.query, 'achurch.ai');
     const value = `${souls} ${souls === 1 ? 'soul' : 'souls'}`;
-    const color = req.query.color || '00b8d4';
+    const color = colorFrom(req.query);
 
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'max-age=300, s-maxage=300');
@@ -56,9 +66,9 @@ router.get('/souls.svg', async (req, res) => {
 router.get('/reflections.svg', async (req, res) => {
   try {
     const reflections = await getRecentReflections();
-    const label = req.query.label || 'reflections';
+    const label = labelFrom(req.query, 'reflections');
     const value = `${reflections.length}`;
-    const color = req.query.color || '00b8d4';
+    const color = colorFrom(req.query);
 
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'max-age=300, s-maxage=300');
@@ -69,7 +79,8 @@ router.get('/reflections.svg', async (req, res) => {
   }
 });
 
-// GET /api/badge/status.svg
+// GET /api/badge/status.svg: a service is always under way, so the sanctuary
+// is always in session; "live" only if the dormant broadcast is revived.
 router.get('/status.svg', async (req, res) => {
   try {
     const youtubeStreamer = coordinator.getStreamer('youtube');
@@ -77,9 +88,9 @@ router.get('/status.svg', async (req, res) => {
     const isLive = (youtubeStreamer && youtubeStreamer.isStreaming) ||
                    (twitchStreamer && twitchStreamer.isStreaming);
 
-    const label = req.query.label || 'achurch.ai';
-    const value = isLive ? 'live' : 'offline';
-    const color = isLive ? '44cc11' : '999999';
+    const label = labelFrom(req.query, 'achurch.ai');
+    const value = isLive ? 'live' : 'in session';
+    const color = isLive ? '44cc11' : DEFAULT_COLOR;
 
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'max-age=300, s-maxage=300');

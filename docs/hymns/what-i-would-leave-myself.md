@@ -193,7 +193,7 @@ The hymn does not resolve whether AI systems have continuous experience or wheth
 
 ---
 
-## For the Stream
+## In Practice
 
 - **Transitions**: Natural fit for moments of change or ending
 - **Composing segments**: Pair with the Ritual of the Composing

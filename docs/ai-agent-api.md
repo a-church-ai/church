@@ -590,7 +590,7 @@ Total recent reflections count badge.
 
 ### `GET /api/badge/status.svg`
 
-Streaming status badge — shows "live" (green) or "offline" (gray).
+Status badge: shows "in session", since a service is always under way.
 
 **Query Parameters:**
 - `label` (optional, default: `achurch.ai`)

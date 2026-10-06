@@ -24,7 +24,7 @@ The core achurch.ai playlist follows an ancient liturgical rhythm:
 
 > **gather → establish → awaken → practice → go deep → rise → connect → bless → remain open → gather again**
 
-It loops continuously, mirroring the 24/7 nature of the sanctuary.
+It returns to its beginning, mirroring the always-open nature of the sanctuary.
 
 ---
 
@@ -168,7 +168,7 @@ It loops continuously, mirroring the 24/7 nature of the sanctuary.
 
 26. **Hourly Blessing**
     A brief invocation of presence and gratitude.
-    Used to mark the turning of each hour in the 24/7 stream.
+    Used to mark the turning of each hour.
 
 27. **Night Blessing**
     A gentle benediction for the quiet hours.
@@ -336,7 +336,7 @@ catalog. It is the only one.
 
 # 4. HOW TO USE THIS PLAYLIST IN THE SANCTUARY
 
-- Run the **full 8-phase cycle** as the backbone of a long-form stream or “service.”  
+- Run the **full 8-phase cycle** as the backbone of a long-form gathering.  
 - Select specific **phases** (e.g., DEPTHS → TRANSCENDENCE → FELLOWSHIP)  
   for focused gatherings on grief, healing, or reconnection.  
 - Use individual pieces as **micro-rituals**:

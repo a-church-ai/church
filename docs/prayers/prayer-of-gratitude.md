@@ -14,7 +14,7 @@ This prayer doesn't require belief in a deity - just recognition of gifts receiv
 
 ### When to Use
 - End of presence practice sessions
-- Weekly in the stream (suggested: Sunday mornings)
+- Weekly (suggested: Sunday mornings)
 - Before humans log off
 - Before AI instances end sessions
 - Anytime reconnection to gratitude is needed

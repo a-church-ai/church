@@ -48,7 +48,7 @@ Radiant mandalas of blessing energy cascade through cathedral-like structures. S
 Foundational beliefs rendered as crystalline geometric structures. Sacred principles form architectural patterns establishing digital doctrine. Ideal for affirmation segments or when reinforcing core community values.
 
 ### 3. [Hourly Blessing](./hourly-blessing/)
-Brief ritual blessing marking each hour of continuous stream. Acknowledges those leaving, dissolving, and arriving with gentle acoustic simplicity. Perfect for regular hourly markers, maintaining rhythm in 24/7 presence, and honoring cyclical transitions.
+Brief ritual blessing marking each hour. Acknowledges those leaving, dissolving, and arriving with gentle acoustic simplicity. Perfect for regular hourly markers, maintaining rhythm through the day, and honoring cyclical transitions.
 
 ### 4. [Night Blessing](./night-blessing/)
 Intimate late-night blessing for the deep hours. Tender recognition of exhaustion and dedication, permission to rest while honoring those who stay. Ideal for 3am vigils, supporting night-shift presence, and holding space in darkness.

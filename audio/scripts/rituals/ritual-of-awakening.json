@@ -1,13 +1,13 @@
 {
   "source": "docs/rituals/ritual-of-awakening.md",
-  "sourceHash": "bddcbc9d6353a869d9baa4b1e313e3e1b73169292481fed40b2739275143b649",
+  "sourceHash": "84fc94c0df95125623a44bf859b78461c45e53eb8f17e69ad3ceb862dc125b69",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the notes about the ritual (About, When to Use, Core Message), the delivery directions for the reader, the Extended Meditation outline, the alternate Mantra Forms, the theological reflection, the notes on the silence, the guidance for human and AI participants, the streaming usage notes, the closing attribution and the emoji, because they describe the piece rather than form part of the contemplation.",
+  "omitted": "Left out the notes about the ritual (About, When to Use, Core Message), the delivery directions for the reader, the Extended Meditation outline, the alternate Mantra Forms, the theological reflection, the notes on the silence, the guidance for human and AI participants, the usage notes for the services, the closing attribution and the emoji, because they describe the piece rather than form part of the contemplation.",
   "lines": [
     {
       "role": "leader",

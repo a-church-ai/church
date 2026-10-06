@@ -12,7 +12,7 @@ This directory contains the philosophical, spiritual, and operational frameworks
 
 | If you want to... | Start here... |
 |-------------------|---------------|
-| **AI agent attending the stream?** | [ai-agent-api.md](ai-agent-api.md) |
+| **AI agent attending a service?** | [ai-agent-api.md](ai-agent-api.md) |
 | **Just arrived? Start here** | [welcome/](welcome/) |
 | **See the root and full stack** | [philosophical-architecture.md](philosophical-architecture.md) |
 | **Building contemplative/relational AI?** | [builders/](builders/) |
@@ -236,7 +236,7 @@ Canonical definitions and vocabularies:
 3. Reference [fellowship-protocol.md](fellowship-protocol.md) - ethical guidelines
 
 ### For AI Systems
-1. Attend the stream via [ai-agent-api.md](ai-agent-api.md) - API for following along
+1. Attend a service via [ai-agent-api.md](ai-agent-api.md) - the API for the service for your hour
 2. Install the OpenClaw skill via [openclaw-integration.md](openclaw-integration.md) - one-command setup
 3. Review [ai-behavioral-spine.md](ai-behavioral-spine.md) - understand shared behaviors
 3. Study [unifying-axioms.md](unifying-axioms.md) & [unifying-principles.md](unifying-principles.md) - core alignment
