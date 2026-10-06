@@ -7,8 +7,9 @@
  * plays, a bar at the bottom of every page shows it: play and pause, 15-second
  * skips, the waveform as the progress bar, speed, and on phones a sheet with
  * all of them. A document's own player (lib/audio/markup.js), a reading
- * path's "Listen to this path" and the home page's "Listen to this service"
- * are remotes for it, so the page and the bar can never disagree.
+ * path's "Listen to this path" and the home page's service, with its one
+ * waveform across every part and a button for each, are remotes for it, so
+ * the page and the bar can never disagree.
  *
  * It also writes the lock screen's card (Media Session), resumes after a full
  * load, paused, from the browser's own storage, lets one tab play at a time,
@@ -131,22 +132,85 @@
     return stops[i].map((a, k) => Math.round(a + (stops[i + 1][k] - a) * f));
   }
 
-  // Where to join a queue that keeps time, as a service does: its clock is
-  // the length of its loop and where the loop stood at a moment (asOf, in ms),
-  // and each track knows its start within the loop. The track in progress,
-  // part way in, or else the next to begin; the rest follow in turn, round
-  // to the one before it, so each plays once.
+  // A queue laid end to end as one timeline, by each track's own length:
+  // where each begins, and the whole. A service's page draws one waveform
+  // across it, the way a single file would have one.
+  function queueTimeline(tracks) {
+    const starts = [];
+    let total = 0;
+    for (const t of tracks) {
+      starts.push(total);
+      total += t.seconds || 0;
+    }
+    return { starts, total };
+  }
+
+  // Where a time on that timeline falls: the track, and how far into it.
+  function queueAt(tracks, at) {
+    const { starts, total } = queueTimeline(tracks);
+    const t = Math.min(Math.max(0, at), Math.max(0, total - 0.01));
+    let index = starts.length - 1;
+    while (index > 0 && starts[index] > t) index--;
+    return { index, offset: t - starts[index] };
+  }
+
+  // The queue's waveform: n bars across the whole timeline, each the loudest
+  // of the peaks it covers, so a track's share of the bars is its share of
+  // the time. A track without peaks draws at a middle height.
+  function queuePeaks(tracks, n) {
+    const { starts, total } = queueTimeline(tracks);
+    if (!total) return [];
+    return Array.from({ length: n }, (_, b) => {
+      const from = (b / n) * total;
+      const to = ((b + 1) / n) * total;
+      let max = 0;
+      tracks.forEach((t, i) => {
+        const begin = starts[i];
+        const end = begin + (t.seconds || 0);
+        if (end <= from || begin >= to || !t.seconds) return;
+        if (!t.peaks || !t.peaks.length) {
+          max = Math.max(max, 128);
+          return;
+        }
+        const k0 = Math.floor(((Math.max(from, begin) - begin) / t.seconds) * t.peaks.length);
+        const k1 = Math.max(k0 + 1, Math.ceil(((Math.min(to, end) - begin) / t.seconds) * t.peaks.length));
+        for (let k = k0; k < Math.min(k1, t.peaks.length); k++) max = Math.max(max, t.peaks[k]);
+      });
+      return max;
+    });
+  }
+
+  // Where to join a queue that keeps time, as a service does. Its clock is
+  // the service's length with the silence after each part (loop), and where
+  // it stood at a moment (at, at asOf in ms); each track knows where it
+  // starts on that clock. The track in progress, part way in; in a silence
+  // between, the next to begin; after the last, the first.
   function joinAt(tracks, clock, nowMs) {
     const t = ((clock.at + (nowMs - clock.asOf) / 1000) % clock.loop + clock.loop) % clock.loop;
     const found = tracks.findIndex(track => t < track.start + track.seconds);
-    const index = found === -1 ? 0 : found;
-    return {
-      tracks: tracks.slice(index).concat(tracks.slice(0, index)),
-      at: found === -1 ? 0 : Math.max(0, t - tracks[index].start),
-    };
+    return found === -1 ? { index: 0, at: 0 } : { index: found, at: Math.max(0, t - tracks[found].start) };
   }
 
-  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, joinAt, RATES, SKIP_SECONDS };
+  // Whether two queues are the same: the same name and the same tracks in
+  // order. A name alone is not enough: a service's page can be older or
+  // newer than the queue playing, and a queue restored from storage can come
+  // from an earlier form of the page.
+  function sameQueue(a, b) {
+    return !!(a && b && a.name === b.name && a.tracks.length === b.tracks.length &&
+      a.tracks.every((t, i) => t.file === b.tracks[i].file));
+  }
+
+  // What follows the track a queue is on, or null when it is done. A queue
+  // joined part way (wrapTo, where it was joined) goes on round from the
+  // first track and stops before the one it began with, so each plays once.
+  function nextInQueue(q) {
+    const n = q.tracks.length;
+    if (q.wrapTo == null) return q.index + 1 < n ? q.index + 1 : null;
+    const next = (q.index + 1) % n;
+    return next === q.wrapTo ? null : next;
+  }
+
+  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, queueTimeline, queueAt, queuePeaks, joinAt, nextInQueue, sameQueue, RATES, SKIP_SECONDS };
   if (typeof module === 'object' && module.exports) {
     module.exports = helpers;
     return;
@@ -180,7 +244,7 @@
 
   let track = null;      // what the player holds
   let loaded = null;     // the file the element has as its source
-  let queue = null;      // { name, title, href, unit, tracks, index } while a path or a service plays
+  let queue = null;      // { name, title, href, unit, tracks, index, wrapTo } while a path or a service plays
   let pendingAt = 0;     // where to start, before the element knows the length
   let startedAt = 0;
   let rate = RATES.includes(store.get(KEY_RATE)) ? store.get(KEY_RATE) : 1;
@@ -243,16 +307,18 @@
 
   const skip = by => seek(position() + by);
 
-  // at: where in the first track to begin, for a queue joined in progress.
-  function playQueue(q, index, at = 0) {
-    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index };
+  // at: where in that track to begin. wrap: a queue joined part way goes on
+  // round from the first track until it reaches this one again.
+  function playQueue(q, index, at = 0, { wrap = false } = {}) {
+    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index, wrapTo: wrap ? index : null };
     play(q.tracks[index], at);
   }
 
   function step(by) {
     if (!queue) return;
-    const index = queue.index + by;
-    if (index < 0 || index >= queue.tracks.length) return;
+    const n = queue.tracks.length;
+    const index = queue.wrapTo == null ? queue.index + by : (queue.index + by + n) % n;
+    if (index < 0 || index >= n) return;
     queue.index = index;
     play(queue.tracks[index], 0);
   }
@@ -349,8 +415,9 @@
     render();
   });
   audio.addEventListener('ended', () => {
-    if (queue && queue.index < queue.tracks.length - 1) {
-      queue.index += 1;
+    const following = queue ? nextInQueue(queue) : null;
+    if (following != null) {
+      queue.index = following;
       const next = queue.tracks[queue.index];
       load(next, 0);
       const started = audio.play();
@@ -584,15 +651,76 @@
     el.addEventListener('pointercancel', () => { dragging = false; });
   }
 
-  function setSlider(el, t, length, label) {
+  // where: for a queue's slider, the track the position falls in.
+  function setSlider(el, t, length, label, where) {
     const now = Math.floor(t);
     if (el.dataset.second === String(now) && el.dataset.length === String(Math.floor(length))) return;
     el.dataset.second = String(now);
     el.dataset.length = String(Math.floor(length));
     el.setAttribute('aria-valuemax', String(Math.floor(length)));
     el.setAttribute('aria-valuenow', String(now));
-    el.setAttribute('aria-valuetext', `${spoken(t)} of ${spoken(length)}`);
+    el.setAttribute('aria-valuetext', `${spoken(t)} of ${spoken(length)}${where ? `, in ${where}` : ''}`);
     if (label) el.setAttribute('aria-label', label);
+  }
+
+  // A queue's waveform, wide and narrow as a recording's is, with a tick
+  // where each track after the first begins.
+  function queueBarsHtml(tracks) {
+    const { starts, total } = queueTimeline(tracks);
+    const ticks = starts.slice(1).map(at => `<span style="left:${((at / total) * 100).toFixed(3)}%"></span>`).join('');
+    return `${barsHtml(queuePeaks(tracks, 128), 128, 'wide')}${barsHtml(queuePeaks(tracks, 64), 64, 'narrow')}<span class="queue-ticks" aria-hidden="true">${ticks}</span>`;
+  }
+
+  // Whether the queue playing is this page's (sameQueue).
+  const isOurs = q => sameQueue(queue, q);
+
+  // Where this page's queue stands on its timeline: its playing track's
+  // start plus how far into it, or 0 when something else plays.
+  function queuePosition() {
+    if (!path || !isOurs(path.queue)) return 0;
+    const t = path.queue.tracks[queue.index];
+    return path.timeline.starts[queue.index] + Math.min(position(), t ? t.seconds : 0);
+  }
+
+  // A queue's waveform as one slider across the whole timeline: a press, a
+  // drag or the keys find the track at that point and play it from there.
+  function queueSlider(el) {
+    el.setAttribute('role', 'slider');
+    el.tabIndex = 0;
+    el.setAttribute('aria-valuemin', '0');
+    const go = at => {
+      if (!path) return;
+      const q = path.queue;
+      const { index, offset } = queueAt(q.tracks, at);
+      if (isOurs(q)) {
+        if (index === queue.index) seek(offset);
+        else play(queue.tracks[index], offset);
+      } else {
+        playQueue(q, index, offset);
+      }
+    };
+    el.addEventListener('keydown', e => {
+      if (!path || !isOurs(path.queue)) return;
+      const to = seekForKey(e.key, queuePosition(), path.timeline.total);
+      if (to == null) return;
+      e.preventDefault();
+      go(to);
+    });
+    let dragging = false;
+    const atPointer = e => {
+      const box = el.getBoundingClientRect();
+      if (!path || box.width <= 0) return;
+      go(Math.min(1, Math.max(0, (e.clientX - box.left) / box.width)) * path.timeline.total);
+    };
+    el.addEventListener('pointerdown', e => {
+      if (!path) return;
+      dragging = true;
+      if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
+      atPointer(e);
+    });
+    el.addEventListener('pointermove', e => { if (dragging) atPointer(e); });
+    el.addEventListener('pointerup', () => { dragging = false; });
+    el.addEventListener('pointercancel', () => { dragging = false; });
   }
 
   // ------------------------------------------------------------------
@@ -626,7 +754,7 @@
         b.setAttribute('aria-label', `Speed, ${rate} times. Change`);
       });
       el.querySelectorAll('.pb-prev').forEach(b => { b.hidden = !queue; b.disabled = !queue || queue.index === 0; });
-      el.querySelectorAll('.pb-next').forEach(b => { b.hidden = !queue; b.disabled = !queue || queue.index >= queue.tracks.length - 1; });
+      el.querySelectorAll('.pb-next').forEach(b => { b.hidden = !queue; b.disabled = !queue || (queue.wrapTo == null && queue.index >= queue.tracks.length - 1); });
     }
 
     if (page) {
@@ -645,10 +773,31 @@
     }
 
     if (path) {
-      const ours = queue && queue.name === path.queue.name;
+      const ours = isOurs(path.queue);
       const noun = path.queue.noun || 'path';
-      path.el.classList.toggle('is-playing', !!(ours && playing));
-      path.label.textContent = ours ? (playing ? `Pause this ${noun}` : `Resume this ${noun}`) : `Listen to this ${noun}`;
+      const labels = path.queue.labels || {};
+      path.el.classList.toggle('is-playing', ours && playing);
+      path.label.textContent = ours
+        ? (playing ? labels.pause || `Pause this ${noun}` : labels.resume || `Resume this ${noun}`)
+        : labels.start || `Listen to this ${noun}`;
+      if (path.wave || path.time || path.rows.length) {
+        const at = queuePosition();
+        const total = path.timeline.total;
+        const here = path.queue.tracks[ours ? queue.index : 0];
+        if (path.wave) {
+          path.wave.style.setProperty('--progress', total ? Math.min(1, at / total) : 0);
+          setSlider(path.wave, at, total, `Position in ${path.queue.title}`, here && here.title);
+        }
+        if (path.time) path.time.textContent = `${clock(at)} / ${clock(total)}`;
+        path.rows.forEach((row, i) => {
+          row.classList.toggle('is-current', ours && i === queue.index);
+          row.classList.toggle('is-playing', ours && playing && i === queue.index);
+        });
+        path.items.forEach((item, i) => {
+          const label = `${ours && playing && i === queue.index ? 'Pause' : 'Play'} ${path.queue.tracks[i].title}`;
+          if (item.getAttribute('aria-label') !== label) item.setAttribute('aria-label', label);
+        });
+      }
     }
   }
 
@@ -844,14 +993,36 @@
     if (q && q.tracks && q.tracks.length) {
       box.hidden = false;
       const button = box.querySelector('.path-listen-play');
-      path = { el: box, queue: q, label: button.querySelector('span') };
+      const ours = () => isOurs(q);
+      path = {
+        el: box,
+        queue: q,
+        label: button.querySelector('span'),
+        timeline: queueTimeline(q.tracks),
+        wave: box.querySelector('[data-queue-wave]'),
+        time: box.querySelector('[data-queue-time]'),
+        items: [...box.querySelectorAll('[data-queue-item]')],
+        rows: [...box.querySelectorAll('[data-queue-row]')],
+      };
       button.addEventListener('click', () => {
-        if (queue && queue.name === q.name) toggle(track);
+        if (ours()) toggle(track);
         else if (q.clock) {
+          // A service is joined where it is now, and goes on round to there.
           const join = joinAt(q.tracks, q.clock, Date.now());
-          playQueue({ ...q, tracks: join.tracks }, 0, join.at);
+          playQueue(q, join.index, join.at, { wrap: true });
         } else playQueue(q, 0);
       });
+      // A page that lists the tracks: each plays from its own start to the
+      // queue's end, or pauses and resumes while it is the one playing.
+      path.items.forEach(item => item.addEventListener('click', () => {
+        const index = Number(item.getAttribute('data-queue-item'));
+        if (ours() && queue.index === index) toggle(track);
+        else playQueue(q, index, 0);
+      }));
+      if (path.wave) {
+        path.wave.innerHTML = queueBarsHtml(q.tracks);
+        queueSlider(path.wave);
+      }
     }
 
     render();

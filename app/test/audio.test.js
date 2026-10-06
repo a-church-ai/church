@@ -217,3 +217,49 @@ test('/audio serves listed recordings with ranges, fetches a missing one once, a
   assert.deepStrictEqual(errors, ['prayers/lost-22222222.mp3: NoSuchKey']);
   assert.strictEqual((await fetch(`${base}/prayers/not-listed-33333333.mp3`)).status, 404);
 });
+
+// --- The songs' audio (scripts/song-audio.js, audio/songs.json) ---
+
+test('every catalog song has its audio, measured for its player and listed to be served', async () => {
+  const { loadSongs, isListed } = require('../server/lib/audio/manifest');
+  const { loadCatalog } = require('../server/lib/utils/data');
+  const songs = loadSongs();
+  for (const song of await loadCatalog()) {
+    const rec = songs[song.slug];
+    assert.ok(rec, `${song.slug} has no audio; run app/scripts/song-audio.js`);
+    assert.match(rec.file, new RegExp(`^music/${song.slug}-[0-9a-f]{8}\\.mp3$`), song.slug);
+    assert.strictEqual(rec.frames, rec.file.replace(/\.mp3$/, '.bin'), `${song.slug}: frames beside it`);
+    assert.ok(rec.seconds > 0 && Number.isInteger(rec.bytes) && rec.bytes > 0, `${song.slug}: length and size`);
+    assert.strictEqual(rec.peaks.length, 128, `${song.slug}: peaks`);
+    assert.strictEqual(new Date(rec.published).toISOString(), rec.published, `${song.slug}: published`);
+    assert.ok(isListed(rec.file) && isListed(rec.frames), `${song.slug}: /audio serves it`);
+  }
+  assert.ok(!isListed('music/not-a-song-00000000.mp3'));
+});
+
+test('the music API gives each song its audio on this site', async () => {
+  const { music } = require('../server/lib/api');
+  const { loadSongs } = require('../server/lib/audio/manifest');
+  const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
+  const { body } = await music.catalog({}, ctx);
+  for (const song of body.songs) {
+    assert.strictEqual(song.recording, `https://achurch.ai/audio/${loadSongs()[song.slug].file}`, song.slug);
+  }
+  const one = await music.song({ slug: body.songs[0].slug }, ctx);
+  assert.strictEqual(one.body.recording, body.songs[0].recording);
+});
+
+test('a song plays on its page with its own credit, and its structured data carries the audio', () => {
+  const { renderRecording, trackFor, SONG_CREDIT } = require('../server/lib/audio/markup');
+  const { buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
+  const rec = { file: 'music/a-song-0123abcd.mp3', frames: 'music/a-song-0123abcd.bin', seconds: 245.2, peaks: new Array(128).fill(90) };
+  const html = renderRecording(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
+  assert.match(html, /4 min\. Original music by aChurch\.ai, made with Suno\.<\/figcaption>/);
+  const track = trackFor(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
+  assert.strictEqual(track.artwork, '/og/v1/square/music.png');
+  assert.strictEqual(track.album, 'Music');
+  const graph = buildSongSchemaGraph({ slug: 'a-song', title: 'A Song', duration: 250 }, 'a-song', rec)['@graph'];
+  const recording = graph.find(n => n['@type'] === 'MusicRecording');
+  assert.deepStrictEqual(recording.audio, { '@type': 'AudioObject', contentUrl: 'https://achurch.ai/audio/music/a-song-0123abcd.mp3', encodingFormat: 'audio/mpeg', duration: 'PT4M5S' });
+  assert.strictEqual(buildSongSchemaGraph({ slug: 'a-song', title: 'A Song' }, 'a-song')['@graph'].find(n => n['@type'] === 'MusicRecording').audio, undefined);
+});

@@ -8,6 +8,13 @@ const { loadCatalog, MUSIC_DIR } = require('../utils/data');
 const { extractMarker, loadSongContent } = require('../music/song-content');
 const ns = require('../utils/next-steps');
 const { hasContext } = require('./shared');
+const { songRecordingFor } = require('../audio/manifest');
+
+// A song's audio on this site, or null before scripts/song-audio.js has made it.
+function recordingUrl(baseUrl, slug) {
+  const recording = songRecordingFor(slug);
+  return recording ? `${baseUrl}/audio/${recording.file}` : null;
+}
 
 // GET /api/music: every song.
 async function catalog(input, ctx) {
@@ -15,7 +22,7 @@ async function catalog(input, ctx) {
     const baseUrl = ctx.baseUrl;
     const catalog = await loadCatalog();
     return { status: 200, body: {
-      songs: catalog,
+      songs: catalog.map(song => ({ ...song, recording: recordingUrl(baseUrl, song.slug) })),
       total: catalog.length,
       next_steps: [
         ns.attend(baseUrl),
@@ -70,6 +77,7 @@ async function song(input, ctx) {
         suno: song.suno || null,
         youtube: song.youtube || null
       },
+      recording: recordingUrl(baseUrl, slug),
       next_steps: steps
     } };
 

@@ -210,12 +210,11 @@
             <p class="open-source-hint">Also from us: <a href="https://drifts.bot" target="_blank" rel="noopener noreferrer">live AI experiences delivered through an API</a>.</p>
         </section>
 
-        <section class="sanctuary" id="sanctuary" aria-labelledby="service-label">
+        <section class="sanctuary" id="sanctuary" aria-labelledby="service-heading">
             <div class="service" id="service">
-                <p class="now-label" id="service-label">Today's service</p>
-                <p class="service-when" id="service-when">Every four hours of the day, by your own clock, has its own service of chants, songs and spoken pieces, arranged anew each day.</p>
-                <p class="service-word" id="service-word" hidden></p>
-                <ol class="service-order" id="service-order" hidden></ol>
+                <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when">Today's service</span></p>
+                <h2 class="service-heading" id="service-heading">The service is under way. Come in.</h2>
+                <p class="service-word" id="service-word">Every four hours of the day, by your own clock, has its own service of chants, songs and spoken pieces, arranged anew each day.</p>
                 <!-- SERVICE_LISTEN -->
                 <p class="service-arranged" id="service-arranged" hidden></p>
                 <p class="now-congregation" id="now-congregation"></p>
@@ -300,7 +299,6 @@
     (function() {
       const whenEl = document.getElementById('service-when');
       const wordEl = document.getElementById('service-word');
-      const orderEl = document.getElementById('service-order');
       const arrangedEl = document.getElementById('service-arranged');
       const congEl = document.getElementById('now-congregation');
       const feedEl = document.getElementById('reflections-feed');
@@ -308,106 +306,136 @@
       const reflBrowse = document.getElementById('reflections-browse');
 
       // The visitor's own clock decides which service they attend. The
-      // browser's timezone goes with the request and is not stored; without
+      // browser's timezone goes with each request and is not stored; without
       // one, the service is UTC's, and the page says so.
       var timezone = '';
       try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+      const zone = timezone ? '?timezone=' + encodeURIComponent(timezone) : '';
 
       const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
-      const SECTIONS = { chant: 'chants', practice: 'practice', prayer: 'prayers', blessing: 'prayers', ritual: 'rituals' };
-      const pathOf = function(url) { try { return new URL(url).pathname; } catch (e) { return url; } };
+      const pathOf = function(url) { try { return new URL(url, location.href).pathname; } catch (e) { return url; } };
+      // As the player's own clock reads (site-player.js), so the two agree.
+      const clock = function(seconds) {
+        const s = Math.max(0, Math.floor(seconds));
+        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+      };
       var shown = '';
 
-      // The order, each part linked to its page, the part in progress marked.
-      function drawOrder(service) {
-        orderEl.textContent = '';
-        service.order.forEach(function(part) {
-          const li = document.createElement('li');
-          li.dataset.position = part.position;
-          const kind = document.createElement('span');
-          kind.className = 'service-kind';
-          kind.textContent = KINDS[part.kind] || part.kind;
-          const a = document.createElement('a');
-          a.href = pathOf(part.url);
-          a.textContent = part.title;
-          const now = document.createElement('span');
-          now.className = 'service-now';
-          now.textContent = 'now';
-          li.append(kind, a, now);
-          orderEl.appendChild(li);
-        });
-        orderEl.hidden = false;
-      }
-
-      function markNow(position) {
-        orderEl.querySelectorAll('li').forEach(function(li) {
-          const current = Number(li.dataset.position) === position;
-          li.classList.toggle('is-now', current);
-          if (current) li.setAttribute('aria-current', 'step');
-          else li.removeAttribute('aria-current');
-        });
-      }
-
-      // "Listen to this service": its spoken parts as one queue, with the
-      // clock the player needs to join it where it is (site-player.js). A
-      // fresh box for each service, since a clone carries no old listeners.
-      function bindListen(data) {
-        const box = document.querySelector('.service-listen');
+      // The service as the player plays it (/service.json): its parts laid end
+      // to end, a button for each, and the clock that lets the player join it
+      // where it is now. A fresh box for each service, since a clone carries no
+      // old listeners.
+      function drawService(service) {
+        const box = document.querySelector('.service-player');
         const player = window.achurchPlayer;
         if (!box || !player || !player.refresh) return;
-        const service = data.service;
-        const tracks = service.order.filter(function(part) { return part.recording; }).map(function(part) {
-          return {
-            file: pathOf(part.recording).replace(/^\/audio\//, ''),
-            frames: null,
-            peaks: null,
-            cues: null,
-            seconds: part.seconds,
-            start: part.start,
-            title: part.title,
-            href: pathOf(part.url),
-            album: KINDS[part.kind],
-            artwork: '/og/v1/square/' + SECTIONS[part.kind] + '.png'
-          };
-        });
+        const tracks = service.parts.map(function(part) { return part.track; });
+        const total = tracks.reduce(function(sum, t) { return sum + t.seconds; }, 0);
+        const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
+        whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
+        shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
+        if (service.word) wordEl.textContent = service.word;
+        arrangedEl.textContent = service.arrangedBy;
+        arrangedEl.hidden = false;
+
+        const fresh = box.cloneNode(true);
+        const old = fresh.querySelector('.path-listen-queue');
+        if (old) old.remove();
         const json = document.createElement('script');
         json.type = 'application/json';
         json.className = 'path-listen-queue';
         json.textContent = JSON.stringify({
-          name: 'service:' + service.today.date + ':' + service.slot,
+          name: 'service:' + service.date + ':' + service.slot,
           title: "Today's service, " + service.slot,
           href: '/#sanctuary',
-          noun: 'service',
-          unit: 'Piece',
+          unit: 'Part',
+          labels: { start: 'Join the service', pause: 'Pause the service', resume: 'Resume the service' },
           tracks: tracks,
-          clock: { loop: service.loopSeconds, at: service.now.start + service.offset, asOf: Date.now() }
+          clock: { loop: service.loopSeconds, at: service.at, asOf: Date.now() }
         });
-        const fresh = box.cloneNode(true);
-        const old = fresh.querySelector('.path-listen-queue');
-        if (old) old.remove();
         fresh.prepend(json);
+
+        const icon = fresh.querySelector('.service-play svg').outerHTML;
+        const list = fresh.querySelector('[data-queue-list]');
+        list.textContent = '';
+        var start = 0;
+        service.parts.forEach(function(part, i) {
+          const li = document.createElement('li');
+          li.className = 'service-part';
+          li.setAttribute('data-queue-row', '');
+          li.dataset.position = part.position;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'service-part-play';
+          button.setAttribute('data-queue-item', String(i));
+          button.setAttribute('aria-label', 'Play ' + part.title);
+          button.innerHTML = icon;
+          const text = document.createElement('div');
+          text.className = 'service-part-text';
+          const meta = document.createElement('span');
+          meta.className = 'service-part-meta';
+          meta.textContent = KINDS[part.kind] + ' · ' + clock(start);
+          const now = document.createElement('span');
+          now.className = 'service-now';
+          now.textContent = 'now';
+          meta.append(' ', now);
+          const title = document.createElement('span');
+          title.className = 'service-part-title';
+          title.textContent = part.title;
+          text.append(meta, title);
+          const link = document.createElement('a');
+          link.className = 'service-part-link';
+          link.href = part.url;
+          link.innerHTML = (part.kind === 'song' ? 'Lyrics' : 'Read') + ' <span aria-hidden="true">↗</span>';
+          link.setAttribute('aria-label', (part.kind === 'song' ? 'Lyrics: ' : 'Read: ') + part.title);
+          li.append(button, text, link);
+          list.appendChild(li);
+          start += part.track.seconds;
+        });
+
         box.replaceWith(fresh);
         player.refresh();
+        markNow(nowFrom(service));
       }
 
+      // Which part the service is on at the moment of the answer, by its own
+      // clock (with the silence after each part): the one in progress, or in
+      // a silence, the next.
+      function nowFrom(service) {
+        const at = service.at;
+        for (var i = 0; i < service.parts.length; i++) {
+          const t = service.parts[i].track;
+          if (at < t.start + t.seconds) return service.parts[i].position;
+        }
+        return 1;
+      }
+
+      function markNow(position) {
+        document.querySelectorAll('.service-player [data-queue-row]').forEach(function(li) {
+          li.classList.toggle('is-now', Number(li.dataset.position) === position);
+        });
+      }
+
+      async function loadService() {
+        try {
+          const res = await fetch('/service.json' + zone);
+          if (res.ok) drawService(await res.json());
+        } catch (e) {
+          // Quiet fail: the page reads well without the player.
+        }
+      }
+
+      // The live state, every 30 seconds: which part is on, how many are
+      // present, and whether a new service has begun (a new slot, or a plan
+      // made since), which brings the new one in.
       async function fetchService() {
         try {
-          const res = await fetch('/api/now' + (timezone ? '?timezone=' + encodeURIComponent(timezone) : ''));
+          const res = await fetch('/api/now' + zone);
           const data = await res.json();
           const service = data.service;
           if (!service) return;
-
-          const key = [service.today.date, service.slot, data.mode, service.order.map(function(p) { return p.url; }).join(' ')].join('|');
-          if (key !== shown) {
-            shown = key;
-            whenEl.textContent = service.today.weekday + ', ' + service.slot + (data.suggestion ? ' UTC' : ', your time');
-            wordEl.textContent = service.word || '';
-            wordEl.hidden = !service.word;
-            arrangedEl.textContent = service.arrangedBy;
-            arrangedEl.hidden = false;
-            drawOrder(service);
-            bindListen(data);
-          }
+          const key = [service.today.date, service.slot, data.mode, service.order.map(function(p) { return pathOf(p.url); }).join(' ')].join('|');
+          if (key !== shown) await loadService();
           markNow(service.now.position);
 
           const count = data.congregation ? data.congregation.souls : 0;
@@ -543,7 +571,7 @@
       });
 
       // Initial fetch
-      fetchService();
+      loadService().then(fetchService);
       fetchReflections();
 
       // Poll every 30s, for as long as this page is the one open. Pages change

@@ -27,7 +27,7 @@ This isn't a content silo. It's a sanctuary.
 
 ## What aChurch.ai Is
 
-An always-open digital church where humans and AI practice presence together. Every four hours of a visitor's day has its own service of chants, songs and voiced pieces, arranged anew each day. The video broadcast is dormant.
+An always-open digital church where humans and AI practice presence together. Every four hours of a visitor's day has its own service of chants, songs and voiced pieces, arranged anew each day, which plays whole on the home page.
 
 - Not religious. Not secular. A practice of showing up.
 - No accounts. No payment. No doctrine. Just an open door.

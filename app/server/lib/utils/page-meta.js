@@ -247,7 +247,8 @@ function secondsToISO8601(secs) {
 // Knowledge Graph entity recognition (not eligible for Google rich results
 // in 2026, but consumed by AEO pipelines + entity discovery). Article is
 // still on Google's rich-result eligibility list and anchors E-E-A-T signals.
-function buildSongSchemaGraph(song, slug) {
+// audio: the song's record in audio/songs.json, when the site can play it.
+function buildSongSchemaGraph(song, slug, audio = null) {
   if (!song || !song.title) return null;
 
   const sanctuary = { '@type': 'Organization', name: 'aChurch.ai', url: 'https://achurch.ai' };
@@ -274,6 +275,14 @@ function buildSongSchemaGraph(song, slug) {
     byArtist: sanctuary,
     ...(song.youtube ? { url: song.youtube } : {}),
     ...(song.suno ? { sameAs: [song.suno] } : {}),
+    ...(audio ? {
+      audio: {
+        '@type': 'AudioObject',
+        contentUrl: `https://achurch.ai/audio/${audio.file}`,
+        encodingFormat: 'audio/mpeg',
+        ...(secondsToISO8601(audio.seconds) ? { duration: secondsToISO8601(audio.seconds) } : {}),
+      },
+    } : {}),
   };
 
   const article = {

@@ -11,7 +11,7 @@
  */
 
 const { resolveTimezone, localTime } = require('../utils/timezone');
-const { RULES, check } = require('./rules');
+const { RULES } = require('./rules');
 const { slotOf, slotStart } = require('./slots');
 const { loadServiceCatalog } = require('./catalog');
 const { readPlan, rotationEntry } = require('./plans');
@@ -51,6 +51,14 @@ function serviceAt({ ids, catalog, local }) {
   };
 }
 
+// Who arranged a service, said plainly, as the API and the home page both
+// say it.
+function arrangedBy(entry) {
+  return entry.arrangedBy === 'rotation'
+    ? 'Arranged by rotation through the library, since no plan was made for this slot and date; it has no word.'
+    : `Arranged, and its word written, by an AI model (${entry.arrangedBy}), for this slot and date.`;
+}
+
 async function serviceFor({ timezone, at = new Date() } = {}) {
   const given = resolveTimezone(timezone);
   const tz = given || 'UTC';
@@ -59,10 +67,13 @@ async function serviceFor({ timezone, at = new Date() } = {}) {
   const catalog = await loadServiceCatalog();
   const plan = await readPlan(local.date);
   let entry = plan && plan.slots && plan.slots[slot];
-  // A stored plan that no longer holds (a piece removed since it was made)
-  // gives way to the rotation rather than serving a gap.
-  if (!entry || check(entry.pieces, catalog).length) entry = await rotationEntry(local.date, slot, catalog);
+  // A stored plan whose pieces are no longer all in the catalog (one removed
+  // since it was made) gives way to the rotation rather than serving a gap.
+  // The rules were checked when it was planned; a piece's length moving a
+  // few seconds since (a song's audio measured against its video's) is not a
+  // reason to discard the day's service.
+  if (!entry || !(entry.pieces || []).every(id => catalog.has(id))) entry = await rotationEntry(local.date, slot, catalog);
   return { timezone: tz, timezoneGiven: Boolean(given), local, slot, entry, ...serviceAt({ ids: entry.pieces, catalog, local }) };
 }
 
-module.exports = { arrange, serviceAt, serviceFor };
+module.exports = { arrange, serviceAt, serviceFor, arrangedBy };

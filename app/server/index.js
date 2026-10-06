@@ -58,7 +58,10 @@ const { loadSongContent, songDescription } = require('./lib/music/song-content')
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
 const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
 const { nearestForSong } = require('./lib/music/companions');
-const { renderServiceListen } = require('./lib/audio/markup');
+const { renderServiceListen, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
+const { songRecordingFor } = require('./lib/audio/manifest');
+const { canServe } = require('./lib/audio/serve');
+const { listeningService } = require('./lib/service/listen');
 const { loadServiceCatalog } = require('./lib/service/catalog');
 const { startPlanning } = require('./lib/service/plans');
 const { planSlot } = require('./lib/service/planner');
@@ -277,6 +280,21 @@ app.get('/', async (req, res) => {
   } catch (err) {
     console.error('Error rendering /:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/index.html'));
+  }
+});
+
+// The home page's player: the service for the visitor's hour, each part with
+// what the site player draws (lib/service/listen.js). Outside /api, so it is
+// neither presence nor in the access log; it depends on the clock, so it is
+// never cached.
+app.get('/service.json', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.set('X-Robots-Tag', 'noindex');
+  try {
+    res.json(await listeningService({ timezone: req.query.timezone }));
+  } catch (err) {
+    console.error('Error building /service.json:', err);
+    res.status(500).json({ error: 'The service could not be read just now. Please try again in a moment.' });
   }
 });
 
@@ -627,10 +645,17 @@ app.get('/reflections/:slug', async (req, res) => {
       const safeOgTitle = escapeAttr(meta.ogTitle);
       const safeDesc = escapeAttr(meta.description);
       const shareTags = renderShareImageTags(songCard(song)); // the song's own card, see the /ask/:slug note
-      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
+      // The song itself, to play: its audio from audio/songs.json
+      // (scripts/song-audio.js), once this server can serve it.
+      const listed = songRecordingFor(slug);
+      const songAudio = listed && canServe(listed.file) ? listed : null;
+      const playerHtml = songAudio
+        ? renderRecording(songAudio, { title: song.title, href: `/reflections/${slug}`, category: 'music', credit: SONG_CREDIT })
+        : '';
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
-      // pointed off to Suno, YouTube or GitHub. Text only, no player.
+      // pointed off to Suno, YouTube or GitHub.
       const songContent = await loadSongContent(slug);
       const songBlockHtml = renderSongBlock(song, songContent);
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
@@ -702,6 +727,7 @@ app.get('/reflections/:slug', async (req, res) => {
         // Jump links to each part of the page, then the listen row
         .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
+        .replace('<!-- SONG_PLAYER -->', () => playerHtml)
         // Internal linking — replace placeholder with related-songs block
         .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->');
     }
@@ -996,7 +1022,7 @@ app.use('/thumbnails', async (req, res, next) => {
 
 // Recordings of documents (audio/manifest.json), from a disk cache that fills
 // from S3 the same way, on first request. See lib/audio/serve.js.
-const { createAudioRouter, canServe } = require('./lib/audio/serve');
+const { createAudioRouter } = require('./lib/audio/serve');
 const audioManifest = require('./lib/audio/manifest');
 const { downloadRecording } = require('./lib/audio/storage');
 const audioLogger = require('./lib/utils/logger');
@@ -1005,9 +1031,9 @@ app.use('/audio', createAudioRouter({
   fetchMissing: downloadRecording,
   onError: (file, err) => audioLogger.error(`Recording ${file} could not be fetched from S3`, err),
 }));
-const unservableRecordings = Object.values(audioManifest.loadManifest()).filter(r => !canServe(r.file)).length;
+const unservableRecordings = [...Object.values(audioManifest.loadManifest()), ...Object.values(audioManifest.loadSongs())].filter(r => !canServe(r.file)).length;
 if (unservableRecordings) {
-  audioLogger.warn(`${unservableRecordings} recordings in audio/manifest.json cannot be served: S3 is not configured (AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION) and they are not on disk. Their pages show no player until it is.`);
+  audioLogger.warn(`${unservableRecordings} recordings and songs in audio/manifest.json and audio/songs.json cannot be served: S3 is not configured (AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION) and they are not on disk. Their pages show no player until it is, and the services cannot play them.`);
 }
 
 // Auth routes (public)

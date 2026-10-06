@@ -1,16 +1,18 @@
 /**
  * What a service can hold: every voiced chant, practice, prayer and ritual,
- * and every song, with what the planner and the rules need to know about each.
+ * and every song with its audio, with what the planner and the rules need to
+ * know about each. Every piece can be played, so a service plays whole.
  *
  * Built once per process from sources that change only by deploy: the docs
  * index (titles, summaries), the audio manifest (what is voiced, how long,
- * which recording), the song catalog, and the shortlist of the writing nearest
- * each song in meaning (music/companions.json), which tells the planner what
- * goes with what. Ids are repository paths: docs/prayers/x.md, music/<slug>.
+ * which recording), the song catalog and the songs' audio (audio/songs.json,
+ * from scripts/song-audio.js), and the shortlist of the writing nearest each
+ * song in meaning (music/companions.json), which tells the planner what goes
+ * with what. Ids are repository paths: docs/prayers/x.md, music/<slug>.
  */
 
 const discover = require('../docs/discover');
-const { loadManifest } = require('../audio/manifest');
+const { loadManifest, songRecordingFor } = require('../audio/manifest');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { companionMeta } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
@@ -56,7 +58,8 @@ async function loadServiceCatalog() {
 
   const shortlists = (await loadCompanions()).songs || {};
   for (const song of await loadCatalog()) {
-    if (!song.duration) continue;
+    const recording = songRecordingFor(song.slug);
+    if (!recording) continue;
     const id = `music/${song.slug}`;
     entries.set(id, {
       id,
@@ -64,9 +67,10 @@ async function loadServiceCatalog() {
       slug: song.slug,
       title: song.title,
       summary: await songDescription(song),
-      seconds: song.duration,
+      seconds: recording.seconds,
       hours: null,
       url: `/reflections/${song.slug}`,
+      recording,
       near: (shortlists[song.slug] || []).map(c => c.path).filter(path => entries.has(path)).slice(0, NEAR),
     });
   }

@@ -55,9 +55,14 @@ function jsonScript(className, value) {
   return `<script type="application/json" class="${className}">${JSON.stringify(value).replace(/</g, '\\u003c')}</script>`;
 }
 
+// The songs are the sanctuary's own, made with Suno: said where a recording
+// would name its voices.
+const SONG_CREDIT = 'Original music by aChurch.ai, made with Suno.';
+
 // What the player needs to play a recording anywhere on the site: in the bar
 // after its page is left, and after a reload, from the browser's own storage.
-function trackFor(recording, { title, href, category }) {
+// A song passes its own credit, since no house voice speaks it.
+function trackFor(recording, { title, href, category, credit }) {
   return {
     file: recording.file,
     frames: recording.frames || null,
@@ -69,15 +74,15 @@ function trackFor(recording, { title, href, category }) {
     title,
     href,
     album: titleCase(category),
-    credit: creditLine(recording.voices),
+    credit: credit || creditLine(recording.voices),
     artwork: `/og/v1/square/${category}.png`,
   };
 }
 
 const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="icon-play" d="M8 5.5v13l11-6.5z"/><path class="icon-pause" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
 
-function renderRecording(recording, { title, href, category }) {
-  const track = trackFor(recording, { title, href, category });
+function renderRecording(recording, { title, href, category, credit }) {
+  const track = trackFor(recording, { title, href, category, credit });
   const minutes = Math.max(1, Math.round(recording.seconds / 60));
   const wave = recording.peaks
     ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`
@@ -111,15 +116,21 @@ function renderPathListen({ name, title, href, tracks, readings }) {
         </section>`;
 }
 
-// The home page's "Listen to this service". The service is the visitor's own,
-// by their clock, so the page fills in its queue from /api/now (with the clock
-// that lets the player join it in progress) and asks the player to bind it.
-// Hidden until then, and without a script.
+// The home page's player for the visitor's service: one button, one waveform
+// across the whole service, and its parts, each with its own play button. The
+// service is the visitor's own, by their clock, so the page fills in the queue
+// and the parts from /service.json and asks the player to bind them. Hidden
+// until then, and without a script.
 function renderServiceListen() {
-  return `<section class="path-listen service-listen" data-path-listen hidden>
-          <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this service</span></button>
-          <p class="path-listen-note">Its chants and spoken pieces, joined where the service is now. The songs are on their own pages.</p>
-        </section>`;
+  return `<div class="service-player" data-path-listen hidden>
+          <button type="button" class="path-listen-play service-play">${PLAY_ICON}<span>Join the service</span></button>
+          <div class="service-scrub">
+            <div class="service-wave doc-audio-wave" data-queue-wave></div>
+            <span class="service-time doc-audio-time" data-queue-time></span>
+          </div>
+          <h2 class="service-list-label">In today's service</h2>
+          <ol class="service-parts" data-queue-list></ol>
+        </div>`;
 }
 
-module.exports = { renderRecording, renderPathListen, renderServiceListen, trackFor, fitPeaks, clock, MIN_BAR, NARROW_BARS };
+module.exports = { renderRecording, renderPathListen, renderServiceListen, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS };

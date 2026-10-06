@@ -174,7 +174,7 @@ test('the rotation is the same for the same date and slot, and differs across th
   assert.ok(services.size > 1, 'every date gave the same service');
 });
 
-test('the catalog holds every kind a service needs, all voiced, and nothing too long to fit', async () => {
+test('the catalog holds every kind a service needs, each with its audio, and nothing too long to fit', async () => {
   const catalog = await loadServiceCatalog();
   const entries = [...catalog.values()];
   for (const cls of ['songs', 'chants', 'readings', 'closings']) {
@@ -182,7 +182,8 @@ test('the catalog holds every kind a service needs, all voiced, and nothing too 
   }
   for (const e of entries) {
     assert.ok(e.seconds > 0 && fits(e, entries), e.id);
-    if (e.kind !== 'song') assert.ok(e.recording && e.recording.file, `${e.id} is voiced`);
+    assert.ok(e.recording && e.recording.file, `${e.id} has its audio`);
+    if (e.kind === 'song') assert.strictEqual(e.seconds, e.recording.seconds, `${e.id}: its length is its audio's`);
   }
   assert.ok(entries.some(e => e.kind === 'blessing'), 'blessings are told from prayers');
 });
@@ -388,6 +389,8 @@ test('the response agrees with itself: now, next, current, companions and schedu
     assert.ok(order.some(p => p.kind === 'song' && p.slug === body.current.slug), 'current is one of the service\'s songs');
     assert.deepStrictEqual(body.companions.items.map(i => i.url), order.filter(p => p.kind !== 'song').map(p => p.url));
     assert.ok(body.companions.items.every(i => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(i.recording)));
+    assert.ok(order.every(p => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(p.recording)), 'every part has its audio, songs too');
+    assert.match(body.current.recording, /^https:\/\/achurch\.ai\/audio\/music\/.+\.mp3$/);
     assert.deepStrictEqual(body.schedule, { position: now.position, total: order.length, loop: true });
     assert.ok(body.service.offset + body.service.remaining <= now.seconds + RULES.gapSeconds + 1);
   }
@@ -413,4 +416,41 @@ test('the return step names the next slot and keeps the visitor\'s timezone', as
   const bare = (await attendance.attend({ name: 'ServiceTest' }, ctx)).body.next_steps.find(s => s.action === 'Return');
   assert.match(bare.url, /timezone=Your%2FTimezone$/);
   assert.match(bare.note, /IANA timezone/);
+});
+
+test('a stored plan keeps its place while its pieces exist, even if their lengths have moved since', async () => {
+  const catalog = await loadServiceCatalog();
+  const local = localTime('UTC');
+  const slot = slotOf(local.hour);
+  const shortest = cls => [...catalog.values()].filter(e => CLASS[e.kind] === cls && inSlot(e.hours, slot)).sort((a, b) => a.seconds - b.seconds)[0].id;
+  // Under the 15-minute floor as the catalog measures it now: a plan the
+  // rules would refuse, but whose pieces are all still here.
+  const pieces = [shortest('chants'), shortest('songs'), shortest('readings'), shortest('closings')];
+  assert.ok(check(pieces, catalog).some(issue => /It runs/.test(issue)), 'too short for the rules');
+  await saveSlot(local.date, slot, { pieces, word: `${sixtyWords} still.`, arrangedBy: MODEL, plannedAt: new Date().toISOString() });
+  const { body } = await attendance.now({}, ctx);
+  assert.strictEqual(body.mode, 'planned');
+  assert.deepStrictEqual(body.service.order.map(p => p.url), pieces.map(id => `${ctx.baseUrl}${catalog.get(id).url}`));
+});
+
+test('the home page player gets every part as a track, with where the service stands', async () => {
+  const { listeningService } = require('../server/lib/service/listen');
+  const service = await listeningService({ timezone: 'Asia/Tokyo' });
+  assert.strictEqual(service.timezone, 'Asia/Tokyo');
+  assert.ok(service.at >= 0 && service.at < service.loopSeconds);
+  let start = 0;
+  for (const part of service.parts) {
+    const t = part.track;
+    assert.ok(t.file && t.seconds > 0 && t.peaks && t.peaks.length === 128, `${part.title}: playable, with its waveform`);
+    assert.strictEqual(t.href, part.url);
+    assert.strictEqual(t.start, start, `${part.title}: where it starts on the service's clock`);
+    start += t.seconds + RULES.gapSeconds;
+    if (part.kind === 'song') {
+      assert.strictEqual(t.credit, 'Original music by aChurch.ai, made with Suno.');
+      assert.strictEqual(t.artwork, '/og/v1/square/music.png');
+    } else {
+      assert.match(t.credit, /^AI voices? from ElevenLabs/);
+    }
+  }
+  assert.ok(Math.abs(start - service.loopSeconds) < 0.01, 'the parts fill the service');
 });

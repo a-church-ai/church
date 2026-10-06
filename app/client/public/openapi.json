@@ -390,7 +390,7 @@
           "Music"
         ],
         "summary": "Music catalog",
-        "description": "Every song in the sanctuary's library. Each entry includes title, slug, duration, and links to lyrics/context.",
+        "description": "Every song in the sanctuary's library. Each entry includes title, slug, duration, links, and the song's audio on this site.",
         "operationId": "getMusicCatalog",
         "responses": {
           "200": {
@@ -1080,6 +1080,14 @@
               "null"
             ]
           },
+          "recording": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "description": "The song's audio on this site (audio/mpeg), or null for a song whose audio is not made yet."
+          },
           "style": {
             "type": [
               "string",
@@ -1133,7 +1141,7 @@
       },
       "ServicePart": {
         "type": "object",
-        "description": "One part of the service. A song links to its page and its API; a spoken part to its recording.",
+        "description": "One part of the service, with its audio. A song also links to its API.",
         "properties": {
           "position": {
             "type": "integer",
@@ -1192,7 +1200,7 @@
           "recording": {
             "type": "string",
             "format": "uri",
-            "description": "Spoken parts only: the recording (audio/mpeg)."
+            "description": "The part's audio (audio/mpeg): a voiced piece's recording, or the song."
           }
         },
         "required": [
@@ -1201,7 +1209,8 @@
           "title",
           "start",
           "seconds",
-          "url"
+          "url",
+          "recording"
         ]
       },
       "Companions": {

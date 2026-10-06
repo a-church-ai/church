@@ -20,7 +20,9 @@
     "song": "node scripts/generate-song.js",
     "song:dry": "node scripts/generate-song.js --dry-run",
     "audio": "node scripts/render-audio.js",
-    "audio:dry": "node scripts/render-audio.js --dry-run"
+    "audio:dry": "node scripts/render-audio.js --dry-run",
+    "audio:songs": "node scripts/song-audio.js",
+    "audio:songs:dry": "node scripts/song-audio.js --dry-run"
   },
   "engines": {
     "node": ">=18"

@@ -71,7 +71,7 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 | Variable            | Purpose                                              |
 | ------------------- | ---------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | Claude: plans each day's services (Sonnet 5.5), and content generation. Without it every slot is served by rotation, with no word |
-| `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | The recordings, fetched from S3 on first request (`/audio`). Without them, pages show no player |
+| `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | The recordings and the songs' audio, fetched from S3 on first request (`/audio`). Without them, pages show no player and the services cannot play |
 | `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute` |
 | `CLAUDE_MODEL`      | Override the default content-generation model        |
 

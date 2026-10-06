@@ -48,6 +48,12 @@ async function silenceWav(seconds, out) {
   await ffmpeg(['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono', '-t', String(seconds), ...WAV, out]);
 }
 
+// The highest peak a file decodes to, in dBFS.
+async function encodedPeak(file) {
+  const { stderr } = await ffmpeg(['-i', file, '-af', 'astats=measure_overall=Peak_level:measure_perchannel=none', '-f', 'null', '-']);
+  return Number((stderr.match(/Peak level dB:\s*(-?[\d.]+|-inf)/g) || []).pop().split(':')[1]);
+}
+
 async function seconds(file) {
   const { stdout } = await run('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file]);
   return Number(stdout.trim());
@@ -134,12 +140,12 @@ async function assemble(parts, workDir, outFile) {
   // The encoder can push peaks past what loudnorm allowed: at 64 kbps the
   // 2026-10-05 recordings decoded to +0.9 dBFS, which clips, against -1.6 at
   // 128 kbps. Measure what was actually written, and refuse a file that clips.
-  const { stderr: stats } = await ffmpeg(['-i', outFile, '-af', 'astats=measure_overall=Peak_level:measure_perchannel=none', '-f', 'null', '-']);
-  const peak = Number((stats.match(/Peak level dB:\s*(-?[\d.]+|-inf)/g) || []).pop().split(':')[1]);
+  const peak = await encodedPeak(outFile);
   if (peak > CLIP_DB) {
     throw new Error(`${path.basename(outFile)} peaks at ${peak.toFixed(2)} dBFS once encoded, over ${CLIP_DB}. Raise the bitrate or lower the true-peak target in audio/house-sound.json.`);
   }
   return { seconds: await seconds(outFile), timeline };
 }
 
-module.exports = { assemble, measure };
+// ffmpeg, seconds and encodedPeak are shared with scripts/song-audio.js.
+module.exports = { assemble, measure, ffmpeg, seconds, encodedPeak, CLIP_DB };

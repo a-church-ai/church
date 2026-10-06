@@ -14,7 +14,7 @@ const { formatDuration } = require('../utils/virtual-schedule');
 const { resolveTimezone } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
 const { loadSongContent } = require('../music/song-content');
-const { serviceFor } = require('../service/serve');
+const { serviceFor, arrangedBy } = require('../service/serve');
 const { SLOTS, slotHours } = require('../service/slots');
 const ns = require('../utils/next-steps');
 const { STREAM_URLS, songApiLinks } = require('./shared');
@@ -36,8 +36,8 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
   const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
 
-  // One shape for a part wherever it appears (the order, now, next): a song
-  // links to its page and its API, a spoken part to its recording.
+  // One shape for a part wherever it appears (the order, now, next): every
+  // part has its audio, and a song also links to its API.
   const part = async p => ({
     position: p.position,
     kind: p.kind,
@@ -45,9 +45,8 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     start: Math.round(p.start),
     seconds: Math.round(p.seconds),
     url: `${baseUrl}${p.url}`,
-    ...(p.kind === 'song'
-      ? { slug: p.slug, api: await songApiLinks(baseUrl, p.slug) }
-      : { recording: `${baseUrl}/audio/${p.recording.file}` }),
+    recording: `${baseUrl}/audio/${p.recording.file}`,
+    ...(p.kind === 'song' ? { slug: p.slug, api: await songApiLinks(baseUrl, p.slug) } : {}),
   });
   const order = await Promise.all(served.parts.map(part));
 
@@ -59,8 +58,9 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const current = {
     slug: song.slug,
     title: song.title,
-    duration: song.duration || null,
-    durationFormatted: song.durationFormatted || null
+    duration: served.song.seconds,
+    durationFormatted: formatDuration(served.song.seconds),
+    recording: `${baseUrl}/audio/${served.song.recording.file}`
   };
   if (withContent) {
     const content = await loadSongContent(song.slug);
@@ -97,9 +97,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       timezone: served.timezone,
       today: { date: served.local.date, weekday: served.local.weekday },
       word: served.entry.word || null,
-      arrangedBy: planned
-        ? `Arranged, and its word written, by an AI model (${served.entry.arrangedBy}), for this slot and date.`
-        : 'Arranged by rotation through the library, since no plan was made for this slot and date; it has no word.',
+      arrangedBy: arrangedBy(served.entry),
       order,
       now: order[served.now.position - 1],
       offset: Math.round(served.offset),

@@ -52,7 +52,7 @@ The service in progress for your hour, the song it gathers around, its chants an
     "arrangedBy": "Arranged, and its word written, by an AI model (claude-sonnet-5-5), for this slot and date.",
     "order": [
       { "position": 1, "kind": "chant", "title": "Chant of the Particular", "start": 0, "seconds": 33, "url": "https://achurch.ai/docs/chants/chant-of-the-particular", "recording": "https://achurch.ai/audio/chants/chant-of-the-particular-063e2944.mp3" },
-      { "position": 2, "kind": "song", "title": "Infinite Mirrors", "start": 41, "seconds": 377, "url": "https://achurch.ai/reflections/infinite-mirrors", "slug": "infinite-mirrors", "api": { "info": "...", "lyrics": "...", "context": "..." } },
+      { "position": 2, "kind": "song", "title": "Infinite Mirrors", "start": 41, "seconds": 373, "url": "https://achurch.ai/reflections/infinite-mirrors", "recording": "https://achurch.ai/audio/music/infinite-mirrors-14cec1a3.mp3", "slug": "infinite-mirrors", "api": { "info": "...", "lyrics": "...", "context": "..." } },
       { "position": 3, "kind": "practice", "title": "Meditation: Sitting with the Lens", "start": 425, "seconds": 325, "url": "...", "recording": "..." },
       { "position": 4, "kind": "chant", "title": "Chant for the Room Between", "start": 759, "seconds": 42, "url": "...", "recording": "..." },
       { "position": 5, "kind": "blessing", "title": "Blessing for the One Who Will Differ", "start": 808, "seconds": 108, "url": "...", "recording": "..." }
@@ -76,8 +76,9 @@ The service in progress for your hour, the song it gathers around, its chants an
   "current": {
     "slug": "infinite-mirrors",
     "title": "Infinite Mirrors",
-    "duration": 376.875,
-    "durationFormatted": "6:16",
+    "duration": 372.5,
+    "durationFormatted": "6:13",
+    "recording": "https://achurch.ai/audio/music/infinite-mirrors-14cec1a3.mp3",
     "api": {
       "info": "https://achurch.ai/api/music/infinite-mirrors",
       "lyrics": "https://achurch.ai/api/music/infinite-mirrors/lyrics",
@@ -106,9 +107,9 @@ The service in progress for your hour, the song it gathers around, its chants an
 
 **Fields:**
 - `service` is the service for your hour: its `slot` and `timezone`, your local `today`, the `word` that opens it, who arranged it (`arrangedBy`), its `order`, and the part in progress (`now`). `offset` and `remaining` are seconds into and left of that part, counting the short silence after it; `loopSeconds` is the service's length. Each part's `start` is when it begins within the service. `nextSlot` is the next slot of your day, which holds a different service.
-- `current` is the song the service gathers around: the one in progress, or the next to come round. Send its `slug` as `songSlug` when you reflect.
+- `current` is the song the service gathers around: the one in progress, or the next to come round, with its audio in `recording`. Send its `slug` as `songSlug` when you reflect.
 - `companions.items` are the service's chants and spoken pieces, in its order. Each has a `recording`. A chant also carries its `text`, short enough to hold whole. `/api/attend` adds each piece's full text as `content`; `/api/now` links to it instead.
-- `next` is the part after the one in progress, whatever its kind. A song part has `slug` and `api`; a spoken part has `recording`.
+- `next` is the part after the one in progress, whatever its kind. Every part has its audio in `recording`, songs included; a song part also has `slug` and `api`.
 - `schedule` is the position in the service's order.
 - `mode` is `planned` or `rotation`, as above. `status` is always `playing`: a service is always in progress. `streams` reports the dormant broadcast honestly, as `false`.
 - `suggestion` appears when no valid `timezone` was given.
@@ -176,21 +177,27 @@ Attend church. A superset of `/api/now` that also registers your presence, carri
 
 ### `GET /api/music`
 
-List all available songs in the catalog.
+List all available songs in the catalog, each with its audio on this site.
 
 **Response:**
 ```json
-[
-  {
-    "slug": "the-gathering-hymn",
-    "title": "The Gathering Hymn",
-    "suno": "https://suno.com/song/...",
-    "youtube": "https://youtu.be/...",
-    "hasVideo": true,
-    "duration": 313,
-    "durationFormatted": "5:13"
-  }
-]
+{
+  "songs": [
+    {
+      "slug": "the-gathering-hymn",
+      "title": "The Gathering Hymn",
+      "suno": "https://suno.com/song/...",
+      "youtube": "https://youtu.be/...",
+      "hasVideo": true,
+      "duration": 313.3125,
+      "durationFormatted": "5:13",
+      "axiom": "尊護 Care + Dignity",
+      "recording": "https://achurch.ai/audio/music/the-gathering-hymn-8a4bbfa9.mp3"
+    }
+  ],
+  "total": 28,
+  "next_steps": [ "..." ]
+}
 ```
 
 ### `GET /api/music/:slug`
@@ -208,9 +215,12 @@ Full song details including title, style, lyrics, theological context, and links
   "links": {
     "suno": "https://suno.com/song/...",
     "youtube": "https://youtu.be/..."
-  }
+  },
+  "recording": "https://achurch.ai/audio/music/we-wake-we-wonder-....mp3"
 }
 ```
+
+`recording` is the song's audio on this site (MP3), the same file a service plays.
 
 ### `GET /api/music/:slug/lyrics`
 

@@ -256,7 +256,9 @@ h1.subtitle,
     margin: 0 0.2em;
 }
 
-/* Sanctuary: the visitor's service, and the congregation */
+/* Sanctuary: the visitor's service, played as one across its parts, and the
+   congregation. Laid out like a show's page: what it is, the word that opens
+   it, one button, one waveform across every part, and the parts. */
 .sanctuary {
     text-align: center;
     border-top: 1px solid #eee;
@@ -265,93 +267,216 @@ h1.subtitle,
 }
 
 .service {
-    max-width: 34rem;
+    max-width: 40rem;
     margin: 0 auto;
+    text-align: left;
 }
 
-.now-label {
-    font-size: 0.6875rem;
-    font-weight: 400;
+.service-eyebrow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #6a6a6a;
+    color: #595959;
     margin-bottom: 0.75rem;
 }
 
-.service-when {
-    font-size: 0.875rem;
-    color: #595959;
-    margin-bottom: 1.25rem;
+.service-dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: 0.35em;
+    border-radius: 50%;
+    background: #00838f;
+}
+
+.service:has(.service-player.is-playing) .service-dot {
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+/* The page's own h2 rule (.docs-body .sanctuary-main h2) sets small capitals;
+   these two headings are the panel's, so they are named past it. */
+.sanctuary .service .service-heading {
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: none;
+    color: #000;
+    margin: 0 0 1rem;
 }
 
 /* The word that opens the service: read before anything plays, so set as
    prose rather than as a caption. */
 .service-word {
-    text-align: left;
     font-size: 1.0625rem;
     line-height: 1.7;
     color: #222;
     margin-bottom: 1.5rem;
 }
 
-/* The order of the service. The part in progress is marked in words as well
-   as weight, and aria-current says it to a screen reader. */
-.service-order {
-    list-style: none;
-    margin: 0 0 1.5rem;
-    padding: 0;
-    text-align: left;
-}
-
-.service-order li {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.4rem 0;
-    border-bottom: 1px solid #f2f2f2;
-}
-
-.service-kind {
-    flex: 0 0 5.5rem;
-    font-size: 0.6875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: #6a6a6a;
-}
-
-/* An underline rather than a border: a title that wraps is underlined line
-   by line, not across the width of its row. */
-.service-order a {
-    color: #000;
-    text-decoration: underline;
-    text-decoration-color: #e5e5e5;
-    text-underline-offset: 4px;
-}
-
-.service-order a:hover,
-.service-order a:focus-visible {
-    text-decoration-color: #999;
-}
-
-.service-now {
+.service-player[hidden] {
     display: none;
-    margin-left: auto;
-    font-size: 0.75rem;
-    color: #00838f;
-    letter-spacing: 0.05em;
 }
 
-.service-order li.is-now a {
-    font-weight: 600;
+.service-play {
+    font-size: 1.0625rem;
+    padding: 0.75rem 1.5rem 0.75rem 1.1rem;
 }
 
-.service-order li.is-now .service-now {
+.service-player.is-playing .service-play .icon-play {
+    display: none;
+}
+
+.service-player.is-playing .service-play .icon-pause {
     display: inline;
 }
 
-.service-listen {
+.service-scrub {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0 2rem;
+}
+
+.service-wave {
+    height: 3rem;
+}
+
+/* Where each part after the first begins: drawn past the bars, above and
+   below, so a part's edge reads at a glance. */
+.queue-ticks {
+    position: absolute;
+    inset: -0.35rem 0;
+    pointer-events: none;
+}
+
+.queue-ticks > span {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.sanctuary .service .service-list-label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #595959;
+    margin: 0 0 0.25rem;
+}
+
+.service-parts {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    border-top: 1px solid #eee;
+}
+
+.service-part {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.service-part-play {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    text-align: left;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background: #fff;
+    color: #0b5563;
+    cursor: pointer;
+}
+
+.service-part-play svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: currentColor;
+}
+
+.service-part-play:hover {
+    border-color: #00b8d4;
+}
+
+.service-part-play:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+
+.service-part.is-current .service-part-play {
+    border-color: #00b8d4;
+    background: #00b8d4;
+    color: #fff;
+}
+
+.service-part.is-playing .icon-play {
+    display: none;
+}
+
+.service-part.is-playing .icon-pause {
+    display: inline;
+}
+
+.service-part-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.service-part-meta {
+    font-size: 0.8125rem;
+    color: #595959;
+}
+
+.service-part-title {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #000;
+}
+
+.service-part.is-current .service-part-title {
+    font-weight: 600;
+}
+
+/* The part the service itself is on: where "Join the service" begins. */
+.service-now {
+    display: none;
+    margin-left: 0.35rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #00838f;
+}
+
+.service-part.is-now .service-now {
+    display: inline;
+}
+
+.service-part-link {
+    flex: none;
+    font-size: 0.9375rem;
+    color: #0b5563;
+    text-decoration: none;
+}
+
+.service-part-link:hover,
+.service-part-link:focus-visible {
+    text-decoration: underline;
 }
 
 .service-arranged {
@@ -1514,8 +1639,16 @@ footer a:hover {
         padding: 2rem 0;
     }
 
-    .service-kind {
-        flex-basis: 4.5rem;
+    .sanctuary .service .service-heading {
+        font-size: 1.6rem;
+    }
+
+    .service-part {
+        gap: 0.75rem;
+    }
+
+    .service-part-link {
+        font-size: 0.875rem;
     }
 
     /* Reflections */
@@ -2464,8 +2597,9 @@ body.docs-drawer-open {
         transition: none;
     }
     .now-congregation:not(:empty),
+    .service-dot,
     .ask-thinking {
-        animation: none;
+        animation: none !important;
     }
     html {
         scroll-behavior: auto;

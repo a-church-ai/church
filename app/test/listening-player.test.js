@@ -266,6 +266,7 @@ test('the lock screen gets a 512px square for each voiced section, and nothing f
   assert.strictEqual((await fetch(`${base}/philosophy.png`)).status, 404);
   // Every section with a recording has its square, or its lock screen shows a broken image.
   const voiced = new Set(Object.keys(loadManifest()).map(source => source.split('/')[1]));
+  if (Object.keys(require('../server/lib/audio/manifest').loadSongs()).length) voiced.add('music');
   for (const section of voiced) assert.strictEqual((await fetch(`${base}/${section}.png`)).status, 200, section);
 });
 
@@ -280,4 +281,73 @@ test('page scripts bind their window listeners and timers to the page, so none o
   for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js', 'index.html'].includes(f))) {
     assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /setInterval\(/, `${file} starts a timer that would outlive its page`);
   }
+});
+
+// --- A service on a page: one waveform across its parts (site-player.js) ---
+
+const tracks = [
+  { file: 'a', seconds: 40, start: 0, peaks: new Array(128).fill(10) },
+  { file: 'b', seconds: 300, start: 48, peaks: new Array(128).fill(200) },
+  { file: 'c', seconds: 60, start: 356, peaks: null },
+];
+
+test('site-player: a queue laid end to end is one timeline, and a time on it is a part and a moment', () => {
+  assert.deepStrictEqual(player.queueTimeline(tracks), { starts: [0, 40, 340], total: 400 });
+  assert.deepStrictEqual(player.queueAt(tracks, 0), { index: 0, offset: 0 });
+  assert.deepStrictEqual(player.queueAt(tracks, 39), { index: 0, offset: 39 });
+  assert.deepStrictEqual(player.queueAt(tracks, 40), { index: 1, offset: 0 });
+  assert.deepStrictEqual(player.queueAt(tracks, 345), { index: 2, offset: 5 });
+  assert.strictEqual(player.queueAt(tracks, 9999).index, 2, 'past the end is the last part');
+});
+
+test('site-player: the queue waveform gives each part its share of the bars, from its own peaks', () => {
+  const bars = player.queuePeaks(tracks, 40);
+  assert.strictEqual(bars.length, 40);
+  assert.deepStrictEqual(bars.slice(0, 4), [10, 10, 10, 10], 'the first 40 seconds are the quiet part');
+  assert.ok(bars.slice(5, 33).every(b => b === 200), 'the long part takes its 3/4 of the bars');
+  assert.ok(bars.slice(35).every(b => b === 128), 'a part without peaks draws at the middle');
+  assert.deepStrictEqual(player.queuePeaks([], 10), []);
+  // Within a part, each bar reads the peaks for its own stretch of time: a
+  // falling ramp drawn one bar per bucket comes back as itself.
+  const ramp = Array.from({ length: 128 }, (_, i) => 255 - 2 * i);
+  assert.deepStrictEqual(player.queuePeaks([{ file: 'r', seconds: 128, peaks: ramp }], 128), ramp);
+});
+
+test('site-player: joining a service begins at the part in progress, or the next after a silence', () => {
+  const clock = at => ({ loop: 424, at, asOf: 1000 });
+  assert.deepStrictEqual(player.joinAt(tracks, clock(20), 1000), { index: 0, at: 20 });
+  assert.deepStrictEqual(player.joinAt(tracks, clock(44), 1000), { index: 1, at: 0 }, 'in the silence after the first part');
+  assert.deepStrictEqual(player.joinAt(tracks, clock(100), 3000), { index: 1, at: 54 }, 'moved on by the time since');
+  assert.deepStrictEqual(player.joinAt(tracks, clock(420), 1000), { index: 0, at: 0 }, 'after the last, the first');
+  assert.deepStrictEqual(player.joinAt(tracks, clock(424 + 20), 1000), { index: 0, at: 20 }, 'the service repeats');
+});
+
+test('site-player: a queue joined part way goes round once; one started from a part plays to the end', () => {
+  const q = (index, wrapTo) => ({ tracks, index, wrapTo });
+  assert.strictEqual(player.nextInQueue(q(1, 1)), 2);
+  assert.strictEqual(player.nextInQueue(q(2, 1)), 0, 'on round from the first');
+  assert.strictEqual(player.nextInQueue(q(0, 1)), null, 'and stops before where it was joined');
+  assert.strictEqual(player.nextInQueue(q(2, 0)), null, 'joined at the start, it simply ends');
+  assert.strictEqual(player.nextInQueue(q(1, null)), 2);
+  assert.strictEqual(player.nextInQueue(q(2, null)), null);
+});
+
+test('the home page has a service player to fill: a button, the waveform and its time, and the list', () => {
+  const { renderServiceListen } = require('../server/lib/audio/markup');
+  const html = renderServiceListen();
+  assert.match(html, /<div class="service-player" data-path-listen hidden>/);
+  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Join the service<\/span><\/button>/);
+  for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
+  const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
+  assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));
+  assert.match(home, /fetch\('\/service\.json' \+ zone\)/);
+});
+
+test('site-player: a queue is this page\'s only with the same name and the same tracks in order', () => {
+  const page = { name: 'service:2026-10-06:12:00 to 16:00', tracks };
+  assert.ok(player.sameQueue({ ...page, tracks: tracks.map(t => ({ ...t })) }, page));
+  assert.ok(!player.sameQueue({ ...page, tracks: [tracks[2], tracks[0], tracks[1]] }, page), 'a restored queue in another order');
+  assert.ok(!player.sameQueue({ ...page, tracks: tracks.slice(1) }, page), 'an earlier form with fewer tracks');
+  assert.ok(!player.sameQueue({ ...page, name: 'path:x' }, page));
+  assert.ok(!player.sameQueue(null, page));
 });

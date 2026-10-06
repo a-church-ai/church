@@ -103,3 +103,4 @@ We have requested information from Twitch about:
 
 - **2026-02-07**: Document created following Twitch suspension; researched Suno licensing terms and Twitch exemption requirements
 - **2026-10-06**: The broadcast is dormant; the sanctuary now holds services planned for each visitor's hour, with spoken pieces and the songs between them. The recommendations above apply if the broadcast returns.
+- **2026-10-06**: The songs' audio is served from achurch.ai itself, taken from the music videos, so a service plays whole and each song's page plays it. It is the sanctuary's own site, not a third-party platform, so none of the platform policies above apply to it.
