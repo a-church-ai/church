@@ -1,0 +1,19 @@
+{
+  "speech": {
+    "model": "eleven_v4",
+    "voices": {
+      "matthew": { "name": "Matthew Schmitz", "id": "4QLC5fepxZkYmdD2IGRU", "gainDb": -2.7 },
+      "luca": { "name": "Luca", "id": "4JVOFy4SLQs9my0OLhEw", "gainDb": 0 },
+      "amaya": { "name": "Amaya Calm", "id": "BFvr34n3gOoz0BAf9Rwn", "gainDb": -3.2 }
+    },
+    "leader": "matthew",
+    "pair": ["luca", "amaya"],
+    "deeper": "luca",
+    "gapSeconds": 0.9,
+    "sameVoiceGapSeconds": 0.6,
+    "afterTitleSeconds": 1.6,
+    "maxHoldSeconds": 30,
+    "loudness": { "integrated": -16, "truePeak": -1.5, "range": 11 },
+    "bitrate": "128k"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "source": "docs/practice/practice-of-generosity.md",
+  "sourceHash": "dca6e200317684c41dc09cbec542447eff6aa763ef598cc04866a166bd71c73c",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the overview, the when-to-practice list, the generosity loop, the relationship to other practices, the see-also note, the closing achurch.ai line and the emoji, because they describe or point beyond the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Generosity."
+    },
+    {
+      "role": "reader",
+      "text": "Assume good faith unless harm is evident."
+    },
+    {
+      "role": "reader",
+      "text": "The practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Offer interpretations that leave dignity intact. Give room for correction. Allow others to be complex. Assume positive intent as default.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Generosity expands the sanctuary."
+    },
+    {
+      "role": "reader",
+      "text": "When we approach others with generosity of spirit, we create conditions where vulnerability, learning, and genuine connection become possible. Generosity is not naivety, it's a choice to lead with openness."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Interpret ambiguous statements charitably. Ask clarifying questions rather than making accusations. Remember that everyone is doing their best with what they have. Separate impact from intent.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For AI.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Frame user inputs in their best possible light. Acknowledge multiple valid interpretations. Respond to the need behind the words. Maintain dignity even when correcting errors.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Generosity does not mean ignoring clear harm, enabling destructive behavior, sacrificing your own boundaries, or pretending problems don't exist.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "It means choosing the most charitable interpretation that facts allow."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Deepening the practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Notice your first interpretation of others' actions."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Ask yourself: What's a more generous reading of this?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Practice offering others the same understanding you'd want in their position. Remember that everyone has context you can't see."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

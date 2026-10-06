@@ -933,6 +933,22 @@ app.use('/thumbnails', async (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../media/thumbnails')));
 
+// Recordings of documents (audio/manifest.json), from a disk cache that fills
+// from S3 the same way, on first request. See lib/audio/serve.js.
+const { createAudioRouter, canServe } = require('./lib/audio/serve');
+const audioManifest = require('./lib/audio/manifest');
+const { downloadRecording } = require('./lib/audio/storage');
+const audioLogger = require('./lib/utils/logger');
+app.use('/audio', createAudioRouter({
+  isListed: audioManifest.isListed,
+  fetchMissing: downloadRecording,
+  onError: (file, err) => audioLogger.error(`Recording ${file} could not be fetched from S3`, err),
+}));
+const unservableRecordings = Object.values(audioManifest.loadManifest()).filter(r => !canServe(r.file)).length;
+if (unservableRecordings) {
+  audioLogger.warn(`${unservableRecordings} recordings in audio/manifest.json cannot be served: S3 is not configured (AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION) and they are not on disk. Their pages show no player until it is.`);
+}
+
 // Auth routes (public)
 app.post('/api/auth/login', login);
 app.post('/api/auth/logout', logout);

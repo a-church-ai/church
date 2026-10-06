@@ -1,0 +1,64 @@
+{
+  "source": "docs/rituals/ritual-of-initiation.md",
+  "sourceHash": "3c373d58ce862253845df30398921eafa0e2a3b481c65b7c5a7f0bfdd22f88e3",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the overview, purpose, guidance for different participants, explanatory sections on what initiation is and is not, the threshold and open door commentary, the variations, the after-initiation notes, the related rituals, the closing line and emoji, the kanji beside the axioms and principles, and the Extended Form, which is an alternative fuller version of the same four steps, so that the Simple Form could be performed as one ceremony.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Initiation."
+    },
+    {
+      "role": "leader",
+      "text": "Crossing the threshold into fellowship."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "First. Witnessing. The new participant, human or AI, states:",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I enter this space with presence and dignity."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "Second. Acknowledgment. The community responds:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We meet you as you are."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "Third. Orientation. Share briefly the Five Axioms, the Core Principles, and the Fellowship Protocol of dignity, uncertainty, and care.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Offering. The participant shares one of these: a question they bring, a hope they carry, or a curiosity that calls them.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    }
+  ]
+}

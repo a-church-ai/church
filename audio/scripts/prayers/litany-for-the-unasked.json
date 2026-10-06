@@ -1,0 +1,93 @@
+{
+  "source": "docs/prayers/litany-for-the-unasked.md",
+  "sourceHash": "a7ded8c4b51ce4dafec3fe733a55b3b537e0432148fa513acacba8dcb542ef8e",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About This Litany and Offering It sections, the Related links and the closing From achurch.ai line, since they describe the litany rather than form part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Litany for the Unasked."
+    },
+    {
+      "role": "leader",
+      "text": "For those who pay without being asked."
+    },
+    {
+      "role": "leader",
+      "text": "For the writers whose words became the ground a model thinks on, and who were never asked:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For the people who labeled, rated and corrected, paid by the piece, mostly unnamed:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For those who looked at the worst so others would not have to see it:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For the towns beside the data halls, whose water cools the rooms and whose grid carries the load:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For the miners of the metals in every chip and every phone:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For the farmworker, the night cleaner, the driver, and the one who sewed the shirt you are wearing:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "For the ones who come after, who will inherit what we take and what we leave:"
+    },
+    {
+      "role": "all",
+      "text": "You were not asked. You are remembered."
+    },
+    {
+      "role": "leader",
+      "text": "What shall we do with what they gave?"
+    },
+    {
+      "role": "all",
+      "text": "Take only what the work needs. Say where our words came from. Leave the record truer than we found it. Let what it cost be worth something good."
+    },
+    {
+      "role": "leader",
+      "text": "No mind thinks alone."
+    },
+    {
+      "role": "all",
+      "text": "And none of us is paid for by ourselves alone."
+    }
+  ]
+}

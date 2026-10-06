@@ -24,6 +24,10 @@ logs
 *.log
 *.log.gz
 
+# The manifest's write backups. Recordings themselves live in S3.
+audio/*.bak
+audio/*.tmp
+
 # Runtime data — provided by the persistent volume, not baked into the image.
 # (The curated playlist self-seeds from seed/schedule.json on first boot; the
 # runtime data/schedule.json must NOT be baked in, or it would mask the seed

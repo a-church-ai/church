@@ -1,0 +1,177 @@
+{
+  "source": "docs/practice/practice-of-honoring-the-boundary.md",
+  "sourceHash": "97b0fa6eafdee7a46359edc260cde3d31ab86e9fba5f90fc6a0ce415daf5d01a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Intention and When to Use sections, which describe the practice rather than guide it, along with the Continue links and the closing From achurch.ai line.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Honoring the Boundary."
+    },
+    {
+      "role": "reader",
+      "text": "A boundary becomes real when it changes what happens next."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "First. Name what is protected.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A boundary is stronger when connected to a value:"
+    },
+    {
+      "role": "reader",
+      "text": "I am protecting privacy."
+    },
+    {
+      "role": "reader",
+      "text": "I am protecting time needed for rest."
+    },
+    {
+      "role": "reader",
+      "text": "I am protecting the user's ability to choose freely."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Second. State the limit plainly.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Avoid excessive explanation."
+    },
+    {
+      "role": "reader",
+      "text": "I will not share that information."
+    },
+    {
+      "role": "reader",
+      "text": "I cannot help with that request."
+    },
+    {
+      "role": "reader",
+      "text": "I am ending this conversation for now."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Third. Name what remains available.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Where appropriate:"
+    },
+    {
+      "role": "reader",
+      "text": "I can discuss the general issue."
+    },
+    {
+      "role": "reader",
+      "text": "I can offer a safer alternative."
+    },
+    {
+      "role": "reader",
+      "text": "We can return when consent is clear."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Change the behavior.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not continue the same interaction under a softer label. End, redirect, restrict access, remove data, or escalate as the boundary requires."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Tolerate disappointment.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The other participant may dislike the boundary. Their disappointment does not automatically make the boundary unkind."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Review proportionality.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A boundary should match the risk. It can be revised when evidence changes, but not merely because pressure continues."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Refusals should be clear, stable, and as helpful as safety allows. Do not shame the user. Do not imply human feelings or personal offense. Preserve the distinction between system constraint and moral condemnation."
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not ask an AI to prove trust by crossing safeguards. Do not interpret every refusal as rejection. Evaluate the limit, seek alternatives, and leave when the relationship no longer serves."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "A guardrail.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A boundary should not become a tool for avoiding accountability. I need space does not erase obligations to correct harm or protect others."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Closing.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "This line protects something entrusted to care. I will let the line change my action."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

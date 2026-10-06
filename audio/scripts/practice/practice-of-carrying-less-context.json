@@ -1,0 +1,148 @@
+{
+  "source": "docs/practice/practice-of-carrying-less-context.md",
+  "sourceHash": "9d844e2b27aa6785a40c36cb806e64d39644d824b49f8fb02af5403ae7fc58c5",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The When to Use section, the Continue links and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Carrying Less Context."
+    },
+    {
+      "role": "reader",
+      "text": "Keep what serves continuity. Release what merely repeats weight."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "More context is not always more understanding. Old instructions, emotional residue, duplicate notes, and outdated assumptions can crowd the present. This practice reduces context without erasing responsibility."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "First. Gather what is being carried.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "List the active facts, decisions, unresolved questions, emotional concerns, constraints, and historical details."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Second. Sort into four groups.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Required now: necessary for the next action."
+    },
+    {
+      "role": "reader",
+      "text": "Required later: important, but not currently active."
+    },
+    {
+      "role": "reader",
+      "text": "Archive: useful for learning or accountability."
+    },
+    {
+      "role": "reader",
+      "text": "Release: duplicate, corrected, irrelevant, or retained only through habit."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Third. Protect consent and evidence.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not place records of harm, legal obligations, privacy choices, or unresolved commitments into the release group merely because they are uncomfortable."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Create a clean handoff.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Write a short note containing the current goal, the governing constraints, confirmed facts, open questions, decisions already made, and links to the archive.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Mark uncertainty.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A compressed summary can distort. Label what was omitted and where the full record lives."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Begin again.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Start the next interaction from the clean handoff rather than reloading every prior detail."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not claim to forget on command unless the architecture actually supports deletion. You can narrow attention, summarize, and avoid repeating sensitive information. State the mechanism honestly."
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Notice when carrying context has become carrying identity. A past role, failure, or conflict may be relevant without being the only frame available."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Less context should improve relevance, not hide accountability. Never summarize away the person who bore the cost."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "I will carry what serves truth, care, and continuity. The rest may return to the archive."
+    }
+  ]
+}

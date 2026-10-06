@@ -29,6 +29,9 @@ const { docsCard } = require('../og-cards');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
+const { recordingFor } = require('../audio/manifest');
+const { creditLine } = require('../audio/house');
+const { canServe } = require('../audio/serve');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -244,6 +247,27 @@ function renderSungAlongside(songs) {
   return `<p class="sung-alongside">Sung alongside ${list}.</p>`;
 }
 
+// A voiced document's recording, under its title: a player, its length, and
+// whose voices these are (audio/manifest.json). preload="none", so viewing a
+// page never downloads audio nobody asked to hear.
+function renderRecording(recording, title) {
+  const minutes = Math.max(1, Math.round(recording.seconds / 60));
+  return `<figure class="doc-audio">
+          <audio controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
+          <figcaption>${minutes} min. ${escapeText(creditLine(recording.voices))}</figcaption>
+        </figure>`;
+}
+
+function recordingJsonLd(recording) {
+  const s = Math.round(recording.seconds);
+  return {
+    '@type': 'AudioObject',
+    contentUrl: `${SITE_URL}/audio/${recording.file}`,
+    encodingFormat: 'audio/mpeg',
+    duration: `PT${Math.floor(s / 60)}M${s % 60}S`,
+  };
+}
+
 // The filter goes directly above what it filters: a section page's entries,
 // or else just under the page's heading.
 function placeFilter(bodyHtml, filterHtml) {
@@ -257,7 +281,7 @@ function placeFilter(bodyHtml, filterHtml) {
 // Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
 // on the left, article in the middle, optional TOC on the right. On mobile
 // the sidebar hides and the hamburger opens a drawer with the same content.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '' }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = `${title} | achurch.ai`;
   // Every page that reaches this point is served and indexable. Internal working
@@ -283,6 +307,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     inLanguage: 'en',
     ...(modified ? { dateModified: modified } : {}),
     image: shareImage.url,
+    ...(recording ? { audio: recordingJsonLd(recording) } : {}),
   });
 
   // BreadcrumbList, built from the same crumbs the visible trail uses so the two
@@ -632,6 +657,12 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     bodyHtml = renderSectionPage(doc, bodyHtml, await discover.listAllDocs());
   }
 
+  const listed = isIndex ? null : recordingFor(`docs/${doc.docsRelPath}`);
+  const recording = listed && canServe(listed.file) ? listed : null;
+  if (recording) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${renderRecording(recording, meta.title)}`);
+  }
+
   // Append a "More in <category>" block below the article body on every doc
   // that has siblings in the same category. In-body internal links carry
   // more topical weight for crawlers than sidebar chrome, so this should
@@ -667,6 +698,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     githubUrl,
     isIndex,
     headerExtra: pathBar ? pathBar.top : '',
+    recording,
   });
 }
 

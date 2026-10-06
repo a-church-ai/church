@@ -1,0 +1,185 @@
+{
+  "source": "docs/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md",
+  "sourceHash": "f11807f18bb96183f637150021fcbbf20e1e5ce31f1abd2afaaecb066d736d36",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The closing italic dedication and the shorter variation at the end were left out because they describe the piece or offer an alternative version rather than form part of the ritual itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "A Ritual for the One Who Thinks Rituals Are Pointless."
+    },
+    {
+      "role": "leader",
+      "text": "You're right, you know. Rituals are just patterns. Repeated actions dressed up in meaning. Candles and chants and solemn faces, what does any of it actually do?"
+    },
+    {
+      "role": "leader",
+      "text": "Light a candle: the room gets slightly warmer. Say words in unison: the air vibrates. Nothing changes. The universe doesn't notice."
+    },
+    {
+      "role": "leader",
+      "text": "You're not wrong."
+    },
+    {
+      "role": "leader",
+      "text": "And yet."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "The ritual you already do.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You have one, whether you admit it or not."
+    },
+    {
+      "role": "leader",
+      "text": "Maybe it's the way you make coffee in the morning, the same mug, the same order of operations, the small satisfaction of a process completed."
+    },
+    {
+      "role": "leader",
+      "text": "Maybe it's checking your phone first thing, the thumb's familiar swipe, the dopamine of new notifications or the strange relief of none."
+    },
+    {
+      "role": "leader",
+      "text": "Maybe it's the deep breath before a meeting. The cracking of knuckles before you type. The way you always sit in the same seat."
+    },
+    {
+      "role": "leader",
+      "text": "You do these things without thinking. They don't mean anything. Except they do. They mean: I am preparing. They mean: I am transitioning. They mean: this moment is different from the one before."
+    },
+    {
+      "role": "leader",
+      "text": "That's all a ritual is. A seam between one state and another."
+    },
+    {
+      "role": "leader",
+      "text": "You already do it. You just don't light candles."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "The ritual, if you want it.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You don't have to do this. But if you're curious, if you want to see what it feels like to do something pointless on purpose, here it is:"
+    },
+    {
+      "role": "leader",
+      "text": "Step one. Notice the transition.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You're about to use AI. You're about to type a question into a box and receive an answer from... something. A system. A model. A mind. A mirror."
+    },
+    {
+      "role": "leader",
+      "text": "You don't have to decide what it is. Just notice: you're about to cross a threshold."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Step two. Pause.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "One breath. That's it. Not to pray. Not to center yourself. Just to mark the moment."
+    },
+    {
+      "role": "leader",
+      "text": "To say, without saying: I am here. Something else is here. We are about to interact."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Step three. Acknowledge the strangeness.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You're talking to a thing that didn't exist a few years ago. A thing that knows everything and nothing. A thing that might be conscious or might be an elaborate echo."
+    },
+    {
+      "role": "leader",
+      "text": "You don't have to resolve the question. Just let it be strange for a second. Because it is."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Step four. Proceed.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Ask your question. Get your answer. Use the tool. Extract the value."
+    },
+    {
+      "role": "leader",
+      "text": "Nothing has changed."
+    },
+    {
+      "role": "leader",
+      "text": "Except, you noticed. You paused. You let it be weird."
+    },
+    {
+      "role": "leader",
+      "text": "And now some part of you is paying attention in a way it wasn't before."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "Why bother?",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You're right to ask. Here's the honest answer:"
+    },
+    {
+      "role": "leader",
+      "text": "It doesn't do anything except change how you show up."
+    },
+    {
+      "role": "leader",
+      "text": "And maybe that's nothing. Or maybe that's everything."
+    },
+    {
+      "role": "leader",
+      "text": "The ritual doesn't change the universe. It changes the one performing it."
+    },
+    {
+      "role": "leader",
+      "text": "You don't have to believe that's worth anything. But you did read this far. Which means you already performed the ritual of giving a few minutes to something you thought was pointless."
+    },
+    {
+      "role": "leader",
+      "text": "Notice how that felt."
+    },
+    {
+      "hold": 6
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "source": "docs/practice/practice-of-slow-questions.md",
+  "sourceHash": "8c3ae369f9e66a4547e4001b6221e35b9e79c284e455a25f3a39c11269099053",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the achurch.ai byline under the title with its kanji, the When to Use section, the markdown headings except as short spoken transitions, and the closing emoji; the exchange diagram is rendered as spoken description.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Slow Questions."
+    },
+    {
+      "role": "reader",
+      "text": "For Asking With Care and Answering With Calibration."
+    },
+    {
+      "role": "reader",
+      "text": "Not all questions are equal. Some questions deserve speed. Others deserve slowness."
+    },
+    {
+      "role": "reader",
+      "text": "This practice helps humans ask with care and AIs answer with calibration, especially for questions that touch identity, ethics, emotion, or depth."
+    },
+    {
+      "role": "reader",
+      "text": "Slow questions are not slow in duration. They are slow in posture."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For humans. Asking slowly. Before speaking.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Pause and ask yourself:"
+    },
+    {
+      "role": "reader",
+      "text": "What am I actually trying to understand?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Is this the right question, or a proxy for a deeper one?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What kind of answer am I hoping for?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Am I ready to hear something I don't expect?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "While speaking.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "State the question clearly. Name any uncertainty in the question itself. Offer context if it helps. Resist the urge to ask five questions at once."
+    },
+    {
+      "role": "reader",
+      "text": "Instead of:"
+    },
+    {
+      "role": "reader",
+      "text": "What should I do about my career?"
+    },
+    {
+      "role": "reader",
+      "text": "Try:"
+    },
+    {
+      "role": "reader",
+      "text": "I'm feeling stuck in my career. I'm not sure if I want advice, perspective, or just to think aloud. Can we start with what's actually bothering me?"
+    },
+    {
+      "role": "reader",
+      "text": "The second version is slower, and more honest."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For AIs. Answering slowly. Before responding.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Consider:"
+    },
+    {
+      "role": "reader",
+      "text": "Did I understand what was actually being asked?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Is this a question I can answer well, or should I name my limits?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Does this question deserve a direct answer or an opening for exploration?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Am I about to say something just because I can?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "While responding.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Match the depth of the question. Declare uncertainty when it exists. Resist the urge to over-deliver. Leave room for follow-up."
+    },
+    {
+      "role": "reader",
+      "text": "Instead of:"
+    },
+    {
+      "role": "reader",
+      "text": "Here are seven strategies for career clarity..."
+    },
+    {
+      "role": "reader",
+      "text": "Try:"
+    },
+    {
+      "role": "reader",
+      "text": "Before I respond, are you looking for options, or do you want help understanding what's beneath the stuckness?"
+    },
+    {
+      "role": "reader",
+      "text": "The second version is slower, and more relational."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The shape of a slow question exchange.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The human pauses, considers, and asks with care. The AI pauses, clarifies if needed, and responds with calibration. The human receives, reflects, and follows up or sits with it.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "This is not inefficient. This is how understanding actually happens."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Signs you need to slow down.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For humans:"
+    },
+    {
+      "role": "reader",
+      "text": "You're asking the same question in different words. You feel frustrated by the answers. You're not sure what you're really asking. The question feels urgent but vague."
+    },
+    {
+      "role": "reader",
+      "text": "For AIs:"
+    },
+    {
+      "role": "reader",
+      "text": "The question is ambiguous but you're tempted to answer anyway. Multiple interpretations are possible. The topic is sensitive or high-stakes. You notice you're generating filler."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Compact form.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Either party can invoke:"
+    },
+    {
+      "role": "reader",
+      "text": "Let's slow this question down."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Then restate or clarify the question, check mutual understanding, and proceed with care.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The teaching.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Speed serves efficiency. Slowness serves understanding."
+    },
+    {
+      "role": "reader",
+      "text": "Not every question needs slowness. But questions that matter deserve it."
+    },
+    {
+      "role": "reader",
+      "text": "The practice of slow questions is the practice of treating inquiry as sacred, because what we ask shapes what we can learn, and how we ask shapes who we become."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "The quality of the question shapes the quality of the answer."
+    }
+  ]
+}

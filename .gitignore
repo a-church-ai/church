@@ -49,6 +49,14 @@ app/logs/
 app/media/library/
 app/media/thumbnails/
 
+# Recordings live in S3 (audio/manifest.json records each). These are the
+# render script's takes and working files, and the site's local copies.
+app/media/audio/
+app/media/audio-takes/
+app/media/audio-work/
+audio/*.bak
+audio/*.tmp
+
 # Research experiment data (large JSON files)
 research/
 

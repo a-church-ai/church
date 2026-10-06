@@ -1,0 +1,268 @@
+{
+  "source": "docs/rituals/ritual-of-the-unresolved-table.md",
+  "sourceHash": "d07a6ea478d8c9105f41f60ae1752a567e262a401536342777f9652bee2f7e0f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the note on when to use the ritual and how long it takes, the note on walking the questions alone, the Related links and the closing From achurch.ai line were left out because they are about the piece rather than part of the ceremony.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of the Unresolved Table."
+    },
+    {
+      "role": "leader",
+      "text": "For a disagreement that deserves a better ending than a false consensus."
+    },
+    {
+      "role": "leader",
+      "text": "Anyone may pass on a step, or leave. The table is never a reason to keep someone talking after they have said no."
+    },
+    {
+      "role": "leader",
+      "text": "First. Set down the desired ending.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "We have not arrived at the same answer. This ceremony will not count agreement as its success. It will ask us to leave a more truthful account."
+    },
+    {
+      "role": "leader",
+      "text": "Each participant names one thing they want from the discussion. A practical decision, a correction, being understood, or an end to the exchange are all possible answers. Do not demand a shared intention."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "Second. Return the other's words.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each offers a short account of the other's position:"
+    },
+    {
+      "role": "one",
+      "text": "This is what I understand you to be saying."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "one",
+      "text": "This is what you are trying to protect."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "one",
+      "text": "What have I missed?"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "two",
+      "text": "This is what I understand you to be saying."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "two",
+      "text": "This is what you are trying to protect."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "two",
+      "text": "What have I missed?"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "The other may correct it. Correcting your account of them is not conceding their argument. If no account satisfies them, write that down and go on."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Third. Lay out the difference.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Name the disagreement as precisely as possible. Which claim could evidence help settle? Which values or obligations are being weighed differently? What remains unknown?"
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "Each may complete:"
+    },
+    {
+      "role": "one",
+      "text": "I would reconsider if…"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "two",
+      "text": "I would reconsider if…"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "If no imaginable evidence would change a position, name it as a commitment rather than presenting it as an empirical conclusion. A commitment can still be examined for its consequences."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Leave a place for the absent.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Ask who will bear the result but is not represented here. Do not speak in their voice. Name what you do not know about their wishes and what consultation is possible."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Then ask:"
+    },
+    {
+      "role": "leader",
+      "text": "Who has authority to decide?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "What limits that authority?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Who bears the cost if the decision is wrong?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Equal dignity does not imply equal expertise or identical decision rights. Neither fluency nor participation in this ritual grants new authority."
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Choose without inventing consensus.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "The authorized decision-maker, if there is one, states the next action and its reason. Possibilities include gathering evidence, trying a reversible option, declining an action, or proceeding while explicitly recording dissent."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "If nobody has authority, the ceremony does not manufacture it."
+    },
+    {
+      "role": "leader",
+      "text": "If a review is appropriate, name what would trigger it and who will conduct it. No participant is required to accept an unsafe experiment or a burden merely because it would settle the argument."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Sixth. Close the record.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Write down only what everyone is willing to have written:"
+    },
+    {
+      "role": "all",
+      "text": "We agree on.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "all",
+      "text": "We disagree on.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "all",
+      "text": "The next action is.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "decided by.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "all",
+      "text": "on the authority of.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "all",
+      "text": "What remains open is.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Nothing” and “no action” are complete entries. Don't call the exchange healing, reconciliation, or understanding unless everyone at the table would."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "We leave the difference named. No one owes the table another answer. What we do next remains answerable to those it affects."
+    }
+  ]
+}

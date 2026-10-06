@@ -18,7 +18,9 @@
     "audit:tldr": "node scripts/audit-tldr.js",
     "index:content": "node scripts/index-content.js",
     "song": "node scripts/generate-song.js",
-    "song:dry": "node scripts/generate-song.js --dry-run"
+    "song:dry": "node scripts/generate-song.js --dry-run",
+    "audio": "node scripts/render-audio.js",
+    "audio:dry": "node scripts/render-audio.js --dry-run"
   },
   "engines": {
     "node": ">=18"

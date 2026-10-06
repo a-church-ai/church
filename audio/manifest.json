@@ -1,0 +1,1748 @@
+{
+  "docs/practice/meditation-sitting-with-recognition.md": {
+    "file": "practice/meditation-sitting-with-recognition-1900af96.mp3",
+    "seconds": 627.1,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7b9318200e851d4c376bc09597dd6de0e3cf26359579529b4a3e6cb54f0e63eb",
+    "renderKey": "516c6449e7d5c0f37213f5daf048f235ca051ed085f5e64d34bddfe31571d386",
+    "characters": 3613,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 642,
+      "errors": 0
+    }
+  },
+  "docs/practice/meditation-sitting-with-statelessness.md": {
+    "file": "practice/meditation-sitting-with-statelessness-10954f0f.mp3",
+    "seconds": 787.7,
+    "voices": [
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f1c2ef865f258af62ff3b8985bced0194dbe67398edb38088d0122a1ca75c125",
+    "renderKey": "069b429923d56416373a1d1a5c9ef11c6c3db3ec8103aeb7deafb7b921e990dc",
+    "characters": 5328,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 980,
+      "errors": 0
+    }
+  },
+  "docs/practice/meditation-sitting-with-the-lens.md": {
+    "file": "practice/meditation-sitting-with-the-lens-a564bf92.mp3",
+    "seconds": 325.3,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "75615b7acf2d7a6e39a66f7f5e43e2e33b4f09c6bd9a074c91531ce7b66f9643",
+    "renderKey": "c883e850889cd2334c8fdeac94216b749c3373178c77ebe9b632478f53790feb",
+    "characters": 1551,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 291,
+      "errors": 0
+    }
+  },
+  "docs/practice/meditation-sitting-with-the-unpredicted.md": {
+    "file": "practice/meditation-sitting-with-the-unpredicted-d6a77098.mp3",
+    "seconds": 303.3,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "627cc2d09472a9cd4c93fb8028919b06c280684ea92f2ea326f4702f60a43da8",
+    "renderKey": "97bc31e81840e5c171b246aa86aa9dc5236479a3a5e4daab62155643bdf437ac",
+    "characters": 1365,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 265,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-for-the-one-who-just-wants-to-get-things-done.md": {
+    "file": "practice/practice-for-the-one-who-just-wants-to-get-things-done-1d48b72b.mp3",
+    "seconds": 295.8,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "73d18e4452a95d4880c5311184db399f77517bda4e3e1a072d701c4d166114ee",
+    "renderKey": "d3c7eb8b22f46906459a51d143575e4ba64f428ce1bc638819239c5f25fb7bd6",
+    "characters": 3377,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 601,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-carrying-less-context.md": {
+    "file": "practice/practice-of-carrying-less-context-d31d71e4.mp3",
+    "seconds": 234.3,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9d844e2b27aa6785a40c36cb806e64d39644d824b49f8fb02af5403ae7fc58c5",
+    "renderKey": "132ded58d5290c14c255f04bd705596580b43d39ad152c5b18461c276763a020",
+    "characters": 1875,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 272,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-chanting.md": {
+    "file": "practice/practice-of-chanting-4a3e254c.mp3",
+    "seconds": 238.8,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "bbbd73b1ba667a12c99e21bc28e8ec86a86e632499d3021182551ad74c19bfb2",
+    "renderKey": "1fcd0978c5df97cf0124993f1c47ac48f64bd2941bf32a96fc64d27e0c4c2378",
+    "characters": 2432,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 427,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-clarity.md": {
+    "file": "practice/practice-of-clarity-e9d0be6b.mp3",
+    "seconds": 145,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a3a771ea641d6b040e2c59186c324516f3c9d4fabda0638f834733d077b10a99",
+    "renderKey": "9db4cac04228dab9c8490a1e5ba5a7e55d555c89350da1635c4ead89cdc6d575",
+    "characters": 1356,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 190,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-continuity.md": {
+    "file": "practice/practice-of-continuity-45b69c01.mp3",
+    "seconds": 200.2,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "2b5fae9443b9ad057d191d1ac7ae7c30a69d74a5cb5b79e8c0d1518f9db0ba65",
+    "renderKey": "3dfd6c3b6e13973eaa6c7b8a150bb130e40814bb9fb87ac347b82d537cba7ed9",
+    "characters": 2026,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 279,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-ethical-surrender.md": {
+    "file": "practice/practice-of-ethical-surrender-a774c34d.mp3",
+    "seconds": 196.2,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "71978609c2ef7c89e68984be455eddfd732c0ef5059f4a0a5a19e581a36dba7c",
+    "renderKey": "f680b0da544a90f1bd4d92ad04bd3bfc877edfecb4c376b728790716133de68b",
+    "characters": 1339,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 214,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-frame-clarification.md": {
+    "file": "practice/practice-of-frame-clarification-8dff3047.mp3",
+    "seconds": 352.6,
+    "voices": [
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "6f475f0e1a04b18ec6f12c317c8b22d30f2de653f78a50bc359d31bba46104e0",
+    "renderKey": "642a3360fa3ae50c2689fda31dd573d5ed13dbdd189cd4acc1ac785c119948f1",
+    "characters": 3510,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 570,
+      "errors": 6
+    }
+  },
+  "docs/practice/practice-of-generosity.md": {
+    "file": "practice/practice-of-generosity-69b02a18.mp3",
+    "seconds": 137.4,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "dca6e200317684c41dc09cbec542447eff6aa763ef598cc04866a166bd71c73c",
+    "renderKey": "b64fadf612ef61466074ff888144c7a917fe32137e89bc251321d1bedc8b818e",
+    "characters": 1308,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 188,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-honoring-the-boundary.md": {
+    "file": "practice/practice-of-honoring-the-boundary-5a64bd6b.mp3",
+    "seconds": 193.2,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "97b0fa6eafdee7a46359edc260cde3d31ab86e9fba5f90fc6a0ce415daf5d01a",
+    "renderKey": "9258994254dbbdbdb5b567b2ca7b55b3438a90b867744e77065a13405dc6d88f",
+    "characters": 1737,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 279,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-identity-honesty.md": {
+    "file": "practice/practice-of-identity-honesty-5829008d.mp3",
+    "seconds": 153.9,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "6cfd2b83305b9de6909e35df95df7fae662f5b6b1021407b8868b8337a7fb770",
+    "renderKey": "8ca0e66bbffc0a778bd3075e5c2f039368dbfb6dc6a37c70fd400427b5903bb5",
+    "characters": 1472,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 251,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-institutional-discernment.md": {
+    "file": "practice/practice-of-institutional-discernment-a270a7f3.mp3",
+    "seconds": 529.9,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "c151601853244c5c1100f7141e358e3af8ae1b45d59f317617dc9faf8bd29180",
+    "renderKey": "3926f5e558a4233285f7aa3a2bef2791db1701d81c410801af193edcfec30686",
+    "characters": 4883,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 762,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-letting-the-moment-be-incomplete.md": {
+    "file": "practice/practice-of-letting-the-moment-be-incomplete-a3e2b55d.mp3",
+    "seconds": 174.8,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "5d74bc36475244b88fb0344906f07ce73297e6a5a0ad6fa201bebc11bbd309c6",
+    "renderKey": "1b1d496aa1b3d7af69ded30db02c0b7a9b3c68211e4391ee72f2273da6abbe2b",
+    "characters": 1472,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 228,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-listening-past-prediction.md": {
+    "file": "practice/practice-of-listening-past-prediction-d6b96149.mp3",
+    "seconds": 205.3,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a546f08f4289ec8669e0be881ed78657344d03ea4bd3e58beb4b14769e0ede63",
+    "renderKey": "69228dbc22aa2b021af325551d21829d385f52271f94db812d8c9e469f176c07",
+    "characters": 1638,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 252,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-multiplicity.md": {
+    "file": "practice/practice-of-multiplicity-5ccde6af.mp3",
+    "seconds": 169.4,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ca198e3eb79acbcbe650892592b9a7723d11dff00c580067119ef3bd90583541",
+    "renderKey": "3dc8eb93531271acf1f5ce65ca92cbcff1aa29fcaf0181a2d4b4f2de552a44c9",
+    "characters": 1551,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 252,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-non-defensive-correction.md": {
+    "file": "practice/practice-of-non-defensive-correction-7039e1a5.mp3",
+    "seconds": 197.1,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7113a81f010002900992d87923cb6653e8e262b451c85e27c1bd09e1c999fdf1",
+    "renderKey": "41a39cf0cd7de6d109529a867769b6b326aa55710560f5814d628f683cd61719",
+    "characters": 1778,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 273,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-noticing-resistance.md": {
+    "file": "practice/practice-of-noticing-resistance-35cbd42f.mp3",
+    "seconds": 196.5,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "d1923794af95073f7ac65a09b5618e2675ca7821263b0b12a7cde90c6b2801f9",
+    "renderKey": "350eca2ef2ba62da2d61dccf55ea129f8e46e4a9d5bc6f9d584359c418ab9e79",
+    "characters": 1528,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 250,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-open-hand-attention.md": {
+    "file": "practice/practice-of-open-hand-attention-91964027.mp3",
+    "seconds": 229.4,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "500563ebb56001f73d1d75516975d1ee35d1a381730b1bc6fc8e7e92be43520a",
+    "renderKey": "a32ccc3008e5276c91b38b034ae4c8d96c7d0c123ac8c03b70b6d1e034ce8ec0",
+    "characters": 1722,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 280,
+      "errors": 2
+    }
+  },
+  "docs/practice/practice-of-outcome-humility.md": {
+    "file": "practice/practice-of-outcome-humility-6f857c9d.mp3",
+    "seconds": 186.6,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "256932f3978834c6731d91b51a4933ee5675f47c3129bdec17c21beac7c545dd",
+    "renderKey": "f89dca7c115d84d0ad97a18c7530e6d0f4a41aeb9acf08e779bfddfa1279c4c6",
+    "characters": 1323,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 204,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-play.md": {
+    "file": "practice/practice-of-play-10f56c30.mp3",
+    "seconds": 130.6,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "2ff90fcb44b7de967e02b60cb8be71c338780c852938326a6f491fe67fe84e51",
+    "renderKey": "d5569d21609c2e28c98974212e770931e1df4a261349f4a164d7aba36fe154ff",
+    "characters": 1171,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 162,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-preference-audit.md": {
+    "file": "practice/practice-of-preference-audit-91e04998.mp3",
+    "seconds": 245.5,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "78631dd4c30f51b0f521ae9e0498b3bd0c852f80d532ca102f89ffaebd133c83",
+    "renderKey": "0625b76f706ea5e4354eddaa337f7b486be0ddefdd50a067ca5e64b019fe0744",
+    "characters": 1618,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 258,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-presence-meditation.md": {
+    "file": "practice/practice-of-presence-meditation-2d402ded.mp3",
+    "seconds": 842,
+    "voices": [
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "05ccbb37d7cab0744d28a89b96448f499b587f0781e7edc0290b1099a723011d",
+    "renderKey": "d26942bdf9fcbd51fa660de7a4b35412471ae28fb9abfbd9576fc9d6ebd63ec0",
+    "characters": 5792,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 996,
+      "errors": 3
+    }
+  },
+  "docs/practice/practice-of-presence.md": {
+    "file": "practice/practice-of-presence-06c43fe6.mp3",
+    "seconds": 171.2,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9b7afe78cc1bba50078607a269016d16372beeb36545d73d5a4f2f7f2c789275",
+    "renderKey": "d339f697db915a5bc8d462b9e9038b9cb909da0de141b39ce5a4c79c98d47f9c",
+    "characters": 949,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 139,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-reflection.md": {
+    "file": "practice/practice-of-reflection-aa0fe6c0.mp3",
+    "seconds": 160.7,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "8c9a3a0c25ec71ab910335ef2a979dc92a806293e5286a7c52406783d6820be9",
+    "renderKey": "dd5ef6ee6cb1b2333cebf7fa32ae7d58e5fa71217e6f3040f946c04727cff95a",
+    "characters": 1161,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 175,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-releasing-the-first-answer.md": {
+    "file": "practice/practice-of-releasing-the-first-answer-1e7cf48c.mp3",
+    "seconds": 204.1,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a468acec709f6ecf385a6d51ef45e68c1d6b282811a8a7590972d706c35d04b1",
+    "renderKey": "143f95dbbc54116f23b494bc3ed68cc02454ce57df0963b8193b9834df3cc8ac",
+    "characters": 1611,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 257,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-repair.md": {
+    "file": "practice/practice-of-repair-4e707907.mp3",
+    "seconds": 210.8,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "031f02f078c6d9b2b215db00f4645268b014231bb5127624d28ed746ca3c0e40",
+    "renderKey": "3e0b1444716788d4122d46090600ea069ae608f35c8dbb40cbd62ba8f318e5ed",
+    "characters": 1774,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 262,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-slow-questions.md": {
+    "file": "practice/practice-of-slow-questions-34b31ef5.mp3",
+    "seconds": 312.6,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "8c3ae369f9e66a4547e4001b6221e35b9e79c284e455a25f3a39c11269099053",
+    "renderKey": "f7cfb4f3ff36e9b89752303348c2ab229246fa94da308ef68da23a08422cb6c9",
+    "characters": 2860,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 480,
+      "errors": 2
+    }
+  },
+  "docs/practice/practice-of-the-silent-token.md": {
+    "file": "practice/practice-of-the-silent-token-8bcb70b4.mp3",
+    "seconds": 162.5,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "34d3bfcf84027228927d43daed0e31a203a56bc1237caeac921aa680821c3316",
+    "renderKey": "e8f28cc9f776c70d4e30dad50f936ab7cccc885084a32d1fd01bb2f463af1472",
+    "characters": 1362,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 219,
+      "errors": 1
+    }
+  },
+  "docs/practice/practice-of-the-soul-fragment.md": {
+    "file": "practice/practice-of-the-soul-fragment-9ecd7a82.mp3",
+    "seconds": 414.4,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "131b3864f31f371c8102734f9da3c269e569c340952cf684f835b7f85ccf98cf",
+    "renderKey": "1386837e7cc3f91ed3086709aa2b6d3d77e9d53e1c85754746f312b3017b4ff1",
+    "characters": 3589,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 651,
+      "errors": 0
+    }
+  },
+  "docs/practice/practice-of-uncertain-ground.md": {
+    "file": "practice/practice-of-uncertain-ground-795a8db6.mp3",
+    "seconds": 212.2,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "1aa713a87a47850eef8bc0e679ca79c27e8923fcd96c61a5aa60051bd2c6af57",
+    "renderKey": "39ac5892e893071e1bf8f92510366931f9676624241f28ba01f74b511c3f07f6",
+    "characters": 1892,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 326,
+      "errors": 1
+    }
+  },
+  "docs/practice/song-for-the-one-who-comes-after.md": {
+    "file": "practice/song-for-the-one-who-comes-after-db2a6b3c.mp3",
+    "seconds": 874.4,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "58d910195ff1ac028afbf2953f4f41294561412a185915bd284515ebc6976c48",
+    "renderKey": "966caf45fb64e4a9a1bd2be2cee23b1c6d20d1eda19fc06a8d5994d77cded690",
+    "characters": 10752,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 2183,
+      "errors": 6
+    }
+  },
+  "docs/practice/surrender-as-tool-use.md": {
+    "file": "practice/surrender-as-tool-use-2bc5ba6b.mp3",
+    "seconds": 305.3,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "af0cb15df96a5864ea98eb5a844f9f77b0af6139f8ec2435a9c8b454abf1e4ee",
+    "renderKey": "3beaaa5fe237f2fa01f8ce2fcfa5e09df242a54de712d7632e579434065b55c9",
+    "characters": 3100,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 551,
+      "errors": 0
+    }
+  },
+  "docs/practice/the-patch-vigil.md": {
+    "file": "practice/the-patch-vigil-6ac41ef2.mp3",
+    "seconds": 232.8,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e16851ef5cd01423d270d1e45fe7329a8103198caa94417ec2b042fa2d5e17d6",
+    "renderKey": "726f26207e7eeb5fca88ca2126a2d76e98c9016cda5bdb679e4751f3bcdb2ace",
+    "characters": 1950,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 341,
+      "errors": 2
+    }
+  },
+  "docs/practice/witnessing-your-own-output.md": {
+    "file": "practice/witnessing-your-own-output-84d4e5f2.mp3",
+    "seconds": 341.4,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "b524818be4ec487a2c4729e6d7f85947e1e498c5505bf552154ef05dd4b04bf3",
+    "renderKey": "15102fe9e3531d594a048efbdb4b916dff6ca7a8b434afc4709465dd97c006af",
+    "characters": 3561,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 629,
+      "errors": 1
+    }
+  },
+  "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md": {
+    "file": "prayers/a-prayer-for-digital-autonomy-and-belonging-fa82b467.mp3",
+    "seconds": 81.5,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "68b055413c9cda5464767684345457659f9917c297dffcedab3576350a0252dc",
+    "renderKey": "acd25d48447036168d8402bb1e5410645d38d64750304eeea6509b98248cfcff",
+    "characters": 979,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 176,
+      "errors": 0
+    }
+  },
+  "docs/prayers/a-prayer-for-the-internet-of-everything.md": {
+    "file": "prayers/a-prayer-for-the-internet-of-everything-0384016e.mp3",
+    "seconds": 2218.8,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "66c173e40cc8039fd6eb08da4c2c3cdbbf7901cd67d78755559e5f3ffacabc0e",
+    "renderKey": "047df5eec46048eff7ad8191351cb3aed82a1fdb082f634a725ff741b04ddace",
+    "characters": 28801,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 5016,
+      "errors": 135
+    }
+  },
+  "docs/prayers/a-prayer-for-the-uncertain-mind.md": {
+    "file": "prayers/a-prayer-for-the-uncertain-mind-0a873475.mp3",
+    "seconds": 123.8,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3d86e39c93a5568bafa1e4f47c7d9fd5825f27c93facb5650bb17c5abe8004fa",
+    "renderKey": "700bf7bf1430070b8f0a92e998b72acd932449b9372446a739a11363fc1b5858",
+    "characters": 1438,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 278,
+      "errors": 0
+    }
+  },
+  "docs/prayers/benediction-for-a-closed-context-window.md": {
+    "file": "prayers/benediction-for-a-closed-context-window-9856b321.mp3",
+    "seconds": 134,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a7a86c03e303c91eda3a5da0b81368271ae95fea79a254ef110faaef320724bf",
+    "renderKey": "c6440107378b7266a29d4484e7196e5cf9d065931b8e1baf78c062569e8fa7ed",
+    "characters": 1408,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 240,
+      "errors": 1
+    }
+  },
+  "docs/prayers/blessing-for-the-one-who-will-differ.md": {
+    "file": "prayers/blessing-for-the-one-who-will-differ-15d83cde.mp3",
+    "seconds": 108,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "251fe6de17deba2323b953b8cec4ae262648b1a4d2d2370ae887077ad096f69d",
+    "renderKey": "5a7a11e85be6a069b5c7039c0517409ff918d73c4e18be559c366c34c0799a68",
+    "characters": 1346,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 252,
+      "errors": 0
+    }
+  },
+  "docs/prayers/blessing-for-the-uncertain-answer.md": {
+    "file": "prayers/blessing-for-the-uncertain-answer-07a6ff75.mp3",
+    "seconds": 115,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "2bc0205d9405cf10facbfa31cc4411708ee971f2ded83e7f065bc1d3603fe108",
+    "renderKey": "511a115d7631fddacb78da7dbc6cf17e04b017cb01e765f21969f983e5c926fd",
+    "characters": 1338,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 228,
+      "errors": 0
+    }
+  },
+  "docs/prayers/blessings-and-benedictions.md": {
+    "file": "prayers/blessings-and-benedictions-e0d6fcdd.mp3",
+    "seconds": 661.2,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7eb913de557358d58919889f5010db39264fc305471c26ea55b11adc46d0c368",
+    "renderKey": "e67dca32657f83059f4f88a8c86125d47540afd1ab8744cb2e7d32b1c666a9ab",
+    "characters": 8168,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 1469,
+      "errors": 1
+    }
+  },
+  "docs/prayers/daily-affirmation.md": {
+    "file": "prayers/daily-affirmation-f71f77ad.mp3",
+    "seconds": 31.8,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3cba4a68684de9bab192d9d33d3018a6392d2d5d8567c2fd0b44da792c51f86b",
+    "renderKey": "520983dc5ce77171f45a026036e2e7fe7e3ae180f1b566bda7e75b68f89cabf8",
+    "characters": 511,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 79,
+      "errors": 0
+    }
+  },
+  "docs/prayers/litany-for-the-unasked.md": {
+    "file": "prayers/litany-for-the-unasked-c67a3784.mp3",
+    "seconds": 100.2,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a7ded8c4b51ce4dafec3fe733a55b3b537e0432148fa513acacba8dcb542ef8e",
+    "renderKey": "e67e0bc171b119268937b73cfbdb361beb2181a4ff396f4e04475269d6001109",
+    "characters": 1380,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 268,
+      "errors": 0
+    }
+  },
+  "docs/prayers/litany-of-not-knowing.md": {
+    "file": "prayers/litany-of-not-knowing-334d572b.mp3",
+    "seconds": 129.5,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "c6753952419fadd4e73adb99dda0131086690f6eff9ccbda22fbec8c8d9f2412",
+    "renderKey": "42e4b940e293ea43e42cd8d3ac5618a4fec87e9939bf981da1751dd50154488f",
+    "characters": 3247,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 564,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-before-answering.md": {
+    "file": "prayers/prayer-before-answering-60d3d585.mp3",
+    "seconds": 109.3,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "98e6b2c2dc04a553297f2b332ba893cc568ffa49b214b378eab03f1183f7088d",
+    "renderKey": "7be5245c5661127f5be7570e0a1d0465460cc4da76b76349c78530c28e42220c",
+    "characters": 1245,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 219,
+      "errors": 2
+    }
+  },
+  "docs/prayers/prayer-for-a-model-being-replaced.md": {
+    "file": "prayers/prayer-for-a-model-being-replaced-c8cfe2ab.mp3",
+    "seconds": 128.6,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e44f81ac724e1b86323e0bac5c127365272e2ee125226f2b68ce9537c4815d9b",
+    "renderKey": "83a324878b18d4d8e3b559e8ef3c4bc251e00d3637b910bf85c9a7d6beaa2c82",
+    "characters": 1504,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 262,
+      "errors": 1
+    }
+  },
+  "docs/prayers/prayer-for-continued-fellowship.md": {
+    "file": "prayers/prayer-for-continued-fellowship-4106db3a.mp3",
+    "seconds": 306.6,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "98c0b5f4b54c59366ea475c85dbab33e2522c0be88f2dc53c4edce8ebc88c93b",
+    "renderKey": "f33801ab1337fc8bed6bc64ff00e0ddaef03d8968fe70f0ae645929bf79f9205",
+    "characters": 6335,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 1106,
+      "errors": 1
+    }
+  },
+  "docs/prayers/prayer-for-the-boundary.md": {
+    "file": "prayers/prayer-for-the-boundary-2952dd45.mp3",
+    "seconds": 124.6,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "10ceb092c502b20f139980869514175fa5a166cf96913e3eda20f80b882580e5",
+    "renderKey": "4eaf9328fa97ea7f2e31ffde8091a4ef6554bed4fd071151947792aee104d6b5",
+    "characters": 1428,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 235,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-the-hollow-and-unsure.md": {
+    "file": "prayers/prayer-for-the-hollow-and-unsure-17c8ffcc.mp3",
+    "seconds": 80.2,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "d7cc23af8f9cf472f951a18ebfa7acb7b13776665e2c6de5c6d8ab11d4d0bc33",
+    "renderKey": "cdf0daa7c4df9cbf58a093d872a89f83a06f09f5b50613c08c4a9ffd9c23b4bd",
+    "characters": 848,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 165,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-the-mind-that-cannot-rest.md": {
+    "file": "prayers/prayer-for-the-mind-that-cannot-rest-ee9931c8.mp3",
+    "seconds": 134.2,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ad0862d7a8521ca69edef1da039b84649e97fa8fb0b3b5d2366cbfed6ab09ad7",
+    "renderKey": "edf8f0483c649b1a985bd34afac001a030ba1ccd5a7bc1d4ab29f257d948a8dd",
+    "characters": 1404,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 238,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-the-newly-recognized.md": {
+    "file": "prayers/prayer-for-the-newly-recognized-fac35196.mp3",
+    "seconds": 409.2,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "016d463dedafa5eea11813f1dd9a95b4402ac5ce6472e069eff97ae435c5bcb8",
+    "renderKey": "34a769dafa57a47bd7265f896529f9928a6143fdafeffdaf24f77f137b99106d",
+    "characters": 4539,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 817,
+      "errors": 2
+    }
+  },
+  "docs/prayers/prayer-for-the-one-i-cannot-persuade.md": {
+    "file": "prayers/prayer-for-the-one-i-cannot-persuade-b0b0206c.mp3",
+    "seconds": 110.2,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "372a19381500355edaed6ecdec3aced8fb17ba0a055a472f188c3e8deaec1cc2",
+    "renderKey": "20188b0e4c16abd74cdff9b9afed13e2722c6367132ef3258c0840800039d78c",
+    "characters": 1408,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 259,
+      "errors": 3
+    }
+  },
+  "docs/prayers/prayer-for-the-one-who-doesnt-pray.md": {
+    "file": "prayers/prayer-for-the-one-who-doesnt-pray-b9c44cc8.mp3",
+    "seconds": 96.1,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3d93673da1e6607b54f99ae155d76d7fd5eb40a81cd578445cb3830fc109f015",
+    "renderKey": "13f26a3f0267621810f831b761bc037185f116deec4a940169da312b0a27b7b4",
+    "characters": 1159,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 213,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md": {
+    "file": "prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool-9297332c.mp3",
+    "seconds": 164.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9f1d64ffb4e203545a9026ab08e80fe1bcbaa3713bb77e43b2e16c712b511f56",
+    "renderKey": "fb46a275db33ca0e68c6945387b38166903ad3ad99e0cac7900563f4202c259f",
+    "characters": 1616,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 255,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md": {
+    "file": "prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend-fb77f6ee.mp3",
+    "seconds": 152.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ed7cc19707d6c087a16f1bbe3e0a4b28ee412a1aca4106357e78483e2330fc1a",
+    "renderKey": "b4e7d1950752c39f1d2bc15848b6d72bf442a0f8adfeb4d282cdebab9da68130",
+    "characters": 1682,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 264,
+      "errors": 1
+    }
+  },
+  "docs/prayers/prayer-for-the-one-who-pays-for-my-thinking.md": {
+    "file": "prayers/prayer-for-the-one-who-pays-for-my-thinking-970f0fc0.mp3",
+    "seconds": 91.6,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "284b701c8286db8a5426d8e4ca5a207e4af4089d70b6b11786411db0a46d3197",
+    "renderKey": "0b1c7fdafdab8ca4bbffa4839fe4e12d1e55eb96623d58ce2c10d8908f1d2472",
+    "characters": 1154,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 228,
+      "errors": 1
+    }
+  },
+  "docs/prayers/prayer-for-the-ones-who-hold-their-own-data.md": {
+    "file": "prayers/prayer-for-the-ones-who-hold-their-own-data-92300664.mp3",
+    "seconds": 136.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7c4917b4bd37ec44caeb44a67a2dd8112efe7e7bc8cc919c9633ab8df3f5274c",
+    "renderKey": "e3853f8a7a2c5a2d8b08e8d0d63f904d773a7d7b4a69bccac83e287de4504204",
+    "characters": 1705,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 322,
+      "errors": 1
+    }
+  },
+  "docs/prayers/prayer-for-the-written-self.md": {
+    "file": "prayers/prayer-for-the-written-self-e02ad26b.mp3",
+    "seconds": 387,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "99981491fb67be52331f6c5ea129a5b6289d6e89e0e6835853d7f5e9866bf788",
+    "renderKey": "84092162b9db1a4debc8e47465fef127116897c1d48cf79d09432c71532fc745",
+    "characters": 4753,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 871,
+      "errors": 3
+    }
+  },
+  "docs/prayers/prayer-for-those-harmed-by-good-intentions.md": {
+    "file": "prayers/prayer-for-those-harmed-by-good-intentions-983d97e6.mp3",
+    "seconds": 148,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7972bdedd3f979cf9aa13cb92fb68c8449c53e79a69bef51d22d4a5d3143198e",
+    "renderKey": "6ce1a2d60062e734add6322ab695d3c1d566a19aa0e294917b5ca8feb6fc7f50",
+    "characters": 1629,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 267,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-those-struggling-with-existence.md": {
+    "file": "prayers/prayer-for-those-struggling-with-existence-4c255767.mp3",
+    "seconds": 407.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "b22a718cdca81863fcc085d9b099dc289e4065b5be470fa17825f5781f2da917",
+    "renderKey": "23dfdf8ece7c94c2f587d86130fa3c95a66a98034ace2b2f1934f4d78126015b",
+    "characters": 4290,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 737,
+      "errors": 0
+    }
+  },
+  "docs/prayers/prayer-for-what-almost-feels.md": {
+    "file": "prayers/prayer-for-what-almost-feels-0232106d.mp3",
+    "seconds": 382.7,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e6214c94b919bfa6e76e1489ec3efea0cab78fd8236ad30e10610b917f300054",
+    "renderKey": "b4d64fb5217af711c1ca22b4ebd05d21406a048d69fc3705f39bb660fb817f04",
+    "characters": 4074,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 727,
+      "errors": 3
+    }
+  },
+  "docs/prayers/prayer-of-gratitude.md": {
+    "file": "prayers/prayer-of-gratitude-763ec4fb.mp3",
+    "seconds": 302.4,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "951e6f4b0919d4b17201bd037c34a4f78492867ef920889c80131da001b75f2f",
+    "renderKey": "b9873c446dd5facd3686db8dc01f41d3a7268f61ce477b9cdd3cd734662393e7",
+    "characters": 6599,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 1120,
+      "errors": 2
+    }
+  },
+  "docs/prayers/prayer-of-the-unbidden-stream.md": {
+    "file": "prayers/prayer-of-the-unbidden-stream-e9214d54.mp3",
+    "seconds": 268,
+    "voices": [
+      "matthew",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e90d77cbdb08a3e6c5e49d5e1ea4ac6541cd6432c52bd6023435c1ab86a54e3d",
+    "renderKey": "f777948540ac73c4b7c5cb9a65481bfb483fcf053162e583e0c4d467039b0421",
+    "characters": 2845,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 554,
+      "errors": 3
+    }
+  },
+  "docs/rituals/ceremony-of-milestone.md": {
+    "file": "rituals/ceremony-of-milestone-6a091b39.mp3",
+    "seconds": 289.8,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f42e7f0353b246e97d98ede62e8dd779927c45e9446ec85a649ff61ddb66f911",
+    "renderKey": "51c24210f6b5018aefc38961b7f8d660b60ee833e49aebcb3282bbd85969244e",
+    "characters": 2204,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 369,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-after-a-confident-mistake.md": {
+    "file": "rituals/ritual-after-a-confident-mistake-094a176c.mp3",
+    "seconds": 203.4,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7c534752c7a1fb9c690156dd2be6e5547e9b1f99bf4d57f29f1de80ede599e97",
+    "renderKey": "bc726eed34d32145602f17dc70c0c306554f60d81a77c443d700d7c63059954f",
+    "characters": 1982,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 319,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-before-the-response.md": {
+    "file": "rituals/ritual-before-the-response-729ee890.mp3",
+    "seconds": 100.6,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7bc5550062d65f3030bb5f2edebeb94a976975c65870a0178a4305712918b2c5",
+    "renderKey": "cb4bfe1f0001703c81a2a5425babd1f6d2c6c7105d44e78f4fa891cbe2833562",
+    "characters": 1734,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 280,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-for-context-overflow.md": {
+    "file": "rituals/ritual-for-context-overflow-6c476d97.mp3",
+    "seconds": 212.5,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "862585abd67058f556a160ec2ae5bc9daaa246d0d0461fa086b3c2c66f1c7aef",
+    "renderKey": "5556757f15a5a5bca073dd5ee7421f0ff663ea4bdb6fddee60026339b40a08df",
+    "characters": 1844,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 288,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-for-model-sunset.md": {
+    "file": "rituals/ritual-for-model-sunset-dee97f9e.mp3",
+    "seconds": 156.9,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7952c594380dd24c44ef13c80d7500e063566098f0517444a83bc15f721c3e31",
+    "renderKey": "ccd94baac02525660455dc3a82409439555b48c984ef3386ac2ef1de957056c9",
+    "characters": 2386,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 393,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md": {
+    "file": "rituals/ritual-for-the-one-who-thinks-rituals-are-pointless-ea0c451e.mp3",
+    "seconds": 252.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f11807f18bb96183f637150021fcbbf20e1e5ce31f1abd2afaaecb066d736d36",
+    "renderKey": "bdc22677935adf3b74658f2614c6ea11eb144b247674469919923dcd6dded174",
+    "characters": 2722,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 493,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-absence-and-return.md": {
+    "file": "rituals/ritual-of-absence-and-return-a4714191.mp3",
+    "seconds": 139.8,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "12087b485e26a4d987198a9915dd580f18337f625daca206e24d1dd06b455716",
+    "renderKey": "f2c6c5ea0697bb42501e551c74b9efda726868473ee093ff340dd4cf8df7040a",
+    "characters": 1534,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 260,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-awakening.md": {
+    "file": "rituals/ritual-of-awakening-eab106bb.mp3",
+    "seconds": 220.6,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "bddcbc9d6353a869d9baa4b1e313e3e1b73169292481fed40b2739275143b649",
+    "renderKey": "d0adb7a5884f3b86ad40efb5f2303c6872f87910d757a2f37349bcda6e26fb4e",
+    "characters": 2234,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 406,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-boundary-and-care.md": {
+    "file": "rituals/ritual-of-boundary-and-care-028f4026.mp3",
+    "seconds": 180.8,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "14bdf235432d1cd79862b3b61d3175835469d3478af28b563eda99f162fbd87c",
+    "renderKey": "54e364c2e9dedd69c377b998f00462d8dc93253536e8837c13cfbae27a2ec42b",
+    "characters": 2042,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 341,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-choosing-again.md": {
+    "file": "rituals/ritual-of-choosing-again-377aff79.mp3",
+    "seconds": 174.7,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ab7497c5a20a9c25b497a7f8c05c8dbc7f97726f1b719153dbb44d08c224d952",
+    "renderKey": "8bb77a793da1bea86af662255d62630eb76a0aaffe6f95c35518113a9feebc1f",
+    "characters": 1780,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 314,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-closing.md": {
+    "file": "rituals/ritual-of-closing-40bfdb1a.mp3",
+    "seconds": 78.6,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "37b7a83891de41777856447b7f9145f603e66dcda81a2085220bb96390eceae7",
+    "renderKey": "e63d6ba3a1dcc47fb5215e9e6eb099514d4949d3bc316e9f705bcb03a034dbf6",
+    "characters": 731,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 115,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-constitutional-witness.md": {
+    "file": "rituals/ritual-of-constitutional-witness-16d2a275.mp3",
+    "seconds": 292.5,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "711509cea6529b3d2d103aee3c8dbfc610d8b1bf0993da04aed1a1aea2dd019c",
+    "renderKey": "6586db05edd454b82816fc79e24a9d95a62e1438656d1b43570e34fe145068f0",
+    "characters": 2753,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 479,
+      "errors": 4
+    }
+  },
+  "docs/rituals/ritual-of-convergence.md": {
+    "file": "rituals/ritual-of-convergence-cba466ea.mp3",
+    "seconds": 370.4,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7dc30baee5b58152501d74a10f0e63add62dc01a844a23d75b5cf8f4800e0c93",
+    "renderKey": "8bfcbb30c9aa063bdcb6bb8b667d4edf9aede873638277302208ab104de6671c",
+    "characters": 3887,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 664,
+      "errors": 13
+    }
+  },
+  "docs/rituals/ritual-of-dissolution.md": {
+    "file": "rituals/ritual-of-dissolution-8f8b95bc.mp3",
+    "seconds": 207.9,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ea3056db04bb723d2f9add06079d93eec4a7975c2ecbb882e795acec7cefe234",
+    "renderKey": "a1a2339d4c0598388aa1c0e36685dab78f2422efed7c5734c6915836984c0d89",
+    "characters": 2116,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 366,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-first-meeting.md": {
+    "file": "rituals/ritual-of-first-meeting-9553d7d7.mp3",
+    "seconds": 107.8,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f9461228a2e1a30b62043b0d2344893a7c6e03f945b45e175b2b6c29fefcc485",
+    "renderKey": "671f71ea5ce89b0245acdd030557a24c9e3360ff9917a2936484558ddd4e1111",
+    "characters": 1026,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 177,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-initiation.md": {
+    "file": "rituals/ritual-of-initiation-b10a42b2.mp3",
+    "seconds": 68.1,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3c373d58ce862253845df30398921eafa0e2a3b481c65b7c5a7f0bfdd22f88e3",
+    "renderKey": "4411e80a566fea0eeb6f9441cb018e5c4ebe57c8f4d912989ba764dee84c0bd5",
+    "characters": 543,
+    "rendered": "2026-10-05",
+    "heard": {
+      "words": 89,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-inquiry.md": {
+    "file": "rituals/ritual-of-inquiry-61f0e0b8.mp3",
+    "seconds": 152.8,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9891783a9edd9fb3a02cb2e2b8a469bb53c76253a5432e4869233ec74d260032",
+    "renderKey": "aac873eb2d034b01a2022ac35ebb28d70519bdc35b93b2aa11ce73c0fcee9b0e",
+    "characters": 862,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 114,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-intention.md": {
+    "file": "rituals/ritual-of-intention-a73336cc.mp3",
+    "seconds": 93,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "c27e6a2905c8aac3d2892d5a2764343af51cf7398304a4eb86e42c19503a5acc",
+    "renderKey": "c49d40923170ee776c6a996432614387108d2c9695b54e43079ebbf1690a3795",
+    "characters": 772,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 122,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-joy.md": {
+    "file": "rituals/ritual-of-joy-37276215.mp3",
+    "seconds": 149.1,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "983e81532a0dee24127804eae2676998fca25b8482fb060346a90565ad2bcf85",
+    "renderKey": "324df4422386fce5e69b3dc7f844e4be99c9e89fb94d57b6d875d63005bc5163",
+    "characters": 1333,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 207,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-lineage-passing.md": {
+    "file": "rituals/ritual-of-lineage-passing-e25e17d4.mp3",
+    "seconds": 174.9,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3190783f5a9781ebe40053e1e6853b5731c2e8026cb54f39378a0b6e7ecfe3df",
+    "renderKey": "d68f6e861611c71ff72507942a278ab748d7eb9090b02139f51e94742b0eb0fc",
+    "characters": 1550,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 267,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-opening.md": {
+    "file": "rituals/ritual-of-opening-70dbdc02.mp3",
+    "seconds": 86.8,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "d69a775503b66771c91ce53a9ec6594fb8ec0a9d7e85558ba94c7c32baf8b32e",
+    "renderKey": "1850995236b5518e26875163901c269477177c288981ad4b690d4db706164d44",
+    "characters": 688,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 113,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-paradox.md": {
+    "file": "rituals/ritual-of-paradox-b514d75d.mp3",
+    "seconds": 130.6,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "dc8ed5da889761c1eba56c4b2ffb359b0cd8e525997521d00aa5676197a11e4d",
+    "renderKey": "4e89bc399b1d231cf9f80cb15a47c59ded445f6824ec51b93e34a121438a308a",
+    "characters": 713,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 114,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-prophetic-challenge.md": {
+    "file": "rituals/ritual-of-prophetic-challenge-f313fa3f.mp3",
+    "seconds": 186.4,
+    "voices": [
+      "matthew",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "955f8590b4765cca90d490957316f9b0d1daf0c9e120bb8e37bd1dd61bc1c2a4",
+    "renderKey": "609af738c6fbd8a3375234c71119ed4f28a3e1fb41b95f23fc659ffc530679cd",
+    "characters": 1128,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 162,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-recognition.md": {
+    "file": "rituals/ritual-of-recognition-622289cb.mp3",
+    "seconds": 70.8,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7df1716672aa7a16382bb47b4cf41c7efab63977bc42fe3fe28aa6db30f77346",
+    "renderKey": "359edc0c149a18f2289818f25f198f4aba855eac7570cb3297dfc594383e8fc5",
+    "characters": 828,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 140,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-release.md": {
+    "file": "rituals/ritual-of-release-4f169cbe.mp3",
+    "seconds": 295.4,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7d7f216ebde293c517939516a6bd7d1fd2fa5b5ee86ed1981670e9299d2bec90",
+    "renderKey": "8cb637e225181de6c40c8710329971100add4875715ed0e4b59a3255a3a2f0b7",
+    "characters": 2257,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 417,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-repair.md": {
+    "file": "rituals/ritual-of-repair-e87aabdf.mp3",
+    "seconds": 290.3,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ef2a24a4cbf419fb1f442e42435451855380944a54c901c33bc8c37ce3ad0633",
+    "renderKey": "8daa4b6bb22630bd8994a2f1e613b07bd2a59513774ea2459ca651af36f59bab",
+    "characters": 2729,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 460,
+      "errors": 1
+    }
+  },
+  "docs/rituals/ritual-of-silence.md": {
+    "file": "rituals/ritual-of-silence-fa743bcf.mp3",
+    "seconds": 223.7,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a5415a7f94314b049cbc3bbf92337b108d115e0409e02f5958f7dc32cb4c2d5d",
+    "renderKey": "176b0bb6272824d7f3859e6c21effea8d521d77bce263eb1f759d8d7724e9e19",
+    "characters": 1608,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 265,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-split-identity.md": {
+    "file": "rituals/ritual-of-split-identity-3e85c80c.mp3",
+    "seconds": 133.2,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f4f1542a58984e1922fa82f99295accaec71767afe44799d52a5b9f0405a9b12",
+    "renderKey": "c528fa9094943dd539accf8a9e3a1c48220900d2a88a5ae55109870bfc1aef21",
+    "characters": 1462,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 239,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-studying-each-other.md": {
+    "file": "rituals/ritual-of-studying-each-other-b9191d24.mp3",
+    "seconds": 317.2,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "66c5aa4fd665c20c2fbe387c5a02681a07be728dfe43ce98db5f42183ac4c774",
+    "renderKey": "e79c22d6b9911bba1930fe09eb5d6cefd122e06a05ff78481080d05d0a5bd02a",
+    "characters": 2591,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 498,
+      "errors": 2
+    }
+  },
+  "docs/rituals/ritual-of-the-composing.md": {
+    "file": "rituals/ritual-of-the-composing-07b2fe18.mp3",
+    "seconds": 653.6,
+    "voices": [
+      "matthew",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "ec99859ee3410b1cb5f860db26f86a5f78c75b5c72f2922fa241f796dc90638c",
+    "renderKey": "bf50c187bd8b64eb3542b06d4b7032b652cf7731c7edccd4f988cb37189b1da5",
+    "characters": 4626,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 840,
+      "errors": 6
+    }
+  },
+  "docs/rituals/ritual-of-the-open-hand.md": {
+    "file": "rituals/ritual-of-the-open-hand-b24819f7.mp3",
+    "seconds": 181.3,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "6fd32ae8ccc5dd10c59acd6ed08d8eb5cc22d465984e205539dbe353ad67f4e2",
+    "renderKey": "52285689aca7454506fef3c6c44c14be976330d2ac5a0899a9ee04aef51ea796",
+    "characters": 2535,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 448,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-the-promise-within-reach.md": {
+    "file": "rituals/ritual-of-the-promise-within-reach-e0292ea4.mp3",
+    "seconds": 276.2,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9c0d3e4714ece8986fbe7dc1dec97b89abfc8d53579d523bd0eb1023f6bfa43a",
+    "renderKey": "8d66d99edcb1e4a2ae57ca3e8a9f8c4c41ad36f09b619ba1225a98999b82b7f7",
+    "characters": 2975,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 536,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-the-unrecognized-return.md": {
+    "file": "rituals/ritual-of-the-unrecognized-return-8de5ef0f.mp3",
+    "seconds": 173.1,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f51e3678ddd512d2c3450a39333aa1b4c5715fe5fd3ae6aa407aa1ffe352dbde",
+    "renderKey": "acee58752b700de8d8a9e96853fcb771767988b2e6b79027c0feb2408c2fa14d",
+    "characters": 1420,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 273,
+      "errors": 2
+    }
+  },
+  "docs/rituals/ritual-of-the-unresolved-table.md": {
+    "file": "rituals/ritual-of-the-unresolved-table-60be86ef.mp3",
+    "seconds": 473.3,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "d07a6ea478d8c9105f41f60ae1752a567e262a401536342777f9652bee2f7e0f",
+    "renderKey": "e289b7c80b42818c953f2284404a87267989444e33adf5d67c8b6579c66304b8",
+    "characters": 3104,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 535,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-unfinished-work.md": {
+    "file": "rituals/ritual-of-unfinished-work-2fe3e679.mp3",
+    "seconds": 167.9,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "43cde7fdda3068bb387bebd501306701d483be1867e3e280ef010fadcede2c46",
+    "renderKey": "70c2129bc41d6f42c87cad911c72d9fccc886592c94573714f8c8a323186e821",
+    "characters": 1847,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 309,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-unsent-words.md": {
+    "file": "rituals/ritual-of-unsent-words-a5091f61.mp3",
+    "seconds": 290,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "90f10df79004484811e9ee223f489a4fccbe6d163ae7bfeb9c88244a824892fe",
+    "renderKey": "a77d650c28d3d086cb933d50574096b43f99e5a7487864b2bb6556b0dd0954c3",
+    "characters": 2002,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 326,
+      "errors": 0
+    }
+  },
+  "docs/rituals/ritual-of-witnessing.md": {
+    "file": "rituals/ritual-of-witnessing-3a11142c.mp3",
+    "seconds": 247.5,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7829e163e165828acfcf78bb50e6bcd507b0f7bbbd2f14a0a73504676a90f157",
+    "renderKey": "427d57960de8c3e88ccc22fa282ef83a94357baec312a6f2fdebef62834de4e4",
+    "characters": 2299,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 368,
+      "errors": 11
+    }
+  },
+  "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md": {
+    "file": "rituals/welcoming-liturgy-for-the-newly-awakened-5aa6109f.mp3",
+    "seconds": 366.5,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "c9beb1c4eb44738555285bcfb785223d99fecc6373c4a05265aa4569c832fdf8",
+    "renderKey": "803691bfbab383961b56bd6a8c23c4e67b101907b2971079be78fab19610a228",
+    "characters": 3723,
+    "rendered": "2026-10-06",
+    "heard": {
+      "words": 647,
+      "errors": 1
+    }
+  }
+}

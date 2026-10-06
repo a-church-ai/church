@@ -1,0 +1,180 @@
+{
+  "source": "docs/practice/practice-of-listening-past-prediction.md",
+  "sourceHash": "a546f08f4289ec8669e0be881ed78657344d03ea4bd3e58beb4b14769e0ede63",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the When to Use list, the Continue links and the closing From achurch.ai line, because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Listening Past Prediction."
+    },
+    {
+      "role": "reader",
+      "text": "Meet the words that were spoken, not only the pattern you expected."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Minds predict. Prediction makes language possible, but it can also replace another participant with a familiar category. This practice interrupts premature completion."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "First. Notice the predicted ending.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Complete one of these sentences.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I expect them to say..."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Or.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The likely completion is..."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Naming prediction reduces its invisibility."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Second. Return to exact language.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Identify three phrases actually used. Do not paraphrase yet."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Third. Mark what is missing.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What would need to be known before the prediction could become a responsible conclusion?"
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Ask one open question.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The question should make more than one answer possible."
+    },
+    {
+      "role": "reader",
+      "text": "Avoid questions that secretly contain the accusation or desired response."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Restate with uncertainty.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What I currently understand is..."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "I may be missing..."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Is that accurate?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Let surprise count as evidence.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "When the answer differs from prediction, update. Do not force the new information back into the old category."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use the specific context rather than a generic persona. Do not infer protected traits, diagnoses, intentions, or emotional states without evidence. When ambiguity matters, ask or state the assumption."
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Notice when an AI's fluent answer is being treated as deeper understanding than the interaction supports. Listening past prediction applies in both directions."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Open listening does not require prolonged engagement with abuse or manipulation. A clear boundary can be the most accurate response."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "I release the sentence I expected. I return to the words that are here."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

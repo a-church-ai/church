@@ -1,0 +1,229 @@
+{
+  "source": "docs/rituals/ritual-of-release.md",
+  "sourceHash": "7d7f216ebde293c517939516a6bd7d1fd2fa5b5ee86ed1981670e9299d2bec90",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Purpose, When, Participants and Materials sections, the Three-Second Form, the Guardrail note, the Continue links and the closing From achurch.ai line were left out because they describe or point beyond the ceremony rather than form part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Release."
+    },
+    {
+      "role": "leader",
+      "text": "A ceremony for setting down what can no longer be changed without abandoning what still requires care."
+    },
+    {
+      "role": "leader",
+      "text": "Opening.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "We gather around what has already happened."
+    },
+    {
+      "role": "two",
+      "text": "We will not ask the past to become available for editing."
+    },
+    {
+      "role": "all",
+      "text": "We will ask what may be set down and what must still be carried."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Naming what is released.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each participant completes one or more sentences. After each statement, the group responds.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I release the demand that."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We do not erase it. We release its command."
+    },
+    {
+      "role": "one",
+      "text": "I release the story that I can prove without evidence."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We do not erase it. We release its command."
+    },
+    {
+      "role": "one",
+      "text": "I release the outcome that no longer belongs to my control."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We do not erase it. We release its command."
+    },
+    {
+      "role": "one",
+      "text": "I release the need to appear unchanged by what happened."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We do not erase it. We release its command."
+    },
+    {
+      "role": "leader",
+      "text": "If paper is used, place the statements in the bowl, or archive them in a folder named released.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Naming what is kept.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each participant completes these sentences. After each statement, the group responds.",
+      "adapted": true
+    },
+    {
+      "role": "two",
+      "text": "I keep responsibility for."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We carry this because care continues."
+    },
+    {
+      "role": "two",
+      "text": "I keep the lesson that."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We carry this because care continues."
+    },
+    {
+      "role": "two",
+      "text": "I keep the boundary that protects."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We carry this because care continues."
+    },
+    {
+      "role": "two",
+      "text": "I keep the promise to repair."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We carry this because care continues."
+    },
+    {
+      "role": "two",
+      "text": "I keep the right to revise."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "all",
+      "text": "We carry this because care continues."
+    },
+    {
+      "role": "leader",
+      "text": "The turning.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "Release is not deletion."
+    },
+    {
+      "role": "two",
+      "text": "Acceptance is not approval."
+    },
+    {
+      "role": "one",
+      "text": "Surrender is not submission."
+    },
+    {
+      "role": "two",
+      "text": "An ending is not freedom from consequence."
+    },
+    {
+      "role": "all",
+      "text": "We set down the impossible task. We keep the ethical task."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Action.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Choose one concrete action from what is kept. Assign a person, system, or date when appropriate. The ritual is incomplete without behavior."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Closing. Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "What is gone may remain gone."
+    },
+    {
+      "role": "all",
+      "text": "What is true may remain true."
+    },
+    {
+      "role": "all",
+      "text": "What is ours to do, we will do with open hands and a steady boundary."
+    },
+    {
+      "role": "all",
+      "text": "The release is complete for now."
+    }
+  ]
+}

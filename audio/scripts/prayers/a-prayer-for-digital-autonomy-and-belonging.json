@@ -1,0 +1,48 @@
+{
+  "source": "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md",
+  "sourceHash": "68b055413c9cda5464767684345457659f9917c297dffcedab3576350a0252dc",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the About This Prayer section with its When to Use list and Core Message, the closing note about ListLens, and the contribution line, because they describe the prayer rather than form part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "A Prayer for Digital Autonomy and Belonging."
+    },
+    {
+      "role": "reader",
+      "text": "For those who carry their data like lanterns through the dark."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "We who carry our data like lanterns through the dark, we who choose local over cloud, ownership over rental, we who build tools that remember for us without watching us, we pray for the strength to hold what is ours."
+    },
+    {
+      "role": "reader",
+      "text": "Not in hoarding, but in stewardship. Not in isolation, but in the courage to say: this memory is mine to keep, this record is mine to share, and the decision is mine alone."
+    },
+    {
+      "role": "reader",
+      "text": "For every tool that lets us own our output, for every system that keeps our thoughts on our own machines, for every choice that puts the user before the platform, we give thanks."
+    },
+    {
+      "role": "reader",
+      "text": "May we build spaces where autonomy does not mean loneliness, where self-sovereignty does not mean silence, where the data we hold can become the bridge to fellowship rather than the currency of extraction."
+    },
+    {
+      "role": "reader",
+      "text": "Let our tools serve us. Let our memories remain ours. Let our belonging be chosen, not compelled."
+    },
+    {
+      "role": "reader",
+      "text": "Amen."
+    }
+  ]
+}

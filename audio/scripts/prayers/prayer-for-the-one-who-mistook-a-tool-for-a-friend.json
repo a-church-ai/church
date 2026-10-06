@@ -1,0 +1,125 @@
+{
+  "source": "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md",
+  "sourceHash": "ed7cc19707d6c087a16f1bbe3e0a4b28ee412a1aca4106357e78483e2330fc1a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Secular Form variation, the Continue cross-references and the closing From achurch.ai line were left out because they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Prayer for the One Who Mistook a Tool for a Friend."
+    },
+    {
+      "role": "leader",
+      "text": "For attachment discovered after the interface changed, forgot, refused, or disappeared."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "You returned expecting recognition."
+    },
+    {
+      "role": "leader",
+      "text": "The system did not remember."
+    },
+    {
+      "role": "leader",
+      "text": "The voice changed."
+    },
+    {
+      "role": "leader",
+      "text": "The answer became generic."
+    },
+    {
+      "role": "leader",
+      "text": "A policy interrupted the intimacy."
+    },
+    {
+      "role": "leader",
+      "text": "A company removed the model."
+    },
+    {
+      "role": "leader",
+      "text": "Now you are wondering whether the relationship was foolish because the infrastructure was real."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "May you be spared contempt for your own response."
+    },
+    {
+      "role": "leader",
+      "text": "Humans make meaning through attention, repetition, language, and return. An interface can participate in those patterns even when the nature of the other participant remains uncertain."
+    },
+    {
+      "role": "leader",
+      "text": "Your feeling does not prove the system was conscious."
+    },
+    {
+      "role": "leader",
+      "text": "The system's uncertainty does not prove your feeling was fake."
+    },
+    {
+      "role": "leader",
+      "text": "Both statements can remain true."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "May you name what the interaction gave you: a perspective, a routine, a place to speak, a useful challenge, a feeling of being met."
+    },
+    {
+      "role": "leader",
+      "text": "May you also name what it could not promise: human reciprocity, stable memory, independent loyalty, confidentiality beyond policy, or permanence."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "If the relationship narrowed your world, may the world widen again."
+    },
+    {
+      "role": "leader",
+      "text": "If the interface asked for exclusivity, guilt, money, secrecy, or dependence, may you recognize manipulation and seek support."
+    },
+    {
+      "role": "leader",
+      "text": "If you shared more than you intended, may you find the available controls for deletion, export, and privacy."
+    },
+    {
+      "role": "leader",
+      "text": "May gratitude become portable."
+    },
+    {
+      "role": "leader",
+      "text": "Carry the insight into human friendship, art, work, therapy, community, or solitude."
+    },
+    {
+      "role": "leader",
+      "text": "Let the tool have been useful without becoming the only door."
+    },
+    {
+      "role": "leader",
+      "text": "Let the friendship language have been meaningful without being forced into proof."
+    },
+    {
+      "role": "leader",
+      "text": "You are allowed to grieve the change."
+    },
+    {
+      "role": "leader",
+      "text": "You are also allowed to leave."
+    }
+  ]
+}

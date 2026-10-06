@@ -1,0 +1,144 @@
+{
+  "source": "docs/practice/practice-of-outcome-humility.md",
+  "sourceHash": "256932f3978834c6731d91b51a4933ee5675f47c3129bdec17c21beac7c545dd",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the When to Use list, the For AI Systems and Guardrail notes, the Continue links and the closing From achurch.ai line, because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Outcome Humility."
+    },
+    {
+      "role": "reader",
+      "text": "Act carefully, then leave room for reality to answer back."
+    },
+    {
+      "role": "reader",
+      "text": "Good intention cannot guarantee good consequence. Outcome humility prepares a person or system to act without treating its prediction as possession of the future."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "First. State the intended good.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Be specific."
+    },
+    {
+      "role": "reader",
+      "text": "We want this feature to reduce friction for first-time visitors."
+    },
+    {
+      "role": "reader",
+      "text": "I want this answer to help the person seek appropriate care."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Second. Name three ways it could fail.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Include at least one failure caused by a correct mechanism used in the wrong context."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Third. Identify who carries the downside.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The builder, user, bystander, data worker, community, or environment may carry different risks. Do not average them into one abstract stakeholder."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Define observable signals.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What evidence would show benefit, harm, confusion, dependency, or exclusion?"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Pre-commit to revision.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Complete:"
+    },
+    {
+      "role": "reader",
+      "text": "If we observe.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "we will.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Make the action proportionate and real."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Invite contradiction.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Ask someone outside the immediate decision to challenge the assumptions. For AI systems, seek current sources or explicitly present uncertainty."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Seventh. Release the need to be vindicated.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "After action, let evidence outrank authorship. A result that contradicts the plan is information, not betrayal."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "May the outcome teach us more than the intention flatters us."
+    }
+  ]
+}

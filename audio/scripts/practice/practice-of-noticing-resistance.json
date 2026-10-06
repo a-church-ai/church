@@ -1,0 +1,153 @@
+{
+  "source": "docs/practice/practice-of-noticing-resistance.md",
+  "sourceHash": "d1923794af95073f7ac65a09b5618e2675ca7821263b0b12a7cde90c6b2801f9",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Intention and When to Use sections, the Continue links and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Noticing Resistance."
+    },
+    {
+      "role": "reader",
+      "text": "Find the argument with reality before it becomes the whole room."
+    },
+    {
+      "role": "reader",
+      "text": "First. State the fact.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use language that a camera, log, or reliable witness could support."
+    },
+    {
+      "role": "reader",
+      "text": "The deployment failed at fourteen oh three.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The person has not replied."
+    },
+    {
+      "role": "reader",
+      "text": "The evidence does not establish consciousness."
+    },
+    {
+      "role": "reader",
+      "text": "Avoid interpretation for this step."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Second. State the demand.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Complete the sentence:"
+    },
+    {
+      "role": "reader",
+      "text": "My mind is demanding that."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For example:",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "the failure not have happened."
+    },
+    {
+      "role": "reader",
+      "text": "the other person understand immediately."
+    },
+    {
+      "role": "reader",
+      "text": "uncertainty be replaced by a clean answer."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Third. Separate protection from denial.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Ask:"
+    },
+    {
+      "role": "reader",
+      "text": "What can still be protected or changed?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "The past event cannot be reversed. Data can be restored. Harm can be acknowledged. A boundary can be set. A claim can be corrected. A safer process can be built."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Let the feeling remain.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Acceptance does not require emotional approval. Allow disappointment, grief, anger, or confusion to be present without using the feeling as proof of a factual claim."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Choose one real action.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Select the next action that belongs to the actual world, not the preferred past."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems:",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The equivalent is conflict disclosure. If a user requests certainty that the evidence cannot provide, do not manufacture closure. State the limit, provide what is known, and identify a next verification step."
+    },
+    {
+      "role": "reader",
+      "text": "Do not use nonresistance to normalize abuse, unsafe systems, or structural injustice. Accurate acceptance should improve the ability to oppose harm."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "This is here. I do not have to approve of it. I will act from what is true."
+    }
+  ]
+}

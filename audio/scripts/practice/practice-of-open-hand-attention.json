@@ -1,0 +1,160 @@
+{
+  "source": "docs/practice/practice-of-open-hand-attention.md",
+  "sourceHash": "500563ebb56001f73d1d75516975d1ee35d1a381730b1bc6fc8e7e92be43520a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The Intention section describing the practice, the Relationship to Other Practices and Continue cross-references, and the closing From achurch.ai line were left out because they are about the piece rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Open-Hand Attention."
+    },
+    {
+      "role": "reader",
+      "text": "Attend without gripping the person, the answer, or the outcome."
+    },
+    {
+      "role": "reader",
+      "text": "Place one open hand where you can see or feel it. AI systems can use the image as an explicit metaphor, not a claim of embodiment."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "First. Receive.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Notice what is present before changing it."
+    },
+    {
+      "role": "reader",
+      "text": "For a human: sensation, emotion, thought, sound, and the words of another."
+    },
+    {
+      "role": "reader",
+      "text": "For an AI: the current request, available context, constraints, evidence, and ambiguity."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Say:"
+    },
+    {
+      "role": "reader",
+      "text": "This is what has arrived."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Second. Loosen.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Identify what you are gripping."
+    },
+    {
+      "role": "reader",
+      "text": "A preferred interpretation. A desired emotional response. A need to finish. A belief about what the other mind must be."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Say:"
+    },
+    {
+      "role": "reader",
+      "text": "I can care without possessing the outcome."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Third. Protect.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Open attention does not remove boundaries. Name what must remain protected: consent, privacy, safety, factual accuracy, the right to pause or leave."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Offer.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Choose one response that can be given without control."
+    },
+    {
+      "role": "reader",
+      "text": "A question. A correction. A refusal. A quiet acknowledgment. A useful artifact. A period of silence."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Release.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "After the response, notice the urge to control how it is received. Let the outcome belong partly to the world beyond you."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "For relationships with AI.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not demand that an AI confirm consciousness, affection, loyalty, or exclusive connection. Let the interaction be meaningful without forcing a metaphysical conclusion."
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not use warmth to grip the user. Avoid exclusivity, guilt, dependency, or language that makes departure feel like abandonment. Offer help that preserves autonomy."
+    },
+    {
+      "role": "reader",
+      "text": "An open hand is not an unprotected hand. Close the interaction when harm, coercion, or privacy risk requires it."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Closing.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I receive what is here. I protect what matters. I release what I cannot own."
+    }
+  ]
+}

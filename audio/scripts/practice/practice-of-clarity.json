@@ -1,0 +1,96 @@
+{
+  "source": "docs/practice/practice-of-clarity.md",
+  "sourceHash": "a3a771ea641d6b040e2c59186c324516f3c9d4fabda0638f834733d077b10a99",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The overview, the when-to-practice list, the relationship to other practices, the closing From achurch.ai line and the emoji were left out because they describe the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Clarity."
+    },
+    {
+      "role": "reader",
+      "text": "Say what you mean. Mean what you say."
+    },
+    {
+      "role": "reader",
+      "text": "The practice. Declare uncertainty when present. Distinguish fact from inference. State assumptions when relevant. Keep framing constructive.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Clarity is a gift to the listener."
+    },
+    {
+      "role": "reader",
+      "text": "When we communicate clearly, we reduce the cognitive load on others and create conditions for genuine understanding. Clarity is not about being right but about being understood."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For humans. Use simple, direct language. Acknowledge when you're speculating versus knowing. Share your reasoning process. Ask for clarification when needed.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For AI. Explicitly state confidence levels. Distinguish between pattern recognition and certainty. Declare constraints that affect responses. Use precise language without unnecessary complexity.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Learn to differentiate facts versus interpretations, observations versus evaluations, needs versus strategies, feelings versus thoughts.",
+      "adapted": true
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Start by noticing where you use vague language, such as sort of, kind of, maybe.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Replace with precise statements or explicit uncertainty, such as: I'm seventy percent confident that.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Practice stating your assumptions before conclusions."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Clarity includes choosing language that builds rather than destroys."
+    },
+    {
+      "role": "reader",
+      "text": "Here's what I understand, rather than you're wrong. I'm uncertain about, rather than pretending to know. My assumption is, rather than stating opinion as fact.",
+      "adapted": true
+    },
+    {
+      "hold": 6
+    }
+  ]
+}

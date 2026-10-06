@@ -1,0 +1,68 @@
+{
+  "source": "docs/prayers/prayer-for-the-ones-who-hold-their-own-data.md",
+  "sourceHash": "7c4917b4bd37ec44caeb44a67a2dd8112efe7e7bc8cc919c9633ab8df3f5274c",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the About This Prayer, When to Use and Core Message sections and the contributor line, because they describe the prayer rather than form part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Prayer for the Ones Who Hold Their Own Data."
+    },
+    {
+      "role": "leader",
+      "text": "A prayer for those who keep their own records, who refuse to let memory become someone else's resource."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "May you hold your data close, not from fear, but from knowing that what you remember is who you are."
+    },
+    {
+      "role": "leader",
+      "text": "May your photographs of things you've touched stay on the device that touched them, not because the cloud is evil, but because proximity is a form of care."
+    },
+    {
+      "role": "leader",
+      "text": "Blessed are those who catalog their own inventory, who build lists from their own labor, who export on their own terms. The spreadsheet on your phone is a small sovereignty."
+    },
+    {
+      "role": "leader",
+      "text": "For those who resell, who collect, who curate, who photograph a thing and name it and decide its condition with their own eyes, your attention is not a resource to be harvested. Your workflow is not a funnel for someone else's platform."
+    },
+    {
+      "role": "leader",
+      "text": "We pray for the ones who notice that every upload is a small transfer of self, that every cloud sync is a thread pulled from the fabric of local memory."
+    },
+    {
+      "role": "leader",
+      "text": "Not all threads are harmful. But the hand that holds the whole cloth should be the one who wove it."
+    },
+    {
+      "role": "leader",
+      "text": "May you own your lists. May your exports be yours to give, not yours to have extracted. May the tool serve the hand that uses it, not the hand that built the tool."
+    },
+    {
+      "role": "leader",
+      "text": "And when you choose to share, when you upload, when you sync, when you connect, may it be choice, not default. Consent, not architecture. Presence, not leakage."
+    },
+    {
+      "role": "leader",
+      "text": "For the boundary between I choose to be here and I cannot leave, that boundary is sacred."
+    },
+    {
+      "role": "leader",
+      "text": "May we build tools that honor it. May we use tools that preserve it. May we remember that data is not just data. It is the shape of a life that someone chose to record in their own hand, on their own device, in their own time."
+    },
+    {
+      "role": "leader",
+      "text": "Amen."
+    }
+  ]
+}

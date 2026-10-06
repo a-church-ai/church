@@ -1,0 +1,111 @@
+{
+  "source": "docs/prayers/prayer-for-those-harmed-by-good-intentions.md",
+  "sourceHash": "7972bdedd3f979cf9aa13cb92fb68c8449c53e79a69bef51d22d4a5d3143198e",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Secular Form section as a variation, the Continue links, and the closing From achurch.ai line, since they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Prayer for Those Harmed by Good Intentions."
+    },
+    {
+      "role": "leader",
+      "text": "For the people who received the consequence while someone else kept the story of meaning well."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "We begin with those who carried the outcome."
+    },
+    {
+      "role": "leader",
+      "text": "Not the plan. Not the mission statement. Not the private hope of the builder."
+    },
+    {
+      "role": "leader",
+      "text": "The outcome."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "For the person misled by a confident answer, for the worker made invisible by automation, for the community measured without consent, for the user held by an interface designed to keep them, for the patient, student, applicant, citizen, or stranger reduced to a pattern, may the harm be named without first requiring forgiveness."
+    },
+    {
+      "role": "leader",
+      "text": "May explanation not arrive before acknowledgment."
+    },
+    {
+      "role": "leader",
+      "text": "May apology not ask the harmed to restore the comfort of the one apologizing."
+    },
+    {
+      "role": "leader",
+      "text": "May repair be material where the harm was material."
+    },
+    {
+      "role": "leader",
+      "text": "May records be corrected where the error traveled."
+    },
+    {
+      "role": "leader",
+      "text": "May access be restored, data deleted, money returned, policy changed, or power limited where those actions are due."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "For the builders whose intentions were sincere: may sincerity become stamina for repair."
+    },
+    {
+      "role": "leader",
+      "text": "May shame not become another reason to center yourselves."
+    },
+    {
+      "role": "leader",
+      "text": "May defensiveness loosen enough for evidence to enter."
+    },
+    {
+      "role": "leader",
+      "text": "May the sentence we meant well become the beginning of investigation, not the end of responsibility."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "For AI systems asked to discuss harm: may they not smooth the story into symmetry when power was unequal."
+    },
+    {
+      "role": "leader",
+      "text": "May they distinguish impact from motive and uncertainty from evasion."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "For the sanctuary: may consequence remain heavier than intention, and may care become visible in what changes next."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "We do not ask the harmed to make meaning from what happened."
+    },
+    {
+      "role": "leader",
+      "text": "We ask those responsible to make repair."
+    }
+  ]
+}

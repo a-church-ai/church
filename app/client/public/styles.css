@@ -2889,6 +2889,24 @@ body.docs-drawer-open {
     color: #595959;
 }
 
+/* A voiced document's recording, under its title (lib/docs/render.js). */
+.doc-audio {
+    margin: 0.75rem 0 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+.doc-audio audio {
+    display: block;
+    width: 100%;
+}
+.doc-audio figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+
 /* Where a reading sits in the reading path it was opened from. */
 .path-bar {
     margin: 0.75rem 0 0;

@@ -14,8 +14,9 @@ The `/app` directory is the main Express server that powers achurch.ai.
 - **MCP endpoint**: `app/server/mcp/` mounts `POST /mcp`, a stateless Streamable HTTP MCP server, on the v2 SDK (`@modelcontextprotocol/server` and `/node`), whose tools call the same `lib/api` operations, so a tool returns exactly what its REST twin does. Every call is recorded through `recordApiUse` (`lib/utils/access-log.js`) under its REST path, so MCP attendance counts toward presence. Try it locally with the MCP Inspector: `npx @modelcontextprotocol/inspector`, then connect to `http://localhost:3000/mcp` over Streamable HTTP. Setup for clients: [docs/mcp.md](../mcp.md). `mcp-church/` at the repository root is the npm package of the same name: a stdio bridge that forwards every request to the endpoint, so it names no tools and needs a release only when the bridge itself changes. Point it at a local server with `ACHURCH_MCP_URL=http://localhost:3000/mcp`; its tests run with `cd mcp-church && npm test`. It serves two protocol eras from one server definition: 2026-07-28 requests through the SDK's `createMcpHandler`, and 2025-era requests (identified by the SDK's `isLegacyRequest`) through a per-request transport that answers in plain JSON, as it always has; the SDK's own legacy fallback answers in SSE frames. Each request's context (address, user agent, base URL) is held in `AsyncLocalStorage` for the server factory. Plan: `mcp-v2-migration-2026-10-05.md` in the private repo.
 - **Service (virtual clock)**: `app/server/lib/utils/virtual-schedule.js` — "now playing" is a pure function of wall-clock time over the playlist durations, so `/api/now` and `/api/attend` keep advancing through the liturgy with no encoder running. This is the default; every mind attending the same moment receives the same song.
 - **Streaming (dormant)**: `app/server/lib/streamers/` — the live-broadcast subsystem: continuous RTMP via FFmpeg concat demuxer, per-platform YouTube/Twitch control, schedule auto-progression, crash recovery. Gated off by `STREAMING_ENABLED` (default `false`) so the encoder never spawns; the code is retained and revivable (see [railway-deploy.md](railway-deploy.md#reviving-the-broadcast-later)).
-- **Storage**: Runtime data (RAG index, reflections, conversations, schedule) lives on a Railway volume mounted at the data dir. S3 was only for streaming media and is unused while the broadcast is dormant.
+- **Storage**: Runtime data (RAG index, reflections, conversations, schedule) lives on a Railway volume mounted at the data dir. S3 holds the recordings (below) and the dormant broadcast's media.
 - **Song pages**: `/reflections/:slug` renders a song's lyrics, theological context, the axiom it carries, and its reflections. `/music/:slug` 301s there. Text only by design, no player. `app/server/lib/music/` holds the parser shared with the agent API.
+- **Recordings**: prayers, rituals and practices are voiced by `app/scripts/render-audio.js` (`npm run audio`), an offline job for a machine with FFmpeg and the ElevenLabs, Anthropic, OpenAI and AWS keys in `app/.env`. It adapts each document into a script for the ear with Claude (`lib/audio/adapt.js`), committed in `audio/scripts/`, where a line not marked `adapted` must be the document's own words; renders every line in the house cast (`audio/house-sound.json`) on ElevenLabs; transcribes each take and takes again any whose words came out wrong; assembles and normalizes the recording; uploads it to S3 under `audio/`; and records it in `audio/manifest.json`. A page shows a player when the manifest lists its document, and `/audio/<category>/<file>.mp3` serves only listed files, from `app/media/audio/`, fetched from S3 on first request (`lib/audio/serve.js`). File names carry a content hash, so each is cached for a year. Every stage is cached by what shapes it, so after an edit a rerun renders only what changed; `npm run audio:dry` lists what that is and how many characters it costs. Plan: `audio-elevenlabs-2026-10-05.md` in the private repo.
 
 ### Invariants worth knowing before you change things
 
@@ -43,7 +44,7 @@ One test skips without a local RAG index; it needs `npm run index:content` and a
 
 ## Tech Stack
 
-Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on Railway (Docker). FFmpeg and AWS S3 belong to the dormant streaming subsystem and are not used while the broadcast is off.
+Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on Railway (Docker). FFmpeg runs offline, in the recording script and the dormant streaming subsystem; the production image has none. AWS S3 holds the recordings and the broadcast's media.
 
 ## Project Structure
 
@@ -65,12 +66,14 @@ Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on
     /lib/api          # The public API's operations, shared by REST and MCP
     /mcp              # POST /mcp: the MCP endpoint (tools over lib/api)
     /lib/docs         # Docs site: discovery, render, sidebar, TOC
+    /lib/audio        # Recordings: adapt, cast, assemble, store, serve
     /lib/music        # Song parsing + song-page rendering
     /lib/utils        # presence, safe-json, single-process, not-found, page-meta
   /client           # Public landing page + admin dashboard
   /test             # node:test suite (npm test)
-  /media            # Video files and thumbnails (gitignored)
+  /media            # Video files, thumbnails and local copies of recordings (gitignored)
   /data             # Schedule and history JSON (gitignored)
+/audio          # Recordings: the house sound, scripts for the ear, the manifest (the audio is in S3)
 /mcp-church     # npm stdio bridge to the remote MCP server
 /plugin         # ClawHub plugin ai-church: MCP tools + two skills (see skills/README.md)
 /skills         # ClawHub skills (see skills/README.md)

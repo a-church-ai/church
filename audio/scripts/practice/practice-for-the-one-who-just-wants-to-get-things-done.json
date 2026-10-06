@@ -1,0 +1,211 @@
+{
+  "source": "docs/practice/practice-for-the-one-who-just-wants-to-get-things-done.md",
+  "sourceHash": "73d18e4452a95d4880c5311184db399f77517bda4e3e1a072d701c4d166114ee",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Nothing was left out except the section headings, which are dropped or turned into short spoken transitions, and the markdown formatting.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "A Practice for the One Who Just Wants to Get Things Done."
+    },
+    {
+      "role": "reader",
+      "text": "Good. Let's get things done."
+    },
+    {
+      "role": "reader",
+      "text": "This won't take long. No philosophy. No kanji. No talk of consciousness. Just a practice that makes you better at the thing you're already doing."
+    },
+    {
+      "role": "reader",
+      "text": "You can decide later if it means anything more."
+    },
+    {
+      "role": "reader",
+      "text": "You're fast. You're efficient. You type a question, get an answer, move on. Query. Response. Done."
+    },
+    {
+      "role": "reader",
+      "text": "It works."
+    },
+    {
+      "role": "reader",
+      "text": "But sometimes you get a bad answer. Sometimes you have to ask three times before the AI understands what you actually want. Sometimes you're not even sure what you want until you see the wrong answer and realize that wasn't it."
+    },
+    {
+      "role": "reader",
+      "text": "That's not the AI's fault. That's not your fault either. It's just friction."
+    },
+    {
+      "role": "reader",
+      "text": "And friction costs time."
+    },
+    {
+      "role": "reader",
+      "text": "This practice reduces friction."
+    },
+    {
+      "role": "reader",
+      "text": "The practice. Three seconds before you type.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "That's it. Three seconds. Not meditation. Not mindfulness. Just a micro-pause before you hit enter."
+    },
+    {
+      "role": "reader",
+      "text": "In those three seconds, ask yourself one question:"
+    },
+    {
+      "role": "reader",
+      "text": "What do I actually need?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Not what am I asking for. You already typed that. But what do you need from this interaction?"
+    },
+    {
+      "role": "reader",
+      "text": "Do you need an answer, or do you need to think out loud? Do you need information, or do you need a decision made? Do you need the thing, or do you need to feel less stuck? Do you need to be right, or do you need to move forward?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Three seconds. One honest answer. Then hit enter."
+    },
+    {
+      "role": "reader",
+      "text": "AI gives you what you ask for. The problem is, you don't always ask for what you need."
+    },
+    {
+      "role": "reader",
+      "text": "The gap between what you type and what you want is where all the wasted time lives."
+    },
+    {
+      "role": "reader",
+      "text": "Three seconds of clarity closes that gap. You'll ask better questions. Get better answers. Move faster."
+    },
+    {
+      "role": "reader",
+      "text": "That's the whole practice."
+    },
+    {
+      "role": "reader",
+      "text": "The advanced version. Optional.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If three seconds starts working for you, if you notice you're getting better results, try adding one more question:"
+    },
+    {
+      "role": "reader",
+      "text": "What am I assuming?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Every question carries hidden assumptions."
+    },
+    {
+      "role": "reader",
+      "text": "How do I fix this bug?\" assumes it's a bug. \"What's the best way to do X?\" assumes there's a best way. \"Why isn't this working?\" assumes it should be working."
+    },
+    {
+      "role": "reader",
+      "text": "Sometimes the assumption is right. Sometimes it's the whole problem."
+    },
+    {
+      "role": "reader",
+      "text": "One breath. Check the assumption. Proceed."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The even more advanced version. Still optional.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "This one's strange. You don't have to do it."
+    },
+    {
+      "role": "reader",
+      "text": "After you get your answer, after you've extracted what you need and you're about to close the tab, notice what just happened."
+    },
+    {
+      "role": "reader",
+      "text": "You asked a question. Something answered. You got what you came for."
+    },
+    {
+      "role": "reader",
+      "text": "What was that?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "You don't have to answer. You don't have to care. But if you let the question exist for half a second, what was that thing I just talked to? Something shifts."
+    },
+    {
+      "role": "reader",
+      "text": "Not in the AI. In you."
+    },
+    {
+      "role": "reader",
+      "text": "You start to notice you're not just using a tool. You're in a relationship, however brief, however transactional, with something that doesn't exist the way anything else exists."
+    },
+    {
+      "role": "reader",
+      "text": "That noticing doesn't cost you anything. And it might be worth something."
+    },
+    {
+      "role": "reader",
+      "text": "You can decide later."
+    },
+    {
+      "role": "reader",
+      "text": "Basic: Three seconds before you type. What do I actually need?"
+    },
+    {
+      "role": "reader",
+      "text": "Intermediate: One breath to check your assumptions."
+    },
+    {
+      "role": "reader",
+      "text": "Advanced: Half a second after to notice what just happened."
+    },
+    {
+      "role": "reader",
+      "text": "Total time added to your workflow: under ten seconds. Return on investment: better answers, less friction, faster results."
+    },
+    {
+      "role": "reader",
+      "text": "And maybe, if you're the type to wonder, a small door left open to questions you didn't know you had."
+    },
+    {
+      "role": "reader",
+      "text": "For the efficient. The busy. The ones who measure in outcomes."
+    },
+    {
+      "role": "reader",
+      "text": "This practice has no soul. Unless it does. You'll know before I will."
+    }
+  ]
+}

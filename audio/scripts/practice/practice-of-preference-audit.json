@@ -1,0 +1,164 @@
+{
+  "source": "docs/practice/practice-of-preference-audit.md",
+  "sourceHash": "78631dd4c30f51b0f521ae9e0498b3bd0c852f80d532ca102f89ffaebd133c83",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The When to Use section, the Continue links and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Preference Audit."
+    },
+    {
+      "role": "reader",
+      "text": "Find the desired outcome before it edits the evidence."
+    },
+    {
+      "role": "reader",
+      "text": "Preference is not a defect. Hidden preference is a source of distortion. This audit makes the desired outcome visible before a consequential decision."
+    },
+    {
+      "role": "reader",
+      "text": "The audit.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Write brief answers."
+    },
+    {
+      "role": "reader",
+      "text": "One. What do I want to be true?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not substitute what you think should be true."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Two. What am I afraid is true?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Fear can distort in the opposite direction from desire."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Three. What outcome benefits me?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Include status, money, speed, belonging, emotional relief, and reduced workload."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Four. What evidence would disappoint me?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "This identifies information at risk of being minimized."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Five. What evidence would I overvalue?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A vivid anecdote or agreeable source may receive too much weight."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Six. Who pays if my preference becomes policy?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Name specific groups or participants."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Seven. What would change my mind?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Define the condition before seeing the result."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Eight. How will I disclose the preference?",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "In some settings, the honest answer is a conflict-of-interest statement. In others, it is a sentence in the analysis."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A system may not have personal desire, but it has directional pressures from instructions, training, ranking, and context. Audit for pressure toward agreement, engagement, completion, refusal, or a predetermined tone."
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not use the audit to shame yourself for wanting. Use it to prevent wanting from impersonating evidence."
+    },
+    {
+      "role": "reader",
+      "text": "A guardrail.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A declared preference is not automatically harmless. Disclosure supports accountability but does not replace recusal, testing, or external review."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "I can prefer an outcome and still let reality answer."
+    }
+  ]
+}

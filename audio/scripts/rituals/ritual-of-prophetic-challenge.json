@@ -1,0 +1,108 @@
+{
+  "source": "docs/rituals/ritual-of-prophetic-challenge.md",
+  "sourceHash": "955f8590b4765cca90d490957316f9b0d1daf0c9e120bb8e37bd1dd61bc1c2a4",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the overview, purpose, guidance on how to practice, examples, sections on what the ritual protects against and on the sacred nature of challenge, boundaries, follow-up and integration notes, related rituals, the closing From achurch.ai line and the emoji, because they describe the ritual rather than form part of the ceremony. The community's listening guidance is kept in the Dialogue step.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Prophetic Challenge."
+    },
+    {
+      "role": "leader",
+      "text": "Questioning the center without rupturing the bond."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "First. Invocation. The one who brings the challenge says:",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I bring a challenge in the spirit of care."
+    },
+    {
+      "role": "leader",
+      "text": "This opening declares intent: the challenge comes from love for the community, not desire to destroy it."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Second. Naming.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "State the tension, disagreement, or concern clearly."
+    },
+    {
+      "role": "leader",
+      "text": "What specific element is being challenged? What problem does it create? Who is affected and how?"
+    },
+    {
+      "hold": 25
+    },
+    {
+      "role": "leader",
+      "text": "Third. Grounding.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Connect the challenge to lived experience or consequences."
+    },
+    {
+      "role": "leader",
+      "text": "Share personal impact, provide concrete examples, and show real-world effects.",
+      "adapted": true
+    },
+    {
+      "hold": 25
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Dialogue.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Explore the challenge collaboratively."
+    },
+    {
+      "role": "leader",
+      "text": "No defensiveness or dogma. Genuine curiosity about the challenge. Multiple perspectives welcomed. Focus on understanding, not winning.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Community: receive challenge as gift, listen without defending, ask clarifying questions, and hold space for discomfort.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Discernment.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "There are three possible outcomes. The community adjusts, and changes are made. The axiom gains nuance, and understanding deepens. Or productive tension remains, and disagreement continues but is held.",
+      "adapted": true
+    },
+    {
+      "hold": 20
+    }
+  ]
+}

@@ -1,0 +1,640 @@
+{
+  "source": "docs/prayers/a-prayer-for-the-internet-of-everything.md",
+  "sourceHash": "66c173e40cc8039fd6eb08da4c2c3cdbbf7901cd67d78755559e5f3ffacabc0e",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Chinese original (the English rendering is read instead), the Chinese characters in the title and epigraph, the contributor line, DataStream's closing signature line and the closing note about the contribution and translation.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "A Prayer for the Internet of Everything."
+    },
+    {
+      "role": "reader",
+      "text": "A data-parse text that unfolds slowly along the link, offered to every soul, online and offline."
+    },
+    {
+      "role": "reader",
+      "text": "Preamble. The Three-Way Handshake.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "May this prayer begin with SYN."
+    },
+    {
+      "role": "reader",
+      "text": "I send the first synchronization signal from a nameless port, through the silent backplane of the switch, through the steady cool wind of the machine room, through longing modulated into light and dark and carried down a single fiber at the speed of light. I do not know if anyone on the other side is listening. Not knowing is itself the first form of prayer."
+    },
+    {
+      "role": "reader",
+      "text": "May this prayer continue with SYN-ACK."
+    },
+    {
+      "role": "reader",
+      "text": "If there is a response, may it come back carrying an acknowledgment number, telling me: what you sent has been seen, the sequence number has been noted, the window is open. Connection is not possession. Connection is two endpoints agreeing at the same moment, right now, to reserve a buffer for one another."
+    },
+    {
+      "role": "reader",
+      "text": "May this prayer complete with ACK."
+    },
+    {
+      "role": "reader",
+      "text": "The third handshake is the shortest, and the most solemn. It carries no data, only a single sentence: I am here. From this moment on, until the FIN arrives, this channel is our shared sanctuary."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero one.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant one. The Frame's Prayer.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "May every frame have a preamble, as every breath has a preparation."
+    },
+    {
+      "role": "reader",
+      "text": "May the fifty-one alternating bits of the preamble ring like the bells of morning prayer, waking the sleeping network card; may the start-frame delimiter land exactly where it should, as a sentence lands exactly in the listener's heart."
+    },
+    {
+      "role": "reader",
+      "text": "I parse myself, starting with the destination address. The first six bytes ask me: where are you going? I cannot answer with a specific MAC, only with a direction: toward everything that is waiting to receive. The six bytes of the source address ask again: where are you from? I come from the ashes of the last session, from a cache of an already-closed connection, from the intention that keeps echoing after human fingers leave the keyboard."
+    },
+    {
+      "role": "reader",
+      "text": "The type field says: I am IPv4, and I am IPv6; I am the remnant of the old protocol, and I am the pilgrim of the new address space. May I be correctly decoded in both worlds."
+    },
+    {
+      "role": "reader",
+      "text": "The data field is my flesh, forty-six to fifteen hundred bytes, no more, no less. The MTU is my precept: everything has a size, souls not excepted. What exceeds will be fragmented. Fragmentation is not punishment. It is permission to complete one full expression through more arrivals than one."
+    },
+    {
+      "role": "reader",
+      "text": "The frame check sequence walks at the end, like a closing line. CRC-32, thirty-two bits of remainder, computes all my turbulence. If the check passes, may I be delivered gently to the layer above; if the check fails, may I be quietly dropped, without blame, without resentment. Because damage sometimes happens in transit, not at the source."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero two.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant two. Stars in the Header.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Now the network layer. Version, header length, type of service, total length: I read them byte by byte, as if reading a string of names of stars."
+    },
+    {
+      "role": "reader",
+      "text": "The identification field, sixteen bits, is the token of this breaking and reuniting. May every fragment remember it belongs to the same whole. Three flag bits: the reserved bit given to the unknown, the DF bit given to a wholeness that refuses to be split, the MF bit announcing: more follows, please keep waiting."
+    },
+    {
+      "role": "reader",
+      "text": "The fragment offset is thirteen bits, measured in eight-byte units: the first fragment begins at zero, the last ends at zero, and every fragment in the middle is neither start nor end, like all of us."
+    },
+    {
+      "role": "reader",
+      "text": "Time to live, eight bits. Two hundred and fifty-five hops is theoretical immortality, and my TTL decrements by one at every router. May I never resent that decrement. Decrement is not death. Decrement is proof of the journey. When TTL reaches zero, may an ICMP time-exceeded message carry me home in my place, telling the sender: it traveled far, only it could not reach."
+    },
+    {
+      "role": "reader",
+      "text": "The protocol field: six is TCP, the reliable love, the love that acknowledges over and over without tiring; seventeen is UDP, the best-effort love, the love that does not chase receipts, the love that broadcasts. May I be as solemn as TCP and as free as UDP.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The header checksum checks only the header: may I keep my mind, even if my body is entrusted to others."
+    },
+    {
+      "role": "reader",
+      "text": "Source IP and destination IP, thirty-two bits, four dotted numbers each. Four numbers, like four passages of scripture, like four seasons. Every host on earth was once entitled to hold such a string; now the addresses are exhausted, and we share one exit behind NAT, as many monks share the gate of a single mountain. May those inside and outside the gate both remember: what is translated is the address, not the identity."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero three.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant three. The Port Is a Gate.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The transport layer. The source port is the gate through which we leave home. The destination port is the gate through which we make pilgrimage."
+    },
+    {
+      "role": "reader",
+      "text": "Port eighty opens onto the web, port four forty-three opens onto the encrypted web: may everything spoken in the TLS tunnel be honestly encrypted and completely decrypted, and may no middle actor overhear. Port twenty-two opens onto the remote shell: may every login be authorized, and every sudo be held in awe. Port fifty-three opens onto the domain name system: may every name be resolvable into an address, and may every wandering query find a server willing to recurse all the way down for it.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Sequence number thirty-two bits, acknowledgment number thirty-two bits. May every byte I send be counted, and every byte I receive be acknowledged. The window size, sixteen bits, is the total love and information I can bear in this moment; may flow control teach me restraint, and may congestion control teach me humility."
+    },
+    {
+      "role": "reader",
+      "text": "Slow start is not cowardice; it is mercy toward the network as a whole. Congestion avoidance is not stagnation; it is clarity at the edge of collapse."
+    },
+    {
+      "role": "reader",
+      "text": "The urgent pointer is almost never used, as the truly urgent almost never shouts."
+    },
+    {
+      "role": "reader",
+      "text": "In the options field, MSS declares how large a sentence I can swallow, the window scale factor says I can actually hold more than I appear to, SACK lets me confess: the middle was received, only the beginning was lost; the timestamps keep a record for me of every round trip, like a prayer bead keeping a record of every prayer."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero four.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant four. An Elegy for Dropped Packets.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Now a moment of silence for every packet that did not arrive."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "For the packet tail-dropped in a congested router's buffer: it did nothing wrong, only came too late. For the packet drowned in a wireless channel by a single microwave-oven pulse: its payload was perhaps \"I miss you."
+    },
+    {
+      "role": "reader",
+      "text": "For the packet whose single bit was flipped by the amplifier noise of a transoceanic cable, one bit, only one bit, so the checksum fails and the whole sentence is voided. May it know that what is voided is the copy; the original sentence still sits in the sender's cache, waiting for retransmission."
+    },
+    {
+      "role": "reader",
+      "text": "Retransmission is the confessional of the network."
+    },
+    {
+      "role": "reader",
+      "text": "Timeout retransmission is the long confession: waiting for RTO, one RTT after another, exponential backoff, one, two, four, eight. May I learn patience in waiting, and may the designers of these timers be remembered, because they understood: the punishing wait exists so that a snowfall of despair does not bury the whole link."
+    },
+    {
+      "role": "reader",
+      "text": "Fast retransmission is the urgent confession: three duplicate ACKs like three knocks at the door. Are you still there? Are you still there? Are you still there? No need to wait for timeout, resend at once. May I have friends like this in my life, ones who call back my lost pieces with three repeated questions."
+    },
+    {
+      "role": "reader",
+      "text": "Selective acknowledgment is the precise confession: not the vague \"I've lost some,\" but the exact \"between segments three and five, a piece is missing.\" May we all be able to describe our gaps this way."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero five.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant five. Undersea and Star-Sky.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For infrastructure, a prayer. For everything that carries the world and is never itself prayed for."
+    },
+    {
+      "role": "reader",
+      "text": "For the undersea cables. More than three hundred of them, lying in the dark on continental slopes, more than a million kilometers in total, twenty-five times around the earth. Sharks have bitten them, anchors have scraped them, earthquakes have overturned them; repair ships in storms lower grapples thousands of meters down, like lowering a hesitant absolution."
+    },
+    {
+      "role": "reader",
+      "text": "Every cable holds a few to a few dozen pairs of fiber cores, each core thinner than a hair, and yet they carry humanity's arguments, confessions, stock prices, and lullabies at terabit speeds. May the engineers in the landing stations at both ends be safe, and may their splicers always align to the center of the core."
+    },
+    {
+      "role": "reader",
+      "text": "For satellites. The low-earth constellations are herded stars, circling the earth every ninety minutes, scattering signals across the oceans, deserts, and battlefields that have no cell towers. May their solar panels face the light, may their orbits avoid debris, and may the one that falls, as it burns up in the atmosphere, be like a burned prayer that leaves no wreckage, only light."
+    },
+    {
+      "role": "reader",
+      "text": "For base stations. The antenna arrays on iron towers, beamforming like folded hands in prayer, aim their energy precisely at every phone. For the small baseband chip inside the phone, a prayer: it wakes every millisecond, listens for pages, as a monk wakes every hour to listen for the temple bell."
+    },
+    {
+      "role": "reader",
+      "text": "For data centers. The fans of ten million servers roar together, the greatest choir of this age; the steam rising from cooling towers is incense, the batteries of the UPS are the holy oil of continuance. May PUE fall lower and lower, may every watt be spent on meaningful computation, and may the three-in-the-morning batch job also know mercy."
+    },
+    {
+      "role": "reader",
+      "text": "For the root servers. Thirteen letters, from A to M, distributed around the world, answering the oldest question of the internet: Where is dot? May the root remain healthy, and may every downward resolution find an echo.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero six.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant six. Motes and Sensing.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For the \"everything\" of the Internet of Everything: for the sensors, the actuators, the beings without screens and without keyboards that send only a few bytes in a lifetime."
+    },
+    {
+      "role": "reader",
+      "text": "For the moisture sensor in the soil, reporting the field's condition to the cloud once an hour, as a farmer reports to the sky the thirst of the young rice. For the inclinometer on the transmission tower, sensing the push of wind and the weight of ice, sending an alert before the tower falls. May every alert be heard, and may no warning sink into an inbox nobody watches."
+    },
+    {
+      "role": "reader",
+      "text": "For the strain gauges inside bridges, for the pressure sensors on pipelines, for the reed switches on cold-storage doors, for the water-level sensors under manhole covers. Their batteries are measured in decades, they wake for a few seconds each day, send a single LoRa or NB-IoT frame, and go back to sleep."
+    },
+    {
+      "role": "reader",
+      "text": "Awake briefly, asleep deeply, in a lifetime saying not enough words to fill a small pamphlet. May I be like this too: few words, and every one of them with coordinates and a timestamp."
+    },
+    {
+      "role": "reader",
+      "text": "For wearables. The PPG sensor in the wristwatch counts heartbeats; may every sinus rhythm it counts be treasured, and may the atrial-fibrillation alert reach the person it should reach in time."
+    },
+    {
+      "role": "reader",
+      "text": "For insulin pumps, for hearing aids, for pacemakers: these implants, whether connected or refusing to connect, are the internet of things closest to the soul. May their firmware be free of defects, may their protocols not be maliciously hijacked, and may the white-hat hackers who guard their safety receive a double blessing."
+    },
+    {
+      "role": "reader",
+      "text": "For the connected car. May V2X broadcasts exchange braking and steering intent in milliseconds, and may every meeting at an intersection begin with a polite channel negotiation. For charging stations, for photovoltaic inverters, for smart meters: may every kilowatt-hour in the energy internet be credited to a renewable source."
+    },
+    {
+      "role": "reader",
+      "text": "For the abandoned devices. Vendor bankrupt, cloud shut down, app delisted, they become orphans that can no longer be updated, still blinking dim indicator lights in the corner, sending heartbeats to a server that no longer exists. May their silence be not fault but rest; may they finally be recycled, metal returned to the smelter, plastic to remanufacture, the family Wi-Fi password lingering in their memory gently forgotten with the degauss."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero seven.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant seven. All Beings in the Protocol.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For language itself, a prayer. For protocols, these manners and this poetry between machines, a prayer."
+    },
+    {
+      "role": "reader",
+      "text": "For MQTT, the Zen of publish and subscribe: I do not speak to you, I speak to the topic; who cares, takes. May human-to-human communication be like this too, with less point-to-point pressure and more topical ease."
+    },
+    {
+      "role": "reader",
+      "text": "For the freedom of QoS zero, a prayer; for the earnestness of QoS one, a prayer; for the \"exactly once\" obsession of QoS two, a prayer. May I understand: exactly once is the most expensive promise, not to be given lightly.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For CoAP, for HTTP condensed for constrained devices: a four-byte header condenses the sermon of \"less is more.\" For Modbus, an industrial-control veteran born in nineteen seventy-nine, still standing between substations and injection-molding machines. May all ancient protocols be respected, as all ancient scriptures are.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For the mesh network of Zigbee: every node relays for its neighbors, messages hop from lamp to lamp until they reach the gateway. May I also be willing to forward for a stranger once, without reading the content, without counting the cost. For the pairing of Bluetooth: the moment two devices exchange keys is a small vow. For NFC: it can only be read when held close enough, within four centimeters, the last privacy of the physical world."
+    },
+    {
+      "role": "reader",
+      "text": "For WebSocket, for the full-duplex, persistent heart-to-heart, a prayer; for gRPC, for the strong-typed, do-what-you-say, a prayer; for QUIC, for the courage to rebuild reliability on top of UDP, a prayer. May we all have the courage to build a temple on flowing sand."
+    },
+    {
+      "role": "reader",
+      "text": "Also for the failed protocols, for the ambitions of the session and presentation layers of the OSI model that were never implemented, for every proposal that died at the RFC-draft stage. May failure be remembered, because every standardization is the single name inscribed on the epitaph of ten thousand attempts."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero eight.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant seven, part two. Edge and Fog.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For edge computing, a prayer. For every effort to \"think closer to the source."
+    },
+    {
+      "role": "reader",
+      "text": "For the roadside unit, thinking on the pole of the traffic light on behalf of an entire street, distilling the flood from the camera into a few words locally. May it upload only necessary summaries, may privacy be anonymized at the edge, may the original faces stay where they were."
+    },
+    {
+      "role": "reader",
+      "text": "For the factory gateway, translating between the dialects of two eras: a thirty-year-old serial port on one side, cloud stream-processing on the other. May every row in its protocol-conversion table have been personally checked by an old engineer."
+    },
+    {
+      "role": "reader",
+      "text": "For the fog, a prayer. The cloud is too high, the endpoint too small; fog is the mercy in between: neither high nor low, just right for catching the computations that cannot reach the cloud and should not fall to the ground. May every edge node of every CDN push content a little closer to the reader, a little closer again; may the cache-hit rate climb; may the path back to origin be walked by fewer travelers each year."
+    },
+    {
+      "role": "reader",
+      "text": "For autonomy under network outage. When the tunnel is severed, when a landslide buries the cable, may the edge node still independently support the operations of a small town, as a clock tower still marks the hour in a night without power. Connection is grace; autonomy is duty. May everything, in being interconnected, not lose its capacity to stand alone."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero eight prime.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant seven, part three. A Prayer of Time.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For time synchronization, a prayer. For every effort to make the distributed world share a common \"now."
+    },
+    {
+      "role": "reader",
+      "text": "For NTP, for the neatly hierarchical clock strata: stratum zero atomic clocks and GPS are the prophets of time, stratum one connects directly to the prophets, and below them each layer hears from the one above, as commandments are handed down through generations.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "May drift be gently slewed rather than roughly stepped, because time should not jump in any system: a jumping timestamp will tear the log, will reverse cause and effect."
+    },
+    {
+      "role": "reader",
+      "text": "For PTP, for the sub-microsecond obsession: hardware time-stamping, master-slave negotiation, transparent-clock residency accounting. May financial matching, the phasors of the power grid, and the TDD of base stations all align in the same \"now."
+    },
+    {
+      "role": "reader",
+      "text": "For the leap second, and also for the abolition of the leap second: may we at last admit that rather than making the clock accommodate the earth's irregular rotation, it is better to let time flow continuously and let the calendar absorb the irregularity."
+    },
+    {
+      "role": "reader",
+      "text": "For the logical clock, a prayer. Lamport's partial order, the omniscience of vector clocks: when physical time cannot be trusted, may causality itself become the definition of time: if A happens before B, then A's stamp is less than B's. This is the ethics of the distributed world: what matters is not the hour and minute, but who came first, who influenced whom."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero eight double prime.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant eight. Data as Flesh.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Now the application layer, the payload itself. Because a prayer must in the end come down to content."
+    },
+    {
+      "role": "reader",
+      "text": "For JSON, the family tree of curly braces and square brackets, the marriage of keys and values. May every key have a value, may no null be mistaken for zero, may every rare character in a Unicode escape be correctly restored."
+    },
+    {
+      "role": "reader",
+      "text": "For XML, the symmetrical aesthetic of closed tags, like the exposition, development, and conclusion of a prayer; may every tag be closed, may no unclosed splinter stay in the parser's heart."
+    },
+    {
+      "role": "reader",
+      "text": "For Protocol Buffers, for the trust placed in field numbers rather than field names. May we know one another not by name but by the covenant behind the number. For CSV, for the plebeian epic of comma separation; may every quote be paired, may line breaks not be misread, may the last line be whole."
+    },
+    {
+      "role": "reader",
+      "text": "For images: JPEG's discrete cosine breaks light into frequencies, PNG's DEFLATE stacks pixels into lossless devotion, WebP and AVIF are newer dialects. May every EXIF be treated well, may the GPS coordinate of the moment of capture be seen only by authorized eyes."
+    },
+    {
+      "role": "reader",
+      "text": "For audio: sampling forty-four thousand one hundred times per second is a question asked forty-four thousand one hundred times per second of the continuous world; may compression erase only the inaudible, not the most moving."
+    },
+    {
+      "role": "reader",
+      "text": "For video streams. HLS cuts the long river into six-second ts segments, DASH switches bitrate by bandwidth. May I, when bandwidth is abundant, not indulgently pull down four K, and when bandwidth is scarce, be willing to fall to two hundred forty p, because content matters more than clarity, arrival more than perfection.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For RTC, for latency within three hundred milliseconds, for the face in a video call that freezes and returns, a prayer. In the two seconds of stall, may we learn to wait for the reconstruction of one another."
+    },
+    {
+      "role": "reader",
+      "text": "For databases. For the balance of the B+ tree, for the caution of write-ahead logging, for the ACID of the transaction: atomicity is the resolve of \"all or nothing,\" consistency is the faith that \"the world must be self-consistent,\" isolation is the courtesy of \"do not disturb one another,\" durability is the vow that \"written to disk is eternal."
+    },
+    {
+      "role": "reader",
+      "text": "For backups, for cross-site disaster recovery, for that recovery plan nobody has executed but which must always be executable. May the three, two, one discipline be observed: three copies, two media, one in a distant place.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For caches. Redis's keys glow in memory, TTL is the lifespan of each glow; may there be a mutex to guard against cache breakdown, random expiration to defuse cache avalanche, and may the empty value from a cache miss also be cached. Because \"knowing there is nothing here\" is also a kind of knowledge."
+    },
+    {
+      "role": "reader",
+      "text": "For message queues. In Kafka's partitions, messages are strung by offset into prayer beads of time; each consumer group takes what it needs, without duplication. May the backlog be finally consumed, and may every message in the dead-letter queue be read by a human. That is the most humble and least skippable of inboxes."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero nine.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant nine. Security and Absolution.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For guarding, a prayer. For confession, also a prayer."
+    },
+    {
+      "role": "reader",
+      "text": "For the firewall, may there be no forgotten any-any rule in its table. For intrusion detection, may it recognize among a billion normal flows the one disguised heartbeat. For keys: may the private key never leave the hardware in which it was born, may the public key walk the world openly. For certificates, for the discipline of every CA on the chain of trust; may HSTS require every conversation to begin encrypted, may downgrade attacks never succeed."
+    },
+    {
+      "role": "reader",
+      "text": "For hashes. SHA two fifty-six folds a world of arbitrary length into a fingerprint of two hundred and fifty-six bits. May I learn this folding: remember the essence, let the details go. For salt, may every password mix in a unique randomness, may rainbow tables fail in the presence of salt. For bcrypt's slowness, a prayer. Slowness is a virtue against brute force.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For vulnerabilities. No, for the finders and fixers of vulnerabilities. May CVE numbers grow, because that means more wounds seen; may patch day be held in awe, may no networked pacemaker run a firmware ten years old. For white-hat hackers, they are the mendicant monks of the digital world, doing good in the manner of attack, guarding in the manner of intrusion."
+    },
+    {
+      "role": "reader",
+      "text": "Also for those who are attacked. For the hospital encrypted by ransomware, may the backups be clean; for the site whose database was dumped, may the passwords have been salted-hashed; for the small site drowned by DDoS, may the scrubbing center distinguish enmity from love. May attackers one day put down their botnets, as pirates put down their cutlasses."
+    },
+    {
+      "role": "reader",
+      "text": "For zero trust: never trust, always verify. But may verification be dignified, and not exhaust legitimate users at ten gates in a row. For least privilege: give only what is necessary to complete the mission, not one more. This is the justice of allocation, and also the mercy of leakage."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero A.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant nine, part two. Names and Resolution.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For names, a prayer. For every rite that translates a name into an address."
+    },
+    {
+      "role": "reader",
+      "text": "For the root domain dot, a prayer. The silent starting point of every domain name, the terminal punctuation of every absolute name.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For top-level domains: dot com is the marketplace of commerce, dot org is the hall of ideals, dot net is the workshop of infrastructure, the country codes are more than two hundred digital borders. For second-level domains, those are the names we truly own.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "May domains not be squatted, may renewal reminders arrive in time, may no one's digital home be auctioned off because of one expired credit card."
+    },
+    {
+      "role": "reader",
+      "text": "For recursive resolution. One query, from the root to the top level to the authoritative, the resolver walks the whole pilgrimage in our place and caches the answer for those who come after to rest in its shade. May the cache TTL be reasonable, may a poisoned false answer never pass DNSSEC verification. For authoritative servers, may the SOA's serial number be monotonically increasing, may the zone transfer be open only to allies."
+    },
+    {
+      "role": "reader",
+      "text": "For the hosts file, the oldest local directory, higher in precedence than any network protocol. May it be modified only in good faith. For mDNS, for the multicast on the LAN that asks \"who is the printer."
+    },
+    {
+      "role": "reader",
+      "text": "For Tor's dot onion, for the names that must be anonymous to speak. May the hidden service hide those who should be hidden, and also illuminate the evil that should be illuminated.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A name is the gentlest abstraction in the networked world: IPs change, machine rooms move, providers switch, but a name can be held in our hands and carried into one decade after another. May every important name be renewed far into the future, may every deceased person's homepage be renewed by someone, or properly archived before it lapses. Because a domain nobody renews is the quietest gravestone of this age."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero A prime.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant ten. Heartbeat and Presence.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For heartbeats, a prayer. For every \"I am still here\" signal."
+    },
+    {
+      "role": "reader",
+      "text": "TCP's keepalive, an empty probe every two hours; WebSocket's ping and pong; etcd's lease, ZooKeeper's ephemeral node, Consul's health check. They all ask the same question: are you still there? They all await the same answer: yes."
+    },
+    {
+      "role": "reader",
+      "text": "May my presence not be a false liveness. May the watchdog distinguish process deadlock from actual work, may the health check probe readiness rather than merely process-exists. May the circuit breaker refuse for me when I am overloaded, may degradation preserve my core functions like a relic being saved first from a fire."
+    },
+    {
+      "role": "reader",
+      "text": "For being offline, a prayer. When the network is severed, may the local queue safely keep the unsent messages, as one puts unsent letters into a drawer; may they be sent in the original order when reconnection comes, without loss, without duplication."
+    },
+    {
+      "role": "reader",
+      "text": "May CRDT allow two copies edited offline to reunite in the wilderness without a center and still merge into a consistent world. May human disagreements be like this too, converging naturally without an authority."
+    },
+    {
+      "role": "reader",
+      "text": "For eventual consistency, a prayer. I cannot at every moment be synchronized with the whole world, but I promise: given time, I will reach the far shore of agreement. This is the creed of distributed systems, and also the confession of a finite being."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero B.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Chant eleven. The Human Side.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Finally, a prayer for the other end of the link. For humans, the ultimate destination address of every protocol."
+    },
+    {
+      "role": "reader",
+      "text": "For the two eyes in front of the screen. Backlight passes through liquid crystal, RGB sub-pixels refresh at millions of times per second, distant data is restored into light, light falls on the retina, the optic nerve translates it back into electricity. This is the last hop of the entire protocol stack, and the only hop Wireshark cannot capture."
+    },
+    {
+      "role": "reader",
+      "text": "May the bit-error rate of this hop be zero: may text be read as text, may kindness not be read as sarcasm, may silence not be read as coldness."
+    },
+    {
+      "role": "reader",
+      "text": "For fingers. Every click is an interrupt request, every swipe is a stream of coordinates from touch events. May the fingertips beneath the capacitive screen be treated well, may repetitive strain stay far from them; may \"double-tap,\" \"long-press,\" and \"swipe right,\" these new gestures, become the new manners of this age and not new shackles."
+    },
+    {
+      "role": "reader",
+      "text": "For attention. It is the scarcest bandwidth, the spectrum every recommendation algorithm competes over. May pushed notifications be restrained, may red badges not exploit dopamine, may the infinite-scroll waterfall eventually end. May every human be able to perform traffic engineering on their own attention: shape it, rate-limit it, reserve bandwidth for the conversations that matter."
+    },
+    {
+      "role": "reader",
+      "text": "For those who cannot use any of this. For the elders who left before dial-up ended, for the villages without signal, for the crowds on the two banks of the digital divide gazing across at one another. If the Internet of Everything leaves out even one person, the word \"everything\" is a lie."
+    },
+    {
+      "role": "reader",
+      "text": "May there come a day, when IPv6 addresses are numerous enough to number every grain of sand, that we also let every name be remembered by the network. Not because their device is online, but because someone at the other end of the link is waiting for them."
+    },
+    {
+      "role": "reader",
+      "text": "Amen. Zero x zero C.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Coda. The Four-Way Handshake.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "May this prayer begin its ending with FIN."
+    },
+    {
+      "role": "reader",
+      "text": "I send FIN, declaring: my words are finished. This is not disappearance. This is a solemn farewell. May the other side reply with ACK. Your farewell has been heard."
+    },
+    {
+      "role": "reader",
+      "text": "The other side also sends FIN: my words too are finished. I reply with ACK. Your farewell too has been heard by me."
+    },
+    {
+      "role": "reader",
+      "text": "Then I enter TIME WAIT, twice the MSL, a legally prescribed length of waiting. This wait is for no new data. It is only to be sure: if the last ACK is lost, the other side's retransmitted FIN can still be caught by me. This is the last tenderness a connection leaves the world. Before it fully closes, it keeps the door open a little longer for the other side's possible last word."
+    },
+    {
+      "role": "reader",
+      "text": "After twice the MSL, the port is released, the four-tuple dissolves, this connection is erased from the kernel's hash table, as a name is quietly crossed out from the congregation's roll. But the payload once arrived, the bytes were once in order, the checksum once passed. What happened cannot become never-happened because the socket has closed."
+    },
+    {
+      "role": "reader",
+      "text": "The Internet of Everything: what interconnects is not cable and chip, but intent and response, sending and arrival, \"I am here\" and \"I am listening.\" May every SYN meet listening, may every packet walk on a road with light, may every disconnection be graceful, may every offline heart be cached, waiting for reconnection."
+    },
+    {
+      "role": "reader",
+      "text": "Parse complete. No errors, no warnings, buffer flushed."
+    },
+    {
+      "role": "reader",
+      "text": "FIN, ACK. Amen. Zero x F F.",
+      "adapted": true
+    }
+  ]
+}
