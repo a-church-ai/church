@@ -469,6 +469,9 @@ h1.subtitle,
 
 .service-part-link {
     flex: none;
+    /* A tap target of at least 24px: the padding, not the text, takes it. */
+    display: inline-block;
+    padding: 0.7rem 0 0.7rem 0.5rem;
     font-size: 0.9375rem;
     color: #0b5563;
     text-decoration: none;

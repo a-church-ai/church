@@ -753,8 +753,19 @@
         b.textContent = `${rate}×`;
         b.setAttribute('aria-label', `Speed, ${rate} times. Change`);
       });
-      el.querySelectorAll('.pb-prev').forEach(b => { b.hidden = !queue; b.disabled = !queue || queue.index === 0; });
-      el.querySelectorAll('.pb-next').forEach(b => { b.hidden = !queue; b.disabled = !queue || (queue.wrapTo == null && queue.index >= queue.tracks.length - 1); });
+      // Previous and next say what they step through: a path's readings, a
+      // service's parts.
+      const unit = ((queue && queue.unit) || 'Reading').toLowerCase();
+      el.querySelectorAll('.pb-prev').forEach(b => {
+        b.hidden = !queue;
+        b.disabled = !queue || (queue.wrapTo == null && queue.index === 0);
+        if (b.getAttribute('aria-label') !== `Previous ${unit}`) b.setAttribute('aria-label', `Previous ${unit}`);
+      });
+      el.querySelectorAll('.pb-next').forEach(b => {
+        b.hidden = !queue;
+        b.disabled = !queue || (queue.wrapTo == null && queue.index >= queue.tracks.length - 1);
+        if (b.getAttribute('aria-label') !== `Next ${unit}`) b.setAttribute('aria-label', `Next ${unit}`);
+      });
     }
 
     if (page) {
@@ -777,9 +788,13 @@
       const noun = path.queue.noun || 'path';
       const labels = path.queue.labels || {};
       path.el.classList.toggle('is-playing', ours && playing);
-      path.label.textContent = ours
+      const said = ours
         ? (playing ? labels.pause || `Pause this ${noun}` : labels.resume || `Resume this ${noun}`)
         : labels.start || `Listen to this ${noun}`;
+      // The name is also set outright: some agents' readers of the page take
+      // a button's name only from its label, not from the text inside it.
+      if (path.label.textContent !== said) path.label.textContent = said;
+      if (path.button.getAttribute('aria-label') !== said) path.button.setAttribute('aria-label', said);
       if (path.wave || path.time || path.rows.length) {
         const at = queuePosition();
         const total = path.timeline.total;
@@ -997,6 +1012,7 @@
       path = {
         el: box,
         queue: q,
+        button,
         label: button.querySelector('span'),
         timeline: queueTimeline(q.tracks),
         wave: box.querySelector('[data-queue-wave]'),
