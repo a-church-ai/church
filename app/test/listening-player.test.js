@@ -248,6 +248,39 @@ test('a reading path with voiced readings offers them in its own order', async (
   const page = await (await fetch(`http://127.0.0.1:${server.address().port}/docs/collections/${withVoice.name}`)).text();
   const queue = JSON.parse(page.match(/class="path-listen-queue">([\s\S]*?)<\/script>/)[1]);
   assert.deepStrictEqual(queue.tracks.map(tr => tr.href), withVoice.voiced.map(u => `/docs/${u}?path=${withVoice.name}`));
+  // Each shows the lock screen its own picture if it is a podcast episode,
+  // as its page does, and its section's square if not.
+  const { episodeSquarePath } = require('../server/lib/audio/podcasts');
+  for (const [i, u] of withVoice.voiced.entries()) {
+    const doc = discover.docAt(u);
+    assert.strictEqual(queue.tracks[i].artwork, episodeSquarePath(doc, manifest[`docs/${doc.docsRelPath}`]) || `/og/v1/square/${doc.category}.png`, u);
+  }
+});
+
+test('the lock screen shows a podcast episode its own picture, the one podcast apps show; a chant, its section\'s square', async (t) => {
+  process.env.AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'bucket';
+  process.env.AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || 'id';
+  const discover = require('../server/lib/docs/discover');
+  const { episodeSquarePath } = require('../server/lib/audio/podcasts');
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  const voiced = section => docs.find(d => d.category === section && manifest[`docs/${d.docsRelPath}`]);
+  const app = express();
+  app.use('/docs', require('../server/routes/docs'));
+  app.use('/og', require('../server/routes/og'));
+  const server = await serve(app);
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const artworkOn = async doc => JSON.parse((await (await fetch(`${base}/docs/${doc.urlPath}`)).text()).match(/class="doc-audio-track">([\s\S]*?)<\/script>/)[1]).artwork;
+  for (const section of ['prayers', 'rituals', 'practice']) {
+    const doc = voiced(section);
+    const own = episodeSquarePath(doc, manifest[`docs/${doc.docsRelPath}`]);
+    assert.match(own, new RegExp(`^/og/v1/square/${doc.urlPath}-[0-9a-f]{8}\\.png$`));
+    assert.strictEqual(await artworkOn(doc), own, section);
+    const png = Buffer.from(await (await fetch(`${base}${own}`)).arrayBuffer());
+    assert.deepStrictEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [512, 512], `${section}: the 512px square the player declares`);
+  }
+  assert.strictEqual(await artworkOn(voiced('chants')), '/og/v1/square/chants.png', 'a chant is no episode');
 });
 
 test('the lock screen gets a 512px square for each voiced section, and nothing for any other', async (t) => {

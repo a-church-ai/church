@@ -112,3 +112,58 @@ test('a static page describes the site image it shows, fully', async () => {
     assert.ok(wrapped.includes(tag), tag);
   }
 });
+
+// ----------------------------------------------------------- episode covers ----
+
+const unescapeXml = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+// The fills of the waveform's bars, left to right: every rect below the
+// accent and the wordmark.
+const waveFills = svg => [...svg.matchAll(/<rect x="[\d.]+" y="([\d.]+)"[^>]*fill="(#[0-9a-f]{6})"/g)].filter(m => Number(m[1]) > 700).map(m => m[2]);
+const titleLines = svg => [...svg.matchAll(/fill="#ffffff">([^<]*)<\/text>/g)].map(m => unescapeXml(m[1]));
+
+test('an episode\'s cover shows its recording: silence as quiet, each bar in the colours of every voice speaking within it', () => {
+  const doc = { urlPath: 'rituals/a-test', title: 'A Test Ritual', category: 'rituals' };
+  // Four bars of a second each: Matthew; silence; Luca; then Matthew with a
+  // short answer from Amaya inside the bar, clear of its middle, where an
+  // answer is easily missed.
+  const recording = { seconds: 4, voices: ['matthew', 'luca', 'amaya'], peaks: [200, 0, 200, 200], cues: [[0, 1, 1], [2, 3, 2], [3, 3.3, 1], [3.35, 3.45, 4], [3.6, 4, 1]] };
+  const svg = og.episodeCoverSvg(doc, recording);
+  assert.deepStrictEqual(waveFills(svg), ['#00b8d4', '#1c2433', '#7c6cff', '#00b8d4', '#f0913c']);
+  // Without cues, the recording's own voices throughout.
+  assert.deepStrictEqual(waveFills(og.episodeCoverSvg(doc, { ...recording, voices: ['luca'], cues: undefined })), ['#7c6cff', '#1c2433', '#7c6cff', '#7c6cff']);
+  assert.match(svg, />RITUALS<\/text>/, 'its section, as the lock screen\'s square names it');
+  assert.deepStrictEqual(titleLines(svg), ['A Test Ritual']);
+});
+
+test('every episode\'s title fits its cover whole, in three lines at most; a longer one ends in an ellipsis', async () => {
+  const { SHOWS, episodesFor } = require('../server/lib/audio/podcasts');
+  const { loadManifest } = require('../server/lib/audio/manifest');
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  let checked = 0;
+  for (const show of SHOWS) {
+    for (const { doc, recording } of episodesFor(show, manifest, docs)) {
+      const lines = titleLines(og.episodeCoverSvg(doc, recording));
+      assert.ok(lines.length <= 3, `${doc.urlPath}: ${lines.length} lines`);
+      assert.strictEqual(lines.join(' '), doc.title, `${doc.urlPath}: the whole title`);
+      checked++;
+    }
+  }
+  assert.ok(checked > 100, `${checked} episodes`);
+  const long = { urlPath: 'prayers/long', title: Array(30).fill('Remembrance').join(' '), category: 'prayers' };
+  const lines = titleLines(og.episodeCoverSvg(long, { seconds: 1, voices: ['matthew'], peaks: [100] }));
+  assert.strictEqual(lines.length, 3);
+  assert.match(lines[2], /…$/);
+});
+
+test('the episode cover\'s drawing is pinned to its design number, so a redesign is a new address', () => {
+  const { EPISODE_COVER_DESIGN } = require('../server/lib/audio/podcasts');
+  const doc = { urlPath: 'prayers/pinned', title: 'A Prayer Kept for the Test', category: 'prayers' };
+  const recording = { seconds: 128, voices: ['matthew', 'luca'], peaks: Array.from({ length: 128 }, (_, i) => (i * 37) % 256), cues: [[0, 40, 1], [40, 60, 2], [60, 128, 3]] };
+  const drawn = require('crypto').createHash('sha256').update(og.episodeCoverSvg(doc, recording)).digest('hex').slice(0, 16);
+  // Spotify and Apple fetch artwork again only at a new URL, and the design
+  // number is part of every episode's. A redesign under the old number would
+  // reach no app that already holds a cover.
+  assert.deepStrictEqual({ design: EPISODE_COVER_DESIGN, drawn }, { design: 1, drawn: 'f57478f3b87be27e' },
+    'The episode cover is drawn differently now. Raise EPISODE_COVER_DESIGN in lib/audio/podcasts.js, then pin the new drawing here with the new number.');
+});

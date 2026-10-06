@@ -51,6 +51,7 @@ async function loadServiceCatalog() {
       seconds: recording.seconds,
       hours: meta ? meta.hours : null,
       url: `/docs/${doc.urlPath}`,
+      urlPath: doc.urlPath,
       category: doc.category,
       recording,
     });

@@ -3,8 +3,9 @@
  * two RSS feeds. What matters: every recording but a chant is an episode of
  * exactly one show; a feed is well-formed RSS carrying what Spotify and Apple require; an
  * episode's file size is exact, and its guid and date survive a re-render;
- * the paths subscribers hold do not move; and each show has a 3000px RGB
- * cover.
+ * the paths subscribers hold do not move; each show has a 3000px RGB cover;
+ * and each episode has its own, at an address that changes with what it
+ * shows.
  */
 
 const test = require('node:test');
@@ -13,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const express = require('express');
-const { SHOWS, OWNER_EMAIL, feedPath, coverPath, guidFor, duration, episodesFor, buildFeed, showForSection, feedFor } = require('../server/lib/audio/podcasts');
+const { SHOWS, OWNER_EMAIL, feedPath, coverPath, guidFor, duration, episodesFor, buildFeed, showForSection, feedFor, episodeCoverHash, episodeCoverPath, episodeSquarePath } = require('../server/lib/audio/podcasts');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const discover = require('../server/lib/docs/discover');
 
@@ -255,4 +256,78 @@ test('a page in a show\'s section names its feed, and the home page names both',
   assert.doesNotMatch(essay, /application\/rss\+xml/);
   const home = fs.readFileSync(path.join(__dirname, '../client/public/index.html'), 'utf8');
   for (const show of SHOWS) assert.ok(home.includes(link(show)), `the home page names ${show.id}`);
+});
+
+test('each episode names its own cover, at an address that changes with what the cover shows and with nothing else', async () => {
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  for (const show of SHOWS) {
+    const xml = await feedFor(show.id);
+    assert.strictEqual(attr(xml.split('<item>')[0], 'itunes:image', 'href'), `${SITE}${coverPath(show)}`, 'the show keeps its own cover');
+    const episodes = episodesFor(show, manifest, docs);
+    items(xml).forEach((item, i) => {
+      const { doc, recording } = episodes[i];
+      const hash = episodeCoverHash(doc, recording);
+      assert.strictEqual(attr(item, 'itunes:image', 'href'), `${SITE}/og/v1/podcast/${doc.urlPath}-${hash}.png`, doc.urlPath);
+      assert.strictEqual(episodeSquarePath(doc, recording), `/og/v1/square/${doc.urlPath}-${hash}.png`, 'the same picture for the lock screen');
+    });
+  }
+
+  const [episode] = episodesFor(SHOWS[0], manifest, docs);
+  const { doc, recording } = episode;
+  const hash = episodeCoverHash(doc, recording);
+  const drawnFrom = {
+    'a new title': [{ ...doc, title: `${doc.title}, Again` }, recording],
+    'another section': [{ ...doc, category: doc.category === 'rituals' ? 'prayers' : 'rituals' }, recording],
+    'a new waveform': [doc, { ...recording, peaks: recording.peaks.map((p, i) => (i ? p : (p + 1) % 256)) }],
+    'new cues': [doc, { ...recording, cues: [...(recording.cues || []), [0, 1, 4]] }],
+    'a new length': [doc, { ...recording, seconds: recording.seconds + 1 }],
+  };
+  for (const [change, [d, r]] of Object.entries(drawnFrom)) assert.notStrictEqual(episodeCoverHash(d, r), hash, change);
+  // What the cover does not show leaves its address alone, so apps are not
+  // sent to fetch the same picture again.
+  assert.strictEqual(episodeCoverHash({ ...doc, description: 'Another.' }, { ...recording, file: 'prayers/x-00000000.mp3', bytes: 1, rendered: '2027-01-01' }), hash);
+
+  // A chant is no episode, and a recording without its waveform keeps the show's cover.
+  const chant = docs.find(d => d.category === 'chants' && manifest[`docs/${d.docsRelPath}`]);
+  assert.strictEqual(episodeCoverPath(chant, manifest[`docs/${chant.docsRelPath}`]), null);
+  const [bare] = items(buildFeed(SHOWS[0], [{ ...episode, recording: { ...recording, peaks: null } }]));
+  assert.strictEqual(attr(bare, 'itunes:image', 'href'), null);
+});
+
+test('an episode\'s cover is served at 1400px and its lock-screen square at 512px, RGB, at its current address only', async (t) => {
+  const app = express();
+  app.use('/og', require('../server/routes/og'));
+  const server = await serve(app);
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  for (const show of SHOWS) {
+    const [{ doc, recording }] = episodesFor(show, manifest, docs);
+    for (const [where, size] of [[episodeCoverPath(doc, recording), 1400], [episodeSquarePath(doc, recording), 512]]) {
+      const res = await fetch(`${base}${where}`);
+      assert.strictEqual(res.status, 200, where);
+      assert.match(res.headers.get('content-type'), /image\/png/);
+      const png = Buffer.from(await res.arrayBuffer());
+      assert.strictEqual(png[25], 2, 'RGB, no alpha channel');
+      const image = rgbPixels(png);
+      assert.deepStrictEqual([image.width, image.height], [size, size]);
+      assert.deepStrictEqual(image.at(2, 2), [0x0a, 0x0e, 0x1a], 'the show cover\'s background');
+      // The title in white across the foot. A missing font draws nothing at all.
+      let lit = 0;
+      for (let y = Math.round(size * 0.62); y < Math.round(size * 0.95); y += 2) for (let x = 0; x < size; x += 2) if (image.at(x, y).every(c => c > 200)) lit++;
+      assert.ok(lit > size / 4, `${where}: the title is drawn (${lit} lit samples)`);
+      assert.strictEqual((await fetch(`${base}${where}`, { method: 'HEAD' })).status, 200);
+      const old = where.replace(/-[0-9a-f]{8}\.png$/, '-00000000.png');
+      assert.strictEqual((await fetch(`${base}${old}`)).status, 404, `${old}: an address no longer current`);
+    }
+  }
+  const chant = docs.find(d => d.category === 'chants' && manifest[`docs/${d.docsRelPath}`]);
+  const hash = episodeCoverHash(chant, manifest[`docs/${chant.docsRelPath}`]);
+  assert.strictEqual((await fetch(`${base}/og/v1/podcast/${chant.urlPath}-${hash}.png`)).status, 404, 'a chant is no episode');
+  assert.strictEqual((await fetch(`${base}/og/v1/square/prayers/no-such-prayer-${hash}.png`)).status, 404);
+  // The shows' covers and the sections' squares answer where they did.
+  assert.strictEqual((await fetch(`${base}${coverPath(SHOWS[1])}`)).status, 200);
+  assert.strictEqual((await fetch(`${base}/og/v1/square/practice.png`)).status, 200);
 });

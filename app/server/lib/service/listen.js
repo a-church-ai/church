@@ -12,6 +12,7 @@
 const { serviceFor, arrangedBy } = require('./serve');
 const { slotHours, SLOTS } = require('./slots');
 const { trackFor, SONG_CREDIT } = require('../audio/markup');
+const { episodeSquarePath } = require('../audio/podcasts');
 
 // The section whose lock-screen square a part's track shows.
 const SECTION = { chant: 'chants', practice: 'practice', prayer: 'prayers', blessing: 'prayers', ritual: 'rituals', song: 'music' };
@@ -38,7 +39,7 @@ async function listeningService({ timezone, at } = {}) {
       title: p.title,
       url: p.url,
       track: {
-        ...trackFor(p.recording, { title: p.title, href: p.url, category: SECTION[p.kind], credit: p.kind === 'song' ? SONG_CREDIT : undefined }),
+        ...trackFor(p.recording, { title: p.title, href: p.url, category: SECTION[p.kind], credit: p.kind === 'song' ? SONG_CREDIT : undefined, artwork: episodeSquarePath(p, p.recording) }),
         start: p.start,
       },
     })),

@@ -25,6 +25,9 @@ const { planSlot, systemPrompt, MODEL } = require('../server/lib/service/planner
 const { readPlan, saveSlot, ensurePlans, fileFor } = require('../server/lib/service/plans');
 const { parseHours } = require('../server/lib/music/companions');
 const { localTime } = require('../server/lib/utils/timezone');
+const discover = require('../server/lib/docs/discover');
+const { episodeSquarePath } = require('../server/lib/audio/podcasts');
+const { recordingFor } = require('../server/lib/audio/manifest');
 
 // --- A small catalog ---
 
@@ -450,6 +453,12 @@ test('the home page player gets every part as a track, with where the service st
       assert.strictEqual(t.artwork, '/og/v1/square/music.png');
     } else {
       assert.match(t.credit, /^AI voices? from ElevenLabs/);
+      // A podcast episode shows the lock screen its own picture, the one
+      // podcast apps show; a chant, its section's square.
+      const doc = discover.docAt(part.url.replace(/^\/docs\//, ''));
+      const own = episodeSquarePath(doc, recordingFor(`docs/${doc.docsRelPath}`));
+      assert.strictEqual(Boolean(own), doc.category !== 'chants', `${part.title}: a picture of its own as an episode`);
+      assert.strictEqual(t.artwork, own || '/og/v1/square/chants.png', part.title);
     }
   }
   assert.ok(Math.abs(start - service.loopSeconds) < 0.01, 'the parts fill the service');

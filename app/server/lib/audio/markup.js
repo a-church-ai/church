@@ -61,8 +61,11 @@ const SONG_CREDIT = 'Original music by aChurch.ai, made with Suno.';
 
 // What the player needs to play a recording anywhere on the site: in the bar
 // after its page is left, and after a reload, from the browser's own storage.
-// A song passes its own credit, since no house voice speaks it.
-function trackFor(recording, { title, href, category, credit }) {
+// A song passes its own credit, since no house voice speaks it, and a podcast
+// episode its own picture for the lock screen (lib/audio/podcasts.js
+// episodeSquarePath), the one podcast apps show; anything else shows its
+// section's square.
+function trackFor(recording, { title, href, category, credit, artwork }) {
   return {
     file: recording.file,
     frames: recording.frames || null,
@@ -75,14 +78,14 @@ function trackFor(recording, { title, href, category, credit }) {
     href,
     album: titleCase(category),
     credit: credit || creditLine(recording.voices),
-    artwork: `/og/v1/square/${category}.png`,
+    artwork: artwork || `/og/v1/square/${category}.png`,
   };
 }
 
 const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="icon-play" d="M8 5.5v13l11-6.5z"/><path class="icon-pause" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
 
-function renderRecording(recording, { title, href, category, credit }) {
-  const track = trackFor(recording, { title, href, category, credit });
+function renderRecording(recording, { title, href, category, credit, artwork }) {
+  const track = trackFor(recording, { title, href, category, credit, artwork });
   const minutes = Math.max(1, Math.round(recording.seconds / 60));
   const wave = recording.peaks
     ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`

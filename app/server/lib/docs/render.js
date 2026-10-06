@@ -33,7 +33,7 @@ const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderRecording, renderPathListen, trackFor } = require('../audio/markup');
-const { showForSection, feedPath } = require('../audio/podcasts');
+const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, playerHead } = require('../utils/assets');
 
 
@@ -257,7 +257,7 @@ function renderPathListenFor(name, collectionDoc) {
     const reading = discover.docAt(urlPath);
     const recording = reading && servedRecording(reading);
     if (recording) {
-      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category }));
+      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
     }
   }
   if (!tracks.length) return '';
@@ -669,7 +669,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
 
   const recording = isIndex ? null : servedRecording(doc);
   const underTitle = recording
-    ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category })
+    ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
   if (underTitle) {
     bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);

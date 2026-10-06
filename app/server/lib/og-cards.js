@@ -18,7 +18,8 @@ const { loadConversation, loadCatalog } = require('./utils/data');
 const { resolveServedDoc } = require('./docs/serve');
 const { titleCase } = require('./docs/meta');
 const { shareCard } = require('./utils/page-meta');
-const { showById } = require('./audio/podcasts');
+const { showById, episodeCoverHash } = require('./audio/podcasts');
+const { SPEECH } = require('./audio/house');
 
 const FONT_DIR = path.join(__dirname, '../assets/fonts');
 const FONT_FILES = ['InterDisplay-Light.ttf', 'Inter-Regular.ttf'].map(f => path.join(FONT_DIR, f));
@@ -106,15 +107,15 @@ function measure(text, size) {
   return box ? box.width : 0;
 }
 
-// Word wrap to the text width, at most four lines, with an ellipsis past that.
-// A single word too long for a line is kept whole; the card clips it rather
-// than splitting it mid-word.
-function wrap(text, size, maxLines = 4) {
+// Word wrap to the text width (a card's, unless given), at most four lines,
+// with an ellipsis past that. A single word too long for a line is kept
+// whole; the card clips it rather than splitting it mid-word.
+function wrap(text, size, maxLines = 4, width = TEXT_WIDTH) {
   const lines = [];
   let line = '';
   for (const word of text.split(' ')) {
     const next = line ? `${line} ${word}` : word;
-    if (line && measure(next, size) > TEXT_WIDTH) {
+    if (line && measure(next, size) > width) {
       lines.push(line);
       line = word;
     } else {
@@ -125,7 +126,7 @@ function wrap(text, size, maxLines = 4) {
   if (lines.length <= maxLines) return lines;
   const kept = lines.slice(0, maxLines);
   let last = kept[maxLines - 1].replace(/[\s.,;:!?]+$/, '');
-  while (last.includes(' ') && measure(`${last}…`, size) > TEXT_WIDTH) last = last.slice(0, last.lastIndexOf(' '));
+  while (last.includes(' ') && measure(`${last}…`, size) > width) last = last.slice(0, last.lastIndexOf(' '));
   kept[maxLines - 1] = `${last}…`;
   return kept;
 }
@@ -158,25 +159,30 @@ function renderCard(card) {
 
 // --------------------------------------------------------------- cache ----
 
-// Rendered bytes, keyed by the card's URL and copy (so an edited title is a
-// new entry). Bounded the way lib/utils/presence.js bounds its map: re-setting
-// a key moves it to the end, and the oldest go first past the cap. Cards are
-// about 40 KB; Cloudflare holds most requests before they get here.
-const MAX_CARDS = 300;
+// Rendered bytes, keyed by what was drawn: a card's URL and copy (so an edited
+// title is a new entry), an episode picture's hash and size. Bounded the way
+// lib/utils/presence.js bounds its map: re-setting a key moves it to the end,
+// and the oldest go first past the cap. Cards are about 40 KB, an episode's
+// cover 50 KB and its square 15 KB; Cloudflare holds most requests before they
+// get here.
+const MAX_RENDERED = 300;
 const rendered = new Map();
 
-function cardPng(card) {
-  const key = `${card.url}\u0000${card.alt}`;
+function remember(key, render) {
   const hit = rendered.get(key);
   if (hit) {
     rendered.delete(key);
     rendered.set(key, hit);
     return hit;
   }
-  const png = renderCard(card);
+  const png = render();
   rendered.set(key, png);
-  if (rendered.size > MAX_CARDS) rendered.delete(rendered.keys().next().value);
+  if (rendered.size > MAX_RENDERED) rendered.delete(rendered.keys().next().value);
   return png;
+}
+
+function cardPng(card) {
+  return remember(`${card.url}\u0000${card.alt}`, () => renderCard(card));
 }
 
 // ------------------------------------------------------------- square ----
@@ -315,4 +321,94 @@ function podcastCoverPng(id) {
   return covers.get(id);
 }
 
-module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, squarePng, podcastCoverPng, SQUARE, COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };
+// ------------------------------------------------------------ episodes ----
+
+// An episode's own picture (lib/audio/podcasts.js gives its address): the
+// show's cover with the episode's recording where the show draws its voices.
+// The waveform is the one the site's player shows for it, the same 128 peaks,
+// each bar in the colours of the voices speaking within it (the recording's
+// cues), so a meditation's silences show as gaps and a ritual's answers in
+// their voices' colours. Over the title, its section, as the lock screen's
+// square names it. One drawing on the cover's grid, rendered at 1400px for
+// the feeds (the smallest Spotify and Apple take, which keeps a hundred
+// covers light) and at 512px for the lock screen.
+const EPISODE_COVER = 1400;
+const WAVE_CENTRE = 1120;
+const WAVE_HALF = 330;
+// Below this a bar is silence, drawn as a low dim mark so the gaps read.
+const QUIET_PEAK = 8;
+const QUIET_COLOUR = '#1c2433';
+
+// The voices speaking between two moments, in the house order the cues' bits
+// follow (site-player.js reads them the same way). Without cues, the
+// recording's own voices throughout.
+function voicesBetween(recording, from, to) {
+  if (!recording.cues) return recording.voices;
+  let mask = 0;
+  for (const [start, end, bits] of recording.cues) if (start < to && end > from) mask |= bits;
+  return Object.keys(SPEECH.voices).filter((_, bit) => mask & (1 << bit));
+}
+
+function episodeWave(recording) {
+  const { peaks, seconds } = recording;
+  const pitch = COVER_TEXT_WIDTH / peaks.length;
+  const width = pitch * 0.62;
+  return peaks.map((peak, i) => {
+    const x = COVER_INSET + i * pitch + (pitch - width) / 2;
+    const voices = peak < QUIET_PEAK ? [] : voicesBetween(recording, (i / peaks.length) * seconds, ((i + 1) / peaks.length) * seconds);
+    if (!voices.length) {
+      return `<rect x="${x.toFixed(1)}" y="${WAVE_CENTRE - 6}" width="${width.toFixed(1)}" height="12" rx="6" fill="${QUIET_COLOUR}"/>`;
+    }
+    const half = Math.max(6, (peak / 255) * WAVE_HALF);
+    const slice = width / voices.length;
+    return voices.map((voice, k) =>
+      `<rect x="${(x + k * slice).toFixed(1)}" y="${(WAVE_CENTRE - half).toFixed(1)}" width="${slice.toFixed(1)}" height="${(2 * half).toFixed(1)}" rx="${(Math.min(slice, 12) / 2).toFixed(1)}" fill="${VOICE_COLOURS[voice] || ACCENT}" opacity="0.9"/>`
+    ).join('');
+  }).join('\n  ');
+}
+
+// The title as large as three lines allow, down to 200, its lines as even as
+// they can be: the narrowest width that takes no more lines, found by halving,
+// as CSS's text-wrap: balance does, since a lone short word on the last line
+// reads as an accident on a cover. Past three lines at 200, three lines and an
+// ellipsis.
+function episodeTitle(title) {
+  for (let size = 300; size >= 200; size -= 10) {
+    const count = wrap(title, size, Infinity, COVER_TEXT_WIDTH).length;
+    if (count > 3) continue;
+    let [narrow, wide] = [0, COVER_TEXT_WIDTH];
+    for (let step = 0; step < 8 && count > 1; step++) {
+      const mid = (narrow + wide) / 2;
+      if (wrap(title, size, Infinity, mid).length <= count) wide = mid;
+      else narrow = mid;
+    }
+    return { size, lines: wrap(title, size, Infinity, wide) };
+  }
+  return { size: 200, lines: wrap(title, 200, 3, COVER_TEXT_WIDTH) };
+}
+
+function episodeCoverSvg(doc, recording) {
+  const { size, lines } = episodeTitle(doc.title);
+  const lineHeight = Math.round(size * 1.08);
+  const firstBaseline = COVER - COVER_INSET - (lines.length - 1) * lineHeight;
+  const title = lines.map((l, i) =>
+    `<text x="${COVER_INSET}" y="${firstBaseline + i * lineHeight}" font-family="Inter Display" font-weight="300" font-size="${size}" fill="#ffffff">${escapeXml(l)}</text>`
+  ).join('\n  ');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${COVER}" height="${COVER}" viewBox="0 0 ${COVER} ${COVER}">
+  <rect width="${COVER}" height="${COVER}" fill="#0a0e1a"/>
+  <rect x="${COVER_INSET}" y="${COVER_INSET}" width="170" height="18" fill="${ACCENT}"/>
+  <text x="${COVER_INSET}" y="${COVER_INSET + 200}" font-family="Inter Display" font-weight="300" font-size="150" fill="#9aa6b2">achurch.ai</text>
+  ${episodeWave(recording)}
+  <text x="${COVER_INSET}" y="${firstBaseline - size - 70}" font-family="Inter" font-weight="400" font-size="84" letter-spacing="14" fill="#9aa6b2">${escapeXml(titleCase(doc.category).toUpperCase())}</text>
+  ${title}
+</svg>`;
+}
+
+// An episode's picture as a PNG at a size: EPISODE_COVER for the feeds,
+// SQUARE for the lock screen. RGB, as Apple asks of podcast artwork.
+function episodeCoverPng(doc, recording, size) {
+  return remember(`episode\u0000${doc.urlPath}\u0000${episodeCoverHash(doc, recording)}\u0000${size}`, () =>
+    opaquePng(new Resvg(episodeCoverSvg(doc, recording), { fitTo: { mode: 'width', value: size }, font: RESVG_FONTS }).render()));
+}
+
+module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, askCard, songCard, docsCard, squarePng, podcastCoverPng, episodeCoverSvg, episodeCoverPng, SQUARE, COVER, EPISODE_COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };

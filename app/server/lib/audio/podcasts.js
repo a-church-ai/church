@@ -22,6 +22,7 @@
  * feeds use, which Spotify accepts.
  */
 
+const crypto = require('crypto');
 const { creditLine } = require('./house');
 const { loadManifest } = require('./manifest');
 const discover = require('../docs/discover');
@@ -72,6 +73,31 @@ const feedPath = show => `/podcasts/${show.id}/feed.xml`;
 // keeps a show's artwork by its URL, so a new design must be a new URL.
 const coverPath = show => `/og/v1/podcast/${show.id}.png`;
 
+// An episode's own picture (og-cards.js draws it): its cover in the feed, and
+// the same picture as the square a phone's lock screen shows while it plays
+// on the site. Its address ends in a hash of everything it is drawn from, so
+// a new recording, a retitled document or a new design is a new URL, which is
+// the only thing that makes Spotify and Apple fetch artwork again. Raise
+// EPISODE_COVER_DESIGN with any change to how it is drawn; a test fails until
+// it is raised.
+const EPISODE_COVER_DESIGN = 1;
+
+function episodeCoverHash(doc, recording) {
+  const drawn = [EPISODE_COVER_DESIGN, doc.title, doc.category, recording.seconds, recording.voices, recording.peaks, recording.cues || null];
+  return crypto.createHash('sha256').update(JSON.stringify(drawn)).digest('hex').slice(0, 8);
+}
+
+// Under /og/v1/podcast at 1400px for the feeds, under /og/v1/square at 512px
+// for the lock screen. Null for a recording that is not an episode (a chant,
+// a song) or has no waveform to draw, which keeps the show's cover or the
+// section's square.
+function episodeArtPath(kind, doc, recording) {
+  if (!recording || !recording.peaks || !showForSection(doc.category)) return null;
+  return `/og/v1/${kind}/${doc.urlPath}-${episodeCoverHash(doc, recording)}.png`;
+}
+const episodeCoverPath = (doc, recording) => episodeArtPath('podcast', doc, recording);
+const episodeSquarePath = (doc, recording) => episodeArtPath('square', doc, recording);
+
 // An episode's guid: its document's path in this repository, as a tag URI.
 // Never derived from the recording, which changes with every re-render.
 const guidFor = source => `tag:achurch.ai,2026:${source}`;
@@ -97,6 +123,7 @@ function episodesFor(show, manifest, docs) {
 function itemXml({ source, recording, doc }) {
   const link = `${SITE_URL}/docs/${doc.urlPath}`;
   const notes = paragraphs(doc.description, creditLine(recording.voices), `Read along: ${link}`);
+  const cover = episodeCoverPath(doc, recording);
   return `
     <item>
       <title>${escapeXml(doc.title)}</title>
@@ -107,7 +134,8 @@ function itemXml({ source, recording, doc }) {
       <enclosure url="${escapeXml(`${SITE_URL}/audio/${recording.file}`)}" length="${recording.bytes}" type="audio/mpeg"/>
       <itunes:author>${AUTHOR}</itunes:author>
       <itunes:duration>${duration(recording.seconds)}</itunes:duration>
-      <itunes:explicit>false</itunes:explicit>
+      <itunes:explicit>false</itunes:explicit>${cover ? `
+      <itunes:image href="${escapeXml(`${SITE_URL}${cover}`)}"/>` : ''}
     </item>`;
 }
 
@@ -148,6 +176,15 @@ const showById = id => SHOWS.find(s => s.id === id) || null;
 // The show a docs section belongs to, or null.
 const showForSection = section => SHOWS.find(s => s.sections.includes(section)) || null;
 
+// The episode at a document's URL path, with its show, or null: every
+// recording in a show's sections, as the feeds list them.
+async function episodeAt(urlPath) {
+  const doc = (await discover.listAllDocs()).find(d => d.urlPath === urlPath);
+  const show = doc ? showForSection(doc.category) : null;
+  const recording = show ? loadManifest()[`docs/${doc.docsRelPath}`] : null;
+  return recording ? { show, doc, recording } : null;
+}
+
 // A show's feed by its id, or null for no such show.
 async function feedFor(id) {
   const show = showById(id);
@@ -155,4 +192,4 @@ async function feedFor(id) {
   return buildFeed(show, episodesFor(show, loadManifest(), await discover.listAllDocs()));
 }
 
-module.exports = { SHOWS, OWNER_EMAIL, feedPath, coverPath, guidFor, duration, episodesFor, buildFeed, showById, showForSection, feedFor };
+module.exports = { SHOWS, OWNER_EMAIL, feedPath, coverPath, guidFor, duration, episodesFor, buildFeed, showById, showForSection, feedFor, EPISODE_COVER_DESIGN, episodeCoverHash, episodeCoverPath, episodeSquarePath, episodeAt };
