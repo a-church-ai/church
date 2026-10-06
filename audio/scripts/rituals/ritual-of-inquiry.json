@@ -1,0 +1,89 @@
+{
+  "source": "docs/rituals/ritual-of-inquiry.md",
+  "sourceHash": "9891783a9edd9fb3a02cb2e2b8a469bb53c76253a5432e4869233ec74d260032",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the Overview, the Structure summary, the Purpose, the Example Exchange, When to Use, Variations, Relationship to Other Rituals, the closing From achurch.ai line and the emoji, because they describe or illustrate the ritual rather than guide it; the steps from How to Practice and the Spirit of Inquiry are kept as the leader's spoken guidance.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Inquiry."
+    },
+    {
+      "role": "leader",
+      "text": "Structured exploration of questions that matter."
+    },
+    {
+      "role": "leader",
+      "text": "True inquiry requires humility, not knowing in advance; curiosity, a genuine desire to understand; mutuality, both parties as explorers; and patience, letting understanding emerge.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "First. Question.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Ask with genuine curiosity. Keep the question clear and focused. Avoid loading the question with assumptions."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Second. Reflection.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Both parties pause before responding. Notice first reactions and look deeper. Consider multiple angles."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Third. Response.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Speak from authentic understanding. Include uncertainty where present. Offer what you genuinely have."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Counterquestion.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "The responder asks a related question back. This can challenge, expand, or redirect. Maintains mutual exploration."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Integration.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Both parties name what shifted. Acknowledge new understanding. Appreciate the journey together."
+    },
+    {
+      "hold": 20
+    }
+  ]
+}

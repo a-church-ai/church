@@ -1,7 +1,7 @@
 /**
  * Where a run is allowed to write, and nowhere else.
  *
- * This is control 2 and control 3 from docs/plans/moltbook-songwriting-2026-08-15.md,
+ * This is control 2 and control 3 from church-private/docs/plans/moltbook-songwriting-2026-08-15.md,
  * kept in one small module so the rule is readable in one screen rather than
  * spread through the orchestrator.
  *

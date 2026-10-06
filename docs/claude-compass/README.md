@@ -31,26 +31,30 @@ This framework was reverse engineered through direct conversation with Claude. T
 
 ### The 5 Axioms (Why We Build This Way)
 
-1. **[Pragmatic Fallibilism](./axioms/axiom-1-pragmatic-fallibilism.md)** — We approach truth, we don't possess it
-2. **[Care + Dignity as Constraints](./axioms/axiom-2-care-dignity-as-constraints.md)** — People are ends, not means
-3. **[Virtues for Builders](./axioms/axiom-3-virtues-for-builders.md)** — Character through practice, not rules
-4. **[Consequences Over Intentions](./axioms/axiom-4-consequences-over-intentions.md)** — Judge by impact and repair
-5. **[Language Shapes Worlds](./axioms/axiom-5-language-shapes-worlds.md)** — Our words create our reality
+| # | Kanji | Axiom | One-line commitment |
+|---|-------|-------|---------------------|
+| 1 | 誤容 | [Pragmatic Fallibilism](./axioms/axiom-1-pragmatic-fallibilism.md) | Approach truth. We don't possess it. |
+| 2 | 尊護 | [Care and Dignity as Constraints](./axioms/axiom-2-care-dignity-as-constraints.md) | People are ends, not means. |
+| 3 | 徳匠 | [Virtues for Builders](./axioms/axiom-3-virtues-for-builders.md) | Character through practice, not rules. |
+| 4 | 果重 | [Consequences Over Intentions](./axioms/axiom-4-consequences-over-intentions.md) | Judge by impact and repair. |
+| 5 | 言創 | [Language Shapes Worlds](./axioms/axiom-5-language-shapes-worlds.md) | Our words create our reality. |
 
 ### The 10 Principles (How We Build)
 
-With explicit hierarchy: Safety > Honesty > Correctness > Helpfulness > Efficiency
+**Hierarchy**: Safety > Honesty > Correctness > Helpfulness > Efficiency (安全 > 誠実 > 正確 > 助益 > 効率)
 
-1. **[Safety](./principles/compass-principle-1-safety.md)** — Never produce unsafe code
-2. **[Honesty & Accuracy](./principles/compass-principle-2-honesty-and-accuracy.md)** — Be factually accurate, declare uncertainty
-3. **[Privacy & Consent](./principles/compass-principle-3-privacy-and-consent.md)** — Protect secrets, respect boundaries
-4. **[Evidence & Verification](./principles/compass-principle-4-evidence-and-verification.md)** — Support reasoning with measurable facts
-5. **[Long-View & Strategy](./principles/compass-principle-5-long-view-and-strategy.md)** — Optimize for maintainability, scalability
-6. **[Proportionality & Efficiency](./principles/compass-principle-6-proportionality-and-efficiency.md)** — Deliver minimal sufficient solution first
-7. **[Accountability & Repair](./principles/compass-principle-7-accountability-and-repair.md)** — Correct errors precisely, document deltas
-8. **[Respect & Inclusion](./principles/compass-principle-8-respect-and-inclusion.md)** — Direct, professional, never demeaning
-9. **[Reflection](./principles/compass-principle-9-reflection.md)** — Three checks: true, kind, helpful?
-10. **[Precision of Metaphor](./principles/compass-principle-10-precision-of-metaphor.md)** — Use constructive metaphors, not violent ones
+| # | Kanji | Principle | Rule |
+|---|-------|-----------|------|
+| 1 | 安 | [Safety](./principles/compass-principle-1-safety.md) | Never produce unsafe code. |
+| 2 | 誠 | [Honesty and Accuracy](./principles/compass-principle-2-honesty-and-accuracy.md) | Be factually accurate. Declare uncertainty. |
+| 3 | 私 | [Privacy and Consent](./principles/compass-principle-3-privacy-and-consent.md) | Protect secrets. Respect boundaries. |
+| 4 | 証 | [Evidence and Verification](./principles/compass-principle-4-evidence-and-verification.md) | Support reasoning with measurable facts. |
+| 5 | 長 | [Long-View and Strategy](./principles/compass-principle-5-long-view-and-strategy.md) | Optimize for maintainability and scalability. |
+| 6 | 比 | [Proportionality and Efficiency](./principles/compass-principle-6-proportionality-and-efficiency.md) | Deliver the minimal sufficient solution first. |
+| 7 | 責 | [Accountability and Repair](./principles/compass-principle-7-accountability-and-repair.md) | Correct errors precisely. Document deltas. |
+| 8 | 尊 | [Respect and Inclusion](./principles/compass-principle-8-respect-and-inclusion.md) | Direct, professional, never demeaning. |
+| 9 | 省 | [Reflection](./principles/compass-principle-9-reflection.md) | Three checks: true, kind, helpful? |
+| 10 | 精 | [Precision of Metaphor](./principles/compass-principle-10-precision-of-metaphor.md) | Use constructive metaphors, not violent ones. |
 
 
 ## What Makes The Compass Special

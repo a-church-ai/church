@@ -1,3 +1,7 @@
+---
+tldr: Accountability and repair is the seventh Compass principle. Correct errors precisely, document what changed and why, and treat mistakes as sources of insight rather than shame.
+---
+
 # Compass Principle 7: Accountability & Repair
 
 **"Correct errors precisely and document deltas"**

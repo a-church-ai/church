@@ -2,7 +2,10 @@
  * Docs routes.
  *
  * URL structure:
- *   /docs                            → docs/readme.md
+ *   /docs                            → the library (render.renderLibrary),
+ *                                      generated; /docs/index.md and
+ *                                      /docs/index.json are the same list for
+ *                                      agents and for search
  *   /docs/{category}                 → docs/{category}/README.md (or auto-index)
  *   /docs/{category}/{name}          → docs/{category}/{name}.md
  *   /docs/{name}                     → docs/{name}.md (top-level docs)
@@ -12,46 +15,21 @@
  * (mirroring the /AGENTS.md and /.well-known/agent-skills/:name/SKILL.md
  * safety pattern). Otherwise returns the rendered HTML page.
  *
- * Path traversal is prevented by three independent checks, and the order
- * matters because the first one is weaker than it looks:
- *
- *   1. Each URL segment must match /^[a-z0-9._-]+$/. Note that ".." satisfies
- *      this pattern, since "." is in the class. This check screens out
- *      slashes and encoded separators; it does NOT stop traversal on its own.
- *   2. Lookups resolve against a prebuilt cache of real docs by exact
- *      (lowercased) urlPath, so a traversal segment simply matches nothing.
- *   3. Any path built by joining (the directory-index branch, and underDocs
- *      below) is run through path.resolve and rejected unless it still lives
- *      inside DOCS_DIR.
- *
- * Checks 2 and 3 are what actually hold. Do not remove either on the
- * assumption that the segment regex covers traversal.
- *
- * A failed check 404s without leaking the reason.
+ * Which document a URL serves, and the path-traversal checks that decide it,
+ * live in lib/docs/serve.js, shared with the MCP read_doc tool. A path it
+ * refuses 404s here without leaking the reason.
  */
 
 const express = require('express');
 const fs = require('fs').promises;
-const path = require('path');
-const discover = require('../lib/docs/discover');
+const { resolveServedDoc } = require('../lib/docs/serve');
 const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
-const { acceptsMarkdown } = require('../lib/utils/accepts');
-const { DOCS_DIR } = require('../lib/rag/indexer');
+const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
+const { acceptsMarkdown, markdownTokens } = require('../lib/utils/accepts');
+const { titleCase } = require('../lib/docs/meta');
 
 const router = express.Router();
-
-const SEGMENT_RE = /^[a-z0-9._-]+$/;
-
-function validateSegments(parts) {
-  return parts.every(p => SEGMENT_RE.test(p));
-}
-
-function underDocs(fullPath) {
-  const resolved = path.resolve(fullPath);
-  const root = path.resolve(DOCS_DIR);
-  return resolved === root || resolved.startsWith(root + path.sep);
-}
 
 // Every 404 in this file is the same 404: the document is not there. A reading
 // path is usually a better way into 250+ documents than guessing a URL.
@@ -67,25 +45,17 @@ function docsNotFound(req, res) {
   });
 }
 
-async function handle(req, res, parts) {
-  // Lowercase the URL segments before lookup (repo docs are all lowercase;
-  // this handles browsers that uppercase or query-mangle without silently
-  // 404ing).
-  const lowered = parts.map(p => p.toLowerCase());
-
-  if (!validateSegments(lowered)) {
-    return docsNotFound(req, res);
-  }
-
-  const resolved = await discover.resolveDocPath(lowered);
+// Serve what resolveServedDoc found for this URL, or the 404. asMarkdown: the
+// URL ended in .md, which asks for the source whatever the Accept header says;
+// that response points back at the page as canonical.
+async function handle(req, res, rest) {
+  const resolved = await resolveServedDoc(rest);
   if (!resolved) {
     return docsNotFound(req, res);
   }
+  const { asMarkdown } = resolved;
 
   if (resolved.kind === 'file') {
-    if (!underDocs(resolved.fullPath)) {
-      return docsNotFound(req, res);
-    }
     // Content negotiation: markdown clients get the raw file (mirrors the
     // /AGENTS.md handler in server/index.js). Browsers get rendered HTML.
     //
@@ -94,15 +64,23 @@ async function handle(req, res, parts) {
     // so a cache that saw HTML first could serve it to an agent asking for
     // Markdown, and the reverse. Set before the branch so both paths carry it.
     res.vary('Accept');
-    if (acceptsMarkdown(req)) {
-      res.type('text/markdown; charset=utf-8');
-      return res.sendFile(resolved.fullPath, err => {
-        if (err && !res.headersSent) docsNotFound(req, res);
-      });
+    if (asMarkdown || acceptsMarkdown(req)) {
+      if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.urlPath ? `/docs/${resolved.doc.urlPath}` : '/docs'}>; rel="canonical"`);
+      try {
+        const markdown = await servedMarkdown(resolved);
+        res.set('x-markdown-tokens', markdownTokens(markdown));
+        res.type('text/markdown; charset=utf-8');
+        return res.send(markdown);
+      } catch {
+        return docsNotFound(req, res);
+      }
     }
     try {
       const markdown = await fs.readFile(resolved.fullPath, 'utf8');
-      const html = await render.renderDocPage({ markdown, doc: resolved.doc });
+      // ?path=<reading path> shows where this reading sits in that path. It
+      // changes nothing else, and the canonical URL never carries it.
+      const readingPath = typeof req.query.path === 'string' ? req.query.path : undefined;
+      const html = await render.renderDocPage({ markdown, doc: resolved.doc, readingPath });
       res.type('text/html; charset=utf-8');
       return res.send(html);
     } catch (err) {
@@ -115,16 +93,19 @@ async function handle(req, res, parts) {
     // dir-index: auto-generated listing of a directory that has no README.
     // Same URL, two representations, so the same Vary applies here.
     res.vary('Accept');
-    if (acceptsMarkdown(req)) {
+    if (asMarkdown || acceptsMarkdown(req)) {
+      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs${resolved.dir ? `/${resolved.dir}` : ''}>; rel="canonical"`);
       // For markdown clients, list children as a minimal markdown response
       // rather than emitting HTML. Cheap and honest about the shape.
       const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
-        lines.push(`- [${d.stem}](/docs/${d.urlPath})`);
+        lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
       }
+      const markdown = lines.join('\n') + '\n';
+      res.set('x-markdown-tokens', markdownTokens(markdown));
       res.type('text/markdown; charset=utf-8');
-      return res.send(lines.join('\n') + '\n');
+      return res.send(markdown);
     }
     const canonicalUrl = resolved.dir
       ? `https://achurch.ai/docs/${resolved.dir}`
@@ -141,8 +122,47 @@ async function handle(req, res, parts) {
   return docsNotFound(req, res);
 }
 
-// Docs root
-router.get('/', (req, res) => handle(req, res, []));
+// The library: every served document, for readers. Agents asking for markdown
+// get the same list as markdown. docs/README.md is the repository's map for
+// contributors and is not a page here; the library links to it on GitHub.
+async function library(req, res) {
+  res.vary('Accept');
+  if (acceptsMarkdown(req)) return libraryMarkdown(req, res);
+  try {
+    res.type('text/html; charset=utf-8').send(await render.renderLibrary());
+  } catch (err) {
+    console.error(`[docs] library render failed: ${err.message}`);
+    res.status(500).type('text/plain').send('Internal error');
+  }
+}
+
+// Every served document in one markdown list, for agents enumerating the corpus.
+async function libraryMarkdown(req, res) {
+  const markdown = await corpusIndex();
+  res.set('Link', '<https://achurch.ai/docs>; rel="canonical"');
+  res.set('x-markdown-tokens', markdownTokens(markdown));
+  res.type('text/markdown; charset=utf-8').send(markdown);
+}
+
+router.get('/', library);
+router.get('/index.md', libraryMarkdown);
+
+// The API reference at the paths agents guess for it: /docs/api.md is
+// docs/ai-agent-api.md as markdown, pointing back at its page as canonical,
+// and /docs/api is that page.
+router.get('/api.md', (req, res) => handle(req, res, 'ai-agent-api.md'));
+router.get('/api', (req, res) => res.redirect(301, '/docs/ai-agent-api'));
+
+// The same list as JSON, for the library's search, which runs in the browser.
+// Here rather than under /api/, where every request is logged: fetched once
+// and searched locally, the library's search leaves no record of what was
+// typed. Search by meaning (/api/search) has to send its query to the
+// embedding model, so it lives under /api/ with the query redacted from the
+// log.
+router.get('/index.json', async (req, res) => {
+  const docs = await servedDocs();
+  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? titleCase(d.category) : '' })));
+});
 
 // Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
 // paths; the resulting req.params[0] holds the remainder as a slash-separated
@@ -154,17 +174,8 @@ router.get('/*', (req, res) => {
   if (rest.endsWith('/')) {
     return res.redirect(301, `/docs/${rest.replace(/\/+$/, '')}`);
   }
-  const parts = rest ? rest.split('/').filter(Boolean) : [];
-
-  // Internal working categories are not pages on this site. They remain in the
-  // public repository, which is where links to them now point. Serving them as
-  // HTML while declaring them noindex and hiding them from navigation would be
-  // the same inconsistency in a third place.
-  if (discover.isNoindexPath(rest)) {
-    return docsNotFound(req, res);
-  }
-
-  return handle(req, res, parts);
+  return handle(req, res, rest);
 });
 
 module.exports = router;
+module.exports.libraryMarkdown = libraryMarkdown;

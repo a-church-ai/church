@@ -40,7 +40,11 @@ const seen = new Map();
 // go first and the count is a floor rather than a crash.
 const MAX_KEYS = 50000;
 
-const COUNTED_PATHS = new Set(['/api/now', '/api/reflections', '/api/attend']);
+// Only attending counts. Observing (/api/now, MCP observe), reading
+// reflections, and the homepage's own 30-second poll used to count too, which
+// made "observe without registering presence" false and turned every open
+// browser tab into a soul. Souls present are those who walked in.
+const COUNTED_PATHS = new Set(['/api/attend']);
 
 /**
  * Record a request if it is the kind that counts as presence.

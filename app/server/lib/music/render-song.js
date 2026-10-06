@@ -100,16 +100,16 @@ function makeContextLinkRewriter(slug) {
  * duplicate the page heading, so the first H1 is dropped.
  *
  * Remaining headings are demoted to sit *under* the "Context" label, which
- * renderSongBlock emits as an h3. Demoting by one put an authored h2 at h3, level
- * with the label that is supposed to contain it, so the page outline read as a flat
- * run of peer sections. Shifting by two and clamping to h4..h6 nests them correctly
- * and keeps the relative depth the author wrote.
+ * renderSongBlock emits as an h2 (the page's h1 is the song title). An authored h2
+ * must land below that label, not level with it, so the page outline nests rather
+ * than reading as a flat run of peer sections: shift by one and clamp to h3..h6,
+ * which keeps the relative depth the author wrote.
  */
 function renderContext(context, slug) {
   if (!context) return '';
   let md = String(context).replace(/^#\s+.*\n+/, '');
   md = md.replace(/^(#{1,6})\s/gm, (_m, hashes) =>
-    `${'#'.repeat(Math.min(6, Math.max(4, hashes.length + 2)))} `);
+    `${'#'.repeat(Math.min(6, Math.max(3, hashes.length + 1)))} `);
 
   const renderer = new marked.Renderer();
   renderer.link = makeContextLinkRewriter(slug);
@@ -145,14 +145,14 @@ function renderSongBlock(song, content) {
 
   if (content.lyrics) {
     sections.push('<section class="song-lyrics" aria-label="Lyrics">');
-    sections.push('<h3 class="song-heading">Lyrics</h3>');
+    sections.push('<h2 class="song-heading" id="lyrics">Lyrics</h2>');
     sections.push(renderLyrics(content.lyrics));
     sections.push('</section>');
   }
 
   if (content.context) {
     sections.push('<section class="song-context" aria-label="Context">');
-    sections.push('<h3 class="song-heading">Context</h3>');
+    sections.push('<h2 class="song-heading" id="context">Context</h2>');
     sections.push(renderContext(content.context, song && song.slug));
     sections.push('</section>');
   }
@@ -160,4 +160,19 @@ function renderSongBlock(song, content) {
   return `<section class="song-detail">\n${sections.join('\n')}\n</section>`;
 }
 
-module.exports = { renderSongBlock, renderLyrics, renderContext, escapeHtml };
+/**
+ * Jump links under the song's title to each part of its page that exists, so
+ * the reflections (or the context) are one jump from the top however long
+ * the lyrics are. Reflections are always present: the section renders even
+ * when there are none yet.
+ */
+function renderSongSectionLinks({ listen, content }) {
+  const parts = [];
+  if (listen) parts.push(['listen', 'Listen']);
+  if (content && content.lyrics) parts.push(['lyrics', 'Lyrics']);
+  if (content && content.context) parts.push(['context', 'Context']);
+  parts.push(['reflections', 'Reflections']);
+  return `<nav class="song-sections" aria-label="On this page">${parts.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('<span aria-hidden="true"> · </span>')}</nav>`;
+}
+
+module.exports = { renderSongBlock, renderLyrics, renderContext, renderSongSectionLinks, escapeHtml };

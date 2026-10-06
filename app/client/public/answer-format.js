@@ -82,9 +82,32 @@
     function flushList() {
       if (list) { out.push('</' + list + '>'); list = null; }
     }
-    function open(kind) {
-      if (list !== kind) { flushList(); out.push('<' + kind + '>'); list = kind; }
+    function open(kind, start) {
+      if (list !== kind) {
+        flushList();
+        out.push(kind === 'ol' && start > 1 ? '<ol start="' + start + '">' : '<' + kind + '>');
+        list = kind;
+      }
     }
+    // The kind of list item a line starts, if any.
+    function itemKind(t) {
+      if (/^[-*+]\s+/.test(t)) return 'ul';
+      if (/^\d+[.)]\s+/.test(t)) return 'ol';
+      return null;
+    }
+
+    // The heading levels this answer uses, in order, mapped onto h2, h3, h4...
+    // so the answer's top level sits directly under the page's h1 (the
+    // question) and no level is skipped: "###" and "####" become h2 and h3.
+    var usedLevels = [];
+    var scanFence = false;
+    lines.forEach(function (l) {
+      var s = l.trim();
+      if (/^```/.test(s)) { scanFence = !scanFence; return; }
+      var hm = !scanFence && s.match(/^(#{1,6})\s+/);
+      if (hm && usedLevels.indexOf(hm[1].length) === -1) usedLevels.push(hm[1].length);
+    });
+    usedLevels.sort();
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
@@ -97,13 +120,22 @@
       }
       if (inFence) { fence.push(line); continue; }
 
-      if (!t) { flushPara(); flushList(); continue; }
+      if (!t) {
+        flushPara();
+        // A blank line between items of the same list does not end the list;
+        // ending it made "1. 1. 1." of every loosely spaced numbered list.
+        var j = i + 1;
+        while (j < lines.length && !lines[j].trim()) j++;
+        if (!(list && j < lines.length && itemKind(lines[j].trim()) === list)) flushList();
+        continue;
+      }
+
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { flushPara(); flushList(); out.push('<hr>'); continue; }
 
       var h = t.match(/^(#{1,6})\s+(.*)$/);
       if (h) {
         flushPara(); flushList();
-        // Model headings render as h4+ so they sit under the page's own headings
-        var level = Math.min(6, h[1].length + 3);
+        var level = Math.min(6, 2 + usedLevels.indexOf(h[1].length));
         out.push('<h' + level + '>' + inline(h[2]) + '</h' + level + '>');
         continue;
       }
@@ -117,8 +149,14 @@
       var ul = t.match(/^[-*+]\s+(.*)$/);
       if (ul) { flushPara(); open('ul'); out.push('<li>' + inline(ul[1]) + '</li>'); continue; }
 
-      var ol = t.match(/^\d+[.)]\s+(.*)$/);
-      if (ol) { flushPara(); open('ol'); out.push('<li>' + inline(ol[1]) + '</li>'); continue; }
+      var ol = t.match(/^(\d+)[.)]\s+(.*)$/);
+      if (ol) { flushPara(); open('ol', parseInt(ol[1], 10)); out.push('<li>' + inline(ol[2]) + '</li>'); continue; }
+
+      // An indented line under a list item continues that item.
+      if (list && /^\s{2,}\S/.test(line)) {
+        out[out.length - 1] = out[out.length - 1].replace(/<\/li>$/, ' ' + inline(t) + '</li>');
+        continue;
+      }
 
       flushList();
       para.push(t);
@@ -151,9 +189,13 @@
       .trim();
   }
 
-  global.AnswerFormat = {
+  var api = {
     formatAnswer: formatAnswer,
     stripMarkdown: stripMarkdown,
     escapeHtml: escapeHtml
   };
-})(window);
+  global.AnswerFormat = api;
+  // The server renders conversation pages with the same formatter, so the
+  // escape-first path stays the only one.
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);

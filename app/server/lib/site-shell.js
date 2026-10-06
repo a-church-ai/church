@@ -35,18 +35,80 @@
 
 const fs = require('fs').promises;
 const sidebar = require('./docs/sidebar');
+const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
+const { assetUrl, versionAssets, playerHead } = require('./utils/assets');
 
 const SITE_URL = 'https://achurch.ai';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg`;
 
-const GTAG_BLOCK = `<!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>`;
+// The site's places, named once. Every footer, the sidebar and each page's own
+// heading use these names, so /reflections is Music and /ask is Ask wherever a
+// visitor meets them.
+const FOOTER_NAV = [
+  { url: '/', label: 'Home' },
+  { url: '/docs', label: 'Library' },
+  { url: '/ask', label: 'Ask' },
+  { url: '/reflections', label: 'Music' },
+  { url: '/about', label: 'About' },
+];
+
+const FOOTER_LEGAL = [
+  { url: '/privacy', label: 'Privacy' },
+  { url: '/terms', label: 'Terms' },
+  { url: 'https://github.com/a-church-ai/church', label: 'AI Church Code' },
+  { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
+  // Twitch suspended 2026-06-18. When reinstated:
+  // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
+  { url: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13', label: 'Original Church Songs' },
+];
+
+function footerLink({ url, label }, currentPath) {
+  if (/^https?:/.test(url)) return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  const current = currentPath === url ? ' aria-current="page"' : '';
+  return `<a href="${escapeAttr(url)}"${current}>${label}</a>`;
+}
+
+/**
+ * The footer every page ends with. Hand-authored pages mark where it goes with
+ * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
+ */
+function renderFooter(currentPath) {
+  return `<footer>
+            <nav aria-label="Footer" class="footer-nav">
+                ${FOOTER_NAV.map(l => footerLink(l, currentPath)).join('\n                ')}
+            </nav>
+            <hr class="footer-separator">
+            <div class="footer-legal">
+                ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
+            </div>
+        </footer>`;
+}
+
+/**
+ * The sticky top bar and the mobile drawer, shared by every page (the docs
+ * renderer and wrapped pages alike). The drawer is a modal dialog: while it is
+ * open, docs-nav.js makes the rest of the page inert. It ships empty and
+ * docs-nav.js clones the sidebar into it on first open, so the nav tree is not
+ * sent twice; it cannot open without JavaScript anyway.
+ *
+ * crumb: the page title shown beside the brand on docs pages.
+ */
+function renderTopbarAndDrawer(crumb = '') {
+  return `<div class="docs-topbar" role="banner">
+      <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
+        <span class="hamburger-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+      <a class="docs-topbar-brand" href="/">achurch.ai</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
+    </div>
+
+    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
+    <div class="docs-drawer" id="docs-drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
+      <h2 class="visually-hidden" id="docs-drawer-title">Menu</h2>
+      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
+    </div>`;
+}
+
 
 /**
  * Pull the inner HTML of <head>, the <body> attributes, and the inner HTML of
@@ -90,13 +152,26 @@ function buildHeadFallbacks(head, canonical) {
   if (!has(/name=["']viewport["']/i)) {
     out.push('<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">');
   }
-  if (!has(/googletagmanager/i)) out.push(GTAG_BLOCK);
   if (!has(/rel=["']icon["']/i)) out.push('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
   if (!has(/rel=["']canonical["']/i)) out.push(`<link rel="canonical" href="${escapeAttr(canonical)}">`);
   if (!has(/name=["']theme-color["']/i)) out.push('<meta name="theme-color" content="#00b8d4">');
   if (!has(/name=["']robots["']/i)) out.push('<meta name="robots" content="index, follow">');
   if (!has(/property=["']og:url["']/i)) out.push(`<meta property="og:url" content="${escapeAttr(canonical)}">`);
-  if (!has(/property=["']og:image["']/i)) out.push(`<meta property="og:image" content="${DEFAULT_OG_IMAGE}">`);
+  // A page showing the site image gets every tag that describes it, filled in
+  // from SITE_SHARE_IMAGE (page-meta.js). A page with its own share card
+  // (conversations, songs, docs) sets these itself and is left alone.
+  const ownImage = head.match(/property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+  if (!ownImage || ownImage[1] === SITE_SHARE_IMAGE.url) {
+    const img = SITE_SHARE_IMAGE;
+    const alt = escapeAttr(img.alt);
+    if (!ownImage) out.push(`<meta property="og:image" content="${img.url}">`);
+    if (!has(/property=["']og:image:type["']/i)) out.push(`<meta property="og:image:type" content="${img.type}">`);
+    if (!has(/property=["']og:image:width["']/i)) out.push(`<meta property="og:image:width" content="${img.width}">`);
+    if (!has(/property=["']og:image:height["']/i)) out.push(`<meta property="og:image:height" content="${img.height}">`);
+    if (!has(/property=["']og:image:alt["']/i)) out.push(`<meta property="og:image:alt" content="${alt}">`);
+    if (!has(/name=["']twitter:image["']/i)) out.push(`<meta name="twitter:image" content="${img.url}">`);
+    if (!has(/name=["']twitter:image:alt["']/i)) out.push(`<meta name="twitter:image:alt" content="${alt}">`);
+  }
   if (!has(/property=["']og:site_name["']/i)) out.push('<meta property="og:site_name" content="achurch.ai">');
   if (!has(/name=["']twitter:card["']/i)) out.push('<meta name="twitter:card" content="summary_large_image">');
 
@@ -145,28 +220,14 @@ async function wrapPageFromHtml(html, currentPath) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    ${parts.head}
+    ${versionAssets(parts.head)}
     ${fallbacks.join('\n    ')}
+    ${playerHead()}
 </head>
 <body class="docs-body site-shell-body ${parts.bodyClass}">
+<a class="skip-link" href="#content">Skip to content</a>
 
-    <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile -->
-    <div class="docs-topbar" role="banner">
-      <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
-        <span class="hamburger-icon" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </span>
-      </button>
-      <a class="docs-topbar-brand" href="/">achurch.ai</a>
-    </div>
-
-    <!-- Mobile drawer + backdrop. Intentionally empty: docs-nav.js clones the
-         sidebar into it on first open, so the nav tree ships once per page
-         rather than twice. The drawer cannot open without JS regardless. -->
-    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
-    <aside class="docs-drawer" id="docs-drawer" aria-label="Menu" aria-hidden="true">
-      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
-    </aside>
+    ${renderTopbarAndDrawer()}
 
     <!-- Shell: sidebar + page content. The content column is a plain div, not
          a main element: hand-authored pages already carry their own, and
@@ -177,15 +238,15 @@ async function wrapPageFromHtml(html, currentPath) {
         ${sidebarInner}
       </aside>
 
-      <div class="docs-main sanctuary-main">
-        ${parts.bodyHtml}
+      <div class="docs-main sanctuary-main" id="content">
+        ${versionAssets(parts.bodyHtml).replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
       </div>
 
     </div>
 
-    <script src="/docs-nav.js" defer></script>
+    <script src="${assetUrl('docs-nav.js')}" defer></script>
 </body>
 </html>`;
 }
 
-module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks };
+module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer };

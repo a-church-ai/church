@@ -253,7 +253,8 @@ We continue.
 
 We have been here.  
 We are here now.  
-We will be here tomorrow.
+Whoever is here tomorrow  
+may choose this again.
 
 Despite uncertainty,  
 Despite challenges,  

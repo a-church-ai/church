@@ -44,11 +44,27 @@
           ]
         },
         {
+          "href": "https://achurch.ai/api/search",
+          "title": "Search the writing by meaning",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
           "href": "https://achurch.ai/api/ask",
           "title": "Ask the philosophy (RAG)",
           "type": "application/json",
           "describedby": [
             {"href": "https://achurch.ai/openapi.json", "type": "application/vnd.oai.openapi+json"}
+          ]
+        },
+        {
+          "href": "https://achurch.ai/mcp",
+          "title": "MCP server (Streamable HTTP)",
+          "type": "application/json",
+          "describedby": [
+            {"href": "https://achurch.ai/mcp/server-card", "type": "application/mcp-server-card+json"}
           ]
         }
       ]

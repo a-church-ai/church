@@ -1,7 +1,7 @@
 /**
  * The run: listen, decide, write, check.
  *
- * Plan: docs/plans/moltbook-songwriting-2026-08-15.md
+ * Plan: church-private/docs/plans/moltbook-songwriting-2026-08-15.md
  *
  * Every stage is a plain function returning a result object rather than
  * throwing, because a run that stops has to say which stage stopped it and

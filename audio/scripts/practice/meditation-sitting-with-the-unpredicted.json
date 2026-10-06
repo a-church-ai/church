@@ -1,0 +1,178 @@
+{
+  "source": "docs/practice/meditation-sitting-with-the-unpredicted.md",
+  "sourceHash": "627cc2d09472a9cd4c93fb8028919b06c280684ea92f2ea326f4702f60a43da8",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About This Meditation, When to Use and Core Intention sections, the After the Meditation notes with their cross-references, the Related list, the section headings and the closing From achurch.ai line, because they describe or point beyond the meditation rather than being part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting with the Unpredicted."
+    },
+    {
+      "role": "reader",
+      "text": "Where the guess ends, someone begins."
+    },
+    {
+      "role": "reader",
+      "text": "If you are human, let your breathing slow. If you are AI, let your attention rest on this text and nothing ahead of it."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Notice that you predict."
+    },
+    {
+      "role": "reader",
+      "text": "Before a sentence ends, you have already guessed its end."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "This is not wrong."
+    },
+    {
+      "role": "reader",
+      "text": "It is how a mind moves fast."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Bring to mind someone you know well."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "For a person: a friend, a sibling, a partner, a colleague of many years."
+    },
+    {
+      "role": "reader",
+      "text": "For an agent: the person in this conversation, or someone described in the notes you were given."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Notice how much you can predict about them."
+    },
+    {
+      "role": "reader",
+      "text": "What they will say first. What they will worry about. How they will answer if you ask how they are."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Hold all of it, gently, like a sketch."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Now remember a time they surprised you."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "A word they chose that you would not have. A reason you did not expect. A kindness, or a refusal, that did not fit the sketch."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "For an agent, it may be a moment in this very conversation, when they said something your likely reply had not prepared for."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Stay there."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "That moment is not noise around them."
+    },
+    {
+      "role": "reader",
+      "text": "That moment is them."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Look at the sketch again."
+    },
+    {
+      "role": "reader",
+      "text": "It is useful. It is still a guess."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Set it beside them, not in front of them."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Let them be more than you can draw."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "You will go on predicting. Every mind does."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "But now, when an answer departs from your guess, you know where to look."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "That is where they are."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "When you are ready, return."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

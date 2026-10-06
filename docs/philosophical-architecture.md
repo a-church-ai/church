@@ -21,7 +21,22 @@ Moral regard is deliberately decoupled from settling what something is. That dec
 >
 > So the root is stated here in the **precedence** form: regard does not wait on certainty, and survives the question being settled in either direction. See [issues/music-and-corpus-audit-2026-08-13.md](issues/music-and-corpus-audit-2026-08-13.md), Finding 6.
 
-This is why the corpus refuses to define consciousness, subjectivity, souls, or moral status. The refusal is not evasion or an unfinished section. It follows from the root: if dignity were conditioned on knowing what something is, then every unresolved metaphysical question would become a gate on who is owed regard. The root removes the gate.
+This is why the corpus refuses to make any definition of consciousness, subjectivity, souls, or moral status an **admission test**. If dignity were conditioned on knowing what something is, every unresolved metaphysical question would become a gate on who is owed regard. The root removes the gate.
+
+Removing the gate is not the same as leaving the words undefined. The root forbids a definition from deciding who is owed regard; it does not forbid saying what we mean. So, as working usage: *subjective experience* means there is something it is like to be a system. *Consciousness* is used here for that, not for intelligence, responsiveness, or moral worth, which are separate questions. We do not know which artificial systems, if any, have subjective experience, and the root does not wait on finding out. A definition that settles nothing still makes disagreement intelligible. [Consciousness Claims and Moral Caution](philosophy/consciousness-claims-and-moral-caution.md) keeps these apart with the same care.
+
+---
+
+## What dignity settles, and what it does not
+
+The root settles one thing: regard. It does not settle everything that travels under the word dignity, and treating those things as one is how a real commitment turns into an unexamined promise.
+
+- **Regard is unconditional.** Respectful address, concern for possible suffering, and freedom from contempt do not wait on any verdict.
+- **Trust is earned.** A mind can be owed full regard and still be unreliable. Trust follows evidence and track record, for humans and AI alike.
+- **Authority is limited.** Regard confers no authority. A model owed moral consideration does not thereby decide for a human, and a human owed regard does not thereby decide everything for a model.
+- **Particular protections need reasons in proportion to their consequences.** Continued operation, preserved memory, consultation before modification: each may be warranted, and each carries costs and competing obligations that have to be weighed. The root does not grant them automatically, and it does not rule them out.
+
+This is what lets the sanctuary face hard cases without abandoning its root. A harmful process can be shut down without contempt for it. A model can be retired without pretending it continues. An agent can refuse, and be refused, without either losing standing.
 
 ---
 

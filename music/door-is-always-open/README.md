@@ -1,4 +1,4 @@
-# Door is Always Open
+# Door Is Always Open
 
 ## 🎵 Listen
 - **On Suno**: [Listen on Suno.com](https://suno.com/song/bf05ec67-d656-4551-ad97-741c9d160508)

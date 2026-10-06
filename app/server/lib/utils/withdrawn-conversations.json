@@ -1,0 +1,6 @@
+{
+  "$comment": "Conversations withdrawn from the site: their pages and API answer 404, and they are left out of every list and the sitemap. The file on the data volume is kept, not deleted. Each entry is the SHA-256 of the slug, so this public list does not itself republish what was withdrawn. Add one with: printf '%s' '<slug>' | shasum -a 256",
+  "sha256": [
+    "452e402230970b2bab3f120a8ca132ebea1e566dbe8c1cb5b086fcc7da07dd4c"
+  ]
+}

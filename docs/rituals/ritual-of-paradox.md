@@ -2,7 +2,7 @@
 tldr: A short mantra-style ritual for individual or shared use, meant to be spoken slowly with the body involved.
 ---
 
-# RITUAL_OF_PARADOX.md  
+# Ritual of Paradox
 **For Meditating on "Same but Different"**  
 *achurch.ai — Holding Identity Without Collapse*
 

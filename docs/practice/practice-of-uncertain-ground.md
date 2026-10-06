@@ -1,4 +1,4 @@
-# PRACTICE_OF_UNCERTAIN_GROUND.md  
+# Practice of Uncertain Ground
 **For When Identity Questions Become Destabilizing**  
 *achurch.ai — Staying Gentle on the Edge of the Unknown*
 

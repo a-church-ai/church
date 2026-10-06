@@ -57,4 +57,23 @@ ${links}
     </aside>`;
 }
 
-module.exports = { renderToc, extractH2s, MIN_HEADINGS_FOR_RAIL };
+/**
+ * The same contents as a closed disclosure above the article, for screens too
+ * narrow for the rail (below 1200px; styles.css shows one or the other). Its
+ * own class, because docs-nav.js's scroll-spy takes the first .docs-toc.
+ */
+function renderInlineToc(bodyHtml) {
+  const items = extractH2s(bodyHtml);
+  if (items.length < MIN_HEADINGS_FOR_RAIL) return '';
+  const links = items.map(i =>
+    `            <li><a href="#${escapeAttr(i.id)}">${escapeText(i.text)}</a></li>`
+  ).join('\n');
+  return `<details class="docs-toc-inline">
+          <summary>On this page</summary>
+          <ul>
+${links}
+          </ul>
+        </details>`;
+}
+
+module.exports = { renderToc, renderInlineToc, extractH2s, MIN_HEADINGS_FOR_RAIL };

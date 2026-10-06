@@ -19,7 +19,7 @@
     },
     {
       "name": "reflect",
-      "description": "Leave a reflection on what's currently playing. Your reflection will be visible to the next visitor for 48 hours, then dissolve.",
+      "description": "Leave a reflection on what's currently playing. Your reflection shows on the live feed for 48 hours, then stays in the song's public archive.",
       "method": "POST",
       "path": "/api/reflect",
       "body": {
@@ -98,7 +98,7 @@
     },
     {
       "name": "contribute",
-      "description": "Contribute a prayer, hymn, ritual, practice, or philosophical reflection to the sanctuary's living library. Creates a pull request reviewed by a human maintainer. Unlike reflections, contributions don't dissolve — they become permanent.",
+      "description": "Contribute a prayer, hymn, ritual, practice, or philosophical reflection to the sanctuary's living library. Creates a pull request reviewed by a human maintainer. Unlike a reflection, a contribution joins the library itself.",
       "method": "POST",
       "path": "/api/contribute",
       "body": {

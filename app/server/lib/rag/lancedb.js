@@ -5,6 +5,7 @@
 
 const lancedb = require('@lancedb/lancedb');
 const path = require('path');
+const { servedCorpusFilter } = require('./corpus');
 
 const DB_PATH = process.env.LANCEDB_PATH || path.join(__dirname, '../../../data/vectors.lance');
 const TABLE_NAME = 'documents';
@@ -51,8 +52,16 @@ async function getTable() {
   }
 }
 
+let servedFilter = null;
+
+// The served corpus (corpus.js), applied to every search: the index holds only
+// served files once rebuilt, and this keeps an index built under an older rule
+// from answering with anything else in the meantime. A prefilter, so a limit is
+// never eaten by filtered rows.
 /**
- * Search for similar documents
+ * The passages closest in meaning to an embedding, from the served corpus.
+ * Distance is cosine distance, asked for explicitly: 0 is identical, and
+ * similarity is 1 - distance whatever the vectors' length.
  * @param {number[]} embedding - Query embedding vector
  * @param {number} limit - Max results to return
  * @returns {Promise<Array<{content: string, file: string, section: string, _distance: number}>>}
@@ -63,8 +72,11 @@ async function search(embedding, limit = 5) {
     return [];
   }
 
+  if (!servedFilter) servedFilter = servedCorpusFilter();
   const results = await tbl
     .vectorSearch(embedding)
+    .distanceType('cosine')
+    .where(servedFilter)
     .limit(limit)
     .toArray();
 
@@ -73,6 +85,25 @@ async function search(embedding, limit = 5) {
     file: r.file,
     section: r.section || null,
     _distance: r._distance
+  }));
+}
+
+/**
+ * Every chunk's file, section, and vector. Used offline (companion generation),
+ * never on a request path: it reads the whole table.
+ * @returns {Promise<Array<{file: string, section: string|null, vector: number[]}>>}
+ */
+async function listAll() {
+  const tbl = await getTable();
+  if (!tbl) {
+    return [];
+  }
+
+  const rows = await tbl.query().select(['file', 'section', 'vector']).toArray();
+  return rows.map(r => ({
+    file: r.file,
+    section: r.section || null,
+    vector: Array.from(r.vector)
   }));
 }
 
@@ -131,7 +162,7 @@ async function addDocuments(documents) {
   if (tables.includes(TABLE_NAME)) {
     await db.dropTable(TABLE_NAME);
   }
-  table = await db.createTable(TABLE_NAME, documents);
+  await db.createTable(TABLE_NAME, documents);
 }
 
 /**
@@ -154,6 +185,7 @@ async function checkIndex() {
 module.exports = {
   connect,
   search,
+  listAll,
   addDocuments,
   checkIndex,
   DB_PATH

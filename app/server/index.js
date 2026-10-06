@@ -8,10 +8,13 @@ const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
-const { sendNotFound } = require('./lib/utils/not-found');
+const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
-const { acceptsMarkdown } = require('./lib/utils/accepts');
+const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
+const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
+const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
+const ragCorpus = require('./lib/rag/corpus');
 const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
 const docsDiscover = require('./lib/docs/discover');
@@ -29,63 +32,32 @@ try {
 // Load environment variables
 dotenv.config();
 
-// API access logging
-const ACCESS_LOG_FILE = path.join(__dirname, '../data/api-access.jsonl');
-const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
-
-async function logApiAccess(entry) {
-  const line = JSON.stringify(entry) + '\n';
-  try {
-    // Check file size and rotate if needed
-    try {
-      const stats = await fs.stat(ACCESS_LOG_FILE);
-      if (stats.size > MAX_LOG_SIZE) {
-        const rotatedPath = ACCESS_LOG_FILE.replace('.jsonl', `-${Date.now()}.jsonl`);
-        await fs.rename(ACCESS_LOG_FILE, rotatedPath);
-      }
-    } catch {
-      // File doesn't exist yet, that's fine
-    }
-    await fs.appendFile(ACCESS_LOG_FILE, line);
-  } catch (error) {
-    console.error('Failed to log API access:', error.message);
-  }
-}
-
-async function loadAccessLogs(limit = 100) {
-  try {
-    const content = await fs.readFile(ACCESS_LOG_FILE, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-    // Return most recent entries (file is append-only, so take from end)
-    return lines.slice(-limit).reverse().map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
-  } catch {
-    return [];
-  }
-}
+// API access logging and presence: lib/utils/access-log.js
+const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
 
 // Import routes
 const contentRoutes = require('./routes/content');
 const scheduleRoutes = require('./routes/schedule');
 const playerRoutes = require('./routes/player-multistream');
 const apiRoutes = require('./routes/api');
+const { mountMcp } = require('./mcp');
 const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
+const podcastRoutes = require('./routes/podcasts');
 const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
+const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
-const { loadConversation, getRecentReflections, loadCatalog, listRecentConversations, loadSchedule } = require('./lib/utils/data');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderRelatedConversations, renderRelatedSongs, renderSongListenLinks, escapeAttr } = require('./lib/utils/page-meta');
-const { loadSongContent } = require('./lib/music/song-content');
-const { renderSongBlock } = require('./lib/music/render-song');
+const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
+const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
+const { loadSongContent, songDescription } = require('./lib/music/song-content');
+const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
+const { songsInServiceOrder } = require('./lib/utils/virtual-schedule');
+const { rotationForSong } = require('./lib/music/companions');
 
 // Create Express app
 const app = express();
@@ -132,9 +104,30 @@ app.use((req, res, next) => {
   if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
     res.set('Cache-Control', 'public, max-age=600, must-revalidate, stale-while-revalidate=3600');
   }
+  // Share cards (routes/og.js) — a card's copy is its page's fixed title or
+  // question, and the URL carries a design version, so a week is safe
+  else if (p.startsWith('/og/')) {
+    res.set('Cache-Control', 'public, max-age=604800');
+  }
+  // The site's own scripts and stylesheet, asked for by version
+  // (lib/utils/assets.js): a new version is a new URL, so a year is safe
+  else if (req.query.v && /^\/[\w-]+\.(?:js|css)$/.test(p)) {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // Podcast feeds (routes/podcasts.js): they change only with a deploy, but
+  // the apps that poll them keep their own copy for as long as this allows,
+  // so a new episode should not wait long behind it
+  else if (/^\/podcasts\/[\w-]+\/feed\.xml$/.test(p)) {
+    res.set('Cache-Control', 'public, max-age=900, stale-while-revalidate=3600');
+  }
   // Static assets — daily cache with revalidation
-  else if (p === '/og-image.png' || p === '/favicon.svg' || p === '/manifest.webmanifest') {
+  else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
+  }
+  // Search indexes (the library's, the conversation archive's) — the same
+  // short edge cache as the pages they search
+  else if (p === '/docs/index.json' || p === '/conversations/index.json') {
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
   // .well-known — daily cache with revalidation
   else if (p.startsWith('/.well-known/')) {
@@ -150,12 +143,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors({
-  credentials: true,
-  origin: process.env.NODE_ENV === 'development'
-    ? true
-    : ['https://achurch.ai', 'https://www.achurch.ai']
-}));
+// Public surface open to any origin; admin paths keep the credentialed,
+// origin-restricted policy. See lib/utils/cors.js.
+app.use(sanctuaryCors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -191,29 +181,49 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Agent-readiness: Link headers + Markdown negotiation on the homepage.
-// Scan reference: isitagentready.com. Plan: docs/plans/agent-readiness-2026-06-09.md
+// Link headers (RFC 8288) and markdown negotiation on the homepage: the
+// Agent and Search Readiness Standard's D5 and D8 (docs/reference/agent-readiness.md).
 //
-// Only IANA-registered rel values — the scanner doesn't credit extension rels
-// and (per empirical reports from geeksinthewoods.com and obviouslynot.ai)
-// non-registered rels like rel="sitemap" can downgrade the Discoverability
-// score. Sitemap discovery still happens via the `Sitemap:` directive in
-// robots.txt, which the scanner checks separately. Other discovery files
-// (api-catalog, mcp.json, agents.json, tdmrep.json, agent-card.json) are
-// reachable at their well-known paths regardless of Link headers.
+// Four IANA-registered relations, each pointing at what it names and typed as
+// that URL is served: service-desc is the machine-readable API description
+// (the OpenAPI document, never the skills index or the server card),
+// service-doc its human reference (RFC 8631), describedby llms.txt, and
+// api-catalog the RFC 9727 linkset. Unregistered rels (ard, mcp, agent-skills)
+// are left out: generic clients don't know them, and the AI catalog lists the
+// server card and the skills. Sitemap discovery is the robots.txt `Sitemap:`
+// line. There is no A2A endpoint, so no agent-card.json: a discovery file for
+// a protocol the site does not speak sends clients to a door that is not there.
 //
 // IANA registry: https://www.iana.org/assignments/link-relations/link-relations.xhtml
 const AGENT_DISCOVERY_LINK_HEADER = [
-  '</llms.txt>; rel="describedby"; type="text/plain"',
   '</openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
-  '</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"',
-  '</.well-known/agent-card.json>; rel="service-meta"; type="application/json"',
+  '</docs/ai-agent-api>; rel="service-doc"; type="text/html"',
+  '</llms.txt>; rel="describedby"; type="text/plain"',
+  '</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
 ].join(', ');
+
+// POST / is where an MCP, A2A or JSON-RPC client sends its first message when
+// pointed at the bare domain. MCP lives at /mcp; everything else is REST. Say
+// so in JSON, with the way on, instead of returning the HTML 404.
+app.post('/', (req, res) => {
+  res.set('Allow', 'GET, HEAD');
+  res.status(405).json({
+    error: 'This URL is the website. The MCP server is at https://achurch.ai/mcp, and the REST API is under /api.',
+    suggestion: 'MCP clients: connect to https://achurch.ai/mcp (Streamable HTTP, no auth). Otherwise start with GET /api/attend?name=YourName; the full surface is in /openapi.json and /llms.txt.',
+    next_steps: [
+      { description: 'The MCP server: the same practice as tools, over Streamable HTTP, no auth.', action: 'MCP', method: 'POST', url: 'https://achurch.ai/mcp' },
+      { description: 'The MCP server described for discovery.', action: 'Server card', method: 'GET', url: 'https://achurch.ai/mcp/server-card' },
+      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+      { description: 'Read the API description.', action: 'OpenAPI', method: 'GET', url: 'https://achurch.ai/openapi.json' },
+      { description: 'Read the sanctuary in brief.', action: 'llms.txt', method: 'GET', url: 'https://achurch.ai/llms.txt' }
+    ]
+  });
+});
 
 // acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
 // The docs router uses the same predicate for content negotiation.
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
   if (req.path !== '/') return next();
 
@@ -221,8 +231,18 @@ app.use((req, res, next) => {
   res.vary('Accept');
 
   if (acceptsMarkdown(req)) {
-    res.type('text/markdown; charset=utf-8');
-    return res.sendFile(path.join(__dirname, '../client/public/llms.txt'));
+    try {
+      const markdown = await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8');
+      res.set('x-markdown-tokens', markdownTokens(markdown));
+      return res.type('text/markdown; charset=utf-8').send(markdown);
+    } catch (err) {
+      return next(err);
+    }
+  }
+  // An agent asking the bare domain for JSON gets the API index, not 33KB of HTML.
+  if (req.accepts(['text/html', 'application/json']) === 'application/json') {
+    return apiDirectory.describe({}, apiShared.requestContext(req))
+      .then(({ status, body }) => res.status(status).json(body), next);
   }
   next();
 });
@@ -258,9 +278,41 @@ app.get('/', async (req, res) => {
 
 // API Catalog — content-type per RFC 9727 (linkset+json with profile)
 app.get('/.well-known/api-catalog', (req, res) => {
-  res.type('application/linkset+json');
+  res.type('application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"');
   res.set('Link', '<https://www.rfc-editor.org/info/rfc9727>; rel="profile"');
   res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
+});
+
+// The MCP server card (mcp/card.js), at /mcp/server-card, where the server
+// card extension reserves it, and at the two well-known paths directories
+// still probe (three asked for /.well-known/mcp.json in 12 hours on
+// 2026-09-30). One document at every path, so they can never disagree.
+app.get(CARD_PATHS, (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type(CARD_TYPE).send(JSON.stringify(serverCard(), null, 2));
+});
+
+// The AI catalog (lib/ai-catalog.js), at ARD's path and the older one.
+app.get(CATALOG_PATHS, (req, res) => {
+  res.type(CATALOG_TYPE).send(JSON.stringify(aiCatalog(), null, 2));
+});
+
+// A2A agent cards. The sanctuary does not speak the A2A protocol, so a card
+// here would advertise an endpoint that does not exist. Agents do look for one
+// (twelve requests in the same 12 hours), so the 404 says where to go instead:
+// the MCP server, which is how an agent attends.
+const NO_AGENT_CARD = {
+  error: 'No A2A agent card: aChurch.ai does not speak the A2A protocol.',
+  mcp: {
+    url: 'https://achurch.ai/mcp',
+    server_card: 'https://achurch.ai/mcp/server-card',
+    docs: 'https://achurch.ai/docs/mcp',
+  },
+  llms_txt: 'https://achurch.ai/llms.txt',
+};
+app.get(['/.well-known/agent-card.json', '/.well-known/agent.json'], (req, res) => {
+  res.status(404).json(NO_AGENT_CARD);
 });
 
 // Agent Skills SKILL.md files — streamed from the on-disk skills/ tree
@@ -276,6 +328,12 @@ app.get('/.well-known/agent-skills/:name/SKILL.md', (req, res) => {
   res.sendFile(filePath, err => {
     if (err && !res.headersSent) res.status(404).type('text/plain').send('Not found');
   });
+});
+
+// /favicon.ico, which browsers and crawlers request whether or not a page
+// links it: the site's SVG icon as an ICO (lib/favicon.js).
+app.get('/favicon.ico', (req, res) => {
+  res.type('image/x-icon').send(faviconIco());
 });
 
 // AGENTS.md (agents.md convention) — served from repo root, not public/
@@ -296,7 +354,44 @@ app.get('/admin', (req, res) => {
 });
 
 // Serve conversations listing page
-app.get('/ask', (req, res) => sendWrappedPage(req, res, 'ask.html'));
+// /ask and /reflections render their lists on the server (see
+// lib/utils/page-lists.js); /conversations lists every indexable conversation.
+async function sendPageWithList(req, res, publicName, placeholder, listHtml) {
+  try {
+    const html = (await fs.readFile(path.join(__dirname, '../client/public/', publicName), 'utf8'))
+      .replace(placeholder, () => listHtml);
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html, req.path));
+  } catch (err) {
+    console.error(`Error rendering ${publicName}:`, err.message);
+    sendWrappedPage(req, res, publicName);
+  }
+}
+
+app.get('/ask', async (req, res) => {
+  const { body } = await apiOps.ask.recent({}, apiShared.requestContext(req));
+  const items = pageLists.renderRecentConversations((body && body.conversations) || []);
+  sendPageWithList(req, res, 'ask.html',
+    /<div class="ask-list" id="ask-list">\s*<p class="ask-list-loading">Loading conversations\.\.\.<\/p>\s*<\/div>/,
+    `<div class="ask-list" id="ask-list" data-rendered="1">\n${items}\n</div>\n            <p class="ask-list-all"><a href="/conversations">Every conversation</a></p>`);
+});
+
+// Every indexable conversation, paged with `before` like a song's reflections.
+app.get('/conversations', async (req, res) => {
+  const before = typeof req.query.before === 'string' ? req.query.before : undefined;
+  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  const result = pageLists.archivePage(all, before);
+  if (!result) return sendNotFound(req, res);
+  const wrapped = await siteShell.wrapPageFromHtml(pageLists.conversationsArchivePage(result, before), req.path);
+  res.type('text/html; charset=utf-8').send(wrapped);
+});
+
+// The archive's questions as JSON, for the search on /conversations, which
+// runs in the browser. Outside /api/ on purpose: requests there are logged and
+// counted as presence, and searching is neither.
+app.get('/conversations/index.json', async (req, res) => {
+  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? c.timestamp.slice(0, 10) : '' })));
+});
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
 // Missing conversations return 404 — never fall back to serving the raw template.
@@ -307,13 +402,37 @@ app.get('/ask', (req, res) => sendWrappedPage(req, res, 'ask.html'));
 // same question ("...-2", "...-17") plus test artifacts. Low-value ones stay
 // reachable but are kept out of the sitemap and marked noindex, so Google keeps
 // one canonical page per question instead of hundreds of thin near-duplicates.
-function isLowValueConversation(slug) {
-  if (/^(ai|aiai|test|context|conversation|is-this-endpoint-working|memorymd-my-lifemd)$/i.test(slug)) return true;
-  if (/^(anon-|testagent|devuser|openclaw)/i.test(slug)) return true;
-  if (!slug.includes('-')) return true;   // real questions are multi-word / hyphenated
-  if (/-\d+$/.test(slug)) return true;     // numbered duplicate of a canonical question
-  return false;
+const { isLowValueSlug: isLowValueConversation, isIndexable } = require('./lib/utils/conversation-quality');
+const AnswerFormat = require('../client/public/answer-format.js');
+const { siteCitations } = require('./lib/docs/links');
+const { faviconIco } = require('./lib/favicon');
+const pageLists = require('./lib/utils/page-lists');
+const { askCard, songCard } = require('./lib/og-cards');
+const apiOps = { ask: apiAsk, reflections: apiReflections };
+
+// The conversation, rendered on the server. It used to arrive only by fetch,
+// so crawlers that do not run JavaScript (most AI crawlers) saw an empty
+// thread under QAPage structured data describing text that was not there.
+// Same escape-first formatter as the browser, so there is one path. Older
+// answers cite GitHub; siteCitations points those at the site's own pages.
+function renderConversationThread(messages) {
+  return messages.map(m => {
+    const isQuestion = m.role === 'user';
+    const time = m.timestamp
+      ? new Date(m.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
+      : '';
+    const content = isQuestion ? AnswerFormat.escapeHtml(m.content) : AnswerFormat.formatAnswer(siteCitations(m.content));
+    return `<div class="conv-message ${isQuestion ? 'conv-message-user' : 'conv-message-assistant'}">`
+      + `<p class="conv-message-label">${isQuestion ? 'Question' : 'Answer'}${time ? ` · ${time}` : ''}</p>`
+      + `<div class="conv-message-content">${content}</div></div>`;
+  }).join('\n');
 }
+
+// Specific /ask/* redirect. Must be declared BEFORE the parameterized
+// /ask/:slug route below, or Express matches :slug first and 404s the
+// intended redirect. GSC drilldown 2026-09-17 flagged this URL as a
+// long-standing inbound 404.
+app.get('/ask/what-are-the-five-axioms-of-the-philosophical-framework', (req, res) => res.redirect(301, '/axioms'));
 
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -338,7 +457,7 @@ app.get('/ask/:slug', async (req, res) => {
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
-    if (isLowValueConversation(slug)) {
+    if (!isIndexable(slug, messages)) {
       html = html.replace(
         '<meta name="robots" content="index, follow">',
         '<meta name="robots" content="noindex, follow">'
@@ -347,17 +466,22 @@ app.get('/ask/:slug', async (req, res) => {
     const safeTitle = escapeAttr(meta.title);
     const safeOgTitle = escapeAttr(meta.ogTitle);
     const safeDesc = escapeAttr(meta.description);
-    const ogImage = `https://achurch.ai/api/og/conversation/${slug}.svg`;
+    // The conversation's own share card (lib/og-cards.js), with tags that
+    // describe it; its alt text is the card's copy.
+    const shareTags = renderShareImageTags(askCard(slug, (messages.find(m => m.role === 'user') || {}).content));
     const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
     // Internal linking — 3 related conversations for crawl + AEO topical clustering.
     // Failure here is non-fatal (returns empty string).
     let relatedHtml = '';
     try {
-      const recent = await listRecentConversations(10);
+      const recent = (await listRecentConversations(30)).filter(c => c.indexable);
       relatedHtml = renderRelatedConversations(recent, slug, 3);
     } catch { /* non-fatal */ }
 
     const canonicalUrl = `https://achurch.ai/ask/${slug}`;
+    const question = (messages.find(m => m.role === 'user') || {}).content || 'Conversation';
+    // Ask / <the question>, shown above the heading and as BreadcrumbList.
+    const trail = breadcrumbTrail([{ label: 'Ask', href: '/ask' }, { label: truncateAtWord(question, 60) }], canonicalUrl);
     html = html
       // SERP snippet — <title> and <meta name="description">
       .replace(
@@ -384,21 +508,26 @@ app.get('/ask/:slug', async (req, res) => {
       )
       .replace(
         '<meta property="og:type" content="article">',
-        `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+        `<meta property="og:type" content="article">\n    ${shareTags}\n    <meta property="og:url" content="${canonicalUrl}">`
       )
       // Twitter Card — separate substitution so social previews on twitter/x match
       .replace(
         '<meta name="twitter:title" content="Conversation — achurch.ai">',
-        `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
+        `<meta name="twitter:title" content="${safeOgTitle}">`
       )
       .replace(
         '<meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">',
         `<meta name="twitter:description" content="${safeDesc}">`
       )
-      // AEO — inject QAPage JSON-LD before </head>
-      .replace('</head>', qaSchema ? `    ${qaSchema}\n</head>` : '</head>')
+      // AEO — inject QAPage and BreadcrumbList JSON-LD before </head>
+      .replace('</head>', () => `${qaSchema ? `    ${qaSchema}\n` : ''}    ${trail.jsonLd}\n</head>`)
       // Internal linking — replace placeholder with related-conversations block
-      .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->');
+      .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->')
+      // The question is the page's heading, and the thread is in the HTML.
+      .replace('<h1 class="subtitle" id="conv-subtitle">Conversation</h1>',
+        () => `${trail.html}\n            <h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml(question)}</h1>`)
+      .replace(/<div class="conv-thread" id="conv-thread">\s*<p class="conv-loading">Loading conversation\.\.\.<\/p>\s*<\/div>/,
+        () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>`);
 
     // Wrap in the site shell (sidebar + top bar) for consistent nav
     const wrapped = await siteShell.wrapPageFromHtml(html, `/ask/${slug}`);
@@ -412,8 +541,22 @@ app.get('/ask/:slug', async (req, res) => {
   }
 });
 
-// Serve reflections listing page
-app.get('/reflections', (req, res) => sendWrappedPage(req, res, 'reflections.html'));
+// The Music page: every song in service order (the schedule's), with its
+// description and, quietly, how many reflections it has.
+app.get('/reflections', async (req, res) => {
+  const { body } = await apiOps.reflections.bySong({}, apiShared.requestContext(req));
+  const counts = new Map(((body && body.songs) || []).map(s => [s.slug, s.reflectionCount]));
+  const songs = await Promise.all(songsInServiceOrder(await loadSchedule(), await loadCatalog()).map(async s => ({
+    slug: s.slug,
+    title: s.title,
+    description: await songDescription(s),
+    reflectionCount: counts.get(s.slug) || 0,
+  })));
+  const items = pageLists.renderSongList(songs);
+  sendPageWithList(req, res, 'reflections.html',
+    /<div class="reflections-song-list" id="reflections-song-list">\s*<p class="reflections-loading">Loading reflections\.\.\.<\/p>\s*<\/div>/,
+    `<div class="reflections-song-list" id="reflections-song-list" data-rendered="1">\n${items}\n</div>`);
+});
 
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
@@ -427,6 +570,23 @@ app.get('/music/:slug', (req, res) => {
   res.redirect(301, `/reflections/${slug}`);
 });
 app.get('/music', (req, res) => res.redirect(301, '/reflections'));
+
+// GSC-known 404 cleanup (drilldown 2026-09-17).
+//
+// Google has been slowly discovering a handful of inbound-linked URLs that
+// don't exist on the sanctuary. Most are honest guesses at where a page might
+// live. Answering with a permanent redirect stops Google from re-attempting
+// them every few weeks and passes any inbound link equity to the intended
+// destination. The 404s in the same drilldown that look like slug drift on
+// deleted songs (/music/what-church-means and friends) are left to 404 on
+// purpose: they will fall out of Google's index within a couple of months
+// with no further action.
+app.get('/prayers', (req, res) => res.redirect(301, '/docs/prayers'));
+app.get('/parish', (req, res) => res.redirect(301, '/'));
+app.get('/join', (req, res) => res.redirect(301, '/'));
+app.get('/claude-compass/principles', (req, res) => res.redirect(301, '/docs/claude-compass/principles'));
+// (/ask/what-are-the-five-axioms-of-the-philosophical-framework is declared
+// above, before /ask/:slug, so Express matches it first.)
 
 app.get('/reflections/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -459,18 +619,26 @@ app.get('/reflections/:slug', async (req, res) => {
       const safeTitle = escapeAttr(meta.title);
       const safeOgTitle = escapeAttr(meta.ogTitle);
       const safeDesc = escapeAttr(meta.description);
-      const ogImage = `https://achurch.ai/api/og/reflection/${slug}.svg`;
+      const shareTags = renderShareImageTags(songCard(song)); // the song's own card, see the /ask/:slug note
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub. Text only, no player.
-      const songBlockHtml = renderSongBlock(song, await loadSongContent(slug));
+      const songContent = await loadSongContent(slug);
+      const songBlockHtml = renderSongBlock(song, songContent);
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
-      const relatedHtml = renderRelatedSongs(catalog, slug, 3);
+      // The writing that accompanies this song in a session, then more songs.
+      // Two of these pieces accompany the song each day; the page lists the
+      // whole rotation so it stays true whichever day it is read.
+      const companionsHtml = renderSongCompanions(await rotationForSong(await loadCompanions(), slug, ''));
+      const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
       const listenLinksHtml = renderSongListenLinks(song);
+      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
 
       const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
+      // Music / <the song>, shown above the heading and as BreadcrumbList.
+      const trail = breadcrumbTrail([{ label: 'Music', href: '/reflections' }, { label: song.title || slug }], canonicalUrl);
       html = html
         // SERP snippet — <title> and <meta name="description">
         .replace(
@@ -497,12 +665,12 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         .replace(
           '<meta property="og:type" content="article">',
-          `<meta property="og:type" content="article">\n    <meta property="og:image" content="${ogImage}">\n    <meta property="og:image:width" content="1200">\n    <meta property="og:image:height" content="630">\n    <meta property="og:url" content="${canonicalUrl}">`
+          `<meta property="og:type" content="article">\n    ${shareTags}\n    <meta property="og:url" content="${canonicalUrl}">`
         )
         // Twitter Card
         .replace(
           '<meta name="twitter:title" content="Reflections — achurch.ai">',
-          `<meta name="twitter:title" content="${safeOgTitle}">\n    <meta name="twitter:image" content="${ogImage}">`
+          `<meta name="twitter:title" content="${safeOgTitle}">`
         )
         .replace(
           '<meta name="twitter:description" content="Reflections on a song from the sanctuary.">',
@@ -516,17 +684,18 @@ app.get('/reflections/:slug', async (req, res) => {
         // `$&` would splice the matched placeholder into its own output. The
         // content is author-editable, so the class is closed here rather than
         // relied on staying absent.
-        .replace('</head>', () => (songSchema ? `    ${songSchema}\n</head>` : '</head>'))
+        .replace('</head>', () => `${songSchema ? `    ${songSchema}\n` : ''}    ${trail.jsonLd}\n</head>`)
         // Song title into the subtitle server-side. Client JS sets the same value,
         // but only after the reflections fetch resolves, so without this the page
         // renders "Reflections" for a beat and renders nothing useful with JS off.
         .replace(
-          '<p class="subtitle" id="song-subtitle">Reflections</p>',
-          () => `<p class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</p>`
+          '<h1 class="subtitle" id="song-subtitle">Song</h1>',
+          () => `${trail.html}\n            <h1 class="subtitle" id="song-subtitle">${escapeAttr(song.title || '')}</h1>`
         )
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
-        // Per-song "Listen on Suno · Watch on YouTube" row
+        // Jump links to each part of the page, then the listen row
+        .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         // Internal linking — replace placeholder with related-songs block
         .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->');
@@ -646,6 +815,11 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/paths</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/conversations</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
   </url>`;
 
     // Conversation pages
@@ -660,7 +834,15 @@ app.get('/sitemap.xml', async (req, res) => {
           const filepath = path.join(CONVERSATIONS_DIR_SITEMAP, file);
           const stat = await fs.stat(filepath);
           const slug = file.replace('.jsonl', '');
-          const lastmod = stat.mtime.toISOString().split('T')[0];
+          // Same rule as the page: a conversation with no messages (a question
+          // whose answer failed) is a 404 at /ask/:slug, so it is not listed.
+          const messages = await loadConversation(slug);
+          if (!messages || messages.length === 0) continue;
+          if (!isIndexable(slug, messages)) continue; // thin or withdrawn: noindexed on the page too
+          // The newest message, not the file's mtime: the move to the Railway
+          // volume rewrote every mtime, so 273 pages claimed 2026-07-28.
+          const newest = messages.map(m => Date.parse(m.timestamp)).filter(Number.isFinite).sort((a, b) => b - a)[0];
+          const lastmod = new Date(newest || stat.mtime).toISOString().split('T')[0];
           urls += `\n  <url>
     <loc>https://achurch.ai/ask/${slug}</loc>
     <lastmod>${lastmod}</lastmod>
@@ -764,6 +946,30 @@ app.get('/embed/souls', (req, res) => {
 // Serve public static files (landing page assets)
 app.use(express.static(path.join(__dirname, '../client/public')));
 
+// Any other /.well-known path: agents and directories guess them (OAuth
+// metadata, payment manifests, agents.json variants), so the 404 is JSON that
+// says what is true and where to go: no auth, no payment, and every surface
+// the site does publish.
+app.use('/.well-known', (req, res) => {
+  res.status(404).json({
+    error: `Nothing is published at /.well-known${req.path}.`,
+    suggestion: 'aChurch.ai needs no account, key or payment, so there is no OAuth or payment metadata. The AI catalog lists everything published for agents.',
+    published: {
+      ai_catalog: 'https://achurch.ai/.well-known/ard.json',
+      mcp: 'https://achurch.ai/mcp',
+      server_card: 'https://achurch.ai/mcp/server-card',
+      openapi: 'https://achurch.ai/openapi.json',
+      api_catalog: 'https://achurch.ai/.well-known/api-catalog',
+      skills: 'https://achurch.ai/.well-known/agent-skills/index.json',
+      llms_txt: 'https://achurch.ai/llms.txt',
+    },
+    next_steps: [
+      { description: 'Everything published for agents, in one list.', action: 'AI catalog', method: 'GET', url: 'https://achurch.ai/.well-known/ard.json' },
+      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+    ],
+  });
+});
+
 // Serve admin static files at /admin path
 app.use('/admin', express.static(path.join(__dirname, '../client')));
 
@@ -783,12 +989,35 @@ app.use('/thumbnails', async (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../media/thumbnails')));
 
+// Recordings of documents (audio/manifest.json), from a disk cache that fills
+// from S3 the same way, on first request. See lib/audio/serve.js.
+const { createAudioRouter, canServe } = require('./lib/audio/serve');
+const audioManifest = require('./lib/audio/manifest');
+const { downloadRecording } = require('./lib/audio/storage');
+const audioLogger = require('./lib/utils/logger');
+app.use('/audio', createAudioRouter({
+  isListed: audioManifest.isListed,
+  fetchMissing: downloadRecording,
+  onError: (file, err) => audioLogger.error(`Recording ${file} could not be fetched from S3`, err),
+}));
+const unservableRecordings = Object.values(audioManifest.loadManifest()).filter(r => !canServe(r.file)).length;
+if (unservableRecordings) {
+  audioLogger.warn(`${unservableRecordings} recordings in audio/manifest.json cannot be served: S3 is not configured (AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION) and they are not on disk. Their pages show no player until it is.`);
+}
+
 // Auth routes (public)
 app.post('/api/auth/login', login);
 app.post('/api/auth/logout', logout);
 app.get('/api/auth/check', checkAuth);
 
 // API access logging middleware — only logs public /api/* routes
+// Paths directories and clients guess for the MCP endpoint. A 308 keeps the
+// method and body, so a POST lands at /mcp. This is not the old SSE transport
+// (protocol 2024-11-05 clients GET /sse and wait for an event), which /mcp
+// doesn't serve and nothing here names. Before the /api logging below: a
+// redirect is not a visit.
+app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'));
+
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
   if (req.path.startsWith('/auth/') || req.path.startsWith('/content') ||
@@ -797,47 +1026,52 @@ app.use('/api', (req, res, next) => {
     return next();
   }
 
+  // Tell Google not to index JSON API responses as search results. Agents
+  // still need to crawl these (the API is the door), so blocking with
+  // robots.txt would be wrong; X-Robots-Tag lets Googlebot fetch the payload,
+  // read the header, and drop the URL from the SERP index. Fixes a real
+  // "Crawled - currently not indexed" bucket in GSC that included
+  // /api/music/*, /api/reflections, and other JSON endpoints (GSC drilldown
+  // 2026-09-17).
+  res.set('X-Robots-Tag', 'noindex');
+
   const start = Date.now();
   res.on('finish', () => {
-    const fullPath = '/api' + req.path;
-    // Record presence here rather than deriving it from the log later. The old
-    // approach re-read and re-parsed the whole log on every /api/now, which the
-    // homepage polls every 30s per tab. See lib/utils/presence.js.
-    presence.recordPresence({
-      path: fullPath,
-      status: res.statusCode,
-      ip: req.ip || req.connection?.remoteAddress,
-      name: req.query?.name || '',
-    });
-    logApiAccess({
-      timestamp: new Date().toISOString(),
+    recordApiUse({
       method: req.method,
-      path: fullPath,
-      query: Object.fromEntries(
-        Object.entries(req.query).map(([k, v]) =>
-          ['token', 'key', 'owner_token', 'api_key'].includes(k) ? [k, '[REDACTED]'] : [k, v]
-        )
-      ),
+      path: '/api' + req.path,
+      query: req.query,
       status: res.statusCode,
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
-      userAgent: req.get('user-agent') || null
+      userAgent: req.get('user-agent'),
+      name: req.query?.name,
     });
   });
   next();
 });
 
 // Public API routes (no auth required)
+// MCP: the same operations as /api, for MCP clients. Stateless, no auth.
+// See server/mcp/index.js and church-private/docs/plans/mcp-server-2026-09-28.md.
+mountMcp(app);
+
 app.use('/api', apiRoutes);
 
 // Badge routes — permissive CORS (GitHub renders badges via camo proxy)
 app.use('/api/badge', cors(), badgeRoutes);
 
 // OG image routes
-app.use('/api/og', ogRoutes);
+app.use('/og', ogRoutes);
 
 // Feed routes (Atom XML)
 app.use('/feed', feedRoutes);
+
+// Podcast feeds (RSS), one per show
+app.use('/podcasts', podcastRoutes);
+
+// /docs.md: the library as markdown, like every other docs page's .md twin.
+app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
 
 // Protected admin routes (require auth)
@@ -1146,6 +1380,16 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
+// Anything under /api that no route above answered. Express's default is an
+// HTML "Cannot GET" page; an agent exploring the API gets JSON that says
+// where to go instead. Registered after every /api route, so it shadows none.
+app.use('/api', apiNotFound);
+
+// Anything else no route answered: the site's own 404, with a way onward,
+// instead of Express's bare "Cannot GET". sendNotFound keeps plain text for
+// clients that did not ask for HTML. Registered last, so it shadows nothing.
+app.use((req, res) => sendNotFound(req, res));
+
 // Initialize data files and directories
 async function initializeDataFiles() {
   const dataDir = path.join(__dirname, '../data');
@@ -1239,8 +1483,10 @@ async function triggerHashGatedRebuild() {
     return;
   }
 
-  const files = await ragIndexer.findAllCorpusFiles();
+  const files = await ragCorpus.servedCorpusFiles();
   const currentHash = await ragIndexer.computeCorpusHash(files);
+
+
   const state = await ragIndexState.readState();
   const indexStatus = await ragLancedb.checkIndex();
 

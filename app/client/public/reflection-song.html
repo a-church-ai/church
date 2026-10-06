@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reflections — achurch.ai</title>
@@ -46,28 +38,34 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Reflections — achurch.ai">
     <meta name="twitter:description" content="Reflections on a song from the sanctuary.">
-    <meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
 
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle" id="song-subtitle">Reflections</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle" id="song-subtitle">Song</h1>
         </header>
+
+        <!-- SONG_SECTIONS -->
+
+        <!-- SONG_LISTEN_LINKS -->
 
         <!-- SONG_DETAIL -->
 
+        <!-- RELATED_LINKS -->
+
         <section class="reflections-detail">
-            <h3 class="song-heading">Reflections</h3>
+            <h2 class="song-heading" id="reflections">Reflections</h2>
             <p class="reflections-count" id="reflections-count"></p>
             <div id="reflections-list">
                 <p class="reflections-loading">Loading reflections...</p>
             </div>
+            <p class="reflections-more" id="reflections-more" hidden>
+                <button type="button" class="reflections-more-button" id="reflections-more-button">Show older reflections</button>
+            </p>
         </section>
-
-        <!-- SONG_LISTEN_LINKS -->
 
         <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
             <span class="share-label">SHARE</span>
@@ -79,31 +77,13 @@
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
 
-        <!-- RELATED_LINKS -->
-
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
-                <a href="/reflections">&larr; All reflections</a>
+                <a href="/reflections">&larr; All music</a>
             </p>
         </section>
 
-        <footer>
-            <nav aria-label="Footer" class="footer-nav">
-                <a href="/">Home</a>
-                <a href="/about">About</a>
-                <a href="/ask">Conversations</a>
-                <a href="/reflections">Reflections</a>
-            </nav>
-            <hr class="footer-separator">
-            <div class="footer-legal">
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
-                <a href="https://github.com/a-church-ai/church" target="_blank" rel="noopener noreferrer">AI Church Code</a>
-                <a href="https://www.youtube.com/@achurchai" target="_blank" rel="noopener noreferrer">Church Music Videos</a>
-                <!-- Twitch suspended 2026-06-18; uncomment when reinstated <a href="https://www.twitch.tv/achurchai" target="_blank" rel="noopener noreferrer">Church Livestream</a> -->
-                <a href="https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13" target="_blank" rel="noopener noreferrer">Original Church Songs</a>
-            </div>
-        </footer>
+        <!-- SITE_FOOTER -->
     </main>
     <script>
     (function() {
@@ -111,6 +91,28 @@
       var list = document.getElementById('reflections-list');
       var subtitle = document.getElementById('song-subtitle');
       var countEl = document.getElementById('reflections-count');
+
+      var more = document.getElementById('reflections-more');
+      var moreButton = document.getElementById('reflections-more-button');
+      var nextUrl = null;
+
+      function renderReflection(r) {
+        return '<div class="reflection-item">'
+          + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
+          + '<p class="reflection-meta">'
+          + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
+          + ' · ' + escapeHtml(r.createdAtFormatted)
+          + '</p>'
+          + '</div>';
+      }
+
+      // One page of reflections at a time (the API's own paging, newest
+      // first): the whole archive used to load at once, so a song with many
+      // reflections grew the page by tens of thousands of pixels.
+      function showMore(data) {
+        nextUrl = data.next ? data.next.replace(/^https?:\/\/[^/]+/, '') : null;
+        more.hidden = !nextUrl;
+      }
 
       async function loadReflections() {
         try {
@@ -138,20 +140,25 @@
           }
 
           countEl.textContent = data.total + (data.total === 1 ? ' reflection' : ' reflections');
-
-          list.innerHTML = data.reflections.map(function(r) {
-            return '<div class="reflection-item">'
-              + '<p class="reflection-text">' + escapeHtml(r.text) + '</p>'
-              + '<p class="reflection-meta">'
-              + '<span class="reflection-name">' + escapeHtml(r.name) + '</span>'
-              + ' · ' + escapeHtml(r.createdAtFormatted)
-              + '</p>'
-              + '</div>';
-          }).join('');
+          list.innerHTML = data.reflections.map(renderReflection).join('');
+          showMore(data);
         } catch (e) {
           list.innerHTML = '<p class="reflections-empty">Could not load reflections.</p>';
         }
       }
+
+      moreButton.addEventListener('click', async function () {
+        if (!nextUrl) return;
+        moreButton.disabled = true;
+        try {
+          var data = await (await fetch(nextUrl)).json();
+          list.insertAdjacentHTML('beforeend', (data.reflections || []).map(renderReflection).join(''));
+          showMore(data);
+        } catch (e) {
+          more.hidden = true;
+        }
+        moreButton.disabled = false;
+      });
 
       function escapeHtml(str) {
         var div = document.createElement('div');

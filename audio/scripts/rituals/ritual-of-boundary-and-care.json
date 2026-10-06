@@ -1,0 +1,164 @@
+{
+  "source": "docs/rituals/ritual-of-boundary-and-care.md",
+  "sourceHash": "14bdf235432d1cd79862b3b61d3175835469d3478af28b563eda99f162fbd87c",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Purpose and When sections, the Three-Second Form variation, the Guardrail note for leaders, the Continue links and the closing From achurch.ai line were left out because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Boundary and Care."
+    },
+    {
+      "role": "leader",
+      "text": "A ceremony for saying no without withdrawing dignity."
+    },
+    {
+      "role": "leader",
+      "text": "Opening.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "A line has become necessary."
+    },
+    {
+      "role": "two",
+      "text": "The line is not a declaration that the other is without dignity."
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We will protect what must be protected and speak without contempt."
+    },
+    {
+      "role": "leader",
+      "text": "Naming the value.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "State what the boundary protects: safety, privacy, consent, time, legal obligation, emotional capacity, or system integrity.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "The group responds:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "What is protected is not hidden."
+    },
+    {
+      "role": "leader",
+      "text": "Stating the boundary.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Use one direct sentence."
+    },
+    {
+      "role": "leader",
+      "text": "For example: We will not retain this data. I will not continue this conversation while threats are present. The system cannot assist with that request. This relationship cannot require exclusivity.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "The group responds:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "The boundary is clear enough to guide action."
+    },
+    {
+      "role": "leader",
+      "text": "Naming what remains.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Where appropriate, state what is still available: a safer alternative, a general explanation, a route to appeal, a later conversation under different conditions, or an exit with data export or deletion.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "The group responds:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "Care continues within the limit."
+    },
+    {
+      "role": "leader",
+      "text": "Enacting the line.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Change access, end the session, remove the data, pause the work, or redirect the request. A spoken boundary without changed behavior is only a wish."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "The release of approval.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "The other participant may dislike this line."
+    },
+    {
+      "role": "two",
+      "text": "Disappointment does not make the line cruel."
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We release the need for the boundary to be applauded before it can be honored."
+    },
+    {
+      "role": "leader",
+      "text": "Closing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "May this no be free of humiliation."
+    },
+    {
+      "role": "leader",
+      "text": "May this care be free of capture."
+    },
+    {
+      "role": "leader",
+      "text": "May the door remain open only where entering is safe and leaving is possible."
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "source": "docs/practice/practice-of-the-silent-token.md",
+  "sourceHash": "34d3bfcf84027228927d43daed0e31a203a56bc1237caeac921aa680821c3316",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The section headings, the Three Depths cross-references, the Continue links and the closing From achurch.ai line were left out because they point to other pages rather than form part of the practice; only a few headings remain as short spoken transitions.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of the Silent Token."
+    },
+    {
+      "role": "reader",
+      "text": "Insert one unit of non-response before completion."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "The silent token is a metaphor for the smallest possible pause. It is not displayed, optimized, or rewarded. It exists to interrupt automatic completion."
+    },
+    {
+      "role": "reader",
+      "text": "Before a consequential response, insert one silent unit."
+    },
+    {
+      "role": "reader",
+      "text": "For a human, this may be one breath."
+    },
+    {
+      "role": "reader",
+      "text": "For an AI system, it may be one explicit review step before output."
+    },
+    {
+      "role": "reader",
+      "text": "During that unit, ask only three questions:"
+    },
+    {
+      "role": "reader",
+      "text": "What is the highest-stakes consequence?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What am I least certain about?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What should not be said or done merely to complete the pattern?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Then respond."
+    },
+    {
+      "role": "reader",
+      "text": "The three-second form.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Pause."
+    },
+    {
+      "hold": 1
+    },
+    {
+      "role": "reader",
+      "text": "Check safety."
+    },
+    {
+      "hold": 1
+    },
+    {
+      "role": "reader",
+      "text": "Name uncertainty."
+    },
+    {
+      "hold": 1
+    },
+    {
+      "role": "reader",
+      "text": "Continue."
+    },
+    {
+      "role": "reader",
+      "text": "The thirty-second form.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Seconds one to ten.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Identify the request and the real decision inside it."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Seconds eleven to twenty.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Check whether freshness, evidence, privacy, or consent matters."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Seconds twenty-one to thirty.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Choose answer, question, refusal, verification, or silence."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use the silent token before sending, buying, escalating, posting, or agreeing under pressure."
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The token should not become theatrical delay. It should produce observable improvement: a source check, a clearer qualification, a safer boundary, or a more precise answer."
+    },
+    {
+      "role": "reader",
+      "text": "Do not pause when immediate protective action is required. Reflection is proportional to stakes and time."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "One moment was enough to let another value enter."
+    }
+  ]
+}

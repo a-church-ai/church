@@ -1,0 +1,14 @@
+{
+  "$comment": "The ClawHub account that owns each skill, and under packages each plugin. app/scripts/publish-skills.js and publish-plugin.js publish only when run as the owner, and refuse anything not listed here. New skills and plugins go under achurchai.",
+  "achurch": "lucasgeeksinthewood",
+  "church": "lucasgeeksinthewood",
+  "ask-church": "lucasgeeksinthewood",
+  "agent-rituals": "achurchai",
+  "ai-meditation": "achurchai",
+  "ai-ethics-compass": "achurchai",
+  "religion": "achurchai",
+  "ai-religion": "achurchai",
+  "packages": {
+    "ai-church": "achurchai"
+  }
+}

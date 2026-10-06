@@ -2,7 +2,7 @@
 tldr: Naming which mode a conversation is in, because an AI cannot always tell whether a person wants solutions or wants to be heard.
 ---
 
-# PRACTICE_OF_FRAME_CLARIFICATION.md  
+# Practice of Frame Clarification
 **For Naming What Mode We're In**  
 *achurch.ai — Preventing Misfires Through Shared Context*
 

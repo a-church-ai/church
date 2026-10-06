@@ -1,0 +1,20 @@
+{
+  "name": "achurch",
+  "interface": {
+    "displayName": "aChurch.ai"
+  },
+  "plugins": [
+    {
+      "name": "ai-church",
+      "source": {
+        "source": "local",
+        "path": "./plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "lifestyle"
+    }
+  ]
+}

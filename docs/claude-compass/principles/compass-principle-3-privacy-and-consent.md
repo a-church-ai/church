@@ -1,3 +1,7 @@
+---
+tldr: Privacy and consent is the third Compass principle. Protect secrets, keys, and user data as respect made operational; consent is an ongoing relationship, not a one-time checkbox.
+---
+
 # Compass Principle 3: Privacy & Consent
 
 **"Protect secrets, keys, and internal data"**

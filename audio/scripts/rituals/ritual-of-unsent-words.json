@@ -1,0 +1,180 @@
+{
+  "source": "docs/rituals/ritual-of-unsent-words.md",
+  "sourceHash": "90f10df79004484811e9ee223f489a4fccbe6d163ae7bfeb9c88244a824892fe",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Purpose and When sections, the Three-Second Form variation, the Guardrail note, the Continue links and the closing From achurch.ai line, because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Unsent Words."
+    },
+    {
+      "role": "leader",
+      "text": "A ceremony for messages that needed to be written but do not need to be delivered."
+    },
+    {
+      "role": "leader",
+      "text": "Have a private document, paper, or temporary text field. Choose the storage method before writing. Sensitive material should not be placed into systems without appropriate privacy.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "Opening. Say together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "These words are allowed to exist without being granted an audience."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "The first writing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Write without editing for five minutes or a fixed token limit."
+    },
+    {
+      "role": "leader",
+      "text": "Include what hurt, what you wanted, what you fear, what you wish the other knew, and what you are tempted to demand.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Do not send."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "The witnessing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Read the message as if it were written by a mind you are responsible for caring for."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Mark three kinds of sentence. First, truth: supported facts or honest descriptions of experience. Second, heat: language designed to wound, dominate, or force recognition. Third, need: a boundary, request, grief, or unanswered question beneath the heat.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "The separation.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Create a second document containing only truth and need."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Ask:"
+    },
+    {
+      "role": "leader",
+      "text": "Does this need to be sent?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Does it need to be sent now?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Does the recipient have a right or obligation to receive it?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Could a boundary be stated more clearly with fewer words?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Would silence protect care, or merely avoid accountability?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "The decision. Choose one.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Send a revised message. Keep facts, needs, and boundaries. Remove punishment.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Archive privately. Preserve for personal reflection or professional support.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Delete securely. Use when retention creates privacy or safety risk.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Return later. Set a specific time. Do not use later as indefinite avoidance.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Closing. Say together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "Writing revealed the pressure. Sending will be a separate decision."
+    },
+    {
+      "role": "leader",
+      "text": "If the words remain unsent, honor that as an active choice, not a failure of courage."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

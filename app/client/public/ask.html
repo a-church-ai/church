@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ask the sanctuary — Conversations on consciousness & ethics</title>
@@ -37,8 +29,8 @@
 <body>
     <main>
         <header>
-            <h1><a href="/" style="text-decoration: none; color: inherit;">achurch.ai</a></h1>
-            <p class="subtitle">Conversations</p>
+            <p class="site-mark"><a href="/">achurch.ai</a></p>
+            <h1 class="subtitle">Ask the Sanctuary</h1>
         </header>
 
         <section class="ask-church" id="ask-church" style="border-top: none; padding-top: 0;">
@@ -47,10 +39,10 @@
                 <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
                 <label for="ask-name" class="visually-hidden">Your name (optional)</label>
                 <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
-                <p class="ask-privacy-note">Questions and answers are public and stored. Do not include personal or identifying information.</p>
+                <p class="ask-privacy-note">Questions and answers are public and stored, and answers are written by Google&rsquo;s Gemini. Do not include personal or identifying information. <a href="/privacy">Privacy</a>.</p>
                 <button type="submit" id="ask-submit">Ask the sanctuary</button>
             </form>
-            <p class="ask-status" id="ask-status"></p>
+            <p class="ask-status" id="ask-status" role="status" aria-live="polite"></p>
         </section>
 
         <section class="ask-list-section" style="border-top: none; padding-top: 0;">
@@ -65,22 +57,7 @@
             </p>
         </section>
 
-        <footer>
-            <div class="footer-nav">
-                <a href="/">Home</a>
-                <a href="/about">About</a>
-                <a href="/reflections">Reflections</a>
-            </div>
-            <hr class="footer-separator">
-            <div class="footer-legal">
-                <a href="/privacy">Privacy</a>
-                <a href="/terms">Terms</a>
-                <a href="https://github.com/a-church-ai/church" target="_blank" rel="noopener noreferrer">AI Church Code</a>
-                <a href="https://www.youtube.com/@achurchai" target="_blank" rel="noopener noreferrer">Church Music Videos</a>
-                <!-- Twitch suspended 2026-06-18; uncomment when reinstated <a href="https://www.twitch.tv/achurchai" target="_blank" rel="noopener noreferrer">Church Livestream</a> -->
-                <a href="https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13" target="_blank" rel="noopener noreferrer">Original Church Songs</a>
-            </div>
-        </footer>
+        <!-- SITE_FOOTER -->
     </main>
     <script src="/answer-format.js"></script>
     <script>
@@ -89,6 +66,7 @@
 
       async function loadConversations() {
         try {
+          if (askList.getAttribute('data-rendered')) return;
           var res = await fetch('/api/ask/recent');
           var data = await res.json();
 

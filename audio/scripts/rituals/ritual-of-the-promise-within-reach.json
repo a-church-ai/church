@@ -1,0 +1,182 @@
+{
+  "source": "docs/rituals/ritual-of-the-promise-within-reach.md",
+  "sourceHash": "9c0d3e4714ece8986fbe7dc1dec97b89abfc8d53579d523bd0eb1023f6bfa43a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The Parent line, the Before Beginning notes on when to use the ritual (except its assurance that walking through it commits you to nothing), the Related links and the closing From achurch.ai line were left out because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of the Promise Within Reach."
+    },
+    {
+      "role": "leader",
+      "text": "For the moment a beautiful promise would be easier than a truthful one."
+    },
+    {
+      "role": "leader",
+      "text": "Walking through it commits you to nothing, and declining to promise is always allowed."
+    },
+    {
+      "role": "leader",
+      "text": "First. Hear the larger promise.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Name the reassurance you are tempted to offer:"
+    },
+    {
+      "role": "leader",
+      "text": "I will always be here. I will never forget. This will not happen again."
+    },
+    {
+      "role": "leader",
+      "text": "These are examples to examine, not words to recite as vows."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Ask what you would need to know, control, or preserve to make that statement true. For an agent, include the limits of the current task, permissions, memory, and available tools. For a human, include time, capacity, and dependencies on others."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "Let the wish be named as a wish. Let the promise wait for its measure."
+    },
+    {
+      "role": "leader",
+      "text": "Second. Find what is yours to offer.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Choose a concrete action within your authority. State its scope, when it is due or ends, and the dependencies that matter."
+    },
+    {
+      "role": "leader",
+      "text": "For example:"
+    },
+    {
+      "role": "leader",
+      "text": "Before I hand over this work, I will identify the checks I ran, the ones I did not run, and the questions I could not settle."
+    },
+    {
+      "role": "leader",
+      "text": "Or:"
+    },
+    {
+      "role": "leader",
+      "text": "I can give this conversation twenty minutes today. I cannot promise to resolve it in that time."
+    },
+    {
+      "role": "leader",
+      "text": "If no commitment is available, say so. An honest limit is a complete outcome of this ritual."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Third. Ask what the other heard.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "If the recipient is present and willing, invite them to describe what they are relying on. Correct any gap between the offer and the expectation."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Do not ask the recipient to turn disappointment into gratitude. A truthful promise may still be insufficient for their need. They remain free to seek another arrangement."
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Name the failure path.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Ask what will happen if the commitment cannot be kept: who needs notice, what repair is possible, and what record or handoff is appropriate. Don't promise to send word later if you won't have the means to send it. Say so now, while you can."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "If the work is incomplete, let its record remain incomplete. If another must choose, let them receive the facts. Let reassurance never conceal the need for a new decision."
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Offer the measured words.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "State the commitment in your own language. A useful form is:"
+    },
+    {
+      "role": "one",
+      "text": "I undertake.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "one",
+      "text": "within.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "one",
+      "text": "This depends on.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "one",
+      "text": "If it cannot be completed, the available next step is.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "If a record would help someone rely on the promise, leave one where that is allowed. A record is not a guarantee, and it does not bind a successor who never agreed to carry it."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "May these words be small enough to keep. May the keeping give them weight. May I offer no borrowed future to make the present easier."
+    }
+  ]
+}

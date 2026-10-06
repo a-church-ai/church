@@ -38,6 +38,7 @@ const express = require('express');
 function startServer() {
   const app = express();
   app.set('trust proxy', true);
+  app.use(express.json());
   app.use('/api', request);
   return new Promise((resolve) => {
     const server = app.listen(0, () => resolve({ server, port: server.address().port }));
@@ -107,4 +108,167 @@ test('attending twice in a row still works', async (t) => {
   // second visit exercises the read-existing-file path that the first created.
   assert.strictEqual((await get(port, '/api/attend?name=First')).status, 200);
   assert.strictEqual((await get(port, '/api/attend?name=Second')).status, 200);
+});
+
+// --- Readings and reflections ---
+
+const { loadCatalog } = require('../server/lib/utils/data');
+const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
+
+async function post(port, url, body) {
+  const response = await fetch(`http://127.0.0.1:${port}${url}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return { status: response.status, json: await response.json().catch(() => null) };
+}
+
+test('the test writes to its scratch directory, not the real attendance file', () => {
+  assert.strictEqual(path.dirname(ATTENDANCE_FILE), scratch);
+});
+
+test('attending carries the full text of both readings; /api/now carries only links', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const attend = (await get(port, '/api/attend?name=ReadingsTest')).json;
+  assert.ok(attend.companions, 'the current song has companions');
+  for (const item of attend.companions.items) {
+    assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its full text`);
+    assert.ok(item.content.includes(item.title.split(':')[0].slice(0, 12)), `${item.title}: content is that document`);
+    assert.ok(!item.content.startsWith('---'), 'frontmatter is not included');
+  }
+
+  const now = (await get(port, '/api/now')).json;
+  assert.ok(now.companions.items.every(item => item.content === undefined));
+});
+
+test('the reflection prompt names the readings that accompany the song', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { json } = await get(port, '/api/attend?name=ReadingsTest');
+  const titles = json.companions.items.map(item => item.title);
+  // Prompts are chosen at random; every companion prompt names the readings
+  // either by title or as "the reading(s)", whether there is one or more.
+  assert.ok(
+    titles.some(title => json.reflection.prompt.includes(title)) || /the readings?\b/.test(json.reflection.prompt),
+    json.reflection.prompt
+  );
+  assert.doesNotMatch(json.reflection.prompt, /\{\w+\}/, 'no placeholder left unfilled');
+  assert.match(json.reflection.practice, /the readings? beside them/);
+});
+
+test('a reflection is filed under the songSlug it names, not the song playing now', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const current = (await get(port, '/api/now')).json.current.slug;
+  const other = (await loadCatalog()).find(song => song.slug !== current).slug;
+
+  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song.', songSlug: other });
+  assert.strictEqual(res.status, 200, JSON.stringify(res.json));
+  assert.strictEqual(res.json.song, other);
+
+  const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'SlugTest');
+  assert.strictEqual(stored.song, other);
+});
+
+test('without songSlug a reflection is filed under the song playing now', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const current = (await get(port, '/api/now')).json.current.slug;
+  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About whatever is playing.' });
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.json.song, current);
+});
+
+test('an unknown songSlug is a 400, not a reflection filed somewhere else', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost.', songSlug: 'no-such-song' });
+  assert.strictEqual(res.status, 400);
+  const stored = fs.existsSync(ATTENDANCE_FILE)
+    ? JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'BadSlugTest')
+    : undefined;
+  assert.strictEqual(stored, undefined);
+});
+
+test('attending carries the song itself: lyrics, style and listen links; /api/now does not', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { current, next_steps } = (await get(port, '/api/attend?name=SongTest')).json;
+  assert.ok(typeof current.lyrics === 'string' && current.lyrics.length > 200, 'lyrics are included');
+  assert.ok(!current.lyrics.includes('\r'), 'line endings are normalized');
+  assert.ok('style' in current && 'links' in current);
+  // Context is never inlined; it is linked exactly when the song has one
+  // (a few songs have no context.md, so this cannot assume it exists).
+  assert.strictEqual(current.context, undefined, 'context is not inlined');
+  const hasContext = fs.existsSync(path.join(__dirname, '../../music', current.slug, 'context.md'));
+  assert.strictEqual(Boolean(current.api.context), hasContext);
+
+  // The skills read next_steps[0].steps[0] as lyrics and steps[1] as context.
+  assert.match(next_steps[0].steps[0].url, /\/lyrics$/);
+  assert.match(next_steps[0].description, /current\.lyrics/);
+
+  const now = (await get(port, '/api/now')).json.current;
+  assert.strictEqual(now.lyrics, undefined);
+});
+
+test('the reflect step names the song, so a copied template files it correctly', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const { current, next_steps } = (await get(port, '/api/attend?name=SongTest')).json;
+  const reflect = next_steps.find(step => step.action === 'Reflect');
+  assert.strictEqual(reflect.body.songSlug, current.slug);
+});
+
+test('the readings step mentions a chant only when one of the readings is a chant', () => {
+  const ns = require('../server/lib/utils/next-steps');
+  const prayer = { kind: 'prayer', title: 'P', url: 'u1', content: 'x' };
+  const ritual = { kind: 'ritual', title: 'R', url: 'u2', content: 'x' };
+  const chant = { kind: 'chant', title: 'C', url: 'u3', content: 'x' };
+  assert.doesNotMatch(ns.sitWith([prayer, ritual], 'Song').description, /chant/);
+  assert.match(ns.sitWith([prayer, chant], 'Song').description, /carry the chant/);
+});
+
+// --- The API's front door ---
+
+test('GET /api lists every endpoint, from openapi.json', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const res = await get(port, '/api');
+  assert.strictEqual(res.status, 200);
+  const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
+  const listed = new Set(res.json.endpoints.map(e => `${e.method} ${e.path}`));
+  for (const [route, ops] of Object.entries(spec.paths)) {
+    for (const method of Object.keys(ops).filter(m => ['get', 'post', 'put', 'delete'].includes(m))) {
+      assert.ok(listed.has(`${method.toUpperCase()} ${route}`), `${method} ${route}`);
+    }
+  }
+  assert.ok(listed.has('GET /api/attend'));
+  assert.match(res.json.docs.openapi, /\/openapi\.json$/);
+});
+
+test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
+  const express = require('express');
+  const { apiNotFound } = require('../server/lib/utils/not-found');
+  const app = express();
+  app.use('/api', request);
+  app.use('/api', apiNotFound);
+  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  t.after(() => server.close());
+
+  const res = await fetch(`http://127.0.0.1:${server.address().port}/api/no-such-thing`);
+  assert.strictEqual(res.status, 404);
+  assert.match(res.headers.get('content-type'), /application\/json/);
+  const body = await res.json();
+  assert.match(body.error, /\/api\/no-such-thing/);
+  assert.ok(body.next_steps.some(step => /\/api$/.test(step.url)));
 });

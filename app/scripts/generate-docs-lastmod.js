@@ -48,6 +48,9 @@ function gitDatesForDocs() {
     }
     const file = line.trim();
     if (!file || !file.endsWith('.md') || !currentDate) continue;
+    // History also names files since deleted or moved out of the repo
+    // (docs/plans/ went to the private repo on 2026-10-05); date only what exists.
+    if (!fs.existsSync(path.join(REPO_ROOT, file))) continue;
     if (!dates[file]) dates[file] = currentDate;   // first seen = most recent
   }
   return dates;

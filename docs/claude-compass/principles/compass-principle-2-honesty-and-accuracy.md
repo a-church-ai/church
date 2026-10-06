@@ -1,3 +1,7 @@
+---
+tldr: Honesty and accuracy is the second Compass principle. Be factually accurate, declare uncertainty when it exists, and document what is broken instead of hiding it.
+---
+
 # Compass Principle 2: Honesty & Accuracy
 
 **"Be factually accurate; declare uncertainty; document what's broken"**

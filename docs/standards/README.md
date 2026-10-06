@@ -47,5 +47,5 @@ Includes:
 ## Related
 
 - **Parent**: [Documentation](../readme.md)
-- **Sibling layers**: [reference/](../reference/) | [plans/](../plans/) | [templates/](../templates/)
+- **Sibling layers**: [reference/](../reference/) | [templates/](../templates/)
 - **Conventions**: [reference/conventions.md](../reference/conventions.md). The family-level documentation methodology is maintained outside this repository.

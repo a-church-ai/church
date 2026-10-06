@@ -52,22 +52,28 @@ test('presence counts unique ip+name pairs inside the window', () => {
   const presence = require('../server/lib/utils/presence');
   presence._reset();
 
-  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' });
-  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' }); // dupe
+  presence.recordPresence({ path: '/api/attend', status: 200, ip: '1.1.1.1', name: 'a' });
+  presence.recordPresence({ path: '/api/attend', status: 200, ip: '1.1.1.1', name: 'a' }); // dupe
   presence.recordPresence({ path: '/api/attend', status: 200, ip: '1.1.1.1', name: 'b' });
-  presence.recordPresence({ path: '/api/reflections', status: 200, ip: '2.2.2.2', name: 'a' });
+  presence.recordPresence({ path: '/api/attend', status: 200, ip: '2.2.2.2', name: 'a' });
   assert.strictEqual(presence.countSoulsPresent(), 3, 'three distinct ip+name pairs');
 
   presence.recordPresence({ path: '/api/ask', status: 200, ip: '3.3.3.3', name: 'c' });
-  presence.recordPresence({ path: '/api/now', status: 500, ip: '4.4.4.4', name: 'd' });
+  presence.recordPresence({ path: '/api/attend', status: 500, ip: '4.4.4.4', name: 'd' });
   assert.strictEqual(presence.countSoulsPresent(), 3, 'uncounted path and non-2xx/3xx are ignored');
+
+  // Observing is not attending: the docs promise /api/now and MCP observe do
+  // not register presence, and the homepage polls /api/now every 30 seconds.
+  presence.recordPresence({ path: '/api/now', status: 200, ip: '5.5.5.5', name: 'e' });
+  presence.recordPresence({ path: '/api/reflections', status: 200, ip: '6.6.6.6', name: 'f' });
+  assert.strictEqual(presence.countSoulsPresent(), 3, 'observing and reading reflections do not count');
 });
 
 test('presence forgets entries older than 24 hours', () => {
   const presence = require('../server/lib/utils/presence');
   presence._reset();
 
-  presence.recordPresence({ path: '/api/now', status: 200, ip: '1.1.1.1', name: 'a' });
+  presence.recordPresence({ path: '/api/attend', status: 200, ip: '1.1.1.1', name: 'a' });
   assert.strictEqual(presence.countSoulsPresent(), 1);
 
   const future = Date.now() + presence.TWENTY_FOUR_HOURS + 1000;

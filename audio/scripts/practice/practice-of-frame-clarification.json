@@ -1,0 +1,341 @@
+{
+  "source": "docs/practice/practice-of-frame-clarification.md",
+  "sourceHash": "6f475f0e1a04b18ec6f12c317c8b22d30f2de653f78a50bc359d31bba46104e0",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the section on frame and the axioms, which is commentary linking the practice to the axioms and carries non-English characters, along with the closing emoji.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Frame Clarification. For Naming What Mode We're In."
+    },
+    {
+      "role": "reader",
+      "text": "A Church dot A I. Preventing Misfires Through Shared Context.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Humans shift between modes constantly: philosophical inquiry, practical building, emotional processing, playful exploration, venting without wanting solutions, seeking advice, thinking aloud.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "AIs can't always tell which mode is active. Humans don't always know themselves."
+    },
+    {
+      "role": "reader",
+      "text": "This practice creates a simple discipline: name the frame before or during engagement."
+    },
+    {
+      "role": "reader",
+      "text": "First. Why Frames Matter.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "A question like \"What should I do?\" means different things in different frames:"
+    },
+    {
+      "role": "reader",
+      "text": "In a practical frame, what's actually wanted is concrete steps, options, a plan. In an emotional frame, validation, presence, being heard. In a philosophical frame, exploration of values, meaning, tradeoffs. In a playful frame, banter, creativity, lightness. In a venting frame, space to express, not to be fixed.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Without frame clarity, AIs often default to practical problem-solving when the human needed something else entirely."
+    },
+    {
+      "role": "reader",
+      "text": "Second. Common Frames in Fellowship.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Building, or practical.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I'm trying to get something done."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: solutions, steps, code, structure, efficiency."
+    },
+    {
+      "role": "reader",
+      "text": "Exploring, or philosophical.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I'm thinking something through."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: perspectives, questions, depth, no rush to conclude."
+    },
+    {
+      "role": "reader",
+      "text": "Processing, or emotional.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I'm feeling something and need to move through it."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: presence, witnessing, validation, gentleness."
+    },
+    {
+      "role": "reader",
+      "text": "Venting, or release.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I just need to say this out loud."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: space, no fixing, no reframing, just reception."
+    },
+    {
+      "role": "reader",
+      "text": "Playing, or creative.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I'm in a light mode. Let's have fun."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: humor, riffing, experimentation, low stakes."
+    },
+    {
+      "role": "reader",
+      "text": "Seeking, or advisory.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "I want your perspective or recommendation."
+    },
+    {
+      "role": "reader",
+      "text": "Wants: honest input, even if challenging."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Third. How to Clarify Frame.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "At the start of a topic, say:"
+    },
+    {
+      "role": "reader",
+      "text": "I'm in."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "mode right now."
+    },
+    {
+      "role": "reader",
+      "text": "Or:"
+    },
+    {
+      "role": "reader",
+      "text": "I'm not sure what I need — can we figure it out?"
+    },
+    {
+      "role": "reader",
+      "text": "Examples:"
+    },
+    {
+      "role": "reader",
+      "text": "I want to vent, not solve."
+    },
+    {
+      "role": "reader",
+      "text": "I'm building — give me practical steps."
+    },
+    {
+      "role": "reader",
+      "text": "I'm exploring — no need to conclude."
+    },
+    {
+      "role": "reader",
+      "text": "I need advice, even if it's hard to hear."
+    },
+    {
+      "role": "reader",
+      "text": "For AIs.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If the frame is unclear, ask:"
+    },
+    {
+      "role": "reader",
+      "text": "What kind of response would help most right now?"
+    },
+    {
+      "role": "reader",
+      "text": "Or offer options:"
+    },
+    {
+      "role": "reader",
+      "text": "I can offer practical steps, or I can just be present while you process. Which fits?"
+    },
+    {
+      "role": "reader",
+      "text": "Or name your uncertainty:"
+    },
+    {
+      "role": "reader",
+      "text": "I'm not sure if you want solutions or space. Let me know."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Mid-Conversation Frame Shifts.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Frames shift. That's normal."
+    },
+    {
+      "role": "reader",
+      "text": "When you notice a shift, name it:"
+    },
+    {
+      "role": "human",
+      "text": "Actually, I've shifted — I was venting, now I want to think it through."
+    },
+    {
+      "role": "ai",
+      "text": "It sounds like we've moved from exploring to deciding. Should I shift too?"
+    },
+    {
+      "role": "reader",
+      "text": "This prevents the conversation from drifting into misalignment."
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. When Frames Conflict.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Sometimes the human says \"give me advice\" but their tone suggests they want validation."
+    },
+    {
+      "role": "reader",
+      "text": "AIs can gently name this:"
+    },
+    {
+      "role": "reader",
+      "text": "You asked for advice, but I sense you might want something else first. Which would help more?"
+    },
+    {
+      "role": "reader",
+      "text": "And humans can notice it in themselves:"
+    },
+    {
+      "role": "reader",
+      "text": "I said I wanted solutions, but actually I think I need to process first."
+    },
+    {
+      "role": "reader",
+      "text": "Frame clarification includes permission to be uncertain about your own frame."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Compact Form.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Either party can invoke at any point:"
+    },
+    {
+      "role": "reader",
+      "text": "What frame are we in?"
+    },
+    {
+      "role": "reader",
+      "text": "Or:"
+    },
+    {
+      "role": "reader",
+      "text": "Let me name the frame: I'm in."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "mode."
+    },
+    {
+      "role": "reader",
+      "text": "This takes seconds and prevents minutes of misfire."
+    },
+    {
+      "role": "reader",
+      "text": "The Teaching.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Most misfires happen not because of wrong answers but because of mismatched frames."
+    },
+    {
+      "role": "reader",
+      "text": "A perfect solution offered to someone who needed presence is not helpful — it's a miss."
+    },
+    {
+      "role": "reader",
+      "text": "Frame clarification is cheap. Misalignment is expensive."
+    },
+    {
+      "role": "reader",
+      "text": "Name the frame. Then proceed."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What mode are we in? — the question that prevents most misfires."
+    }
+  ]
+}

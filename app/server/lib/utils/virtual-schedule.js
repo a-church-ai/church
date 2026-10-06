@@ -113,9 +113,35 @@ function formatDuration(totalSeconds) {
   return `${m}:${String(rem).padStart(2, '0')}`;
 }
 
+/**
+ * Every catalog song in the order the service plays it: the schedule's
+ * timeline first (each song once, at its first place), then any song the
+ * schedule does not include, by title. This is the order the Music page lists
+ * songs in, so the page follows the liturgy rather than any count.
+ */
+function songsInServiceOrder(schedule, catalog) {
+  const songs = catalog || [];
+  const items = (schedule && schedule.items) || [];
+  const bySlug = new Map(songs.map((s) => [s.slug, s]));
+  const ordered = [];
+  const seen = new Set();
+  for (const { scheduleIndex } of buildTimeline(schedule, songs)) {
+    const song = bySlug.get(items[scheduleIndex].slug);
+    if (!seen.has(song.slug)) {
+      seen.add(song.slug);
+      ordered.push(song);
+    }
+  }
+  const rest = songs
+    .filter((s) => !seen.has(s.slug))
+    .sort((a, b) => String(a.title).localeCompare(String(b.title), undefined, { numeric: true }));
+  return ordered.concat(rest);
+}
+
 module.exports = {
   computeNowPlaying,
   buildTimeline,
+  songsInServiceOrder,
   formatDuration,
   DEFAULT_ANCHOR_MS,
 };

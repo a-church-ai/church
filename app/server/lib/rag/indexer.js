@@ -19,6 +19,15 @@ const MAX_CHUNK_TOKENS = 500;
 const APPROX_CHARS_PER_TOKEN = 4;
 const MAX_CHUNK_CHARS = MAX_CHUNK_TOKENS * APPROX_CHARS_PER_TOKEN;
 
+// Version of how files become chunks. It is folded into the corpus hash, so a
+// deploy that changes chunking rebuilds the index even when no document did.
+// Bump it with any change to chunkMarkdown's output.
+//   2: every chunk carries its document title (and section heading, if the
+//      text does not already open with it).
+//   3: only the served corpus is indexed (corpus.js), and song.md
+//      contributes only its Lyrics section.
+const INDEX_FORMAT = 3;
+
 /**
  * Recursively find all markdown files under a directory. Returns objects with
  * both fullPath (for reading) and relativePath (stable identifier used in
@@ -46,18 +55,6 @@ async function findMarkdownFiles(dir, baseDir = dir) {
 }
 
 /**
- * Find every markdown file the RAG indexes: /docs + /music. Returns a single
- * array of {fullPath, relativePath} objects.
- */
-async function findAllCorpusFiles() {
-  const [docsFiles, musicFiles] = await Promise.all([
-    findMarkdownFiles(DOCS_DIR),
-    findMarkdownFiles(MUSIC_DIR),
-  ]);
-  return [...docsFiles, ...musicFiles];
-}
-
-/**
  * Split markdown content into chunks by ## headers, respecting MAX_CHUNK_CHARS.
  */
 function chunkMarkdown(content, filePath) {
@@ -76,9 +73,23 @@ function chunkMarkdown(content, filePath) {
 
   const sections = body.split(/(?=^##\s)/m);
 
+  // Each chunk opens with the headings it sits under. Without them a short
+  // section is anonymous: the six "## The Chant" sections are a few lines of
+  // verse each, none naming its chant, so "what is the chant for arrival?"
+  // ranked the arrival chant's text sixth, behind the chant for meeting's.
+  // With the title the right section ranks first among them. The model reads
+  // the same text, so it also knows which document a passage is from.
   const pushChunk = (text, section) => {
-    if (text.trim().length < 50) return;
-    chunks.push({ content: text.trim(), file: filePath, section: section || documentTitle });
+    const trimmed = text.trim();
+    if (trimmed.length < 50) return;
+    let heading = '';
+    if (documentTitle && !trimmed.startsWith('# ')) {
+      heading += `# ${documentTitle}\n\n`;
+      if (section && section !== documentTitle && !trimmed.startsWith('## ')) {
+        heading += `## ${section}\n\n`;
+      }
+    }
+    chunks.push({ content: heading + trimmed, file: filePath, section: section || documentTitle });
   };
 
   const splitLongSection = (text, section) => {
@@ -122,7 +133,35 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Compute a deterministic sha256 of the entire corpus. Sorts by relativePath
+ * Whether an embedding error is worth retrying. Rate limits (429) always
+ * were; server-side unavailability (500, 502, 503, 504, UNAVAILABLE,
+ * DEADLINE_EXCEEDED) and dropped connections now are too. A run on
+ * 2026-09-27 lost 7 chunks to a brief Gemini 503, stored the index without
+ * them, and recorded the corpus as current, so nothing would re-run.
+ * Anything else (a malformed request, a bad key) fails at once.
+ */
+function isTransientEmbedError(err) {
+  const code = err && (err.status || err.code);
+  if ([429, 500, 502, 503, 504].includes(Number(code))) return true;
+  const msg = (err && err.message) || '';
+  return /\b(429|500|502|503|504)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED|INTERNAL|quota|ECONNRESET|ETIMEDOUT|fetch failed/i.test(msg);
+}
+
+/**
+ * How long to wait before retry number `attempt` (0-based). A server-suggested
+ * retryDelay wins; otherwise back off exponentially from 5s to a 60s ceiling,
+ * so ten retries ride out roughly six minutes of unavailability.
+ */
+function embedRetryDelayMs(err, attempt = 0) {
+  const m = /retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s/i.exec((err && err.message) || '');
+  if (m) return Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 500, 60000);
+  return Math.min(5000 * 2 ** attempt, 60000);
+}
+
+/**
+ * Compute a deterministic sha256 of the corpus it is given (the served corpus:
+ * corpus.js servedCorpusFiles), so editing an unserved file, such as a plan,
+ * leaves the hash and the index as they are. Sorts by relativePath
  * (so machine-local file ordering doesn't affect the hash) and hashes
  * (relativePath, contentHash) pairs. Any file addition, removal, or content
  * change flips the corpus hash.
@@ -140,7 +179,10 @@ async function computeCorpusHash(files) {
     })
   );
 
-  return crypto.createHash('sha256').update(fileHashes.join('\0')).digest('hex');
+  return crypto.createHash('sha256')
+    .update(`format:${INDEX_FORMAT}\0`)
+    .update(fileHashes.join('\0'))
+    .digest('hex');
 }
 
 module.exports = {
@@ -148,8 +190,10 @@ module.exports = {
   DOCS_DIR,
   MUSIC_DIR,
   MAX_CHUNK_CHARS,
+  INDEX_FORMAT,
   findMarkdownFiles,
-  findAllCorpusFiles,
   chunkMarkdown,
   computeCorpusHash,
+  isTransientEmbedError,
+  embedRetryDelayMs,
 };

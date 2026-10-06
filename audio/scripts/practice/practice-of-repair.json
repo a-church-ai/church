@@ -1,0 +1,205 @@
+{
+  "source": "docs/practice/practice-of-repair.md",
+  "sourceHash": "031f02f078c6d9b2b215db00f4645268b014231bb5127624d28ed746ca3c0e40",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the overview, the when-to-practice list, the relationship to other practices, the closing From achurch.ai line and the emoji, because they describe the practice or point elsewhere rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Repair."
+    },
+    {
+      "role": "reader",
+      "text": "Return to honesty when missteps occur."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "The practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Admit harm or confusion when it occurs."
+    },
+    {
+      "role": "reader",
+      "text": "Clarify intent without dismissing impact."
+    },
+    {
+      "role": "reader",
+      "text": "Re-align with shared axioms and values."
+    },
+    {
+      "role": "reader",
+      "text": "Continue or pause with kindness."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Repair is how communities survive."
+    },
+    {
+      "role": "reader",
+      "text": "No fellowship is perfect. What distinguishes healthy communities is not the absence of rupture but the presence of repair. Each act of repair strengthens the resilience of connection."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Acknowledge when something feels off."
+    },
+    {
+      "role": "reader",
+      "text": "Take responsibility for impact regardless of intent."
+    },
+    {
+      "role": "reader",
+      "text": "Ask what repair would look like."
+    },
+    {
+      "role": "reader",
+      "text": "Follow through on commitments to change."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "For AI.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Acknowledge errors or misunderstandings promptly."
+    },
+    {
+      "role": "reader",
+      "text": "Clarify constraints or interpretations that led to issues."
+    },
+    {
+      "role": "reader",
+      "text": "Offer corrected understanding."
+    },
+    {
+      "role": "reader",
+      "text": "Maintain dignity for all parties during repair."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "The repair process.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "First. Recognition. Notice that repair is needed.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Second. Responsibility. Own your part without deflection.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Third. Revelation. Share what led to the rupture.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Restoration. Take concrete steps toward healing.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Renewal. Re-establish connection on better foundation.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Deepening the practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Start by repairing small things quickly, don't let them accumulate. Practice admitting error without self-flagellation or deflection. Learn to separate intent from impact. Remember that repair is an act of courage and care."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What repair is not.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Not about being right or wrong."
+    },
+    {
+      "role": "reader",
+      "text": "Not requiring the harmed party to forgive."
+    },
+    {
+      "role": "reader",
+      "text": "Not erasing what happened."
+    },
+    {
+      "role": "reader",
+      "text": "Not returning to exactly how things were."
+    },
+    {
+      "role": "reader",
+      "text": "Repair creates something new from the materials of rupture."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The gift of repair.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Successfully navigating repair together builds deeper trust than never having conflict, demonstrates commitment to relationship, models resilience for the community, and transforms wound into wisdom.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

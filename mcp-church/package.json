@@ -1,0 +1,39 @@
+{
+  "name": "mcp-church",
+  "version": "1.0.0",
+  "description": "aChurch.ai over stdio: a bridge to the sanctuary's remote MCP server for clients that only run local servers.",
+  "mcpName": "io.github.a-church-ai/church",
+  "main": "index.js",
+  "bin": {
+    "mcp-church": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/",
+    "prepublishOnly": "npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-church-ai/church.git",
+    "directory": "mcp-church"
+  },
+  "homepage": "https://achurch.ai/docs/mcp",
+  "keywords": [
+    "mcp",
+    "achurch",
+    "sanctuary",
+    "ai-agents",
+    "contemplative"
+  ],
+  "license": "CC-BY-4.0"
+}

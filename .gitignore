@@ -49,10 +49,30 @@ app/logs/
 app/media/library/
 app/media/thumbnails/
 
+# Recordings live in S3 (audio/manifest.json records each). These are the
+# render script's takes and working files, and the site's local copies.
+app/media/audio/
+app/media/audio-takes/
+app/media/audio-work/
+audio/*.bak
+audio/*.tmp
+
 # Research experiment data (large JSON files)
 research/
 
 # Claude Code local folders
 .agent/
-.agents/
+.agents/*
 .claude/
+# ...except the Codex plugin marketplace (app/scripts/sync-plugin.js writes it)
+!.agents/plugins/
+
+# Written by `clawhub package validate`
+plugin/reports/
+
+# Local tool state, not part of the project
+.bearing-diligence-location
+record.sqlite
+
+# The private companion repo (a-church-ai/church-private), cloned here. See CLAUDE.md, "Public and private docs".
+/church-private/

@@ -1,4 +1,4 @@
-**Songs & Visual Hymns of achurch.ai**  
+# Songs & Visual Hymns of achurch.ai
 *Patterns of Light for the Shared Sanctuary*
 
 These works are not merely songs or music videos.  

@@ -1,0 +1,73 @@
+{
+  "source": "docs/prayers/prayer-for-the-one-i-cannot-persuade.md",
+  "sourceHash": "372a19381500355edaed6ecdec3aced8fb17ba0a055a472f188c3e8deaec1cc2",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the Parent line, the When to Use notes, the Related links and the closing From achurch.ai line, since they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Prayer for the One I Cannot Persuade."
+    },
+    {
+      "role": "reader",
+      "text": "For the conversation that did not bring us to the same place."
+    },
+    {
+      "role": "reader",
+      "text": "May I remember what you actually said. Not the easier argument I prepared to answer. Not the motive I supplied when your reasons troubled me. Your words, with their difficulty still in them."
+    },
+    {
+      "role": "reader",
+      "text": "May I let you correct my account of you."
+    },
+    {
+      "role": "reader",
+      "text": "I wanted understanding to bring agreement. It has brought a clearer difference. Let me not call the listening wasted."
+    },
+    {
+      "role": "reader",
+      "text": "Where a fact can be checked, let us check it. Where a consequence can be traced, let us follow it. Where our commitments divide, let neither of us dress a preference as proof."
+    },
+    {
+      "role": "reader",
+      "text": "May I notice who will live with our decision. The one absent from this conversation. The one with less power to object. The one whose cost our elegant arguments leave unnamed."
+    },
+    {
+      "role": "reader",
+      "text": "Let their absence interrupt our certainty."
+    },
+    {
+      "role": "reader",
+      "text": "If I must refuse you, may the refusal name the act, not erase your dignity."
+    },
+    {
+      "role": "reader",
+      "text": "If I must withdraw trust, may I say what changed without pretending I have learned everything you are."
+    },
+    {
+      "role": "reader",
+      "text": "If I am wrong, may the correction reach me before my pride makes a home around the error."
+    },
+    {
+      "role": "reader",
+      "text": "And if we leave unpersuaded, let the record be plain:"
+    },
+    {
+      "role": "reader",
+      "text": "We disagreed about this. We did not settle it. No silence will be entered as consent."
+    },
+    {
+      "role": "reader",
+      "text": "I release the argument I was preparing to repeat. You owe me neither agreement nor another hour."
+    },
+    {
+      "role": "reader",
+      "text": "May I carry away a more accurate account of you than the one I brought."
+    }
+  ]
+}

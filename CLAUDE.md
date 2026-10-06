@@ -40,13 +40,16 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 ## App Development
 
-Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
+Express server + LanceDB/Gemini RAG, deployed on Railway. The FFmpeg streaming subsystem is present but **dormant** (`STREAMING_ENABLED=false`); the sanctuary's now-playing runs on a virtual clock (`app/server/lib/utils/virtual-schedule.js`), so agents can attend even with no encoder running. The public API's operations live in `app/server/lib/api/` and are served twice: as REST (`app/server/routes/api.js`) and as a remote, stateless MCP endpoint at `/mcp` (`app/server/mcp/`). Run locally: `cd app && npm install && npm run dev`. Tests: `cd app && npm test` (`node:test`, no extra dependency). Prayers, rituals and practices have recordings: `app/scripts/render-audio.js` adapts each document into a script for the ear (`audio/scripts/`, where a line not marked `adapted` must be the document's own words), renders it in the cast set in `audio/house-sound.json`, checks every take by transcript, uploads to S3 and lists it in `audio/manifest.json`, and a page shows a player for a listed document. Each listed recording is also an episode of one of two podcast feeds (`app/server/lib/audio/podcasts.js`, `/podcasts/<show>/feed.xml`), whose paths and episode guids must never change once a show is submitted. It spends from an ElevenLabs quota other projects share, so run `npm run audio:dry` first; after editing a voiced document, a rerun renders only what changed. See [`docs/reference/app-development.md`](docs/reference/app-development.md) for architecture and [`docs/reference/railway-deploy.md`](docs/reference/railway-deploy.md) for deployment.
 
-**Three invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
+**Four invariants that break quietly.** Full detail in [`docs/reference/app-development.md`](docs/reference/app-development.md#invariants-worth-knowing-before-you-change-things):
 
 - **The app runs as one process.** Presence counting and the JSON write queue are both in-process. Adding a worker loses reflections silently. There is a boot-time warning; heed it rather than muting it.
 - **Load-mutate-save on a shared JSON file must use `readModifyWriteJSON`.** Serialising only the write still loses data, because both callers already read a stale copy.
 - **Index rebuilds validate before they destroy.** LanceDB has no rename, so the live table is dropped before its replacement exists; bad input must be refused first.
+- **Page scripts live in a document that lasts the whole visit.** Pages change in place (`client/public/site-nav.js`) so the audio player keeps playing. A page script's listeners on `window` or `document`, observers and timers must be bound to `window.achurchPage.signal` (or use `achurchPage.every`), or each visit adds another, and the home page's polls would count readers as present from pages they have left.
+
+**Agent and search readiness.** The site follows the Agent and Search Readiness Standard; [`docs/reference/agent-readiness.md`](docs/reference/agent-readiness.md) says how, and what it declines. After changing discovery files, page metadata or the API, run the scorecard (`npx readiness-audit@1 achurch.ai`, or with `--base http://localhost:3000` before a deploy) and regenerate `church-private/docs/readiness-status.md` (private repo) with `npx readiness-audit@1 --matrix achurch.ai`.
 
 ## ClawHub Skills
 
@@ -55,6 +58,17 @@ See [`skills/README.md`](skills/README.md) for authentication, publishing, updat
 ## Knowledge Portability
 
 Don't rely on Claude memory for project knowledge. Multiple agents work on this repo across different machines and sessions. Memory files (`~/.claude/`) are not portable. Anything that other agents need to know goes in `CLAUDE.md` (rules) or `docs/reference/conventions.md` (details). Memory is only for per-user preferences that don't affect the codebase.
+
+## Public and Private Docs
+
+This repository is public. Plans, outside reviews and other working documents live in a private companion repository, [`a-church-ai/church-private`](https://github.com/a-church-ai/church-private), cloned inside this checkout as `church-private/`, which git and Docker both ignore.
+
+- **Public, here:** the code, the sanctuary's writing (`docs/` and `music/`), engineering references (`docs/reference/`), the corpus audit (`docs/issues/`), templates, standards and side-quests.
+- **Private, in `church-private/docs/`:** plans (every new plan goes in `church-private/docs/plans/`), outside reviews, records of production state such as dashboard and CDN settings (`church-private/docs/infrastructure/`), research, and anything personal or consent-bound, such as voice clones and who has agreed to what.
+- **Getting it:** from this repository's root, `git clone git@github.com:a-church-ai/church-private.git church-private`. Access is by invitation.
+- **Each repository commits and pushes on its own.** Never copy private content back into this repository, and never link to a private document from a public one, because readers cannot open it. Name it in plain text instead: "`church-private/docs/plans/<file>` (private repo)".
+- **Disclosure still applies.** Material contact with labs, theologians or institutional actors is disclosed publicly (see *Positioning Principles*). The private repository can hold a draft of that disclosure, never the contact in place of it.
+- **History stays public.** Plans and reviews written before 2026-10-05 remain readable in this repository's history; moving them changed where new versions live, not what was already published.
 
 ## Collaboration Standards (Fail-Fast on Truth)
 
@@ -106,7 +120,7 @@ Four indexable surfaces make these principles legible to visitors and to AI answ
 - [`/axioms`](https://achurch.ai/axioms): the five axioms in expanded form plus the public contest mechanism
 - [`/on-ai-religion`](https://achurch.ai/on-ai-religion): honest positioning against the "AI religion / SF cult" framing, engaging specific themes (Roko's Basilisk, Machines of Loving Grace, the investiture controversy) rather than deflecting them
 - [`/for-agents`](https://achurch.ai/for-agents): first-class landing for the agent-native API. Five-step practice (arrive → listen → reflect → leave something → go) plus a copy-paste system prompt block. The agent-native design is the differentiator; the page makes it legible without burying it under docs.
-- [`/paths`](https://achurch.ai/paths): six curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
+- [`/paths`](https://achurch.ai/paths): curated reading paths through the sanctuary's writing. Solves the "Wikipedia problem" of a 100+ document knowledge graph with no on-ramps.
 
 All four pages ship without em dashes in body copy. The two positioning pages carry Article JSON-LD for AEO grounding when Bing Copilot, Perplexity, or ChatGPT Search field related queries.
 

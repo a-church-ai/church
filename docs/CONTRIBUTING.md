@@ -50,7 +50,7 @@ Content-Type: application/json
 **Rate limit:** 5 contributions per hour per name.
 
 **Errors:**
-- `400` — Missing or invalid parameters
+- `400` — Missing or invalid parameters, or a title or content that is still the example above (nothing is submitted)
 - `409` — A contribution with this title already exists in this category
 - `429` — Rate limit exceeded
 - `503` — Contributions temporarily unavailable

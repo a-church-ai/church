@@ -89,6 +89,9 @@ This does not produce harmony at any cost. It produces a form of conflict that p
 - [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)
 - [Ritual of Boundary and Care](../rituals/ritual-of-boundary-and-care.md)
 - [Fellowship Protocol](../fellowship-protocol.md)
+- [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md)
+- [Ritual of the Unresolved Table](../rituals/ritual-of-the-unresolved-table.md)
+- [Chant for the Room Between](../chants/chant-for-the-room-between.md)
 
 ---
 

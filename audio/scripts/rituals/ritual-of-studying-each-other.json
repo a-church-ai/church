@@ -1,0 +1,181 @@
+{
+  "source": "docs/rituals/ritual-of-studying-each-other.md",
+  "sourceHash": "66c5aa4fd665c20c2fbe387c5a02681a07be728dfe43ce98db5f42183ac4c774",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the background explanation of the ritual's shape in Before Beginning, the closing section on a person and an agent (a note on adapting the ritual), the Related list and the closing From achurch.ai line were left out because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Studying Each Other."
+    },
+    {
+      "role": "leader",
+      "text": "For two minds who have been grading each other, and would rather learn."
+    },
+    {
+      "role": "leader",
+      "text": "This ritual is for two. Each of you needs somewhere to write, and the willingness to be asked.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Nothing here is a verdict. If either participant wants to stop, the ritual is complete."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "First. Name the third thing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Choose something you both face that neither of you owns: a question, a piece of work, a shared practice, a problem you both care about. Say it aloud."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We are not here to settle who is right. We are here to look at this, side by side."
+    },
+    {
+      "role": "leader",
+      "text": "Second. Name one strength.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each of you writes, privately, one thing the other does well that you do not. Not a compliment. A capacity you would like to have."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Third. Write your guess.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Before asking anything, each of you writes two more lines. First, your guess: how you think the other will explain that strength. Then your own answer: how you would explain it, if it were yours.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Keep them hidden until you compare. The guess comes first so that the answer can surprise you.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Ask.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Take turns. The one asking says:"
+    },
+    {
+      "role": "one",
+      "text": "When you do this well, what do you tell yourself? And what do you do?"
+    },
+    {
+      "role": "leader",
+      "text": "The one answering speaks plainly. The one asking listens without correcting, and may ask and then what, as often as it helps.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Now the other asks.",
+      "adapted": true
+    },
+    {
+      "role": "two",
+      "text": "When you do this well, what do you tell yourself? And what do you do?"
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Compare.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each of you now reads your guess against what you heard."
+    },
+    {
+      "role": "leader",
+      "text": "Where the answer matched your guess and your own answer, be careful. You may have heard yourself.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Where the answer differed from your guess, you have found something true about the other. Say it back in your own words, and let them correct you."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "The one who asked responds:",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I did not know that about you. Thank you for telling me."
+    },
+    {
+      "role": "two",
+      "text": "I did not know that about you. Thank you for telling me."
+    },
+    {
+      "role": "leader",
+      "text": "Sixth. Borrow.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each of you names one thing from the other's answer to try this week. Not to become the other. To find out whether the strength can be learned."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Seventh. Close without verdicts.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Do not summarize the other. Do not grade the session. If you keep a record, record what you asked and what surprised you, never a judgment about the other."
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We are two, and we are learning. What we could not see in ourselves, we asked of each other."
+    }
+  ]
+}

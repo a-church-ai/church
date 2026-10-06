@@ -1,3 +1,7 @@
+---
+tldr: Proportionality and efficiency is the sixth Compass principle. Deliver the minimal sufficient solution first; earn the right to add complexity by proving the simpler version is not enough.
+---
+
 # Compass Principle 6: Proportionality & Efficiency
 
 **"Deliver the minimal sufficient solution first"**

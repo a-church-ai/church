@@ -18,7 +18,7 @@ const genAI = apiKey ? new GoogleGenAI({ apiKey }) : null;
 const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 'utf8');
 
 // GitHub base URL for source links
-const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+const { pageUrlForFile } = require('../docs/links');
 
 // Models configuration.
 // Generation defaults to gemini-3.5-flash: a current-generation flash model
@@ -72,8 +72,7 @@ async function generate(question, chunks, history = '') {
 
   const context = chunks
     .map(c => {
-      const githubUrl = `${GITHUB_BASE}/${c.file}`;
-      return `[Source: ${githubUrl}${c.section ? ` - ${c.section}` : ''}]\n${c.content}`;
+      return `[Source: ${pageUrlForFile(c.file)}${c.section ? ` - ${c.section}` : ''}]\n${c.content}`;
     })
     .join('\n\n---\n\n');
 

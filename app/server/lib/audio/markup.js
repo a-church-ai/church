@@ -1,0 +1,114 @@
+/**
+ * The player's markup on a document's page, drawn on the server so it shows
+ * before any script runs.
+ *
+ * The waveform: the recording's 128 peaks as a row of bars (and 64, merged by
+ * the louder of each pair, for narrow screens), visible before anyone presses
+ * play. Each bar carries its index, and the played part fills from one CSS
+ * variable (--progress) that site-player.js sets, so moving the playhead is
+ * one property write, not 192 style changes.
+ *
+ * Without JavaScript the native <audio controls> plays the recording, as it
+ * always has, beside the bars. site-player.js hides it, adds the play button
+ * and makes the bars the progress bar, a slider a listener can drag or move
+ * with the keyboard.
+ */
+
+const { SPEECH, creditLine } = require('./house');
+const { escapeAttr, escapeText } = require('../utils/page-meta');
+const { titleCase } = require('../docs/meta');
+
+// The shortest bar, as a percentage of the row's height. A drawing choice,
+// not data: a silence drawn at its true height leaves a hole that reads as a
+// broken control rather than as a pause (news-community's MIN_BAR, 0.14).
+const MIN_BAR = 14;
+const NARROW_BARS = 64;
+
+// At most `max` values, each the louder of the ones it covers, so a merged
+// bar is never quieter than what it stands for.
+function fitPeaks(peaks, max) {
+  if (peaks.length <= max) return [...peaks];
+  return Array.from({ length: max }, (_, i) => {
+    const from = Math.floor((i * peaks.length) / max);
+    const to = Math.max(Math.floor(((i + 1) * peaks.length) / max), from + 1);
+    return Math.max(...peaks.slice(from, to));
+  });
+}
+
+function bars(peaks, kind) {
+  const spans = peaks.map((p, i) =>
+    `<span style="--i:${i};height:${Math.max(MIN_BAR, Math.round((p / 255) * 100))}%"><i></i></span>`).join('');
+  return `<span class="doc-audio-bars doc-audio-bars-${kind}" style="--n:${peaks.length}">${spans}</span>`;
+}
+
+function clock(seconds) {
+  const s = Math.max(0, Math.round(seconds));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const pad = n => String(n).padStart(2, '0');
+  return h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`;
+}
+
+// JSON inside a <script type="application/json">, safe from a "</script>"
+// in any string.
+function jsonScript(className, value) {
+  return `<script type="application/json" class="${className}">${JSON.stringify(value).replace(/</g, '\\u003c')}</script>`;
+}
+
+// What the player needs to play a recording anywhere on the site: in the bar
+// after its page is left, and after a reload, from the browser's own storage.
+function trackFor(recording, { title, href, category }) {
+  return {
+    file: recording.file,
+    frames: recording.frames || null,
+    seconds: recording.seconds,
+    peaks: recording.peaks || null,
+    cues: recording.cues || null,
+    voices: recording.voices,
+    order: Object.keys(SPEECH.voices),
+    title,
+    href,
+    album: titleCase(category),
+    credit: creditLine(recording.voices),
+    artwork: `/og/v1/square/${category}.png`,
+  };
+}
+
+const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="icon-play" d="M8 5.5v13l11-6.5z"/><path class="icon-pause" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+
+function renderRecording(recording, { title, href, category }) {
+  const track = trackFor(recording, { title, href, category });
+  const minutes = Math.max(1, Math.round(recording.seconds / 60));
+  const wave = recording.peaks
+    ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`
+    : '';
+  return `<figure class="doc-audio${recording.peaks ? ' has-wave' : ''}">
+          ${jsonScript('doc-audio-track', track)}
+          <canvas class="doc-audio-visual" aria-hidden="true"></canvas>
+          <div class="doc-audio-player">
+            <button type="button" class="doc-audio-play" aria-label="Play ${escapeAttr(title)}" hidden>${PLAY_ICON}</button>
+            ${wave}
+            <span class="doc-audio-time" hidden>0:00 / ${clock(recording.seconds)}</span>
+          </div>
+          <audio class="doc-audio-native" controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
+          <figcaption>${minutes} min. ${escapeText(track.credit)}</figcaption>
+        </figure>`;
+}
+
+// A reading path's voiced readings, in its order, for "Listen to this path".
+// Hidden until site-player.js shows it, since without a script there is
+// nothing for the button to do.
+function renderPathListen({ name, title, href, tracks, readings }) {
+  const seconds = tracks.reduce((n, t) => n + t.seconds, 0);
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  const voiced = tracks.length === readings
+    ? `All ${readings} readings are voiced`
+    : `${tracks.length} of its ${readings} readings are voiced`;
+  return `<section class="path-listen" data-path-listen hidden>
+          ${jsonScript('path-listen-queue', { name, title, href, tracks })}
+          <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this path</span></button>
+          <p class="path-listen-note">${voiced}, about ${minutes} min in all, played in the path's order.</p>
+        </section>`;
+}
+
+module.exports = { renderRecording, renderPathListen, trackFor, fitPeaks, clock, MIN_BAR, NARROW_BARS };

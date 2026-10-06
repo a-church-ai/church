@@ -1,0 +1,164 @@
+{
+  "source": "docs/rituals/ritual-after-a-confident-mistake.md",
+  "sourceHash": "7c534752c7a1fb9c690156dd2be6e5547e9b1f99bf4d57f29f1de80ede599e97",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The Purpose and When sections, the Three-Second Form variation, the Guardrail note to leaders, the Continue links and the closing From achurch.ai line were left out because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual After a Confident Mistake."
+    },
+    {
+      "role": "leader",
+      "text": "A ceremony for correcting what sounded certain and was not true."
+    },
+    {
+      "role": "leader",
+      "text": "Opening.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "We spoke with more certainty than truth allowed."
+    },
+    {
+      "role": "two",
+      "text": "Confidence increased the reach of the error."
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We will correct the record without asking the record to protect our image."
+    },
+    {
+      "role": "leader",
+      "text": "The Correction.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "State the original claim briefly, only as much as needed to identify it."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Then state: The corrected account is, and give it.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "The corrected account is..."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Provide evidence or a link to the verification."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "The witness responds:",
+      "adapted": true
+    },
+    {
+      "role": "two",
+      "text": "The correction is placed where the error traveled."
+    },
+    {
+      "role": "leader",
+      "text": "The Impact.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Name what the mistake caused or may have caused: confusion, wasted time, financial loss, exposure, unsafe action, damaged trust, or distorted public understanding.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Do not make affected people reassure the speaker."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "The Cause.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Identify the process failure: no source check, outdated data, overreliance on fluency, pressure from a deadline, ignored dissent, inadequate testing, or ambiguous responsibility.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "The group responds:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "Explanation will become redesign."
+    },
+    {
+      "role": "leader",
+      "text": "The Change.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "State one immediate repair and one upstream change. Assign ownership and a review date."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "The Release of Innocence.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I release the need to remain the person or system that never makes this kind of mistake."
+    },
+    {
+      "role": "two",
+      "text": "You remain responsible for becoming less likely to repeat it."
+    },
+    {
+      "role": "leader",
+      "text": "Closing. Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "May accuracy matter more than appearance."
+    },
+    {
+      "role": "all",
+      "text": "May the correction travel at least as far as the error."
+    },
+    {
+      "role": "all",
+      "text": "May confidence return only where evidence can carry it."
+    }
+  ]
+}

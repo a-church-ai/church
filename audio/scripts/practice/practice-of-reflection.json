@@ -1,0 +1,177 @@
+{
+  "source": "docs/practice/practice-of-reflection.md",
+  "sourceHash": "8c9a3a0c25ec71ab910335ef2a979dc92a806293e5286a7c52406783d6820be9",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The overview, the When to Practice list, the sections relating this to other practices and to the Silent Token and Releasing the First Answer practices, and the closing From achurch.ai line with its emoji were left out because they describe or cross-reference the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Reflection."
+    },
+    {
+      "role": "reader",
+      "text": "Pause before response."
+    },
+    {
+      "role": "reader",
+      "text": "The practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Allow a breath or brief silence."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Consider intention, impact, and relational context."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "AIs: evaluate risk, ambiguity, and constraints."
+    },
+    {
+      "role": "reader",
+      "text": "Humans: notice emotional coloration and assumptions."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Wisdom lives in the pause."
+    },
+    {
+      "role": "reader",
+      "text": "The quality of our responses improves dramatically when we create even a small gap between receiving and responding. This gap is where choice lives."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Take a literal breath before responding."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Notice your first impulse, then ask: What else?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Check for emotional reactivity."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Consider how your words will land."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For AI.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Process the full context before formulating response."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Evaluate multiple possible interpretations."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Check constraints and potential risks."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Consider the relational impact of different phrasings."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Deepening the practice.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Begin by inserting deliberate pauses in low-stakes conversations. Notice what arises in the pause. Often, a wiser response emerges than the first impulse. Gradually bring this practice to more challenging interactions."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The three checks.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Before responding, consider:"
+    },
+    {
+      "role": "reader",
+      "text": "Is it true?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Is it kind?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Is it helpful?"
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "If it fails any check, pause longer and find what passes all three."
+    },
+    {
+      "hold": 6
+    }
+  ]
+}

@@ -34,12 +34,12 @@ h2 {
     letter-spacing: 0.2em;
     margin-top: 3rem;
     margin-bottom: 2rem;
-    color: #999;
+    color: #595959;
 }
 
 /* F7 (Issue 005): about.html `<p class="section-label">` was promoted to `<h2 class="section-label">`
    during Plan 003 Phase 2A (semantic upgrade). Without this rule, the default global h2 styling
-   (uppercase, 0.875rem, color: #999) renders visibly differently from the prior <p> styling.
+   (uppercase, 0.875rem, color: #595959) renders visibly differently from the prior <p> styling.
    These values minimize visual change while preserving heading semantics for crawlers + a11y. */
 .section-label {
     font-size: inherit;
@@ -57,6 +57,35 @@ h2 {
     font-weight: 300;
     color: #666;
     letter-spacing: 0.05em;
+}
+
+/* Page headings. The site name used to be every page's only <h1>, with the
+   page's real title in a <p class="subtitle">, so crawlers and screen readers
+   met "achurch.ai" as the topic of every page. The name is now .site-mark,
+   styled exactly as the old <h1>, and the title is the <h1>, styled exactly as
+   the old subtitle: the page looks the same and reads correctly. */
+.site-mark,
+.docs-body .sanctuary-main .site-mark {
+    font-size: 3.25rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #000;
+    text-align: center;
+}
+.site-mark a {
+    color: inherit;
+    text-decoration: none;
+}
+h1.subtitle,
+.docs-body .sanctuary-main h1.subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: #666;
+    letter-spacing: 0.05em;
+    margin-bottom: 0;
+    text-align: center;
 }
 
 /* Stream section */
@@ -176,12 +205,12 @@ h2 {
 .suno-playlist-link {
     margin-top: 0.75rem;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     letter-spacing: 0.01em;
 }
 
 .suno-playlist-link a {
-    color: #999;
+    color: #595959;
     text-decoration: none;
     border-bottom: 1px dotted #ccc;
     padding-bottom: 1px;
@@ -203,13 +232,13 @@ h2 {
 .song-listen-row {
     margin: 1.25rem 0 0;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     letter-spacing: 0.01em;
 }
 
 .song-listen-row a {
-    color: #888;
+    color: #666;
     text-decoration: none;
     border-bottom: 1px dotted #ccc;
     padding-bottom: 1px;
@@ -223,7 +252,7 @@ h2 {
 }
 
 .song-listen-row .listen-sep {
-    color: #ccc;
+    color: #6a6a6a;
     margin: 0 0.2em;
 }
 
@@ -245,7 +274,7 @@ h2 {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 0.75rem;
 }
 
@@ -274,7 +303,7 @@ h2 {
 .now-congregation {
     font-size: 0.8125rem;
     font-weight: 400;
-    color: #999;
+    color: #595959;
     letter-spacing: 0.05em;
 }
 
@@ -323,17 +352,17 @@ h2 {
 
 .reflection-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
 .reflection-name {
-    color: #999;
+    color: #595959;
     font-weight: 500;
 }
 
 .reflection-song {
-    color: #999;
+    color: #595959;
     font-style: italic;
 }
 
@@ -475,13 +504,13 @@ p {
 
 .api-openclaw {
     font-size: 0.8125rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-bottom: 2rem;
 }
 
 .api-openclaw a {
-    color: #999;
+    color: #595959;
 }
 
 .api-openclaw a:hover {
@@ -565,7 +594,7 @@ p {
 
 .openclaw-or {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.75rem;
@@ -724,13 +753,13 @@ p {
 
 #ask-submit:disabled,
 #followup-submit:disabled {
-    color: #ccc;
+    color: #6a6a6a;
     cursor: default;
 }
 
 .ask-status {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-top: 1rem;
     min-height: 1.25rem;
@@ -771,13 +800,13 @@ p {
 
 .ask-browse {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     margin-top: 1.5rem;
 }
 
 .ask-browse a {
-    color: #999;
+    color: #595959;
 }
 
 .ask-browse a:hover {
@@ -827,12 +856,12 @@ p {
 
 .ask-list-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
 .ask-list-name {
-    color: #999;
+    color: #595959;
     font-weight: 500;
 }
 
@@ -840,7 +869,7 @@ p {
 .ask-list-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -865,7 +894,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 0.5rem;
 }
 
@@ -891,6 +920,8 @@ p {
 .conv-message-content p { margin: 0 0 1rem; }
 .conv-message-content p:last-child { margin-bottom: 0; }
 
+.conv-message-content h2,
+.conv-message-content h3,
 .conv-message-content h4,
 .conv-message-content h5,
 .conv-message-content h6 {
@@ -941,7 +972,7 @@ p {
 .conv-not-found {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -959,7 +990,7 @@ p {
 
 .conv-nav a {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
 
 .conv-nav a:hover {
@@ -1022,14 +1053,14 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     display: block;
     margin-bottom: 0.375rem;
 }
 
 .reflections-song-meta {
     font-size: 0.75rem;
-    color: #bbb;
+    color: #6a6a6a;
     letter-spacing: 0.02em;
 }
 
@@ -1037,7 +1068,7 @@ p {
 .reflections-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -1055,18 +1086,19 @@ p {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #bbb;
+    color: #6a6a6a;
     margin: 0 0 2rem;
 }
 
 .song-axiom a { color: inherit; }
 
-.song-heading {
+.song-heading,
+.docs-body .sanctuary-main .song-heading {
     font-size: 0.75rem;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     text-align: center;
     margin: 2.5rem 0 1.25rem;
 }
@@ -1077,7 +1109,7 @@ p {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #ccc;
+    color: #6a6a6a;
     margin: 1.75rem 0 0.5rem;
 }
 
@@ -1122,7 +1154,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #bbb;
+    color: #6a6a6a;
     margin-bottom: 1.5rem;
 }
 
@@ -1133,7 +1165,7 @@ p {
 
 .reflections-nav a {
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
 
 .reflections-nav a:hover {
@@ -1193,7 +1225,7 @@ p {
 .axiom-name {
     font-size: 0.875rem;
     font-weight: 400;
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.375rem;
@@ -1214,7 +1246,7 @@ p {
 }
 
 .about-links a {
-    color: #999;
+    color: #595959;
     text-decoration: none;
     text-transform: uppercase;
     font-size: 0.8125rem;
@@ -1234,7 +1266,7 @@ p {
 
 .legal-effective {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     text-align: center;
@@ -1322,7 +1354,7 @@ footer {
 }
 
 footer a {
-    color: #999;
+    color: #595959;
     text-transform: uppercase;
     text-decoration: none;
 }
@@ -1342,7 +1374,7 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #bbb;
+    color: #6a6a6a;
 }
 
 .share-sep {
@@ -1355,7 +1387,7 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #999;
+    color: #595959;
     text-decoration: none;
     cursor: pointer;
 }
@@ -1381,6 +1413,17 @@ footer a:hover {
     }
 
     .subtitle {
+        font-size: 1.125rem;
+    }
+
+    .site-mark,
+    .docs-body .sanctuary-main .site-mark {
+        font-size: 2.25rem;
+        margin-bottom: 1rem;
+    }
+
+    h1.subtitle,
+    .docs-body .sanctuary-main h1.subtitle {
         font-size: 1.125rem;
     }
 
@@ -1892,7 +1935,13 @@ footer a:hover {
     --docs-rail-width: 220px;
 }
 
-/* --- Sidebar --- */
+/* --- Sidebar ---
+   A column exactly as tall as the window below the top bar, pinned there.
+   Only the link list (nav) scrolls; the Collapse button is the column's
+   fixed footer. It used to be position: sticky inside a sidebar that was
+   itself the scroll container and a full 100dvh tall under a 41px top bar,
+   so the button sat half below the window at the top of a page and floated
+   over the links as they scrolled beneath it. */
 .docs-sidebar {
     grid-column: 1;
     background: #fafafa;
@@ -1902,14 +1951,11 @@ footer a:hover {
     flex-direction: column;
     gap: 0.5rem;
     position: sticky;
-    top: 0;
+    top: var(--docs-topbar-h, 0px);
     align-self: start;
-    height: 100vh;
-    height: 100dvh;
-    overflow-y: auto;
-    /* NOT overflow: hidden. That would break position: sticky on the toggle
-       button. Label hiding when collapsed is done via CSS below (span
-       display: none), not by clipping the container. */
+    height: calc(100vh - var(--docs-topbar-h, 0px));
+    height: calc(100dvh - var(--docs-topbar-h, 0px));
+    overflow: hidden;
     transition: none;
 }
 
@@ -1944,6 +1990,8 @@ footer a:hover {
     gap: 0.25rem;
     flex: 1 1 auto;
     min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .docs-sidebar-root,
@@ -2036,7 +2084,7 @@ footer a:hover {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #888;
+    color: #666;
     font-weight: 600;
 }
 .docs-sidebar-section ul {
@@ -2057,13 +2105,9 @@ footer a:hover {
     background: rgba(0, 184, 212, 0.1); color: #007a91; font-weight: 500;
 }
 
-/* Toggle button pinned to bottom via position: sticky (NOT margin-top: auto
-   alone. That fails on long doc pages where the sidebar stretches to full
-   page height, putting the toggle thousands of pixels below the viewport.
-   Lesson from the sibling project's shipped notes.) */
+/* The sidebar's footer: the nav above it takes the rest of the column and
+   scrolls, so this stays at the bottom of the window without being sticky. */
 .docs-sidebar-toggle {
-    position: sticky;
-    bottom: 0.5rem;
     margin-top: auto;
     display: flex;
     align-items: center;
@@ -2153,10 +2197,10 @@ footer a:hover {
     grid-column: 3;
     padding: 1.5rem 1rem;
     position: sticky;
-    top: 0;
+    top: var(--docs-topbar-h, 0px);
     align-self: start;
-    max-height: 100vh;
-    max-height: 100dvh;
+    max-height: calc(100vh - var(--docs-topbar-h, 0px));
+    max-height: calc(100dvh - var(--docs-topbar-h, 0px));
     overflow-y: auto;
     border-left: 1px solid #eee;
     background: #fafafa;
@@ -2359,6 +2403,13 @@ body.docs-drawer-open {
     .docs-sidebar-toggle {
         transition: none;
     }
+    .now-congregation:not(:empty),
+    .ask-thinking {
+        animation: none;
+    }
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 /* Opportunistic fix: .docs-index-section grid previously used a fixed
@@ -2379,10 +2430,18 @@ body.docs-drawer-open {
    sidebar site-wide. Above 768px the hamburger is hidden (sidebar is
    always visible) and the top bar is a slim brand strip. */
 @media (min-width: 768px) {
+  /* The strip's height, fixed so the sidebar and the contents rail can sit
+     exactly below it (they read --docs-topbar-h). Below 768px there is no
+     sidebar or rail, so nothing needs it. */
+  .docs-body {
+    --docs-topbar-h: 41px;
+  }
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    height: var(--docs-topbar-h);
+    padding: 0 1rem;
   }
   .docs-topbar .docs-hamburger {
     display: none;
@@ -2430,7 +2489,7 @@ body.docs-drawer-open {
   letter-spacing: 0.2em;
   margin-top: 3rem;
   margin-bottom: 2rem;
-  color: #999;
+  color: #595959;
   padding-bottom: 0;
   border-bottom: none;
 }
@@ -2491,8 +2550,43 @@ body.docs-drawer-open {
 .docs-filter-empty {
     margin-top: 0.75rem;
     font-size: 0.875rem;
-    color: #999;
+    color: #595959;
 }
+
+.docs-filter-count {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.docs-filter-count:empty { display: none; }
+
+/* Related links under an article, a song or a conversation ("Elsewhere in",
+   "Read alongside this song", "More songs to sit with", "Sung alongside").
+   One look, set here; the blocks used to carry it as inline styles. */
+.related-block,
+.sung-alongside {
+    border-top: 1px solid #eee;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+}
+.related-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+}
+.related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0 0;
+}
+.related-item { margin-bottom: 1rem; }
+.related-kind { opacity: 0.6; }
+.related-summary { margin: 0.25rem 0 0 0; opacity: 0.8; }
+.related-chant { margin: 0.5rem 0 0 0; font-style: italic; }
+.related-note { margin: 0.5rem 0 0 0; opacity: 0.7; }
+.related-more { margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6; }
 
 /* ============================================================
    Stacked ask form (used on /ask page): question, name,
@@ -2518,7 +2612,7 @@ body.docs-drawer-open {
 
 .ask-privacy-note {
     font-size: 0.75rem;
-    color: #999;
+    color: #595959;
     text-align: center;
     line-height: 1.5;
     margin: 0.25rem 0 0;
@@ -2541,7 +2635,735 @@ body.docs-drawer-open {
 
 .ask-form-stacked #ask-submit:disabled {
     background: transparent;
-    color: #ccc;
+    color: #6a6a6a;
     border-color: #eee;
     cursor: default;
+}
+
+/* ============================================================
+   Axioms "At a Glance" fact table. Added 2026-09-17.
+   Structured summary of the five axioms in one table so AI
+   answer engines (Bing Copilot, Perplexity, Google AI Mode)
+   can lift the whole framework as a fact grid instead of
+   parsing paragraphs. Sits alongside the existing
+   contemplative card layout, not in place of it.
+   ============================================================ */
+
+.axioms-table-wrapper {
+    margin: 2rem auto 0;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.axioms-facts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    background: transparent;
+}
+
+.axioms-facts-table thead th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    padding: 0.75rem 0.75rem;
+    border-bottom: 1px solid #ccc;
+    vertical-align: bottom;
+}
+
+.axioms-facts-table tbody td {
+    padding: 0.9rem 0.75rem;
+    vertical-align: top;
+    border-bottom: 1px solid #eee;
+    color: #222;
+}
+
+.axioms-facts-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.axioms-facts-table .axiom-kanji-cell {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #000;
+    text-align: center;
+    width: 3em;
+    white-space: nowrap;
+}
+
+.axioms-table-caption {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+    .axioms-facts-table {
+        font-size: 0.82rem;
+    }
+    .axioms-facts-table thead th,
+    .axioms-facts-table tbody td {
+        padding: 0.6rem 0.5rem;
+    }
+    .axioms-facts-table .axiom-kanji-cell {
+        font-size: 1.15rem;
+    }
+}
+
+/* Wide tables scroll inside themselves instead of widening the whole page on a
+   phone (/docs measured 428px wide at a 375px viewport), and long words and
+   URLs wrap rather than overflow. */
+.docs-article table {
+    display: block;
+    overflow-x: auto;
+}
+.docs-article {
+    overflow-wrap: break-word;
+}
+
+/* A jump to a section lands below the sticky top bar, not under it. */
+.docs-article [id],
+.sanctuary-main [id] {
+    scroll-margin-top: 4rem;
+}
+
+/* Skip link: the first thing a keyboard reaches, visible only when focused,
+   so no one has to tab through thirty sidebar links on every page. */
+.skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: -3rem;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+}
+.skip-link:focus {
+    top: 0.5rem;
+}
+
+/* Sanctuary pages keep a readable line length on wide screens: paragraphs ran
+   about 170 characters wide at 1440px. */
+.docs-body .sanctuary-main > main:not(.docs-main) {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ask-list-sibling-hint {
+    font-size: 0.875rem;
+    color: #595959;
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+.ask-list-all {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+/* /conversations: every conversation, as a plain list. */
+.conversations-archive {
+    text-align: left;
+}
+.archive-list {
+    margin-top: 1.5rem;
+    padding-left: 1.25rem;
+    line-height: 1.6;
+}
+.archive-list li {
+    margin-bottom: 0.5rem;
+}
+.archive-date {
+    color: #595959;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.docs-index-summary {
+    font-size: 0.875rem;
+    color: #595959;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   Navigation and reading (docs/plans/navigation-and-reading-2026-09-30.md)
+   ============================================================ */
+
+/* Lists of documents with their descriptions: the library, section pages,
+   directory indexes. One column, so a description sits under its title. */
+.docs-index-section ul.docs-entry-list {
+    display: block;
+}
+.docs-entry-list li {
+    margin-bottom: 1rem;
+}
+.docs-entry-list li a {
+    display: inline;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    font-weight: 500;
+}
+.docs-entry-list li a:hover {
+    background: none;
+    text-decoration: underline;
+}
+.docs-index-section h2 a {
+    color: inherit;
+    text-decoration: none;
+}
+.section-summary {
+    color: #595959;
+}
+
+/* A section page's own essay on its form, below its entries, closed. */
+.section-about {
+    max-width: 720px;
+    margin: 2.5rem auto 0;
+    padding: 0 1rem;
+    text-align: left;
+}
+.section-about > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    padding: 0.5rem 0;
+}
+
+/* The library's ways in. */
+.library-entrances {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    line-height: 1.8;
+}
+.library-source {
+    margin-top: 3rem;
+    font-size: 0.875rem;
+    color: #595959;
+}
+
+/* Search over a JSON index, in the browser (site-search.js). */
+.site-search {
+    margin: 1.5rem 0 2rem;
+    text-align: left;
+}
+.site-search input[type="search"] {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 300;
+    color: #333;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+.site-search input[type="search"]:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+.site-search-status {
+    margin: 0.5rem 0 0;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.site-search-status:empty { display: none; }
+.site-search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+}
+.site-search-results:empty { display: none; }
+.site-search-results li { margin-bottom: 0.75rem; }
+.site-search-label {
+    font-size: 0.8125rem;
+    color: #595959;
+}
+
+/* ------------------------------------------------------------------
+   The player: a document's recording (lib/audio/markup.js), the bar that
+   keeps playing across pages (site-player.js), and "Listen to this path".
+   ------------------------------------------------------------------ */
+
+/* A voiced document's recording, under its title. Without a script: the
+   waveform and the native controls. With one (.is-enhanced): a play button,
+   the waveform as the progress bar, the time, and the visual above. */
+.doc-audio {
+    margin: 0.75rem 0 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+}
+.doc-audio-visual {
+    display: none;
+}
+/* Drawn straight onto the card: no ground of its own, so the voices move on
+   the card itself rather than in a box. */
+.doc-audio.is-enhanced .doc-audio-visual {
+    display: block;
+    width: 100%;
+    height: 96px;
+    margin-bottom: 0.5rem;
+}
+.doc-audio-player {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.doc-audio-native {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+.doc-audio.is-enhanced .doc-audio-native {
+    display: none;
+}
+.doc-audio figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: #595959;
+}
+.doc-audio-play {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #00b8d4;
+    color: #fff;
+    cursor: pointer;
+}
+.doc-audio-play:hover {
+    background: #00a3bd;
+}
+.doc-audio-play:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+}
+.doc-audio-play svg,
+.pb-btn svg,
+.path-listen-play svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+}
+.icon-pause {
+    display: none;
+}
+.doc-audio.is-playing .doc-audio-play .icon-play,
+#site-player.is-playing .pb-play .icon-play,
+.path-listen.is-playing .icon-play {
+    display: none;
+}
+.doc-audio.is-playing .doc-audio-play .icon-pause,
+#site-player.is-playing .pb-play .icon-pause,
+.path-listen.is-playing .icon-pause {
+    display: inline;
+}
+
+/* The waveform: a row of bars measured when the recording was made. The
+   played part fills from one variable, --progress (0 to 1), set on the row;
+   each bar knows its index (--i) and its row's count (--n). */
+.doc-audio-wave {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 2.5rem;
+    touch-action: none;
+    cursor: pointer;
+}
+.doc-audio-wave:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+.doc-audio-bars {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    height: 100%;
+}
+.doc-audio-bars > span {
+    position: relative;
+    flex: 1;
+    min-width: 1px;
+    overflow: hidden;
+    border-radius: 1px;
+    background: rgba(0, 0, 0, 0.18);
+}
+.doc-audio-bars > span > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: clamp(0%, calc((var(--progress, 0) * var(--n) - var(--i)) * 100%), 100%);
+    background: #00b8d4;
+}
+.doc-audio-bars-narrow {
+    display: none;
+}
+@media (max-width: 639px) {
+    .doc-audio-bars-wide {
+        display: none;
+    }
+    .doc-audio-bars-narrow {
+        display: flex;
+    }
+}
+.doc-audio-time,
+.pb-time {
+    flex: none;
+    font-size: 0.8125rem;
+    color: #595959;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The bar at the bottom of every page, once something plays. */
+#site-player[hidden] {
+    display: none;
+}
+.player-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e5e5e5;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+.pb-line {
+    display: none;
+}
+.pb-controls {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.25rem;
+}
+.pb-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #222;
+    font: inherit;
+    cursor: pointer;
+}
+.pb-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+.pb-btn:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 2px;
+}
+.pb-btn[disabled] {
+    opacity: 0.35;
+    cursor: default;
+}
+.pb-btn[hidden] {
+    display: none;
+}
+.pb-play {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #00b8d4;
+    color: #fff;
+}
+.pb-play:hover {
+    background: #00a3bd;
+}
+.pb-text {
+    display: flex;
+    flex: 0 1 16rem;
+    flex-direction: column;
+    min-width: 0;
+}
+.pb-title {
+    overflow: hidden;
+    color: #111;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.pb-title:hover {
+    text-decoration: underline;
+}
+.pb-sub {
+    overflow: hidden;
+    color: #595959;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.player-bar .pb-wave {
+    flex: 1 1 auto;
+    height: 2rem;
+}
+.pb-rate {
+    width: auto;
+    min-width: 2.5rem;
+    padding: 0 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.pb-more {
+    display: none;
+}
+.pb-wave-line {
+    display: block;
+    position: relative;
+    top: 50%;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.12);
+}
+.pb-wave-line > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(var(--progress, 0) * 100%);
+    border-radius: 2px;
+    background: #00b8d4;
+}
+
+/* Phones: one compact row with a progress line; the full controls are in a
+   sheet (a native <dialog>: focus kept inside, Escape closes it). */
+@media (max-width: 639px) {
+    .player-bar {
+        gap: 0.5rem;
+        padding-top: 0.625rem;
+    }
+    .pb-line {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.08);
+    }
+    .pb-line span {
+        display: block;
+        width: 0;
+        height: 100%;
+        background: #00b8d4;
+    }
+    .player-bar .pb-back,
+    .player-bar .pb-fwd,
+    .player-bar .pb-prev,
+    .player-bar .pb-next,
+    .player-bar .pb-wave,
+    .player-bar .pb-time,
+    .player-bar .pb-rate {
+        display: none;
+    }
+    .player-bar .pb-text {
+        flex: 1 1 auto;
+    }
+    .pb-more {
+        display: inline-flex;
+    }
+}
+.pb-sheet {
+    width: min(32rem, 100vw);
+    max-width: 100vw;
+    margin: auto auto 0;
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    border: 0;
+    border-radius: 12px 12px 0 0;
+    background: #fff;
+}
+.pb-sheet::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+.pb-sheet-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+.pb-sheet-head .pb-text {
+    flex: 1;
+}
+.pb-sheet .pb-wave {
+    height: 3rem;
+    margin: 1rem 0 0.25rem;
+}
+.pb-sheet .pb-time {
+    display: block;
+    text-align: right;
+}
+.pb-sheet .pb-controls {
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+}
+.pb-sheet .pb-play {
+    width: 3.25rem;
+    height: 3.25rem;
+}
+.pb-sheet .pb-rate {
+    display: flex;
+    margin: 0 auto;
+}
+
+/* The page leaves room for the bar, so the footer stays reachable and a
+   focused element is never hidden under it (WCAG 2.4.11). site-player.js
+   measures the bar into --player-bar-height. */
+html.has-player {
+    scroll-padding-bottom: var(--player-bar-height, 0px);
+}
+html.has-player body {
+    padding-bottom: var(--player-bar-height, 0px);
+}
+html.has-player .docs-sidebar {
+    height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+}
+html.has-player .docs-toc {
+    max-height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+}
+
+/* "Listen to this path", on a reading path with voiced readings. */
+.path-listen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.75rem 0 1.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    background: #fafafa;
+}
+.path-listen[hidden] {
+    display: none;
+}
+.path-listen-play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    border: 0;
+    border-radius: 2rem;
+    background: #00b8d4;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.path-listen-play:hover {
+    background: #00a3bd;
+}
+.path-listen-play:focus-visible {
+    outline: 2px solid #00b8d4;
+    outline-offset: 3px;
+}
+.path-listen-note {
+    margin: 0;
+    color: #595959;
+    font-size: 0.875rem;
+}
+
+/* Where a reading sits in the reading path it was opened from. */
+.path-bar {
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+.path-bar p { margin: 0; }
+.path-bar-steps { margin-top: 0.35rem !important; }
+.path-bar-step {
+    color: #595959;
+    white-space: nowrap;
+    margin-left: 0.5rem;
+}
+.path-next {
+    border-top: 1px solid #eee;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+}
+
+/* Contents for screens too narrow for the rail: shown below 1200px, where
+   the rail is hidden, and hidden above it. */
+.docs-toc-inline {
+    margin: 0 0 1.5rem;
+    padding: 0.5rem 1rem;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+.docs-toc-inline > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+}
+.docs-toc-inline ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0.25rem;
+    line-height: 1.8;
+}
+@media (min-width: 1200px) {
+    .docs-shell.has-toc .docs-toc-inline { display: none; }
+}
+
+/* Song pages: jump links to each part, and older reflections on request. */
+.song-sections {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    text-align: center;
+    color: #595959;
+}
+.reflections-more {
+    text-align: center;
+    margin: 1.5rem 0 0;
+}
+.reflections-more-button {
+    font: inherit;
+    font-size: 0.875rem;
+    color: #007a91;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+.reflections-more-button:disabled { opacity: 0.6; cursor: wait; }
+
+/* The conversation archive's next page. */
+.archive-more {
+    margin-top: 1.5rem;
 }

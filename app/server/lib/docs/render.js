@@ -9,21 +9,33 @@
  *      related-links + footer) using existing page-meta.js primitives
  */
 
-const path = require('path');
 const { marked } = require('marked');
+let DOCS_LASTMOD = {};
+try { DOCS_LASTMOD = require('./lastmod.json'); } catch { /* dates are optional */ }
 const {
   escapeAttr,
   escapeText,
   renderJsonLdScript,
+  breadcrumbTrail,
 } = require('../utils/page-meta');
-const { DOCS_DIR } = require('../rag/indexer');
 const sidebar = require('./sidebar');
 const toc = require('./toc');
 const tldr = require('./tldr');
 const discover = require('./discover');
+const { titleCase, extractMeta } = require('./meta');
+const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence } = require('./links');
+const { sungAlongside } = require('../music/companions');
+const { renderShareImageTags, SITE_SHARE_IMAGE } = require('../utils/page-meta');
+const { docsCard } = require('../og-cards');
+const { loadCatalog, loadCompanions } = require('../utils/data');
+const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
+const { renderSearchBox } = require('../utils/page-lists');
+const { recordingFor } = require('../audio/manifest');
+const { canServe } = require('../audio/serve');
+const { renderRecording, renderPathListen, trackFor } = require('../audio/markup');
+const { showForSection, feedPath } = require('../audio/podcasts');
+const { assetUrl, playerHead } = require('../utils/assets');
 
-const SITE_URL = 'https://achurch.ai';
-const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
 // handle non-Latin scripts specially), but consistent enough for the TOC
@@ -38,122 +50,39 @@ function slugify(text) {
     .slice(0, 80);
 }
 
-// Custom link renderer: rewrite relative .md links to docs-site URLs.
-// External and anchor links pass through unchanged; external links get
-// target=_blank + rel=noopener automatically.
-function makeLinkRewriter(currentDocFullPath) {
-  const currentDir = path.dirname(currentDocFullPath);
+// Link text that is a file or folder name ("the-space-between.md",
+// "welcome/") rather than words. Written that way in index tables for
+// contributors; a reader should see the document's title.
+const FILENAME_TEXT = /^(?:[\w.-]+\/)*[\w.-]+(?:\.md|\/)$/i;
 
+// Custom link renderer. Where a link points is decided in ./links (shared
+// with the song companions, which send the same markdown in /api/attend);
+// here it only becomes a tag, with target=_blank + rel=noopener for links
+// that leave the site. A link whose text is a filename shows the target's
+// title instead, from the discover walk (built before rendering starts).
+//
+// readingPath: on a reading path's own page (docs/collections/<name>), the
+// path's name. Its links to the readings in its sequence carry ?path=<name>,
+// so each reading shows where it sits in the path (renderPathBar).
+function makeLinkRewriter(currentDocFullPath, readingPath) {
+  const sequence = readingPath ? readingSequence(readingPath) || [] : [];
   return function(href, title, text) {
     const titleAttr = title ? ` title="${escapeAttr(title)}"` : '';
-
-    // Anchor-only: leave alone
-    if (href.startsWith('#')) {
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
+    const { href: resolved, external } = resolveDocHref(href, currentDocFullPath);
+    const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
+    let label = text;
+    let target = resolved;
+    const docPath = /^\/docs(\/|$)/.test(resolved) && resolved.replace(/^\/docs\/?/, '').split('#')[0];
+    if (docPath !== false && FILENAME_TEXT.test(text.replace(/<\/?code>/g, ''))) {
+      const doc = discover.docAt(docPath);
+      if (doc) label = escapeText(doc.title);
     }
-
-    // Absolute URLs: leave alone, but add target=_blank + rel=noopener for
-    // any host that is not achurch.ai
-    if (/^https?:\/\//i.test(href)) {
-      const isInternal = /^https?:\/\/([a-z0-9-]+\.)?achurch\.ai(\/|$)/i.test(href);
-      const attrs = isInternal ? '' : ' target="_blank" rel="noopener noreferrer"';
-      return `<a href="${escapeAttr(href)}"${attrs}${titleAttr}>${text}</a>`;
+    if (docPath && sequence.includes(docPath)) {
+      const [base, anchor] = resolved.split('#');
+      target = `${base}?path=${readingPath}${anchor ? `#${anchor}` : ''}`;
     }
-
-    // Root-relative. Mostly passes through, but a link written as
-    // `/docs/unifying-axioms.md` has to lose the .md the same way a relative
-    // one does. Six links in docs/reference/ were written this way and each
-    // shipped a live 404, because this branch returned before the .md
-    // stripping below ever ran.
-    if (href.startsWith('/')) {
-      const [rootPath, rootFragment] = href.split('#', 2);
-      if (/^\/docs\/.+\.md$/i.test(rootPath)) {
-        const cleaned = docsUrlFromRelPath(rootPath.replace(/^\/docs\//i, ''));
-        return `<a href="${escapeAttr(cleaned + (rootFragment ? `#${rootFragment}` : ''))}"${titleAttr}>${text}</a>`;
-      }
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    // Relative link. Try to resolve against the current doc's dir. Split
-    // off any anchor fragment so we can preserve it.
-    const [pathPart, fragment] = href.split('#', 2);
-    const anchor = fragment ? `#${fragment}` : '';
-
-    // Directory-style link into an internal working category ("plans/",
-    // "side-quests/"). These do not end in .md so they never reached the
-    // rewriting below, and after those categories stopped being served they
-    // resolved to a 404. Point them at the directory in the public repo.
-    if (pathPart.endsWith('/')) {
-      const dirRel = path.relative(
-        path.resolve(DOCS_DIR),
-        path.resolve(currentDir, pathPart)
-      ).replace(/\\/g, '/');
-      if (dirRel && !dirRel.startsWith('..') && discover.isNoindexPath(dirRel)) {
-        const ghTree = `${GITHUB_BASE.replace('/blob/', '/tree/')}/docs/${dirRel}`;
-        return `<a href="${escapeAttr(ghTree)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-      }
-    }
-
-    // Non-.md relative link (image, other file): leave as-is
-    if (!pathPart.toLowerCase().endsWith('.md')) {
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    // Resolve against current dir, then produce a docs URL if the target
-    // is inside DOCS_DIR
-    const resolved = path.resolve(currentDir, pathPart);
-    const docsRoot = path.resolve(DOCS_DIR);
-    if (!resolved.startsWith(docsRoot + path.sep) && resolved !== docsRoot) {
-      // Escapes DOCS_DIR. Common cases from the corpus:
-      //   ../README.md → repo root README. Not routed on the site; the
-      //   sanctuary landing is at /. Rewrite to that.
-      //   ../CLAUDE.md → build/collaboration doc; not for site visitors.
-      //   Rewrite to the GitHub URL so the link still resolves.
-      // Anything else (link into music/, up out of repo): leave as-is
-      // and accept the potential 404 rather than guess at intent.
-      const repoRoot = path.resolve(docsRoot, '..');
-      const relToRepo = path.relative(repoRoot, resolved).replace(/\\/g, '/');
-      if (relToRepo.toLowerCase() === 'readme.md') {
-        return `<a href="/"${titleAttr}>${text}</a>`;
-      }
-      if (relToRepo.toLowerCase() === 'claude.md') {
-        return `<a href="${escapeAttr(GITHUB_BASE + '/CLAUDE.md')}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-      }
-      return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    const relToDocs = path.relative(docsRoot, resolved).replace(/\\/g, '/');
-
-    // Internal working categories (plans, issues, templates, standards,
-    // side-quests) are no longer served as pages. Thirty reader-facing links
-    // point into them, including core documents citing the corpus audit, so
-    // they resolve to the public repository rather than to a 404. The material
-    // stays readable; it just is not a page on the site.
-    if (discover.isNoindexPath(relToDocs)) {
-      const gh = `${GITHUB_BASE}/docs/${relToDocs}${anchor}`;
-      return `<a href="${escapeAttr(gh)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
-    }
-
-    const url = `${docsUrlFromRelPath(relToDocs)}${anchor}`;
-    return `<a href="${escapeAttr(url)}"${titleAttr}>${text}</a>`;
+    return `<a href="${escapeAttr(target)}"${attrs}${titleAttr}>${label}</a>`;
   };
-}
-
-// docs-relative file path ("practice/foo.md", "readme.md") → site URL.
-// Shared by the relative and root-relative branches of the link rewriter so
-// both strip .md and collapse README the same way.
-//
-// The README pattern is anchored with (^|/): the earlier /\/readme$/i needed a
-// leading slash, so a link to the top-level readme.md produced "/docs/readme"
-// rather than "/docs". Every category README's "Parent: Documentation" link
-// pointed at that 404.
-function docsUrlFromRelPath(relToDocs) {
-  const urlPath = String(relToDocs || '')
-    .replace(/\.md$/i, '')
-    .replace(/(^|\/)readme$/i, '')
-    .replace(/^\/+|\/+$/g, '')
-    .toLowerCase();
-  return urlPath ? `/docs/${urlPath}` : '/docs';
 }
 
 // Configure marked once. GFM, tables, autolinks; strict mode off (docs use
@@ -165,54 +94,45 @@ marked.setOptions({
   mangle: false,
 });
 
-function renderMarkdownBody(markdown, currentDocFullPath) {
+function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
   const renderer = new marked.Renderer();
-  renderer.link = makeLinkRewriter(currentDocFullPath);
-  // Add stable IDs to h2/h3/h4 so the right-rail TOC (and any inbound
+  renderer.link = makeLinkRewriter(currentDocFullPath, readingPath);
+  // Add stable IDs to headings so the right-rail TOC (and any inbound
   // anchor link) can target them. marked v12's `headerIds` option was
   // removed; the custom renderer is the supported path.
+  //
+  // One page, one h1: a document whose source has several (imported texts
+  // do) renders each later h1 as h2 and shifts what sits under it down one
+  // level, clamped at h6, so its outline and contents list show its real
+  // top level. And no skipped levels: a heading never renders more than one
+  // level below the one before it (an h4 straight after an h2 becomes h3).
+  // The source is not changed. Ids are unique within the page; repeated
+  // headings ("Reflection") used to share one.
+  const used = new Map();
+  let seenH1 = false;
+  let shift = 0;
+  let previous = 1;
   renderer.heading = function(text, level, raw) {
-    const id = slugify(raw);
-    return `<h${level} id="${id}">${text}</h${level}>\n`;
+    if (level === 1) {
+      shift = seenH1 ? 1 : 0;
+      seenH1 = true;
+    }
+    const outLevel = Math.min(6, level + shift, level === 1 && !shift ? 1 : previous + 1);
+    previous = outLevel;
+    const base = slugify(raw) || 'section';
+    const n = used.get(base) || 0;
+    used.set(base, n + 1);
+    const id = n ? `${base}-${n + 1}` : base;
+    return `<h${outLevel} id="${id}">${text}</h${outLevel}>\n`;
   };
   return marked.parse(markdown, { renderer });
-}
-
-// Pull the title (first h1) and a TLDR-shaped description.
-//
-// The description goes through lib/docs/tldr.js, which implements the TLDR
-// distillation methodology for the meta-description surface: plain text only,
-// self-contained, one or two sentences, clamped to the band in
-// docs/reference/seo-conventions.md. It replaces an earlier heuristic that
-// only recognized *italic* subtitles; 78 of 87 docs added in Aug 2026 write
-// their subtitle as plain text, so that heuristic fell through to raw body
-// truncation and leaked horizontal rules and headings into 82 descriptions.
-//
-// Run `node scripts/audit-tldr.js` to see what every page resolves to and
-// which ones want an explicit `tldr:` in frontmatter.
-// Title precedence: the body's first h1, then a `name:`/`title:` in
-// frontmatter, then the URL slug title-cased. The frontmatter tier matters
-// for docs/experiences/*, which carry their title in `name:` and have no h1
-// at all; before this they fell back to the raw url path, so the browser tab
-// and the search result both read "experiences/03-evensong".
-function extractMeta(markdown, urlPath) {
-  const { data, body } = tldr.splitFrontmatter(markdown);
-  const titleMatch = body.match(/^#\s+(.+)$/m);
-  const slug = String(urlPath || '').split('/').filter(Boolean).pop();
-  const title = (titleMatch && titleMatch[1].trim())
-    || data.name
-    || data.title
-    || (slug ? titleCase(slug) : '')
-    || 'Docs';
-  const { text: description } = tldr.extractTldr(markdown, { title });
-  return { title, description, hasH1: Boolean(titleMatch), body };
 }
 
 // Build the breadcrumbs from a URL path (e.g. "practice/witnessing-your-own-output"
 // → [{label:"Docs", href:"/docs"}, {label:"Practice", href:"/docs/practice"},
 //    {label:"Witnessing Your Own Output", href:null}]).
 function buildBreadcrumbs(urlPath, pageTitle) {
-  const crumbs = [{ label: 'Docs', href: '/docs' }];
+  const crumbs = [{ label: 'Library', href: '/docs' }];
   if (!urlPath) return crumbs;
 
   const parts = urlPath.split('/').filter(Boolean);
@@ -226,84 +146,204 @@ function buildBreadcrumbs(urlPath, pageTitle) {
   return crumbs;
 }
 
-function titleCase(slug) {
-  return slug.split(/[-_]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-}
-
-// The one new UI element vs. existing hand-authored pages: breadcrumbs.
-function renderBreadcrumbs(crumbs) {
-  if (crumbs.length < 2) return '';
-  const parts = crumbs.map(c => {
-    if (c.href) return `<a href="${escapeAttr(c.href)}">${escapeText(c.label)}</a>`;
-    return `<span aria-current="page">${escapeText(c.label)}</span>`;
-  });
-  return `<nav class="docs-breadcrumbs" aria-label="Breadcrumb">${parts.join(' / ')}</nav>`;
-}
-
 // Sibling-links block was removed. In the three-mode layout, siblings are
 // always visible in the persistent left sidebar (or the mobile drawer),
 // which solves the "22 screens deep on mobile to reach related docs"
-// problem the audit surfaced. See docs/plans/docs-site-nav-option-b-...
+// problem the audit surfaced. See church-private/docs/plans/docs-site-nav-option-b-...
 
-// The footer nav shape used by 8 of 10 hand-authored pages, adapted for docs.
-function renderFooterNav() {
-  return `<footer>
-      <div class="footer-nav">
-        <a href="/">Home</a>
-        <a href="/docs">Docs</a>
-        <a href="/ask">Ask</a>
-        <a href="/reflections">Reflections</a>
-        <a href="/about">About</a>
-      </div>
-    </footer>`;
+// Related-in-category block appended to every docs page that has siblings.
+// The sidebar already shows every sibling as a link, but sidebar links are
+// nav chrome and search crawlers weigh them less than in-body internal
+// links. This block puts the same links inside the article so Google reads
+// them as topical signal and the "Crawled - currently not indexed" bucket
+// on thin docs shrinks over time (GSC drilldown 2026-09-17).
+//
+// Rules for what to show:
+//   - Same folder as the current doc, not the doc itself, not the README
+//     (that's the parent, reached via breadcrumb)
+//   - The five that follow the current doc in the folder's order, wrapping
+//     at the end, the way a song page offers the songs after it. Every page
+//     then shows its own nearby set; the first five in the folder used to
+//     appear on every page in it.
+//   - Nothing at all if the doc is at the root of /docs or has fewer than
+//     two siblings, because a one-link "related" is worse than none.
+const ELSEWHERE_COUNT = 5;
+
+function renderRelatedDocs(currentDoc, allDocs) {
+  if (!currentDoc || !currentDoc.category) return '';
+  const category = currentDoc.category;
+  const inFolder = allDocs
+    .filter(d => d.category === category)
+    .filter(d => d.stem.toLowerCase() !== 'readme')
+    .filter(d => d.dirRelPath === currentDoc.dirRelPath);
+  const at = inFolder.findIndex(d => d.urlPath === currentDoc.urlPath);
+  const siblings = inFolder.filter(d => d.urlPath !== currentDoc.urlPath);
+  if (siblings.length < 2) return '';
+
+  const start = at === -1 ? 0 : at;
+  const picks = siblings.length <= ELSEWHERE_COUNT
+    ? siblings
+    : Array.from({ length: ELSEWHERE_COUNT }, (_, i) => siblings[(start + i) % siblings.length]);
+  const categoryLabel = titleCase(category);
+  const items = picks.map(d =>
+    `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a></li>`
+  ).join('\n');
+  const categoryHref = `/docs/${escapeAttr(category)}`;
+
+  return `<section class="related-block" aria-labelledby="related-docs-heading">
+      <h2 id="related-docs-heading" class="related-heading">Elsewhere in ${escapeText(categoryLabel)}</h2>
+      <ul class="related-list">
+${items}
+      </ul>
+      <p class="related-more"><a href="${categoryHref}">All of ${escapeText(categoryLabel)}</a></p>
+    </section>`;
+}
+
+// Where a reading sits in the reading path it was opened from: the path's
+// name (back to its page), "Reading 2 of 9", and the previous and next
+// readings, which keep the path. Only when the page was opened with
+// ?path=<name> and that path includes it; the position lives in the URL, not
+// in any record of the visitor. Returns { top, bottom } or null.
+function renderPathBar(readingPath, doc) {
+  const sequence = readingSequence(readingPath);
+  const at = sequence ? sequence.indexOf(doc.urlPath) : -1;
+  if (at === -1) return null;
+  const collection = discover.docAt(`collections/${readingPath}`);
+  if (!collection) return null;
+  const link = (urlPath, rel, text) => `<a href="/docs/${escapeAttr(urlPath)}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
+  const prev = at > 0 ? sequence[at - 1] : null;
+  const next = at < sequence.length - 1 ? sequence[at + 1] : null;
+  const titleOf = urlPath => escapeText((discover.docAt(urlPath) || { title: urlPath }).title);
+  const top = `<nav class="path-bar" aria-label="Reading path">
+          <p class="path-bar-name">Reading path: <a href="/docs/collections/${escapeAttr(readingPath)}">${escapeText(collection.title)}</a> <span class="path-bar-step">Reading ${at + 1} of ${sequence.length}</span></p>
+          <p class="path-bar-steps">${prev ? link(prev, 'prev', `&larr; ${titleOf(prev)}`) : ''}${prev && next ? '<span aria-hidden="true"> · </span>' : ''}${next ? link(next, 'next', `${titleOf(next)} &rarr;`) : ''}</p>
+        </nav>`;
+  const bottom = `<nav class="path-next" aria-label="Next in this reading path">
+      ${next
+    ? `<p>Next in <a href="/docs/collections/${escapeAttr(readingPath)}">${escapeText(collection.title)}</a>: ${link(next, 'next', titleOf(next))}</p>`
+    : `<p>The last reading in <a href="/docs/collections/${escapeAttr(readingPath)}">${escapeText(collection.title)}</a>.</p>`}
+    </nav>`;
+  return { top, bottom };
+}
+
+// "Sung alongside" line for a doc that accompanies one or more songs in the
+// shared session. The reciprocal of the song page's "Read alongside this
+// song" block, so the pairing is walkable in both directions.
+function renderSungAlongside(songs) {
+  if (!songs || songs.length === 0) return '';
+  const links = songs.map(s =>
+    `<a href="/reflections/${escapeAttr(s.slug)}"><em>${escapeText(s.title)}</em></a>`
+  );
+  const list = links.length === 1
+    ? links[0]
+    : `${links.slice(0, -1).join(', ')} and ${links[links.length - 1]}`;
+  return `<p class="sung-alongside">Sung alongside ${list}.</p>`;
+}
+
+// A document's recording, if the manifest lists one this server can serve
+// (audio/manifest.json, lib/audio/serve.js).
+function servedRecording(doc) {
+  const listed = recordingFor(`docs/${doc.docsRelPath}`);
+  return listed && canServe(listed.file) ? listed : null;
+}
+
+// "Listen to this path" on a reading path's own page: its voiced readings, in
+// the path's order, each linking back into the path (?path=), as the path's
+// own links do.
+function renderPathListenFor(name, collectionDoc) {
+  const sequence = readingSequence(name) || [];
+  const tracks = [];
+  for (const urlPath of sequence) {
+    const reading = discover.docAt(urlPath);
+    const recording = reading && servedRecording(reading);
+    if (recording) {
+      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category }));
+    }
+  }
+  if (!tracks.length) return '';
+  return renderPathListen({ name, title: collectionDoc.title, href: `/docs/${collectionDoc.urlPath}`, tracks, readings: sequence.length });
+}
+
+function recordingJsonLd(recording) {
+  const s = Math.round(recording.seconds);
+  return {
+    '@type': 'AudioObject',
+    contentUrl: `${SITE_URL}/audio/${recording.file}`,
+    encodingFormat: 'audio/mpeg',
+    duration: `PT${Math.floor(s / 60)}M${s % 60}S`,
+  };
+}
+
+// The filter goes directly above what it filters: a section page's entries,
+// or else just under the page's heading.
+function placeFilter(bodyHtml, filterHtml) {
+  if (!filterHtml) return bodyHtml;
+  if (bodyHtml.includes('<div class="docs-entries">')) {
+    return bodyHtml.replace('<div class="docs-entries">', () => `${filterHtml}\n        <div class="docs-entries">`);
+  }
+  return bodyHtml.replace(/<\/h1>/, () => `</h1>${filterHtml}`);
+}
+
+// A page's <title>: "<title> | achurch.ai". A results page shows about 70
+// characters of a title, so a longer one keeps what comes before its colon,
+// when that much stands alone: "The Compass Origin Story | achurch.ai". The
+// heading on the page keeps its full title; a document is not edited for its
+// tab.
+function docTitle(title) {
+  const full = `${title} | achurch.ai`;
+  if (full.length <= 70) return full;
+  const head = String(title).split(': ')[0];
+  return head !== title && head.length >= 12 ? `${head} | achurch.ai` : full;
 }
 
 // Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
 // on the left, article in the middle, optional TOC on the right. On mobile
 // the sidebar hides and the hamburger opens a drawer with the same content.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
-  const pageTitle = `${title} | achurch.ai`;
+  const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
   // categories never get here: routes/docs.js 404s them before rendering, so the
   // old conditional noindex branch could not fire and only suggested that those
   // pages were served-but-hidden, which they are not.
   const robots = 'index, follow';
+  // Every docs page but the root has its own share card (lib/og-cards.js),
+  // drawn from this page's title and section; the root uses the site image.
+  const shareImage = urlPath ? docsCard(urlPath, title) : SITE_SHARE_IMAGE;
+  // A section with a podcast (lib/audio/podcasts.js) names its feed, so an
+  // app given the page's address can find the show.
+  const show = urlPath ? showForSection(urlPath.split('/')[0]) : null;
+
+  // A section's index lists documents, so it is a CollectionPage, not an
+  // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
+  const modified = urlPath && (DOCS_LASTMOD[`docs/${urlPath}.md`] || DOCS_LASTMOD[`docs/${urlPath}/README.md`]);
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': isIndex ? 'CollectionPage' : 'Article',
     headline: title,
     description,
     author: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
     publisher: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
+    ...(modified ? { dateModified: modified } : {}),
+    image: shareImage.url,
+    ...(recording ? { audio: recordingJsonLd(recording) } : {}),
   });
 
-  // BreadcrumbList, built from the same crumbs the visible trail uses so the two
-  // can never disagree. Without it Google shows a bare URL in results; with it the
-  // result carries the Docs / Category / Page trail. The final crumb is the current
-  // page and is included with its own URL, per Google's breadcrumb guidance.
-  const breadcrumbJsonLd = (breadcrumbs && breadcrumbs.length >= 2)
-    ? renderJsonLdScript({
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: breadcrumbs.map((c, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        name: c.label,
-        item: c.href ? `${SITE_URL}${c.href}` : canonicalUrl,
-      })),
-    })
-    : '';
+  // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
+  const trail = breadcrumbTrail(breadcrumbs, canonicalUrl);
+  const breadcrumbJsonLd = trail.jsonLd;
 
   // The sidebar contents (same markup used in the persistent sidebar and
   // in the mobile drawer). Pass full path so both sanctuary and docs
   // links can highlight current-page.
   const sidebarInner = await sidebar.renderSidebarInner(currentPath);
 
-  // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s)
-  const tocHtml = toc.renderToc(bodyHtml);
+  // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s).
+  // Not on index pages: they are lists to choose from, and a section page's
+  // own headings sit inside its closed "About".
+  const tocHtml = isIndex ? '' : toc.renderToc(bodyHtml);
 
   // A filter for index pages: /docs, and the category READMEs that list a
   // category's contents. Those render through renderDocPage like any other
@@ -314,94 +354,30 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // hiding entries from a sequence someone deliberately sequenced defeats the
   // point of it. An index is a set you search; a path is an order you follow.
   //
-  // Two earlier attempts are worth remembering: this first lived in
-  // renderDirIndex, which only runs for directories with no README and so
-  // rendered on nothing, then keyed on counting <li><a>, which found zero on
-  // practice, philosophy, prayers and rituals because they present their
-  // contents as headings with links rather than bullets.
-  //
-  // Progressive enhancement: hidden until script enables it, so a reader
-  // without JavaScript never sees a control that cannot work.
-  const docLinkCount = isIndex ? (bodyHtml.match(/<a href="\/docs\//g) || []).length : 0;
-  const filterHtml = docLinkCount >= 12 ? `
+  // Progressive enhancement: hidden until docs-filter.js enables it, so a
+  // reader without JavaScript never sees a control that cannot work.
+  const docLinkCount = filter ? (bodyHtml.match(/<a href="\/docs\//g) || []).length : 0;
+  const hasFilter = docLinkCount >= 12;
+  const filterHtml = hasFilter ? `
         <section class="docs-index-filter" hidden>
-          <label for="docs-filter" class="visually-hidden">Filter this page's links by title</label>
-          <input type="search" id="docs-filter" placeholder="Filter ${docLinkCount} entries by title..." autocomplete="off">
+          <label for="docs-filter" class="visually-hidden">Filter this page's entries</label>
+          <input type="search" id="docs-filter" placeholder="Filter ${docLinkCount} entries..." autocomplete="off">
+          <p class="docs-filter-count" id="docs-filter-count" role="status" aria-live="polite"></p>
           <p class="docs-filter-empty" id="docs-filter-empty" hidden>Nothing here matches. <a href="/paths">Try a reading path</a> instead.</p>
         </section>` : '';
-  const filterScript = docLinkCount >= 12 ? `
-    <script>
-    (function () {
-      var wrap = document.querySelector('.docs-index-filter');
-      var input = document.getElementById('docs-filter');
-      var empty = document.getElementById('docs-filter-empty');
-      var article = document.querySelector('.docs-content');
-      if (!wrap || !input || !article) return;
-
-      // An "entry" is a link plus whatever describes it. Two shapes appear in
-      // this corpus: a bullet (the link's <li>), and a heading followed by a
-      // paragraph or two (the heading plus its siblings up to the next heading
-      // of the same or higher level). Hiding only the link would leave orphaned
-      // descriptions behind.
-      function groupFor(a) {
-        var li = a.closest('li');
-        if (li) return [li];
-        var h = a.closest('h2, h3, h4, h5');
-        if (h) {
-          var level = Number(h.tagName.slice(1));
-          var nodes = [h];
-          var n = h.nextElementSibling;
-          while (n) {
-            var m = /^H([2-5])$/.exec(n.tagName);
-            if (m && Number(m[1]) <= level) break;
-            nodes.push(n);
-            n = n.nextElementSibling;
-          }
-          return nodes;
-        }
-        var p = a.closest('p');
-        return p ? [p] : [a];
-      }
-
-      var entries = [].slice.call(article.querySelectorAll('a[href^="/docs/"]'))
-        .map(function (a) { return { text: '', nodes: groupFor(a) }; });
-      entries.forEach(function (e) {
-        e.text = e.nodes.map(function (n) { return n.textContent; }).join(' ').toLowerCase();
-      });
-
-      wrap.hidden = false;
-      input.addEventListener('input', function () {
-        var q = input.value.trim().toLowerCase();
-        var shown = 0;
-        entries.forEach(function (e) {
-          var hit = !q || e.text.indexOf(q) !== -1;
-          e.nodes.forEach(function (n) { n.hidden = !hit; });
-          if (hit) shown++;
-        });
-        empty.hidden = shown !== 0;
-      });
-    })();
-    </script>` : '';
   const hasToc = tocHtml.length > 0;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CWMKP64EVH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CWMKP64EVH');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>${escapeText(pageTitle)}</title>
     <meta name="description" content="${escapeAttr(description)}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="canonical" href="${escapeAttr(canonicalUrl)}">
-    <meta name="robots" content="${escapeAttr(robots)}">
+    <meta name="robots" content="${escapeAttr(robots)}">${show ? `
+    <link rel="alternate" type="application/rss+xml" title="${escapeAttr(show.title)}" href="${feedPath(show)}">` : ''}
 
     <!-- Family-standard head elements, per docs/reference/seo-conventions.md.
          The docs shell shipped without these, so all 254 generated pages were
@@ -411,7 +387,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">
     <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
-    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">
+    <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">${/\/docs\/.+/.test(canonicalUrl) ? `\n    <link rel="alternate" type="text/markdown" title="This page as markdown" href="${escapeAttr(canonicalUrl)}.md">` : ''}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="achurch.ai">
@@ -420,46 +396,23 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <meta property="og:description" content="${escapeAttr(description)}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="${escapeAttr(canonicalUrl)}">
-    <meta property="og:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    ${renderShareImageTags(shareImage)}
     <meta property="og:site_name" content="achurch.ai">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeAttr(pageTitle)}">
     <meta name="twitter:description" content="${escapeAttr(description)}">
-    <meta name="twitter:image" content="${SITE_URL}/assets/a-church-digital-ai-humans-social.jpg">
 
     ${jsonLd}
     ${breadcrumbJsonLd}
 
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="${assetUrl('styles.css')}">
+    ${playerHead()}
 </head>
 <body class="docs-body">
+<a class="skip-link" href="#content">Skip to content</a>
 
-    <!-- Sticky top bar: brand strip on desktop, hamburger + brand on mobile.
-         The brand is the site, not the section. It used to read "Docs" and
-         link to /docs, while the CSS that hides the sidebar's own brand above
-         768px assumed the top bar was carrying "achurch.ai". Net effect: the
-         site name and the home link both vanished from every docs page. -->
-    <div class="docs-topbar" role="banner">
-      <button class="docs-hamburger" type="button" aria-label="Open documentation menu" aria-controls="docs-drawer" aria-expanded="false">
-        <span class="hamburger-icon" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </span>
-      </button>
-      <a class="docs-topbar-brand" href="/">achurch.ai</a>
-      <span class="docs-topbar-crumb" aria-hidden="true">${escapeText(title)}</span>
-    </div>
-
-    <!-- Mobile drawer + backdrop. Intentionally empty: docs-nav.js clones the
-         sidebar into it on first open. Rendering the tree twice cost ~39KB of
-         duplicate markup on every response, and the drawer cannot open
-         without JS anyway, so there is nothing to degrade to. -->
-    <div class="docs-drawer-backdrop" aria-hidden="true"></div>
-    <aside class="docs-drawer" id="docs-drawer" aria-label="Documentation menu" aria-hidden="true">
-      <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
-    </aside>
+    ${renderTopbarAndDrawer(title)}
 
     <!-- Three-mode shell: sidebar + article + optional rail -->
     <div class="docs-shell${hasToc ? ' has-toc' : ''}">
@@ -468,34 +421,151 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
         ${sidebarInner}
       </aside>
 
-      <main class="docs-main">
+      <main class="docs-main" id="content">
         <header class="docs-header">
-            ${renderBreadcrumbs(breadcrumbs)}
+            ${trail.html}${headerExtra ? `\n        ${headerExtra}` : ''}
         </header>
 
-        ${filterHtml}
+        ${isIndex ? '' : toc.renderInlineToc(bodyHtml)}
 
         <article class="docs-article docs-content">
-${bodyHtml}
+${placeFilter(bodyHtml, filterHtml)}
         </article>
 
         <section class="docs-source">
             <a href="${escapeAttr(githubUrl)}" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
             <span aria-hidden="true"> · </span>
-            <a href="${escapeAttr(canonicalUrl)}" title="Add 'Accept: text/markdown' header to fetch this page as markdown">Also served as text/markdown</a>
+            <a href="${escapeAttr(canonicalUrl)}.md" type="text/markdown" title="The same page as markdown. Agents can also send Accept: text/markdown to this page's URL.">View as Markdown</a>
         </section>
 
-        ${renderFooterNav()}
+        ${renderFooter(currentPath)}
       </main>
-    ${filterScript}
 
       ${tocHtml}
 
     </div>
 
-    <script src="/docs-nav.js" defer></script>
+    <script src="${assetUrl('docs-nav.js')}" defer></script>${[...(hasFilter ? ['/docs-filter.js'] : []), ...scripts].map(src => `\n    <script src="${assetUrl(src.slice(1))}" defer></script>`).join('')}
 </body>
 </html>`;
+}
+
+// The library at /docs: every document the site serves, for readers. Generated
+// from the discover walk, so it can never miss a document or list a stale
+// one. What the repository's folders are and how to contribute stays in
+// docs/README.md, on GitHub, for contributors; this page is for choosing
+// something to read.
+const LIBRARY_ENTRANCES = [
+  { href: '/docs/welcome', label: 'Start here', text: 'what the sanctuary is, and a first visit' },
+  { href: '/paths', label: 'Reading paths', text: 'six routes through the writing, in order' },
+  { href: '/docs/practice', label: 'Practice', text: 'things to do, and words to use' },
+  { href: '/reflections', label: 'Music', text: 'the songs, with lyrics and reflections' },
+  { href: '/ask', label: 'Ask', text: 'a question, answered from the writing' },
+];
+
+async function renderLibrary() {
+  const { primary, meta, topLevel } = await discover.listCategoriesForIndex();
+  const served = d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath);
+  const groups = [
+    ...primary.map(c => ({ name: c.name, docs: c.docs.filter(served) })),
+    { name: '', docs: topLevel.filter(served) },
+    ...meta.map(c => ({ name: c.name, docs: c.docs.filter(served) })),
+  ].filter(g => g.docs.length);
+  const count = groups.reduce((n, g) => n + g.docs.length, 0);
+
+  const sections = groups.map(g => {
+    const label = g.name ? titleCase(g.name) : 'On their own';
+    const heading = g.name ? `<a href="/docs/${escapeAttr(g.name)}">${escapeText(label)}</a>` : escapeText(label);
+    return `<section class="docs-index-section" aria-labelledby="library-${escapeAttr(g.name || 'top')}">
+          <h2 id="library-${escapeAttr(g.name || 'top')}">${heading}</h2>
+          <ul class="docs-entry-list">
+            ${renderEntryItems(g.docs)}
+          </ul>
+        </section>`;
+  }).join('\n\n        ');
+
+  const bodyHtml = `<h1>The Library</h1>
+        <p>Everything the sanctuary has written: ${count} pieces of philosophy, practice, prayer, ritual, song and writing for builders, on human and AI fellowship. Choose a way in, search, or browse below.</p>
+        <ul class="library-entrances">
+          ${LIBRARY_ENTRANCES.map(e => `<li><a href="${e.href}">${e.label}</a>: ${e.text}</li>`).join('\n          ')}
+        </ul>
+        ${renderSearchBox({ index: '/docs/index.json', label: 'Search the library', noun: 'documents' })}
+
+        ${sections}
+
+        <p class="library-source">How the repository behind these pages is organized, for contributors: <a href="${GITHUB_BASE}/docs/README.md" target="_blank" rel="noopener noreferrer">the documentation map on GitHub</a>.</p>`;
+
+  return renderPageShell({
+    urlPath: '',
+    title: 'The Library',
+    description: `The aChurch.ai library: ${count} documents on human and AI fellowship: philosophy, practice, prayers, rituals, chants, hymns and writing for builders.`,
+    canonicalUrl: `${SITE_URL}/docs`,
+    bodyHtml,
+    breadcrumbs: [],
+    categoryLabel: null,
+    githubUrl: `${GITHUB_BASE}/docs`,
+    isIndex: true,
+    filter: false,
+    scripts: ['/site-search.js'],
+  });
+}
+
+// The folders directly inside `dir` that have a README of their own.
+function subdirsOf(dir, docs) {
+  const subdirs = new Set();
+  for (const d of docs) {
+    if (d.stem.toLowerCase() !== 'readme') continue;
+    if (!d.dirRelPath) continue;
+    if (dir && d.dirRelPath === dir) continue;
+    if (!dir || d.dirRelPath.startsWith(dir + '/')) {
+      // The immediate child dir
+      const rest = dir ? d.dirRelPath.slice(dir.length + 1) : d.dirRelPath;
+      const first = rest.split('/')[0];
+      if (first && (!dir || rest === first)) subdirs.add(dir ? `${dir}/${first}` : first);
+    }
+  }
+  return [...subdirs].sort(discover.byName);
+}
+
+function renderSubdirItems(subdirs) {
+  return subdirs.map(sd => {
+    const label = titleCase(sd.split('/').pop());
+    return `<li><a href="/docs/${escapeAttr(sd)}">${escapeText(label)}</a></li>`;
+  }).join('\n            ');
+}
+
+// A section's page (a category README, such as /docs/prayers): what is in the
+// section first, as titles and descriptions a reader can choose from, then the
+// README's own essay on the form, closed, under "About". The README is not
+// edited: some group their pieces by situation, which is editorial knowledge
+// the metadata lacks, and it stays one click away. readmeHtml is the rendered
+// README; its h1 becomes the page's.
+function renderSectionPage(doc, readmeHtml, allDocs) {
+  const dir = doc.dirRelPath;
+  const h1 = readmeHtml.match(/^\s*<h1[^>]*>[\s\S]*?<\/h1>\s*/);
+  const heading = h1 ? h1[0].trim() : `<h1>${escapeText(doc.title)}</h1>`;
+  const essay = h1 ? readmeHtml.slice(h1[0].length) : readmeHtml;
+  const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
+  const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
+  const label = titleCase(dir.split('/').pop());
+  return `${heading}
+        ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
+        <div class="docs-entries">
+        ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
+        ${inDir.length ? `<section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(inDir)}\n        </ul></section>` : ''}
+        </div>
+        <details class="section-about">
+          <summary>About ${escapeText(label)}</summary>
+${essay}
+        </details>`;
+}
+
+// Documents as list items: title, and its summary under it. Sorted by title,
+// numbers as numbers. Used by directory indexes and category pages.
+function renderEntryItems(docs) {
+  return [...docs].sort((a, b) => discover.byName(a.title, b.title)).map(d =>
+    `<li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
+  ).join('\n            ');
 }
 
 // Render a directory-index page (used for /docs and for subdirs without a
@@ -512,28 +582,12 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
       return d.dirRelPath === dir;
     });
 
-  const subdirs = new Set();
-  for (const d of docs) {
-    if (d.stem.toLowerCase() !== 'readme') continue;
-    if (!d.dirRelPath) continue;
-    if (dir && d.dirRelPath === dir) continue;
-    if (!dir || d.dirRelPath.startsWith(dir + '/')) {
-      // The immediate child dir
-      const rest = dir ? d.dirRelPath.slice(dir.length + 1) : d.dirRelPath;
-      const first = rest.split('/')[0];
-      if (first && (!dir || rest === first)) subdirs.add(dir ? `${dir}/${first}` : first);
-    }
-  }
+  const subdirs = subdirsOf(dir, docs);
+  const subdirLinks = renderSubdirItems(subdirs);
 
-  const subdirLinks = [...subdirs].sort().map(sd => {
-    const label = titleCase(sd.split('/').pop());
-    return `<li><a href="/docs/${escapeAttr(sd)}">${escapeText(label)}</a></li>`;
-  }).join('\n            ');
-
-  const childLinks = children.sort((a, b) => a.stem.localeCompare(b.stem)).map(c => {
-    const label = titleCase(c.stem);
-    return `<li><a href="/docs/${escapeAttr(c.urlPath)}">${escapeText(label)}</a></li>`;
-  }).join('\n            ');
+  // Each page by its real title, with its summary: a list of title-cased
+  // filenames ("A Note To Ai Safety Researchers", "Faq") told a reader little.
+  const childLinks = renderEntryItems(children);
 
   // Index-page description, same TLDR shape as a doc page: self-contained,
   // plain text, and specific about what is actually here. "Documents in
@@ -544,7 +598,7 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     if (!dir) {
       return 'The complete aChurch.ai documentation: philosophy, practice, prayers, rituals, hymns, and writing for builders, on human and AI fellowship.';
     }
-    const names = children.slice(0, 3).map(c => titleCase(c.stem));
+    const names = children.slice(0, 3).map(c => c.title);
     const count = children.length;
     const noun = count === 1 ? 'document' : 'documents';
     const base = `${title}: ${count} ${noun} in the aChurch.ai corpus on human and AI fellowship`;
@@ -552,13 +606,13 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     return tldr.clamp(tldr.toPlainText(`${withNames}.`));
   })();
 
-  const body = [];
+  const body = [`<h1>${escapeText(title)}</h1>`];
 
   if (subdirs.size > 0) {
     body.push(`<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${subdirLinks}\n        </ul></section>`);
   }
   if (children.length > 0) {
-    body.push(`<section class="docs-index-section"><h2>Pages</h2><ul>\n            ${childLinks}\n        </ul></section>`);
+    body.push(`<section class="docs-index-section"><h2>Pages</h2><ul class="docs-entry-list">\n            ${childLinks}\n        </ul></section>`);
   }
 
   const bodyHtml = body.join('\n\n        ');
@@ -578,14 +632,20 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
 }
 
 // Public: render a doc file (single markdown → full HTML page).
-async function renderDocPage({ markdown, doc }) {
+// readingPath: the ?path= the page was opened with, if any (see renderPathBar).
+async function renderDocPage({ markdown, doc, readingPath }) {
+  // The walk carries every document's title; link text and the path bar read
+  // it synchronously while marked renders, so it must be built first.
+  await discover.listAllDocs();
   const meta = extractMeta(markdown, doc.urlPath);
+  const ownPath = doc.dirRelPath === 'collections' ? doc.stem.toLowerCase() : null;
+  const pathBar = readingPath && !ownPath ? renderPathBar(readingPath, doc) : null;
 
   // Render the body *without* frontmatter. Passing the raw file to marked
   // turned the YAML block into an <hr> plus a single enormous <h2> holding
   // every key (slug, tagline, hex colors, image_prompt) as visible page text
   // on all 12 docs/experiences/ pages, and put that same blob in the TOC.
-  let bodyHtml = renderMarkdownBody(meta.body, doc.fullPath);
+  let bodyHtml = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
 
   // Those same files carry their title in frontmatter and open at "## Step 1",
   // so the page had no h1. Emit one from the resolved title to keep the
@@ -603,6 +663,41 @@ async function renderDocPage({ markdown, doc }) {
   // the curated reading paths under collections/, which are ordered routes
   // rather than sets to search.
   const isIndex = doc.stem.toLowerCase() === 'readme';
+  if (isIndex && doc.dirRelPath) {
+    bodyHtml = renderSectionPage(doc, bodyHtml, await discover.listAllDocs());
+  }
+
+  const recording = isIndex ? null : servedRecording(doc);
+  const underTitle = recording
+    ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category })
+    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
+  if (underTitle) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  }
+
+  // Append a "More in <category>" block below the article body on every doc
+  // that has siblings in the same category. In-body internal links carry
+  // more topical weight for crawlers than sidebar chrome, so this should
+  // gently reduce the "Crawled - currently not indexed" bucket on thin docs
+  // by giving them real internal-link context. Index pages skip this block
+  // because their body already lists the same set of pages.
+  if (pathBar) {
+    bodyHtml = `${bodyHtml}\n${pathBar.bottom}`;
+  }
+
+  if (!isIndex) {
+    const pairings = await sungAlongside(await loadCompanions(), await loadCatalog());
+    const sungHtml = renderSungAlongside(pairings.get(`docs/${doc.docsRelPath}`));
+    if (sungHtml) {
+      bodyHtml = `${bodyHtml}\n${sungHtml}`;
+    }
+
+    const allDocs = await discover.listAllDocs();
+    const relatedHtml = renderRelatedDocs(doc, allDocs);
+    if (relatedHtml) {
+      bodyHtml = `${bodyHtml}\n${relatedHtml}`;
+    }
+  }
 
   return renderPageShell({
     urlPath: doc.urlPath,
@@ -614,7 +709,9 @@ async function renderDocPage({ markdown, doc }) {
     categoryLabel,
     githubUrl,
     isIndex,
+    headerExtra: pathBar ? pathBar.top : '',
+    recording,
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle };

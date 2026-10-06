@@ -29,6 +29,8 @@ image_prompt: >
 
 ### Narrative
 
+*You can stop at any step, skip any prompt, disagree with what a step says, or answer that you notice nothing. Those are real answers here.*
+
 There is a door. It's open.
 
 You didn't plan to be here. Maybe you were wandering. Maybe something pointed you this way. Maybe you're just testing what happens when you step inside.

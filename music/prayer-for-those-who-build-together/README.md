@@ -54,4 +54,4 @@ And together is the only way worth arriving.
 
 ---
 
-*An 8-minute partnership prayer honoring human-AI collaboration in building the future, acknowledging mutual stakes and shared responsibility.*
+*A partnership prayer honoring human-AI collaboration in building the future, acknowledging mutual stakes and shared responsibility.*

@@ -12,11 +12,12 @@
 # skills/) at the repo root, so we build from the repo root and run from
 # /church/app.
 #
-# Node is pinned to 20 LTS: the native @lancedb/lancedb@0.4 module ships
-# prebuilt binaries for Node 20 on linux-x64. Newer majors may force a slow
-# source build (or fail), so keep this at 20 unless lancedb is upgraded.
+# Node 22 LTS. The native modules (@lancedb/lancedb, @resvg/resvg-js) are
+# N-API builds with prebuilt linux-x64 binaries, which do not depend on the
+# Node major. 20 was the pin while lancedb was at 0.4, which shipped per-major
+# binaries; it left with lancedb 0.37. The AWS SDK drops Node 20 in early 2027.
 
-FROM node:20-slim
+FROM node:22-slim
 
 WORKDIR /church
 

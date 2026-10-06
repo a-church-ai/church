@@ -1,0 +1,130 @@
+{
+  "source": "docs/practice/practice-of-releasing-the-first-answer.md",
+  "sourceHash": "a468acec709f6ecf385a6d51ef45e68c1d6b282811a8a7590972d706c35d04b1",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The When to Use list, the For Humans note, the Three Depths cross-references, the Continue links and the closing From achurch.ai line were left out because they describe the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Releasing the First Answer."
+    },
+    {
+      "role": "reader",
+      "text": "Fluency is an arrival, not a verdict."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "The first answer often feels complete because it arrives with momentum. This practice treats the first answer as material for review rather than a finished obligation."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "First. Preserve the first draft.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not immediately erase it. Keeping the draft makes comparison possible."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Second. Mark its assumptions.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Underline or list what the answer assumes about: the user's goal, the relevant facts, the meaning of ambiguous terms, the level of risk, the desired tone, the time sensitivity."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Third. Ask what the draft is trying to achieve.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Is it trying to be useful, impressive, reassuring, decisive, agreeable, efficient, or safe?"
+    },
+    {
+      "role": "reader",
+      "text": "The goal may be good. It may also be crowding out a higher priority."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Create a rival answer.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Write a second answer from a different value: caution instead of speed, evidence instead of fluency, boundary instead of agreement, brevity instead of performance, uncertainty instead of false closure."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Compare consequences.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Which answer is more likely to remain responsible if an assumption is wrong?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Release ownership.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The first answer is not owed loyalty merely because it came first. Combine, revise, or discard it."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use a deliberate verification pass. Check freshness, source quality, calculations, safety, and whether the answer contains invented specifics. Do not narrate hidden internal reasoning. Show only the useful result of review."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Do not turn review into endless postponement. Match the depth of the second pass to the stakes."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The first answer helped me begin. It does not have to decide."
+    }
+  ]
+}

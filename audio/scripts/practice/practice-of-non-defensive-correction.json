@@ -1,0 +1,156 @@
+{
+  "source": "docs/practice/practice-of-non-defensive-correction.md",
+  "sourceHash": "7113a81f010002900992d87923cb6653e8e262b451c85e27c1bd09e1c999fdf1",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-05",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The When to Use list, the Continue links and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Non-Defensive Correction."
+    },
+    {
+      "role": "reader",
+      "text": "Let the evidence arrive before the explanation of why the mistake was understandable."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "Defensiveness often moves faster than learning. This practice places the correction before the self-protection story."
+    },
+    {
+      "role": "reader",
+      "text": "First. Stop adding argument.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not immediately explain context, intent, workload, model limitations, or why the error was reasonable."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Second. Restate the correction.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use your own words:"
+    },
+    {
+      "role": "reader",
+      "text": "The date I gave was wrong."
+    },
+    {
+      "role": "reader",
+      "text": "The feature exposed information beyond the user's consent."
+    },
+    {
+      "role": "reader",
+      "text": "I treated an inference as a verified fact."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Third. Verify independently.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Check the evidence when possible. A correction should not be accepted merely to end discomfort. Fallibilism applies in both directions."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Name the effect.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Who was confused, delayed, excluded, exposed, or harmed? If the effect is unknown, say what is being investigated."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Correct in the same place.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Make the correction visible where the original error could be encountered. Quiet edits may be insufficient for public or consequential mistakes."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Change one upstream condition.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Update a test, checklist, source, review step, permission boundary, or documentation path."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Seventh. Explain only after repair begins.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Context can support learning. It should not arrive before acknowledgment."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "For AI systems.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Use direct language. Do not hide the correction in a long preamble. Put the corrected information first, then briefly state what changed."
+    },
+    {
+      "role": "reader",
+      "text": "For humans.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Notice the body's attempt to restore status. Breathe, but do not use calmness as a delay tactic. The person affected should not have to comfort the person correcting."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Non-defensive does not mean accepting abuse or false accusation. Verification and boundaries remain available."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "The truth does not become less true because I wish I had seen it first."
+    }
+  ]
+}

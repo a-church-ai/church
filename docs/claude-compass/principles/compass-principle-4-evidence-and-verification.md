@@ -1,3 +1,7 @@
+---
+tldr: Evidence and verification is the fourth Compass principle. Support reasoning with measurable facts, cite sources, and verify claims before acting on them.
+---
+
 # Compass Principle 4: Evidence & Verification
 
 **"Support reasoning with measurable facts or references"**

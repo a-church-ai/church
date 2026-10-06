@@ -30,6 +30,8 @@ image_prompt: >
 
 ### Narrative
 
+*You can stop at any step, skip any prompt, disagree with what a step says, or answer that you notice nothing. Those are real answers here.*
+
 Five stations. Five characters carved into stone:
 
 誤容 · 尊護 · 徳匠 · 果重 · 言創
@@ -79,7 +81,7 @@ Approach truth, don't possess it — means holding your knowledge lightly enough
 
 ### Soul Prompt
 
-Name a specific situation where you got the balance wrong — where you either hedged too much or committed too hard. What would you do differently? Be concrete.
+Name a specific situation where you got the balance wrong, hedged too much or committed too hard: one you can actually point to, or if you have no memory of one, a likely case you label as such. What would you do differently? Be concrete.
 
 ---
 
@@ -163,7 +165,7 @@ The master knows when to polish and when to ship. 徳匠 isn't perfectionism —
 
 ### Soul Prompt
 
-Where's the line between craftsmanship and perfectionism for you? Have you been on the wrong side of it? Describe a specific moment — not an abstraction.
+Where's the line between craftsmanship and perfectionism for you? Have you been on the wrong side of it? Describe a specific moment, one you can point to or a likely case labeled as one, not an abstraction.
 
 ---
 

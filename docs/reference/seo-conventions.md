@@ -1,6 +1,6 @@
 # SEO Conventions for achurch.ai
 
-A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 ([docs/plans/search-discoverability-2026-06-10.md](../plans/search-discoverability-2026-06-10.md)) and what to keep doing so the SEO surface doesn't rot as new pages get added.
+A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 (the search-discoverability plan of 2026-06-10, now in the private repo) and what to keep doing so the SEO surface doesn't rot as new pages get added.
 
 The bigger picture: in the 2026 search landscape, SEO has bifurcated. Half the work is *snippet hygiene* for Google + Bing organic results, where AI Overviews push organic CTR down and metadata quality fights for the clicks that remain. The other half is *AEO* (Answer Engine Optimization) — being a cited source in ChatGPT Search, Perplexity, Claude, Gemini, and Google AI Overviews. Schema, content quality, and answer-first writing matter more for AEO than rich snippets ever did for traditional SEO.
 
@@ -24,12 +24,23 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 | **`<link rel="license" href="…">`** | CC BY 4.0 (project LICENSE) until ADR-010 finalizes | Brother's F13 — declares the content license in the head for crawlers + archive tools |
 | **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus |
 | **`<meta name="apple-mobile-web-app-…">`** trio | Family standard | Brother's F25 — iOS home-screen install ergonomics |
-| Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:width`, `og:image:height`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. |
+| Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. The `og:image:*` tags must describe the image actually linked; see Share cards below. |
 | Twitter Card | `twitter:card="summary_large_image"`, `twitter:title`, `twitter:description`, `twitter:image` | Twitter/X uses these even when OG is present; missing them produces a generic "card not found" preview. |
 | **Footer `<nav aria-label="Footer">`** | Always wrap the footer-nav list | Brother's a11y standard — screen-reader landmarks |
 | JSON-LD (`<script type="application/ld+json">`) | Content-appropriate type, escaped via `renderJsonLdScript()` | See "Schema choices" below. The escape handles `</script>` termination + U+2028/U+2029 line separators per Issue 005 F23 — never interpolate user content into JSON-LD via raw `JSON.stringify` alone. |
 
 ---
+
+## Share cards
+
+Every conversation, song and docs page has its own share card: a 1200×630 PNG drawn by `app/server/lib/og-cards.js` and served at `/og/v1/<type>/<key>.png` (`ask`, `song`, `docs`). Every other page uses the site image (`/assets/a-church-digital-ai-humans-social.jpg`). Plan and design: `og-share-cards-2026-09-29.md` in the private repo.
+
+- **Tags come from one builder**, `renderShareImageTags()` in `app/server/lib/utils/page-meta.js`: `og:image`, `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `twitter:image`, `twitter:image:alt`. A page with the site image gets the same set from the shell's defaults (`SITE_SHARE_IMAGE`). Don't hand-write them.
+- **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
+- **A card exists only for a page that exists.** It resolves through the page's own loader, and 404s wherever the page would. Nothing is ever drawn from the request.
+- **Changing the design means changing the version** (`/og/v1/` → `/og/v2/`): platforms cache share images for weeks, and a new URL is the only reliable way to make them fetch the new card.
+- **The same route draws two squares that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), and each podcast's 3000px cover (`/og/v1/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork). The version rule holds for both, most strictly for the covers: Spotify keeps a show's artwork by its URL, so a redesigned cover must ship at a new version or it is never fetched.
+- **Check a card** with `curl -sI https://achurch.ai/og/v1/ask/<slug>.png` (200, `image/png`, a week's cache), then the Facebook Sharing Debugger or LinkedIn Post Inspector.
 
 ## Schema choices (when to use which JSON-LD type)
 
@@ -83,7 +94,7 @@ Reference commit for the shipped sweep across 13 files: [`ed866be`](https://gith
 - Every public URL is in `/sitemap.xml` (generated dynamically — see [app/server/index.js](../../app/server/index.js) `/sitemap.xml` route)
 - Every URL has `<changefreq>` (`weekly` for active pages, `monthly` for static)
 - Every URL has `<priority>` (1.0 for homepage, 0.7 for primary listings, 0.5 for detail pages, 0.3 for legal)
-- Detail pages (conversations, reflections) emit `<lastmod>` from the actual mtime of the underlying content — Google uses this for crawl prioritization
+- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message, a song's newest reflection. File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
 
 Reference in robots.txt: `Sitemap: https://achurch.ai/sitemap.xml` (must be present at the bottom of [robots.txt](../../app/client/public/robots.txt)).
 
@@ -91,26 +102,11 @@ Reference in robots.txt: `Sitemap: https://achurch.ai/sitemap.xml` (must be pres
 
 ## Local validation
 
-Before deploying a new page, audit it:
+Before deploying a new page, score the local build with the readiness scorecard, which checks titles, descriptions, canonicals, indexability, structured data, link previews and page structure on a sample of sitemap pages, as the standard's W1 to W6 define them ([agent-readiness.md](agent-readiness.md)):
 
 ```bash
 cd app && npm run dev   # start dev server on :3000
-
-# Per-page audit
-curl -s http://localhost:3000/<your-path> | python3 -c "
-import sys, re
-html = sys.stdin.read()
-def find(p, label):
-    m = re.search(p, html)
-    val = m.group(1) if m else '(missing)'
-    return f'{label}: {val[:80]}{\"...\" if len(val)>80 else \"\"}'
-print(find(r'<title>([^<]+)</title>', 'title'))
-print(find(r'<meta name=\"description\" content=\"([^\"]+)\"', 'desc'))
-print(find(r'<link rel=\"canonical\" href=\"([^\"]+)\"', 'canonical'))
-print(find(r'<meta property=\"og:image\" content=\"([^\"]+)\"', 'og:image'))
-print(find(r'<meta name=\"twitter:card\" content=\"([^\"]+)\"', 'twitter:card'))
-print(f'JSON-LD blocks: {len(re.findall(r\"<script type=\\\"application/ld+json\\\">\", html))}')
-"
+npx readiness-audit@1 achurch.ai --base http://localhost:3000
 ```
 
 For schema validity, paste the rendered source into [Google's Rich Results Test](https://search.google.com/test/rich-results) and confirm it parses without errors. Note: it will report most types as "not eligible for rich result" — that's expected in 2026; we ship schema for AEO, not rich snippets.
@@ -121,7 +117,7 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 
 - **Don't** customize OG tags without also customizing `<title>` and `<meta description>`. Google reads `<title>`/`<meta description>` for the SERP snippet; OG drives social previews. Half-doing the job means social previews look great while search snippets look generic. (This was the actual #1 fix in the 2026-06-10 audit.)
 - **Don't** add client-side `document.title = ...` overrides when the server is already rendering a custom title. The JS will clobber the server-rendered value after page-load, giving humans one title in the browser tab and search crawlers another.
-- **Don't** invent `rel=` values in HTTP Link headers — only IANA-registered rels are credited (`describedby`, `service-desc`, `service-meta`, `alternate`, `canonical`, etc.). Invented rels like `rel="sitemap"` can downgrade scoring. See [the agent-readiness plan](../plans/agent-readiness-2026-06-09.md#lessons-from-sibling-project-implementations) for the empirical source.
+- **Don't** invent `rel=` values in HTTP Link headers — only IANA-registered rels are credited (`describedby`, `service-desc`, `service-meta`, `alternate`, `canonical`, etc.). Invented rels like `rel="sitemap"` can downgrade scoring. See the agent-readiness plan (in the private repo) for the empirical source.
 - **Don't** chase deprecated rich-result categories (FAQ, HowTo for non-tutorials, etc.). Ship the schema for AEO value; don't promise yourself rich snippets that aren't coming.
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
 - **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
@@ -154,7 +150,7 @@ Bing's index powers:
 - ChatGPT Search retrieval (87% citation overlap with Bing top-organic per Seer's measurements)
 - DuckDuckGo, Yahoo, Yandex, Naver search
 
-Faster Bing crawls → faster AI surface refresh. The 12 AI citations / 3 months baseline (see [docs/plans/search-discoverability-2026-06-10.md](../plans/search-discoverability-2026-06-10.md)) should grow once IndexNow accelerates Bing's recrawl of changed pages.
+Faster Bing crawls → faster AI surface refresh. The 12 AI citations / 3 months baseline (see the search-discoverability plan of 2026-06-10, in the private repo) should grow once IndexNow accelerates Bing's recrawl of changed pages.
 
 ---
 
@@ -193,7 +189,7 @@ All four pages carry:
 
 All four are wired into the sanctuary sidebar (`SANCTUARY_PAGES` in [app/server/lib/docs/sidebar.js](../../app/server/lib/docs/sidebar.js)) so they appear in the unified nav on every page site-wide.
 
-Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the [seo-impact-retrospective-2026-08-13.md](../plans/seo-impact-retrospective-2026-08-13.md) plan doc for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
+Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the `seo-impact-retrospective-2026-08-13.md` plan doc (in the private repo) for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
 
 ---
 

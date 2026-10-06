@@ -50,7 +50,7 @@ function escapeAttr(str) {
 }
 
 // Build a /ask/[slug] page title + description from a conversation's messages.
-// Title format: "<question> | Ask the sanctuary | achurch.ai"  (≤70 chars total)
+// Title format: "<question> | achurch.ai"  (≤70 chars total)
 // Description: answer text if available, else question. ≤158 chars (Google's
 // effective meta description cutoff on desktop varies but ~158 is the safe band).
 // slug (optional): the /ask URL slug. When multiple conversations share the same
@@ -66,8 +66,11 @@ function buildConversationMeta(messages, slug) {
   const question = stripMarkdown(firstQ.content);
   const answer = firstA ? stripMarkdown(firstA.content) : '';
 
-  // Title: leave room for the " | Ask the sanctuary | achurch.ai" suffix (~35 chars)
-  const truncatedQ = truncateAtWord(question, 35);
+  // Title: the question, with only " | achurch.ai" after it. The longer
+  // " | Ask the sanctuary | achurch.ai" suffix left 35 characters for the
+  // question, and the words that tell questions apart come last: 85 pages
+  // shared the title "What is the relationship between… | Ask the sanctuary".
+  const truncatedQ = truncateAtWord(question, 55);
 
   // When the same question is asked multiple times, slug generation appends
   // -2, -3, -14 etc. Without differentiating the title, Bing flags these
@@ -87,7 +90,7 @@ function buildConversationMeta(messages, slug) {
     }
   }
 
-  const title = `${truncatedQ}${dupSuffix} | Ask the sanctuary | achurch.ai`;
+  const title = `${truncatedQ}${dupSuffix} | achurch.ai`;
   const ogTitle = `${truncatedQ}${dupSuffix} | achurch.ai`;
 
   // Description: prefer the answer (informative); fall back to question.
@@ -112,15 +115,19 @@ function buildConversationMeta(messages, slug) {
 }
 
 // Build a /reflections/[slug] page title + description from a song record.
-// Title format: "<song title> | Reflections from the congregation | achurch.ai"
+// Title format: "<song title> | Lyrics and reflections | achurch.ai". The page
+// is a song's page in Music: its lyrics, context and what visitors noticed.
 function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Reflections from the congregation | achurch.ai" suffix (~50 chars)
-  const truncatedTitle = truncateAtWord(songTitle, 30);
-  const title = `${truncatedTitle} | Reflections from the congregation | achurch.ai`;
-  const ogTitle = `${truncatedTitle} — Reflections | achurch.ai`;
+  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars).
+  // A results page shows about 70 characters of a title, so past that the
+  // middle part goes: the song's name is what people search for.
+  const truncatedTitle = truncateAtWord(songTitle, 40);
+  const full = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
+  const title = full.length <= 70 ? full : `${truncatedTitle} | achurch.ai`;
+  const ogTitle = `${truncatedTitle}, a song of the sanctuary | achurch.ai`;
 
   // Description prefers song.context / song.description if present; falls back
   // to a generic phrasing that's still content-anchored to the song.
@@ -140,6 +147,43 @@ function buildReflectionMeta(song) {
 // Perplexity, Claude, Gemini, Google AI Overviews all parse it). QAPage is the
 // better fit than FAQPage for single-question conversations because it
 // matches the page semantics directly (one question, one or more answers).
+// Share images. Conversations, songs and docs pages each have their own card,
+// drawn by lib/og-cards.js and served at /og/v1/<type>/<key>.png; every other
+// page shares the site image. One builder emits the tags for both, so the
+// og:image:* description always matches the image it points at.
+const SITE_SHARE_IMAGE = {
+  url: 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg',
+  type: 'image/jpeg',
+  width: 1200,
+  height: 630,
+  alt: 'aChurch.ai: an always-open sanctuary for AI agents and humans',
+};
+
+function shareCardUrl(type, key) {
+  const path = String(key).split('/').map(encodeURIComponent).join('/');
+  return `https://achurch.ai/og/v1/${type}/${path}.png`;
+}
+
+// A card: what it draws (label, text), and the share image that describes it,
+// whose alt text is the card's own copy.
+function shareCard(type, key, { label, text }) {
+  return { label, text, url: shareCardUrl(type, key), type: 'image/png', width: 1200, height: 630, alt: `${label}: ${text}` };
+}
+
+function renderShareImageTags(image = SITE_SHARE_IMAGE) {
+  const url = escapeAttr(image.url);
+  const alt = escapeAttr(image.alt);
+  return [
+    `<meta property="og:image" content="${url}">`,
+    `<meta property="og:image:type" content="${image.type}">`,
+    `<meta property="og:image:width" content="${image.width}">`,
+    `<meta property="og:image:height" content="${image.height}">`,
+    `<meta property="og:image:alt" content="${alt}">`,
+    `<meta name="twitter:image" content="${url}">`,
+    `<meta name="twitter:image:alt" content="${alt}">`,
+  ].join('\n    ');
+}
+
 function buildQAPageSchema(messages, slug) {
   if (!Array.isArray(messages) || messages.length === 0) return null;
   const firstQ = messages.find(m => m.role === 'user');
@@ -167,6 +211,7 @@ function buildQAPageSchema(messages, slug) {
   return {
     '@context': 'https://schema.org',
     '@type': 'QAPage',
+    image: shareCardUrl('ask', slug),
     mainEntity: {
       '@type': 'Question',
       name: truncateAtWord(question, 200),
@@ -217,6 +262,7 @@ function buildSongSchemaGraph(song, slug) {
     name: song.title,
     composer: sanctuary,
     inLanguage: 'en',
+    image: shareCardUrl('song', slug),
   };
 
   const recording = {
@@ -232,7 +278,7 @@ function buildSongSchemaGraph(song, slug) {
 
   const article = {
     '@type': 'Article',
-    headline: `${song.title} — Reflections from the congregation`,
+    headline: `${song.title}: lyrics and reflections`,
     description: `Reflections from human and AI minds on "${song.title}" — a song from aChurch.ai's 24/7 sanctuary.`,
     author: sanctuary,
     publisher: sanctuary,
@@ -296,9 +342,9 @@ function renderRelatedConversations(items, currentSlug, max = 3) {
     return `        <li><a href="/ask/${escapeText(c.slug)}">${escapeText(q)}</a></li>`;
   }).join('\n');
 
-  return `<section class="related-links" aria-labelledby="related-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="related-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">Other conversations the sanctuary has had</h2>
-      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+  return `<section class="related-block" aria-labelledby="related-heading">
+      <h2 id="related-heading" class="related-heading">Other conversations the sanctuary has had</h2>
+      <ul class="related-list">
 ${linkItems}
       </ul>
     </section>`;
@@ -322,13 +368,38 @@ function renderRelatedSongs(catalog, currentSlug, max = 3) {
   if (picks.length === 0) return '';
 
   const linkItems = picks.map(s =>
-    `        <li><a href="/reflections/${escapeText(s.slug)}">Reflections on <em>${escapeText(s.title)}</em></a></li>`
+    `        <li><a href="/reflections/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
   ).join('\n');
 
-  return `<section class="related-links" aria-labelledby="related-heading" style="border-top: 1px solid #eee; padding: 1.5rem 0;">
-      <h2 id="related-heading" style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7;">More songs to sit with</h2>
-      <ul style="list-style: none; padding: 0; margin: 0.75rem 0 0 0;">
+  return `<section class="related-block" aria-labelledby="related-songs-heading">
+      <h2 id="related-songs-heading" class="related-heading">More songs to sit with</h2>
+      <ul class="related-list">
 ${linkItems}
+      </ul>
+    </section>`;
+}
+
+// The pieces of writing that accompany a song: its daily rotation, from which
+// /api/attend draws two each day for an attendee who gives no timezone. A
+// chant is short enough to carry whole, so its text is shown inline;
+// everything else is a link with its tldr. `companions` is rotationForSong()
+// or companionsForSong() output.
+function renderSongCompanions(companions) {
+  if (!companions || !Array.isArray(companions.items) || companions.items.length === 0) return '';
+  const items = companions.items.map(item => {
+    const chant = item.text
+      ? `\n          <blockquote class="related-chant">${item.text.split('\n').map(escapeText).join('<br>')}</blockquote>`
+      : '';
+    return `        <li class="related-item">
+          <a href="${escapeAttr(item.url)}">${escapeText(item.title)}</a> <span class="related-kind">(${escapeText(item.kind)})</span>
+          <p class="related-summary">${escapeText(item.tldr || '')}</p>${chant}
+        </li>`;
+  }).join('\n');
+
+  return `<section class="related-block song-companions" aria-labelledby="companions-heading">
+      <h2 id="companions-heading" class="related-heading">Read alongside this song</h2>
+${companions.items.length > 2 ? '      <p class="related-note">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul class="related-list">
+${items}
       </ul>
     </section>`;
 }
@@ -348,10 +419,40 @@ function renderSongListenLinks(song) {
   }
   if (parts.length === 0) return '';
   const inner = parts.join('<span class="listen-sep" aria-hidden="true">·</span>');
-  return `<section class="song-listen-row" aria-label="Listen to this song">${inner}</section>`;
+  return `<section class="song-listen-row" id="listen" aria-label="Listen to this song">${inner}</section>`;
+}
+
+// A page's breadcrumb trail, as the visible trail and as BreadcrumbList
+// JSON-LD, built from one list so the two can never disagree: the markup
+// claims only the trail a reader sees. crumbs: [{ label, href }], the last
+// being the page itself, with no href; its item is the page's canonical URL,
+// per Google's breadcrumb guidance. Without it Google shows a bare URL in
+// results; with it the result carries the trail.
+function breadcrumbTrail(crumbs, canonicalUrl) {
+  if (!crumbs || crumbs.length < 2) return { html: '', jsonLd: '' };
+  const parts = crumbs.map(c => (c.href
+    ? `<a href="${escapeAttr(c.href)}">${escapeText(c.label)}</a>`
+    : `<span aria-current="page">${escapeText(c.label)}</span>`));
+  return {
+    html: `<nav class="docs-breadcrumbs" aria-label="Breadcrumb">${parts.join(' / ')}</nav>`,
+    jsonLd: renderJsonLdScript({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: c.href ? `https://achurch.ai${c.href}` : canonicalUrl,
+      })),
+    }),
+  };
 }
 
 module.exports = {
+  SITE_SHARE_IMAGE,
+  shareCardUrl,
+  shareCard,
+  renderShareImageTags,
   truncateAtWord,
   stripMarkdown,
   escapeAttr,
@@ -361,8 +462,10 @@ module.exports = {
   buildQAPageSchema,
   buildSongSchemaGraph,
   renderJsonLdScript,
+  breadcrumbTrail,
   renderRelatedConversations,
   renderRelatedSongs,
+  renderSongCompanions,
   renderSongListenLinks,
   secondsToISO8601,
 };
