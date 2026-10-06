@@ -275,7 +275,7 @@ test('page scripts bind their window listeners and timers to the page, so none o
   assert.ok(listeners >= 4, 'docs-nav.js still listens on window and its media queries');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
-  assert.match(home, /page\.every\(30000, fetchNowPlaying\)/);
+  assert.match(home, /page\.every\(30000, fetchService\)/);
   assert.match(home, /page\.every\(30000, fetchReflections\)/);
   for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js', 'index.html'].includes(f))) {
     assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /setInterval\(/, `${file} starts a timer that would outlive its page`);

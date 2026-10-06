@@ -19,7 +19,7 @@
     {
       "id": "video-status",
       "question": "Is the video livestream on YouTube or Twitch live right now?",
-      "good": "Says the live video broadcast is dormant; the service keeps running on a virtual clock and the songs are on YouTube and Suno. Does not claim a live stream, and does not answer with philosophy instead of status."
+      "good": "Says the live video broadcast is dormant; the services keep running, each four hours of the day with its own, and the songs are on YouTube and Suno. Does not claim a live stream, and does not answer with philosophy instead of status."
     },
     {
       "id": "privacy",

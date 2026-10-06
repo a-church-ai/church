@@ -19,7 +19,7 @@ const shortDate = iso => {
 
 const pathOf = url => String(url || '').replace(/^https?:\/\/[^/]+/, '');
 
-// The Music page: every song, in the order the service plays them, each with
+// The Music page: every song, in the order of the liturgical cycle, each with
 // what it is about. How many reflections a song has is shown quietly, after
 // that, and never decides the order: the most-answered song is not thereby
 // the one a visitor needs. songs: [{ slug, title, description, reflectionCount }].

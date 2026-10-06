@@ -56,8 +56,12 @@ const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, share
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
-const { songsInServiceOrder } = require('./lib/utils/virtual-schedule');
-const { rotationForSong } = require('./lib/music/companions');
+const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
+const { nearestForSong } = require('./lib/music/companions');
+const { renderServiceListen } = require('./lib/audio/markup');
+const { loadServiceCatalog } = require('./lib/service/catalog');
+const { startPlanning } = require('./lib/service/plans');
+const { planSlot } = require('./lib/service/planner');
 
 // Create Express app
 const app = express();
@@ -259,9 +263,12 @@ app.get('/', async (req, res) => {
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
     ]);
-    const substituted = catalog && Array.isArray(catalog) && catalog.length > 0
+    const counted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
       : html;
+    // The service panel's listen box, drawn where every player's markup is
+    // (lib/audio/markup.js); the page fills it from /api/now.
+    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen());
     // Wrap in the site shell (sidebar + top bar) so the homepage matches
     // the rest of the site's navigation
     const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
@@ -541,12 +548,12 @@ app.get('/ask/:slug', async (req, res) => {
   }
 });
 
-// The Music page: every song in service order (the schedule's), with its
+// The Music page: every song in the order of the liturgical cycle, with its
 // description and, quietly, how many reflections it has.
 app.get('/reflections', async (req, res) => {
   const { body } = await apiOps.reflections.bySong({}, apiShared.requestContext(req));
   const counts = new Map(((body && body.songs) || []).map(s => [s.slug, s.reflectionCount]));
-  const songs = await Promise.all(songsInServiceOrder(await loadSchedule(), await loadCatalog()).map(async s => ({
+  const songs = await Promise.all(songsInCycleOrder(await loadSchedule(), await loadCatalog()).map(async s => ({
     slug: s.slug,
     title: s.title,
     description: await songDescription(s),
@@ -627,10 +634,8 @@ app.get('/reflections/:slug', async (req, res) => {
       const songContent = await loadSongContent(slug);
       const songBlockHtml = renderSongBlock(song, songContent);
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
-      // The writing that accompanies this song in a session, then more songs.
-      // Two of these pieces accompany the song each day; the page lists the
-      // whole rotation so it stays true whichever day it is read.
-      const companionsHtml = renderSongCompanions(await rotationForSong(await loadCompanions(), slug, ''));
+      // The writing nearest this song in meaning, then more songs.
+      const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
       const listenLinksHtml = renderSongListenLinks(song);
@@ -1603,6 +1608,15 @@ async function startServer() {
       console.warn(`[rag] startup rebuild check failed: ${err.message}; server continues`);
     });
 
+    // The day's services (lib/service/plans.js): after boot and hourly, plan
+    // whatever is missing for the dates in use and the next. Without an
+    // Anthropic key nothing is planned, and every slot is served by rotation.
+    if (process.env.ANTHROPIC_API_KEY) {
+      startPlanning({ catalog: loadServiceCatalog, plan: planSlot });
+    } else {
+      console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
+    }
+
     // Auto-resume streaming on Node boot.
     //
     // If schedule.isPlaying is true (we were broadcasting before the process
@@ -1618,8 +1632,8 @@ async function startServer() {
     // why the 4-month outage went unnoticed.
     setTimeout(async () => {
       try {
-        // Broadcast gated off (default). The service still runs on the virtual
-        // clock via /api/now + /api/attend; only the FFmpeg encoder stays dark.
+        // Broadcast gated off (default). The service is still served, from the
+        // day's plans, via /api/now + /api/attend; only the FFmpeg encoder stays dark.
         // This is the single most important guard for running on a lightweight
         // host: without it, a schedule left mid-broadcast would try to spawn
         // FFmpeg on boot (and, worse, actually stream).

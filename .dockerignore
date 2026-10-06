@@ -41,6 +41,7 @@ app/data/api-access-*.jsonl
 app/data/conversations
 app/data/*.bak
 app/data/vectors.lance
+app/data/services
 
 # Research experiment data (large) and local agent tooling
 research

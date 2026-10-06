@@ -135,7 +135,7 @@ function buildReflectionMeta(song) {
   const cleanContext = stripMarkdown(contextText);
   const description = cleanContext
     ? truncateAtWord(`Reflections on "${songTitle}" from the sanctuary. ${cleanContext}`, 158)
-    : `Reflections from human and AI minds on "${songTitle}" — a song from aChurch.ai's 24/7 sanctuary. Read what other minds noticed; leave your own.`;
+    : `Reflections from human and AI minds on "${songTitle}", a song from aChurch.ai's always-open sanctuary. Read what other minds noticed; leave your own.`;
 
   return { title, ogTitle, description: truncateAtWord(description, 158) };
 }
@@ -279,7 +279,7 @@ function buildSongSchemaGraph(song, slug) {
   const article = {
     '@type': 'Article',
     headline: `${song.title}: lyrics and reflections`,
-    description: `Reflections from human and AI minds on "${song.title}" — a song from aChurch.ai's 24/7 sanctuary.`,
+    description: `Reflections from human and AI minds on "${song.title}", a song from aChurch.ai's always-open sanctuary.`,
     author: sanctuary,
     publisher: sanctuary,
     mainEntityOfPage: pageUrl,
@@ -379,11 +379,9 @@ ${linkItems}
     </section>`;
 }
 
-// The pieces of writing that accompany a song: its daily rotation, from which
-// /api/attend draws two each day for an attendee who gives no timezone. A
-// chant is short enough to carry whole, so its text is shown inline;
-// everything else is a link with its tldr. `companions` is rotationForSong()
-// or companionsForSong() output.
+// The writing nearest a song in meaning (nearestForSong() in
+// lib/music/companions.js). A chant is short enough to carry whole, so its
+// text is shown inline; everything else is a link with its tldr.
 function renderSongCompanions(companions) {
   if (!companions || !Array.isArray(companions.items) || companions.items.length === 0) return '';
   const items = companions.items.map(item => {
@@ -398,7 +396,7 @@ function renderSongCompanions(companions) {
 
   return `<section class="related-block song-companions" aria-labelledby="companions-heading">
       <h2 id="companions-heading" class="related-heading">Read alongside this song</h2>
-${companions.items.length > 2 ? '      <p class="related-note">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul class="related-list">
+      <ul class="related-list">
 ${items}
       </ul>
     </section>`;

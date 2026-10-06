@@ -110,7 +110,7 @@ test('attending twice in a row still works', async (t) => {
   assert.strictEqual((await get(port, '/api/attend?name=Second')).status, 200);
 });
 
-// --- Readings and reflections ---
+// --- The service's pieces, and reflections ---
 
 const { loadCatalog } = require('../server/lib/utils/data');
 const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
@@ -128,12 +128,12 @@ test('the test writes to its scratch directory, not the real attendance file', (
   assert.strictEqual(path.dirname(ATTENDANCE_FILE), scratch);
 });
 
-test('attending carries the full text of both readings; /api/now carries only links', async (t) => {
+test('attending carries the full text of the service\'s pieces; /api/now carries only links', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const attend = (await get(port, '/api/attend?name=ReadingsTest')).json;
-  assert.ok(attend.companions, 'the current song has companions');
+  assert.ok(attend.companions.items.length >= 3, 'a chant, a reading and a closing at least');
   for (const item of attend.companions.items) {
     assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its full text`);
     assert.ok(item.content.includes(item.title.split(':')[0].slice(0, 12)), `${item.title}: content is that document`);
@@ -144,23 +144,24 @@ test('attending carries the full text of both readings; /api/now carries only li
   assert.ok(now.companions.items.every(item => item.content === undefined));
 });
 
-test('the reflection prompt names the readings that accompany the song', async (t) => {
+test('the reflection prompt names the song and the pieces around it', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const { json } = await get(port, '/api/attend?name=ReadingsTest');
   const titles = json.companions.items.map(item => item.title);
-  // Prompts are chosen at random; every companion prompt names the readings
-  // either by title or as "the reading(s)", whether there is one or more.
+  // Prompts are chosen at random; every one names the song, and the pieces
+  // either by title or as "the pieces".
+  assert.ok(json.reflection.prompt.includes(json.current.title), json.reflection.prompt);
   assert.ok(
-    titles.some(title => json.reflection.prompt.includes(title)) || /the readings?\b/.test(json.reflection.prompt),
+    titles.some(title => json.reflection.prompt.includes(title)) || /the pieces\b/.test(json.reflection.prompt),
     json.reflection.prompt
   );
   assert.doesNotMatch(json.reflection.prompt, /\{\w+\}/, 'no placeholder left unfilled');
-  assert.match(json.reflection.practice, /the readings? beside them/);
+  assert.match(json.reflection.practice, /the pieces beside them/);
 });
 
-test('a reflection is filed under the songSlug it names, not the song playing now', async (t) => {
+test('a reflection is filed under the songSlug it names, not the service\'s song', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
@@ -175,14 +176,19 @@ test('a reflection is filed under the songSlug it names, not the song playing no
   assert.strictEqual(stored.song, other);
 });
 
-test('without songSlug a reflection is filed under the song playing now', async (t) => {
+test('without songSlug a reflection is filed under the song of the reflector\'s service', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
-  const current = (await get(port, '/api/now')).json.current.slug;
-  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About whatever is playing.' });
-  assert.strictEqual(res.status, 200);
-  assert.strictEqual(res.json.song, current);
+  for (const timezone of ['Asia/Tokyo', 'America/Chicago']) {
+    const current = (await get(port, `/api/now?timezone=${timezone}`)).json.current.slug;
+    const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service.', timezone });
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.json.song, current, timezone);
+  }
+  const utc = (await get(port, '/api/now')).json.current.slug;
+  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service.' });
+  assert.strictEqual(res.json.song, utc, 'no timezone: UTC\'s service');
 });
 
 test('an unknown songSlug is a 400, not a reflection filed somewhere else', async (t) => {
@@ -228,13 +234,19 @@ test('the reflect step names the song, so a copied template files it correctly',
   assert.strictEqual(reflect.body.songSlug, current.slug);
 });
 
-test('the readings step mentions a chant only when one of the readings is a chant', () => {
+test('the pieces step links every piece, and says where the text is only when it is there', () => {
   const ns = require('../server/lib/utils/next-steps');
-  const prayer = { kind: 'prayer', title: 'P', url: 'u1', content: 'x' };
-  const ritual = { kind: 'ritual', title: 'R', url: 'u2', content: 'x' };
-  const chant = { kind: 'chant', title: 'C', url: 'u3', content: 'x' };
-  assert.doesNotMatch(ns.sitWith([prayer, ritual], 'Song').description, /chant/);
-  assert.match(ns.sitWith([prayer, chant], 'Song').description, /carry the chant/);
+  const pieces = [
+    { kind: 'chant', title: 'C', url: 'u1', recording: 'a1' },
+    { kind: 'prayer', title: 'P', url: 'u2', recording: 'a2' },
+  ];
+  const linked = ns.sitWith(pieces);
+  assert.deepStrictEqual(linked.steps.map(step => step.url), ['u1', 'u2']);
+  assert.ok(linked.steps.every(step => step.tool === 'read_doc'));
+  assert.doesNotMatch(linked.description, /\.content/);
+  assert.match(linked.description, /recording/);
+  const full = ns.sitWith(pieces.map(piece => ({ ...piece, content: 'x' })));
+  assert.match(full.description, /companions\.items\[\]\.content/);
 });
 
 // --- The API's front door ---

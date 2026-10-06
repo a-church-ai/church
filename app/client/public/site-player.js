@@ -6,9 +6,9 @@
  * keeps playing while site-nav.js changes pages around it. Once something
  * plays, a bar at the bottom of every page shows it: play and pause, 15-second
  * skips, the waveform as the progress bar, speed, and on phones a sheet with
- * all of them. A document's own player (lib/audio/markup.js) and a reading
- * path's "Listen to this path" are remotes for it, so the page and the bar
- * can never disagree.
+ * all of them. A document's own player (lib/audio/markup.js), a reading
+ * path's "Listen to this path" and the home page's "Listen to this service"
+ * are remotes for it, so the page and the bar can never disagree.
  *
  * It also writes the lock screen's card (Media Session), resumes after a full
  * load, paused, from the browser's own storage, lets one tab play at a time,
@@ -131,7 +131,22 @@
     return stops[i].map((a, k) => Math.round(a + (stops[i + 1][k] - a) * f));
   }
 
-  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, RATES, SKIP_SECONDS };
+  // Where to join a queue that keeps time, as a service does: its clock is
+  // the length of its loop and where the loop stood at a moment (asOf, in ms),
+  // and each track knows its start within the loop. The track in progress,
+  // part way in, or else the next to begin; the rest follow in turn, round
+  // to the one before it, so each plays once.
+  function joinAt(tracks, clock, nowMs) {
+    const t = ((clock.at + (nowMs - clock.asOf) / 1000) % clock.loop + clock.loop) % clock.loop;
+    const found = tracks.findIndex(track => t < track.start + track.seconds);
+    const index = found === -1 ? 0 : found;
+    return {
+      tracks: tracks.slice(index).concat(tracks.slice(0, index)),
+      at: found === -1 ? 0 : Math.max(0, t - tracks[index].start),
+    };
+  }
+
+  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, joinAt, RATES, SKIP_SECONDS };
   if (typeof module === 'object' && module.exports) {
     module.exports = helpers;
     return;
@@ -165,7 +180,7 @@
 
   let track = null;      // what the player holds
   let loaded = null;     // the file the element has as its source
-  let queue = null;      // { name, title, href, tracks, index } while a path plays
+  let queue = null;      // { name, title, href, unit, tracks, index } while a path or a service plays
   let pendingAt = 0;     // where to start, before the element knows the length
   let startedAt = 0;
   let rate = RATES.includes(store.get(KEY_RATE)) ? store.get(KEY_RATE) : 1;
@@ -228,9 +243,10 @@
 
   const skip = by => seek(position() + by);
 
-  function playQueue(q, index) {
-    queue = { name: q.name, title: q.title, href: q.href, tracks: q.tracks, index };
-    play(q.tracks[index], 0);
+  // at: where in the first track to begin, for a queue joined in progress.
+  function playQueue(q, index, at = 0) {
+    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index };
+    play(q.tracks[index], at);
   }
 
   function step(by) {
@@ -339,7 +355,7 @@
       load(next, 0);
       const started = audio.play();
       if (started && started.catch) started.catch(() => render());
-      announce(`Now playing ${next.title}, reading ${queue.index + 1} of ${queue.tracks.length}`);
+      announce(`Now playing ${next.title}, ${(queue.unit || 'Reading').toLowerCase()} ${queue.index + 1} of ${queue.tracks.length}`);
       return;
     }
     pendingAt = 0;
@@ -597,7 +613,7 @@
         if (a.textContent !== track.title) a.textContent = track.title;
         a.setAttribute('href', track.href);
       });
-      const sub = queue ? `Reading ${queue.index + 1} of ${queue.tracks.length}: ${queue.title}` : track.album;
+      const sub = queue ? `${queue.unit || 'Reading'} ${queue.index + 1} of ${queue.tracks.length}: ${queue.title}` : track.album;
       el.querySelectorAll('.pb-sub').forEach(s => { if (s.textContent !== sub) s.textContent = sub; });
       el.querySelectorAll('.pb-time').forEach(s => { s.textContent = `${clock(t)} / ${clock(d)}`; });
       el.querySelectorAll('.pb-wave').forEach(w => {
@@ -630,8 +646,9 @@
 
     if (path) {
       const ours = queue && queue.name === path.queue.name;
+      const noun = path.queue.noun || 'path';
       path.el.classList.toggle('is-playing', !!(ours && playing));
-      path.label.textContent = ours ? (playing ? 'Pause this path' : 'Resume this path') : 'Listen to this path';
+      path.label.textContent = ours ? (playing ? `Pause this ${noun}` : `Resume this ${noun}`) : `Listen to this ${noun}`;
     }
   }
 
@@ -830,7 +847,10 @@
       path = { el: box, queue: q, label: button.querySelector('span') };
       button.addEventListener('click', () => {
         if (queue && queue.name === q.name) toggle(track);
-        else playQueue(q, 0);
+        else if (q.clock) {
+          const join = joinAt(q.tracks, q.clock, Date.now());
+          playQueue({ ...q, tracks: join.tracks }, 0, join.at);
+        } else playQueue(q, 0);
       });
     }
 
@@ -845,6 +865,9 @@
     seek,
     playQueue,
     close,
+    // For a page that draws its listen box after load, as the home page does
+    // with the service it fetches: bind what the page now holds.
+    refresh: bindPage,
     get track() { return track; },
     get queue() { return queue; },
     get position() { return position(); },

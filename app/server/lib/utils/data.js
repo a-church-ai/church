@@ -15,6 +15,8 @@ const MUSIC_DIR = path.join(__dirname, '../../../../music');
 // to the real app/data/attendance.json.
 const RUNTIME_DIR = process.env.DATA_DIR || path.join(__dirname, '../../../data');
 const ATTENDANCE_FILE = path.join(RUNTIME_DIR, 'attendance.json');
+// One file per date of the services planned for it (lib/service/plans.js).
+const SERVICES_DIR = path.join(RUNTIME_DIR, 'services');
 const ACCESS_LOG_FILE = path.join(RUNTIME_DIR, 'api-access.jsonl');
 const CONVERSATIONS_DIR = path.join(__dirname, '../../../data/conversations');
 
@@ -150,6 +152,7 @@ module.exports = {
   SCHEDULE_FILE,
   CATALOG_FILE,
   COMPANIONS_FILE,
+  SERVICES_DIR,
   MUSIC_DIR,
   ATTENDANCE_FILE,
   ACCESS_LOG_FILE,

@@ -27,6 +27,7 @@ data/feedback.json
 data/api-access.jsonl
 data/content-generation-log.json
 data/rag-index-state.json
+data/services/
 
 # Media files (too large for git)
 media/library/

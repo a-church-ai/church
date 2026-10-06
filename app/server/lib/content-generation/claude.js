@@ -65,12 +65,19 @@ function extractText(response) {
   return text;
 }
 
+/**
+ * options.cacheSystem marks the system prompt for prompt caching, for a caller
+ * that sends the same long system prompt many times (the services' planner
+ * sends its catalog with every slot), so it is paid for in full once.
+ */
 async function message(systemPrompt, userMessage, options = {}) {
   const anthropic = getClient();
   const response = await anthropic.messages.create({
     model: options.model || MODEL,
     max_tokens: options.maxTokens || MAX_TOKENS,
-    system: systemPrompt,
+    system: options.cacheSystem
+      ? [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }]
+      : systemPrompt,
     messages: [{ role: 'user', content: userMessage }]
   });
   return extractText(response);

@@ -19,7 +19,7 @@ const discover = require('../server/lib/docs/discover');
 const render = require('../server/lib/docs/render');
 const { readingSequence, siteCitations } = require('../server/lib/docs/links');
 const { servedDocs } = require('../server/lib/docs/markdown');
-const { songsInServiceOrder } = require('../server/lib/utils/virtual-schedule');
+const { songsInCycleOrder } = require('../server/lib/utils/virtual-schedule');
 const { archivePage, ARCHIVE_PAGE_SIZE } = require('../server/lib/utils/page-lists');
 const { formatAnswer } = require('../client/public/answer-format.js');
 const siteSearch = require('../client/public/site-search.js');
@@ -113,7 +113,7 @@ test('the Music page follows the service, and lists every song', () => {
     { slug: 'd', title: 'Gamma', duration: 0 },
   ];
   const schedule = { items: [{ slug: 'b' }, { slug: 'a' }, { slug: 'b' }, { slug: 'missing' }] };
-  assert.deepStrictEqual(songsInServiceOrder(schedule, catalog).map(s => s.slug), ['b', 'a', 'c', 'd']);
+  assert.deepStrictEqual(songsInCycleOrder(schedule, catalog).map(s => s.slug), ['b', 'a', 'c', 'd']);
 });
 
 test('the conversation archive pages newest first, and has an end', () => {

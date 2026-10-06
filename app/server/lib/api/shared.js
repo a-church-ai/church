@@ -54,7 +54,7 @@ const SEARCH_RATE_LIMIT_MAX = 60;
 
 // Where the music lives. The 24/7 live broadcast is dormant, so these point at
 // the on-demand catalog (song videos + the Suno playlist), not a live stream —
-// honest with the `streams.youtube/twitch: false` flags and `mode: 'virtual'`.
+// honest with the `streams.youtube/twitch: false` flags.
 const STREAM_URLS = {
   youtube: 'https://www.youtube.com/@achurchai',
   suno: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13'

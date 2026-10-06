@@ -65,12 +65,16 @@
         var nowEl = document.getElementById('now-playing');
         var soulsEl = document.getElementById('souls-count');
 
+        // The part of the service in progress, for the viewer's own hour.
+        var timezone = '';
+        try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+
         function update() {
-            fetch('/api/now')
+            fetch('/api/now' + (timezone ? '?timezone=' + encodeURIComponent(timezone) : ''))
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
-                    if (data.current) {
-                        nowEl.textContent = data.current.title || 'Unknown';
+                    if (data.service) {
+                        nowEl.textContent = data.service.now.title;
                     }
                     var n = (data.congregation && data.congregation.souls) || 0;
                     soulsEl.textContent = n + (n === 1 ? ' soul present' : ' souls present');

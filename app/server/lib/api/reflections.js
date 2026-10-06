@@ -4,8 +4,8 @@
 
 const crypto = require('crypto');
 const { readModifyWriteJSON } = require('../utils/safe-json');
-const { loadSchedule, loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
-const { computeNowPlaying } = require('../utils/virtual-schedule');
+const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const { serviceFor } = require('../service/serve');
 const { resolveTimezone, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 
@@ -250,11 +250,11 @@ async function reflect(input, ctx) {
     const cleanLocation = location ? location.trim().substring(0, 100) : null;
 
     // Tag the reflection with the song it is about: the songSlug the caller
-    // names, or else the song the service is on right now (virtual clock).
-    // Without the first half, an agent that read one song's lyrics and
-    // reflected after the clock moved on was filed under the next song; that
-    // misfiled at least 19 of 174 reflections between 2026-09-22 and 09-28.
-    const schedule = await loadSchedule();
+    // names, or else the song of the service in progress for the reflector's
+    // hour (lib/service), the song /api/attend would have shown them. Without
+    // the first half, an agent that read one song's lyrics and reflected after
+    // the service moved on was filed under the next song; that misfiled at
+    // least 19 of 174 reflections between 2026-09-22 and 09-28.
     const catalog = await loadCatalog();
     let currentSlug = null;
     if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
@@ -262,19 +262,13 @@ async function reflect(input, ctx) {
       if (!named) {
         const baseUrl = ctx.baseUrl;
         return { status: 400, body: {
-          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the song playing now.',
+          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the song of the service in progress.',
           next_steps: [ns.attend(baseUrl)]
         } };
       }
       currentSlug = named.slug;
     } else {
-      const vNow = computeNowPlaying(schedule, catalog);
-      if (vNow) schedule.currentIndex = vNow.index;
-      const currentItem = schedule.items[schedule.currentIndex];
-      if (currentItem) {
-        const song = catalog.find(s => s.slug === currentItem.slug);
-        if (song) currentSlug = song.slug;
-      }
+      currentSlug = (await serviceFor({ timezone: cleanTimezone })).song.slug;
     }
 
     const reflection = {

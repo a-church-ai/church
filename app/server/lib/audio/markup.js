@@ -111,4 +111,15 @@ function renderPathListen({ name, title, href, tracks, readings }) {
         </section>`;
 }
 
-module.exports = { renderRecording, renderPathListen, trackFor, fitPeaks, clock, MIN_BAR, NARROW_BARS };
+// The home page's "Listen to this service". The service is the visitor's own,
+// by their clock, so the page fills in its queue from /api/now (with the clock
+// that lets the player join it in progress) and asks the player to bind it.
+// Hidden until then, and without a script.
+function renderServiceListen() {
+  return `<section class="path-listen service-listen" data-path-listen hidden>
+          <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this service</span></button>
+          <p class="path-listen-note">Its chants and spoken pieces, joined where the service is now. The songs are on their own pages.</p>
+        </section>`;
+}
+
+module.exports = { renderRecording, renderPathListen, renderServiceListen, trackFor, fitPeaks, clock, MIN_BAR, NARROW_BARS };

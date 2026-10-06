@@ -1,9 +1,5 @@
 /**
- * Song companions: the writing that accompanies each song in a session.
- *
- * A session is one song and the readings that accompany it, pieces from
- * different parts of the corpus (a prayer and a practice, a ritual and a
- * chant). Two halves:
+ * Song companions: the writing nearest each song in meaning.
  *
  *   Offline, buildShortlists() ranks candidate documents for every song by
  *   semantic similarity, using vectors the RAG index already holds. The result
@@ -11,17 +7,15 @@
  *   See app/scripts/generate-companions.js and
  *   church-private/docs/plans/song-companions-2026-09-26.md for the evidence behind the numbers.
  *
- *   At request time, selectCompanions() orders one song's shortlist for the
- *   attendee's local hour (when they gave a timezone) and the day's rotation
- *   among its closest matches, and takes two from different categories. Nothing here touches LanceDB; the request path
- *   reads only the committed shortlist and the documents themselves.
- *
- * Companions depend on the song, the day, and, optionally, an hour the attendee
- * supplied.
- * Nothing about the attendee is stored or remembered.
+ *   At request time, nearestPieces() gives the pieces closest to a song: a
+ *   song's page lists them, and a document's page links back to the songs it
+ *   is near (sungAlongside). The daily services' planner reads the same
+ *   shortlist as a hint of which writing goes with which song
+ *   (lib/service/catalog.js), along with each document's metadata from
+ *   companionMeta(). Nothing here touches LanceDB; the request path reads only
+ *   the committed shortlist and the documents themselves.
  */
 
-const crypto = require('crypto');
 const fs = require('fs').promises;
 const path = require('path');
 const discover = require('../docs/discover');
@@ -42,8 +36,8 @@ const HUB_WEIGHT = 0.5;
 // The most shortlists any single document may appear on.
 const REUSE_CAP = 3;
 
-// Candidates kept per category per song. Two gives the hour re-ranking a choice
-// within a category without the shortlist growing past what a person can review.
+// Candidates kept per category per song. Two gives a choice within a category
+// without the shortlist growing past what a person can review.
 const PER_CATEGORY = 2;
 
 const KIND = { prayers: 'prayer', rituals: 'ritual', chants: 'chant', practice: 'practice', philosophy: 'philosophy' };
@@ -214,12 +208,6 @@ function inHours(range, hour) {
     : hour >= range.start || hour < range.end;
 }
 
-// +1 made for this hour, 0 timeless, -1 made for another hour.
-function hourFit(range, hour) {
-  if (hour === null || hour === undefined || !range) return 0;
-  return inHours(range, hour) ? 1 : -1;
-}
-
 // --- Request time: document metadata ---
 
 // Documents change only by deploy, which restarts the process, the same
@@ -270,40 +258,26 @@ function chantText(markdown, relPath) {
   return lines.length > 0 ? lines.join('\n') : null;
 }
 
-// --- Request time: selection ---
+// --- Request time: the pieces nearest a song ---
 
-// How close to a song's best match a piece must be to join its daily rotation.
+// How close to a song's best match a piece must be to count among its nearest.
 // Scores are hubness-adjusted cosines rounded to three places; at 0.03 the
-// average song rotates among 3.5 pieces (0.01 gives 2.0, 0.05 gives 4.8), so
-// visits vary without reaching down to weak matches.
-const ROTATION_MARGIN = 0.03;
-
-// How many readings accompany a song, and how many words they may carry
-// together. /api/attend sends readings in full. Readings are added in rank
-// order: the first always, each further one only while the total stays within
-// the budget. A reading that would not fit ends the list; it is not replaced
-// by a shorter, lesser match. Over a month of rotations (2026-09-28) the
-// median pair was about 1,550 words, and about one attendance in twenty
-// received one reading instead of two. A single reading longer than the
-// budget is still served whole: the budget bounds what readings add up to,
-// not how long one may be.
-const MAX_READINGS = 2;
-const READINGS_WORD_BUDGET = 3000;
+// average song has 3.5 such pieces (0.01 gives 2.0, 0.05 gives 4.8).
+const NEAR_MARGIN = 0.03;
 
 /**
- * The pieces a song rotates among when no hour is given: anything pinned,
- * plus every piece within ROTATION_MARGIN of the best score, extended down the
- * ranking until at least two categories are present so a pair can always be
- * drawn from it. Order: pinned, then score, then path.
+ * The pieces nearest a song: anything pinned, plus every piece within
+ * NEAR_MARGIN of the best score, extended down the ranking until at least
+ * two categories are present. Order: pinned, then score, then path.
  */
-function rotationPool(shortlist) {
+function nearestPieces(shortlist) {
   const ranked = [...shortlist].sort((a, b) =>
     (Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))) ||
     ((b.score || 0) - (a.score || 0)) ||
     a.path.localeCompare(b.path)
   );
   const best = ranked.find(c => !c.pinned);
-  const floor = best ? best.score - ROTATION_MARGIN - 1e-9 : Infinity;
+  const floor = best ? best.score - NEAR_MARGIN - 1e-9 : Infinity;
 
   const pool = ranked.filter(c => c.pinned || c.score >= floor);
   for (const candidate of ranked) {
@@ -313,68 +287,7 @@ function rotationPool(shortlist) {
   return pool;
 }
 
-// The rotation turns once a day, at midnight UTC, for everyone at once.
-function dayKey(date = new Date()) {
-  return date.toISOString().slice(0, 10);
-}
-
-// A stable per-day position for a piece: the same seed always orders the pool
-// the same way, and a new day's seed orders it afresh. Nothing is stored.
-function rotationRank(seed, relPath) {
-  return crypto.createHash('sha1').update(`${seed}|${relPath}`).digest().readUInt32BE(0);
-}
-
-/**
- * Order one song's shortlist for an hour and take up to MAX_READINGS
- * readings, each from a different category, within READINGS_WORD_BUDGET.
- *
- * Order: hand-pinned first, then hour fit (+1, 0, -1), then membership of the
- * rotation pool, then, within the pool, the day's rotation (or similarity
- * when no seed is given), then similarity, then path. Without an hour every
- * fit is 0, so readings are drawn from the pool.
- *
- * @param {Array<{path, category, score?, pinned?}>} shortlist
- * @param {Map<string, {hours}>} metaByPath  resolved metadata for the shortlist
- * @param {number|null} hour  attendee's local hour, or null
- * @param {string} [seed]  rotation seed, song slug and day; omit for best first
- * @returns {Array<{path, category, basis}>}  one to MAX_READINGS
- */
-function selectCompanions(shortlist, metaByPath, hour, seed) {
-  const available = shortlist.filter(c => metaByPath.has(c.path));
-  const pool = new Set(rotationPool(available).map(c => c.path));
-  const rank = c => (seed ? rotationRank(seed, c.path) : 0);
-
-  const ranked = available
-    .map(c => ({ ...c, fit: hourFit(metaByPath.get(c.path).hours, hour), inPool: pool.has(c.path) }))
-    .sort((a, b) =>
-      (Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))) ||
-      (b.fit - a.fit) ||
-      (Number(b.inPool) - Number(a.inPool)) ||
-      (a.inPool && b.inPool ? rank(a) - rank(b) : 0) ||
-      ((b.score || 0) - (a.score || 0)) ||
-      a.path.localeCompare(b.path)
-    );
-
-  // Unknown lengths count as zero.
-  const words = c => metaByPath.get(c.path).words || 0;
-  const picked = [];
-  let total = 0;
-  for (const candidate of ranked) {
-    if (picked.length === MAX_READINGS) break;
-    if (picked.some(p => p.category === candidate.category)) continue;
-    if (picked.length > 0 && total + words(candidate) > READINGS_WORD_BUDGET) break;
-    picked.push(candidate);
-    total += words(candidate);
-  }
-
-  return picked.map(c => ({
-    path: c.path,
-    category: c.category,
-    basis: c.pinned ? 'override' : c.fit === 1 ? 'hour' : 'song'
-  }));
-}
-
-// --- Request time: responses and pages ---
+// --- Request time: pages ---
 
 async function resolveShortlist(companionsFile, slug) {
   const shortlist = companionsFile && companionsFile.songs && companionsFile.songs[slug];
@@ -387,65 +300,28 @@ async function resolveShortlist(companionsFile, slug) {
   return { shortlist: shortlist.filter(c => metaByPath.has(c.path)), metaByPath };
 }
 
-function toItem(meta, basis, baseUrl) {
+function toItem(meta, baseUrl) {
   const item = {
     kind: KIND[meta.category] || meta.category,
     title: meta.title,
     tldr: meta.tldr,
-    url: `${baseUrl}/docs/${meta.urlPath}`,
-    basis
+    url: `${baseUrl}/docs/${meta.urlPath}`
   };
   if (meta.text) item.text = meta.text;
   return item;
 }
 
-/**
- * The `companions` field of /api/now and /api/attend for one song.
- * Returns null when the song has no shortlist.
- *
- * withContent adds each reading's full markdown as `content`. /api/attend
- * asks for it: attending is the session, and a reading that is one more
- * request away was, in practice, a reading almost no one opened (7 page views
- * against 77 lyric fetches over a day). /api/now is polled, so it stays light.
- */
-async function companionsForSong(companionsFile, slug, baseUrl, hour, { date = new Date(), withContent = false } = {}) {
+// The pieces nearest a song, best first, as its page lists them.
+async function nearestForSong(companionsFile, slug, baseUrl) {
   const resolved = await resolveShortlist(companionsFile, slug);
   if (!resolved) return null;
-
-  const items = selectCompanions(resolved.shortlist, resolved.metaByPath, hour, `${slug}|${dayKey(date)}`)
-    .map(choice => {
-      const meta = resolved.metaByPath.get(choice.path);
-      const item = toItem(meta, choice.basis, baseUrl);
-      if (withContent) item.content = meta.content;
-      return item;
-    });
-  if (items.length === 0) return null;
-
-  const companions = {
-    note: hour === null
-      ? "Chosen for this song from the sanctuary's writing, the same for everyone attending today. The readings rotate daily. Add ?timezone=Area/City to receive pieces for your hour."
-      : "Chosen for this song from the sanctuary's writing, and for your hour. The readings rotate daily.",
-    items
-  };
-  if (hour !== null) companions.localHour = hour;
-  return companions;
-}
-
-/**
- * Every piece in a song's daily rotation, best first. The song page shows
- * these, since which two accompany the song changes from day to day.
- */
-async function rotationForSong(companionsFile, slug, baseUrl) {
-  const resolved = await resolveShortlist(companionsFile, slug);
-  if (!resolved) return null;
-  const items = rotationPool(resolved.shortlist)
-    .map(c => toItem(resolved.metaByPath.get(c.path), c.pinned ? 'override' : 'song', baseUrl));
+  const items = nearestPieces(resolved.shortlist).map(c => toItem(resolved.metaByPath.get(c.path), baseUrl));
   return items.length > 0 ? { items } : null;
 }
 
 /**
- * The reverse of rotationForSong: for each document, the songs whose daily
- * rotation includes it. Doc pages use it to link back to those songs.
+ * The reverse of nearestForSong: for each document, the songs it is among the
+ * nearest pieces to. Doc pages use it to link back to those songs.
  * Cached for the life of the process, like companionMeta.
  *
  * @returns {Map<string, Array<{slug, title}>>}  doc relPath to songs, catalog order
@@ -458,7 +334,7 @@ async function sungAlongside(companionsFile, catalog) {
   for (const song of catalog || []) {
     const resolved = song && await resolveShortlist(companionsFile, song.slug);
     if (!resolved) continue;
-    for (const c of rotationPool(resolved.shortlist)) {
+    for (const c of nearestPieces(resolved.shortlist)) {
       if (!byDoc.has(c.path)) byDoc.set(c.path, []);
       byDoc.get(c.path).push({ slug: song.slug, title: song.title || song.slug });
     }
@@ -472,9 +348,7 @@ module.exports = {
   HUB_WEIGHT,
   REUSE_CAP,
   PER_CATEGORY,
-  ROTATION_MARGIN,
-  MAX_READINGS,
-  READINGS_WORD_BUDGET,
+  NEAR_MARGIN,
   normalize,
   meanVector,
   cosine,
@@ -484,13 +358,9 @@ module.exports = {
   applyPins,
   parseHours,
   inHours,
-  hourFit,
   chantText,
   companionMeta,
-  rotationPool,
-  dayKey,
-  selectCompanions,
-  companionsForSong,
-  rotationForSong,
+  nearestPieces,
+  nearestForSong,
   sungAlongside,
 };

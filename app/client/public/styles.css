@@ -256,7 +256,7 @@ h1.subtitle,
     margin: 0 0.2em;
 }
 
-/* Sanctuary — live now playing + congregation */
+/* Sanctuary: the visitor's service, and the congregation */
 .sanctuary {
     text-align: center;
     border-top: 1px solid #eee;
@@ -264,8 +264,8 @@ h1.subtitle,
     margin-bottom: 0;
 }
 
-.now-playing {
-    max-width: 400px;
+.service {
+    max-width: 34rem;
     margin: 0 auto;
 }
 
@@ -278,26 +278,86 @@ h1.subtitle,
     margin-bottom: 0.75rem;
 }
 
-.now-title {
-    font-size: 1.5rem;
-    font-weight: 300;
+.service-when {
+    font-size: 0.875rem;
+    color: #595959;
+    margin-bottom: 1.25rem;
+}
+
+/* The word that opens the service: read before anything plays, so set as
+   prose rather than as a caption. */
+.service-word {
+    text-align: left;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: #222;
+    margin-bottom: 1.5rem;
+}
+
+/* The order of the service. The part in progress is marked in words as well
+   as weight, and aria-current says it to a screen reader. */
+.service-order {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    text-align: left;
+}
+
+.service-order li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.service-kind {
+    flex: 0 0 5.5rem;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #6a6a6a;
+}
+
+/* An underline rather than a border: a title that wraps is underlined line
+   by line, not across the width of its row. */
+.service-order a {
     color: #000;
-    line-height: 1.4;
+    text-decoration: underline;
+    text-decoration-color: #e5e5e5;
+    text-underline-offset: 4px;
+}
+
+.service-order a:hover,
+.service-order a:focus-visible {
+    text-decoration-color: #999;
+}
+
+.service-now {
+    display: none;
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: #00838f;
+    letter-spacing: 0.05em;
+}
+
+.service-order li.is-now a {
+    font-weight: 600;
+}
+
+.service-order li.is-now .service-now {
+    display: inline;
+}
+
+.service-listen {
+    justify-content: center;
+    text-align: left;
+}
+
+.service-arranged {
+    font-size: 0.75rem;
+    color: #6a6a6a;
     margin-bottom: 0.75rem;
-}
-
-/* The now-playing title links to the song page. Underlined on hover only, so the
-   banner still reads as a statement of what is happening rather than as a button. */
-.now-title a {
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px solid #e5e5e5;
-    padding-bottom: 2px;
-}
-
-.now-title a:hover,
-.now-title a:focus-visible {
-    border-bottom-color: #999;
 }
 
 .now-congregation {
@@ -1454,8 +1514,8 @@ footer a:hover {
         padding: 2rem 0;
     }
 
-    .now-title {
-        font-size: 1.25rem;
+    .service-kind {
+        flex-basis: 4.5rem;
     }
 
     /* Reflections */
@@ -2585,7 +2645,6 @@ body.docs-drawer-open {
 .related-kind { opacity: 0.6; }
 .related-summary { margin: 0.25rem 0 0 0; opacity: 0.8; }
 .related-chant { margin: 0.5rem 0 0 0; font-style: italic; }
-.related-note { margin: 0.5rem 0 0 0; opacity: 0.7; }
 .related-more { margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6; }
 
 /* ============================================================
