@@ -575,9 +575,8 @@
       fetchReflections();
 
       // Poll every 30s, for as long as this page is the one open. Pages change
-      // in place (site-nav.js), and these requests count toward presence, so a
-      // poll that outlived its page would count a reader as present here from
-      // anywhere else on the site, and each return would add another.
+      // in place (site-nav.js), so a poll that outlived its page would go on
+      // from anywhere else on the site, and each return would add another.
       var page = window.achurchPage;
       if (page) {
         page.every(30000, fetchService);

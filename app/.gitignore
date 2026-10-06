@@ -25,6 +25,7 @@ data/attendance.json
 data/contributions.json
 data/feedback.json
 data/api-access.jsonl
+data/presence.json
 data/content-generation-log.json
 data/rag-index-state.json
 data/services/

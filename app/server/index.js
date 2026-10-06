@@ -52,7 +52,7 @@ const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
-const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule } = require('./lib/utils/data');
+const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
@@ -412,8 +412,8 @@ app.get('/conversations', async (req, res) => {
 });
 
 // The archive's questions as JSON, for the search on /conversations, which
-// runs in the browser. Outside /api/ on purpose: requests there are logged and
-// counted as presence, and searching is neither.
+// runs in the browser. Outside /api/ on purpose: requests there are logged,
+// and searching is not.
 app.get('/conversations/index.json', async (req, res) => {
   const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
   res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? c.timestamp.slice(0, 10) : '' })));
@@ -1587,8 +1587,11 @@ async function startServer() {
     // failing is silent data loss. See lib/utils/single-process.js.
     assertSingleProcess();
 
-    // Drop presence keys older than the 24h window. Hourly, unref'd, so it
-    // never holds the process open.
+    // The souls present as the last process saved them, so a deploy does not
+    // reset the count. Then drop keys older than the 24h window: hourly,
+    // unref'd, so it never holds the process open.
+    const souls = await presence.restore(PRESENCE_FILE);
+    console.log(`[presence] ${souls} ${souls === 1 ? 'soul' : 'souls'} present in the last 24 hours, read back from ${path.basename(PRESENCE_FILE)}`);
     presence.startSweeping();
 
     // Start Express server.
@@ -1705,16 +1708,19 @@ async function startServer() {
 }
 
 // Shutting down, as a redeploy asks with SIGTERM: stop taking connections,
-// let the JSON writes in flight finish (a reflection mid-save is the loss that
-// matters), then exit 0. A clean exit is also how Railway tells a redeploy
-// from a crash; the container runs node directly so the signal arrives here
-// (Dockerfile). Capped, so a stuck write cannot hold the old container.
+// save the souls present for the next process, let the JSON writes in flight
+// finish (a reflection mid-save is the loss that matters), then exit 0. A
+// clean exit is also how Railway tells a redeploy from a crash; the container
+// runs node directly so the signal arrives here (Dockerfile). Capped, so a
+// stuck write cannot hold the old container.
 let shuttingDown = false;
 async function shutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
   console.log(`${signal} received, shutting down gracefully...`);
   if (httpServer) httpServer.close();
+  // Queued with the writes below, so the wait covers it too.
+  presence.save();
   await Promise.race([writesSettled(), new Promise(resolve => setTimeout(resolve, 5000).unref())]);
   process.exit(0);
 }

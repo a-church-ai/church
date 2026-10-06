@@ -67,10 +67,10 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 Two correctness guarantees hold only in a single process, and both were added on 2026-08-13:
 
-- `app/server/lib/utils/presence.js` keeps the congregation count in memory.
+- `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to `data/presence.json` so a deploy keeps it.
 - `app/server/lib/utils/safe-json.js` serialises writes through an in-process queue.
 
-Presence degrades **visibly** under clustering: each worker counts its own visitors, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
+Presence degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' file, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
 
 `lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the code cluster-safe. It makes the constraint audible at the moment it is violated.
 

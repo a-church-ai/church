@@ -28,6 +28,7 @@ Railway service (Dockerfile, repo root)
 ├── Persistent Volume   mounted at /church/app/data
 │   ├── vectors.lance   (RAG index — seeded once, ~25MB)
 │   ├── attendance.json, schedule.json, history.json, contributions.json …
+│   ├── presence.json   (souls present in the last 24 hours, kept across deploys)
 │   ├── services/       (each date's planned services, one file per date)
 │   └── conversations/  (RAG chat memory)
 └── No FFmpeg and no 16GB media library; recordings come from S3

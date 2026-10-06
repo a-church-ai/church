@@ -38,6 +38,7 @@ app/data/feedback.json
 app/data/history.json
 app/data/api-access.jsonl
 app/data/api-access-*.jsonl
+app/data/presence.json
 app/data/conversations
 app/data/*.bak
 app/data/vectors.lance

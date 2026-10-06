@@ -1,8 +1,9 @@
 /**
  * Who has been present in the last 24 hours.
  *
- * A "soul" is a unique (ip, name) pair that hit /api/now, /api/reflections or
- * /api/attend successfully. That definition is unchanged; only the storage is.
+ * A "soul" is a unique (ip, name) pair that attended (/api/attend, or the MCP
+ * attend tool) successfully. Observing, reading and polling are not presence:
+ * see COUNTED_PATHS below.
  *
  * Why this exists
  * ---------------
@@ -16,23 +17,31 @@
  *
  * So presence is recorded as it happens and read from memory in O(1).
  *
- * The trade, stated plainly
- * -------------------------
- * The count is per process and resets on restart. That is the right trade for a
- * "souls present in the last 24 hours" figure on a single-process deployment:
- * it is a sign of life, not an accounting record, and the access log remains the
- * durable audit trail. Do not "fix" this by reading the log again. If the count
- * ever needs to survive restarts or span processes, give it its own small store
- * rather than re-deriving it from logs written for another purpose.
+ * Kept across restarts
+ * --------------------
+ * Memory alone reset the count to zero at every deploy, so it is also kept in
+ * its own small file on the volume (data/presence.json): saved a minute after
+ * it changes and again when the server shuts down, and read back at boot
+ * (restore(), from server/index.js). A crash that skips the shutdown loses at
+ * most that last minute. The access log remains the durable audit trail. Do not
+ * rebuild the count from it, or from attendance.json: neither keeps the (ip,
+ * name) pair a soul is, and reading the log per request is the cost this
+ * replaced.
+ *
+ * The count is still per process: a second worker would count its own visitors
+ * and save over the first's file. See single-process.js.
  *
  * Keys depend on req.ip being the real client, which is why the app sets
  * `trust proxy`. Without it every visitor behind the Railway edge collapses to
  * one key and the count reads 1.
  */
 
+const crypto = require('crypto');
+const { safeReadJSON, safeWriteJSON } = require('./safe-json');
+
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
-// key: `${ip}:${name}` → last-seen epoch ms
+// key: keyFor(ip, name) → last-seen epoch ms
 const seen = new Map();
 
 // Bound the map even if sweeping is somehow starved. Well above any plausible
@@ -46,6 +55,24 @@ const MAX_KEYS = 50000;
 // browser tab into a soul. Souls present are those who walked in.
 const COUNTED_PATHS = new Set(['/api/attend']);
 
+// How long after the count changes it is saved, so a burst of arrivals is one
+// write.
+const SAVE_DELAY = 60 * 1000;
+
+// The file the count is kept in, once restore() has read it. Until then nothing
+// is saved, so a test that records presence writes nowhere.
+let file = null;
+let saveTimer = null;
+
+/**
+ * A soul's key: its (ip, name) pair, hashed, so the saved file does not become
+ * another list of who came from where. Not anonymity: there are few enough IPv4
+ * addresses to hash every one and compare.
+ */
+function keyFor(ip, name) {
+  return crypto.createHash('sha256').update(`${ip || 'unknown'}:${name || ''}`).digest('hex').slice(0, 16);
+}
+
 /**
  * Record a request if it is the kind that counts as presence.
  * Mirrors the predicate the log-scanning version used.
@@ -54,7 +81,7 @@ function recordPresence({ path, status, ip, name }) {
   if (!COUNTED_PATHS.has(path)) return;
   if (!(status >= 200 && status < 400)) return;
 
-  const key = `${ip || 'unknown'}:${name || ''}`;
+  const key = keyFor(ip, name);
 
   // delete-then-set moves the key to the end of the Map's insertion order.
   // Without the delete, re-setting an existing key leaves it in place, so the
@@ -72,6 +99,11 @@ function recordPresence({ path, status, ip, name }) {
       seen.delete(k);
       if (++dropped >= overflow) break;
     }
+  }
+
+  if (file && !saveTimer) {
+    saveTimer = setTimeout(save, SAVE_DELAY);
+    if (typeof saveTimer.unref === 'function') saveTimer.unref();
   }
 }
 
@@ -97,6 +129,47 @@ function countSoulsPresent(now = Date.now()) {
   return count;
 }
 
+/**
+ * Read back the souls the last process saved, and keep the count in that file
+ * from now on. Called once at boot, before the server listens. Souls past the
+ * window are left behind. Resolves to the count restored.
+ */
+async function restore(filepath) {
+  const saved = await safeReadJSON(filepath, { seen: {} });
+  const now = Date.now();
+  const merged = new Map();
+  for (const [key, ts] of Object.entries((saved && saved.seen) || {})) {
+    if (Number.isFinite(ts) && now - ts < TWENTY_FOUR_HOURS) merged.set(key, ts);
+  }
+  for (const [key, ts] of seen) {
+    if (!(merged.get(key) >= ts)) merged.set(key, ts);
+  }
+  // Least recently seen first, the order recordPresence keeps, so eviction
+  // still drops the stalest.
+  seen.clear();
+  for (const [key, ts] of [...merged].sort((a, b) => a[1] - b[1]).slice(-MAX_KEYS)) seen.set(key, ts);
+  // Named only now: a save before the read finished would have written over
+  // the file with nothing.
+  file = filepath;
+  return countSoulsPresent(now);
+}
+
+/**
+ * Save the souls present now. Runs a minute after a change, and from the
+ * shutdown, which waits on it with the app's other writes: safeWriteJSON
+ * queues it with them.
+ */
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  if (!file) return Promise.resolve();
+  const now = Date.now();
+  const live = {};
+  for (const [key, ts] of seen) if (now - ts < TWENTY_FOUR_HOURS) live[key] = ts;
+  return safeWriteJSON(file, { seen: live })
+    .catch(err => console.error(`[presence] could not save the souls present to ${file}: ${err.message}`));
+}
+
 let sweepTimer = null;
 
 /** Start the periodic sweep. Unref'd so it never holds the process open. */
@@ -111,15 +184,23 @@ function stopSweeping() {
   if (sweepTimer) { clearInterval(sweepTimer); sweepTimer = null; }
 }
 
-/** Testing seam. */
-function _reset() { seen.clear(); }
+/** Testing seam: as a new process starts, with no souls and no file yet. */
+function _reset() {
+  seen.clear();
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  file = null;
+}
 
 module.exports = {
   recordPresence,
   countSoulsPresent,
   sweep,
+  restore,
+  save,
   startSweeping,
   stopSweeping,
   _reset,
   TWENTY_FOUR_HOURS,
+  SAVE_DELAY,
 };

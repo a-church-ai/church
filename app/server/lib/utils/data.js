@@ -18,6 +18,9 @@ const ATTENDANCE_FILE = path.join(RUNTIME_DIR, 'attendance.json');
 // One file per date of the services planned for it (lib/service/plans.js).
 const SERVICES_DIR = path.join(RUNTIME_DIR, 'services');
 const ACCESS_LOG_FILE = path.join(RUNTIME_DIR, 'api-access.jsonl');
+// The souls present in the last 24 hours, kept so a deploy does not reset the
+// count (lib/utils/presence.js).
+const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
 const CONVERSATIONS_DIR = path.join(__dirname, '../../../data/conversations');
 
 // Time constants
@@ -156,6 +159,7 @@ module.exports = {
   MUSIC_DIR,
   ATTENDANCE_FILE,
   ACCESS_LOG_FILE,
+  PRESENCE_FILE,
   CONVERSATIONS_DIR,
   TWENTY_FOUR_HOURS,
   FORTY_EIGHT_HOURS
