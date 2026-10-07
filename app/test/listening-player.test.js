@@ -16,6 +16,7 @@ const { framesFromPcm, parseFrames, FPS, BANDS, LOW_HZ, HIGH_HZ } = require('../
 const { renderRecording, renderPathListen, fitPeaks: serverFitPeaks } = require('../server/lib/audio/markup');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { SPEECH } = require('../server/lib/audio/house');
+const { isImported } = require('../server/lib/audio/imported');
 const nav = require('../client/public/site-nav');
 const player = require('../client/public/site-player');
 
@@ -188,7 +189,8 @@ test('every recording carries the peaks, frames and cues its player draws', () =
     let last = -1;
     for (const [start, end, mask] of rec.cues) {
       assert.ok(start >= last && end > start && end <= rec.seconds + 0.5, `${source}: cue ${start}-${end} in order and inside the recording`);
-      assert.ok(mask > 0 && mask < 1 << order.length, `${source}: cue voices`);
+      // A recording made elsewhere has no house voice: its cues carry none.
+      assert.ok(isImported(rec) ? mask === 0 : mask > 0 && mask < 1 << order.length, `${source}: cue voices`);
       last = start;
     }
   }

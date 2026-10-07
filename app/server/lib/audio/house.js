@@ -55,4 +55,10 @@ function creditLine(voiceKeys) {
   return `${names.length === 1 ? 'AI voice' : 'AI voices'} from ElevenLabs: ${list}.`;
 }
 
-module.exports = { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine };
+// A recording's credit: its own, for one made elsewhere (lib/audio/
+// imported.js), or the house voices that speak it.
+function creditFor(recording) {
+  return recording.credit || creditLine(recording.voices);
+}
+
+module.exports = { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine, creditFor };

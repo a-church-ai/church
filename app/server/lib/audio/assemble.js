@@ -147,5 +147,29 @@ async function assemble(parts, workDir, outFile) {
   return { seconds: await seconds(outFile), timeline };
 }
 
-// ffmpeg, seconds and encodedPeak are shared with scripts/song-audio.js.
-module.exports = { assemble, measure, ffmpeg, seconds, encodedPeak, CLIP_DB };
+// Music keeps its two channels, and needs more bits than speech's mono.
+const WHOLE_BITRATE = '192k';
+
+// Audio made elsewhere, a song from its video or a meditation brought in
+// whole, at the house loudness with one gain for the whole of it, so its
+// dynamics stay as they were made, as stereo MP3. Its own loudness range is
+// the target's, so loudnorm never squeezes music to speech's narrower range.
+// outputArgs choose what of the input is kept. Returns the loudness measured
+// and whether the gain was one gain throughout: loudnorm quietly turns
+// dynamic when one gain would break the true-peak ceiling.
+async function encodeWhole(input, outFile, outputArgs = ['-vn']) {
+  const { integrated, truePeak, range } = SPEECH.loudness;
+  const json = stderr => JSON.parse(stderr.slice(stderr.lastIndexOf('{'), stderr.lastIndexOf('}') + 1));
+  const m = json((await ffmpeg(['-i', input, '-vn', '-af', `loudnorm=I=${integrated}:TP=${truePeak}:print_format=json`, '-f', 'null', '-'])).stderr);
+  const lra = Math.min(50, Math.max(range, Math.ceil(Number(m.input_lra)) + 1));
+  const apply = `loudnorm=I=${integrated}:TP=${truePeak}:LRA=${lra}:measured_I=${m.input_i}:measured_TP=${m.input_tp}:measured_LRA=${m.input_lra}:measured_thresh=${m.input_thresh}:offset=${m.target_offset}:linear=true:print_format=json`;
+  await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
+  const { stderr } = await ffmpeg(['-i', input, ...outputArgs, '-af', apply, '-ac', '2', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', WHOLE_BITRATE, outFile]);
+  const peak = await encodedPeak(outFile);
+  if (peak > CLIP_DB) throw new Error(`peaks at ${peak.toFixed(2)} dBFS once encoded, over ${CLIP_DB}`);
+  return { measured: Number(m.input_i), target: integrated, linear: json(stderr).normalization_type === 'linear' };
+}
+
+// ffmpeg, seconds and encodeWhole are shared with scripts/song-audio.js and
+// scripts/import-recording.js.
+module.exports = { assemble, measure, ffmpeg, seconds, encodedPeak, encodeWhole, CLIP_DB };

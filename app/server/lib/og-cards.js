@@ -339,14 +339,25 @@ const WAVE_HALF = 330;
 const QUIET_PEAK = 8;
 const QUIET_COLOUR = '#1c2433';
 
+// A voice from outside the house, an imported recording's (lib/audio/
+// imported.js): its cues carry no house voice, and it is drawn in the accent.
+const OUTSIDE_VOICE = 'outside';
+
 // The voices speaking between two moments, in the house order the cues' bits
 // follow (site-player.js reads them the same way). Without cues, the
 // recording's own voices throughout.
 function voicesBetween(recording, from, to) {
   if (!recording.cues) return recording.voices;
   let mask = 0;
-  for (const [start, end, bits] of recording.cues) if (start < to && end > from) mask |= bits;
-  return Object.keys(SPEECH.voices).filter((_, bit) => mask & (1 << bit));
+  let spoken = false;
+  for (const [start, end, bits] of recording.cues) {
+    if (start < to && end > from) {
+      mask |= bits;
+      spoken = true;
+    }
+  }
+  const voices = Object.keys(SPEECH.voices).filter((_, bit) => mask & (1 << bit));
+  return spoken && !voices.length ? [OUTSIDE_VOICE] : voices;
 }
 
 function episodeWave(recording) {

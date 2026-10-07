@@ -14,7 +14,7 @@
  * with the keyboard.
  */
 
-const { SPEECH, creditLine } = require('./house');
+const { SPEECH, creditFor } = require('./house');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 const { titleCase } = require('../docs/meta');
 const { SHOWS, feedPath } = require('./podcasts');
@@ -65,7 +65,8 @@ const SONG_CREDIT = 'Original music by aChurch.ai, made with Suno.';
 
 // What the player needs to play a recording anywhere on the site: in the bar
 // after its page is left, and after a reload, from the browser's own storage.
-// A song passes its own credit, since no house voice speaks it, and a podcast
+// A song passes its own credit, since no house voice speaks it (a recording
+// made elsewhere carries its own, house.creditFor), and a podcast
 // episode its own picture for the lock screen (lib/audio/podcasts.js
 // episodeSquarePath), the one podcast apps show; anything else shows its
 // section's square.
@@ -81,7 +82,7 @@ function trackFor(recording, { title, href, category, credit, artwork }) {
     title,
     href,
     album: titleCase(category),
-    credit: credit || creditLine(recording.voices),
+    credit: credit || creditFor(recording),
     artwork: artwork || `/og/v1/square/${category}.png`,
   };
 }

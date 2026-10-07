@@ -8,6 +8,8 @@ Spoken recordings of the sanctuary's prayers, rituals and practices, played on e
 
 Every recording in the manifest is also an episode of one of two podcasts, built from it by the site: prayers and rituals at `https://achurch.ai/podcasts/prayers-and-rituals/feed.xml`, and practices at `https://achurch.ai/podcasts/meditations-and-practices/feed.xml`.
 
+A recording can also be made elsewhere, like a meditation read in someone's own voice over music made for it. `app/scripts/import-recording.js` brings one in whole: its document holds exactly the words it says, its record in `manifest.json` carries `imported`, its own `credit` and no house `voices`, and the render script leaves it alone.
+
 The voices are AI voices, and every player says so.
 
 To make or update recordings, from `app/`: `npm run audio:dry` to see what would be rendered and what it costs, then `npm run audio`. How it works: [docs/reference/app-development.md](../docs/reference/app-development.md).

@@ -17,6 +17,11 @@
  * take ends in one unbroken /s/ with no stop for a t: the takes were right.
  * A miss that repeats on one rare phrase is worth hearing alone before a
  * retake is spent.
+ *
+ * A recording made elsewhere (scripts/import-recording.js) is heard whole by
+ * whisper-1 with each word's time, which both checks its words and says when
+ * each passage is spoken, for the player's cues. OpenAI takes files up to
+ * 25 MB, so it is sent as a small mono copy.
  */
 
 const MODEL = 'gpt-4o-mini-transcribe';
@@ -25,20 +30,20 @@ const TRIES = 5;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function transcribe(mp3, model = MODEL) {
+// One request, tried again while OpenAI is busy or failing.
+async function request(fields, mp3) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY not configured. Add it to app/.env');
   for (let attempt = 1; ; attempt++) {
     const form = new FormData();
-    form.append('model', model);
-    form.append('language', 'en');
+    for (const [name, value] of fields) form.append(name, value);
     form.append('file', new Blob([mp3], { type: 'audio/mpeg' }), 'line.mp3');
     const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: { authorization: `Bearer ${key}` },
       body: form,
     });
-    if (res.ok) return (await res.json()).text || '';
+    if (res.ok) return res.json();
     const detail = (await res.text()).slice(0, 300);
     if (!(res.status === 429 || res.status >= 500) || attempt === TRIES) {
       const err = new Error(`Transcription: HTTP ${res.status} ${detail}`);
@@ -49,4 +54,19 @@ async function transcribe(mp3, model = MODEL) {
   }
 }
 
-module.exports = { transcribe, MODEL, SECOND_OPINION };
+async function transcribe(mp3, model = MODEL) {
+  return (await request([['model', model], ['language', 'en']], mp3)).text || '';
+}
+
+// The whole text, and each word with when it starts and ends, in seconds.
+async function transcribeWords(mp3) {
+  const body = await request([
+    ['model', SECOND_OPINION],
+    ['language', 'en'],
+    ['response_format', 'verbose_json'],
+    ['timestamp_granularities[]', 'word'],
+  ], mp3);
+  return { text: body.text || '', words: (body.words || []).map(w => ({ word: w.word, start: w.start, end: w.end })) };
+}
+
+module.exports = { transcribe, transcribeWords, MODEL, SECOND_OPINION };

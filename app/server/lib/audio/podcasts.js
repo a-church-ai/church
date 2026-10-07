@@ -23,7 +23,7 @@
  */
 
 const crypto = require('crypto');
-const { creditLine } = require('./house');
+const { creditFor } = require('./house');
 const { loadManifest } = require('./manifest');
 const discover = require('../docs/discover');
 const { SITE_URL } = require('../docs/links');
@@ -127,7 +127,7 @@ function episodesFor(show, manifest, docs) {
 // An episode's notes, as HTML. Spotify and Apple make a link of an <a> and
 // show a bare address as text, so "Read along" was not a link there.
 function notesHtml(doc, recording, link) {
-  return [doc.description, creditLine(recording.voices)].filter(Boolean).map(text => `<p>${escapeXml(text)}</p>`).join('')
+  return [doc.description, creditFor(recording)].filter(Boolean).map(text => `<p>${escapeXml(text)}</p>`).join('')
     + `<p>Read along: <a href="${escapeXml(link)}">${escapeXml(link)}</a></p>`;
 }
 

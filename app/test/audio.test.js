@@ -14,6 +14,7 @@ const express = require('express');
 const { wordsOf, containsRun, wordErrors, takePasses } = require('../server/lib/audio/words');
 const { checkScript, cleanText } = require('../server/lib/audio/adapt');
 const { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine } = require('../server/lib/audio/house');
+const { isImported } = require('../server/lib/audio/imported');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { createAudioRouter, canServe } = require('../server/lib/audio/serve');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
@@ -117,13 +118,20 @@ test('every script is well formed, cast from the house pair, and faithful to its
   }
 });
 
-test('every recording in the manifest belongs to a voiced document and its script', () => {
+test('every recording in the manifest belongs to a voiced document and its script, or was made elsewhere and says whose voice it is', () => {
   for (const [source, rec] of Object.entries(loadManifest())) {
     assert.ok(fs.existsSync(path.join(REPO, source)), `${source} no longer exists`);
     const stem = source.replace(/^docs\//, '').replace(/\.md$/, '');
     assert.match(rec.file, new RegExp(`^${stem}-[0-9a-f]{8}\\.mp3$`), source);
-    assert.ok(fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source} has no script`);
-    assert.ok(rec.voices.length && rec.voices.every(v => SPEECH.voices[v]), `${source}: voices`);
+    if (isImported(rec)) {
+      // lib/audio/imported.js: no house script and no house voice, its own credit.
+      assert.ok(!fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source}: made elsewhere, yet the house has a script for it`);
+      assert.deepStrictEqual(rec.voices, [], `${source}: no house voice speaks it`);
+      assert.match(rec.credit, /^AI voices? from ElevenLabs: .+\.$/, `${source}: its credit`);
+    } else {
+      assert.ok(fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source} has no script`);
+      assert.ok(rec.voices.length && rec.voices.every(v => SPEECH.voices[v]), `${source}: voices`);
+    }
     assert.ok(rec.seconds > 0, `${source}: length`);
   }
 });

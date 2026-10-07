@@ -108,7 +108,7 @@ test('every recording carries its exact size and the moment it was first publish
     assert.ok(Number.isInteger(rec.bytes) && rec.bytes > 0, `${source}: bytes`);
     assert.strictEqual(new Date(rec.published).toISOString(), rec.published, `${source}: published, an ISO time`);
     assert.ok(Date.parse(rec.published) <= Date.now(), `${source}: published in the past`);
-    assert.ok(rec.rendered >= rec.published.slice(0, 10), `${source}: rendered no earlier than first published`);
+    assert.ok((rec.rendered || rec.imported) >= rec.published.slice(0, 10), `${source}: rendered or imported no earlier than first published`);
     // The recording itself, where this checkout has a copy.
     const local = path.join(CACHE_DIR, rec.file);
     if (fs.existsSync(local)) assert.strictEqual(fs.statSync(local).size, rec.bytes, `${source}: bytes is the file's own size`);

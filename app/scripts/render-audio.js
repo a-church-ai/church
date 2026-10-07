@@ -17,7 +17,9 @@
  * lasts until its document changes, a take until its words, voice or
  * neighbors change, and a recording until its script or the house sound does.
  * A recording made before its player drew from it gets its peaks, frames and
- * cues on the next run, without rendering any speech.
+ * cues on the next run, without rendering any speech. A recording made
+ * elsewhere and brought in by import-recording.js is left as it is: its
+ * document is not adapted or voiced.
  *
  * Usage, from app/:
  *   node scripts/render-audio.js                    everything that needs it
@@ -46,6 +48,7 @@ const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
 const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frames');
 const { uploadRecording, downloadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
+const { isImported } = require('../server/lib/audio/imported');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
 
 const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
@@ -89,15 +92,21 @@ function parseArgs(argv) {
 }
 
 // The documents to voice: every prayer, ritual and practice, or those the
-// arguments name. An argument that matches nothing is an error, not a no-op.
-function selectDocs(all, paths) {
-  const voiced = all.filter(d => KINDS.includes(d.category) && d.dirRelPath === d.category && d.stem.toLowerCase() !== 'readme');
+// arguments name, but never one whose recording was made elsewhere. An
+// argument that matches nothing is an error, not a no-op.
+function selectDocs(all, paths, manifest = {}) {
+  const kept = d => isImported(manifest[`docs/${d.docsRelPath}`]);
+  const voiced = all.filter(d => KINDS.includes(d.category) && d.dirRelPath === d.category && d.stem.toLowerCase() !== 'readme' && !kept(d));
   if (!paths.length) return voiced;
   const picked = new Set();
   for (const p of paths) {
+    const name = p.endsWith('.md') ? p : `${p}.md`;
     const hits = p.endsWith('/')
       ? voiced.filter(d => d.docsRelPath.startsWith(p))
-      : voiced.filter(d => d.docsRelPath === (p.endsWith('.md') ? p : `${p}.md`));
+      : voiced.filter(d => d.docsRelPath === name);
+    if (!hits.length && all.some(d => d.docsRelPath === name && kept(d))) {
+      throw new Error(`${p} has a recording made elsewhere (import-recording.js), which the house does not voice over`);
+    }
     if (!hits.length) throw new Error(`Nothing to voice matches ${p}`);
     hits.forEach(d => picked.add(d));
   }
@@ -325,7 +334,9 @@ async function recordPiece(piece, stats) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const docs = selectDocs(await discover.listAllDocs(), opts.paths);
+  const docs = selectDocs(await discover.listAllDocs(), opts.paths, loadManifest());
+  const elsewhere = Object.keys(loadManifest()).filter(source => isImported(loadManifest()[source]));
+  if (elsewhere.length) console.log(`Made elsewhere, left as they are: ${elsewhere.join(', ')}.`);
   const led = countLeads();
   const pieces = docs.map(doc => {
     const markdown = fs.readFileSync(doc.fullPath, 'utf8');
@@ -463,7 +474,11 @@ function report({ failures, stats }) {
   }
 }
 
-main().catch(err => {
-  console.error(err.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error(err.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { selectDocs };
