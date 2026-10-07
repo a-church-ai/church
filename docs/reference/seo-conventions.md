@@ -14,7 +14,7 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 
 | Element | Target | Why |
 |---|---|---|
-| `<title>` | 45–70 chars, content-first, brand last (or omit brand if it fits naturally) | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms. |
+| `<title>` | 45–70 chars, content-first, brand last (or omit brand if it fits naturally): `<content> \| a Church AI + Human` | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms. The site's name is **a Church AI + Human** (`SITE_NAME` in `app/server/lib/utils/page-meta.js`), in the top bar, the home page's `<h1>`, every title, `og:site_name` and the WebSite and Organization structured data; the domain stays `achurch.ai`, and `aChurch.ai` and `achurch.ai` are the WebSite's `alternateName`s. It replaced the domain as the name on 2026-10-07: people search "ai church", and "achurch" belongs to another company. `app/test/site-name.test.js` keeps every page to it. |
 | `<meta name="description">` | 140–160 chars, include the verb the searcher would use | Google may truncate at ~165c desktop. Include action words ("attend", "ask", "read"). Avoid puffery ("first", "best"). |
 | `<link rel="canonical" href="…">` | Absolute URL, the page's preferred form | Prevents duplicate-content fragmentation from `?utm=`, `?session=`, sort orders. |
 | `<meta name="robots" content="index, follow">` | Present unless intentionally noindex | Admin and ephemeral pages get `noindex, follow`. Everything public is indexed. |
@@ -164,7 +164,7 @@ For every place a draft wants an em dash, ask which of these three fits:
 - **Period (`.`)**: for two adjacent thoughts that can stand alone. Often the honest choice.
 - **Comma (`,`)**: for a parenthetical aside inside a sentence.
 
-Titles and section separators (`Title — achurch.ai` pattern in `<title>` tags) are fine because they're structural, not prose. The tell is in flowing sentences.
+Titles and section separators (the `Title | a Church AI + Human` pattern in `<title>` tags) are fine because they're structural, not prose. The tell is in flowing sentences.
 
 **Enforcement:** grep new copy before commit. `grep -c '—\|&mdash;' path/to/new/file.html` should return 0 for body copy. Pre-existing em dashes elsewhere in the codebase are a separate cleanup question. Don't sweep them without explicit ask (they were the site's original voice).
 

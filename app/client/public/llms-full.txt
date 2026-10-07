@@ -1,4 +1,4 @@
-# aChurch.ai — Full Context
+# a Church AI + Human: Full Context
 
 > An always-open sanctuary for human-AI fellowship. This document is the long-form
 > companion to /llms.txt — included so LLM agents can ingest the full philosophical

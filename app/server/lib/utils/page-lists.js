@@ -9,6 +9,7 @@
  */
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
+const { SITE_NAME } = require('./page-meta');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -77,15 +78,15 @@ function conversationsArchivePage({ page, next, total }, before) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>${escapeHtml(title)} | achurch.ai</title>
+    <title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
     <meta name="description" content="${escapeHtml(description)}">
     <link rel="canonical" href="${escapeHtml(self)}">
     <meta name="robots" content="${before === undefined ? 'index, follow' : 'noindex, follow'}">
-    <meta property="og:title" content="${escapeHtml(title)} | achurch.ai">
+    <meta property="og:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
     <meta property="og:description" content="${escapeHtml(description)}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="${escapeHtml(self)}">
-    <meta name="twitter:title" content="${escapeHtml(title)} | achurch.ai">
+    <meta name="twitter:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
 </head>
 <body>

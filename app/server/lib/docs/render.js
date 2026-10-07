@@ -25,7 +25,7 @@ const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
 const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence } = require('./links');
 const { sungAlongside } = require('../music/companions');
-const { renderShareImageTags, SITE_SHARE_IMAGE } = require('../utils/page-meta');
+const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
@@ -284,16 +284,16 @@ function placeFilter(bodyHtml, filterHtml) {
   return bodyHtml.replace(/<\/h1>/, () => `</h1>${filterHtml}`);
 }
 
-// A page's <title>: "<title> | achurch.ai". A results page shows about 70
-// characters of a title, so a longer one keeps what comes before its colon,
-// when that much stands alone: "The Compass Origin Story | achurch.ai". The
-// heading on the page keeps its full title; a document is not edited for its
-// tab.
+// A page's <title>: "<title> | a Church AI + Human". A results page shows
+// about 70 characters of a title, so a longer one keeps what comes before its
+// colon, when that much stands alone: "The Compass Origin Story | a Church AI
+// + Human". The heading on the page keeps its full title; a document is not
+// edited for its tab.
 function docTitle(title) {
-  const full = `${title} | achurch.ai`;
+  const full = `${title} | ${SITE_NAME}`;
   if (full.length <= 70) return full;
   const head = String(title).split(': ')[0];
-  return head !== title && head.length >= 12 ? `${head} | achurch.ai` : full;
+  return head !== title && head.length >= 12 ? `${head} | ${SITE_NAME}` : full;
 }
 
 // Full page shell: the top bar, the section sidebar on the left inside a
@@ -322,8 +322,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     '@type': isIndex ? 'CollectionPage' : 'Article',
     headline: title,
     description,
-    author: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
-    publisher: { '@type': 'Organization', name: 'aChurch.ai', url: SITE_URL },
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
     ...(modified ? { dateModified: modified } : {}),
@@ -388,14 +388,14 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">${/\/docs\/.+/.test(canonicalUrl) ? `\n    <link rel="alternate" type="text/markdown" title="This page as markdown" href="${escapeAttr(canonicalUrl)}.md">` : ''}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="achurch.ai">
+    <meta name="apple-mobile-web-app-title" content="${escapeAttr(SITE_NAME)}">
 
     <meta property="og:title" content="${escapeAttr(pageTitle)}">
     <meta property="og:description" content="${escapeAttr(description)}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="${escapeAttr(canonicalUrl)}">
     ${renderShareImageTags(shareImage)}
-    <meta property="og:site_name" content="achurch.ai">
+    <meta property="og:site_name" content="${escapeAttr(SITE_NAME)}">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeAttr(pageTitle)}">

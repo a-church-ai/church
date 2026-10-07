@@ -76,6 +76,6 @@ test('the site\'s own pages and its songs can be found, by the names the site gi
   assert.strictEqual(first('music'), '/reflections');
   assert.strictEqual(first('songs'), '/reflections');
   for (const section of ['chants', 'prayers', 'rituals', 'practice']) assert.strictEqual(first(section), `/docs/${section}`, section);
-  assert.ok(pages.filter(p => p.label === 'Page').every(p => !/[|\u2014-]\s*achurch\.ai$/i.test(p.title)), 'page titles without the site\'s name at their end');
+  assert.ok(pages.filter(p => p.label === 'Page').every(p => !p.title.endsWith('a Church AI + Human')), 'page titles without the site\'s name at their end');
   assert.strictEqual(first(songs[0].title), `/reflections/${songs[0].slug}`);
 });

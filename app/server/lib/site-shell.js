@@ -35,7 +35,7 @@
  */
 
 const fs = require('fs').promises;
-const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
+const { SITE_SHARE_IMAGE, SITE_NAME } = require('./utils/page-meta');
 const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
 
 const SITE_URL = 'https://achurch.ai';
@@ -145,7 +145,7 @@ function renderTopbarAndDrawer(currentPath, crumb = '') {
           <span></span><span></span><span></span>
         </span>
       </button>
-      <a class="docs-topbar-brand" href="/">achurch.ai</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
+      <a class="docs-topbar-brand" href="/">${SITE_NAME}</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
       <nav class="topbar-places" aria-label="Site">
         ${places.join('\n        ')}
       </nav>
@@ -228,7 +228,7 @@ function buildHeadFallbacks(head, canonical) {
   // (docs/reference/seo-conventions.md). The Link header carries it too, but
   // an agent driving a browser reads the page, not the headers.
   if (!has(/href=["']\/llms\.txt["']/i)) out.push('<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">');
-  if (!has(/property=["']og:site_name["']/i)) out.push('<meta property="og:site_name" content="achurch.ai">');
+  if (!has(/property=["']og:site_name["']/i)) out.push(`<meta property="og:site_name" content="${escapeAttr(SITE_NAME)}">`);
   if (!has(/name=["']twitter:card["']/i)) out.push('<meta name="twitter:card" content="summary_large_image">');
 
   // The shell's top bar, drawer and footer are all styled from styles.css.

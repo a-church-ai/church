@@ -2644,6 +2644,14 @@ footer a:hover {
     min-width: 0;
 }
 
+/* On a narrow phone the site's name leaves the page title beside it a few
+   letters ("Pr..."); the page's own breadcrumbs say where the reader is. */
+@media (max-width: 479px) {
+    .docs-topbar-crumb {
+        display: none;
+    }
+}
+
 /* The site's places (site-shell.js PLACES). In the bar from 768px; below
    that, docs-nav.js copies them into the drawer. */
 .topbar-places {

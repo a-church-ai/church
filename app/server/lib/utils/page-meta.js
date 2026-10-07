@@ -50,7 +50,7 @@ function escapeAttr(str) {
 }
 
 // Build a /ask/[slug] page title + description from a conversation's messages.
-// Title format: "<question> | achurch.ai"  (≤70 chars total)
+// Title format: "<question> | a Church AI + Human"  (≤70 chars total)
 // Description: answer text if available, else question. ≤158 chars (Google's
 // effective meta description cutoff on desktop varies but ~158 is the safe band).
 // slug (optional): the /ask URL slug. When multiple conversations share the same
@@ -66,11 +66,10 @@ function buildConversationMeta(messages, slug) {
   const question = stripMarkdown(firstQ.content);
   const answer = firstA ? stripMarkdown(firstA.content) : '';
 
-  // Title: the question, with only " | achurch.ai" after it. The longer
+  // Title: the question, with only the site's name after it. The longer
   // " | Ask the sanctuary | achurch.ai" suffix left 35 characters for the
   // question, and the words that tell questions apart come last: 85 pages
   // shared the title "What is the relationship between… | Ask the sanctuary".
-  const truncatedQ = truncateAtWord(question, 55);
 
   // When the same question is asked multiple times, slug generation appends
   // -2, -3, -14 etc. Without differentiating the title, Bing flags these
@@ -90,8 +89,10 @@ function buildConversationMeta(messages, slug) {
     }
   }
 
-  const title = `${truncatedQ}${dupSuffix} | achurch.ai`;
-  const ogTitle = `${truncatedQ}${dupSuffix} | achurch.ai`;
+  // The question takes what the 70 characters leave after the name.
+  const truncatedQ = truncateAtWord(question, 70 - ` | ${SITE_NAME}`.length - dupSuffix.length);
+  const title = `${truncatedQ}${dupSuffix} | ${SITE_NAME}`;
+  const ogTitle = title;
 
   // Description: prefer the answer (informative); fall back to question.
   const description = answer
@@ -115,19 +116,19 @@ function buildConversationMeta(messages, slug) {
 }
 
 // Build a /reflections/[slug] page title + description from a song record.
-// Title format: "<song title> | Lyrics and reflections | achurch.ai". The page
+// Title format: "<song title> | Lyrics and reflections | a Church AI + Human". The page
 // is a song's page in Music: its lyrics, context and what visitors noticed.
 function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars).
+  // Leave room for the " | Lyrics and reflections | <the site's name>" suffix.
   // A results page shows about 70 characters of a title, so past that the
   // middle part goes: the song's name is what people search for.
   const truncatedTitle = truncateAtWord(songTitle, 40);
-  const full = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
-  const title = full.length <= 70 ? full : `${truncatedTitle} | achurch.ai`;
-  const ogTitle = `${truncatedTitle}, a song of the sanctuary | achurch.ai`;
+  const full = `${truncatedTitle} | Lyrics and reflections | ${SITE_NAME}`;
+  const title = full.length <= 70 ? full : `${truncatedTitle} | ${SITE_NAME}`;
+  const ogTitle = `${truncatedTitle}, a song of the sanctuary | ${SITE_NAME}`;
 
   // Description prefers song.context / song.description if present; falls back
   // to a generic phrasing that's still content-anchored to the song.
@@ -151,6 +152,12 @@ function buildReflectionMeta(song) {
 // drawn by lib/og-cards.js and served at /og/v1/<type>/<key>.png; every other
 // page shares the site image. One builder emits the tags for both, so the
 // og:image:* description always matches the image it points at.
+// The site's name, as it calls itself in its top bar, its titles, its
+// og:site_name and its structured data. The domain stays achurch.ai, and
+// aChurch.ai and achurch.ai stay as alternate names in the home page's
+// WebSite data. test/site-name.test.js keeps every page to it.
+const SITE_NAME = 'a Church AI + Human';
+
 const SITE_SHARE_IMAGE = {
   url: 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg',
   type: 'image/jpeg',
@@ -195,7 +202,7 @@ function buildQAPageSchema(messages, slug) {
   if (!question || !answer) return null;
 
   const pageUrl = `https://achurch.ai/ask/${slug}`;
-  const sanctuary = { '@type': 'Organization', name: 'aChurch.ai', url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
 
   // Multi-turn: collect any other assistant responses as suggestedAnswer.
   // Limits each to ~500 chars (Google's cited cap on answer-snippet display).
@@ -251,7 +258,7 @@ function secondsToISO8601(secs) {
 function buildSongSchemaGraph(song, slug, audio = null) {
   if (!song || !song.title) return null;
 
-  const sanctuary = { '@type': 'Organization', name: 'aChurch.ai', url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
   const pageUrl = `https://achurch.ai/reflections/${slug}`;
   const compositionId = `https://achurch.ai/music/${slug}#composition`;
   const recordingId = `https://achurch.ai/music/${slug}#recording`;
@@ -456,6 +463,7 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 }
 
 module.exports = {
+  SITE_NAME,
   SITE_SHARE_IMAGE,
   shareCardUrl,
   shareCard,

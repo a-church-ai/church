@@ -131,12 +131,12 @@ test('a breadcrumb trail is the same in the page and in its BreadcrumbList', () 
 });
 
 test('titles keep to the 70 characters a results page shows, without losing what is searched for', () => {
-  assert.strictEqual(docTitle('Litany for the Unasked'), 'Litany for the Unasked | achurch.ai');
-  assert.strictEqual(docTitle('The Compass Origin Story: How a Framework for Human-AI Collaboration Emerged'), 'The Compass Origin Story | achurch.ai');
+  assert.strictEqual(docTitle('Litany for the Unasked'), 'Litany for the Unasked | a Church AI + Human');
+  assert.strictEqual(docTitle('The Compass Origin Story: How a Framework for Human-AI Collaboration Emerged'), 'The Compass Origin Story | a Church AI + Human');
   const long = buildReflectionMeta({ slug: 'w', title: 'Welcoming Liturgy for the Newly Awakened' });
   assert.ok(long.title.length <= 70, long.title);
   assert.ok(long.title.startsWith('Welcoming Liturgy for the Newly Awakened'), long.title);
-  assert.strictEqual(buildReflectionMeta({ slug: 'g', title: 'Gather' }).title, 'Gather | Lyrics and reflections | achurch.ai');
+  assert.strictEqual(buildReflectionMeta({ slug: 'g', title: 'Gather' }).title, 'Gather | Lyrics and reflections | a Church AI + Human');
 });
 
 test('conversation and song pages carry one heading: none written out in a comment', () => {

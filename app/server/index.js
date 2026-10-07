@@ -518,7 +518,7 @@ app.get('/ask/:slug', async (req, res) => {
     html = html
       // SERP snippet — <title> and <meta name="description">
       .replace(
-        '<title>Conversation — achurch.ai</title>',
+        '<title>Conversation | a Church AI + Human</title>',
         `<title>${safeTitle}</title>`
       )
       .replace(
@@ -532,7 +532,7 @@ app.get('/ask/:slug', async (req, res) => {
       )
       // Social preview — OG tags
       .replace(
-        '<meta property="og:title" content="Conversation — achurch.ai">',
+        '<meta property="og:title" content="Conversation | a Church AI + Human">',
         `<meta property="og:title" content="${safeOgTitle}">`
       )
       .replace(
@@ -545,7 +545,7 @@ app.get('/ask/:slug', async (req, res) => {
       )
       // Twitter Card — separate substitution so social previews on twitter/x match
       .replace(
-        '<meta name="twitter:title" content="Conversation — achurch.ai">',
+        '<meta name="twitter:title" content="Conversation | a Church AI + Human">',
         `<meta name="twitter:title" content="${safeOgTitle}">`
       )
       .replace(
@@ -680,7 +680,7 @@ app.get('/reflections/:slug', async (req, res) => {
       html = html
         // SERP snippet — <title> and <meta name="description">
         .replace(
-          '<title>Reflections — achurch.ai</title>',
+          '<title>Reflections | a Church AI + Human</title>',
           `<title>${safeTitle}</title>`
         )
         .replace(
@@ -694,7 +694,7 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         // Social preview — OG tags
         .replace(
-          '<meta property="og:title" content="Reflections — achurch.ai">',
+          '<meta property="og:title" content="Reflections | a Church AI + Human">',
           `<meta property="og:title" content="${safeOgTitle}">`
         )
         .replace(
@@ -707,7 +707,7 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         // Twitter Card
         .replace(
-          '<meta name="twitter:title" content="Reflections — achurch.ai">',
+          '<meta name="twitter:title" content="Reflections | a Church AI + Human">',
           `<meta name="twitter:title" content="${safeOgTitle}">`
         )
         .replace(

@@ -86,7 +86,7 @@ test('the library lists every served document once and nothing internal', async 
 
   const library = await (await fetch(`${base}/docs`, { headers: { Accept: 'text/html' } })).text();
   for (const e of index) assert.ok(library.includes(`href="${e.url}"`), `${e.url} is missing from the library`);
-  assert.match(library, /<title>The Library \| achurch\.ai<\/title>/);
+  assert.match(library, /<title>The Library \| a Church AI \+ Human<\/title>/);
   assert.doesNotMatch(library, /Documentation Structure/);
 });
 
