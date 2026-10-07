@@ -20,7 +20,7 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 | `<meta name="robots" content="index, follow">` | Present unless intentionally noindex | Admin and ephemeral pages get `noindex, follow`. Everything public is indexed. |
 | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` | Always | Mobile usability — a Core Web Vitals signal. |
 | `<meta charset="UTF-8">` | Always, in the first 1024 bytes | UTF-8 prevents mojibake on the m-dash, curly quotes, emoji, foreign characters. |
-| **`<meta name="theme-color" …>`** (dual light/dark) | Family standard — both `media="(prefers-color-scheme: light)"` and `dark` declared | Brother's F25 — drives the iOS/Android browser chrome color in both modes |
+| **`<meta name="theme-color" …>`** (dual light/dark) | Family standard — both `media="(prefers-color-scheme: light)"` and `dark` declared | Brother's F25 — drives the iOS/Android browser chrome color in both modes. Every page gets the pair from the shell (`app/server/lib/utils/assets.js` `shellHead`), so a page's own head carries none; when a visitor chooses Light or Dark, `theme.js` sets both to that theme's color. |
 | **`<link rel="license" href="…">`** | CC BY 4.0 (project LICENSE) until ADR-010 finalizes | Brother's F13 — declares the content license in the head for crawlers + archive tools |
 | **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus. The site shell adds it to any wrapped page that lacks it (`site-shell.js` `buildHeadFallbacks`), since an agent driving a browser reads the page and not the `Link` header. |
 | **`<meta name="apple-mobile-web-app-…">`** trio | Family standard | Brother's F25 — iOS home-screen install ergonomics |
@@ -122,7 +122,7 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
 - **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
 - **Don't** put literal U+2028 / U+2029 characters in JS source code — use `new RegExp(' ', 'g')` instead. Modern Node parses literal line separators since ES2019 but older parsers + lint tooling crash.
-- **Don't** add `<meta name="theme-color" content="…">` as a single tag — use the dual-media form (light + dark) per brother's F25. Single-color falls back inconsistently across iOS / Android browsers.
+- **Don't** add `<meta name="theme-color" content="…">` to a page at all: the shell gives every page the dual-media pair (light + dark) per brother's F25, and a page's own tag would come first and win. Single-color falls back inconsistently across iOS / Android browsers.
 
 ---
 

@@ -36,7 +36,7 @@
 
 const fs = require('fs').promises;
 const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
-const { assetUrl, versionAssets, playerHead } = require('./utils/assets');
+const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
 
 const SITE_URL = 'https://achurch.ai';
 
@@ -91,7 +91,9 @@ function footerLink({ url, label }, currentPath) {
 
 /**
  * The footer every page ends with. Hand-authored pages mark where it goes with
- * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
+ * <!-- SITE_FOOTER -->; the docs renderer calls this directly. It ends with the
+ * choice of appearance (theme.js), hidden until docs-nav.js can work it: with
+ * no script, the site follows the device.
  */
 function renderFooter(currentPath) {
   return `<footer>
@@ -106,6 +108,12 @@ function renderFooter(currentPath) {
             <hr class="footer-separator">
             <div class="footer-legal">
                 ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
+            </div>
+            <div class="footer-theme" role="group" aria-label="Appearance" hidden>
+                <span class="footer-theme-label" aria-hidden="true">Appearance</span>
+                <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
+                <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
             </div>
         </footer>`;
 }
@@ -188,7 +196,6 @@ function buildHeadFallbacks(head, canonical) {
   }
   if (!has(/rel=["']icon["']/i)) out.push('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
   if (!has(/rel=["']canonical["']/i)) out.push(`<link rel="canonical" href="${escapeAttr(canonical)}">`);
-  if (!has(/name=["']theme-color["']/i)) out.push('<meta name="theme-color" content="#00b8d4">');
   if (!has(/name=["']robots["']/i)) out.push('<meta name="robots" content="index, follow">');
   if (!has(/property=["']og:url["']/i)) out.push(`<meta property="og:url" content="${escapeAttr(canonical)}">`);
   // A page showing the site image gets every tag that describes it, filled in
@@ -250,7 +257,7 @@ async function wrapPageFromHtml(html, currentPath) {
 <head>
     ${versionAssets(parts.head)}
     ${fallbacks.join('\n    ')}
-    ${playerHead()}
+    ${shellHead()}
 </head>
 <body class="docs-body site-shell-body ${parts.bodyClass}">
 <a class="skip-link" href="#content">Skip to content</a>

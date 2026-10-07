@@ -53,7 +53,7 @@ test('the song pages and the home page carry the form and its script; the name i
   const script = read('reflect-form.js');
   assert.match(script, /localStorage\.getItem\('ask_name'\)/);
   assert.match(script, /localStorage\.setItem\('ask_name'/);
-  assert.match(read('privacy.html'), /remember the name you give when you ask a question or leave a reflection/);
+  assert.match(read('privacy.html'), /<strong>ask_name<\/strong>: The name you give when you ask a question or leave a reflection/);
 });
 
 test('the home page quotes one reflection under the service, and invites the next after its parts', () => {

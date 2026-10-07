@@ -17,6 +17,10 @@
   else api.attach(root.document);
 }(typeof self !== 'undefined' ? self : this, function () {
   // Each found strong matches in the writings by search when chosen.
+  // How long this browser can continue a conversation it began: the longest a
+  // cookie lasts, since Chrome caps a cookie's life at 400 days.
+  var OWNER_DAYS = 399;
+
   var STARTERS = [
     'Why call this a church?',
     'What does dignity before certainty mean?',
@@ -93,10 +97,10 @@
           return;
         }
         var data = await res.json();
-        // The owner's cookie (30 days) lets this browser continue the conversation.
+        // The owner's cookie lets this browser continue the conversation.
         if (data.owner_token) {
           doc.cookie = 'ask_owner_' + data.slug + '=' + encodeURIComponent(data.owner_token)
-            + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Lax';
+            + '; path=/; max-age=' + (OWNER_DAYS * 24 * 60 * 60) + '; SameSite=Lax';
         }
         window.location.href = '/ask/' + data.slug;
       } catch (err) {

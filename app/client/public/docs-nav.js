@@ -2,7 +2,7 @@
  * Site-wide client-side nav behavior.
  *
  * Loaded on every page: the hand-written pages and the documents share one
- * shell (site-shell.js, docs/render.js). Three responsibilities:
+ * shell (site-shell.js, docs/render.js). Four responsibilities:
  *   1. The drawer: a modal dialog (site-shell.js renders it empty). Below
  *      768px the menu button opens it with the top bar's places and, on a
  *      section page, the section sidebar; below 1024px a section page's "This
@@ -11,6 +11,8 @@
  *   2. The section sidebar's current document, scrolled into view.
  *   3. Right-rail TOC scroll-spy: IntersectionObserver on article h2 elements
  *      updates aria-current="location" on the corresponding TOC link.
+ *   4. The footer's Auto, Light and Dark (theme.js keeps the choice and sets
+ *      it before the page paints).
  *
  * No dependencies. Runs after DOMContentLoaded (script is defer-loaded).
  * Each part no-ops when its elements are absent.
@@ -126,6 +128,41 @@
 
     OPENABLE_MQ.addEventListener('change', function () {
       if (!OPENABLE_MQ.matches && drawer.classList.contains('open')) closeDrawer();
+    }, { signal: pageSignal });
+  }
+
+  // ------ Appearance ------
+
+  // Applied again on every page, since each new page's head brings the bar
+  // colours back to their defaults, and kept in step with the site's other
+  // tabs, which share the choice.
+  const theme = window.achurchTheme;
+  const themeGroup = document.querySelector('.footer-theme');
+  if (theme) {
+    const storage = theme.storageOf(window);
+    // choice: the one just made, which stands even where storage is blocked.
+    const showTheme = function (choice) {
+      choice = choice || theme.stored(storage);
+      theme.apply(document, choice);
+      if (themeGroup) {
+        themeGroup.querySelectorAll('[data-theme-choice]').forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b.getAttribute('data-theme-choice') === choice));
+        });
+      }
+    };
+    showTheme(null);
+    if (themeGroup) {
+      themeGroup.hidden = false;
+      themeGroup.addEventListener('click', function (e) {
+        const b = e.target.closest('[data-theme-choice]');
+        if (!b) return;
+        const choice = b.getAttribute('data-theme-choice');
+        theme.choose(document, storage, choice);
+        showTheme(choice);
+      });
+    }
+    window.addEventListener('storage', function (e) {
+      if (e.key === theme.KEY || e.key === null) showTheme(null);
     }, { signal: pageSignal });
   }
 

@@ -27,7 +27,7 @@ const BODY = (heading, message, links) => `
         </header>
 
         <section class="notfound" style="max-width: 480px; margin: 0 auto; text-align: center;">
-            <p style="color: #444; line-height: 1.8;">${message}</p>
+            <p style="color: var(--text-2); line-height: 1.8;">${message}</p>
             <p style="margin-top: 2rem;">
               ${links.map(l => `<a href="${l.href}" style="margin: 0 0.75rem;">${l.label}</a>`).join('')}
             </p>

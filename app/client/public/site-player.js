@@ -239,6 +239,9 @@
   };
 
   const reducedMotion = root.matchMedia ? root.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  // The theme the page is drawn in (theme.js, styles.css), which the visual
+  // follows: a visitor's choice on <html>, or else the device's setting.
+  const isDark = () => root.getComputedStyle(root.document.documentElement).colorScheme === 'dark';
   const audio = new Audio();
   audio.preload = 'none';
 
@@ -383,6 +386,14 @@
     if (document.hidden) save();
     else if (!audio.paused) startLoop();
   });
+
+  // A change of theme, chosen in the footer or the device's own, redraws the
+  // visual, which reads the theme as it draws. Both last the whole visit, as
+  // the player does.
+  if (root.MutationObserver) {
+    new root.MutationObserver(() => drawVisual()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+  if (root.matchMedia) root.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawVisual());
 
   // ------------------------------------------------------------------
   // The element's events.
@@ -892,8 +903,10 @@
     const frame = current && page.frames ? frameAt(page.frames, at) : null;
     const target = { loud: frame ? Math.min(1.25, frame.loud) : REST.loud, bands: frame ? frame.bands : null };
     const ramps = rampsFor(page.track, current ? at : 0);
-    // Each voice at full strength, the layers behind a shade lighter.
-    const targetColors = ramps.map((ramp, L) => colorAt(ramp, 0.5 + L * 0.03));
+    // Each voice at full strength, the layers behind a shade toward the
+    // ground: lighter on a light card, darker on a dark one.
+    const shade = isDark() ? -1 : 1;
+    const targetColors = ramps.map((ramp, L) => colorAt(ramp, 0.5 + L * 0.03 * shade));
 
     // Ease toward the frame, so twenty frames a second move smoothly.
     const ease = moving ? 0.3 : 1;

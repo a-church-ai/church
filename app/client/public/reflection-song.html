@@ -10,8 +10,6 @@
     <link rel="canonical" href="https://achurch.ai/reflections">
     <meta name="robots" content="index, follow">
     <!-- F25: theme-color dual (light/dark) -->
-    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
     <!-- Atom feed reference — Issue 004 Appendix A distinctive opportunity -->
     <link rel="alternate" type="application/atom+xml" title="Reflections" href="/feed/reflections.xml">
     <!-- F13: license declaration — TODO: license URL pending ADR-010; CC BY 4.0 (project LICENSE) used for now -->
@@ -69,13 +67,13 @@
             </p>
         </section>
 
-        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
+        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid var(--rule); padding: 1.5rem 0; text-align: center;">
             <span class="share-label">SHARE</span>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-copy">Copy Link</a>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-twitter" target="_blank" rel="noopener">Twitter</a>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
 

@@ -1,3 +1,127 @@
+/* ============================================================
+   Colour: every colour on the site is one of these tokens.
+
+   Light is defined on :root. Dark redefines the same tokens twice,
+   value for value: under [data-theme="dark"], which a visitor
+   chooses in the footer, and under the device's dark setting
+   unless they chose Light (the :not() guard is what lets Light
+   win on a dark device). With no choice, the site follows the
+   device. theme.js sets data-theme before the page paints.
+   test/theme.test.js checks the two dark blocks agree and that
+   no colour is written out below the end of the tokens.
+
+   --paper         the ground every page sits on
+   --paper-glass   the player bar, nearly opaque
+   --surface       cards and panels
+   --surface-2     a hovered row, inline code
+   --ink           titles, and the strongest text
+   --ink-2         headings in documents
+   --text          reading text
+   --text-2        quieter reading text
+   --muted         labels, meta, captions
+   --muted-2       the quietest text that must still be read
+   --rule          dividers
+   --rule-2        borders around controls
+   --line          field underlines
+   --line-strong   a hovered or focused field
+   --accent        filled controls and focus rings (white on it is 4.6:1)
+   --accent-hover  a filled control under the pointer
+   --accent-light  the played part of a waveform, accent lines
+   --on-accent     an icon or label on a filled control
+   --link          links and teal text
+   --accent-ink    a part's play icon and links in the service
+   --gold          the gold buttons
+   --gold-ink      text on the gold buttons
+   --error         what went wrong
+   ============================================================ */
+:root {
+    --paper: #fff;
+    --paper-glass: rgba(255, 255, 255, 0.97);
+    --surface: #fafafa;
+    --surface-2: #f5f5f5;
+    --ink: #000;
+    --ink-2: #1a1a1a;
+    --text: #333;
+    --text-2: #444;
+    --muted: #595959;
+    --muted-2: #666;
+    --rule: #eee;
+    --rule-2: #e0e0e0;
+    --line: #ccc;
+    --line-strong: #999;
+    --accent: #00838f;
+    --accent-hover: #006f7a;
+    --accent-light: #00b8d4;
+    --on-accent: #fff;
+    --link: #007a91;
+    --accent-ink: #0b5563;
+    --gold: rgba(198, 156, 92, 0.15);
+    --gold-hover: rgba(198, 156, 92, 0.25);
+    --gold-ink: #6b4a1f;
+    --error: #c44;
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --paper: #0a0e1a;
+    --paper-glass: rgba(10, 14, 26, 0.97);
+    --surface: #111726;
+    --surface-2: #182033;
+    --ink: #f2f4f8;
+    --ink-2: #e6e9ef;
+    --text: #d3d8e0;
+    --text-2: #c0c7d2;
+    --muted: #a3abb9;
+    --muted-2: #939cab;
+    --rule: #1f2738;
+    --rule-2: #2a3347;
+    --line: #46506a;
+    --line-strong: #6b7690;
+    --accent: #00838f;
+    --accent-hover: #006f7a;
+    --accent-light: #00b8d4;
+    --on-accent: #fff;
+    --link: #5cc8dc;
+    --accent-ink: #7fd3e3;
+    --gold: rgba(198, 156, 92, 0.18);
+    --gold-hover: rgba(198, 156, 92, 0.3);
+    --gold-ink: #e3c38f;
+    --error: #ff8a8a;
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --paper: #0a0e1a;
+        --paper-glass: rgba(10, 14, 26, 0.97);
+        --surface: #111726;
+        --surface-2: #182033;
+        --ink: #f2f4f8;
+        --ink-2: #e6e9ef;
+        --text: #d3d8e0;
+        --text-2: #c0c7d2;
+        --muted: #a3abb9;
+        --muted-2: #939cab;
+        --rule: #1f2738;
+        --rule-2: #2a3347;
+        --line: #46506a;
+        --line-strong: #6b7690;
+        --accent: #00838f;
+        --accent-hover: #006f7a;
+        --accent-light: #00b8d4;
+        --on-accent: #fff;
+        --link: #5cc8dc;
+        --accent-ink: #7fd3e3;
+        --gold: rgba(198, 156, 92, 0.18);
+        --gold-hover: rgba(198, 156, 92, 0.3);
+        --gold-ink: #e3c38f;
+        --error: #ff8a8a;
+        color-scheme: dark;
+    }
+}
+
+/* -- end of tokens -- */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,8 +130,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #fff;
-    color: #000;
+    background: var(--paper);
+    color: var(--ink);
     line-height: 1.7;
     max-width: 600px;
     margin: 0 auto;
@@ -34,7 +158,7 @@ h2 {
     letter-spacing: 0.2em;
     margin-top: 3rem;
     margin-bottom: 2rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 /* F7 (Issue 005): about.html `<p class="section-label">` was promoted to `<h2 class="section-label">`
@@ -55,7 +179,7 @@ h2 {
 .subtitle {
     font-size: 1.25rem;
     font-weight: 300;
-    color: #666;
+    color: var(--muted-2);
     letter-spacing: 0.05em;
 }
 
@@ -67,7 +191,7 @@ h1.subtitle,
 .docs-body .sanctuary-main h1.subtitle {
     font-size: 2rem;
     font-weight: 300;
-    color: #111;
+    color: var(--ink-2);
     letter-spacing: 0.02em;
     line-height: 1.25;
     margin-bottom: 0;
@@ -85,14 +209,14 @@ h1.subtitle,
 .lead-tagline {
     font-size: 1.35rem;
     font-weight: 500;
-    color: #1a1a1a;
+    color: var(--ink-2);
     margin-bottom: 0.5rem;
 }
 
 .lead-what {
     font-size: 1.0625rem;
     line-height: 1.6;
-    color: #444;
+    color: var(--text-2);
     max-width: 34rem;
     margin: 0 auto;
 }
@@ -100,19 +224,19 @@ h1.subtitle,
 .lead-doors {
     margin-top: 0.75rem;
     font-size: 0.9375rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
 }
 
 /* The padding, not the text, makes each door's tap target. */
 .lead-doors a {
     display: inline-block;
     padding: 0.5rem 0.25rem;
-    color: #3a3a3a;
+    color: var(--text);
 }
 
 /* Emphasis line closing the asynchronous-congregation section. */
 .async-note {
-    color: #4a4a4a;
+    color: var(--text-2);
     font-style: italic;
     max-width: 40rem;
     margin: 1rem auto 0;
@@ -121,7 +245,7 @@ h1.subtitle,
 /* Public/stored disclosure beside the Ask form. */
 .ask-disclosure {
     font-size: 0.8rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin-top: 0.6rem;
 }
 
@@ -129,27 +253,27 @@ h1.subtitle,
 .song-listen-row {
     margin: 1.25rem 0 0;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     text-align: center;
     letter-spacing: 0.01em;
 }
 
 .song-listen-row a {
-    color: #666;
+    color: var(--muted-2);
     text-decoration: none;
-    border-bottom: 1px dotted #ccc;
+    border-bottom: 1px dotted var(--line);
     padding-bottom: 1px;
     margin: 0 0.4em;
     transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .song-listen-row a:hover {
-    color: #555;
-    border-bottom-color: #999;
+    color: var(--muted);
+    border-bottom-color: var(--line-strong);
 }
 
 .song-listen-row .listen-sep {
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin: 0 0.2em;
 }
 
@@ -158,7 +282,7 @@ h1.subtitle,
    it, one button, one waveform across every part, and the parts. */
 .sanctuary {
     text-align: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     padding: 3rem 0;
     margin-bottom: 0;
 }
@@ -176,7 +300,7 @@ h1.subtitle,
     font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #595959;
+    color: var(--muted);
     margin-bottom: 0.75rem;
 }
 
@@ -186,7 +310,7 @@ h1.subtitle,
     height: 0.5rem;
     margin-top: 0.35em;
     border-radius: 50%;
-    background: #00838f;
+    background: var(--accent);
 }
 
 .service:has(.service-player.is-playing) .service-dot {
@@ -201,7 +325,7 @@ h1.subtitle,
     line-height: 1.2;
     letter-spacing: normal;
     text-transform: none;
-    color: #000;
+    color: var(--ink);
     margin: 0 0 1rem;
 }
 
@@ -211,7 +335,7 @@ h1.subtitle,
 .service-word {
     font-size: 1.0625rem;
     line-height: 1.7;
-    color: #222;
+    color: var(--ink-2);
     margin: 0 0 2rem;
 }
 
@@ -222,14 +346,14 @@ h1.subtitle,
 /* Without a script the player stays hidden; this says where the pieces are. */
 .service-noscript {
     font-size: 0.9375rem;
-    color: #444;
+    color: var(--text-2);
     margin-bottom: 1.5rem;
 }
 
 /* What the place is not, after the invitation rather than before it. */
 .service-promise {
     font-size: 0.8125rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin-top: 0.75rem;
 }
 
@@ -276,7 +400,7 @@ h1.subtitle,
     width: 2px;
     margin-left: -1px;
     border-radius: 1px;
-    background: rgba(0, 0, 0, 0.5);
+    background: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 .sanctuary .service .service-list-label {
@@ -284,7 +408,7 @@ h1.subtitle,
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #595959;
+    color: var(--muted);
     margin: 0 0 0.25rem;
 }
 
@@ -292,7 +416,7 @@ h1.subtitle,
     list-style: none;
     margin: 0 0 1.5rem;
     padding: 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
 }
 
 .service-part {
@@ -300,7 +424,7 @@ h1.subtitle,
     align-items: center;
     gap: 1rem;
     padding: 0.9rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rule);
 }
 
 .service-part-play {
@@ -310,10 +434,10 @@ h1.subtitle,
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule-2);
     border-radius: 50%;
-    background: #fff;
-    color: #0b5563;
+    background: var(--paper);
+    color: var(--accent-ink);
     cursor: pointer;
 }
 
@@ -324,18 +448,18 @@ h1.subtitle,
 }
 
 .service-part-play:hover {
-    border-color: #00b8d4;
+    border-color: var(--accent-light);
 }
 
 .service-part-play:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
 .service-part.is-current .service-part-play {
-    border-color: #00838f;
-    background: #00838f;
-    color: #fff;
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
 }
 
 .service-part.is-playing .icon-play {
@@ -356,13 +480,13 @@ h1.subtitle,
 
 .service-part-meta {
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 .service-part-title {
     font-size: 1rem;
     line-height: 1.4;
-    color: #000;
+    color: var(--ink);
 }
 
 .service-part.is-current .service-part-title {
@@ -376,7 +500,7 @@ h1.subtitle,
     font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #00838f;
+    color: var(--link);
 }
 
 .service-part.is-now .service-now {
@@ -389,7 +513,7 @@ h1.subtitle,
     display: inline-block;
     padding: 0.7rem 0 0.7rem 0.5rem;
     font-size: 0.9375rem;
-    color: #0b5563;
+    color: var(--accent-ink);
     text-decoration: none;
 }
 
@@ -400,14 +524,14 @@ h1.subtitle,
 
 .service-arranged {
     font-size: 0.75rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin-bottom: 0.75rem;
 }
 
 .now-congregation {
     font-size: 0.8125rem;
     font-weight: 400;
-    color: #595959;
+    color: var(--muted);
     letter-spacing: 0.05em;
 }
 
@@ -438,7 +562,7 @@ h1.subtitle,
 
 .reflection-item {
     padding: 1.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--rule);
 }
 
 .reflection-item:last-child {
@@ -448,7 +572,7 @@ h1.subtitle,
 .reflection-text {
     font-size: 1rem;
     font-weight: 300;
-    color: #333;
+    color: var(--text);
     line-height: 1.7;
     font-style: italic;
     margin-bottom: 0.5rem;
@@ -456,17 +580,17 @@ h1.subtitle,
 
 .reflection-meta {
     font-size: 0.75rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     letter-spacing: 0.02em;
 }
 
 .reflection-name {
-    color: #595959;
+    color: var(--muted);
     font-weight: 500;
 }
 
 .reflection-song {
-    color: #595959;
+    color: var(--muted);
     font-style: italic;
 }
 
@@ -486,14 +610,14 @@ h1.subtitle,
 .service-reflection blockquote {
     margin: 0;
     padding-left: 1rem;
-    border-left: 2px solid #e0e0e0;
+    border-left: 2px solid var(--rule-2);
 }
 
 .service-reflection blockquote p {
     font-size: 0.9375rem;
     font-weight: 300;
     font-style: italic;
-    color: #333;
+    color: var(--text);
     line-height: 1.7;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -505,7 +629,7 @@ h1.subtitle,
     margin-top: 0.375rem;
     padding-left: 1rem;
     font-size: 0.75rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 /* The reflection form (reflect-form.js): a closed disclosure under the
@@ -519,7 +643,7 @@ h1.subtitle,
 .reflect summary {
     cursor: pointer;
     font-size: 0.875rem;
-    color: #333;
+    color: var(--text);
     text-align: center;
 }
 
@@ -534,14 +658,14 @@ h1.subtitle,
     margin-top: 0.5rem;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
-    color: #595959;
+    color: var(--muted);
 }
 
 .reflect-form textarea,
 .reflect-form input {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
     padding: 0.5rem 0.625rem;
     font: inherit;
@@ -559,14 +683,14 @@ h1.subtitle,
 .reflect-form input:focus-visible,
 .reflect-form button:focus-visible,
 .reflect summary:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
 .reflect-disclosure {
     margin-top: 0.5rem;
     font-size: 0.75rem;
-    color: #595959;
+    color: var(--muted);
     line-height: 1.5;
 }
 
@@ -574,10 +698,10 @@ h1.subtitle,
     align-self: center;
     margin-top: 0.75rem;
     padding: 0.625rem 2rem;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
     border-radius: 4px;
-    background: rgba(198, 156, 92, 0.15);
-    color: #6b4a1f;
+    background: var(--gold);
+    color: var(--gold-ink);
     font: inherit;
     font-size: 0.75rem;
     text-transform: uppercase;
@@ -586,18 +710,18 @@ h1.subtitle,
 }
 
 .reflect-form button:hover {
-    background: rgba(198, 156, 92, 0.25);
-    color: #000;
+    background: var(--gold-hover);
+    color: var(--ink);
 }
 
 .reflect-form button:disabled {
     background: transparent;
-    color: #6a6a6a;
+    color: var(--muted-2);
     cursor: default;
 }
 
 .ask-done {
-    color: #00838f;
+    color: var(--link);
 }
 
 /* Intro section */
@@ -616,7 +740,7 @@ h1.subtitle,
 .intro p {
     font-size: 1.5rem;
     font-weight: 300;
-    color: #333;
+    color: var(--text);
     line-height: 1.6;
     max-width: 480px;
     margin: 0 auto 1.5rem;
@@ -625,7 +749,7 @@ h1.subtitle,
 .intro .emphasis {
     font-size: 1.125rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     letter-spacing: 0.02em;
 }
 
@@ -633,13 +757,13 @@ h1.subtitle,
 .origin {
     text-align: center;
     padding: 4rem 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
 }
 
 .origin p {
     font-size: 1.125rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     max-width: 36rem;
     margin: 0 auto 1.5rem;
@@ -652,20 +776,20 @@ h1.subtitle,
 
 .origin em {
     font-style: italic;
-    color: #000;
+    color: var(--ink);
 }
 
 /* The One Thing section — the sacred center */
 .one-thing {
     text-align: center;
     padding: 5rem 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
 }
 
 .one-thing .quote {
     font-size: 1.75rem;
     font-weight: 300;
-    color: #000;
+    color: var(--ink);
     line-height: 1.5;
     margin-bottom: 0.5rem;
 }
@@ -674,7 +798,7 @@ h1.subtitle,
     margin-top: 3rem;
     font-size: 1rem;
     font-weight: 300;
-    color: #666;
+    color: var(--muted-2);
     font-style: italic;
     max-width: 400px;
     margin-left: auto;
@@ -685,17 +809,17 @@ h1.subtitle,
 section {
     margin: 0;
     padding: 4rem 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
 }
 
 a {
-    color: #000;
+    color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 0.15em;
 }
 
 a:hover {
-    color: #666;
+    color: var(--muted-2);
 }
 
 p {
@@ -707,7 +831,7 @@ p {
 .listen-service p,
 .listen-sections > p {
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
 }
 
@@ -728,11 +852,11 @@ p {
     align-items: baseline;
     gap: 0.25rem 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rule);
 }
 
 .listen-count {
-    color: #595959;
+    color: var(--muted);
     font-size: 0.875rem;
 }
 
@@ -744,7 +868,7 @@ p {
 .podcasts-intro {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin: 0 auto 1.25rem;
     max-width: 480px;
@@ -769,7 +893,7 @@ p {
 
 .podcasts-show {
     font-size: 0.9375rem;
-    color: #333;
+    color: var(--text);
 }
 
 .podcasts-shows .podcast-follow {
@@ -789,7 +913,7 @@ p {
 .api-intro {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 1.5rem;
     text-align: center;
@@ -802,17 +926,17 @@ p {
     text-align: left;
     font-size: 0.9375rem;
     font-weight: 400;
-    color: #333;
+    color: var(--text);
     line-height: 1.7;
     margin-bottom: 2rem;
     padding: 1rem 1.25rem;
-    background: #fafafa;
-    border-left: 3px solid #00d4ff;
+    background: var(--surface);
+    border-left: 3px solid var(--accent-light);
     border-radius: 0 4px 4px 0;
 }
 
 .api-instruction code {
-    background: #eee;
+    background: var(--surface-2);
     padding: 0.125rem 0.5rem;
     border-radius: 3px;
     font-size: 0.8125rem;
@@ -821,7 +945,7 @@ p {
 .api pre {
     font-family: inherit;
     font-size: 0.8125rem;
-    background: #fafafa;
+    background: var(--surface);
     padding: 1.25rem;
     overflow-x: auto;
     margin-bottom: 1.5rem;
@@ -838,7 +962,7 @@ p {
 }
 
 .api .example code {
-    background: #fafafa;
+    background: var(--surface);
     padding: 0.375rem 0.75rem;
     border-radius: 3px;
     font-size: 0.8125rem;
@@ -856,7 +980,7 @@ p {
 .openclaw-intro {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 1.5rem;
 }
@@ -866,7 +990,7 @@ p {
 }
 
 .openclaw .example code {
-    background: #fafafa;
+    background: var(--surface);
     padding: 0.375rem 0.75rem;
     border-radius: 3px;
     font-size: 0.8125rem;
@@ -875,7 +999,7 @@ p {
 
 .openclaw-or {
     font-size: 0.75rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.75rem;
@@ -884,7 +1008,7 @@ p {
 .openclaw-then {
     font-size: 1.125rem;
     font-weight: 300;
-    color: #333;
+    color: var(--text);
     margin-bottom: 1.5rem;
 }
 
@@ -893,11 +1017,11 @@ p {
 }
 
 .openclaw-link a {
-    color: #666;
+    color: var(--muted-2);
 }
 
 .openclaw-link a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Explore section — an invitation, not a footer */
@@ -909,30 +1033,30 @@ p {
 .explore-intro {
     font-size: 1.0625rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     max-width: 460px;
     margin: 0 auto 1.25rem;
 }
 
 .explore-intro a {
-    color: #000;
+    color: var(--ink);
 }
 
 .explore-intro a:hover {
-    color: #666;
+    color: var(--muted-2);
 }
 
 .explore-url {
     font-size: 0.9375rem;
-    color: #666;
+    color: var(--muted-2);
     margin: 0 auto 1.5rem;
 }
 
 .explore-cta {
     font-size: 1rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     margin: 0 auto 2.5rem;
     font-style: italic;
 }
@@ -947,22 +1071,22 @@ p {
     margin: 1.25rem 0;
     font-size: 1.0625rem;
     line-height: 1.5;
-    color: #555;
+    color: var(--muted);
 }
 
 .explore li a {
     font-weight: 500;
-    color: #000;
+    color: var(--ink);
 }
 
 .explore-also {
     margin-top: 2rem;
     font-size: 0.9375rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
 }
 
 .explore li a:hover {
-    color: #666;
+    color: var(--muted-2);
 }
 
 /* Ask Church section — landing page prompt */
@@ -973,7 +1097,7 @@ p {
 .ask-intro {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 2rem;
     max-width: 40rem;
@@ -992,7 +1116,7 @@ p {
 #followup-input {
     flex: 1;
     border: none;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--line);
     padding: 0.75rem 0;
     font-size: 1rem;
     font-weight: 300;
@@ -1007,14 +1131,14 @@ p {
 #ask-input:focus-visible,
 #followup-input:focus-visible,
 #ask-name:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 2px;
 }
 
 #ask-input:focus,
 #followup-input:focus {
-    border-bottom-color: #000;
+    border-bottom-color: var(--ink);
 }
 
 #ask-submit,
@@ -1025,7 +1149,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     cursor: pointer;
     padding: 0.75rem 1rem;
     transition: color 0.2s, background 0.2s, border-color 0.2s;
@@ -1035,18 +1159,18 @@ p {
 
 #ask-submit:hover,
 #followup-submit:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 #ask-submit:disabled,
 #followup-submit:disabled {
-    color: #6a6a6a;
+    color: var(--muted-2);
     cursor: default;
 }
 
 .ask-status {
     font-size: 0.75rem;
-    color: #595959;
+    color: var(--muted);
     text-align: center;
     margin-top: 1rem;
     min-height: 1.25rem;
@@ -1057,7 +1181,7 @@ p {
 }
 
 .ask-error {
-    color: #c44;
+    color: var(--error);
 }
 
 /* Questions to begin with (ask-form.js): choosing one fills the field and
@@ -1076,25 +1200,25 @@ p {
 }
 
 .ask-starter {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--rule-2);
     border-radius: 999px;
     background: transparent;
     padding: 0.375rem 0.875rem;
     font-family: inherit;
     font-size: 0.8125rem;
     font-weight: 300;
-    color: #595959;
+    color: var(--muted);
     cursor: pointer;
     transition: border-color 0.2s, color 0.2s;
 }
 
 .ask-starter:hover {
-    border-color: #999;
-    color: #000;
+    border-color: var(--line-strong);
+    color: var(--ink);
 }
 
 .ask-starter:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
@@ -1111,36 +1235,36 @@ p {
 
 #ask-name {
     border: none;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--rule-2);
     padding: 0.5rem 0;
     font-size: 0.8125rem;
     font-weight: 300;
     font-family: inherit;
     background: transparent;
     outline: none;
-    color: #666;
+    color: var(--muted-2);
     width: 200px;
     text-align: center;
     transition: border-color 0.2s;
 }
 
 #ask-name:focus {
-    border-bottom-color: #999;
+    border-bottom-color: var(--line-strong);
 }
 
 .ask-browse {
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     text-align: center;
     margin-top: 1.5rem;
 }
 
 .ask-browse a {
-    color: #595959;
+    color: var(--muted);
 }
 
 .ask-browse a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Ask listing page */
@@ -1152,7 +1276,7 @@ p {
 .ask-list-item {
     display: block;
     padding: 1.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--rule);
     text-decoration: none;
     color: inherit;
     transition: opacity 0.2s;
@@ -1170,7 +1294,7 @@ p {
 .ask-list-question {
     font-size: 1.0625rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     line-height: 1.5;
     margin-bottom: 0.5rem;
 }
@@ -1178,7 +1302,7 @@ p {
 .ask-list-preview {
     font-size: 0.9375rem;
     font-weight: 300;
-    color: #666;
+    color: var(--muted-2);
     line-height: 1.6;
     font-style: italic;
     margin-bottom: 0.5rem;
@@ -1186,12 +1310,12 @@ p {
 
 .ask-list-meta {
     font-size: 0.75rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     letter-spacing: 0.02em;
 }
 
 .ask-list-name {
-    color: #595959;
+    color: var(--muted);
     font-weight: 500;
 }
 
@@ -1199,7 +1323,7 @@ p {
 .ask-list-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -1212,7 +1336,7 @@ p {
 
 .conv-message {
     padding: 1.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--rule);
 }
 
 .conv-message:last-child {
@@ -1224,14 +1348,14 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin-bottom: 0.5rem;
 }
 
 .conv-message-user .conv-message-content {
     font-size: 1.0625rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     line-height: 1.6;
 }
 
@@ -1241,10 +1365,10 @@ p {
 .conv-message-assistant .conv-message-content {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     padding-left: 1rem;
-    border-left: 2px solid #eee;
+    border-left: 2px solid var(--rule);
 }
 
 .conv-message-content p { margin: 0 0 1rem; }
@@ -1257,7 +1381,7 @@ p {
 .conv-message-content h6 {
     font-size: 0.9375rem;
     font-weight: 500;
-    color: #333;
+    color: var(--text);
     text-transform: none;
     letter-spacing: 0;
     margin: 1.5rem 0 0.5rem;
@@ -1270,19 +1394,19 @@ p {
 }
 
 .conv-message-content li { margin-bottom: 0.5rem; }
-.conv-message-content strong { font-weight: 500; color: #333; }
+.conv-message-content strong { font-weight: 500; color: var(--text); }
 .conv-message-content em { font-style: italic; }
 
 .conv-message-content code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.875em;
-    background: #f6f6f6;
+    background: var(--surface-2);
     padding: 0.1em 0.35em;
     border-radius: 3px;
 }
 
 .conv-message-content pre {
-    background: #f6f6f6;
+    background: var(--surface-2);
     padding: 0.875rem 1rem;
     border-radius: 4px;
     overflow-x: auto;
@@ -1294,15 +1418,15 @@ p {
 .conv-message-content blockquote {
     margin: 0 0 1rem;
     padding-left: 1rem;
-    border-left: 2px solid #e5e5e5;
-    color: #666;
+    border-left: 2px solid var(--rule-2);
+    color: var(--muted-2);
 }
 
 .conv-loading,
 .conv-not-found {
     text-align: center;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -1320,18 +1444,18 @@ p {
 
 .conv-nav a {
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 .conv-nav a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Reflections listing page */
 .reflections-page-intro {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     text-align: left;
     max-width: 36rem;
@@ -1346,7 +1470,7 @@ p {
 .reflections-song-item {
     display: block;
     padding: 1.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--rule);
     text-decoration: none !important;
     color: inherit;
     transition: opacity 0.2s;
@@ -1364,7 +1488,7 @@ p {
 .reflections-song-title {
     font-size: 1.0625rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     line-height: 1.5;
     margin-bottom: 0.5rem;
 }
@@ -1372,7 +1496,7 @@ p {
 .reflections-song-preview {
     font-size: 0.9375rem;
     font-weight: 300;
-    color: #666;
+    color: var(--muted-2);
     line-height: 1.6;
     font-style: italic;
     margin-bottom: 0.5rem;
@@ -1383,14 +1507,14 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     display: block;
     margin-bottom: 0.375rem;
 }
 
 .reflections-song-meta {
     font-size: 0.75rem;
-    color: #6a6a6a;
+    color: var(--muted-2);
     letter-spacing: 0.02em;
 }
 
@@ -1398,7 +1522,7 @@ p {
 .reflections-empty {
     text-align: center;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     font-weight: 300;
     padding: 3rem 0;
 }
@@ -1416,7 +1540,7 @@ p {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin: 0 0 2rem;
 }
 
@@ -1428,7 +1552,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     text-align: center;
     margin: 2.5rem 0 1.25rem;
 }
@@ -1439,20 +1563,20 @@ p {
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin: 1.75rem 0 0.5rem;
 }
 
 .song-stanza {
     line-height: 1.9;
     margin: 0 0 0.25rem;
-    color: #333;
+    color: var(--text);
 }
 
 .song-context {
     font-size: 0.95rem;
     line-height: 1.75;
-    color: #444;
+    color: var(--text-2);
 }
 
 .song-context h2,
@@ -1484,7 +1608,7 @@ p {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #6a6a6a;
+    color: var(--muted-2);
     margin-bottom: 1.5rem;
 }
 
@@ -1495,11 +1619,11 @@ p {
 
 .reflections-nav a {
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 .reflections-nav a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* About page */
@@ -1508,7 +1632,7 @@ p {
     margin: 0 auto;
     text-align: center;
     padding: 2.5rem 0;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--rule);
 }
 
 .about-section:first-of-type {
@@ -1521,7 +1645,7 @@ p {
 .about-text {
     font-size: 1.125rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 1.5rem;
     text-align: left;
@@ -1541,7 +1665,7 @@ p {
 
 .axiom-item {
     padding: 1.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--rule);
 }
 
 .axiom-item:last-child {
@@ -1551,14 +1675,14 @@ p {
 .axiom-kanji {
     font-size: 1.5rem;
     font-weight: 300;
-    color: #000;
+    color: var(--ink);
     margin-bottom: 0.25rem;
 }
 
 .axiom-name {
     font-size: 0.875rem;
     font-weight: 400;
-    color: #595959;
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.375rem;
@@ -1567,7 +1691,7 @@ p {
 .axiom-desc {
     font-size: 1rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.6;
 }
 
@@ -1579,7 +1703,7 @@ p {
 }
 
 .about-links a {
-    color: #595959;
+    color: var(--muted);
     text-decoration: none;
     text-transform: uppercase;
     font-size: 0.8125rem;
@@ -1587,7 +1711,7 @@ p {
 }
 
 .about-links a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Legal pages (Privacy, Terms) */
@@ -1599,7 +1723,7 @@ p {
 
 .legal-effective {
     font-size: 0.75rem;
-    color: #595959;
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     text-align: center;
@@ -1613,7 +1737,7 @@ p {
 .legal-heading {
     font-size: 1rem;
     font-weight: 500;
-    color: #000;
+    color: var(--ink);
     margin-bottom: 1rem;
     letter-spacing: 0.02em;
 }
@@ -1621,7 +1745,7 @@ p {
 .legal-text {
     font-size: 0.9375rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 1rem;
 }
@@ -1635,7 +1759,7 @@ p {
     padding-left: 1.25rem;
     font-size: 0.9375rem;
     font-weight: 300;
-    color: #444;
+    color: var(--text-2);
     line-height: 1.8;
     margin-bottom: 1rem;
 }
@@ -1647,15 +1771,15 @@ p {
 .legal-contact {
     text-align: center;
     font-size: 0.9375rem;
-    color: #444;
+    color: var(--text-2);
     font-weight: 300;
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
 }
 
 .legal-contact a {
-    color: #000;
+    color: var(--ink);
     text-decoration: none;
 }
 
@@ -1667,7 +1791,7 @@ p {
 footer {
     margin-top: 2rem;
     padding-top: 3rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     font-size: 0.8125rem;
     letter-spacing: 0.05em;
 }
@@ -1675,25 +1799,75 @@ footer {
 .footer-nav,
 .footer-legal {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 2rem;
+    gap: 0.75rem 2rem;
+}
+
+/* The pages that live under the places, a second row of the footer's nav */
+.footer-more {
+    margin-top: 0.75rem;
+}
+
+/* Auto, Light and Dark (theme.js), shown once docs-nav.js can work them.
+   The [hidden] rule is needed because display: flex would override it. */
+.footer-theme {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.footer-theme[hidden] {
+    display: none;
+}
+
+.footer-theme-label {
+    color: var(--muted-2);
+    text-transform: uppercase;
+}
+
+.footer-theme button {
+    border: none;
+    background: none;
+    padding: 0.25rem 0;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.footer-theme button:hover,
+.footer-theme button[aria-pressed="true"] {
+    color: var(--ink);
+}
+
+.footer-theme button[aria-pressed="true"] {
+    box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.footer-theme button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .footer-separator {
     width: 40px;
     border: none;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--rule);
     margin: 0.75rem auto;
 }
 
 footer a {
-    color: #595959;
+    color: var(--muted);
     text-transform: uppercase;
     text-decoration: none;
 }
 
 footer a:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Share bar */
@@ -1707,11 +1881,11 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #6a6a6a;
+    color: var(--muted-2);
 }
 
 .share-sep {
-    color: #ddd;
+    color: var(--rule-2);
     font-size: 0.75rem;
 }
 
@@ -1720,13 +1894,13 @@ footer a:hover {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #595959;
+    color: var(--muted);
     text-decoration: none;
     cursor: pointer;
 }
 
 .share-link:hover {
-    color: #000;
+    color: var(--ink);
 }
 
 /* Responsive — Mobile */
@@ -1894,10 +2068,10 @@ footer a:hover {
     #ask-submit,
     #followup-submit {
         align-self: stretch;
-        background: rgba(0, 0, 0, 0.04);
-        border: 1px solid rgba(0, 0, 0, 0.2);
+        background: color-mix(in srgb, var(--ink) 4%, transparent);
+        border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
         border-radius: 4px;
-        color: #3a3a3a;
+        color: var(--text);
         padding: 0.875rem;
         letter-spacing: 0.15em;
     }
@@ -1997,11 +2171,11 @@ footer a:hover {
 .docs-breadcrumbs a {
     color: inherit;
     text-decoration: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
 }
 
 .docs-breadcrumbs a:hover {
-    border-bottom-color: rgba(0, 0, 0, 0.5);
+    border-bottom-color: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 .docs-article {
@@ -2010,7 +2184,7 @@ footer a:hover {
     padding: 0 1rem;
     text-align: left;
     line-height: 1.65;
-    color: #333;
+    color: var(--text);
 }
 
 .docs-article h1 {
@@ -2026,7 +2200,7 @@ footer a:hover {
     margin-top: 2.5rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0.25rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rule);
 }
 
 .docs-article h3 {
@@ -2053,14 +2227,14 @@ footer a:hover {
 .docs-article blockquote {
     margin: 1.25rem 0;
     padding: 0.5rem 1.25rem;
-    border-left: 3px solid #00b8d4;
-    background: rgba(0, 184, 212, 0.04);
-    color: #444;
+    border-left: 3px solid var(--accent-light);
+    background: color-mix(in srgb, var(--accent-light) 4%, transparent);
+    color: var(--text-2);
     font-style: italic;
 }
 
 .docs-article code {
-    background: #f4f4f4;
+    background: var(--surface-2);
     padding: 0.15em 0.35em;
     border-radius: 3px;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
@@ -2068,8 +2242,8 @@ footer a:hover {
 }
 
 .docs-article pre {
-    background: #f7f7f7;
-    border: 1px solid #eee;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
     border-radius: 6px;
     padding: 1rem;
     overflow-x: auto;
@@ -2091,31 +2265,31 @@ footer a:hover {
 
 .docs-article th,
 .docs-article td {
-    border: 1px solid #e5e5e5;
+    border: 1px solid var(--rule-2);
     padding: 0.5rem 0.75rem;
     text-align: left;
     vertical-align: top;
 }
 
 .docs-article th {
-    background: #f7f7f7;
+    background: var(--surface-2);
     font-weight: 600;
 }
 
 .docs-article hr {
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     margin: 2rem 0;
 }
 
 .docs-article a {
-    color: #007a91;
+    color: var(--link);
     text-decoration: none;
-    border-bottom: 1px solid rgba(0, 122, 145, 0.25);
+    border-bottom: 1px solid color-mix(in srgb, var(--link) 25%, transparent);
 }
 
 .docs-article a:hover {
-    border-bottom-color: rgba(0, 122, 145, 0.75);
+    border-bottom-color: color-mix(in srgb, var(--link) 75%, transparent);
 }
 
 .docs-index-section {
@@ -2146,16 +2320,16 @@ footer a:hover {
 .docs-index-section li a {
     display: block;
     padding: 0.6rem 0.75rem;
-    background: #fafafa;
+    background: var(--surface);
     border-radius: 4px;
-    color: #007a91;
+    color: var(--link);
     text-decoration: none;
-    border: 1px solid #eee;
+    border: 1px solid var(--rule);
 }
 
 .docs-index-section li a:hover {
-    background: #f0f0f0;
-    border-color: #ddd;
+    background: var(--surface-2);
+    border-color: var(--rule-2);
 }
 
 /* ============================================================
@@ -2201,7 +2375,7 @@ footer a:hover {
     letter-spacing: -0.01em;
     margin: 0 0 0.5rem 0;
     line-height: 1.2;
-    color: #111;
+    color: var(--ink-2);
 }
 .docs-body .docs-article h2 {
     font-size: 1.5rem;
@@ -2210,14 +2384,14 @@ footer a:hover {
     letter-spacing: 0;
     margin: 2.5rem 0 0.75rem 0;
     padding-bottom: 0.25rem;
-    border-bottom: 1px solid #eee;
-    color: #222;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
 }
 .docs-body .docs-article h3 {
     font-size: 1.2rem;
     font-weight: 600;
     margin: 1.75rem 0 0.5rem 0;
-    color: #333;
+    color: var(--text);
 }
 /* Global `header { text-align: center; margin-bottom: 5rem }` is wrong for
    the docs main's breadcrumb header */
@@ -2266,7 +2440,7 @@ footer a:hover {
    content: no fill, small type. */
 .docs-sidebar {
     grid-column: 1;
-    border-right: 1px solid #eee;
+    border-right: 1px solid var(--rule);
     padding: 1rem 0.5rem;
     display: flex;
     flex-direction: column;
@@ -2288,10 +2462,10 @@ footer a:hover {
 .sidebar-back {
     display: block;
     padding: 0.25rem 0.75rem;
-    color: #595959;
+    color: var(--muted);
     text-decoration: none;
 }
-.sidebar-back:hover { color: #000; }
+.sidebar-back:hover { color: var(--ink); }
 
 .sidebar-list {
     flex: 1 1 auto;
@@ -2304,14 +2478,14 @@ footer a:hover {
     display: block;
     padding: 0.35rem 0.75rem;
     font-weight: 600;
-    color: #222;
+    color: var(--ink-2);
     text-decoration: none;
     /* Stays at the top of the list as it scrolls, so a page deep in a long
        section still shows which section it is. */
     position: sticky;
     top: 0;
     z-index: 1;
-    background: #fff;
+    background: var(--paper);
 }
 
 .sidebar-list ul,
@@ -2325,31 +2499,31 @@ footer a:hover {
 .sidebar-sections li a {
     display: block;
     padding: 0.3rem 0.75rem;
-    color: #555;
+    color: var(--muted);
     text-decoration: none;
     border-radius: 4px;
     line-height: 1.35;
 }
 .sidebar-list a:hover,
 .sidebar-sections li a:hover {
-    background: #f5f5f5;
-    color: #007a91;
+    background: var(--surface-2);
+    color: var(--link);
 }
 .sidebar-list a[aria-current="page"] {
-    color: #007a91;
+    color: var(--link);
     font-weight: 500;
-    border-left: 2px solid #00838f;
+    border-left: 2px solid var(--accent);
     border-radius: 0 4px 4px 0;
     padding-left: calc(0.75rem - 2px);
 }
 
 .sidebar-sections {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     padding-top: 0.5rem;
 }
 .sidebar-sections summary {
     padding: 0.3rem 0.75rem;
-    color: #595959;
+    color: var(--muted);
     cursor: pointer;
 }
 .sidebar-sections[open] ul {
@@ -2363,20 +2537,20 @@ footer a:hover {
     display: none;
     margin-top: 0.5rem;
     padding: 0.35rem 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
     background: transparent;
     font: inherit;
     font-size: 0.8125rem;
-    color: #444;
+    color: var(--text-2);
     cursor: pointer;
 }
 .section-toggle:hover {
-    border-color: #999;
-    color: #000;
+    border-color: var(--line-strong);
+    color: var(--ink);
 }
 .section-toggle:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
@@ -2403,7 +2577,7 @@ footer a:hover {
     max-width: 720px;
     text-align: left;
     padding: 1.5rem 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     opacity: 0.6;
     font-size: 0.9rem;
 }
@@ -2418,14 +2592,14 @@ footer a:hover {
     max-height: calc(100vh - var(--docs-topbar-h, 0px));
     max-height: calc(100dvh - var(--docs-topbar-h, 0px));
     overflow-y: auto;
-    border-left: 1px solid #eee;
-    background: #fafafa;
+    border-left: 1px solid var(--rule);
+    background: var(--surface);
 }
 .docs-toc-title {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #666;
+    color: var(--muted-2);
     font-weight: 600;
     margin-bottom: 0.75rem;
 }
@@ -2440,16 +2614,16 @@ footer a:hover {
 }
 .docs-toc a {
     display: block;
-    color: #666;
+    color: var(--muted-2);
     text-decoration: none;
     padding: 0.2rem 0.5rem;
     border-left: 2px solid transparent;
     line-height: 1.4;
 }
-.docs-toc a:hover { color: #333; }
+.docs-toc a:hover { color: var(--text); }
 .docs-toc a[aria-current="location"] {
-    color: #007a91;
-    border-left-color: #00b8d4;
+    color: var(--link);
+    border-left-color: var(--accent-light);
     font-weight: 500;
 }
 
@@ -2464,8 +2638,8 @@ footer a:hover {
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     padding-top: max(0.5rem, env(safe-area-inset-top));
-    background: #fff;
-    border-bottom: 1px solid #eee;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -2477,13 +2651,13 @@ footer a:hover {
     width: 44px;
     height: 44px;
     background: transparent;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
     cursor: pointer;
     padding: 0;
 }
 .docs-hamburger:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 .hamburger-icon {
@@ -2495,7 +2669,7 @@ footer a:hover {
 .hamburger-icon span {
     display: block;
     height: 2px;
-    background: #444;
+    background: var(--text-2);
     border-radius: 1px;
 }
 .docs-topbar-brand {
@@ -2505,7 +2679,7 @@ footer a:hover {
     padding: 0 0.25rem;
 }
 .docs-topbar-crumb {
-    color: #666;
+    color: var(--muted-2);
     font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
@@ -2525,17 +2699,17 @@ footer a:hover {
     font-size: 0.875rem;
 }
 .topbar-places a {
-    color: #595959;
+    color: var(--muted);
     text-decoration: none;
     padding: 0.25rem 0;
     white-space: nowrap;
 }
 .topbar-places a:hover {
-    color: #000;
+    color: var(--ink);
 }
 .topbar-places a[aria-current] {
-    color: #000;
-    box-shadow: inset 0 -2px 0 #00838f;
+    color: var(--ink);
+    box-shadow: inset 0 -2px 0 var(--accent);
 }
 .topbar-places .topbar-aside {
     margin-left: auto;
@@ -2558,7 +2732,7 @@ footer a:hover {
     width: min(280px, 85vw);
     height: 100vh;
     height: 100dvh;
-    background: #fff;
+    background: var(--paper);
     z-index: 21;
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
     padding: 1rem 0.5rem;
@@ -2579,15 +2753,15 @@ footer a:hover {
     width: 40px;
     height: 40px;
     background: transparent;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
     cursor: pointer;
     font-size: 1.2rem;
-    color: #444;
+    color: var(--text-2);
     margin-bottom: 0.5rem;
 }
 .docs-drawer-close:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 /* Inside the drawer: the places as a list, then the section's own list and
@@ -2600,7 +2774,7 @@ footer a:hover {
     flex: none;
     margin: 0 0 0.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rule);
     font-size: 1rem;
 }
 .docs-drawer .topbar-places:last-child {
@@ -2613,7 +2787,7 @@ footer a:hover {
     margin-left: 0;
 }
 .docs-drawer .topbar-places a[aria-current] {
-    box-shadow: inset 2px 0 0 #00838f;
+    box-shadow: inset 2px 0 0 var(--accent);
 }
 .docs-drawer .sidebar-list {
     flex: none;
@@ -2754,7 +2928,7 @@ body.docs-drawer-open {
   font-weight: 300;
   letter-spacing: 0.05em;
   margin-bottom: 1.5rem;
-  color: #000;
+  color: var(--ink);
   text-align: center;
 }
 .docs-body .sanctuary-main h2 {
@@ -2764,7 +2938,7 @@ body.docs-drawer-open {
   letter-spacing: 0.2em;
   margin-top: 3rem;
   margin-bottom: 2rem;
-  color: #595959;
+  color: var(--muted);
   padding-bottom: 0;
   border-bottom: none;
 }
@@ -2800,27 +2974,27 @@ body.docs-drawer-open {
     font-size: 0.9375rem;
     font-family: inherit;
     font-weight: 300;
-    color: #333;
-    background: #fafafa;
-    border: 1px solid #e5e5e5;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
 }
 
 .docs-index-filter input[type="search"]:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
 .docs-filter-empty {
     margin-top: 0.75rem;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 .docs-filter-count {
     margin-top: 0.5rem;
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 .docs-filter-count:empty { display: none; }
 
@@ -2829,7 +3003,7 @@ body.docs-drawer-open {
    One look, set here; the blocks used to carry it as inline styles. */
 .related-block,
 .sung-alongside {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     padding: 1.5rem 0;
     margin-top: 2rem;
 }
@@ -2875,7 +3049,7 @@ body.docs-drawer-open {
 
 .ask-privacy-note {
     font-size: 0.75rem;
-    color: #595959;
+    color: var(--muted);
     text-align: center;
     line-height: 1.5;
     margin: 0.25rem 0 0;
@@ -2885,21 +3059,21 @@ body.docs-drawer-open {
     align-self: center;
     margin-top: 0.5rem;
     padding: 0.75rem 2rem;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
     border-radius: 4px;
-    background: rgba(198, 156, 92, 0.15);
-    color: #6b4a1f;
+    background: var(--gold);
+    color: var(--gold-ink);
 }
 
 .ask-form-stacked #ask-submit:hover {
-    background: rgba(198, 156, 92, 0.25);
-    color: #000;
+    background: var(--gold-hover);
+    color: var(--ink);
 }
 
 .ask-form-stacked #ask-submit:disabled {
     background: transparent;
-    color: #6a6a6a;
-    border-color: #eee;
+    color: var(--muted-2);
+    border-color: var(--rule);
     cursor: default;
 }
 
@@ -2932,17 +3106,17 @@ body.docs-drawer-open {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #666;
+    color: var(--muted-2);
     padding: 0.75rem 0.75rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--line);
     vertical-align: bottom;
 }
 
 .axioms-facts-table tbody td {
     padding: 0.9rem 0.75rem;
     vertical-align: top;
-    border-bottom: 1px solid #eee;
-    color: #222;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
 }
 
 .axioms-facts-table tbody tr:last-child td {
@@ -2952,7 +3126,7 @@ body.docs-drawer-open {
 .axioms-facts-table .axiom-kanji-cell {
     font-size: 1.4rem;
     font-weight: 400;
-    color: #000;
+    color: var(--ink);
     text-align: center;
     width: 3em;
     white-space: nowrap;
@@ -2961,7 +3135,7 @@ body.docs-drawer-open {
 .axioms-table-caption {
     margin-top: 1rem;
     font-size: 0.8rem;
-    color: #666;
+    color: var(--muted-2);
     text-align: center;
     letter-spacing: 0.02em;
 }
@@ -3004,8 +3178,8 @@ body.docs-drawer-open {
     top: -3rem;
     z-index: 1000;
     padding: 0.5rem 1rem;
-    background: #000;
-    color: #fff;
+    background: var(--ink);
+    color: var(--paper);
     text-decoration: none;
 }
 .skip-link:focus {
@@ -3022,7 +3196,7 @@ body.docs-drawer-open {
 
 .ask-list-sibling-hint {
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     line-height: 1.6;
     margin-top: 1rem;
 }
@@ -3044,14 +3218,14 @@ body.docs-drawer-open {
     margin-bottom: 0.5rem;
 }
 .archive-date {
-    color: #595959;
+    color: var(--muted);
     font-size: 0.85em;
     white-space: nowrap;
 }
 
 .docs-index-summary {
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
     line-height: 1.5;
 }
 
@@ -3084,7 +3258,7 @@ body.docs-drawer-open {
     text-decoration: none;
 }
 .section-summary {
-    color: #595959;
+    color: var(--muted);
 }
 
 /* A section page's own essay on its form, below its entries, closed. */
@@ -3097,7 +3271,7 @@ body.docs-drawer-open {
 .section-about > summary {
     cursor: pointer;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
     padding: 0.5rem 0;
 }
 
@@ -3111,7 +3285,7 @@ body.docs-drawer-open {
 .library-source {
     margin-top: 3rem;
     font-size: 0.875rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 /* Search over a JSON index, in the browser (site-search.js). */
@@ -3125,19 +3299,19 @@ body.docs-drawer-open {
     font-size: 0.9375rem;
     font-family: inherit;
     font-weight: 300;
-    color: #333;
-    background: #fafafa;
-    border: 1px solid #e5e5e5;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
 }
 .site-search input[type="search"]:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 .site-search-status {
     margin: 0.5rem 0 0;
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 .site-search-status:empty { display: none; }
 .site-search-results {
@@ -3149,7 +3323,7 @@ body.docs-drawer-open {
 .site-search-results li { margin-bottom: 0.75rem; }
 .site-search-label {
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 /* ------------------------------------------------------------------
@@ -3163,8 +3337,8 @@ body.docs-drawer-open {
 .doc-audio {
     margin: 0.75rem 0 1.5rem;
     padding: 0.75rem 1rem;
-    background: #fafafa;
-    border: 1px solid #eee;
+    background: var(--surface);
+    border: 1px solid var(--rule);
     border-radius: 6px;
 }
 .doc-audio-visual {
@@ -3194,7 +3368,7 @@ body.docs-drawer-open {
 .doc-audio figcaption {
     margin-top: 0.5rem;
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 
 /* Where to follow a podcast (lib/audio/markup.js podcastLinks): Spotify's own
@@ -3206,7 +3380,7 @@ body.docs-drawer-open {
     gap: 0.25rem 1rem;
     margin: 0 0 1.5rem;
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
 }
 .podcast-follow p {
     flex-basis: 100%;
@@ -3227,7 +3401,7 @@ body.docs-drawer-open {
 .podcast-follow-feed {
     display: inline-block;
     padding: 0.6rem 0;
-    color: #0b5563;
+    color: var(--accent-ink);
 }
 .doc-audio-play {
     flex: none;
@@ -3239,15 +3413,15 @@ body.docs-drawer-open {
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: #00838f;
-    color: #fff;
+    background: var(--accent);
+    color: var(--on-accent);
     cursor: pointer;
 }
 .doc-audio-play:hover {
-    background: #006f7a;
+    background: var(--accent-hover);
 }
 .doc-audio-play:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
 .doc-audio-play svg,
@@ -3283,7 +3457,7 @@ body.docs-drawer-open {
     cursor: pointer;
 }
 .doc-audio-wave:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 2px;
 }
@@ -3299,7 +3473,7 @@ body.docs-drawer-open {
     min-width: 1px;
     overflow: hidden;
     border-radius: 1px;
-    background: rgba(0, 0, 0, 0.18);
+    background: color-mix(in srgb, var(--ink) 18%, transparent);
 }
 .doc-audio-bars > span > i {
     position: absolute;
@@ -3307,7 +3481,7 @@ body.docs-drawer-open {
     bottom: 0;
     left: 0;
     width: clamp(0%, calc((var(--progress, 0) * var(--n) - var(--i)) * 100%), 100%);
-    background: #00b8d4;
+    background: var(--accent-light);
 }
 .doc-audio-bars-narrow {
     display: none;
@@ -3324,7 +3498,7 @@ body.docs-drawer-open {
 .pb-time {
     flex: none;
     font-size: 0.8125rem;
-    color: #595959;
+    color: var(--muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -3342,8 +3516,8 @@ body.docs-drawer-open {
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid #e5e5e5;
-    background: rgba(255, 255, 255, 0.97);
+    border-top: 1px solid var(--rule-2);
+    background: var(--paper-glass);
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
 .pb-line {
@@ -3366,15 +3540,15 @@ body.docs-drawer-open {
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: #222;
+    color: var(--ink-2);
     font: inherit;
     cursor: pointer;
 }
 .pb-btn:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
 }
 .pb-btn:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 .pb-btn[disabled] {
@@ -3387,11 +3561,11 @@ body.docs-drawer-open {
 .pb-play {
     width: 2.5rem;
     height: 2.5rem;
-    background: #00838f;
-    color: #fff;
+    background: var(--accent);
+    color: var(--on-accent);
 }
 .pb-play:hover {
-    background: #006f7a;
+    background: var(--accent-hover);
 }
 .pb-text {
     display: flex;
@@ -3401,7 +3575,7 @@ body.docs-drawer-open {
 }
 .pb-title {
     overflow: hidden;
-    color: #111;
+    color: var(--ink-2);
     font-size: 0.875rem;
     font-weight: 600;
     text-decoration: none;
@@ -3413,7 +3587,7 @@ body.docs-drawer-open {
 }
 .pb-sub {
     overflow: hidden;
-    color: #595959;
+    color: var(--muted);
     font-size: 0.75rem;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -3440,7 +3614,7 @@ body.docs-drawer-open {
     height: 4px;
     margin-top: -2px;
     border-radius: 2px;
-    background: rgba(0, 0, 0, 0.12);
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .pb-wave-line > i {
     position: absolute;
@@ -3449,7 +3623,7 @@ body.docs-drawer-open {
     left: 0;
     width: calc(var(--progress, 0) * 100%);
     border-radius: 2px;
-    background: #00b8d4;
+    background: var(--accent-light);
 }
 
 /* Phones: one compact row with a progress line; the full controls are in a
@@ -3466,13 +3640,13 @@ body.docs-drawer-open {
         right: 0;
         left: 0;
         height: 2px;
-        background: rgba(0, 0, 0, 0.08);
+        background: color-mix(in srgb, var(--ink) 8%, transparent);
     }
     .pb-line span {
         display: block;
         width: 0;
         height: 100%;
-        background: #00b8d4;
+        background: var(--accent-light);
     }
     .player-bar .pb-back,
     .player-bar .pb-fwd,
@@ -3497,7 +3671,7 @@ body.docs-drawer-open {
     padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
     border: 0;
     border-radius: 12px 12px 0 0;
-    background: #fff;
+    background: var(--paper);
 }
 .pb-sheet::backdrop {
     background: rgba(0, 0, 0, 0.4);
@@ -3556,9 +3730,9 @@ html.has-player .docs-toc {
     gap: 1rem;
     margin: 0.75rem 0 1.5rem;
     padding: 0.75rem 1rem;
-    border: 1px solid #eee;
+    border: 1px solid var(--rule);
     border-radius: 6px;
-    background: #fafafa;
+    background: var(--surface);
 }
 .path-listen[hidden] {
     display: none;
@@ -3570,22 +3744,22 @@ html.has-player .docs-toc {
     padding: 0.5rem 1rem 0.5rem 0.75rem;
     border: 0;
     border-radius: 2rem;
-    background: #00838f;
-    color: #fff;
+    background: var(--accent);
+    color: var(--on-accent);
     font: inherit;
     font-weight: 600;
     cursor: pointer;
 }
 .path-listen-play:hover {
-    background: #006f7a;
+    background: var(--accent-hover);
 }
 .path-listen-play:focus-visible {
-    outline: 2px solid #00838f;
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
 .path-listen-note {
     margin: 0;
-    color: #595959;
+    color: var(--muted);
     font-size: 0.875rem;
 }
 
@@ -3593,20 +3767,20 @@ html.has-player .docs-toc {
 .path-bar {
     margin: 0.75rem 0 0;
     padding: 0.75rem 1rem;
-    background: #fafafa;
-    border: 1px solid #eee;
+    background: var(--surface);
+    border: 1px solid var(--rule);
     border-radius: 4px;
     font-size: 0.875rem;
 }
 .path-bar p { margin: 0; }
 .path-bar-steps { margin-top: 0.35rem !important; }
 .path-bar-step {
-    color: #595959;
+    color: var(--muted);
     white-space: nowrap;
     margin-left: 0.5rem;
 }
 .path-next {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rule);
     margin-top: 2rem;
     padding-top: 1.5rem;
 }
@@ -3616,15 +3790,15 @@ html.has-player .docs-toc {
 .docs-toc-inline {
     margin: 0 0 1.5rem;
     padding: 0.5rem 1rem;
-    background: #fafafa;
-    border: 1px solid #eee;
+    background: var(--surface);
+    border: 1px solid var(--rule);
     border-radius: 4px;
     font-size: 0.9rem;
 }
 .docs-toc-inline > summary {
     cursor: pointer;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
 }
 .docs-toc-inline ul {
     list-style: none;
@@ -3641,7 +3815,7 @@ html.has-player .docs-toc {
     margin: 0.75rem 0 0;
     font-size: 0.875rem;
     text-align: center;
-    color: #595959;
+    color: var(--muted);
 }
 .reflections-more {
     text-align: center;
@@ -3650,9 +3824,9 @@ html.has-player .docs-toc {
 .reflections-more-button {
     font: inherit;
     font-size: 0.875rem;
-    color: #007a91;
-    background: #fafafa;
-    border: 1px solid #e5e5e5;
+    color: var(--link);
+    background: var(--surface);
+    border: 1px solid var(--rule-2);
     border-radius: 4px;
     padding: 0.5rem 1rem;
     cursor: pointer;

@@ -44,3 +44,9 @@ test('a failed question says why, in the API\'s words when it has them', () => {
   assert.match(failureText(503, null), /cannot answer right now/);
   assert.strictEqual(failureText(500, null), 'Something went wrong. Try again.');
 });
+
+test('the cookie that keeps a conversation yours lasts 399 days, and the privacy policy says so', () => {
+  // Chrome caps a cookie's life at 400 days, so 399 is the longest that holds.
+  assert.match(read('ask-form.js'), /OWNER_DAYS = 399/);
+  assert.match(read('privacy.html'), /<strong>ask_owner_\[slug\]<\/strong>[^<]*Expires after 399 days/);
+});

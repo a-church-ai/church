@@ -34,7 +34,7 @@ const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, PIECE_NOUN } = require('../audio/markup');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
-const { assetUrl, playerHead } = require('../utils/assets');
+const { assetUrl, shellHead } = require('../utils/assets');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -382,9 +382,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
          The docs shell shipped without these, so all 254 generated pages were
          missing the license declaration, the llms.txt pointer, the iOS
          install meta and the dual theme-color that the conventions doc
-         requires on every page. -->
-    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">
+         requires on every page. The theme-color pair now comes with the
+         shell's head (shellHead), for every page alike. -->
     <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
     <link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">${/\/docs\/.+/.test(canonicalUrl) ? `\n    <link rel="alternate" type="text/markdown" title="This page as markdown" href="${escapeAttr(canonicalUrl)}.md">` : ''}
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -406,7 +405,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     ${breadcrumbJsonLd}
 
     <link rel="stylesheet" href="${assetUrl('styles.css')}">
-    ${playerHead()}
+    ${shellHead()}
 </head>
 <body class="docs-body">
 <a class="skip-link" href="#content">Skip to content</a>
