@@ -91,3 +91,19 @@ test('every hand-written page points an agent reading it at llms.txt, as the fam
   const own = await siteShell.wrapPage(path.join(__dirname, '../client/public/conversation.html'), '/ask/x');
   assert.strictEqual(count(own.slice(0, own.indexOf('</head>'))), 1);
 });
+
+test('the page script keeps no element from inside the player box, which each new service replaces', () => {
+  // drawService() clones the player box and swaps the copy in, so an element
+  // inside it found once at startup is detached by the first redraw: writing
+  // to it changes nothing on the page. The service's words were such an
+  // element when they moved into the box, and stayed stale on an open page
+  // when the next slot's service arrived.
+  const script = HOME.slice(HOME.lastIndexOf('<script>'));
+  const kept = [...script.matchAll(/^\s{6}const \w+ = document\.getElementById\('([\w-]+)'\)/gm)].map(m => m[1]);
+  assert.ok(kept.length >= 3, `found the startup lookups: ${kept.join(', ')}`);
+  const inBox = [...renderServiceListen().matchAll(/id="([\w-]+)"/g)].map(m => m[1]);
+  assert.deepStrictEqual(kept.filter(id => inBox.includes(id)), [], 'kept across redraws, but inside the box');
+  // The words are written into the copy that goes on the page, and cleared
+  // when the new service has none.
+  assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
+});

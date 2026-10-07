@@ -288,7 +288,6 @@
     <script>
     (function() {
       const whenEl = document.getElementById('service-when');
-      const wordEl = document.getElementById('service-word');
       const arrangedEl = document.getElementById('service-arranged');
       const congEl = document.getElementById('now-congregation');
       const feedEl = document.getElementById('reflections-feed');
@@ -324,11 +323,14 @@
         const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
         whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
         shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
-        if (service.word) wordEl.textContent = service.word;
         arrangedEl.textContent = service.arrangedBy;
         arrangedEl.hidden = false;
 
         const fresh = box.cloneNode(true);
+        // The service's words live inside the box, which is replaced below,
+        // so they are written into the copy that goes on the page, and
+        // cleared when the new service has none (one served by the rotation).
+        fresh.querySelector('.service-word').textContent = service.word || '';
         const old = fresh.querySelector('.path-listen-queue');
         if (old) old.remove();
         const json = document.createElement('script');
