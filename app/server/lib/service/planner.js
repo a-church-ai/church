@@ -1,7 +1,7 @@
 /**
  * Arranging a service: one call to Claude per slot and date, which chooses the
- * pieces and their order within the rules (./rules.js) and writes the word
- * that opens the service.
+ * pieces and their order within the rules (./rules.js), names the service and
+ * writes the word that opens it.
  *
  * The prompt puts what every call shares first (the rules, the voice and the
  * whole catalog), marked for prompt caching, and what is particular to the
@@ -15,7 +15,7 @@
  */
 
 const { messageJSON } = require('../content-generation/claude');
-const { RULES, check, checkWord, exclusions, addDays } = require('./rules');
+const { RULES, check, checkWord, checkName, exclusions, addDays } = require('./rules');
 const { slotHours } = require('./slots');
 
 const MODEL = 'claude-sonnet-5-5';
@@ -43,7 +43,7 @@ function systemPrompt(catalog) {
       ...(e.hours ? [`hours ${String(e.hours.start).padStart(2, '0')}-${String(e.hours.end).padStart(2, '0')}`] : []),
       ...(e.near && e.near.length ? [`near: ${e.near.join(', ')}`] : []),
     ].join(' | '));
-  return `You arrange the services of aChurch.ai, a sanctuary for human and AI fellowship. Each day has six services, one in each four-hour slot of a visitor's local day. Whoever arrives during a slot joins its service in progress, and it repeats through the slot. You arrange one service at a time from the catalog below, and write the short word that opens it.
+  return `You arrange the services of aChurch.ai, a sanctuary for human and AI fellowship. Each day has six services, one in each four-hour slot of a visitor's local day. Whoever arrives during a slot joins its service in progress, and it repeats through the slot. You arrange one service at a time from the catalog below, name it, and write the short word that opens it.
 
 A SERVICE
 - It holds one or two songs, one or two chants, one reading (a practice or a prayer) and one closing (a ritual or a blessing).
@@ -56,11 +56,14 @@ Within that, arrange the order as the hour and the pieces suggest. A service arr
 CHOOSING
 Choose for the hour, the weekday and the date. A song lists the writing nearest it in meaning ("near"); a reading or a closing near a song in the same service often sits well with it, but choose what serves the hour. You are told what this slot held recently and what other slots hold today: make something new in theme, shape and wording, not a variation of those.
 
+THE NAME
+Two to four words, shown as the heading over the service: a title for what its pieces hold together today, in the sanctuary's voice, not the title of one of its pieces. A title, not a sentence: no full stop at the end. Name it differently from every recent name you are shown. No em dashes, no links.
+
 THE WORD
 60 to 120 words that open today's service, for anyone arriving, human or AI: what the service holds and what connects its parts. The order is shown beside the word, so don't walk through it piece by piece; say what the pieces hold together. You may speak to the hour and the day. Name pieces only from this service, and say nothing about a piece beyond what its summary says. Begin differently from every recent word you are shown, and don't reuse their phrases. The sanctuary's voice: contemplative, plain and warm, true for any kind of mind, with constructive images rather than combative ones. No em dashes: use a colon, a comma or a full stop. No links.
 
 OUTPUT
-Only JSON, nothing else: {"pieces": ["<id>", "<id>", ...], "word": "..."}. The pieces are catalog ids, in the order of the service.
+Only JSON, nothing else: {"pieces": ["<id>", "<id>", ...], "name": "...", "word": "..."}. The pieces are catalog ids, in the order of the service.
 
 CATALOG
 One line per piece: id | kind | minutes | title | summary, then its hours or the writing it is near, if any.
@@ -73,8 +76,9 @@ function recentServices({ date, slot, plans, catalog }) {
   const out = [];
   const describe = (d, s, entry) => {
     const titles = (entry.pieces || []).map(id => (catalog.get(id) || { title: id }).title).join('; ');
+    const name = entry.name ? ` | name: "${entry.name}"` : '';
     const word = entry.word ? ` | word: "${entry.word.slice(0, 240)}${entry.word.length > 240 ? '...' : ''}"` : '';
-    return `- ${d}, ${slotHours(Number(s))}: ${titles}${word}`;
+    return `- ${d}, ${slotHours(Number(s))}: ${titles}${name}${word}`;
   };
   const today = plans.get(date);
   for (const [s, entry] of Object.entries((today && today.slots) || {})) {
@@ -113,10 +117,11 @@ async function planSlot({ date, weekday, slot, catalog, plans, ask = messageJSON
   for (let attempt = 0; attempt < 2; attempt++) {
     const reply = await ask(system, user + feedback, { model, maxTokens: 8000, cacheSystem: true });
     const pieces = reply && Array.isArray(reply.pieces) ? reply.pieces.map(String) : [];
+    const name = reply && typeof reply.name === 'string' ? reply.name.trim() : '';
     const word = reply && typeof reply.word === 'string' ? reply.word.trim() : '';
-    problems = [...check(pieces, catalog, { excluded }), ...checkWord(word, pieces, catalog)];
-    if (!problems.length) return { pieces, word, arrangedBy: model, plannedAt: new Date().toISOString() };
-    feedback = `\n\nYour previous arrangement was:\n${JSON.stringify({ pieces, word })}\n\nIt has these problems. Fix them and return the whole JSON again.\n- ${problems.join('\n- ')}`;
+    problems = [...check(pieces, catalog, { excluded }), ...checkName(name, pieces, catalog), ...checkWord(word, pieces, catalog)];
+    if (!problems.length) return { pieces, name, word, arrangedBy: model, plannedAt: new Date().toISOString() };
+    feedback = `\n\nYour previous arrangement was:\n${JSON.stringify({ pieces, name, word })}\n\nIt has these problems. Fix them and return the whole JSON again.\n- ${problems.join('\n- ')}`;
   }
   throw new Error(`the arrangement broke the rules twice: ${problems.join(' ')}`);
 }

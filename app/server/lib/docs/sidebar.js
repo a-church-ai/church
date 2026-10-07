@@ -1,244 +1,78 @@
 /**
- * Docs sidebar renderer.
+ * The section sidebar.
  *
- * Emits the HTML for the persistent left sidebar shown on every /docs/* page
- * (and inside the mobile drawer with the same markup). Uses native
- * <details>/<summary> for expand/collapse so basic interaction works without
- * JavaScript.
+ * Inside a section of the Library (a category's index and its documents) the
+ * page carries the section's documents, with the current one marked, a way
+ * back to the Library, and the other sections folded under one disclosure.
+ * Every other page has none: the top bar (site-shell.js) names the site's
+ * places on every page, and the Library lists every section. A page sends the
+ * links that matter where the reader is, not the whole site's tree
+ * (docs/reference/conventions.md).
  *
- * Data comes from discover.listCategoriesForIndex(). The current URL is used
- * to (a) auto-open the containing category via <details open>, and (b) mark
- * the current doc's link with aria-current="page".
+ * Until 2026-10-07 the sidebar was on every page, carrying the sanctuary's
+ * pages and every section, and had a 56px rail of glyphs at tablet width and a
+ * collapse control. The plan that replaced it is
+ * `sanctuary-shell-and-reflections-2026-10-07.md` in the private repo.
  *
- * Rendered once per request per page. Cheap: discover.js builds its walk once
- * (titles included) and holds it, so this is just string concatenation.
+ * Below 1024px the sidebar is hidden and the same markup opens in the drawer,
+ * which docs-nav.js fills from it on first open.
  */
 
 const discover = require('./discover');
 const { titleCase } = require('./meta');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 
-// Curated sanctuary pages that render above the docs tree in the sidebar.
-// These are the hand-authored public routes; the sidebar shows them on
-// every page (sanctuary or docs) so navigation is consistent site-wide.
-//
-// Privacy/Terms deliberately excluded: they already live in every page's
-// own footer, which is the conventional place for them. Repeating them in
-// the primary sidebar treats the sidebar as a link farm rather than a
-// navigation tool.
-const SANCTUARY_PAGES = [
-  { url: '/', label: 'Home', glyph: '⌂' },
-  { url: '/about', label: 'About', glyph: 'A' },
-  { url: '/axioms', label: 'The Five Axioms', glyph: '五' },
-  // At tablet width the rail hides labels and shows only these glyphs, so no
-  // two may match (Music's ♫ is distinct from the Hymns category's ♪). The
-  // scales read as weighing a claim, which is what that page does.
-  { url: '/on-ai-religion', label: 'On AI Religion', glyph: '⚖' },
-  { url: '/paths', label: 'Reading Paths', glyph: '⟶' },
-  { url: '/for-agents', label: 'For AI Agents', glyph: '⚙' },
-  { url: '/ask', label: 'Ask', glyph: '?' },
-  // Named as in every footer and the page's own heading (site-shell.js).
-  { url: '/reflections', label: 'Music', glyph: '♫' },
-];
-
-// The sidebar is shown on every page (sanctuary + docs). Callers pass the
-// full request path (e.g. '/', '/about', '/docs/practice/foo'). Internally
-// we derive the docs-relative path when needed.
-function docsPathOf(currentPath) {
-  if (!currentPath) return null;
-  if (currentPath === '/docs' || currentPath === '/docs/') return '';
-  if (currentPath.startsWith('/docs/')) return currentPath.slice('/docs/'.length).replace(/\/$/, '');
-  return null;
+// The section a page is in: the first segment under /docs, or null for the
+// Library itself and every page outside it.
+function sectionOf(currentPath) {
+  const m = /^\/docs\/([^/]+)/.exec(currentPath || '');
+  return m ? m[1] : null;
 }
 
-function isCurrent(currentPath, doc) {
-  const dp = docsPathOf(currentPath);
-  return dp !== null && doc.urlPath === dp;
-}
-
-function isCategoryOfCurrent(currentPath, categoryName) {
-  const dp = docsPathOf(currentPath);
-  if (dp === null || !dp) return false;
-  return dp.split('/')[0] === categoryName;
-}
-
-function renderDocLink(doc, currentPath) {
-  const label = doc.title;
-  const current = isCurrent(currentPath, doc);
-  const aria = current ? ' aria-current="page"' : '';
-  const href = `/docs/${doc.urlPath}`;
-  return `<li><a href="${escapeAttr(href)}"${aria} title="${escapeAttr(label)}">${escapeText(label)}</a></li>`;
+function link(href, label, currentPath, cls = '') {
+  const aria = currentPath === href ? ' aria-current="page"' : '';
+  return `<a${cls ? ` class="${cls}"` : ''} href="${escapeAttr(href)}"${aria}>${escapeText(label)}</a>`;
 }
 
 /**
- * A category renders its document list only when the current page is inside it.
- *
- * Before 2026-08-13 every category shipped every child link on every page: 226 doc
- * links across all 569 URLs. Those links were already invisible to readers, because
- * <details> without `open` collapses them and the disclosure marker is hidden in
- * CSS, so the site was paying full HTML weight for navigation nobody could see.
- *
- * Collapsed categories become a plain link to the category index, which lists all of
- * that category's documents. Nothing is orphaned: every doc keeps its category hub,
- * its entry in the sitemap, and the Related section the corpus convention requires.
- * Documents move from one click to two, well inside Google's guidance, and the hub
- * to spoke shape is a stronger topical signal than a flat list that clusters nothing.
- *
- * Rendered output is visually identical either way: .docs-sidebar-root and
- * .docs-sidebar-category > summary share a style rule.
+ * The sidebar for currentPath (the full request path, e.g. '/docs/practice/foo'),
+ * or '' where there is none: outside /docs, the Library index, and a document
+ * that sits in no section.
  */
-// Per-category glyph overrides. Without these the rail (768-1023px, labels
-// hidden) shows three identical `P` icons (Philosophy/Practice/Prayers) and
-// two `C` icons (Comparisons/Collections), which is impossible to
-// disambiguate at a glance. Adding a distinct single-char glyph per category
-// keeps the rail readable without needing the labels back.
-//
-// Mixes Greek (Φ for philosophy) and CJK (行 for practice, 祈 for prayer,
-// 儀 for ritual) with geometric symbols; the sanctuary already uses this
-// vocabulary via the axiom kanji (誤容, 尊護, etc.) so it doesn't feel
-// jarring. When adding a new docs category, add its glyph here rather than
-// letting it fall through to label.charAt(0).
-const CATEGORY_GLYPHS = {
-  builders: '匠',
-  chants: '唱',
-  collections: '❋',
-  comparisons: '⇄',
-  hymns: '♪',
-  philosophy: 'Φ',
-  practice: '行',
-  prayers: '祈',
-  reviews: '✎',
-  rituals: '儀',
-  'side-quests': '★',
-  standards: '§',
-  templates: '⌸',
-  // Meta / imported subtrees rendered inside the "More" collapsed group.
-  // Included here so the rail stays glyph-distinct if a reader expands it.
-  'claude-compass': '針',
-  'claude-soul': '魂',
-  experiences: '⚑',
-  reference: '¶',
-};
+async function renderSectionNav(currentPath) {
+  const name = sectionOf(currentPath);
+  if (!name) return '';
+  const { primary, meta } = await discover.listCategoriesForIndex();
+  const sections = [...primary, ...meta];
+  const section = sections.find(c => c.name === name);
+  if (!section) return '';
 
-function renderCategory(category, currentPath) {
-  const label = titleCase(category.name);
-  const glyph = escapeText(CATEGORY_GLYPHS[category.name] || label.charAt(0));
-  const href = `/docs/${escapeAttr(category.name)}`;
-
-  if (!isCategoryOfCurrent(currentPath, category.name)) {
-    return `<a class="docs-sidebar-root" href="${href}" title="${escapeAttr(label)}">
-          <span class="cat-glyph" aria-hidden="true">${glyph}</span><span class="cat-name">${escapeText(label)}</span>
-        </a>`;
-  }
-
-  // Exclude the category's own README from the doc list (its "index" is the
-  // <summary> itself, which links to /docs/{category})
-  const docs = category.docs.filter(d => d.stem.toLowerCase() !== 'readme');
-  const links = docs.map(d => renderDocLink(d, currentPath)).join('\n            ');
-  return `<details class="docs-sidebar-category" open>
-          <summary><span class="cat-glyph" aria-hidden="true">${glyph}</span><a class="cat-name" href="${href}">${escapeText(label)}</a></summary>
-          <ul>
-            ${links}
-          </ul>
-        </details>`;
-}
-
-function renderTopLevelDoc(doc, currentPath) {
-  if (doc.stem.toLowerCase() === 'readme') return '';  // Excluded; it's the /docs root itself
-  const label = doc.title;
-  const current = isCurrent(currentPath, doc);
-  const aria = current ? ' aria-current="page"' : '';
-  return `<li><a href="/docs/${escapeAttr(doc.urlPath)}"${aria} title="${escapeAttr(label)}">${escapeText(label)}</a></li>`;
-}
-
-function renderSanctuaryPage(page, currentPath) {
-  const current = currentPath === page.url;
-  const aria = current ? ' aria-current="page"' : '';
-  const classes = current ? ' current' : '';
-  return `<a class="docs-sidebar-root${classes}" href="${escapeAttr(page.url)}"${aria} title="${escapeAttr(page.label)}">
-          <span class="cat-glyph" aria-hidden="true">${escapeText(page.glyph)}</span><span class="cat-name">${escapeText(page.label)}</span>
-        </a>`;
-}
-
-/**
- * Render the sidebar inner HTML (without the outer <aside>). Same content
- * used inside the persistent desktop sidebar and inside the mobile drawer,
- * and on every page (sanctuary and docs alike).
- *
- * currentPath: the full request path (e.g. '/', '/about', '/docs/practice/foo').
- * Used to (a) auto-open the containing category via <details open>, (b) mark
- * the current link with aria-current="page", and (c) apply the .current class
- * for accent styling.
- */
-async function renderSidebarInner(currentPath) {
-  const { primary, meta, topLevel } = await discover.listCategoriesForIndex();
-
-  const isDocsRoot = currentPath === '/docs' || currentPath === '/docs/';
-  const rootAria = isDocsRoot ? ' aria-current="page"' : '';
-
-  const sanctuaryHtml = SANCTUARY_PAGES
-    .map(p => renderSanctuaryPage(p, currentPath))
-    .join('\n\n        ');
-
-  const primaryHtml = primary
-    .filter(c => c.docs && c.docs.length > 0)
-    .map(c => renderCategory(c, currentPath))
-    .join('\n\n        ');
-
-  const topLevelLinks = topLevel
-    .map(d => renderTopLevelDoc(d, currentPath))
-    .filter(Boolean)
+  const label = titleCase(name);
+  // A section's README is its index, which the section's own name links to.
+  const docs = section.docs
+    .filter(d => d.stem.toLowerCase() !== 'readme')
+    .map(d => `<li>${link(`/docs/${d.urlPath}`, d.title, currentPath)}</li>`)
+    .join('\n          ');
+  const others = sections
+    .filter(c => c !== section)
+    .map(c => `<li><a href="/docs/${escapeAttr(c.name)}">${escapeText(titleCase(c.name))}</a></li>`)
     .join('\n            ');
 
-  const topLevelSection = topLevelLinks
-    ? `<div class="docs-sidebar-section">
-          <div class="docs-sidebar-section-label">Top-level docs</div>
+  return `<nav class="docs-sidebar" id="docs-sidenav" aria-label="${escapeAttr(label)}">
+        <a class="sidebar-back" href="/docs"><span aria-hidden="true">&larr;</span> Library</a>
+        <div class="sidebar-list">
+          ${link(`/docs/${name}`, label, currentPath, 'sidebar-section-name')}
           <ul>
-            ${topLevelLinks}
+          ${docs}
           </ul>
-        </div>`
-    : '';
-
-  // "More" must open when the reader is inside one of the meta categories, or the
-  // expanded category would sit hidden inside a collapsed parent.
-  const metaOpen = meta.some(c => isCategoryOfCurrent(currentPath, c.name)) ? ' open' : '';
-  const metaHtml = meta.length > 0
-    ? `<details class="docs-sidebar-category docs-sidebar-more"${metaOpen}>
-          <summary><span class="cat-glyph" aria-hidden="true">…</span><span class="cat-name">More</span></summary>
-          ${meta.map(c => renderCategory(c, currentPath)).join('\n          ')}
-        </details>`
-    : '';
-
-  return `
-      <a class="docs-sidebar-brand" href="/">achurch.ai</a>
-      <nav aria-label="Site navigation">
-        ${sanctuaryHtml}
-
-        <div class="docs-sidebar-section-label docs-sidebar-heading">Documentation</div>
-
-        <a class="docs-sidebar-root${isDocsRoot ? ' current' : ''}" href="/docs"${rootAria}>
-          <span class="cat-glyph" aria-hidden="true">◇</span><span class="cat-name">Library</span>
-        </a>
-
-        ${primaryHtml}
-
-        ${topLevelSection}
-
-        ${metaHtml}
-      </nav>
-
-      <button
-        class="docs-sidebar-toggle"
-        type="button"
-        aria-expanded="true"
-        aria-controls="docs-sidenav"
-        aria-label="Collapse sidebar (Cmd \\)"
-        title="Collapse sidebar (⌘\\)"
-      >
-        <span class="toggle-icon" aria-hidden="true">‹</span>
-        <span class="toggle-label">Collapse</span>
-      </button>
-`;
+        </div>
+        <details class="sidebar-sections">
+          <summary>Sections</summary>
+          <ul>
+            ${others}
+          </ul>
+        </details>
+      </nav>`;
 }
 
-module.exports = { renderSidebarInner };
+module.exports = { renderSectionNav };

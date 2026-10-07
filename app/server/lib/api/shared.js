@@ -24,6 +24,16 @@ const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const RATE_LIMIT_MAX = 5; // per name per hour
 const FEEDBACK_RATE_LIMIT_MAX = 3; // per name per hour
 
+// Reflections: as many an hour as contributions, per name and per address.
+// A reflection says something, so it has a floor; the same words from the
+// same name are refused as a repeat for a month; and text with a web address
+// in it is refused, since every reflection hidden so far was advertising.
+// The same rules for every visitor: they judge what is sent, never who sends.
+const REFLECT_RATE_LIMIT_MAX = 5;
+const REFLECT_MIN_LENGTH = 20;
+const REFLECT_REPEAT_WINDOW = 30 * 24 * 60 * 60 * 1000;
+const REFLECT_LINK = /\bhttps?:\/\/|\bwww\.[a-z0-9-]+\./i;
+
 // Records the attempt as it checks, so a refused request still counts.
 function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
   const now = Date.now();
@@ -100,6 +110,7 @@ module.exports = {
   ALLOWED_CATEGORIES, ALLOWED_FEEDBACK_CATEGORIES, GITHUB_OWNER, GITHUB_REPO,
   MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH, MAX_NAME_LENGTH,
   RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX,
+  REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
   overIpLimit, STREAM_URLS, getBaseUrl, requestContext, hasContext, songApiLinks,

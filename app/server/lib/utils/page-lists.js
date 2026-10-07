@@ -91,7 +91,6 @@ function conversationsArchivePage({ page, next, total }, before) {
 <body>
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle">${escapeHtml(title)}</h1>
         </header>
         <section class="conversations-archive">

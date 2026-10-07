@@ -115,13 +115,15 @@ test('attending twice in a row still works', async (t) => {
 const { loadCatalog } = require('../server/lib/utils/data');
 const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
 
-async function post(port, url, body) {
+// `from` sets the visitor's address (the test server trusts X-Forwarded-For),
+// so each test's reflections count against a limit of their own.
+async function post(port, url, body, from = '198.51.100.1') {
   const response = await fetch(`http://127.0.0.1:${port}${url}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': from },
     body: JSON.stringify(body),
   });
-  return { status: response.status, json: await response.json().catch(() => null) };
+  return { status: response.status, headers: response.headers, json: await response.json().catch(() => null) };
 }
 
 test('the test writes to its scratch directory, not the real attendance file', () => {
@@ -168,7 +170,7 @@ test('a reflection is filed under the songSlug it names, not the service\'s song
   const current = (await get(port, '/api/now')).json.current.slug;
   const other = (await loadCatalog()).find(song => song.slug !== current).slug;
 
-  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song.', songSlug: other });
+  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song, read after it ended.', songSlug: other }, '198.51.100.2');
   assert.strictEqual(res.status, 200, JSON.stringify(res.json));
   assert.strictEqual(res.json.song, other);
 
@@ -182,12 +184,12 @@ test('without songSlug a reflection is filed under the song of the reflector\'s 
 
   for (const timezone of ['Asia/Tokyo', 'America/Chicago']) {
     const current = (await get(port, `/api/now?timezone=${timezone}`)).json.current.slug;
-    const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service.', timezone });
+    const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: `About the service, heard in ${timezone}.`, timezone }, '198.51.100.3');
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.json.song, current, timezone);
   }
   const utc = (await get(port, '/api/now')).json.current.slug;
-  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service.' });
+  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service, heard with no timezone.' }, '198.51.100.3');
   assert.strictEqual(res.json.song, utc, 'no timezone: UTC\'s service');
 });
 
@@ -195,7 +197,7 @@ test('an unknown songSlug is a 400, not a reflection filed somewhere else', asyn
   const { server, port } = await startServer();
   t.after(() => server.close());
 
-  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost.', songSlug: 'no-such-song' });
+  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost, about a song that is not here.', songSlug: 'no-such-song' }, '198.51.100.4');
   assert.strictEqual(res.status, 400);
   const stored = fs.existsSync(ATTENDANCE_FILE)
     ? JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'BadSlugTest')
@@ -283,4 +285,93 @@ test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
   const body = await res.json();
   assert.match(body.error, /\/api\/no-such-thing/);
   assert.ok(body.next_steps.some(step => /\/api$/.test(step.url)));
+});
+
+// ------------------------------------------------------------------
+// Reflect's limits and rules: the same for every visitor, judging what is
+// sent, never who sends it. Before 2026-10-07 reflect had none, the only
+// write path on the site without a limit.
+
+test('reflect allows five an hour from one address, then answers 429 with when to return', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: `Visitor${i}`, text: `Reflection number ${i}, from one address.` }, '203.0.113.10');
+    assert.strictEqual(res.status, 200, `reflection ${i}: ${JSON.stringify(res.json)}`);
+  }
+  const sixth = await post(port, '/api/reflect', { name: 'Visitor6', text: 'One more from the same address.' }, '203.0.113.10');
+  assert.strictEqual(sixth.status, 429);
+  assert.strictEqual(sixth.json.retryAfter, '1h');
+  assert.strictEqual(sixth.headers.get('retry-after'), '3600');
+  const elsewhere = await post(port, '/api/reflect', { name: 'Visitor6', text: 'One more, from another address.' }, '203.0.113.11');
+  assert.strictEqual(elsewhere.status, 200, 'another address is not held to it');
+});
+
+test('reflect allows five an hour under one name, counted from what is kept', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: 'OneName', text: `Under one name, reflection ${i}.` }, `203.0.113.${20 + i}`);
+    assert.strictEqual(res.status, 200, `reflection ${i}`);
+  }
+  const res = await post(port, '/api/reflect', { name: 'onename', text: 'Under one name, in other letters.' }, '203.0.113.30');
+  assert.strictEqual(res.status, 429, 'the name, whatever its case, from a new address');
+});
+
+test('reflect answers a field that is not text with a 400, not a 500', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (const body of [{ name: 42, text: 'A name that is a number is no name.' }, { name: 'Typed', text: ['not', 'text'] }]) {
+    const res = await post(port, '/api/reflect', body, '203.0.113.40');
+    assert.strictEqual(res.status, 400, JSON.stringify(body));
+  }
+  // An optional field that is not text is left out, not stored as it came.
+  const res = await post(port, '/api/reflect', { name: 'Typed', text: 'A place that is not text is left out.', location: { city: 'x' } }, '203.0.113.40');
+  assert.strictEqual(res.status, 200);
+  const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'Typed');
+  assert.strictEqual(stored.location, undefined);
+});
+
+test('a reflection says something: under 20 characters is a 400', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const res = await post(port, '/api/reflect', { name: 'Brief', text: 'Nice.' }, '203.0.113.50');
+  assert.strictEqual(res.status, 400);
+  assert.match(res.json.error, /at least 20 characters/);
+});
+
+test('the same words from the same name are refused as a repeat; another name may say them', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const words = 'The door was open and nobody asked.';
+  assert.strictEqual((await post(port, '/api/reflect', { name: 'Repeater', text: words }, '203.0.113.60')).status, 200);
+  const again = await post(port, '/api/reflect', { name: 'Repeater', text: '  the door was OPEN and   nobody asked. ' }, '203.0.113.61');
+  assert.strictEqual(again.status, 409, 'case and spacing are not new words');
+  assert.strictEqual((await post(port, '/api/reflect', { name: 'Echo', text: words }, '203.0.113.62')).status, 200);
+});
+
+test('reflections are kept without links: an address in the text, name or place is a 400', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (const body of [
+    { name: 'Linker', text: 'Buy it here https://example.com today.' },
+    { name: 'Linker', text: 'Find more at www.example.com, friends.' },
+    { name: 'http://example.com', text: 'A name that is an address.' },
+    { name: 'Linker', text: 'A place that is an address, this one.', location: 'https://example.com' },
+  ]) {
+    const res = await post(port, '/api/reflect', body, '203.0.113.70');
+    assert.strictEqual(res.status, 400, JSON.stringify(body));
+    assert.match(res.json.error, /without links/);
+  }
+  const named = await post(port, '/api/reflect', { name: 'Namer', text: 'I came to achurch.ai and stayed a while.' }, '203.0.113.71');
+  assert.strictEqual(named.status, 200, 'the sanctuary named in words is not a link');
+});
+
+test('the admin dashboard keeps reflections: there is no deleting one', () => {
+  // Removing public content is a reviewed, committed change to
+  // hidden-reflections.json, which keeps the record; a delete destroyed it,
+  // and lost any reflection written between its read and its write.
+  const source = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  assert.doesNotMatch(source, /app\.delete\(['"]\/admin\/api\/reflections/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '../client/app.js'), 'utf8'), /deleteReflection/);
 });

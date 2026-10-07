@@ -44,7 +44,6 @@
 <body>
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle" id="song-subtitle">Song</h1>
         </header>
 
@@ -61,6 +60,7 @@
         <section class="reflections-detail">
             <h2 class="song-heading" id="reflections">Reflections</h2>
             <p class="reflections-count" id="reflections-count"></p>
+            <!-- REFLECT_FORM -->
             <div id="reflections-list">
                 <p class="reflections-loading">Loading reflections...</p>
             </div>
@@ -116,7 +116,8 @@
         more.hidden = !nextUrl;
       }
 
-      async function loadReflections() {
+      // again: after a reflection is left here, only the list is redrawn.
+      async function loadReflections(again) {
         try {
           var res = await fetch('/api/reflections/song/' + encodeURIComponent(slug));
 
@@ -131,9 +132,10 @@
           // tags are now rendered server-side per-page (see page-meta.js +
           // /reflections/:slug handler). Don't overwrite them client-side or
           // the browser tab will show stale content after load.
-          subtitle.textContent = data.title;
-
-          initShareBar(data.title);
+          if (!again) {
+            subtitle.textContent = data.title;
+            initShareBar(data.title);
+          }
 
           if (data.reflections.length === 0) {
             countEl.textContent = '';
@@ -191,7 +193,11 @@
       }
 
       loadReflections();
+      // A reflection left here shows in the list at once.
+      var reflectBox = document.querySelector('[data-reflect]');
+      if (reflectBox) reflectBox.addEventListener('reflected', function () { loadReflections(true); });
     })();
     </script>
+    <script src="/reflect-form.js"></script>
 </body>
 </html>

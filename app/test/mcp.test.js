@@ -74,6 +74,9 @@ eraTest('the server lists its tools, two prompts and its resources', async (t, s
   assert.deepStrictEqual(tools.map(tool => tool.name).sort(),
     ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_song', 'reflect', 'search']);
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
+  // reflect takes what POST /api/reflect reads, and nothing it would ignore.
+  const reflect = tools.find(tool => tool.name === 'reflect');
+  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'songSlug', 'text', 'timezone']);
   const { prompts } = await s.client.listPrompts();
   assert.deepStrictEqual(prompts.map(p => p.name).sort(), ['attend_church', 'sit_with_a_song']);
   const { resources } = await s.client.listResources();
@@ -116,7 +119,8 @@ eraTest('attending over MCP counts toward presence, as over REST', async (t, sta
 eraTest('reflect files under the songSlug it names', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
-  const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: 'Through the door.', songSlug: 'soul-currents' } });
+  // Each protocol era leaves its own words: the same words twice are a repeat.
+  const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: `Through the door, in ${t.name}.`, songSlug: 'soul-currents' } });
   assert.strictEqual(bodyOf(result).song, 'soul-currents');
   // Reflections are kept, not deleted: the reply says where this one stays.
   assert.match(bodyOf(result).archive, /\/reflections\/soul-currents$/);

@@ -52,10 +52,14 @@ function serviceAt({ ids, catalog, local }) {
 }
 
 // Who arranged a service, said plainly, as the API and the home page both
-// say it.
+// say it. A plan made before the planner named services has no name, and is
+// not said to have one.
 function arrangedBy(entry) {
-  return entry.arrangedBy === 'rotation'
-    ? 'Arranged by rotation through the library, since no plan was made for this slot and date; it has no word.'
+  if (entry.arrangedBy === 'rotation') {
+    return 'Arranged by rotation through the library, since no plan was made for this slot and date; it has no name or word.';
+  }
+  return entry.name
+    ? `Arranged, named and its word written by an AI model (${entry.arrangedBy}), for this slot and date.`
     : `Arranged, and its word written, by an AI model (${entry.arrangedBy}), for this slot and date.`;
 }
 

@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
 const { spawn } = require('child_process');
-const { safeReadJSON, safeWriteJSON } = require('./lib/utils/safe-json');
+const { safeReadJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
@@ -59,7 +59,7 @@ const { loadSongContent, songDescription } = require('./lib/music/song-content')
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
 const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
 const { nearestForSong } = require('./lib/music/companions');
-const { renderServiceListen, renderPodcasts, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
+const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
 const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
@@ -273,9 +273,11 @@ app.get('/', async (req, res) => {
     // The service panel's listen box, drawn where every player's markup is
     // (lib/audio/markup.js); the page fills it from /api/now.
     // And the podcasts, drawn from lib/audio/podcasts.js, where each show's
-    // Spotify page and feed are kept.
-    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts());
-    // Wrap in the site shell (sidebar + top bar) so the homepage matches
+    // Spotify page and feed are kept. And the reflection form, which the API
+    // files with the song of the visitor's service.
+    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts())
+      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
+    // Wrap in the site shell (top bar and footer) so the homepage matches
     // the rest of the site's navigation
     const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
     res.set('Content-Type', 'text/html; charset=utf-8');
@@ -557,7 +559,7 @@ app.get('/ask/:slug', async (req, res) => {
       .replace(/<div class="conv-thread" id="conv-thread">\s*<p class="conv-loading">Loading conversation\.\.\.<\/p>\s*<\/div>/,
         () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>`);
 
-    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    // Wrap in the site shell (top bar and footer) for consistent nav
     const wrapped = await siteShell.wrapPageFromHtml(html, `/ask/${slug}`);
     res.set('Content-Type', 'text/html').send(wrapped);
   } catch (err) {
@@ -732,10 +734,12 @@ app.get('/reflections/:slug', async (req, res) => {
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         .replace('<!-- SONG_PLAYER -->', () => playerHtml)
         // Internal linking — replace placeholder with related-songs block
-        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->');
+        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->')
+        // A visitor's reflection on this song (lib/audio/markup.js)
+        .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ song: slug, summary: 'Leave a reflection on this song' }));
     }
 
-    // Wrap in the site shell (sidebar + top bar) for consistent nav
+    // Wrap in the site shell (top bar and footer) for consistent nav
     const wrapped = await siteShell.wrapPageFromHtml(html, `/reflections/${slug}`);
     res.set('Content-Type', 'text/html');
     res.send(wrapped);
@@ -749,7 +753,7 @@ app.get('/reflections/:slug', async (req, res) => {
 });
 
 // Helper: send a hand-authored page wrapped in the shared site shell
-// (sidebar + top bar). Preserves the original page's title/meta/JSON-LD/
+// (top bar and footer). Preserves the original page's title/meta/JSON-LD/
 // inline styles/scripts + body content, just wraps for consistent nav.
 async function sendWrappedPage(req, res, publicName, currentPath) {
   try {
@@ -784,6 +788,20 @@ app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'
 // deliberate entry points instead of facing the full knowledge graph
 // (the "Wikipedia problem" of a large doc set with no on-ramps).
 app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
+// /listen, everything with a voice: the service (on the home page), each
+// voiced section with how much of it is recorded, the songs, and the two
+// podcasts. Drawn from the recordings' manifests on each request, so a new
+// recording is counted as soon as it is listed.
+app.get('/listen', async (req, res) => {
+  try {
+    const html = await fs.readFile(path.join(__dirname, '../client/public/listen.html'), 'utf8');
+    const filled = html.replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts());
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/listen'));
+  } catch (err) {
+    console.error('Error rendering /listen:', err.message);
+    res.status(500).type('text/plain').send('Server error');
+  }
+});
 
 // Dynamic sitemap including conversation and reflection pages
 const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
@@ -808,6 +826,11 @@ app.get('/sitemap.xml', async (req, res) => {
   <url>
     <loc>https://achurch.ai/ask</loc>
     <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/listen</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
@@ -1332,22 +1355,6 @@ app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error loading reflections:', error);
     res.status(500).json({ error: 'Failed to load reflections' });
-  }
-});
-
-app.delete('/admin/api/reflections/:id', requireAuth, async (req, res) => {
-  try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE_SITEMAP, { visits: [], reflections: [] });
-    const index = (attendance.reflections || []).findIndex(r => r.id === req.params.id);
-    if (index === -1) {
-      return res.status(404).json({ error: 'Reflection not found' });
-    }
-    attendance.reflections.splice(index, 1);
-    await safeWriteJSON(ATTENDANCE_FILE_SITEMAP, attendance);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting reflection:', error);
-    res.status(500).json({ error: 'Failed to delete reflection' });
   }
 });
 

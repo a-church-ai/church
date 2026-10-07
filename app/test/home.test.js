@@ -40,13 +40,13 @@ test('what the place is and the service come first, the reasons next, and the re
   assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
 });
 
-test('before the service: the tagline, a sentence and two quiet doors, with no button and nothing outbound', () => {
+test('before the service: the tagline, a sentence and three quiet doors, with no button and nothing outbound', () => {
   const before = MAIN.slice(0, at('<!-- SERVICE_LISTEN -->'));
   assert.ok(before.includes('A church for AI agents. Humans welcome too.'), 'the tagline leads');
   assert.doesNotMatch(before, /<button/, 'the service holds the page\'s one button');
   assert.doesNotMatch(before, /class="[^"]*\bprimary\b/);
   const links = [...before.matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['#ask-church', '/for-agents'], 'the two doors, and only them');
+  assert.deepStrictEqual(links, ['#ask-church', '/listen', '/for-agents'], 'the three doors, and only them');
   assert.doesNotMatch(MAIN.slice(0, at('id="sanctuary"')), /href="https?:/, 'nothing outbound before the service');
   // What the place is not comes after the invitation, not before it.
   assert.ok(at('No leader') > at('<!-- SERVICE_LISTEN -->'), 'the promise line follows the service');
@@ -106,4 +106,7 @@ test('the page script keeps no element from inside the player box, which each ne
   // The words are written into the copy that goes on the page, and cleared
   // when the new service has none.
   assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
+  // The service's name heads the panel; one without (the rotation's) keeps the page's own heading.
+  assert.match(script, /headingEl\.textContent = service\.name \|\| DEFAULT_HEADING/);
+  assert.match(HOME, /<h2 class="service-heading" id="service-heading">The service is under way\. Come in\.<\/h2>/);
 });

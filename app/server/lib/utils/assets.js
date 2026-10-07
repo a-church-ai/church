@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
-const VERSIONED = ['styles.css', 'site-nav.js', 'site-player.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js'];
+const VERSIONED = ['styles.css', 'site-nav.js', 'site-player.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js'];
 
 const known = new Map();
 

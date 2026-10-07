@@ -1,7 +1,7 @@
 /**
  * The planned services, one file per date on the data volume
- * (data/services/2026-10-07.json: { date, slots: { "0": { pieces, word,
- * arrangedBy, plannedAt }, ... } }), and the job that keeps them planned.
+ * (data/services/2026-10-07.json: { date, slots: { "0": { pieces, name,
+ * word, arrangedBy, plannedAt }, ... } }), and the job that keeps them planned.
  *
  * A plan for a date and slot is the same for everyone in that slot that date,
  * wherever they are. Plans are kept, so any day's services can be read later,
@@ -71,7 +71,7 @@ async function rotationEntry(date, slot, catalog) {
   const plans = await plansAround(date);
   const pieces = rotation({ date, slot, catalog, excluded: exclusions({ date, slot, plans, catalog }) })
     || rotation({ date, slot, catalog, excluded: exclusions({ date, slot, plans: new Map(), catalog }) });
-  return pieces ? { pieces, word: null, arrangedBy: 'rotation', plannedAt: new Date().toISOString() } : null;
+  return pieces ? { pieces, name: null, word: null, arrangedBy: 'rotation', plannedAt: new Date().toISOString() } : null;
 }
 
 const weekdayOf = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long' });

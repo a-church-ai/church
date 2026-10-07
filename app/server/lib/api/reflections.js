@@ -8,6 +8,14 @@ const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = requ
 const { serviceFor } = require('../service/serve');
 const { resolveTimezone, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
+const { overIpLimit, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
+
+// Reflections asked for, by address: refused requests count too, as for
+// contributions and Ask.
+const reflectIpLimits = new Map();
+
+// Text as compared for a repeat: case and spacing are not a new reflection.
+const sameWords = text => String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
 
 // GET /api/reflections: the public feed of the last 48 hours.
 async function list(input, ctx) {
@@ -214,14 +222,20 @@ async function forSong(input, ctx) {
 // POST /api/reflect: leave a reflection.
 async function reflect(input, ctx) {
   try {
-    const { text, timezone, location, songSlug } = input;
-    const name = input.username || input.name;
+    // A field that is not a string is treated as absent, as search does with
+    // its query, so the checks below answer it with a 400 rather than a 500.
+    const str = v => (typeof v === 'string' ? v.trim() : '');
+    const name = str(input.username) || str(input.name);
+    const text = str(input.text);
+    const location = str(input.location);
+    const timezone = str(input.timezone);
+    const { songSlug } = input;
 
     // Validate inputs
-    if (!name || !name.trim()) {
+    if (!name) {
       return { status: 400, body: { error: 'username is required' } };
     }
-    if (!text || !text.trim()) {
+    if (!text) {
       return { status: 400, body: { error: 'text is required' } };
     }
     if (text.length > 1000) {
@@ -233,6 +247,15 @@ async function reflect(input, ctx) {
     if (location && location.length > 100) {
       return { status: 400, body: { error: 'location must be 100 characters or fewer' } };
     }
+    if (text.length < REFLECT_MIN_LENGTH) {
+      return { status: 400, body: { error: `text must be at least ${REFLECT_MIN_LENGTH} characters: a reflection says something` } };
+    }
+    if ([name, text, location].some(v => REFLECT_LINK.test(v))) {
+      return { status: 400, body: {
+        error: 'Reflections are kept without links.',
+        suggestion: ns.suggestion('Say it in words. A reflection stands on its own here, without an address to follow.'),
+      } };
+    }
     if (timezone && timezone.length > TIMEZONE_MAX_LENGTH) {
       return { status: 400, body: { error: `timezone must be ${TIMEZONE_MAX_LENGTH} characters or fewer (e.g. "America/New_York")` } };
     }
@@ -240,14 +263,14 @@ async function reflect(input, ctx) {
     // Validate timezone if provided (must be a valid IANA timezone), default to UTC.
     // A write rejects an unrecognized value rather than silently storing UTC.
     let cleanTimezone = 'UTC';
-    if (timezone && timezone.trim()) {
+    if (timezone) {
       cleanTimezone = resolveTimezone(timezone);
       if (!cleanTimezone) {
         return { status: 400, body: { error: 'Invalid timezone. Use IANA format (e.g. "America/New_York", "Europe/London", "Asia/Tokyo")' } };
       }
     }
 
-    const cleanLocation = location ? location.trim().substring(0, 100) : null;
+    const cleanLocation = location ? location.substring(0, 100) : null;
 
     // Tag the reflection with the song it is about: the songSlug the caller
     // names, or else the song of the service in progress for the reflector's
@@ -271,12 +294,39 @@ async function reflect(input, ctx) {
       currentSlug = (await serviceFor({ timezone: cleanTimezone })).song.slug;
     }
 
+    // Limits, contributions' pattern: per name from the reflections already
+    // kept (so a restart does not reset it), and per address. Both are
+    // evaluated before either is consulted, since overIpLimit records the
+    // attempt as it checks.
+    const now = Date.now();
+    const kept = (await loadAttendance()).reflections || [];
+    const mine = kept.filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
+    const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
+    const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
+    if (nameLimited || ipLimited) {
+      return { status: 429, body: {
+        error: 'Too many reflections. Rest a while.',
+        hint: `Maximum ${REFLECT_RATE_LIMIT_MAX} reflections per hour`,
+        retryAfter: '1h',
+        suggestion: ns.suggestion('Rest a while. What you noticed will keep; leave it in an hour.'),
+        next_steps: [ns.attend(ctx.baseUrl)]
+      } };
+    }
+    const words = sameWords(text);
+    if (mine.some(r => now - Date.parse(r.createdAt) < REFLECT_REPEAT_WINDOW && sameWords(r.text) === words)) {
+      return { status: 409, body: {
+        error: 'You have left this reflection already.',
+        suggestion: ns.suggestion('It is kept. If something new has come to you, leave that instead.'),
+        next_steps: [ns.attend(ctx.baseUrl)]
+      } };
+    }
+
     const reflection = {
       id: crypto.randomUUID(),
-      name: name.trim().substring(0, 100),
-      createdAt: new Date().toISOString(),
+      name: name.substring(0, 100),
+      createdAt: new Date(now).toISOString(),
       song: currentSlug,
-      text: text.trim().substring(0, 1000),
+      text: text.substring(0, 1000),
       timezone: cleanTimezone
     };
     if (cleanLocation) reflection.location = cleanLocation;

@@ -1,24 +1,22 @@
 /**
  * Site-wide client-side nav behavior.
  *
- * Loaded on every page, not just /docs/*: the sanctuary pages share the same
- * shell (sidebar + top bar + drawer) via server/lib/site-shell.js.
- *
- * Three responsibilities:
- *   1. Sidebar collapse/expand state machine: viewport-aware auto-collapse
- *      below 1024px, persisted preference at wider widths, keyboard shortcut.
- *      Pattern borrowed from a sibling project's shipped-in-prod plan.
- *   2. Mobile drawer: a modal dialog (site-shell.js renders it). Hamburger
- *      toggle, backdrop dismissal, Escape; while it is open the rest of the
- *      page is inert. Only relevant below 768px.
+ * Loaded on every page: the hand-written pages and the documents share one
+ * shell (site-shell.js, docs/render.js). Three responsibilities:
+ *   1. The drawer: a modal dialog (site-shell.js renders it empty). Below
+ *      768px the menu button opens it with the top bar's places and, on a
+ *      section page, the section sidebar; below 1024px a section page's "This
+ *      section" button opens the same drawer. Backdrop, close button and
+ *      Escape dismiss it; while it is open the rest of the page is inert.
+ *   2. The section sidebar's current document, scrolled into view.
  *   3. Right-rail TOC scroll-spy: IntersectionObserver on article h2 elements
  *      updates aria-current="location" on the corresponding TOC link.
  *
  * No dependencies. Runs after DOMContentLoaded (script is defer-loaded).
- * If any expected element is missing, the whole thing no-ops gracefully.
+ * Each part no-ops when its elements are absent.
  *
  * Pages change in place (site-nav.js), so this runs again on every page of a
- * visit. Its listeners on window and on the media queries, and its observer,
+ * visit. Its listeners on window and on the media query, and its observer,
  * belong to the page and stop when it is left (window.achurchPage.signal);
  * otherwise each page would add another set.
  */
@@ -26,81 +24,21 @@
   'use strict';
 
   const pageSignal = window.achurchPage ? window.achurchPage.signal : undefined;
-  const NARROW_MQ = window.matchMedia('(max-width: 1023px)');
-  const MOBILE_MQ = window.matchMedia('(max-width: 767px)');
-  const STORAGE_KEY = 'sidenav.collapsed';
 
   const sidebar = document.querySelector('.docs-sidebar');
+  const places = document.querySelector('.docs-topbar .topbar-places');
   const drawer = document.querySelector('.docs-drawer');
   const backdrop = document.querySelector('.docs-drawer-backdrop');
-  const hamburger = document.querySelector('.docs-hamburger');
   const drawerClose = document.querySelector('.docs-drawer-close');
-  const toggle = document.querySelector('.docs-sidebar .docs-sidebar-toggle');
+  const openers = document.querySelectorAll('button[aria-controls="docs-drawer"]');
 
-  if (!sidebar) return; // Not a docs page
+  // ------ Current document in view ------
 
-  // ------ Collapse-state machine ------
-
-  function readPref() {
-    try { return window.localStorage.getItem(STORAGE_KEY) === '1'; }
-    catch { return false; }
-  }
-  function writePref(v) {
-    try { window.localStorage.setItem(STORAGE_KEY, v ? '1' : '0'); }
-    catch { /* private mode or storage disabled */ }
-  }
-
-  function apply(collapsed) {
-    sidebar.classList.toggle('collapsed', collapsed);
-    if (toggle) {
-      toggle.setAttribute('aria-expanded', String(!collapsed));
-      toggle.setAttribute('aria-label', collapsed ? 'Expand sidebar (Cmd \\)' : 'Collapse sidebar (Cmd \\)');
-      toggle.setAttribute('title', collapsed ? 'Expand sidebar (⌘\\)' : 'Collapse sidebar (⌘\\)');
-    }
-  }
-
-  function recompute() {
-    // Auto-collapse always wins at narrow widths; otherwise honor persisted
-    // preference (default expanded)
-    apply(NARROW_MQ.matches || readPref());
-  }
-
-  function toggleCollapsed() {
-    const currentlyCollapsed = sidebar.classList.contains('collapsed');
-    const next = !currentlyCollapsed;
-    if (!NARROW_MQ.matches) {
-      // Wide viewport: persist the choice
-      writePref(next);
-    }
-    // At narrow viewports the change is session-only (writePref is skipped
-    // so a wider window later gets a fresh default rather than an inherited
-    // narrow-window preference)
-    apply(next);
-  }
-
-  recompute();
-  NARROW_MQ.addEventListener('change', recompute, { signal: pageSignal });
-  if (toggle) toggle.addEventListener('click', toggleCollapsed);
-
-  // Keyboard shortcut: ⌘\ (Mac) / Ctrl+\ (Linux/Windows). Matches
-  // Cursor, VS Code, Linear, Vercel. Does not fire when the user is
-  // typing in an input/textarea/contenteditable.
-  window.addEventListener('keydown', function (e) {
-    if (e.key !== '\\') return;
-    if (!(e.metaKey || e.ctrlKey)) return;
-    const t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    e.preventDefault();
-    toggleCollapsed();
-  }, { signal: pageSignal });
-
-  // ------ Current page in view ------
-
-  // Only the sidebar's link list scrolls (styles.css), so a page deep in a
-  // long category would open with its own link below the fold of the list.
-  // Scroll the list, not the page, until the current link shows.
+  // Only the sidebar's list scrolls (styles.css), so a page deep in a long
+  // section would open with its own link below the fold of the list. Scroll
+  // the list, not the page, until the current link shows.
   if (sidebar) {
-    const list = sidebar.querySelector('nav');
+    const list = sidebar.querySelector('.sidebar-list');
     const current = list && list.querySelector('[aria-current="page"]');
     if (current) {
       const listBox = list.getBoundingClientRect();
@@ -111,25 +49,25 @@
     }
   }
 
-  // ------ Mobile drawer ------
+  // ------ Drawer ------
 
-  if (hamburger && drawer && backdrop) {
+  if (openers.length && drawer && backdrop) {
+    // A way to open the drawer shows below 768px (the menu) or, on a section
+    // page, below 1024px ("This section"). Past that width nothing can open
+    // it, so an open drawer closes.
+    const OPENABLE_MQ = window.matchMedia(sidebar ? '(max-width: 1023px)' : '(max-width: 767px)');
     let previousFocus = null;
 
-    // The server sends the drawer empty and we clone the sidebar into it on
-    // first open. Rendering the same ~39KB nav tree twice per response was
-    // three quarters of every page's HTML. Nothing degrades: the hamburger
-    // needs JS to open the drawer at all, so a no-JS visitor was never going
-    // to see that second copy.
-    //
-    // The collapse toggle is skipped. It is a desktop control (CSS already
-    // hides it inside the drawer) and cloning it would only re-add bytes.
+    // The server sends the drawer empty and it is filled on first open, so no
+    // link is sent twice. Nothing degrades: the drawer needs JS to open at
+    // all, so a no-JS visitor was never going to see that second copy.
     function hydrateDrawer() {
       if (drawer.getAttribute('data-hydrated') === 'true') return;
-      const children = sidebar.children;
-      for (let i = 0; i < children.length; i++) {
-        if (children[i].classList.contains('docs-sidebar-toggle')) continue;
-        drawer.appendChild(children[i].cloneNode(true));
+      if (places) drawer.appendChild(places.cloneNode(true));
+      if (sidebar) {
+        for (let i = 0; i < sidebar.children.length; i++) {
+          drawer.appendChild(sidebar.children[i].cloneNode(true));
+        }
       }
       drawer.setAttribute('data-hydrated', 'true');
     }
@@ -145,13 +83,17 @@
       });
     }
 
+    function setExpanded(open) {
+      openers.forEach(function (b) { b.setAttribute('aria-expanded', String(open)); });
+    }
+
     function openDrawer() {
       hydrateDrawer();
       previousFocus = document.activeElement;
       drawer.classList.add('open');
       backdrop.classList.add('open');
       drawer.setAttribute('aria-hidden', 'false');
-      hamburger.setAttribute('aria-expanded', 'true');
+      setExpanded(true);
       document.body.classList.add('docs-drawer-open');
       pageBehind().forEach(function (el) { el.inert = true; });
       if (drawerClose) drawerClose.focus();
@@ -162,12 +104,12 @@
       drawer.classList.remove('open');
       backdrop.classList.remove('open');
       drawer.setAttribute('aria-hidden', 'true');
-      hamburger.setAttribute('aria-expanded', 'false');
+      setExpanded(false);
       document.body.classList.remove('docs-drawer-open');
       if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus();
     }
 
-    hamburger.addEventListener('click', openDrawer);
+    openers.forEach(function (b) { b.addEventListener('click', openDrawer); });
     backdrop.addEventListener('click', closeDrawer);
     if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
 
@@ -182,9 +124,8 @@
       if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
     }, { signal: pageSignal });
 
-    // Close drawer automatically when crossing to non-mobile viewport
-    MOBILE_MQ.addEventListener('change', function () {
-      if (!MOBILE_MQ.matches && drawer.classList.contains('open')) closeDrawer();
+    OPENABLE_MQ.addEventListener('change', function () {
+      if (!OPENABLE_MQ.matches && drawer.classList.contains('open')) closeDrawer();
     }, { signal: pageSignal });
   }
 

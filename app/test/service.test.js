@@ -18,7 +18,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 
 const { SLOTS, slotOf, slotStart, slotHours } = require('../server/lib/service/slots');
-const { RULES, CLASS, WINDOW_DAYS, addDays, check, checkWord, inSlot, exclusions, rotation, fits } = require('../server/lib/service/rules');
+const { RULES, CLASS, WINDOW_DAYS, addDays, check, checkWord, checkName, inSlot, exclusions, rotation, fits } = require('../server/lib/service/rules');
 const { serviceAt, serviceFor } = require('../server/lib/service/serve');
 const { loadServiceCatalog } = require('../server/lib/service/catalog');
 const { planSlot, systemPrompt, MODEL } = require('../server/lib/service/planner');
@@ -102,6 +102,19 @@ test('the word is checked for length, punctuation, links and other services\' ti
   assert.match(checkWord(`${words(70)} https://achurch.ai`, good, small).join(' '), /link/);
   assert.match(checkWord(`${words(70)} The r2 piece`, good, small).join(' '), /doesn't hold: The r2 piece/);
   assert.deepStrictEqual(checkWord(`${words(70)} The r1 piece`, good, small), [], 'its own pieces may be named');
+});
+
+test('the name is checked like the word: two to four words, a title without a full stop', () => {
+  assert.deepStrictEqual(checkName('Keeping What We Promise', good, small), []);
+  assert.deepStrictEqual(checkName('Who Keeps Watch?', good, small), []);
+  assert.match(checkName('', good, small).join(' '), /no name/);
+  assert.match(checkName(null, good, small).join(' '), /no name/);
+  assert.match(checkName('Gathering', good, small).join(' '), /1 words; it should be 2 to 4/);
+  assert.match(checkName('One Two Three Four Five', good, small).join(' '), /5 words/);
+  assert.match(checkName('Open \u2014 Door', good, small).join(' '), /em dash/);
+  assert.match(checkName('The Open Door.', good, small).join(' '), /full stop/);
+  assert.match(checkName('See https://achurch.ai', good, small).join(' '), /link/);
+  assert.match(checkName('The r2 piece', good, small).join(' '), /doesn't hold: The r2 piece/);
 });
 
 test('a piece with hours belongs only to the slots its hours reach', () => {
@@ -261,26 +274,29 @@ async function plannerCase(replies) {
 
 // What the rotation would hold for the slot: a plan that keeps every rule.
 const keeping = catalog => rotation({ date: '2031-03-04', slot: 2, catalog, excluded: exclusions({ date: '2031-03-04', slot: 2, plans: new Map(), catalog }) });
-const validReply = catalog => ({ pieces: keeping(catalog), word: sixtyWords });
+const validReply = catalog => ({ pieces: keeping(catalog), name: 'What the Morning Keeps', word: sixtyWords });
 
 test('a plan that keeps the rules is returned as the entry to store', async () => {
   const { calls, args, catalog } = await plannerCase([validReply]);
   const entry = await planSlot(args);
   assert.deepStrictEqual(entry.pieces, keeping(catalog));
   assert.strictEqual(entry.word, sixtyWords);
+  assert.strictEqual(entry.name, 'What the Morning Keeps');
   assert.strictEqual(entry.arrangedBy, MODEL);
   assert.strictEqual(calls.length, 1);
   assert.deepStrictEqual(calls[0].options, { model: MODEL, maxTokens: 8000, cacheSystem: true });
 });
 
 test('a plan that breaks a rule is sent back once, with every problem named', async () => {
-  const backwards = catalog => ({ pieces: [...keeping(catalog)].reverse(), word: `${sixtyWords} \u2014` });
+  const backwards = catalog => ({ pieces: [...keeping(catalog)].reverse(), name: 'Morning', word: `${sixtyWords} \u2014` });
   const { calls, args } = await plannerCase([backwards, validReply]);
   const entry = await planSlot(args);
   assert.strictEqual(calls.length, 2);
   assert.match(calls[1].user, /Your previous arrangement was/);
   assert.match(calls[1].user, /must open with a chant or a song/);
   assert.match(calls[1].user, /em dash/);
+  assert.match(calls[1].user, /The name is 1 words/);
+  assert.match(calls[1].user, /"name":"Morning"/, 'the previous name is shown with the rest');
   assert.strictEqual(entry.word, sixtyWords);
 });
 
@@ -296,13 +312,15 @@ test('the shared prompt is the same for every slot, and lists the whole catalog'
   assert.strictEqual(prompt, systemPrompt(catalog));
   for (const id of catalog.keys()) assert.ok(prompt.includes(`\n${id} | `), id);
   assert.doesNotMatch(prompt, /2031|Tuesday/, 'nothing particular to a slot');
+  assert.match(prompt, /THE NAME\n/);
+  assert.match(prompt, /\{"pieces": \["<id>", "<id>", \.\.\.\], "name": "\.\.\.", "word": "\.\.\."\}/);
 });
 
 test('the slot\'s prompt carries its date, its hours, what it can\'t use and what came before', async () => {
   const catalog = await loadServiceCatalog();
   const yesterday = rotation({ date: '2031-03-03', slot: 2, catalog });
-  const plans = new Map([['2031-03-03', { slots: { 2: { pieces: yesterday, word: 'Yesterday\'s word.' } } }]]);
-  const fresh = c => ({ pieces: rotation({ date: '2031-03-04', slot: 2, catalog: c, excluded: exclusions({ date: '2031-03-04', slot: 2, plans, catalog: c }) }), word: sixtyWords });
+  const plans = new Map([['2031-03-03', { slots: { 2: { pieces: yesterday, name: 'Yesterday Kept', word: 'Yesterday\'s word.' } } }]]);
+  const fresh = c => ({ pieces: rotation({ date: '2031-03-04', slot: 2, catalog: c, excluded: exclusions({ date: '2031-03-04', slot: 2, plans, catalog: c }) }), name: 'A Fresh Morning', word: sixtyWords });
   const { calls, args } = await plannerCase([fresh]);
   args.plans = plans;
   await planSlot(args);
@@ -312,7 +330,7 @@ test('the slot\'s prompt carries its date, its hours, what it can\'t use and wha
   for (const id of yesterday.filter(id => catalog.get(id).kind !== 'song' && catalog.get(id).kind !== 'chant')) {
     assert.ok(user.includes(id), `${id} is listed as unavailable`);
   }
-  assert.match(user, /2031-03-03, 08:00 to 12:00: .*\| word: "Yesterday's word\."/);
+  assert.match(user, /2031-03-03, 08:00 to 12:00: .*\| name: "Yesterday Kept" \| word: "Yesterday's word\."/);
 });
 
 // --- The job that keeps the days planned ---
@@ -320,6 +338,7 @@ test('the slot\'s prompt carries its date, its hours, what it can\'t use and wha
 const quiet = { warn() {}, info() {}, error() {} };
 const planner = async ({ date, slot, catalog, plans }) => ({
   pieces: rotation({ date, slot, catalog, excluded: exclusions({ date, slot, plans, catalog }) }),
+  name: 'A Stub Service',
   word: sixtyWords,
   arrangedBy: 'stub',
   plannedAt: new Date().toISOString(),
@@ -365,13 +384,27 @@ test('a stored plan is what /api/now serves, with its word, said to be arranged 
   const local = localTime('UTC');
   const pieces = rotation({ date: '2099-01-01', slot: slotOf(local.hour), catalog });
   const word = `${sixtyWords} today.`;
-  await saveSlot(local.date, slotOf(local.hour), { pieces, word, arrangedBy: MODEL, plannedAt: new Date().toISOString() });
+  await saveSlot(local.date, slotOf(local.hour), { pieces, name: 'The Day Held Open', word, arrangedBy: MODEL, plannedAt: new Date().toISOString() });
 
   const { body } = await attendance.now({}, ctx);
   assert.strictEqual(body.mode, 'planned');
   assert.strictEqual(body.service.word, word);
+  assert.strictEqual(body.service.name, 'The Day Held Open');
+  assert.match(body.service.arrangedBy, /^Arranged, named and its word written by an AI model/);
+  const { listeningService } = require('../server/lib/service/listen');
+  assert.strictEqual((await listeningService({ timezone: 'UTC' })).name, 'The Day Held Open', 'the home page gets it too');
   assert.match(body.service.arrangedBy, new RegExp(`AI model \\(${MODEL}\\)`));
   assert.deepStrictEqual(body.service.order.map(p => p.url), pieces.map(id => `${ctx.baseUrl}${catalog.get(id).url}`));
+});
+
+test('a plan made before services had names is not said to be named', async () => {
+  const catalog = await loadServiceCatalog();
+  const local = localTime('UTC');
+  const pieces = rotation({ date: '2099-01-01', slot: slotOf(local.hour), catalog });
+  await saveSlot(local.date, slotOf(local.hour), { pieces, word: `${sixtyWords} once.`, arrangedBy: MODEL, plannedAt: new Date().toISOString() });
+  const { body } = await attendance.now({}, ctx);
+  assert.strictEqual(body.service.name, null);
+  assert.match(body.service.arrangedBy, /^Arranged, and its word written, by an AI model/);
 });
 
 test('a stored plan that no longer holds gives way to the rotation', async () => {
@@ -380,6 +413,7 @@ test('a stored plan that no longer holds gives way to the rotation', async () =>
   const { body } = await attendance.now({}, ctx);
   assert.strictEqual(body.mode, 'rotation');
   assert.strictEqual(body.service.word, null);
+  assert.strictEqual(body.service.name, null);
   assert.match(body.service.arrangedBy, /rotation/);
 });
 

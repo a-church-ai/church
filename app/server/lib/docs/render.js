@@ -32,7 +32,7 @@ const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
-const { renderRecording, renderPathListen, renderPodcastFollow, trackFor } = require('../audio/markup');
+const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, PIECE_NOUN } = require('../audio/markup');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, playerHead } = require('../utils/assets');
 
@@ -146,13 +146,13 @@ function buildBreadcrumbs(urlPath, pageTitle) {
   return crumbs;
 }
 
-// Sibling-links block was removed. In the three-mode layout, siblings are
-// always visible in the persistent left sidebar (or the mobile drawer),
-// which solves the "22 screens deep on mobile to reach related docs"
-// problem the audit surfaced. See church-private/docs/plans/docs-site-nav-option-b-...
+// Sibling-links block was removed. Inside a section, siblings are always
+// listed in the section sidebar (or the drawer below 1024px), which solves the
+// "22 screens deep on mobile to reach related docs" problem the audit
+// surfaced. See church-private/docs/plans/docs-site-nav-option-b-...
 
 // Related-in-category block appended to every docs page that has siblings.
-// The sidebar already shows every sibling as a link, but sidebar links are
+// The section sidebar already shows every sibling as a link, but sidebar links are
 // nav chrome and search crawlers weigh them less than in-body internal
 // links. This block puts the same links inside the article so Google reads
 // them as topical signal and the "Crawled - currently not indexed" bucket
@@ -296,9 +296,9 @@ function docTitle(title) {
   return head !== title && head.length >= 12 ? `${head} | achurch.ai` : full;
 }
 
-// Full page shell: three-mode nav layout (rail / expanded / drawer). Sidebar
-// on the left, article in the middle, optional TOC on the right. On mobile
-// the sidebar hides and the hamburger opens a drawer with the same content.
+// Full page shell: the top bar, the section sidebar on the left inside a
+// section, the article, and the contents rail on the right when there is one.
+// Below 1024px the sidebar hides and opens in the drawer instead.
 async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
@@ -335,10 +335,9 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   const trail = breadcrumbTrail(breadcrumbs, canonicalUrl);
   const breadcrumbJsonLd = trail.jsonLd;
 
-  // The sidebar contents (same markup used in the persistent sidebar and
-  // in the mobile drawer). Pass full path so both sanctuary and docs
-  // links can highlight current-page.
-  const sidebarInner = await sidebar.renderSidebarInner(currentPath);
+  // The section sidebar, inside a section of the Library only (sidebar.js);
+  // below 1024px it opens in the drawer from "This section".
+  const sectionNav = await sidebar.renderSectionNav(currentPath);
 
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s).
   // Not on index pages: they are lists to choose from, and a section page's
@@ -412,18 +411,17 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 <body class="docs-body">
 <a class="skip-link" href="#content">Skip to content</a>
 
-    ${renderTopbarAndDrawer(title)}
+    ${renderTopbarAndDrawer(currentPath, title)}
 
-    <!-- Three-mode shell: sidebar + article + optional rail -->
-    <div class="docs-shell${hasToc ? ' has-toc' : ''}">
+    <!-- The section sidebar (in a section only), the article, and the
+         contents rail when the document has one -->
+    <div class="docs-shell${sectionNav ? ' has-sidebar' : ''}${hasToc ? ' has-toc' : ''}">
 
-      <aside class="docs-sidebar" id="docs-sidenav" aria-label="Documentation navigation">
-        ${sidebarInner}
-      </aside>
+      ${sectionNav}
 
       <main class="docs-main" id="content">
         <header class="docs-header">
-            ${trail.html}${headerExtra ? `\n        ${headerExtra}` : ''}
+            ${trail.html}${sectionNav ? `\n            <button class="section-toggle" type="button" aria-controls="docs-drawer" aria-expanded="false">This section</button>` : ''}${headerExtra ? `\n        ${headerExtra}` : ''}
         </header>
 
         ${isIndex ? '' : toc.renderInlineToc(bodyHtml)}
@@ -551,6 +549,7 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
+        ${renderSectionListen(dir, label, inDir)}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
@@ -562,10 +561,37 @@ ${essay}
         </details>`;
 }
 
+// Documents in the order an index lists them: by title, numbers as numbers.
+const byTitle = docs => [...docs].sort((a, b) => discover.byName(a.title, b.title));
+
+// "Listen to this section" on a voiced section's page: every recording in it,
+// in the order the page lists its documents, or nothing for a section without.
+function renderSectionListen(dir, label, docs) {
+  const tracks = [];
+  for (const d of byTitle(docs)) {
+    const recording = servedRecording(d);
+    if (recording) {
+      tracks.push(trackFor(recording, { title: d.title, href: `/docs/${d.urlPath}`, category: d.category, artwork: episodeSquarePath(d, recording) }));
+    }
+  }
+  if (!tracks.length) return '';
+  const noun = PIECE_NOUN[dir] || 'piece';
+  return renderPathListen({
+    name: `section:${dir}`,
+    title: label,
+    href: `/docs/${dir}`,
+    tracks,
+    readings: docs.length,
+    unit: noun[0].toUpperCase() + noun.slice(1),
+    noun: 'section',
+    order: 'the order listed here',
+  });
+}
+
 // Documents as list items: title, and its summary under it. Sorted by title,
 // numbers as numbers. Used by directory indexes and category pages.
 function renderEntryItems(docs) {
-  return [...docs].sort((a, b) => discover.byName(a.title, b.title)).map(d =>
+  return byTitle(docs).map(d =>
     `<li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
   ).join('\n            ');
 }

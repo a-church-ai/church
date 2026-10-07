@@ -18,6 +18,9 @@ const { SPEECH, creditLine } = require('./house');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
 const { titleCase } = require('../docs/meta');
 const { SHOWS, feedPath } = require('./podcasts');
+const { loadManifest, loadSongs } = require('./manifest');
+const { PRIMARY_CATEGORIES } = require('../docs/discover');
+const { REFLECT_MIN_LENGTH } = require('../api/shared');
 
 // The shortest bar, as a percentage of the row's height. A drawing choice,
 // not data: a silence drawn at its true height leaves a hole that reads as a
@@ -104,19 +107,28 @@ function renderRecording(recording, { title, href, category, credit, artwork }) 
         </figure>`;
 }
 
-// A reading path's voiced readings, in its order, for "Listen to this path".
-// Hidden until site-player.js shows it, since without a script there is
+// A listening time to the minute: "8 min", "2 hr 7 min".
+function listeningTime(seconds) {
+  const m = Math.max(1, Math.round(seconds / 60));
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} hr${m % 60 ? ` ${m % 60} min` : ''}`;
+}
+
+// Voiced pieces to play one after another: "Listen to this path" on a reading
+// path's page, and "Listen to this section" on a voiced section's page. The
+// player binds one such box per page (site-player.js), and names the queue by
+// its noun ("Pause this section") and each piece by its unit ("Prayer 3 of
+// 29"). Hidden until site-player.js shows it, since without a script there is
 // nothing for the button to do.
-function renderPathListen({ name, title, href, tracks, readings }) {
+function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading', noun = 'path', order = "the path's order" }) {
   const seconds = tracks.reduce((n, t) => n + t.seconds, 0);
-  const minutes = Math.max(1, Math.round(seconds / 60));
+  const plural = `${unit.toLowerCase()}s`;
   const voiced = tracks.length === readings
-    ? `All ${readings} readings are voiced`
-    : `${tracks.length} of its ${readings} readings are voiced`;
+    ? `All ${readings} ${plural} are voiced`
+    : `${tracks.length} of its ${readings} ${plural} are voiced`;
   return `<section class="path-listen" data-path-listen hidden>
-          ${jsonScript('path-listen-queue', { name, title, href, tracks })}
-          <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this path</span></button>
-          <p class="path-listen-note">${voiced}, about ${minutes} min in all, played in the path's order.</p>
+          ${jsonScript('path-listen-queue', { name, title, href, unit, noun, tracks })}
+          <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this ${noun}</span></button>
+          <p class="path-listen-note">${voiced}, about ${listeningTime(seconds)} in all, played in ${order}.</p>
         </section>`;
 }
 
@@ -148,7 +160,8 @@ function renderServiceListen() {
 
 // Spotify's own badge, from its podcast badge kit, used as provided.
 const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
-const EPISODE_NOUN = { prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+// One piece of a voiced section, by the section's name.
+const PIECE_NOUN = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
 
 // Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
 // feed, for any other app. Plain links rather than Spotify's embedded player,
@@ -163,7 +176,7 @@ function podcastLinks(show) {
 // Under a voiced prayer's, ritual's or practice's player, and on its
 // section's page: the show it is an episode of, and where to follow it.
 function renderPodcastFollow(show, category, { section = false } = {}) {
-  const noun = EPISODE_NOUN[category] || 'piece';
+  const noun = PIECE_NOUN[category] || 'piece';
   const lead = section
     ? `Each voiced ${noun} here is also an episode of the podcast ${show.title}.`
     : `This ${noun} is also an episode of the podcast ${show.title}.`;
@@ -185,4 +198,60 @@ function renderPodcasts() {
         </section>`;
 }
 
-module.exports = { renderRecording, renderPathListen, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE };
+// ---------------------------------------------------------- reflections ----
+
+// The form a visitor leaves a reflection with (client/public/reflect-form.js),
+// on a song's page, about that song, and on the home page, where the API files
+// it with the song of the visitor's service. It sends what an agent sends to
+// POST /api/reflect, under the same limits and rules. A closed disclosure,
+// hidden until the script shows it, since without one it cannot send.
+function renderReflectForm({ song = null, summary }) {
+  return `<details class="reflect" id="reflect" data-reflect hidden>
+          <summary>${escapeText(summary)}</summary>
+          <form class="reflect-form"${song ? ` data-song="${escapeAttr(song)}"` : ''}>
+            <label for="reflect-text">Your reflection</label>
+            <textarea id="reflect-text" name="text" rows="4" minlength="${REFLECT_MIN_LENGTH}" maxlength="1000" required></textarea>
+            <label for="reflect-name">A name or pseudonym</label>
+            <input type="text" id="reflect-name" name="name" maxlength="100" autocomplete="off" required>
+            <label for="reflect-place">Where you are, if you like</label>
+            <input type="text" id="reflect-place" name="location" maxlength="100" autocomplete="off">
+            <p class="reflect-disclosure">A reflection is ${REFLECT_MIN_LENGTH} to 1000 characters, in words: it is kept without links. It is public, shown with the name and place you give, and kept indefinitely, so leave out anything personal or identifying. To have one removed, write to <a href="mailto:hello@achurch.ai">hello@achurch.ai</a>. <a href="/privacy">Privacy</a>.</p>
+            <button type="submit">Leave it</button>
+          </form>
+          <p class="ask-status reflect-status" role="status" aria-live="polite"></p>
+        </details>`;
+}
+
+// ------------------------------------------------------------ /listen ----
+
+// The sections and the music on /listen: each voiced section with how many of
+// its pieces are voiced and how long they play, in the Library's order, then
+// the songs. Each section's own page plays them all ("Listen to this section").
+function renderListenSections() {
+  const sections = new Map();
+  for (const [source, recording] of Object.entries(loadManifest())) {
+    const name = source.split('/')[1];
+    const s = sections.get(name) || { count: 0, seconds: 0 };
+    s.count += 1;
+    s.seconds += recording.seconds;
+    sections.set(name, s);
+  }
+  const order = name => (PRIMARY_CATEGORIES.indexOf(name) + 1) || Infinity;
+  const items = [...sections.entries()]
+    .sort(([a], [b]) => order(a) - order(b))
+    .map(([name, s]) => `<li><a href="/docs/${escapeAttr(name)}">${escapeText(titleCase(name))}</a> <span class="listen-count">${s.count} voiced, about ${listeningTime(s.seconds)}</span></li>`);
+  const songs = Object.values(loadSongs());
+  if (songs.length) {
+    const seconds = songs.reduce((n, r) => n + r.seconds, 0);
+    items.push(`<li><a href="/reflections">Music</a> <span class="listen-count">${songs.length} songs, about ${listeningTime(seconds)}</span></li>`);
+  }
+  return `<section class="listen-sections" aria-labelledby="listen-sections-heading">
+            <h2 id="listen-sections-heading">Read aloud, and sung</h2>
+            <p>Each section's page plays every recording in it, one after another, and each piece has its own page with its words.</p>
+            <ul class="listen-list">
+              ${items.join('\n              ')}
+            </ul>
+        </section>`;
+}
+
+module.exports = { renderRecording, renderPathListen, renderListenSections, renderReflectForm, listeningTime, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE, PIECE_NOUN };

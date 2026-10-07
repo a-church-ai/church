@@ -27,6 +27,7 @@ async function listeningService({ timezone, at } = {}) {
     slot: slotHours(served.slot),
     nextSlot: slotHours((served.slot + 1) % SLOTS),
     mode: served.entry.arrangedBy === 'rotation' ? 'rotation' : 'planned',
+    name: served.entry.name || null,
     word: served.entry.word || null,
     arrangedBy: arrangedBy(served.entry),
     // The service's own clock: its length with the silence after each part,

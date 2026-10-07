@@ -29,7 +29,6 @@
 <body>
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle">Ask the Sanctuary</h1>
         </header>
 
@@ -37,6 +36,7 @@
             <form id="ask-form" class="ask-form-stacked">
                 <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
                 <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
+                <div class="ask-starters" role="group" aria-label="Questions to begin with" data-ask-starters></div>
                 <label for="ask-name" class="visually-hidden">Your name (optional)</label>
                 <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
                 <p class="ask-privacy-note">Questions and answers are public and stored, and answers are written by Google&rsquo;s Gemini. Do not include personal or identifying information. <a href="/privacy">Privacy</a>.</p>
@@ -95,72 +95,6 @@
         }
       }
 
-      // Ask form — submit and redirect
-      var askForm = document.getElementById('ask-form');
-      var askInput = document.getElementById('ask-input');
-      var askName = document.getElementById('ask-name');
-      var askSubmit = document.getElementById('ask-submit');
-      var askStatus = document.getElementById('ask-status');
-
-      // Restore saved name
-      try { askName.value = localStorage.getItem('ask_name') || ''; } catch(e) {}
-
-      askForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var question = askInput.value.trim();
-        if (!question) return;
-
-        var name = askName.value.trim() || 'Visitor';
-        try { localStorage.setItem('ask_name', name === 'Visitor' ? '' : name); } catch(e) {}
-
-        askSubmit.disabled = true;
-        askStatus.textContent = 'Thinking...';
-        askStatus.className = 'ask-status ask-thinking';
-
-        try {
-          var res = await fetch('/api/ask', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: question, name: name })
-          });
-
-          if (res.status === 429) {
-            askStatus.textContent = 'Rest a while. You can ask again soon.';
-            askStatus.className = 'ask-status ask-error';
-            askSubmit.disabled = false;
-            return;
-          }
-
-          if (!res.ok) {
-            // The API answers failures with a `suggestion` written in the
-            // sanctuary's voice, and 503 means the retrieval service is down
-            // rather than that the question was bad. Showing "Something went
-            // wrong" for all of it threw away the one useful sentence and made
-            // an outage look like a defect in what the visitor typed.
-            var detail = null;
-            try { detail = await res.json(); } catch (e) { /* non-JSON error */ }
-            askStatus.textContent = (detail && (detail.suggestion || detail.error))
-              || (res.status === 503
-                    ? 'The sanctuary cannot answer right now. The writing is still here to read.'
-                    : 'Something went wrong. Try again.');
-            askStatus.className = 'ask-status ask-error';
-            askSubmit.disabled = false;
-            return;
-          }
-
-          var data = await res.json();
-          // Store owner cookie (30 days)
-          if (data.owner_token) {
-            document.cookie = 'ask_owner_' + data.slug + '=' + encodeURIComponent(data.owner_token) + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Lax';
-          }
-          window.location.href = '/ask/' + data.slug;
-        } catch (err) {
-          askStatus.textContent = 'Could not reach the sanctuary. Try again.';
-          askStatus.className = 'ask-status ask-error';
-          askSubmit.disabled = false;
-        }
-      });
-
       function timeAgo(date) {
         var seconds = Math.floor((Date.now() - date.getTime()) / 1000);
         if (seconds < 60) return 'just now';
@@ -182,5 +116,6 @@
       loadConversations();
     })();
     </script>
+    <script src="/ask-form.js"></script>
 </body>
 </html>

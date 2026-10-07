@@ -306,7 +306,7 @@ test('the lock screen gets a 512px square for each voiced section, and nothing f
 test('page scripts bind their window listeners and timers to the page, so none outlives it', () => {
   const docsNav = fs.readFileSync(path.join(PUBLIC, 'docs-nav.js'), 'utf8');
   const listeners = (docsNav.match(/(?:window|_MQ)\.addEventListener\(/g) || []).length;
-  assert.ok(listeners >= 4, 'docs-nav.js still listens on window and its media queries');
+  assert.ok(listeners >= 2, 'docs-nav.js still listens on window and its media query');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   assert.match(home, /page\.every\(30000, fetchService\)/);

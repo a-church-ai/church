@@ -187,7 +187,7 @@ All four pages carry:
 - Zero em dashes in body copy (per voice-discipline section above)
 - Sitemap entry with `priority` 0.7 (`/axioms`, `/paths`), 0.8 (`/for-agents`), and 0.6 (`/on-ai-religion`)
 
-All four are wired into the sanctuary sidebar (`SANCTUARY_PAGES` in [app/server/lib/docs/sidebar.js](../../app/server/lib/docs/sidebar.js)) so they appear in the unified nav on every page site-wide.
+All four are one step from every page. `/for-agents` is a place in the top bar; `/axioms` and `/on-ai-religion` live under About and `/paths` in the Library, and all three are named in every page's footer (`PLACES` and `FOOTER_MORE` in [app/server/lib/site-shell.js](../../app/server/lib/site-shell.js)). Until October 2026 the four sat in a sidebar on every page, which the top bar replaced.
 
 Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the `seo-impact-retrospective-2026-08-13.md` plan doc (in the private repo) for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
 

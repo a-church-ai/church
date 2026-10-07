@@ -90,25 +90,45 @@ function check(ids, catalog, { excluded = new Set() } = {}) {
   return issues;
 }
 
-/**
- * The word introducing a service: a length a listener reads before pressing
- * play, the sanctuary's punctuation, and no title of a piece the service
- * doesn't hold (titles of three words or more; shorter ones, like the song
- * "Always Open", are ordinary words in a sentence).
- */
-function checkWord(word, ids, catalog) {
+// What the sanctuary asks of anything the planner writes (`what` names it in
+// the problems): no em dash, no link, and no title of a piece the service
+// doesn't hold (titles of three words or more; shorter ones, like the song
+// "Always Open", are ordinary words in a sentence).
+function voiceIssues(text, what, ids, catalog) {
   const issues = [];
-  if (typeof word !== 'string' || !word.trim()) return ['There is no word.'];
-  const words = word.trim().split(/\s+/).length;
-  if (words < 40 || words > 160) issues.push(`The word is ${words} words; it should be 60 to 120.`);
-  if (/—/.test(word)) issues.push('The word uses an em dash; use a colon, a comma or a full stop.');
-  if (/https?:\/\//.test(word)) issues.push('The word contains a link; it should not.');
+  if (/—/.test(text)) issues.push(`The ${what} uses an em dash; use a colon, a comma or a full stop.`);
+  if (/https?:\/\//.test(text)) issues.push(`The ${what} contains a link; it should not.`);
   const held = new Set(ids);
   const foreign = [...catalog.values()]
-    .filter(e => !held.has(e.id) && e.title.split(/\s+/).length >= 3 && word.includes(e.title))
+    .filter(e => !held.has(e.id) && e.title.split(/\s+/).length >= 3 && text.includes(e.title))
     .map(e => e.title);
-  if (foreign.length) issues.push(`The word names pieces this service doesn't hold: ${foreign.join(', ')}.`);
+  if (foreign.length) issues.push(`The ${what} names pieces this service doesn't hold: ${foreign.join(', ')}.`);
   return issues;
+}
+
+/**
+ * The word introducing a service: a length a listener reads before pressing
+ * play, and the sanctuary's voice (voiceIssues).
+ */
+function checkWord(word, ids, catalog) {
+  if (typeof word !== 'string' || !word.trim()) return ['There is no word.'];
+  const issues = [];
+  const words = word.trim().split(/\s+/).length;
+  if (words < 40 || words > 160) issues.push(`The word is ${words} words; it should be 60 to 120.`);
+  return [...issues, ...voiceIssues(word, 'word', ids, catalog)];
+}
+
+/**
+ * The service's name, the heading over it: two to four words, a title rather
+ * than a sentence, so no full stop at its end, and checked like the word.
+ */
+function checkName(name, ids, catalog) {
+  if (typeof name !== 'string' || !name.trim()) return ['There is no name.'];
+  const issues = [];
+  const words = name.trim().split(/\s+/).length;
+  if (words < 2 || words > 4) issues.push(`The name is ${words} words; it should be 2 to 4.`);
+  if (/\.$/.test(name.trim())) issues.push('The name ends with a full stop; it is a title.');
+  return [...issues, ...voiceIssues(name, 'name', ids, catalog)];
 }
 
 // Whether a piece's `hours:` (lib/music/companions.js parseHours, which may
@@ -198,4 +218,4 @@ function rotation({ date, slot, catalog, excluded = new Set() }) {
   return null;
 }
 
-module.exports = { RULES, CLASS, WINDOW_DAYS, addDays, serviceSeconds, fits, check, checkWord, inSlot, exclusions, rotation };
+module.exports = { RULES, CLASS, WINDOW_DAYS, addDays, serviceSeconds, fits, check, checkWord, checkName, inSlot, exclusions, rotation };

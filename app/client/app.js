@@ -1422,38 +1422,11 @@ function renderReflections(reflections) {
                 <td class="py-2 px-3 text-sm text-gray-600">${escapeHtml(r.song || '-')}</td>
                 <td class="py-2 px-3 text-sm text-gray-500 max-w-xs" title="${escapeHtml(r.text || '')}">${escapeHtml(truncatedText)}</td>
                 <td class="py-2 px-3 text-sm text-gray-500 whitespace-nowrap">${dateStr}</td>
-                <td class="py-2 px-3">
-                    <button class="reflection-delete-btn text-xs text-red-400 hover:text-red-600" data-id="${escapeHtml(r.id)}">Delete</button>
-                </td>
+                <td class="py-2 px-3 text-xs text-gray-400 font-mono select-all">${escapeHtml(r.id || '')}</td>
             </tr>
         `;
     }).join('');
 
-    document.querySelectorAll('.reflection-delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteReflection(btn.dataset.id));
-    });
-}
-
-async function deleteReflection(id) {
-    if (!confirm('Delete this reflection? This cannot be undone.')) return;
-
-    try {
-        const response = await fetch(`/admin/api/reflections/${encodeURIComponent(id)}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-
-        if (response.ok) {
-            showMessage('Reflection deleted', 'success');
-            loadReflections();
-        } else {
-            const data = await response.json();
-            showMessage(data.error || 'Failed to delete reflection', 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting reflection:', error);
-        showMessage('Failed to delete reflection', 'error');
-    }
 }
 
 async function downloadReflections() {

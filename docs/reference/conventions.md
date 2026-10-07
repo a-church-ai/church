@@ -37,6 +37,8 @@ That is the whole rule, and it is a statement about what a reader is served rath
 
 Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commit/89bb803): the docs sidebar renders a category's documents only when the reader is inside that category. Collapsed categories are a link to the category index. The homepage went from 258 document links to 32, and from 68KB to 35KB, with the rendered page unchanged, because those links were already hidden behind a collapsed `<details>` and no reader could see them.
 
+Applied again on 2026-10-07: the sidebar left every page but a section of the Library. The top bar names six places on every page, and a section page lists only its own documents, with the other sections folded under one disclosure.
+
 **Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
 
 **Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents.

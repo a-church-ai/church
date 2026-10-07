@@ -96,6 +96,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       slot: slotHours(served.slot),
       timezone: served.timezone,
       today: { date: served.local.date, weekday: served.local.weekday },
+      name: served.entry.name || null,
       word: served.entry.word || null,
       arrangedBy: arrangedBy(served.entry),
       order,

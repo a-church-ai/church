@@ -23,7 +23,6 @@ function wantsHtml(req) {
 const BODY = (heading, message, links) => `
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle">${heading}</h1>
         </header>
 
@@ -40,7 +39,7 @@ const BODY = (heading, message, links) => `
  * Send a 404. HTML clients get the site shell with a way onward; everyone else
  * gets plain text.
  *
- * @param {object} options.heading  subtitle under the wordmark
+ * @param {object} options.heading  the page's heading
  * @param {string} options.message  one sentence, sanctuary voice
  * @param {Array<{href,label}>} options.links  where to go instead
  */

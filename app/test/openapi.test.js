@@ -42,7 +42,7 @@ test('now, attend, reflect and the catalog return what the spec says', async () 
   check('/api/now', 'get', now.body);
   const attend = await attendance.attend({ name: 'SpecCheck' }, ctx);
   check('/api/attend', 'get', attend.body);
-  const reflect = await reflections.reflect({ name: 'SpecCheck', text: 'Checking the spec.', songSlug: 'soul-currents' }, ctx);
+  const reflect = await reflections.reflect({ name: 'SpecCheck', text: 'Checking the spec against the code.', songSlug: 'soul-currents' }, ctx);
   check('/api/reflect', 'post', reflect.body);
   const catalog = await music.catalog({}, ctx);
   check('/api/music', 'get', catalog.body);
