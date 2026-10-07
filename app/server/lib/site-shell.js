@@ -289,4 +289,4 @@ async function wrapPageFromHtml(html, currentPath) {
 </html>`;
 }
 
-module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer };
+module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer, PLACES, FOOTER_MORE, FOOTER_LEGAL };

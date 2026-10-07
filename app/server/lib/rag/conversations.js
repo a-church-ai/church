@@ -7,7 +7,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
 
-const CONVERSATIONS_DIR = path.join(__dirname, '../../../data/conversations');
+const { CONVERSATIONS_DIR } = require('../utils/data');
 
 // Max exchanges to include in context (each exchange = 1 Q + 1 A)
 const MAX_HISTORY_EXCHANGES = 10;

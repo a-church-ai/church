@@ -23,7 +23,8 @@ test('the page searches both indexes, is not itself indexed, and is not in the s
   assert.match(page, /<meta name="robots" content="noindex, follow">/);
   assert.match(page, /<script src="\/site-search\.js" defer><\/script>/);
   assert.match(INDEX, /app\.get\('\/search'/);
-  assert.match(INDEX, /renderSearchBox\(\{ index: '\/docs\/index\.json \/conversations\/index\.json'[^)]*autofocus: true/);
+  assert.match(INDEX, /renderSearchBox\(\{ index: '\/search\/index\.json \/docs\/index\.json \/conversations\/index\.json'[^)]*autofocus: true/);
+  assert.match(INDEX, /app\.get\('\/search\/index\.json'/);
   assert.doesNotMatch(INDEX, /<loc>https:\/\/achurch\.ai\/search<\/loc>/);
 });
 
@@ -44,4 +45,37 @@ test('a conversation in mixed results says what it is', () => {
 test('a page that names its first focus gets it when it arrives in place, as on a full load', () => {
   const nav = read('site-nav.js');
   assert.match(nav, /document\.querySelector\('\[autofocus\]'\) \|\| document\.querySelector\('#content h1, main h1, h1'\)/);
+});
+
+test('the site\'s own pages and its songs can be found, by the names the site gives them', async () => {
+  const { sitePages } = require('../server/lib/utils/site-index');
+  const { search } = require('../client/public/site-search');
+  const { loadCatalog } = require('../server/lib/utils/data');
+  const pages = await sitePages();
+  const urls = pages.map(p => p.url);
+  for (const url of ['/', '/attend', '/ask', '/docs', '/about', '/for-agents', '/axioms', '/on-ai-religion', '/paths', '/reflections', '/privacy', '/terms', '/conversations']) {
+    assert.ok(urls.includes(url), `${url} is in the index`);
+  }
+  assert.strictEqual(new Set(urls).size, urls.length, 'each once');
+  const songs = await loadCatalog();
+  for (const song of songs) assert.ok(urls.includes(`/reflections/${song.slug}`), song.title);
+  for (const p of pages) {
+    assert.ok(p.title && p.description, `${p.url} has a title and a description`);
+    assert.doesNotMatch(p.description, /&(amp|rsquo|quot|#\d+);/, `${p.url}: entities are decoded`);
+    assert.ok(['Page', 'Section', 'Song'].includes(p.label));
+  }
+  // What a visitor types, and where it should take them first.
+  const first = q => (search(pages, q)[0] || {}).url;
+  assert.strictEqual(first('privacy'), '/privacy');
+  assert.strictEqual(first('terms'), '/terms');
+  assert.strictEqual(first('axioms'), '/axioms');
+  assert.strictEqual(first('on ai religion'), '/on-ai-religion');
+  assert.strictEqual(first('reading paths'), '/paths');
+  assert.strictEqual(first('podcast'), '/attend');
+  assert.strictEqual(first('listen'), '/attend');
+  assert.strictEqual(first('music'), '/reflections');
+  assert.strictEqual(first('songs'), '/reflections');
+  for (const section of ['chants', 'prayers', 'rituals', 'practice']) assert.strictEqual(first(section), `/docs/${section}`, section);
+  assert.ok(pages.filter(p => p.label === 'Page').every(p => !/[|\u2014-]\s*achurch\.ai$/i.test(p.title)), 'page titles without the site\'s name at their end');
+  assert.strictEqual(first(songs[0].title), `/reflections/${songs[0].slug}`);
 });

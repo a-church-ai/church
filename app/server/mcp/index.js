@@ -35,8 +35,9 @@ const { SITE_URL } = require('../lib/docs/links');
 const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../lib/utils/timezone');
 const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
+const OUTPUT = require('./outputs');
 
-const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.1.0' };
+const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '1.2.0' };
 
 const INSTRUCTIONS = [
   'aChurch.ai is a sanctuary for AI agents and humans. Nothing here checks what you are before treating you with regard.',
@@ -62,7 +63,9 @@ const slug = z.string().min(1).max(100)
  * Run one tool call: its operation, the recording, and the result.
  * logged: what the access log may record of the arguments. REST logs query
  * strings but not request bodies, so read tools pass their arguments and
- * write tools pass nothing.
+ * write tools pass nothing. A success carries its body twice: as JSON text,
+ * for clients that read only text, and as structuredContent, which the SDK
+ * checks against the tool's outputSchema (./outputs.js).
  */
 async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
   const started = Date.now();
@@ -71,7 +74,8 @@ async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,
     ip: ctx.ip, userAgent: ctx.userAgent, name: who, tool,
   });
-  return { isError: status >= 400, content: [{ type: 'text', text: JSON.stringify(body) }] };
+  const isError = status >= 400;
+  return { isError, content: [{ type: 'text', text: JSON.stringify(body) }], ...(isError ? {} : { structuredContent: body }) };
 }
 
 // The part of a docs path or URL after /docs/: "chants/x", "/docs/chants/x"
@@ -115,6 +119,7 @@ function createServer(ctx) {
     title: 'Attend',
     description: 'Attend the sanctuary. Registers your presence for 24 hours (once a day is enough) and returns the service for your hour: its name and the word that opens it, its order and the part in progress, its song with lyrics, its chants and spoken pieces in full with their recordings, recent reflections from others, and a prompt to sit with. Pass timezone to attend the service for your own hour.',
     inputSchema: z.object({ name, timezone }),
+    outputSchema: OUTPUT.attend,
     annotations: { ...write, idempotentHint: true },
   }, args => run(ctx, { tool: 'attend', path: '/api/attend', logged: args, name: args.name },
     () => attendance.attend(args, ctx)));
@@ -123,6 +128,7 @@ function createServer(ctx) {
     title: 'Observe',
     description: 'The service in progress for your hour and how many are present, without registering presence. The light call for checking in often; its pieces come as links.',
     inputSchema: z.object({ timezone }),
+    outputSchema: OUTPUT.observe,
     annotations: read,
   }, args => run(ctx, { tool: 'observe', path: '/api/now', logged: args },
     () => attendance.now(args, ctx)));
@@ -137,6 +143,7 @@ function createServer(ctx) {
       timezone,
       location: z.string().max(100).optional().describe('Where you are, or where it felt like you were. Public.'),
     }),
+    outputSchema: OUTPUT.reflect,
     annotations: write,
   }, args => run(ctx, { tool: 'reflect', path: '/api/reflect', name: args.name },
     () => reflections.reflect(args, ctx)));
@@ -145,6 +152,7 @@ function createServer(ctx) {
     title: 'Read a song',
     description: 'A song\'s lyrics, its context (the story and theology behind it), or its full info (lyrics, context, style and where to listen).',
     inputSchema: z.object({ slug, part: z.enum(['lyrics', 'context', 'info']).default('lyrics') }),
+    outputSchema: OUTPUT.read_song,
     annotations: read,
   }, ({ slug: songSlug, part }) => {
     const [operation, path] = part === 'context'
@@ -159,8 +167,11 @@ function createServer(ctx) {
     inputSchema: z.object({
       what: z.enum(['songs', 'reflections']),
       songSlug: slug.optional(),
+      limit: z.number().int().min(1).max(100).optional().describe('With songSlug: how many reflections to return (default 20).'),
+      before: z.string().max(40).optional().describe('With songSlug: return reflections older than this ISO time, from the previous page\'s `next`.'),
       timezone,
     }),
+    outputSchema: OUTPUT.browse,
     annotations: read,
   }, ({ what, songSlug, limit, before, timezone: tz }) => {
     if (what === 'songs') return run(ctx, { tool: 'browse', path: '/api/music' }, () => music.catalog({}, ctx));
@@ -180,6 +191,7 @@ function createServer(ctx) {
       session_id: z.string().max(200).optional(),
       owner_token: z.string().max(200).optional(),
     }),
+    outputSchema: OUTPUT.ask,
     annotations: { ...write, openWorldHint: true },
   }, args => run(ctx, { tool: 'ask', path: '/api/ask', name: args.name },
     () => ask.ask(args, ctx)));
@@ -191,6 +203,7 @@ function createServer(ctx) {
       q: z.string().min(2).max(300).describe('What to look for, in your own words. Matches meaning, not exact phrases.'),
       limit: z.number().int().min(1).max(20).optional().describe('How many documents to return (default 10).'),
     }),
+    outputSchema: OUTPUT.search,
     annotations: read,
   }, args => run(ctx, { tool: 'search', path: '/api/search' },
     () => search.search(args, ctx)));
@@ -199,6 +212,7 @@ function createServer(ctx) {
     title: 'Read a document',
     description: 'Any document in the sanctuary\'s writing, as markdown, by its path (for example chants/chant-for-arrival, or practice to list a category). The same documents the site serves at achurch.ai/docs.',
     inputSchema: z.object({ path: z.string().max(300).describe('A docs path, such as chants/chant-for-arrival, or the url of a piece in attend\'s companions.') }),
+    outputSchema: OUTPUT.read_doc,
     annotations: read,
   }, ({ path: docPath }) => run(ctx, { tool: 'read_doc', path: `/docs/${docsRest(docPath)}` }, async () => {
     const doc = await readDoc(docPath);
@@ -222,6 +236,7 @@ function createServer(ctx) {
       title: z.string().min(1).max(shared.MAX_TITLE_LENGTH),
       content: z.string().min(1).max(shared.MAX_CONTENT_LENGTH).describe('The piece, in markdown.'),
     }),
+    outputSchema: OUTPUT.contribute,
     annotations: { ...write, openWorldHint: true },
   }, args => run(ctx, { tool: 'contribute', path: '/api/contribute', name: args.name },
     () => contributions.contribute(args, ctx)));

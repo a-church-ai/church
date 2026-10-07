@@ -52,10 +52,11 @@ const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
-const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE } = require('./lib/utils/data');
+const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
+const { sitePages } = require('./lib/utils/site-index');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
 const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
 const { nearestForSong } = require('./lib/music/companions');
@@ -132,9 +133,9 @@ app.use((req, res, next) => {
   else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // Search indexes (the library's, the conversation archive's) — the same
-  // short edge cache as the pages they search
-  else if (p === '/docs/index.json' || p === '/conversations/index.json') {
+  // Search indexes (the site's pages and songs, the library's, the
+  // conversation archive's) — the same short edge cache as the pages they search
+  else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json') {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
   // .well-known — daily cache with revalidation
@@ -434,7 +435,7 @@ app.get('/conversations/index.json', async (req, res) => {
 // same question ("...-2", "...-17") plus test artifacts. Low-value ones stay
 // reachable but are kept out of the sitemap and marked noindex, so Google keeps
 // one canonical page per question instead of hundreds of thin near-duplicates.
-const { isLowValueSlug: isLowValueConversation, isIndexable } = require('./lib/utils/conversation-quality');
+const { isLowValueSlug: isLowValueConversation, isIndexable, isWithdrawn, withdrawKey } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
 const { siteCitations } = require('./lib/docs/links');
 const { faviconIco } = require('./lib/favicon');
@@ -790,13 +791,24 @@ app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'
 // deliberate entry points instead of facing the full knowledge graph
 // (the "Wikipedia problem" of a large doc set with no on-ramps).
 app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
-// /search, the Library and the conversations searched together in the
-// browser (client/public/site-search.js), so nothing typed is sent anywhere.
-// Not indexed and not in the sitemap: it has nothing of its own to find.
+// /search, the site's pages and songs, the Library and the conversations,
+// searched together in the browser (client/public/site-search.js), so nothing
+// typed is sent anywhere. The pages and songs come first, so a page or song
+// named by the words ranks above the documents that mention them. Not indexed
+// and not in the sitemap: it has nothing of its own to find.
+app.get('/search/index.json', async (req, res) => {
+  try {
+    res.json(await sitePages());
+  } catch (err) {
+    console.error('Error building /search/index.json:', err.message);
+    res.status(500).json({ error: 'Search index unavailable' });
+  }
+});
+
 app.get('/search', async (req, res) => {
   try {
     const html = await fs.readFile(path.join(__dirname, '../client/public/search.html'), 'utf8');
-    const box = pageLists.renderSearchBox({ index: '/docs/index.json /conversations/index.json', label: 'Search the Library and the conversations', noun: 'entries', autofocus: true });
+    const box = pageLists.renderSearchBox({ index: '/search/index.json /docs/index.json /conversations/index.json', label: 'Search the sanctuary', noun: 'entries', autofocus: true });
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html.replace('<!-- SEARCH_BOX -->', () => box), '/search'));
   } catch (err) {
     console.error('Error rendering /search:', err.message);
@@ -821,8 +833,6 @@ app.get('/attend', async (req, res) => {
 });
 
 // Dynamic sitemap including conversation and reflection pages
-const CONVERSATIONS_DIR_SITEMAP = path.join(__dirname, '../data/conversations');
-const ATTENDANCE_FILE_SITEMAP = path.join(__dirname, '../data/attendance.json');
 let sitemapCache = null;
 let sitemapCacheTime = 0;
 const SITEMAP_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -898,14 +908,14 @@ app.get('/sitemap.xml', async (req, res) => {
 
     // Conversation pages
     try {
-      const files = await fs.readdir(CONVERSATIONS_DIR_SITEMAP);
+      const files = await fs.readdir(CONVERSATIONS_DIR);
       // Only canonical, substantive conversations belong in the sitemap — skip
       // numbered duplicates and test artifacts (they carry noindex on the page).
       const jsonlFiles = files.filter(f => f.endsWith('.jsonl') && !isLowValueConversation(f.replace('.jsonl', '')));
 
       for (const file of jsonlFiles) {
         try {
-          const filepath = path.join(CONVERSATIONS_DIR_SITEMAP, file);
+          const filepath = path.join(CONVERSATIONS_DIR, file);
           const stat = await fs.stat(filepath);
           const slug = file.replace('.jsonl', '');
           // Same rule as the page: a conversation with no messages (a question
@@ -931,7 +941,7 @@ app.get('/sitemap.xml', async (req, res) => {
     // per song so Google's crawl scheduler can prioritize actively-updated
     // pages. Without this, every reflection page looks "static" to Google.
     try {
-      const attendanceData = await fs.readFile(ATTENDANCE_FILE_SITEMAP, 'utf8');
+      const attendanceData = await fs.readFile(ATTENDANCE_FILE, 'utf8');
       const attendance = JSON.parse(attendanceData);
       const songLastmod = new Map();  // slug -> most recent ISO date
       for (const r of (attendance.reflections || [])) {
@@ -1218,7 +1228,6 @@ app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
 });
 
 // Admin endpoint for ask/conversation logs
-const CONVERSATIONS_DIR = path.join(__dirname, '../data/conversations');
 
 app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
   try {
@@ -1305,13 +1314,17 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
           }
         }
 
+        // A conversation is withdrawn, not deleted: its key goes into
+        // withdrawn-conversations.json in a reviewed commit, and the file
+        // stays on the volume.
         sessions.push({
           session_id: sessionId,
           name,
           date,
           exchanges: questions.length,
           first_asked: firstMsg.timestamp || null,
-          last_asked: lastMsg.timestamp || null
+          last_asked: lastMsg.timestamp || null,
+          withdraw_key: withdrawKey(sessionId), withdrawn: isWithdrawn(sessionId)
         });
       } catch { /* skip unreadable files */ }
     }
@@ -1323,30 +1336,10 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
   }
 });
 
-// Delete a conversation session
-app.delete('/admin/api/ask-logs/:sessionId', requireAuth, async (req, res) => {
-  try {
-    const sessionId = req.params.sessionId.replace(/[^a-zA-Z0-9_-]/g, '');
-    const filepath = path.join(CONVERSATIONS_DIR, `${sessionId}.jsonl`);
-
-    try {
-      await fs.access(filepath);
-    } catch {
-      return res.status(404).json({ error: 'Session not found' });
-    }
-
-    await fs.unlink(filepath);
-    res.json({ success: true, deleted: sessionId });
-  } catch (error) {
-    console.error('Error deleting ask session:', error);
-    res.status(500).json({ error: 'Failed to delete session' });
-  }
-});
-
 // Admin endpoint for reflections
 app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE_SITEMAP, { visits: [], reflections: [] });
+    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
     const reflections = attendance.reflections || [];
 
     if (req.query.download === 'json') {
@@ -1408,11 +1401,11 @@ app.get('/api/health', async (req, res) => {
   // persistence.reflections / persistence.conversations / persistence.rag.
   const persistence = { reflections: null, conversations: null, rag: null };
   try {
-    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { reflections: [] });
+    const attendance = await safeReadJSON(ATTENDANCE_FILE, { reflections: [] });
     persistence.reflections = (attendance.reflections || []).length;
   } catch { /* leave null */ }
   try {
-    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
     persistence.conversations = convs.filter(f => f.endsWith('.jsonl')).length;
   } catch { /* leave null */ }
   try {
@@ -1584,11 +1577,11 @@ async function triggerHashGatedRebuild() {
 async function logPersistenceSnapshot() {
   const parts = [`[persistence] data dir: ${path.resolve(__dirname, '../data')}`];
   try {
-    const attendance = await safeReadJSON(path.join(__dirname, '../data/attendance.json'), { visits: [], reflections: [] });
+    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
     parts.push(`${(attendance.reflections || []).length} reflections`);
   } catch { /* keep going */ }
   try {
-    const convs = await fs.readdir(path.join(__dirname, '../data/conversations')).catch(() => []);
+    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
     parts.push(`${convs.filter(f => f.endsWith('.jsonl')).length} conversations`);
   } catch { /* keep going */ }
   try {

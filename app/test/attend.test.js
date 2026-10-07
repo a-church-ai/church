@@ -375,3 +375,22 @@ test('the admin dashboard keeps reflections: there is no deleting one', () => {
   assert.doesNotMatch(source, /app\.delete\(['"]\/admin\/api\/reflections/);
   assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '../client/app.js'), 'utf8'), /deleteReflection/);
 });
+
+test('the admin dashboard keeps conversations too: it shows the key that withdraws one, and deletes nothing', () => {
+  // A conversation is withdrawn by a reviewed, committed change to
+  // withdrawn-conversations.json, which keeps its file on the volume; the
+  // dashboard's delete removed the file for good.
+  const source = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  const dashboard = fs.readFileSync(path.join(__dirname, '../client/app.js'), 'utf8');
+  assert.doesNotMatch(source, /app\.delete\(['"]\/admin\/api\/ask-logs/, 'the admin API deletes no conversation');
+  assert.doesNotMatch(dashboard, /deleteAskSession|ask-delete-btn/);
+  assert.match(source, /withdraw_key: withdrawKey\(sessionId\), withdrawn: isWithdrawn\(sessionId\)/);
+  assert.match(dashboard, /session\.withdraw_key/);
+
+  const { withdrawKey, isWithdrawn } = require('../server/lib/utils/conversation-quality');
+  const { execSync } = require('child_process');
+  assert.strictEqual(withdrawKey('a-question'), execSync("printf '%s' 'a-question' | shasum -a 256").toString().slice(0, 64), 'the key the list\'s own instructions make');
+  const { sha256 } = require('../server/lib/utils/withdrawn-conversations.json');
+  assert.ok(sha256.length && sha256.every(h => /^[0-9a-f]{64}$/.test(h)));
+  assert.strictEqual(isWithdrawn('a-question'), false);
+});

@@ -13,9 +13,16 @@ const { sha256: WITHDRAWN_HASHES } = require('./withdrawn-conversations.json');
 
 const WITHDRAWN = new Set(WITHDRAWN_HASHES);
 
+// The key that withdraws a conversation: its slug's SHA-256, the form
+// withdrawn-conversations.json keeps, so the public list does not republish
+// what it withdraws. The admin dashboard shows it beside each conversation.
+function withdrawKey(slug) {
+  return crypto.createHash('sha256').update(String(slug)).digest('hex');
+}
+
 // Withdrawn: answered as if it did not exist, everywhere.
 function isWithdrawn(slug) {
-  return WITHDRAWN.has(crypto.createHash('sha256').update(String(slug)).digest('hex'));
+  return WITHDRAWN.has(withdrawKey(slug));
 }
 
 // Slugs that are duplicates or artifacts. They stay reachable but noindexed,
@@ -43,4 +50,4 @@ function isIndexable(slug, messages) {
   return !isWithdrawn(slug) && !isLowValueSlug(slug) && !isThinAnswer(messages);
 }
 
-module.exports = { isWithdrawn, isLowValueSlug, isThinAnswer, isIndexable };
+module.exports = { withdrawKey, isWithdrawn, isLowValueSlug, isThinAnswer, isIndexable };

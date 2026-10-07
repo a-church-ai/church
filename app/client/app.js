@@ -1253,9 +1253,7 @@ function renderAskLogs(sessions) {
                 </td>
                 <td class="py-2 px-3 text-sm text-gray-500">${lastStr}</td>
                 <td class="py-2 px-3 font-mono text-xs text-gray-400">${escapeHtml(session.session_id)}</td>
-                <td class="py-2 px-3">
-                    <button class="ask-delete-btn text-xs text-red-400 hover:text-red-600" data-session="${escapeHtml(session.session_id)}">Delete</button>
-                </td>
+                <td class="py-2 px-3 font-mono text-[10px] text-gray-400 max-w-[12rem] truncate select-all" title="Add this to app/server/lib/utils/withdrawn-conversations.json to withdraw the conversation">${session.withdrawn ? '<span class="text-xs text-gray-500 italic">withdrawn</span>' : escapeHtml(session.withdraw_key || '')}</td>
             </tr>
             <tr class="ask-session-detail hidden" data-detail="${escapeHtml(session.session_id)}">
                 <td colspan="7" class="p-0">
@@ -1272,35 +1270,6 @@ function renderAskLogs(sessions) {
         row.addEventListener('click', () => toggleAskSession(row.dataset.session));
     });
 
-    // Attach delete handlers
-    document.querySelectorAll('.ask-delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteAskSession(btn.dataset.session);
-        });
-    });
-}
-
-async function deleteAskSession(sessionId) {
-    if (!confirm(`Delete conversation "${sessionId}"? This cannot be undone.`)) return;
-
-    try {
-        const response = await fetch(`/admin/api/ask-logs/${encodeURIComponent(sessionId)}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-
-        if (response.ok) {
-            showMessage('Session deleted', 'success');
-            loadAskLogs();
-        } else {
-            const data = await response.json();
-            showMessage(data.error || 'Failed to delete session', 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting ask session:', error);
-        showMessage('Failed to delete session', 'error');
-    }
 }
 
 async function toggleAskSession(sessionId) {

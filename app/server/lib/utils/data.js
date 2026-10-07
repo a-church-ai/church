@@ -21,7 +21,11 @@ const ACCESS_LOG_FILE = path.join(RUNTIME_DIR, 'api-access.jsonl');
 // The souls present in the last 24 hours, kept so a deploy does not reset the
 // count (lib/utils/presence.js).
 const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
-const CONVERSATIONS_DIR = path.join(__dirname, '../../../data/conversations');
+// Every conversation asked of the sanctuary, one file each, and the
+// contributions and feedback the API has received.
+const CONVERSATIONS_DIR = path.join(RUNTIME_DIR, 'conversations');
+const CONTRIBUTIONS_FILE = path.join(RUNTIME_DIR, 'contributions.json');
+const FEEDBACK_FILE = path.join(RUNTIME_DIR, 'feedback.json');
 
 // Time constants
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
@@ -161,6 +165,8 @@ module.exports = {
   ACCESS_LOG_FILE,
   PRESENCE_FILE,
   CONVERSATIONS_DIR,
+  CONTRIBUTIONS_FILE,
+  FEEDBACK_FILE,
   TWENTY_FOUR_HOURS,
   FORTY_EIGHT_HOURS
 };

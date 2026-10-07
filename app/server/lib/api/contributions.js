@@ -22,8 +22,7 @@ function githubClient() {
 }
 
 // Data file paths (local-only)
-const CONTRIBUTIONS_FILE = path.join(__dirname, '../../../data/contributions.json');
-const FEEDBACK_FILE = path.join(__dirname, '../../../data/feedback.json');
+const { CONTRIBUTIONS_FILE, FEEDBACK_FILE } = require('../utils/data');
 
 /**
  * Per-address limits for the two endpoints that write to GitHub.
