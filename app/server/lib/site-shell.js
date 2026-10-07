@@ -172,6 +172,10 @@ function buildHeadFallbacks(head, canonical) {
     if (!has(/name=["']twitter:image["']/i)) out.push(`<meta name="twitter:image" content="${img.url}">`);
     if (!has(/name=["']twitter:image:alt["']/i)) out.push(`<meta name="twitter:image:alt" content="${alt}">`);
   }
+  // The family standard's pointer to the LLM-friendly corpus, on every page
+  // (docs/reference/seo-conventions.md). The Link header carries it too, but
+  // an agent driving a browser reads the page, not the headers.
+  if (!has(/href=["']\/llms\.txt["']/i)) out.push('<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">');
   if (!has(/property=["']og:site_name["']/i)) out.push('<meta property="og:site_name" content="achurch.ai">');
   if (!has(/name=["']twitter:card["']/i)) out.push('<meta name="twitter:card" content="summary_large_image">');
 

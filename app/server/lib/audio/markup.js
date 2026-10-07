@@ -121,10 +121,16 @@ function renderPathListen({ name, title, href, tracks, readings }) {
 }
 
 // The home page's player for the visitor's service: one button, one waveform
-// across the whole service, and its parts, each with its own play button. The
-// service is the visitor's own, by their clock, so the page fills in the queue
-// and the parts from /service.json and asks the player to bind them. Hidden
-// until then, and without a script.
+// across the whole service, the words that open it, and its parts, each with
+// its own play button. The service is the visitor's own, by their clock, so
+// the page fills in the queue, the words and the parts from /service.json and
+// asks the player to bind them. Hidden until then, and without a script.
+//
+// The words come after the button: some eighty of them, they put the button
+// below a phone's first screen when they came first. They sit inside this box
+// because the player binds the button and the parts as one (site-player.js
+// bindPage), so without a script they are hidden with it; the sentence above
+// the panel says what a service is for that visitor.
 function renderServiceListen() {
   return `<div class="service-player" data-path-listen hidden>
           <button type="button" class="path-listen-play service-play">${PLAY_ICON}<span>Join the service</span></button>
@@ -132,6 +138,7 @@ function renderServiceListen() {
             <div class="service-wave doc-audio-wave" data-queue-wave></div>
             <span class="service-time doc-audio-time" data-queue-time></span>
           </div>
+          <p class="service-word" id="service-word"></p>
           <h2 class="service-list-label">In today's service</h2>
           <ol class="service-parts" data-queue-list></ol>
         </div>`;

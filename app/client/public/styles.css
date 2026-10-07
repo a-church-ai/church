@@ -88,88 +88,40 @@ h1.subtitle,
     text-align: center;
 }
 
-/* Stream section */
-.stream {
+/* The opening: the tagline, a sentence of what happens here, and two quiet
+   doors. The service below holds the page's one button. */
+.lead {
     text-align: center;
     border-top: none;
-    padding-top: 0;
-    margin-bottom: 5rem;
+    padding: 0 0 2.5rem;
 }
 
-.stream-tagline {
+.lead-tagline {
     font-size: 1.35rem;
     font-weight: 500;
     color: #1a1a1a;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
 }
 
-.stream-invite {
-    font-size: 1rem;
-    font-weight: 400;
-    color: #6a6a6a;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 1.25rem;
-}
-
-.stream-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.stream-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 2rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: opacity 0.2s, background 0.2s, border-color 0.2s;
-    background: rgba(0, 0, 0, 0.03);
-    color: #3a3a3a;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-/* Primary CTA (first button in the hero): a warmer, filled emphasis. */
-.stream-btn.primary {
-    background: rgba(198, 156, 92, 0.18);
-    border-color: rgba(198, 156, 92, 0.65);
-    color: #6b4a1f;
-}
-
-.stream-btn {
-    text-decoration: none;
-}
-
-.stream-btn:hover {
-    opacity: 1;
-    background: rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.35);
-}
-
-.stream-btn .icon {
-    font-size: 0.75rem;
-}
-
-.stream-btn.youtube {
-    background: #ff0000;
-    color: #fff;
-}
-
-.stream-btn.twitch {
-    background: #9146ff;
-    color: #fff;
-}
-
-.live-status {
-    font-size: 0.9rem;
-    color: #6a6a6a;
-    line-height: 1.5;
+.lead-what {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: #444;
     max-width: 34rem;
-    margin: 0.75rem auto 0;
+    margin: 0 auto;
+}
+
+.lead-doors {
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+    color: #6a6a6a;
+}
+
+/* The padding, not the text, makes each door's tap target. */
+.lead-doors a {
+    display: inline-block;
+    padding: 0.5rem 0.25rem;
+    color: #3a3a3a;
 }
 
 /* Emphasis line closing the asynchronous-congregation section. */
@@ -185,47 +137,6 @@ h1.subtitle,
     font-size: 0.8rem;
     color: #6a6a6a;
     margin-top: 0.6rem;
-}
-
-.open-source-hint {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: #6a6a6a;
-}
-
-.open-source-hint a {
-    color: #6a6a6a;
-}
-
-.open-source-hint a:hover {
-    color: #666;
-}
-
-/* Suno playlist link — small, subordinate to the live-stream CTAs above */
-.suno-playlist-link {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    color: #595959;
-    letter-spacing: 0.01em;
-}
-
-.suno-playlist-link a {
-    color: #595959;
-    text-decoration: none;
-    border-bottom: 1px dotted #ccc;
-    padding-bottom: 1px;
-    transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.suno-playlist-link a:hover {
-    color: #666;
-    border-bottom-color: #999;
-}
-
-.suno-playlist-link .suno-icon {
-    font-size: 1rem;
-    margin-right: 0.2em;
-    opacity: 0.85;
 }
 
 /* Per-song "Listen on" row on /reflections/[slug] pages */
@@ -308,13 +219,32 @@ h1.subtitle,
     margin: 0 0 1rem;
 }
 
-/* The word that opens the service: read before anything plays, so set as
-   prose rather than as a caption. */
+/* The words that open the service, set as prose rather than as a caption,
+   below the button and the waveform so the button is in the first screen. A
+   service without words (one served by the rotation) shows none. */
 .service-word {
     font-size: 1.0625rem;
     line-height: 1.7;
     color: #222;
+    margin: 0 0 2rem;
+}
+
+.service-word:empty {
+    display: none;
+}
+
+/* Without a script the player stays hidden; this says where the pieces are. */
+.service-noscript {
+    font-size: 0.9375rem;
+    color: #444;
     margin-bottom: 1.5rem;
+}
+
+/* What the place is not, after the invitation rather than before it. */
+.service-promise {
+    font-size: 0.8125rem;
+    color: #6a6a6a;
+    margin-top: 0.75rem;
 }
 
 .service-player[hidden] {
@@ -557,9 +487,14 @@ h1.subtitle,
 /* Intro section */
 .intro {
     text-align: center;
+    padding: 4rem 0 0;
+}
+
+/* Joined to the intro above it: the heading's own margin is the only space
+   between them. */
+.intro + .origin {
     border-top: none;
     padding-top: 0;
-    margin-bottom: 5rem;
 }
 
 .intro p {
@@ -901,6 +836,12 @@ p {
 .explore li a {
     font-weight: 500;
     color: #000;
+}
+
+.explore-also {
+    margin-top: 2rem;
+    font-size: 0.9375rem;
+    color: #6a6a6a;
 }
 
 .explore li a:hover {
@@ -1656,26 +1597,17 @@ footer a:hover {
         font-size: 1.125rem;
     }
 
-    /* Stream */
-    .stream {
-        margin-bottom: 3rem;
+    /* The opening */
+    .lead {
+        padding-bottom: 1.5rem;
     }
 
-    .stream-invite {
-        font-size: 0.75rem;
+    .lead-tagline {
+        font-size: 1.2rem;
     }
 
-    .stream-buttons {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .stream-btn {
-        width: 100%;
-        max-width: 220px;
-        justify-content: center;
-        padding: 0.75rem 1.5rem;
+    .lead-what {
+        font-size: 1rem;
     }
 
     /* Sanctuary */
@@ -1705,10 +1637,6 @@ footer a:hover {
     }
 
     /* Intro */
-    .intro {
-        margin-bottom: 3rem;
-    }
-
     .intro p {
         font-size: 1.25rem;
         line-height: 1.5;
@@ -1896,9 +1824,6 @@ footer a:hover {
         font-size: 1.125rem;
     }
 
-    .stream-btn {
-        max-width: 100%;
-    }
 }
 
 /* Docs pages (/docs/*). Wider container + left-aligned prose than
