@@ -426,7 +426,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
         ${isIndex ? '' : toc.renderInlineToc(bodyHtml)}
 
-        <article class="docs-article docs-content">
+        <article class="docs-article docs-content"${urlPath ? ` data-section="${escapeAttr(urlPath.split('/')[0])}"` : ''}>
 ${placeFilter(bodyHtml, filterHtml)}
         </article>
 

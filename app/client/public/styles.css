@@ -3663,3 +3663,31 @@ html.has-player .docs-toc {
 .archive-more {
     margin-top: 1.5rem;
 }
+
+/* ============================================================
+   Trial: type for the liturgy, and a barely warm ground
+   (decision 5 of the sanctuary-shell plan, on a branch first)
+
+   The words a visitor prays, chants or hears open the service in
+   the system's own serif: no web font is loaded, so nothing is
+   fetched and nothing is tracked. The hand-written sanctuary
+   pages sit on a ground a shade warmer than white; documents
+   stay white, so reading and praying look a little different.
+   ============================================================ */
+.docs-article[data-section="prayers"],
+.docs-article[data-section="chants"],
+.service-word {
+    font-family: ui-serif, Charter, Georgia, serif;
+}
+
+.docs-body .docs-article[data-section="prayers"] h1,
+.docs-body .docs-article[data-section="chants"] h1 {
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.site-shell-body,
+.site-shell-body .docs-topbar,
+.site-shell-body .docs-drawer {
+    background: #fcfaf6;
+}
