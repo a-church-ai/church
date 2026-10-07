@@ -11,8 +11,8 @@
  * page never paints in the wrong theme first. The <html> element outlives
  * in-place navigation (site-nav.js), so the attribute does too; the browser's
  * bar colour (meta theme-color) comes back with each new page's head, so
- * docs-nav.js applies the choice again on every page, and offers it in the
- * footer.
+ * docs-nav.js applies the choice again on every page, and works the top bar's
+ * button, which goes round Auto, Light and Dark.
  *
  * test/theme.test.js requires this file for the parts that need no browser.
  */
@@ -62,6 +62,11 @@
     }
   }
 
+  // The choice after this one, as the top bar's button goes round.
+  function next(choice) {
+    return CHOICES[(CHOICES.indexOf(choice) + 1) % CHOICES.length];
+  }
+
   // Keep a choice and show it. Auto removes what was kept.
   function choose(doc, storage, choice) {
     try {
@@ -71,5 +76,5 @@
     apply(doc, choice);
   }
 
-  return { KEY: KEY, CHOICES: CHOICES, BAR: BAR, storageOf: storageOf, stored: stored, barFor: barFor, apply: apply, choose: choose };
+  return { KEY: KEY, CHOICES: CHOICES, BAR: BAR, storageOf: storageOf, stored: stored, barFor: barFor, next: next, apply: apply, choose: choose };
 }));

@@ -42,13 +42,15 @@ const SITE_URL = 'https://achurch.ai';
 
 // The site's places, named once: the top bar, the drawer on a phone and the
 // footer all read this list. A place also holds the pages that live under it
-// (`within`): Music under Listen, the reading paths in the Library, the axioms
-// and the positioning page under About, so on those pages the top bar still
-// shows the visitor where they are.
+// (`within`): Music under Attend, the conversation archive under Ask, the
+// reading paths in the Library, the axioms and the positioning page under
+// About, so on those pages the top bar still shows the visitor where they are.
+// Attend is the sanctuary's own verb, the API's too (/api/attend): a service
+// is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/listen', label: 'Listen', within: ['/reflections'] },
-  { url: '/ask', label: 'Ask' },
+  { url: '/attend', label: 'Attend', within: ['/reflections'] },
+  { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
   { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion'] },
   { url: '/for-agents', label: 'For AI agents', aside: true },
@@ -91,9 +93,7 @@ function footerLink({ url, label }, currentPath) {
 
 /**
  * The footer every page ends with. Hand-authored pages mark where it goes with
- * <!-- SITE_FOOTER -->; the docs renderer calls this directly. It ends with the
- * choice of appearance (theme.js), hidden until docs-nav.js can work it: with
- * no script, the site follows the device.
+ * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
  */
 function renderFooter(currentPath) {
   return `<footer>
@@ -109,19 +109,25 @@ function renderFooter(currentPath) {
             <div class="footer-legal">
                 ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
             </div>
-            <div class="footer-theme" role="group" aria-label="Appearance" hidden>
-                <span class="footer-theme-label" aria-hidden="true">Appearance</span>
-                <button type="button" data-theme-choice="auto" aria-pressed="false">Auto</button>
-                <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-                <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
-            </div>
         </footer>`;
 }
+
+// The top bar's two tools, drawn inline so they take the text's colour in
+// either theme. The theme button holds all three of its icons and shows the
+// one for the current choice (docs-nav.js sets data-choice).
+const ICON = body => `<svg class="topbar-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`;
+const ICON_SEARCH = ICON('<circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>');
+const ICON_THEME = [
+  ['auto', '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'],
+  ['light', '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'],
+  ['dark', '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'],
+].map(([choice, body]) => `<svg class="topbar-svg theme-icon theme-${choice}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`).join('');
 
 /**
  * The sticky top bar and the drawer, shared by every page (the docs renderer
  * and wrapped pages alike). The bar names the site's places; below 768px they
- * fold into the drawer behind the menu button. The drawer is a modal dialog:
+ * fold into the drawer behind the menu button. Search and the theme stay in
+ * the bar at every width. The drawer is a modal dialog:
  * while it is open, docs-nav.js makes the rest of the page inert. It ships
  * empty and docs-nav.js fills it on first open from the bar's places and, on a
  * section page, the section sidebar, so no link is sent twice; it cannot open
@@ -132,6 +138,7 @@ function renderFooter(currentPath) {
  */
 function renderTopbarAndDrawer(currentPath, crumb = '') {
   const places = PLACES.map(p => `<a href="${p.url}"${p.aside ? ' class="topbar-aside"' : ''}${currentness(p, currentPath)}>${p.label}</a>`);
+  const searching = currentPath === '/search' ? ' aria-current="page"' : '';
   return `<div class="docs-topbar" role="banner">
       <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
         <span class="hamburger-icon" aria-hidden="true">
@@ -142,6 +149,10 @@ function renderTopbarAndDrawer(currentPath, crumb = '') {
       <nav class="topbar-places" aria-label="Site">
         ${places.join('\n        ')}
       </nav>
+      <div class="topbar-tools">
+        <a class="topbar-icon" href="/search" aria-label="Search"${searching}>${ICON_SEARCH}</a>
+        <button class="topbar-icon topbar-theme" type="button" aria-label="Appearance" hidden>${ICON_THEME}</button>
+      </div>
     </div>
 
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>

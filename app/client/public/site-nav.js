@@ -157,8 +157,11 @@
     }
   }
 
+  // Where focus goes when a page arrives in place: the field a page marks
+  // autofocus (the search page's), as a full load would honour it, or else
+  // its heading.
   function focusArrival() {
-    const heading = document.querySelector('#content h1, main h1, h1');
+    const heading = document.querySelector('[autofocus]') || document.querySelector('#content h1, main h1, h1');
     const target = heading || document.querySelector('#content, main');
     if (!target) return;
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');

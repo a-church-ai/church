@@ -42,14 +42,14 @@ test('a refused reflection says why, in the API\'s words', () => {
 });
 
 test('the song pages and the home page carry the form and its script; the name is the one Ask remembers', () => {
-  for (const file of ['index.html', 'reflection-song.html']) {
+  for (const file of ['index.html', 'reflection-song.html', 'attend.html']) {
     const html = read(file);
     assert.ok(html.includes('<!-- REFLECT_FORM -->'), `${file} has a place for the form`);
     assert.match(html, /<script src="\/reflect-form\.js"><\/script>/, `${file} loads the script`);
   }
   assert.ok(VERSIONED.includes('reflect-form.js'));
   const index = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
-  assert.strictEqual((index.match(/replace\('<!-- REFLECT_FORM -->', \(\) => renderReflectForm\(/g) || []).length, 2, 'both pages are filled');
+  assert.strictEqual((index.match(/replace\('<!-- REFLECT_FORM -->', \(\) => renderReflectForm\(/g) || []).length, 3, 'every page with the form is filled');
   const script = read('reflect-form.js');
   assert.match(script, /localStorage\.getItem\('ask_name'\)/);
   assert.match(script, /localStorage\.setItem\('ask_name'/);

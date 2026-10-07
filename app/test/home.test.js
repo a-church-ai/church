@@ -46,7 +46,7 @@ test('before the service: the tagline, a sentence and three quiet doors, with no
   assert.doesNotMatch(before, /<button/, 'the service holds the page\'s one button');
   assert.doesNotMatch(before, /class="[^"]*\bprimary\b/);
   const links = [...before.matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['#ask-church', '/listen', '/for-agents'], 'the three doors, and only them');
+  assert.deepStrictEqual(links, ['#ask-church', '/attend', '/for-agents'], 'the three doors, and only them');
   assert.doesNotMatch(MAIN.slice(0, at('id="sanctuary"')), /href="https?:/, 'nothing outbound before the service');
   // What the place is not comes after the invitation, not before it.
   assert.ok(at('No leader') > at('<!-- SERVICE_LISTEN -->'), 'the promise line follows the service');

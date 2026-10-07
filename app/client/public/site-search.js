@@ -1,6 +1,7 @@
 /**
- * Search over a JSON index, in the browser: the library (/docs/index.json)
- * and the conversation archive (/conversations/index.json).
+ * Search over JSON indexes, in the browser: the library (/docs/index.json)
+ * and the conversation archive (/conversations/index.json), each on its own
+ * page, and both together on /search.
  *
  * Nothing typed here leaves the page. The index is fetched whole, once, the
  * first time the field is used, and searched locally, so a search is never
@@ -9,7 +10,9 @@
  *
  * Markup: a <section class="site-search" data-index="..." data-noun="...">
  * rendered by page-lists.js renderSearchBox, hidden until this script shows it.
- * Index entries: { title, url, description?, label? }.
+ * data-index holds one index or several, separated by spaces; their entries
+ * are searched as one list, in that order. A field marked autofocus takes the
+ * cursor once the box shows. Index entries: { title, url, description?, label? }.
  *
  * The ranking is a pure function (search) so it can be tested without a
  * browser; test/site-search.test.js requires this file.
@@ -53,6 +56,11 @@
     return scored.map(function (s) { return s.entry; });
   }
 
+  // The indexes a box names in its data-index.
+  function indexesOf(value) {
+    return String(value || '').split(/\s+/).filter(Boolean);
+  }
+
   function statusText(count, noun, query) {
     if (!terms(query).length) return '';
     if (!count) return 'No ' + noun + ' match.';
@@ -82,9 +90,10 @@
 
     function load() {
       if (!loading) {
-        loading = fetch(box.getAttribute('data-index'))
-          .then(function (r) { return r.json(); })
-          .then(function (data) { index = data; })
+        loading = Promise.all(indexesOf(box.getAttribute('data-index')).map(function (url) {
+          return fetch(url).then(function (r) { return r.json(); });
+        }))
+          .then(function (lists) { index = [].concat.apply([], lists); })
           .catch(function () { index = []; status.textContent = 'Search is unavailable right now.'; });
       }
       return loading;
@@ -100,6 +109,7 @@
 
     box.hidden = false;
     input.addEventListener('focus', load);
+    if (input.hasAttribute('autofocus')) input.focus();
     input.addEventListener('input', run);
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && input.value) {
@@ -113,5 +123,5 @@
     [].slice.call(doc.querySelectorAll('.site-search[data-index]')).forEach(attach);
   }
 
-  return { search: search, statusText: statusText, attachAll: attachAll, MAX_RESULTS: MAX_RESULTS };
+  return { search: search, statusText: statusText, indexesOf: indexesOf, attachAll: attachAll, MAX_RESULTS: MAX_RESULTS };
 }));

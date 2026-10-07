@@ -222,9 +222,9 @@ function renderReflectForm({ song = null, summary }) {
         </details>`;
 }
 
-// ------------------------------------------------------------ /listen ----
+// ------------------------------------------------------------ /attend ----
 
-// The sections and the music on /listen: each voiced section with how many of
+// The sections and the music on /attend: each voiced section with how many of
 // its pieces are voiced and how long they play, in the Library's order, then
 // the songs. Each section's own page plays them all ("Listen to this section").
 function renderListenSections() {

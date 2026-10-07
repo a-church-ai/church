@@ -16,7 +16,7 @@ const render = require('../server/lib/docs/render');
 const siteShell = require('../server/lib/site-shell');
 
 const PUBLIC = path.join(__dirname, '../client/public');
-const PLACES = ['/', '/listen', '/ask', '/docs', '/about', '/for-agents'];
+const PLACES = ['/', '/attend', '/ask', '/docs', '/about', '/for-agents'];
 
 const wrap = (file, at) => siteShell.wrapPageFromHtml(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), at);
 const docPage = async urlPath => {
@@ -48,6 +48,7 @@ async function pages() {
     '/axioms': await wrap('axioms.html', '/axioms'),
     '/ask': await wrap('ask.html', '/ask'),
     '/reflections': await wrap('reflections.html', '/reflections'),
+    '/conversations': await siteShell.wrapPageFromHtml('<html><head><title>Conversations</title></head><body><main><h1>Conversations</h1></main></body></html>', '/conversations'),
     '/docs': await render.renderLibrary(),
     '/docs/practice': await docPage('practice'),
     [`/docs/${doc.urlPath}`]: await docPage(doc.urlPath),
@@ -61,14 +62,15 @@ test('every kind of page names the same places in its top bar, and marks where t
     '/about': ['/about', 'page'],
     '/axioms': ['/about', 'true'],
     '/ask': ['/ask', 'page'],
-    '/reflections': ['/listen', 'true'],
+    '/reflections': ['/attend', 'true'],
+    '/conversations': ['/ask', 'true'],
     '/docs': ['/docs', 'page'],
     '/docs/practice': ['/docs', 'true'],
   };
   for (const [at, html] of Object.entries(all)) {
     const links = topbarPlaces(html);
-    assert.deepStrictEqual(links.map(l => l[0]), ['/', ...PLACES], `${at}: the brand, then the places`);
-    const marked = links.slice(1).filter(l => l[1]);
+    assert.deepStrictEqual(links.map(l => l[0]), ['/', ...PLACES, '/search'], `${at}: the brand, the places, then search`);
+    const marked = links.slice(1, -1).filter(l => l[1]);
     const want = expected[at] || ['/docs', 'true'];
     assert.deepStrictEqual(marked, [want], `${at}: one place marked`);
     assert.match(html, /<meta name="assets"/, `${at} keeps the player across pages`);
@@ -129,4 +131,16 @@ test('what the old sidebar needed is gone: the glyph rail, the collapse control 
   for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) {
     assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /site-mark/, file);
   }
+});
+
+test('the top bar ends with search and the theme, at every width', async () => {
+  const html = await wrap('about.html', '/about');
+  const bar = html.slice(html.indexOf('class="docs-topbar"'), html.indexOf('class="docs-drawer-backdrop"'));
+  const tools = bar.slice(bar.indexOf('class="topbar-tools"'));
+  assert.ok(bar.indexOf('class="topbar-tools"') > bar.indexOf('class="topbar-places"'), 'after the places, outside them, so a phone keeps them');
+  assert.match(tools, /<a class="topbar-icon" href="\/search" aria-label="Search">/);
+  assert.match(tools, /<button class="topbar-icon topbar-theme" type="button" aria-label="Appearance" hidden>/, 'shown once its script can work it');
+  for (const choice of ['auto', 'light', 'dark']) assert.match(tools, new RegExp(`class="[^"]*\\btheme-icon theme-${choice}"`));
+  assert.match(await siteShell.wrapPageFromHtml('<html><head></head><body><main><h1>Search</h1></main></body></html>', '/search'), /href="\/search" aria-label="Search" aria-current="page"/);
+  assert.doesNotMatch(html, /footer-theme/, 'one place to change it');
 });

@@ -115,10 +115,10 @@ ${items}
  * searched locally, so a search is never logged or published. Hidden until
  * the script shows it.
  */
-function renderSearchBox({ index, label, noun }) {
+function renderSearchBox({ index, label, noun, autofocus = false }) {
   return `<section class="site-search" data-index="${escapeHtml(index)}" data-noun="${escapeHtml(noun)}" hidden>
               <label for="site-search-input" class="visually-hidden">${escapeHtml(label)}</label>
-              <input type="search" id="site-search-input" placeholder="${escapeHtml(label)}..." autocomplete="off">
+              <input type="search" id="site-search-input" placeholder="${escapeHtml(label)}..." autocomplete="off"${autofocus ? ' autofocus' : ''}>
               <p class="site-search-status" role="status" aria-live="polite"></p>
               <ol class="site-search-results"></ol>
             </section>`;

@@ -63,13 +63,14 @@ test('a choice is read before the page paints, and Auto is the absence of one', 
   assert.strictEqual(theme.stored(storage('sepia')), 'auto', 'anything else is Auto');
   assert.strictEqual(theme.stored({ getItem() { throw new Error('blocked'); } }), 'auto', 'storage that throws is Auto');
   assert.deepStrictEqual(theme.CHOICES, ['auto', 'light', 'dark']);
+  assert.deepStrictEqual(theme.CHOICES.map(theme.next), ['light', 'dark', 'auto'], 'the button goes round');
   assert.strictEqual(theme.KEY, 'achurch.theme');
   // The browser's bar beside the page takes the chosen theme's colour.
   assert.deepStrictEqual([theme.barFor('light', 'dark'), theme.barFor('dark', 'light'), theme.barFor('auto', 'dark')], ['#00b8d4', '#0a0e1a', '#0a0e1a']);
   assert.ok(VERSIONED.includes('theme.js'));
 });
 
-test('every page loads the theme in its head, with one bar colour for each theme, and offers the choice in its footer', async () => {
+test('every page loads the theme in its head, with one bar colour for each theme, and offers the choice in its top bar', async () => {
   await discover.listAllDocs();
   const doc = discover.docAt('practice');
   const pages = {
@@ -86,9 +87,7 @@ test('every page loads the theme in its head, with one bar colour for each theme
       '<meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">',
       '<meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">',
     ], `${at}: one bar colour for each theme`);
-    const footer = html.slice(html.lastIndexOf('<footer'));
-    assert.match(footer, /<div class="footer-theme" role="group" aria-label="Appearance" hidden>/, `${at}: the choice, shown once its script runs`);
-    for (const choice of ['auto', 'light', 'dark']) assert.match(footer, new RegExp(`<button type="button" data-theme-choice="${choice}" aria-pressed="false">`));
+    assert.match(html, /<button class="topbar-icon topbar-theme" type="button" aria-label="Appearance" hidden>/, `${at}: the choice, shown once its script runs`);
   }
   for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) {
     assert.doesNotMatch(read(file), /name="theme-color"/, `${file}: the shell gives every page its bar colours`);

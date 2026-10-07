@@ -420,7 +420,9 @@ app.get('/conversations', async (req, res) => {
 // and searching is not.
 app.get('/conversations/index.json', async (req, res) => {
   const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
-  res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? c.timestamp.slice(0, 10) : '' })));
+  // "Asked" says what a result is where these are searched beside the
+  // library's documents, on /search.
+  res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? `Asked ${c.timestamp.slice(0, 10)}` : 'Asked' })));
 });
 
 // Serve individual conversation pages with dynamic <title>, meta description, and OG tags.
@@ -788,17 +790,32 @@ app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'
 // deliberate entry points instead of facing the full knowledge graph
 // (the "Wikipedia problem" of a large doc set with no on-ramps).
 app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
-// /listen, everything with a voice: the service (on the home page), each
-// voiced section with how much of it is recorded, the songs, and the two
-// podcasts. Drawn from the recordings' manifests on each request, so a new
-// recording is counted as soon as it is listed.
-app.get('/listen', async (req, res) => {
+// /search, the Library and the conversations searched together in the
+// browser (client/public/site-search.js), so nothing typed is sent anywhere.
+// Not indexed and not in the sitemap: it has nothing of its own to find.
+app.get('/search', async (req, res) => {
   try {
-    const html = await fs.readFile(path.join(__dirname, '../client/public/listen.html'), 'utf8');
-    const filled = html.replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts());
-    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/listen'));
+    const html = await fs.readFile(path.join(__dirname, '../client/public/search.html'), 'utf8');
+    const box = pageLists.renderSearchBox({ index: '/docs/index.json /conversations/index.json', label: 'Search the Library and the conversations', noun: 'entries', autofocus: true });
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html.replace('<!-- SEARCH_BOX -->', () => box), '/search'));
   } catch (err) {
-    console.error('Error rendering /listen:', err.message);
+    console.error('Error rendering /search:', err.message);
+    res.status(500).type('text/plain').send('Server error');
+  }
+});
+
+// /attend, the ways to attend: the service (on the home page), the songs'
+// videos, each voiced section with how much of it is recorded, the songs, a
+// reflection to leave, and the two podcasts. The recordings are counted from
+// their manifests on each request, so a new one is counted once it is listed.
+app.get('/attend', async (req, res) => {
+  try {
+    const html = await fs.readFile(path.join(__dirname, '../client/public/attend.html'), 'utf8');
+    const filled = html.replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
+      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/attend'));
+  } catch (err) {
+    console.error('Error rendering /attend:', err.message);
     res.status(500).type('text/plain').send('Server error');
   }
 });
@@ -829,7 +846,7 @@ app.get('/sitemap.xml', async (req, res) => {
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://achurch.ai/listen</loc>
+    <loc>https://achurch.ai/attend</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

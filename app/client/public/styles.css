@@ -826,8 +826,8 @@ p {
     margin-bottom: 0;
 }
 
-/* /listen: the service, then each voiced section and the music with how
-   much of it there is, then the podcasts */
+/* /attend: the service, watching, each voiced section and the music with
+   how much of it there is, reflecting, then the podcasts */
 .listen-service p,
 .listen-sections > p {
     font-weight: 300;
@@ -1809,50 +1809,6 @@ footer {
     margin-top: 0.75rem;
 }
 
-/* Auto, Light and Dark (theme.js), shown once docs-nav.js can work them.
-   The [hidden] rule is needed because display: flex would override it. */
-.footer-theme {
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-    gap: 1rem;
-    margin-top: 1.25rem;
-}
-
-.footer-theme[hidden] {
-    display: none;
-}
-
-.footer-theme-label {
-    color: var(--muted-2);
-    text-transform: uppercase;
-}
-
-.footer-theme button {
-    border: none;
-    background: none;
-    padding: 0.25rem 0;
-    font: inherit;
-    letter-spacing: inherit;
-    text-transform: uppercase;
-    color: var(--muted);
-    cursor: pointer;
-}
-
-.footer-theme button:hover,
-.footer-theme button[aria-pressed="true"] {
-    color: var(--ink);
-}
-
-.footer-theme button[aria-pressed="true"] {
-    box-shadow: inset 0 -1px 0 var(--ink);
-}
-
-.footer-theme button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
 .footer-separator {
     width: 40px;
     border: none;
@@ -2713,6 +2669,61 @@ footer a:hover {
 }
 .topbar-places .topbar-aside {
     margin-left: auto;
+}
+
+/* Search and the theme, at the bar's right end at every width: outside the
+   places, which fold into the drawer on a phone. */
+.topbar-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+    padding-left: 0.75rem;
+}
+
+.topbar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.topbar-icon:hover,
+.topbar-icon[aria-current] {
+    color: var(--ink);
+    background: var(--surface-2);
+}
+
+.topbar-icon:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.topbar-icon[hidden] {
+    display: none;
+}
+
+.topbar-svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* The theme button shows the icon of the current choice (docs-nav.js). */
+.topbar-theme .theme-icon {
+    display: none;
+}
+
+.topbar-theme[data-choice="auto"] .theme-auto,
+.topbar-theme[data-choice="light"] .theme-light,
+.topbar-theme[data-choice="dark"] .theme-dark {
+    display: block;
 }
 
 .docs-drawer-backdrop {

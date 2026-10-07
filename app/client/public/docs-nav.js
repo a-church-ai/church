@@ -11,8 +11,8 @@
  *   2. The section sidebar's current document, scrolled into view.
  *   3. Right-rail TOC scroll-spy: IntersectionObserver on article h2 elements
  *      updates aria-current="location" on the corresponding TOC link.
- *   4. The footer's Auto, Light and Dark (theme.js keeps the choice and sets
- *      it before the page paints).
+ *   4. The top bar's appearance button, which goes round Auto, Light and Dark
+ *      (theme.js keeps the choice and sets it before the page paints).
  *
  * No dependencies. Runs after DOMContentLoaded (script is defer-loaded).
  * Each part no-ops when its elements are absent.
@@ -137,26 +137,29 @@
   // colours back to their defaults, and kept in step with the site's other
   // tabs, which share the choice.
   const theme = window.achurchTheme;
-  const themeGroup = document.querySelector('.footer-theme');
+  const themeButton = document.querySelector('.topbar-theme');
+  const THEME_SAID = { auto: 'Auto, following your device', light: 'Light', dark: 'Dark' };
   if (theme) {
     const storage = theme.storageOf(window);
+    let shown = 'auto';
     // choice: the one just made, which stands even where storage is blocked.
     const showTheme = function (choice) {
-      choice = choice || theme.stored(storage);
-      theme.apply(document, choice);
-      if (themeGroup) {
-        themeGroup.querySelectorAll('[data-theme-choice]').forEach(function (b) {
-          b.setAttribute('aria-pressed', String(b.getAttribute('data-theme-choice') === choice));
-        });
+      shown = choice || theme.stored(storage);
+      theme.apply(document, shown);
+      if (themeButton) {
+        // The icon is the current choice; the name says it, and what a press
+        // changes it to.
+        const said = 'Appearance: ' + THEME_SAID[shown] + '. Switch to ' + THEME_SAID[theme.next(shown)].split(',')[0] + '.';
+        themeButton.setAttribute('data-choice', shown);
+        themeButton.setAttribute('aria-label', said);
+        themeButton.setAttribute('title', said);
       }
     };
     showTheme(null);
-    if (themeGroup) {
-      themeGroup.hidden = false;
-      themeGroup.addEventListener('click', function (e) {
-        const b = e.target.closest('[data-theme-choice]');
-        if (!b) return;
-        const choice = b.getAttribute('data-theme-choice');
+    if (themeButton) {
+      themeButton.hidden = false;
+      themeButton.addEventListener('click', function () {
+        const choice = theme.next(shown);
         theme.choose(document, storage, choice);
         showTheme(choice);
       });

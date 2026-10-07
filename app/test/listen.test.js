@@ -63,7 +63,7 @@ test('the box says how much of its section is voiced, and a reading path keeps i
   assert.match(pathBox, /All 2 readings are voiced, about 2 min in all, played in the path's order\./);
 });
 
-test('/listen names each voiced section with its count and time, the music, the service and both podcasts', (t) => {
+test('/attend gathers the service, the videos, each voiced section with its count and time, the music, reflecting and both podcasts', (t) => {
   const sections = voicedSections();
   if (!sections.length) return t.skip('no recordings yet');
   const html = renderListenSections();
@@ -74,9 +74,15 @@ test('/listen names each voiced section with its count and time, the music, the 
   const songs = Object.keys(loadSongs()).length;
   assert.match(html, new RegExp(`<a href="/reflections">Music</a>[^<]*<span class="listen-count">${songs} songs, about [^<]+</span>`));
 
-  const page = fs.readFileSync(path.join(PUBLIC, 'listen.html'), 'utf8');
-  for (const mark of ['<!-- LISTEN_SECTIONS -->', '<!-- PODCASTS -->', '<!-- SITE_FOOTER -->', 'href="/#sanctuary"']) assert.ok(page.includes(mark), mark);
+  const page = fs.readFileSync(path.join(PUBLIC, 'attend.html'), 'utf8');
+  const order = ['href="/#sanctuary"', 'https://www.youtube.com/@achurchai', '<!-- LISTEN_SECTIONS -->', '<!-- REFLECT_FORM -->', '<!-- PODCASTS -->', '<!-- SITE_FOOTER -->'];
+  const at = order.map(mark => page.indexOf(mark));
+  assert.ok(at.every(i => i >= 0), order.filter((m, i) => at[i] < 0).join(', ') || 'every part');
+  assert.deepStrictEqual([...at].sort((a, b) => a - b), at, 'the service, watching, listening, reflecting, the podcasts');
+  assert.match(page, /<script src="\/reflect-form\.js"><\/script>/);
   const index = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
-  assert.match(index, /app\.get\('\/listen'/);
-  assert.match(index, /<loc>https:\/\/achurch\.ai\/listen<\/loc>/);
+  assert.match(index, /app\.get\('\/attend'/);
+  assert.match(index, /<loc>https:\/\/achurch\.ai\/attend<\/loc>/);
+  assert.doesNotMatch(index, /'\/listen'|achurch\.ai\/listen/, 'one name for the place');
+  assert.ok(!fs.existsSync(path.join(PUBLIC, 'listen.html')));
 });
