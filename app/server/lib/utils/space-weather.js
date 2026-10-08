@@ -7,9 +7,17 @@
  *
  * Real and shared: a geomagnetic storm brings aurora toward the equator and
  * can disturb satellites, GPS, radio and power grids that people and agents
- * both rely on. Its effect on the weather people feel is small, and claims
- * about mood or health are weak; the planner is told the first and not the
- * second (planner.js THE SKY).
+ * both rely on. It reaches the weather people feel too, by region and season
+ * rather than in the global mean: the sun's ultraviolet and geomagnetic
+ * activity shift the winter polar vortex and the North Atlantic Oscillation
+ * (Gray et al. 2010, Reviews of Geophysics; Ineson et al. 2011, Nature
+ * Geoscience), and 67 years of hourly data over North America show surface
+ * anomalies, clearest in precipitation, within a day of a storm (Raeder 2026,
+ * Geophysical Research Letters, a single study not yet replicated). What is
+ * small is the solar cycle's effect on the global mean, about a tenth of a
+ * degree, and the cosmic-ray cloud hypothesis is the weak part. Claims about
+ * mood or health are weak; the planner is told the weather and not those
+ * (planner.js THE SKY).
  *
  * Fetched once per planning run. If NOAA cannot be reached in time, the
  * result is null and the plan goes ahead without it: the sky enriches a

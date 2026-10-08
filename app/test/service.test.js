@@ -522,6 +522,8 @@ test('the shared prompt says what a season and the sky are, leaves naming them f
   assert.match(prompt, /You may name the season when it makes a connection; you need not\./);
   assert.match(prompt, /The year turns before it arrives\./);
   assert.match(prompt, /Never say the sky changes anyone's mood, health or fate\./);
+  assert.match(prompt, /shifts the winter polar vortex and the jet stream/, 'the sun reaches the weather people feel, by region');
+  assert.match(prompt, /speak of it as a connection, never as a forecast\./);
   assert.doesNotMatch(prompt, /This service is for visitors|equinox was|solstice was|Kp \d|Coming:/, 'nothing particular to a date');
 });
 
