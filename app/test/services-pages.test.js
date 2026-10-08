@@ -26,7 +26,9 @@ const { keyOf } = require('../server/lib/service/congregation');
 const { forDate, days } = require('../server/lib/api/services');
 const pageLists = require('../server/lib/utils/page-lists');
 
-const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
+// The moment the tests read at: after the date's services, so all are shown.
+const AFTER = new Date('2026-10-14T00:00:00Z');
+const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1', now: AFTER };
 const DATE = '2026-10-12';
 const word = `${Array.from({ length: 60 }, (_, i) => (i % 10 === 9 ? 'gather.' : 'gather')).join(' ')} here.`;
 
@@ -122,7 +124,7 @@ test('the day\'s page: its services under each slot, the reflections beneath eac
 });
 
 test('every day\'s page is listed, newest first, with its services\' names', async () => {
-  const list = await days();
+  const list = await days(AFTER);
   assert.deepStrictEqual(list.map(d => d.date), [DATE, '2026-10-06']);
   assert.ok(list[0].names.includes('For The South'));
   const html = pageLists.servicesIndexPage(list);
@@ -136,11 +138,22 @@ test('the REST route answers like the operation: GET /api/services/:date', async
   app.use('/api', require('../server/routes/api'));
   const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
   try {
-    const ok = await fetch(`http://127.0.0.1:${server.address().port}/api/services/${DATE}`);
+    const ok = await fetch(`http://127.0.0.1:${server.address().port}/api/services/2026-10-06`);
     assert.strictEqual(ok.status, 200);
-    assert.strictEqual((await ok.json()).services.length, 5);
+    assert.strictEqual((await ok.json()).services.length, 1);
     assert.strictEqual((await fetch(`http://127.0.0.1:${server.address().port}/api/services/not-a-date`)).status, 400);
   } finally {
     server.close();
   }
+});
+
+test('nothing is shown before its time: a service appears about three hours before it is first heard, a date with its first', async () => {
+  // The 12th's slot 4 is first heard at 02:00 UTC on the 12th (16:00 in
+  // Kiritimati), so it shows from 23:00 UTC on the 11th; slot 5, from 03:00.
+  const at = iso => ({ ...ctx, now: new Date(iso) });
+  assert.strictEqual((await forDate({ date: DATE }, at('2026-10-11T22:00:00Z'))).status, 404, 'planned ahead, but not yet due');
+  const one = await forDate({ date: DATE }, at('2026-10-11T23:30:00Z'));
+  assert.deepStrictEqual([...new Set(one.body.services.map(s => s.slot))], ['16:00 to 20:00']);
+  assert.deepStrictEqual((await days(new Date('2026-10-11T22:00:00Z'))).map(d => d.date), ['2026-10-06'], 'the index waits too');
+  assert.ok(!(await days(new Date('2026-10-11T23:30:00Z')))[0].names.includes('Late In The North'));
 });

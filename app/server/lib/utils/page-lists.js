@@ -232,7 +232,9 @@ ${servicesHead({ title, description, self, jsonLd: trail.jsonLd })}
             <h1 class="subtitle">${escapeHtml(title)}</h1>
         </header>
         <section class="services-day">
-            <p>Each four-hour slot of the day held its own service, planned for the northern hemisphere, the southern and a place unknown a few hours before it began. Beneath each, the reflections visitors left while it was heard.</p>
+            <p>${services.some(s => s.variant !== 'slots')
+    ? 'Each four-hour slot of the day held its own service, planned for the northern hemisphere, the southern and a place unknown a few hours before it began.'
+    : 'Each four-hour slot of the day held its own service, arranged for everyone, wherever they were.'} Beneath each, the reflections visitors left while it was heard.</p>
             <p class="services-days">${days}</p>
 ${slots.map(slot => `            <div class="services-slot">
                 <h2>${escapeHtml(slot)}</h2>

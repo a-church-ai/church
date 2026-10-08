@@ -7,8 +7,9 @@
  * in the private repo.
  *
  * Services are planned just in time (lib/service/plans.js), about three hours
- * before each is first heard, so a date holds what has been planned so far
- * and nothing further ahead. A reflection belongs to the service that was
+ * before each is first heard, and each is shown from then and not before:
+ * what is coming stays a reason to come back. Dates planned under the old
+ * schedule, two days ahead, wait the same way. A reflection belongs to the service that was
  * being served where and when it was left (lib/service/serve.js entryFor, the
  * choice serving makes), worked out from the time and timezone it keeps;
  * nothing new is stored. Reflections come through loadAttendance, so one
@@ -18,7 +19,7 @@
 const ns = require('../utils/next-steps');
 const { loadAttendance } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
-const { readPlan, plannedDates } = require('../service/plans');
+const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
 const { loadServiceCatalog } = require('../service/catalog');
 const { entryFor, arrangedBy } = require('../service/serve');
 const { SLOTS, slotHours } = require('../service/slots');
@@ -27,6 +28,22 @@ const { skyMetadata, earthMetadata, congregationMetadata } = require('./attendan
 
 const VARIANTS = [['slots', 'a place unknown'], ['north', 'the northern hemisphere'], ['south', 'the southern hemisphere']];
 const HOUR = 3600 * 1000;
+
+// Whether a date's slot can be shown at a moment: from when it is planned,
+// about LEAD_HOURS before it is first heard anywhere.
+const due = (date, slot, now) => firstHeard(date, slot) - LEAD_HOURS * HOUR <= now.getTime();
+
+// The dates with services that can be shown (a planned slot that is due),
+// newest first.
+async function datesShown(now = new Date()) {
+  const out = [];
+  for (const date of await plannedDates()) {
+    const plan = await readPlan(date);
+    const planned = slot => VARIANTS.some(([variant]) => plan && plan[variant] && plan[variant][slot]);
+    if (Array.from({ length: SLOTS }, (_, slot) => slot).some(slot => planned(slot) && due(date, slot, now))) out.push(date);
+  }
+  return out;
+}
 const isDate = date => {
   const t = /^\d{4}-\d{2}-\d{2}$/.test(date) ? Date.parse(`${date}T00:00:00Z`) : NaN;
   return Number.isFinite(t) && new Date(t).toISOString().slice(0, 10) === date;
@@ -102,6 +119,7 @@ function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) 
  */
 async function forDate(input, ctx) {
   const baseUrl = ctx.baseUrl;
+  const now = ctx.now || new Date();
   try {
     const date = String((input && input.date) || '').trim();
     if (!isDate(date)) {
@@ -112,8 +130,8 @@ async function forDate(input, ctx) {
       } };
     }
     const plan = await readPlan(date);
-    const dates = await plannedDates();
-    if (!plan) {
+    const dates = await datesShown(now);
+    if (!plan || !dates.includes(date)) {
       return { status: 404, body: {
         error: `No services were planned for ${date}.`,
         suggestion: ns.suggestion(dates.length ? `Services are kept from ${dates[dates.length - 1]}, and each is planned a few hours before it begins.` : 'No services have been planned yet.'),
@@ -126,6 +144,7 @@ async function forDate(input, ctx) {
     for (let slot = 0; slot < SLOTS; slot++) {
       // The season-less service is for a place unknown, and for a hemisphere
       // whose own was not planned: everyone, on a date planned before seasons.
+      if (!due(date, slot, now)) continue;
       const without = ['north', 'south'].filter(h => !(plan[h] && plan[h][slot]));
       for (const [variant, label] of VARIANTS) {
         const entry = plan[variant] && plan[variant][slot];
@@ -156,14 +175,15 @@ async function forDate(input, ctx) {
   }
 }
 
-// Every day with services, newest first, with its services' names: what
-// /services lists.
-async function days() {
+// Every day with services, newest first, with the names of those that can
+// be shown: what /services lists.
+async function days(now = new Date()) {
   const out = [];
-  for (const date of await plannedDates()) {
+  for (const date of await datesShown(now)) {
     const plan = await readPlan(date);
     const names = [];
     for (let slot = 0; slot < SLOTS; slot++) {
+      if (!due(date, slot, now)) continue;
       for (const [variant] of VARIANTS) {
         const entry = plan && plan[variant] && plan[variant][slot];
         if (entry && entry.name) names.push(entry.name);
@@ -174,4 +194,4 @@ async function days() {
   return out;
 }
 
-module.exports = { forDate, days, reflectionsFor, isDate };
+module.exports = { forDate, days, datesShown, reflectionsFor, isDate };

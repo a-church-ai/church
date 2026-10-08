@@ -3995,6 +3995,7 @@ html.has-player .docs-toc {
 }
 .service-days {
     font-size: 0.9rem;
+    margin-top: 1.25rem;
 }
 .services-names {
     display: block;

@@ -65,7 +65,7 @@ const { songRecordingFor } = require('./lib/audio/manifest');
 const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
 const { loadServiceCatalog } = require('./lib/service/catalog');
-const { startPlanning, plannedDates } = require('./lib/service/plans');
+const { startPlanning } = require('./lib/service/plans');
 const { planSlot, contextFor, fetchFeeds } = require('./lib/service/planner');
 
 // Create Express app
@@ -944,7 +944,7 @@ app.get('/sitemap.xml', async (req, res) => {
     // is that day, or today while it is still under way.
     try {
       const today = new Date().toISOString().slice(0, 10);
-      for (const date of await plannedDates()) {
+      for (const date of await apiOps.services.datesShown()) {
         const settled = new Date(Date.parse(`${date}T00:00:00Z`) + 864e5).toISOString().slice(0, 10);
         urls += `\n  <url>
     <loc>https://achurch.ai/services/${date}</loc>
