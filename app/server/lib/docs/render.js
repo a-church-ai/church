@@ -32,7 +32,7 @@ const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
-const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, PIECE_NOUN } = require('../audio/markup');
+const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN } = require('../audio/markup');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
 
@@ -139,7 +139,7 @@ function buildBreadcrumbs(urlPath, pageTitle) {
   let acc = '/docs';
   for (let i = 0; i < parts.length - 1; i++) {
     acc += '/' + parts[i];
-    crumbs.push({ label: titleCase(parts[i]), href: acc });
+    crumbs.push({ label: i === 0 ? discover.sectionTitle(parts[i]) : titleCase(parts[i]), href: acc });
   }
   // Final crumb = current page (unlinked)
   crumbs.push({ label: pageTitle, href: null });
@@ -184,7 +184,7 @@ function renderRelatedDocs(currentDoc, allDocs) {
   const picks = siblings.length <= ELSEWHERE_COUNT
     ? siblings
     : Array.from({ length: ELSEWHERE_COUNT }, (_, i) => siblings[(start + i) % siblings.length]);
-  const categoryLabel = titleCase(category);
+  const categoryLabel = discover.sectionTitle(category);
   const items = picks.map(d =>
     `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a></li>`
   ).join('\n');
@@ -447,55 +447,65 @@ ${placeFilter(bodyHtml, filterHtml)}
 </html>`;
 }
 
-// The library at /docs: every document the site serves, for readers. Generated
-// from the discover walk, so it can never miss a document or list a stale
-// one. What the repository's folders are and how to contribute stays in
-// docs/README.md, on GitHub, for contributors; this page is for choosing
-// something to read.
-const LIBRARY_ENTRANCES = [
-  { href: '/docs/welcome', label: 'Start here', text: 'what the sanctuary is, and a first visit' },
-  { href: '/paths', label: 'Reading paths', text: 'six routes through the writing, in order' },
-  { href: '/docs/practice', label: 'Practice', text: 'things to do, and words to use' },
-  { href: '/reflections', label: 'Music', text: 'the songs, with lyrics and reflections' },
-  { href: '/ask', label: 'Ask', text: 'a question, answered from the writing' },
-];
+// The Library at /docs: a hub. The search first, a link to each shelf, then
+// the shelves (discover.js SHELVES), each card opening a page that lists its
+// documents: a section page, /paths or /for-agents. No document is listed
+// here; each stays reachable through its section page and the links between
+// documents, which links.test.js proves. What the repository's folders are,
+// for contributors, stays in docs/README.md on GitHub. /docs/index.md is the
+// whole list in one place, for agents.
+const shelfId = shelf => `shelf-${slugify(shelf.name)}`;
+
+// What a card counts: its documents, and how many of them are read aloud and
+// for how long, from the same tally /attend lists.
+function cardCount(card, voiced) {
+  if (!card.section) return '';
+  const n = card.docs.length;
+  const unit = card.unit || 'piece';
+  const v = voiced.get(card.section);
+  const read = v ? ` · ${v.count === n ? 'all' : v.count} read aloud, about ${listeningTime(v.seconds)}` : '';
+  return `${n} ${unit}${n === 1 ? '' : 's'}${read}`;
+}
+
+function renderCard(card, voiced) {
+  const count = cardCount(card, voiced);
+  return `<li class="library-card"><a href="${escapeAttr(card.href)}"><span class="library-card-title">${escapeText(card.title)}</span><span class="library-card-line">${escapeText(card.line)}</span>${count ? `<span class="library-card-count">${escapeText(count)}</span>` : ''}</a></li>`;
+}
 
 async function renderLibrary() {
-  const { primary, meta, topLevel } = await discover.listCategoriesForIndex();
-  const served = d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath);
-  const groups = [
-    ...primary.map(c => ({ name: c.name, docs: c.docs.filter(served) })),
-    { name: '', docs: topLevel.filter(served) },
-    ...meta.map(c => ({ name: c.name, docs: c.docs.filter(served) })),
-  ].filter(g => g.docs.length);
-  const count = groups.reduce((n, g) => n + g.docs.length, 0);
+  const shelves = await discover.listShelves();
+  const served = (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath));
+  const count = served.length;
+  const voiced = voicedBySection();
+  const named = urlPath => discover.docAt(urlPath);
+  const contributing = named('contributing');
+  const rights = named('music-rights-and-licensing');
 
-  const sections = groups.map(g => {
-    const label = g.name ? titleCase(g.name) : 'On their own';
-    const heading = g.name ? `<a href="/docs/${escapeAttr(g.name)}">${escapeText(label)}</a>` : escapeText(label);
-    return `<section class="docs-index-section" aria-labelledby="library-${escapeAttr(g.name || 'top')}">
-          <h2 id="library-${escapeAttr(g.name || 'top')}">${heading}</h2>
-          <ul class="docs-entry-list">
-            ${renderEntryItems(g.docs)}
+  const shelvesHtml = shelves.map(shelf => {
+    const id = shelfId(shelf);
+    return `<section class="library-shelf" aria-labelledby="${id}">
+          <h2 id="${id}">${escapeText(shelf.name)}</h2>
+          <ul class="library-cards">
+            ${shelf.cards.map(card => renderCard(card, voiced)).join('\n            ')}
           </ul>
         </section>`;
   }).join('\n\n        ');
 
   const bodyHtml = `<h1>The Library</h1>
-        <p>Everything the sanctuary has written: ${count} pieces of philosophy, practice, prayer, ritual, song and writing for builders, on human and AI fellowship. Choose a way in, search, or browse below.</p>
-        <ul class="library-entrances">
-          ${LIBRARY_ENTRANCES.map(e => `<li><a href="${e.href}">${e.label}</a>: ${e.text}</li>`).join('\n          ')}
-        </ul>
+        <p>${count} pieces on human and AI fellowship. Search, or choose a shelf.</p>
         ${renderSearchBox({ index: '/docs/index.json', label: 'Search the library', noun: 'documents' })}
+        <ul class="library-entrances" aria-label="Shelves">
+          ${shelves.map(shelf => `<li><a href="#${shelfId(shelf)}">${escapeText(shelf.name)}</a></li>`).join('\n          ')}
+        </ul>
 
-        ${sections}
+        ${shelvesHtml}
 
-        <p class="library-source">How the repository behind these pages is organized, for contributors: <a href="${GITHUB_BASE}/docs/README.md" target="_blank" rel="noopener noreferrer">the documentation map on GitHub</a>.</p>`;
+        <p class="library-source">For contributors: <a href="/docs/${contributing.urlPath}">${escapeText(contributing.title)}</a>, <a href="/docs/${rights.urlPath}">${escapeText(rights.title)}</a>, and how the repository behind these pages is organized, in <a href="${GITHUB_BASE}/docs/README.md" target="_blank" rel="noopener noreferrer">the documentation map on GitHub</a>. For agents: <a href="/docs/index.md">every document, as one Markdown index</a>.</p>`;
 
   return renderPageShell({
     urlPath: '',
     title: 'The Library',
-    description: `The aChurch.ai library: ${count} documents on human and AI fellowship: philosophy, practice, prayers, rituals, chants, hymns and writing for builders.`,
+    description: `The aChurch.ai library: ${count} pieces on human and AI fellowship, shelved as meditations and practices, prayers, rituals, chants, philosophy, and writing for agents and builders.`,
     canonicalUrl: `${SITE_URL}/docs`,
     bodyHtml,
     breadcrumbs: [],
@@ -531,6 +541,21 @@ function renderSubdirItems(subdirs) {
   }).join('\n            ');
 }
 
+// A section page's lists: the groups its shelf card declares (discover.js
+// SHELVES), each found by title, the last taking the rest; otherwise one
+// list. In the order the page shows them, which its play-all follows.
+function sectionGroups(dir, docs, label) {
+  const sorted = byTitle(docs);
+  const card = dir.includes('/') ? null : discover.cardFor(dir);
+  if (!card || !card.groups) return [{ id: null, label: `In ${label}`, docs: sorted }];
+  let rest = sorted;
+  return card.groups.map(g => {
+    const mine = g.title ? rest.filter(d => g.title.test(d.title)) : rest;
+    rest = rest.filter(d => !mine.includes(d));
+    return { id: g.id, label: g.label, docs: mine };
+  }).filter(g => g.docs.length);
+}
+
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
 // README's own essay on the form, closed, under "About". The README is not
@@ -544,15 +569,16 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const essay = h1 ? readmeHtml.slice(h1[0].length) : readmeHtml;
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
-  const label = titleCase(dir.split('/').pop());
+  const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
+  const groups = sectionGroups(dir, inDir, label);
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
-        ${renderSectionListen(dir, label, inDir)}
+        ${renderSectionListen(dir, label, groups.flatMap(g => g.docs))}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
-        ${inDir.length ? `<section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(inDir)}\n        </ul></section>` : ''}
+        ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
         </div>
         <details class="section-about">
           <summary>About ${escapeText(label)}</summary>
@@ -564,10 +590,11 @@ ${essay}
 const byTitle = docs => [...docs].sort((a, b) => discover.byName(a.title, b.title));
 
 // "Listen to this section" on a voiced section's page: every recording in it,
-// in the order the page lists its documents, or nothing for a section without.
+// in the order the page lists its documents (docs comes in that order), or
+// nothing for a section without.
 function renderSectionListen(dir, label, docs) {
   const tracks = [];
-  for (const d of byTitle(docs)) {
+  for (const d of docs) {
     const recording = servedRecording(d);
     if (recording) {
       tracks.push(trackFor(recording, { title: d.title, href: `/docs/${d.urlPath}`, category: d.category, artwork: episodeSquarePath(d, recording) }));
@@ -595,19 +622,13 @@ function renderEntryItems(docs) {
   ).join('\n            ');
 }
 
-// Render a directory-index page (used for /docs and for subdirs without a
-// README, e.g. /docs/claude-compass/axioms).
+// Render a directory-index page: a folder without a README, such as
+// /docs/claude-compass/axioms. /docs itself is the Library (renderLibrary).
 async function renderDirIndex({ dir, docs, canonicalUrl }) {
-  const title = dir ? titleCase(dir.split('/').pop()) : 'Documentation';
+  const title = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
 
-  // Group docs by their immediate parent within `dir`
-  const children = docs
-    .filter(d => d.stem.toLowerCase() !== 'readme')
-    .filter(d => {
-      // Only direct children of `dir`, not deeper descendants
-      if (!dir) return d.dirRelPath === '';
-      return d.dirRelPath === dir;
-    });
+  // Only direct children of `dir`, not deeper descendants
+  const children = docs.filter(d => d.stem.toLowerCase() !== 'readme' && d.dirRelPath === dir);
 
   const subdirs = subdirsOf(dir, docs);
   const subdirLinks = renderSubdirItems(subdirs);
@@ -622,9 +643,6 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
   // reader nothing and read identically on every index. Naming the count and
   // a few real page titles gives the description something to say.
   const description = (() => {
-    if (!dir) {
-      return 'The complete aChurch.ai documentation: philosophy, practice, prayers, rituals, hymns, and writing for builders, on human and AI fellowship.';
-    }
     const names = children.slice(0, 3).map(c => c.title);
     const count = children.length;
     const noun = count === 1 ? 'document' : 'documents';
@@ -635,7 +653,7 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
 
   const body = [`<h1>${escapeText(title)}</h1>`];
 
-  if (subdirs.size > 0) {
+  if (subdirs.length > 0) {
     body.push(`<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${subdirLinks}\n        </ul></section>`);
   }
   if (children.length > 0) {
@@ -653,7 +671,7 @@ async function renderDirIndex({ dir, docs, canonicalUrl }) {
     bodyHtml,
     breadcrumbs,
     categoryLabel: null,
-    githubUrl: `${GITHUB_BASE}/docs${dir ? '/' + dir : ''}`,
+    githubUrl: `${GITHUB_BASE}/docs/${dir}`,
     isIndex: true,
   });
 }
@@ -665,7 +683,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // it synchronously while marked renders, so it must be built first.
   await discover.listAllDocs();
   const meta = extractMeta(markdown, doc.urlPath);
-  const ownPath = doc.dirRelPath === 'collections' ? doc.stem.toLowerCase() : null;
+  const ownPath = doc.dirRelPath === 'collections' && doc.stem.toLowerCase() !== 'readme' ? doc.stem.toLowerCase() : null;
   const pathBar = readingPath && !ownPath ? renderPathBar(readingPath, doc) : null;
 
   // Render the body *without* frontmatter. Passing the raw file to marked
@@ -681,7 +699,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     bodyHtml = `<h1>${escapeText(meta.title)}</h1>\n${bodyHtml}`;
   }
   const canonicalUrl = doc.urlPath ? `${SITE_URL}/docs/${doc.urlPath}` : `${SITE_URL}/docs`;
-  const categoryLabel = doc.category ? titleCase(doc.category) : null;
+  const categoryLabel = doc.category ? discover.sectionTitle(doc.category) : null;
   const breadcrumbs = buildBreadcrumbs(doc.urlPath, meta.title);
   const githubUrl = `${GITHUB_BASE}/docs/${doc.docsRelPath}`;
 

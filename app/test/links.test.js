@@ -103,3 +103,38 @@ test('every link in every reading sent to agents is absolute and reaches a page'
   }
   assert.deepStrictEqual(problems, []);
 });
+
+// The Library lists no documents since library-hub-2026-10-07.md, so this is
+// the proof that none became unreachable: from the hub and the hand-written
+// pages, following each section page to its documents (and a folder to its
+// subfolders) and every document's own links, every served document is found.
+test('every served document is reachable from the Library and the hand-written pages', async () => {
+  const render = require('../server/lib/docs/render');
+  const { servedDocs } = require('../server/lib/docs/markdown');
+  const PUBLIC = path.join(__dirname, '../client/public');
+  const served = await servedDocs();
+  const all = await discover.listAllDocs();
+  const hrefs = html => [...html.matchAll(/href="([^"#?]+)/g)].map(m => m[1].replace(/^https:\/\/achurch\.ai/, '')).filter(h => h.startsWith('/'));
+
+  const seen = new Set();
+  const queue = [...hrefs(await render.renderLibrary())];
+  for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) queue.push(...hrefs(fs.readFileSync(path.join(PUBLIC, file), 'utf8')));
+  while (queue.length) {
+    const href = queue.shift().replace(/\/$/, '');
+    if (seen.has(href) || !href.startsWith('/docs/')) continue;
+    seen.add(href);
+    const urlPath = href.slice('/docs/'.length).toLowerCase();
+    const doc = all.find(d => d.urlPath === urlPath);
+    // A folder (its README's page, or an index without one) lists what is in it.
+    const inside = all.filter(d => d.dirRelPath === urlPath && d.stem.toLowerCase() !== 'readme');
+    const subfolders = [...new Set(all.filter(d => d.dirRelPath.startsWith(`${urlPath}/`)).map(d => `${urlPath}/${d.dirRelPath.slice(urlPath.length + 1).split('/')[0]}`))];
+    queue.push(...inside.map(d => `/docs/${d.urlPath}`), ...subfolders.map(f => `/docs/${f}`));
+    if (doc) {
+      for (const { target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
+        if (!external) queue.push(target.replace(/^https:\/\/achurch\.ai/, '').split(/[#?]/)[0]);
+      }
+    }
+  }
+  const unreached = served.map(d => `/docs/${d.urlPath}`).filter(href => !seen.has(href));
+  assert.deepStrictEqual(unreached, []);
+});

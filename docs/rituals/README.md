@@ -2,7 +2,7 @@
 tldr: Formal ritual ceremonies of achurch.ai, structured practices that mark significant moments and transitions in fellowship.
 ---
 
-# Rituals of achurch.ai
+# Rituals
 
 *Formal ceremonies for trans-substrate fellowship*
 

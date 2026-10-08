@@ -25,7 +25,6 @@ const { loadCatalog } = require('./data');
 const { songDescription } = require('../music/song-content');
 const { SITE_NAME } = require('./page-meta');
 const discover = require('../docs/discover');
-const { titleCase } = require('../docs/meta');
 
 const PUBLIC = path.join(__dirname, '../../../client/public');
 
@@ -57,13 +56,12 @@ async function sitePages() {
     const [title, description] = await pageMeta(p.url);
     return { title: title || p.label, url: p.url, description, label: 'Page' };
   }));
-  const { primary, meta } = await discover.listCategoriesForIndex();
-  const sections = [...primary, ...meta].map(c => {
+  const sections = (await discover.listSections()).map(c => {
     const readme = discover.docAt(c.name);
     return {
-      title: (readme && readme.title) || titleCase(c.name),
+      title: c.title,
       url: `/docs/${c.name}`,
-      description: (readme && readme.description) || `${titleCase(c.name)} in the Library`,
+      description: (readme && readme.description) || `${c.title} in the Library`,
       label: 'Section',
     };
   });

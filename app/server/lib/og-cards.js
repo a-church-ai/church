@@ -16,7 +16,10 @@ const zlib = require('zlib');
 const { Resvg } = require('@resvg/resvg-js');
 const { loadConversation, loadCatalog } = require('./utils/data');
 const { resolveServedDoc } = require('./docs/serve');
+// Squares and episode covers draw the folder's name (titleCase): a cover's
+// URL hashes what it draws, and Spotify and Apple fetch every changed cover again.
 const { titleCase } = require('./docs/meta');
+const { sectionTitle } = require('./docs/discover');
 const { shareCard } = require('./utils/page-meta');
 const { showById, episodeCoverHash } = require('./audio/podcasts');
 const { SPEECH } = require('./audio/house');
@@ -46,10 +49,10 @@ function songCard(song) {
 }
 
 // A document's section is its first path segment, labelled as its page's
-// breadcrumb and "More in" block label it (titleCase(doc.category)).
+// breadcrumb and "Elsewhere in" block label it (discover.sectionTitle).
 function docsCard(urlPath, title) {
   const section = String(urlPath).split('/')[0];
-  const label = section && section !== urlPath ? titleCase(section) : 'Docs';
+  const label = section && section !== urlPath ? sectionTitle(section) : 'Docs';
   return shareCard('docs', urlPath, { label, text: oneLine(title) });
 }
 

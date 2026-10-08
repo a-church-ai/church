@@ -27,7 +27,7 @@ const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
 const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
 const { acceptsMarkdown, markdownTokens } = require('../lib/utils/accepts');
-const { titleCase } = require('../lib/docs/meta');
+const discover = require('../lib/docs/discover');
 
 const router = express.Router();
 
@@ -94,10 +94,10 @@ async function handle(req, res, rest) {
     // Same URL, two representations, so the same Vary applies here.
     res.vary('Accept');
     if (asMarkdown || acceptsMarkdown(req)) {
-      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs${resolved.dir ? `/${resolved.dir}` : ''}>; rel="canonical"`);
+      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs/${resolved.dir}>; rel="canonical"`);
       // For markdown clients, list children as a minimal markdown response
       // rather than emitting HTML. Cheap and honest about the shape.
-      const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
+      const lines = [`# ${resolved.dir}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
         lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
@@ -107,13 +107,12 @@ async function handle(req, res, rest) {
       res.type('text/markdown; charset=utf-8');
       return res.send(markdown);
     }
-    const canonicalUrl = resolved.dir
-      ? `https://achurch.ai/docs/${resolved.dir}`
-      : `https://achurch.ai/docs`;
+    // The root is the Library (router.get('/')), so a folder index is always a
+    // folder's.
     const html = await render.renderDirIndex({
       dir: resolved.dir,
       docs: resolved.docs,
-      canonicalUrl,
+      canonicalUrl: `https://achurch.ai/docs/${resolved.dir}`,
     });
     res.type('text/html; charset=utf-8');
     return res.send(html);
@@ -161,7 +160,7 @@ router.get('/api', (req, res) => res.redirect(301, '/docs/ai-agent-api'));
 // log.
 router.get('/index.json', async (req, res) => {
   const docs = await servedDocs();
-  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? titleCase(d.category) : '' })));
+  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? discover.sectionTitle(d.category) : '' })));
 });
 
 // Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard

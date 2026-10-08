@@ -39,9 +39,11 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 Applied again on 2026-10-07: the sidebar left every page but a section of the Library. The top bar names six places on every page, and a section page lists only its own documents, with the other sections folded under one disclosure.
 
+And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, so "Practice" reads Meditations and Practices wherever a reader sees it.
+
 **Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
 
-**Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents.
+**Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents. Since the Library became shelves, `app/test/links.test.js` makes the crawl permanent: from the hub and the hand-written pages, through each section page and every document's own links, every served document must be reached.
 
 ## Document shape
 

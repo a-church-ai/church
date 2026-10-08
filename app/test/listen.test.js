@@ -41,8 +41,10 @@ test('a voiced section\'s page plays its recordings as one queue, in the order i
   for (const section of sections) {
     const html = await docPage(section);
     assert.strictEqual((html.match(/data-path-listen/g) || []).length, 1, `${section}: one box, as the player binds one`);
-    const list = html.slice(html.indexOf('class="docs-entry-list"'));
-    const listed = [...list.slice(0, list.indexOf('</ul>')).matchAll(/<li><a href="\/docs\/([^"]+)"/g)].map(m => m[1]);
+    // Every list of entries, in the page's order: a section can be divided
+    // into groups (discover.js SHELVES), and its play-all follows them.
+    const entries = html.slice(html.indexOf('<div class="docs-entries">'), html.indexOf('class="section-about"'));
+    const listed = [...entries.matchAll(/<li><a href="\/docs\/([^"]+)"/g)].map(m => m[1]);
     const expected = listed.map(u => manifest[`docs/${u}.md`]).filter(Boolean).map(r => r.file);
     const q = queueOf(html);
     assert.deepStrictEqual(q.tracks.map(tr => tr.file), expected, `${section}: every recording, in the page's order`);

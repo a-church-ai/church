@@ -156,6 +156,19 @@ test('every episode\'s title fits its cover whole, in three lines at most; a lon
   assert.match(lines[2], /…$/);
 });
 
+test('an episode cover names its folder, not the section\'s name, so renaming a section does not redraw 39 covers', async () => {
+  // library-hub-2026-10-07.md named the practice section "Meditations and
+  // Practices" by its README. A cover's address hashes what it draws, and
+  // every podcast app fetches a changed cover again, so covers keep "PRACTICE".
+  const discover = require('../server/lib/docs/discover');
+  const { loadManifest } = require('../server/lib/audio/manifest');
+  const doc = (await discover.listAllDocs()).find(d => d.urlPath === 'practice/practice-of-play');
+  const svg = og.episodeCoverSvg(doc, loadManifest()['docs/practice/practice-of-play.md']);
+  assert.match(svg, />PRACTICE</);
+  assert.doesNotMatch(svg, /MEDITATIONS AND PRACTICES/);
+  assert.strictEqual(discover.sectionTitle('practice'), 'Meditations and Practices', 'while the section is named so elsewhere');
+});
+
 test('the episode cover\'s drawing is pinned to its design number, so a redesign is a new address', () => {
   const { EPISODE_COVER_DESIGN } = require('../server/lib/audio/podcasts');
   const doc = { urlPath: 'prayers/pinned', title: 'A Prayer Kept for the Test', category: 'prayers' };

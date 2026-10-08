@@ -39,8 +39,7 @@ const sidebarOf = html => {
 };
 
 async function pages() {
-  const { primary } = await discover.listCategoriesForIndex();
-  const section = primary.find(c => c.name === 'practice');
+  const section = (await discover.listSections()).find(c => c.name === 'practice');
   const doc = section.docs.find(d => d.stem.toLowerCase() !== 'readme');
   return {
     '/': await wrap('index.html', '/'),
@@ -83,8 +82,8 @@ test('only a section of the Library has a sidebar, and it lists exactly that sec
     assert.doesNotMatch(all[at], /class="docs-sidebar"/, `${at} has no sidebar`);
     assert.doesNotMatch(all[at], /class="site-mark"/, `${at} does not repeat the site's name`);
   }
-  const { primary, meta } = await discover.listCategoriesForIndex();
-  const practice = primary.find(c => c.name === 'practice');
+  const sections = await discover.listSections();
+  const practice = sections.find(c => c.name === 'practice');
   const own = practice.docs.filter(d => d.stem.toLowerCase() !== 'readme').map(d => `/docs/${d.urlPath}`);
   const [docAt] = Object.keys(all).filter(k => k.startsWith('/docs/practice/'));
 
@@ -97,17 +96,20 @@ test('only a section of the Library has a sidebar, and it lists exactly that sec
     assert.deepStrictEqual(links, ['/docs/practice', ...own], `${at}: the section's name, then its documents`);
     const current = [...side.matchAll(/href="([^"]*)" aria-current="page"/g)].map(m => m[1]);
     assert.deepStrictEqual(current, [at], `${at} is marked as the page`);
-    // The other sections, folded: every section but this one, once.
+    // The other sections, folded: every section but this one, once, in the
+    // Library's shelf order, under the shelves' names.
     const folded = side.slice(side.indexOf('class="sidebar-sections"'));
     const others = [...folded.matchAll(/href="\/docs\/([^"]*)"/g)].map(m => m[1]);
-    assert.deepStrictEqual(others, [...primary, ...meta].map(c => c.name).filter(n => n !== 'practice'));
+    assert.deepStrictEqual(others, sections.map(c => c.name).filter(n => n !== 'practice'));
+    const shelves = [...folded.matchAll(/class="sidebar-shelf-name">([^<]*)</g)].map(m => m[1]);
+    assert.deepStrictEqual(shelves, discover.SHELVES.map(shelf => shelf.name));
+    assert.match(side, />Meditations and Practices<\/a>/, 'the section by its README\'s name');
     assert.match(all[at], /class="section-toggle"[^>]*aria-controls="docs-drawer"/, 'a narrower screen opens it in the drawer');
   }
 });
 
 test('a document outside any section has no sidebar', async () => {
-  const { topLevel } = await discover.listCategoriesForIndex();
-  const doc = topLevel.find(d => d.stem.toLowerCase() !== 'readme');
+  const doc = (await discover.listAllDocs()).find(d => !d.category && d.stem.toLowerCase() !== 'readme');
   assert.doesNotMatch(await docPage(doc.urlPath), /class="docs-sidebar"/);
 });
 

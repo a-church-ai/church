@@ -2482,9 +2482,19 @@ footer a:hover {
     color: var(--muted);
     cursor: pointer;
 }
-.sidebar-sections[open] ul {
+.sidebar-sections[open] > ul {
     max-height: 40vh;
     overflow-y: auto;
+}
+/* The other sections by shelf: the shelf's name over its sections. */
+.sidebar-shelf-name {
+    display: block;
+    padding: 0.5rem 0.75rem 0.1rem;
+    font-size: 0.75rem;
+    color: var(--muted-2);
+}
+.sidebar-sections .sidebar-shelf ul {
+    margin: 0;
 }
 
 /* Below 1024px a section page shows this beside its breadcrumbs, and it
@@ -3294,12 +3304,89 @@ body.docs-drawer-open {
     padding: 0.5rem 0;
 }
 
-/* The library's ways in. */
-.library-entrances {
+/* A link to each of the Library's shelves, under its search. Scoped to
+   the article so its list and section rules (padding, a rule above every
+   section) do not reach the hub's own blocks. */
+.docs-article .site-search {
+    padding: 0;
+    border-top: 0;
+}
+.docs-article .library-entrances {
     list-style: none;
     padding: 0;
-    margin: 1.5rem 0;
-    line-height: 1.8;
+    margin: -0.75rem 0 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.library-entrances a {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--link);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+.library-entrances a:hover {
+    border-color: var(--accent);
+    background: var(--surface-2);
+}
+
+/* The Library's shelves (discover.js SHELVES): a heading over a grid of
+   cards, each a link to the page that lists its documents. */
+.docs-article .library-shelf {
+    margin: 2rem 0 0;
+    padding: 0;
+    border-top: 0;
+    text-align: left;
+}
+.docs-article .library-shelf h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0 0 0.75rem;
+    padding: 0;
+    border: 0;
+}
+.docs-article .library-cards {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: 0.75rem;
+}
+.library-card a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    background: var(--paper);
+    color: var(--text);
+    text-decoration: none;
+}
+.library-card a:hover {
+    border-color: var(--accent);
+}
+.library-card-title {
+    font-weight: 500;
+    color: var(--ink-2);
+}
+.library-card-line {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.45;
+}
+.library-card-count {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    font-size: 0.8125rem;
+    color: var(--muted-2);
 }
 .library-source {
     margin-top: 3rem;

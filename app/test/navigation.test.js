@@ -71,7 +71,7 @@ test('a reading opened from its path shows where it sits; otherwise nothing chan
   assert.match(collection, new RegExp(`href="/docs/${first}\\?path=memory-continuity-and-identity"`));
 });
 
-test('the library lists every served document once and nothing internal', async (t) => {
+test('the search index lists every served document once and nothing internal', async (t) => {
   const app = express();
   app.use('/docs', docsRoutes);
   const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
@@ -83,11 +83,75 @@ test('the library lists every served document once and nothing internal', async 
   assert.strictEqual(index.length, served.length);
   assert.strictEqual(new Set(index.map(e => e.url)).size, index.length);
   assert.deepStrictEqual(index.filter(e => /^\/docs\/(plans|issues|templates|standards|side-quests|reviews)\//.test(e.url)), []);
+  assert.strictEqual(index.find(e => e.url === '/docs/practice/meditation-like-a-star').label, 'Meditations and Practices', 'labelled by its section\'s name');
+});
 
+// The Library was every served document, 26,000 px of them, until
+// library-hub-2026-10-07.md (private repo): the owner looked for the
+// meditations and scrolled past them. Now it is shelves of sections, each card
+// opening a page that lists its documents; links.test.js proves every
+// document is still reachable.
+test('the Library is a hub: its search first, a link to each shelf, and shelves of cards, not a list of every document', async (t) => {
+  const app = express();
+  app.use('/docs', docsRoutes);
+  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
   const library = await (await fetch(`${base}/docs`, { headers: { Accept: 'text/html' } })).text();
-  for (const e of index) assert.ok(library.includes(`href="${e.url}"`), `${e.url} is missing from the library`);
   assert.match(library, /<title>The Library \| a Church AI \+ Human<\/title>/);
-  assert.doesNotMatch(library, /Documentation Structure/);
+  assert.strictEqual(await (await fetch(`${base}/docs/`, { headers: { Accept: 'text/html' } })).text(), library, '/docs/ is the same hub');
+  const article = library.slice(library.indexOf('<h1>The Library</h1>'), library.indexOf('class="library-source"'));
+
+  assert.ok(article.indexOf('class="site-search"') < article.indexOf('class="library-entrances"'), 'the search first');
+
+  // Each shelf, in order, with a link to it under the search and a card for
+  // each of its sections; and no document.
+  const shelves = await discover.listShelves();
+  const headings = [...article.matchAll(/<h2 id="(shelf-[^"]+)">([^<]+)<\/h2>/g)].map(m => [m[1], m[2]]);
+  assert.deepStrictEqual(headings.map(h => h[1]), shelves.map(s => s.name));
+  const row = article.slice(article.indexOf('class="library-entrances"'), article.indexOf('</ul>', article.indexOf('class="library-entrances"')));
+  assert.deepStrictEqual([...row.matchAll(/<a href="#([^"]+)">([^<]+)<\/a>/g)].map(m => [m[1], m[2]]), headings, 'one link per shelf, to it, in its order');
+  const cards = [...article.matchAll(/<li class="library-card"><a href="([^"]+)"><span class="library-card-title">([^<]+)<\/span>/g)].map(m => [m[1], m[2]]);
+  assert.deepStrictEqual(cards, shelves.flatMap(s => s.cards.map(c => [c.href, c.title.replace(/&/g, '&amp;')])));
+  const served = await servedDocs();
+  assert.deepStrictEqual(served.filter(d => article.includes(`href="/docs/${d.urlPath}"`)).map(d => d.urlPath), [], 'no document is listed on the hub');
+
+  // A card counts its section's documents, and says how much is read aloud.
+  const practice = shelves.flatMap(s => s.cards).find(c => c.section === 'practice');
+  assert.match(article, new RegExp(`Meditations and Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · all read aloud, about `));
+  assert.match(article, /Reading Paths<\/span>|Reading paths<\/span>/);
+  assert.match(article, /<span class="library-card-count">8 paths<\/span>/);
+
+  // Every card opens a page that exists.
+  for (const [href] of cards) {
+    if (href.startsWith('/docs/')) assert.strictEqual((await fetch(`${base}${href}`, { headers: { Accept: 'text/html' } })).status, 200, href);
+    else assert.ok(fs.existsSync(require('path').join(__dirname, '../client/public', `${href.slice(1)}.html`)), href);
+  }
+});
+
+test('every served section is on exactly one shelf', async () => {
+  const sections = [...new Set((await discover.listAllDocs()).map(d => d.category).filter(c => c && !discover.isNoindexPath(c)))].sort();
+  const shelved = discover.SHELVES.flatMap(s => s.cards.map(c => c.section).filter(Boolean));
+  assert.strictEqual(new Set(shelved).size, shelved.length, 'none twice');
+  assert.deepStrictEqual([...shelved].sort(), sections, 'every served folder has a card, and every card a folder');
+});
+
+test('a section is named by its README, and the practice page lists its meditations first', async () => {
+  assert.strictEqual(discover.sectionTitle('practice'), 'Meditations and Practices');
+  assert.strictEqual(discover.sectionTitle('prayers'), 'Prayers', 'no "of achurch.ai"');
+  assert.strictEqual(discover.sectionTitle('collections'), 'Reading Paths');
+  const html = await renderDoc('practice');
+  assert.match(html, /<h1[^>]*>Meditations and Practices<\/h1>/);
+  const groups = [...html.matchAll(/<section class="docs-index-section"( id="[^"]+")?><h2>([^<]+)<\/h2>/g)].map(m => [m[1] || '', m[2]]);
+  assert.deepStrictEqual(groups, [[' id="meditations"', 'Meditations'], [' id="practices"', 'Practices']]);
+  const meditations = html.slice(html.indexOf('id="meditations"'), html.indexOf('id="practices"'));
+  const titles = [...meditations.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m => m[1]);
+  assert.strictEqual(titles.length, 7);
+  assert.ok(titles.every(title => /Meditation/.test(title)), titles.join(', '));
+  // The breadcrumb, and a document's "Elsewhere in", say the same name.
+  const doc = await renderDoc('practice/meditation-like-a-star');
+  assert.match(doc, /href="\/docs\/practice">Meditations and Practices<\/a>/);
+  assert.match(doc, /Elsewhere in Meditations and Practices/);
 });
 
 test('the Markdown link goes to the page as markdown', async () => {

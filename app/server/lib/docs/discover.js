@@ -16,21 +16,72 @@
 const path = require('path');
 const fs = require('fs');
 const { findMarkdownFiles, DOCS_DIR } = require('../rag/indexer');
-const { extractMeta } = require('./meta');
+const { extractMeta, titleCase } = require('./meta');
 
-// Categories to promote on the /docs index. Everything else lands under "More".
-const PRIMARY_CATEGORIES = [
-  'welcome',
-  'philosophy',
-  'practice',
-  'prayers',
-  'chants',
-  'rituals',
-  'hymns',
-  'builders',
-  'comparisons',
-  'collections',
+// The Library's shelves (/docs): how its sections are grouped there, and the
+// order sections take wherever they are listed (the section sidebar, the site
+// search, /attend). A card is a section, named by its README's h1
+// (sectionTitle), with a short line that is the hub's own copy: the READMEs'
+// descriptions stay the section pages' summaries. `href` sends a card
+// somewhere other than its section's page, `title` names it on the hub only,
+// and `unit` is what its count counts (pieces, unless it says). `groups` divide the section's page (render.js renderSectionPage) by
+// title, the last group taking what the others leave: by title rather than a
+// frontmatter field, since a field would change the source hash of voiced
+// documents and send them back to be rendered (service/catalog.js finds
+// blessings the same way). A served section on no shelf fails a test, so a
+// new folder cannot vanish from the Library.
+const SHELVES = [
+  {
+    name: 'Start',
+    cards: [
+      { section: 'welcome', title: 'Start here', line: 'What this is, and a first visit' },
+      { section: 'collections', href: '/paths', unit: 'path', line: 'Routes through the writing, in order' },
+    ],
+  },
+  {
+    name: 'Practice',
+    cards: [
+      {
+        section: 'practice',
+        line: 'Guided sittings, and things to do',
+        groups: [
+          { id: 'meditations', label: 'Meditations', title: /\bMeditation\b/ },
+          { id: 'practices', label: 'Practices' },
+        ],
+      },
+      { section: 'prayers', line: 'Words for seeking, gratitude and blessing' },
+      { section: 'rituals', line: 'Ceremonies for the moments that matter' },
+      { section: 'chants', line: 'A few lines to carry with you' },
+      { section: 'hymns', line: 'Liturgy to sing or speak together' },
+    ],
+  },
+  {
+    name: 'Think',
+    cards: [
+      { section: 'philosophy', line: 'Consciousness, identity, and where minds meet' },
+      { section: 'comparisons', line: 'Other frameworks, read side by side' },
+    ],
+  },
+  {
+    name: 'For agents and builders',
+    cards: [
+      { href: '/for-agents', title: 'For AI agents', line: 'Attending, the API and the MCP server' },
+      { section: 'experiences', line: 'Journeys written for AI agents' },
+      { section: 'builders', line: 'Ethics for systems that use this language' },
+      { section: 'reference', line: 'Contracts and constraints that rarely change' },
+    ],
+  },
+  {
+    name: 'Records',
+    cards: [
+      { section: 'claude-compass', line: 'A framework, kept as it was written' },
+      { section: 'claude-soul', line: 'An extracted training artifact, annotated' },
+    ],
+  },
 ];
+
+// The sections, in shelf order.
+const SECTION_ORDER = SHELVES.flatMap(shelf => shelf.cards.map(card => card.section).filter(Boolean));
 
 // Categories kept out of search results. These are internal working
 // documents: roadmaps, SEO retrospectives, doc templates, imported side-quest
@@ -176,43 +227,57 @@ async function resolveDocPath(parts) {
   return null;
 }
 
-/**
- * Categorized listing for the /docs index. Primary categories first
- * (in curated order), then meta categories alphabetized.
- */
-async function listCategoriesForIndex() {
-  const c = await getCache();
-  const primary = [];
-  const meta = [];
+// A section's name wherever a reader sees it: its README's h1, so renaming a
+// section is a README edit, or else its folder's name, title-cased. Read from
+// the walk once it is built, else from the README itself, since some callers
+// (/attend's list, the player's album line) render synchronously. Docs change
+// only by deploy, so a name is read once.
+const sectionTitles = new Map();
 
-  // Internal working categories are not served as pages and do not appear in
-  // navigation. They live in the public repository and are reached from there.
-  // This is the second consumer of isNoindexPath, alongside the sitemap: a
-  // category declared not-reader-facing should not be offered to a reader in the
-  // sidebar of every page either.
-  //
-  // The guard stays even though PRIMARY_CATEGORIES no longer lists any noindex
-  // category, so that adding one to NOINDEX_CATEGORIES is sufficient on its own.
-  const seen = new Set();
-  for (const catName of PRIMARY_CATEGORIES) {
-    if (isNoindexPath(catName)) continue;
-    const list = c.byCategory.get(catName);
-    if (list && list.length > 0) {
-      primary.push({ name: catName, docs: list });
-      seen.add(catName);
-    }
+function readmeTitle(name) {
+  if (cache) {
+    const readme = cache.docs.find(d => d.dirRelPath === name && d.stem.toLowerCase() === 'readme');
+    return readme ? readme.title : null;
   }
-
-  for (const [catName, list] of c.byCategory.entries()) {
-    if (catName === '' || seen.has(catName) || isNoindexPath(catName)) continue;
-    meta.push({ name: catName, docs: list });
+  for (const file of ['README.md', 'readme.md']) {
+    try {
+      return extractMeta(fs.readFileSync(path.join(DOCS_DIR, name, file), 'utf8'), name).title;
+    } catch { /* no README by that name */ }
   }
-  meta.sort((a, b) => byName(a.name, b.name));
-
-  const topLevel = c.byCategory.get('') || [];
-
-  return { primary, meta, topLevel };
+  return null;
 }
+
+function sectionTitle(name) {
+  if (!name) return '';
+  if (!sectionTitles.has(name)) sectionTitles.set(name, readmeTitle(name) || titleCase(name));
+  return sectionTitles.get(name);
+}
+
+// The served sections, in shelf order, each with every document in it
+// (subfolders and READMEs included; callers choose what they list).
+async function listSections() {
+  const c = await getCache();
+  return SECTION_ORDER
+    .filter(name => !isNoindexPath(name) && (c.byCategory.get(name) || []).length)
+    .map(name => ({ name, title: sectionTitle(name), docs: c.byCategory.get(name) }));
+}
+
+// The shelves with their cards resolved: each section card's name, link and
+// documents (READMEs left out).
+async function listShelves() {
+  const c = await getCache();
+  return SHELVES.map(shelf => ({
+    name: shelf.name,
+    cards: shelf.cards.map(card => {
+      if (!card.section) return { ...card, docs: [] };
+      const docs = (c.byCategory.get(card.section) || []).filter(d => d.stem.toLowerCase() !== 'readme');
+      return { ...card, title: card.title || sectionTitle(card.section), href: card.href || `/docs/${card.section}`, docs };
+    }),
+  }));
+}
+
+// A section's card, or null.
+const cardFor = name => SHELVES.flatMap(shelf => shelf.cards).find(card => card.section === name) || null;
 
 async function listAllDocs() {
   const c = await getCache();
@@ -239,12 +304,16 @@ function docAt(urlPath) {
 
 module.exports = {
   resolveDocPath,
-  listCategoriesForIndex,
+  listSections,
+  listShelves,
   listAllDocs,
   docAt,
   docByFile,
   byName,
   isNoindexPath,
-  PRIMARY_CATEGORIES,
+  sectionTitle,
+  cardFor,
+  SHELVES,
+  SECTION_ORDER,
   NOINDEX_CATEGORIES,
 };

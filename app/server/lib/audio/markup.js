@@ -16,10 +16,9 @@
 
 const { SPEECH, creditFor } = require('./house');
 const { escapeAttr, escapeText } = require('../utils/page-meta');
-const { titleCase } = require('../docs/meta');
 const { SHOWS, feedPath } = require('./podcasts');
 const { loadManifest, loadSongs } = require('./manifest');
-const { PRIMARY_CATEGORIES } = require('../docs/discover');
+const { SECTION_ORDER, sectionTitle } = require('../docs/discover');
 const { REFLECT_MIN_LENGTH } = require('../api/shared');
 
 // The shortest bar, as a percentage of the row's height. A drawing choice,
@@ -81,7 +80,7 @@ function trackFor(recording, { title, href, category, credit, artwork }) {
     order: Object.keys(SPEECH.voices),
     title,
     href,
-    album: titleCase(category),
+    album: sectionTitle(category),
     credit: credit || creditFor(recording),
     artwork: artwork || `/og/v1/square/${category}.png`,
   };
@@ -225,10 +224,9 @@ function renderReflectForm({ song = null, summary }) {
 
 // ------------------------------------------------------------ /attend ----
 
-// The sections and the music on /attend: each voiced section with how many of
-// its pieces are voiced and how long they play, in the Library's order, then
-// the songs. Each section's own page plays them all ("Listen to this section").
-function renderListenSections() {
+// Each section's voiced pieces, by section name: how many, and how long they
+// play, from the manifest. /attend lists them and the Library's cards say them.
+function voicedBySection() {
   const sections = new Map();
   for (const [source, recording] of Object.entries(loadManifest())) {
     const name = source.split('/')[1];
@@ -237,10 +235,17 @@ function renderListenSections() {
     s.seconds += recording.seconds;
     sections.set(name, s);
   }
-  const order = name => (PRIMARY_CATEGORIES.indexOf(name) + 1) || Infinity;
-  const items = [...sections.entries()]
+  return sections;
+}
+
+// The sections and the music on /attend: each voiced section with how many of
+// its pieces are voiced and how long they play, in the Library's order, then
+// the songs. Each section's own page plays them all ("Listen to this section").
+function renderListenSections() {
+  const order = name => (SECTION_ORDER.indexOf(name) + 1) || Infinity;
+  const items = [...voicedBySection().entries()]
     .sort(([a], [b]) => order(a) - order(b))
-    .map(([name, s]) => `<li><a href="/docs/${escapeAttr(name)}">${escapeText(titleCase(name))}</a> <span class="listen-count">${s.count} voiced, about ${listeningTime(s.seconds)}</span></li>`);
+    .map(([name, s]) => `<li><a href="/docs/${escapeAttr(name)}">${escapeText(sectionTitle(name))}</a> <span class="listen-count">${s.count} voiced, about ${listeningTime(s.seconds)}</span></li>`);
   const songs = Object.values(loadSongs());
   if (songs.length) {
     const seconds = songs.reduce((n, r) => n + r.seconds, 0);
@@ -255,4 +260,4 @@ function renderListenSections() {
         </section>`;
 }
 
-module.exports = { renderRecording, renderPathListen, renderListenSections, renderReflectForm, listeningTime, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE, PIECE_NOUN };
+module.exports = { renderRecording, renderPathListen, renderListenSections, voicedBySection, renderReflectForm, listeningTime, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE, PIECE_NOUN };
