@@ -12,8 +12,10 @@ const test = require('node:test');
 const assert = require('node:assert');
 const seasons = require('../server/lib/utils/seasons');
 const LATITUDES = require('../server/lib/utils/zone-latitudes.json');
-const { lunation, moonOn, showersNear, eclipsesNear } = require('../server/lib/utils/sky');
+const { moonPhaseAfter, moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear, lightHoursOn } = require('../server/lib/utils/sky');
 const spaceWeather = require('../server/lib/utils/space-weather');
+const { htmlText } = require('../server/lib/utils/fetch-public');
+const earth = require('../server/lib/utils/earth');
 
 const minutesApart = (a, b) => Math.abs(new Date(a) - new Date(b)) / 60000;
 
@@ -79,12 +81,10 @@ test('the day\'s length and its change: about twelve hours at the equator, the s
 test('every new and full moon of 2026 falls within five minutes of the published times', () => {
   // USNO, Phases of the Moon, 2026.
   const usno = ['2026-01-03T10:03Z full', '2026-01-18T19:52Z new', '2026-02-01T22:09Z full', '2026-02-17T12:01Z new', '2026-03-03T11:38Z full', '2026-03-19T01:23Z new', '2026-04-02T02:12Z full', '2026-04-17T11:52Z new', '2026-05-01T17:23Z full', '2026-05-16T20:01Z new', '2026-05-31T08:45Z full', '2026-06-15T02:54Z new', '2026-06-29T23:56Z full', '2026-07-14T09:43Z new', '2026-07-29T14:36Z full', '2026-08-12T17:37Z new', '2026-08-28T04:18Z full', '2026-09-11T03:27Z new', '2026-09-26T16:49Z full', '2026-10-10T15:50Z new', '2026-10-26T04:12Z full', '2026-11-09T07:02Z new', '2026-11-24T14:53Z full', '2026-12-09T00:52Z new', '2026-12-24T01:28Z full'];
-  const synodic = 29.530588853;
   for (const line of usno) {
     const [published, kind] = line.split(' ');
-    const lunations = (Date.parse(published) - Date.UTC(2000, 0, 6, 18, 14)) / 864e5 / synodic;
-    const k = kind === 'full' ? Math.round(lunations - 0.5) + 0.5 : Math.round(lunations);
-    assert.ok(minutesApart(lunation(k), published) <= 5, `${line}: ${lunation(k).toISOString()}`);
+    const found = moonPhaseAfter(Date.parse(published) - 2 * 864e5, kind);
+    assert.ok(minutesApart(found, published) <= 5, `${line}: ${found.toISOString()}`);
   }
 });
 
@@ -138,4 +138,75 @@ test('NOAA\'s forecast: each date\'s highest Kp and its storm scale, and nothing
   assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: down }), null);
   const refused = async () => ({ ok: false, status: 503 });
   assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: refused }), null);
+
+  // Where the forecast is going: a whole step up or down by the next day, or
+  // steady, and nothing said when the forecast ends with the date.
+  assert.deepStrictEqual(['2026-10-08', '2026-10-09', '2026-10-10'].map(d => spaceWeather.spaceWeatherOn(sw, d).trend), ['building', 'easing', null]);
+});
+
+// --- The planets, the Voyagers and the Earth (sky-and-earth-sources-2026-10-08.md,
+// private repo). Written to fail before they were told, 2026-10-08.
+
+test('the planets\' events within three weeks fall on the published dates', () => {
+  // EarthSky's 2026 and 2027 almanacs (and the IAA's 2026 ephemeris).
+  const on = (from, body, kind) => planetEventsNear(from).find(e => e.body === body && e.kind === kind);
+  assert.deepStrictEqual([on('2026-10-08', 'Mercury', 'greatest elongation').date, on('2026-10-08', 'Mercury', 'greatest elongation').when], ['2026-10-12', 'evening']);
+  assert.strictEqual(on('2026-10-08', 'Venus', 'inferior conjunction').date, '2026-10-24');
+  assert.strictEqual(on('2026-11-10', 'Uranus', 'opposition').date, '2026-11-25', 'an outer planet\'s opposition is 0 degrees from the sun, not 180');
+  assert.strictEqual(on('2026-11-10', 'Uranus', 'opposition').nakedEye, false);
+  assert.deepStrictEqual([on('2026-12-20', 'Venus', 'greatest elongation').date, on('2026-12-20', 'Venus', 'greatest elongation').when], ['2027-01-03', 'morning']);
+  // Within 21 days and not 22, as everything that is coming.
+  assert.strictEqual(planetEventsNear('2026-11-04').find(e => e.body === 'Uranus' && e.kind === 'opposition').days, 21);
+  assert.ok(!planetEventsNear('2026-11-03').some(e => e.body === 'Uranus' && e.kind === 'opposition'));
+  // The moon passing close to Jupiter and Mars on one night.
+  assert.deepStrictEqual(planetEventsNear('2026-10-28').filter(e => e.kind === 'near the moon' && e.date === '2026-11-02').map(e => e.body), ['Jupiter', 'Mars']);
+});
+
+test('what can be seen depends on the hemisphere: Mercury\'s October evening is southern, its November morning northern', () => {
+  const mercury = from => planetEventsNear(from).find(e => e.body === 'Mercury' && e.kind === 'greatest elongation');
+  assert.deepStrictEqual(mercury('2026-10-08').placed, { north: false, south: true });
+  assert.deepStrictEqual(mercury('2026-11-10').placed, { north: true, south: false });
+  const seen = (date, h) => Object.fromEntries(planetsOn(date, h).map(p => [p.name, p.when]));
+  assert.strictEqual(seen('2026-10-08', 'south').Mercury, 'evening');
+  assert.strictEqual(seen('2026-10-08', 'north').Mercury, undefined);
+  // Saturn, days past opposition, is low at both twilights from the north and high at midnight.
+  assert.strictEqual(seen('2026-10-08', 'north').Saturn, 'night');
+  assert.strictEqual(planetsOn('2026-10-08', null), null, 'a place unknown is told no planets seen');
+});
+
+test('the Voyagers are named only within three weeks of their dates, with their distance', () => {
+  const near = date => voyagersNear(date).map(v => `${v.craft} ${v.what} ${v.days}`);
+  assert.deepStrictEqual(near('2026-10-28'), ['Voyager 2 interstellar space 8', 'Voyager 1 one light-day 21']);
+  assert.deepStrictEqual(near('2026-10-27'), ['Voyager 2 interstellar space 9'], 'the light-day 22 days off, not yet');
+  assert.deepStrictEqual(near('2026-12-01'), [], 'nothing near: the Voyagers not mentioned');
+  assert.ok(near('2027-08-10').includes('Voyager 2 launch 10'), 'an anniversary comes round each year');
+  assert.ok(!near('2027-11-01').some(v => /one light-day/.test(v)), 'the light-day is once');
+  // NASA puts the light-day at 18 November 2026; JPL's monthly distances,
+  // interpolated, cross 24 light-hours within a few days of it.
+  assert.ok(Math.abs(lightHoursOn('Voyager 1', '2026-11-18') - 24) < 0.01);
+  assert.ok(lightHoursOn('Voyager 1', '2026-11-14') < 24 && lightHoursOn('Voyager 1', '2026-11-22') > 24);
+  assert.strictEqual(lightHoursOn('Voyager 1', '2040-01-01'), null, 'past the table: no distance, not a guess');
+});
+
+test('a page\'s text: tags dropped, entities decoded once, whitespace collapsed', () => {
+  assert.strictEqual(htmlText('<p>El Ni&ntilde;o <b>Advisory</b><br>83&#37; &amp;lt; &#x41;&nbsp;&Ntilde;</p>'), 'El Niño Advisory 83% &lt; A Ñ');
+  assert.strictEqual(htmlText('&unknown; stays'), '&unknown; stays');
+});
+
+test('NOAA\'s ENSO discussion: its status, its synopsis and its date, and nothing when it cannot be had or read', async () => {
+  const page = `<html><body>issued by<br>CLIMATE PREDICTION CENTER/NCEP/NWS<br>8 October 2026
+    <strong>ENSO Alert System Status: </strong> El Ni&ntilde;o Advisory<br><br>
+    <u>Synopsis:</u>&nbsp;<strong>El Ni&ntilde;o continues to strengthen, with a strong-to-very strong El Ni&ntilde;o likely through January-March 2027 (remaining greater than an 83&#37; chance).</strong>
+    El Ni&ntilde;o strengthened further last month, with anomalies exceeding +4.0&deg;C.</body></html>`;
+  const ok = async url => ({ ok: url === earth.ENSO_URL, status: 200, text: async () => page });
+  assert.deepStrictEqual(await earth.fetchEarth({ fetchImpl: ok }), { enso: {
+    status: 'El Niño Advisory',
+    synopsis: 'El Niño continues to strengthen, with a strong-to-very strong El Niño likely through January-March 2027 (remaining greater than an 83% chance).',
+    asOf: '2026-10-08',
+    source: 'NOAA Climate Prediction Center',
+  } });
+  const unlabelled = async () => ({ ok: true, text: async () => '<p>Page moved</p>' });
+  assert.strictEqual(await earth.fetchEarth({ fetchImpl: unlabelled }), null, 'a page without its labels is not guessed at');
+  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => { throw new Error('unreachable'); } }), null);
+  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => ({ ok: false, status: 503 }) }), null);
 });

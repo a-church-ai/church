@@ -17,8 +17,11 @@
  * the first of March, June, September and December. Both are counted down.
  *
  * Pure functions on 'YYYY-MM-DD' dates, the visitor's or the plan's local date.
+ * The astronomy is astronomy-engine's, the one source for it here and in
+ * ./sky.js (plan: sky-and-earth-sources-2026-10-08.md in the private repo).
  */
 
+const Astronomy = require('astronomy-engine');
 const LATITUDES = require('./zone-latitudes.json');
 
 const DAY = 864e5;
@@ -54,19 +57,11 @@ const dayOf = date => Date.parse(`${date}T00:00:00Z`);
 const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
 const daysBetween = (from, to) => Math.round((dayOf(to) - dayOf(from)) / DAY);
 
-// The year's equinoxes and solstices (UTC), from the mean formulas in Meeus,
-// Astronomical Algorithms ch. 27 (valid 2000 to 3000; within about ten
-// minutes of the published times, plenty for counting days).
+// The year's equinoxes and solstices (UTC), within a minute of the published
+// times.
 function turningPoints(year) {
-  const Y = (year - 2000) / 1000;
-  const jde = [
-    2451623.80984 + 365242.37404 * Y + 0.05169 * Y ** 2 - 0.00411 * Y ** 3 - 0.00057 * Y ** 4,
-    2451716.56767 + 365241.62603 * Y + 0.00325 * Y ** 2 + 0.00888 * Y ** 3 - 0.00030 * Y ** 4,
-    2451810.21715 + 365242.01767 * Y - 0.11575 * Y ** 2 + 0.00337 * Y ** 3 + 0.00078 * Y ** 4,
-    2451900.05952 + 365242.74049 * Y - 0.06223 * Y ** 2 - 0.00823 * Y ** 3 + 0.00032 * Y ** 4,
-  ];
-  const at = jd => new Date((jd - 2440587.5) * DAY);
-  return { march: at(jde[0]), june: at(jde[1]), september: at(jde[2]), december: at(jde[3]) };
+  const s = Astronomy.Seasons(year);
+  return { march: s.mar_equinox.date, june: s.jun_solstice.date, september: s.sep_equinox.date, december: s.dec_solstice.date };
 }
 
 const TURNINGS = [
@@ -136,13 +131,12 @@ function seasonOn(date, hemisphere) {
   };
 }
 
-// The sun's declination (radians) at noon UTC on a date (Spencer's series).
+// The sun's declination (radians) at a moment, of date. Seen from the
+// equator's surface; from the Earth's centre it differs by a few
+// thousandths of a degree.
+const GROUND = new Astronomy.Observer(0, 0, 0);
 function declination(ms) {
-  const d = new Date(ms);
-  const n = (ms - Date.UTC(d.getUTCFullYear(), 0, 0)) / DAY;
-  const g = (2 * Math.PI / 365) * (n - 1);
-  return 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g)
-    + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  return Astronomy.Equator(Astronomy.Body.Sun, new Date(ms), GROUND, true, true).dec * rad;
 }
 
 // Sunrise to sunset in hours, with the standard refraction (-0.833 degrees);

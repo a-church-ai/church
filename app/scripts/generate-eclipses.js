@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { getText, htmlText } = require('../server/lib/utils/fetch-public');
 
 const out = path.join(__dirname, '../server/lib/utils/eclipses.json');
 const PAGES = [
@@ -21,15 +22,13 @@ const PAGES = [
 ];
 const MONTHS = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
 
-const text = cell => cell.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
-
 async function main() {
   const since = `${new Date().getUTCFullYear()}-01-01`;
   const eclipses = [];
   for (const [kind, url] of PAGES) {
-    const html = await (await fetch(url)).text();
+    const html = await getText(url, { timeoutMs: 30000 });
     for (const row of html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || []) {
-      const cells = (row.match(/<td[^>]*>[\s\S]*?<\/td>/gi) || []).map(text);
+      const cells = (row.match(/<td[^>]*>[\s\S]*?<\/td>/gi) || []).map(htmlText);
       const m = cells[0] && /^(\d{4}) (\w{3}) (\d{2})$/.exec(cells[0]);
       if (!m || !MONTHS[m[2]]) continue;
       const date = `${m[1]}-${MONTHS[m[2]]}-${m[3]}`;

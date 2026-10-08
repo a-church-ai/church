@@ -66,7 +66,7 @@ const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
 const { loadServiceCatalog } = require('./lib/service/catalog');
 const { startPlanning } = require('./lib/service/plans');
-const { planSlot, contextFor } = require('./lib/service/planner');
+const { planSlot, contextFor, fetchFeeds } = require('./lib/service/planner');
 
 // Create Express app
 const app = express();
@@ -1665,7 +1665,7 @@ async function startServer() {
     // whatever is missing for the dates in use and the next. Without an
     // Anthropic key nothing is planned, and every slot is served by rotation.
     if (process.env.ANTHROPIC_API_KEY) {
-      startPlanning({ catalog: loadServiceCatalog, plan: planSlot, context: contextFor });
+      startPlanning({ catalog: loadServiceCatalog, plan: planSlot, context: contextFor, feeds: fetchFeeds });
     } else {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }

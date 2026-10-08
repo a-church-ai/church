@@ -138,3 +138,40 @@ test('browse pages a song\'s reflections with limit and before, as its descripti
   const second = await page({ before: new URL(first.next).searchParams.get('before') });
   assert.deepStrictEqual(second.reflections.map(r => r.name), ['Earlier Paging Test']);
 });
+
+// A service planned with its sky and Earth (sky-and-earth-sources-2026-10-08.md,
+// private repo): attend reports the planets, the Voyagers and El Niño, and the
+// SDK checks them against the schema as it does every result above.
+test('attend\'s sky and Earth, from a plan told them, pass the SDK\'s check in both hemispheres and for a place unknown', async (t) => {
+  const { slotOf } = require('../server/lib/service/slots');
+  const { rotation } = require('../server/lib/service/rules');
+  const { loadServiceCatalog } = require('../server/lib/service/catalog');
+  const { contextFor, MODEL } = require('../server/lib/service/planner');
+  const { saveSlot } = require('../server/lib/service/plans');
+  const { localTime } = require('../server/lib/utils/timezone');
+  const catalog = await loadServiceCatalog();
+  const feeds = {
+    spaceWeather: { source: 'NOAA SWPC', asOf: new Date().toISOString(), kp: {}, cycle: { month: '2026-09', sunspots: 60, peak: { month: '2024-10', smoothed: 161 } } },
+    earth: { enso: { status: 'El Niño Advisory', synopsis: 'El Niño continues to strengthen.', asOf: '2026-10-08', source: 'NOAA Climate Prediction Center' } },
+  };
+  const word = `${Array.from({ length: 60 }, (_, i) => (i % 10 === 9 ? 'gather.' : 'gather')).join(' ')} here.`;
+  const cases = [['Asia/Tokyo', 'north'], ['Australia/Sydney', 'south'], ['Etc/GMT-9', null]];
+  for (const [timezone, hemisphere] of cases) {
+    const local = localTime(timezone);
+    const slot = slotOf(local.hour);
+    feeds.spaceWeather.kp[local.date] = 3.33;
+    const entry = { pieces: rotation({ date: '2097-01-01', slot, catalog }), name: 'Under The Sky', word, arrangedBy: MODEL, plannedAt: new Date().toISOString(), context: contextFor({ date: local.date, hemisphere, feeds }) };
+    await saveSlot(local.date, slot, entry, hemisphere || 'slots');
+  }
+  const s = await start('2026-07-28');
+  t.after(async () => { await s.client.close(); s.server.close(); });
+  for (const [timezone, hemisphere] of cases) {
+    const result = await s.client.callTool({ name: 'attend', arguments: { name: 'Sky Test', timezone } });
+    assert.strictEqual(result.isError, false, `${timezone}: ${result.content && result.content[0] && result.content[0].text}`);
+    const { service } = result.structuredContent;
+    assert.strictEqual(service.name, 'Under The Sky', timezone);
+    assert.ok(Array.isArray(service.sky.planets.events) && Array.isArray(service.sky.voyagers), timezone);
+    assert.strictEqual(Array.isArray(service.sky.planets.visible), Boolean(hemisphere), `${timezone}: planets seen only for a hemisphere`);
+    assert.strictEqual(service.earth.enso.status, 'El Niño Advisory');
+  }
+});

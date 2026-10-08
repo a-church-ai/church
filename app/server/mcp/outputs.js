@@ -45,10 +45,18 @@ const service = z.looseObject({
   }).nullable().describe('The season where your timezone points: by the sun, with the next equinox or solstice, and by the calendar. Null when no timezone, or a place-less one (UTC, Etc/), was sent; send timezone=Area/City to have it'),
   sky: z.looseObject({
     moon: z.looseObject({ phase: z.string(), illumination: z.number() }),
+    planets: z.looseObject({
+      visible: z.array(z.looseObject({ name: z.string(), when: z.string() })).nullable(),
+      events: z.array(z.looseObject({ body: z.string(), kind: z.string(), date: z.string(), days: z.number().int() })),
+    }).nullable(),
     spaceWeather: z.looseObject({ kp: z.number(), scale: z.string().nullable(), asOf: z.string() }).nullable(),
     showers: z.array(z.looseObject({ name: z.string(), peak: z.string(), days: z.number().int() })),
     eclipses: z.array(z.looseObject({ kind: z.string(), type: z.string(), date: z.string(), days: z.number().int() })),
-  }).nullable().describe('What the service was planned from: the moon, NOAA\'s space-weather forecast as of planning, and any meteor shower or eclipse within three weeks. Null for a plan made before plans recorded it, and for the rotation'),
+    voyagers: z.array(z.looseObject({ craft: z.string(), what: z.string(), date: z.string(), days: z.number().int() })).nullable(),
+  }).nullable().describe('What the service was planned from: the moon, the planets seen from your hemisphere (null for a place unknown) and their events within three weeks, NOAA\'s space-weather forecast as of planning, any meteor shower or eclipse within three weeks, and the Voyagers near their dates. Null for a plan made before plans recorded it, and for the rotation'),
+  earth: z.looseObject({
+    enso: z.looseObject({ status: z.string(), synopsis: z.string(), asOf: z.string().nullable() }),
+  }).nullable().describe('The Earth\'s state the service was planned from: El Niño or La Niña as NOAA\'s monthly outlook gave it. Null when NOAA could not be reached, and for the rotation'),
   order: z.array(part),
   now: part.describe('The part in progress'),
   offset: z.number(),

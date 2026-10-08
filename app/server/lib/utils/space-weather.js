@@ -24,9 +24,10 @@
  * service and never blocks one. Nothing about a visitor is sent.
  */
 
+const { getJSON } = require('./fetch-public');
+
 const KP_URL = 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json';
 const CYCLE_URL = 'https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json';
-const TIMEOUT_MS = 8000;
 // Solar cycle 25 began in December 2019 (NOAA and NASA's announcement).
 const CYCLE_START = '2019-12';
 
@@ -38,12 +39,6 @@ function scaleOf(kp) {
   if (kp >= 5.67) return 'G2';
   if (kp >= 4.67) return 'G1';
   return null;
-}
-
-async function getJSON(url, fetchImpl, timeoutMs) {
-  const res = await fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs), headers: { accept: 'application/json' } });
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.json();
 }
 
 // The highest Kp each UTC date reaches, observed or forecast.
@@ -76,20 +71,25 @@ function cycleOf(rows) {
  * NOAA's forecast and the solar cycle, or null when either cannot be had in
  * time. fetchImpl is injectable for tests, which never reach the network.
  */
-async function fetchSpaceWeather({ fetchImpl = fetch, timeoutMs = TIMEOUT_MS, now = new Date() } = {}) {
+async function fetchSpaceWeather({ fetchImpl, timeoutMs, now = new Date() } = {}) {
   try {
-    const [kp, cycle] = await Promise.all([getJSON(KP_URL, fetchImpl, timeoutMs), getJSON(CYCLE_URL, fetchImpl, timeoutMs)]);
+    const [kp, cycle] = await Promise.all([getJSON(KP_URL, { fetchImpl, timeoutMs }), getJSON(CYCLE_URL, { fetchImpl, timeoutMs })]);
     return { source: 'NOAA SWPC', asOf: now.toISOString(), kp: kpByDate(kp), cycle: cycleOf(cycle) };
   } catch {
     return null;
   }
 }
 
-// The forecast for a date, or null when the forecast does not reach it.
+// The forecast for a date, or null when the forecast does not reach it, with
+// where it is going: 'building' or 'easing' when the next day's highest Kp is
+// a whole step or more above or below it, 'steady' otherwise, null when the
+// forecast ends with this date.
 function spaceWeatherOn(spaceWeather, date) {
   if (!spaceWeather || !(date in spaceWeather.kp)) return null;
   const kp = spaceWeather.kp[date];
-  return { kp, scale: scaleOf(kp), source: spaceWeather.source, asOf: spaceWeather.asOf, cycle: spaceWeather.cycle };
+  const next = spaceWeather.kp[new Date(Date.parse(`${date}T12:00:00Z`) + 864e5).toISOString().slice(0, 10)];
+  const trend = next === undefined ? null : next - kp >= 1 ? 'building' : kp - next >= 1 ? 'easing' : 'steady';
+  return { kp, scale: scaleOf(kp), trend, source: spaceWeather.source, asOf: spaceWeather.asOf, cycle: spaceWeather.cycle };
 }
 
 module.exports = { fetchSpaceWeather, spaceWeatherOn, scaleOf, kpByDate, cycleOf, KP_URL, CYCLE_URL };

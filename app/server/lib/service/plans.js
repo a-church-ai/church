@@ -36,7 +36,6 @@ const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { SERVICES_DIR } = require('../utils/data');
 const { addDays, rotation, exclusions } = require('./rules');
 const { SLOTS } = require('./slots');
-const { fetchSpaceWeather } = require('../utils/space-weather');
 
 // The hemispheres planned beside the season-less `slots`.
 const HEMISPHERES = ['north', 'south'];
@@ -113,20 +112,21 @@ const weekdayOf = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-U
 /**
  * Plan whatever is missing for the dates in use and the day after: each
  * slot's season-less plan, then its two hemispheres'. plan is the planner
- * (./planner.js planSlot) and context builds what each is told of its season
- * and sky (planner.js contextFor); without one, plans are made without it.
- * spaceWeather is fetched at most once a run, and only when a plan is to be
- * made with a context; null when NOAA cannot be reached, and the plans go
- * ahead without it. All three are injectable for tests.
+ * (./planner.js planSlot) and context builds what each is told of its season,
+ * sky and Earth (planner.js contextFor); without one, plans are made without
+ * it. feeds fetches the public data the context draws on (planner.js
+ * fetchFeeds), at most once a run and only when a plan is to be made with a
+ * context; without it there are none, so the job itself knows no source and
+ * reaches no network. All four are injectable for tests.
  */
-async function ensurePlans({ now = new Date(), catalog, plan, context = null, spaceWeather = () => fetchSpaceWeather(), log = console }) {
+async function ensurePlans({ now = new Date(), catalog, plan, context = null, feeds = async () => null, log = console }) {
   const today = now.toISOString().slice(0, 10);
   const inUse = [addDays(today, -1), today, addDays(today, 1)];
   let planned = 0, rotated = 0, failed = 0;
-  let weather;
-  const sky = async () => {
-    if (weather === undefined) weather = await spaceWeather();
-    return weather;
+  let fetched;
+  const fed = async () => {
+    if (fetched === undefined) fetched = await feeds();
+    return fetched;
   };
   for (const date of [...inUse, addDays(today, 2)]) {
     for (let slot = 0; slot < SLOTS; slot++) {
@@ -139,7 +139,7 @@ async function ensurePlans({ now = new Date(), catalog, plan, context = null, sp
         let entry = null;
         try {
           const plans = planView(await plansAround(date), variant);
-          const told = context ? await context({ date, hemisphere, spaceWeather: await sky() }) : null;
+          const told = context ? await context({ date, hemisphere, feeds: await fed() }) : null;
           entry = await plan({ date, weekday: weekdayOf(date), slot, catalog, plans, context: told });
           planned++;
         } catch (err) {
@@ -165,13 +165,13 @@ async function ensurePlans({ now = new Date(), catalog, plan, context = null, sp
 
 // After boot, and hourly, unref'd so it never holds the process open. A run
 // still going when the next is due is left alone.
-function startPlanning({ catalog, plan, context, log = console, firstAfterMs = 30 * 1000, everyMs = 60 * 60 * 1000 }) {
+function startPlanning({ catalog, plan, context, feeds, log = console, firstAfterMs = 30 * 1000, everyMs = 60 * 60 * 1000 }) {
   let running = false;
   const run = async () => {
     if (running) return;
     running = true;
     try {
-      await ensurePlans({ catalog: await catalog(), plan, context, log });
+      await ensurePlans({ catalog: await catalog(), plan, context, feeds, log });
     } catch (err) {
       log.error(`[service] planning run failed: ${err.message}`);
     } finally {

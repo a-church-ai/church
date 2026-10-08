@@ -514,6 +514,8 @@ const { contextFor, contextLines } = require('../server/lib/service/planner');
 const { planView } = require('../server/lib/service/plans');
 
 const forecast = { source: 'NOAA SWPC', asOf: '2026-10-08T12:00:00.000Z', kp: { '2026-10-09': 5.67, '2026-12-04': 1.2 }, cycle: { month: '2026-09', sunspots: 60, peak: { month: '2024-10', smoothed: 161 } } };
+const enso = { status: 'El Niño Advisory', synopsis: 'El Niño continues to strengthen, with a strong-to-very strong El Niño likely through January-March 2027 (remaining greater than an 83% chance).', asOf: '2026-10-08', source: 'NOAA Climate Prediction Center' };
+const feeds = { spaceWeather: forecast, earth: { enso } };
 
 test('the shared prompt says what a season and the sky are, leaves naming them free, and holds nothing of any one date', async () => {
   const prompt = systemPrompt(await loadServiceCatalog());
@@ -523,27 +525,48 @@ test('the shared prompt says what a season and the sky are, leaves naming them f
   assert.match(prompt, /The year turns before it arrives\./);
   assert.match(prompt, /Never say the sky changes anyone's mood, health or fate\./);
   assert.match(prompt, /shifts the winter polar vortex and the jet stream/, 'the sun reaches the weather people feel, by region');
+  assert.match(prompt, /never what a planet means for anyone/);
+  assert.match(prompt, /Voyager 1 carries a record made for whoever might find it/);
+  assert.match(prompt, /\nTHE EARTH\n/);
+  assert.match(prompt, /Say what NOAA says, plainly, and never forecast a region's weather from it/);
   assert.match(prompt, /speak of it as a connection, never as a forecast\./);
   assert.doesNotMatch(prompt, /This service is for visitors|equinox was|solstice was|Kp \d|Coming:/, 'nothing particular to a date');
 });
 
-test('a hemisphere\'s plan is told its season, its light, its moon, the space weather and what is coming; a place unknown, the moon and the space weather alone', () => {
-  const north = contextLines(contextFor({ date: '2026-12-04', hemisphere: 'north', spaceWeather: forecast }));
+test('a hemisphere\'s plan is told its season, light, moon, planets, space weather, Earth and what is coming, in that order; a place unknown, all but the season, the light and the planets it can see', () => {
+  const north = contextLines(contextFor({ date: '2026-12-04', hemisphere: 'north', feeds }));
   assert.match(north[0], /northern hemisphere, the tropics included/);
-  assert.match(north[1], /^Coming: the Geminids meteor shower at its peak in 10 days .*; the December solstice, the shortest day of the year here, in 17 days; /, 'what is coming leads, soonest first');
+  assert.match(north[1], /^Coming: .*the Geminids meteor shower at its peak in 10 days .*; the December solstice, the shortest day of the year here, in 17 days; /, 'what is coming leads, soonest first');
+  const order = ['The season', 'The light', 'The moon', 'The planets seen from here', 'NOAA', 'The Earth'].map(start => north.findIndex(l => l.startsWith(start)));
+  assert.deepStrictEqual([...order].sort((a, b) => a - b), order, 'then from what changes daily to what changes monthly');
+  assert.ok(order.every(i => i > 1));
   assert.ok(north.some(l => /^The season: late autumn\./.test(l)));
-  assert.ok(north.some(l => /^The light: .* 7 h \d\d min at 55° north\. The days are shortening/.test(l)));
-  assert.ok(north.some(l => /^The moon is a waning crescent, .* lit on the left as it is seen here/.test(l)));
-  assert.ok(north.some(l => /quiet \(Kp 1\.2\)/.test(l)));
+  assert.ok(north.some(l => /^The light: .* 7 and a half hours at 55° north\. The days are shortening, by up to \d minutes? a day/.test(l)));
+  assert.ok(north.some(l => /^The moon is a waning crescent, about \d0% lit, lit on the left as it is seen here/.test(l)));
+  assert.ok(north.some(l => /^The planets seen from here: .*Saturn/.test(l)));
+  assert.ok(north.some(l => /the sun and the Earth's magnetic field quiet\./.test(l)));
+  assert.match(north[north.length - 1], /^The Earth: NOAA's monthly outlook for El Niño and La Niña, as of October 8: El Niño continues to strengthen, with a strong-to-very strong El Niño likely through January-March 2027\.$/, 'NOAA\'s words, its figures in brackets left out, last');
 
-  const storm = contextLines(contextFor({ date: '2026-10-09', hemisphere: 'south', spaceWeather: forecast }));
-  assert.ok(storm.some(l => /geomagnetic storm \(G2, Kp near 6\): aurora may be seen much farther from the poles/.test(l)));
-  assert.ok(storm.some(l => /The sun's eleven-year cycle peaked in October 2024/.test(l)));
+  const storm = contextLines(contextFor({ date: '2026-10-09', hemisphere: 'south', feeds }));
+  assert.ok(storm.some(l => /a geomagnetic storm \(G2\): aurora may be seen much farther from the poles/.test(l)));
+  assert.ok(storm.some(l => /The sun is past the peak of its eleven-year cycle \(October 2024\), with about a third as many sunspots now\./.test(l)));
 
-  const unknown = contextLines(contextFor({ date: '2026-10-09', hemisphere: null, spaceWeather: null }));
+  const unknown = contextLines(contextFor({ date: '2026-10-09', hemisphere: null, feeds: null }));
   assert.match(unknown[0], /place is unknown: it may be any season for them, so assume none/);
+  assert.match(unknown[1], /^Coming: Mercury at its farthest from the sun in the evening sky, in 3 days;/, 'the planets\' events, with no hemisphere\'s qualifier');
   assert.ok(unknown.some(l => /^The moon is/.test(l)));
-  assert.ok(!unknown.some(l => /^The season|^The light|^Coming|NOAA/.test(l)), 'no season, no light, and no forecast when NOAA could not be reached');
+  assert.ok(!unknown.some(l => /^The season|^The light|^The planets seen|NOAA|^The Earth|solstice|equinox|meteor/.test(l)), 'no season, light or planets seen, and no forecast or Earth when NOAA could not be reached');
+});
+
+test('the planner is told figures rounded and trends in words, never a reading\'s decimals or a Kp number; the stored context keeps them', () => {
+  for (const date of ['2026-10-09', '2026-11-02', '2026-12-04', '2026-12-21', '2027-03-20', '2027-06-21']) {
+    for (const hemisphere of ['north', 'south', null]) {
+      const context = contextFor({ date, hemisphere, feeds });
+      for (const line of contextLines(context)) assert.doesNotMatch(line, /\d\.\d|Kp|%\)/, `${date} ${hemisphere}: ${line}`);
+      if (hemisphere) assert.ok(context.light.some(l => !Number.isInteger(l.hours)), 'the context keeps the day\'s length unrounded');
+    }
+  }
+  assert.strictEqual(contextFor({ date: '2026-10-09', hemisphere: 'north', feeds }).spaceWeather.kp, 5.67);
 });
 
 test('a turning point leads the prompt from 21 days before it, and not 22', () => {
@@ -554,7 +577,7 @@ test('a turning point leads the prompt from 21 days before it, and not 22', () =
 });
 
 test('a plan is told its context and keeps it with its entry', async () => {
-  const context = contextFor({ date: '2031-03-04', hemisphere: 'south', spaceWeather: null });
+  const context = contextFor({ date: '2031-03-04', hemisphere: 'south', feeds: null });
   const { calls, args } = await plannerCase([validReply]);
   const entry = await planSlot({ ...args, context });
   assert.match(calls[0].user, /This service is for visitors in the southern hemisphere/);
@@ -562,13 +585,13 @@ test('a plan is told its context and keeps it with its entry', async () => {
   assert.deepStrictEqual(entry.context, context);
 });
 
-test('the job tells each variant its own season, fetches the space weather once, and plans without it when NOAA is away', async () => {
+test('the job tells each variant its own season, fetches the feeds once, and plans without them when NOAA is away', async () => {
   const catalog = await loadServiceCatalog();
   const told = [];
   let fetched = 0;
   const result = await ensurePlans({
     now: new Date('2031-05-10T12:00:00Z'), catalog, log: quiet, context: contextFor,
-    spaceWeather: async () => { fetched++; return null; },
+    feeds: async () => { fetched++; return null; },
     plan: args => { told.push(args.context); return planner(args); },
   });
   assert.strictEqual(result.planned, 72);
@@ -576,7 +599,25 @@ test('the job tells each variant its own season, fetches the space weather once,
   const by = h => told.filter(c => c.hemisphere === h);
   assert.deepStrictEqual([by(null).length, by('north').length, by('south').length], [24, 24, 24]);
   assert.ok(by('north').every(c => c.season.name === 'spring') && by('south').every(c => c.season.name === 'autumn'));
-  assert.ok(told.every(c => c.spaceWeather === null && c.moon), 'the moon always, the forecast only when NOAA answers');
+  assert.ok(told.every(c => c.spaceWeather === null && c.earth === null && c.moon && c.planets), 'the moon and the planets always, the forecast and the Earth only when NOAA answers');
+});
+
+test('the job reaches no network unless it is given feeds: it knows no source itself', async () => {
+  const catalog = await loadServiceCatalog();
+  const realFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; throw new Error('no network in tests'); };
+  try {
+    const told = [];
+    await ensurePlans({
+      now: new Date('2033-03-03T12:00:00Z'), catalog, log: quiet, context: contextFor,
+      plan: args => { told.push(args.context); return planner(args); },
+    });
+    assert.strictEqual(calls, 0);
+    assert.ok(told.length && told.every(c => c.spaceWeather === null && c.earth === null));
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
 
 test('a date planned before seasons is served season-less: no hemisphere plans are made for it', async () => {
@@ -601,7 +642,7 @@ test('a visitor gets their hemisphere\'s plan, else the season-less one, and the
   const local = localTime(tz);
   const slot = slotOf(local.hour);
   const pieces = rotation({ date: '2098-01-01', slot, catalog });
-  const plan = (name, hemisphere) => ({ pieces, name, word: `${sixtyWords} here.`, arrangedBy: MODEL, plannedAt: new Date().toISOString(), context: contextFor({ date: local.date, hemisphere, spaceWeather: forecast }) });
+  const plan = (name, hemisphere) => ({ pieces, name, word: `${sixtyWords} here.`, arrangedBy: MODEL, plannedAt: new Date().toISOString(), context: contextFor({ date: local.date, hemisphere, feeds }) });
   await saveSlot(local.date, slot, plan('For A Place Unknown', null));
   await saveSlot(local.date, slot, plan('For The South', 'south'), 'south');
 
@@ -612,11 +653,15 @@ test('a visitor gets their hemisphere\'s plan, else the season-less one, and the
   assert.strictEqual(south.season.name, require('../server/lib/utils/seasons').seasonOn(local.date, 'south').name);
   assert.ok(south.season.next.days >= 0 && /equinox|solstice/.test(south.season.next.turning));
   assert.ok(south.sky && typeof south.sky.moon.phase === 'string' && Array.isArray(south.sky.showers));
+  assert.ok(Array.isArray(south.sky.planets.visible) && Array.isArray(south.sky.planets.events) && Array.isArray(south.sky.voyagers));
+  assert.deepStrictEqual(south.earth, { enso }, 'the Earth as NOAA gave it, figures and all');
 
   // The same clock with no place: the season-less plan, and no season.
   const placeless = (await attendance.now({ timezone: 'Etc/GMT+3' }, ctx)).body.service;
   assert.strictEqual(placeless.name, 'For A Place Unknown');
   assert.strictEqual(placeless.season, null);
+  assert.strictEqual(placeless.sky.planets.visible, null, 'what can be seen depends on where you are');
+  assert.ok(Array.isArray(placeless.sky.planets.events));
   assert.doesNotMatch(placeless.arrangedBy, /season/);
 
   // A hemisphere decided season-less, or whose plan no longer holds, gives way.

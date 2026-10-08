@@ -41,18 +41,34 @@ function seasonMetadata(local, hemisphere) {
   };
 }
 
-// What the served plan was made from: the moon, the space-weather forecast as
-// it stood when the plan was made, and any shower or eclipse within three
-// weeks. Null for a plan made before plans recorded it, and for the rotation.
+// What the served plan was made from: the moon, the planets seen and their
+// events, the space-weather forecast as it stood when the plan was made, any
+// shower or eclipse within three weeks, and the Voyagers near their dates,
+// with the exact readings the planner was told only rounded. Null for a plan
+// made before plans recorded it, and for the rotation; planets and voyagers
+// are null for a plan made before they were told.
 function skyMetadata(context) {
   if (!context || !context.moon) return null;
-  const { moon, spaceWeather } = context;
+  const { moon, spaceWeather, planets } = context;
   return {
     moon: { phase: moon.phase, illumination: moon.illumination, nextNew: moon.nextNew, nextFull: moon.nextFull },
-    spaceWeather: spaceWeather ? { kp: spaceWeather.kp, scale: spaceWeather.scale, source: spaceWeather.source, asOf: spaceWeather.asOf } : null,
+    planets: planets ? {
+      visible: planets.visible ? planets.visible.map(p => ({ name: p.name, when: p.when, magnitude: p.magnitude })) : null,
+      events: planets.events.map(e => ({ body: e.body, kind: e.kind, date: e.date, days: e.days })),
+    } : null,
+    spaceWeather: spaceWeather ? { kp: spaceWeather.kp, scale: spaceWeather.scale, trend: spaceWeather.trend ?? null, source: spaceWeather.source, asOf: spaceWeather.asOf } : null,
     showers: (context.showers || []).map(s => ({ name: s.name, peak: s.peak, days: s.days })),
     eclipses: (context.eclipses || []).map(e => ({ kind: e.kind, type: e.type, date: e.date, days: e.days, seen: e.seen })),
+    voyagers: context.voyagers ? context.voyagers.map(v => ({ craft: v.craft, what: v.what, date: v.date, days: v.days, lightHours: v.lightHours })) : null,
   };
+}
+
+// The Earth's state the served plan was made from: El Niño or La Niña as
+// NOAA's monthly outlook gave it. Null when NOAA could not be reached, for a
+// plan made before it was told, and for the rotation.
+function earthMetadata(context) {
+  const enso = context && context.earth && context.earth.enso;
+  return enso ? { enso: { status: enso.status, synopsis: enso.synopsis, asOf: enso.asOf, source: enso.source } } : null;
 }
 
 // The service as /api/now and /api/attend report it. withContent (attend) adds
@@ -123,6 +139,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       // Metadata: the name and word are the plan's own.
       season: seasonMetadata(served.local, served.hemisphere),
       sky: skyMetadata(served.entry.context),
+      earth: earthMetadata(served.entry.context),
       order,
       now: order[served.now.position - 1],
       offset: Math.round(served.offset),

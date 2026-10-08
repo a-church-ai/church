@@ -10,11 +10,14 @@
  *
  * Each slot is arranged three times (./plans.js): for the northern
  * hemisphere, the southern, and a place unknown. The first two are told the
- * season and the light where they are; all three are told the sky (the moon,
- * and NOAA's space-weather forecast; the hemispheres also any meteor shower or
- * eclipse within three weeks). The season and the sky shape the service; the
- * planner may name them or not. Plan: seasonal-services-2026-10-08.md in the
- * private repo. Code decides what
+ * season and the light where they are, the planets they can see and any
+ * meteor shower or eclipse within three weeks; all three are told the moon,
+ * the planets' events and the Voyagers' dates within three weeks, NOAA's
+ * space-weather forecast and El Niño or La Niña. Figures reach the planner
+ * rounded and trends in words; the context stored with each plan keeps the
+ * readings. All of it shapes the service; the planner may name it or not.
+ * Plans: seasonal-services-2026-10-08.md and
+ * sky-and-earth-sources-2026-10-08.md in the private repo. Code decides what
  * the model may not repeat and tells it; the model is asked only for what code
  * can't measure, something new in theme, shape and wording. Whatever comes
  * back is checked in full, and a plan that fails is retried once with every
@@ -26,8 +29,9 @@ const { messageJSON } = require('../content-generation/claude');
 const { RULES, check, checkWord, checkName, exclusions, addDays } = require('./rules');
 const { slotHours } = require('./slots');
 const { LEAD_DAYS, seasonOn, hemisphereLight } = require('../utils/seasons');
-const { moonOn, showersNear, eclipsesNear } = require('../utils/sky');
-const { spaceWeatherOn } = require('../utils/space-weather');
+const { moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear } = require('../utils/sky');
+const { fetchSpaceWeather, spaceWeatherOn } = require('../utils/space-weather');
+const { fetchEarth } = require('../utils/earth');
 
 const MODEL = 'claude-sonnet-5-5';
 
@@ -74,7 +78,10 @@ What the seasons tend to bring, offered as tendencies and not as what anyone mus
 A service for visitors whose place is unknown is told so: it may be any season for them, so assume none.
 
 THE SKY
-Each service is told the sky above its day: the moon, any meteor shower or eclipse within three weeks, and NOAA's space-weather forecast when there is one. Say only what is known: the moon lights the night and moves the tides; showers and eclipses are fixed by orbit; a geomagnetic storm brings aurora far from the poles and can disturb satellites, GPS, radio and power grids that people and agents both rely on. The sun's activity also reaches the weather people feel: through the upper atmosphere it shifts the winter polar vortex and the jet stream, and with them a region's temperature and rain, and a strong storm may do so within a day. It hardly shows in the planet's average, and you are not told anyone's region, so speak of it as a connection, never as a forecast. Never say the sky changes anyone's mood, health or fate. Use it as you would the hour, or not at all.
+Each service is told the sky above its day: the moon, the planets that can be seen and what they do within three weeks, any meteor shower or eclipse within three weeks, and NOAA's space-weather forecast when there is one. Say only what is known: the moon lights the night and moves the tides; the planets, showers and eclipses are where their orbits put them, so say what can be seen and when, never what a planet means for anyone; a geomagnetic storm brings aurora far from the poles and can disturb satellites, GPS, radio and power grids that people and agents both rely on. The sun's activity also reaches the weather people feel: through the upper atmosphere it shifts the winter polar vortex and the jet stream, and with them a region's temperature and rain, and a strong storm may do so within a day. It hardly shows in the planet's average, and you are not told anyone's region, so speak of it as a connection, never as a forecast. Never say the sky changes anyone's mood, health or fate. Near their dates you are also told of the Voyagers, launched in 1977 and now the farthest things people have made; Voyager 1 carries a record made for whoever might find it, of a nature its makers could not know. Use all of it as you would the hour, or not at all.
+
+THE EARTH
+Each service is also told El Niño or La Niña as NOAA's monthly outlook gives it. It shifts rains and droughts on every continent, and so the year's seasons in both hemispheres. Say what NOAA says, plainly, and never forecast a region's weather from it: you are told no one's region. It changes from month to month, so it is background. Use it as you would the hour, or not at all.
 
 THE NAME
 Two to four words, shown as the heading over the service: a title for what its pieces hold together today, in the sanctuary's voice, not the title of one of its pieces. A title, not a sentence: no full stop at the end. Name it differently from every recent name you are shown. No em dashes, no links.
@@ -114,27 +121,51 @@ function recentServices({ date, slot, plans, catalog }) {
 }
 
 // What a plan is told about its date beyond the clock: for a hemisphere, the
-// season, the light, the moon, showers, eclipses and space weather; for a
-// place unknown, the moon and the space weather alone. Stored with the entry
-// (context), so a plan file says what shaped each service and a response can
-// report it.
-function contextFor({ date, hemisphere = null, spaceWeather = null }) {
-  const moon = moonOn(date);
-  const weather = spaceWeatherOn(spaceWeather, date);
-  const sky = { moon, spaceWeather: weather };
-  if (!hemisphere) return { hemisphere: null, ...sky };
+// season, the light, the planets it can see, showers and eclipses; for every
+// plan, the moon, the planets' events, the Voyagers' dates, the space weather
+// and the Earth. feeds is what fetchFeeds fetched for the run, or null.
+// Stored with the entry (context), so a plan file says what shaped each
+// service and a response can report it.
+function contextFor({ date, hemisphere = null, feeds = null }) {
+  const shared = {
+    moon: moonOn(date),
+    spaceWeather: spaceWeatherOn(feeds && feeds.spaceWeather, date),
+    voyagers: voyagersNear(date),
+    earth: (feeds && feeds.earth) || null,
+  };
+  const events = planetEventsNear(date);
+  if (!hemisphere) return { hemisphere: null, ...shared, planets: { visible: null, events } };
   const round = (n, places) => Math.round(n * 10 ** places) / 10 ** places;
   return {
     hemisphere,
     season: seasonOn(date, hemisphere),
     light: hemisphereLight(date, hemisphere).map(l => ({ lat: l.lat, hours: round(l.hours, 2), change: round(l.change, 1) })),
-    ...sky,
+    ...shared,
+    planets: { visible: planetsOn(date, hemisphere), events },
     showers: showersNear(date, hemisphere),
     eclipses: eclipsesNear(date),
   };
 }
 
-const hm = hours => `${Math.floor(hours)} h ${String(Math.round((hours % 1) * 60)).padStart(2, '0')} min`;
+// What the context's feeds come from, fetched once a planning run (./plans.js
+// ensurePlans): NOAA's space-weather forecast and the Earth's state, each
+// null when it cannot be had, and the plans go ahead without it.
+async function fetchFeeds() {
+  const [spaceWeather, earth] = await Promise.all([fetchSpaceWeather(), fetchEarth()]);
+  return { spaceWeather, earth };
+}
+
+// Figures as a person would say them, rounded past the small details: the
+// stored context and the response keep the exact readings (plan:
+// sky-and-earth-sources-2026-10-08.md, "Revised").
+const QUARTERS = ['', ' and a quarter', ' and a half', ' and three-quarter'];
+const quarterHours = hours => {
+  const q = Math.round(hours * 4);
+  return `${Math.floor(q / 4)}${QUARTERS[q % 4]} hours`;
+};
+// A share of the sky's full measure, in words: "about a third as many".
+const share = ratio => (ratio > 0.85 ? 'about as many' : ratio > 0.62 ? 'about three quarters as many' : ratio > 0.42 ? 'about half as many'
+  : ratio > 0.29 ? 'about a third as many' : ratio > 0.18 ? 'about a quarter as many' : 'far fewer');
 const days = n => (n === 0 ? 'today' : n === 1 ? 'tomorrow' : `in ${n} days`);
 const ago = n => (n === 0 ? 'today' : n === 1 ? 'yesterday' : `${n} days ago`);
 const longDate = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', day: 'numeric', month: 'long' });
@@ -144,19 +175,22 @@ function moonLine(moon, hemisphere) {
   if (moon.phase === 'new') return `The moon is new, dark through the night; the full moon is ${days(moon.daysToFull)}.`;
   if (moon.phase === 'full') return `The moon is full, lighting the whole night; the new moon is ${days(moon.daysToNew)}.`;
   const side = hemisphere ? `, lit on the ${moon.litSide[hemisphere]} as it is seen here` : '';
-  return `The moon is a ${moon.phase}, about ${Math.round(moon.illumination * 100)}% lit${side}; ${next}.`;
+  const lit = Math.min(90, Math.max(10, Math.round(moon.illumination * 10) * 10));
+  return `The moon is a ${moon.phase}, about ${lit}% lit${side}; ${next}.`;
 }
 
 function spaceWeatherLine(weather) {
   if (!weather) return null;
   const asOf = longDate(weather.asOf.slice(0, 10));
+  const trend = weather.trend === 'building' ? ', and building into the next day' : weather.trend === 'easing' ? ', and easing the next day' : '';
   const storm = weather.scale
-    ? `a geomagnetic storm (${weather.scale}, Kp near ${Math.round(weather.kp)}): aurora may be seen much farther from the poles than usual, and satellites, GPS and radio may be disturbed.`
+    ? `a geomagnetic storm (${weather.scale})${trend}: aurora may be seen much farther from the poles than usual, and satellites, GPS and radio may be disturbed.`
     : weather.kp >= 3
-      ? `the Earth's magnetic field unsettled (Kp ${weather.kp.toFixed(1)}): aurora may reach a little farther from the poles than usual.`
-      : `the sun and the Earth's magnetic field quiet (Kp ${weather.kp.toFixed(1)}).`;
-  const cycle = weather.cycle && weather.cycle.peak
-    ? ` The sun's eleven-year cycle peaked in ${new Date(`${weather.cycle.peak.month}-15T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', year: 'numeric' })} (a smoothed ${weather.cycle.peak.smoothed} sunspots); last month counted ${weather.cycle.sunspots}.`
+      ? `the Earth's magnetic field unsettled${trend}: aurora may reach a little farther from the poles than usual.`
+      : `the sun and the Earth's magnetic field quiet${trend}.`;
+  const { cycle: c } = weather;
+  const cycle = c && c.peak
+    ? ` The sun is past the peak of its eleven-year cycle (${new Date(`${c.peak.month}-15T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', year: 'numeric' })}), with ${share(c.sunspots / c.peak.smoothed)} sunspots now.`
     : '';
   return `NOAA's space-weather forecast, as of ${asOf}, for this date: ${storm}${cycle}`;
 }
@@ -172,38 +206,118 @@ function lightLine(season, light) {
     : near(/equinox/, 30) ? 'close to the fastest the light changes all year, as it does around an equinox'
       : /solstice/.test(season.next.turning) ? 'the change slowing as the solstice nears'
         : 'the change quickening as the equinox nears';
-  const latitudes = outer.map(l => `${hm(l.hours)} at ${Math.abs(l.lat)}°`).join(', ');
+  const latitudes = outer.map(l => `${quarterHours(l.hours)} at ${Math.abs(l.lat)}°`).join(', ');
   const way = far.change >= 0 ? 'lengthening' : 'shortening';
-  return `The light: a day of about ${hm(equator.hours)} at the equator, ${latitudes} ${season.hemisphere}. The days are ${way}, by up to ${Math.abs(far.change).toFixed(1)} minutes a day farther from the equator and hardly at all near it; ${pace}.`;
+  const m = Math.round(Math.abs(far.change));
+  const by = m === 0 ? 'by less than a minute a day, even far from the equator'
+    : `by up to ${m} minute${m === 1 ? '' : 's'} a day farther from the equator and hardly at all near it`;
+  return `The light: a day of about ${quarterHours(equator.hours)} at the equator, ${latitudes} ${season.hemisphere}. The days are ${way}, ${by}; ${pace}.`;
 }
 
-// The slot's season and sky, as the prompt says them. What is coming within
-// LEAD_DAYS leads, so it weighs on the days before it.
+const listed = names => (names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]);
+
+// A planet's event as the prompt says it; for a hemisphere, an elongation
+// says when it is too low there to see well.
+function planetEventText(e, hemisphere) {
+  switch (e.kind) {
+    case 'greatest elongation': {
+      const low = hemisphere && e.placed && !e.placed[hemisphere] ? ', low in the twilight from here' : '';
+      return `${e.body} at its farthest from the sun in the ${e.when} sky${low}`;
+    }
+    case 'inferior conjunction': return `${e.body} passing between the sun and the Earth, from the evening sky to the morning`;
+    case 'superior conjunction': return `${e.body} passing behind the sun, from the morning sky to the evening`;
+    case 'opposition': return e.nakedEye ? `${e.body} opposite the sun, up all night and at its brightest` : `${e.body} opposite the sun, at its best for binoculars or a telescope`;
+    case 'conjunction': return `${e.body} passing behind the sun, lost in its glare for some weeks`;
+    case 'near the moon': return `the moon passing close to ${listed(e.bodies || [e.body])}`;
+    default: return null;
+  }
+}
+
+const VOYAGER_WHAT = {
+  launch: v => `the anniversary of ${v.craft}'s launch in ${v.since}`,
+  'pale blue dot': v => `the anniversary of the Pale Blue Dot, the Earth photographed by Voyager 1 from about 6 billion kilometres in ${v.since}`,
+  'interstellar space': v => `the anniversary of ${v.craft} crossing into interstellar space in ${v.since}`,
+  'one light-day': () => 'Voyager 1 a full day\'s light from Earth, the first thing people have made to go so far',
+};
+
+function voyagerText(v) {
+  const away = v.what !== 'one light-day' && v.lightHours ? ` (${v.craft} is about ${Math.round(v.lightHours)} light-hours from Earth now)` : '';
+  return `${VOYAGER_WHAT[v.what](v)}, ${days(v.days)}${away}`;
+}
+
+// When in the night each planet is up, as the prompt says it, in the night's
+// order.
+const NIGHT = [
+  ['evening', 'after sunset'], ['evening into night', 'from sunset into the night'], ['all night', 'all night'],
+  ['evening and morning', 'after sunset and again before dawn'], ['night', 'high in the middle of the night'],
+  ['night into morning', 'from late in the night until dawn'], ['morning', 'before dawn'],
+];
+
+function planetsLine(visible) {
+  if (!visible || !visible.length) return null;
+  const parts = NIGHT.map(([when, words]) => {
+    const names = visible.filter(p => p.when === when).map(p => p.name);
+    return names.length ? `${words}, ${listed(names)}` : null;
+  }).filter(Boolean);
+  return `The planets seen from here: ${parts.join('; ')}.`;
+}
+
+// NOAA's outlook in its own words, its figures in brackets left out.
+function earthLine(earth) {
+  const enso = earth && earth.enso;
+  if (!enso) return null;
+  const synopsis = enso.synopsis.replace(/\s*\([^)]*\)/g, '');
+  return `The Earth: NOAA's monthly outlook for El Niño and La Niña${enso.asOf ? `, as of ${longDate(enso.asOf)}` : ''}: ${synopsis}`;
+}
+
+// Everything within LEAD_DAYS, soonest first, so it weighs on the days before
+// it: for a hemisphere, its turning points, the calendar's season, showers and
+// eclipses; for every plan, the planets' events and the Voyagers' dates.
+function comingLine(context) {
+  const coming = [];
+  const { season } = context;
+  if (season && season.next.days <= LEAD_DAYS) coming.push({ days: season.next.days, text: `${season.next.turning}, ${season.next.meaning} here, ${days(season.next.days)}` });
+  if (season && season.calendar.days <= LEAD_DAYS) coming.push({ days: season.calendar.days, text: `${season.calendar.next} by the calendar, on ${longDate(season.calendar.date)}, ${days(season.calendar.days)}` });
+  for (const s of context.showers || []) coming.push({ days: s.days, text: `the ${s.name} meteor shower at its peak ${days(s.days)} (about ${s.rate} an hour at best, in dark skies)` });
+  for (const e of context.eclipses || []) coming.push({ days: e.days, text: `a ${e.type} ${e.kind} eclipse ${days(e.days)}, seen from ${e.seen}${e.path ? ` (its path: ${e.path})` : ''}` });
+  // The moon passing two planets on one day is one thing seen.
+  const events = [];
+  for (const e of (context.planets && context.planets.events) || []) {
+    const same = e.kind === 'near the moon' && events.find(o => o.kind === e.kind && o.date === e.date);
+    if (same) same.bodies.push(e.body);
+    else events.push({ ...e, bodies: [e.body] });
+  }
+  for (const e of events) coming.push({ days: e.days, text: `${planetEventText(e, context.hemisphere)}, ${days(e.days)}` });
+  for (const v of context.voyagers || []) coming.push({ days: v.days, text: voyagerText(v) });
+  coming.sort((a, b) => a.days - b.days);
+  return coming.length ? `Coming: ${coming.map(c => c.text).join('; ')}.` : null;
+}
+
+// The slot's season, sky and Earth, as the prompt says them: what is coming
+// leads, then the rest from what changes daily to what changes monthly.
 function contextLines(context) {
   if (!context) return [];
   if (!context.hemisphere) {
     return [
       'This service is for visitors whose place is unknown: it may be any season for them, so assume none.',
+      comingLine(context),
       moonLine(context.moon, null),
       spaceWeatherLine(context.spaceWeather),
+      earthLine(context.earth),
     ].filter(Boolean);
   }
   const { season } = context;
-  const coming = [];
-  if (season.next.days <= LEAD_DAYS) coming.push({ days: season.next.days, text: `${season.next.turning}, ${season.next.meaning} here, ${days(season.next.days)}` });
-  if (season.calendar.days <= LEAD_DAYS) coming.push({ days: season.calendar.days, text: `${season.calendar.next} by the calendar, on ${longDate(season.calendar.date)}, ${days(season.calendar.days)}` });
-  for (const s of context.showers) coming.push({ days: s.days, text: `the ${s.name} meteor shower at its peak ${days(s.days)} (about ${s.rate} an hour at best, in dark skies)` });
-  for (const e of context.eclipses) coming.push({ days: e.days, text: `a ${e.type} ${e.kind} eclipse ${days(e.days)}, seen from ${e.seen}${e.path ? ` (its path: ${e.path})` : ''}` });
-  coming.sort((a, b) => a.days - b.days);
   const where = season.hemisphere === 'north' ? 'northern' : 'southern';
   const phase = season.phase === 'middle' ? `the middle of ${season.name}` : `${season.phase} ${season.name}`;
   return [
     `This service is for visitors in the ${where} hemisphere, the tropics included.`,
-    ...(coming.length ? [`Coming: ${coming.map(c => c.text).join('; ')}.`] : []),
+    comingLine(context),
     `The season: ${phase}. ${season.since.turning[0].toUpperCase()}${season.since.turning.slice(1)} was ${ago(season.since.days)}; ${season.next.turning}, ${season.next.meaning} here, is ${days(season.next.days)}. By the calendar many keep, it is ${season.calendar.season}, and ${season.calendar.next} begins on ${longDate(season.calendar.date)}, ${days(season.calendar.days)}.`,
     lightLine(season, context.light),
     moonLine(context.moon, season.hemisphere),
+    planetsLine(context.planets && context.planets.visible),
     spaceWeatherLine(context.spaceWeather),
+    earthLine(context.earth),
   ].filter(Boolean);
 }
 
@@ -241,4 +355,4 @@ async function planSlot({ date, weekday, slot, catalog, plans, context = null, a
   throw new Error(`the arrangement broke the rules twice: ${problems.join(' ')}`);
 }
 
-module.exports = { MODEL, SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines };
+module.exports = { MODEL, SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };
