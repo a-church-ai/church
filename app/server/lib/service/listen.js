@@ -29,7 +29,7 @@ async function listeningService({ timezone, at } = {}) {
     mode: served.entry.arrangedBy === 'rotation' ? 'rotation' : 'planned',
     name: served.entry.name || null,
     word: served.entry.word || null,
-    arrangedBy: arrangedBy(served.entry),
+    arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
     // The service's own clock: its length with the silence after each part,
     // and how far into it the moment of this answer is.
     loopSeconds: served.loopSeconds,

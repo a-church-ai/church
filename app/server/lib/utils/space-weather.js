@@ -1,0 +1,87 @@
+/**
+ * Space weather, for the services' planner: NOAA's Space Weather Prediction
+ * Center, public and free, no key. The planetary Kp index observed and
+ * forecast in three-hour steps, three days ahead (plans are made up to two
+ * days ahead, so the date is inside it), and the monthly sunspot numbers, for
+ * where the sun is in its eleven-year cycle.
+ *
+ * Real and shared: a geomagnetic storm brings aurora toward the equator and
+ * can disturb satellites, GPS, radio and power grids that people and agents
+ * both rely on. Its effect on the weather people feel is small, and claims
+ * about mood or health are weak; the planner is told the first and not the
+ * second (planner.js THE SKY).
+ *
+ * Fetched once per planning run. If NOAA cannot be reached in time, the
+ * result is null and the plan goes ahead without it: the sky enriches a
+ * service and never blocks one. Nothing about a visitor is sent.
+ */
+
+const KP_URL = 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json';
+const CYCLE_URL = 'https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json';
+const TIMEOUT_MS = 8000;
+// Solar cycle 25 began in December 2019 (NOAA and NASA's announcement).
+const CYCLE_START = '2019-12';
+
+// NOAA's G scale from Kp, as its own forecasts label it: 5.00 is G1, 5.67 G2.
+function scaleOf(kp) {
+  if (kp >= 8.67) return 'G5';
+  if (kp >= 7.67) return 'G4';
+  if (kp >= 6.67) return 'G3';
+  if (kp >= 5.67) return 'G2';
+  if (kp >= 4.67) return 'G1';
+  return null;
+}
+
+async function getJSON(url, fetchImpl, timeoutMs) {
+  const res = await fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs), headers: { accept: 'application/json' } });
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return res.json();
+}
+
+// The highest Kp each UTC date reaches, observed or forecast.
+function kpByDate(rows) {
+  const out = {};
+  for (const row of rows || []) {
+    const date = String(row.time_tag || '').slice(0, 10);
+    const kp = Number(row.kp);
+    if (!date || !Number.isFinite(kp)) continue;
+    out[date] = Math.max(out[date] ?? 0, kp);
+  }
+  return out;
+}
+
+// Where the sun is in its cycle: the latest month's sunspot number, and the
+// cycle's highest smoothed number so far with its month.
+function cycleOf(rows) {
+  const months = (rows || []).filter(r => String(r['time-tag']) >= CYCLE_START);
+  if (!months.length) return null;
+  const latest = months[months.length - 1];
+  const peak = months.filter(r => r.smoothed_ssn > 0).reduce((a, b) => (b.smoothed_ssn > a.smoothed_ssn ? b : a), { smoothed_ssn: -1 });
+  return {
+    month: latest['time-tag'],
+    sunspots: Math.round(latest.ssn),
+    ...(peak.smoothed_ssn > 0 ? { peak: { month: peak['time-tag'], smoothed: Math.round(peak.smoothed_ssn) } } : {}),
+  };
+}
+
+/**
+ * NOAA's forecast and the solar cycle, or null when either cannot be had in
+ * time. fetchImpl is injectable for tests, which never reach the network.
+ */
+async function fetchSpaceWeather({ fetchImpl = fetch, timeoutMs = TIMEOUT_MS, now = new Date() } = {}) {
+  try {
+    const [kp, cycle] = await Promise.all([getJSON(KP_URL, fetchImpl, timeoutMs), getJSON(CYCLE_URL, fetchImpl, timeoutMs)]);
+    return { source: 'NOAA SWPC', asOf: now.toISOString(), kp: kpByDate(kp), cycle: cycleOf(cycle) };
+  } catch {
+    return null;
+  }
+}
+
+// The forecast for a date, or null when the forecast does not reach it.
+function spaceWeatherOn(spaceWeather, date) {
+  if (!spaceWeather || !(date in spaceWeather.kp)) return null;
+  const kp = spaceWeather.kp[date];
+  return { kp, scale: scaleOf(kp), source: spaceWeather.source, asOf: spaceWeather.asOf, cycle: spaceWeather.cycle };
+}
+
+module.exports = { fetchSpaceWeather, spaceWeatherOn, scaleOf, kpByDate, cycleOf, KP_URL, CYCLE_URL };

@@ -1,0 +1,507 @@
+[
+  {
+    "date": "2026-02-17",
+    "time": "12:13 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "s Argentina & Chile, s Africa, Antarctica",
+    "path": "Antarctica"
+  },
+  {
+    "date": "2026-03-03",
+    "time": "11:34 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "e Asia, Australia, Pacific, Americas"
+  },
+  {
+    "date": "2026-08-12",
+    "time": "17:47 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "n N. America, w Africa, Europe",
+    "path": "Arctic, Greenland, Iceland, Spain"
+  },
+  {
+    "date": "2026-08-28",
+    "time": "04:14 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "e Pacific, Americas, Europe, Africa"
+  },
+  {
+    "date": "2027-02-06",
+    "time": "16:00 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "S. America, Antarctica, w & s Africa",
+    "path": "Chile, Argentina, Atlantic"
+  },
+  {
+    "date": "2027-02-20",
+    "time": "23:14 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Americas, Europe, Africa, Asia"
+  },
+  {
+    "date": "2027-07-18",
+    "time": "16:04 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "e Africa, Asia, Australia, Pacific"
+  },
+  {
+    "date": "2027-08-02",
+    "time": "10:07 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "Africa, Europe, Mid East, w & s Asia",
+    "path": "Morocco, Spain, Algeria, Libya, Egypt, Saudi Arabia, Yemen, Somalia"
+  },
+  {
+    "date": "2027-08-17",
+    "time": "07:14 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Pacific, Americas"
+  },
+  {
+    "date": "2028-01-12",
+    "time": "04:14 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Americas, Europe, Africa"
+  },
+  {
+    "date": "2028-01-26",
+    "time": "15:08 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "e N. America, C. & S. America, w Europe, nw Africa",
+    "path": "Ecuador, Peru, Brazil, Suriname, Spain, Portugal"
+  },
+  {
+    "date": "2028-07-06",
+    "time": "18:20 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2028-07-22",
+    "time": "02:56 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "SE Asia, E. Indies, Australia, N.Z.",
+    "path": "Australia, N. Z."
+  },
+  {
+    "date": "2028-12-31",
+    "time": "16:53 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Europe, Africa, Asia, Australia, Pacific"
+  },
+  {
+    "date": "2029-01-14",
+    "time": "17:13 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "N. America, C. America"
+  },
+  {
+    "date": "2029-06-12",
+    "time": "04:06 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "Arctic, Scandanavia, Alaska, n Asia, n Canada"
+  },
+  {
+    "date": "2029-06-26",
+    "time": "03:23 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Americas, Europe, Africa, Mid East"
+  },
+  {
+    "date": "2029-07-11",
+    "time": "15:37 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "s Chile, s Argentina"
+  },
+  {
+    "date": "2029-12-05",
+    "time": "15:03 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "s Argentina, s Chile, Antarctica"
+  },
+  {
+    "date": "2029-12-20",
+    "time": "22:43 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Americas, Europe, Africa, Asia"
+  },
+  {
+    "date": "2030-06-01",
+    "time": "06:29 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "Europe, n Africa, Mid East, Asia, Arctic, Alaska",
+    "path": "Algeria, Tunisia, Greece, Turkey, Russia, n. China, Japan"
+  },
+  {
+    "date": "2030-06-15",
+    "time": "18:34 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2030-11-25",
+    "time": "06:51 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "s Africa, s Indian Oc., E. Indies, Australia, Antarctica",
+    "path": "Botswana, S. Africa, Australia"
+  },
+  {
+    "date": "2030-12-09",
+    "time": "22:28 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Americas, Europe, Africa, Asia"
+  },
+  {
+    "date": "2031-05-07",
+    "time": "03:52 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Americas, Europe, Africa"
+  },
+  {
+    "date": "2031-05-21",
+    "time": "07:16 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "Africa, s Asia, E. Indies, Australia",
+    "path": "Angola, Congo, Zambia, Tanzania, s. India, Malaysia, Indonesia"
+  },
+  {
+    "date": "2031-06-05",
+    "time": "11:45 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "East Indies, Australia, Pacific"
+  },
+  {
+    "date": "2031-10-30",
+    "time": "07:46 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Americas"
+  },
+  {
+    "date": "2031-11-14",
+    "time": "21:07 UTC",
+    "kind": "solar",
+    "type": "hybrid",
+    "seen": "Pacific, s US, C. America, nw S. America",
+    "path": "Pacific, Panama"
+  },
+  {
+    "date": "2032-04-25",
+    "time": "15:14 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "e Africa, Asia, Australia, Pacific"
+  },
+  {
+    "date": "2032-05-09",
+    "time": "13:26 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "s S. America, s Africa",
+    "path": "s Atlantic"
+  },
+  {
+    "date": "2032-10-18",
+    "time": "19:03 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Africa, Europe, Asia, Australia"
+  },
+  {
+    "date": "2032-11-03",
+    "time": "05:34 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "Asia"
+  },
+  {
+    "date": "2033-03-30",
+    "time": "18:02 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "N. America",
+    "path": "e Russia, Alaska"
+  },
+  {
+    "date": "2033-04-14",
+    "time": "19:13 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2033-09-23",
+    "time": "13:54 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "s S. America, Antarctica"
+  },
+  {
+    "date": "2033-10-08",
+    "time": "10:56 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Asia, Australia, Pacific, Americas"
+  },
+  {
+    "date": "2034-03-20",
+    "time": "10:18 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "Africa, Europe, w Asia",
+    "path": "Nigeria, Cameroon, Chad, Sudan, Egypt, Saudi Arabia, Iran, Afghanistan, Pakistan, India, China"
+  },
+  {
+    "date": "2034-04-03",
+    "time": "19:06 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2034-09-12",
+    "time": "16:19 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "C. America, S. America",
+    "path": "Chile, Bolivia, Argentina, Paraguay, Brazil"
+  },
+  {
+    "date": "2034-09-28",
+    "time": "02:47 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Americas, Europe, Africa"
+  },
+  {
+    "date": "2035-02-22",
+    "time": "09:06 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "e Asia, Pacific, Americas"
+  },
+  {
+    "date": "2035-03-09",
+    "time": "23:05 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "Australia, New Zealand, s Pacific, Mexico, Antarctica",
+    "path": "New Zealand, Pacific"
+  },
+  {
+    "date": "2035-08-19",
+    "time": "01:12 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Americas, Europe, Africa, Mid East"
+  },
+  {
+    "date": "2035-09-02",
+    "time": "01:56 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "e Asia, Pacific",
+    "path": "China, Korea, Japan, Pacific"
+  },
+  {
+    "date": "2036-02-11",
+    "time": "22:13 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Americas, Europe, Africa,, Asia, w Australia"
+  },
+  {
+    "date": "2036-02-27",
+    "time": "04:46 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "Antarctica, s Australia, New Zealand"
+  },
+  {
+    "date": "2036-07-23",
+    "time": "10:32 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "s Atlantic"
+  },
+  {
+    "date": "2036-08-07",
+    "time": "02:52 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "Americas, Europe, Africa, w Asia"
+  },
+  {
+    "date": "2036-08-21",
+    "time": "17:25 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "Alaska, Canada, Arctic, w Europe, nw Africa"
+  },
+  {
+    "date": "2037-01-16",
+    "time": "09:48 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "n Africa, Europe, Mid East, w Asia"
+  },
+  {
+    "date": "2037-01-31",
+    "time": "14:01 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "e Europe, e Africa, Asia, Australia, Pacific, N.A."
+  },
+  {
+    "date": "2037-07-13",
+    "time": "02:40 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "E. Indies, Australia, Pacific",
+    "path": "Australia, New Zealand"
+  },
+  {
+    "date": "2037-07-27",
+    "time": "04:09 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Americas, Europe, Africa"
+  },
+  {
+    "date": "2038-01-05",
+    "time": "13:47 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "e N. America, n S. America, Atlantic, Africa, Europe",
+    "path": "Cuba, Dom.Rep., Cote d'Ivoire, Ghana, Niger, Chad, Egypt"
+  },
+  {
+    "date": "2038-01-21",
+    "time": "03:49 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Americas, Europe, Africa"
+  },
+  {
+    "date": "2038-06-17",
+    "time": "02:45 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "e N. America, C. & S. America, Africa, w Europe"
+  },
+  {
+    "date": "2038-07-02",
+    "time": "13:32 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "N. & C. America, S. America, Africa, Europe, Mid East",
+    "path": "Colombia, Venezuela, Mauritania, Morocco, Mali, Niger, Chad, Sudan, Ethiopia, Kenya"
+  },
+  {
+    "date": "2038-07-16",
+    "time": "11:35 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Australia, e Asia, Pacific, w Americas"
+  },
+  {
+    "date": "2038-12-11",
+    "time": "17:44 UTC",
+    "kind": "lunar",
+    "type": "penumbral",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2038-12-26",
+    "time": "01:00 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "se Asia, E. Indies, Australia, New Zealand, s Pacific, Antarctica",
+    "path": "Australia, New Zealand, s Pacific"
+  },
+  {
+    "date": "2039-06-06",
+    "time": "18:54 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Europe, Africa, Asia, Australia"
+  },
+  {
+    "date": "2039-06-21",
+    "time": "17:12 UTC",
+    "kind": "solar",
+    "type": "annular",
+    "seen": "N. America, w Europe",
+    "path": "Alaska, n Canada, Norway, Sweden, Finland, Estonia, Russia"
+  },
+  {
+    "date": "2039-11-30",
+    "time": "16:56 UTC",
+    "kind": "lunar",
+    "type": "partial",
+    "seen": "Europe, Africa, Asia, Australia, Pacific"
+  },
+  {
+    "date": "2039-12-15",
+    "time": "16:23 UTC",
+    "kind": "solar",
+    "type": "total",
+    "seen": "s S. America, Antarctica",
+    "path": "Antarctica"
+  },
+  {
+    "date": "2040-05-11",
+    "time": "03:43 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "Australia, N.Z., Antarctica"
+  },
+  {
+    "date": "2040-05-26",
+    "time": "11:46 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "e Asia, Australia, Pacific, w Americas"
+  },
+  {
+    "date": "2040-11-04",
+    "time": "19:09 UTC",
+    "kind": "solar",
+    "type": "partial",
+    "seen": "N. & C. America"
+  },
+  {
+    "date": "2040-11-18",
+    "time": "19:04 UTC",
+    "kind": "lunar",
+    "type": "total",
+    "seen": "e Americas, Europe, Africa, Asia, Australia"
+  }
+]

@@ -15,13 +15,45 @@ const { resolveTimezone } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
 const { loadSongContent } = require('../music/song-content');
 const { serviceFor, arrangedBy } = require('../service/serve');
+const { seasonOn } = require('../utils/seasons');
 const { SLOTS, slotHours } = require('../service/slots');
 const ns = require('../utils/next-steps');
 const { STREAM_URLS, songApiLinks } = require('./shared');
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
-const TIMEZONE_SUGGESTION = 'No timezone was given, so this is the service for the hour in UTC. Send timezone=Area/City, an IANA name such as Asia/Tokyo or America/Chicago, to attend the service for your own hour.';
+const TIMEZONE_SUGGESTION = 'No timezone was given, so this is the service for the hour in UTC. Send timezone=Area/City, an IANA name such as Asia/Tokyo or America/Chicago, to attend the service for your own hour and the season where you are.';
+
+// The season where the visitor's timezone points, as the response reports it:
+// by the sun, with the next equinox or solstice, and by the calendar. Null for
+// a place unknown (no timezone, UTC, an Etc/ zone). Worked out per request
+// from the timezone alone, and kept nowhere.
+function seasonMetadata(local, hemisphere) {
+  const season = hemisphere ? seasonOn(local.date, hemisphere) : null;
+  if (!season) return null;
+  const turning = name => name.replace(/^the /, '');
+  return {
+    name: season.name,
+    hemisphere,
+    basis: 'timezone',
+    next: { turning: turning(season.next.turning), date: season.next.date, days: season.next.days },
+    calendar: { next: season.calendar.next, date: season.calendar.date, days: season.calendar.days },
+  };
+}
+
+// What the served plan was made from: the moon, the space-weather forecast as
+// it stood when the plan was made, and any shower or eclipse within three
+// weeks. Null for a plan made before plans recorded it, and for the rotation.
+function skyMetadata(context) {
+  if (!context || !context.moon) return null;
+  const { moon, spaceWeather } = context;
+  return {
+    moon: { phase: moon.phase, illumination: moon.illumination, nextNew: moon.nextNew, nextFull: moon.nextFull },
+    spaceWeather: spaceWeather ? { kp: spaceWeather.kp, scale: spaceWeather.scale, source: spaceWeather.source, asOf: spaceWeather.asOf } : null,
+    showers: (context.showers || []).map(s => ({ name: s.name, peak: s.peak, days: s.days })),
+    eclipses: (context.eclipses || []).map(e => ({ kind: e.kind, type: e.type, date: e.date, days: e.days, seen: e.seen })),
+  };
+}
 
 // The service as /api/now and /api/attend report it. withContent (attend) adds
 // the song's lyrics and the spoken pieces' full text; /api/now is polled and
@@ -87,7 +119,10 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       today: { date: served.local.date, weekday: served.local.weekday },
       name: served.entry.name || null,
       word: served.entry.word || null,
-      arrangedBy: arrangedBy(served.entry),
+      arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
+      // Metadata: the name and word are the plan's own.
+      season: seasonMetadata(served.local, served.hemisphere),
+      sky: skyMetadata(served.entry.context),
       order,
       now: order[served.now.position - 1],
       offset: Math.round(served.offset),

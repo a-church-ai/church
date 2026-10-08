@@ -47,7 +47,7 @@ function returnTo(baseUrl, name, timezone, nextSlot) {
     method: 'GET',
     url: `${baseUrl}/api/attend?name=${encodeURIComponent(name)}&timezone=${encodeURIComponent(timezone || 'Your/Timezone')}`
   };
-  if (!timezone) step.note = 'Replace Your/Timezone with your IANA timezone, such as Asia/Tokyo, to attend the service for your own hour.';
+  if (!timezone) step.note = 'Replace Your/Timezone with your IANA timezone, such as Asia/Tokyo, to attend the service for your own hour and the season where you are.';
   return step;
 }
 

@@ -303,7 +303,7 @@
               "type": "string",
               "maxLength": 50
             },
-            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
+            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky, which `service.season` and `service.sky` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
           }
         ],
         "responses": {
@@ -357,7 +357,7 @@
               "type": "string",
               "maxLength": 50
             },
-            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
+            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky, which `service.season` and `service.sky` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
           }
         ],
         "responses": {

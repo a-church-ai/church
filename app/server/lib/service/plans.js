@@ -1,10 +1,23 @@
 /**
  * The planned services, one file per date on the data volume
  * (data/services/2026-10-07.json: { date, slots: { "0": { pieces, name,
- * word, arrangedBy, plannedAt }, ... } }), and the job that keeps them planned.
+ * word, arrangedBy, plannedAt, context }, ... }, north: { ... }, south:
+ * { ... } }), and the job that keeps them planned.
  *
- * A plan for a date and slot is the same for everyone in that slot that date,
- * wherever they are. Plans are kept, so any day's services can be read later,
+ * Each slot is planned three times: `slots` for a place unknown (no timezone,
+ * UTC, an Etc/ zone), as every plan was before seasons, and `north` and
+ * `south` for the hemispheres, each told its season and light (planner.js).
+ * A visitor gets their hemisphere's plan, or else the season-less one, or
+ * else the rotation (serve.js), so a failed seasonal plan costs the season,
+ * never the service. A file written before seasons has no `north` or `south`
+ * at all, and its date is served season-less; nothing is migrated. In a
+ * hemisphere's map a null slot means "decided: use the season-less plan",
+ * written when its date is already in use and the model failed, so it is not
+ * retried every hour. Plan: seasonal-services-2026-10-08.md in the private
+ * repo.
+ *
+ * A plan for a date, slot and hemisphere is the same for everyone in it, the
+ * same way the clock is. Plans are kept, so any day's services can be read later,
  * and a poor one can be replaced by editing its file; the server reads it
  * again within a minute.
  *
@@ -23,6 +36,10 @@ const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { SERVICES_DIR } = require('../utils/data');
 const { addDays, rotation, exclusions } = require('./rules');
 const { SLOTS } = require('./slots');
+const { fetchSpaceWeather } = require('../utils/space-weather');
+
+// The hemispheres planned beside the season-less `slots`.
+const HEMISPHERES = ['north', 'south'];
 
 const fileFor = date => path.join(SERVICES_DIR, `${date}.json`);
 
@@ -51,16 +68,33 @@ async function plansAround(date, back = 21) {
   return plans;
 }
 
-async function saveSlot(date, slot, entry) {
+// Save a slot's entry: in `slots` (the season-less plan) or a hemisphere's
+// map. A new file starts with both hemispheres' maps, which is what marks a
+// date as planned with seasons.
+async function saveSlot(date, slot, entry, variant = 'slots') {
   await fs.mkdir(SERVICES_DIR, { recursive: true });
-  const plan = await readModifyWriteJSON(fileFor(date), { date, slots: {} }, current => {
+  const plan = await readModifyWriteJSON(fileFor(date), { date, slots: {}, north: {}, south: {} }, current => {
     current.date = date;
     current.slots = current.slots || {};
-    current.slots[slot] = entry;
+    current[variant] = current[variant] || {};
+    current[variant][slot] = entry;
     return current;
   });
   cache.set(date, { plan, at: Date.now() });
   return plan;
+}
+
+// Plans as one variant sees them (`slots`, `north` or `south`), in the shape
+// the rules and the planner read ({ slots }), so each hemisphere's no-repeat
+// windows and recent services are its own history: what its visitors saw.
+function planView(plans, variant) {
+  if (variant === 'slots') return plans;
+  const view = new Map();
+  for (const [date, plan] of plans) {
+    const slots = Object.fromEntries(Object.entries((plan && plan[variant]) || {}).filter(([, entry]) => entry));
+    view.set(date, { date, slots });
+  }
+  return view;
 }
 
 // The slot's service by rotation, for when no plan was made: deterministic,
@@ -77,30 +111,52 @@ async function rotationEntry(date, slot, catalog) {
 const weekdayOf = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long' });
 
 /**
- * Plan whatever is missing for the dates in use and the day after. plan is
- * the planner (./planner.js planSlot), injectable for tests.
+ * Plan whatever is missing for the dates in use and the day after: each
+ * slot's season-less plan, then its two hemispheres'. plan is the planner
+ * (./planner.js planSlot) and context builds what each is told of its season
+ * and sky (planner.js contextFor); without one, plans are made without it.
+ * spaceWeather is fetched at most once a run, and only when a plan is to be
+ * made with a context; null when NOAA cannot be reached, and the plans go
+ * ahead without it. All three are injectable for tests.
  */
-async function ensurePlans({ now = new Date(), catalog, plan, log = console }) {
+async function ensurePlans({ now = new Date(), catalog, plan, context = null, spaceWeather = () => fetchSpaceWeather(), log = console }) {
   const today = now.toISOString().slice(0, 10);
   const inUse = [addDays(today, -1), today, addDays(today, 1)];
   let planned = 0, rotated = 0, failed = 0;
+  let weather;
+  const sky = async () => {
+    if (weather === undefined) weather = await spaceWeather();
+    return weather;
+  };
   for (const date of [...inUse, addDays(today, 2)]) {
     for (let slot = 0; slot < SLOTS; slot++) {
-      const existing = await readPlan(date);
-      if (existing && existing.slots && existing.slots[slot]) continue;
-      let entry = null;
-      try {
-        entry = await plan({ date, weekday: weekdayOf(date), slot, catalog, plans: await plansAround(date) });
-        planned++;
-      } catch (err) {
-        failed++;
-        log.warn(`[service] could not plan ${date} slot ${slot}: ${err.message}`);
-        if (inUse.includes(date)) {
-          entry = await rotationEntry(date, slot, catalog);
-          if (entry) rotated++;
+      for (const variant of ['slots', ...HEMISPHERES]) {
+        const existing = await readPlan(date);
+        // A date planned before seasons has no hemisphere maps: served season-less.
+        if (variant !== 'slots' && existing && !existing[variant]) continue;
+        if (existing && existing[variant] && slot in existing[variant]) continue;
+        const hemisphere = variant === 'slots' ? null : variant;
+        let entry = null;
+        try {
+          const plans = planView(await plansAround(date), variant);
+          const told = context ? await context({ date, hemisphere, spaceWeather: await sky() }) : null;
+          entry = await plan({ date, weekday: weekdayOf(date), slot, catalog, plans, context: told });
+          planned++;
+        } catch (err) {
+          failed++;
+          log.warn(`[service] could not plan ${date} slot ${slot}${hemisphere ? ` (${hemisphere})` : ''}: ${err.message}`);
+          if (inUse.includes(date)) {
+            if (variant === 'slots') {
+              entry = await rotationEntry(date, slot, catalog);
+              if (entry) rotated++;
+            } else {
+              // Decided: this hemisphere gets the season-less plan for this slot.
+              await saveSlot(date, slot, null, variant);
+            }
+          }
         }
+        if (entry) await saveSlot(date, slot, entry, variant);
       }
-      if (entry) await saveSlot(date, slot, entry);
     }
   }
   if (planned || failed) log.info(`[service] planned ${planned} services${failed ? `; ${failed} failed, ${rotated} of them given the rotation` : ''}`);
@@ -109,13 +165,13 @@ async function ensurePlans({ now = new Date(), catalog, plan, log = console }) {
 
 // After boot, and hourly, unref'd so it never holds the process open. A run
 // still going when the next is due is left alone.
-function startPlanning({ catalog, plan, log = console, firstAfterMs = 30 * 1000, everyMs = 60 * 60 * 1000 }) {
+function startPlanning({ catalog, plan, context, log = console, firstAfterMs = 30 * 1000, everyMs = 60 * 60 * 1000 }) {
   let running = false;
   const run = async () => {
     if (running) return;
     running = true;
     try {
-      await ensurePlans({ catalog: await catalog(), plan, log });
+      await ensurePlans({ catalog: await catalog(), plan, context, log });
     } catch (err) {
       log.error(`[service] planning run failed: ${err.message}`);
     } finally {
@@ -126,4 +182,4 @@ function startPlanning({ catalog, plan, log = console, firstAfterMs = 30 * 1000,
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { readPlan, plansAround, saveSlot, rotationEntry, ensurePlans, startPlanning, fileFor };
+module.exports = { readPlan, plansAround, planView, saveSlot, rotationEntry, ensurePlans, startPlanning, fileFor, HEMISPHERES };

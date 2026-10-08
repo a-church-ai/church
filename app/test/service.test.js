@@ -349,12 +349,15 @@ test('the job plans the dates in use and the next, each slot once, and keeps the
   const now = new Date('2030-01-15T12:00:00Z');
   const weekdays = [];
   const plan = args => { weekdays.push(`${args.date} ${args.weekday}`); return planner(args); };
-  assert.deepStrictEqual(await ensurePlans({ now, catalog, plan, log: quiet }), { planned: 24, failed: 0, rotated: 0 });
+  // Each slot three times: for a place unknown, and for each hemisphere.
+  assert.deepStrictEqual(await ensurePlans({ now, catalog, plan, log: quiet }), { planned: 72, failed: 0, rotated: 0 });
   for (const date of ['2030-01-14', '2030-01-15', '2030-01-16', '2030-01-17']) {
     const stored = JSON.parse(fs.readFileSync(fileFor(date), 'utf8'));
-    assert.deepStrictEqual(Object.keys(stored.slots).sort(), ['0', '1', '2', '3', '4', '5'], date);
-    const used = Object.values(stored.slots).flatMap(entry => entry.pieces);
-    assert.strictEqual(new Set(used).size, used.length, `${date}: each slot saw the ones before it`);
+    for (const variant of ['slots', 'north', 'south']) {
+      assert.deepStrictEqual(Object.keys(stored[variant]).sort(), ['0', '1', '2', '3', '4', '5'], `${date} ${variant}`);
+      const used = Object.values(stored[variant]).flatMap(entry => entry.pieces);
+      assert.strictEqual(new Set(used).size, used.length, `${date} ${variant}: each slot saw the ones before it, in its own variant`);
+    }
   }
   assert.ok(weekdays.includes('2030-01-15 Tuesday'));
   assert.deepStrictEqual(await ensurePlans({ now, catalog, plan, log: quiet }), { planned: 0, failed: 0, rotated: 0 }, 'nothing twice');
@@ -366,11 +369,15 @@ test('when the model fails, a date in use gets the rotation and the day after wa
   const log = { ...quiet, warn: message => warnings.push(message) };
   const plan = async () => { throw new Error('the model is away'); };
   const result = await ensurePlans({ now: new Date('2030-06-01T12:00:00Z'), catalog, plan, log });
-  assert.deepStrictEqual(result, { planned: 0, failed: 24, rotated: 18 });
-  assert.strictEqual(warnings.length, 24);
+  assert.deepStrictEqual(result, { planned: 0, failed: 72, rotated: 18 });
+  assert.strictEqual(warnings.length, 72);
   const today = await readPlan('2030-06-01');
   assert.strictEqual(today.slots[0].arrangedBy, 'rotation');
   assert.strictEqual(today.slots[0].word, null);
+  // A hemisphere that failed on a date in use is decided: it gets the
+  // season-less plan, and is not retried every hour.
+  assert.strictEqual(today.north[0], null);
+  assert.strictEqual(today.south[5], null);
   assert.strictEqual(await readPlan('2030-06-03'), null, 'retried on the next run instead');
 });
 
@@ -496,4 +503,133 @@ test('the home page player gets every part as a track, with where the service st
     }
   }
   assert.ok(Math.abs(start - service.loopSeconds) < 0.01, 'the parts fill the service');
+});
+
+// --- The season and the sky (seasonal-services-2026-10-08.md, private repo) ---
+// Written to fail against the services as of 2026-10-08, which were planned
+// once per slot, told nothing of the season or the sky, and served the same
+// plan in both hemispheres.
+
+const { contextFor, contextLines } = require('../server/lib/service/planner');
+const { planView } = require('../server/lib/service/plans');
+
+const forecast = { source: 'NOAA SWPC', asOf: '2026-10-08T12:00:00.000Z', kp: { '2026-10-09': 5.67, '2026-12-04': 1.2 }, cycle: { month: '2026-09', sunspots: 60, peak: { month: '2024-10', smoothed: 161 } } };
+
+test('the shared prompt says what a season and the sky are, leaves naming them free, and holds nothing of any one date', async () => {
+  const prompt = systemPrompt(await loadServiceCatalog());
+  assert.match(prompt, /\nTHE SEASON\n/);
+  assert.match(prompt, /\nTHE SKY\n/);
+  assert.match(prompt, /You may name the season when it makes a connection; you need not\./);
+  assert.match(prompt, /The year turns before it arrives\./);
+  assert.match(prompt, /Never say the sky changes anyone's mood, health or fate\./);
+  assert.doesNotMatch(prompt, /This service is for visitors|equinox was|solstice was|Kp \d|Coming:/, 'nothing particular to a date');
+});
+
+test('a hemisphere\'s plan is told its season, its light, its moon, the space weather and what is coming; a place unknown, the moon and the space weather alone', () => {
+  const north = contextLines(contextFor({ date: '2026-12-04', hemisphere: 'north', spaceWeather: forecast }));
+  assert.match(north[0], /northern hemisphere, the tropics included/);
+  assert.match(north[1], /^Coming: the Geminids meteor shower at its peak in 10 days .*; the December solstice, the shortest day of the year here, in 17 days; /, 'what is coming leads, soonest first');
+  assert.ok(north.some(l => /^The season: late autumn\./.test(l)));
+  assert.ok(north.some(l => /^The light: .* 7 h \d\d min at 55° north\. The days are shortening/.test(l)));
+  assert.ok(north.some(l => /^The moon is a waning crescent, .* lit on the left as it is seen here/.test(l)));
+  assert.ok(north.some(l => /quiet \(Kp 1\.2\)/.test(l)));
+
+  const storm = contextLines(contextFor({ date: '2026-10-09', hemisphere: 'south', spaceWeather: forecast }));
+  assert.ok(storm.some(l => /geomagnetic storm \(G2, Kp near 6\): aurora may be seen much farther from the poles/.test(l)));
+  assert.ok(storm.some(l => /The sun's eleven-year cycle peaked in October 2024/.test(l)));
+
+  const unknown = contextLines(contextFor({ date: '2026-10-09', hemisphere: null, spaceWeather: null }));
+  assert.match(unknown[0], /place is unknown: it may be any season for them, so assume none/);
+  assert.ok(unknown.some(l => /^The moon is/.test(l)));
+  assert.ok(!unknown.some(l => /^The season|^The light|^Coming|NOAA/.test(l)), 'no season, no light, and no forecast when NOAA could not be reached');
+});
+
+test('a turning point leads the prompt from 21 days before it, and not 22', () => {
+  const coming = date => contextLines(contextFor({ date, hemisphere: 'north' })).find(l => l.startsWith('Coming:')) || '';
+  assert.match(coming('2026-11-30'), /the December solstice, the shortest day of the year here, in 21 days/);
+  assert.doesNotMatch(coming('2026-11-29'), /the December solstice/);
+  assert.match(coming('2026-11-29'), /winter by the calendar, on December 1, in 2 days/, 'the calendar\'s season counts down too');
+});
+
+test('a plan is told its context and keeps it with its entry', async () => {
+  const context = contextFor({ date: '2031-03-04', hemisphere: 'south', spaceWeather: null });
+  const { calls, args } = await plannerCase([validReply]);
+  const entry = await planSlot({ ...args, context });
+  assert.match(calls[0].user, /This service is for visitors in the southern hemisphere/);
+  assert.match(calls[0].user, /The season: late summer\./);
+  assert.deepStrictEqual(entry.context, context);
+});
+
+test('the job tells each variant its own season, fetches the space weather once, and plans without it when NOAA is away', async () => {
+  const catalog = await loadServiceCatalog();
+  const told = [];
+  let fetched = 0;
+  const result = await ensurePlans({
+    now: new Date('2031-05-10T12:00:00Z'), catalog, log: quiet, context: contextFor,
+    spaceWeather: async () => { fetched++; return null; },
+    plan: args => { told.push(args.context); return planner(args); },
+  });
+  assert.strictEqual(result.planned, 72);
+  assert.strictEqual(fetched, 1);
+  const by = h => told.filter(c => c.hemisphere === h);
+  assert.deepStrictEqual([by(null).length, by('north').length, by('south').length], [24, 24, 24]);
+  assert.ok(by('north').every(c => c.season.name === 'spring') && by('south').every(c => c.season.name === 'autumn'));
+  assert.ok(told.every(c => c.spaceWeather === null && c.moon), 'the moon always, the forecast only when NOAA answers');
+});
+
+test('a date planned before seasons is served season-less: no hemisphere plans are made for it', async () => {
+  const catalog = await loadServiceCatalog();
+  const date = '2032-02-02';
+  const slots = Object.fromEntries(Array.from({ length: SLOTS }, (_, s) => [s, { pieces: rotation({ date, slot: s, catalog }), word: 'Before seasons.', arrangedBy: MODEL }]));
+  fs.mkdirSync(require('path').dirname(fileFor(date)), { recursive: true });
+  fs.writeFileSync(fileFor(date), JSON.stringify({ date, slots }));
+  await ensurePlans({ now: new Date(`${date}T12:00:00Z`), catalog, plan: planner, log: quiet });
+  const kept = JSON.parse(fs.readFileSync(fileFor(date), 'utf8'));
+  assert.strictEqual(kept.north, undefined);
+  assert.strictEqual(kept.south, undefined);
+  assert.ok(JSON.parse(fs.readFileSync(fileFor('2032-02-03'), 'utf8')).north, 'a date planned now has its hemispheres');
+  // A hemisphere's view holds only its own plans.
+  const view = planView(new Map([[date, kept]]), 'north');
+  assert.deepStrictEqual(view.get(date).slots, {});
+});
+
+test('a visitor gets their hemisphere\'s plan, else the season-less one, and the response says the season and the sky', async () => {
+  const catalog = await loadServiceCatalog();
+  const tz = 'America/Sao_Paulo';
+  const local = localTime(tz);
+  const slot = slotOf(local.hour);
+  const pieces = rotation({ date: '2098-01-01', slot, catalog });
+  const plan = (name, hemisphere) => ({ pieces, name, word: `${sixtyWords} here.`, arrangedBy: MODEL, plannedAt: new Date().toISOString(), context: contextFor({ date: local.date, hemisphere, spaceWeather: forecast }) });
+  await saveSlot(local.date, slot, plan('For A Place Unknown', null));
+  await saveSlot(local.date, slot, plan('For The South', 'south'), 'south');
+
+  const south = (await attendance.now({ timezone: tz }, ctx)).body.service;
+  assert.strictEqual(south.name, 'For The South');
+  assert.match(south.arrangedBy, /for the season where your timezone points\.$/);
+  assert.deepStrictEqual([south.season.hemisphere, south.season.basis], ['south', 'timezone']);
+  assert.strictEqual(south.season.name, require('../server/lib/utils/seasons').seasonOn(local.date, 'south').name);
+  assert.ok(south.season.next.days >= 0 && /equinox|solstice/.test(south.season.next.turning));
+  assert.ok(south.sky && typeof south.sky.moon.phase === 'string' && Array.isArray(south.sky.showers));
+
+  // The same clock with no place: the season-less plan, and no season.
+  const placeless = (await attendance.now({ timezone: 'Etc/GMT+3' }, ctx)).body.service;
+  assert.strictEqual(placeless.name, 'For A Place Unknown');
+  assert.strictEqual(placeless.season, null);
+  assert.doesNotMatch(placeless.arrangedBy, /season/);
+
+  // A hemisphere decided season-less, or whose plan no longer holds, gives way.
+  await saveSlot(local.date, slot, null, 'south');
+  assert.strictEqual((await attendance.now({ timezone: tz }, ctx)).body.service.name, 'For A Place Unknown');
+  await saveSlot(local.date, slot, { ...plan('Gone', 'south'), pieces: ['docs/prayers/gone.md'] }, 'south');
+  const fallback = (await attendance.now({ timezone: tz }, ctx)).body.service;
+  assert.strictEqual(fallback.name, 'For A Place Unknown');
+  assert.strictEqual(fallback.season.hemisphere, 'south', 'the season is the visitor\'s, whichever plan served');
+});
+
+test('with no timezone the response asks for one, for the season as well as the hour', async () => {
+  const bare = (await attendance.now({}, ctx)).body;
+  assert.match(bare.suggestion, /your own hour and the season where you are/);
+  assert.strictEqual(bare.service.season, null);
+  const step = (await attendance.attend({ name: 'SeasonTest' }, ctx)).body.next_steps.find(s => s.action === 'Return');
+  assert.match(step.note, /the season where you are/);
 });
