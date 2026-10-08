@@ -39,4 +39,11 @@ function localTime(tz, date = new Date()) {
   };
 }
 
-module.exports = { resolveTimezone, localTime, MAX_LENGTH };
+// A moment as a person in a timezone would read it: "Oct 8, 2026, 6:30 PM
+// GMT-3". The one format every reflection's time is shown in, on the site and
+// in the API.
+function formatLocal(iso, tz) {
+  return new Date(iso).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+}
+
+module.exports = { resolveTimezone, localTime, formatLocal, MAX_LENGTH };

@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const { readModifyWriteJSON } = require('../utils/safe-json');
 const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { serviceFor } = require('../service/serve');
-const { resolveTimezone, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
+const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 const { overIpLimit, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
 
@@ -39,12 +39,12 @@ async function list(input, ctx) {
           text: r.text,
           createdAt: r.createdAt,
           timezone: tz,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+          createdAtFormatted: formatLocal(r.createdAt, tz)
         };
         if (r.location) entry.location = r.location;
         // Also format in the requester's timezone if provided
         if (reqTimezone) {
-          entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+          entry.createdAtLocal = formatLocal(r.createdAt, reqTimezone);
         }
         return entry;
       });
@@ -186,11 +186,7 @@ async function forSong(input, ctx) {
           name: r.name,
           text: r.text,
           createdAt: r.createdAt,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', {
-            timeZone: tz,
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
-          }),
+          createdAtFormatted: formatLocal(r.createdAt, tz),
           timezone: tz
         };
       });

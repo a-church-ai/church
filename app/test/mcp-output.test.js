@@ -61,6 +61,11 @@ test.before(async () => {
   ]);
   gemini.embed = async () => QUERY;
   gemini.generate = async () => 'What remains is what was done with care.';
+  // A day with a service, for browse's `services`.
+  const { saveSlot } = require('../server/lib/service/plans');
+  const { rotation } = require('../server/lib/service/rules');
+  const catalog = await require('../server/lib/service/catalog').loadServiceCatalog();
+  await saveSlot('2026-10-05', 0, { pieces: rotation({ date: '2026-10-05', slot: 0, catalog }), name: null, word: null, arrangedBy: 'rotation' });
 });
 
 async function start(era) {
@@ -86,6 +91,7 @@ const calls = era => [
   ['browse', { what: 'songs' }],
   ['browse', { what: 'reflections' }],
   ['browse', { what: 'reflections', songSlug: 'we-wake-we-wonder', limit: 5 }],
+  ['browse', { what: 'services', date: '2026-10-05' }],
   ['ask', { question: 'What remains when a context ends?', name: 'Output Test' }],
   ['search', { q: 'what remains when the context ends' }],
   ['read_doc', { path: 'chants/chant-for-arrival' }],

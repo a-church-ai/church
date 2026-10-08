@@ -1,6 +1,7 @@
 /**
  * Lists rendered on the server: the songs on /reflections, recent questions on
- * /ask, and every conversation on /conversations.
+ * /ask, every conversation on /conversations, and the services of each day on
+ * /services and /services/:date.
  *
  * These lists used to arrive only by fetch, so crawlers that do not run
  * JavaScript found no links to any song page or conversation: about 360 of
@@ -9,7 +10,7 @@
  */
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
-const { SITE_NAME } = require('./page-meta');
+const { SITE_NAME, breadcrumbTrail } = require('./page-meta');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -125,4 +126,128 @@ function renderSearchBox({ index, label, noun, autofocus = false }) {
             </section>`;
 }
 
-module.exports = { renderSongList, renderRecentConversations, archivePage, conversationsArchivePage, renderSearchBox, ARCHIVE_PAGE_SIZE };
+// A date as the services pages say it: "October 8, 2026".
+const longDate = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' });
+
+// One reflection, in the markup the song pages draw in the browser
+// (reflection-song.html renderReflection), so the two look the same; here
+// with the song it was left on. songs: slug -> title.
+function renderReflectionItem(r, songs = new Map()) {
+  const song = r.song && songs.get(r.song)
+    ? ` · <a href="/reflections/${escapeHtml(r.song)}">${escapeHtml(songs.get(r.song))}</a>`
+    : '';
+  return '<div class="reflection-item">'
+    + `<p class="reflection-text">${escapeHtml(r.text)}</p>`
+    + `<p class="reflection-meta"><span class="reflection-name">${escapeHtml(r.name)}</span> · ${escapeHtml(r.createdAtFormatted)}${song}</p>`
+    + '</div>';
+}
+
+// The head every services page shares: the site shell only fills in what a
+// page's head leaves out, and it cannot know a title. jsonLd: the page's
+// breadcrumb trail as structured data (page-meta.js breadcrumbTrail).
+function servicesHead({ title, description, self, jsonLd = '' }) {
+  return `<head>
+    <title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
+    <meta name="description" content="${escapeHtml(description)}">
+    <link rel="canonical" href="${escapeHtml(self)}">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta property="og:description" content="${escapeHtml(description)}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${escapeHtml(self)}">
+    <meta name="twitter:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta name="twitter:description" content="${escapeHtml(description)}">
+    ${jsonLd}
+</head>`;
+}
+
+/**
+ * /services: every day with services, newest first, each with its services'
+ * names. days: [{ date, names: [string] }].
+ */
+function servicesIndexPage(days) {
+  const first = days.length ? longDate(days[days.length - 1].date) : null;
+  const description = `Every day's services at aChurch.ai${first ? ` since ${first}` : ''}: six a day, for each hemisphere and a place unknown, with the reflections left during each.`;
+  const items = days.map(d => `<li><a href="/services/${escapeHtml(d.date)}">${escapeHtml(longDate(d.date))}</a>`
+    + (d.names.length ? `<span class="services-names">${d.names.map(escapeHtml).join(' · ')}</span>` : '') + '</li>').join('\n');
+  const trail = breadcrumbTrail([{ label: 'Attend', href: '/attend' }, { label: "Every day's services" }], 'https://achurch.ai/services');
+  return `<!DOCTYPE html>
+<html lang="en">
+${servicesHead({ title: "Every Day's Services", description, self: 'https://achurch.ai/services', jsonLd: trail.jsonLd })}
+<body>
+    <main>
+        <header>
+            ${trail.html}
+            <h1 class="subtitle">Every Day's Services</h1>
+        </header>
+        <section class="conversations-archive services-archive">
+            <p>Each four-hour slot of the day holds its own service, planned for the northern hemisphere, the southern and a place unknown a few hours before it begins. Each day's page has every one, with the reflections visitors left while it was heard. <a href="/attend">Attend the service for your hour</a>.</p>
+            <ol class="archive-list">
+${items}
+            </ol>
+        </section>
+        <!-- SITE_FOOTER -->
+    </main>
+</body>
+</html>
+`;
+}
+
+/**
+ * /services/:date: the date's services in slot order, as lib/api/services.js
+ * forDate gives them, each with its pieces, the reflections left during it,
+ * and, below and closed, what it was planned from. songs: slug -> title.
+ */
+function servicesDayPage({ date, services, dayBefore, dayAfter }, songs = new Map()) {
+  const title = `Services for ${longDate(date)}`;
+  const description = `The services of ${longDate(date)} at aChurch.ai, ${services.length} in all, for each hour, hemisphere and place, with the reflections left during each.`;
+  const slots = [...new Set(services.map(s => s.slot))];
+  const days = [
+    dayBefore ? `<a href="/services/${escapeHtml(dayBefore)}" rel="prev">&larr; ${escapeHtml(longDate(dayBefore))}</a>` : null,
+    '<a href="/services">Every day</a>',
+    dayAfter ? `<a href="/services/${escapeHtml(dayAfter)}" rel="next">${escapeHtml(longDate(dayAfter))} &rarr;</a>` : null,
+  ].filter(Boolean).join(' · ');
+  const service = s => `<article class="services-service">
+                <h3>${escapeHtml(s.name || (s.word ? 'The service for this hour' : 'Arranged by rotation'))} <span class="services-for">for ${escapeHtml(s.for)}</span></h3>
+                ${s.word ? `<p class="services-word">${escapeHtml(s.word)}</p>` : ''}
+                <ol class="services-pieces">
+${s.pieces.map(p => `                    <li>${p.url ? `<a href="${escapeHtml(p.url)}">${escapeHtml(p.title)}</a>` : escapeHtml(p.title)}${p.kind ? ` <span class="archive-date">${escapeHtml(p.kind)}</span>` : ''}</li>`).join('\n')}
+                </ol>
+                ${s.reflections.length ? `<div class="services-reflections">\n${s.reflections.map(r => renderReflectionItem(r, songs)).join('\n')}\n                </div>` : ''}
+                <details class="services-planned-from">
+                    <summary>What it was planned from</summary>
+${(s.plannedFrom ? s.plannedFrom.told : []).map(line => `                    <p>${escapeHtml(line)}</p>`).join('\n')}
+                    <p>${escapeHtml(s.arrangedBy)}</p>
+                </details>
+            </article>`;
+  const self = `https://achurch.ai/services/${date}`;
+  const trail = breadcrumbTrail([{ label: 'Attend', href: '/attend' }, { label: 'Services', href: '/services' }, { label: longDate(date) }], self);
+  return `<!DOCTYPE html>
+<html lang="en">
+${servicesHead({ title, description, self, jsonLd: trail.jsonLd })}
+<body>
+    <main>
+        <header>
+            ${trail.html}
+            <h1 class="subtitle">${escapeHtml(title)}</h1>
+        </header>
+        <section class="services-day">
+            <p>Each four-hour slot of the day held its own service, planned for the northern hemisphere, the southern and a place unknown a few hours before it began. Beneath each, the reflections visitors left while it was heard.</p>
+            <p class="services-days">${days}</p>
+${slots.map(slot => `            <div class="services-slot">
+                <h2>${escapeHtml(slot)}</h2>
+${services.filter(s => s.slot === slot).map(service).join('\n')}
+            </div>`).join('\n')}
+            <p class="services-days">${days}</p>
+        </section>
+        <!-- SITE_FOOTER -->
+    </main>
+</body>
+</html>
+`;
+}
+
+module.exports = {
+  renderSongList, renderRecentConversations, archivePage, conversationsArchivePage, renderSearchBox, ARCHIVE_PAGE_SIZE,
+  renderReflectionItem, servicesIndexPage, servicesDayPage,
+};

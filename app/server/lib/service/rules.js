@@ -10,6 +10,7 @@
  */
 
 const { SLOT_HOURS, slotStart } = require('./slots');
+const { SHOWERS } = require('../utils/sky');
 
 const RULES = {
   songs: [1, 2],
@@ -131,6 +132,61 @@ function checkName(name, ids, catalog) {
   return [...issues, ...voiceIssues(name, 'name', ids, catalog)];
 }
 
+const PLANETS = ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+
+/**
+ * What the name and word say of the sky and the Earth, against what the plan
+ * was told (planner.js contextFor), so a service never tells its visitors
+ * something false about the night above them: a planet, a meteor shower, an
+ * eclipse, a Voyager, El Niño or La Niña named only when the plan was told
+ * of it; the evening or morning star only when Venus is seen then; a storm,
+ * aurora, radio blackouts or a radiation storm only when NOAA forecast them;
+ * the moon called full or new tonight only on its night. Narrow on purpose:
+ * a false alarm costs a retry and could cost a service, so only plain claims
+ * are read, and the sky may always go unsaid. Nothing for a plan told no
+ * context. Plan: sky-and-earth-sources-2026-10-08.md in the private repo.
+ */
+function checkSky(text, context) {
+  if (!context || typeof text !== 'string') return [];
+  const says = re => re.test(text);
+  const issues = [];
+  const planets = context.planets || {};
+  const visible = planets.visible || [];
+  const told = new Set([...visible.map(p => p.name), ...(planets.events || []).map(e => e.body)]);
+  for (const p of PLANETS) {
+    if (says(new RegExp(`\\b${p}\\b`)) && !told.has(p)) issues.push(`${p}, which the sky you were told does not hold`);
+  }
+  const venus = visible.find(p => p.name === 'Venus');
+  if (says(/\bevening star\b/i) && !(venus && /evening|all night/.test(venus.when))) issues.push('the evening star, though Venus is not seen after sunset from here');
+  if (says(/\bmorning star\b/i) && !(venus && /morning|all night/.test(venus.when))) issues.push('the morning star, though Venus is not seen before dawn from here');
+  const { moon } = context;
+  const asIs = moon && (moon.phase === 'full' || moon.phase === 'new' ? moon.phase : `a ${moon.phase}`);
+  if (moon && moon.phase !== 'full' && says(/\bmoon is (?:now )?full\b|\bfull moon (?:tonight|today)\b|\b(?:tonight|today)'?s full moon\b|\bunder (?:a|the|this) full moon\b/i)) issues.push(`a full moon, though the moon is ${asIs}`);
+  if (moon && moon.phase !== 'new' && says(/\bmoon is (?:now )?new\b|\bnew moon (?:tonight|today)\b|\b(?:tonight|today)'?s new moon\b/i)) issues.push(`a new moon, though the moon is ${asIs}`);
+  const showers = context.showers || [];
+  for (const s of SHOWERS) {
+    if (says(new RegExp(`\\b${s.name}\\b`)) && !showers.some(n => n.name === s.name)) issues.push(`the ${s.name}, which are not near`);
+  }
+  if (says(/\bmeteor/i) && !showers.length) issues.push('meteors, though no shower is near');
+  if (says(/\beclipse/i) && !(context.eclipses || []).length) issues.push('an eclipse, though none is near');
+  const voyagers = context.voyagers || [];
+  for (const craft of ['Voyager 1', 'Voyager 2']) {
+    if (says(new RegExp(`\\b${craft}\\b`)) && !voyagers.some(v => v.craft === craft)) issues.push(`${craft}, which you were not told of`);
+  }
+  if (says(/\bVoyagers?\b(?! [12]\b)/) && !voyagers.length) issues.push('the Voyagers, which you were not told of');
+  const sw = context.spaceWeather;
+  if (says(/\b(?:geomagnetic|magnetic|solar|space) storms?\b/i) && !(sw && sw.scale)) issues.push('a storm, though NOAA forecasts none');
+  if (says(/\baurora/i) && !(sw && (sw.scale || sw.kp >= 3))) issues.push('aurora, though NOAA forecasts the field quiet');
+  if (says(/\bradio blackouts?\b/i) && !(sw && sw.radio && (sw.radio.minor >= 25 || sw.radio.major >= 25))) issues.push('radio blackouts, which NOAA does not expect');
+  if (says(/\bradiation storms?\b/i) && !(sw && sw.radiation && sw.radiation.chance >= 10)) issues.push('a radiation storm, which NOAA does not expect');
+  const enso = context.earth && context.earth.enso;
+  const outlook = enso ? `${enso.status} ${enso.synopsis}` : '';
+  for (const [name, re] of [['El Niño', /\bEl Ni[nñ]o\b/i], ['La Niña', /\bLa Ni[nñ]a\b/i]]) {
+    if (re.test(text) && !re.test(outlook)) issues.push(`${name}, which NOAA's outlook does not report`);
+  }
+  return issues.length ? [`The name or word speaks of ${issues.join('; ')}. Say only what you were told of the sky and the Earth, or leave them unsaid.`] : [];
+}
+
 // Whether a piece's `hours:` (lib/music/companions.js parseHours, which may
 // wrap midnight) reach into a slot. A piece without hours fits any slot.
 function inSlot(hours, slot) {
@@ -218,4 +274,4 @@ function rotation({ date, slot, catalog, excluded = new Set() }) {
   return null;
 }
 
-module.exports = { RULES, CLASS, WINDOW_DAYS, addDays, serviceSeconds, fits, check, checkWord, checkName, inSlot, exclusions, rotation };
+module.exports = { RULES, CLASS, WINDOW_DAYS, addDays, serviceSeconds, fits, check, checkWord, checkName, checkSky, inSlot, exclusions, rotation };

@@ -11,5 +11,6 @@ module.exports = {
   ask: require('./ask'),
   search: require('./search'),
   directory: require('./directory'),
+  services: require('./services'),
   shared: require('./shared'),
 };

@@ -33,6 +33,7 @@ const PUBLIC = path.join(__dirname, '../../../client/public');
 const DRAWN = {
   '/docs': ['The Library', 'Everything the sanctuary has written: philosophy, practice, prayers, rituals, chants, hymns and writing for builders, with reading paths into it.'],
   '/conversations': ['Conversations: every question asked here', 'Every question asked of the sanctuary\'s writing, with its answer, newest first.'],
+  '/services': ['Every day\'s services', 'Each day\'s services, every hour and hemisphere, with the reflections visitors left during each.'],
 };
 
 const ENTITIES = { amp: '&', quot: '"', '#39': '\'', apos: '\'', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', mdash: '—', ndash: '–', lt: '<', gt: '>' };
@@ -50,7 +51,7 @@ async function pageMeta(url) {
 }
 
 async function sitePages() {
-  const places = [...PLACES, ...FOOTER_MORE, ...FOOTER_LEGAL, { url: '/conversations', label: 'Conversations' }]
+  const places = [...PLACES, ...FOOTER_MORE, ...FOOTER_LEGAL, { url: '/conversations', label: 'Conversations' }, { url: '/services', label: 'Services' }]
     .filter((p, i, all) => p.url.startsWith('/') && all.findIndex(q => q.url === p.url) === i);
   const pages = await Promise.all(places.map(async p => {
     const [title, description] = await pageMeta(p.url);

@@ -54,6 +54,9 @@ const service = z.looseObject({
     eclipses: z.array(z.looseObject({ kind: z.string(), type: z.string(), date: z.string(), days: z.number().int() })),
     voyagers: z.array(z.looseObject({ craft: z.string(), what: z.string(), date: z.string(), days: z.number().int() })).nullable(),
   }).nullable().describe('What the service was planned from: the moon, the planets seen from your hemisphere (null for a place unknown) and their events within three weeks, NOAA\'s space-weather forecast as of planning, any meteor shower or eclipse within three weeks, and the Voyagers near their dates. Null for a plan made before plans recorded it, and for the rotation'),
+  visitors: z.looseObject({
+    tier: z.string(), days: z.number().int(), reflections: z.number().int(), themes: z.array(z.string()),
+  }).nullable().describe('What visitors, human and AI, left in reflections over the days before the service, as the themes its planner was told: never their words or names. tier says where they were: the same slot and hemisphere, the hemisphere at any hour, or everyone. Null for a service planned without any'),
   earth: z.looseObject({
     enso: z.looseObject({ status: z.string(), synopsis: z.string(), asOf: z.string().nullable() }),
   }).nullable().describe('The Earth\'s state the service was planned from: El Niño or La Niña as NOAA\'s monthly outlook gave it. Null when NOAA could not be reached, and for the rotation'),
@@ -105,14 +108,28 @@ const readSong = song.extend({
 
 const reflection = z.looseObject({ name: z.string(), text: z.string(), createdAt: z.string() });
 
-// The catalog (songs), the last 48 hours (reflections), or one song's archive
-// (slug, title, reflections, total, and next while older ones remain).
+// One of a day's services, with the reflections left during it.
+const dayService = z.looseObject({
+  slot: z.string(),
+  for: z.string(),
+  name: z.string().nullable(),
+  word: z.string().nullable(),
+  reflections: z.array(reflection),
+});
+
+// The catalog (songs), the last 48 hours (reflections), one song's archive
+// (slug, title, reflections, total, and next while older ones remain), or a
+// day's services (date, services, dayBefore, dayAfter).
 const browse = z.looseObject({
   songs: z.array(song).optional(),
   total: z.number().int().optional(),
   reflections: z.array(reflection).optional(),
   slug: z.string().optional(),
   title: z.string().optional(),
+  date: z.string().optional(),
+  services: z.array(dayService).optional(),
+  dayBefore: z.string().nullable().optional(),
+  dayAfter: z.string().nullable().optional(),
   next_steps: nextSteps,
 });
 

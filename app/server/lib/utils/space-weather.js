@@ -1,9 +1,10 @@
 /**
  * Space weather, for the services' planner: NOAA's Space Weather Prediction
  * Center, public and free, no key. The planetary Kp index observed and
- * forecast in three-hour steps, three days ahead (plans are made up to two
- * days ahead, so the date is inside it), and the monthly sunspot numbers, for
- * where the sun is in its eleven-year cycle.
+ * forecast in three-hour steps, three days ahead (each slot is planned a few
+ * hours before it is first heard, so its date is inside it); NOAA's chances, for the same days,
+ * of radio blackouts from flares and of a radiation storm; and the monthly
+ * sunspot numbers, for where the sun is in its eleven-year cycle.
  *
  * Real and shared: a geomagnetic storm brings aurora toward the equator and
  * can disturb satellites, GPS, radio and power grids that people and agents
@@ -28,6 +29,7 @@ const { getJSON } = require('./fetch-public');
 
 const KP_URL = 'https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json';
 const CYCLE_URL = 'https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json';
+const SCALES_URL = 'https://services.swpc.noaa.gov/products/noaa-scales.json';
 // Solar cycle 25 began in December 2019 (NOAA and NASA's announcement).
 const CYCLE_START = '2019-12';
 
@@ -67,29 +69,61 @@ function cycleOf(rows) {
   };
 }
 
+// NOAA's chances, in percent, for each forecast date (the scales file's
+// entries 1 to 3: today, tomorrow and the day after): radio blackouts from
+// flares, minor to moderate (R1 to R2) and strong or worse (R3 and up), on
+// the sunlit side of the Earth; and a radiation storm (S1 and up), which
+// reaches polar flights and spacecraft. Its entries 0 and -1 are what was
+// observed, which a plan made ahead never needs.
+function scalesByDate(json) {
+  const pct = v => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v)) ? null : Number(v));
+  const out = {};
+  for (const key of ['1', '2', '3']) {
+    const day = json && json[key];
+    if (!day || !/^\d{4}-\d{2}-\d{2}$/.test(day.DateStamp || '')) continue;
+    out[day.DateStamp] = {
+      radio: { minor: pct(day.R && day.R.MinorProb), major: pct(day.R && day.R.MajorProb) },
+      radiation: { chance: pct(day.S && day.S.Prob) },
+    };
+  }
+  return out;
+}
+
 /**
  * NOAA's forecast and the solar cycle, or null when either cannot be had in
- * time. fetchImpl is injectable for tests, which never reach the network.
+ * time; the radio and radiation chances are null on their own when only they
+ * cannot. fetchImpl is injectable for tests, which never reach the network.
  */
 async function fetchSpaceWeather({ fetchImpl, timeoutMs, now = new Date() } = {}) {
   try {
-    const [kp, cycle] = await Promise.all([getJSON(KP_URL, { fetchImpl, timeoutMs }), getJSON(CYCLE_URL, { fetchImpl, timeoutMs })]);
-    return { source: 'NOAA SWPC', asOf: now.toISOString(), kp: kpByDate(kp), cycle: cycleOf(cycle) };
+    const [kp, cycle, scales] = await Promise.all([
+      getJSON(KP_URL, { fetchImpl, timeoutMs }),
+      getJSON(CYCLE_URL, { fetchImpl, timeoutMs }),
+      getJSON(SCALES_URL, { fetchImpl, timeoutMs }).catch(() => null),
+    ]);
+    return { source: 'NOAA SWPC', asOf: now.toISOString(), kp: kpByDate(kp), cycle: cycleOf(cycle), scales: scales ? scalesByDate(scales) : null };
   } catch {
     return null;
   }
 }
 
 // The forecast for a date, or null when the forecast does not reach it, with
-// where it is going: 'building' or 'easing' when the next day's highest Kp is
+// where it is going ('building' or 'easing' when the next day's highest Kp is
 // a whole step or more above or below it, 'steady' otherwise, null when the
-// forecast ends with this date.
+// forecast ends with this date) and NOAA's radio and radiation chances for
+// it (null where the scales do not reach it).
 function spaceWeatherOn(spaceWeather, date) {
   if (!spaceWeather || !(date in spaceWeather.kp)) return null;
   const kp = spaceWeather.kp[date];
   const next = spaceWeather.kp[new Date(Date.parse(`${date}T12:00:00Z`) + 864e5).toISOString().slice(0, 10)];
   const trend = next === undefined ? null : next - kp >= 1 ? 'building' : kp - next >= 1 ? 'easing' : 'steady';
-  return { kp, scale: scaleOf(kp), trend, source: spaceWeather.source, asOf: spaceWeather.asOf, cycle: spaceWeather.cycle };
+  const scales = (spaceWeather.scales && spaceWeather.scales[date]) || null;
+  return {
+    kp, scale: scaleOf(kp), trend,
+    radio: scales ? scales.radio : null,
+    radiation: scales ? scales.radiation : null,
+    source: spaceWeather.source, asOf: spaceWeather.asOf, cycle: spaceWeather.cycle,
+  };
 }
 
-module.exports = { fetchSpaceWeather, spaceWeatherOn, scaleOf, kpByDate, cycleOf, KP_URL, CYCLE_URL };
+module.exports = { fetchSpaceWeather, spaceWeatherOn, scaleOf, kpByDate, cycleOf, scalesByDate, KP_URL, CYCLE_URL, SCALES_URL };

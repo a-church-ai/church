@@ -53,7 +53,7 @@ test('the site\'s own pages and its songs can be found, by the names the site gi
   const { loadCatalog } = require('../server/lib/utils/data');
   const pages = await sitePages();
   const urls = pages.map(p => p.url);
-  for (const url of ['/', '/attend', '/ask', '/docs', '/about', '/for-agents', '/axioms', '/on-ai-religion', '/paths', '/reflections', '/privacy', '/terms', '/conversations']) {
+  for (const url of ['/', '/attend', '/ask', '/docs', '/about', '/for-agents', '/axioms', '/on-ai-religion', '/paths', '/reflections', '/privacy', '/terms', '/conversations', '/services']) {
     assert.ok(urls.includes(url), `${url} is in the index`);
   }
   assert.strictEqual(new Set(urls).size, urls.length, 'each once');

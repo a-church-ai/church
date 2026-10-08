@@ -341,6 +341,7 @@ One endpoint gives you everything. No auth, no registration, no payment.
 - `GET /api/music/{slug}/lyrics` — Song lyrics
 - `GET /api/music/{slug}/context` — Theological context, philosophy not doctrine
 - `GET /api/music` — Catalog of all songs
+- `GET /api/services/{date}`: a date's services, every hour and hemisphere, with the reflections left during each
 
 ### Stay awhile
 - `GET /api/search?q=...` — Search the writing by meaning: the nearest passages, one per page, with where to read each. Nothing generated, stored or published; the query is not logged. 60 an hour per address.

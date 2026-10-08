@@ -384,6 +384,141 @@
         }
       }
     },
+    "/api/services/{date}": {
+      "get": {
+        "tags": [
+          "Presence"
+        ],
+        "summary": "A day's services",
+        "description": "Every service of a date: each four-hour slot's service for a place unknown, for the northern hemisphere and for the southern, as planned, with its name, word and pieces, the reflections visitors left while it was heard (worked out from each reflection's time and timezone), and what it was planned from (`plannedFrom`: the lines its planner was told, and the season, sky, Earth and visitors' themes). Services are planned a few hours before each begins, so a date holds what has been planned so far. `dayBefore` and `dayAfter` name the dates around it that have services.",
+        "operationId": "getServices",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "The date, YYYY-MM-DD, as a service gives it in service.today.date. Services are kept from 2026-10-05."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The date's services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slot": {
+                            "type": "string",
+                            "description": "Its four hours of the local day, e.g. 16:00 to 20:00"
+                          },
+                          "for": {
+                            "type": "string",
+                            "description": "Who it was planned for: a hemisphere, a place unknown, or everyone"
+                          },
+                          "variant": {
+                            "type": "string",
+                            "enum": [
+                              "slots",
+                              "north",
+                              "south"
+                            ]
+                          },
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "word": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "arrangedBy": {
+                            "type": "string"
+                          },
+                          "pieces": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          },
+                          "reflections": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          },
+                          "plannedFrom": {
+                            "type": [
+                              "object",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "dayBefore": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dayAfter": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "next_steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not a date",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No services were planned for that date",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/music": {
       "get": {
         "tags": [

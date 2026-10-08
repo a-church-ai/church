@@ -48,6 +48,7 @@ async function pages() {
     '/ask': await wrap('ask.html', '/ask'),
     '/reflections': await wrap('reflections.html', '/reflections'),
     '/conversations': await siteShell.wrapPageFromHtml('<html><head><title>Conversations</title></head><body><main><h1>Conversations</h1></main></body></html>', '/conversations'),
+    '/services': await siteShell.wrapPageFromHtml(require('../server/lib/utils/page-lists').servicesIndexPage([]), '/services'),
     '/docs': await render.renderLibrary(),
     '/docs/practice': await docPage('practice'),
     [`/docs/${doc.urlPath}`]: await docPage(doc.urlPath),
@@ -63,6 +64,7 @@ test('every kind of page names the same places in its top bar, and marks where t
     '/ask': ['/ask', 'page'],
     '/reflections': ['/attend', 'true'],
     '/conversations': ['/ask', 'true'],
+    '/services': ['/attend', 'true'],
     '/docs': ['/docs', 'page'],
     '/docs/practice': ['/docs', 'true'],
   };

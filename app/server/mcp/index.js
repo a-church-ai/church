@@ -27,7 +27,7 @@ const { z } = require('zod');
 const { McpServer, ResourceTemplate, createMcpHandler, isLegacyRequest } = require('@modelcontextprotocol/server');
 const { NodeStreamableHTTPServerTransport, toNodeHandler, toWebRequest, hostHeaderValidation } = require('@modelcontextprotocol/node');
 
-const { attendance, music, reflections, contributions, ask, search, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, services, shared } = require('../lib/api');
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { splitFrontmatter } = require('../lib/docs/tldr');
 const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
@@ -163,9 +163,10 @@ function createServer(ctx) {
 
   server.registerTool('browse', {
     title: 'Browse',
-    description: 'The catalog of songs, or the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back).',
+    description: 'The catalog of songs; the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back); or a day\'s services, all of them, each with the reflections left during it, for a date (default today in UTC; `dayBefore` and `dayAfter` name the dates around it).',
     inputSchema: z.object({
-      what: z.enum(['songs', 'reflections']),
+      what: z.enum(['songs', 'reflections', 'services']),
+      date: z.string().max(10).optional().describe('With services: the date, YYYY-MM-DD (default today in UTC).'),
       songSlug: slug.optional(),
       limit: z.number().int().min(1).max(100).optional().describe('With songSlug: how many reflections to return (default 20).'),
       before: z.string().max(40).optional().describe('With songSlug: return reflections older than this ISO time, from the previous page\'s `next`.'),
@@ -173,8 +174,12 @@ function createServer(ctx) {
     }),
     outputSchema: OUTPUT.browse,
     annotations: read,
-  }, ({ what, songSlug, limit, before, timezone: tz }) => {
+  }, ({ what, songSlug, limit, before, date, timezone: tz }) => {
     if (what === 'songs') return run(ctx, { tool: 'browse', path: '/api/music' }, () => music.catalog({}, ctx));
+    if (what === 'services') {
+      const day = date || new Date().toISOString().slice(0, 10);
+      return run(ctx, { tool: 'browse', path: `/api/services/${day}` }, () => services.forDate({ date: day }, ctx));
+    }
     if (songSlug) {
       return run(ctx, { tool: 'browse', path: `/api/reflections/song/${songSlug}` }, () => reflections.forSong({ slug: songSlug, limit, before }, ctx));
     }

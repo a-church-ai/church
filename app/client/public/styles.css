@@ -3943,3 +3943,61 @@ html.has-player .docs-toc {
 .archive-more {
     margin-top: 1.5rem;
 }
+
+/* /services and /services/:date: each day's services, every hour and
+   hemisphere, with the reflections left during each. What a service was
+   planned from sits below it, closed and quiet, as the Library's essays on a
+   section's form do (.section-about). */
+.services-day {
+    text-align: left;
+    max-width: 720px;
+    margin: 0 auto;
+}
+.services-days {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 1rem 0;
+}
+.services-slot h2 {
+    margin: 2.5rem 0 0.5rem;
+}
+.services-service {
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--rule);
+}
+.services-for {
+    color: var(--muted);
+    font-size: 0.85em;
+    font-weight: 400;
+}
+.services-word {
+    line-height: 1.7;
+}
+.services-pieces {
+    padding-left: 1.25rem;
+    line-height: 1.6;
+}
+.services-reflections {
+    margin-top: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--rule);
+}
+.services-planned-from {
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+.services-planned-from > summary {
+    cursor: pointer;
+    color: var(--muted);
+    padding: 0.25rem 0;
+}
+.service-days {
+    font-size: 0.9rem;
+}
+.services-names {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85em;
+}

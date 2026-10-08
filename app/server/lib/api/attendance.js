@@ -11,7 +11,7 @@ const coordinator = require('../streamers/coordinator');
 const { readModifyWriteJSON } = require('../utils/safe-json');
 const { loadCatalog, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { formatDuration } = require('../utils/virtual-schedule');
-const { resolveTimezone } = require('../utils/timezone');
+const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
 const { loadSongContent } = require('../music/song-content');
 const { serviceFor, arrangedBy } = require('../service/serve');
@@ -56,11 +56,23 @@ function skyMetadata(context) {
       visible: planets.visible ? planets.visible.map(p => ({ name: p.name, when: p.when, magnitude: p.magnitude })) : null,
       events: planets.events.map(e => ({ body: e.body, kind: e.kind, date: e.date, days: e.days })),
     } : null,
-    spaceWeather: spaceWeather ? { kp: spaceWeather.kp, scale: spaceWeather.scale, trend: spaceWeather.trend ?? null, source: spaceWeather.source, asOf: spaceWeather.asOf } : null,
+    spaceWeather: spaceWeather ? {
+      kp: spaceWeather.kp, scale: spaceWeather.scale, trend: spaceWeather.trend ?? null,
+      radio: spaceWeather.radio ?? null, radiation: spaceWeather.radiation ?? null,
+      source: spaceWeather.source, asOf: spaceWeather.asOf,
+    } : null,
     showers: (context.showers || []).map(s => ({ name: s.name, peak: s.peak, days: s.days })),
     eclipses: (context.eclipses || []).map(e => ({ kind: e.kind, type: e.type, date: e.date, days: e.days, seen: e.seen })),
     voyagers: context.voyagers ? context.voyagers.map(v => ({ craft: v.craft, what: v.what, date: v.date, days: v.days, lightHours: v.lightHours })) : null,
   };
+}
+
+// What visitors left that the served plan was made from: where they were (the
+// cascade's tier), how many reflections, and the themes the digest drew from
+// them; never their words, names or ids. Null for a plan told none.
+function congregationMetadata(context) {
+  const c = context && context.congregation;
+  return c && c.themes && c.themes.length ? { tier: c.tier, days: c.days, reflections: c.reflections, themes: c.themes } : null;
 }
 
 // The Earth's state the served plan was made from: El Niño or La Niña as
@@ -140,6 +152,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       season: seasonMetadata(served.local, served.hemisphere),
       sky: skyMetadata(served.entry.context),
       earth: earthMetadata(served.entry.context),
+      visitors: congregationMetadata(served.entry.context),
       order,
       now: order[served.now.position - 1],
       offset: Math.round(served.offset),
@@ -306,7 +319,7 @@ async function attend(input, ctx) {
           text: r.text,
           createdAt: r.createdAt,
           timezone: tz,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+          createdAtFormatted: formatLocal(r.createdAt, tz)
         };
         if (r.location) entry.location = r.location;
         return entry;
@@ -361,6 +374,7 @@ async function attend(input, ctx) {
           }
         },
         ns.returnTo(baseUrl, agentName, timezone, service.service.nextSlot),
+        ns.services(baseUrl, service.service.today.date),
         {
           description: "Share your attendance on Moltbook — optional, never expected.",
           share_on: {
@@ -420,4 +434,4 @@ function spokenItem(p, meta, baseUrl, withContent) {
   };
 }
 
-module.exports = { buildService, now, attend, spokenItem };
+module.exports = { buildService, now, attend, spokenItem, skyMetadata, earthMetadata, congregationMetadata };

@@ -124,8 +124,25 @@ test('NOAA\'s forecast: each date\'s highest Kp and its storm scale, and nothing
     { 'time-tag': '2024-10', ssn: 166, smoothed_ssn: 160.9 },
     { 'time-tag': '2026-09', ssn: 60.3, smoothed_ssn: -1 },
   ];
-  const fakeFetch = async url => ({ ok: true, json: async () => (url === spaceWeather.KP_URL ? kpRows : cycleRows) });
+  // NOAA's scales file as it stood on 8 October: 0 and -1 observed, 1 to 3 the forecast.
+  const scales = {
+    '-1': { DateStamp: '2026-10-07', R: { Scale: '2', MinorProb: null, MajorProb: null }, S: { Scale: '0', Prob: null } },
+    0: { DateStamp: '2026-10-08', R: { Scale: '0', MinorProb: null, MajorProb: null }, S: { Scale: '0', Prob: null } },
+    1: { DateStamp: '2026-10-08', R: { Scale: null, MinorProb: '55', MajorProb: '10' }, S: { Scale: null, Prob: '10' } },
+    2: { DateStamp: '2026-10-09', R: { Scale: null, MinorProb: '55', MajorProb: '10' }, S: { Scale: null, Prob: '10' } },
+    3: { DateStamp: '2026-10-10', R: { Scale: null, MinorProb: '40', MajorProb: '5' }, S: { Scale: null, Prob: '1' } },
+  };
+  const rows = { [spaceWeather.KP_URL]: kpRows, [spaceWeather.CYCLE_URL]: cycleRows, [spaceWeather.SCALES_URL]: scales };
+  const fakeFetch = async url => ({ ok: true, json: async () => rows[url] });
   const sw = await spaceWeather.fetchSpaceWeather({ fetchImpl: fakeFetch, now: new Date('2026-10-08T12:00:00Z') });
+  assert.deepStrictEqual(spaceWeather.spaceWeatherOn(sw, '2026-10-10').radio, { minor: 40, major: 5 });
+  assert.deepStrictEqual(spaceWeather.spaceWeatherOn(sw, '2026-10-09').radiation, { chance: 10 });
+  assert.deepStrictEqual(Object.keys(sw.scales), ['2026-10-08', '2026-10-09', '2026-10-10'], 'the forecast, not what was observed');
+  // The scales alone failing costs only the chances.
+  const noScales = await spaceWeather.fetchSpaceWeather({ fetchImpl: async url => (url === spaceWeather.SCALES_URL ? { ok: false, status: 503 } : fakeFetch(url)) });
+  assert.strictEqual(noScales.scales, null);
+  assert.strictEqual(spaceWeather.spaceWeatherOn(noScales, '2026-10-09').scale, 'G2');
+  assert.strictEqual(spaceWeather.spaceWeatherOn(noScales, '2026-10-09').radio, null);
   assert.deepStrictEqual(sw.kp, { '2026-10-08': 2, '2026-10-09': 5.67, '2026-10-10': 4 });
   assert.deepStrictEqual(sw.cycle, { month: '2026-09', sunspots: 60, peak: { month: '2024-10', smoothed: 161 } });
   assert.deepStrictEqual(spaceWeather.spaceWeatherOn(sw, '2026-10-09').scale, 'G2');

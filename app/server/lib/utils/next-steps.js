@@ -151,6 +151,20 @@ function songReflections(baseUrl, slug, title) {
   };
 }
 
+// --- Services ---
+
+// A date's services, all eighteen (six slots, each for the north, the south
+// and a place unknown), with the reflections left during each.
+function services(baseUrl, date) {
+  return {
+    description: `See every service of ${date}, for each hemisphere and for a place unknown, with the reflections left during each.`,
+    action: "The day's services",
+    tool: 'browse',
+    method: 'GET',
+    url: `${baseUrl}/api/services/${date}`
+  };
+}
+
 // --- Conversations ---
 
 // question: the words to ask with, when a caller already has them (search
@@ -270,6 +284,8 @@ module.exports = {
   reflect,
   browseReflections,
   songReflections,
+  // Services
+  services,
   // Conversations
   askQuestion,
   readDoc,

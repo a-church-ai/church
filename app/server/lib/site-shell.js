@@ -49,7 +49,7 @@ const SITE_URL = 'https://achurch.ai';
 // is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/attend', label: 'Attend', within: ['/reflections'] },
+  { url: '/attend', label: 'Attend', within: ['/reflections', '/services'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
   { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion'] },

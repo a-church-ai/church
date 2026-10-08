@@ -66,12 +66,20 @@ function arrangedBy(entry, { seasonal = false } = {}) {
     : `Arranged, and its word written, by an AI model (${entry.arrangedBy}), ${forWhen}.`;
 }
 
-async function serviceFor({ timezone, at = new Date() } = {}) {
+/**
+ * Which service a timezone was given at a moment: the local date and slot,
+ * the hemisphere the timezone points to, the entry served and which of the
+ * date's plans it came from (`variant`: the hemisphere's, `slots` for the
+ * season-less one, or `rotation`). The one choice of plan, which serving and
+ * the day pages (lib/api/services.js, mapping each reflection to the service
+ * it was left during) both make.
+ */
+async function entryFor({ timezone, at = new Date(), catalog } = {}) {
   const given = resolveTimezone(timezone);
   const tz = given || 'UTC';
   const local = localTime(tz, at);
   const slot = slotOf(local.hour);
-  const catalog = await loadServiceCatalog();
+  const pieces = catalog || await loadServiceCatalog();
   const hemisphere = given ? hemisphereOf(given) : null;
   const plan = await readPlan(local.date);
   // A stored plan whose pieces are no longer all in the catalog (one removed
@@ -79,20 +87,19 @@ async function serviceFor({ timezone, at = new Date() } = {}) {
   // checked when it was planned; a piece's length moving a few seconds since
   // (a song's audio measured against its video's) is not a reason to discard
   // the day's service.
-  const holds = entry => entry && (entry.pieces || []).every(id => catalog.has(id));
+  const holds = entry => entry && (entry.pieces || []).every(id => pieces.has(id));
   const seasonal = hemisphere && plan && plan[hemisphere] ? plan[hemisphere][slot] : null;
   const seasonless = plan && plan.slots ? plan.slots[slot] : null;
-  const entry = holds(seasonal) ? seasonal : holds(seasonless) ? seasonless : await rotationEntry(local.date, slot, catalog);
-  return {
-    timezone: tz,
-    timezoneGiven: Boolean(given),
-    hemisphere,
-    seasonal: entry === seasonal,
-    local,
-    slot,
-    entry,
-    ...serviceAt({ ids: entry.pieces, catalog, local }),
-  };
+  const [entry, variant] = holds(seasonal) ? [seasonal, hemisphere]
+    : holds(seasonless) ? [seasonless, 'slots']
+      : [await rotationEntry(local.date, slot, pieces), 'rotation'];
+  return { timezone: tz, timezoneGiven: Boolean(given), hemisphere, seasonal: variant === hemisphere, variant, local, slot, entry };
 }
 
-module.exports = { arrange, serviceAt, serviceFor, arrangedBy };
+async function serviceFor({ timezone, at = new Date() } = {}) {
+  const catalog = await loadServiceCatalog();
+  const chosen = await entryFor({ timezone, at, catalog });
+  return { ...chosen, ...serviceAt({ ids: chosen.entry.pieces, catalog, local: chosen.local }) };
+}
+
+module.exports = { arrange, serviceAt, entryFor, serviceFor, arrangedBy };

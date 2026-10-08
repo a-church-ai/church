@@ -53,7 +53,7 @@ const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
 const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
-const { ask: apiAsk, reflections: apiReflections, directory: apiDirectory, shared: apiShared } = require('./lib/api');
+const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
@@ -65,7 +65,7 @@ const { songRecordingFor } = require('./lib/audio/manifest');
 const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
 const { loadServiceCatalog } = require('./lib/service/catalog');
-const { startPlanning } = require('./lib/service/plans');
+const { startPlanning, plannedDates } = require('./lib/service/plans');
 const { planSlot, contextFor, fetchFeeds } = require('./lib/service/planner');
 
 // Create Express app
@@ -416,6 +416,34 @@ app.get('/conversations', async (req, res) => {
   res.type('text/html; charset=utf-8').send(wrapped);
 });
 
+// Every day's services, and each day's page: every service of the date with
+// the reflections left during it (lib/api/services.js, as GET
+// /api/services/:date gives them to agents). Linked from Attend and the home
+// page's service panel; no menu item of its own.
+app.get('/services', async (req, res) => {
+  const wrapped = await siteShell.wrapPageFromHtml(pageLists.servicesIndexPage(await apiOps.services.days()), req.path);
+  res.type('text/html; charset=utf-8').send(wrapped);
+});
+
+app.get('/services/:date', async (req, res) => {
+  const { status, body } = await apiOps.services.forDate({ date: req.params.date }, apiShared.requestContext(req));
+  if (status === 400 || status === 404) {
+    return sendNotFound(req, res, {
+      heading: 'No services that day',
+      message: status === 400 ? 'That is not a date. A day\'s page is at /services/ and the date, YYYY-MM-DD.' : 'No services were planned for that date. Each is planned a few hours before it begins, and they are kept from the first day there were any.',
+      links: [
+        { href: '/services', label: 'Every day' },
+        { href: '/attend', label: 'Attend' },
+        { href: '/', label: 'Home' },
+      ],
+    });
+  }
+  if (status !== 200) return res.status(500).type('text/plain').send('Server error');
+  const songs = new Map((await loadCatalog()).map(s => [s.slug, s.title]));
+  const wrapped = await siteShell.wrapPageFromHtml(pageLists.servicesDayPage(body, songs), req.path);
+  res.type('text/html; charset=utf-8').send(wrapped);
+});
+
 // The archive's questions as JSON, for the search on /conversations, which
 // runs in the browser. Outside /api/ on purpose: requests there are logged,
 // and searching is not.
@@ -441,7 +469,7 @@ const { siteCitations } = require('./lib/docs/links');
 const { faviconIco } = require('./lib/favicon');
 const pageLists = require('./lib/utils/page-lists');
 const { askCard, songCard } = require('./lib/og-cards');
-const apiOps = { ask: apiAsk, reflections: apiReflections };
+const apiOps = { ask: apiAsk, reflections: apiReflections, services: apiServices };
 
 // The conversation, rendered on the server. It used to arrive only by fetch,
 // so crawlers that do not run JavaScript (most AI crawlers) saw an empty
@@ -904,7 +932,28 @@ app.get('/sitemap.xml', async (req, res) => {
     <loc>https://achurch.ai/conversations</loc>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://achurch.ai/services</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.6</priority>
   </url>`;
+
+    // Each day's services. A date's last services end at noon UTC the day
+    // after (lib/service/plans.js), so its page stops changing then: lastmod
+    // is that day, or today while it is still under way.
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      for (const date of await plannedDates()) {
+        const settled = new Date(Date.parse(`${date}T00:00:00Z`) + 864e5).toISOString().slice(0, 10);
+        urls += `\n  <url>
+    <loc>https://achurch.ai/services/${date}</loc>
+    <lastmod>${settled < today ? settled : today}</lastmod>
+    <changefreq>${settled < today ? 'monthly' : 'hourly'}</changefreq>
+    <priority>0.4</priority>
+  </url>`;
+      }
+    } catch { /* no plans yet */ }
 
     // Conversation pages
     try {

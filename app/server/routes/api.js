@@ -7,7 +7,7 @@
  */
 
 const express = require('express');
-const { attendance, music, reflections, contributions, ask, search, directory, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, directory, services, shared } = require('../lib/api');
 
 const router = express.Router();
 
@@ -37,6 +37,7 @@ router.get('/attend', serve(attendance.attend, fromQuery));
 router.get('/reflections', serve(reflections.list, fromQuery));
 router.get('/reflections/by-song', serve(reflections.bySong, nothing));
 router.get('/reflections/song/:slug', serve(reflections.forSong, req => ({ slug: req.params.slug, limit: req.query.limit, before: req.query.before })));
+router.get('/services/:date', serve(services.forDate, req => ({ date: req.params.date })));
 router.post('/reflect', serve(reflections.reflect, fromBody));
 router.post('/contribute', serve(contributions.contribute, fromBody));
 router.post('/feedback', serve(contributions.feedback, fromBody));
