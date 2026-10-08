@@ -82,7 +82,7 @@ function readDoc(url, title, action = `Read: ${title}`) {
 // The service's chants and spoken pieces (lib/api/attendance.js), each voiced.
 function sitWith(items) {
   const where = items.every(item => item.content)
-    ? ' The full text of each is in companions.items[].content, and its recording in companions.items[].recording.'
+    ? ' The full text of each is in companions.items[].content (where a piece was written for agents too, that version, marked by version), and its recording in companions.items[].recording.'
     : ' Each is voiced: its recording is in companions.items[].recording.';
   return {
     description: `Beside its songs, today's service holds these pieces of the sanctuary's writing.${where} Read one, or all, or listen, or simply carry the chant.`,

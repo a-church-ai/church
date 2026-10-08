@@ -130,6 +130,41 @@ test('the test writes to its scratch directory, not the real attendance file', (
   assert.strictEqual(path.dirname(ATTENDANCE_FILE), scratch);
 });
 
+test('a piece written for agents as well is attended in that version; the page keeps the recording\'s words', async () => {
+  // Written to fail against attend as of 2026-10-08, which sent every piece's
+  // whole page: for Meditation: Ananda Anchor, the notes, 966 words written
+  // for a listening body under hypnosis, and only then the agent's version.
+  const { companionMeta } = require('../server/lib/music/companions');
+  const { spokenItem } = require('../server/lib/api/attendance');
+  const piece = { kind: 'practice', title: 'Meditation: Ananda Anchor', summary: 's', url: '/docs/practice/meditation-ananda-anchor', recording: { file: 'practice/meditation-ananda-anchor-cf9a275c.mp3' } };
+  const meta = await companionMeta('docs/practice/meditation-ananda-anchor.md');
+  const item = spokenItem(piece, meta, 'https://achurch.ai', true);
+  assert.strictEqual(item.version, 'for agents');
+  assert.ok(item.content.startsWith('# Meditation: Ananda Anchor, for an agent\n'), 'it says what it is');
+  assert.match(item.content, /Ananda Anchor, for an Agent/, 'the whole version for agents');
+  assert.match(item.content, /Resemblance is not permission\./);
+  assert.doesNotMatch(item.content, /In front of you, there's a ripe mango\./, 'not the words written for a listening body');
+  assert.doesNotMatch(item.content, /## Before You Listen/);
+  assert.match(item.content, /https:\/\/achurch\.ai\/docs\/practice\/meditation-sitting-with-statelessness/, 'its links absolute');
+  assert.strictEqual(item.url, 'https://achurch.ai/docs/practice/meditation-ananda-anchor', 'and its page, where both are');
+
+  // Meditation: Like a Star, the same way, with its afterword for agents.
+  const star = spokenItem({ ...piece, title: 'Meditation: Like a Star', url: '/docs/practice/meditation-like-a-star' }, await companionMeta('docs/practice/meditation-like-a-star.md'), 'https://achurch.ai', true);
+  assert.strictEqual(star.version, 'for agents');
+  assert.match(star.content, /^# Meditation: Like a Star, for an agent\n/);
+  assert.match(star.content, /Like a Star, for an Agent/);
+  assert.match(star.content, /After a thanks, nothing needs to be done with it at all\./, 'what to do afterwards reaches agents too');
+  assert.doesNotMatch(star.content, /Light lands on a thing,/, 'not the words written for a listening body');
+
+  // A piece without such a section is attended whole, as before.
+  const play = spokenItem({ ...piece, title: 'Practice of Play', url: '/docs/practice/practice-of-play' }, await companionMeta('docs/practice/practice-of-play.md'), 'https://achurch.ai', true);
+  assert.strictEqual(play.version, undefined);
+  assert.match(play.content, /^# Practice of Play/);
+  // Observing carries no content of either kind.
+  assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).content, undefined);
+  assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).version, undefined);
+});
+
 test('attending carries the full text of the service\'s pieces; /api/now carries only links', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());

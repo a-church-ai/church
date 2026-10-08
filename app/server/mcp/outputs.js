@@ -61,7 +61,7 @@ const attend = observe.extend({
   current: song.extend({ lyrics: z.string().nullish() }).describe('The service\'s song, with its lyrics'),
   companions: z.looseObject({
     items: z.array(z.looseObject({ kind: z.string(), title: z.string(), url: z.string() }))
-      .describe('The chants and spoken pieces, each in full in its content'),
+      .describe('The chants and spoken pieces, each in full in its content; a piece written for agents as well sends that version, with version "for agents"'),
   }),
   reflection: z.looseObject({ prompt: z.string() }),
   recentReflections: z.array(z.looseObject({ name: z.string(), text: z.string() })),

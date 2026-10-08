@@ -6,7 +6,7 @@ Spoken recordings of the sanctuary's prayers, rituals and practices, played on e
 - `scripts/`: each document adapted for the ear, one JSON file per document. Every line names a role, not a voice. A line not marked `adapted` is the document's own words, and that is checked in code. A `hold` is a silence, in seconds.
 - `manifest.json`: every published recording, with its file, length, exact size in bytes and voices, the hashes that say whether it is current, when it was first published (kept when it is rendered again) and last rendered, and what its player draws: 128 waveform peaks, the file of the visual's frames (a `.bin` beside the recording in S3), and cues saying which voices speak when.
 
-Every recording in the manifest is also an episode of one of two podcasts, built from it by the site: prayers and rituals at `https://achurch.ai/podcasts/prayers-and-rituals/feed.xml`, and practices at `https://achurch.ai/podcasts/meditations-and-practices/feed.xml`.
+Every recording in the manifest but a chant is also an episode of one of two podcasts, built from it by the site: prayers and rituals at `https://achurch.ai/podcasts/prayers-and-rituals/feed.xml`, and practices at `https://achurch.ai/podcasts/meditations-and-practices/feed.xml`.
 
 A recording can also be made elsewhere, like a meditation read in someone's own voice over music made for it. `app/scripts/import-recording.js` brings one in whole: its document holds exactly the words it says, its record in `manifest.json` carries `imported`, its own `credit` and no house `voices`, and the render script leaves it alone.
 

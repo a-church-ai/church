@@ -70,20 +70,9 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   }
   current.api = order[served.song.position - 1].api;
 
-  // The chant and the spoken pieces, in the item shape companions has always
-  // had, each with its recording.
   const items = [];
   for (const p of served.parts.filter(p => p.kind !== 'song')) {
-    const meta = await companionMeta(p.id);
-    items.push({
-      kind: p.kind,
-      title: p.title,
-      tldr: p.summary,
-      url: `${baseUrl}${p.url}`,
-      recording: `${baseUrl}/audio/${p.recording.file}`,
-      ...(meta.text ? { text: meta.text } : {}),
-      ...(withContent ? { content: meta.content } : {})
-    });
+    items.push(spokenItem(p, await companionMeta(p.id), baseUrl, withContent));
   }
 
   const planned = served.entry.arrangedBy !== 'rotation';
@@ -362,4 +351,21 @@ async function attend(input, ctx) {
   }
 }
 
-module.exports = { buildService, now, attend };
+// A chant or a spoken piece, in the item shape companions has always had,
+// with its recording. A piece written for agents as well sends that version
+// as its content, and says so (music/companions.js forAgents); its page, at
+// url, keeps the recording's own words.
+function spokenItem(p, meta, baseUrl, withContent) {
+  return {
+    kind: p.kind,
+    title: p.title,
+    tldr: p.summary,
+    url: `${baseUrl}${p.url}`,
+    recording: `${baseUrl}/audio/${p.recording.file}`,
+    ...(meta.text ? { text: meta.text } : {}),
+    ...(withContent ? { content: meta.forAgents || meta.content } : {}),
+    ...(withContent && meta.forAgents ? { version: 'for agents' } : {}),
+  };
+}
+
+module.exports = { buildService, now, attend, spokenItem };

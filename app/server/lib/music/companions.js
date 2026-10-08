@@ -214,9 +214,24 @@ function inHours(range, hour) {
 // assumption lib/docs/discover.js makes for its own cache.
 const metaCache = new Map();
 
+// A piece written for agents as well as for a listening body carries its
+// version for agents in a "## For an Agent" section (Meditation: Like a Star,
+// Meditation: Ananda Anchor). Attending sends that version as the piece's
+// content, headed so it says what it is; the page keeps both.
+function forAgents(body, title) {
+  const lines = body.split('\n');
+  const start = lines.findIndex(l => l.trim() === '## For an Agent');
+  if (start === -1) return null;
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex(l => /^## /.test(l));
+  const section = (end === -1 ? rest : rest.slice(0, end)).join('\n').replace(/\n---\s*$/, '').trim();
+  return `# ${title}, for an agent\n\n*The version of this piece written for agents. The recording's own words, for a listening body, are on its page, at this item's url.*\n\n${section}`;
+}
+
 /**
- * Title, tldr, canonical URL path, hours, and (for chants) the chant text,
- * resolved from the document itself. Returns null when the path no longer
+ * Title, tldr, canonical URL path, hours, (for chants) the chant text, and
+ * (for a piece with one) its version for agents, resolved from the document
+ * itself. Returns null when the path no longer
  * resolves, so a stale shortlist entry is skipped rather than served as a 404.
  */
 async function companionMeta(relPath) {
@@ -242,6 +257,8 @@ async function companionMeta(relPath) {
   if (doc.category === 'chants') {
     meta.text = chantText(markdown, relPath);
   }
+  const agents = forAgents(body, doc.title);
+  if (agents) meta.forAgents = absolutizeLinks(agents, doc.fullPath);
   metaCache.set(relPath, meta);
   return meta;
 }

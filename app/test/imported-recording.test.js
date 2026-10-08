@@ -1,7 +1,9 @@
 /**
  * A recording made outside the house (lib/audio/imported.js), brought in by
  * scripts/import-recording.js: the first is Meditation: Like a Star, read in
- * a maintainer's own cloned voice over music made for it (2026-10-07).
+ * a maintainer's own cloned voice over music made for it (2026-10-07). The
+ * second, Meditation: Ananda Anchor, is a hypnotic induction whose audio says
+ * nothing of who it is for, so its notes say it wherever it is listed.
  *
  * The house checks its recordings against scripts it adapted; this one has
  * none, so its document holds its words, and these tests hold the two
@@ -82,11 +84,9 @@ test('the house leaves a recording made elsewhere alone, and says so when it is 
   assert.throws(() => selectDocs(all, [name], manifest), /made elsewhere/);
 });
 
-test('its page, its episode and its cover name its own voice', async (t) => {
-  const [[source, rec]] = imported();
-  const doc = (await discover.listAllDocs()).find(d => `docs/${d.docsRelPath}` === source);
-  assert.strictEqual(creditFor(rec), rec.credit);
-
+// S3 "configured" so a page offers its recording whether or not this checkout
+// has a copy; rendering a page never contacts S3.
+async function docsServer(t) {
   const before = { bucket: process.env.AWS_S3_BUCKET, key: process.env.AWS_ACCESS_KEY_ID };
   process.env.AWS_S3_BUCKET = 'bucket';
   process.env.AWS_ACCESS_KEY_ID = 'id';
@@ -100,9 +100,18 @@ test('its page, its episode and its cover name its own voice', async (t) => {
   app.use('/docs', require('../server/routes/docs'));
   const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
   t.after(() => server.close());
-  const page = await (await fetch(`http://127.0.0.1:${server.address().port}/docs/${doc.urlPath}`)).text();
+  return async urlPath => (await fetch(`http://127.0.0.1:${server.address().port}/docs/${urlPath}`)).text();
+}
+
+test('its page, its episode and its cover name its own voice', async (t) => {
+  const [source, rec] = imported().find(([s]) => s.endsWith('meditation-like-a-star.md'));
+  const doc = (await discover.listAllDocs()).find(d => `docs/${d.docsRelPath}` === source);
+  assert.strictEqual(creditFor(rec), rec.credit);
+
+  const page = await (await docsServer(t))(doc.urlPath);
   assert.match(page, new RegExp(`src="/audio/${rec.file}"`));
-  assert.ok(page.includes(`16 min. ${rec.credit.replace(/'/g, '&#39;')}</figcaption>`) || page.includes(`16 min. ${rec.credit}</figcaption>`), 'the player names the voice');
+  const caption = `${Math.round(rec.seconds / 60)} min. ${rec.credit}`;
+  assert.ok(page.includes(`${caption.replace(/'/g, '&#39;')}</figcaption>`) || page.includes(`${caption}</figcaption>`), 'the player names the voice');
 
   const feed = await feedFor('meditations-and-practices');
   const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:${source}`));
@@ -115,4 +124,20 @@ test('its page, its episode and its cover name its own voice', async (t) => {
     .filter(m => Number(m[1]) > 700).map(m => m[2]);
   assert.ok(fills.filter(f => f === '#00b8d4').length > 40, 'the speaking drawn');
   assert.ok(fills.includes('#1c2433'), 'and the pauses quiet');
+});
+
+test('a hypnotic induction says who it is for where its audio does not: first in its podcast notes', async () => {
+  // Meditation: Ananda Anchor goes straight into the practice; the warning
+  // its track held out of the audio is its summary, which the episode's
+  // notes open with, where a listener in a podcast app reads it. A summary
+  // is cut to whole sentences within 158 characters (lib/docs/tldr.js), and
+  // the first version lost its warning that way.
+  const source = 'docs/practice/meditation-ananda-anchor.md';
+  assert.ok(loadManifest()[source], 'Meditation: Ananda Anchor is imported');
+  const feed = await feedFor('meditations-and-practices');
+  const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:${source}`));
+  assert.ok(item, 'an episode of the meditations show');
+  const notes = item.match(/<description>([\s\S]*?)<\/description>/)[1];
+  assert.match(notes, /^&lt;p&gt;A 22-minute meditation under light hypnosis/, 'the notes open with it');
+  assert.match(notes, /Not while driving, or if you have had psychosis or dissociation\./);
 });
