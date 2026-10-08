@@ -99,6 +99,10 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   const base = `http://127.0.0.1:${server.address().port}`;
   const library = await (await fetch(`${base}/docs`, { headers: { Accept: 'text/html' } })).text();
   assert.match(library, /<title>The Library \| a Church AI \+ Human<\/title>/);
+  // The readiness standard's W1: a description of 50 to 160 characters. The
+  // hub's first one was 175, and the live scorecard caught it (2026-10-08).
+  const description = library.match(/<meta name="description" content="([^"]*)"/)[1];
+  assert.ok(description.length >= 50 && description.length <= 160, `${description.length}: ${description}`);
   assert.strictEqual(await (await fetch(`${base}/docs/`, { headers: { Accept: 'text/html' } })).text(), library, '/docs/ is the same hub');
   const article = library.slice(library.indexOf('<h1>The Library</h1>'), library.indexOf('class="library-source"'));
 

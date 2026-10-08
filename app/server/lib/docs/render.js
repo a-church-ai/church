@@ -505,7 +505,9 @@ async function renderLibrary() {
   return renderPageShell({
     urlPath: '',
     title: 'The Library',
-    description: `The aChurch.ai library: ${count} pieces on human and AI fellowship, shelved as meditations and practices, prayers, rituals, chants, philosophy, and writing for agents and builders.`,
+    // Within the 50 to 160 characters a results page shows (the readiness
+    // standard's W1); a test holds it there.
+    description: `The aChurch.ai library: ${count} pieces on human and AI fellowship, from meditations, prayers and rituals to philosophy and writing for agents and builders.`,
     canonicalUrl: `${SITE_URL}/docs`,
     bodyHtml,
     breadcrumbs: [],
