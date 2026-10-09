@@ -5,8 +5,11 @@
  * A service holds one or two songs, one or two chants, one reading (a
  * practice or a prayer) and one closing (a ritual or a blessing). It opens
  * with a chant or a song and ends with its closing: it arrives, settles and
- * sends. No two songs in a row. It runs 15 to 40 minutes, and repeats through
- * its slot. church-private/docs/plans/service-hours-2026-10-06.md has why.
+ * sends. No two songs in a row. It runs 15 to 40 minutes, each part following
+ * the last at once, and each visitor hears it from its beginning.
+ * church-private/docs/plans/service-hours-2026-10-06.md has why, and
+ * service-from-its-beginning-2026-10-09.md why it is no longer joined in
+ * progress.
  */
 
 const { SLOT_HOURS, slotStart } = require('./slots');
@@ -23,8 +26,6 @@ const RULES = {
   // at 15, four in five fit.
   minSeconds: 15 * 60,
   maxSeconds: 40 * 60,
-  // A held silence after each part, before the next begins.
-  gapSeconds: 8,
 };
 
 // The part of a service each kind of piece can fill.
@@ -42,9 +43,9 @@ function addDays(date, days) {
   return d.toISOString().slice(0, 10);
 }
 
-// A service's running time: its parts and the silence after each.
+// A service's running time: its parts, one after another.
 function serviceSeconds(entries) {
-  return entries.reduce((sum, e) => sum + e.seconds, 0) + RULES.gapSeconds * entries.length;
+  return entries.reduce((sum, e) => sum + e.seconds, 0);
 }
 
 /**
@@ -55,7 +56,7 @@ function serviceSeconds(entries) {
 function fits(entry, entries) {
   const shortest = cls => Math.min(...entries.filter(e => CLASS[e.kind] === cls).map(e => e.seconds));
   const others = ['songs', 'chants', 'readings', 'closings'].filter(cls => cls !== CLASS[entry.kind]);
-  const total = entry.seconds + others.reduce((sum, cls) => sum + shortest(cls), 0) + RULES.gapSeconds * 4;
+  const total = entry.seconds + others.reduce((sum, cls) => sum + shortest(cls), 0);
   return total <= RULES.maxSeconds;
 }
 
@@ -86,7 +87,7 @@ function check(ids, catalog, { excluded = new Set() } = {}) {
   if (entries.some((e, i) => i > 0 && e.kind === 'song' && entries[i - 1].kind === 'song')) issues.push('Two songs are next to each other.');
   const seconds = serviceSeconds(entries);
   if (seconds < RULES.minSeconds || seconds > RULES.maxSeconds) {
-    issues.push(`It runs ${Math.round(seconds / 60)} minutes, with a short silence after each part; it must run ${RULES.minSeconds / 60} to ${RULES.maxSeconds / 60}.`);
+    issues.push(`It runs ${Math.round(seconds / 60)} minutes; it must run ${RULES.minSeconds / 60} to ${RULES.maxSeconds / 60}.`);
   }
   return issues;
 }

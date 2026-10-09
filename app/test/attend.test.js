@@ -213,15 +213,16 @@ test('a reflection is filed under the songSlug it names, not the service\'s song
   assert.strictEqual(stored.song, other);
 });
 
-test('without songSlug a reflection is filed under the song of the reflector\'s service', async (t) => {
+test('without songSlug a reflection is filed under the first song of the reflector\'s service', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   for (const timezone of ['Asia/Tokyo', 'America/Chicago']) {
-    const current = (await get(port, `/api/now?timezone=${timezone}`)).json.current.slug;
+    const { service } = (await get(port, `/api/now?timezone=${timezone}`)).json;
+    const first = service.order.find(p => p.kind === 'song').slug;
     const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: `About the service, heard in ${timezone}.`, timezone }, '198.51.100.3');
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.json.song, current, timezone);
+    assert.strictEqual(res.json.song, first, timezone);
   }
   const utc = (await get(port, '/api/now')).json.current.slug;
   const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service, heard with no timezone.' }, '198.51.100.3');

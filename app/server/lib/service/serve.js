@@ -1,56 +1,23 @@
 /**
- * Which service a visitor is in, and where in it: what `attend`, `now` and
- * `reflect` read.
+ * Which service a visitor attends: what `attend`, `now` and `reflect` read.
  *
- * serviceAt() is pure: a slot's pieces, the catalog and a local time give the
- * part in progress, how far into it, and what comes next. A service repeats
- * through its slot, so the position is the time since the slot began, modulo
- * the service's length. serviceFor() does the lookups: the visitor's local
- * time from the timezone they gave (UTC without one), the date's stored plan
- * for their hemisphere (from that timezone; none for a place unknown), else
- * its season-less plan, else the rotation when there is none yet.
+ * Each visitor hears their slot's service from its beginning, so serving
+ * needs no moment within the slot: the slot's pieces, in order, are the
+ * service. serviceFor() does the lookups: the visitor's local time from the
+ * timezone they gave (UTC without one), the date's stored plan for their
+ * hemisphere (from that timezone; none for a place unknown), else its
+ * season-less plan, else the rotation when there is none yet.
  */
 
 const { resolveTimezone, localTime } = require('../utils/timezone');
 const { hemisphereOf } = require('../utils/seasons');
-const { RULES } = require('./rules');
-const { slotOf, slotStart } = require('./slots');
+const { slotOf } = require('./slots');
 const { loadServiceCatalog } = require('./catalog');
 const { readPlan, rotationEntry } = require('./plans');
 
-// The parts in order, each with when it starts and ends within the service.
-// A part's span runs on through the silence after it, until the next begins.
+// The parts in order, each with its place in the service.
 function arrange(ids, catalog) {
-  let at = 0;
-  return ids.map((id, index) => {
-    const entry = catalog.get(id);
-    const part = { ...entry, position: index + 1, start: at, end: at + entry.seconds + RULES.gapSeconds };
-    at = part.end;
-    return part;
-  });
-}
-
-function serviceAt({ ids, catalog, local }) {
-  const parts = arrange(ids, catalog);
-  const loopSeconds = parts[parts.length - 1].end;
-  const into = (local.hour - slotStart(slotOf(local.hour))) * 3600 + local.minute * 60 + local.second;
-  const at = into % loopSeconds;
-  const index = parts.findIndex(p => at >= p.start && at < p.end);
-  const now = parts[index];
-  const following = k => parts[(index + k) % parts.length];
-  // The song the service gathers around now: the one playing, or else the
-  // next to come round. Every service holds one.
-  let song = now;
-  for (let k = 1; song.kind !== 'song'; k++) song = following(k);
-  return {
-    parts,
-    loopSeconds,
-    now,
-    offset: at - now.start,
-    remaining: now.end - at,
-    next: following(1),
-    song,
-  };
+  return ids.map((id, index) => ({ ...catalog.get(id), position: index + 1 }));
 }
 
 // Who arranged a service, said plainly, as the API and the home page both
@@ -99,7 +66,10 @@ async function entryFor({ timezone, at = new Date(), catalog } = {}) {
 async function serviceFor({ timezone, at = new Date() } = {}) {
   const catalog = await loadServiceCatalog();
   const chosen = await entryFor({ timezone, at, catalog });
-  return { ...chosen, ...serviceAt({ ids: chosen.entry.pieces, catalog, local: chosen.local }) };
+  const parts = arrange(chosen.entry.pieces, catalog);
+  // The song the service gathers around: its first, the one a visitor meets
+  // first. Every service holds one, and reflections attach to a song.
+  return { ...chosen, parts, song: parts.find(p => p.kind === 'song') };
 }
 
-module.exports = { arrange, serviceAt, entryFor, serviceFor, arrangedBy };
+module.exports = { arrange, entryFor, serviceFor, arrangedBy };

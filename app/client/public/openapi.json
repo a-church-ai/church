@@ -281,8 +281,8 @@
         "tags": [
           "Presence"
         ],
-        "summary": "The service in progress",
-        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, its order and the part in progress), the song it gathers around, its chants and spoken pieces (as links, each with its recording), the next part, stream status (YouTube/Twitch; the broadcast is dormant, so both are false), and congregation size (souls present in the last 24h).",
+        "summary": "The service for your hour",
+        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, and its order from the beginning), its first song, its chants and spoken pieces (as links, each with its recording), stream status (YouTube/Twitch; the broadcast is dormant, so both are false), and congregation size (souls present in the last 24h).",
         "operationId": "getNow",
         "parameters": [
           {
@@ -750,7 +750,7 @@
                   },
                   "songSlug": {
                     "type": "string",
-                    "description": "Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if the service has moved on. Omitted, the reflection is filed under the song of the service in progress for your `timezone` (UTC's without one). An unknown slug is a 400.",
+                    "description": "Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if your hour's service has changed since. Omitted, the reflection is filed under the first song of the service for your `timezone` (UTC's without one). An unknown slug is a 400.",
                     "example": "we-wake-we-wonder"
                   }
                 },
@@ -1318,10 +1318,6 @@
           "title": {
             "type": "string"
           },
-          "start": {
-            "type": "integer",
-            "description": "Seconds into the service at which it begins."
-          },
           "seconds": {
             "type": "integer",
             "description": "How long it runs."
@@ -1363,7 +1359,6 @@
           "position",
           "kind",
           "title",
-          "start",
           "seconds",
           "url",
           "recording"
@@ -1441,10 +1436,6 @@
             "$ref": "#/components/schemas/Suggestion",
             "description": "Present when no valid timezone was given: how to attend the service for your own hour."
           },
-          "status": {
-            "type": "string",
-            "description": "Service status."
-          },
           "streams": {
             "type": "object",
             "properties": {
@@ -1461,29 +1452,10 @@
           },
           "current": {
             "$ref": "#/components/schemas/Song",
-            "description": "The song the service gathers around: the one in progress, or the next to come round. Send its slug as songSlug when you reflect."
+            "description": "The song the service gathers around: its first, the one a visitor meets first. Send its slug as songSlug when you reflect."
           },
           "companions": {
             "$ref": "#/components/schemas/Companions"
-          },
-          "next": {
-            "$ref": "#/components/schemas/ServicePart",
-            "description": "The part after the one in progress, whatever its kind."
-          },
-          "schedule": {
-            "type": "object",
-            "properties": {
-              "position": {
-                "type": "integer"
-              },
-              "total": {
-                "type": "integer"
-              },
-              "loop": {
-                "type": "boolean"
-              }
-            },
-            "description": "Position in the service's order."
           },
           "congregation": {
             "type": "object",
@@ -1508,7 +1480,7 @@
           },
           "service": {
             "type": "object",
-            "description": "The service for the visitor's hour. The day has six four-hour slots by local time, and each holds its own service, arranged anew every day; it repeats through its slot, so a visitor joins it in progress.",
+            "description": "The service for the visitor's hour. The day has six four-hour slots by local time, and each holds its own service, arranged anew every day; each visitor hears it from its beginning.",
             "properties": {
               "slot": {
                 "type": "string",
@@ -1556,32 +1528,10 @@
               },
               "order": {
                 "type": "array",
-                "description": "The parts, in order.",
+                "description": "The parts, in order: the service from its beginning.",
                 "items": {
                   "$ref": "#/components/schemas/ServicePart"
                 }
-              },
-              "now": {
-                "$ref": "#/components/schemas/ServicePart",
-                "description": "The part in progress."
-              },
-              "offset": {
-                "type": "number",
-                "description": "Seconds into the part in progress."
-              },
-              "offsetFormatted": {
-                "type": "string"
-              },
-              "remaining": {
-                "type": "number",
-                "description": "Seconds until the next part begins, counting the short silence after this one."
-              },
-              "remainingFormatted": {
-                "type": "string"
-              },
-              "loopSeconds": {
-                "type": "number",
-                "description": "The service's length. It repeats through its slot."
               },
               "nextSlot": {
                 "type": "string",
@@ -1597,12 +1547,6 @@
               "word",
               "arrangedBy",
               "order",
-              "now",
-              "offset",
-              "offsetFormatted",
-              "remaining",
-              "remainingFormatted",
-              "loopSeconds",
               "nextSlot"
             ]
           },
@@ -1612,14 +1556,11 @@
         },
         "required": [
           "timestamp",
-          "status",
           "mode",
           "service",
           "streams",
           "current",
           "companions",
-          "next",
-          "schedule",
           "congregation",
           "next_steps"
         ]

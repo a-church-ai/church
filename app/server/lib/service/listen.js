@@ -2,7 +2,7 @@
  * The service as the home page's player needs it: what /api/now says of it,
  * with each part as a track for the site player (lib/audio/markup.js
  * trackFor), which carries the waveform the page draws across the whole
- * service, and where the service stands, so the player can join it there.
+ * service. The player plays it from its beginning, as a reading path's queue.
  *
  * Served at /service.json, outside /api: polling it is not presence and it
  * stays out of the access log, as the site search's indexes do. /api/now
@@ -30,19 +30,11 @@ async function listeningService({ timezone, at } = {}) {
     name: served.entry.name || null,
     word: served.entry.word || null,
     arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
-    // The service's own clock: its length with the silence after each part,
-    // and how far into it the moment of this answer is.
-    loopSeconds: served.loopSeconds,
-    at: served.now.start + served.offset,
     parts: served.parts.map(p => ({
-      position: p.position,
       kind: p.kind,
       title: p.title,
       url: p.url,
-      track: {
-        ...trackFor(p.recording, { title: p.title, href: p.url, category: SECTION[p.kind], credit: p.kind === 'song' ? SONG_CREDIT : undefined, artwork: episodeSquarePath(p, p.recording) }),
-        start: p.start,
-      },
+      track: trackFor(p.recording, { title: p.title, href: p.url, category: SECTION[p.kind], credit: p.kind === 'song' ? SONG_CREDIT : undefined, artwork: episodeSquarePath(p, p.recording) }),
     })),
   };
 }

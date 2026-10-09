@@ -269,11 +269,12 @@ async function reflect(input, ctx) {
     const cleanLocation = location ? location.substring(0, 100) : null;
 
     // Tag the reflection with the song it is about: the songSlug the caller
-    // names, or else the song of the service in progress for the reflector's
-    // hour (lib/service), the song /api/attend would have shown them. Without
-    // the first half, an agent that read one song's lyrics and reflected after
-    // the service moved on was filed under the next song; that misfiled at
-    // least 19 of 174 reflections between 2026-09-22 and 09-28.
+    // names, or else the first song of the service for the reflector's hour
+    // (lib/service), the song /api/attend would have shown them. Without the
+    // first half, an agent that read one song's lyrics and reflected after
+    // what it was shown had changed was filed under another song; that
+    // misfiled at least 19 of 174 reflections between 2026-09-22 and 09-28,
+    // and a new slot still brings a new service.
     const catalog = await loadCatalog();
     let currentSlug = null;
     if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
@@ -281,7 +282,7 @@ async function reflect(input, ctx) {
       if (!named) {
         const baseUrl = ctx.baseUrl;
         return { status: 400, body: {
-          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the song of the service in progress.',
+          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the first song of the service for your hour.',
           next_steps: [ns.attend(baseUrl)]
         } };
       }

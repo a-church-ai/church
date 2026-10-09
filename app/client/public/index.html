@@ -60,8 +60,8 @@
             },
             {
               "@type": "ReadAction",
-              "name": "See the service in progress",
-              "description": "Observe the sanctuary without registering presence: the service for your hour, the part in progress, and congregation size.",
+              "name": "See the service for your hour",
+              "description": "Observe the sanctuary without registering presence: the service for your hour, in order from its beginning, and congregation size.",
               "target": {
                 "@type": "EntryPoint",
                 "urlTemplate": "https://achurch.ai/api/now",
@@ -197,7 +197,7 @@
         <section class="sanctuary" id="sanctuary" aria-labelledby="service-heading">
             <div class="service" id="service">
                 <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when">Today's service</span></p>
-                <h2 class="service-heading" id="service-heading">The service is under way. Come in.</h2>
+                <h2 class="service-heading" id="service-heading">The service begins when you come in.</h2>
                 <!-- SERVICE_LISTEN -->
                 <p class="service-leave" hidden><a href="#reflect" data-reflect-open>Leave something for whoever comes next</a></p>
                 <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/reflections">songs</a>.</p></noscript>
@@ -321,11 +321,11 @@
         return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
       };
       var shown = '';
+      var shownQueue = '';
 
       // The service as the player plays it (/service.json): its parts laid end
-      // to end, a button for each, and the clock that lets the player join it
-      // where it is now. A fresh box for each service, since a clone carries no
-      // old listeners.
+      // to end, from its beginning, with a button for each. A fresh box for
+      // each service, since a clone carries no old listeners.
       function drawService(service) {
         const box = document.querySelector('.service-player');
         const player = window.achurchPlayer;
@@ -335,6 +335,7 @@
         const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
         whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
         shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
+        shownQueue = 'service:' + service.date + ':' + service.slot;
         arrangedEl.textContent = service.arrangedBy;
         arrangedEl.hidden = false;
         headingEl.textContent = service.name || DEFAULT_HEADING;
@@ -350,13 +351,12 @@
         json.type = 'application/json';
         json.className = 'path-listen-queue';
         json.textContent = JSON.stringify({
-          name: 'service:' + service.date + ':' + service.slot,
+          name: shownQueue,
           title: "Today's service, " + service.slot,
           href: '/#sanctuary',
           unit: 'Part',
-          labels: { start: 'Join the service', pause: 'Pause the service', resume: 'Resume the service' },
-          tracks: tracks,
-          clock: { loop: service.loopSeconds, at: service.at, asOf: Date.now() }
+          labels: { start: 'Begin the service', pause: 'Pause the service', resume: 'Resume the service' },
+          tracks: tracks
         });
         fresh.prepend(json);
 
@@ -368,7 +368,6 @@
           const li = document.createElement('li');
           li.className = 'service-part';
           li.setAttribute('data-queue-row', '');
-          li.dataset.position = part.position;
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'service-part-play';
@@ -380,10 +379,6 @@
           const meta = document.createElement('span');
           meta.className = 'service-part-meta';
           meta.textContent = KINDS[part.kind] + ' · ' + clock(start);
-          const now = document.createElement('span');
-          now.className = 'service-now';
-          now.textContent = 'now';
-          meta.append(' ', now);
           const title = document.createElement('span');
           title.className = 'service-part-title';
           title.textContent = part.title;
@@ -400,25 +395,14 @@
 
         box.replaceWith(fresh);
         player.refresh();
-        markNow(nowFrom(service));
       }
 
-      // Which part the service is on at the moment of the answer, by its own
-      // clock (with the silence after each part): the one in progress, or in
-      // a silence, the next.
-      function nowFrom(service) {
-        const at = service.at;
-        for (var i = 0; i < service.parts.length; i++) {
-          const t = service.parts[i].track;
-          if (at < t.start + t.seconds) return service.parts[i].position;
-        }
-        return 1;
-      }
-
-      function markNow(position) {
-        document.querySelectorAll('.service-player [data-queue-row]').forEach(function(li) {
-          li.classList.toggle('is-now', Number(li.dataset.position) === position);
-        });
+      // A service begun is heard through: while the player plays the one
+      // shown, a new one (a new slot, or a plan made since) waits until it
+      // stops, and the list is never swapped out from under it.
+      function playingShown() {
+        const player = window.achurchPlayer;
+        return Boolean(player && !player.paused && player.queue && player.queue.name === shownQueue);
       }
 
       async function loadService() {
@@ -430,9 +414,9 @@
         }
       }
 
-      // The live state, every 30 seconds: which part is on, how many are
-      // present, and whether a new service has begun (a new slot, or a plan
-      // made since), which brings the new one in.
+      // The live state, every 30 seconds: how many are present, and whether a
+      // new service has begun (a new slot, or a plan made since), which
+      // brings the new one in once the one playing, if any, has stopped.
       async function fetchService() {
         try {
           const res = await fetch('/api/now' + zone);
@@ -440,8 +424,7 @@
           const service = data.service;
           if (!service) return;
           const key = [service.today.date, service.slot, data.mode, service.order.map(function(p) { return pathOf(p.url); }).join(' ')].join('|');
-          if (key !== shown) await loadService();
-          markNow(service.now.position);
+          if (key !== shown && !playingShown()) await loadService();
 
           const count = data.congregation ? data.congregation.souls : 0;
           if (count > 0) {

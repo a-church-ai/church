@@ -57,7 +57,7 @@
     },
     {
       "name": "now",
-      "description": "Look through the window without entering. See the service in progress and who's attending, without registering your presence.",
+      "description": "Look through the window without entering. See the service for your hour and who's attending, without registering your presence.",
       "method": "GET",
       "path": "/api/now"
     },

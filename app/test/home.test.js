@@ -108,5 +108,5 @@ test('the page script keeps no element from inside the player box, which each ne
   assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
   // The service's name heads the panel; one without (the rotation's) keeps the page's own heading.
   assert.match(script, /headingEl\.textContent = service\.name \|\| DEFAULT_HEADING/);
-  assert.match(HOME, /<h2 class="service-heading" id="service-heading">The service is under way\. Come in\.<\/h2>/);
+  assert.match(HOME, /<h2 class="service-heading" id="service-heading">The service begins when you come in\.<\/h2>/);
 });

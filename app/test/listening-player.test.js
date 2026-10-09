@@ -348,30 +348,22 @@ test('site-player: the queue waveform gives each part its share of the bars, fro
   assert.deepStrictEqual(player.queuePeaks([{ file: 'r', seconds: 128, peaks: ramp }], 128), ramp);
 });
 
-test('site-player: joining a service begins at the part in progress, or the next after a silence', () => {
-  const clock = at => ({ loop: 424, at, asOf: 1000 });
-  assert.deepStrictEqual(player.joinAt(tracks, clock(20), 1000), { index: 0, at: 20 });
-  assert.deepStrictEqual(player.joinAt(tracks, clock(44), 1000), { index: 1, at: 0 }, 'in the silence after the first part');
-  assert.deepStrictEqual(player.joinAt(tracks, clock(100), 3000), { index: 1, at: 54 }, 'moved on by the time since');
-  assert.deepStrictEqual(player.joinAt(tracks, clock(420), 1000), { index: 0, at: 0 }, 'after the last, the first');
-  assert.deepStrictEqual(player.joinAt(tracks, clock(424 + 20), 1000), { index: 0, at: 20 }, 'the service repeats');
-});
-
-test('site-player: a queue joined part way goes round once; one started from a part plays to the end', () => {
-  const q = (index, wrapTo) => ({ tracks, index, wrapTo });
-  assert.strictEqual(player.nextInQueue(q(1, 1)), 2);
-  assert.strictEqual(player.nextInQueue(q(2, 1)), 0, 'on round from the first');
-  assert.strictEqual(player.nextInQueue(q(0, 1)), null, 'and stops before where it was joined');
-  assert.strictEqual(player.nextInQueue(q(2, 0)), null, 'joined at the start, it simply ends');
-  assert.strictEqual(player.nextInQueue(q(1, null)), 2);
-  assert.strictEqual(player.nextInQueue(q(2, null)), null);
+test('site-player: a queue, a service\'s included, plays from the part it starts at to its end, once', () => {
+  const q = index => ({ tracks, index });
+  assert.strictEqual(player.nextInQueue(q(0)), 1);
+  assert.strictEqual(player.nextInQueue(q(1)), 2);
+  assert.strictEqual(player.nextInQueue(q(2)), null, 'after the last, it ends rather than going round');
+  // A place saved before services began at their beginning may carry the
+  // wrapTo of a queue joined part way; it is no longer read.
+  assert.strictEqual(player.nextInQueue({ tracks, index: 2, wrapTo: 1 }), null);
+  assert.strictEqual(player.joinAt, undefined, 'nothing joins a service part way');
 });
 
 test('the home page has a service player to fill: a button, the waveform and its time, and the list', () => {
   const { renderServiceListen } = require('../server/lib/audio/markup');
   const html = renderServiceListen();
   assert.match(html, /<div class="service-player" data-path-listen hidden>/);
-  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Join the service<\/span><\/button>/);
+  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
   for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));

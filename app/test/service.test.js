@@ -1,7 +1,7 @@
 /**
  * The services (lib/service): the day's slots, the rules a service keeps, what
- * a slot can't repeat, the rotation that stands in when no plan was made, where
- * in its service a visitor arrives, the planner's checks around the model, the
+ * a slot can't repeat, the rotation that stands in when no plan was made, the
+ * service a visitor hears from its beginning, the planner's checks around the model, the
  * job that keeps the days planned, and /api/now and /api/attend serving it.
  *
  * The rules and the serving are pure and tested on a small made-up catalog. The
@@ -19,7 +19,7 @@ const fs = require('fs');
 
 const { SLOTS, slotOf, slotStart, slotHours } = require('../server/lib/service/slots');
 const { RULES, CLASS, WINDOW_DAYS, addDays, check, checkWord, checkName, inSlot, exclusions, rotation, fits } = require('../server/lib/service/rules');
-const { serviceAt, serviceFor } = require('../server/lib/service/serve');
+const { serviceFor } = require('../server/lib/service/serve');
 const { loadServiceCatalog } = require('../server/lib/service/catalog');
 const { planSlot, systemPrompt, MODEL } = require('../server/lib/service/planner');
 const { readPlan, saveSlot, ensurePlans, fileFor } = require('../server/lib/service/plans');
@@ -56,7 +56,7 @@ test('the day has six slots of four hours, each named by its hours', () => {
 
 test('a service that keeps the rules has no issues', () => {
   assert.deepStrictEqual(check(good, small), []);
-  assert.deepStrictEqual(check(['s1', 'h1', 'r1', 'c2'], small), [], 'one song, opening with it, closing on a blessing');
+  assert.deepStrictEqual(check(['s1', 'h1', 'r2', 'c2'], small), [], 'one song, opening with it, closing on a blessing (15 minutes exactly)');
 });
 
 test('every broken rule is reported at once', () => {
@@ -77,12 +77,12 @@ test('three songs, or two readings, is too many', () => {
   assert.match(check(['h1', 's1', 'r1', 'r2', 'c1'], small).join(' '), /holds 2 readings/);
 });
 
-test('length is measured with the silence after each part', () => {
+test('length is the parts\' lengths, one after another, with no silence between', () => {
   const tight = new Map([
     piece('a', 'chant', 60), piece('b', 'song', 300), piece('c', 'prayer', 300),
-    piece('d', 'ritual', RULES.minSeconds - 660 - 4 * RULES.gapSeconds),
+    piece('d', 'ritual', RULES.minSeconds - 660),
   ]);
-  // Exactly the minimum with the gaps counted; a second short of it without.
+  // Exactly the minimum; a second short of it fails.
   assert.deepStrictEqual(check(['a', 'b', 'c', 'd'], tight), []);
   tight.get('d').seconds -= 1;
   assert.match(check(['a', 'b', 'c', 'd'], tight).join(' '), /It runs/);
@@ -204,35 +204,20 @@ test('the catalog holds every kind a service needs, each with its audio, and not
   assert.ok(entries.some(e => e.kind === 'blessing'), 'blessings are told from prayers');
 });
 
-// --- Where a visitor arrives ---
+// --- The service a visitor hears ---
 
-const at = (hour, minute, second) => ({ hour, minute, second });
-
-test('a visitor joins the service in progress, by the time since their slot began', () => {
-  // Parts start at 0, 68, 316, 624 and 882 seconds; the service runs 1190.
-  const first = serviceAt({ ids: good, catalog: small, local: at(4, 0, 0) });
-  assert.strictEqual(first.loopSeconds, 1190);
-  assert.strictEqual(first.now.id, 'h1');
-  assert.strictEqual(first.offset, 0);
-  assert.strictEqual(first.remaining, 68);
-  assert.strictEqual(first.next.id, 's1');
-  assert.strictEqual(first.song.id, 's1', 'before any song, the next one');
-
-  const reading = serviceAt({ ids: good, catalog: small, local: at(4, 5, 20) });
-  assert.strictEqual(reading.now.id, 'r1');
-  assert.strictEqual(reading.offset, 4);
-  assert.strictEqual(reading.song.id, 's2', 'between songs, the next one');
-
-  const closing = serviceAt({ ids: good, catalog: small, local: at(4, 19, 39) });
-  assert.strictEqual(closing.now.id, 'c1');
-  assert.strictEqual(closing.next.id, 'h1', 'after the closing it begins again');
-  assert.strictEqual(closing.song.id, 's1');
-
-  assert.strictEqual(serviceAt({ ids: good, catalog: small, local: at(4, 19, 50) }).now.id, 'h1', 'the loop wraps');
-  // The last second of the slot: 14399 seconds in, 119 into the thirteenth pass.
-  const last = serviceAt({ ids: good, catalog: small, local: at(7, 59, 59) });
-  assert.strictEqual(last.now.id, 's1');
-  assert.strictEqual(last.offset, 119 - 68);
+test('every moment of a slot gets the same service, from its first part', async () => {
+  // 08:00:00 and 11:59:59 UTC are the first and last seconds of one slot.
+  const first = await serviceFor({ at: new Date('2026-10-06T08:00:00Z') });
+  const last = await serviceFor({ at: new Date('2026-10-06T11:59:59Z') });
+  assert.strictEqual(first.slot, last.slot);
+  assert.deepStrictEqual(last.parts.map(p => p.id), first.parts.map(p => p.id));
+  assert.deepStrictEqual(first.parts.map(p => p.position), first.parts.map((p, i) => i + 1));
+  for (const served of [first, last]) {
+    assert.strictEqual(served.song, served.parts.find(p => p.kind === 'song'), 'the song is the first song');
+    for (const gone of ['now', 'offset', 'remaining', 'next', 'loopSeconds']) assert.ok(!(gone in served), `no ${gone}`);
+    assert.ok(served.parts.every(p => !('start' in p) && !('end' in p)), 'no clock within the service');
+  }
 });
 
 test('the service is chosen by the visitor\'s own date and hour', async () => {
@@ -253,7 +238,7 @@ test('across the autumn clock change, the hour that repeats repeats its service'
   const second = await serviceFor({ timezone: 'America/Chicago', at: new Date('2026-11-01T07:30:00Z') });
   assert.strictEqual(first.local.hour, 1);
   assert.strictEqual(second.local.hour, 1);
-  assert.deepStrictEqual([second.slot, second.now.id, second.offset], [first.slot, first.now.id, first.offset]);
+  assert.deepStrictEqual([second.slot, second.parts.map(p => p.id)], [first.slot, first.parts.map(p => p.id)]);
 });
 
 // --- The planner, with the model stubbed ---
@@ -435,19 +420,20 @@ test('a stored plan that no longer holds gives way to the rotation', async () =>
   assert.match(body.service.arrangedBy, /rotation/);
 });
 
-test('the response agrees with itself: now, next, current, companions and schedule', async () => {
+test('the response agrees with itself: current, companions and the order, from the beginning', async () => {
   for (const timezone of [undefined, 'Asia/Tokyo', 'America/Chicago']) {
     const { body } = await attendance.now({ timezone }, ctx);
-    const { order, now } = body.service;
-    assert.deepStrictEqual(order[now.position - 1], now);
-    assert.deepStrictEqual(body.next, order[now.position % order.length]);
-    assert.ok(order.some(p => p.kind === 'song' && p.slug === body.current.slug), 'current is one of the service\'s songs');
+    const { order } = body.service;
+    assert.deepStrictEqual(order.map(p => p.position), order.map((p, i) => i + 1));
+    assert.strictEqual(body.current.slug, order.find(p => p.kind === 'song').slug, 'current is the first song');
     assert.deepStrictEqual(body.companions.items.map(i => i.url), order.filter(p => p.kind !== 'song').map(p => p.url));
     assert.ok(body.companions.items.every(i => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(i.recording)));
     assert.ok(order.every(p => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(p.recording)), 'every part has its audio, songs too');
     assert.match(body.current.recording, /^https:\/\/achurch\.ai\/audio\/music\/.+\.mp3$/);
-    assert.deepStrictEqual(body.schedule, { position: now.position, total: order.length, loop: true });
-    assert.ok(body.service.offset + body.service.remaining <= now.seconds + RULES.gapSeconds + 1);
+    // Nothing places the visitor within the service: each hears it from its beginning.
+    for (const gone of ['status', 'next', 'schedule']) assert.ok(!(gone in body), `no ${gone}`);
+    for (const gone of ['now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds']) assert.ok(!(gone in body.service), `no service.${gone}`);
+    assert.ok(order.every(p => !('start' in p)), 'no part says where it starts on a clock');
   }
 });
 
@@ -488,18 +474,16 @@ test('a stored plan keeps its place while its pieces exist, even if their length
   assert.deepStrictEqual(body.service.order.map(p => p.url), pieces.map(id => `${ctx.baseUrl}${catalog.get(id).url}`));
 });
 
-test('the home page player gets every part as a track, with where the service stands', async () => {
+test('the home page player gets every part as a track, from the beginning', async () => {
   const { listeningService } = require('../server/lib/service/listen');
   const service = await listeningService({ timezone: 'Asia/Tokyo' });
   assert.strictEqual(service.timezone, 'Asia/Tokyo');
-  assert.ok(service.at >= 0 && service.at < service.loopSeconds);
-  let start = 0;
+  for (const gone of ['at', 'loopSeconds']) assert.ok(!(gone in service), `no ${gone}`);
   for (const part of service.parts) {
     const t = part.track;
     assert.ok(t.file && t.seconds > 0 && t.peaks && t.peaks.length === 128, `${part.title}: playable, with its waveform`);
     assert.strictEqual(t.href, part.url);
-    assert.strictEqual(t.start, start, `${part.title}: where it starts on the service's clock`);
-    start += t.seconds + RULES.gapSeconds;
+    assert.ok(!('start' in t) && !('position' in part), `${part.title}: no place on a clock`);
     if (part.kind === 'song') {
       assert.strictEqual(t.credit, 'Original music by aChurch.ai, made with Suno.');
       assert.strictEqual(t.artwork, '/og/v1/square/music.png');
@@ -513,7 +497,6 @@ test('the home page player gets every part as a track, with where the service st
       assert.strictEqual(t.artwork, own || '/og/v1/square/chants.png', part.title);
     }
   }
-  assert.ok(Math.abs(start - service.loopSeconds) < 0.01, 'the parts fill the service');
 });
 
 // --- The season and the sky (seasonal-services-2026-10-08.md, private repo) ---

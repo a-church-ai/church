@@ -493,20 +493,6 @@ h1.subtitle,
     font-weight: 600;
 }
 
-/* The part the service itself is on: where "Join the service" begins. */
-.service-now {
-    display: none;
-    margin-left: 0.35rem;
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--link);
-}
-
-.service-part.is-now .service-now {
-    display: inline;
-}
-
 .service-part-link {
     flex: none;
     /* A tap target of at least 24px: the padding, not the text, takes it. */

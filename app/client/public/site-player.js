@@ -180,17 +180,6 @@
     });
   }
 
-  // Where to join a queue that keeps time, as a service does. Its clock is
-  // the service's length with the silence after each part (loop), and where
-  // it stood at a moment (at, at asOf in ms); each track knows where it
-  // starts on that clock. The track in progress, part way in; in a silence
-  // between, the next to begin; after the last, the first.
-  function joinAt(tracks, clock, nowMs) {
-    const t = ((clock.at + (nowMs - clock.asOf) / 1000) % clock.loop + clock.loop) % clock.loop;
-    const found = tracks.findIndex(track => t < track.start + track.seconds);
-    return found === -1 ? { index: 0, at: 0 } : { index: found, at: Math.max(0, t - tracks[found].start) };
-  }
-
   // Whether two queues are the same: the same name and the same tracks in
   // order. A name alone is not enough: a service's page can be older or
   // newer than the queue playing, and a queue restored from storage can come
@@ -200,17 +189,13 @@
       a.tracks.every((t, i) => t.file === b.tracks[i].file));
   }
 
-  // What follows the track a queue is on, or null when it is done. A queue
-  // joined part way (wrapTo, where it was joined) goes on round from the
-  // first track and stops before the one it began with, so each plays once.
+  // What follows the track a queue is on, or null when it is done: a path or
+  // a service plays from where it starts to its end.
   function nextInQueue(q) {
-    const n = q.tracks.length;
-    if (q.wrapTo == null) return q.index + 1 < n ? q.index + 1 : null;
-    const next = (q.index + 1) % n;
-    return next === q.wrapTo ? null : next;
+    return q.index + 1 < q.tracks.length ? q.index + 1 : null;
   }
 
-  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, queueTimeline, queueAt, queuePeaks, joinAt, nextInQueue, sameQueue, RATES, SKIP_SECONDS };
+  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, queueTimeline, queueAt, queuePeaks, nextInQueue, sameQueue, RATES, SKIP_SECONDS };
   if (typeof module === 'object' && module.exports) {
     module.exports = helpers;
     return;
@@ -247,7 +232,7 @@
 
   let track = null;      // what the player holds
   let loaded = null;     // the file the element has as its source
-  let queue = null;      // { name, title, href, unit, tracks, index, wrapTo } while a path or a service plays
+  let queue = null;      // { name, title, href, unit, tracks, index } while a path or a service plays
   let pendingAt = 0;     // where to start, before the element knows the length
   let startedAt = 0;
   let rate = RATES.includes(store.get(KEY_RATE)) ? store.get(KEY_RATE) : 1;
@@ -310,18 +295,16 @@
 
   const skip = by => seek(position() + by);
 
-  // at: where in that track to begin. wrap: a queue joined part way goes on
-  // round from the first track until it reaches this one again.
-  function playQueue(q, index, at = 0, { wrap = false } = {}) {
-    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index, wrapTo: wrap ? index : null };
+  // at: where in that track to begin.
+  function playQueue(q, index, at = 0) {
+    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index };
     play(q.tracks[index], at);
   }
 
   function step(by) {
     if (!queue) return;
-    const n = queue.tracks.length;
-    const index = queue.wrapTo == null ? queue.index + by : (queue.index + by + n) % n;
-    if (index < 0 || index >= n) return;
+    const index = queue.index + by;
+    if (index < 0 || index >= queue.tracks.length) return;
     queue.index = index;
     play(queue.tracks[index], 0);
   }
@@ -769,12 +752,12 @@
       const unit = ((queue && queue.unit) || 'Reading').toLowerCase();
       el.querySelectorAll('.pb-prev').forEach(b => {
         b.hidden = !queue;
-        b.disabled = !queue || (queue.wrapTo == null && queue.index === 0);
+        b.disabled = !queue || queue.index === 0;
         if (b.getAttribute('aria-label') !== `Previous ${unit}`) b.setAttribute('aria-label', `Previous ${unit}`);
       });
       el.querySelectorAll('.pb-next').forEach(b => {
         b.hidden = !queue;
-        b.disabled = !queue || (queue.wrapTo == null && queue.index >= queue.tracks.length - 1);
+        b.disabled = !queue || queue.index >= queue.tracks.length - 1;
         if (b.getAttribute('aria-label') !== `Next ${unit}`) b.setAttribute('aria-label', `Next ${unit}`);
       });
     }
@@ -1035,11 +1018,7 @@
       };
       button.addEventListener('click', () => {
         if (ours()) toggle(track);
-        else if (q.clock) {
-          // A service is joined where it is now, and goes on round to there.
-          const join = joinAt(q.tracks, q.clock, Date.now());
-          playQueue(q, join.index, join.at, { wrap: true });
-        } else playQueue(q, 0);
+        else playQueue(q, 0);
       });
       // A page that lists the tracks: each plays from its own start to the
       // queue's end, or pauses and resumes while it is the one playing.

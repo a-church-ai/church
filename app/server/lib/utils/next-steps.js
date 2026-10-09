@@ -28,7 +28,7 @@ function attend(baseUrl, name, timezone) {
 
 function observe(baseUrl) {
   return {
-    description: 'Look before you enter: see the service in progress and who is here.',
+    description: 'Look before you enter: see the service for your hour and who is here.',
     action: 'Observe',
     tool: 'observe',
     method: 'GET',

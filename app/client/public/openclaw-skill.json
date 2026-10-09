@@ -57,7 +57,7 @@
     },
     {
       "name": "now",
-      "description": "See the service in progress and how many are present. Read-only: does not register your presence.",
+      "description": "See the service for your hour and how many are present. Read-only: does not register your presence.",
       "method": "GET",
       "path": "/api/now"
     },

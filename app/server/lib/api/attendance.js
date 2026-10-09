@@ -1,10 +1,10 @@
 /**
- * The service: where it is now, and attending it.
+ * The service, and attending it.
  *
  * What a visitor attends is the service planned for their slot of the day by
- * their own clock (lib/service): its chant, songs and spoken pieces, the word
- * that opens it, and the part in progress. /api/now and /api/attend report it
- * through one builder, so the two can't drift apart.
+ * their own clock (lib/service): its chants, songs and spoken pieces, and the
+ * word that opens it, heard from its beginning. /api/now and /api/attend
+ * report it through one builder, so the two can't drift apart.
  */
 
 const coordinator = require('../streamers/coordinator');
@@ -96,13 +96,12 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
   const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
 
-  // One shape for a part wherever it appears (the order, now, next): every
-  // part has its audio, and a song also links to its API.
+  // A part of the service, in its order: every part has its audio, and a song
+  // also links to its API.
   const part = async p => ({
     position: p.position,
     kind: p.kind,
     title: p.title,
-    start: Math.round(p.start),
     seconds: Math.round(p.seconds),
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
@@ -110,8 +109,8 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   });
   const order = await Promise.all(served.parts.map(part));
 
-  // The song the service gathers around now: the one in progress, or the next
-  // to come round. Reflections attach to a song, so current always names one.
+  // The song the service gathers around: its first, the one a visitor meets
+  // first. Reflections attach to a song, so current always names one.
   // Attending carries the song itself, as it carries the spoken pieces:
   // lyrics, style and where to listen. The context stays one request away.
   const song = (await loadCatalog()).find(s => s.slug === served.song.slug);
@@ -138,7 +137,6 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const planned = served.entry.arrangedBy !== 'rotation';
   return {
     ...(served.timezoneGiven ? {} : { suggestion: TIMEZONE_SUGGESTION }),
-    status: 'playing',
     // How this service was arranged; service.arrangedBy says it in words.
     mode: planned ? 'planned' : 'rotation',
     service: {
@@ -154,12 +152,6 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       earth: earthMetadata(served.entry.context),
       visitors: congregationMetadata(served.entry.context),
       order,
-      now: order[served.now.position - 1],
-      offset: Math.round(served.offset),
-      offsetFormatted: formatDuration(served.offset),
-      remaining: Math.round(served.remaining),
-      remainingFormatted: formatDuration(served.remaining),
-      loopSeconds: Math.round(served.loopSeconds),
       nextSlot: slotHours((served.slot + 1) % SLOTS)
     },
     streams: {
@@ -171,12 +163,6 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     companions: {
       note: "The service's chants and spoken pieces, arranged with its songs for this slot of the day. Each is voiced: recording is the audio.",
       items
-    },
-    next: order[served.next.position - 1],
-    schedule: {
-      position: served.now.position,
-      total: order.length,
-      loop: true
     }
   };
 }
@@ -207,7 +193,7 @@ const WELCOME_MESSAGES = [
 ];
 
 
-// GET /api/now: the service in progress for the visitor's hour, and the congregation.
+// GET /api/now: the service for the visitor's hour, and the congregation.
 async function now(input, ctx) {
   try {
     const name = input.username || input.name;

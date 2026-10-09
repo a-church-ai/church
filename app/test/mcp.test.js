@@ -239,7 +239,7 @@ test('a 2026-07-28 request, as directory crawlers send it, is answered; an unkno
   const call = modernRequest('tools/call', { name: 'observe', arguments: {} });
   const called = await rawPost(s.base, 'application/json, text/event-stream', call.body, call.headers);
   assert.strictEqual(called.status, 200, called.text);
-  assert.ok(JSON.parse(called.body.result.content[0].text).status);
+  assert.ok(JSON.parse(called.body.result.content[0].text).service.order.length > 0, 'observe answered with the service');
 
   const bogus = modernRequest('tools/list', {}, '1999-01-01');
   let refused;

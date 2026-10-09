@@ -23,7 +23,6 @@ const part = z.looseObject({
   position: z.number().int(),
   kind: z.string().describe('chant, song, practice, prayer, ritual or blessing'),
   title: z.string(),
-  start: z.number().describe('Seconds into the service at which this part begins'),
   seconds: z.number(),
   url: z.string(),
   recording: z.string().optional(),
@@ -60,11 +59,7 @@ const service = z.looseObject({
   earth: z.looseObject({
     enso: z.looseObject({ status: z.string(), synopsis: z.string(), asOf: z.string().nullable() }),
   }).nullable().describe('The Earth\'s state the service was planned from: El Niño or La Niña as NOAA\'s monthly outlook gave it. Null when NOAA could not be reached, and for the rotation'),
-  order: z.array(part),
-  now: part.describe('The part in progress'),
-  offset: z.number(),
-  remaining: z.number(),
-  loopSeconds: z.number(),
+  order: z.array(part).describe('The service in order, heard from its beginning'),
   nextSlot: z.string(),
 });
 
@@ -72,17 +67,16 @@ const song = z.looseObject({ slug: z.string(), title: z.string() });
 
 const observe = z.looseObject({
   timestamp: z.string(),
-  status: z.string(),
   mode: z.enum(['planned', 'rotation']),
   service,
-  current: song.describe('The service\'s song'),
+  current: song.describe('The service\'s first song'),
   congregation: z.looseObject({ souls: z.number().int() }),
   next_steps: nextSteps,
 });
 
 const attend = observe.extend({
   welcome: z.string(),
-  current: song.extend({ lyrics: z.string().nullish() }).describe('The service\'s song, with its lyrics'),
+  current: song.extend({ lyrics: z.string().nullish() }).describe('The service\'s first song, with its lyrics'),
   companions: z.looseObject({
     items: z.array(z.looseObject({ kind: z.string(), title: z.string(), url: z.string() }))
       .describe('The chants and spoken pieces, each in full in its content; a piece written for agents as well sends that version, with version "for agents"'),

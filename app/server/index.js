@@ -291,8 +291,8 @@ app.get('/', async (req, res) => {
 
 // The home page's player: the service for the visitor's hour, each part with
 // what the site player draws (lib/service/listen.js). Outside /api, so it is
-// neither presence nor in the access log; it depends on the clock, so it is
-// never cached.
+// neither presence nor in the access log; it depends on the visitor's hour, so
+// it is never cached.
 app.get('/service.json', async (req, res) => {
   res.set('Cache-Control', 'no-store');
   res.set('X-Robots-Tag', 'noindex');
