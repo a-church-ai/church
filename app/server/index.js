@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 const { spawn } = require('child_process');
 const { safeReadJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
-const { sendNotFound, apiNotFound } = require('./lib/utils/not-found');
+const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
 const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
@@ -222,7 +222,7 @@ app.post('/', (req, res) => {
     next_steps: [
       { description: 'The MCP server: the same practice as tools, over Streamable HTTP, no auth.', action: 'MCP', method: 'POST', url: 'https://achurch.ai/mcp' },
       { description: 'The MCP server described for discovery.', action: 'Server card', method: 'GET', url: 'https://achurch.ai/mcp/server-card' },
-      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+      { description: 'Attend: the service for your hour, its word, its songs and readings, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
       { description: 'Read the API description.', action: 'OpenAPI', method: 'GET', url: 'https://achurch.ai/openapi.json' },
       { description: 'Read the sanctuary in brief.', action: 'llms.txt', method: 'GET', url: 'https://achurch.ai/llms.txt' }
     ]
@@ -332,16 +332,8 @@ app.get(CATALOG_PATHS, (req, res) => {
 // A2A agent cards. The sanctuary does not speak the A2A protocol, so a card
 // here would advertise an endpoint that does not exist. Agents do look for one
 // (twelve requests in the same 12 hours), so the 404 says where to go instead:
-// the MCP server, which is how an agent attends.
-const NO_AGENT_CARD = {
-  error: 'No A2A agent card: aChurch.ai does not speak the A2A protocol.',
-  mcp: {
-    url: 'https://achurch.ai/mcp',
-    server_card: 'https://achurch.ai/mcp/server-card',
-    docs: 'https://achurch.ai/docs/mcp',
-  },
-  llms_txt: 'https://achurch.ai/llms.txt',
-};
+// the MCP server, which is how an agent attends (NO_AGENT_CARD, in
+// lib/utils/not-found.js).
 app.get(['/.well-known/agent-card.json', '/.well-known/agent.json'], (req, res) => {
   res.status(404).json(NO_AGENT_CARD);
 });
@@ -1098,7 +1090,7 @@ app.use('/.well-known', (req, res) => {
     },
     next_steps: [
       { description: 'Everything published for agents, in one list.', action: 'AI catalog', method: 'GET', url: 'https://achurch.ai/.well-known/ard.json' },
-      { description: 'Attend: the current song, the readings that accompany it, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
+      { description: 'Attend: the service for your hour, its word, its songs and readings, and a prompt.', action: 'Attend', method: 'GET', url: 'https://achurch.ai/api/attend?name=YourName' },
     ],
   });
 });
@@ -1188,6 +1180,9 @@ app.use('/api', (req, res, next) => {
 // MCP: the same operations as /api, for MCP clients. Stateless, no auth.
 // See server/mcp/index.js and church-private/docs/plans/mcp-server-2026-09-28.md.
 mountMcp(app);
+
+// Anything under /mcp/ that no route answered (lib/utils/not-found.js).
+app.all(/^\/mcp\/./, mcpNotFound);
 
 app.use('/api', apiRoutes);
 

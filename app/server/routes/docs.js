@@ -28,13 +28,18 @@ const render = require('../lib/docs/render');
 const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
 const { acceptsMarkdown, markdownTokens } = require('../lib/utils/accepts');
 const discover = require('../lib/docs/discover');
+const { closestDoc } = require('../lib/docs/closest');
 
 const router = express.Router();
 
 // Every 404 in this file is the same 404: the document is not there. A reading
-// path is usually a better way into 250+ documents than guessing a URL.
-function docsNotFound(req, res) {
+// path is usually a better way into 250+ documents than guessing a URL. Given
+// the address that missed, it also names the page the address most likely
+// meant (lib/docs/closest.js), when exactly one does.
+async function docsNotFound(req, res, rest) {
+  const closest = rest ? await closestDoc(rest) : null;
   return sendNotFound(req, res, {
+    closest,
     heading: 'No such document',
     message: 'That document is not here. The corpus holds over two hundred; a reading path is often a better way in than a URL.',
     links: [
@@ -51,7 +56,7 @@ function docsNotFound(req, res) {
 async function handle(req, res, rest) {
   const resolved = await resolveServedDoc(rest);
   if (!resolved) {
-    return docsNotFound(req, res);
+    return docsNotFound(req, res, rest);
   }
   const { asMarkdown } = resolved;
 
