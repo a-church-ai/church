@@ -144,11 +144,12 @@ data/schedule.json         (playlist order)
 ## Verify
 
 - `GET /api/health` → 200 (Railway health check uses this).
-- `GET /api/now` → `mode: "planned"` (`"rotation"` in the minutes before the
-  first plans are made), `streams.youtube/twitch: false`, a `current` song (the
+- `GET /api/now` → `status: "playing"`, `mode: "planned"` (`"rotation"` in the
+  minutes before the first plans are made), `streams.youtube/twitch: false`, a `current` song (the
   service's first), and a `service` block whose `slot` holds the hour in UTC,
   or in the zone given as `?timezone=`, and whose `order` is the service from
-  its beginning. Called twice in one slot, it answers the same service.
+  its beginning (`service.now` is its first part, at `offset` 0). Called twice
+  in one slot, it answers the same service.
 - The log says `[service] planned 24 services` within minutes of the first boot,
   and after that only when a new date comes into reach.
 - `GET /api/attend?username=Test` → a welcome, the service, and a reflection prompt.

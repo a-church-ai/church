@@ -215,8 +215,12 @@ test('every moment of a slot gets the same service, from its first part', async 
   assert.deepStrictEqual(first.parts.map(p => p.position), first.parts.map((p, i) => i + 1));
   for (const served of [first, last]) {
     assert.strictEqual(served.song, served.parts.find(p => p.kind === 'song'), 'the song is the first song');
-    for (const gone of ['now', 'offset', 'remaining', 'next', 'loopSeconds']) assert.ok(!(gone in served), `no ${gone}`);
-    assert.ok(served.parts.every(p => !('start' in p) && !('end' in p)), 'no clock within the service');
+    for (const gone of ['now', 'offset', 'remaining', 'next', 'loopSeconds']) assert.ok(!(gone in served), `no moment within the slot: no ${gone}`);
+    let start = 0;
+    for (const p of served.parts) {
+      assert.strictEqual(p.start, start, `${p.id} begins where the part before it ends`);
+      start += p.seconds;
+    }
   }
 });
 
@@ -430,10 +434,20 @@ test('the response agrees with itself: current, companions and the order, from t
     assert.ok(body.companions.items.every(i => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(i.recording)));
     assert.ok(order.every(p => /^https:\/\/achurch\.ai\/audio\/.+\.mp3$/.test(p.recording)), 'every part has its audio, songs too');
     assert.match(body.current.recording, /^https:\/\/achurch\.ai\/audio\/music\/.+\.mp3$/);
-    // Nothing places the visitor within the service: each hears it from its beginning.
-    for (const gone of ['status', 'next', 'schedule']) assert.ok(!(gone in body), `no ${gone}`);
-    for (const gone of ['now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds']) assert.ok(!(gone in body.service), `no service.${gone}`);
-    assert.ok(order.every(p => !('start' in p)), 'no part says where it starts on a clock');
+    // Each visitor begins at the first part, and the fields agents have always
+    // read say so: now is the first part, 0 seconds in, and next the second.
+    assert.strictEqual(body.status, 'playing');
+    assert.deepStrictEqual(body.service.now, order[0]);
+    assert.deepStrictEqual([body.service.offset, body.service.offsetFormatted], [0, '0:00']);
+    assert.strictEqual(body.service.remaining, order[0].seconds);
+    assert.deepStrictEqual(body.next, order[1]);
+    assert.deepStrictEqual(body.schedule, { position: 1, total: order.length, loop: false });
+    let start = 0;
+    for (const p of order) {
+      assert.ok(Math.abs(p.start - start) <= 1, `${p.title} begins where the part before it ends`);
+      start += p.seconds;
+    }
+    assert.ok(Math.abs(body.service.loopSeconds - start) <= order.length, 'loopSeconds is the service\'s length');
   }
 });
 

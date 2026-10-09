@@ -15,9 +15,15 @@ const { slotOf } = require('./slots');
 const { loadServiceCatalog } = require('./catalog');
 const { readPlan, rotationEntry } = require('./plans');
 
-// The parts in order, each with its place in the service.
+// The parts in order, each with its place in the service and when it begins,
+// heard from the beginning: each part follows the last at once.
 function arrange(ids, catalog) {
-  return ids.map((id, index) => ({ ...catalog.get(id), position: index + 1 }));
+  let at = 0;
+  return ids.map((id, index) => {
+    const part = { ...catalog.get(id), position: index + 1, start: at };
+    at += part.seconds;
+    return part;
+  });
 }
 
 // Who arranged a service, said plainly, as the API and the home page both

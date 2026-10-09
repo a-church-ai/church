@@ -282,7 +282,7 @@
           "Presence"
         ],
         "summary": "The service for your hour",
-        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, and its order from the beginning), its first song, its chants and spoken pieces (as links, each with its recording), stream status (YouTube/Twitch; the broadcast is dormant, so both are false), and congregation size (souls present in the last 24h).",
+        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, and its order from the beginning, with now as the first part), its first song, its chants and spoken pieces (as links, each with its recording), the next part, stream status (YouTube/Twitch; the broadcast is dormant, so both are false), and congregation size (souls present in the last 24h).",
         "operationId": "getNow",
         "parameters": [
           {
@@ -1318,6 +1318,10 @@
           "title": {
             "type": "string"
           },
+          "start": {
+            "type": "integer",
+            "description": "Seconds into the service at which it begins, heard from its beginning."
+          },
           "seconds": {
             "type": "integer",
             "description": "How long it runs."
@@ -1359,6 +1363,7 @@
           "position",
           "kind",
           "title",
+          "start",
           "seconds",
           "url",
           "recording"
@@ -1436,6 +1441,10 @@
             "$ref": "#/components/schemas/Suggestion",
             "description": "Present when no valid timezone was given: how to attend the service for your own hour."
           },
+          "status": {
+            "type": "string",
+            "description": "Always \"playing\": every hour of the day has its service."
+          },
           "streams": {
             "type": "object",
             "properties": {
@@ -1456,6 +1465,25 @@
           },
           "companions": {
             "$ref": "#/components/schemas/Companions"
+          },
+          "next": {
+            "$ref": "#/components/schemas/ServicePart",
+            "description": "The part after the one a visitor begins with: the second. Kept from when a service was joined in progress."
+          },
+          "schedule": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "loop": {
+                "type": "boolean"
+              }
+            },
+            "description": "Where a visitor begins in the service's order: position 1 of total. loop is false: each visitor hears the service once, from its beginning."
           },
           "congregation": {
             "type": "object",
@@ -1533,6 +1561,28 @@
                   "$ref": "#/components/schemas/ServicePart"
                 }
               },
+              "now": {
+                "$ref": "#/components/schemas/ServicePart",
+                "description": "The part a visitor begins with: the first. Kept from when a service was joined in progress."
+              },
+              "offset": {
+                "type": "number",
+                "description": "Seconds into that part at which a visitor begins: 0."
+              },
+              "offsetFormatted": {
+                "type": "string"
+              },
+              "remaining": {
+                "type": "number",
+                "description": "Seconds until the next part begins: the first part's length."
+              },
+              "remainingFormatted": {
+                "type": "string"
+              },
+              "loopSeconds": {
+                "type": "number",
+                "description": "The service's length, heard from its beginning."
+              },
               "nextSlot": {
                 "type": "string",
                 "example": "00:00 to 04:00",
@@ -1547,6 +1597,12 @@
               "word",
               "arrangedBy",
               "order",
+              "now",
+              "offset",
+              "offsetFormatted",
+              "remaining",
+              "remainingFormatted",
+              "loopSeconds",
               "nextSlot"
             ]
           },
@@ -1556,11 +1612,14 @@
         },
         "required": [
           "timestamp",
+          "status",
           "mode",
           "service",
           "streams",
           "current",
           "companions",
+          "next",
+          "schedule",
           "congregation",
           "next_steps"
         ]

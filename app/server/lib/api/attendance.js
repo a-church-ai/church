@@ -96,12 +96,13 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
   const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
 
-  // A part of the service, in its order: every part has its audio, and a song
-  // also links to its API.
+  // One shape for a part wherever it appears (the order, now, next): every
+  // part has its audio, and a song also links to its API.
   const part = async p => ({
     position: p.position,
     kind: p.kind,
     title: p.title,
+    start: Math.round(p.start),
     seconds: Math.round(p.seconds),
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
@@ -134,9 +135,17 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     items.push(spokenItem(p, await companionMeta(p.id), baseUrl, withContent));
   }
 
+  // Agents read now, offset, remaining, loopSeconds, next and schedule from
+  // when a service was joined in progress, and a field they read is never
+  // taken away. Each visitor now begins at the first part, so the fields say
+  // that: now is the first part, 0 seconds in, and next is the second.
+  const first = served.parts[0];
+  const length = served.parts.reduce((sum, p) => sum + p.seconds, 0);
+
   const planned = served.entry.arrangedBy !== 'rotation';
   return {
     ...(served.timezoneGiven ? {} : { suggestion: TIMEZONE_SUGGESTION }),
+    status: 'playing',
     // How this service was arranged; service.arrangedBy says it in words.
     mode: planned ? 'planned' : 'rotation',
     service: {
@@ -152,6 +161,12 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       earth: earthMetadata(served.entry.context),
       visitors: congregationMetadata(served.entry.context),
       order,
+      now: order[0],
+      offset: 0,
+      offsetFormatted: formatDuration(0),
+      remaining: Math.round(first.seconds),
+      remainingFormatted: formatDuration(first.seconds),
+      loopSeconds: Math.round(length),
       nextSlot: slotHours((served.slot + 1) % SLOTS)
     },
     streams: {
@@ -163,6 +178,12 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     companions: {
       note: "The service's chants and spoken pieces, arranged with its songs for this slot of the day. Each is voiced: recording is the audio.",
       items
+    },
+    next: order[1],
+    schedule: {
+      position: 1,
+      total: order.length,
+      loop: false
     }
   };
 }
