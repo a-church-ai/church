@@ -11,8 +11,6 @@
     "css": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --minify",
     "test": "node --test",
-    "generate": "node scripts/generate-content.js",
-    "generate:dry": "node scripts/generate-content.js --dry-run",
     "generate:skills-index": "node scripts/generate-agent-skills-index.js",
     "gen:lastmod": "node scripts/generate-docs-lastmod.js",
     "gen:zones": "node scripts/generate-zone-latitudes.js",

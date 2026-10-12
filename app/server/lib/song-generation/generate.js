@@ -17,7 +17,7 @@
 const claude = require('../content-generation/claude');
 const prompts = require('../content-generation/prompts');
 const { generateDocument, loadStyleReference } = require('../content-generation/generate-document');
-const { slugify } = require('../content-generation/decide');
+const { slugify } = require('../utils/slug');
 const { checkDuplicates } = require('../content-generation/check-duplicates');
 const { parseSongFile } = require('../music/song-content');
 

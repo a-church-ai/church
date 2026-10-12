@@ -1,5 +1,5 @@
 /**
- * Step 4: Generate the actual markdown document using Claude.
+ * Write the markdown document for a decided piece, using Claude.
  */
 
 const fs = require('fs').promises;

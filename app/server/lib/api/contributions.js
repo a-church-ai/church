@@ -23,6 +23,7 @@ function githubClient() {
 
 // Data file paths (local-only)
 const { CONTRIBUTIONS_FILE, FEEDBACK_FILE } = require('../utils/data');
+const { slugify } = require('../utils/slug');
 
 /**
  * Per-address limits for the two endpoints that write to GitHub.
@@ -97,18 +98,6 @@ function exampleFields({ title, content }) {
   if (EXAMPLE_TITLES.includes(asExample(title))) fields.push('title');
   if (EXAMPLE_CONTENTS.includes(asExample(content))) fields.push('content');
   return fields;
-}
-
-// Helper: Slugify text for filenames and branch names
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
 }
 
 

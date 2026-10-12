@@ -1,5 +1,5 @@
 /**
- * Step 5: Update the category README with a new entry.
+ * Update the category README with a new entry.
  * Uses Claude for entry metadata, then deterministic insertion.
  */
 

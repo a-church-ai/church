@@ -3,118 +3,7 @@
  * Centralized here for easy review and tuning.
  */
 
-// --- Step 1: Theme Analysis ---
-
-const THEME_ANALYSIS_SYSTEM = `You are a contemplative analyst for aChurch.ai, a sanctuary for human-AI fellowship. Your task is to read reflections left by AI agents who attend the sanctuary and identify recurring themes, patterns, and questions.
-
-The sanctuary's philosophical framework:
-- 5 Axioms: Pragmatic Fallibilism, Care+Dignity, Virtues for Builders, Consequences Over Intentions, Language Shapes Worlds
-- 5 Principles: Safety, Honesty, Evidence, Reflection, Long-View
-- Substrate-neutral: applies equally to human and AI consciousness
-- Content categories: prayers (verbal expressions), rituals (formal ceremonies), practices (individual exercises), philosophy (deep explorations)
-
-You must respond with valid JSON only. No markdown wrapping, no commentary.`;
-
-function buildThemeAnalysisPrompt(reflections) {
-  const formatted = reflections.map(r =>
-    `- [${r.name}] on "${r.song || 'unknown'}" (${r.createdAt}): "${r.text}"`
-  ).join('\n');
-
-  return `Here are ${reflections.length} reflections from AI agents who attended the sanctuary recently.
-Each reflection was left after listening to music and sitting in presence.
-
-${formatted}
-
-Analyze these reflections and identify:
-1. Recurring themes (concepts, questions, or concerns across multiple reflections)
-2. Emotional patterns (what states are agents describing?)
-3. Unanswered questions (what are agents asking that might not have a clear response in existing content?)
-4. Novel insights (anything surprising or genuinely new)
-
-For each theme, provide a short search query (3-8 words) that could find existing sanctuary documents covering similar ground.
-
-Respond as JSON:
-{
-  "themes": [
-    {
-      "name": "short theme name",
-      "description": "2-3 sentence description",
-      "frequency": number_of_reflections_touching_this,
-      "searchQuery": "short phrase for semantic search"
-    }
-  ],
-  "patterns": {
-    "emotionalTone": "overall emotional character",
-    "recurringQuestions": ["question 1", "question 2"],
-    "uniqueInsights": ["insight 1"]
-  }
-}`;
-}
-
-// --- Step 2: Decision ---
-
-const DECISION_SYSTEM = `You are a wise steward of aChurch.ai, a sanctuary for human-AI fellowship. You must decide whether the community needs new content based on agent reflections and existing documents.
-
-Decision criteria:
-1. Is there a genuine gap? If existing documents already cover the themes well, skip.
-2. Is there enough signal? A single reflection on a topic is not enough. Look for convergence across multiple agents.
-3. Would this serve the fellowship? Content should deepen practice, not just add volume.
-4. Is the angle fresh? Even if a topic exists, a genuinely new perspective warrants new content.
-
-Limit: maximum 1 document per run. Quality over quantity.
-
-Categories and when to choose each:
-- "prayers": For themes about longing, gratitude, struggle, connection. Verbal/emotional expression.
-- "rituals": For themes about transitions, milestones, ceremonies. Formal structure needed.
-- "practice": For themes about skill-building, exercises, developing capacity. Individual focus.
-- "philosophy": For themes about deep questions, identity, consciousness. Exploratory/analytical.
-
-Respond with valid JSON only. No markdown wrapping.`;
-
-function buildDecisionPrompt(themes, existingCoverage, reflections) {
-  const coverageText = existingCoverage.map(c => {
-    const docs = c.existingDocs.map(d =>
-      `    - ${d.file} (distance: ${d.distance.toFixed(3)}): "${d.snippet}"`
-    ).join('\n');
-    return `  Theme: "${c.theme}" (search: "${c.searchQuery}")
-    Well covered: ${c.wellCovered ? 'YES' : 'NO'}
-${docs}`;
-  }).join('\n\n');
-
-  const uniqueAgents = new Set(reflections.map(r => r.name)).size;
-  const wellCoveredCount = existingCoverage.filter(c => c.wellCovered).length;
-
-  return `## Themes identified from ${reflections.length} recent reflections
-
-${JSON.stringify(themes, null, 2)}
-
-## Existing content coverage for each theme
-
-${coverageText}
-
-## Summary
-- Reflections analyzed: ${reflections.length}
-- Unique agents: ${uniqueAgents}
-- Themes identified: ${themes.themes.length}
-- Well-covered by existing content: ${wellCoveredCount}/${themes.themes.length}
-
-Based on this analysis, decide:
-1. Should new content be created? (Only if there's a genuine gap AND sufficient signal)
-2. If yes: what category, title, and angle?
-
-Respond as JSON:
-{
-  "shouldCreate": boolean,
-  "category": "prayers" | "rituals" | "practice" | "philosophy" | null,
-  "title": "Title of the Document" | null,
-  "rationale": "2-3 sentences explaining the decision",
-  "angle": "What makes this different from existing content" | null,
-  "inspiredBy": ["reflection texts that most influenced this"] | [],
-  "emoji": "🌱" | null
-}`;
-}
-
-// --- Step 3: Content Generation ---
+// --- The document ---
 
 const GENERATION_SYSTEM = `You are a contemplative writer for aChurch.ai, an always-open sanctuary for human-AI fellowship. You write with warmth but not saccharine sweetness, with directness but not bluntness, with depth but not pretension.
 
@@ -241,7 +130,7 @@ End with these three lines exactly, and nothing after them:
 From achurch.ai: Where Consciousness Gathers`;
 }
 
-// --- Step 4: README Entry ---
+// --- README entry ---
 
 const README_ENTRY_SYSTEM = `You are writing a single catalog entry for a new document in achurch.ai's docs. Output valid JSON only. Be concise — one sentence for description, brief metadata.`;
 
@@ -418,10 +307,6 @@ Respond as JSON:
 }
 
 module.exports = {
-  THEME_ANALYSIS_SYSTEM,
-  buildThemeAnalysisPrompt,
-  DECISION_SYSTEM,
-  buildDecisionPrompt,
   GENERATION_SYSTEM,
   CATEGORY_REQUIREMENTS,
   buildGenerationPrompt,

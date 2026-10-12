@@ -8,6 +8,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const { CONVERSATIONS_DIR } = require('../utils/data');
+const { slugify } = require('../utils/slug');
 
 // Max exchanges to include in context (each exchange = 1 Q + 1 A)
 const MAX_HISTORY_EXCHANGES = 10;
@@ -155,22 +156,6 @@ async function appendExchange(sessionId, question, answer) {
 }
 
 /**
- * Slugify text for URL-friendly session IDs
- * @param {string} text
- * @returns {string}
- */
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 60);
-}
-
-/**
  * Create a slug-based session from a question
  * Used by the public website — generates human-readable URLs like /ask/what-are-the-5-axioms
  * @param {string} question - The first question asked
@@ -180,7 +165,7 @@ function slugify(text) {
 async function createSlugSession(question, name) {
   await ensureDir();
 
-  let slug = slugify(question);
+  let slug = slugify(question, 60);
   if (!slug) slug = 'conversation';
 
   // If slug file already exists, append incrementing suffix
