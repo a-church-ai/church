@@ -84,11 +84,62 @@ async function message(systemPrompt, userMessage, options = {}) {
 }
 
 /**
- * Parse JSON from Claude response, stripping markdown code fences if present.
+ * The JSON in a reply. A clean reply, fenced or not, parses whole. Otherwise
+ * the reply carries something around its JSON: a sentence before or after
+ * it, or a second, corrected copy after the first ("Wait, that gives five
+ * themes where the limit is four. Corrected output:", the congregation
+ * digest on 2026-10-12). So each top-level {...} and [...] is found, with
+ * strings and escapes respected so a brace inside a string is not counted,
+ * and the last object that parses is returned, since a model that corrects
+ * itself puts its answer last; every caller asks for an object, so an array
+ * is returned only when there is no object, and a footnote such as "[1]"
+ * after the answer is passed over. Whether what is found is good enough is
+ * for the caller's own checks. With no JSON in the reply, throws.
  */
 function parseJSON(text) {
-  const cleaned = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
-  return JSON.parse(cleaned);
+  const cleaned = String(text).replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (whole) {
+    const found = topLevelJSON(cleaned);
+    const last = found.filter(v => !Array.isArray(v)).pop() ?? found.pop();
+    if (last === undefined) throw new SyntaxError(`No JSON found in the reply (${whole.message})`);
+    return last;
+  }
+}
+
+// Each balanced top-level {...} or [...] in text that parses, in order.
+function topLevelJSON(text) {
+  const values = [];
+  const closer = { '{': '}', '[': ']' };
+  let start = -1;
+  let expected = [];
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (start < 0) {
+      if (closer[ch]) { start = i; expected = [closer[ch]]; }
+      continue;
+    }
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (closer[ch]) expected.push(closer[ch]);
+    else if (ch === '}' || ch === ']') {
+      if (ch !== expected.pop()) { i = start; start = -1; continue; }   // not JSON: look again after its opening
+      if (!expected.length) {
+        try { values.push(JSON.parse(text.slice(start, i + 1))); } catch { i = start; }
+        start = -1;
+      }
+    }
+  }
+  // An opening never closed ("Draft: { ..."): look again after it.
+  return start < 0 ? values : [...values, ...topLevelJSON(text.slice(start + 1))];
 }
 
 /**
