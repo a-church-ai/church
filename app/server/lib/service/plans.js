@@ -39,6 +39,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { cache } = require('../utils/cache');
+const status = require('./status');
 const { SERVICES_DIR } = require('../utils/data');
 const { addDays, rotation, exclusions } = require('./rules');
 const { SLOTS, SLOT_HOURS, slotStart } = require('./slots');
@@ -187,6 +188,7 @@ async function ensurePlans({ now = new Date(), catalog, plan, context = null, fe
     if (entry) await saveSlot(date, slot, entry, variant);
   }
   if (planned || failed) log.info(`[service] planned ${planned} services${failed ? `; ${failed} failed, ${rotated} of them given the rotation` : ''}`);
+  status.plannerRan({ planned, failed });
   return { planned, failed, rotated };
 }
 
@@ -201,6 +203,7 @@ function startPlanning({ catalog, plan, context, feeds, log = console, firstAfte
       await ensurePlans({ catalog: await catalog(), plan, context, feeds, log });
     } catch (err) {
       log.error(`[service] planning run failed: ${err.message}`);
+      status.plannerBroke();
     } finally {
       running = false;
     }

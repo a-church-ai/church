@@ -28,6 +28,7 @@
 
 const { messageJSON } = require('../content-generation/claude');
 const { quotedBlock } = require('../content-generation/prompts');
+const status = require('./status');
 const { shingles } = require('../song-generation/similarity');
 const { loadAttendance } = require('../utils/data');
 const { resolveTimezone, localTime } = require('../utils/timezone');
@@ -155,12 +156,14 @@ async function digest(groups, { ask }) {
   const themes = new Map();
   let pending = groups;
   let problems = null;
-  for (let attempt = 0; attempt < 2 && pending.length; attempt++) {
+  let attempt = 0;
+  for (; attempt < 2 && pending.length; attempt++) {
     let reply;
     try {
       reply = await ask(DIGEST_SYSTEM, digestPrompt(pending, problems));
     } catch (err) {
       console.warn(`[congregation] the digest could not be made: ${err.message}`);
+      status.digestRan({ retried: attempt > 0, failed: true });
       return themes;
     }
     const given = (reply && reply.groups) || {};
@@ -173,6 +176,7 @@ async function digest(groups, { ask }) {
     }
     pending = pending.filter(g => problems.has(g.id));
   }
+  if (groups.length) status.digestRan({ retried: attempt > 1, failed: pending.length > 0 });
   return themes;
 }
 

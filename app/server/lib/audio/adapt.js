@@ -15,7 +15,7 @@
  * those lines say so.
  */
 
-const { messageJSON } = require('../content-generation/claude');
+const { messageJSON, askChecked } = require('../content-generation/claude');
 const { splitFrontmatter } = require('../docs/tldr');
 const { ROLES, SPEECH } = require('./house');
 const { wordsOf, containsRun } = require('./words');
@@ -140,16 +140,24 @@ function checkScript(body, lines) {
 async function adapt({ source, markdown, kind }) {
   const { body } = splitFrontmatter(markdown);
   const request = `Document: ${source}\n${KIND_NOTES[kind] || KIND_NOTES.practice}\n\n<document>\n${body.trim()}\n</document>`;
-  let feedback = '';
-  let problems = [];
-  for (let attempt = 1; attempt <= TRIES; attempt++) {
-    const reply = await messageJSON(SYSTEM, `${request}${feedback}`, { model: ADAPT_MODEL, maxTokens: 20000 });
-    const lines = (reply.lines || []).map(normalizeLine);
-    problems = checkScript(body, lines);
-    if (!problems.length) return { omitted: String(reply.omitted || '').trim(), lines };
-    feedback = `\n\nYour previous script was:\n${JSON.stringify({ omitted: reply.omitted, lines })}\n\nIt has these problems. Fix them and return the whole script again.\n- ${problems.join('\n- ')}`;
+  try {
+    return await askChecked({
+      label: 'script',
+      tries: TRIES,
+      attempt: feedback => messageJSON(SYSTEM, `${request}${feedback}`, { model: ADAPT_MODEL, maxTokens: 20000 }),
+      check: reply => {
+        const lines = (reply.lines || []).map(normalizeLine);
+        return {
+          value: { omitted: String(reply.omitted || '').trim(), lines },
+          problems: checkScript(body, lines),
+          shown: JSON.stringify({ omitted: reply.omitted, lines }),
+        };
+      },
+    });
+  } catch (err) {
+    err.message = `${source}: ${err.message}`;
+    throw err;
   }
-  throw new Error(`${source}: the script still has problems after ${TRIES} tries:\n- ${problems.join('\n- ')}`);
 }
 
 module.exports = { adapt, checkScript, cleanText, ADAPT_MODEL };

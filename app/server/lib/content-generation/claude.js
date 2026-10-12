@@ -109,4 +109,32 @@ async function messageJSON(systemPrompt, userMessage, options = {}) {
   }
 }
 
-module.exports = { message, messageJSON, parseJSON, extractText, MODEL };
+/**
+ * Ask until the answer passes its checks, telling the model what was wrong.
+ *
+ * attempt(feedback, problems) makes the call: feedback is '' the first time,
+ * and after that the previous answer and its problems in the words every
+ * caller uses, for the caller to append to its request; problems is the list
+ * itself, for a caller that decides from it what to ask again (the songwriter
+ * rewrites its document only when a problem is the document's). check(reply)
+ * returns { value, problems, shown }: what to return when there are no
+ * problems, the problems, and the answer as the model is shown it. After
+ * `tries` answers with problems, throws naming the last ones.
+ *
+ * Used by the services' planner, the audio adapter and the songwriter. The
+ * congregation digest keeps its own loop, since it asks again only for the
+ * groups that failed and keeps the rest.
+ */
+async function askChecked({ label, tries, attempt, check }) {
+  let feedback = '';
+  let problems = [];
+  for (let i = 0; i < tries; i++) {
+    const checked = check(await attempt(feedback, problems));
+    problems = checked.problems;
+    if (!problems.length) return checked.value;
+    feedback = `\n\nYour previous ${label} was:\n${checked.shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
+  }
+  throw new Error(`the ${label} still has problems after ${tries} ${tries === 1 ? 'try' : 'tries'}: ${problems.join('; ')}`);
+}
+
+module.exports = { message, messageJSON, askChecked, parseJSON, extractText, MODEL };

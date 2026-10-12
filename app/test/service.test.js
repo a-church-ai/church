@@ -291,7 +291,7 @@ test('a plan that breaks a rule is sent back once, with every problem named', as
 
 test('a plan that fails twice is the caller\'s to handle', async () => {
   const { calls, args } = await plannerCase([{ pieces: ['docs/nope.md'], word: '' }, { nonsense: true }]);
-  await assert.rejects(planSlot(args), /broke the rules twice/);
+  await assert.rejects(planSlot(args), /the arrangement still has problems after 2 tries/);
   assert.strictEqual(calls.length, 2);
 });
 

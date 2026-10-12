@@ -58,6 +58,7 @@ const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
 const { loadServiceCatalog } = require('./lib/service/catalog');
 const { startPlanning } = require('./lib/service/plans');
+const { servicesStatus } = require('./lib/service/status');
 const { planSlot, contextFor, fetchFeeds } = require('./lib/service/planner');
 
 // Create Express app
@@ -1255,7 +1256,8 @@ app.get('/api/health', async (req, res) => {
       youtube: isYoutubeLive,
       twitch: isTwitchLive
     },
-    persistence
+    persistence,
+    services: servicesStatus()
   });
 });
 

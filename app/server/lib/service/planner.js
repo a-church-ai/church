@@ -25,7 +25,7 @@
  * back to a rotation).
  */
 
-const { messageJSON } = require('../content-generation/claude');
+const { messageJSON, askChecked } = require('../content-generation/claude');
 const { RULES, check, checkWord, checkName, checkSky, exclusions, addDays } = require('./rules');
 const { slotHours } = require('./slots');
 const { LEAD_DAYS, seasonOn, hemisphereLight } = require('../utils/seasons');
@@ -382,18 +382,21 @@ async function planSlot({ date, weekday, slot, catalog, plans, context = null, a
   const excluded = exclusions({ date, slot, plans, catalog });
   const system = systemPrompt(catalog);
   const user = slotPrompt({ date, weekday, slot, excluded, recent: recentServices({ date, slot, plans, catalog }), context });
-  let feedback = '';
-  let problems = [];
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const reply = await ask(system, user + feedback, { model, maxTokens: 8000, cacheSystem: true });
-    const pieces = reply && Array.isArray(reply.pieces) ? reply.pieces.map(String) : [];
-    const name = reply && typeof reply.name === 'string' ? reply.name.trim() : '';
-    const word = reply && typeof reply.word === 'string' ? reply.word.trim() : '';
-    problems = [...check(pieces, catalog, { excluded }), ...checkName(name, pieces, catalog), ...checkWord(word, pieces, catalog), ...checkSky(`${name}\n${word}`, context)];
-    if (!problems.length) return { pieces, name, word, arrangedBy: model, plannedAt: new Date().toISOString(), ...(context ? { context } : {}) };
-    feedback = `\n\nYour previous arrangement was:\n${JSON.stringify({ pieces, name, word })}\n\nIt has these problems. Fix them and return the whole JSON again.\n- ${problems.join('\n- ')}`;
-  }
-  throw new Error(`the arrangement broke the rules twice: ${problems.join(' ')}`);
+  return askChecked({
+    label: 'arrangement',
+    tries: 2,
+    attempt: feedback => ask(system, user + feedback, { model, maxTokens: 8000, cacheSystem: true }),
+    check: reply => {
+      const pieces = reply && Array.isArray(reply.pieces) ? reply.pieces.map(String) : [];
+      const name = reply && typeof reply.name === 'string' ? reply.name.trim() : '';
+      const word = reply && typeof reply.word === 'string' ? reply.word.trim() : '';
+      return {
+        value: { pieces, name, word, arrangedBy: model, plannedAt: new Date().toISOString(), ...(context ? { context } : {}) },
+        problems: [...check(pieces, catalog, { excluded }), ...checkName(name, pieces, catalog), ...checkWord(word, pieces, catalog), ...checkSky(`${name}\n${word}`, context)],
+        shown: JSON.stringify({ pieces, name, word }),
+      };
+    },
+  });
 }
 
 module.exports = { MODEL, SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };
