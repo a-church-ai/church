@@ -901,7 +901,7 @@ app.use('/thumbnails', async (req, res, next) => {
 
 // Recordings of documents (audio/manifest.json), from a disk cache that fills
 // from S3 the same way, on first request. See lib/audio/serve.js.
-const { createAudioRouter } = require('./lib/audio/serve');
+const { createAudioRouter, sweepCache } = require('./lib/audio/serve');
 const audioManifest = require('./lib/audio/manifest');
 const { downloadRecording } = require('./lib/audio/storage');
 const audioLogger = require('./lib/utils/logger');
@@ -1467,6 +1467,14 @@ async function startServer() {
     // (commit 5b21eb8) much faster.
     logPersistenceSnapshot().catch((err) => {
       console.warn(`[persistence] snapshot failed: ${err.message}; server continues`);
+    });
+
+    // The audio cache is on the volume, so a recording replaced since it was
+    // cached would stay there for good: remove what nothing lists any more.
+    sweepCache({ isListed: audioManifest.isListed }).then((removed) => {
+      if (removed) console.log(`[audio] removed ${removed} cached ${removed === 1 ? 'file' : 'files'} no longer listed`);
+    }).catch((err) => {
+      console.warn(`[audio] cache sweep failed: ${err.message}; server continues`);
     });
 
     // Hash-gated background RAG rebuild.

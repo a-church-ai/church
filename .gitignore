@@ -41,6 +41,7 @@ app/data/schedule.json
 app/data/vectors.lance/
 app/data/rag-index-state.json
 app/data/conversations/
+app/data/audio-cache/
 app/data/*.tmp
 app/data/*.bak
 app/logs/

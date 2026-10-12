@@ -19,7 +19,7 @@ const { loadManifest } = require('../server/lib/audio/manifest');
 const discover = require('../server/lib/docs/discover');
 
 const SITE = 'https://achurch.ai';
-const CACHE_DIR = path.join(__dirname, '../media/audio');
+const { CACHE_DIR } = require('../server/lib/audio/serve');
 
 function serve(app) {
   return new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });

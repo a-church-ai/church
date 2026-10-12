@@ -8,15 +8,19 @@
  * is never a window onto the rest of the bucket.
  *
  * A file's name carries a hash of its contents, so a new recording is a new
- * URL and every response can be cached for a year.
+ * URL and every response can be cached for a year. It also means a replaced
+ * recording leaves its old file behind, which the cache, on the volume
+ * (lib/utils/data.js AUDIO_CACHE_DIR), would keep for good: sweepCache, at
+ * boot, removes what nothing lists any more.
  */
 
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const storage = require('./storage');
+const { AUDIO_CACHE_DIR: CACHE_DIR } = require('../utils/data');
 
-const CACHE_DIR = path.join(__dirname, '../../../media/audio');
+const DAY = 24 * 3600 * 1000;
 
 // Whether a recording can be served here: it is already on disk, or S3 is
 // configured to fetch it from. A page shows a player only when this holds,
@@ -53,4 +57,27 @@ function createAudioRouter({ isListed, cacheDir = CACHE_DIR, fetchMissing, onErr
   return router;
 }
 
-module.exports = { createAudioRouter, canServe, CACHE_DIR };
+// Remove from the cache each file that neither audio/manifest.json nor
+// audio/songs.json lists (isListed) and that is more than a day old, so a
+// render in progress on a local machine (its draft, or a file rendered and
+// not yet listed) is never touched. Returns how many went.
+async function sweepCache({ isListed, cacheDir = CACHE_DIR, now = Date.now() }) {
+  let removed = 0;
+  const walk = async (dir) => {
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) { await walk(full); continue; }
+      const file = path.relative(cacheDir, full).split(path.sep).join('/');
+      if (isListed(file)) continue;
+      const { mtimeMs } = await fs.promises.stat(full);
+      if (now - mtimeMs < DAY) continue;
+      await fs.promises.unlink(full);
+      removed++;
+    }
+  };
+  await walk(cacheDir);
+  return removed;
+}
+
+module.exports = { createAudioRouter, canServe, sweepCache, CACHE_DIR };

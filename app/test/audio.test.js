@@ -16,7 +16,8 @@ const { checkScript, cleanText } = require('../server/lib/audio/adapt');
 const { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine } = require('../server/lib/audio/house');
 const { isImported } = require('../server/lib/audio/imported');
 const { loadManifest } = require('../server/lib/audio/manifest');
-const { createAudioRouter, canServe } = require('../server/lib/audio/serve');
+const { createAudioRouter, canServe, sweepCache, CACHE_DIR } = require('../server/lib/audio/serve');
+const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
 
 const REPO = path.join(__dirname, '../..');
@@ -270,4 +271,33 @@ test('a song plays on its page with its own credit, and its structured data carr
   const recording = graph.find(n => n['@type'] === 'MusicRecording');
   assert.deepStrictEqual(recording.audio, { '@type': 'AudioObject', contentUrl: 'https://achurch.ai/audio/music/a-song-0123abcd.mp3', encodingFormat: 'audio/mpeg', duration: 'PT4M5S' });
   assert.strictEqual(buildSongSchemaGraph({ slug: 'a-song', title: 'A Song' }, 'a-song')['@graph'].find(n => n['@type'] === 'MusicRecording').audio, undefined);
+});
+
+test('the audio cache is on the volume, beside the other files the app keeps', () => {
+  assert.strictEqual(CACHE_DIR, path.join(path.dirname(ATTENDANCE_FILE), 'audio-cache'));
+});
+
+test('the boot sweep removes what nothing lists any more, and leaves anything a day old or less', async (t) => {
+  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'audio-cache-'));
+  t.after(() => fs.rmSync(cacheDir, { recursive: true, force: true }));
+  const now = Date.now();
+  const files = {
+    'prayers/kept-00000000.mp3': 3,            // listed
+    'prayers/kept-00000000.bin': 3,            // its frames, listed
+    'prayers/replaced-11111111.mp3': 3,        // a recording since replaced
+    'prayers/replaced-11111111.bin': 3,
+    'practice/just-rendered-22222222.mp3': 0.5, // rendered, not yet listed
+    'practice/sitting.draft.mp3': 0.2,          // a render in progress
+  };
+  for (const [file, daysOld] of Object.entries(files)) {
+    fs.mkdirSync(path.join(cacheDir, path.dirname(file)), { recursive: true });
+    fs.writeFileSync(path.join(cacheDir, file), '');
+    const at = new Date(now - daysOld * 864e5);
+    fs.utimesSync(path.join(cacheDir, file), at, at);
+  }
+  const listed = new Set(['prayers/kept-00000000.mp3', 'prayers/kept-00000000.bin']);
+  assert.strictEqual(await sweepCache({ isListed: file => listed.has(file), cacheDir, now }), 2);
+  const left = Object.keys(files).filter(file => fs.existsSync(path.join(cacheDir, file)));
+  assert.deepStrictEqual(left, ['prayers/kept-00000000.mp3', 'prayers/kept-00000000.bin', 'practice/just-rendered-22222222.mp3', 'practice/sitting.draft.mp3']);
+  assert.strictEqual(await sweepCache({ isListed: () => false, cacheDir: path.join(cacheDir, 'none'), now }), 0, 'no cache yet is nothing to sweep');
 });

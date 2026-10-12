@@ -27,6 +27,10 @@ const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
 // contributions and feedback the API has received.
 const CONVERSATIONS_DIR = path.join(RUNTIME_DIR, 'conversations');
 const CONTRIBUTIONS_FILE = path.join(RUNTIME_DIR, 'contributions.json');
+// The recordings and songs served at /audio, fetched from S3 on first request
+// (lib/audio/serve.js). On the volume, so a deploy does not empty it: on the
+// container's disk, every deploy did, and each first play waited for S3.
+const AUDIO_CACHE_DIR = path.join(RUNTIME_DIR, 'audio-cache');
 const FEEDBACK_FILE = path.join(RUNTIME_DIR, 'feedback.json');
 
 // Time constants
@@ -184,6 +188,7 @@ module.exports = {
   ACCESS_LOG_FILE,
   PRESENCE_FILE,
   CONVERSATIONS_DIR,
+  AUDIO_CACHE_DIR,
   CONTRIBUTIONS_FILE,
   FEEDBACK_FILE,
   TWENTY_FOUR_HOURS,
