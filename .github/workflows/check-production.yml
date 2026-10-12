@@ -1,0 +1,38 @@
+name: Check production
+
+# Once a day, a small check of the live site (app/scripts/check-production.js):
+# /api/health and the planner and digest it reports, /api/now against the
+# published spec, yesterday's and today's services, the MCP tools, the podcast
+# feeds, the recordings and search. Public, read-only requests, two at a time.
+#
+# Scheduled checks from the desktop app stopped at their first approval with
+# no one there to give it, and were marked succeeded (2026-10-09). This runs
+# where no approval is needed, holds no secret, installs nothing, and fails
+# loudly: a failed run emails the account the workflow belongs to.
+#
+# Free: GitHub Actions cost nothing for a public repository on a standard
+# runner. Plan: production-health-2026-10-12.md in the private repo.
+
+on:
+  schedule:
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Check achurch.ai
+        working-directory: app
+        run: node scripts/check-production.js

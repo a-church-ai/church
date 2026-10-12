@@ -58,3 +58,10 @@ test('/api/health reports them beside its other fields, and stays healthy whatev
   assert.match(health, /services: servicesStatus\(\)/);
   assert.doesNotMatch(health, /res\.status\(/, 'nothing it reports turns the check red');
 });
+
+test('the fields the daily check reads are kept: grow this list, never shrink it', () => {
+  const status = servicesStatus();
+  for (const key of ['since', 'planner', 'digest']) assert.ok(key in status, key);
+  for (const key of ['lastRunAt', 'lastPlanned', 'lastFailed', 'failuresSinceBoot']) assert.ok(key in status.planner, `planner.${key}`);
+  for (const key of ['runsSinceBoot', 'retriesSinceBoot', 'failuresSinceBoot', 'lastFailureAt']) assert.ok(key in status.digest, `digest.${key}`);
+});
