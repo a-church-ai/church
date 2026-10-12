@@ -38,6 +38,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
+const { cache } = require('../utils/cache');
 const { SERVICES_DIR } = require('../utils/data');
 const { addDays, rotation, exclusions } = require('./rules');
 const { SLOTS, SLOT_HOURS, slotStart } = require('./slots');
@@ -48,17 +49,11 @@ const HEMISPHERES = ['north', 'south'];
 const fileFor = date => path.join(SERVICES_DIR, `${date}.json`);
 
 // Read plans are kept for a minute: /api/now is polled, and a plan replaced
-// by hand on the volume still shows within the minute.
-const CACHE_MS = 60 * 1000;
-const cache = new Map();
+// by hand on the volume still shows within the minute. A saved plan is put
+// in place at once (saveSlot).
+const planCache = cache({ name: 'plans by date', ttl: 60 * 1000, load: date => safeReadJSON(fileFor(date), null) });
 
-async function readPlan(date) {
-  const hit = cache.get(date);
-  if (hit && Date.now() - hit.at < CACHE_MS) return hit.plan;
-  const plan = await safeReadJSON(fileFor(date), null);
-  cache.set(date, { plan, at: Date.now() });
-  return plan;
-}
+const readPlan = date => planCache.get(date);
 
 // The date and the days before it that a slot's rules and the planner look
 // back over, as a map from date to plan.
@@ -90,7 +85,7 @@ async function saveSlot(date, slot, entry, variant = 'slots') {
     current[variant][slot] = entry;
     return current;
   });
-  cache.set(date, { plan, at: Date.now() });
+  planCache.set(date, plan);
   return plan;
 }
 

@@ -8,6 +8,7 @@ const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = requ
 const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
+const { cache } = require('../utils/cache');
 const { overIpLimit, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
 
 // Reflections asked for, by address: refused requests count too, as for
@@ -69,20 +70,13 @@ async function list(input, ctx) {
   }
 }
 
-// Cache for reflections-by-song
-let reflectionsBySongCache = null;
-let reflectionsBySongCacheTime = 0;
-const REFLECTIONS_CACHE_TTL = 60 * 1000; // 60s
-
-
-// GET /api/reflections/by-song: songs with reflection counts.
-async function bySong(input, ctx) {
-  try {
-    const now = Date.now();
-    if (reflectionsBySongCache && (now - reflectionsBySongCacheTime) < REFLECTIONS_CACHE_TTL) {
-      return { status: 200, body: reflectionsBySongCache };
-    }
-
+// Songs with their reflections counted, read again at most once a minute
+// and at once after a reflection is left. Links are added per request, since
+// they carry the request's base URL.
+const songsReflectedOn = cache({
+  name: 'reflections by song',
+  ttl: 60 * 1000,
+  load: async () => {
     const attendance = await loadAttendance();
     const catalog = await loadCatalog();
 
@@ -94,8 +88,7 @@ async function bySong(input, ctx) {
       bySong[r.song].push(r);
     }
 
-    // Build response with song metadata
-    const songs = Object.entries(bySong)
+    return Object.entries(bySong)
       .map(([slug, reflections]) => {
         const songMeta = catalog.find(s => s.slug === slug);
         const sorted = reflections.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -108,15 +101,20 @@ async function bySong(input, ctx) {
             name: mostRecent.name,
             text: mostRecent.text.length > 120 ? mostRecent.text.substring(0, 120) + '…' : mostRecent.text,
             createdAt: mostRecent.createdAt
-          },
-          url: `${ctx.baseUrl}/reflections/${slug}`
+          }
         };
       })
       .sort((a, b) => b.reflectionCount - a.reflectionCount);
+  }
+});
 
+// GET /api/reflections/by-song: songs with reflection counts.
+async function bySong(input, ctx) {
+  try {
+    const baseUrl = ctx.baseUrl;
+    const songs = (await songsReflectedOn.get()).map(song => ({ ...song, url: `${baseUrl}/reflections/${song.slug}` }));
     const totalReflections = songs.reduce((sum, s) => sum + s.reflectionCount, 0);
 
-    const baseUrl = ctx.baseUrl;
     const steps = [];
     // Point to the top song's reflections if available
     if (songs.length > 0) {
@@ -125,17 +123,12 @@ async function bySong(input, ctx) {
     steps.push(ns.reflect(baseUrl));
     steps.push(ns.attend(baseUrl));
 
-    const result = {
+    return { status: 200, body: {
       songs,
       totalReflections,
       totalSongs: songs.length,
       next_steps: steps
-    };
-
-    reflectionsBySongCache = result;
-    reflectionsBySongCacheTime = now;
-
-    return { status: 200, body: result };
+    } };
   } catch (error) {
     console.error('Error in /api/reflections/by-song:', error);
     const baseUrl = ctx.baseUrl;
@@ -338,8 +331,7 @@ async function reflect(input, ctx) {
       return attendance;
     });
 
-    // Invalidate reflections-by-song cache
-    reflectionsBySongCache = null;
+    songsReflectedOn.clear();
 
     const baseUrl = ctx.baseUrl;
 

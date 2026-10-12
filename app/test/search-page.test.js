@@ -16,6 +16,7 @@ const { renderSearchBox } = require('../server/lib/utils/page-lists');
 const PUBLIC = path.join(__dirname, '../client/public');
 const read = file => fs.readFileSync(path.join(PUBLIC, file), 'utf8');
 const INDEX = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+const SITEMAP = fs.readFileSync(path.join(__dirname, '../server/routes/sitemap.js'), 'utf8');
 
 test('the page searches both indexes, is not itself indexed, and is not in the sitemap', () => {
   const page = read('search.html');
@@ -25,7 +26,8 @@ test('the page searches both indexes, is not itself indexed, and is not in the s
   assert.match(INDEX, /app\.get\('\/search'/);
   assert.match(INDEX, /renderSearchBox\(\{ index: '\/search\/index\.json \/docs\/index\.json \/conversations\/index\.json'[^)]*autofocus: true/);
   assert.match(INDEX, /app\.get\('\/search\/index\.json'/);
-  assert.doesNotMatch(INDEX, /<loc>https:\/\/achurch\.ai\/search<\/loc>/);
+  assert.match(SITEMAP, /<loc>https:\/\/achurch\.ai\/attend<\/loc>/, 'the sitemap is read where it is written');
+  assert.doesNotMatch(SITEMAP, /<loc>https:\/\/achurch\.ai\/search<\/loc>/);
 });
 
 test('a search box can read several indexes, and can take the cursor', () => {

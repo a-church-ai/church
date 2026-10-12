@@ -17,6 +17,7 @@
  */
 
 const ns = require('../utils/next-steps');
+const { cache } = require('../utils/cache');
 const { loadAttendance } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
 const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
@@ -51,28 +52,30 @@ const isDate = date => {
 
 // Reflections are kept a minute, as the songs' reflections are: a day page is
 // read by many and the file holds every reflection ever left.
-const CACHE_MS = 60 * 1000;
-const cache = new Map();
-
+//
 // The reflections left during a date's services, each with the slot and the
 // variant it was served under. A date's services are heard from 10:00 UTC the
 // day before (UTC+14) until noon UTC the day after (UTC-12, its last slot).
-async function reflectionsFor(date, catalog) {
-  const hit = cache.get(date);
-  if (hit && Date.now() - hit.at < CACHE_MS) return hit.reflections;
-  const start = Date.parse(`${date}T00:00:00Z`) - 14 * HOUR;
-  const end = Date.parse(`${date}T00:00:00Z`) + 36 * HOUR;
-  const out = [];
-  for (const r of (await loadAttendance()).reflections || []) {
-    const t = Date.parse(r.createdAt);
-    if (!(t >= start && t < end)) continue;
-    const served = await entryFor({ timezone: r.timezone, at: new Date(t), catalog });
-    if (served.local.date !== date) continue;
-    out.push({ slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant, reflection: r });
-  }
-  cache.set(date, { reflections: out, at: Date.now() });
-  return out;
-}
+const reflectionsOn = cache({
+  name: 'reflections by date',
+  ttl: 60 * 1000,
+  load: async date => {
+    const catalog = await loadServiceCatalog();
+    const start = Date.parse(`${date}T00:00:00Z`) - 14 * HOUR;
+    const end = Date.parse(`${date}T00:00:00Z`) + 36 * HOUR;
+    const out = [];
+    for (const r of (await loadAttendance()).reflections || []) {
+      const t = Date.parse(r.createdAt);
+      if (!(t >= start && t < end)) continue;
+      const served = await entryFor({ timezone: r.timezone, at: new Date(t), catalog });
+      if (served.local.date !== date) continue;
+      out.push({ slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant, reflection: r });
+    }
+    return out;
+  },
+});
+
+const reflectionsFor = date => reflectionsOn.get(date);
 
 // One service as the API and the page give it.
 function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) {
@@ -139,7 +142,7 @@ async function forDate(input, ctx) {
       } };
     }
     const catalog = await loadServiceCatalog();
-    const reflections = await reflectionsFor(date, catalog);
+    const reflections = await reflectionsFor(date);
     const services = [];
     for (let slot = 0; slot < SLOTS; slot++) {
       // The season-less service is for a place unknown, and for a hemisphere

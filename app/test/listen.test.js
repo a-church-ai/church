@@ -83,8 +83,9 @@ test('/attend gathers the service, the videos, each voiced section with its coun
   assert.deepStrictEqual([...at].sort((a, b) => a - b), at, 'the service, watching, listening, reflecting, the podcasts');
   assert.match(page, /<script src="\/reflect-form\.js"><\/script>/);
   const index = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  const sitemap = fs.readFileSync(path.join(__dirname, '../server/routes/sitemap.js'), 'utf8');
   assert.match(index, /app\.get\('\/attend'/);
-  assert.match(index, /<loc>https:\/\/achurch\.ai\/attend<\/loc>/);
-  assert.doesNotMatch(index, /'\/listen'|achurch\.ai\/listen/, 'one name for the place');
+  assert.match(sitemap, /<loc>https:\/\/achurch\.ai\/attend<\/loc>/);
+  assert.doesNotMatch(index + sitemap, /'\/listen'|achurch\.ai\/listen/, 'one name for the place');
   assert.ok(!fs.existsSync(path.join(PUBLIC, 'listen.html')));
 });

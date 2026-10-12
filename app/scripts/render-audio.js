@@ -50,6 +50,7 @@ const { uploadRecording, downloadRecording, bucket } = require('../server/lib/au
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { isImported } = require('../server/lib/audio/imported');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { pool } = require('../server/lib/utils/pool');
 
 const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
@@ -111,26 +112,6 @@ function selectDocs(all, paths, manifest = {}) {
     hits.forEach(d => picked.add(d));
   }
   return voiced.filter(d => picked.has(d));
-}
-
-// Run fn over items, `size` at a time. A fatal error (a spent quota, a bad
-// key) stops the pool; anything else is fn's to handle.
-async function pool(items, size, fn) {
-  let next = 0;
-  let fatal = null;
-  const worker = async () => {
-    while (!fatal && next < items.length) {
-      const item = items[next++];
-      try {
-        await fn(item);
-      } catch (err) {
-        if (!err.fatal) throw err;
-        fatal = err;
-      }
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(size, items.length) }, worker));
-  if (fatal) throw fatal;
 }
 
 // How many scripts each voice leads, per category, across every script
