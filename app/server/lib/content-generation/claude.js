@@ -167,10 +167,12 @@ async function messageJSON(systemPrompt, userMessage, options = {}) {
  * and after that the previous answer and its problems in the words every
  * caller uses, for the caller to append to its request; problems is the list
  * itself, for a caller that decides from it what to ask again (the songwriter
- * rewrites its document only when a problem is the document's). check(reply)
+ * rewrites its document only when a problem is the document's, and words
+ * each stage's request with correction()). check(reply), which may be async,
  * returns { value, problems, shown }: what to return when there are no
  * problems, the problems, and the answer as the model is shown it. After
- * `tries` answers with problems, throws naming the last ones.
+ * `tries` answers with problems, throws naming the last ones, with the list
+ * on the error's `problems`.
  *
  * Used by the services' planner, the audio adapter and the songwriter. The
  * congregation digest keeps its own loop, since it asks again only for the
@@ -180,12 +182,19 @@ async function askChecked({ label, tries, attempt, check }) {
   let feedback = '';
   let problems = [];
   for (let i = 0; i < tries; i++) {
-    const checked = check(await attempt(feedback, problems));
+    const checked = await check(await attempt(feedback, problems));
     problems = checked.problems;
     if (!problems.length) return checked.value;
-    feedback = `\n\nYour previous ${label} was:\n${checked.shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
+    feedback = correction(label, checked.shown, problems);
   }
-  throw new Error(`the ${label} still has problems after ${tries} ${tries === 1 ? 'try' : 'tries'}: ${problems.join('; ')}`);
+  const err = new Error(`the ${label} still has problems after ${tries} ${tries === 1 ? 'try' : 'tries'}: ${problems.join('; ')}`);
+  err.problems = problems;
+  throw err;
 }
 
-module.exports = { message, messageJSON, askChecked, parseJSON, extractText, MODEL };
+// What a model is told when its answer had problems, appended to its request.
+function correction(label, shown, problems) {
+  return `\n\nYour previous ${label} was:\n${shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
+}
+
+module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL };

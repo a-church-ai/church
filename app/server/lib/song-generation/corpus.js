@@ -71,14 +71,23 @@ async function existingSlugs() {
   return new Set([...songs.map((s) => s.id), ...docs.map((d) => d.slug)]);
 }
 
+// The tldr's findings that are about its length alone. A summary that is
+// short is still a true summary: the piece is published, and the finding is
+// a warning on its commit (production-health-2026-10-12.md, private repo).
+const TLDR_LENGTH = ['too-short', 'too-long', 'no-claim'];
+
 /**
- * Check a generated document against the corpus conventions.
+ * Check a generated document against the corpus conventions: { ok, issues,
+ * warnings }. Issues are what is wrong, broken or missing, and fail the
+ * piece; warnings are the tldr's length alone, and do not.
  *
- * validateTldr does the heavy lifting and already rejects em dashes, markup,
- * and bad lengths, so this only adds the structural pieces it does not cover.
+ * validateTldr does the heavy lifting on the tldr (em dashes, markup, length),
+ * so this only adds the structural pieces it does not cover. A finding on the
+ * tldr carries the tldr itself, so a log says what was found, not only that.
  */
 function validateDocument(content, { category, title }) {
   const issues = [];
+  const warnings = [];
 
   // splitFrontmatter returns { data, body }, and extractTldr returns an object
   // carrying .text rather than a bare string. Both were misread in the first
@@ -89,8 +98,13 @@ function validateDocument(content, { category, title }) {
     issues.push('missing tldr frontmatter');
   } else {
     const extracted = extractTldr(content);
-    const check = validateTldr(extracted && extracted.text);
-    if (!check.ok) issues.push(`tldr: ${check.issues.join(', ')}`);
+    const text = (extracted && extracted.text) || '';
+    const check = validateTldr(text);
+    const shown = `(${text.length} characters, ${text.split(/\s+/).filter(Boolean).length} words): "${text}"`;
+    const wrong = check.issues.filter((code) => !TLDR_LENGTH.includes(code));
+    const short = check.issues.filter((code) => TLDR_LENGTH.includes(code));
+    if (wrong.length) issues.push(`tldr: ${check.issues.join(', ')} ${shown}`);
+    else if (short.length) warnings.push(`tldr: ${short.join(', ')} ${shown}`);
   }
 
   if (!/^#\s+\S/m.test(body || content)) issues.push('missing # Title');
@@ -131,7 +145,7 @@ function validateDocument(content, { category, title }) {
   // The practical effect of a miss is a skipped run, not a bad commit. Failing
   // closed is the right direction when nobody is reviewing the output.
 
-  return { ok: issues.length === 0, issues };
+  return { ok: issues.length === 0, issues, warnings };
 }
 
 module.exports = {

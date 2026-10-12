@@ -39,12 +39,15 @@ function extractDescription(content) {
  * default, which is the cheap mid-tier model: right for a caller that has not
  * thought about it, wrong for the document, which is the piece a reader
  * actually reads and the most output-heavy call in the pipeline.
+ *
+ * `options.feedback`, appended to the request, is what was wrong with the
+ * previous document (claude.js correction()), when it is written again.
  */
 async function generateDocument(decision, themes, reflections, projectRoot, options = {}) {
   console.log(`Generating ${decision.category} document: "${decision.title}"...`);
 
   const styleRef = await loadStyleReference(decision.category, projectRoot);
-  const prompt = buildGenerationPrompt(decision, themes, reflections, styleRef);
+  const prompt = buildGenerationPrompt(decision, themes, reflections, styleRef) + (options.feedback || '');
 
   const content = await claude.message(GENERATION_SYSTEM, prompt, {
     model: options.model,

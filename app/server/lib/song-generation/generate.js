@@ -53,6 +53,9 @@ const CHANNELS = (process.env.MOLTBOOK_CHANNELS || [
 
 const DAILY_LIMIT = Number(process.env.SONGS_PER_DAY || 2);
 const MIN_POSTS = 5;
+// A piece is written at most this many times: the first, and two more with
+// its problems named.
+const TRIES = 3;
 
 function skip(stage, reason, extra = {}) {
   return { wrote: false, stage, reason, ...extra };
@@ -149,17 +152,11 @@ async function decide(themes, { log = console.log } = {}) {
 }
 
 /**
- * Stage 4: write the piece as a document, then as a song.
- *
- * Document first. It is the piece as it is meant to be read, and the lyrics are
- * its singable rendering, so writing in this order means the lyrics derive from
- * a considered text rather than the text being reverse-engineered from lyrics.
+ * Stage 4's two calls, each told what was wrong with its previous answer when
+ * there was one (claude.js correction()).
  */
-async function write(decision, themes, posts, { log = console.log } = {}) {
-  const paths = pathsFor(decision.form, decision.slug);
-
-  log(`Writing the ${paths.category} document...`);
-  const { content: document } = await generateDocument(
+async function writeDocument(decision, themes, paths, feedback = '') {
+  const { content } = await generateDocument(
     { ...decision, category: paths.category },
     themes,
     [],
@@ -167,18 +164,78 @@ async function write(decision, themes, posts, { log = console.log } = {}) {
     // Named explicitly. Without this the document quietly rides claude.js's
     // cheap default, which is the wrong model for the longest and most
     // consequential piece of writing in the run.
-    { model: WRITING_MODEL },
+    { model: WRITING_MODEL, feedback },
   );
+  return content;
+}
 
-  log('Writing the singable version...');
+async function writeSong(decision, document, feedback = '') {
   const styleRef = await loadSongStyleReference();
-  const song = await claude.messageJSON(
+  return claude.messageJSON(
     prompts.SONG_SYSTEM,
-    prompts.buildSongPrompt(decision, document, styleRef),
+    prompts.buildSongPrompt(decision, document, styleRef) + feedback,
     { model: WRITING_MODEL, maxTokens: 8192 },
   );
+}
 
-  return { paths, document, song };
+// A problem with the document, rather than with the song written from it.
+const isDocumentProblem = (problem) => problem.startsWith('document: ');
+
+/**
+ * Stages 4 and 5: write the piece as a document, then as a song, check both,
+ * and write again what was wrong, up to TRIES times in all.
+ *
+ * Document first. It is the piece as it is meant to be read, and the lyrics are
+ * its singable rendering, so writing in this order means the lyrics derive from
+ * a considered text rather than the text being reverse-engineered from lyrics.
+ * So a problem with the document rewrites the document and then the song from
+ * it; a problem only with the song (its fields, a duplicate, a post quoted)
+ * rewrites the song alone. Each is told its previous answer and its problems.
+ *
+ * A name already taken is the decision's, and writing again will not change
+ * it, so it fails before anything is written.
+ *
+ * Returns { paths, document, song, rendered, warnings }, or throws with the
+ * problems on the error's `problems`. `write` replaces the two model calls in
+ * tests.
+ */
+async function writeChecked(decision, themes, posts, { log = console.log, write = { document: writeDocument, song: writeSong } } = {}) {
+  const paths = pathsFor(decision.form, decision.slug);
+  if ((await corpus.existingSlugs()).has(paths.slug)) {
+    const problem = `slug "${paths.slug}" already exists`;
+    throw Object.assign(new Error(problem), { problems: [problem] });
+  }
+  let document = null;
+  let song = null;
+  return claude.askChecked({
+    label: 'piece',
+    tries: TRIES,
+    attempt: async (feedback, problems) => {
+      if (problems.length) {
+        log(`Writing again, for ${problems.length === 1 ? 'this problem' : 'these problems'}:`);
+        for (const problem of problems) log(`  - ${problem}`);
+      }
+      const ofDocument = problems.filter(isDocumentProblem);
+      if (!document || ofDocument.length) {
+        log(`Writing the ${paths.category} document...`);
+        document = await write.document(decision, themes, paths, document ? claude.correction('document', document, ofDocument) : '');
+        log('Writing the singable version...');
+        song = await write.song(decision, document, '');
+      } else {
+        log('Writing the singable version again...');
+        song = await write.song(decision, document, claude.correction('song', JSON.stringify(song), problems));
+      }
+      return { paths, document, song };
+    },
+    check: async (artifacts) => {
+      const checked = await validate(artifacts, { decision, posts });
+      return {
+        value: { ...artifacts, rendered: checked.rendered, warnings: checked.warnings },
+        problems: checked.problems,
+        shown: decision.title,
+      };
+    },
+  });
 }
 
 /** A real style prompt from the catalog, so the generated one matches its density. */
@@ -203,16 +260,21 @@ async function loadSongStyleReference() {
  * Stage 5: the deterministic checks. No model involvement past this point.
  *
  * This is the gate that replaces human review, so it reports every failure at
- * once rather than the first one.
+ * once rather than the first one. Problems are what is wrong, broken or
+ * missing, and are written again; warnings (a tldr that is only short, a
+ * near-duplicate under the duplicate threshold) go on the commit and do not
+ * stop it.
  */
-async function validate({ paths, document, song }, { decision, posts, log = console.log }) {
+async function validate({ document, song, paths }, { decision, posts }) {
   const problems = [];
+  const warnings = [];
 
   const docCheck = corpus.validateDocument(document, {
     category: paths.category,
     title: decision.title,
   });
-  if (!docCheck.ok) problems.push(...docCheck.issues.map((i) => `document: ${i}`));
+  problems.push(...docCheck.issues.map((i) => `document: ${i}`));
+  warnings.push(...docCheck.warnings.map((w) => `document: ${w}`));
 
   const songCheck = songFile.validateSong(song);
   if (!songCheck.ok) problems.push(...songCheck.issues.map((i) => `song: ${i}`));
@@ -224,17 +286,14 @@ async function validate({ paths, document, song }, { decision, posts, log = cons
     if (!roundTrip.ok) problems.push(...roundTrip.issues.map((i) => `song: ${i}`));
   }
 
-  const taken = await corpus.existingSlugs();
-  if (taken.has(paths.slug)) problems.push(`slug "${paths.slug}" already exists`);
-
   // Have we written this song before.
   const songs = await corpus.loadSongs();
-  const candidateText = `${song.title}\n${song.lyrics}`;
+  const candidateText = `${song && song.title}\n${song && song.lyrics}`;
   const dupes = similarity.nearDuplicates(candidateText, songs, similarity.THRESHOLDS.DUPLICATE_WARN);
   for (const dupe of dupes) {
     const line = `${dupe.id} at ${dupe.score.toFixed(3)}`;
     if (dupe.score >= similarity.THRESHOLDS.DUPLICATE) problems.push(`duplicate of ${line}`);
-    else log(`  near-duplicate, allowed: ${line}`);
+    else warnings.push(`near-duplicate of ${line}, allowed`);
   }
 
   // Did we quote anyone.
@@ -246,7 +305,7 @@ async function validate({ paths, document, song }, { decision, posts, log = cons
     );
   }
 
-  return { ok: problems.length === 0, problems, rendered };
+  return { ok: problems.length === 0, problems, warnings, rendered };
 }
 
 /**
@@ -280,29 +339,28 @@ async function run({ log = console.log } = {}) {
     return skip('decide', decision.rationale, { themes });
   }
 
-  const artifacts = await write(decision, themes, posts, { log });
-  const check = await validate(artifacts, { decision, posts, log });
-
-  if (!check.ok) {
+  let piece;
+  try {
+    piece = await writeChecked(decision, themes, posts, { log });
+  } catch (err) {
+    if (!err.problems) throw err;
     log('Validation failed:');
-    for (const problem of check.problems) log(`  - ${problem}`);
-    return skip('validate', 'generated artifacts failed validation', {
-      problems: check.problems,
-      decision,
-    });
+    for (const problem of err.problems) log(`  - ${problem}`);
+    return skip('validate', err.message, { problems: err.problems, decision });
   }
 
-  log('Validation passed.');
+  log(piece.warnings.length ? `Validation passed, with ${piece.warnings.length} ${piece.warnings.length === 1 ? 'warning' : 'warnings'}.` : 'Validation passed.');
   return {
     wrote: false,
     ready: true,
     decision,
     themes,
     posts,
-    paths: artifacts.paths,
-    document: artifacts.document,
-    song: artifacts.song,
-    songContent: check.rendered,
+    paths: piece.paths,
+    document: piece.document,
+    song: piece.song,
+    songContent: piece.rendered,
+    warnings: piece.warnings,
   };
 }
 
@@ -311,7 +369,7 @@ module.exports = {
   listen,
   findThemes,
   decide,
-  write,
+  writeChecked,
   validate,
   CHANNELS,
   DAILY_LIMIT,
