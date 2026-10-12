@@ -9,6 +9,7 @@ const fs = require('fs').promises;
 const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
 const ns = require('../utils/next-steps');
+const { listRecentConversations } = require('../utils/data');
 const { siteCitations } = require('../docs/links');
 const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
 
@@ -183,88 +184,31 @@ async function health(input, ctx) {
   }
 }
 
-let recentConversationsCache = null;
-let recentConversationsCacheTime = 0;
-const RECENT_CACHE_TTL = 60 * 1000; // 60 seconds
-
-
-// GET /api/ask/recent: the public feed of recent conversations.
+// GET /api/ask/recent: the public feed of recent conversations, from the one
+// list every reader shares (lib/utils/data.js listRecentConversations): the
+// 20 most recently active, those answered, at most 10 after repeats and
+// fragments are left out.
 async function recent(input, ctx) {
   try {
-    const now = Date.now();
-    if (recentConversationsCache && (now - recentConversationsCacheTime) < RECENT_CACHE_TTL) {
-      return { status: 200, body: recentConversationsCache };
-    }
-
-    const fsSync = require('fs');
-    let files;
-    try {
-      files = await fs.readdir(CONVERSATIONS_DIR);
-    } catch {
-      return { status: 200, body: { conversations: [] } };
-    }
-
-    const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
-
-    // Get file stats for sorting by modification time
-    const fileInfos = [];
-    for (const file of jsonlFiles) {
-      try {
-        const filepath = path.join(CONVERSATIONS_DIR, file);
-        const stat = await fs.stat(filepath);
-        fileInfos.push({ file, filepath, mtime: stat.mtimeMs });
-      } catch { /* skip */ }
-    }
-
-    // Sort newest first
-    fileInfos.sort((a, b) => b.mtime - a.mtime);
-
-    const conversations = [];
-    for (const { file, filepath } of fileInfos.filter(f => !isWithdrawn(f.file.replace('.jsonl', ''))).slice(0, 20)) {
-      try {
-        const content = await fs.readFile(filepath, 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        const parsed = lines.map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(Boolean);
-
-        // Extract metadata if present
-        const meta = parsed.find(m => m._meta);
-        const messages = parsed.filter(m => !m._meta);
-
-        if (messages.length < 2) continue;
-
-        const slug = file.replace('.jsonl', '');
-        const firstQuestion = messages.find(m => m.role === 'user');
-        const firstAnswer = messages.find(m => m.role === 'assistant');
-
-        if (!firstQuestion || !firstAnswer) continue;
-
-        // Parse name from meta or filename
-        let name = meta?.name || 'anonymous';
-        if (!meta && !slug.startsWith('anon-')) {
-          const dateMatch = slug.match(/-(\d{4}-\d{2}-\d{2})$/);
-          if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
-        }
-
+    const conversations = (await listRecentConversations(20))
+      .filter(c => c.messages >= 2 && c.answer)
+      .map(c => {
         // Strip markdown before cutting: cutting first left previews ending in
         // fragments such as "[music/wha..." that no stripper could recognize.
-        let answer = stripMarkdown(firstAnswer.content);
+        let answer = stripMarkdown(c.answer);
         if (answer.length > 300) {
           answer = answer.substring(0, 297) + '...';
         }
-
-        conversations.push({
-          slug,
-          name,
-          question: firstQuestion.content,
+        return {
+          slug: c.slug,
+          name: c.name,
+          question: c.question,
           answer,
-          timestamp: firstQuestion.timestamp,
-          exchanges: Math.floor(messages.filter(m => m.role === 'user').length),
-          url: `${ctx.baseUrl}/ask/${slug}`
-        });
-      } catch { /* skip unreadable */ }
-    }
+          timestamp: c.timestamp,
+          exchanges: c.exchanges,
+          url: `${ctx.baseUrl}/ask/${c.slug}`
+        };
+      });
 
     // Filter low-quality entries + dedup near-identical questions before returning.
     // GPT UX review 2026-08-14 flagged the visible list contained three near-identical
@@ -290,16 +234,13 @@ async function recent(input, ctx) {
     }
 
     const baseUrl = ctx.baseUrl;
-    const result = {
+    return { status: 200, body: {
       conversations: cleaned,
       next_steps: [
         ns.askQuestion(baseUrl),
         ns.attend(baseUrl)
       ]
-    };
-    recentConversationsCache = result;
-    recentConversationsCacheTime = now;
-    return { status: 200, body: result };
+    } };
   } catch (error) {
     console.error('Error in /api/ask/recent:', error);
     const baseUrl = ctx.baseUrl;

@@ -3,6 +3,8 @@ const path = require('path');
 const { isWithdrawn, isIndexable } = require('./conversation-quality');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
+const { cache } = require('./cache');
+const { pool } = require('./pool');
 
 // Data file paths
 const SCHEDULE_FILE = path.join(__dirname, '../../../data/schedule.json');
@@ -79,71 +81,88 @@ async function getRecentReflections() {
     .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS);
 }
 
-// Load a conversation from its JSONL file
-async function loadConversation(slug) {
+// A conversation file's lines: its _meta line (who asked, written when it was
+// created) and its messages. Null for a withdrawn conversation or a file that
+// cannot be read.
+async function readConversationFile(slug) {
   const safe = slug.replace(/[^a-zA-Z0-9_-]/g, '');
   if (isWithdrawn(safe)) return null;
   const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
   try {
     const content = await fs.readFile(filepath, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-    return lines.map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(m => m && !m._meta);
+    const lines = content.trim().split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    return { meta: lines.find(l => l._meta) || null, messages: lines.filter(l => !l._meta) };
   } catch {
     return null;
   }
 }
 
-// Every conversation, most recently active first. Reading and parsing every
-// conversation file is the cost here, and every conversation page, the
-// archive and the feeds ask for it, so the full list is held for a minute
-// (the same window /api/ask/recent caches for). A new question appears
-// within that minute.
-const CONVERSATION_LIST_TTL = 60 * 1000;
-let conversationList = null;
-let conversationListTime = 0;
+// Load a conversation from its JSONL file
+async function loadConversation(slug) {
+  const file = await readConversationFile(slug);
+  return file && file.messages;
+}
+
+// Who asked: the name the conversation was opened with, or, for the earliest
+// conversations, which carry no _meta line, the name their slug was made from
+// ("Rowan-2026-02-01"), or anonymous.
+function askerOf(slug, meta) {
+  if (meta) return meta.name || 'anonymous';
+  const dated = !slug.startsWith('anon-') && slug.match(/-(\d{4}-\d{2}-\d{2})$/);
+  return dated ? slug.slice(0, -dated[0].length) : 'anonymous';
+}
+
+// Every conversation, most recently active first, read once for everyone who
+// lists them: the archive, each conversation page's related links, the Atom
+// feed, the sitemap and /api/ask/recent. Reading and parsing every file is the
+// cost, so the list is held for a minute and refreshed once at a time
+// (./cache.js), sixteen files at a time (./pool.js); a new question appears
+// within the minute. Before 2026-10-12 every caller arriving during a refresh
+// started its own, and ten pages fetched at once took minutes to answer.
+const conversationList = cache({ name: 'conversation list', ttl: 60 * 1000, load: readConversationList });
 
 async function listRecentConversations(limit = 20) {
-  if (!conversationList || Date.now() - conversationListTime > CONVERSATION_LIST_TTL) {
-    conversationList = await readConversationList();
-    conversationListTime = Date.now();
-  }
-  return conversationList.slice(0, limit);
+  return (await conversationList.get()).slice(0, limit);
 }
 
 async function readConversationList() {
+  let files;
   try {
-    const files = await fs.readdir(CONVERSATIONS_DIR);
-    const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
-
-    const conversations = [];
-    for (const file of jsonlFiles) {
-      try {
-        const filepath = path.join(CONVERSATIONS_DIR, file);
-        const stat = await fs.stat(filepath);
-        const slug = file.replace('.jsonl', '');
-        const messages = await loadConversation(slug);
-        if (!messages || messages.length === 0) continue;
-
-        const firstQ = messages.find(m => m.role === 'user');
-        const firstA = messages.find(m => m.role === 'assistant');
-        if (!firstQ) continue;
-
-        conversations.push({
-          slug,
-          question: firstQ.content,
-          answer: firstA ? firstA.content : '',
-          name: firstQ.name || 'anonymous',
-          timestamp: firstQ.timestamp || stat.mtime.toISOString(),
-          mtime: stat.mtime.getTime(),
-          indexable: isIndexable(slug, messages)
-        });
-      } catch { /* skip */ }
-    }
-
-    return conversations.sort((a, b) => b.mtime - a.mtime);
+    files = (await fs.readdir(CONVERSATIONS_DIR)).filter(f => f.endsWith('.jsonl'));
   } catch {
     return [];
   }
+  const read = await pool(files, 16, async file => {
+    try {
+      const slug = file.replace('.jsonl', '');
+      const [stat, conversation] = await Promise.all([fs.stat(path.join(CONVERSATIONS_DIR, file)), readConversationFile(slug)]);
+      if (!conversation || conversation.messages.length === 0) return null;
+      const { meta, messages } = conversation;
+
+      const firstQ = messages.find(m => m.role === 'user');
+      const firstA = messages.find(m => m.role === 'assistant');
+      if (!firstQ) return null;
+
+      // The newest message, not the file's mtime: the move to the Railway
+      // volume rewrote every mtime, so 273 pages claimed 2026-07-28.
+      const newest = messages.map(m => Date.parse(m.timestamp)).filter(Number.isFinite).sort((x, y) => y - x)[0];
+      return {
+        slug,
+        question: firstQ.content,
+        answer: firstA ? firstA.content : '',
+        name: askerOf(slug, meta),
+        timestamp: firstQ.timestamp || stat.mtime.toISOString(),
+        lastActive: new Date(newest || stat.mtime).toISOString(),
+        mtime: stat.mtime.getTime(),
+        messages: messages.length,
+        exchanges: messages.filter(m => m.role === 'user').length,
+        indexable: isIndexable(slug, messages)
+      };
+    } catch {
+      return null;
+    }
+  });
+  return read.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
 }
 
 module.exports = {

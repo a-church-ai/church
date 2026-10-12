@@ -93,8 +93,12 @@ test('the conversations feed lists every conversation shown, with its asker', as
   assert.match(res.headers.get('content-type'), /^application\/atom\+xml/);
   const xml = await res.text();
   const entries = [...xml.matchAll(/<entry>[\s\S]*?<id>https:\/\/achurch\.ai\/ask\/([^<]+)<\/id>[\s\S]*?<name>([^<]*)<\/name>/g)].map(m => [m[1], m[2]]);
-  const slugs = entries.map(([slug]) => slug).sort();
-  assert.deepStrictEqual(slugs, ['ai', 'how-do-i-keep-a-practice', 'what-does-presence-ask-of-us', 'what-is-not-covered-here']);
+  assert.deepStrictEqual(entries.sort(), [
+    ['ai', 'Test'],
+    ['how-do-i-keep-a-practice', 'Ash'],
+    ['what-does-presence-ask-of-us', 'Wren'],
+    ['what-is-not-covered-here', 'anonymous'],
+  ], 'the names /ask shows, where the feed once said anonymous for everyone');
   assert.match(xml, /<summary>Presence is attention/);
 });
 
