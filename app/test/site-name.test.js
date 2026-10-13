@@ -57,7 +57,8 @@ test('no hand-written page calls itself by the domain any more', () => {
 test('titles built on the server end with the name when it fits, and give the room to the page\'s own words when it does not', () => {
   assert.strictEqual(render.docTitle('Litany for the Unasked'), `Litany for the Unasked | ${SITE_NAME}`);
   assert.ok(render.docTitle('The Compass Origin Story: How a Framework for Human-AI Collaboration Came to Be').length <= 70);
-  assert.strictEqual(render.docTitle('Compass Principle 6: Proportionality and Efficiency'), 'Compass Principle 6: Proportionality and Efficiency', 'the name goes before any of the title does');
+  assert.strictEqual(render.docTitle('Compass Principle 6: Proportionality and Efficiency'), 'Compass Principle 6: Proportionality and Efficiency | a Church', 'the short name when the whole does not fit');
+  assert.strictEqual(render.docTitle('Compass Principle 4: Evidence and Verification, Calibrated Claims'), 'Compass Principle 4: Evidence and Verification, Calibrated Claims', 'no name before any of the title goes');
   assert.ok(buildReflectionMeta({ slug: 'g', title: 'Gather' }).title.endsWith(` | ${SITE_NAME}`));
   const answer = { role: 'assistant', content: 'What was done with care remains, carried by whoever was there and by what they made of it afterwards.' };
   const short = buildConversationMeta([{ role: 'user', content: 'What remains when the window closes?' }, answer], 'q');

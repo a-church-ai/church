@@ -160,16 +160,20 @@ const SITE_NAME = 'a Church AI + Human';
 
 // A page's <title>. A results page shows about 70 characters of a title, and
 // the page's own words are what a searcher matches, so the site's name follows
-// them only when both fit: past 70, the name is the part that goes. A title
-// still too long keeps what comes before its colon, when that much stands
-// alone ("The Compass Origin Story", with the name again if it fits), or else
-// is cut at a word. `tail` is kept
-// whole after the title: the counter that tells repeated questions apart.
+// them only as far as it fits: the whole name, else its short form
+// (SITE_SHORT_NAME), else none, before any of the title goes. A title still
+// too long keeps what comes before its colon, when that much stands alone
+// ("The Compass Origin Story", with the name again if it fits), or else is cut
+// at a word. `tail` is kept whole after the title: the counter that tells
+// repeated questions apart.
+const SITE_SHORT_NAME = 'a Church';
 const TITLE_MAX = 70;
 function siteTitle(title, tail = '') {
   const own = String(title || '').trim();
-  const full = `${own}${tail} | ${SITE_NAME}`;
-  if (full.length <= TITLE_MAX) return full;
+  for (const name of [SITE_NAME, SITE_SHORT_NAME]) {
+    const named = `${own}${tail} | ${name}`;
+    if (named.length <= TITLE_MAX) return named;
+  }
   if ((own + tail).length <= TITLE_MAX) return own + tail;
   const head = own.split(': ')[0];
   if (head !== own && head.length >= 12 && (head + tail).length <= TITLE_MAX) return siteTitle(head, tail);
@@ -482,6 +486,7 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 
 module.exports = {
   SITE_NAME,
+  SITE_SHORT_NAME,
   siteTitle,
   SITE_SHARE_IMAGE,
   shareCardUrl,

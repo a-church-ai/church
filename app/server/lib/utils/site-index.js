@@ -23,7 +23,7 @@ const path = require('path');
 const { PLACES, FOOTER_MORE, FOOTER_LEGAL } = require('../site-shell');
 const { loadCatalog } = require('./data');
 const { songDescription } = require('../music/song-content');
-const { SITE_NAME } = require('./page-meta');
+const { SITE_NAME, SITE_SHORT_NAME } = require('./page-meta');
 const discover = require('../docs/discover');
 
 const PUBLIC = path.join(__dirname, '../../../client/public');
@@ -47,7 +47,8 @@ async function pageMeta(url) {
   const html = await fs.readFile(path.join(PUBLIC, file), 'utf8');
   const title = (html.match(/<title>([^<]*)<\/title>/i) || [])[1] || '';
   const description = (html.match(/<meta name="description" content="([^"]*)"/i) || [])[1] || '';
-  return [decode(title).replace(new RegExp(`\\s+\\|\\s+${SITE_NAME.replace(/[+]/g, '\\+')}\\s*$`), '').trim(), decode(description)];
+  const named = new RegExp(`\\s+\\|\\s+(?:${[SITE_NAME, SITE_SHORT_NAME].map(n => n.replace(/[+]/g, '\\+')).join('|')})\\s*$`);
+  return [decode(title).replace(named, '').trim(), decode(description)];
 }
 
 async function sitePages() {
