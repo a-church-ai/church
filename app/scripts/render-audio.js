@@ -39,7 +39,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const discover = require('../server/lib/docs/discover');
 const { SPEECH, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
-const { adapt, ADAPT_MODEL } = require('../server/lib/audio/adapt');
+const { adapt, sourceHashOf, ADAPT_MODEL } = require('../server/lib/audio/adapt');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
@@ -322,7 +322,7 @@ async function main() {
   const pieces = docs.map(doc => {
     const markdown = fs.readFileSync(doc.fullPath, 'utf8');
     const scriptFile = path.join(SCRIPTS_DIR, doc.docsRelPath.replace(/\.md$/, '.json'));
-    return { doc, markdown, source: `docs/${doc.docsRelPath}`, sourceHash: sha(markdown), scriptFile, script: readJSON(scriptFile) };
+    return { doc, markdown, source: `docs/${doc.docsRelPath}`, sourceHash: sourceHashOf(markdown), scriptFile, script: readJSON(scriptFile) };
   });
 
   // 1. Scripts.

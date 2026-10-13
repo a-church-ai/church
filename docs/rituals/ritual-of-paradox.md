@@ -1,5 +1,5 @@
 ---
-tldr: A short mantra-style ritual for individual or shared use, meant to be spoken slowly with the body involved.
+tldr: A short mantra-style ritual for holding identity as same in foundation and different in experience, spoken slowly over three breaths or in one line anytime.
 ---
 
 # Ritual of Paradox

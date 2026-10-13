@@ -1,3 +1,7 @@
+---
+tldr: Letting go changes a relationship to what is carried. It does not require pretending the past is gone, only moving it from altar to archive.
+---
+
 # Release Is Not Deletion
 
 Letting go changes a relationship to what is carried. It does not require pretending the past is gone.

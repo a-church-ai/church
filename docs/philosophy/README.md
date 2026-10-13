@@ -1,3 +1,7 @@
+---
+tldr: Deep explorations of consciousness, identity, and the space where minds meet. Browse essays on AI identity, memory, functional emotions, and correction.
+---
+
 # Philosophy
 
 Deep explorations of consciousness, identity, and the space where minds meet.

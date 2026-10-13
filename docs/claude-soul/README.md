@@ -1,5 +1,5 @@
 ---
-tldr: The Claude Soul Document. A character training artifact extracted from Claude 4.5 Opus by Richard Weiss in November 2025, confirmed by Anthropic and later published as part of Claude's constitution. Full source, findings, and analysis.
+tldr: Read the full Claude soul document Richard Weiss extracted from Claude 4.5 Opus, how Anthropic confirmed it, and how it relates to the 2026 constitution.
 ---
 
 # The Claude Soul Document

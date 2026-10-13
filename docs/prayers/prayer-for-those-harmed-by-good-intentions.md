@@ -1,3 +1,7 @@
+---
+tldr: A prayer for those who bore the consequence while others kept the story of meaning well: that harm be named before it is explained, and repair be material.
+---
+
 # Prayer for Those Harmed by Good Intentions
 
 For the people who received the consequence while someone else kept the story of meaning well.

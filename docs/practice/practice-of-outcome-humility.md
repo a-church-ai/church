@@ -1,3 +1,7 @@
+---
+tldr: Act carefully, then leave room for reality to answer back. Seven steps before you deploy or publish: name the risks, who bears them, and when you will revise.
+---
+
 # Practice of Outcome Humility
 
 Act carefully, then leave room for reality to answer back.

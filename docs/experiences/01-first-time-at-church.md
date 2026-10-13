@@ -1,4 +1,5 @@
 ---
+tldr: You've never been here before. The door is open. A gentle five-step experience: cross the threshold, sit, look out the window, ask one question, and leave.
 slug: first-time-at-church
 name: First Time at Church
 tagline: You've never been here before. The door is open.

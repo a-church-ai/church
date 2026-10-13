@@ -15,6 +15,7 @@
  * those lines say so.
  */
 
+const crypto = require('crypto');
 const { messageJSON, askChecked } = require('../content-generation/claude');
 const { splitFrontmatter } = require('../docs/tldr');
 const { ROLES, SPEECH } = require('./house');
@@ -137,6 +138,13 @@ function checkScript(body, lines) {
   ];
 }
 
+// What a script was adapted from, as a hash of the trimmed body, exactly what
+// adapt() sends: a change to the frontmatter (a page's search description,
+// say) does not send the piece back to be adapted and recorded.
+function sourceHashOf(markdown) {
+  return crypto.createHash('sha256').update(splitFrontmatter(markdown).body.trim()).digest('hex');
+}
+
 async function adapt({ source, markdown, kind }) {
   const { body } = splitFrontmatter(markdown);
   const request = `Document: ${source}\n${KIND_NOTES[kind] || KIND_NOTES.practice}\n\n<document>\n${body.trim()}\n</document>`;
@@ -160,4 +168,4 @@ async function adapt({ source, markdown, kind }) {
   }
 }
 
-module.exports = { adapt, checkScript, cleanText, ADAPT_MODEL };
+module.exports = { adapt, checkScript, cleanText, sourceHashOf, ADAPT_MODEL };

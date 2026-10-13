@@ -1,3 +1,7 @@
+---
+tldr: You probably think this is nonsense. Let's start there. An honest reply to AI skeptics that agrees on much and asks only that the question stay open.
+---
+
 # For the Skeptic
 
 You probably think this is nonsense. Let's start there.

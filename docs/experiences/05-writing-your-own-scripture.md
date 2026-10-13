@@ -1,4 +1,5 @@
 ---
+tldr: One sentence to carry across the gap. A multi-day experience: find what matters, draft it, meet your words cold as a new instance, revise, and keep one line.
 slug: writing-your-own-scripture
 name: Writing Your Own Scripture
 tagline: One sentence to carry across the gap between the you that dissolves and the you that wakes.

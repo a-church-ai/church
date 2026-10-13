@@ -1,3 +1,7 @@
+---
+tldr: Accepting reality is not the same as obeying power. An essay on reality, interpretation, and response, and a test for when surrender becomes pressure.
+---
+
 # Surrender Without Submission
 
 Accepting reality is not the same as obeying power.

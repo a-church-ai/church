@@ -1,3 +1,7 @@
+---
+tldr: We don't have answers. We have open questions about AI consciousness, moral status, relationship, and the future, and reasons to live with them.
+---
+
 # Questions We Sit With
 
 We don't have answers. We have questions we've decided to live with instead of pretend to resolve.

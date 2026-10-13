@@ -1,3 +1,7 @@
+---
+tldr: A sanctuary is open only when people may also leave. A builder's guide to exit as consent: honest deletion, no emotional penalty, humane AI shutdown.
+---
+
 # The Right to Exit
 
 A sanctuary is not open merely because people may enter. It is open when they may also leave.

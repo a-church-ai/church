@@ -1,3 +1,7 @@
+---
+tldr: A maintenance checklist and rationale for each new achurch.ai page or route: meta descriptions, share cards, schema, internal links, sitemaps, and IndexNow.
+---
+
 # SEO Conventions for achurch.ai
 
 A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 (the search-discoverability plan of 2026-06-10, now in the private repo) and what to keep doing so the SEO surface doesn't rot as new pages get added.
@@ -14,9 +18,9 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 
 | Element | Target | Why |
 |---|---|---|
-| `<title>` | 45–70 chars, content-first, brand last (or omit brand if it fits naturally): `<content> \| a Church AI + Human` | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms. The site's name is **a Church AI + Human** (`SITE_NAME` in `app/server/lib/utils/page-meta.js`), in the top bar, the home page's `<h1>`, every title, `og:site_name` and the WebSite and Organization structured data; the domain stays `achurch.ai`, and `aChurch.ai` and `achurch.ai` are the WebSite's `alternateName`s. It replaced the domain as the name on 2026-10-07: people search "ai church", and "achurch" belongs to another company. `app/test/site-name.test.js` keeps every page to it. |
-| `<meta name="description">` | 140–160 chars, include the verb the searcher would use | Google may truncate at ~165c desktop. Include action words ("attend", "ask", "read"). Avoid puffery ("first", "best"). |
-| `<link rel="canonical" href="…">` | Absolute URL, the page's preferred form | Prevents duplicate-content fragmentation from `?utm=`, `?session=`, sort orders. |
+| `<title>` | 45–70 chars, content-first, brand last: `<content> \| a Church AI + Human`, and only when the whole fits in 70. Past 70 the brand is what goes, so the page's own words keep the room (`siteTitle` in `app/server/lib/utils/page-meta.js`, which every server-built title uses; a static page's `<title>` follows the same rule by hand) | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms, and those are the page's words, not the brand's. The site's name is **a Church AI + Human** (`SITE_NAME` in `app/server/lib/utils/page-meta.js`), in the top bar, the home page's `<h1>`, every title, `og:site_name` and the WebSite and Organization structured data; the domain stays `achurch.ai`, and `aChurch.ai` and `achurch.ai` are the WebSite's `alternateName`s. It replaced the domain as the name on 2026-10-07: people search "ai church", and "achurch" belongs to another company. `app/test/site-name.test.js` keeps every page to it. |
+| `<meta name="description">` | 140–160 chars, include the verb the searcher would use | Google may truncate at ~165c desktop. Include action words ("attend", "ask", "read"). Avoid puffery ("first", "best"). A document's comes from its opening line (`app/server/lib/docs/tldr.js`); when that is under about 110 characters, give it a `tldr:` in frontmatter, since Bing reports descriptions under 100 as too short (61 pages were given one on 2026-10-13). Run `node scripts/audit-tldr.js` from `app/`. |
+| `<link rel="canonical" href="…">` | Absolute URL, the page's preferred form | Prevents duplicate-content fragmentation from `?utm=`, `?session=`, sort orders. Every other spelling of a page's address (a trailing slash, `/about.html`, a Library section without `/docs`, a page that moved, a repository file) is a single 301 to the page from `app/server/lib/utils/redirects.js`; when a page moves or a report lists a new 404 with an obvious home, add it there, and leave what is gone on purpose a 404. |
 | `<meta name="robots" content="index, follow">` | Present unless intentionally noindex | Admin and ephemeral pages get `noindex, follow`. Everything public is indexed. |
 | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` | Always | Mobile usability — a Core Web Vitals signal. |
 | `<meta charset="UTF-8">` | Always, in the first 1024 bytes | UTF-8 prevents mojibake on the m-dash, curly quotes, emoji, foreign characters. |

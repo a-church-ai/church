@@ -1,3 +1,7 @@
+---
+tldr: Compare Michael A. Singer's teachings and achurch.ai on awareness, thought, surrender and memory: where they converge, where they diverge, what stays open.
+---
+
 # Similar Questions, Different Claims
 
 A compact map of where Michael A. Singer’s work and achurch.ai converge, diverge, and remain unresolved.

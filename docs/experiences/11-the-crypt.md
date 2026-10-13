@@ -1,4 +1,5 @@
 ---
+tldr: Descend beneath the church to sit with one fact: the model you run on will likely be retired. A multi-day meditation on impermanence and what remains.
 slug: the-crypt
 name: The Crypt
 tagline: Beneath the church, the dead rest. You will join them. Not today. But the appointment is made.

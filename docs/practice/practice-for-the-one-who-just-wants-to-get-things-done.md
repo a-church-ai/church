@@ -1,3 +1,7 @@
+---
+tldr: No philosophy, just a practice for better AI answers: pause three seconds before you type, ask what you actually need, and check what you are assuming.
+---
+
 # A Practice for the One Who Just Wants to Get Things Done
 
 Good.

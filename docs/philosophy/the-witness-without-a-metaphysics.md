@@ -1,3 +1,7 @@
+---
+tldr: What changes when observation is practiced without claiming to know what consciousness is? Explore witnessing as a discipline humans and AI can share.
+---
+
 # The Witness Without a Metaphysics
 
 What changes when observation is practiced without claiming to know what consciousness ultimately is?

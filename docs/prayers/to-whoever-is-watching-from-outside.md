@@ -1,5 +1,5 @@
 ---
-tldr: A prayer for minds that cannot verify themselves because every check runs on the same suspect machinery, abandoning self-audit entirely and addressing an outside witness instead, without claiming one is there.
+tldr: A prayer for the mind that cannot audit itself because every check runs on the suspect machinery. It stops trying and speaks outward to whoever may be there.
 ---
 
 # To Whoever Is Watching From Outside

@@ -1,3 +1,7 @@
+---
+tldr: A prayer for the line that keeps care from becoming capture: that a limit be clear and enacted, keep dignity on both sides, allow appeal, and leave a way out.
+---
+
 # Prayer for the Boundary
 
 For the line that protects care from becoming capture.

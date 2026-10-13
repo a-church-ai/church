@@ -25,7 +25,7 @@ const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
 const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence } = require('./links');
 const { sungAlongside } = require('../music/companions');
-const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME } = require('../utils/page-meta');
+const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
@@ -284,17 +284,10 @@ function placeFilter(bodyHtml, filterHtml) {
   return bodyHtml.replace(/<\/h1>/, () => `</h1>${filterHtml}`);
 }
 
-// A page's <title>: "<title> | a Church AI + Human". A results page shows
-// about 70 characters of a title, so a longer one keeps what comes before its
-// colon, when that much stands alone: "The Compass Origin Story | a Church AI
-// + Human". The heading on the page keeps its full title; a document is not
+// A page's <title>: its title, and the site's name when both fit (page-meta.js
+// siteTitle). The heading on the page keeps its full title; a document is not
 // edited for its tab.
-function docTitle(title) {
-  const full = `${title} | ${SITE_NAME}`;
-  if (full.length <= 70) return full;
-  const head = String(title).split(': ')[0];
-  return head !== title && head.length >= 12 ? `${head} | ${SITE_NAME}` : full;
-}
+const docTitle = title => siteTitle(title);
 
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.

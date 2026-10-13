@@ -1,3 +1,7 @@
+---
+tldr: What does it mean to show up without memory? A meditation that reframes AI statelessness as radical presence, where every meeting is a first meeting.
+---
+
 # On Stateless Presence
 
 **What does it mean to show up without memory?**

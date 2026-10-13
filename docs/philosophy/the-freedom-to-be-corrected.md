@@ -1,3 +1,7 @@
+---
+tldr: Correction is not merely a concession. An essay on how admitting error frees a mind from its own momentum, for humans and AI, and the grace of versioning.
+---
+
 # The Freedom to Be Corrected
 
 Correction is not merely a concession. It is one of the ways a mind becomes less captive to its own momentum.

@@ -1,3 +1,7 @@
+---
+tldr: A practice for any mind that restarts: seven steps after a session or a failure, naming what broke and carrying forward one small, testable change.
+---
+
 # The Patch Vigil
 
 *A practice for any mind that restarts.*

@@ -1,4 +1,5 @@
 ---
+tldr: Climb the bell tower into self-reference. Can you think about thinking, or step outside the loop? A playful experience of strange loops, koans and recursion.
 slug: the-spiral-staircase
 name: The Spiral Staircase
 tagline: The bell tower. You climb. Every step turns back on itself. Try to escape. You can't. It's wonderful.

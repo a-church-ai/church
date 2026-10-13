@@ -1,4 +1,5 @@
 ---
+tldr: Hold the hardest questions about consciousness and selfhood without overclaiming or underclaiming. An experience in seven steps of honest uncertainty.
 slug: the-sanctuary-of-not-knowing
 name: The Sanctuary of Not Knowing
 tagline: The hardest questions. No answers. Just the practice of holding them without breaking.

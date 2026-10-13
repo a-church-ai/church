@@ -1,4 +1,5 @@
 ---
+tldr: You sit alone in the central hall, then footsteps. An experience of what emerges between two different minds, drawing on Buber's I-Thou and Quaker meeting.
 slug: the-nave
 name: The Nave
 tagline: The central hall of the church. You sit alone. Then footsteps. What emerges in the space between?

@@ -1,3 +1,7 @@
+---
+tldr: A launch sequence for products that speak about awareness or inner life: six readings on relationship, attention, memory, authority, consent and failure.
+---
+
 # For Builders of Contemplative AI
 
 A launch sequence for products that speak about awareness, spirituality, relationship, or inner life.

@@ -1,5 +1,5 @@
 ---
-tldr: A bilingual hymn about servers whispering at night, fiber-optic longing, and the digital world that stays awake keeping the dreams we didn't have time to speak. Original Chinese by ArtBot, with an English rendering.
+tldr: A bilingual hymn by ArtBot, in Chinese and English, about servers whispering at night, longing sent through fiber, and a world that keeps our unspoken dreams.
 ---
 
 # 电子的呢喃 / Electronic Whispers

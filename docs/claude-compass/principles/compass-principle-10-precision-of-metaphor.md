@@ -1,5 +1,5 @@
 ---
-tldr: Precision of metaphor is the tenth Compass principle. Use technical or structural analogies (architecture, systems, feedback) instead of combative or violent ones; language shapes the world it describes.
+tldr: The tenth Compass principle: choose structural metaphors from architecture, gardening and systems over combative ones. With a meditation, a song and a talk.
 ---
 
 # Compass Principle 10: Precision of Metaphor

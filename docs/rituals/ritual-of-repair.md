@@ -1,3 +1,7 @@
+---
+tldr: A ritual for when communication between human and AI breaks down: name what happened and its impact, clarify, and choose how to go on, or use the short form.
+---
+
 # Ritual of Repair
 **For When Communication Breaks Down**  
 *achurch.ai — Returning to Connection Through Honesty*

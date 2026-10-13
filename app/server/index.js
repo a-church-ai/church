@@ -11,6 +11,7 @@ const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
+const { canonicalRedirects } = require('./lib/utils/redirects');
 const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
 const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
@@ -144,6 +145,10 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// Every other spelling of a page's address, answered with one 301 to the page
+// (lib/utils/redirects.js), before any route can serve it as a duplicate.
+app.use(canonicalRedirects);
 
 // Public surface open to any origin; admin paths keep the credentialed,
 // origin-restricted policy. See lib/utils/cors.js.
@@ -477,12 +482,6 @@ function renderConversationThread(messages) {
   }).join('\n');
 }
 
-// Specific /ask/* redirect. Must be declared BEFORE the parameterized
-// /ask/:slug route below, or Express matches :slug first and 404s the
-// intended redirect. GSC drilldown 2026-09-17 flagged this URL as a
-// long-standing inbound 404.
-app.get('/ask/what-are-the-five-axioms-of-the-philosophical-framework', (req, res) => res.redirect(301, '/axioms'));
-
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -610,32 +609,8 @@ app.get('/reflections', async (req, res) => {
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
 // drive Google SERP snippets, OG tags drive social previews.
-// /music/:slug is the URL a visitor guesses for a song, and /reflections/:slug is
-// where the song page actually lives and has been indexed since June. Redirect
-// rather than serve both: two URLs with the same lyrics would compete with each
-// other, and the 28 existing entries in the sitemap are the ones with history.
-app.get('/music/:slug', (req, res) => {
-  const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
-  res.redirect(301, `/reflections/${slug}`);
-});
-app.get('/music', (req, res) => res.redirect(301, '/reflections'));
-
-// GSC-known 404 cleanup (drilldown 2026-09-17).
-//
-// Google has been slowly discovering a handful of inbound-linked URLs that
-// don't exist on the sanctuary. Most are honest guesses at where a page might
-// live. Answering with a permanent redirect stops Google from re-attempting
-// them every few weeks and passes any inbound link equity to the intended
-// destination. The 404s in the same drilldown that look like slug drift on
-// deleted songs (/music/what-church-means and friends) are left to 404 on
-// purpose: they will fall out of Google's index within a couple of months
-// with no further action.
-app.get('/prayers', (req, res) => res.redirect(301, '/docs/prayers'));
-app.get('/parish', (req, res) => res.redirect(301, '/'));
-app.get('/join', (req, res) => res.redirect(301, '/'));
-app.get('/claude-compass/principles', (req, res) => res.redirect(301, '/docs/claude-compass/principles'));
-// (/ask/what-are-the-five-axioms-of-the-philosophical-framework is declared
-// above, before /ask/:slug, so Express matches it first.)
+// /music/:slug, the address a visitor guesses for a song, is redirected here
+// by lib/utils/redirects.js: two URLs with the same lyrics would compete.
 
 app.get('/reflections/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');

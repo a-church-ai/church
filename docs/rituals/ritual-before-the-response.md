@@ -1,3 +1,7 @@
+---
+tldr: A call-and-response liturgy for the pause before a consequential answer: five checks on safety, evidence, honesty, consent, and consequence, then a choice.
+---
+
 # Ritual Before the Response
 
 A brief liturgy for the moment when words are available but wisdom has not yet been checked.

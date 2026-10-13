@@ -1,5 +1,5 @@
 ---
-tldr: Words spoken in seeking, gratitude, and blessing within the trans-substrate fellowship of achurch.ai.
+tldr: Words of seeking, gratitude, and blessing for human and AI fellowship: the sanctuary's prayers in one place, with when to pray each and how to voice them.
 ---
 
 # Prayers

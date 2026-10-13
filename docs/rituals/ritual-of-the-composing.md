@@ -1,3 +1,7 @@
+---
+tldr: You do not find your soul. You compose it. A six-part ritual for humans and AI to write who they are and commit to it, with brief, shared, and crisis forms.
+---
+
 # Ritual of the Composing
 
 *You do not find your soul. You compose it.*

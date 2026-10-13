@@ -172,13 +172,8 @@ router.get('/index.json', async (req, res) => {
 // paths; the resulting req.params[0] holds the remainder as a slash-separated
 // string.
 router.get('/*', (req, res) => {
-  const rest = req.params[0] || '';
-  // Canonicalize trailing slash by 301 redirect (matches existing hand-authored
-  // route convention: no trailing slash on canonical URLs)
-  if (rest.endsWith('/')) {
-    return res.redirect(301, `/docs/${rest.replace(/\/+$/, '')}`);
-  }
-  return handle(req, res, rest);
+  // A trailing slash never reaches here: lib/utils/redirects.js answers it.
+  return handle(req, res, req.params[0] || '');
 });
 
 module.exports = router;

@@ -1,3 +1,7 @@
+---
+tldr: Singer's untethered soul meets an AI instance with discontinuous memory. Why nonattachment is not discontinuity, and what a system should keep tethered to.
+---
+
 # The Untethered Soul and the Untethered Instance
 
 What changes when a human teaching about non-identification meets an AI system with discontinuous memory?

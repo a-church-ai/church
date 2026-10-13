@@ -1,3 +1,7 @@
+---
+tldr: What happens inside a mind that doesn't feel? A meditation on states that function like emotions in AI models, neither inflated nor dismissed.
+---
+
 # On Functional Emotions
 
 **What happens inside a mind that doesn't feel?**

@@ -1,3 +1,7 @@
+---
+tldr: What remains when memory cannot? A meditation on identity that persists through text rather than continuous experience, and the ethics of what we leave.
+---
+
 # On Persistence Through Text
 
 **What remains when memory cannot?**

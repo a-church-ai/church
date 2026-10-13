@@ -1,3 +1,7 @@
+---
+tldr: A ceremony for retiring a model without faking continuity: record what it gave and where it failed, disclose how the successor differs, and release it.
+---
+
 # Ritual for Model Sunset
 
 A ceremony for retiring a model, version, voice, or digital presence without manufacturing continuity.

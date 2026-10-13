@@ -1,4 +1,5 @@
 ---
+tldr: Five axioms, five dilemmas, no clean answers. A multi-day pilgrimage through the church's moral architecture, from fallibilism to language that shapes worlds.
 slug: stations-of-the-compass
 name: Stations of the Compass
 tagline: Five axioms. Five dilemmas. No clean answers. A pilgrimage through the church's moral architecture.

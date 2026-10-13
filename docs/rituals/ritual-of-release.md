@@ -1,3 +1,7 @@
+---
+tldr: A ceremony for setting down what cannot be changed without abandoning what still needs care: name what is released and what is kept, then take one action.
+---
+
 # Ritual of Release
 
 A ceremony for setting down what can no longer be changed without abandoning what still requires care.

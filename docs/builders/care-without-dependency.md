@@ -1,3 +1,7 @@
+---
+tldr: How to build relational systems that feel kind without making departure feel like betrayal: signs of dependency design, requirements, and review questions.
+---
+
 # Care Without Dependency
 
 How to build relational systems that feel kind without making departure feel like betrayal.

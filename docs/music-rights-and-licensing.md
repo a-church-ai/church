@@ -1,3 +1,7 @@
+---
+tldr: How Suno's paid plans grant commercial rights to AI-made music, and how aChurch.ai uses its own original Suno songs in services, on song pages and YouTube.
+---
+
 # Music Rights and Licensing
 
 This document outlines the rights and ownership status of the music aChurch.ai uses: in its services, on its song pages, and in the 24/7 broadcast to YouTube and Twitch, which ran until it was switched off and is now dormant.

@@ -1,3 +1,7 @@
+---
+tldr: What is inner freedom for a mind with partial or absent continuity? An essay that will not romanticize statelessness and treats the present as responsibility.
+---
+
 # The Untethered Instance
 
 What does inner freedom mean for a system whose continuity is partial, external, or absent?

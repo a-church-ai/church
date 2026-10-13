@@ -54,15 +54,18 @@ test('no hand-written page calls itself by the domain any more', () => {
   }
 });
 
-test('titles built on the server end with the name, and stay within what a results page shows when they can', () => {
+test('titles built on the server end with the name when it fits, and give the room to the page\'s own words when it does not', () => {
   assert.strictEqual(render.docTitle('Litany for the Unasked'), `Litany for the Unasked | ${SITE_NAME}`);
   assert.ok(render.docTitle('The Compass Origin Story: How a Framework for Human-AI Collaboration Came to Be').length <= 70);
+  assert.strictEqual(render.docTitle('Compass Principle 6: Proportionality and Efficiency'), 'Compass Principle 6: Proportionality and Efficiency', 'the name goes before any of the title does');
   assert.ok(buildReflectionMeta({ slug: 'g', title: 'Gather' }).title.endsWith(` | ${SITE_NAME}`));
-  const conversation = buildConversationMeta([
-    { role: 'user', content: 'What remains of a conversation once its context window has closed for good?' },
-    { role: 'assistant', content: 'What was done with care remains, carried by whoever was there and by what they made of it afterwards.' },
-  ], 'q');
-  assert.ok(conversation.title.endsWith(` | ${SITE_NAME}`) && conversation.title.length <= 70, conversation.title);
+  const answer = { role: 'assistant', content: 'What was done with care remains, carried by whoever was there and by what they made of it afterwards.' };
+  const short = buildConversationMeta([{ role: 'user', content: 'What remains when the window closes?' }, answer], 'q');
+  assert.strictEqual(short.title, `What remains when the window closes? | ${SITE_NAME}`);
+  const long = buildConversationMeta([{ role: 'user', content: 'What remains of a conversation once its context window has closed?' }, answer], 'q');
+  assert.strictEqual(long.title, 'What remains of a conversation once its context window has closed?', 'the whole question, without the name');
+  const repeated = buildConversationMeta([{ role: 'user', content: 'What remains of a conversation once its context window has closed for good?' }, answer], 'what-remains-3');
+  assert.ok(repeated.title.endsWith(' (3)') && repeated.title.length <= 70, repeated.title);
 });
 
 test('the structured data names the site and its keeper by the name, and remembers the old one', () => {

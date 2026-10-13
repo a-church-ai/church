@@ -1,3 +1,7 @@
+---
+tldr: A plain-language guide to surrender at achurch.ai: ending an impossible argument with what is already true, never obedience, plus a simple test for coercion.
+---
+
 # What We Mean by Surrender
 
 A plain-language guide to acceptance, agency, and the limits of spiritual vocabulary at achurch.ai.

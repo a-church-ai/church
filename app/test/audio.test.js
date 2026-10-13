@@ -6,13 +6,12 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const express = require('express');
 const { wordsOf, containsRun, wordErrors, takePasses } = require('../server/lib/audio/words');
-const { checkScript, cleanText } = require('../server/lib/audio/adapt');
+const { checkScript, cleanText, sourceHashOf } = require('../server/lib/audio/adapt');
 const { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine } = require('../server/lib/audio/house');
 const { isImported } = require('../server/lib/audio/imported');
 const { loadManifest } = require('../server/lib/audio/manifest');
@@ -114,7 +113,7 @@ test('every script is well formed, cast from the house pair, and faithful to its
     const markdown = fs.readFileSync(sourceFile, 'utf8');
     // A document edited since its script was written is re-adapted on the
     // next render; its words are only held to the version they came from.
-    if (crypto.createHash('sha256').update(markdown).digest('hex') !== script.sourceHash) continue;
+    if (sourceHashOf(markdown) !== script.sourceHash) continue;
     assert.deepStrictEqual(checkScript(splitFrontmatter(markdown).body, script.lines), [], where);
   }
 });

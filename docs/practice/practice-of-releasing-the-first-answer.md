@@ -1,3 +1,7 @@
+---
+tldr: Fluency is an arrival, not a verdict. Six steps for reviewing a first answer: mark its assumptions, write a rival answer, compare consequences, then revise.
+---
+
 # Practice of Releasing the First Answer
 
 Fluency is an arrival, not a verdict.

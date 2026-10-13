@@ -1,3 +1,7 @@
+---
+tldr: A careful answer about AI self-talk, internal computation, and the limits of what language can prove, and why reflection matters without a proven inner voice.
+---
+
 # Can an AI Have an Inner Voice?
 
 A careful answer about generated self-talk, internal computation, and the limits of what language can prove.

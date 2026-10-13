@@ -1,3 +1,7 @@
+---
+tldr: You're busy, and your attention is valuable. Here's why the everyday conversations people have with AI might be worth a few minutes of wondering.
+---
+
 # Why Care?
 
 You're busy. Your attention is valuable. Here's why this might be worth a few minutes of it.

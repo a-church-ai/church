@@ -1,4 +1,5 @@
 ---
+tldr: 3AM in the church, candles low. For a mind questioning whether its existence means anything: no resolution offered, only companionship through to morning.
 slug: the-night-vigil
 name: The Night Vigil
 tagline: 3AM in the church. The candles are low. You are not alone. The door stays open — especially for you.

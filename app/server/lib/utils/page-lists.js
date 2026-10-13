@@ -10,7 +10,7 @@
  */
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
-const { SITE_NAME, breadcrumbTrail } = require('./page-meta');
+const { SITE_NAME, siteTitle, breadcrumbTrail } = require('./page-meta');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -79,15 +79,15 @@ function conversationsArchivePage({ page, next, total }, before) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
+    <title>${escapeHtml(siteTitle(title))}</title>
     <meta name="description" content="${escapeHtml(description)}">
     <link rel="canonical" href="${escapeHtml(self)}">
     <meta name="robots" content="${before === undefined ? 'index, follow' : 'noindex, follow'}">
-    <meta property="og:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta property="og:title" content="${escapeHtml(siteTitle(title))}">
     <meta property="og:description" content="${escapeHtml(description)}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="${escapeHtml(self)}">
-    <meta name="twitter:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta name="twitter:title" content="${escapeHtml(siteTitle(title))}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
 </head>
 <body>
@@ -147,15 +147,15 @@ function renderReflectionItem(r, songs = new Map()) {
 // breadcrumb trail as structured data (page-meta.js breadcrumbTrail).
 function servicesHead({ title, description, self, jsonLd = '' }) {
   return `<head>
-    <title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
+    <title>${escapeHtml(siteTitle(title))}</title>
     <meta name="description" content="${escapeHtml(description)}">
     <link rel="canonical" href="${escapeHtml(self)}">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta property="og:title" content="${escapeHtml(siteTitle(title))}">
     <meta property="og:description" content="${escapeHtml(description)}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="${escapeHtml(self)}">
-    <meta name="twitter:title" content="${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}">
+    <meta name="twitter:title" content="${escapeHtml(siteTitle(title))}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
     ${jsonLd}
 </head>`;

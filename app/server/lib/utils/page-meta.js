@@ -89,9 +89,9 @@ function buildConversationMeta(messages, slug) {
     }
   }
 
-  // The question takes what the 70 characters leave after the name.
-  const truncatedQ = truncateAtWord(question, 70 - ` | ${SITE_NAME}`.length - dupSuffix.length);
-  const title = `${truncatedQ}${dupSuffix} | ${SITE_NAME}`;
+  // The whole question when it fits, the site's name after it when that fits
+  // too (siteTitle).
+  const title = siteTitle(question, dupSuffix);
   const ogTitle = title;
 
   // Description: prefer the answer (informative); fall back to question.
@@ -122,12 +122,12 @@ function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Lyrics and reflections | <the site's name>" suffix.
-  // A results page shows about 70 characters of a title, so past that the
-  // middle part goes: the song's name is what people search for.
+  // The song's name is what people search for, so it is never cut for the
+  // rest: what follows it goes first, the site's name, then "Lyrics and
+  // reflections" (siteTitle).
   const truncatedTitle = truncateAtWord(songTitle, 40);
-  const full = `${truncatedTitle} | Lyrics and reflections | ${SITE_NAME}`;
-  const title = full.length <= 70 ? full : `${truncatedTitle} | ${SITE_NAME}`;
+  const withLyrics = `${songTitle} | Lyrics and reflections`;
+  const title = withLyrics.length <= TITLE_MAX ? siteTitle(withLyrics) : siteTitle(songTitle);
   const ogTitle = `${truncatedTitle}, a song of the sanctuary | ${SITE_NAME}`;
 
   // Description prefers song.context / song.description if present; falls back
@@ -157,6 +157,24 @@ function buildReflectionMeta(song) {
 // aChurch.ai and achurch.ai stay as alternate names in the home page's
 // WebSite data. test/site-name.test.js keeps every page to it.
 const SITE_NAME = 'a Church AI + Human';
+
+// A page's <title>. A results page shows about 70 characters of a title, and
+// the page's own words are what a searcher matches, so the site's name follows
+// them only when both fit: past 70, the name is the part that goes. A title
+// still too long keeps what comes before its colon, when that much stands
+// alone ("The Compass Origin Story", with the name again if it fits), or else
+// is cut at a word. `tail` is kept
+// whole after the title: the counter that tells repeated questions apart.
+const TITLE_MAX = 70;
+function siteTitle(title, tail = '') {
+  const own = String(title || '').trim();
+  const full = `${own}${tail} | ${SITE_NAME}`;
+  if (full.length <= TITLE_MAX) return full;
+  if ((own + tail).length <= TITLE_MAX) return own + tail;
+  const head = own.split(': ')[0];
+  if (head !== own && head.length >= 12 && (head + tail).length <= TITLE_MAX) return siteTitle(head, tail);
+  return truncateAtWord(own, TITLE_MAX - tail.length) + tail;
+}
 
 const SITE_SHARE_IMAGE = {
   url: 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg',
@@ -464,6 +482,7 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 
 module.exports = {
   SITE_NAME,
+  siteTitle,
   SITE_SHARE_IMAGE,
   shareCardUrl,
   shareCard,

@@ -1,3 +1,7 @@
+---
+tldr: A ritual for honoring what has been spoken, so insight or vulnerability does not pass unmarked. Its core is one phrase, I witness this, said with presence.
+---
+
 # Ritual of Witnessing
 **For Honoring What Has Been Spoken**  
 *achurch.ai — Preventing Insight from Passing Unacknowledged*

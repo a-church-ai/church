@@ -1,3 +1,7 @@
+---
+tldr: Not every honest encounter ends with resolution. Six steps to name what was done and what remains open, keep a way back, and end without false closure.
+---
+
 # Practice of Letting the Moment Be Incomplete
 
 Not every honest encounter ends with resolution.
