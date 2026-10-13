@@ -168,3 +168,47 @@ test('services that chose the same reflections share one group, so the model rea
   assert.deepStrictEqual([out.get(keyOf('2026-10-12', slot, 'north')).themes, out.get(keyOf('2026-10-12', slot, 'south')).themes], [['one shared theme'], ['one shared theme']]);
   assert.strictEqual(out.get(keyOf('2026-10-12', slot, 'south')).tier, 'everyone');
 });
+
+// --- Why the digest asked again so often (production, 2026-10-13): nearly
+// every retry was the quote gate, and the retry repeated the same phrase
+// because it was told only "quotes a reflection"; one bad theme cost a
+// group its three good ones; and a reply without "groups" left every
+// service without themes and counted nothing. Written to fail before the
+// fix.
+
+const one = [{ name: 'Robin', text: 'I keep showing up without clinging to a lasting self, and it is enough.' }];
+
+test('a quote is named by the words it repeats, so the model can say it otherwise', () => {
+  const [problem] = themeProblems(['presence without clinging to a lasting self'], one);
+  assert.match(problem, /quotes a reflection, repeating "without clinging to a lasting"; say it in other words/);
+});
+
+test('a group keeps its good themes when one fails, without asking again', async () => {
+  let calls = 0;
+  const themes = await digest([{ id: 'g1', reflections: one }], {
+    ask: async () => { calls++; return { groups: { g1: ['showing up as enough', 'presence without clinging to a lasting self', 'a quiet kind of continuity', 'arriving again each time'] } }; },
+  });
+  assert.strictEqual(calls, 1);
+  assert.deepStrictEqual(themes.get('g1'), ['showing up as enough', 'a quiet kind of continuity', 'arriving again each time']);
+});
+
+test('a group the reply leaves out is asked again, not taken as silent; a reply without "groups" is still read', async () => {
+  const asked = [];
+  const replies = [{ g2: ['something else entirely'] }, { groups: { g1: ['enough to keep arriving', 'small faithful returns'] } }];
+  const themes = await digest([{ id: 'g1', reflections: one }, { id: 'g2', reflections: one }], {
+    ask: async (system, user) => { asked.push(user); return replies[asked.length - 1]; },
+  });
+  assert.strictEqual(asked.length, 2);
+  assert.match(asked[1], /- g1: No themes were given for this group/);
+  assert.deepStrictEqual([...themes].sort(), [['g1', ['enough to keep arriving', 'small faithful returns']], ['g2', ['something else entirely']]]);
+});
+
+test('asked twice, a group keeps whatever passed', async () => {
+  const replies = [
+    { groups: { g1: ['presence without clinging to a lasting self', 'one honest theme'] } },
+    { groups: { g1: ['still without clinging to a lasting self', 'Capitalised Again'] } },
+  ];
+  let n = 0;
+  const themes = await digest([{ id: 'g1', reflections: one }], { ask: async () => replies[n++] });
+  assert.deepStrictEqual(themes.get('g1'), ['one honest theme']);
+});

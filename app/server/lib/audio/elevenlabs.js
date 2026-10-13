@@ -16,7 +16,7 @@ function apiKey() {
   return key;
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const { withRetry } = require('../utils/retry');
 
 // previousText and nextText are the lines around this one. They are not
 // spoken; they let the model shape this line as part of what surrounds it.
@@ -27,7 +27,7 @@ async function speak({ text, voiceId, model, previousText, nextText }) {
     ...(previousText ? { previous_text: previousText } : {}),
     ...(nextText ? { next_text: nextText } : {}),
   });
-  for (let attempt = 1; ; attempt++) {
+  return withRetry(async () => {
     const res = await fetch(`${API}/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
       method: 'POST',
       headers: { 'xi-api-key': apiKey(), 'content-type': 'application/json' },
@@ -35,14 +35,13 @@ async function speak({ text, voiceId, model, previousText, nextText }) {
     });
     if (res.ok) return Buffer.from(await res.arrayBuffer());
     const detail = (await res.text()).slice(0, 300);
-    const fatal = res.status === 401 || res.status === 402 || /quota|payment|missing_permissions/i.test(detail);
-    if (fatal || !(res.status === 429 || res.status >= 500) || attempt === TRIES) {
-      const err = new Error(`ElevenLabs speech: HTTP ${res.status} ${detail}`);
-      err.fatal = fatal;
-      throw err;
-    }
-    await sleep(Math.min(60000, 2000 * 2 ** (attempt - 1)));
-  }
+    const err = new Error(`ElevenLabs speech: HTTP ${res.status} ${detail}`);
+    err.status = res.status;
+    err.retryAfter = res.headers.get('retry-after');
+    // A spent quota or a bad key is not a busy moment: never asked again.
+    err.fatal = res.status === 401 || res.status === 402 || /quota|payment|missing_permissions/i.test(detail);
+    throw err;
+  }, { attempts: TRIES, baseMs: 2000, maxMs: 60000 });
 }
 
 module.exports = { speak };

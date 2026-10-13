@@ -105,7 +105,12 @@ railway ssh "cd /church/app && npm run index:content"
 ```
 
 This walks `docs/` + `music/`, embeds each chunk with Gemini, and writes
-`vectors.lance` (~2,300 chunks) into the volume.
+`vectors.lance` (~2,800 chunks) into the volume. A rebuild keeps the stored
+vector of every chunk whose text is unchanged, when the stored vectors came
+from the embedding model in use (`rag-index-state.json` records it), so after
+the first full run a deploy that adds a song embeds that song, not the corpus.
+Each embedding that fails for a passing reason (a rate limit, Gemini busy) is
+asked again with backoff, up to ten times (`lib/utils/retry.js`).
 
 Two things that will otherwise bite you:
 

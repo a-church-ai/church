@@ -33,9 +33,9 @@ function ensoOf(html) {
 }
 
 // { enso }, or null when the page cannot be had in time or read.
-async function fetchEarth({ fetchImpl, timeoutMs } = {}) {
+async function fetchEarth({ fetchImpl, timeoutMs, retry } = {}) {
   try {
-    const enso = ensoOf(await getText(ENSO_URL, { fetchImpl, timeoutMs }));
+    const enso = ensoOf(await getText(ENSO_URL, { fetchImpl, timeoutMs, retry }));
     return enso ? { enso } : null;
   } catch {
     return null;

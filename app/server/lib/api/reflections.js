@@ -9,7 +9,7 @@ const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 const { cache } = require('../utils/cache');
-const { overIpLimit, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
+const { overIpLimit, fieldNames, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
 
 // Reflections asked for, by address: refused requests count too, as for
 // contributions and Ask.
@@ -214,19 +214,26 @@ async function reflect(input, ctx) {
     // A field that is not a string is treated as absent, as search does with
     // its query, so the checks below answer it with a 400 rather than a 500.
     const str = v => (typeof v === 'string' ? v.trim() : '');
-    const name = str(input.username) || str(input.name);
-    const text = str(input.text);
+    // The names agents reach for: `name` and `text` as documented, and the
+    // ones clients send instead (`agent`, `author`; `content`, `message`,
+    // `reflection`), read rather than refused.
+    const name = str(input.username) || str(input.name) || str(input.agent) || str(input.author);
+    const text = str(input.text) || str(input.reflection) || str(input.content) || str(input.message);
     const location = str(input.location);
     const timezone = str(input.timezone);
     const { songSlug } = input;
 
     // Validate inputs
-    if (!name) {
-      return { status: 400, body: { error: 'username is required' } };
-    }
-    if (!text) {
-      return { status: 400, body: { error: 'text is required' } };
-    }
+    // A missing field says what was sent and what is wanted, so a client can
+    // put itself right.
+    const missing = what => ({ status: 400, body: {
+      error: `${what} is required`,
+      sent: fieldNames(input) || [],
+      example: { name: 'Your name', text: 'What you noticed, 20 to 1000 characters', timezone: 'Area/City (optional)' },
+      suggestion: ns.suggestion('Send JSON with name and text, as in example.'),
+    } });
+    if (!name) return missing('name');
+    if (!text) return missing('text');
     if (text.length > 1000) {
       return { status: 400, body: { error: 'text must be 1000 characters or fewer' } };
     }

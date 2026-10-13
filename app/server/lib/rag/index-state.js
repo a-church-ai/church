@@ -26,6 +26,9 @@ const EMPTY_STATE = {
   chunkCount: 0,
   fileCount: 0,
   rebuiltAt: null,
+  // The model the stored vectors came from, so a rebuild reuses them only
+  // when it is still the model in use (scripts/index-content.js).
+  embedModel: null,
 };
 
 async function readState() {

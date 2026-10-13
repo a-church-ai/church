@@ -148,6 +148,9 @@ app.use((req, res, next) => {
 // Public surface open to any origin; admin paths keep the credentialed,
 // origin-restricted policy. See lib/utils/cors.js.
 app.use(sanctuaryCors());
+// The API reads a body as JSON whatever its label says (lib/api/shared.js
+// readBody); the rest of the site parses as it always has.
+app.use('/api', apiShared.readBody);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -947,6 +950,11 @@ app.use('/api', (req, res, next) => {
 
   const start = Date.now();
   res.on('finish', () => {
+    // A refused request is logged with why (the error the client was given)
+    // and, for one that sent a body, the names of its fields and its
+    // Content-Type, never the values: enough to see what a client gets wrong.
+    const refused = res.statusCode >= 400;
+    const sent = refused && req.method !== 'GET';
     recordApiUse({
       method: req.method,
       path: '/api' + req.path,
@@ -956,6 +964,9 @@ app.use('/api', (req, res, next) => {
       ip: req.ip || req.connection?.remoteAddress,
       userAgent: req.get('user-agent'),
       name: req.query?.name,
+      error: refused ? res.locals.apiError : undefined,
+      fields: sent ? apiShared.fieldNames(req.body) : undefined,
+      contentType: sent ? req.get('content-type') || null : undefined,
     });
   });
   next();

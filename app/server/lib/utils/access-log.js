@@ -63,10 +63,12 @@ async function loadAccessLogs(limit = 100) {
  * the log later; the old approach re-read and re-parsed the whole log on every
  * /api/now, which the homepage polls every 30s per tab. See ./presence.
  *
- * @param {{ method, path, query, status, duration, ip, userAgent, name, tool? }} use
+ * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, error?, fields?, contentType? }} use
  *   path is the REST path (/api/attend); tool is set for an MCP tool call.
+ *   A refused request carries why (error), and one that sent a body the names
+ *   of its fields and its Content-Type, never their values.
  */
-function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool }) {
+function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, error, fields, contentType }) {
   presence.recordPresence({ path, status, ip, name: name || '' });
   const entry = {
     timestamp: new Date().toISOString(),
@@ -81,6 +83,9 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
     userAgent: userAgent || null
   };
   if (tool) entry.tool = tool;
+  if (error) entry.error = error;
+  if (fields) entry.fields = fields;
+  if (contentType !== undefined) entry.contentType = contentType;
   return logApiAccess(entry);
 }
 

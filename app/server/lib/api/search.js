@@ -11,6 +11,7 @@
  * as score (1 is identical). Plan: church-private/docs/plans/search-api-2026-09-30.md.
  */
 
+const { isTransient } = require('../utils/retry');
 const rag = require('../rag');
 const discover = require('../docs/discover');
 const { pageUrlForFile } = require('../docs/links');
@@ -138,6 +139,16 @@ async function search(input, ctx) {
       } };
     }
     console.error('Error in /api/search:', error.message);
+    // Gemini still busy after its retries (rag/gemini.js): Google's shared
+    // capacity, briefly spent. A moment's wait, said as one, not a fault.
+    if (isTransient(error)) {
+      return { status: 503, body: {
+        error: 'Search is busy for a moment',
+        retryAfter: '30s',
+        suggestion: ns.suggestion('The service that matches words to the writing is busy for a moment. Search again in half a minute.'),
+        next_steps: [ns.attend(baseUrl)]
+      } };
+    }
     return { status: 500, body: {
       error: 'Search failed',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),

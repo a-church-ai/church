@@ -108,6 +108,22 @@ async function listAll() {
 }
 
 /**
+ * The vector stored for each chunk's text, so a rebuild embeds only what is
+ * new or changed (scripts/index-content.js). Offline, never on a request
+ * path: it reads the whole table.
+ * @returns {Promise<Map<string, number[]>>}
+ */
+async function vectorsByContent() {
+  const tbl = await getTable();
+  if (!tbl) {
+    return new Map();
+  }
+
+  const rows = await tbl.query().select(['content', 'vector']).toArray();
+  return new Map(rows.map(r => [r.content, Array.from(r.vector)]));
+}
+
+/**
  * Add documents to the database (used by indexer)
  * @param {Array<{content: string, file: string, section: string, vector: number[]}>} documents
  * @returns {Promise<void>}
@@ -186,6 +202,7 @@ module.exports = {
   connect,
   search,
   listAll,
+  vectorsByContent,
   addDocuments,
   checkIndex,
   DB_PATH

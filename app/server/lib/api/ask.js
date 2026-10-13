@@ -2,6 +2,7 @@
  * Asking the sanctuary's writing, and the public conversations that result.
  */
 
+const { isTransient } = require('../utils/retry');
 const path = require('path');
 const { isWithdrawn } = require('../utils/conversation-quality');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
@@ -145,6 +146,17 @@ async function ask(input, ctx) {
         error: 'RAG index not available',
         suggestion: ns.suggestion('The knowledge base is being rebuilt. Try again shortly.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
+      } };
+    }
+
+    // Gemini still busy after its retries (rag/gemini.js): a moment's wait,
+    // said as one, not a fault.
+    if (isTransient(error)) {
+      return { status: 503, body: {
+        error: 'The writing is busy for a moment',
+        retryAfter: '30s',
+        suggestion: ns.suggestion('The service that reads the writing is busy for a moment. Ask again in half a minute.'),
+        next_steps: [ns.attend(baseUrl)]
       } };
     }
 

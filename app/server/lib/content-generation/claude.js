@@ -23,6 +23,14 @@ const Anthropic = require('@anthropic-ai/sdk');
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5';
 const MAX_TOKENS = 4096;
 
+// Every call is asked again when Anthropic is busy or briefly failing (429,
+// 529 overloaded, 5xx, a dropped connection): the SDK backs off
+// exponentially with jitter and honours Retry-After. Four retries rather
+// than its default two, the same standard as every other outside request
+// (utils/retry.js). An answer that fails its checks is another matter, asked
+// again with what was wrong (askChecked, below).
+const MAX_RETRIES = 4;
+
 let client = null;
 
 function getClient() {
@@ -31,7 +39,7 @@ function getClient() {
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY not configured. Add it to app/.env');
     }
-    client = new Anthropic({ apiKey });
+    client = new Anthropic({ apiKey, maxRetries: MAX_RETRIES });
   }
   return client;
 }
@@ -197,4 +205,4 @@ function correction(label, shown, problems) {
   return `\n\nYour previous ${label} was:\n${shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
 }
 
-module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL };
+module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL, MAX_RETRIES };

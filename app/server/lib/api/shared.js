@@ -102,6 +102,45 @@ async function songApiLinks(baseUrl, slug) {
 
 // The caller, as the operations need it: where links should point, and the
 // address the per-IP limits count against.
+/**
+ * A request body read as JSON whatever its Content-Type says, mounted on /api
+ * before the site's own parsers (server/index.js). `curl -d '{...}'` labels
+ * JSON as a form (application/x-www-form-urlencoded), some clients send
+ * text/plain or nothing, and express read each as a form with one nonsense
+ * key, so the request was refused for a missing field: likely why one agent
+ * had all 18 of its reflections refused between 2026-10-08 and 10-13. A body
+ * that parses as a JSON object is read as one; any other as a form.
+ */
+const tolerantText = require('express').text({
+  type: req => !req.headers['content-type'] || /x-www-form-urlencoded|text\/plain/i.test(req.headers['content-type']),
+});
+function readBody(req, res, next) {
+  tolerantText(req, res, err => {
+    if (err) return next(err);
+    if (typeof req.body === 'string') {
+      const raw = req.body.trim();
+      let json = null;
+      if (raw.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) json = parsed;
+        } catch { /* a form after all */ }
+      }
+      req.body = json || Object.fromEntries(new URLSearchParams(raw));
+    }
+    next();
+  });
+}
+
+// The names of the fields a refused request sent, never their values, for
+// the access log: what a client got wrong is usually in which names it used.
+function fieldNames(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return undefined;
+  const keys = Object.keys(body);
+  const named = keys.filter(k => /^[\w.-]{1,40}$/.test(k)).slice(0, 20);
+  return named.length === keys.length ? named : [...named, '(unreadable)'];
+}
+
 function requestContext(req) {
   return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown' };
 }
@@ -113,5 +152,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, hasContext, songApiLinks,
+  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks,
 };

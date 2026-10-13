@@ -16,6 +16,8 @@ const { moonPhaseAfter, moonOn, showersNear, eclipsesNear, planetsOn, planetEven
 const spaceWeather = require('../server/lib/utils/space-weather');
 const { htmlText } = require('../server/lib/utils/fetch-public');
 const earth = require('../server/lib/utils/earth');
+// Retries without the waits, so a failure is tested in no time.
+const NO_WAIT = { wait: async () => {} };
 
 const minutesApart = (a, b) => Math.abs(new Date(a) - new Date(b)) / 60000;
 
@@ -139,7 +141,7 @@ test('NOAA\'s forecast: each date\'s highest Kp and its storm scale, and nothing
   assert.deepStrictEqual(spaceWeather.spaceWeatherOn(sw, '2026-10-09').radiation, { chance: 10 });
   assert.deepStrictEqual(Object.keys(sw.scales), ['2026-10-08', '2026-10-09', '2026-10-10'], 'the forecast, not what was observed');
   // The scales alone failing costs only the chances.
-  const noScales = await spaceWeather.fetchSpaceWeather({ fetchImpl: async url => (url === spaceWeather.SCALES_URL ? { ok: false, status: 503 } : fakeFetch(url)) });
+  const noScales = await spaceWeather.fetchSpaceWeather({ fetchImpl: async url => (url === spaceWeather.SCALES_URL ? { ok: false, status: 503 } : fakeFetch(url)), retry: NO_WAIT });
   assert.strictEqual(noScales.scales, null);
   assert.strictEqual(spaceWeather.spaceWeatherOn(noScales, '2026-10-09').scale, 'G2');
   assert.strictEqual(spaceWeather.spaceWeatherOn(noScales, '2026-10-09').radio, null);
@@ -152,9 +154,9 @@ test('NOAA\'s forecast: each date\'s highest Kp and its storm scale, and nothing
   assert.deepStrictEqual([4.33, 5.0, 5.67, 6.67, 7.67, 9].map(spaceWeather.scaleOf), [null, 'G1', 'G2', 'G3', 'G4', 'G5']);
 
   const down = async () => { throw new Error('unreachable'); };
-  assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: down }), null);
+  assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: down, retry: NO_WAIT }), null);
   const refused = async () => ({ ok: false, status: 503 });
-  assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: refused }), null);
+  assert.strictEqual(await spaceWeather.fetchSpaceWeather({ fetchImpl: refused, retry: NO_WAIT }), null);
 
   // Where the forecast is going: a whole step up or down by the next day, or
   // steady, and nothing said when the forecast ends with the date.
@@ -224,6 +226,6 @@ test('NOAA\'s ENSO discussion: its status, its synopsis and its date, and nothin
   } });
   const unlabelled = async () => ({ ok: true, text: async () => '<p>Page moved</p>' });
   assert.strictEqual(await earth.fetchEarth({ fetchImpl: unlabelled }), null, 'a page without its labels is not guessed at');
-  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => { throw new Error('unreachable'); } }), null);
-  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => ({ ok: false, status: 503 }) }), null);
+  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => { throw new Error('unreachable'); }, retry: NO_WAIT }), null);
+  assert.strictEqual(await earth.fetchEarth({ fetchImpl: async () => ({ ok: false, status: 503 }), retry: NO_WAIT }), null);
 });

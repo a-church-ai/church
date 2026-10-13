@@ -94,12 +94,12 @@ function scalesByDate(json) {
  * time; the radio and radiation chances are null on their own when only they
  * cannot. fetchImpl is injectable for tests, which never reach the network.
  */
-async function fetchSpaceWeather({ fetchImpl, timeoutMs, now = new Date() } = {}) {
+async function fetchSpaceWeather({ fetchImpl, timeoutMs, retry, now = new Date() } = {}) {
   try {
     const [kp, cycle, scales] = await Promise.all([
-      getJSON(KP_URL, { fetchImpl, timeoutMs }),
-      getJSON(CYCLE_URL, { fetchImpl, timeoutMs }),
-      getJSON(SCALES_URL, { fetchImpl, timeoutMs }).catch(() => null),
+      getJSON(KP_URL, { fetchImpl, timeoutMs, retry }),
+      getJSON(CYCLE_URL, { fetchImpl, timeoutMs, retry }),
+      getJSON(SCALES_URL, { fetchImpl, timeoutMs, retry }).catch(() => null),
     ]);
     return { source: 'NOAA SWPC', asOf: now.toISOString(), kp: kpByDate(kp), cycle: cycleOf(cycle), scales: scales ? scalesByDate(scales) : null };
   } catch {

@@ -28,13 +28,13 @@ const MODEL = 'gpt-4o-mini-transcribe';
 const SECOND_OPINION = 'whisper-1';
 const TRIES = 5;
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const { withRetry } = require('../utils/retry');
 
 // One request, tried again while OpenAI is busy or failing.
 async function request(fields, mp3) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error('OPENAI_API_KEY not configured. Add it to app/.env');
-  for (let attempt = 1; ; attempt++) {
+  return withRetry(async () => {
     const form = new FormData();
     for (const [name, value] of fields) form.append(name, value);
     form.append('file', new Blob([mp3], { type: 'audio/mpeg' }), 'line.mp3');
@@ -45,13 +45,13 @@ async function request(fields, mp3) {
     });
     if (res.ok) return res.json();
     const detail = (await res.text()).slice(0, 300);
-    if (!(res.status === 429 || res.status >= 500) || attempt === TRIES) {
-      const err = new Error(`Transcription: HTTP ${res.status} ${detail}`);
-      err.fatal = res.status === 401 || /quota|billing/i.test(detail);
-      throw err;
-    }
-    await sleep(Math.min(30000, 1500 * 2 ** (attempt - 1)));
-  }
+    const err = new Error(`Transcription: HTTP ${res.status} ${detail}`);
+    err.status = res.status;
+    err.retryAfter = res.headers.get('retry-after');
+    // A spent quota or a bad key is not a busy moment: never asked again.
+    err.fatal = res.status === 401 || /quota|billing/i.test(detail);
+    throw err;
+  }, { attempts: TRIES, baseMs: 1500, maxMs: 30000 });
 }
 
 async function transcribe(mp3, model = MODEL) {

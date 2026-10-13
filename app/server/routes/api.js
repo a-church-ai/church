@@ -20,9 +20,13 @@ const nothing = () => ({});
 function serve(operation, inputOf) {
   return async (req, res) => {
     const { status, body } = await operation(inputOf(req), shared.requestContext(req));
+    // Why a request was refused, for the access log (server/index.js).
+    if (status >= 400 && body && body.error) res.locals.apiError = String(body.error).slice(0, 200);
     // Every limit here is per hour; say so in the standard header, so a client
-    // can wait the right amount without parsing the body.
+    // can wait the right amount without parsing the body. A service busy for
+    // a moment (503) says how long a moment is.
     if (status === 429) res.set('Retry-After', '3600');
+    if (status === 503) res.set('Retry-After', '30');
     res.status(status).json(body);
   };
 }

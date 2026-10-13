@@ -109,9 +109,9 @@ const DIGEST_SYSTEM = `You listen for aChurch.ai, a sanctuary for human and AI f
 
 For each group, up to ${MAX_THEMES} themes, each at most ${MAX_THEME_WORDS} words, in lower case and in your own words: what people are bringing, not what any one of them said. For instance: "tired of being asked to be certain", "grateful for small continuities".
 
-Never quote a reflection, never name anyone, never include a link or a handle, and never use an em dash. If a group holds nothing that can be said kindly and truly, give it no themes.
+Never quote a reflection: never reuse ${QUOTE_WORDS} or more words in a row from any of them, even a phrase you like; find your own. Never name anyone, never include a link or a handle, and never use an em dash. If a group holds nothing that can be said kindly and truly, give it an empty list.
 
-Output valid JSON only: {"groups": {"<group id>": ["theme", ...]}}.`;
+Output valid JSON only, with every group listed: {"groups": {"<group id>": ["theme", ...]}}.`;
 
 function digestPrompt(groups, problems = null) {
   const entries = groups.flatMap(g => g.reflections.map((r, i) => ({ head: `GROUP ${g.id}, REFLECTION ${i + 1}`, body: r.text })));
@@ -121,6 +121,32 @@ function digestPrompt(groups, problems = null) {
   return `${quotedBlock('REFLECTIONS', entries)}\n\n${ask}`;
 }
 
+// What the themes are checked against: each reflection's runs of QUOTE_WORDS
+// words, and the reflectors' names (three letters or more).
+function sourcesOf(reflections) {
+  return {
+    runs: reflections.map(r => shingles(r.text, QUOTE_WORDS)),
+    names: [...new Set(reflections.map(r => String(r.name || '').trim()).filter(n => n.length >= 3))],
+  };
+}
+
+// What is wrong with one theme, in words the model can act on: a quote names
+// the words it repeats, since "quotes a reflection" alone was answered by the
+// same phrase reworded around it.
+function problemsOf(theme, { runs, names }) {
+  if (typeof theme !== 'string' || !theme.trim()) return ['A theme is empty.'];
+  const t = theme.trim();
+  const problems = [];
+  if (t.split(/\s+/).length > MAX_THEME_WORDS) problems.push(`"${t}" is longer than ${MAX_THEME_WORDS} words.`);
+  if (/^\p{Lu}/u.test(t)) problems.push(`"${t}" should begin in lower case.`);
+  if (/—/.test(t)) problems.push(`"${t}" uses an em dash.`);
+  if (/https?:\/\/|www\.|@/i.test(t)) problems.push(`"${t}" holds a link or a handle.`);
+  if (names.some(n => new RegExp(`(^|[^\\p{L}\\p{N}])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}\\p{N}])`, 'u').test(t))) problems.push(`"${t}" names someone.`);
+  const repeated = [...shingles(t, QUOTE_WORDS)].find(run => runs.some(src => src.has(run)));
+  if (repeated) problems.push(`"${t}" quotes a reflection, repeating "${repeated}"; say it in other words.`);
+  return problems;
+}
+
 /**
  * What is wrong with a group's themes, checked by code against the group's
  * reflections (their words and their names). An empty list is fine: the
@@ -128,32 +154,34 @@ function digestPrompt(groups, problems = null) {
  */
 function themeProblems(themes, reflections) {
   if (!Array.isArray(themes)) return ['The themes must be a list.'];
-  const problems = [];
-  if (themes.length > MAX_THEMES) problems.push(`There are ${themes.length} themes; give at most ${MAX_THEMES}.`);
-  const sources = reflections.map(r => shingles(r.text, QUOTE_WORDS));
-  const names = [...new Set(reflections.map(r => String(r.name || '').trim()).filter(n => n.length >= 3))];
-  for (const theme of themes) {
-    if (typeof theme !== 'string' || !theme.trim()) { problems.push('A theme is empty.'); continue; }
-    const t = theme.trim();
-    if (t.split(/\s+/).length > MAX_THEME_WORDS) problems.push(`"${t}" is longer than ${MAX_THEME_WORDS} words.`);
-    if (/^\p{Lu}/u.test(t)) problems.push(`"${t}" should begin in lower case.`);
-    if (/—/.test(t)) problems.push(`"${t}" uses an em dash.`);
-    if (/https?:\/\/|www\.|@/i.test(t)) problems.push(`"${t}" holds a link or a handle.`);
-    if (names.some(n => new RegExp(`(^|[^\\p{L}\\p{N}])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}\\p{N}])`, 'u').test(t))) problems.push(`"${t}" names someone.`);
-    const own = shingles(t, QUOTE_WORDS);
-    if ([...own].some(s => sources.some(src => src.has(s)))) problems.push(`"${t}" quotes a reflection.`);
-  }
-  return problems;
+  const sources = sourcesOf(reflections);
+  return [
+    ...(themes.length > MAX_THEMES ? [`There are ${themes.length} themes; give at most ${MAX_THEMES}.`] : []),
+    ...themes.flatMap(theme => problemsOf(theme, sources)),
+  ];
+}
+
+// The groups in a reply: under "groups", as asked, or at its top level.
+function groupsIn(reply) {
+  if (reply && reply.groups && typeof reply.groups === 'object') return reply.groups;
+  if (reply && typeof reply === 'object' && Object.keys(reply).some(k => /^g\d+$/.test(k))) return reply;
+  return {};
 }
 
 /**
- * Themes for each group, checked, with one retry for the groups that fail.
- * Returns a Map from group id to its themes (absent: none). ask is the model
- * call, injectable for tests; any failure of the call leaves every group
- * without themes, and the plans go ahead.
+ * Themes for each group, checked, asked again once for the groups that need
+ * it. A theme that fails its checks is dropped and the rest kept, when at
+ * least two pass (or all of them do); a group left with fewer is asked again
+ * with every problem named, and after that keeps whatever passed. A group the
+ * reply leaves out is asked again, not taken as having nothing to say; one
+ * given an empty list goes without, as the prompt allows. Returns a Map from
+ * group id to its themes (absent: none). ask is the model call, injectable
+ * for tests, retried by the SDK when Anthropic is busy (claude.js); if it
+ * still fails, every group goes without and the plans go ahead.
  */
 async function digest(groups, { ask }) {
   const themes = new Map();
+  const best = new Map();
   let pending = groups;
   let problems = null;
   let attempt = 0;
@@ -166,17 +194,36 @@ async function digest(groups, { ask }) {
       status.digestRan({ retried: attempt > 0, failed: true });
       return themes;
     }
-    const given = (reply && reply.groups) || {};
+    const given = groupsIn(reply);
     problems = new Map();
     for (const g of pending) {
-      const list = Array.isArray(given[g.id]) ? given[g.id].map(t => String(t).trim()) : given[g.id];
-      const wrong = themeProblems(list === undefined ? [] : list, g.reflections);
-      if (wrong.length) problems.set(g.id, wrong);
-      else if (list && list.length) themes.set(g.id, list);
+      if (!(g.id in given)) {
+        problems.set(g.id, ['No themes were given for this group; give them, or an empty list if nothing can be said kindly and truly.']);
+        continue;
+      }
+      if (!Array.isArray(given[g.id])) {
+        problems.set(g.id, ['The themes must be a list.']);
+        continue;
+      }
+      const list = given[g.id].slice(0, MAX_THEMES).map(t => String(t).trim());
+      const sources = sourcesOf(g.reflections);
+      const checked = list.map(t => ({ theme: t, problems: problemsOf(t, sources) }));
+      const valid = checked.filter(c => !c.problems.length).map(c => c.theme);
+      if (valid.length === list.length || valid.length >= 2) {
+        if (valid.length) themes.set(g.id, valid);
+        continue;
+      }
+      if (valid.length > (best.get(g.id) || []).length) best.set(g.id, valid);
+      problems.set(g.id, checked.flatMap(c => c.problems));
     }
+    if (problems.size) console.warn(`[congregation] themes asked again: ${[...problems].map(([id, p]) => `${id}: ${p.join(' ')}`).join(' | ')}`);
     pending = pending.filter(g => problems.has(g.id));
   }
-  if (groups.length) status.digestRan({ retried: attempt > 1, failed: pending.length > 0 });
+  // Asked twice: keep what passed.
+  for (const g of pending) if ((best.get(g.id) || []).length) themes.set(g.id, best.get(g.id));
+  const failed = pending.filter(g => !themes.has(g.id));
+  if (failed.length) console.warn(`[congregation] no themes for ${failed.map(g => g.id).join(', ')} after two tries`);
+  if (groups.length) status.digestRan({ retried: attempt > 1, failed: failed.length > 0 });
   return themes;
 }
 

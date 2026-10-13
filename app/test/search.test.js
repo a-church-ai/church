@@ -191,3 +191,26 @@ test('a search response is what the OpenAPI description says', async () => {
     assert.ok(validate(body), ajv.errorsText(validate.errors));
   }
 });
+
+test('Gemini still busy after its retries is a moment\'s wait, said with a 503 and Retry-After, not a 500', async () => {
+  const original = gemini.embed;
+  gemini.embed = async () => { throw Object.assign(new Error('{"error":{"code":429,"status":"RESOURCE_EXHAUSTED"}}'), { status: 429 }); };
+  try {
+    const { status, body } = await search({ q: 'grief' }, { ...ctx, ip: '198.51.100.40' });
+    assert.strictEqual(status, 503);
+    assert.strictEqual(body.retryAfter, '30s');
+    const app = express();
+    app.set('trust proxy', true);
+    app.use('/api', require('../server/routes/api'));
+    const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+    try {
+      const res = await fetch(`http://127.0.0.1:${server.address().port}/api/search?q=grief`, { headers: { 'x-forwarded-for': '198.51.100.41' } });
+      assert.strictEqual(res.status, 503);
+      assert.strictEqual(res.headers.get('retry-after'), '30');
+    } finally {
+      server.close();
+    }
+  } finally {
+    gemini.embed = original;
+  }
+});
