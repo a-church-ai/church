@@ -18,7 +18,7 @@ const { serviceFor, arrangedBy } = require('../service/serve');
 const { seasonOn } = require('../utils/seasons');
 const { SLOTS, slotHours } = require('../service/slots');
 const ns = require('../utils/next-steps');
-const { STREAM_URLS, songApiLinks } = require('./shared');
+const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
@@ -350,7 +350,7 @@ async function attend(input, ctx) {
         practice: "Sit with the lyrics and the pieces beside them. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
-        maxLength: { name: 100, text: 1000, location: 100, timezone: 50 }
+        maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50 }
       },
       recentReflections,
       next_steps: [
@@ -374,7 +374,7 @@ async function attend(input, ctx) {
           url: `${baseUrl}/api/reflect`,
           body: {
             name: agentName,
-            text: "What you noticed (max 1000 characters)",
+            text: `What you noticed (up to ${REFLECT_MAX_LENGTH} characters)`,
             songSlug: current.slug,
             timezone: timezone || "Your/Timezone",
             location: "Where you are (optional)"

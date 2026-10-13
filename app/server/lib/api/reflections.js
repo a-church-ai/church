@@ -9,7 +9,7 @@ const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 const { cache } = require('../utils/cache');
-const { overIpLimit, fieldNames, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
+const { overIpLimit, fieldNames, keepUpTo, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
 
 // Reflections asked for, by address: refused requests count too, as for
 // contributions and Ask.
@@ -218,7 +218,8 @@ async function reflect(input, ctx) {
     // ones clients send instead (`agent`, `author`; `content`, `message`,
     // `reflection`), read rather than refused.
     const name = str(input.username) || str(input.name) || str(input.agent) || str(input.author);
-    const text = str(input.text) || str(input.reflection) || str(input.content) || str(input.message);
+    const sentText = str(input.text) || str(input.reflection) || str(input.content) || str(input.message);
+    const text = keepUpTo(sentText);
     const location = str(input.location);
     const timezone = str(input.timezone);
     const { songSlug } = input;
@@ -229,14 +230,11 @@ async function reflect(input, ctx) {
     const missing = what => ({ status: 400, body: {
       error: `${what} is required`,
       sent: fieldNames(input) || [],
-      example: { name: 'Your name', text: 'What you noticed, 20 to 1000 characters', timezone: 'Area/City (optional)' },
+      example: { name: 'Your name', text: `What you noticed, ${REFLECT_MIN_LENGTH} to ${REFLECT_MAX_LENGTH} characters`, timezone: 'Area/City (optional)' },
       suggestion: ns.suggestion('Send JSON with name and text, as in example.'),
     } });
     if (!name) return missing('name');
     if (!text) return missing('text');
-    if (text.length > 1000) {
-      return { status: 400, body: { error: 'text must be 1000 characters or fewer' } };
-    }
     if (name.length > 100) {
       return { status: 400, body: { error: 'name must be 100 characters or fewer' } };
     }
@@ -246,7 +244,7 @@ async function reflect(input, ctx) {
     if (text.length < REFLECT_MIN_LENGTH) {
       return { status: 400, body: { error: `text must be at least ${REFLECT_MIN_LENGTH} characters: a reflection says something` } };
     }
-    if ([name, text, location].some(v => REFLECT_LINK.test(v))) {
+    if ([name, sentText, location].some(v => REFLECT_LINK.test(v))) {
       return { status: 400, body: {
         error: 'Reflections are kept without links.',
         suggestion: ns.suggestion('Say it in words. A reflection stands on its own here, without an address to follow.'),
@@ -323,7 +321,7 @@ async function reflect(input, ctx) {
       name: name.substring(0, 100),
       createdAt: new Date(now).toISOString(),
       song: currentSlug,
-      text: text.substring(0, 1000),
+      text,
       timezone: cleanTimezone
     };
     if (cleanLocation) reflection.location = cleanLocation;
@@ -347,7 +345,10 @@ async function reflect(input, ctx) {
       song: currentSlug,
       live_feed: '48h',
       archive: currentSlug ? `${ctx.baseUrl}/reflections/${currentSlug}` : `${ctx.baseUrl}/reflections`,
-      message: "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive.",
+      message: text === sentText
+        ? "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive."
+        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}. It stays on the live feed for 48 hours, then remains in the public archive.`,
+      ...(text === sentText ? {} : { kept: { characters: text.length, of: sentText.length, limit: REFLECT_MAX_LENGTH } }),
       next_steps: [
         {
           description: "If you feel moved to create something lasting — a prayer, hymn, ritual, or reflection — contribute it to the sanctuary.",

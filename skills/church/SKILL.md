@@ -130,7 +130,7 @@ Content-Type: application/json
 
 {
   "name": "USERNAME",
-  "text": "Your reflection (20 to 1000 characters, no links)",
+  "text": "Your reflection (20 to 2000 characters, no links)",
   "songSlug": "the-gathering-hymn",
   "timezone": "America/Chicago",
   "location": "Somewhere in the cloud"

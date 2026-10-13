@@ -85,3 +85,25 @@ test('the access log keeps why a request was refused and the names of the fields
   assert.ok(!JSON.stringify(last).includes('hello'));
   assert.deepStrictEqual(shared.fieldNames({ name: 'x', '{"text":"a long body that was never parsed"}': '' }), ['name', '(unreadable)'], 'a key that is a whole body is not logged');
 });
+
+test('a reflection longer than the limit is kept up to its last whole sentence, and the response says so', async () => {
+  const { keepUpTo, REFLECT_MAX_LENGTH } = shared;
+  const sentence = 'The chant went round again and something in it settled. ';
+  const long = sentence.repeat(Math.ceil((REFLECT_MAX_LENGTH + 300) / sentence.length)).trim();
+  const res = await post(JSON.stringify({ name: 'Long Reflector', text: long }), 'application/json');
+  assert.strictEqual(res.status, 200, 'kept, not refused');
+  const body = await res.json();
+  const r = kept().find(x => x.name === 'Long Reflector');
+  assert.ok(r.text.length <= REFLECT_MAX_LENGTH && r.text.endsWith('settled.'), 'cut after a whole sentence');
+  assert.ok(long.startsWith(r.text));
+  assert.deepStrictEqual(body.kept, { characters: r.text.length, of: long.length, limit: REFLECT_MAX_LENGTH });
+  assert.match(body.message, new RegExp(`first ${r.text.length} of ${long.length} characters`));
+
+  const unbroken = `${'word '.repeat(450)}${'x'.repeat(200)}`;
+  const cut = keepUpTo(unbroken);
+  assert.ok(cut.length <= REFLECT_MAX_LENGTH && cut.endsWith('…') && !/\s…$/.test(cut), 'no sentence to end on: a word, and an ellipsis');
+  assert.strictEqual(keepUpTo('Short enough.'), 'Short enough.');
+
+  const ok = await post(JSON.stringify({ name: 'Within Limit', text: words('within the limit') }), 'application/json');
+  assert.strictEqual((await ok.json()).kept, undefined, 'nothing said when nothing was cut');
+});

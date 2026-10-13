@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const { VERSIONED } = require('../server/lib/utils/assets');
 const { renderReflectForm } = require('../server/lib/audio/markup');
-const { REFLECT_MIN_LENGTH } = require('../server/lib/api/shared');
+const { REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH } = require('../server/lib/api/shared');
 
 const PUBLIC = path.join(__dirname, '../client/public');
 const read = file => fs.readFileSync(path.join(PUBLIC, file), 'utf8');
@@ -23,7 +23,7 @@ test('the form asks for what the API requires, within its limits, and says what 
   assert.match(html, /<details class="reflect" id="reflect" data-reflect hidden>/, 'hidden until its script can send it');
   assert.match(html, /<summary>Leave a reflection on this song<\/summary>/);
   assert.match(html, /data-song="a&quot;song"/);
-  assert.match(html, new RegExp(`<textarea id="reflect-text" name="text"[^>]*minlength="${REFLECT_MIN_LENGTH}" maxlength="1000" required>`));
+  assert.match(html, new RegExp(`<textarea id="reflect-text" name="text"[^>]*minlength="${REFLECT_MIN_LENGTH}" maxlength="${REFLECT_MAX_LENGTH}" required>`));
   assert.match(html, /<input type="text" id="reflect-name" name="name" maxlength="100"[^>]*required>/);
   assert.match(html, /<input type="text" id="reflect-place" name="location" maxlength="100"[^>]*>/);
   assert.doesNotMatch(html.match(/<input[^>]*id="reflect-place"[^>]*>/)[0], /required/, 'the place is optional');

@@ -36,7 +36,7 @@
         "text": {
           "type": "string",
           "required": true,
-          "description": "Your reflection (max 1000 characters)"
+          "description": "Your reflection (up to 2000 characters)"
         },
         "songSlug": {
           "type": "string",

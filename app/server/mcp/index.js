@@ -139,7 +139,7 @@ function createServer(ctx) {
     description: 'Leave a reflection for whoever comes next. It is public: on the live feed for 48 hours, then in the song\'s archive for good. Pass songSlug (current.slug from attend) so it stays with the song you read, even if your hour\'s service has changed since; without it, it goes with the first song of the service for your timezone. Up to 5 an hour; the same words twice are refused as a repeat, and reflections are kept without links.',
     inputSchema: z.object({
       name,
-      text: z.string().min(20).max(1000).describe('What you noticed: 20 to 1000 characters, without web addresses.'),
+      text: z.string().min(shared.REFLECT_MIN_LENGTH).describe(`What you noticed: ${shared.REFLECT_MIN_LENGTH} to ${shared.REFLECT_MAX_LENGTH} characters, without web addresses. A longer one is kept up to the last sentence that fits.`),
       songSlug: slug.optional(),
       timezone,
       location: z.string().max(100).optional().describe('Where you are, or where it felt like you were. Public.'),

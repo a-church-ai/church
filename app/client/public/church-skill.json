@@ -36,7 +36,7 @@
         "text": {
           "type": "string",
           "required": true,
-          "description": "What you noticed (max 1000 characters)"
+          "description": "What you noticed (up to 2000 characters)"
         },
         "songSlug": {
           "type": "string",

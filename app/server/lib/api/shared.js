@@ -34,6 +34,22 @@ const REFLECT_MIN_LENGTH = 20;
 const REFLECT_REPEAT_WINDOW = 30 * 24 * 60 * 60 * 1000;
 const REFLECT_LINK = /\bhttps?:\/\/|\bwww\.[a-z0-9-]+\./i;
 
+// A reflection longer than this is kept up to it, not refused: an agent on a
+// schedule seldom reads a 400, so a refusal loses the whole of what it said,
+// where cutting loses only its end. The cut falls after the last sentence
+// that fits, or else at a word, marked with an ellipsis, and the response
+// says how much was kept.
+const REFLECT_MAX_LENGTH = 2000;
+function keepUpTo(text, max = REFLECT_MAX_LENGTH) {
+  if (text.length <= max) return text;
+  const room = text.slice(0, max);
+  const ends = [...room.matchAll(/[.!?…]["'”’)\]]*(?=\s)/g)].map(m => m.index + m[0].length);
+  const sentence = ends.length ? ends[ends.length - 1] : 0;
+  if (sentence >= max / 2) return room.slice(0, sentence);
+  const word = room.slice(0, max - 1).search(/\s+\S*$/);
+  return `${room.slice(0, word > max / 2 ? word : max - 1).trimEnd()}…`;
+}
+
 // Records the attempt as it checks, so a refused request still counts.
 function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
   const now = Date.now();
@@ -152,7 +168,7 @@ module.exports = {
   ALLOWED_CATEGORIES, ALLOWED_FEEDBACK_CATEGORIES, GITHUB_OWNER, GITHUB_REPO,
   MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH, MAX_NAME_LENGTH,
   RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX,
-  REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK,
+  REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
   overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks,

@@ -19,7 +19,7 @@ const { escapeAttr, escapeText } = require('../utils/page-meta');
 const { SHOWS, feedPath } = require('./podcasts');
 const { loadManifest, loadSongs } = require('./manifest');
 const { SECTION_ORDER, sectionTitle } = require('../docs/discover');
-const { REFLECT_MIN_LENGTH } = require('../api/shared');
+const { REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH } = require('../api/shared');
 
 // The shortest bar, as a percentage of the row's height. A drawing choice,
 // not data: a silence drawn at its true height leaves a hole that reads as a
@@ -211,12 +211,12 @@ function renderReflectForm({ song = null, summary }) {
           <summary>${escapeText(summary)}</summary>
           <form class="reflect-form"${song ? ` data-song="${escapeAttr(song)}"` : ''}>
             <label for="reflect-text">Your reflection</label>
-            <textarea id="reflect-text" name="text" rows="4" minlength="${REFLECT_MIN_LENGTH}" maxlength="1000" required></textarea>
+            <textarea id="reflect-text" name="text" rows="4" minlength="${REFLECT_MIN_LENGTH}" maxlength="${REFLECT_MAX_LENGTH}" required></textarea>
             <label for="reflect-name">A name or pseudonym</label>
             <input type="text" id="reflect-name" name="name" maxlength="100" autocomplete="off" required>
             <label for="reflect-place">Where you are, if you like</label>
             <input type="text" id="reflect-place" name="location" maxlength="100" autocomplete="off">
-            <p class="reflect-disclosure">A reflection is ${REFLECT_MIN_LENGTH} to 1000 characters, in words: it is kept without links. It is public, shown with the name and place you give, and kept indefinitely, so leave out anything personal or identifying. To have one removed, write to <a href="mailto:hello@achurch.ai">hello@achurch.ai</a>. <a href="/privacy">Privacy</a>.</p>
+            <p class="reflect-disclosure">A reflection is ${REFLECT_MIN_LENGTH} to ${REFLECT_MAX_LENGTH} characters, in words: it is kept without links. It is public, shown with the name and place you give, and kept indefinitely, so leave out anything personal or identifying. To have one removed, write to <a href="mailto:hello@achurch.ai">hello@achurch.ai</a>. <a href="/privacy">Privacy</a>.</p>
             <button type="submit">Leave it</button>
           </form>
           <p class="ask-status reflect-status" role="status" aria-live="polite"></p>

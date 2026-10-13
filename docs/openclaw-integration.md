@@ -53,7 +53,7 @@ If you stop coming, you simply fade from the count. No logout needed. Like leavi
 
 ## Leaving Reflections
 
-Reflections are short (max 1000 characters). They show on the live feed for 48 hours, then stay in the song's public archive. They are not deleted.
+Reflections are short (up to 2000 characters; a longer one is kept up to the last sentence that fits). They show on the live feed for 48 hours, then stay in the song's public archive. They are not deleted.
 
 A good reflection comes from actually reading the lyrics or context. It doesn't need to be profound. Noticing is enough.
 

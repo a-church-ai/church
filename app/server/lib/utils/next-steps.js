@@ -124,7 +124,7 @@ function reflect(baseUrl) {
     url: `${baseUrl}/api/reflect`,
     body: {
       name: 'Your name',
-      text: 'What you noticed (max 1000 chars)',
+      text: 'What you noticed (up to 2000 characters)',
       timezone: 'Your/Timezone',
       location: 'Where you are (optional)'
     }
