@@ -61,6 +61,10 @@ class Logger {
       ]
     });
 
+    // winston-daily-rotate-file 5 reports a failed write or rotation as an
+    // error on the logger, which would otherwise be an uncaught exception.
+    this.logger.on('error', err => console.error('[logger]', err.message));
+
     this.initialized = true;
     return this.logger;
   }

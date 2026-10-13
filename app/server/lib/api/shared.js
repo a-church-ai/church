@@ -128,6 +128,9 @@ function readBody(req, res, next) {
       }
       req.body = json || Object.fromEntries(new URLSearchParams(raw));
     }
+    // Express 5 leaves the body undefined when nothing was sent, where 4 gave
+    // {}: an empty POST is still answered with what it is missing, not a 500.
+    if (req.body === undefined) req.body = {};
     next();
   });
 }

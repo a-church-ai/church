@@ -11,7 +11,9 @@ const { attendance, music, reflections, contributions, ask, search, directory, s
 
 const router = express.Router();
 
-const fromQuery = req => req.query;
+// A key sent twice (?name=a&name=b) arrives as an array, which no operation
+// expects; the first value is the one meant.
+const fromQuery = req => Object.fromEntries(Object.entries(req.query).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]));
 const fromBody = req => req.body;
 const fromSlug = req => ({ slug: req.params.slug });
 const nothing = () => ({});

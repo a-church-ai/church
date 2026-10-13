@@ -66,7 +66,8 @@ const FILENAME_TEXT = /^(?:[\w.-]+\/)*[\w.-]+(?:\.md|\/)$/i;
 // so each reading shows where it sits in the path (renderPathBar).
 function makeLinkRewriter(currentDocFullPath, readingPath) {
   const sequence = readingPath ? readingSequence(readingPath) || [] : [];
-  return function(href, title, text) {
+  return function({ href, title, tokens }) {
+    const text = this.parser.parseInline(tokens);
     const titleAttr = title ? ` title="${escapeAttr(title)}"` : '';
     const { href: resolved, external } = resolveDocHref(href, currentDocFullPath);
     const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
@@ -90,16 +91,14 @@ function makeLinkRewriter(currentDocFullPath, readingPath) {
 marked.setOptions({
   gfm: true,
   breaks: false,
-  headerIds: true,
-  mangle: false,
 });
 
 function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
   const renderer = new marked.Renderer();
   renderer.link = makeLinkRewriter(currentDocFullPath, readingPath);
   // Add stable IDs to headings so the right-rail TOC (and any inbound
-  // anchor link) can target them. marked v12's `headerIds` option was
-  // removed; the custom renderer is the supported path.
+  // anchor link) can target them. marked has no heading ids of its own;
+  // the custom renderer is the supported path.
   //
   // One page, one h1: a document whose source has several (imported texts
   // do) renders each later h1 as h2 and shifts what sits under it down one
@@ -112,7 +111,13 @@ function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
   let seenH1 = false;
   let shift = 0;
   let previous = 1;
-  renderer.heading = function(text, level, raw) {
+  // An id is made from the heading's words alone: `plain` walks its tokens
+  // for their text, since marked's text renderer would give a bold link's
+  // markdown source ("[Hymn](hymn.md)") and change ids that pages link to.
+  const plain = tokens => tokens.map(t => (t.tokens ? plain(t.tokens) : t.text || '')).join('');
+  renderer.heading = function({ tokens, depth: level }) {
+    const text = this.parser.parseInline(tokens);
+    const raw = plain(tokens);
     if (level === 1) {
       shift = seenH1 ? 1 : 0;
       seenH1 = true;

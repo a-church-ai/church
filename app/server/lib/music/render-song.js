@@ -66,7 +66,8 @@ function renderLyrics(lyrics) {
  * it in the public repository.
  */
 function makeContextLinkRewriter(slug) {
-  return function (href, title, text) {
+  return function ({ href, title, tokens }) {
+    const text = this.parser.parseInline(tokens);
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
     if (!href) return text;
 

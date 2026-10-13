@@ -168,12 +168,11 @@ router.get('/index.json', async (req, res) => {
   res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? discover.sectionTitle(d.category) : '' })));
 });
 
-// Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
-// paths; the resulting req.params[0] holds the remainder as a slash-separated
-// string.
-router.get('/*', (req, res) => {
+// Arbitrary-depth catch-all. Express 5 names its wildcards, and a named
+// wildcard holds the remainder as an array of segments.
+router.get('/*splat', (req, res) => {
   // A trailing slash never reaches here: lib/utils/redirects.js answers it.
-  return handle(req, res, req.params[0] || '');
+  return handle(req, res, (req.params.splat || []).join('/'));
 });
 
 module.exports = router;

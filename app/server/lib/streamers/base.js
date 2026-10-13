@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const logger = require('../utils/logger');
 const ffmpegConfig = require('../config/ffmpeg');
 const ConcatPlaylist = require('../utils/concat-playlist');
@@ -61,7 +61,7 @@ class BaseStreamer extends EventEmitter {
       await ffmpegConfig.validateInputFile(contentPath);
 
       // Generate unique stream ID
-      this.streamId = `${this.platform}-${uuidv4()}`;
+      this.streamId = `${this.platform}-${randomUUID()}`;
 
       logger.stream(this.platform, `Starting stream with content: ${contentPath}`);
 
@@ -126,7 +126,7 @@ class BaseStreamer extends EventEmitter {
       // Validate at least the first video
       await ffmpegConfig.validateInputFile(videoPaths[0]);
 
-      this.streamId = `${this.platform}-${uuidv4()}`;
+      this.streamId = `${this.platform}-${randomUUID()}`;
       this.isContinuous = true;
       this.currentContent = videoPaths[0];
 

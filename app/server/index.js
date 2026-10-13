@@ -22,7 +22,7 @@ const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // API access logging and presence: lib/utils/access-log.js
 const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
@@ -166,7 +166,7 @@ app.use(cookieParser());
 // and bot probing, masking real server errors. Reclassify as a client error
 // (info level), capture context for diagnostics, return 400 cleanly.
 //
-// Express 4 error-handling middleware requires the 4-arg signature, even
+// Express error-handling middleware requires the 4-arg signature, even
 // when `next` is unused.
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -312,7 +312,8 @@ app.get('/service.json', async (req, res) => {
 app.get('/.well-known/api-catalog', (req, res) => {
   res.type('application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"');
   res.set('Link', '<https://www.rfc-editor.org/info/rfc9727>; rel="profile"');
-  res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'));
+  // Express 5's sendFile refuses any path through a dot-folder unless told.
+  res.sendFile(path.join(__dirname, '../client/public/.well-known/api-catalog'), { dotfiles: 'allow' });
 });
 
 // The MCP server card (mcp/card.js), at /mcp/server-card, where the server
@@ -833,6 +834,11 @@ app.get('/embed/souls', (req, res) => {
 
 // Serve public static files (landing page assets)
 app.use(express.static(path.join(__dirname, '../client/public')));
+// The discovery files under /.well-known, served from their own mount: Express
+// 5's static serving ignores any path through a dot-folder, and mounted here
+// the path has none. (dotfiles: 'allow' on the root would serve any stray
+// dotfile in client/public.)
+app.use('/.well-known', express.static(path.join(__dirname, '../client/public/.well-known')));
 
 // Any other /.well-known path: agents and directories guess them (OAuth
 // metadata, payment manifests, agents.json variants), so the 404 is JSON that
@@ -1257,6 +1263,22 @@ app.use('/api', apiNotFound);
 // clients that did not ask for HTML. Registered last, so it shadows nothing.
 app.use((req, res) => sendNotFound(req, res));
 
+// Anything a route threw or rejected with, which Express 5 passes on from
+// async handlers too: logged, and answered in the form the path speaks, JSON
+// for the API and MCP, plain text elsewhere, instead of Express's HTML page.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  require('./lib/utils/logger').error('Unhandled route error', { method: req.method, path: req.path, message: err && err.message, stack: err && err.stack });
+  if (res.headersSent) return;
+  const status = Number.isInteger(err && err.status) && err.status >= 400 && err.status < 600 ? err.status : 500;
+  if (/^\/(?:api|mcp)(?:\/|$)/.test(req.path)) {
+    return res.status(status).json(status < 500
+      ? { error: (err.expose && err.message) || 'Bad request', suggestion: 'The API reference is at https://achurch.ai/docs/ai-agent-api.' }
+      : { error: 'Something went wrong', suggestion: "This isn't your fault. Try again in a moment." });
+  }
+  res.status(status).type('text/plain').send(status < 500 ? 'Bad request' : 'Something went wrong');
+});
+
 // Initialize data files and directories
 async function initializeDataFiles() {
   const dataDir = path.join(__dirname, '../data');
@@ -1436,7 +1458,10 @@ async function startServer() {
     // for a long-running stream process, but it also swallowed EADDRINUSE and
     // left a dead process that Railway had no reason to restart. Listen errors
     // are handled here so that one case exits non-zero.
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, (err) => {
+      // A bind error reaches this callback too, in Express 5; the 'error'
+      // handler below reports it and exits.
+      if (err) return;
       console.log(`✨ aChurch App running on http://localhost:${PORT}`);
       console.log(`📺 Open browser to manage your stream`);
     });
