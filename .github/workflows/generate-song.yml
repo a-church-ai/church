@@ -62,13 +62,6 @@ jobs:
         working-directory: app
         run: npm ci
 
-      - name: Run the unit tests
-        working-directory: app
-        # The tests are the review gate for everything this job commits. If the
-        # song renderer or the similarity thresholds are broken, the run should
-        # stop here rather than publish.
-        run: npm test
-
       - name: Configure the committer
         # generate-song.js runs `git commit` itself, which fails with "Author
         # identity unknown" on a fresh runner. The name says what wrote the
@@ -93,12 +86,25 @@ jobs:
             node scripts/generate-song.js
           fi
 
+      - name: Test what was written
+        working-directory: app
+        # The tests are the review gate for everything this job commits, so
+        # they run on what it wrote, before the push. They ran before the
+        # writing until 2026-10-14, which pushed each piece untested and let a
+        # piece that broke a test stop every later run until a person mended
+        # main; now a piece that breaks one is not pushed, and the next run
+        # starts again from main.
+        run: npm test
+
       - name: Push
         if: inputs.dry_run != true
         run: |
           # The generator already committed, or it wrote nothing at all. Pushing
           # with nothing to push is a no-op rather than an error.
           if [ -n "$(git log origin/${GITHUB_REF_NAME}..HEAD --oneline)" ]; then
+            # main may have moved during the run (a person's push); put the
+            # piece on top of it rather than have the push refused.
+            git pull --rebase --quiet origin "${GITHUB_REF_NAME}"
             git push
           else
             echo "Nothing to push: no piece was written this run."

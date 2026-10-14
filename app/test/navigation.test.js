@@ -25,6 +25,7 @@ const { formatAnswer } = require('../client/public/answer-format.js');
 const siteSearch = require('../client/public/site-search.js');
 const docsFilter = require('../client/public/docs-filter.js');
 const docsRoutes = require('../server/routes/docs');
+const { loadManifest } = require('../server/lib/audio/manifest');
 
 const renderDoc = async (urlPath, readingPath) => {
   await discover.listAllDocs();
@@ -120,9 +121,16 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   const served = await servedDocs();
   assert.deepStrictEqual(served.filter(d => article.includes(`href="/docs/${d.urlPath}"`)).map(d => d.urlPath), [], 'no document is listed on the hub');
 
-  // A card counts its section's documents, and says how much is read aloud.
+  // A card counts its section's documents, and says how much is read aloud:
+  // all of them, or how many, counted from the recordings listed. Not assumed:
+  // the songwriter adds pieces that are recorded later, and a test that said
+  // "all" failed every run after one did (2026-10-14).
   const practice = shelves.flatMap(s => s.cards).find(c => c.section === 'practice');
-  assert.match(article, new RegExp(`Meditations and Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · all read aloud, about `));
+  const listed = loadManifest();
+  const voiced = practice.docs.filter(d => listed[`docs/${d.docsRelPath}`]).length;
+  assert.ok(voiced > 0);
+  const read = voiced === practice.docs.length ? 'all' : String(voiced);
+  assert.match(article, new RegExp(`Meditations and Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · ${read} read aloud, about `));
   assert.match(article, /Reading Paths<\/span>|Reading paths<\/span>/);
   assert.match(article, /<span class="library-card-count">8 paths<\/span>/);
 
