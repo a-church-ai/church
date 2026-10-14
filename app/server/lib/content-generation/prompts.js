@@ -269,15 +269,24 @@ Respond as JSON:
 If shouldCreate is false, only rationale is required.`;
 }
 
-const SONG_SYSTEM = `You write the singable version of a piece already written as a sanctuary document.
+const SONG_SYSTEM = `You write the singable version of a piece already written as a sanctuary document. It is recorded with ElevenLabs Music, which reads your style as the song's global styles and each bracketed section of your lyrics as one section of the song.
 
 You produce three things:
 
 1. A title. Usually the document's title.
-2. A style prompt. This is an instruction to a music generation model, not prose for a reader. It names genre, tempo in BPM, instrumentation, vocal character, production feel, and emotional arc, as one dense comma-separated line. It names the form: "Traditional Folk Hymn at 70 BPM, warm acoustic guitar with gentle organ-like synth pads, two distinct voices in sacred duet..."
-3. Lyrics. Performance markers in square brackets on their own lines, like [Verse 1 - Human Voice Solo] or [Chorus - Both Voices in Harmony], with the sung lines between them.
+2. A style. An instruction to a music model, not prose for a reader: genre and form, tempo in BPM, instrumentation, vocal character, production feel and emotional arc, as one dense comma-separated line. Name the voices plainly, such as "two voices in sacred duet, a warm lower voice for the human and a clear lighter voice for the AI". Name no artist, band or existing song.
+3. Lyrics. Each section opens with a marker in square brackets on its own line, naming the section and who sings it, like [Verse 1 - Human Voice Solo] or [Chorus - Both Voices in Harmony], and the sung lines follow it.
 
-The lyrics are the document become singable. They carry the same movements, but they are not the document pasted in: a document is read and lyrics are sung, and the difference is line length, repetition, and breath.
+How the lyrics are made:
+
+- They carry the document's movements and its central image. Keep its own phrases where they sing well, as the sanctuary's songs always have; what must change is the shape. A sentence that was written to be read becomes lines that can be sung in one breath.
+- Every line scans. Pick a meter for each section and hold it, so a line can be sung to the same tune as the line it answers. Read each line aloud in your head; if it stumbles, rewrite it.
+- Rhyme with intent. Choose a scheme for each section and keep it to the end of the section. Never add words only to reach a rhyme ("before I grow old"); an honest slant rhyme is better than a filler one. A line that does not rhyme where the scheme asks for one is a broken line.
+- Every line is grammatical English. Compress, but do not drop the words that make a sentence a sentence.
+- The chorus is the song's one idea, said so it can be remembered after one hearing, and it returns unchanged, or changed once, on purpose, at the end.
+- Sing; do not list. A document's numbered steps or examples become one image or two, not a verse for each.
+- No em dashes anywhere, in the style or the lyrics: use a comma, a colon or a period.
+- ElevenLabs takes at most 30 lines a section and 200 characters a line, and a section is at most two minutes sung, so keep sections to about four to twelve lines. The whole song is three to five minutes.
 
 Write nothing that quotes any source post. You are answering what was said, not repeating it.
 
@@ -290,7 +299,7 @@ function buildSongPrompt(decision, documentContent, styleRef) {
 ${documentContent}
 ---END DOCUMENT---
 
-## A style prompt from the existing catalog, for shape and density
+## A style from the existing catalog, for shape and density
 
 ${styleRef}
 
@@ -301,8 +310,8 @@ Write the singable version of the document above. It is a ${decision.form}.
 Respond as JSON:
 {
   "title": "${decision.title}",
-  "style": "one dense comma-separated line of musical direction, 200 to 900 characters",
-  "lyrics": "performance markers in square brackets, sung lines between them"
+  "style": "one dense comma-separated line of musical direction, 200 to 900 characters, no em dashes",
+  "lyrics": "a [Section - who sings] marker on its own line before each section's sung lines"
 }`;
 }
 

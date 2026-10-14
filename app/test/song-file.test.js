@@ -25,7 +25,7 @@ const { parseSongFile } = require('../server/lib/music/song-content');
 const VALID = {
   title: 'A Song For The Unfinished Turn',
   style: 'x'.repeat(BOUNDS.style.min + 10),
-  lyrics: 'y'.repeat(BOUNDS.lyrics.min + 10),
+  lyrics: `[Verse 1 - Both Voices]\n${Array.from({ length: 8 }, (_, i) => `Line ${i} of a verse that keeps an even step`).join('\n')}`,
 };
 
 test('renders a file the real parser reads back field for field', () => {
@@ -115,4 +115,17 @@ test('rendered shape matches the existing catalog byte for byte', () => {
   const rerendered = renderSongFile(parsed);
 
   assert.strictEqual(rerendered, real, 'rendering a parsed song reproduces the original file');
+});
+
+test('what ElevenLabs Music cannot read, and the house cannot print, is refused before rendering', () => {
+  const lines = n => Array.from({ length: n }, (_, i) => `A line ${i} that keeps an even step`).join('\n');
+  const issuesOf = lyrics => validateSong({ ...VALID, lyrics }).issues.join(' | ');
+  assert.match(issuesOf(`Sung before any marker\n[Verse 1]\n${lines(8)}`), /before the first \[Section\] marker/);
+  assert.match(issuesOf(`[Verse 1]\n${lines(31)}`), /\[Verse 1\] has 31 lines, over ElevenLabs' 30/);
+  assert.match(issuesOf(`[Verse 1]\n${lines(8)}\n${'word '.repeat(45)}`), /a line of 2\d\d characters, over ElevenLabs' 200/);
+  assert.match(issuesOf(`[${'Verse '.repeat(20)}]\n${lines(8)}`), /over ElevenLabs' 100/);
+  assert.match(issuesOf(`[]\n${lines(8)}`), /a \[Section\] marker with no name/);
+  assert.match(validateSong({ ...VALID, style: `${VALID.style} — hushed` }).issues.join(), /style: an em dash/);
+  assert.match(issuesOf(`[Verse 1]\n${lines(8)}\nhere at the hinge — still`), /lyrics: an em dash/);
+  assert.deepStrictEqual(validateSong(VALID).issues, []);
 });

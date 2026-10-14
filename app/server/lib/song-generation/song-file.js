@@ -47,6 +47,44 @@ const BOUNDS = {
 
 const MARKER_PATTERN = /<!--\s*SONG:/i;
 
+// What ElevenLabs Music takes, since 2026-10-14 the only way a song here is
+// recorded (POST /v1/music, composition plans): each section named in 1 to 100
+// characters, at most 30 lines, each line at most 200 characters. The lyrics'
+// [Section] markers are those sections.
+const ELEVENLABS = { sectionName: 100, linesPerSection: 30, lineLength: 200 };
+const SECTION_MARKER = /^\[([^\]]*)\]$/;
+
+// The lyrics as sections: { name, lines } for each [marker], and the lines
+// sung before any marker under name null.
+function sectionsOf(lyrics) {
+  const sections = [];
+  for (const line of normalizeField(lyrics).split('\n')) {
+    const marker = SECTION_MARKER.exec(line.trim());
+    if (marker) sections.push({ name: marker[1].trim(), lines: [] });
+    else if (line.trim()) {
+      if (!sections.length) sections.push({ name: null, lines: [] });
+      sections[sections.length - 1].lines.push(line.trim());
+    }
+  }
+  return sections;
+}
+
+// What would stop ElevenLabs reading the lyrics as a composition plan.
+function elevenLabsIssues(lyrics) {
+  const issues = [];
+  const sections = sectionsOf(lyrics);
+  if (sections.length && sections[0].name === null) issues.push('lyrics: sung lines come before the first [Section] marker; every line belongs to a section');
+  for (const { name, lines } of sections) {
+    if (name === '') issues.push('lyrics: a [Section] marker with no name');
+    if (name && name.length > ELEVENLABS.sectionName) issues.push(`lyrics: the section name "${name.slice(0, 40)}..." is ${name.length} characters, over ElevenLabs' ${ELEVENLABS.sectionName}`);
+    if (lines.length > ELEVENLABS.linesPerSection) issues.push(`lyrics: [${name}] has ${lines.length} lines, over ElevenLabs' ${ELEVENLABS.linesPerSection} a section`);
+    for (const line of lines) {
+      if (line.length > ELEVENLABS.lineLength) issues.push(`lyrics: a line of ${line.length} characters, over ElevenLabs' ${ELEVENLABS.lineLength}: "${line.slice(0, 60)}..."`);
+    }
+  }
+  return issues;
+}
+
 function containsMarker(value) {
   return MARKER_PATTERN.test(value);
 }
@@ -89,7 +127,10 @@ function validateSong(song) {
     const { min, max } = BOUNDS[field];
     if (value.length < min) issues.push(`${field}: too short (${value.length} < ${min})`);
     if (value.length > max) issues.push(`${field}: too long (${value.length} > ${max})`);
+    // The house's voice rule (CLAUDE.md), which the documents are held to too.
+    if (value.includes('—')) issues.push(`${field}: an em dash; use a comma, a colon or a period`);
   }
+  if (normalizeField(song && song.lyrics)) issues.push(...elevenLabsIssues(song.lyrics));
 
   return { ok: issues.length === 0, issues };
 }
@@ -148,6 +189,8 @@ module.exports = {
   validateRendered,
   normalizeField,
   containsMarker,
+  sectionsOf,
   BOUNDS,
   FIELDS,
+  ELEVENLABS,
 };
