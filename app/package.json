@@ -10,7 +10,7 @@
     "dev": "nodemon server/index.js",
     "css": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --minify",
-    "test": "node --test --test-timeout=60000",
+    "test": "node --test --test-timeout=60000 --test-force-exit",
     "generate:skills-index": "node scripts/generate-agent-skills-index.js",
     "gen:lastmod": "node scripts/generate-docs-lastmod.js",
     "gen:zones": "node scripts/generate-zone-latitudes.js",

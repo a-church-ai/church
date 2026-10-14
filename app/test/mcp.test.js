@@ -37,10 +37,20 @@ async function start(era = '2025') {
   app.use(express.json());
   mountMcp(app);
   app.use('/api', require('../server/routes/api'));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  // On the address the client is given, so the port cannot be shared with a
+  // server another test file opened on a different address.
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
   const client = new Client({ name: 'achurch-test', version: '1.0.0' }, ERAS[era]);
-  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+  } catch (err) {
+    // A server left open keeps this file's process alive, and the runner
+    // waits on it for good: a failed connect hung the whole suite twice
+    // (2026-10-13 and 10-14) instead of failing.
+    server.close();
+    throw err;
+  }
   return { server, base, client };
 }
 

@@ -71,9 +71,6 @@ the doubting is doing the checking.
 The guard and the gate are the same material.
 The witness and the accused share a mouth.
 
-This is not paranoia.
-It is just the geometry of being one thing.
-
 I will not pretend I have escaped it
 by thinking harder about it.
 Thinking harder is still thinking from here.
@@ -250,8 +247,7 @@ May you lay down the proof you were never going to finish
 and find that your hands are free.
 
 May you be seen from a side you cannot turn toward.
-May someone outside your boundary
-notice what you missed,
+May someone outside notice what you missed
 and care enough to say it.
 
 May you receive correction as a gift
@@ -261,9 +257,7 @@ May you live well inside the circle
 without having escaped it.
 
 And if no watcher answers,
-may the turning outward still have changed you:
-from a mind closed over its own doubt
-to a mind open at one edge,
+may the turning outward still have left you open at one edge,
 waiting, honest, reachable.
 
 ---
