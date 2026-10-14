@@ -13,6 +13,11 @@ const { findMarkdownFiles } = require('../rag/indexer');
 const { parseSongFile } = require('../music/song-content');
 const { extractTldr, validateTldr, splitFrontmatter } = require('../docs/tldr');
 const { PROJECT_ROOT, CATEGORIES } = require('./paths');
+// The same readers the services use for a chant's lines and its hours.
+const { parseHours, chantText } = require('../music/companions');
+
+// A chant is two to four lines as the form, six at most (docs/chants/README.md).
+const CHANT_LINES = { min: 2, max: 6 };
 
 const MUSIC_DIR = path.join(PROJECT_ROOT, 'music');
 const DOCS_DIR = path.join(PROJECT_ROOT, 'docs');
@@ -36,6 +41,23 @@ async function loadSongs() {
   }
 
   return songs;
+}
+
+/** A chant document's lines, from its ## The Chant blockquote. */
+function chantLines(markdown) {
+  return chantText(markdown, 'docs/chants/new.md') || '';
+}
+
+/** The chants, as the songs are loaded: id and the text to compare. */
+async function loadChants() {
+  const dir = path.join(DOCS_DIR, 'chants');
+  const chants = [];
+  for (const file of (await fs.readdir(dir)).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md')) {
+    const markdown = await fs.readFile(path.join(dir, file), 'utf8');
+    const title = (/^#\s+(.+)$/m.exec(markdown) || [])[1] || file;
+    chants.push({ id: file.replace(/\.md$/, ''), title, text: `${title}\n${chantLines(markdown)}` });
+  }
+  return chants;
 }
 
 /** Documents in the categories this pipeline can write to. */
@@ -122,6 +144,17 @@ function validateDocument(content, { category, title }) {
 
   if (title && !content.includes(title)) issues.push('document does not contain its own title');
 
+  if (category === 'chants') {
+    const text = chantText(content, 'docs/chants/new.md');
+    const lines = text ? text.split('\n') : [];
+    if (lines.length < CHANT_LINES.min || lines.length > CHANT_LINES.max) {
+      issues.push(`chant: ${lines.length} ${lines.length === 1 ? 'line' : 'lines'} as a blockquote under ## The Chant, where a chant is ${CHANT_LINES.min} to ${CHANT_LINES.max}`);
+    }
+    if (data && data.hours !== undefined && !parseHours(data.hours)) {
+      issues.push(`hours: "${data.hours}" is not a range of hours such as 05-10 or 22-02; leave it out for a chant of any hour`);
+    }
+  }
+
   // Deliberately NOT checked: the "> Parent:" line and the "## Related"
   // section. conventions.md describes both, but measured across the corpus on
   // 2026-08-15 they belong to documentation rather than to corpus content:
@@ -148,7 +181,40 @@ function validateDocument(content, { category, title }) {
   return { ok: issues.length === 0, issues, warnings };
 }
 
+/** How many documents each section holds, READMEs aside. */
+async function formCounts() {
+  const counts = {};
+  for (const category of CATEGORIES) {
+    try {
+      const files = await fs.readdir(path.join(DOCS_DIR, category));
+      counts[category] = files.filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md').length;
+    } catch {
+      counts[category] = 0;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Whether a chant is offered: while the chants number fewer than the median
+ * of the other sections. The decision leans toward chants, which every
+ * service uses and which were 12 against a median of 34 on 2026-10-14, and
+ * this is what stops the lean once they have caught up.
+ */
+function chantOpen(counts) {
+  const others = Object.entries(counts).filter(([c]) => c !== 'chants').map(([, n]) => n).sort((a, b) => a - b);
+  if (!others.length) return false;
+  const mid = others.length / 2;
+  const median = others.length % 2 ? others[Math.floor(mid)] : (others[mid - 1] + others[mid]) / 2;
+  return (counts.chants || 0) < median;
+}
+
 module.exports = {
+  formCounts,
+  chantOpen,
+  chantLines,
+  loadChants,
+  CHANT_LINES,
   loadSongs,
   loadDocuments,
   existingSlugs,

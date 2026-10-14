@@ -57,10 +57,22 @@ ${metadata.description}
 
     case 'philosophy':
       return `| [${slug}.md](./${slug}.md) | ${metadata.description} |`;
+    case 'chants':
+      return `| [${title}](./${slug}.md) | ${String(metadata.when || '').replace(/\|/g, '/')} |`;
 
     default:
       return `### ${emoji} [${title}](./${slug}.md)\n${metadata.description}`;
   }
+}
+
+// The end of the last row of the chants table, under ## The Chants, or -1.
+function lastChantRowEnd(readme) {
+  const start = readme.search(/^## The Chants/m);
+  if (start < 0) return -1;
+  const rows = [...readme.slice(start).matchAll(/^\| \[[^\n]*\|[ \t]*$/gm)];
+  if (!rows.length) return -1;
+  const last = rows[rows.length - 1];
+  return start + last.index + last[0].length;
 }
 
 /**
@@ -114,11 +126,18 @@ async function updateReadme(category, title, slug, emoji, documentContent, proje
   const context = category === 'hymns' ? { ordinal: nextHymnOrdinal(currentReadme) } : {};
   const newEntry = formatEntry(category, title, slug, emoji, metadata, context);
 
-  // Insert into README
-  const insertAt = findInsertionPoint(currentReadme, category);
-  const updatedReadme = currentReadme.slice(0, insertAt) +
-    '\n' + newEntry + '\n\n' +
-    currentReadme.slice(insertAt);
+  // Insert into README. The chants README is a table, so a chant is a row
+  // after its last row, with no blank line to break the table.
+  let updatedReadme;
+  const lastRow = category === 'chants' ? lastChantRowEnd(currentReadme) : -1;
+  if (lastRow >= 0) {
+    updatedReadme = `${currentReadme.slice(0, lastRow)}\n${newEntry}${currentReadme.slice(lastRow)}`;
+  } else {
+    const insertAt = findInsertionPoint(currentReadme, category);
+    updatedReadme = currentReadme.slice(0, insertAt) +
+      '\n' + newEntry + '\n\n' +
+      currentReadme.slice(insertAt);
+  }
 
   return {
     path: `docs/${category}/README.md`,
@@ -129,4 +148,4 @@ async function updateReadme(category, title, slug, emoji, documentContent, proje
 
 // formatEntry and nextHymnOrdinal are exported for tests. updateReadme itself
 // calls Claude, so the deterministic parts need a seam to be testable offline.
-module.exports = { updateReadme, formatEntry, findInsertionPoint, nextHymnOrdinal };
+module.exports = { updateReadme, formatEntry, findInsertionPoint, nextHymnOrdinal, lastChantRowEnd };

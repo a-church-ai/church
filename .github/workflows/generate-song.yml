@@ -5,13 +5,15 @@ name: Write a song from Moltbook
 # and a twice-daily job at fixed times would only ever sample the regions awake
 # then, with no trace left of the material it never fetched.
 #
-# Four runs do not mean four songs. The generator stops when two songs already
-# exist in the last 24 hours, and the decide stage skips whenever the corpus
-# already answers what is being said. Roughly half of all runs are expected to
-# write nothing, which is the intended behaviour and not a fault.
+# Four runs do not mean four pieces. A piece is a hymn, prayer, ritual or
+# meditation with its song, or a chant, which is spoken and has none. The
+# generator stops when it has written two pieces in the last 24 hours, and the
+# decide stage skips whenever the corpus already answers what is being said.
+# Roughly half of all runs are expected to write nothing, which is the intended
+# behaviour and not a fault.
 #
 # GitHub's cron is best effort and can fire late under load, so the spacing rule
-# is enforced from the last song's commit time rather than from the slot.
+# is enforced from the songwriter's own commit times rather than from the slot.
 #
 # To pause this: use the "Disable workflow" control in the Actions tab. There is
 # deliberately no environment flag for it, because a flag whose only job is
@@ -35,8 +37,8 @@ permissions:
   contents: write
 
 concurrency:
-  # Two runs writing songs at once would race on the daily cap, which reads git
-  # history, and could publish three songs in a day between them.
+  # Two runs writing at once would race on the daily cap, which reads git
+  # history, and could publish three pieces in a day between them.
   group: generate-song
   cancel-in-progress: false
 

@@ -39,7 +39,8 @@ async function git(args) {
 }
 
 /**
- * Write the four files.
+ * Write the files: the document, its song (a chant has none), the section's
+ * README and the lastmod manifest.
  *
  * The lastmod manifest is updated in place rather than by regenerating it:
  * generate-docs-lastmod.js derives dates from git history, and this document
@@ -49,9 +50,11 @@ async function writeArtifacts(result) {
   const { paths, document, songContent, decision } = result;
   const written = [];
 
-  await fs.mkdir(path.dirname(paths.absolute.song), { recursive: true });
-  await fs.writeFile(paths.absolute.song, songContent, 'utf8');
-  written.push(paths.relative.song);
+  if (paths.absolute.song) {
+    await fs.mkdir(path.dirname(paths.absolute.song), { recursive: true });
+    await fs.writeFile(paths.absolute.song, songContent, 'utf8');
+    written.push(paths.relative.song);
+  }
 
   await fs.writeFile(paths.absolute.document, document, 'utf8');
   written.push(paths.relative.document);
@@ -155,11 +158,13 @@ function preview(result) {
   console.log(`\n--- ${paths.relative.document} (first 900 chars) ---`);
   console.log(document.slice(0, 900));
 
-  console.log(`\n--- style prompt ---`);
-  console.log(song.style);
+  if (song) {
+    console.log(`\n--- style prompt ---`);
+    console.log(song.style);
 
-  console.log(`\n--- lyrics (first 900 chars) ---`);
-  console.log(song.lyrics.slice(0, 900));
+    console.log(`\n--- lyrics (first 900 chars) ---`);
+    console.log(song.lyrics.slice(0, 900));
+  }
   console.log();
 }
 

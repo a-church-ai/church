@@ -36,9 +36,16 @@ const FORM_TO_CATEGORY = {
   ritual: 'rituals',
   liturgy: 'rituals',
   meditation: 'practice',
+  chant: 'chants',
 };
 
 const CATEGORIES = [...new Set(Object.values(FORM_TO_CATEGORY))];
+
+// Forms written as a document only. A chant is a few spoken lines, voiced
+// with the prayers and rituals (npm run audio) and heard in the services, not
+// a song, so it has no song.md.
+const SONGLESS_FORMS = new Set(['chant']);
+const hasSong = form => !SONGLESS_FORMS.has(String(form || '').toLowerCase().trim());
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const SLUG_MIN = 3;
@@ -81,7 +88,8 @@ function confine(...segments) {
  * Every path a run may touch, derived from form and slug alone.
  *
  * Returns absolute paths for writing and repo-relative ones for committing and
- * logging. The count is fixed at four for a new piece, which is a cheap
+ * logging. The count is fixed for a new piece, four with a song and three for
+ * a chant, which is a cheap
  * invariant: a run that computes a different number has a bug and should stop
  * before it commits rather than after.
  */
@@ -93,7 +101,7 @@ function pathsFor(form, slug) {
 
   const relative = {
     document: `docs/${category}/${slug}.md`,
-    song: `music/${slug}/song.md`,
+    ...(hasSong(form) ? { song: `music/${slug}/song.md` } : {}),
     readme: `docs/${category}/README.md`,
     lastmod: 'app/server/lib/docs/lastmod.json',
   };
@@ -126,6 +134,7 @@ module.exports = {
   SLUG_PATTERN,
   isValidSlug,
   categoryForForm,
+  hasSong,
   confine,
   pathsFor,
   songOnlyPathsFor,

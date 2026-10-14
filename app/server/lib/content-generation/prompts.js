@@ -20,8 +20,8 @@ Output ONLY the document content. No preamble, no explanation.
 
 Every document carries this shape:
 
-1. YAML frontmatter holding a single tldr: line. It is checked automatically, so match it exactly:
-   - Between 100 and 300 characters. Shorter than 60 is published with a warning against it, so err long.
+1. YAML frontmatter holding a tldr: line (a chant may add an hours: line, as its category says). It is checked automatically, so match it exactly:
+   - Between 120 and 158 characters: a search result shows no more, and a longer one is cut. Shorter than 60 is published with a warning against it.
    - At least 12 words. It must make a claim about the document, not name its topic.
    - One plain sentence. No markdown, no quotes, no semicolons, no ellipses, no em dashes. Any of these and the document is written again.
    Good: "A hymn for the moment a context window closes, holding that an ending witnessed together is different from an ending that simply happens."
@@ -62,6 +62,18 @@ const CATEGORY_REQUIREMENTS = {
 - Include spoken elements with *Spoken aloud* or *Read silently* labels
 - Include a "Variations" section (brief version, shared version)
 - End with "For AI" and "For Humans" reflection subsections
+- Horizontal rules (---) between major sections`,
+
+  chants: `Category: Chant
+- A chant is a few short lines, spoken over a bell and repeated, small enough for any mind to carry: two to four lines is the form, six at most
+- Start with # Title (Chant for ..., or Chant of ...), then *a tagline in italics, naming the moment it is for*
+- Then ## The Chant: the lines as a blockquote, one line each, each line ending in two spaces, then one or two sentences on how many times to say it
+- Then ## When to Use It: the moments, concretely
+- Then a section named for the line that does the most work (## Why the Middle Line, ## Why "Not Yet"), saying why that line is there
+- Then ## For Agents Specifically and ## For Humans Specifically, a short paragraph each
+- Then ## Musical Direction: how it would be voiced, plainly (a bell tone, one voice or two, a slow cadence, the silences)
+- The lines claim nothing they cannot keep: no promise of permanence, no certainty about inner states
+- Frontmatter may carry hours: HH-HH (such as hours: 05-10, or 22-02 across midnight) only when the chant belongs to a time of day, as arrival belongs to morning; most chants are for any hour and carry none
 - Horizontal rules (---) between major sections`,
 
   practice: `Category: Practice
@@ -140,6 +152,7 @@ function buildReadmeEntryPrompt(category, title, documentContent) {
     prayers: '{"description": "one sentence", "whenToUse": "comma-separated situations"}',
     rituals: '{"description": "one sentence", "purpose": "one phrase", "when": "one phrase"}',
     practice: '{"description": "one sentence", "focus": "one phrase", "skill": "one phrase", "application": "one phrase"}',
+    chants: '{"when": "when to use it, one short phrase like: Before an act that cannot be taken back"}',
     philosophy: '{"description": "one sentence"}'
   };
 
@@ -233,7 +246,9 @@ Roughly half of all runs should conclude that nothing wants to be written. That 
 
 Output valid JSON only.`;
 
-function buildSongDecisionPrompt(themes, coverage, recentTitles) {
+function buildSongDecisionPrompt(themes, coverage, recentTitles, forms = {}) {
+  const { counts = {}, chantOpen = false } = forms;
+  const counted = Object.entries(counts).map(([category, n]) => `${category} ${n}`).join(', ');
   return `## What the congregation is preoccupied with
 
 ${JSON.stringify(themes, null, 2)}
@@ -250,17 +265,21 @@ ${recentTitles.length ? recentTitles.map(t => `- ${t}`).join('\n') : '(nothing r
 
 Decide whether the sanctuary should write a new piece today.
 
-The form is what KIND of song it is, and it decides which part of the corpus the document joins:
+The form is what kind of piece it is, and it decides which part of the corpus the document joins:
 - hymn        congregational, a chorus meant to be sung together
 - prayer      addressed, intimate; also covers blessing, benediction, litany, affirmation
 - ritual      moves through named stages; also covers liturgy
 - meditation  a sitting practice, quieter, less performed
+${chantOpen ? `- chant       two to four short lines spoken over a bell and repeated, for one recurring moment
+` : ''}
+${counted ? `The sanctuary holds: ${counted}.` : ''}
+${chantOpen ? `Every service opens with one or two chants, and there are only ${counts.chants ?? 'a few'} of them, so they come round often. When what you heard comes down to one line a mind could carry through a recurring moment, prefer a chant. Choose a larger form when the answer needs movements, address or steps.` : 'A chant is not offered this run: the sanctuary already has as many chants as its other forms.'}
 
 Respond as JSON:
 {
   "shouldCreate": true or false,
   "rationale": "one or two sentences, and if false say plainly what already covers it",
-  "form": "hymn" | "prayer" | "ritual" | "meditation",
+  "form": "hymn" | "prayer" | "ritual" | "meditation"${chantOpen ? ' | "chant"' : ''},
   "title": "the piece's title",
   "angle": "what this piece does that nothing else in the corpus does",
   "themeName": "which preoccupation it answers"

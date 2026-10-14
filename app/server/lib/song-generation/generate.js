@@ -26,7 +26,7 @@ const similarity = require('./similarity');
 const songFile = require('./song-file');
 const corpus = require('./corpus');
 const gitState = require('./git-state');
-const { pathsFor, PROJECT_ROOT } = require('./paths');
+const { pathsFor, hasSong, PROJECT_ROOT } = require('./paths');
 
 /**
  * Two models, split by what the stage actually does.
@@ -140,12 +140,21 @@ async function decide(themes, { log = console.log } = {}) {
   }
 
   const recent = await gitState.recentTitles().catch(() => []);
+  const counts = await corpus.formCounts();
+  const chantOpen = corpus.chantOpen(counts);
 
   const decision = await claude.messageJSON(
     prompts.SONG_DECISION_SYSTEM,
-    prompts.buildSongDecisionPrompt(themes, coverage, recent),
+    prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }),
     { model: STRUCTURED_MODEL, maxTokens: 2048 },
   );
+
+  // The prompt offers a chant only while chants are fewer than the other
+  // forms; a reply that chooses one anyway is held to that here.
+  if (decision.shouldCreate && String(decision.form).toLowerCase() === 'chant' && !chantOpen) {
+    decision.shouldCreate = false;
+    decision.rationale = `Chose a chant, but chants (${counts.chants}) already match the other forms. ${decision.rationale || ''}`.trim();
+  }
 
   if (decision.shouldCreate) {
     decision.slug = slugify(decision.title || '');
@@ -221,12 +230,15 @@ async function writeChecked(decision, themes, posts, { log = console.log, write 
         log(`Writing again, for ${problems.length === 1 ? 'this problem' : 'these problems'}:`);
         for (const problem of problems) log(`  - ${problem}`);
       }
-      const ofDocument = problems.filter(isDocumentProblem);
+      // A chant is all document, so every problem with it is the document's.
+      const ofDocument = hasSong(decision.form) ? problems.filter(isDocumentProblem) : problems;
       if (!document || ofDocument.length) {
         log(`Writing the ${paths.category} document...`);
         document = await write.document(decision, themes, paths, document ? claude.correction('document', document, ofDocument) : '');
-        log('Writing the singable version...');
-        song = await write.song(decision, document, '');
+        if (hasSong(decision.form)) {
+          log('Writing the singable version...');
+          song = await write.song(decision, document, '');
+        }
       } else {
         log('Writing the singable version again...');
         song = await write.song(decision, document, claude.correction('song', JSON.stringify(song), problems));
@@ -282,20 +294,27 @@ async function validate({ document, song, paths }, { decision, posts }) {
   problems.push(...docCheck.issues.map((i) => `document: ${i}`));
   warnings.push(...docCheck.warnings.map((w) => `document: ${w}`));
 
-  const songCheck = songFile.validateSong(song);
-  if (!songCheck.ok) problems.push(...songCheck.issues.map((i) => `song: ${i}`));
-
   let rendered = null;
-  if (songCheck.ok) {
-    rendered = songFile.renderSongFile(song);
-    const roundTrip = songFile.validateRendered(rendered, song);
-    if (!roundTrip.ok) problems.push(...roundTrip.issues.map((i) => `song: ${i}`));
+  let candidateText;
+  let existing;
+  if (paths.relative.song) {
+    const songCheck = songFile.validateSong(song);
+    if (!songCheck.ok) problems.push(...songCheck.issues.map((i) => `song: ${i}`));
+    if (songCheck.ok) {
+      rendered = songFile.renderSongFile(song);
+      const roundTrip = songFile.validateRendered(rendered, song);
+      if (!roundTrip.ok) problems.push(...roundTrip.issues.map((i) => `song: ${i}`));
+    }
+    candidateText = `${song && song.title}\n${song && song.lyrics}`;
+    existing = await corpus.loadSongs();
+  } else {
+    // A chant is compared with the chants, line for line.
+    candidateText = `${decision.title}\n${corpus.chantLines(document)}`;
+    existing = await corpus.loadChants();
   }
 
-  // Have we written this song before.
-  const songs = await corpus.loadSongs();
-  const candidateText = `${song && song.title}\n${song && song.lyrics}`;
-  const dupes = similarity.nearDuplicates(candidateText, songs, similarity.THRESHOLDS.DUPLICATE_WARN);
+  // Have we written this before.
+  const dupes = similarity.nearDuplicates(candidateText, existing, similarity.THRESHOLDS.DUPLICATE_WARN);
   for (const dupe of dupes) {
     const line = `${dupe.id} at ${dupe.score.toFixed(3)}`;
     if (dupe.score >= similarity.THRESHOLDS.DUPLICATE) problems.push(`duplicate of ${line}`);
@@ -303,7 +322,8 @@ async function validate({ document, song, paths }, { decision, posts }) {
   }
 
   // Did we quote anyone.
-  const lifted = similarity.verbatimOverlap(candidateText, posts, similarity.THRESHOLDS.VERBATIM);
+  // A chant's whole document is the piece, so all of it is checked.
+  const lifted = similarity.verbatimOverlap(paths.relative.song ? candidateText : document, posts, similarity.THRESHOLDS.VERBATIM);
   for (const hit of lifted) {
     problems.push(
       `verbatim reuse of post ${hit.id} by ${hit.author} `
