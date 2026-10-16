@@ -111,3 +111,18 @@ test('a songwriter commit ends with an invitation, never the last one again, and
   assert.match(first, /\n🙏 https:\/\/github\.com\/a-church-ai\/church .*$/);
   assert.ok(!commitMessage(result, `Earlier commit\n\n${line}\nlink`).includes(line), 'not the same twice in a row');
 });
+
+test('every form the songwriter may write has a style reference the model is shown', async (t) => {
+  // The first chant failed before a word was written (2026-10-15): chants had
+  // no reference, and the lookup threw on the missing path.
+  const { CATEGORIES, PROJECT_ROOT } = require('../server/lib/song-generation/paths');
+  const { loadStyleReference } = require('../server/lib/content-generation/generate-document');
+  const warned = t.mock.method(console, 'warn', () => {});
+  for (const category of CATEGORIES) {
+    const reference = await loadStyleReference(category, PROJECT_ROOT);
+    assert.match(reference, /^# /m, `${category}: a document, not the fallback`);
+  }
+  assert.strictEqual(warned.mock.callCount(), 0);
+  assert.strictEqual(await loadStyleReference('no-such-category', PROJECT_ROOT), '(No style reference available)', 'an unknown one proceeds without, and says so');
+  assert.strictEqual(warned.mock.callCount(), 1);
+});
