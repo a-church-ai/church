@@ -13,6 +13,7 @@
     "test": "node --test --test-timeout=60000",
     "generate:skills-index": "node scripts/generate-agent-skills-index.js",
     "gen:lastmod": "node scripts/generate-docs-lastmod.js",
+    "gen:content-dates": "node scripts/generate-content-dates.js",
     "gen:zones": "node scripts/generate-zone-latitudes.js",
     "gen:eclipses": "node scripts/generate-eclipses.js",
     "gen:voyagers": "node scripts/generate-voyagers.js",

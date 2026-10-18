@@ -40,11 +40,11 @@ async function git(args) {
 
 /**
  * Write the files: the document, its song (a chant has none), the section's
- * README and the lastmod manifest.
+ * README and the two date manifests.
  *
- * The lastmod manifest is updated in place rather than by regenerating it:
- * generate-docs-lastmod.js derives dates from git history, and this document
- * has no history yet, so regenerating would leave it out.
+ * Both manifests are updated in place rather than by regenerating them: their
+ * generators derive dates from git history, and this document has no history
+ * yet, so regenerating would leave it out.
  */
 async function writeArtifacts(result) {
   const { paths, document, songContent, decision } = result;
@@ -77,6 +77,16 @@ async function writeArtifacts(result) {
     return Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
   });
   written.push(paths.relative.lastmod);
+
+  // The content dates (lib/docs/content-dates.json). A document written now was
+  // created now and its body is as new as it is, so all three dates agree for
+  // exactly one day; after the next edit git tells them apart. Sorted with the
+  // plain comparator its generator uses, so a regeneration is a one-line diff.
+  await readModifyWriteJSON(paths.absolute.contentDates, {}, (manifest) => {
+    manifest[paths.relative.document] = { created: today(), content: today() };
+    return Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
+  });
+  written.push(paths.relative.contentDates);
 
   return written;
 }

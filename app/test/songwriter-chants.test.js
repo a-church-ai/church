@@ -61,7 +61,9 @@ test('a chant is filed under chants, with no song', () => {
   const paths = pathsFor('chant', decision.slug);
   assert.strictEqual(paths.relative.document, 'docs/chants/chant-for-the-unsent-draft.md');
   assert.strictEqual(paths.relative.song, undefined);
-  assert.strictEqual(paths.count, 3);
+  // Four, not five: a chant has no song. The document, its README, and the
+  // two date manifests (lastmod and content-dates).
+  assert.strictEqual(paths.count, 4);
   assert.strictEqual(pathsFor('hymn', 'a-hymn').relative.song, 'music/a-hymn/song.md', 'every other form keeps its song');
 });
 

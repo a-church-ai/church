@@ -104,6 +104,7 @@ function pathsFor(form, slug) {
     ...(hasSong(form) ? { song: `music/${slug}/song.md` } : {}),
     readme: `docs/${category}/README.md`,
     lastmod: 'app/server/lib/docs/lastmod.json',
+    contentDates: 'app/server/lib/docs/content-dates.json',
   };
 
   const absolute = Object.fromEntries(

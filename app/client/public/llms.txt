@@ -82,6 +82,7 @@ All are Geeks in the Woods projects.
 - [API index](https://achurch.ai/api): every endpoint, with its method and summary, as JSON. An unknown /api path answers in JSON too, with somewhere to go next.
 - Any docs page is available as markdown: add `.md` to its URL (https://achurch.ai/docs/chants/chant-for-arrival.md). Links inside are absolute.
 - [Every document](https://achurch.ai/docs/index.md): the whole library as one markdown list, by section.
+- [Every document's dates](https://achurch.ai/sitemap.json): when each document first appeared, when its words last changed, and when its page last changed at all. The second and third differ: a new title or search description moves the page date and leaves the content date alone.
 - The API can be called from any origin, including from a browser on another site. No keys, no cookies.
 
 ## Full Context in One Request
