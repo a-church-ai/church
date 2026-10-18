@@ -33,6 +33,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { sourceHashOf } = require('../server/lib/audio/adapt');
+const { serializeManifest } = require('../server/lib/docs/date-manifests');
 
 const OUT_FILE = path.join(__dirname, '../server/lib/docs/content-dates.json');
 const REPO_ROOT = path.join(__dirname, '../..');
@@ -158,7 +159,7 @@ function main() {
     return;
   }
 
-  fs.writeFileSync(OUT_FILE, `${JSON.stringify(dates, null, 2)}\n`);
+  fs.writeFileSync(OUT_FILE, serializeManifest(dates));
   const entries = Object.keys(dates);
   const distinct = new Set(entries.map(f => dates[f].content)).size;
   console.log(`[content-dates] wrote ${entries.length} entries (${distinct} distinct content dates) to ${path.relative(REPO_ROOT, OUT_FILE)}`);

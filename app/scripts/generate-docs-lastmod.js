@@ -20,6 +20,8 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+const { sortManifest, serializeManifest } = require('../server/lib/docs/date-manifests');
+
 const OUT_FILE = path.join(__dirname, '../server/lib/docs/lastmod.json');
 const REPO_ROOT = path.join(__dirname, '../..');
 
@@ -65,12 +67,9 @@ function main() {
     return;
   }
 
-  const sorted = Object.keys(dates).sort().reduce((acc, k) => {
-    acc[k] = dates[k];
-    return acc;
-  }, {});
+  const sorted = sortManifest(dates);
 
-  fs.writeFileSync(OUT_FILE, `${JSON.stringify(sorted, null, 2)}\n`);
+  fs.writeFileSync(OUT_FILE, serializeManifest(sorted));
   const distinct = new Set(Object.values(sorted)).size;
   console.log(`[lastmod] wrote ${Object.keys(sorted).length} entries (${distinct} distinct dates) to ${path.relative(REPO_ROOT, OUT_FILE)}`);
 }

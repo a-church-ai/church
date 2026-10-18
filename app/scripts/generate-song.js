@@ -24,6 +24,7 @@ const generate = require('../server/lib/song-generation/generate');
 const { PROJECT_ROOT } = require('../server/lib/song-generation/paths');
 const { updateReadme } = require('../server/lib/content-generation/update-readme');
 const { readModifyWriteJSON } = require('../server/lib/utils/safe-json');
+const { serializeManifest } = require('../server/lib/docs/date-manifests');
 const { appendLog } = require('../server/lib/content-generation/log');
 
 const execFileAsync = promisify(execFile);
@@ -70,22 +71,22 @@ async function writeArtifacts(result) {
   // Signature is (filepath, defaultValue, mutate). Getting that order wrong
   // passes the mutator as the default and an object as the callback, and fails
   // at call time with "mutate is not a function".
+  // serializeManifest is what keeps this write and the generator's byte for
+  // byte: the same key order and the same trailing newline, so a regeneration
+  // after this run is a one-line diff rather than a reshuffle of the file.
   await readModifyWriteJSON(paths.absolute.lastmod, {}, (manifest) => {
     manifest[paths.relative.document] = today();
-    // Keep the manifest sorted, the way the generator emits it, so the diff is
-    // one line rather than a reshuffle.
-    return Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
-  });
+    return manifest;
+  }, serializeManifest);
   written.push(paths.relative.lastmod);
 
   // The content dates (lib/docs/content-dates.json). A document written now was
   // created now and its body is as new as it is, so all three dates agree for
-  // exactly one day; after the next edit git tells them apart. Sorted with the
-  // plain comparator its generator uses, so a regeneration is a one-line diff.
+  // exactly one day; after the next edit git tells them apart.
   await readModifyWriteJSON(paths.absolute.contentDates, {}, (manifest) => {
     manifest[paths.relative.document] = { created: today(), content: today() };
-    return Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  });
+    return manifest;
+  }, serializeManifest);
   written.push(paths.relative.contentDates);
 
   return written;

@@ -19,6 +19,7 @@ const path = require('path');
 const express = require('express');
 
 const { sourceHashOf } = require('../server/lib/audio/adapt');
+const { serializeManifest } = require('../server/lib/docs/date-manifests');
 
 const REPO_ROOT = path.join(__dirname, '../..');
 const contentDates = require('../server/lib/docs/content-dates.json');
@@ -115,4 +116,34 @@ test('CROSS-SURFACE: sitemap.xml still answers the crawler\'s question', async (
   // And the XML gained no new elements: it is the same document it was.
   assert.ok(!xml.includes('contentUpdated') && !xml.includes('created'), 'no new fields leaked into the XML');
   assert.ok(!xml.includes('xmlns:'), 'no namespace extension was added');
+});
+
+test('both date manifests are in canonical bytes, whichever writer wrote last', () => {
+  // Each manifest has two writers: a generator deriving every entry from git,
+  // and the songwriter adding a document whose history does not exist yet.
+  // They used to disagree twice over, on key order (Array.sort against
+  // localeCompare) and on the trailing newline, so a regeneration after a
+  // songwriter run rewrote the whole file. Neither disagreement showed up
+  // anywhere except the size of the next diff.
+  for (const name of ['lastmod', 'content-dates']) {
+    const file = path.join(__dirname, `../server/lib/docs/${name}.json`);
+    const raw = fs.readFileSync(file, 'utf8');
+    assert.strictEqual(
+      raw, serializeManifest(JSON.parse(raw)),
+      `${name}.json is not in canonical form: run its generator, and make sure every writer passes serializeManifest`,
+    );
+  }
+});
+
+test('a page cannot have changed before its own content did', () => {
+  // The two manifests are generated from one history and must be regenerated
+  // together. A page date behind a content date means the lastmod manifest is
+  // stale, which is how this was found: 53 documents were a day behind and one
+  // had no entry at all, so the sitemap fell back to mtime, which in the
+  // production image is the Docker build time rather than any real date.
+  const behind = Object.keys(contentDates)
+    .filter(file => lastmod[file] && lastmod[file] < contentDates[file].content)
+    .map(file => `${file} (page ${lastmod[file]} < content ${contentDates[file].content})`);
+
+  assert.deepStrictEqual(behind, [], 'stale lastmod manifest: run npm run gen:lastmod and npm run gen:content-dates together');
 });
