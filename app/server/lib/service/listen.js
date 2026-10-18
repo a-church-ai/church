@@ -12,6 +12,7 @@
 const { serviceFor, arrangedBy } = require('./serve');
 const { slotHours, SLOTS } = require('./slots');
 const { trackFor, SONG_CREDIT } = require('../audio/markup');
+const { shapeOf } = require('./shape');
 const { episodeSquarePath } = require('../audio/podcasts');
 
 // The section whose lock-screen square a part's track shows.
@@ -30,6 +31,8 @@ async function listeningService({ timezone, at } = {}) {
     name: served.entry.name || null,
     word: served.entry.word || null,
     arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
+    // What the service holds, and the one line the same in every service.
+    ...shapeOf(served.parts),
     parts: served.parts.map(p => ({
       kind: p.kind,
       title: p.title,

@@ -329,6 +329,14 @@ h1.subtitle,
     margin: 0 0 1rem;
 }
 
+/* What the service holds, by form, under the name and above the button: a
+   visitor reads the shape of the thing before deciding to begin it. */
+.service-forms {
+    font-size: 0.9375rem;
+    color: var(--text-2);
+    margin: -0.5rem 0 1.25rem;
+}
+
 /* The words that open the service, set as prose rather than as a caption,
    below the button and the waveform so the button is in the first screen. A
    service without words (one served by the rotation) shows none. */
@@ -348,6 +356,14 @@ h1.subtitle,
     font-size: 0.9375rem;
     color: var(--text-2);
     margin-bottom: 1.5rem;
+}
+
+/* The one line every service carries, whatever the day arranged: nothing is
+   owed from an earlier visit. Static, so it cannot vary with the plan. */
+.service-refrain {
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    margin-top: 1.25rem;
 }
 
 /* What the place is not, after the invitation rather than before it. */

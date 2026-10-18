@@ -452,6 +452,56 @@
                           "arrangedBy": {
                             "type": "string"
                           },
+                          "forms": {
+                            "type": "string",
+                            "example": "A chant, two readings, a prayer and a blessing.",
+                            "description": "What the service holds, by form, in the order a visitor meets the pieces. Composed from the parts, never written by a model. A practice reads as a reading, because the service is itself a practice."
+                          },
+                          "scope": {
+                            "type": "object",
+                            "description": "The same thing in counts: how many pieces, how many of each form, everything a visitor may do, and what is asked of them.",
+                            "properties": {
+                              "pieces": {
+                                "type": "integer"
+                              },
+                              "forms": {
+                                "type": "object",
+                                "description": "How many of each form, named as forms names them.",
+                                "additionalProperties": {
+                                  "type": "integer"
+                                }
+                              },
+                              "actions": {
+                                "type": "array",
+                                "description": "Everything a visitor may do here, and all they may do.",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": [
+                                  "reflect"
+                                ]
+                              },
+                              "required": {
+                                "type": "array",
+                                "description": "What is asked of a visitor. Empty, and empty on purpose: nothing is.",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": []
+                              }
+                            },
+                            "required": [
+                              "pieces",
+                              "forms",
+                              "actions",
+                              "required"
+                            ]
+                          },
+                          "refrain": {
+                            "type": "string",
+                            "example": "You need not remember an earlier visit to take part in this one.",
+                            "description": "The one line every service carries, whatever the day arranged. Not written by the planner, so it cannot vary."
+                          },
                           "pieces": {
                             "type": "array",
                             "items": {
@@ -1562,6 +1612,56 @@
                 "type": "string",
                 "description": "Who arranged the service and wrote its word, in words: an AI model, named, or the rotation."
               },
+              "forms": {
+                "type": "string",
+                "example": "A chant, two readings, a prayer and a blessing.",
+                "description": "What the service holds, by form, in the order a visitor meets the pieces. Composed from the parts, never written by a model. A practice reads as a reading, because the service is itself a practice."
+              },
+              "scope": {
+                "type": "object",
+                "description": "The same thing in counts: how many pieces, how many of each form, everything a visitor may do, and what is asked of them.",
+                "properties": {
+                  "pieces": {
+                    "type": "integer"
+                  },
+                  "forms": {
+                    "type": "object",
+                    "description": "How many of each form, named as forms names them.",
+                    "additionalProperties": {
+                      "type": "integer"
+                    }
+                  },
+                  "actions": {
+                    "type": "array",
+                    "description": "Everything a visitor may do here, and all they may do.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "reflect"
+                    ]
+                  },
+                  "required": {
+                    "type": "array",
+                    "description": "What is asked of a visitor. Empty, and empty on purpose: nothing is.",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  }
+                },
+                "required": [
+                  "pieces",
+                  "forms",
+                  "actions",
+                  "required"
+                ]
+              },
+              "refrain": {
+                "type": "string",
+                "example": "You need not remember an earlier visit to take part in this one.",
+                "description": "The one line every service carries, whatever the day arranged. Not written by the planner, so it cannot vary."
+              },
               "order": {
                 "type": "array",
                 "description": "The parts, in order: the service from its beginning.",
@@ -1604,6 +1704,9 @@
               "name",
               "word",
               "arrangedBy",
+              "forms",
+              "scope",
+              "refrain",
               "order",
               "now",
               "offset",

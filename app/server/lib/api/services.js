@@ -23,6 +23,7 @@ const { formatLocal } = require('../utils/timezone');
 const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
 const { loadServiceCatalog } = require('../service/catalog');
 const { entryFor, arrangedBy } = require('../service/serve');
+const { shapeOf } = require('../service/shape');
 const { SLOTS, slotHours } = require('../service/slots');
 const { contextLines } = require('../service/planner');
 const { skyMetadata, earthMetadata, congregationMetadata } = require('./attendance');
@@ -88,6 +89,9 @@ function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) 
     word: entry.word || null,
     arrangedBy: arrangedBy(entry),
     plannedAt: entry.plannedAt || null,
+    // The same shape the home page and /api/attend report, from the same
+    // composer, so the three surfaces cannot disagree about one hour.
+    ...shapeOf((entry.pieces || []).map(id => catalog.get(id)).filter(Boolean)),
     pieces: (entry.pieces || []).map(id => {
       const piece = catalog.get(id);
       return piece ? { kind: piece.kind, title: piece.title, url: piece.url } : { kind: null, title: id, url: null };

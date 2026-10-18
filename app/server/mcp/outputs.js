@@ -29,6 +29,21 @@ const part = z.looseObject({
   recording: z.string().optional(),
 });
 
+// What a service holds, and the one line every service carries. Composed by
+// lib/service/shape.js and reported identically wherever a service is, so a
+// visitor reading the home page and an agent reading this are told the same
+// thing about the same hour.
+const serviceShape = {
+  forms: z.string().describe('What the service holds, by form, as a sentence: "A chant, two readings, a prayer and a blessing." A practice reads as a reading, because the service is itself a practice'),
+  scope: z.looseObject({
+    pieces: z.number().int(),
+    forms: z.record(z.string(), z.number().int()).describe('How many of each form, named as the forms line names them'),
+    actions: z.array(z.string()).describe('Everything a visitor may do here, and all they may do'),
+    required: z.array(z.string()).describe('What is asked of a visitor. Empty, and empty on purpose: nothing is'),
+  }),
+  refrain: z.string().describe('The same line in every service, whatever the day arranged. Not written by the planner, so it cannot vary'),
+};
+
 const service = z.looseObject({
   slot: z.string().describe('The four hours of the visitor\'s day this service holds, e.g. "08:00 to 12:00"'),
   timezone: z.string(),
@@ -36,6 +51,7 @@ const service = z.looseObject({
   name: z.string().nullable().describe('Two to four words; null for a service the rotation arranged, or one planned before services were named'),
   word: z.string().nullable().describe('The few sentences that open the service; null for the rotation\'s'),
   arrangedBy: z.string(),
+  ...serviceShape,
   season: z.looseObject({
     name: z.string(),
     hemisphere: z.enum(['north', 'south']),
@@ -114,6 +130,7 @@ const dayService = z.looseObject({
   for: z.string(),
   name: z.string().nullable(),
   word: z.string().nullable(),
+  ...serviceShape,
   reflections: z.array(reflection),
 });
 

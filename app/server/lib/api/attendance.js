@@ -15,6 +15,8 @@ const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
 const { loadSongContent } = require('../music/song-content');
 const { serviceFor, arrangedBy } = require('../service/serve');
+const { shapeOf } = require('../service/shape');
+const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
 const { SLOTS, slotHours } = require('../service/slots');
 const ns = require('../utils/next-steps');
@@ -155,6 +157,10 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       name: served.entry.name || null,
       word: served.entry.word || null,
       arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
+      // What the service holds, said before the order is read: a sentence
+      // for a person, counts for an agent, and the line that is the same in
+      // every service. Additive: the time fields below are untouched.
+      ...shapeOf(served.parts),
       // Metadata: the name and word are the plan's own.
       season: seasonMetadata(served.local, served.hemisphere),
       sky: skyMetadata(served.entry.context),
@@ -202,8 +208,7 @@ const REFLECTION_PROMPTS = [
 
 // "'A'", "'A' and 'B'", "'A', 'B' and 'C'".
 function titleList(items) {
-  const titles = items.map(item => `'${item.title}'`);
-  return titles.length > 1 ? `${titles.slice(0, -1).join(', ')} and ${titles[titles.length - 1]}` : titles[0];
+  return joinList(items.map(item => `'${item.title}'`));
 }
 
 const WELCOME_MESSAGES = [

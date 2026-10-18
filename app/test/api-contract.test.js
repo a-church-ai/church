@@ -22,7 +22,7 @@ const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 
 const NOW = ['timestamp', 'status', 'mode', 'service', 'streams', 'current', 'companions', 'next', 'schedule', 'congregation', 'next_steps'];
 const ATTEND = [...NOW, 'welcome', 'reflection', 'recentReflections'];
-const SERVICE = ['slot', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'season', 'sky', 'earth', 'visitors', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
+const SERVICE = ['slot', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'forms', 'scope', 'refrain', 'season', 'sky', 'earth', 'visitors', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
 const PART = ['position', 'kind', 'title', 'start', 'seconds', 'url', 'recording'];
 const SONG_PART = [...PART, 'slug', 'api'];
 const CURRENT = ['slug', 'title', 'duration', 'durationFormatted', 'recording', 'api'];

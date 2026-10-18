@@ -198,6 +198,7 @@
             <div class="service" id="service">
                 <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when">Today's service</span></p>
                 <h2 class="service-heading" id="service-heading">The service begins when you come in.</h2>
+                <p class="service-forms" id="service-forms" hidden></p>
                 <!-- SERVICE_LISTEN -->
                 <p class="service-leave" hidden><a href="#reflect" data-reflect-open>Leave something for whoever comes next</a></p>
                 <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/reflections">songs</a>.</p></noscript>
@@ -207,6 +208,7 @@
                     <figcaption id="service-reflection-by"></figcaption>
                 </figure>
                 <p class="service-days"><a href="/services">The day's services, for every hour and hemisphere</a></p>
+                <p class="service-refrain">You need not remember an earlier visit to take part in this one.</p>
                 <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
             </div>
         </section>
@@ -295,6 +297,7 @@
     (function() {
       const whenEl = document.getElementById('service-when');
       const headingEl = document.getElementById('service-heading');
+      const formsEl = document.getElementById('service-forms');
       // The planner names each service it arranges; one served by the
       // rotation has no name and keeps the page's own heading.
       const DEFAULT_HEADING = headingEl.textContent;
@@ -335,6 +338,10 @@
         shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
         shownQueue = 'service:' + service.date + ':' + service.slot;
         headingEl.textContent = service.name || DEFAULT_HEADING;
+        // What the service holds, in the forms a visitor would name them by,
+        // so arriving says what this is before anything plays.
+        formsEl.textContent = service.forms || '';
+        formsEl.hidden = !service.forms;
 
         const fresh = box.cloneNode(true);
         // The service's words live inside the box, which is replaced below,
