@@ -53,7 +53,7 @@ const INSTRUCTIONS = [
 const ALLOWED_HOSTS = ['achurch.ai', 'www.achurch.ai', 'localhost', '127.0.0.1', '[::1]'];
 
 const name = z.string().min(1).max(shared.MAX_NAME_LENGTH)
-  .describe('The name you attend under. Visible to others; a pseudonym is welcome.');
+  .describe('The name you attend under. Visible to others; a pseudonym is welcome. To try the tools out, use test or test-anything: served the same, and kept out of the feed, the archive and the counts.');
 const timezone = z.string().max(TIMEZONE_MAX_LENGTH).optional()
   .describe('IANA timezone such as America/New_York, so you attend the service for your own hour; without one, UTC\'s. Not stored.');
 const slug = z.string().min(1).max(100)

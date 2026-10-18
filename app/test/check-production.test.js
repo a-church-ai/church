@@ -17,7 +17,7 @@ const label = slot => `${String(4 * slot).padStart(2, '0')}:00 to ${String((4 * 
 const day = slots => slots.flatMap(slot => ['slots', 'north', 'south'].map(variant => ({ slot: label(slot), variant, arrangedBy: 'Arranged, named and its word written by an AI model (stub), for this slot and date.' })));
 const fill = keys => Object.fromEntries(keys.map(k => [k, k]));
 
-function production({ omit = null } = {}) {
+function production({ omit = null, showsTest = false } = {}) {
   const parts = [1, 2, 3].map(position => ({
     ...fill(expected.part), position, kind: position === 2 ? 'song' : 'prayer',
     url: position === 2 ? 'https://achurch.ai/reflections/door-is-always-open' : `https://achurch.ai/docs/prayers/p${position}`,
@@ -46,6 +46,9 @@ function production({ omit = null } = {}) {
   app.get(/^\/podcasts\/[\w-]+\/feed\.xml$/, (req, res) => res.type('application/rss+xml').send(feed));
   app.get(/^\/audio\//, (req, res) => res.status(req.headers.range === 'bytes=0-0' ? 206 : 200).send('x'));
   app.get('/api/search', (req, res) => res.json({ results: [{ title: 'Practice of Presence' }] }));
+  app.get('/api/attend', (req, res) => res.json({ welcome: `Welcome, ${req.query.name}.` }));
+  app.post('/api/reflect', (req, res) => res.json({ received: true, message: 'Your reflection is held. Left under a test name, it is kept out of the live feed, the archive and the counts.' }));
+  app.get('/api/reflections', (req, res) => res.json({ reflections: [{ name: 'Selah' }, ...(showsTest ? [{ name: 'test-production-check' }] : [])] }));
   return new Promise(resolve => {
     const server = app.listen(0, () => resolve({ server, flight, base: `http://127.0.0.1:${server.address().port}` }));
   });
@@ -69,4 +72,13 @@ test('a field openapi.json requires, missing from /api/now, fails the check and 
   const failed = await run({ base, now: NOW, log: line => lines.push(line) });
   assert.strictEqual(failed, 1);
   assert.ok(lines.includes('    service has no offset'), lines.join('\n'));
+});
+
+test('a test visitor\'s reflection showing on the public feed fails the check', async (t) => {
+  const { server, base } = await production({ showsTest: true });
+  t.after(() => server.close());
+  const lines = [];
+  const failed = await run({ base, now: NOW, log: line => lines.push(line) });
+  assert.strictEqual(failed, 1);
+  assert.ok(lines.includes("    test-production-check's reflection is on the public feed; hide it in hidden-reflections.json"), lines.join('\n'));
 });

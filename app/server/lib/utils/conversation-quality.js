@@ -10,6 +10,7 @@
 
 const crypto = require('crypto');
 const { sha256: WITHDRAWN_HASHES } = require('./withdrawn-conversations.json');
+const { isTestName } = require('./test-visitor');
 
 const WITHDRAWN = new Set(WITHDRAWN_HASHES);
 
@@ -46,8 +47,9 @@ function isThinAnswer(messages) {
 }
 
 // Indexable: worth a search engine's attention and a place in the sitemap.
-function isIndexable(slug, messages) {
-  return !isWithdrawn(slug) && !isLowValueSlug(slug) && !isThinAnswer(messages);
+// asker is who opened it (data.js askerOf); a test visitor's never is.
+function isIndexable(slug, messages, asker) {
+  return !isWithdrawn(slug) && !isLowValueSlug(slug) && !isThinAnswer(messages) && !isTestName(asker);
 }
 
 module.exports = { withdrawKey, isWithdrawn, isLowValueSlug, isThinAnswer, isIndexable };

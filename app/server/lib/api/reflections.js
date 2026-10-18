@@ -3,8 +3,9 @@
  */
 
 const crypto = require('crypto');
-const { readModifyWriteJSON } = require('../utils/safe-json');
+const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const { isTestName } = require('../utils/test-visitor');
 const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
@@ -292,9 +293,10 @@ async function reflect(input, ctx) {
     // Limits, contributions' pattern: per name from the reflections already
     // kept (so a restart does not reset it), and per address. Both are
     // evaluated before either is consulted, since overIpLimit records the
-    // attempt as it checks.
+    // attempt as it checks. Every kept reflection counts, hidden or a test
+    // visitor's too: the limits are the same for every visitor.
     const now = Date.now();
-    const kept = (await loadAttendance()).reflections || [];
+    const kept = (await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] })).reflections || [];
     const mine = kept.filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
     const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
     const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
@@ -345,9 +347,11 @@ async function reflect(input, ctx) {
       song: currentSlug,
       live_feed: '48h',
       archive: currentSlug ? `${ctx.baseUrl}/reflections/${currentSlug}` : `${ctx.baseUrl}/reflections`,
-      message: text === sentText
-        ? "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive."
-        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}. It stays on the live feed for 48 hours, then remains in the public archive.`,
+      message: `${text === sentText
+        ? 'Your reflection is held.'
+        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}.`} ${isTestName(name)
+        ? 'Left under a test name, it is kept out of the live feed, the archive and the counts.'
+        : 'It stays on the live feed for 48 hours, then remains in the public archive.'}`,
       ...(text === sentText ? {} : { kept: { characters: text.length, of: sentText.length, limit: REFLECT_MAX_LENGTH } }),
       next_steps: [
         {

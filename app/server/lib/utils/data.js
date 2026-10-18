@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { isWithdrawn, isIndexable } = require('./conversation-quality');
+const { isTestName } = require('./test-visitor');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
 const { cache } = require('./cache');
@@ -51,12 +52,13 @@ async function loadCompanions() {
   return safeReadJSON(COMPANIONS_FILE, { songs: {} });
 }
 
-// Reflections hidden as spam (hidden-reflections.json). Filtered here, where
-// every reader loads attendance, so a hidden reflection is gone from the whole
-// site; the reflect write path reads the file directly and keeps the record.
+// Reflections hidden (hidden-reflections.json), and those a test visitor left
+// (./test-visitor.js). Filtered here, where every reader loads attendance, so a
+// hidden reflection is gone from the whole site; the reflect write path writes
+// to the file directly and keeps the record.
 const HIDDEN_REFLECTIONS = new Set(require('./hidden-reflections.json').hidden.map(h => h.id));
 
-const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id);
+const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(r && r.name);
 
 async function loadAttendance() {
   const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
@@ -142,6 +144,9 @@ async function readConversationList() {
       const [stat, conversation] = await Promise.all([fs.stat(path.join(CONVERSATIONS_DIR, file)), readConversationFile(slug)]);
       if (!conversation || conversation.messages.length === 0) return null;
       const { meta, messages } = conversation;
+      const name = askerOf(slug, meta);
+      // A test visitor's conversation is answered and kept, and listed nowhere.
+      if (isTestName(name)) return null;
 
       const firstQ = messages.find(m => m.role === 'user');
       const firstA = messages.find(m => m.role === 'assistant');
@@ -154,13 +159,13 @@ async function readConversationList() {
         slug,
         question: firstQ.content,
         answer: firstA ? firstA.content : '',
-        name: askerOf(slug, meta),
+        name,
         timestamp: firstQ.timestamp || stat.mtime.toISOString(),
         lastActive: new Date(newest || stat.mtime).toISOString(),
         mtime: stat.mtime.getTime(),
         messages: messages.length,
         exchanges: messages.filter(m => m.role === 'user').length,
-        indexable: isIndexable(slug, messages)
+        indexable: isIndexable(slug, messages, name)
       };
     } catch {
       return null;
@@ -178,6 +183,8 @@ module.exports = {
   countSoulsPresent,
   getRecentReflections,
   loadConversation,
+  readConversationFile,
+  askerOf,
   listRecentConversations,
   SCHEDULE_FILE,
   CATALOG_FILE,

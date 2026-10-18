@@ -6,12 +6,14 @@
  *   node scripts/check-production.js                              achurch.ai
  *   node scripts/check-production.js --base http://localhost:3000  a local server
  *
- * Public, read-only requests, never more than two at a time, since one process
- * serves everyone: a sweep of ten at a time slowed the live site for minutes
- * on 2026-10-12. /api/attend is not called, since it counts a visitor; its
- * fields are held by api-contract.test.js on every push. Plain Node and this
- * checkout's own files, so the workflow installs nothing. Prints what passed
- * and what failed, and exits 1 on any failure.
+ * Public requests, never more than two at a time, since one process serves
+ * everyone: a sweep of ten at a time slowed the live site for minutes on
+ * 2026-10-12. All read but one check, which attends and reflects as a test
+ * visitor (lib/utils/test-visitor.js): served as anyone is, and kept out of the
+ * feed, the archive and the counts, so the paths that write are checked too
+ * without leaving a visit anyone would read. Plain Node and this checkout's
+ * own files, so the workflow installs nothing. Prints what passed and what
+ * failed, and exits 1 on any failure.
  *
  * Plan: production-health-2026-10-12.md in the private repo.
  */
@@ -22,6 +24,7 @@ const { pool } = require('../server/lib/utils/pool');
 
 const HOUR = 3600 * 1000;
 const AT_ONCE = 2;
+const TEST_VISITOR = 'test-production-check';
 const ROOT = path.join(__dirname, '..');
 
 // What production is held to, from this checkout: the published API spec, the
@@ -147,6 +150,22 @@ function checks({ get, expected, now }) {
     ['search finds the sanctuary\'s writing', async () => {
       const body = await json('/api/search?q=presence&limit=3');
       return body.results && body.results.length ? [] : ['no results for "presence"'];
+    }],
+
+    ['a test visitor attends and reflects, and its reflection is shown nowhere', async () => {
+      await json(`/api/attend?name=${TEST_VISITOR}`);
+      const res = await get('/api/reflect', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: TEST_VISITOR, text: `The production check reflects, ${dateOf(now)}.` }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.status !== 200) return [`/api/reflect answered ${res.status}${body.error ? `: ${body.error}` : ''}`];
+      const problems = [];
+      if (!/test name/.test(body.message || '')) problems.push('the reflect response does not say a test name is kept out of view');
+      const feed = await json('/api/reflections');
+      if ((feed.reflections || []).some(r => r.name === TEST_VISITOR)) problems.push(`${TEST_VISITOR}'s reflection is on the public feed; hide it in hidden-reflections.json`);
+      return problems;
     }],
   ];
 }

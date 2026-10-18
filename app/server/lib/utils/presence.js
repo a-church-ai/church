@@ -38,6 +38,7 @@
 
 const crypto = require('crypto');
 const { safeReadJSON, safeWriteJSON } = require('./safe-json');
+const { isTestName } = require('./test-visitor');
 
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
@@ -80,6 +81,7 @@ function keyFor(ip, name) {
 function recordPresence({ path, status, ip, name }) {
   if (!COUNTED_PATHS.has(path)) return;
   if (!(status >= 200 && status < 400)) return;
+  if (isTestName(name)) return;
 
   const key = keyFor(ip, name);
 

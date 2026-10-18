@@ -45,7 +45,7 @@ const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const coordinator = require('./lib/streamers/coordinator');
 const { isStreamingEnabled } = require('./lib/config/streaming');
-const { loadConversation, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
+const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
@@ -486,7 +486,8 @@ function renderConversationThread(messages) {
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
-  const messages = await loadConversation(slug);
+  const file = await readConversationFile(slug);
+  const messages = file && file.messages;
   if (!messages || messages.length === 0) {
     return sendNotFound(req, res, {
       heading: 'No such conversation',
@@ -506,7 +507,7 @@ app.get('/ask/:slug', async (req, res) => {
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
-    if (!isIndexable(slug, messages)) {
+    if (!isIndexable(slug, messages, askerOf(slug, file.meta))) {
       html = html.replace(
         '<meta name="robots" content="index, follow">',
         '<meta name="robots" content="noindex, follow">'

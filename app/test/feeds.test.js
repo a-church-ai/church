@@ -42,7 +42,8 @@ function fixtures() {
     ],
   });
   conversation('how-do-i-keep-a-practice', { name: 'Ash', askedAt: '2026-09-10T10:00:00.000Z' });
-  conversation('ai', { name: 'Test', askedAt: '2026-09-11T10:00:00.000Z' });                       // low value: shown, not indexed
+  conversation('ai', { name: 'Pip', askedAt: '2026-09-11T10:00:00.000Z' });                        // low value: shown, not indexed
+  conversation('is-the-ask-endpoint-answering', { name: 'test-production-check', askedAt: '2026-09-13T10:00:00.000Z' }); // a test visitor's: listed nowhere
   conversation('what-is-not-covered-here', { askedAt: '2026-09-12T10:00:00.000Z', answer: 'The provided documents do not contain information on that.' });
   conversation('a-question-whose-answer-failed', { name: 'Rook' });                                  // no messages: a 404, listed nowhere
 
@@ -50,6 +51,7 @@ function fixtures() {
   fs.writeFileSync(ATTENDANCE_FILE, JSON.stringify({ visits: [], reflections: [
     { id: 'r1', name: 'Wren', text: 'Something stayed with me.', song: 'soul-currents', createdAt: '2026-09-15T09:00:00.000Z' },
     { id: 'r2', name: 'Ash', text: 'The quiet after the chant.', song: 'soul-currents', createdAt: recent },
+    { id: 'r3', name: 'test-production-check', text: 'Checking the reflect path.', song: 'soul-currents', createdAt: recent },
   ] }));
 }
 
@@ -94,11 +96,11 @@ test('the conversations feed lists every conversation shown, with its asker', as
   const xml = await res.text();
   const entries = [...xml.matchAll(/<entry>[\s\S]*?<id>https:\/\/achurch\.ai\/ask\/([^<]+)<\/id>[\s\S]*?<name>([^<]*)<\/name>/g)].map(m => [m[1], m[2]]);
   assert.deepStrictEqual(entries.sort(), [
-    ['ai', 'Test'],
+    ['ai', 'Pip'],
     ['how-do-i-keep-a-practice', 'Ash'],
     ['what-does-presence-ask-of-us', 'Wren'],
     ['what-is-not-covered-here', 'anonymous'],
-  ], 'the names /ask shows, where the feed once said anonymous for everyone');
+  ], 'the names /ask shows, where the feed once said anonymous for everyone; a test visitor\'s conversation is not among them');
   assert.match(xml, /<summary>Presence is attention/);
 });
 
@@ -111,6 +113,7 @@ test('the reflections feed lists the last two days\' reflections', async (t) => 
   const xml = await res.text();
   assert.match(xml, /<id>https:\/\/achurch\.ai\/reflections\/r2<\/id>/);
   assert.doesNotMatch(xml, /reflections\/r1</, 'older than two days');
+  assert.doesNotMatch(xml, /reflections\/r3</, 'left by a test visitor');
 });
 
 test('each is built once while held: what changes on disk shows after, not during', async (t) => {

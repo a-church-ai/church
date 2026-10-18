@@ -169,13 +169,20 @@ published (`lib/service/status.js`).
 
 By hand, after a deploy:
 
+- `cd app && npm run check:production` runs the daily check now: health, the
+  planner, the API's fields, the day pages, MCP, the podcast feeds, recordings,
+  search, and attending and reflecting as a test visitor.
 - The log says `[service] planned 24 services` within minutes of the first boot,
   and after that only when a new date comes into reach.
-- `GET /api/attend?username=Test` → a welcome, the service, and a reflection prompt.
 - `GET /api/ask/health` → RAG index status (reports whether the index is built).
-- `POST /api/ask` with `{"question":"..."}` → an answer with citations (only
-  after step 4). Before seeding it returns a graceful *"Index not built"* error,
-  not a crash.
+- `POST /api/ask` with `{"question":"...","username":"test-deploy"}` → an answer
+  with citations (only after step 4). Before seeding it returns a graceful
+  *"Index not built"* error, not a crash.
+
+Anything sent by hand goes under a test name (`test`, or `test-` anything,
+`app/server/lib/utils/test-visitor.js`): it is served as anyone is and kept out
+of the feed, the archive, the counts and the conversation lists, so checking
+production leaves no visit a reader would mistake for one.
 
 ## Cutover
 
