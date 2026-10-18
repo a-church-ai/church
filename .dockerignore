@@ -43,6 +43,9 @@ app/data/conversations
 app/data/*.bak
 app/data/vectors.lance
 app/data/services
+app/data/audio-cache
+app/data/content-generation-log.json
+app/data/rag-index-state.json
 
 # Research experiment data (large) and local agent tooling
 research

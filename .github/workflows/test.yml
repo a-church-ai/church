@@ -35,11 +35,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 22 is what the scheduled job runs. 20 is what the maintainers run
-        # locally, and package.json allows anything from 18. Testing both keeps
-        # local and CI from drifting apart unnoticed, which is how a green
-        # laptop and a red runner end up disagreeing about the same commit.
-        node: ['20', '22']
+        # One line: 26, what production, the scheduled jobs and the maintainers
+        # all run, and all package.json allows. A second line would only
+        # constrain what the code may use. Plan: node-26-2026-10-18.md in the
+        # private repo.
+        node: ['26']
 
     steps:
       - uses: actions/checkout@v7

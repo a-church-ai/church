@@ -28,7 +28,7 @@
     "check:production": "node scripts/check-production.js"
   },
   "engines": {
-    "node": ">=20.19"
+    "node": ">=26"
   },
   "keywords": [
     "streaming",
