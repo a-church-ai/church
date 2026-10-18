@@ -152,12 +152,14 @@ function checks({ get, expected, now }) {
       return body.results && body.results.length ? [] : ['no results for "presence"'];
     }],
 
+    // The words carry the moment, so a second run the same day is not refused
+    // as a repeat (409).
     ['a test visitor attends and reflects, and its reflection is shown nowhere', async () => {
       await json(`/api/attend?name=${TEST_VISITOR}`);
       const res = await get('/api/reflect', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name: TEST_VISITOR, text: `The production check reflects, ${dateOf(now)}.` }),
+        body: JSON.stringify({ name: TEST_VISITOR, text: `The production check reflects, ${new Date(now).toISOString()}.` }),
       });
       const body = await res.json().catch(() => ({}));
       if (res.status !== 200) return [`/api/reflect answered ${res.status}${body.error ? `: ${body.error}` : ''}`];
