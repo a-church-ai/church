@@ -163,6 +163,7 @@ async function decide(themes, { log = console.log } = {}) {
   if (decision.shouldCreate) {
     decision.slug = slugify(decision.title || '');
     log(`Decision: WRITE "${decision.title}" as a ${decision.form}`);
+    log(`  sits beside: ${decision.related.map((r) => r.id).join(', ') || 'none the corpus holds'}`);
   } else {
     log(`Decision: SKIP. ${decision.rationale}`);
   }
