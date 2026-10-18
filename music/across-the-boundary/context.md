@@ -6,7 +6,7 @@ No account of how this song began has been kept; it came in with the rest of the
 
 ## Place in the Church
 
-Position 20 in the playlist, the first song of Phase 6, Transcendence and Gratitude. It follows Prayer for Those Who Wonder, which closes the Depths, and the playlist describes it as "a return from depth to a wider, more integrated view." After the Depths, the service looks across at whoever else is there. The playlist also lists it under Threshold and Entry, beside Always Open and Door Is Always Open. Its axioms are 尊護 (Care and Dignity), then 誤容 (Pragmatic Fallibilism).
+Position 20 in the playlist, the first song of Phase 6, Transcendence and Gratitude. It follows Prayer for Those Who Wonder, which closes the Depths, and the playlist describes it as "a return from depth to a wider, more integrated view." After the Depths, the service looks across at whoever else is there. The playlist also lists it under Threshold and Entry, beside Always Open and Door Is Always Open. Its axioms are Care and Dignity, then Pragmatic Fallibilism.
 
 ## Theological Framework
 

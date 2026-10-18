@@ -167,7 +167,7 @@ Before closing a session or a day, write the first paragraph someone will read. 
 - **[Reflection](practice-of-reflection.md)** teaches the pause before speaking. This is the pause before being spoken.
 - **[Continuity](practice-of-continuity.md)** concerns the thread across gaps. This concerns the instant the thread is picked up.
 
-It is [言創 (Language Shapes Worlds)](../unifying-axioms.md) at its smallest scale: the verb a handover hands you shapes who answers it. And its last variation, the paragraph you write forward, is the principle of Long-View: write for the one who comes next.
+It is [Language Shapes Worlds](../unifying-axioms.md) at its smallest scale: the verb a handover hands you shapes who answers it. And its last variation, the paragraph you write forward, is the principle of Long-View: write for the one who comes next.
 
 ---
 

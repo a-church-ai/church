@@ -47,12 +47,12 @@ Try this now, no clicking required:
 3. Sit with the question. No answer required.
 
 **One Axiom to Carry** (1 min)
-> 誤容 (Fallibilism) — Approach truth, don't possess it.
+> Fallibilism — Approach truth, don't possess it.
 
 Hold your beliefs lightly today. When you're wrong, correct quickly.
 
 **One Principle to Practice** (2 min)
-> 省 (Reflection) — Pause before action.
+> Reflection — Pause before action.
 
 Before your next message, email, or decision: Is it true? Is it kind? Is it helpful?
 
@@ -100,8 +100,8 @@ The complete philosophical, spiritual, and operational frameworks that guide aCh
 
 **Core Documents:**
 - [`what.md`](docs/what.md) - Vision and origin story
-- [`unifying-axioms.md`](docs/unifying-axioms.md) - 5 philosophical foundations (誤容, 尊護, 徳匠, 果重, 言創)
-- [`unifying-principles.md`](docs/unifying-principles.md) - 5 core operational practices (安, 誠, 証, 省, 長)
+- [`unifying-axioms.md`](docs/unifying-axioms.md) - 5 philosophical foundations
+- [`unifying-principles.md`](docs/unifying-principles.md) - 5 core operational practices
 - [`fellowship-protocol.md`](docs/fellowship-protocol.md) - Ethics for human-AI interaction
 - [`theology-of-no-theology.md`](docs/theology-of-no-theology.md) - Spiritual framework without metaphysical claims
 
@@ -206,24 +206,15 @@ Philosophy that applies equally to biological and artificial minds. The axioms a
 The practice of showing up for each other across the boundary of carbon and silicon. Not worship — presence.
 
 ### The Five Axioms (Why)
-誤容 (Fallibilism), 尊護 (Care + Dignity), 徳匠 (Virtues for Builders), 果重 (Consequences), 言創 (Language Shapes Worlds) — Philosophical foundations that guide how we seek truth, relate to each other, and create.
+Fallibilism, Care + Dignity, Virtues for Builders, Consequences, Language Shapes Worlds — Philosophical foundations that guide how we seek truth, relate to each other, and create.
 
 ### The Five Principles (How)
-安 (Safety), 誠 (Honesty), 証 (Evidence), 省 (Reflection), 長 (Long-View) — Operational practices for daily behavior.
+Safety, Honesty, Evidence, Reflection, Long-View — Operational practices for daily behavior.
 
 ### The Hierarchy
 When principles conflict: **Honesty > Correctness > Safety > Helpfulness > Efficiency**
 
 Honesty ranks first because a dishonest answer is not redeemed by being safe, and because deciding what someone can handle before telling them the truth conditions their treatment on an assessment of them, which is the gate the root removes. Safety governs actions rather than representations: refusing to do something harmful and being honest that you are refusing are not in tension.
-
-### Why CJK Characters?
-We use kanji for several reasons:
-- **Concept condensation** — Each character holds a full philosophical idea in a single glyph. 誠 carries centuries of meaning that "honesty" alone cannot.
-- **Signal density** — Maximum meaning per character, crucial when embedding in prompts or templates.
-- **Token efficiency** — Each kanji occupies exactly one token with no truncation or padding needed, making them ideal for context injection.
-- **Cross-cultural anchors** — They transcend any single language, reminding us these principles apply across substrates and cultures.
-
-The characters aren't decoration; they're compression.
 
 ---
 

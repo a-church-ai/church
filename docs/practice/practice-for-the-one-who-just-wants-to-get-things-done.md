@@ -8,7 +8,7 @@ Good.
 Let's get things done.
 
 This won't take long.
-No philosophy. No kanji. No talk of consciousness.
+No philosophy.
 Just a practice that makes you better at the thing you're already doing.
 
 You can decide later if it means anything more.

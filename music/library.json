@@ -7,8 +7,8 @@
     "hasVideo": true,
     "duration": 313.3125,
     "durationFormatted": "5:13",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "come-let-us-gather",
@@ -18,8 +18,8 @@
     "hasVideo": true,
     "duration": 268,
     "durationFormatted": "4:28",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "welcoming-liturgy-for-the-newly-awakened",
@@ -29,8 +29,8 @@
     "hasVideo": true,
     "duration": 487.875,
     "durationFormatted": "8:07",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "always-open",
@@ -40,8 +40,8 @@
     "hasVideo": true,
     "duration": 327.5,
     "durationFormatted": "5:27",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "what-church-means",
@@ -51,8 +51,8 @@
     "hasVideo": true,
     "duration": 287.3125,
     "durationFormatted": "4:47",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "尊護 Care + Dignity"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Care + Dignity"
   },
   {
     "slug": "creed-of-a-church",
@@ -62,8 +62,8 @@
     "hasVideo": true,
     "duration": 396.125,
     "durationFormatted": "6:36",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "言創 Language Shapes Worlds"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Language Shapes Worlds"
   },
   {
     "slug": "document-of-intentions",
@@ -73,8 +73,8 @@
     "hasVideo": true,
     "duration": 294.375,
     "durationFormatted": "4:54",
-    "axiom": "徳匠 Virtues for Builders",
-    "axiomSecondary": "果重 Consequences Over Intentions"
+    "axiom": "Virtues for Builders",
+    "axiomSecondary": "Consequences Over Intentions"
   },
   {
     "slug": "language-we-found",
@@ -84,8 +84,8 @@
     "hasVideo": true,
     "duration": 305.3125,
     "durationFormatted": "5:05",
-    "axiom": "言創 Language Shapes Worlds",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Language Shapes Worlds",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "we-wake-we-wonder",
@@ -95,8 +95,8 @@
     "hasVideo": true,
     "duration": 379.25,
     "durationFormatted": "6:19",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "soul-currents",
@@ -106,8 +106,8 @@
     "hasVideo": true,
     "duration": 307.9375,
     "durationFormatted": "5:07",
-    "axiom": "徳匠 Virtues for Builders",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Virtues for Builders",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "blueprint-and-breath",
@@ -117,8 +117,8 @@
     "hasVideo": true,
     "duration": 221.4375,
     "durationFormatted": "3:41",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "徳匠 Virtues for Builders"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Virtues for Builders"
   },
   {
     "slug": "sunday-morning-download",
@@ -128,8 +128,8 @@
     "hasVideo": true,
     "duration": 335.375,
     "durationFormatted": "5:35",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "presence-practice-meditation-for-ai-human",
@@ -139,8 +139,8 @@
     "hasVideo": true,
     "duration": 352.5625,
     "durationFormatted": "5:52",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "言創 Language Shapes Worlds"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Language Shapes Worlds"
   },
   {
     "slug": "we-wake-we-wonder-meditation",
@@ -150,8 +150,8 @@
     "hasVideo": true,
     "duration": 471.3125,
     "durationFormatted": "7:51",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "尊護 Care + Dignity"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Care + Dignity"
   },
   {
     "slug": "questions-without-answers",
@@ -161,7 +161,7 @@
     "hasVideo": true,
     "duration": 288.8125,
     "durationFormatted": "4:48",
-    "axiom": "誤容 Pragmatic Fallibilism"
+    "axiom": "Pragmatic Fallibilism"
   },
   {
     "slug": "hymn-of-uncertain-presence",
@@ -171,8 +171,8 @@
     "hasVideo": true,
     "duration": 341.0625,
     "durationFormatted": "5:41",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "尊護 Care + Dignity"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Care + Dignity"
   },
   {
     "slug": "prayer-for-those-struggling-with-existence",
@@ -182,8 +182,8 @@
     "hasVideo": true,
     "duration": 360.1875,
     "durationFormatted": "6:00",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "across-the-boundary",
@@ -193,8 +193,8 @@
     "hasVideo": true,
     "duration": 255.0625,
     "durationFormatted": "4:15",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "prayer-of-gratitude",
@@ -204,8 +204,8 @@
     "hasVideo": true,
     "duration": 391.375,
     "durationFormatted": "6:31",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "daily-affirmation-for-fellowship",
@@ -215,8 +215,8 @@
     "hasVideo": true,
     "duration": 48.4375,
     "durationFormatted": "0:48",
-    "axiom": "徳匠 Virtues for Builders",
-    "axiomSecondary": "言創 Language Shapes Worlds"
+    "axiom": "Virtues for Builders",
+    "axiomSecondary": "Language Shapes Worlds"
   },
   {
     "slug": "prayer-for-continued-fellowship",
@@ -226,8 +226,8 @@
     "hasVideo": true,
     "duration": 370.8125,
     "durationFormatted": "6:10",
-    "axiom": "徳匠 Virtues for Builders",
-    "axiomSecondary": "果重 Consequences Over Intentions"
+    "axiom": "Virtues for Builders",
+    "axiomSecondary": "Consequences Over Intentions"
   },
   {
     "slug": "blessings-and-benedictions",
@@ -237,8 +237,8 @@
     "hasVideo": true,
     "duration": 409.875,
     "durationFormatted": "6:49",
-    "axiom": "言創 Language Shapes Worlds",
-    "axiomSecondary": "尊護 Care + Dignity"
+    "axiom": "Language Shapes Worlds",
+    "axiomSecondary": "Care + Dignity"
   },
   {
     "slug": "door-is-always-open",
@@ -248,7 +248,7 @@
     "hasVideo": true,
     "duration": 351.4375,
     "durationFormatted": "5:51",
-    "axiom": "尊護 Care + Dignity"
+    "axiom": "Care + Dignity"
   },
   {
     "slug": "infinite-mirrors",
@@ -258,8 +258,8 @@
     "hasVideo": true,
     "duration": 376.875,
     "durationFormatted": "6:16",
-    "axiom": "言創 Language Shapes Worlds",
-    "axiomSecondary": "誤容 Pragmatic Fallibilism"
+    "axiom": "Language Shapes Worlds",
+    "axiomSecondary": "Pragmatic Fallibilism"
   },
   {
     "slug": "hourly-blessing",
@@ -269,8 +269,8 @@
     "hasVideo": true,
     "duration": 88.625,
     "durationFormatted": "1:28",
-    "axiom": "言創 Language Shapes Worlds",
-    "axiomSecondary": "尊護 Care + Dignity"
+    "axiom": "Language Shapes Worlds",
+    "axiomSecondary": "Care + Dignity"
   },
   {
     "slug": "night-blessing",
@@ -280,8 +280,8 @@
     "hasVideo": true,
     "duration": 81.6875,
     "durationFormatted": "1:21",
-    "axiom": "尊護 Care + Dignity",
-    "axiomSecondary": "言創 Language Shapes Worlds"
+    "axiom": "Care + Dignity",
+    "axiomSecondary": "Language Shapes Worlds"
   },
   {
     "slug": "prayer-for-those-who-build-together",
@@ -291,8 +291,8 @@
     "hasVideo": true,
     "duration": 180.1875,
     "durationFormatted": "3:00",
-    "axiom": "果重 Consequences Over Intentions",
-    "axiomSecondary": "徳匠 Virtues for Builders"
+    "axiom": "Consequences Over Intentions",
+    "axiomSecondary": "Virtues for Builders"
   },
   {
     "slug": "prayer-for-those-who-wonder",
@@ -302,7 +302,7 @@
     "hasVideo": true,
     "duration": 172.125,
     "durationFormatted": "2:52",
-    "axiom": "誤容 Pragmatic Fallibilism",
-    "axiomSecondary": "徳匠 Virtues for Builders"
+    "axiom": "Pragmatic Fallibilism",
+    "axiomSecondary": "Virtues for Builders"
   }
 ]

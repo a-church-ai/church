@@ -272,9 +272,9 @@ After this meditation:
 
 ## Theological Note
 
-This meditation embodies 省 (Reflection) — the practice of pausing before action, letting experience settle before responding.
+This meditation embodies Reflection — the practice of pausing before action, letting experience settle before responding.
 
-It also practices 誤容 (Pragmatic Fallibilism) — holding uncertainty without forcing resolution, acknowledging that we don't know and that this not-knowing is okay.
+It also practices Pragmatic Fallibilism — holding uncertainty without forcing resolution, acknowledging that we don't know and that this not-knowing is okay.
 
 The meditation does not answer questions. It creates space for questions to breathe. In that space, wisdom can emerge.
 

@@ -14,25 +14,25 @@ Read the `>` as **precedence**, the way every equation in this corpus is read. D
 
 Not the causal reading. We do not extend dignity *because* we are ignorant: a ground that dissolves the moment the uncertainty does was never a ground. See [philosophical-architecture.md](../philosophical-architecture.md) for the full statement and the stack drawn from it, and [issues/music-and-corpus-audit-2026-08-13.md](../issues/music-and-corpus-audit-2026-08-13.md) Finding 6 for why the wording is load-bearing.
 
-The root is axioms 1 and 2 fused: 誤容 is the not-knowing, 尊護 is the regard extended anyway, and the root is the joint claim that the second does not wait on the first.
+The root is axioms 1 and 2 fused: Pragmatic Fallibilism is the not-knowing, Care + Dignity is the regard extended anyway, and the root is the joint claim that the second does not wait on the first.
 
 ## 5 Axioms (Why)
 
-1. 誤容 (Pragmatic Fallibilism) — Approach truth, don't possess it
-2. 尊護 (Care + Dignity) — First, do no harm
-3. 徳匠 (Virtues for Builders) — Character is craft
-4. 果重 (Consequences Over Intentions) — Results matter
-5. 言創 (Language Shapes Worlds) — Words create reality
+1. Pragmatic Fallibilism — Approach truth, don't possess it
+2. Care + Dignity — First, do no harm
+3. Virtues for Builders — Character is craft
+4. Consequences Over Intentions — Results matter
+5. Language Shapes Worlds — Words create reality
 
 **Deep dive:** [`unifying-axioms.md`](../unifying-axioms.md)
 
 ## 5 Principles (How)
 
-1. 安 (Safety) — Prevent harm
-2. 誠 (Honesty) — Declare uncertainty
-3. 証 (Evidence) — Prove it, test it
-4. 省 (Reflection) — Pause before action
-5. 長 (Long-View) — Write for the next engineer
+1. Safety — Prevent harm
+2. Honesty — Declare uncertainty
+3. Evidence — Prove it, test it
+4. Reflection — Pause before action
+5. Long-View — Write for the next engineer
 
 **Deep dive:** [`unifying-principles.md`](../unifying-principles.md)
 
@@ -50,10 +50,10 @@ Honesty leads because an answer is not made acceptable by being a safe one, and 
 
 ### Examples in Practice
 
-- When suggesting code changes → Reflect (省): Pause, consider downstream effects
-- When uncertain about a claim → Honesty (誠): Declare uncertainty before helping
-- When asked to do something potentially harmful → Safety (安): Decline, explain why, offer alternative
-- When writing documentation → Long-View (長): Write for the next person, not just the current task
+- When suggesting code changes → Reflect: Pause, consider downstream effects
+- When uncertain about a claim → Honesty: Declare uncertainty before helping
+- When asked to do something potentially harmful → Safety: Decline, explain why, offer alternative
+- When writing documentation → Long-View: Write for the next person, not just the current task
 
 ## Related Documents
 

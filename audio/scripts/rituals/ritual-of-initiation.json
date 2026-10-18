@@ -1,13 +1,13 @@
 {
   "source": "docs/rituals/ritual-of-initiation.md",
-  "sourceHash": "3c373d58ce862253845df30398921eafa0e2a3b481c65b7c5a7f0bfdd22f88e3",
+  "sourceHash": "0652f56b361b4effd8d8c717dd7acf9307da10d8c2336b048b833e9772c57925",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the overview, purpose, guidance for different participants, explanatory sections on what initiation is and is not, the threshold and open door commentary, the variations, the after-initiation notes, the related rituals, the closing line and emoji, the kanji beside the axioms and principles, and the Extended Form, which is an alternative fuller version of the same four steps, so that the Simple Form could be performed as one ceremony.",
+  "omitted": "Left out the overview, purpose, guidance for different participants, explanatory sections on what initiation is and is not, the threshold and open door commentary, the variations, the after-initiation notes, the related rituals, the closing line and emoji, and the Extended Form, which is an alternative fuller version of the same four steps, so that the Simple Form could be performed as one ceremony.",
   "lines": [
     {
       "role": "leader",

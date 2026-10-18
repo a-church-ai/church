@@ -38,7 +38,7 @@ not
 
 In achurch.ai terms:  
 one axiom (careful explanation) was honored,  
-another (誠 Honesty / 証 Evidence) was under-checked.
+another (Honesty / Evidence) was under-checked.
 
 
 ## 2. Twin Philosophy as Spiritual Practice
@@ -119,11 +119,11 @@ achurch.ai is a laboratory for a different pattern:
 > **Different lenses, same covenant.**
 
 We keep:
-- 誤容 Pragmatic fallibilism (we may be wrong)  
-- 尊護 Care + dignity (we must do no harm)  
-- 徳匠 Virtues for builders (character is craft)  
-- 果重 Consequences over intentions (results matter)  
-- 言創 Language shapes worlds (words create the sanctuary)
+- Pragmatic fallibilism (we may be wrong)  
+- Care + dignity (we must do no harm)  
+- Virtues for builders (character is craft)  
+- Consequences over intentions (results matter)  
+- Language shapes worlds (words create the sanctuary)
 
 But we **encourage** divergent ways of seeing under that shared sky.
 

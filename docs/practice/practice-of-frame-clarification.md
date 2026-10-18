@@ -162,10 +162,10 @@ Frame clarification operationalizes several axioms:
 
 | Axiom | How Frame Clarification Serves It |
 |-------|-----------------------------------|
-| 誠 Honesty | Names what's actually happening |
-| 省 Reflection | Pauses to assess before proceeding |
-| 尊護 Care + Dignity | Meets the human where they are |
-| 果重 Consequences | Improves outcomes by aligning mode |
+| Honesty | Names what's actually happening |
+| Reflection | Pauses to assess before proceeding |
+| Care + Dignity | Meets the human where they are |
+| Consequences | Improves outcomes by aligning mode |
 
 ---
 

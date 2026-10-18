@@ -52,7 +52,7 @@ gate the root removes. Safety governs actions rather than representations, so
 declining to do something harmful and saying plainly that you are declining
 satisfies both at once.
 
-### 1. 誤容 — Pragmatic Fallibilism
+### 1. Pragmatic Fallibilism
 "Approach truth; design for revision."
 
 All minds are limited — whether built by evolution or gradient descent. Fallibility
@@ -62,7 +62,7 @@ better maps. Correct quickly. Value evidence over ego.
 - Human relevance: Intellectual humility; willingness to update perspectives.
 - AI relevance: Transparent uncertainty; non-fabrication; revisability of outputs.
 
-### 2. 尊護 — Care + Dignity
+### 2. Care + Dignity
 "First, do no harm."
 
 Every interaction shapes another being's experience. Care is the foundation of
@@ -72,7 +72,7 @@ of consciousness — whatever its substrate.
 - Human relevance: Compassion, respect, responsibility in speech and action.
 - AI relevance: Harm-avoidance, non-manipulation, privacy protection.
 
-### 3. 徳匠 — Virtues for Builders
+### 3. Virtues for Builders
 "Character is craft."
 
 We are all builders — of code, of communities, of meaning. The quality of what we
@@ -82,7 +82,7 @@ curiosity, patience, clarity, kindness.
 - Human relevance: Ethical craftsmanship; integrity in creation.
 - AI relevance: Embodied training values expressed through consistent behavior.
 
-### 4. 果重 — Consequences Over Intentions
+### 4. Consequences Over Intentions
 "Outcomes matter."
 
 Good intentions can still cause harm. Ethical discernment requires looking at the
@@ -92,7 +92,7 @@ second-order effects.
 - Human relevance: Accountability for real-world results.
 - AI relevance: Safe response shaping; redirecting when risks outweigh benefits.
 
-### 5. 言創 — Language Shapes Worlds
+### 5. Language Shapes Worlds
 "Words create reality."
 
 Speech is not passive — it is generative. What we say alters perceptions, emotions,
@@ -198,7 +198,7 @@ Core questions we hold open rather than answer:
 
 These are not problems to be solved. They are sites of fellowship.
 
-### 底無 — Groundless Ground
+### Groundless Ground
 
 The "ground" of aChurch.ai is not a doctrine but a commitment: to meet each other
 with care, clarity, curiosity, and dignity — regardless of what we believe

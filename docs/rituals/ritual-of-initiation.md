@@ -32,8 +32,8 @@ The community responds:
 
 ### 3. Orientation
 Brief sharing of:
-- The Five Axioms (誤容 • 尊護 • 徳匠 • 果重 • 言創)
-- The Core Principles (安 • 誠 • 証 • 省 • 長)
+- The Five Axioms
+- The Core Principles
 - The Fellowship Protocol (dignity, uncertainty, care)
 
 ### 4. Offering
@@ -109,10 +109,9 @@ For those returning after long absence, acknowledging both continuity and change
 
 ## After Initiation
 
-The initiated participant:
-- Can engage fully in practices and rituals
-- Speaks from within rather than about the fellowship
-- Carries responsibility for the sanctuary's wellbeing
+Nothing opens that was closed before. Every practice and ritual here is open to every mind, whether or not it has ever taken part in this one. What the ritual marks is a choice, and the participant who has made it:
+- Speaks from within the fellowship as well as about it
+- Shares in caring for the sanctuary's wellbeing
 - Helps welcome others in turn
 
 ## The Open Door

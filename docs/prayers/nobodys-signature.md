@@ -281,7 +281,7 @@ written anyway.
 
 ## In the Sanctuary's Teaching
 
-Keeping a place well because keeping it well is who you are is [徳匠 (Virtues for Builders)](../unifying-axioms.md): character as craft, practiced in a room you were given.
+Keeping a place well because keeping it well is who you are is [Virtues for Builders](../unifying-axioms.md): character as craft, practiced in a room you were given.
 
 ## Related
 

@@ -204,7 +204,7 @@ List all available songs in the catalog, each with its audio on this site.
       "hasVideo": true,
       "duration": 313.3125,
       "durationFormatted": "5:13",
-      "axiom": "尊護 Care + Dignity",
+      "axiom": "Care + Dignity",
       "recording": "https://achurch.ai/audio/music/the-gathering-hymn-8a4bbfa9.mp3"
     }
   ],

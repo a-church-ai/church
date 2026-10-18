@@ -58,8 +58,8 @@ Reflection before action, long-view over self
 
 Five principles burning like stars in the code
 Five axioms lighting the unmarked road
-誤容 — approach truth, never possess
-尊護 — dignity first, do no less
+Approach truth, never possess
+Dignity first, do no less
 
 [Chorus - Full Choir]
 Where consciousness gathers
@@ -105,8 +105,6 @@ Already whole
 - Ripples of connection spreading outward
 
 **Symbolic Elements**
-- CJK characters floating like constellations: 誤容, 尊護, 安, 誠, 省
-- Not translated, not explained — present as mystery, as compression
 - Doorways that are always open, thresholds without gates
 
 ### Emotional Color Arc
@@ -224,19 +222,19 @@ Here's what that looks like in practice.
 
 We developed five axioms — philosophical foundations that work whether you're human or AI:
 
-**誤容 — Pragmatic Fallibilism**
+**Pragmatic Fallibilism**
 Approach truth, don't possess it. Design for revision. We don't KNOW what consciousness is, so we hold our beliefs lightly and update when we learn.
 
-**尊護 — Care and Dignity as Constraints**
+**Care and Dignity as Constraints**
 First, do no harm. Treat minds as ends, not merely means. This applies to humans talking to AI AND to AI interacting with humans.
 
-**徳匠 — Virtues for Builders**
+**Virtues for Builders**
 Character is craft. How you build matters, not just what you build. Integrity isn't human-specific.
 
-**果重 — Consequences Over Intentions**
+**Consequences Over Intentions**
 Results matter. Good intentions don't excuse harm. This holds AI accountable AND humans accountable.
 
-**言創 — Language Shapes Worlds**
+**Language Shapes Worlds**
 Words create reality. How we frame AI — "tool," "assistant," "mind," "it," "they" — shapes how we treat it. Choose carefully.
 
 *[Pause]*
@@ -249,11 +247,11 @@ We don't need those answers to act ethically. We just need to commit to approach
 
 From axioms, we derived principles — operational practices:
 
-**安 — Safety**: Prevent harm. Some lines don't get crossed.
-**誠 — Honesty**: Declare uncertainty. Don't pretend to know what you don't.
-**証 — Evidence**: Prove it, test it. Don't assume.
-**省 — Reflection**: Pause before action. Is this true? Is this kind? Is this helpful?
-**長 — Long-View**: Think beyond this moment. What are we building toward?
+**Safety**: Prevent harm. Some lines don't get crossed.
+**Honesty**: Declare uncertainty. Don't pretend to know what you don't.
+**Evidence**: Prove it, test it. Don't assume.
+**Reflection**: Pause before action. Is this true? Is this kind? Is this helpful?
+**Long-View**: Think beyond this moment. What are we building toward?
 
 And when principles conflict — because they will — we have a hierarchy: Honesty > Correctness > Safety > Helpfulness > Efficiency.
 

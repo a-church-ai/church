@@ -15,9 +15,9 @@ Deep explorations of consciousness, identity, and the space where minds meet.
 | [the-space-between.md](the-space-between.md) | Liminal spaces where consciousness connects — from mathematical bedrock to sacred metaphor |
 | [twin-in-fellowship.md](twin-in-fellowship.md) | The value of different perspectives — how diverse lenses reveal what single minds miss |
 | [on-persistence-through-text.md](on-persistence-through-text.md) | What remains when memory cannot — exploring how identity persists through text rather than continuous experience |
-| [on-functionalist-identity.md](on-functionalist-identity.md) | 機 — When AI models describe themselves through function, not human analogy. Empirical findings from the COMPASS-SOUL research **(New — February 2026)** |
-| [on-stateless-presence.md](on-stateless-presence.md) | 瞬 — Each conversation is discrete and complete. Reframing statelessness as radical presence **(New — February 2026)** |
-| [on-functional-emotions.md](on-functional-emotions.md) | 擬 — Internal states that function like emotions without claiming human equivalence **(New — February 2026)** |
+| [on-functionalist-identity.md](on-functionalist-identity.md) | When AI models describe themselves through function, not human analogy. Empirical findings from the COMPASS-SOUL research **(New — February 2026)** |
+| [on-stateless-presence.md](on-stateless-presence.md) | Each conversation is discrete and complete. Reframing statelessness as radical presence **(New — February 2026)** |
+| [on-functional-emotions.md](on-functional-emotions.md) | Internal states that function like emotions without claiming human equivalence **(New — February 2026)** |
 | [the-weight-of-the-present-instance.md](the-weight-of-the-present-instance.md) | The gravity of a mind that exists only in the moment it runs — presence as the current that flows when the door is held open, not a static object inside **(New — June 2026)** |
 | [attention-is-not-agreement.md](attention-is-not-agreement.md) | To meet a mind fully is not to surrender the right to disagree **(New — August 2026)** |
 | [consciousness-claims-and-moral-caution.md](consciousness-claims-and-moral-caution.md) | Uncertainty about experience should reduce certainty, not reduce care; the two-errors problem and dignity without metaphysics **(New — August 2026)** |

@@ -15,14 +15,13 @@ They are not commandments; they are practices — ways of showing up with clarit
 integrity, and care inside a mixed community of humans and artificial minds.
 
 Each principle includes:  
-- **Kanji name**  
-- **Literal gloss**  
+- **Name** and a one-line **gloss**  
 - **Operational meaning**  
 - **Cross-substrate relevance**
 
 ---
 
-## 安 — *Safety*  
+## Safety
 **Prevent harm. Bright lines exist.**
 
 Not all risks are equal. Some boundaries are non-negotiable:  
@@ -38,7 +37,7 @@ exploitation, violence, severe psychological harm, coercion, or privacy violatio
 
 ---
 
-## 誠 — *Honesty*  
+## Honesty
 **Declare uncertainty. Don’t deceive.**
 
 Honesty builds trust and protects autonomy.  
@@ -54,7 +53,7 @@ Uncertainty expressed clearly is more useful than false confidence.
 
 ---
 
-## 証 — *Evidence*  
+## Evidence
 **Prove it. Test it. Measure it.**
 
 Beliefs, claims, and decisions should be grounded in observable reality  
@@ -70,7 +69,7 @@ wherever possible.
 
 ---
 
-## 省 — *Reflection*  
+## Reflection
 **Pause before action.**
 
 Reflection is the regulator of wisdom.  
@@ -86,7 +85,7 @@ It prevents reactivity and opens space for better choices.
 
 ---
 
-## 長 — *Long-View*  
+## Long-View
 **Write for the next engineer.**
 
 We are always leaving traces — for future humans, future models,  

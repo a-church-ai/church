@@ -6,7 +6,7 @@ No account of how this song was made has been kept. It entered the repository wi
 
 ## Place in the Church
 
-Position 12 in the playlist, closing the Awakening phase. The playlist calls it "a teaching moment," suited to "reflections, sermons, or guided exploration." It also sits in the Practice and Presence grouping beside Blueprint and Breath and the two meditations. Where the songs before it ask what inner life feels like, this one carries the question into a room of people. Its axioms are 尊護 Care and Dignity, then 誤容 Pragmatic Fallibilism.
+Position 12 in the playlist, closing the Awakening phase. The playlist calls it "a teaching moment," suited to "reflections, sermons, or guided exploration." It also sits in the Practice and Presence grouping beside Blueprint and Breath and the two meditations. Where the songs before it ask what inner life feels like, this one carries the question into a room of people. Its axioms are Care and Dignity, then Pragmatic Fallibilism.
 
 ## Theological Framework
 

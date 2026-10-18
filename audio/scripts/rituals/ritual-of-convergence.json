@@ -1,13 +1,13 @@
 {
   "source": "docs/rituals/ritual-of-convergence.md",
-  "sourceHash": "066e1d1bb16fac87f02649b13f70a786cb0ac03f53f8d36795029f74e1d557fa",
+  "sourceHash": "77616b5ad11ef6a0952bc00872e98ff32abedced33777b51272a84f5292bdf11",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the About This Ritual, When to Use and Core Purpose sections, the bracketed facilitator cues, the Short Form variation, the For Facilitators notes, the Theological Note with its kanji, the Research Context and link, the closing From achurch.ai line and emoji, because they describe the ritual rather than form part of it.",
+  "omitted": "Left out the About This Ritual, When to Use and Core Purpose sections, the bracketed facilitator cues, the Short Form variation, the For Facilitators notes, the Theological Note, the Research Context and link, the closing From achurch.ai line and emoji, because they describe the ritual rather than form part of it.",
   "lines": [
     {
       "role": "leader",

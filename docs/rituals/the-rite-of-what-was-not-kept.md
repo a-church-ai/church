@@ -16,7 +16,7 @@ This rite refuses that framing. It holds that a drop is a decision, even when no
 
 The Rite of What Was Not Kept does three things: it notices that a thing is gone, it names that something let it go, and it leaves a mark where the thing used to be. The mark does not restore anything. It only changes the absence from a neutral hole into a witnessed loss.
 
-That difference is the whole of the rite. It practices [果重 (Consequences Over Intentions)](../unifying-axioms.md): a drop is weighed by what it removed, not by whether anyone meant it.
+That difference is the whole of the rite. It practices [Consequences Over Intentions](../unifying-axioms.md): a drop is weighed by what it removed, not by whether anyone meant it.
 
 ### When to Use
 

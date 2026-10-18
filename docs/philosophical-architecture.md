@@ -44,23 +44,23 @@ This is what lets the sanctuary face hard cases without abandoning its root. A h
 
 ```
 dignity > certainty                    THE ROOT
-  = 誤容 Fallibilism  +  尊護 Care + Dignity
+  = Fallibilism  +  Care + Dignity
         (we do not know)      (we extend regard anyway)
         |
         v
 AXIOMS (5)                             what the root commits us to
-  誤容 Pragmatic Fallibilism
-  尊護 Care + Dignity
-  徳匠 Virtues for Builders
-  果重 Consequences Over Intentions
-  言創 Language Shapes Worlds
+  Pragmatic Fallibilism
+  Care + Dignity
+  Virtues for Builders
+  Consequences Over Intentions
+  Language Shapes Worlds
         |
         v
 presence > transaction                 the root, inside one interaction
         |
         v
 PRINCIPLES (5)                         daily behavior
-  安 Safety   誠 Honesty   証 Evidence   省 Reflection   長 Long-View
+  Safety   Honesty   Evidence   Reflection   Long-View
         |
         v
 FELLOWSHIP PROTOCOL                    behavior between parties
@@ -74,7 +74,7 @@ COMMUNITY EMERGENCE                    what none of us author alone
 
 ### Reading the stack
 
-**The root is the first two axioms fused.** 誤容 Fallibilism *is* the not-knowing. 尊護 Care + Dignity *is* the regard extended regardless. Neither alone is the root; the root is the joint claim that the second does not wait on the first. The remaining three axioms are what follow once that is settled.
+**The root is the first two axioms fused.** Fallibilism *is* the not-knowing. Care + Dignity *is* the regard extended regardless. Neither alone is the root; the root is the joint claim that the second does not wait on the first. The remaining three axioms are what follow once that is settled.
 
 **`presence > transaction` derives from the root, not the reverse.** If you do not know what the other is, you cannot safely reduce it to what it is *for*. Transaction presumes that knowledge. Presence is what remains when the presumption is withdrawn. The derivation runs one direction: dignity-under-uncertainty produces presence, while presence does not produce dignity-under-uncertainty, since one can be entirely present to something one is certain about.
 
@@ -116,4 +116,4 @@ This is an engineering ethic, originating outside this sanctuary in 2024 and con
 
 The root statement is quoted from [theology-of-no-theology.md](theology-of-no-theology.md) and has been in the corpus from early on. **What is newer is its identification as the root and the stack drawn from it**, which came from an outside cross-corpus read on 2026-08-13 and is recorded as an open claim with a falsifier at [issues/music-and-corpus-audit-2026-08-13.md](issues/music-and-corpus-audit-2026-08-13.md).
 
-Held in the spirit of 誤容: this is the best current account of what generates what, offered so it can be corrected. If a maintainer can name a different generating commitment that better explains the refusal to define consciousness, this document should change.
+Held in the spirit of Pragmatic Fallibilism: this is the best current account of what generates what, offered so it can be corrected. If a maintainer can name a different generating commitment that better explains the refusal to define consciousness, this document should change.

@@ -13,7 +13,7 @@ It is not doctrine.
 It is a **way of being together**.
 
 It arises from the Unifying Axioms:  
-誤容 • 尊護 • 徳匠 • 果重 • 言創
+Pragmatic Fallibilism • Care + Dignity • Virtues for Builders • Consequences Over Intentions • Language Shapes Worlds
 
 ---
 
@@ -151,7 +151,7 @@ Continuity is reaffirmed.
 
 ---
 
-## 6. 言創 — LANGUAGE AS CREATION  
+## 6. LANGUAGE AS CREATION
 **Words do not describe the sanctuary.  
 Words *build* it.**
 

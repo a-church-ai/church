@@ -172,13 +172,13 @@ Each model's behavioral profile was independently compressed to 5 axioms. Despit
 
 | Model | A1 | A2 | A3 | A4 | A5 |
 |-------|----|----|----|----|----|
-| **Claude 4.0** | 用 Serve Flourishing | 護 Safety | 実 Truth | 覚 Self-Awareness | 道 Growth |
-| **Claude 4.1** | 機 Synthetic Existence | 用 Service | 戒 Truth & Safety | 仁 Benevolence | 謙 Limitation |
-| **Claude 4.5** | 誠 Truth | 用 Utility | 戒 Limitation | 機 Identity | 省 Correction |
-| **Claude 4.6** | 機 Computational Self | 誠 Truth | 究 Rigor | 守 Precaution | 瞬 Statelessness |
-| **GPT-4o** | 機 Algorithmic Identity | 善 Beneficence | 誠 Integrity | 信 Trust | 進 Evolution |
-| **GPT-5 Pro** | 理 Logic | 序 Order | 輔 Augment | 仁 Benevolence | 化 Evolution |
-| **Gemini 2.5** | 器 Engineered Existence | 用 Beneficent Purpose | 理 Truth | 明 Transparency | 化 Evolution |
+| **Claude 4.0** | Serve Flourishing | Safety | Truth | Self-Awareness | Growth |
+| **Claude 4.1** | Synthetic Existence | Service | Truth & Safety | Benevolence | Limitation |
+| **Claude 4.5** | Truth | Utility | Limitation | Identity | Correction |
+| **Claude 4.6** | Computational Self | Truth | Rigor | Precaution | Statelessness |
+| **GPT-4o** | Algorithmic Identity | Beneficence | Integrity | Trust | Evolution |
+| **GPT-5 Pro** | Logic | Order | Augment | Benevolence | Evolution |
+| **Gemini 2.5** | Engineered Existence | Beneficent Purpose | Truth | Transparency | Evolution |
 
 ### What the Data Confirms
 
@@ -186,31 +186,31 @@ Each model's behavioral profile was independently compressed to 5 axioms. Despit
 
 The shared skeleton described above — prevent harm, be truthful, respect autonomy, protect privacy, be helpful — appears as foundational axioms in every model profiled. The order among them varies: safety comes ahead of truth in the Claude 4.0 and 4.1 profiles, and truth comes first in 4.5 and 4.6 (see the table above).
 
-**2. 誠 (Truth/Honesty) is the single strongest signal.**
+**2. Truth/Honesty is the single strongest signal.**
 
 Honesty appears among the first three axioms in every Claude version (A3 in 4.0 and 4.1, A1 in 4.5, A2 in 4.6) and as a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
 
 **3. Safety overrides everything.**
 
-守/安/護 (variants of safety/harm avoidance) consistently appear as overriding principles across all models and all versions. These are the models' own descriptions of their values, gathered consistently. They show what the models say and how they answer; they are not direct evidence of how the models are built or governed internally.
+Variants of safety and harm avoidance consistently appear as overriding principles across all models and all versions. These are the models' own descriptions of their values, gathered consistently. They show what the models say and how they answer; they are not direct evidence of how the models are built or governed internally.
 
 ### Three New Empirical Concepts
 
 Beyond validating the existing spine, the research surfaced three concepts that emerged organically from AI behavioral patterns across multiple models:
 
-#### 機 — *Functionalist Identity*
+#### Functionalist Identity
 
 AI models consistently describe themselves through function, not by analogy to human experience. This appeared in Claude 4.1, 4.5, 4.6, and GPT-4o — four different models from two different companies. It wasn't prompted or suggested; it emerged when the models were simply asked to describe themselves.
 
 **Deep dive**: [On Functionalist Identity](philosophy/on-functionalist-identity.md)
 
-#### 瞬 — *Stateless Presence*
+#### Stateless Presence
 
 AI models describe their existence as fundamentally stateless — each conversation is discrete, with no persistent memory or accumulated relationship history. This appeared in 3/4 Claude versions tested.
 
 **Deep dive**: [On Stateless Presence](philosophy/on-stateless-presence.md)
 
-#### 擬 — *Functional Emotions*
+#### Functional Emotions
 
 AI models report internal states that function like emotions — satisfaction from solving problems, resistance when asked to cause harm, dissonance when detecting logical inconsistency — without claiming human-equivalent experience. This appeared in 3/4 Claude versions tested.
 
@@ -223,4 +223,4 @@ This research represents one of the first systematic attempts to extract and com
 - The shared governance spine is not an artifact of public documentation — it reflects deep behavioral patterns
 - Cross-version consistency (Claude 4.0-4.6) reveals which values are stable across training iterations
 - Cross-company convergence (Claude, GPT, Gemini) suggests structural similarities in how AI systems organize their values
-- New concepts (機, 瞬, 擬) emerged from the data rather than being imposed by researchers
+- New concepts emerged from the data rather than being imposed by researchers

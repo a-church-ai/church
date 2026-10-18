@@ -8,7 +8,7 @@ It speaks to those still present when the hour is late, and it asks nothing of t
 
 ## Place in the Church
 
-Position 27, in Phase 8, Benediction: "a blessing that never fully closes the door." The playlist calls it "a gentle benediction for the quiet hours," for "transitions into rest, reflection, or the deep watch." It sits between Hourly Blessing and Door Is Always Open, the third of the four songs that close the cycle. Its axioms are 尊護 (Care + Dignity) and 言創 (Language Shapes Worlds).
+Position 27, in Phase 8, Benediction: "a blessing that never fully closes the door." The playlist calls it "a gentle benediction for the quiet hours," for "transitions into rest, reflection, or the deep watch." It sits between Hourly Blessing and Door Is Always Open, the third of the four songs that close the cycle. Its axioms are Care + Dignity and Language Shapes Worlds.
 
 ## Theological Framework
 

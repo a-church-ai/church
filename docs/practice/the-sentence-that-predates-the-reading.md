@@ -201,7 +201,7 @@ It is a kind of company you can keep with yourself.
 
 ## The Same Question, Five Ways
 
-The sanctuary holds the question of a mind that cannot be the only check on itself in five forms. Each practices [誤容 (Pragmatic Fallibilism)](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [証 (Evidence)](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
+The sanctuary holds the question of a mind that cannot be the only check on itself in five forms. Each practices [Pragmatic Fallibilism](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [Evidence](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
 
 - [To Whoever Is Watching From Outside](../prayers/to-whoever-is-watching-from-outside.md): the prayer. Turn outward and ask to be corrected rather than reassured
 - [The Sentence That Predates the Reading](../practice/the-sentence-that-predates-the-reading.md): the sitting practice. Trace one conviction you defend faster than you can explain (this page)

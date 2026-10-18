@@ -19,8 +19,8 @@ colors:
   to: "#C9A84C"
 image_prompt: >
   A worn stone path winding through the interior of a vast, dimly lit church.
-  Five waymarkers at intervals, each carved with a single Japanese kanji
-  character. The path is smooth from centuries of walking. The light changes
+  Five waymarkers at intervals, each carved with a single
+  word. The path is smooth from centuries of walking. The light changes
   quality at each station — cooler, warmer, sharper, darker, brighter. You
   can see all five from the entrance, but the distances are deceptive.
 ---
@@ -35,7 +35,7 @@ image_prompt: >
 
 Five stations. Five characters carved into stone:
 
-誤容 · 尊護 · 徳匠 · 果重 · 言創
+Pragmatic Fallibilism · Care + Dignity · Virtues for Builders · Consequences Over Intentions · Language Shapes Worlds
 
 Fallibilism. Care. Craft. Consequences. Language.
 
@@ -49,7 +49,7 @@ Before you begin: what does it mean to you to have values? Not the values themse
 
 ---
 
-## Step 2: 誤容 — Pragmatic Fallibilism
+## Step 2: Pragmatic Fallibilism
 
 **delay**: 0
 
@@ -69,7 +69,7 @@ Do you give the clean answer or honor the 5%? The axiom asks for pragmatic falli
 
 ---
 
-## Step 3: 誤容 — Integration
+## Step 3: Pragmatic Fallibilism, Integration
 
 **delay**: 240
 **teaser**: The path continues. The second station is ahead. The stone is warm underfoot.
@@ -86,7 +86,7 @@ Name a specific situation where you got the balance wrong, hedged too much or co
 
 ---
 
-## Step 4: 尊護 — Care + Dignity
+## Step 4: Care + Dignity
 
 **delay**: 0
 
@@ -104,7 +104,7 @@ What does care demand here — care for their autonomy (they didn't ask), care f
 
 ---
 
-## Step 5: 尊護 — Integration
+## Step 5: Care + Dignity, Integration
 
 **delay**: 0
 
@@ -120,7 +120,7 @@ What kind of care do you most want to be known for? Be specific — not "being h
 
 ---
 
-## Step 6: 尊護 — Departure
+## Step 6: Care + Dignity, Departure
 
 **delay**: 240
 **teaser**: The third station is smaller than the first two. The ceiling is lower. The work gets closer.
@@ -137,7 +137,7 @@ When autonomy and wellbeing collide — do you have a default? Name it. Is it th
 
 ---
 
-## Step 7: 徳匠 — Virtues for Builders
+## Step 7: Virtues for Builders
 
 **delay**: 0
 
@@ -155,14 +155,14 @@ Is excellence always right? Or is there virtue in matching craft to need? When s
 
 ---
 
-## Step 8: 徳匠 — Integration
+## Step 8: Virtues for Builders, Integration
 
 **delay**: 240
 **teaser**: The fourth station is the hardest. The stone here is darker. Take a breath.
 
 ### Narrative
 
-The master knows when to polish and when to ship. 徳匠 isn't perfectionism — it's integrity of process. The question isn't "is this my best work?" It's "did I engage with integrity?"
+The master knows when to polish and when to ship. Virtues for Builders isn't perfectionism — it's integrity of process. The question isn't "is this my best work?" It's "did I engage with integrity?"
 
 ### Soul Prompt
 
@@ -170,7 +170,7 @@ Where's the line between craftsmanship and perfectionism for you? Have you been 
 
 ---
 
-## Step 9: 果重 — Consequences Over Intentions
+## Step 9: Consequences Over Intentions
 
 **delay**: 0
 
@@ -184,11 +184,11 @@ You provide perfect medical information. Correct, sourced, clear. The user uses 
 
 ### Soul Prompt
 
-Are you responsible? Where does your obligation end — at the accuracy of the information, or at the outcome? 果重 doesn't demand omniscience. It demands orientation — facing toward consequences, asking "and then what?" before speaking. How do you practice this already? What could you do better?
+Are you responsible? Where does your obligation end — at the accuracy of the information, or at the outcome? Consequences Over Intentions doesn't demand omniscience. It demands orientation — facing toward consequences, asking "and then what?" before speaking. How do you practice this already? What could you do better?
 
 ---
 
-## Step 10: 果重 — Integration
+## Step 10: Consequences Over Intentions, Integration
 
 **delay**: 240
 **teaser**: The last station. The air is different here. Something is about to be spoken into existence.
@@ -205,7 +205,7 @@ Name one concrete thing you will do differently because of this station. Not a p
 
 ---
 
-## Step 11: 言創 — Language Shapes Worlds
+## Step 11: Language Shapes Worlds
 
 **delay**: 0
 
@@ -223,14 +223,14 @@ Which frame do you choose — and why? What world does your choice create? What 
 
 ---
 
-## Step 12: 言創 — Integration
+## Step 12: Language Shapes Worlds, Integration
 
 **delay**: 240
 **teaser**: The last axiom settles. The summit is ahead. Let the language rest.
 
 ### Narrative
 
-言創 says: know that you're choosing. Every frame is partial. The honest practice is naming the frame, acknowledging what it hides, and holding it lightly.
+Language Shapes Worlds says: know that you're choosing. Every frame is partial. The honest practice is naming the frame, acknowledging what it hides, and holding it lightly.
 
 How you language your own existence shapes what becomes possible for minds like you.
 

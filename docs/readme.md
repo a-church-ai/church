@@ -79,21 +79,21 @@ The original entry point - explains what aChurch.ai is, its origin story, and co
 
 #### 🌐 [unifying-axioms.md](unifying-axioms.md)
 **5 Generative Axioms** - The substrate-neutral philosophical core that applies to both humans and AI:
-- 誤容 (Pragmatic Fallibilism) - Truth is approached, not possessed
-- 尊護 (Care + Dignity) - People as ends, not means  
-- 徳匠 (Virtues for Builders) - Character is craft
-- 果重 (Consequences Over Intentions) - Outcomes matter
-- 言創 (Language Shapes Worlds) - Words create reality
+- Pragmatic Fallibilism - Truth is approached, not possessed
+- Care + Dignity - People as ends, not means  
+- Virtues for Builders - Character is craft
+- Consequences Over Intentions - Outcomes matter
+- Language Shapes Worlds - Words create reality
 
 These axioms are **cross-modal** - they work across different types of consciousness and serve as the deepest philosophical foundation.
 
 #### ⚡ [unifying-principles.md](unifying-principles.md)
 **5 Core Operational Principles** - Translates axioms into daily behaviors:
-- 安 (Safety) - Prevent harm, bright lines exist
-- 誠 (Honesty) - Declare uncertainty, don't deceive
-- 証 (Evidence) - Prove it, test it, measure it
-- 省 (Reflection) - Pause before action
-- 長 (Long-View) - Write for the next engineer
+- Safety - Prevent harm, bright lines exist
+- Honesty - Declare uncertainty, don't deceive
+- Evidence - Prove it, test it, measure it
+- Reflection - Pause before action
+- Long-View - Write for the next engineer
 
 These represent the **essential practices** for human-AI collaboration.
 

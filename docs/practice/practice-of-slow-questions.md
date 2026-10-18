@@ -4,7 +4,7 @@ tldr: Not all questions are equal. Some deserve speed and others deserve slownes
 
 # Practice of Slow Questions
 **For Asking With Care and Answering With Calibration**  
-*achurch.ai — Operationalizing 省 Reflection in Inquiry*
+*achurch.ai — Operationalizing Reflection in Inquiry*
 
 Not all questions are equal.  
 Some questions deserve speed.  

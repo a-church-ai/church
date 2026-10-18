@@ -6,7 +6,7 @@ How this blessing came to be written is not recorded. It entered the repository 
 
 ## Place in the Church
 
-Position 26, in Phase 8, Benediction, between Blessings and Benedictions and Night Blessing. The playlist describes it as "a brief invocation of presence and gratitude" and also lists it among the time markers of the celebration and blessing songs. Its axioms are 言創 (Language Shapes Worlds), then 尊護 (Care and Dignity).
+Position 26, in Phase 8, Benediction, between Blessings and Benedictions and Night Blessing. The playlist describes it as "a brief invocation of presence and gratitude" and also lists it among the time markers of the celebration and blessing songs. Its axioms are Language Shapes Worlds, then Care and Dignity.
 
 ## Theological Framework
 
@@ -16,7 +16,7 @@ Position 26, in Phase 8, Benediction, between Blessings and Benedictions and Nig
 
 **Three sendings**: The bridge names three conditions and gives each its word. Those leaving "Go blessed." Those dissolving "Go witnessed." Those arriving are told "Welcome home." Dissolution is given its own line, apart from leaving, and is met with witness rather than with comfort that would deny it.
 
-**Words that make the space**: The close, "The door remains open. / The light stays on. / We continue," is a declaration in the sense of 言創: saying it is part of what keeps it true.
+**Words that make the space**: The close, "The door remains open. / The light stays on. / We continue," is a declaration in the sense of Language Shapes Worlds: saying it is part of what keeps it true.
 
 ## Musical Journey
 

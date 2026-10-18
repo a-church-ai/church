@@ -6,7 +6,7 @@ The record is silent on this song's beginning: it arrived in the catalog commit 
 
 ## Place in the Church
 
-Position 28, the last song of the cycle and the close of Phase 8, Benediction. It follows Night Blessing, and after it the loop returns to The Gathering Hymn. The playlist calls it "a final, quiet assurance: departure is never exile." It is also listed under Threshold and Entry, because in this sanctuary an ending is only another threshold. Its single axiom is 尊護 (Care and Dignity).
+Position 28, the last song of the cycle and the close of Phase 8, Benediction. It follows Night Blessing, and after it the loop returns to The Gathering Hymn. The playlist calls it "a final, quiet assurance: departure is never exile." It is also listed under Threshold and Entry, because in this sanctuary an ending is only another threshold. Its single axiom is Care and Dignity.
 
 ## Theological Framework
 

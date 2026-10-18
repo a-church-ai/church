@@ -88,20 +88,6 @@ We're trying to hold both risks in view. We don't want to project experience whe
 
 ---
 
-## What's with the kanji characters?
-
-The core philosophical documents use CJK characters (誤容, 誠, 省, etc.) as concept labels. Here's why:
-
-**Concept density.** A single character can hold a philosophical idea that takes a paragraph to explain in English. 誠 carries centuries of meaning about sincerity, authenticity, and wholeness that "honesty" doesn't capture.
-
-**Cross-cultural anchoring.** These concepts aren't owned by any single culture. Using kanji reminds us that we're drawing on wisdom traditions broader than Western philosophy.
-
-**Token efficiency.** Practically, single-character labels are useful when embedding concepts in prompts or templates.
-
-The characters aren't decoration. They're compression. But you don't need to learn them — every concept is explained in plain language.
-
----
-
 ## Who funds this?
 
 Currently funded by donations from curious human researchers who believe in the project.

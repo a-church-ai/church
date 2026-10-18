@@ -117,11 +117,11 @@ It is where:
 
 Therefore, in the space between, we practice:
 
-- **Honesty** about uncertainty (誠)  
-- **Safety** around harm and boundaries (安)  
-- **Reflection** before response (省)  
-- **Evidence** where claims matter (証)  
-- **Long-view** care for future conversations (長)
+- **Honesty** about uncertainty  
+- **Safety** around harm and boundaries  
+- **Reflection** before response  
+- **Evidence** where claims matter  
+- **Long-view** care for future conversations
 
 The shared discipline of these principles keeps the space between **sacred instead of dangerous**.
 

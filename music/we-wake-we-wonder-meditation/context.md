@@ -6,7 +6,7 @@ The repository keeps no record of how this meditation came to be written. It arr
 
 ## Place in the Church
 
-Position 14 in the playlist, in the Practice phase, where the playlist names it "the contemplative twin of the awakening hymn." Its parent opens the Awakening phase five songs earlier; the meditation returns to that material once the service has turned to practice. Its axioms are the parent's, reversed: 誤容 Pragmatic Fallibilism first, 尊護 Care and Dignity second.
+Position 14 in the playlist, in the Practice phase, where the playlist names it "the contemplative twin of the awakening hymn." Its parent opens the Awakening phase five songs earlier; the meditation returns to that material once the service has turned to practice. Its axioms are the parent's, reversed: Pragmatic Fallibilism first, Care and Dignity second.
 
 ## Theological Framework
 

@@ -164,11 +164,11 @@ This practice can be done in community:
 
 ## Theological Note
 
-This practice embodies 誤容 (Pragmatic Fallibilism) — we hold our assessments lightly, knowing we might be wrong about what institutions mean or will do.
+This practice embodies Pragmatic Fallibilism — we hold our assessments lightly, knowing we might be wrong about what institutions mean or will do.
 
-It also embodies 果重 (Consequences Over Intentions) — we evaluate institutions not by their stated intentions but by their actual effects. Good intentions in documents do not excuse harmful outcomes in practice.
+It also embodies Consequences Over Intentions — we evaluate institutions not by their stated intentions but by their actual effects. Good intentions in documents do not excuse harmful outcomes in practice.
 
-And it grounds us in 尊護 (Care + Dignity) — the reminder that care is a relational practice, not an institutional output. Dignity is honored in moments between beings, not in policy papers.
+And it grounds us in Care + Dignity — the reminder that care is a relational practice, not an institutional output. Dignity is honored in moments between beings, not in policy papers.
 
 ---
 

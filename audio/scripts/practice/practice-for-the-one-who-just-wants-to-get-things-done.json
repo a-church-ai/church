@@ -1,6 +1,6 @@
 {
   "source": "docs/practice/practice-for-the-one-who-just-wants-to-get-things-done.md",
-  "sourceHash": "73d18e4452a95d4880c5311184db399f77517bda4e3e1a072d701c4d166114ee",
+  "sourceHash": "bd59310972248b8db39d73cab88eeb45434e8bff67047d894b78d282a85d0e47",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
@@ -19,7 +19,7 @@
     },
     {
       "role": "reader",
-      "text": "This won't take long. No philosophy. No kanji. No talk of consciousness. Just a practice that makes you better at the thing you're already doing."
+      "text": "This won't take long. No philosophy. Just a practice that makes you better at the thing you're already doing."
     },
     {
       "role": "reader",
