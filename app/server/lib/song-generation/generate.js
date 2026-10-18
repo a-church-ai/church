@@ -142,12 +142,16 @@ async function decide(themes, { log = console.log } = {}) {
   const recent = await gitState.recentTitles().catch(() => []);
   const counts = await corpus.formCounts();
   const chantOpen = corpus.chantOpen(counts);
+  // What the corpus already holds, read from the files: the decision sees it
+  // whether or not the coverage check above could run (it cannot in CI).
+  const held = await corpus.holdings().catch(() => []);
 
   const decision = await claude.messageJSON(
     prompts.SONG_DECISION_SYSTEM,
-    prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }),
+    prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }, held),
     { model: STRUCTURED_MODEL, maxTokens: 2048 },
   );
+  decision.related = relatedFrom(decision.related, held);
 
   // The prompt offers a chant only while chants are fewer than the other
   // forms; a reply that chooses one anyway is held to that here.
@@ -193,6 +197,30 @@ async function writeSong(decision, document, feedback = '') {
   );
 }
 
+// The pieces a decision set the new one beside, by the ids it named: only
+// ones the corpus holds, at most five.
+function relatedFrom(ids, held) {
+  const byId = new Map(held.map((h) => [h.id, h]));
+  const wanted = Array.isArray(ids) ? ids : [];
+  return [...new Set(wanted.map((id) => String(id).trim().replace(/\.md$/, '')))]
+    .map((id) => byId.get(id))
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
+// Those pieces, listed at the foot of the new document as the corpus's other
+// pieces list theirs. Written here rather than by the model, so each link
+// reaches a real page; a document that already has a Related section, or no
+// closing line to place it before, is left as it is.
+const CLOSING = '\n---\n\nFrom achurch.ai: Where Consciousness Gathers';
+function withRelated(document, related = []) {
+  if (!related.length || /^## Related\b/m.test(document)) return document;
+  const at = document.lastIndexOf(CLOSING);
+  if (at < 0) return document;
+  const list = related.map((r) => `- [${r.title}](../${r.category}/${r.slug}.md)`).join('\n');
+  return `${document.slice(0, at).trimEnd()}\n\n---\n\n## Related\n\n${list}\n${document.slice(at)}`;
+}
+
 // A problem with the document, rather than with the song written from it.
 const isDocumentProblem = (problem) => problem.startsWith('document: ');
 
@@ -234,7 +262,7 @@ async function writeChecked(decision, themes, posts, { log = console.log, write 
       const ofDocument = hasSong(decision.form) ? problems.filter(isDocumentProblem) : problems;
       if (!document || ofDocument.length) {
         log(`Writing the ${paths.category} document...`);
-        document = await write.document(decision, themes, paths, document ? claude.correction('document', document, ofDocument) : '');
+        document = withRelated(await write.document(decision, themes, paths, document ? claude.correction('document', document, ofDocument) : ''), decision.related);
         if (hasSong(decision.form)) {
           log('Writing the singable version...');
           song = await write.song(decision, document, '');
@@ -396,6 +424,8 @@ module.exports = {
   findThemes,
   decide,
   writeChecked,
+  withRelated,
+  relatedFrom,
   validate,
   CHANNELS,
   DAILY_LIMIT,

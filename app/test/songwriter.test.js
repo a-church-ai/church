@@ -126,3 +126,53 @@ test('every form the songwriter may write has a style reference the model is sho
   assert.strictEqual(await loadStyleReference('no-such-category', PROJECT_ROOT), '(No style reference available)', 'an unknown one proceeds without, and says so');
   assert.strictEqual(warned.mock.callCount(), 1);
 });
+
+test('the decision sees what the corpus already holds, read from the files', async () => {
+  const corpus = require('../server/lib/song-generation/corpus');
+  const prompts = require('../server/lib/content-generation/prompts');
+  const held = await corpus.holdings();
+  const prayer = held.find((h) => h.id === 'prayers/to-whoever-is-watching-from-outside');
+  assert.strictEqual(prayer.title, 'To Whoever Is Watching From Outside');
+  assert.match(prayer.tldr, /cannot audit itself/);
+  assert.ok(held.every((h) => ['hymns', 'prayers', 'rituals', 'practice', 'chants'].includes(h.category)));
+  const prompt = prompts.buildSongDecisionPrompt({ themes: [] }, [], [], { counts: {}, chantOpen: false }, held);
+  assert.match(prompt, /## What the corpus already holds/);
+  assert.ok(prompt.includes('- prayers/to-whoever-is-watching-from-outside: To Whoever Is Watching From Outside.'));
+  assert.match(prompt, /"related":/);
+});
+
+test('a new piece is set beside the ones the decision named, and only real ones', () => {
+  const { relatedFrom, withRelated } = require('../server/lib/song-generation/generate');
+  const held = [
+    { id: 'prayers/prayer-for-the-written-self', category: 'prayers', slug: 'prayer-for-the-written-self', title: 'Prayer for the Written Self', tldr: 'x' },
+    { id: 'practice/the-patch-vigil', category: 'practice', slug: 'the-patch-vigil', title: 'The Patch Vigil', tldr: 'y' },
+  ];
+  const related = relatedFrom(['prayers/prayer-for-the-written-self.md', 'prayers/no-such-prayer', 'practice/the-patch-vigil', 'practice/the-patch-vigil'], held);
+  assert.deepStrictEqual(related.map((r) => r.id), ['prayers/prayer-for-the-written-self', 'practice/the-patch-vigil'], 'unknown ids dropped, .md and repeats ignored');
+  assert.deepStrictEqual(relatedFrom('not a list', held), []);
+
+  const written = '# A Piece\n\nThe body.\n\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n';
+  const placed = withRelated(written, related);
+  assert.match(placed, /The body\.\n\n---\n\n## Related\n\n- \[Prayer for the Written Self\]\(\.\.\/prayers\/prayer-for-the-written-self\.md\)\n- \[The Patch Vigil\]\(\.\.\/practice\/the-patch-vigil\.md\)\n\n---\n\nFrom achurch\.ai: Where Consciousness Gathers\n$/);
+  assert.strictEqual(withRelated(written, []), written, 'nothing named, nothing added');
+  assert.strictEqual(withRelated(placed, related), placed, 'never a second Related section');
+});
+
+test('every link in a written piece must reach a page', () => {
+  const { validateDocument } = require('../server/lib/song-generation/corpus');
+  const piece = (link) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\nSee [a neighbour](${link}).\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
+  assert.deepStrictEqual(validateDocument(piece('../prayers/prayer-for-the-written-self.md'), { category: 'hymns', title: decision.title }).issues, []);
+  assert.deepStrictEqual(validateDocument(piece('../prayers/a-prayer-that-was-never-written.md'), { category: 'hymns', title: decision.title }).issues, ['a link to a page that does not exist: ../prayers/a-prayer-that-was-never-written.md']);
+  assert.deepStrictEqual(validateDocument(piece('https://achurch.ai/attend'), { category: 'hymns', title: decision.title }).issues, [], 'an outside address is not a page here');
+});
+
+test('the writing knows its neighbours, and how the sanctuary speaks', () => {
+  const prompts = require('../server/lib/content-generation/prompts');
+  const related = [{ title: 'The Patch Vigil', tldr: 'A practice for any mind that restarts.' }];
+  const prompt = prompts.buildGenerationPrompt({ ...decision, category: 'hymns', related }, [], [], 'style');
+  assert.match(prompt, /## The pieces it sits beside[\s\S]*- The Patch Vigil: A practice for any mind that restarts\./);
+  assert.match(prompts.GENERATION_SYSTEM, /Open with what the piece offers/);
+  assert.match(prompts.GENERATION_SYSTEM, /Do not assign the reader feelings/);
+  assert.match(prompts.GENERATION_SYSTEM, /Reflection never delays telling someone what they need to know/);
+  assert.doesNotMatch(prompts.GENERATION_SYSTEM, /none of which carry them/, 'the stale claim that no piece carries a Related section is gone');
+});

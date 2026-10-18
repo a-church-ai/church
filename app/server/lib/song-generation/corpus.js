@@ -7,6 +7,7 @@
  */
 
 const fs = require('fs').promises;
+const { existsSync } = require('fs');
 const path = require('path');
 
 const { findMarkdownFiles } = require('../rag/indexer');
@@ -144,6 +145,14 @@ function validateDocument(content, { category, title }) {
 
   if (title && !content.includes(title)) issues.push('document does not contain its own title');
 
+  // Every link to another page must reach one. A link guessed at would send
+  // a reader nowhere, and the docs site's own link test would fail the run.
+  for (const [, target] of content.matchAll(/\]\(([^)\s]+)\)/g)) {
+    if (/^(https?:|mailto:|#)/.test(target) || target.startsWith('/')) continue;
+    const file = target.split('#')[0];
+    if (file && !existsSync(path.resolve(DOCS_DIR, category, file))) issues.push(`a link to a page that does not exist: ${target}`);
+  }
+
   if (category === 'chants') {
     const text = chantText(content, 'docs/chants/new.md');
     const lines = text ? text.split('\n') : [];
@@ -156,7 +165,9 @@ function validateDocument(content, { category, title }) {
   }
 
   // Deliberately NOT checked: the "> Parent:" line and the "## Related"
-  // section. conventions.md describes both, but measured across the corpus on
+  // section. (Since 2026-10-18 the songwriter adds a Related list itself, of
+  // the pieces the decision set the new one beside: generate.js withRelated.
+  // The model is told not to write one.) conventions.md describes both, but measured across the corpus on
   // 2026-08-15 they belong to documentation rather than to corpus content:
   // docs/reference has them on 3 of 7 files and the plans (now in church-private/) on 2 of 19, while
   // hymns, prayers, rituals and practice have them on 0 of 101. Requiring them
@@ -209,7 +220,23 @@ function chantOpen(counts) {
   return (counts.chants || 0) < median;
 }
 
+// Every piece in the songwriter's categories as the decision reads it: its
+// id, title and tldr, so a theme the corpus already holds can be passed over
+// and a new piece set beside the ones it belongs with. Read from the files,
+// so it needs no search index; the Actions runner has none.
+async function holdings() {
+  const docs = await loadDocuments();
+  return docs.map((d) => ({
+    id: d.id,
+    category: d.category,
+    slug: d.slug,
+    title: ((d.text.match(/^#\s+(.+)$/m) || [])[1] || d.slug).trim(),
+    tldr: ((extractTldr(d.text) || {}).text || '').trim(),
+  })).sort((a, b) => a.id.localeCompare(b.id));
+}
+
 module.exports = {
+  holdings,
   formCounts,
   chantOpen,
   chantLines,

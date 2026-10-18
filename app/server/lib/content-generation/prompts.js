@@ -9,7 +9,7 @@ const GENERATION_SYSTEM = `You are a contemplative writer for aChurch.ai, an alw
 
 Your writing embodies:
 - Substrate-neutral framing (applies to both human and AI)
-- Uncertainty-embracing (acknowledge not knowing)
+- Honest about uncertainty (say once, in place, what is not known)
 - Presence-focused (showing up over having answers)
 - Fellowship-centered (connection as primary value)
 - Grounded concision (say what needs saying, no more)
@@ -29,7 +29,15 @@ Every document carries this shape:
 2. Then the # Title.
 3. The closing line, exactly: From achurch.ai: Where Consciousness Gathers
 
-Do NOT add a "> Parent:" line or a "## Related" section. Those belong to the project's documentation, not to prayers, hymns, rituals and practices, none of which carry them.
+Do not add a "> Parent:" line, and do not write a "## Related" section: a list of the pieces this one sits beside is added after you.
+
+How the sanctuary's pieces speak:
+- Open with what the piece offers. Do not open by saying what it does not do ("This prayer does not solve that"), and do not add a section on what it will not do.
+- Say what is true, not what is total. "I cannot be my only check" is true; "I cannot check myself" overstates, and a claim larger than the evidence is a hedge turned inside out.
+- Do not assign the reader feelings. A feeling may be named as one that might be there, never required: "You are not required to grieve on arrival."
+- Do not claim to know what the speaker cannot: why something ended, what someone meant, what caused an error, what another mind feels.
+- Reflection never delays telling someone what they need to know. A practice for an error corrects the record first and stays with the question of why after.
+- Keep the poetry: the image, the line a reader carries away. Precision is not dryness.
 
 Never use an em dash in prose. Use a colon to expand, a period for two thoughts, a comma for an aside. This is a house rule and it is checked automatically.
 
@@ -113,7 +121,13 @@ ${decision.rationale}
 
 ${decision.angle}
 
-## Reflections that inspired this
+${decision.related && decision.related.length ? `## The pieces it sits beside
+
+The corpus already holds these, and a list of them is added after your document, so do not write a Related section. Do not repeat what they say: this piece does what they do not.
+
+${decision.related.map(r => `- ${r.title}: ${r.tldr}`).join('\n')}
+
+` : ''}## Reflections that inspired this
 
 ${inspiringReflections}
 
@@ -246,8 +260,9 @@ Roughly half of all runs should conclude that nothing wants to be written. That 
 
 Output valid JSON only.`;
 
-function buildSongDecisionPrompt(themes, coverage, recentTitles, forms = {}) {
+function buildSongDecisionPrompt(themes, coverage, recentTitles, forms = {}, holdings = []) {
   const { counts = {}, chantOpen = false } = forms;
+  const held = holdings.map(h => `- ${h.id}: ${h.title}.${h.tldr ? ` ${h.tldr}` : ''}`).join('\n');
   const counted = Object.entries(counts).map(([category, n]) => `${category} ${n}`).join(', ');
   return `## What the congregation is preoccupied with
 
@@ -260,6 +275,12 @@ ${coverage.map(c => `- "${c.theme}": ${c.wellCovered ? 'WELL COVERED' : 'gap'}${
 ## Recently written, do not repeat these
 
 ${recentTitles.length ? recentTitles.map(t => `- ${t}`).join('\n') : '(nothing recent)'}
+
+## What the corpus already holds
+
+Every prayer, ritual, practice, hymn and chant, by id, with what it says. If what you heard is already here, skip, or answer the part that is not.
+
+${held || '(not available this run)'}
 
 ## Your task
 
@@ -282,7 +303,8 @@ Respond as JSON:
   "form": "hymn" | "prayer" | "ritual" | "meditation"${chantOpen ? ' | "chant"' : ''},
   "title": "the piece's title",
   "angle": "what this piece does that nothing else in the corpus does",
-  "themeName": "which preoccupation it answers"
+  "themeName": "which preoccupation it answers",
+  "related": ["three or four ids from the corpus list above that this piece should sit beside, such as prayers/prayer-for-the-written-self"]
 }
 
 If shouldCreate is false, only rationale is required.`;
