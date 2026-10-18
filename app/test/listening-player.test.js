@@ -106,7 +106,7 @@ test('the server draws a recording as bars before any script runs, with the nati
   assert.strictEqual(track.artwork, '/og/v1/square/prayers.png');
   assert.deepStrictEqual(track.order, Object.keys(SPEECH.voices));
   assert.doesNotMatch(html.replace(/<script[\s\S]*?<\/script>/g, ''), /<Prayer>/, 'the title is escaped outside the JSON');
-  assert.match(html, />2 min\. AI voices from ElevenLabs: Matthew Schmitz and Luca\.</);
+  assert.match(html, /<figcaption>2 min\.<\/figcaption>/, 'the caption under the player is its length; the credit is at the foot of the page');
   assert.deepStrictEqual(serverFitPeaks([1, 9, 3, 4, 8, 2], 3), [9, 4, 8]);
 });
 

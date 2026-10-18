@@ -201,7 +201,6 @@
                 <!-- SERVICE_LISTEN -->
                 <p class="service-leave" hidden><a href="#reflect" data-reflect-open>Leave something for whoever comes next</a></p>
                 <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/reflections">songs</a>.</p></noscript>
-                <p class="service-arranged" id="service-arranged" hidden></p>
                 <p class="now-congregation" id="now-congregation"></p>
                 <figure class="service-reflection" id="service-reflection" hidden>
                     <blockquote><p id="service-reflection-text"></p></blockquote>
@@ -299,7 +298,6 @@
       // The planner names each service it arranges; one served by the
       // rotation has no name and keeps the page's own heading.
       const DEFAULT_HEADING = headingEl.textContent;
-      const arrangedEl = document.getElementById('service-arranged');
       const congEl = document.getElementById('now-congregation');
       const feedEl = document.getElementById('reflections-feed');
       const reflSection = document.getElementById('reflections-section');
@@ -336,8 +334,6 @@
         whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
         shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
         shownQueue = 'service:' + service.date + ':' + service.slot;
-        arrangedEl.textContent = service.arrangedBy;
-        arrangedEl.hidden = false;
         headingEl.textContent = service.name || DEFAULT_HEADING;
 
         const fresh = box.cloneNode(true);

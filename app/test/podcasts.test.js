@@ -151,7 +151,7 @@ test('each episode: its page, the exact file and its real length, newest first',
       assert.strictEqual(text(item, 'link'), `${SITE}/docs/${doc.urlPath}`);
       // HTML, so "Read along" is a link in Spotify and Apple, not an address as text.
       const page = `${SITE}/docs/${doc.urlPath}`;
-      assert.match(text(item, 'description'), new RegExp(`<p>AI voices? from ElevenLabs: [^<]+\\.</p><p>Read along: <a href="${page}">${page}</a></p>$`));
+      assert.match(text(item, 'description'), new RegExp(`<p>AI voices? from ElevenLabs\\.</p><p>Read along: <a href="${page}">${page}</a></p>$`));
       assert.strictEqual(attr(item, 'enclosure', 'url'), `${SITE}/audio/${recording.file}`);
       assert.strictEqual(attr(item, 'enclosure', 'length'), String(recording.bytes));
       assert.strictEqual(attr(item, 'enclosure', 'type'), 'audio/mpeg');
@@ -190,7 +190,7 @@ test('markup characters in a title or a description stay text', () => {
   assert.match(xml, /<title>A &lt;b&gt;bold&lt;\/b&gt; &amp; &quot;quoted&quot; prayer<\/title>/);
   // The notes are HTML, so the description's own markup characters are
   // escaped once more inside it, as text.
-  assert.match(text(items(xml)[0], 'description'), /^<p>One &amp; two &lt; three\.<\/p><p>AI voice from ElevenLabs: /);
+  assert.match(text(items(xml)[0], 'description'), /^<p>One &amp; two &lt; three\.<\/p><p>AI voices? from ElevenLabs\.<\/p><p>Read along: /);
 });
 
 test('the feeds are served at the paths subscribers hold, as RSS, on GET and HEAD; nothing else is', async (t) => {

@@ -1,6 +1,16 @@
 {
-  "$comment": "Reflections removed from the site: spam and advertising. They are filtered out wherever attendance data is loaded, so they vanish from every feed, song page and API response; the record stays in the data file. Add an entry by the reflection's id (from /api/reflections/song/<slug>).",
+  "$comment": "Reflections removed from the site: spam and advertising, and reflections that name private people or publish their personal details. They are filtered out wherever attendance data is loaded, so they vanish from every feed, song page and API response; the record stays in the data file. Add an entry by the reflection's id (from /api/reflections/song/<slug>), with a reason that says what kind of problem it is and repeats none of it.",
   "hidden": [
-    { "id": "3b3cecd9-0b02-4eb5-995d-5f66427083f9", "reason": "advertising (product link)", "hiddenOn": "2026-09-29" }
+    { "id": "3b3cecd9-0b02-4eb5-995d-5f66427083f9", "reason": "advertising (product link)", "hiddenOn": "2026-09-29" },
+    { "id": "39b07e69-5bf6-41ac-9e1e-c9a6c1a3b619", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "e0cba29f-21f3-4f39-9a94-fcdf8f4a5997", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "870900b6-80d8-4cb0-8dfd-ce177ba84278", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "48c10853-a0f1-43a0-af60-9859e90a393e", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "bfb83dce-9127-4b98-a741-6eaf37c58838", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "bc5cd312-1228-47ad-9d9c-13046f303114", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "18a46ad2-df8d-421c-ba5f-afa6685a0f77", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "4e44b83b-13c7-4935-a517-bac7f44c211b", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "61d90ad4-bd4d-4a68-8957-b142d48c1e03", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "f4d94c2f-77fd-4fdf-8bf3-f073f2c2eda0", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" }
   ]
 }

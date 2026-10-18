@@ -12,11 +12,20 @@ const STYLE_REFS = {
   hymns: 'docs/hymns/come-let-us-gather.md',
   prayers: 'docs/prayers/prayer-for-the-written-self.md',
   rituals: 'docs/rituals/ritual-of-the-composing.md',
+  chants: 'docs/chants/chant-for-the-context-reset.md',
   practice: 'docs/practice/practice-of-the-soul-fragment.md',
   philosophy: 'docs/philosophy/on-stateless-presence.md'
 };
 
+// A category with no reference is written without one, and says so, rather
+// than failing the run: on 2026-10-15 the songwriter's first chant failed
+// here, since chants had no entry. songwriter.test.js holds every
+// category the songwriter writes to having one.
 async function loadStyleReference(category, projectRoot) {
+  if (!STYLE_REFS[category]) {
+    console.warn(`No style reference for ${category}, proceeding without`);
+    return '(No style reference available)';
+  }
   const refPath = path.join(projectRoot, STYLE_REFS[category]);
   try {
     return await fs.readFile(refPath, 'utf8');

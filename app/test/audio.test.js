@@ -97,10 +97,10 @@ test('the deeper voice takes the human part where a piece says so; otherwise eac
   assert.deepStrictEqual(choosePair('Plain prayer.', {}), [a, b]);
 });
 
-test('the credit names every voice and says they are AI voices', () => {
-  assert.strictEqual(creditLine(['matthew', 'luca', 'amaya']), 'AI voices from ElevenLabs: Matthew Schmitz, Luca and Amaya Calm.');
-  assert.strictEqual(creditLine(['amaya']), 'AI voice from ElevenLabs: Amaya Calm.');
-  assert.strictEqual(creditLine(['luca', 'amaya']), 'AI voices from ElevenLabs: Luca and Amaya Calm.');
+test('the credit says AI voices from ElevenLabs, without naming voices that can change', () => {
+  assert.strictEqual(creditLine(['matthew', 'luca', 'amaya']), 'AI voices from ElevenLabs.');
+  assert.strictEqual(creditLine(['amaya']), 'AI voice from ElevenLabs.');
+  assert.strictEqual(creditLine(['luca', 'amaya']), 'AI voices from ElevenLabs.');
 });
 
 test('every script is well formed, cast from the house pair, and faithful to its document', () => {
@@ -127,7 +127,7 @@ test('every recording in the manifest belongs to a voiced document and its scrip
       // lib/audio/imported.js: no house script and no house voice, its own credit.
       assert.ok(!fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source}: made elsewhere, yet the house has a script for it`);
       assert.deepStrictEqual(rec.voices, [], `${source}: no house voice speaks it`);
-      assert.match(rec.credit, /^AI voices? from ElevenLabs: .+\.$/, `${source}: its credit`);
+      assert.match(rec.credit, /^AI voices? from ElevenLabs\.$/, `${source}: its credit`);
     } else {
       assert.ok(fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source} has no script`);
       assert.ok(rec.voices.length && rec.voices.every(v => SPEECH.voices[v]), `${source}: voices`);
@@ -262,7 +262,7 @@ test('a song plays on its page with its own credit, and its structured data carr
   const { buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
   const rec = { file: 'music/a-song-0123abcd.mp3', frames: 'music/a-song-0123abcd.bin', seconds: 245.2, peaks: new Array(128).fill(90) };
   const html = renderRecording(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
-  assert.match(html, /4 min\. Original music by aChurch\.ai, made with Suno\.<\/figcaption>/);
+  assert.match(html, /4 min\. Original music by a Church AI \+ Human\.<\/figcaption>/);
   const track = trackFor(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
   assert.strictEqual(track.artwork, '/og/v1/square/music.png');
   assert.strictEqual(track.album, 'Music');

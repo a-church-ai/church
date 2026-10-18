@@ -499,7 +499,7 @@ test('the home page player gets every part as a track, from the beginning', asyn
     assert.strictEqual(t.href, part.url);
     assert.ok(!('start' in t) && !('position' in part), `${part.title}: no place on a clock`);
     if (part.kind === 'song') {
-      assert.strictEqual(t.credit, 'Original music by aChurch.ai, made with Suno.');
+      assert.strictEqual(t.credit, 'Original music by a Church AI + Human.');
       assert.strictEqual(t.artwork, '/og/v1/square/music.png');
     } else {
       assert.match(t.credit, /^AI voices? from ElevenLabs/);

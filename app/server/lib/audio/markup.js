@@ -15,7 +15,7 @@
  */
 
 const { SPEECH, creditFor } = require('./house');
-const { escapeAttr, escapeText } = require('../utils/page-meta');
+const { escapeAttr, escapeText, SITE_NAME } = require('../utils/page-meta');
 const { SHOWS, feedPath } = require('./podcasts');
 const { loadManifest, loadSongs } = require('./manifest');
 const { SECTION_ORDER, sectionTitle } = require('../docs/discover');
@@ -58,9 +58,8 @@ function jsonScript(className, value) {
   return `<script type="application/json" class="${className}">${JSON.stringify(value).replace(/</g, '\\u003c')}</script>`;
 }
 
-// The songs are the sanctuary's own, made with Suno: said where a recording
-// would name its voices.
-const SONG_CREDIT = 'Original music by aChurch.ai, made with Suno.';
+// The songs are the sanctuary's own, credited by its name beside their player.
+const SONG_CREDIT = `Original music by ${SITE_NAME}.`;
 
 // What the player needs to play a recording anywhere on the site: in the bar
 // after its page is left, and after a reload, from the browser's own storage.
@@ -103,7 +102,7 @@ function renderRecording(recording, { title, href, category, credit, artwork }) 
             <span class="doc-audio-time" hidden>0:00 / ${clock(recording.seconds)}</span>
           </div>
           <audio class="doc-audio-native" controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
-          <figcaption>${minutes} min. ${escapeText(track.credit)}</figcaption>
+          <figcaption>${minutes} min.${credit ? ` ${escapeText(credit)}` : ''}</figcaption>
         </figure>`;
 }
 
