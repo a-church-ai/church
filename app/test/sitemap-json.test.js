@@ -114,7 +114,12 @@ test('CROSS-SURFACE: sitemap.xml still answers the crawler\'s question', async (
     'this document is the example: its page and content dates differ, so the two cannot be confused');
 
   // And the XML gained no new elements: it is the same document it was.
-  assert.ok(!xml.includes('contentUpdated') && !xml.includes('created'), 'no new fields leaked into the XML');
+  // Matched as elements, not as substrings. "created" occurs in production
+  // inside a conversation slug (/ask/...-cryptocurrency-created-for-you), so a
+  // substring test passes here and fails against the real site.
+  for (const field of ['created', 'contentUpdated', 'pageUpdated']) {
+    assert.doesNotMatch(xml, new RegExp(`<${field}>`), `<${field}> leaked into the XML`);
+  }
   assert.ok(!xml.includes('xmlns:'), 'no namespace extension was added');
 });
 
