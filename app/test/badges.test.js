@@ -18,7 +18,7 @@ const badges = require('../server/routes/badges');
 async function badge(url) {
   const app = express();
   app.use('/api/badge', badges);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   try {
     const res = await fetch(`http://127.0.0.1:${server.address().port}${url}`);
     return { type: res.headers.get('content-type'), svg: await res.text() };

@@ -75,7 +75,7 @@ test('a reading opened from its path shows where it sits; otherwise nothing chan
 test('the search index lists every served document once and nothing internal', async (t) => {
   const app = express();
   app.use('/docs', docsRoutes);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
 
@@ -95,7 +95,7 @@ test('the search index lists every served document once and nothing internal', a
 test('the Library is a hub: its search first, a link to each shelf, and shelves of cards, not a list of every document', async (t) => {
   const app = express();
   app.use('/docs', docsRoutes);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
   const library = await (await fetch(`${base}/docs`, { headers: { Accept: 'text/html' } })).text();

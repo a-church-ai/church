@@ -65,6 +65,13 @@ const { planSlot, contextFor, fetchFeeds } = require('./lib/service/planner');
 // Create Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Which address to bind. Unset means every interface, which is what Railway
+// needs and what production has always done. A test sets HOST=127.0.0.1 so the
+// port it is given is held on the loopback address it then fetches: a wildcard
+// bind leaves that address free for any other program on the machine to claim
+// afterwards, and macOS then delivers the test's own requests to that program.
+// See test/runtime.test.js for the whole mechanism.
+const HOST = process.env.HOST || undefined;
 
 // Railway terminates TLS and proxies to this process, so req.ip is the edge's
 // address unless Express is told to read X-Forwarded-For. Three things key on
@@ -1459,11 +1466,16 @@ async function startServer() {
     // for a long-running stream process, but it also swallowed EADDRINUSE and
     // left a dead process that Railway had no reason to restart. Listen errors
     // are handled here so that one case exits non-zero.
-    const server = app.listen(PORT, (err) => {
+    const server = app.listen(PORT, HOST, (err) => {
       // A bind error reaches this callback too, in Express 5; the 'error'
       // handler below reports it and exits.
       if (err) return;
-      console.log(`✨ aChurch App running on http://localhost:${PORT}`);
+      // The port the server actually bound, not the one it was asked for.
+      // PORT=0 means "any free port", which the tests use to avoid choosing a
+      // port that something else claims between the choosing and the binding;
+      // printing the request rather than the result would say "0".
+      const bound = server.address().port;
+      console.log(`✨ aChurch App running on http://${HOST || 'localhost'}:${bound}`);
       console.log(`📺 Open browser to manage your stream`);
     });
     httpServer = server;

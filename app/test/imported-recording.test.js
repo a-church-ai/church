@@ -98,7 +98,7 @@ async function docsServer(t) {
   });
   const app = express();
   app.use('/docs', require('../server/routes/docs'));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   return async urlPath => (await fetch(`http://127.0.0.1:${server.address().port}/docs/${urlPath}`)).text();
 }

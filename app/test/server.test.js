@@ -18,18 +18,27 @@ const { spawn } = require('child_process');
 
 const PUBLIC_WELL_KNOWN = path.join(__dirname, '../client/public/.well-known');
 
-const freePort = () => new Promise((resolve, reject) => {
-  const s = net.createServer().listen(0, () => { const { port } = s.address(); s.close(() => resolve(port)); }).on('error', reject);
-});
-
 let child;
 let base;
+let port;
 
 test.before(async () => {
-  const port = await freePort();
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-server-'));
   child = spawn(process.execPath, [path.join(__dirname, '../server/index.js')], {
-    env: { ...process.env, PORT: String(port), DATA_DIR: dataDir, NODE_ENV: 'test', STREAMING_ENABLED: 'false',
+    // Two ways this used to pick up someone else's port, both fixed here.
+    //
+    // HOST pins the child to the address this test fetches. Without it the
+    // server binds every interface, which leaves 127.0.0.1:port free for any
+    // other program on the machine to bind afterwards, and macOS then hands
+    // this test's own requests to that program: the test reads a stranger's
+    // reply. test/runtime.test.js carries the whole mechanism.
+    //
+    // PORT=0 lets the server pick a port and say which, rather than this test
+    // finding a free one and handing it over. Between the finding and the
+    // binding anything else on the machine can take it, and the server then
+    // dies of EADDRINUSE for a reason that has nothing to do with the code
+    // under test.
+    env: { ...process.env, PORT: '0', HOST: '127.0.0.1', DATA_DIR: dataDir, NODE_ENV: 'test', STREAMING_ENABLED: 'false',
       GEMINI_API_KEY: '', ANTHROPIC_API_KEY: '', GITHUB_TOKEN: '', ELEVENLABS_API_KEY: '', AWS_S3_BUCKET: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -38,7 +47,10 @@ test.before(async () => {
     const timer = setTimeout(() => reject(new Error(`the server did not start:\n${output}`)), 30000);
     const listen = chunk => {
       output += chunk;
-      if (output.includes(`running on http://localhost:${port}`)) { clearTimeout(timer); resolve(); }
+      // The line names the address and the port it bound, which is how we
+      // learn the port at all.
+      const started = /running on http:\/\/127\.0\.0\.1:(\d+)/.exec(output);
+      if (started) { port = Number(started[1]); clearTimeout(timer); resolve(); }
     };
     child.stdout.on('data', listen);
     child.stderr.on('data', chunk => { output += chunk; });

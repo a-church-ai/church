@@ -64,7 +64,7 @@ test('the middleware answers GET and HEAD with a 301 and keeps the query, and le
   const app = express();
   app.use(canonicalRedirects);
   app.use((req, res) => res.status(204).end());
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
 

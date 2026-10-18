@@ -24,7 +24,7 @@ const SKILLS_INDEX = JSON.parse(fs.readFileSync(path.join(PUBLIC, '.well-known/a
 const SPEC = JSON.parse(fs.readFileSync(path.join(PUBLIC, 'openapi.json'), 'utf8'));
 
 function serve(app) {
-  return new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  return new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
 }
 
 test('the AI catalog lists only what is served, each entry with ARD\'s required terms', () => {

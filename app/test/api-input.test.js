@@ -34,7 +34,7 @@ test.before(async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use('/api', (req, res, next) => { res.on('finish', () => locals.push(res.locals.apiError)); next(); });
   app.use('/api', require('../server/routes/api'));
-  server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   base = `http://127.0.0.1:${server.address().port}`;
 });
 test.after(() => server.close());

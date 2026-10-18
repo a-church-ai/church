@@ -208,7 +208,7 @@ test('the manifest keeps number arrays on one line, so a re-render diffs as a fe
 });
 
 function serve(app) {
-  return new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  return new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
 }
 
 test('pages carry the player: the build, both scripts and the versioned stylesheet; a voiced page its bars', async (t) => {

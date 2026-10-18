@@ -136,7 +136,7 @@ test('every day\'s page is listed, newest first, with its services\' names', asy
 test('the REST route answers like the operation: GET /api/services/:date', async () => {
   const app = express();
   app.use('/api', require('../server/routes/api'));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   try {
     const ok = await fetch(`http://127.0.0.1:${server.address().port}/api/services/2026-10-06`);
     assert.strictEqual(ok.status, 200);

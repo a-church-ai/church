@@ -41,7 +41,7 @@ function startServer() {
   app.use(express.json());
   app.use('/api', request);
   return new Promise((resolve) => {
-    const server = app.listen(0, () => resolve({ server, port: server.address().port }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
   });
 }
 
@@ -312,7 +312,7 @@ test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
   const app = express();
   app.use('/api', request);
   app.use('/api', apiNotFound);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
 
   const res = await fetch(`http://127.0.0.1:${server.address().port}/api/no-such-thing`);

@@ -21,7 +21,7 @@ function start() {
   const app = express();
   app.use('/og', ogRoutes);
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
   });
 }
 

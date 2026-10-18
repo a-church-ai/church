@@ -155,7 +155,7 @@ for (const [era, options] of [['2025', {}], ['2026-07-28', { versionNegotiation:
     app.use(express.json());
     mountMcp(app);
     app.use('/api', require('../server/routes/api'));
-    const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     const base = `http://127.0.0.1:${server.address().port}`;
     const client = new Client({ name: 'search-test', version: '1.0.0' }, options);
     await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
@@ -202,7 +202,7 @@ test('Gemini still busy after its retries is a moment\'s wait, said with a 503 a
     const app = express();
     app.set('trust proxy', true);
     app.use('/api', require('../server/routes/api'));
-    const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     try {
       const res = await fetch(`http://127.0.0.1:${server.address().port}/api/search?q=grief`, { headers: { 'x-forwarded-for': '198.51.100.41' } });
       assert.strictEqual(res.status, 503);

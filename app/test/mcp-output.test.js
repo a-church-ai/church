@@ -73,7 +73,7 @@ async function start(era) {
   app.set('trust proxy', true);
   app.use(express.json());
   mountMcp(app);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   const client = new Client({ name: 'achurch-output-test', version: '1.0.0' }, ERAS[era]);
   await client.connect(new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${server.address().port}/mcp`)));
   return { server, client };

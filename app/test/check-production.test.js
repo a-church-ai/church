@@ -50,7 +50,7 @@ function production({ omit = null, showsTest = false } = {}) {
   app.post('/api/reflect', (req, res) => res.json({ received: true, message: 'Your reflection is held. Left under a test name, it is kept out of the live feed, the archive and the counts.' }));
   app.get('/api/reflections', (req, res) => res.json({ reflections: [{ name: 'Selah' }, ...(showsTest ? [{ name: 'test-production-check' }] : [])] }));
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve({ server, flight, base: `http://127.0.0.1:${server.address().port}` }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, flight, base: `http://127.0.0.1:${server.address().port}` }));
   });
 }
 

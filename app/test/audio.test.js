@@ -173,7 +173,7 @@ test('a voiced page plays its recording under its title; an unvoiced page has no
   const docsRoutes = require('../server/routes/docs');
   const app = express();
   app.use('/docs', docsRoutes);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
   const [source, rec] = voiced;
@@ -205,7 +205,7 @@ test('/audio serves listed recordings with ranges, fetches a missing one once, a
     },
     onError: (file, err) => errors.push(`${file}: ${err.message}`),
   }));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}/audio`;
 

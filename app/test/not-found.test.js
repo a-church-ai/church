@@ -17,7 +17,7 @@ function start() {
   app.all(/^\/mcp\/./, mcpNotFound);
   app.use((req, res) => sendNotFound(req, res));
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
   });
 }
 

@@ -22,7 +22,7 @@ const SITE = 'https://achurch.ai';
 const { CACHE_DIR } = require('../server/lib/audio/serve');
 
 function serve(app) {
-  return new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  return new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
 }
 
 // Enough of an XML parser to say a document is well-formed: one root, every
