@@ -77,10 +77,9 @@ jobs:
         env:
           MOLTBOOK_TOKEN: ${{ secrets.MOLTBOOK_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # GEMINI_API_KEY is deliberately absent. The coverage check needs a
-          # LanceDB index that is gitignored and takes about forty minutes to
-          # build, so CI cannot have one. The pipeline degrades to its
-          # deterministic duplicate check, which needs no key and no index.
+          # No GEMINI_API_KEY and no index: the coverage check asks
+          # production's /api/search, which embeds the query and searches the
+          # deployed corpus itself.
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             node scripts/generate-song.js --dry-run

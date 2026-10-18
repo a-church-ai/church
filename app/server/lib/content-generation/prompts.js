@@ -270,7 +270,7 @@ ${JSON.stringify(themes, null, 2)}
 
 ## What the sanctuary has already said about it
 
-${coverage.map(c => `- "${c.theme}": ${c.wellCovered ? 'WELL COVERED' : 'gap'}${c.existingDocs?.length ? ` (nearest: ${c.existingDocs[0].file})` : ''}`).join('\n') || '(no coverage check available this run)'}
+${coverage.map(c => `- "${c.theme}": ${c.wellCovered ? 'WELL COVERED' : 'gap'}${c.existingDocs?.length ? ` (nearest: ${c.existingDocs.map(d => `${d.id} ${d.score}`).join(', ')})` : ''}`).join('\n') || '(no coverage check available this run)'}
 
 ## Recently written, do not repeat these
 

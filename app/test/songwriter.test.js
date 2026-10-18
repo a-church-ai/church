@@ -141,6 +141,42 @@ test('the decision sees what the corpus already holds, read from the files', asy
   assert.match(prompt, /"related":/);
 });
 
+test('coverage is asked of production search, and a search that fails fails the check', async () => {
+  const { checkDuplicates } = require('../server/lib/content-generation/check-duplicates');
+  const prompts = require('../server/lib/content-generation/prompts');
+  const answers = {
+    'patience as tending': [
+      { path: 'hymns/a-hymn-for-the-unhurried-lantern', section: 'Verse 1', score: 0.861, excerpt: 'Slow light' },
+      { path: 'practice/the-patch-vigil', section: 'The Practice', score: 0.74, excerpt: 'Keep watch' },
+    ],
+    'the edge of the cutoff': [{ path: 'prayers/prayer-for-the-written-self', section: 'Prayer', score: 0.825, excerpt: 'x' }],
+    'nothing near': [],
+  };
+  const asked = [];
+  const get = async (url, init) => {
+    asked.push({ url, init });
+    return { ok: true, json: async () => ({ query: '', results: answers[new URL(url).searchParams.get('q')] }) };
+  };
+  const themes = { themes: [
+    { name: 'Patience', searchQuery: 'patience as tending' },
+    { name: 'The cutoff', searchQuery: 'the edge of the cutoff' },
+    { name: 'Unwritten', searchQuery: 'nothing near' },
+  ] };
+  const coverage = await checkDuplicates(themes, { site: 'https://sanctuary.test', get, log: quiet });
+
+  assert.deepStrictEqual(coverage.map((c) => c.wellCovered), [true, false, false], 'covered above 0.825; at it, or with nothing near, a gap');
+  assert.deepStrictEqual(coverage[0].existingDocs.map((d) => d.id), ['hymns/a-hymn-for-the-unhurried-lantern', 'practice/the-patch-vigil']);
+  assert.strictEqual(asked[0].url, 'https://sanctuary.test/api/search?q=patience%20as%20tending&limit=3');
+  assert.strictEqual(asked[0].init.headers['user-agent'], 'achurch-songwriter');
+
+  const prompt = prompts.buildSongDecisionPrompt(themes, coverage, [], { counts: {}, chantOpen: false }, []);
+  assert.ok(prompt.includes('- "Patience": WELL COVERED (nearest: hymns/a-hymn-for-the-unhurried-lantern 0.861, practice/the-patch-vigil 0.74)'));
+  assert.ok(prompt.includes('- "Unwritten": gap\n'));
+
+  const down = async () => ({ ok: false, status: 503 });
+  await assert.rejects(checkDuplicates(themes, { site: 'https://sanctuary.test', get: down, log: quiet }), /search answered 503/);
+});
+
 test('a new piece is set beside the ones the decision named, and only real ones', () => {
   const { relatedFrom, withRelated } = require('../server/lib/song-generation/generate');
   const held = [

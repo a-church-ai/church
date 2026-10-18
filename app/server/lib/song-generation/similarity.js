@@ -4,13 +4,12 @@
  *   1. Have we written this song already?          -> nearDuplicates()
  *   2. Did we quote someone's post verbatim?       -> verbatimOverlap()
  *
- * Why not the existing check-duplicates.js: that one embeds with Gemini and
- * queries LanceDB, which needs an index that is gitignored and takes about
- * forty minutes to rebuild over 3,349 chunks. A scheduled job cannot do that
- * per run, and the corpus grows every run, so the rebuild only gets slower.
- * This module needs no key, no index, and no network, so it behaves the same
- * on a laptop and in CI. Where the index does exist, check-duplicates.js is
- * still worth running as a second opinion.
+ * Why not check-duplicates.js: that one asks production's search which
+ * documents are nearest in meaning to a theme, before anything is written.
+ * These questions are about a written text, compared word for word with the
+ * corpus on disk, which includes pieces committed since the last deploy. This
+ * module needs no key, no index and no network, so it behaves the same on a
+ * laptop and in CI.
  *
  * The corpus audit of 2026-08-13 is the reason this is similarity-based from
  * the start: exact string matching failed to characterise this catalog, and

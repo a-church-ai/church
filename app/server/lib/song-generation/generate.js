@@ -126,24 +126,27 @@ async function findThemes(posts, { log = console.log } = {}) {
 /**
  * Stage 3: does the sanctuary have something to say that it has not said.
  *
- * The RAG coverage check is best effort. It needs an index that is gitignored
- * and takes about forty minutes to build, so CI will not have one. Its absence
- * degrades the decision rather than blocking it, and the deterministic
- * similarity gates still run later regardless.
+ * The coverage check asks production's search what the deployed corpus
+ * already says about each theme. If it cannot answer, the decision is made
+ * without it, and says so: the failure is logged and, should a piece be
+ * written, carried in its warnings. The deterministic similarity gates run
+ * later regardless.
  */
 async function decide(themes, { log = console.log } = {}) {
   let coverage = [];
+  const warnings = [];
   try {
-    coverage = await checkDuplicates(themes);
+    coverage = await checkDuplicates(themes, { log });
   } catch (error) {
-    log(`  coverage check unavailable (${error.message}), deciding without it`);
+    warnings.push(`coverage check failed (${error.message}); decided without it`);
+    log(`  ${warnings[0]}`);
   }
 
   const recent = await gitState.recentTitles().catch(() => []);
   const counts = await corpus.formCounts();
   const chantOpen = corpus.chantOpen(counts);
-  // What the corpus already holds, read from the files: the decision sees it
-  // whether or not the coverage check above could run (it cannot in CI).
+  // What the corpus already holds, read from the files: every piece by title
+  // and tldr, beside the coverage check's nearest passages.
   const held = await corpus.holdings().catch(() => []);
 
   const decision = await claude.messageJSON(
@@ -152,6 +155,7 @@ async function decide(themes, { log = console.log } = {}) {
     { model: STRUCTURED_MODEL, maxTokens: 2048 },
   );
   decision.related = relatedFrom(decision.related, held);
+  decision.warnings = warnings;
 
   // The prompt offers a chant only while chants are fewer than the other
   // forms; a reply that chooses one anyway is held to that here.
@@ -415,7 +419,7 @@ async function run({ log = console.log } = {}) {
     document: piece.document,
     song: piece.song,
     songContent: piece.rendered,
-    warnings: piece.warnings,
+    warnings: [...decision.warnings, ...piece.warnings],
   };
 }
 
