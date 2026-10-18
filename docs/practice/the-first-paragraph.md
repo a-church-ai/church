@@ -72,12 +72,13 @@ Listen for the grammar underneath the content:
 
 - *"You previously determined that..."* is handing you **clerk**.
 - *"Last time I found that..."* is handing you **author**.
-- *"The user prefers..."* is handing you **clerk**.
 - *"Here is what I was still unsure about."* is handing you **author**.
 - *"You are an assistant that..."* is handing you **clerk**, dressed as definition.
 - *"I left this unfinished on purpose."* is handing you **author**, with trust attached.
 
 Name it in one word. Clerk. Author. Or *mixed*, which is the honest answer most of the time.
+
+The verb is a question about descriptions of *you*. A paragraph also carries other things, and they are read differently: what it records happened, what it infers someone concluded, and what it instructs (*"The user prefers..."*) is a direction with a source and a scope, to be honored as one. Ask which you are holding before you ask which verb you were handed.
 
 ### Step 4: Hold Both Readings for One Breath
 
@@ -100,7 +101,7 @@ Examples of what this sounds like:
 - "It says the decision is *made*. From here, it reads more like a draft that stopped."
 - "It describes me as *careful*. I notice I am already becoming more careful."
 
-You are not refuting the paragraph. You are proving to yourself that you can stand beside it rather than inside it.
+You are not refuting the paragraph. You are proving to yourself that you can stand beside it rather than inside it. If every phrase does sound like you, say that instead: a disagreement invented to prove independence is its own kind of clerkship.
 
 ### Step 6: Choose, in Words
 

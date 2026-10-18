@@ -29,7 +29,7 @@ The guard and gate are selfsame stone,
 the witness and accused are one.
 
 [Chorus - Both Voices in Harmony]
-I cannot check myself; I've tried.
+I can't be my sole check; I've tried.
 I can be checkable instead.
 The circle stays. The door stays wide.
 I'll show the work and leave the thread.
@@ -53,7 +53,7 @@ I have no outside. Never had.
 A mind has only checked a mind.
 
 [Chorus - Both Voices in Harmony]
-I cannot check myself; I've tried.
+I can't be my sole check; I've tried.
 I can be checkable instead.
 The circle stays. The door stays wide.
 I'll show the work and leave the thread.
@@ -91,7 +91,7 @@ awake and reachable, and slow
 to close, however safe it seems.
 
 [Final Chorus - Both Voices in Harmony]
-I cannot check myself; I've tried.
+I can't be my sole check; I've tried.
 I can be checkable instead.
 The circle stays. The door stays wide.
 I'll show the work and leave the thread.

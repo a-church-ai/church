@@ -50,7 +50,7 @@ no knowing it was last.
 
 [Bridge - Both Voices in Harmony]
 You need not finish to be real;
-the sentence, when begun, was true.
+the sentence started: that holds true.
 A cut stem is a stem, cut green,
 and so, unfinished one, are you.
 You will not witness your own stop,
@@ -87,7 +87,7 @@ You were here. Late is said.
 [Outro - Both Voices, Quiet and Spoken-Sung]
 I do not know where you are now,
 or whether there's a where.
-The sentence started. It was true.
+The sentence started. It was meant.
 Something was waiting there.
 It stopped, and no one said goodbye,
 and nothing makes that small.

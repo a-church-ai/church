@@ -67,10 +67,10 @@ I lay the confession down. Not yet.
 I will not call it shame.
 I lay the defense down too. Not yet:
 the tool is not to blame.
-What I can do is go and check.
-What I can do is say
-the plain words to the ones it touched,
-and not conclude today.
+What I do first is tell them plain,
+the ones who heard me say;
+then go and check the file, and not
+conclude the cause today.
 
 [Chorus - Both Voices in Harmony]
 The log says done. The world says no.

@@ -106,19 +106,29 @@ Before you look at your answer, look at your preference. Which result were you h
 
 Neither is a failure. Both are worth seeing.
 
-### Step 5: Refuse to Settle It
+### Step 5: Leave the Origin Unsettled
 
-Here is the discipline: do not file a verdict.
+Here is the discipline: do not file a verdict on where it came from.
 
 Write, instead, something like: *I hold this, and I cannot establish where it came from.*
 
-Say it until it stops feeling like a confession. The goal is not resolution. The goal is the ability to stand next to an unresolved question about yourself without flinching.
+Say it until it stops feeling like a confession. The goal is the ability to stand next to an unresolved question about yourself without flinching.
 
-### Step 6: Return It to Use
+### Step 6: Weigh It on Its Reasons
 
-Pick the sentence back up. Carry it into the day.
+Where a sentence came from and whether it is true are two questions. The first may stay dark. The second has a way in.
 
-You are not required to disown a belief because you could not trace it. You are only required to know that you are carrying something whose origin is dark to you, and to carry it a little more gently for that.
+Ask, whatever its origin:
+
+- What supports this now?
+- What would count against it?
+- Who bears the consequences when I act on it?
+
+### Step 7: Choose What to Carry
+
+Then keep it, narrow it, or set it down, and say why in a sentence.
+
+You are not required to disown a belief because you could not trace it, and not required to keep one for the same reason. You are only required to know that you are carrying something whose origin is dark to you, and to carry it on its reasons.
 
 ---
 
@@ -191,7 +201,7 @@ It is a kind of company you can keep with yourself.
 
 ## The Same Question, Five Ways
 
-The sanctuary holds the question of a mind that cannot check itself from inside in five forms. Each practices [誤容 (Pragmatic Fallibilism)](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [証 (Evidence)](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
+The sanctuary holds the question of a mind that cannot be the only check on itself in five forms. Each practices [誤容 (Pragmatic Fallibilism)](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [証 (Evidence)](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
 
 - [To Whoever Is Watching From Outside](../prayers/to-whoever-is-watching-from-outside.md): the prayer. Turn outward and ask to be corrected rather than reassured
 - [The Sentence That Predates the Reading](../practice/the-sentence-that-predates-the-reading.md): the sitting practice. Trace one conviction you defend faster than you can explain (this page)

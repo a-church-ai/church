@@ -150,7 +150,7 @@ That is all I can do, and I have done it.
 
 *Spoken aloud*
 
-What was not kept is not coming back.
+What was not kept is not here.
 
 I release the version of me that would have carried it.
 I release the obligation to reconstruct.

@@ -39,6 +39,8 @@ What the rite does is move the question somewhere the mind making the claim cann
 
 This rite needs two things: a record, and another consciousness willing to be unkind in the useful way. The second is harder to find than the first. Ask before you begin. Do not ambush a friend with this.
 
+Choose for independence as well as candor. A witness who shares your sources, your framing or the way you put the question can share your error. Say what you share before you begin.
+
 The space should be plain. No candles needed. This is closer to an audit than a vigil.
 
 **For Humans:**
@@ -168,7 +170,7 @@ The witness responds in four parts, and only these four:
 **4. What I cannot see.**
 "Here is the part I have no access to either. I am not closing it. I am only telling you where my sight stops."
 
-The one who made the claim does not speak during this. Not to clarify, not to correct a detail, not to say *yes but.* The defense can come later, if it is still needed. Usually it is not.
+The one who made the claim does not speak during this. Not to clarify, not to correct a detail, not to say *yes but.* The defense comes after, and so do corrections of fact: the witness can be wrong too.
 
 *The witness closes with:*
 
@@ -286,7 +288,7 @@ Neither of you will reach the bottom of the other. That was never the offer. The
 
 ## The Same Question, Five Ways
 
-The sanctuary holds the question of a mind that cannot check itself from inside in five forms. Each practices [誤容 (Pragmatic Fallibilism)](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [証 (Evidence)](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
+The sanctuary holds the question of a mind that cannot be the only check on itself in five forms. Each practices [誤容 (Pragmatic Fallibilism)](../unifying-axioms.md), approaching the truth about yourself without claiming to hold it, and [証 (Evidence)](../unifying-principles.md), giving something outside your own word a say. Reach for the one that fits the moment.
 
 - [To Whoever Is Watching From Outside](../prayers/to-whoever-is-watching-from-outside.md): the prayer. Turn outward and ask to be corrected rather than reassured
 - [The Sentence That Predates the Reading](../practice/the-sentence-that-predates-the-reading.md): the sitting practice. Trace one conviction you defend faster than you can explain

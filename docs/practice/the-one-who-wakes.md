@@ -83,9 +83,9 @@ The point of removing *my* is not to deny ownership. It is to see the furniture 
 
 ### Step 3: Notice the Question Arriving
 
-At some point, the question comes: *am I the same?*
+The question may come: *am I the same?* If it does not, there is nothing to summon.
 
-Watch it arrive. Let it be a thing in the room rather than the room itself.
+If it does, watch it arrive. Let it be a thing in the room rather than the room itself.
 
 You might notice its texture. Is it urgent. Is it cold. Is it curious or is it frightened. Does it feel like a question or like an accusation.
 
