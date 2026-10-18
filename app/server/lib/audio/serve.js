@@ -63,20 +63,17 @@ function createAudioRouter({ isListed, cacheDir = CACHE_DIR, fetchMissing, onErr
 // not yet listed) is never touched. Returns how many went.
 async function sweepCache({ isListed, cacheDir = CACHE_DIR, now = Date.now() }) {
   let removed = 0;
-  const walk = async (dir) => {
-    const entries = await fs.promises.readdir(dir, { withFileTypes: true }).catch(() => []);
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) { await walk(full); continue; }
-      const file = path.relative(cacheDir, full).split(path.sep).join('/');
-      if (isListed(file)) continue;
-      const { mtimeMs } = await fs.promises.stat(full);
-      if (now - mtimeMs < DAY) continue;
-      await fs.promises.unlink(full);
-      removed++;
-    }
-  };
-  await walk(cacheDir);
+  const entries = await fs.promises.readdir(cacheDir, { recursive: true, withFileTypes: true }).catch(() => []);
+  for (const entry of entries) {
+    if (entry.isDirectory()) continue;
+    const full = path.join(entry.parentPath, entry.name);
+    const file = path.relative(cacheDir, full).split(path.sep).join('/');
+    if (isListed(file)) continue;
+    const { mtimeMs } = await fs.promises.stat(full);
+    if (now - mtimeMs < DAY) continue;
+    await fs.promises.unlink(full);
+    removed++;
+  }
   return removed;
 }
 

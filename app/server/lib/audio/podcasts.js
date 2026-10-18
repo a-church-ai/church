@@ -88,7 +88,7 @@ const EPISODE_COVER_DESIGN = 1;
 
 function episodeCoverHash(doc, recording) {
   const drawn = [EPISODE_COVER_DESIGN, doc.title, doc.category, recording.seconds, recording.voices, recording.peaks, recording.cues || null];
-  return crypto.createHash('sha256').update(JSON.stringify(drawn)).digest('hex').slice(0, 8);
+  return crypto.hash('sha256', JSON.stringify(drawn)).slice(0, 8);
 }
 
 // Under /og/v1/podcast at 1400px for the feeds, under /og/v1/square at 512px

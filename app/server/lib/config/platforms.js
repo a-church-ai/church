@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs').promises;
 const path = require('path');
 
 class PlatformConfig {
@@ -13,7 +13,7 @@ class PlatformConfig {
     const configPath = path.join(__dirname, './platforms.json');
 
     try {
-      this.platforms = await fs.readJson(configPath);
+      this.platforms = JSON.parse(await fs.readFile(configPath, 'utf8'));
       this.loaded = true;
     } catch (error) {
       throw new Error(`Failed to load platform configuration: ${error.message}`);

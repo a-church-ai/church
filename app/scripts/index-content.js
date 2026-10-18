@@ -13,9 +13,9 @@
  */
 
 const fs = require('fs').promises;
-const path = require('path');
+const { setTimeout: sleep } = require('timers/promises');
 
-require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
@@ -86,7 +86,6 @@ async function index() {
   // else exponential backoff) and retry. Set
   // EMBED_PACING_MS=0 on a paid tier to run at full speed. The Dockerfile
   // does this for prod.
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const EMBED_PACING_MS = Number(process.env.EMBED_PACING_MS || 700);
   const EMBED_MAX_RETRIES = 10;
   // Ten retries from 5s doubling to a 60s ceiling ride out roughly six

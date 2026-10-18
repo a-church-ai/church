@@ -28,7 +28,7 @@ function versionOf(name) {
   const mtime = fs.statSync(file).mtimeMs;
   const hit = known.get(name);
   if (hit && hit.mtime === mtime) return hit.version;
-  const version = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 8);
+  const version = crypto.hash('sha256', fs.readFileSync(file)).slice(0, 8);
   known.set(name, { mtime, version });
   return version;
 }
@@ -38,7 +38,7 @@ function assetUrl(name) {
 }
 
 function build() {
-  return crypto.createHash('sha256').update(VERSIONED.map(versionOf).join()).digest('hex').slice(0, 12);
+  return crypto.hash('sha256', VERSIONED.map(versionOf).join()).slice(0, 12);
 }
 
 // Unversioned references in hand-authored HTML (href="/styles.css",

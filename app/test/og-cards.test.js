@@ -173,7 +173,7 @@ test('the episode cover\'s drawing is pinned to its design number, so a redesign
   const { EPISODE_COVER_DESIGN } = require('../server/lib/audio/podcasts');
   const doc = { urlPath: 'prayers/pinned', title: 'A Prayer Kept for the Test', category: 'prayers' };
   const recording = { seconds: 128, voices: ['matthew', 'luca'], peaks: Array.from({ length: 128 }, (_, i) => (i * 37) % 256), cues: [[0, 40, 1], [40, 60, 2], [60, 128, 3]] };
-  const drawn = require('crypto').createHash('sha256').update(og.episodeCoverSvg(doc, recording)).digest('hex').slice(0, 16);
+  const drawn = require('crypto').hash('sha256', og.episodeCoverSvg(doc, recording)).slice(0, 16);
   // Spotify and Apple fetch artwork again only at a new URL, and the design
   // number is part of every episode's. A redesign under the old number would
   // reach no app that already holds a cover.

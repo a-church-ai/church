@@ -15,8 +15,7 @@ class Logger {
     const logDirectory = process.env.LOG_DIRECTORY || path.join(__dirname, '../../../logs');
 
     // Ensure log directory exists
-    const fs = require('fs-extra');
-    fs.ensureDirSync(logDirectory);
+    require('fs').mkdirSync(logDirectory, { recursive: true });
 
     // Create file transport with rotation
     const fileTransport = new DailyRotateFile({

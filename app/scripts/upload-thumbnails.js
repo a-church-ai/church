@@ -8,9 +8,8 @@
 const path = require('path');
 const fs = require('fs').promises;
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const dotenv = require('dotenv');
 
-dotenv.config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || 'us-east-1',

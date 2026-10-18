@@ -15,7 +15,7 @@
  * retried.
  */
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const { setTimeout: sleep } = require('timers/promises');
 
 // Statuses and messages that mean "try again shortly".
 const TRANSIENT_STATUS = [408, 425, 429, 500, 502, 503, 504, 529];

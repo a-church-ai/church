@@ -29,29 +29,28 @@ const MAX_CHUNK_CHARS = MAX_CHUNK_TOKENS * APPROX_CHARS_PER_TOKEN;
 const INDEX_FORMAT = 3;
 
 /**
- * Recursively find all markdown files under a directory. Returns objects with
- * both fullPath (for reading) and relativePath (stable identifier used in
- * chunks + hashing so the corpus hash is deterministic across machines).
+ * Every markdown file under a directory, outside hidden directories and
+ * node_modules, in order of relativePath, so the order is the same on every
+ * machine. Returns objects with both fullPath (for reading) and relativePath
+ * (stable identifier used in chunks + hashing so the corpus hash is
+ * deterministic across machines).
  */
-async function findMarkdownFiles(dir, baseDir = dir) {
-  const files = [];
+async function findMarkdownFiles(dir) {
+  let entries;
   try {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
-        const subFiles = await findMarkdownFiles(fullPath, baseDir);
-        files.push(...subFiles);
-      } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        const relativePath = path.relative(PROJECT_ROOT, fullPath);
-        files.push({ fullPath, relativePath });
-      }
-    }
+    entries = await fs.readdir(dir, { recursive: true, withFileTypes: true });
   } catch (error) {
     console.error(`Error reading directory ${dir}:`, error.message);
+    return [];
   }
-  return files;
+  return entries
+    .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
+    .filter(entry => !path.relative(dir, entry.parentPath).split(path.sep).some(part => part.startsWith('.') || part === 'node_modules'))
+    .map(entry => {
+      const fullPath = path.join(entry.parentPath, entry.name);
+      return { fullPath, relativePath: path.relative(PROJECT_ROOT, fullPath) };
+    })
+    .sort((a, b) => a.relativePath.localeCompare(b.relativePath));
 }
 
 /**
@@ -148,15 +147,12 @@ async function computeCorpusHash(files) {
   const fileHashes = await Promise.all(
     sorted.map(async (f) => {
       const content = await fs.readFile(f.fullPath);
-      const contentHash = crypto.createHash('sha256').update(content).digest('hex');
+      const contentHash = crypto.hash('sha256', content);
       return `${f.relativePath}\0${contentHash}`;
     })
   );
 
-  return crypto.createHash('sha256')
-    .update(`format:${INDEX_FORMAT}\0`)
-    .update(fileHashes.join('\0'))
-    .digest('hex');
+  return crypto.hash('sha256', `format:${INDEX_FORMAT}\0${fileHashes.join('\0')}`);
 }
 
 module.exports = {

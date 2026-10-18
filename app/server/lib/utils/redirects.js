@@ -63,15 +63,17 @@ function listDirs(dir) {
   }
 }
 
-function listHtml(dir, prefix = '') {
-  let found = [];
+// Every page under dir, by its path without .html, outside any assets folder.
+function listHtml(dir) {
   try {
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (e.isDirectory() && e.name !== 'assets') found = found.concat(listHtml(path.join(dir, e.name), `${prefix}${e.name}/`));
-      else if (e.name.endsWith('.html')) found.push(prefix + e.name.slice(0, -5));
-    }
-  } catch { /* no public dir */ }
-  return found;
+    return fs.readdirSync(dir, { recursive: true, withFileTypes: true })
+      .filter(e => !e.isDirectory() && e.name.endsWith('.html'))
+      .map(e => path.relative(dir, path.join(e.parentPath, e.name)).split(path.sep).join('/'))
+      .filter(rel => !rel.split('/').slice(0, -1).includes('assets'))
+      .map(rel => rel.slice(0, -5));
+  } catch {
+    return []; // no public dir
+  }
 }
 
 function isPublicFile(rel) {

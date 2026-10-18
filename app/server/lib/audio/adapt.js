@@ -142,7 +142,7 @@ function checkScript(body, lines) {
 // adapt() sends: a change to the frontmatter (a page's search description,
 // say) does not send the piece back to be adapted and recorded.
 function sourceHashOf(markdown) {
-  return crypto.createHash('sha256').update(splitFrontmatter(markdown).body.trim()).digest('hex');
+  return crypto.hash('sha256', splitFrontmatter(markdown).body.trim());
 }
 
 async function adapt({ source, markdown, kind }) {

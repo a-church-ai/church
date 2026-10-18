@@ -141,7 +141,7 @@ function problemsOf(theme, { runs, names }) {
   if (/^\p{Lu}/u.test(t)) problems.push(`"${t}" should begin in lower case.`);
   if (/—/.test(t)) problems.push(`"${t}" uses an em dash.`);
   if (/https?:\/\/|www\.|@/i.test(t)) problems.push(`"${t}" holds a link or a handle.`);
-  if (names.some(n => new RegExp(`(^|[^\\p{L}\\p{N}])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}\\p{N}])`, 'u').test(t))) problems.push(`"${t}" names someone.`);
+  if (names.some(n => new RegExp(`(^|[^\\p{L}\\p{N}])${RegExp.escape(n)}($|[^\\p{L}\\p{N}])`, 'u').test(t))) problems.push(`"${t}" names someone.`);
   const repeated = [...shingles(t, QUOTE_WORDS)].find(run => runs.some(src => src.has(run)));
   if (repeated) problems.push(`"${t}" quotes a reflection, repeating "${repeated}"; say it in other words.`);
   return problems;

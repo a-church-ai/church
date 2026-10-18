@@ -21,7 +21,7 @@
  *   node scripts/eval-ask.js > review.md     # keep the report
  */
 
-require('dotenv').config({ path: require('path').join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
 const { questions } = require('./ask-eval.json');

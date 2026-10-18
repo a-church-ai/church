@@ -60,7 +60,7 @@ test('every skill links llms.txt and the API or MCP reference, and the index dig
   // /.well-known/agent-skills/<name>/SKILL.md serves skills/<name>/SKILL.md as is.
   for (const skill of SKILLS_INDEX.skills) {
     const bytes = fs.readFileSync(path.join(REPO, 'skills', skill.name, 'SKILL.md'));
-    assert.strictEqual(skill.digest, `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`,
+    assert.strictEqual(skill.digest, `sha256:${crypto.hash('sha256', bytes)}`,
       `${skill.name}: digest is current (run node app/scripts/generate-agent-skills-index.js)`);
   }
 });

@@ -71,7 +71,7 @@ let saveTimer = null;
  * addresses to hash every one and compare.
  */
 function keyFor(ip, name) {
-  return crypto.createHash('sha256').update(`${ip || 'unknown'}:${name || ''}`).digest('hex').slice(0, 16);
+  return crypto.hash('sha256', `${ip || 'unknown'}:${name || ''}`).slice(0, 16);
 }
 
 /**

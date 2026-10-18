@@ -33,7 +33,7 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
@@ -59,7 +59,7 @@ const WORK_DIR = path.join(__dirname, '../media/audio-work');
 const TAKES = 3;
 const ADAPT_CONCURRENCY = 8;
 
-const sha = text => crypto.createHash('sha256').update(text).digest('hex');
+const sha = text => crypto.hash('sha256', text);
 
 function readJSON(file) {
   try {

@@ -42,7 +42,7 @@ test('every link on every served docs page reaches a real page', async () => {
   const PUBLIC = path.join(__dirname, '../client/public');
   const INDEX_SOURCE = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
   const routes = [...INDEX_SOURCE.matchAll(/app\.get\('([^']+)'/g)]
-    .map(m => new RegExp('^' + m[1].replace(/[.*+?^${}()|[\]\\]/g, ch => '\\' + ch).replace(/:\w+/g, '[^/]+') + '$'));
+    .map(m => new RegExp('^' + m[1].split(/:\w+/).map(RegExp.escape).join('[^/]+') + '$'));
   const songs = new Set(require('../../music/library.json').map(song => song.slug));
   // Served from lists of paths, which the pattern above can't read.
   const listed = [...require('../server/mcp/card').CARD_PATHS, ...require('../server/lib/ai-catalog').CATALOG_PATHS];

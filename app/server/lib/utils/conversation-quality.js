@@ -18,7 +18,7 @@ const WITHDRAWN = new Set(WITHDRAWN_HASHES);
 // withdrawn-conversations.json keeps, so the public list does not republish
 // what it withdraws. The admin dashboard shows it beside each conversation.
 function withdrawKey(slug) {
-  return crypto.createHash('sha256').update(String(slug)).digest('hex');
+  return crypto.hash('sha256', String(slug));
 }
 
 // Withdrawn: answered as if it did not exist, everywhere.

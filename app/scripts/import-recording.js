@@ -25,7 +25,7 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
@@ -42,7 +42,7 @@ const { CACHE_DIR } = require('../server/lib/audio/serve');
 const REPO = path.join(__dirname, '../..');
 const WORK_DIR = path.join(__dirname, '../media/audio-work/imported');
 
-const sha = data => crypto.createHash('sha256').update(data).digest('hex');
+const sha = data => crypto.hash('sha256', data);
 const clock = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
 
 function parseArgs(argv) {

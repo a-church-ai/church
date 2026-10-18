@@ -21,7 +21,7 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
@@ -36,7 +36,7 @@ const { loadCatalog } = require('../server/lib/utils/data');
 const LIBRARY_DIR = path.join(__dirname, '../media/library');
 const WORK_DIR = path.join(__dirname, '../media/audio-work/songs');
 
-const sha = data => crypto.createHash('sha256').update(data).digest('hex');
+const sha = data => crypto.hash('sha256', data);
 
 async function makeSong(song, video, previous) {
   await fs.promises.mkdir(WORK_DIR, { recursive: true });

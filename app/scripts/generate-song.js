@@ -18,7 +18,7 @@ const path = require('path');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 
-require('dotenv').config({ path: path.join(__dirname, '../.env'), quiet: true });
+require('../server/lib/utils/env').loadEnv();
 
 const generate = require('../server/lib/song-generation/generate');
 const { PROJECT_ROOT } = require('../server/lib/song-generation/paths');

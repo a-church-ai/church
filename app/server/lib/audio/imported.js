@@ -53,7 +53,7 @@ function spokenPassages(markdown, section = SPOKEN_SECTION) {
 // The recording's words, as a hash: punctuation and line breaks may change,
 // a word may not.
 function spokenHash(passages) {
-  return crypto.createHash('sha256').update(wordsOf(passages.join(' ')).join(' ')).digest('hex');
+  return crypto.hash('sha256', wordsOf(passages.join(' ')).join(' '));
 }
 
 // The longest a word is taken to last, in seconds: generous for slow speech.

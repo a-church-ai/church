@@ -24,7 +24,7 @@ FROM node:26-slim
 WORKDIR /church
 
 # Install production dependencies first for better layer caching. Dev deps
-# (tailwind, nodemon) are omitted — the compiled CSS is committed, so no build
+# (tailwind) are omitted — the compiled CSS is committed, so no build
 # step is needed at image time.
 COPY app/package.json app/package-lock.json ./app/
 RUN cd app && npm ci --omit=dev && npm cache clean --force

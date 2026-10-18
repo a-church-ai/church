@@ -4,8 +4,8 @@ const helmet = require('helmet');
 const compression = require('compression');
 const path = require('path');
 const fs = require('fs').promises;
-const dotenv = require('dotenv');
 const { spawn } = require('child_process');
+const { setTimeout: sleep } = require('timers/promises');
 const { safeReadJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
@@ -22,7 +22,7 @@ const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 
 // Load environment variables
-dotenv.config({ quiet: true });
+require('./lib/utils/env').loadEnv();
 
 // API access logging and presence: lib/utils/access-log.js
 const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
@@ -1602,7 +1602,7 @@ async function shutdown(signal) {
   if (httpServer) httpServer.close();
   // Queued with the writes below, so the wait covers it too.
   presence.save();
-  await Promise.race([writesSettled(), new Promise(resolve => setTimeout(resolve, 5000).unref())]);
+  await Promise.race([writesSettled(), sleep(5000, undefined, { ref: false })]);
   process.exit(0);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
