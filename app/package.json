@@ -71,5 +71,13 @@
     "ajv": "^8.20.0",
     "nodemon": "^3.0.1",
     "tailwindcss": "^4.1.18"
+  },
+  "allowScripts": {
+    "@google/genai": false,
+    "@parcel/watcher": false,
+    "fsevents": false,
+    "onnxruntime-node": false,
+    "protobufjs": false,
+    "sharp": false
   }
 }
