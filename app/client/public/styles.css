@@ -508,12 +508,6 @@ h1.subtitle,
     text-decoration: underline;
 }
 
-.service-arranged {
-    font-size: 0.75rem;
-    color: var(--muted-2);
-    margin-bottom: 0.75rem;
-}
-
 .now-congregation {
     font-size: 0.8125rem;
     font-weight: 400;
@@ -3459,6 +3453,13 @@ body.docs-drawer-open {
 }
 .doc-audio figcaption {
     margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+/* A recording's credit, at the foot of its document (lib/docs/render.js). */
+.doc-audio-credit {
+    margin-top: 2rem;
     font-size: 0.8125rem;
     color: var(--muted);
 }

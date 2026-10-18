@@ -55,8 +55,8 @@ function parseArgs(argv) {
   }
   const [document, audio] = opts.positional;
   if (!document || !audio || opts.positional.length > 2) throw new Error('Usage: import-recording.js <document> <audio file> --credit "<text>" [--dry-run]');
-  if (!opts.credit || !/^AI voices? from ElevenLabs: .+\.$/.test(opts.credit)) {
-    throw new Error('--credit names the voice as the player and the podcast say it: "AI voice from ElevenLabs: ...", ending in a period');
+  if (!opts.credit || !/^AI voices? from ElevenLabs\.$/.test(opts.credit)) {
+    throw new Error('--credit says the voice as the page and the podcast say it: "AI voice from ElevenLabs."');
   }
   return { ...opts, document, audio };
 }

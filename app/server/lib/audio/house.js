@@ -46,13 +46,12 @@ function choosePair(markdown, led = {}) {
   return (led[b] || 0) < (led[a] || 0) ? [b, a] : [a, b];
 }
 
-// "AI voices from ElevenLabs: Matthew Schmitz, Luca and Amaya Calm." The
-// voices are named as the library names them, and said to be synthetic: the
-// leader's voice belongs to a real narrator who did not read these words.
+// "AI voices from ElevenLabs.", or "AI voice" for one. The voices themselves
+// are not named: the cast can change, and the credit is kept simple. It is
+// said at the foot of a recording's page, in its structured data and in each
+// podcast episode's notes, where Apple asks for it (lib/audio/podcasts.js).
 function creditLine(voiceKeys) {
-  const names = voiceKeys.map(key => SPEECH.voices[key].name);
-  const list = names.length < 3 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
-  return `${names.length === 1 ? 'AI voice' : 'AI voices'} from ElevenLabs: ${list}.`;
+  return `${voiceKeys.length === 1 ? 'AI voice' : 'AI voices'} from ElevenLabs.`;
 }
 
 // A recording's credit: its own, for one made elsewhere (lib/audio/

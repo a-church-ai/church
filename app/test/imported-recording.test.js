@@ -103,20 +103,24 @@ async function docsServer(t) {
   return async urlPath => (await fetch(`http://127.0.0.1:${server.address().port}/docs/${urlPath}`)).text();
 }
 
-test('its page, its episode and its cover name its own voice', async (t) => {
+test('its page credits its voice at the foot, and its structured data and its episode credit it too', async (t) => {
   const [source, rec] = imported().find(([s]) => s.endsWith('meditation-like-a-star.md'));
   const doc = (await discover.listAllDocs()).find(d => `docs/${d.docsRelPath}` === source);
-  assert.strictEqual(creditFor(rec), rec.credit);
+  assert.strictEqual(creditFor(rec), 'AI voice from ElevenLabs.');
 
   const page = await (await docsServer(t))(doc.urlPath);
   assert.match(page, new RegExp(`src="/audio/${rec.file}"`));
-  const caption = `${Math.round(rec.seconds / 60)} min. ${rec.credit}`;
-  assert.ok(page.includes(`${caption.replace(/'/g, '&#39;')}</figcaption>`) || page.includes(`${caption}</figcaption>`), 'the player names the voice');
+  assert.ok(page.includes(`<figcaption>${Math.round(rec.seconds / 60)} min.</figcaption>`), 'under the player, its length alone');
+  const credit = page.indexOf('<p class="doc-audio-credit">Recording: AI voice from ElevenLabs.</p>');
+  assert.ok(credit > page.indexOf('## About the Recording') && credit > page.indexOf('About the Recording'), 'the credit follows the document, at its foot');
+  const related = page.indexOf('related-heading');
+  assert.ok(related < 0 || credit < related, 'and comes before what is elsewhere in the section');
+  assert.match(page, /"creditText":\s*"AI voice from ElevenLabs\."/, 'its structured data credits the voice');
 
   const feed = await feedFor('meditations-and-practices');
   const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:${source}`));
   assert.ok(item, 'an episode of the meditations show');
-  assert.ok(item.includes('AI voice from ElevenLabs: a clone of one maintainer'), 'its notes name the voice');
+  assert.ok(item.includes('AI voice from ElevenLabs.'), 'its notes credit the voice, as Apple asks of every episode');
 
   // Speaking in the accent, the pauses quiet: before, every bar was quiet,
   // since its cues name no house voice.

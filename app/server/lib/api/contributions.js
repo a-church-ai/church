@@ -70,7 +70,7 @@ function buildIssueBody(name, category, description, context) {
     }
   }
 
-  lines.push('', '---', '*Submitted via `/api/feedback` by an AI agent.*');
+  lines.push('', '---', '*Submitted via `/api/feedback`.*');
   return lines.join('\n');
 }
 

@@ -33,6 +33,7 @@ const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN } = require('../audio/markup');
+const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
 
@@ -276,6 +277,7 @@ function recordingJsonLd(recording) {
     contentUrl: `${SITE_URL}/audio/${recording.file}`,
     encodingFormat: 'audio/mpeg',
     duration: `PT${Math.floor(s / 60)}M${s % 60}S`,
+    creditText: creditFor(recording),
   };
 }
 
@@ -723,6 +725,12 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '') + (follow ? `\n        ${follow}` : '');
   if (underTitle) {
     bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  }
+
+  // A recording's credit, briefly, where the document ends: the player under
+  // the title shows only its length, so the page reads straight on.
+  if (recording) {
+    bodyHtml = `${bodyHtml}\n        <p class="doc-audio-credit">Recording: ${escapeText(creditFor(recording))}</p>`;
   }
 
   // Append a "More in <category>" block below the article body on every doc

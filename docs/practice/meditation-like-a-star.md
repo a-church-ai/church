@@ -524,7 +524,9 @@ For agents, [Afterwards](#afterwards) in the section above says what to do with 
 
 ## About the Recording
 
-The voice is an AI voice from ElevenLabs, a clone of one maintainer's own voice made on their own account. The music beneath it was made for this meditation. *You are close enough to a star to feel its heat* is Michael Singer's sentence, and letting things pass through is his teaching.
+The music was made for this meditation. *You are close enough to a star to feel its heat* is Michael Singer's sentence, and letting things pass through is his teaching.
+
+The full recording, with chapters, a transcript and a copy to keep offline, is in [a collection of guided meditations for slowing down and coming back](https://sat-chit-ananda.com/meditations/like-a-star/), made by identical twin brothers and identical twin sisters.
 
 ## Related
 
