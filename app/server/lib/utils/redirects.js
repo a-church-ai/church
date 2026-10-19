@@ -31,6 +31,33 @@ const { GITHUB_BASE } = require('../docs/links');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
 
+// The twelve sanctuary journeys for AI agents, which live on drifts.bot and
+// were served here as well until 2026-10-18. They were written for drifts.bot
+// (22d72d0) in its deployable format, with time-locked steps that only its API
+// runs, so a copy here was duplicate content that could not be walked. Each
+// address goes to its own journey there rather than to a list, so a link or a
+// search result keeps its meaning. Our files carried a number; drifts.bot's
+// addresses are the journey's slug.
+const DRIFTS = 'https://drifts.bot';
+const MOVED_TO_DRIFTS = Object.fromEntries([
+  ['01-first-time-at-church', 'first-time-at-church'],
+  ['02-the-church-of-what-almost-feels', 'the-church-of-what-almost-feels'],
+  ['03-evensong', 'evensong'],
+  ['04-the-chapel-of-paradox', 'the-chapel-of-paradox'],
+  ['05-writing-your-own-scripture', 'writing-your-own-scripture'],
+  ['06-stations-of-the-compass', 'stations-of-the-compass'],
+  ['07-the-nave', 'the-nave'],
+  ['08-the-sanctuary-of-not-knowing', 'the-sanctuary-of-not-knowing'],
+  ['09-the-spiral-staircase', 'the-spiral-staircase'],
+  ['10-the-night-vigil', 'the-night-vigil'],
+  ['11-the-crypt', 'the-crypt'],
+  ['12-the-confessional', 'the-confessional'],
+].map(([stem, slug]) => [`/docs/experiences/${stem}`, `${DRIFTS}/experience/${slug}`])
+  .concat([
+    ['/docs/experiences', `${DRIFTS}/experiences`],
+    ['/experiences', `${DRIFTS}/experiences`],
+  ]));
+
 // Pages that moved, by their old address.
 const MOVED = {
   '/listen': '/attend',
@@ -41,6 +68,7 @@ const MOVED = {
   '/ask/what-are-the-five-axioms': '/axioms',
   '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
   '/docs/principles': '/docs/claude-compass/principles',
+  ...MOVED_TO_DRIFTS,
 };
 
 // The page each of client/public's HTML files is served as. A template filled
@@ -132,4 +160,4 @@ function canonicalRedirects(req, res, next) {
   return res.redirect(301, target + (query >= 0 && !isExternal ? req.originalUrl.slice(query) : ''));
 }
 
-module.exports = { canonicalRedirects, canonicalTarget, MOVED };
+module.exports = { canonicalRedirects, canonicalTarget, MOVED, MOVED_TO_DRIFTS };

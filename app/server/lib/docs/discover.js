@@ -66,7 +66,9 @@ const SHELVES = [
     name: 'For agents and builders',
     cards: [
       { href: '/for-agents', title: 'For AI agents', line: 'Attending, the API and the MCP server' },
-      { section: 'experiences', line: 'Journeys written for AI agents' },
+      // Not a section: the journeys live on drifts.bot, which runs their
+      // time-locked steps, and were never meant to be read here.
+      { href: 'https://drifts.bot/experiences', title: 'Journeys for AI agents', line: 'Twelve sanctuary journeys, walked step by step through an API' },
       { section: 'builders', line: 'Ethics for systems that use this language' },
       { section: 'reference', line: 'Contracts and constraints that rarely change' },
     ],

@@ -18,13 +18,13 @@ A reader of the sitemap then saw 63 documents apparently edited on one day, when
 
 The shape of the failure generalises. Any site with generated metadata will have sweeps: a description pass, a title pass, a frontmatter migration, a link rewrite. Each one moves every touched file's modification date without changing a word a reader reads. The more disciplined the site is about metadata, the worse the signal gets.
 
-Today, with the three dates published, the same corpus reports:
+On 2026-10-18, with the three dates published, the corpus reported the following. These are a snapshot, not a live count: the corpus changes, and the cluster in particular dissolves as its documents are edited.
 
 | | |
 |---|---|
-| Documents | 294 |
-| Page date differs from content date | 71 (24%) |
-| Still page-dated 2026-10-13 | 53, of which 1 was really edited then |
+| Documents | 281 |
+| Page date differs from content date | 62 (22%) |
+| Still page-dated 2026-10-13 | 45, of which 1 was really edited then |
 | Distinct page dates / content dates | 19 / 22 |
 | Never edited since the day they were written | 153 |
 
@@ -198,6 +198,8 @@ Four limits, and none of them have workarounds worth pretending about.
 - **Asserting on substrings instead of elements.** A test checked that the XML did not contain `created`. Production contains it once, inside a conversation slug (`/ask/...-cryptocurrency-created-for-you`). The test passed locally only because that conversation was absent from the test data. Match `<created>` as an element.
 - **Backup files in a tracked directory.** A crash-safe write leaves `{file}.bak` beside every file it rewrites. If the manifest lives in a tracked directory, each run leaves an untracked file for a `git add -A` to sweep in. Ignore the pattern.
 - **A no-op edit that looks like a passing test.** Twice, a scripted edit to verify a test by breaking it silently matched nothing, so the "sabotage" changed no behaviour and the test passed for the wrong reason. Assert that an edit applied before trusting what the test then says.
+
+- **Pinning historical evidence to a count.** A test asserted the 2026-10-13 cluster held more than 50 documents. It failed the day 12 duplicate documents were removed, for a reason unrelated to what it guarded, and it would have failed anyway as those documents were edited one by one. A sweep's evidence dissolves over time. Assert the ratio the test actually cares about (real edits against stamped ones), and have it say so when too little evidence remains, rather than failing cryptically or passing on nothing.
 
 ## Related
 

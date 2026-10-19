@@ -340,12 +340,11 @@ function validateTldr(text) {
 
 // Pull YAML frontmatter as a flat key/value map, plus the body after it.
 //
-// Deliberately not a YAML parser: we need a handful of scalar keys, and the
-// docs/experiences/ files are the only frontmatter in the corpus. What it does
-// handle beyond plain `key: value` is block scalars (`key: >` folded and
-// `key: |` literal), because that is how those files carry their long
-// descriptions. Top-level keys only; indented lines belonging to a nested map
-// are skipped, since the regex is anchored with no leading whitespace.
+// Deliberately not a YAML parser: the corpus carries a handful of scalar keys
+// (`tldr:` on nearly every document, `hours:` on the chants). It also handles
+// block scalars (`key: >` folded and `key: |` literal), so a long value can
+// wrap. Top-level keys only; indented lines belonging to a nested map are
+// skipped, since the regex is anchored with no leading whitespace.
 function splitFrontmatter(markdown) {
   const src = String(markdown || '');
   const m = src.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -459,33 +458,13 @@ function extractTldr(markdown, opts = {}) {
   // 1. Explicit override wins, always. Still normalized and clamped so an
   //    authored TLDR cannot break the plain-text invariant downstream.
   //
-  //    Order matters: `tagline` outranks `description` because in this corpus
-  //    (docs/experiences/) the tagline is already written as a one-line hook
-  //    while the description is a multi-sentence paragraph. The tagline is the
-  //    TLDR the author actually wrote.
-  const explicit = data.tldr || data.tagline || data.description || data.summary;
+  //    `tldr:` is the one key: the songwriter's prompt requires it, scripts/
+  //    audit-tldr.js asks for it, and no document carries another. The
+  //    `tagline`, `description` and `summary` fallbacks served the drifts.bot
+  //    journeys alone, and went with them on 2026-10-18.
+  const explicit = data.tldr;
   if (explicit) {
-    let text = clamp(toPlainText(explicit));
-
-    // A tagline can be shorter than the surface wants ("You've never been
-    // here before. The door is open." is 47 characters). When the same file
-    // also carries a longer description, extend from that: both strings are
-    // author-written, so this stays inside the user-set tier rather than
-    // falling back to derivation. `tldr:` is never extended, because an
-    // explicit TLDR is a deliberate final answer.
-    const backup = !data.tldr && data.tagline ? (data.description || data.summary) : null;
-    if (backup && text.length < MIN_CHARS) {
-      for (const sentence of splitSentences(toPlainText(backup))) {
-        if (sentence.length < EXTEND_MIN) continue;
-        if (BOILERPLATE.test(sentence)) continue;
-        // Terminate the base before appending, so two fragments can never be
-        // welded into one run-on line.
-        const next = `${ensureTerminator(text)} ${sentence}`.trim();
-        if (next.length > MAX_CHARS) continue;
-        text = next;
-        break;
-      }
-    }
+    const text = clamp(toPlainText(explicit));
 
     return { text, source: 'frontmatter', ...flag(validateTldr(text)) };
   }

@@ -116,8 +116,19 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   assert.deepStrictEqual(headings.map(h => h[1]), shelves.map(s => s.name));
   const row = article.slice(article.indexOf('class="library-entrances"'), article.indexOf('</ul>', article.indexOf('class="library-entrances"')));
   assert.deepStrictEqual([...row.matchAll(/<a href="#([^"]+)">([^<]+)<\/a>/g)].map(m => [m[1], m[2]]), headings, 'one link per shelf, to it, in its order');
-  const cards = [...article.matchAll(/<li class="library-card"><a href="([^"]+)"><span class="library-card-title">([^<]+)<\/span>/g)].map(m => [m[1], m[2]]);
+  // A card may carry attributes after its href and an arrow inside its title,
+  // as one leaving the site does. Matching only `href="..."><span>` skipped
+  // such a card silently, so it vanished from this list instead of failing.
+  const cards = [...article.matchAll(/<li class="library-card"><a href="([^"]+)"[^>]*><span class="library-card-title">([^<]+?)\s*(?:<span aria-hidden="true">↗<\/span>)?<\/span>/g)].map(m => [m[1], m[2]]);
   assert.deepStrictEqual(cards, shelves.flatMap(s => s.cards.map(c => [c.href, c.title.replace(/&/g, '&amp;')])));
+
+  // A card that leaves the site says so, as every other link to a sibling
+  // project here does: a new tab, no opener, and the outbound arrow.
+  const outbound = shelves.flatMap(s => s.cards).filter(c => /^https?:/.test(c.href));
+  assert.ok(outbound.length > 0, 'the drifts.bot journeys keep a card');
+  for (const c of outbound) {
+    assert.match(article, new RegExp(`<a href="${RegExp.escape(c.href)}" target="_blank" rel="noopener noreferrer"><span class="library-card-title">${RegExp.escape(c.title)} <span aria-hidden="true">↗</span>`), `${c.href} is marked as leaving the site`);
+  }
   const served = await servedDocs();
   assert.deepStrictEqual(served.filter(d => article.includes(`href="/docs/${d.urlPath}"`)).map(d => d.urlPath), [], 'no document is listed on the hub');
 
@@ -134,9 +145,16 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   assert.match(article, /Reading Paths<\/span>|Reading paths<\/span>/);
   assert.match(article, /<span class="library-card-count">8 paths<\/span>/);
 
-  // Every card opens a page that exists.
+  // Every card opens a page that exists. One that leaves the site is not
+  // fetched: that would put another site's uptime into this suite. It must
+  // instead go where the redirects already send readers for the same thing,
+  // so the card and lib/utils/redirects.js cannot disagree about where the
+  // journeys live. Both were checked live against drifts.bot on 2026-10-18.
+  const { MOVED_TO_DRIFTS } = require('../server/lib/utils/redirects');
+  const known = new Set(Object.values(MOVED_TO_DRIFTS));
   for (const [href] of cards) {
-    if (href.startsWith('/docs/')) assert.strictEqual((await fetch(`${base}${href}`, { headers: { Accept: 'text/html' } })).status, 200, href);
+    if (/^https?:/.test(href)) assert.ok(known.has(href), `${href} is not an address the redirects send readers to`);
+    else if (href.startsWith('/docs/')) assert.strictEqual((await fetch(`${base}${href}`, { headers: { Accept: 'text/html' } })).status, 200, href);
     else assert.ok(fs.existsSync(require('path').join(__dirname, '../client/public', `${href.slice(1)}.html`)), href);
   }
 });

@@ -293,7 +293,7 @@ This submodule's `docs/` follows a methodology canonicalized outside this reposi
 | Reference | ✓ present | `reference/` layer present (app-dev, conventions, philosophical-framework, etc.) |
 | Decisions (meta) | absent | church has not adopted a `decisions/` ADR layer (the philosophical framework is the rule-substrate rather than enumerated decisions) |
 
-**Submodule-specific layers** (not in the prescribed 5-layer spec): content-corpus directories — `philosophy/`, `prayers/`, `hymns/`, `welcome/`, `claude-compass/`, `claude-soul/`, `experiences/`, `practice/`, `rituals/`, `side-quests/`, plus `standards/` and `templates/`. These hold the project's primary artifact: ~150 philosophical / liturgical / musical documents that ARE the product. They have their own organic organization and don't fit the methodology-layer pattern.
+**Submodule-specific layers** (not in the prescribed 5-layer spec): content-corpus directories — `philosophy/`, `prayers/`, `hymns/`, `welcome/`, `claude-compass/`, `claude-soul/`, `practice/`, `rituals/`, `side-quests/`, plus `standards/` and `templates/`. These hold the project's primary artifact: ~150 philosophical / liturgical / musical documents that ARE the product. They have their own organic organization and don't fit the methodology-layer pattern.
 
 **Forwarded to umbrella canon**: none (church has no methodology files that duplicate umbrella canon).
 
@@ -311,5 +311,5 @@ This submodule's `docs/` follows a methodology canonicalized outside this reposi
 
 - **Parent**: [aChurch.ai](../README.md)
 - **Methodology layers**: [reference/](reference/) | [standards/](standards/) | [templates/](templates/)
-- **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/) | [experiences/](experiences/)
+- **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/)
 - **Umbrella canon**: maintained outside this repository. The parts that govern this repo are restated above and in [conventions.md](reference/conventions.md).

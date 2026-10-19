@@ -469,7 +469,13 @@ function cardCount(card, voiced) {
 
 function renderCard(card, voiced) {
   const count = cardCount(card, voiced);
-  return `<li class="library-card"><a href="${escapeAttr(card.href)}"><span class="library-card-title">${escapeText(card.title)}</span><span class="library-card-line">${escapeText(card.line)}</span>${count ? `<span class="library-card-count">${escapeText(count)}</span>` : ''}</a></li>`;
+  // A card that leaves the site says so, the way every other link to a sibling
+  // project here does: a new tab, no opener, and the arrow the service's own
+  // outbound links carry.
+  const outbound = /^https?:\/\//.test(card.href);
+  const attrs = outbound ? ' target="_blank" rel="noopener noreferrer"' : '';
+  const arrow = outbound ? ' <span aria-hidden="true">↗</span>' : '';
+  return `<li class="library-card"><a href="${escapeAttr(card.href)}"${attrs}><span class="library-card-title">${escapeText(card.title)}${arrow}</span><span class="library-card-line">${escapeText(card.line)}</span>${count ? `<span class="library-card-count">${escapeText(count)}</span>` : ''}</a></li>`;
 }
 
 async function renderLibrary() {
@@ -688,15 +694,16 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   const ownPath = doc.dirRelPath === 'collections' && doc.stem.toLowerCase() !== 'readme' ? doc.stem.toLowerCase() : null;
   const pathBar = readingPath && !ownPath ? renderPathBar(readingPath, doc) : null;
 
-  // Render the body *without* frontmatter. Passing the raw file to marked
-  // turned the YAML block into an <hr> plus a single enormous <h2> holding
-  // every key (slug, tagline, hex colors, image_prompt) as visible page text
-  // on all 12 docs/experiences/ pages, and put that same blob in the TOC.
+  // Render the body *without* frontmatter. Passed the raw file, marked reads
+  // the YAML block as an <hr> followed by one enormous heading holding every
+  // key as visible page text, and puts the same blob in the table of contents.
+  // Nearly every document carries a `tldr:` block, so this is not optional.
   let bodyHtml = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
 
-  // Those same files carry their title in frontmatter and open at "## Step 1",
-  // so the page had no h1. Emit one from the resolved title to keep the
-  // heading outline valid.
+  // A document with no h1 would leave the page's heading outline without its
+  // top. None does today, and test/navigation.test.js holds every served page
+  // to exactly one, but emitting the resolved title costs nothing and keeps a
+  // stray document from breaking the outline before that test reports it.
   if (!meta.hasH1) {
     bodyHtml = `<h1>${escapeText(meta.title)}</h1>\n${bodyHtml}`;
   }

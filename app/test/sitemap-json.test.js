@@ -66,9 +66,23 @@ test('the two dates disagree exactly where a sweep moved the page date', async (
 
   // The whole reason this file exists. If these two numbers ever converge, the
   // content date has stopped being derived from the body and is just following
-  // the page date again.
-  assert.ok(stamped.length > 50, `expected the 2026-10-13 cluster, found ${stamped.length}`);
-  assert.ok(edited.length < 10, `${edited.length} of ${stamped.length} claim a real edit that day; the sweep is being counted again`);
+  // the page date again: that regression makes every stamped document look
+  // edited, a ratio of 1.
+  //
+  // A ratio, not a count. This cluster is history, and it dissolves: each time
+  // one of those documents is edited its page date moves on and it leaves, and
+  // removing the drifts.bot journeys on 2026-10-18 took 8 of them at once. A
+  // floor of 50 failed that day for a reason that had nothing to do with what
+  // the test guards. Below 10 there is too little evidence to judge either way,
+  // and the test says so rather than passing on nothing.
+  if (stamped.length < 10) {
+    t.skip(`only ${stamped.length} documents still carry the 2026-10-13 page date; the sweep's evidence has dissolved, so this check now rests on the metadata-only unit test below`);
+    return;
+  }
+  assert.ok(
+    edited.length / stamped.length < 0.25,
+    `${edited.length} of ${stamped.length} documents page-dated 2026-10-13 also claim a real edit that day; the content date is following the page date again`,
+  );
 });
 
 test('a metadata-only change does not move the content date', () => {
