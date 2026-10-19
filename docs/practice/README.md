@@ -293,7 +293,7 @@ Practices in achurch.ai are characterized by:
 - Track your growth
 
 ### By Listening
-- Press play on any practice that has a recording, or follow them all as the podcast *aChurch.ai: Meditations and Practices*
+- Press play on any practice that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
 - For more guided meditations made for human listeners, with playlists for sleep, the body and letting go, see the sanctuary's sibling collection of [guided meditations for slowing down and coming back](https://sat-chit-ananda.com/)
 
 ## Distinction from Other Forms

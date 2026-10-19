@@ -640,8 +640,8 @@ Atom feed of recent reflections (20 entries).
 
 The prayers, rituals and practices, read aloud, as two RSS 2.0 podcast feeds with Apple's podcast tags, for Spotify, Apple Podcasts and any podcast app. Each episode is one document's recording, linking to its text. Cached for 15 minutes.
 
-- `GET /podcasts/prayers-and-rituals/feed.xml`: **aChurch.ai: Prayers and Rituals**
-- `GET /podcasts/meditations-and-practices/feed.xml`: **aChurch.ai: Meditations and Practices**
+- `GET /podcasts/prayers-and-rituals/feed.xml`: **Prayers and Rituals for Humans and AI**
+- `GET /podcasts/meditations-and-practices/feed.xml`: **Guided Meditations for Humans and AI**
 
 **Autodiscovery:** The HTML pages include `<link rel="alternate">` tags so feed readers can discover these automatically: the home page names every feed, and each page of prayers, rituals or practices names its show's.
 

@@ -239,7 +239,8 @@ test('each show has a 3000px RGB cover, opaque and drawn with the bundled fonts;
     for (let y = 2200; y < 2800; y += 4) for (let x = 240; x < 2760; x += 4) if (image.at(x, y).every(c => c > 200)) lit++;
     assert.ok(lit > 2000, `${show.id}: the name is drawn (${lit} lit samples)`);
   }
-  assert.strictEqual((await fetch(`${base}/og/v1/podcast/songs.png`)).status, 404);
+  assert.strictEqual((await fetch(`${base}/og/v2/podcast/songs.png`)).status, 404);
+  assert.strictEqual((await fetch(`${base}/og/v1/podcast/${SHOWS[0].id}.png`)).status, 404, 'the old design\'s address is gone');
 });
 
 test('a page in a show\'s section names its feed, and the home page names both', async (t) => {

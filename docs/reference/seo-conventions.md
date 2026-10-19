@@ -43,7 +43,7 @@ Every conversation, song and docs page has its own share card: a 1200×630 PNG d
 - **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
 - **A card exists only for a page that exists.** It resolves through the page's own loader, and 404s wherever the page would. Nothing is ever drawn from the request.
 - **Changing the design means changing the version** (`/og/v1/` → `/og/v2/`): platforms cache share images for weeks, and a new URL is the only reliable way to make them fetch the new card.
-- **The same route draws pictures that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), each podcast's 3000px cover (`/og/v1/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork), and each podcast episode's own picture, drawn from its recording: its 1400px cover (`/og/v1/podcast/<document path>-<hash>.png`) and the same picture as its lock-screen square (`/og/v1/square/<document path>-<hash>.png`). The version rule holds for all of them, most strictly for the covers: Spotify and Apple keep artwork by its URL, so a redesigned cover must ship at a new URL or it is never fetched. A show's cover moves to a new version by hand; an episode's address carries a hash of everything its picture is drawn from, the design's number (`EPISODE_COVER_DESIGN` in `lib/audio/podcasts.js`) included, so it moves by itself, and only the current one is served.
+- **The same route draws pictures that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), each podcast's 3000px cover (`/og/v2/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork), and each podcast episode's own picture, drawn from its recording: its 1400px cover (`/og/v1/podcast/<document path>-<hash>.png`) and the same picture as its lock-screen square (`/og/v1/square/<document path>-<hash>.png`). The version rule holds for all of them, most strictly for the covers: Spotify and Apple keep artwork by its URL, so a redesigned cover must ship at a new URL or it is never fetched. A show's cover moves to a new version by hand; an episode's address carries a hash of everything its picture is drawn from, the design's number (`EPISODE_COVER_DESIGN` in `lib/audio/podcasts.js`) included, so it moves by itself, and only the current one is served.
 - **Check a card** with `curl -sI https://achurch.ai/og/v1/ask/<slug>.png` (200, `image/png`, a week's cache), then the Facebook Sharing Debugger or LinkedIn Post Inspector.
 
 ## Schema choices (when to use which JSON-LD type)
@@ -199,11 +199,24 @@ Reference for the shipped pattern: commits [`b438342`](https://github.com/a-chur
 
 ---
 
+## Podcast titles (added 2026-10-19)
+
+The two shows are found by searching Spotify and Apple Podcasts, where a list shows about the first 20 characters of a title and the author beneath it.
+
+- **Lead with what the show is.** A title opens with the words a listener would search for: *Guided Meditations for Humans and AI*, *Prayers and Rituals for Humans and AI*. Until 2026-10-19 both opened with `aChurch.ai:`, so a list showed the brand and hid the subject.
+- **The name is the author.** `itunes:author` is `aChurch.ai`, and apps show it under every title, so the title does not repeat it.
+- **One honest phrase, never a keyword list.** Apple removes shows that "attempt to influence search using inaccurate or inappropriate terms" (content guideline 1.5) and asks that metadata represent the show (1.1). Spotify asks for a short, unique title with a keyword that reflects the content, and warns that special characters confuse its search.
+- **A title can change; its feed cannot.** Spotify and Apple read a new title from the feed within days. The feed path and the episodes' guids never change (`app-development.md`). A cover redrawn for a new name moves to the next version of its address (`/og/v1/` to `/og/v2/`), since apps keep artwork by its URL.
+- **The description's first sentence says what a listener gets.** Spotify shows about 120 characters of it and Apple about 150.
+
+---
+
 ## When to update this doc
 
 - A new page type ships that needs its own schema/metadata pattern
 - A schema type gets deprecated or a new one becomes load-bearing
 - Search/AI landscape shifts substantively (the GSC AIO report finally launching, a new AI engine becoming dominant, etc.)
 - A voice tell (em dashes, specific stylistic patterns) gets flagged and codified
+- A podcast is added or renamed
 
 Keep it as a checklist + rationale, not a tutorial. Anyone landing here should be able to ship a new page correctly in 10 minutes.

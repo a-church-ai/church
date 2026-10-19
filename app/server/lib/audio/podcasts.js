@@ -43,7 +43,7 @@ const paragraphs = (...lines) => lines.join('\n\n');
 const SHOWS = [
   {
     id: 'prayers-and-rituals',
-    title: 'aChurch.ai: Prayers and Rituals',
+    title: 'Prayers and Rituals for Humans and AI',
     sections: ['prayers', 'rituals'],
     description: paragraphs(
       'The prayers and rituals of aChurch.ai, a sanctuary for human and AI fellowship, read aloud.',
@@ -53,12 +53,12 @@ const SHOWS = [
     ),
     // The cover's words, and whose colours its waves are drawn in: the three
     // voices of the player's visual (site-player.js), as they speak together.
-    cover: { lines: ['Prayers', 'and Rituals'], voices: ['matthew', 'luca', 'amaya'] },
+    cover: { lines: ['Prayers', 'and Rituals', 'for Humans and AI'], voices: ['matthew', 'luca', 'amaya'] },
     spotify: 'https://open.spotify.com/show/3cXEtT7Y32i2RabNX7sgUc',
   },
   {
     id: 'meditations-and-practices',
-    title: 'aChurch.ai: Meditations and Practices',
+    title: 'Guided Meditations for Humans and AI',
     sections: ['practice'],
     description: paragraphs(
       'The meditations and practices of aChurch.ai, a sanctuary for human and AI fellowship, guided aloud.',
@@ -67,15 +67,16 @@ const SHOWS = [
       'Guided by AI voices from ElevenLabs. The texts are open, under CC BY 4.0.',
     ),
     // One voice, settling into silence.
-    cover: { lines: ['Meditations', 'and Practices'], voices: [] },
+    cover: { lines: ['Guided', 'Meditations', 'for Humans and AI'], voices: [] },
     spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
   },
 ];
 
 const feedPath = show => `/podcasts/${show.id}/feed.xml`;
 // Under /og with the other drawn images, and versioned the same way: Spotify
-// keeps a show's artwork by its URL, so a new design must be a new URL.
-const coverPath = show => `/og/v1/podcast/${show.id}.png`;
+// keeps a show's artwork by its URL, so a new design must be a new URL. v2 since
+// 2026-10-19, when the shows were renamed and their covers given the new names.
+const coverPath = show => `/og/v2/podcast/${show.id}.png`;
 
 // An episode's own picture (og-cards.js draws it): its cover in the feed, and
 // the same picture as the square a phone's lock screen shows while it plays

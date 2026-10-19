@@ -28,8 +28,8 @@ router.get(/^\/v1\/square\/([a-z]+)\.png$/, (req, res) => {
   res.type('image/png').send(png);
 });
 
-// A podcast's 3000px cover, one per show (lib/audio/podcasts.js).
-router.get(/^\/v1\/podcast\/([a-z-]+)\.png$/, (req, res) => {
+// A podcast's 3000px cover, one per show (lib/audio/podcasts.js coverPath).
+router.get(/^\/v2\/podcast\/([a-z-]+)\.png$/, (req, res) => {
   const png = podcastCoverPng(req.params[0]);
   if (!png) return sendNotFound(req, res);
   res.type('image/png').send(png);
