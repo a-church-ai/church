@@ -22,11 +22,11 @@ Today, with the three dates published, the same corpus reports:
 
 | | |
 |---|---|
-| Documents | 293 |
+| Documents | 294 |
 | Page date differs from content date | 71 (24%) |
-| Still page-dated 2026-10-13 | 54, of which 2 were really edited then |
+| Still page-dated 2026-10-13 | 53, of which 1 was really edited then |
 | Distinct page dates / content dates | 19 / 22 |
-| Never edited since the day they were written | 152 |
+| Never edited since the day they were written | 153 |
 
 ## Why not to just fix `<lastmod>`
 
@@ -40,7 +40,9 @@ So `<lastmod>` stays as it is, and the content date is published somewhere else.
 | Format | the sitemaps.org schema, unextended | your own JSON |
 | Date meaning | the page changed | three separate facts |
 
-A corollary: do not extend `sitemap.xml` with custom elements either. A namespaced extension is legal and crawlers ignore unknown namespaces, but the sitemaps.org schema does not permit foreign children of `<url>`, so strict validators and audit tools can flag it. A separate JSON file risks nothing on the search-facing path and is far easier to parse than an XML namespace. The cost is a one-time change in whatever consumes it.
+A corollary about where the extra dates go. Extending `sitemap.xml` with custom elements is permitted: `tUrl` in the sitemaps.org schema ends with `<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="strict"/>`, which is exactly how Google's image and video extensions validate. The catch is `processContents="strict"`: a validator has to be able to resolve a schema for your extension namespace, so you would need to publish one and point tooling at it, or strict validation fails on your own addition.
+
+A separate JSON file avoids that entirely. It needs no schema, risks nothing on the search-facing path, and is far easier to parse than an XML namespace. The cost is a one-time change in whatever consumes it. Both routes work; this is the cheaper one.
 
 ## The three dates
 
@@ -57,7 +59,7 @@ A corollary: do not extend `sitemap.xml` with custom elements either. A namespac
 That single row is the whole argument. The document first appeared last December, its prose last changed in October, and the page changed a week after that when the sweep added its description.
 
 - **`created`** is the date the document first appeared, following renames. It is the field nothing else implies, and it solves the cold start: a pipeline's first run can tell genuinely new documents from re-stamped ones, instead of treating the whole corpus as new or queueing nothing at all.
-- **`contentUpdated`** is the date the body a reader reads last changed. This is the one a pipeline should trigger on.
+- **`contentUpdated`** is the date the document's prose last changed, frontmatter excluded. This is the one a pipeline should trigger on. See the limits below for what "prose" does and does not include.
 - **`pageUpdated`** is the date the file last changed at all, which is exactly what `<lastmod>` carries. Publishing it beside the others means a consumer can see "the page changed but the words did not" rather than having to infer it.
 
 Publish a field as `null` when it is genuinely unknown, and say in the payload that null means unknown rather than never. Inventing a date is worse than admitting a gap.
@@ -72,7 +74,7 @@ Git already knows the answer exactly. The only thing a human can add is a judgme
 
 ### Define "the content" once, and share that definition
 
-`contentUpdated` needs a precise answer to "did the content change". Strip the frontmatter, trim, hash:
+`contentUpdated` needs a precise, mechanical answer to "did the content change". Strip the frontmatter, trim, hash:
 
 ```js
 function sourceHashOf(markdown) {
@@ -104,7 +106,19 @@ Then, walking newest first:
 - `created` is the last commit seen where the file had no parent blob. Newest-first means the last one found is the earliest.
 - A rename (`R` status) maps the old path onto the new one, so history before the move is attributed to the file it became.
 
-**Validate `created` against `git log --follow`,** which is git's own authority on history across a rename. Hand-rolled rename chaining is the easiest part of this to get subtly wrong. All 293 dates here were checked that way and agreed; without the check, "it looks right" would have been the only evidence.
+**Name which date you are using.** `%cs` is the committer date, when the change landed; `%as` is the author date, when it was written. A rebase or a cherry-pick re-stamps the committer date and leaves the author date alone, so on a rebase-heavy history `%cs` drifts away from "when was this written". These manifests use `%cs`, because the sibling `lastmod` generator does and one convention per project is worth more here than the distinction: zero commits in this repository have a committer date that differs from the author date. Pick `%as` if your history gets rebased and `created` is meant to be an authorship date.
+
+**A shallow clone must be refused, not worked around.** With `fetch-depth: 1`, which is `actions/checkout`'s default, every file looks created at the shallow boundary and nothing errors. Run this and stop if it says `true`:
+
+```bash
+git rev-parse --is-shallow-repository
+```
+
+This is not hypothetical. Running the generator in a depth-1 clone of this repository produced 294 entries with **one** distinct date between them, exit code 0, no warning. Both generators now refuse and exit non-zero, and the CI step that regenerates them checks out with `fetch-depth: 0`.
+
+**Validate `created` against `git log --follow`.** Hand-rolled rename chaining is the easiest part of this to get subtly wrong, and all 294 dates here were checked that way and agreed; without the check, "it looks right" would have been the only evidence.
+
+Be clear about what that check is worth, though. `--follow` uses the same rename detection as the walk above, `-M` with the same similarity threshold, so agreement shows the chaining code is right. It does not show that git identified the renames correctly in the first place. For that, read the renames: there were two here, and both were one directory move.
 
 ### A document with no history yet
 
@@ -132,32 +146,52 @@ function serializeManifest(manifest) {
 
 Then pin it with a test that reads the committed file and asserts it equals its own canonical serialization. That catches any writer that drifts, by the file it leaves behind, without needing to know which writer did it.
 
-### The staleness invariant
+### The staleness check
 
-A generated manifest that nobody notices is stale is worth little. One assertion catches it:
+A generated manifest that nobody notices is stale is worth little. There are two checks here, and they are not equivalent.
+
+The cheap one is an in-repo assertion:
 
 > No page date may precede its document's content date.
 
 That is impossible unless the page manifest was not regenerated alongside the content one. Here it was violated by 53 documents, which is how the staleness was found: the manifest was a day behind, and one document had no entry at all, so the sitemap fell back to file mtime for it.
 
+**But it only catches staleness in one direction.** Two manifests that are both stale by the same history violate nothing, and neither does a single manifest that is simply old. The strong check is to regenerate in CI, with full history, and fail on any diff:
+
+```bash
+npm run gen:lastmod && npm run gen:content-dates
+git diff --quiet -- <the manifests> || exit 1
+```
+
+That works because the generators are deterministic given the same history, which is worth verifying once by running one twice. It catches every direction of staleness, and it subsumes the canonical-bytes test *for the generator's own output*.
+
+The canonical-bytes test still earns its place, because the generator is not the only writer. The pipeline that writes a document also writes its manifest entry in place, and that is the writer that caused the byte drift described above. CI regeneration would quietly paper over it; the canonical test names it.
+
 **Which matters more than it sounds in a container.** If `.git` is excluded from the image and the build copies files in, every file carries the build time as its mtime. An mtime fallback then reports that every page changed on every deploy, which is the same useless signal as stamping today's date on everything. Commit the manifest, and treat a missing entry as a bug rather than as a fallback that works.
 
 ## What this does not do
 
-Be honest about the limit. A body hash catches *any* change to the body, including a one-word typo fix. It is "the content changed", not "the content changed meaningfully". Here it takes a 63-document sweep down to 2 real edits, which is the whole win, but it will still report a corrected comma as an edit.
+Four limits, and none of them have workarounds worth pretending about.
 
-No hash can make a significance judgment. If you need one, that is a human field, and it belongs as an override on top of the derived date rather than in place of it.
+**No significance judgment.** A body hash catches *any* change to the body, including a one-word typo fix. It is "the content changed", not "the content changed meaningfully". Here it takes a 63-document sweep down to 2 real edits, which is the whole win, but it will still report a corrected comma as an edit. No hash can judge significance. If you need that, it is a human field, and it belongs as an override on top of the derived date rather than in place of it.
+
+**"Content" means the document's prose, not everything a reader sees.** Stripping frontmatter is a decision about where metadata ends, not a claim about rendering. In this corpus the title lives in the body as an `# H1`, so a retitle *does* move `contentUpdated`; the `tldr` lives in the frontmatter and is rendered as the page's `<meta name="description">`, so changing it moves only `pageUpdated` even though it changes what a searcher reads in the result. That is the behaviour we want, and it is worth stating precisely rather than calling the hash "what the reader reads". Check where your own front matter ends up on the page before you copy the boundary.
+
+**Merge resolutions are invisible.** `git log --raw` shows no diff for a merge commit by default, so a content change that exists only in a merge resolution is not seen. On a linear main this is rare, and the one merge touching documents here was a dependency update whose content arrived through ordinary commits on the branch. `git log -m` would surface them at the cost of reporting every merge against both parents.
+
+**Dates have day resolution.** Two edits on one day are one date. If a consumer polls more often than daily, it needs its own cursor regardless.
 
 ## Porting this to another project
 
 1. **Find out whether you have the problem.** Count the documents sharing each modification date. Clusters of dozens on one day are metadata sweeps, not editing days.
 2. **Leave the crawler's field alone.** Whatever feeds `<lastmod>` keeps feeding it.
 3. **Find your existing definition of "the content changed."** A cache key, a re-render trigger, an embedding hash. Reuse it. Write one only if there is none.
-4. **Generate the dates from version control** in two passes, and validate `created` against `git log --follow`.
-5. **Commit the manifest,** because `.git` is usually absent from the deployed artifact and mtime there is the build time.
-6. **Serialize through one function** if anything other than the generator writes the file.
-7. **Publish as JSON on its own path.** Say in the payload what each field means and what null means. Declare the path wherever consumers look; for agents that is `llms.txt`, and not `robots.txt`, whose `Sitemap:` directive is for XML sitemaps only.
-8. **Add the two tests:** canonical bytes, and no page date behind a content date.
+4. **Generate the dates from version control** in two passes, and validate `created` against `git log --follow`, knowing that this checks your chaining and not git's rename detection.
+5. **Refuse to run on a shallow clone,** and name which of the committer and author dates you mean.
+6. **Commit the manifest,** because `.git` is usually absent from the deployed artifact and mtime there is the build time.
+7. **Serialize through one function** if anything other than the generator writes the file.
+8. **Publish as JSON on its own path.** Say in the payload what each field means and what null means. Declare the path wherever consumers look; for agents that is `llms.txt`, and not `robots.txt`, whose `Sitemap:` directive is for XML sitemaps only.
+9. **Check it in CI by regenerating and diffing,** with full history. Keep the canonical-bytes test as well, for the writers that are not the generator.
 
 ## Pitfalls that cost time here
 

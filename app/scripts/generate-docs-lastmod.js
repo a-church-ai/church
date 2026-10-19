@@ -30,11 +30,26 @@ const REPO_ROOT = path.join(__dirname, '../..');
 // not a NUL or other control byte: those do not survive editing round-trips.
 const MARKER = '@@LASTMOD@@';
 
+/**
+ * A shallow clone has no history before its boundary, so every file looks
+ * created there and every date is wrong in a way nothing reports.
+ * actions/checkout defaults to fetch-depth 1, which makes this the normal
+ * state in CI rather than an unusual one. Refuse instead.
+ */
+function refuseShallow() {
+  const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'],
+    { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+  if (shallow === 'true') {
+    throw new Error('this is a shallow clone, so file history is truncated and every date would be wrong; fetch full history first (actions/checkout: fetch-depth: 0)');
+  }
+}
+
 function gitDatesForDocs() {
   // One `git log` pass over docs/, walking commits newest-first and recording
   // the first (most recent) date seen per path. Much faster than one git
   // invocation per file: 254 files would otherwise be 254 process spawns.
   // %cs is the committer date as YYYY-MM-DD, exactly the <lastmod> format.
+  refuseShallow();
   const raw = execFileSync(
     'git',
     ['log', '--name-only', `--format=${MARKER}%cs`, '--', 'docs'],
@@ -63,7 +78,11 @@ function main() {
   try {
     dates = gitDatesForDocs();
   } catch (err) {
-    console.error(`[lastmod] git unavailable (${err.message}); leaving manifest untouched`);
+    // Non-zero: a caller that regenerates and diffs (the CI check) must be able
+    // to tell a refusal from a clean run. Returning 0 here meant `npm run
+    // gen:lastmod` reported success while writing nothing.
+    console.error(`[lastmod] cannot derive dates: ${err.message}. The manifest is left untouched.`);
+    process.exitCode = 1;
     return;
   }
 

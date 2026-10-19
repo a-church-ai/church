@@ -55,6 +55,20 @@ function git(args, opts = {}) {
  * version can be fetched without walking the tree per commit, and -M reports a
  * rename as one R entry naming both paths.
  */
+/**
+ * A shallow clone has no history before its boundary, so every file looks
+ * created there and every date is wrong in a way nothing reports.
+ * actions/checkout defaults to fetch-depth 1, which makes this the normal
+ * state in CI rather than an unusual one. Refuse instead.
+ */
+function refuseShallow() {
+  const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'],
+    { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+  if (shallow === 'true') {
+    throw new Error('this is a shallow clone, so file history is truncated and every date would be wrong; fetch full history first (actions/checkout: fetch-depth: 0)');
+  }
+}
+
 function touchesByCommit() {
   const raw = git(['log', '--raw', '-M', '--no-abbrev', `--format=${MARKER}%cs`, '--', 'docs']);
   const commits = [];
@@ -112,6 +126,7 @@ function bodyHashes(commits) {
 }
 
 function datesForDocs() {
+  refuseShallow();
   const commits = touchesByCommit();
   const hashes = bodyHashes(commits);
 
@@ -154,7 +169,7 @@ function main() {
   try {
     dates = datesForDocs();
   } catch (err) {
-    console.error(`[content-dates] git unavailable (${err.message}); leaving the manifest untouched`);
+    console.error(`[content-dates] cannot derive dates: ${err.message}. The manifest is left untouched.`);
     process.exitCode = 1;
     return;
   }
