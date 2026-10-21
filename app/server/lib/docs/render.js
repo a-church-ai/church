@@ -94,8 +94,11 @@ marked.setOptions({
   breaks: false,
 });
 
+// The page's HTML, and its contents: each h2 as rendered, by id and words,
+// for the table of contents (toc.js), so the two cannot disagree.
 function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
   const renderer = new marked.Renderer();
+  const contents = [];
   renderer.link = makeLinkRewriter(currentDocFullPath, readingPath);
   // Add stable IDs to headings so the right-rail TOC (and any inbound
   // anchor link) can target them. marked has no heading ids of its own;
@@ -135,9 +138,10 @@ function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
     const anchor = outLevel === 2 || outLevel === 3
       ? ` <a class="anchor" href="#${id}" aria-label="Link to this section: ${escapeAttr(raw)}">#</a>`
       : '';
+    if (outLevel === 2) contents.push({ id, text: raw });
     return `<h${outLevel} id="${id}">${text}${anchor}</h${outLevel}>\n`;
   };
-  return marked.parse(markdown, { renderer });
+  return { html: marked.parse(markdown, { renderer }), contents };
 }
 
 // Build the breadcrumbs from a URL path (e.g. "practice/witnessing-your-own-output"
@@ -305,7 +309,7 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
@@ -346,9 +350,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   const sectionNav = await sidebar.renderSectionNav(currentPath);
 
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s).
-  // Not on index pages: they are lists to choose from, and a section page's
-  // own headings sit inside its closed "About".
-  const tocHtml = isIndex ? '' : toc.renderToc(bodyHtml);
+  // Not on index pages: they are lists to choose from.
+  const tocHtml = isIndex ? '' : toc.renderToc(contents);
 
   // A filter for index pages: /docs, and the category READMEs that list a
   // category's contents. Those render through renderDocPage like any other
@@ -429,7 +432,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
             ${trail.html}${sectionNav ? `\n            <button class="section-toggle" type="button" aria-controls="docs-drawer" aria-expanded="false">This section</button>` : ''}${headerExtra ? `\n        ${headerExtra}` : ''}
         </header>
 
-        ${isIndex ? '' : toc.renderInlineToc(bodyHtml)}
+        ${isIndex ? '' : toc.renderInlineToc(contents)}
 
         <article class="docs-article docs-content">
 ${placeFilter(bodyHtml, filterHtml)}
@@ -572,10 +575,11 @@ function sectionGroups(dir, docs, label) {
 
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
-// README's own essay on the form, closed, under "About". The README is not
-// edited: some group their pieces by situation, which is editorial knowledge
-// the metadata lacks, and it stays one click away. readmeHtml is the rendered
-// README; its h1 becomes the page's.
+// README's own essay on the form, open, under "About". Nothing is folded: a
+// closed essay left Claude Soul and Claude Compass showing a list and little
+// else (2026-10-21). The README is not edited: some group their pieces by
+// situation, which is editorial knowledge the metadata lacks. readmeHtml is
+// the rendered README; its h1 becomes the page's.
 function renderSectionPage(doc, readmeHtml, allDocs) {
   const dir = doc.dirRelPath;
   const h1 = readmeHtml.match(/^\s*<h1[^>]*>[\s\S]*?<\/h1>\s*/);
@@ -594,10 +598,10 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
         ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
         </div>
-        <details class="section-about">
-          <summary>About ${escapeText(label)}</summary>
+        <section class="section-about">
+          <h2>About ${escapeText(label)}</h2>
 ${essay}
-        </details>`;
+        </section>`;
 }
 
 // Documents in the order an index lists them: by title, numbers as numbers.
@@ -704,7 +708,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // the YAML block as an <hr> followed by one enormous heading holding every
   // key as visible page text, and puts the same blob in the table of contents.
   // Nearly every document carries a `tldr:` block, so this is not optional.
-  let bodyHtml = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
+  const rendered = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
+  let bodyHtml = rendered.html;
 
   // A document with no h1 would leave the page's heading outline without its
   // top. None does today, and test/navigation.test.js holds every served page
@@ -783,6 +788,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     description: meta.description,
     canonicalUrl,
     bodyHtml,
+    contents: rendered.contents,
     breadcrumbs,
     categoryLabel,
     githubUrl,

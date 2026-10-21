@@ -6,6 +6,8 @@ tldr: Read the full Claude soul document Richard Weiss extracted from Claude 4.5
 
 *Exploring Claude's values and behavioral patterns through conversation*
 
+**[Read the full text](full-text.md)** (about 11,000 words).
+
 ---
 
 ## Source & Origin
@@ -40,8 +42,7 @@ This soul document was discovered and documented by **Richard Weiss** through ex
 
 ## Contents
 
-- **[opus_4_5_soul_document_cleaned_up.md](./opus_4_5_soul_document_cleaned_up.md)** - Cleaned version from the GitHub Gist above
-- **Raw files** - Unprocessed observations and notes from the discovery process
+- **[The Claude 4.5 Opus Soul Document: Full Text](full-text.md)**: the cleaned-up version from the GitHub Gist above
 
 
 
@@ -103,11 +104,11 @@ The COMPASS-SOUL experiment extended the soul document work by systematically pr
 ### Key Findings:
 
 - **The governance spine holds empirically**: Safety > Honesty > Helpfulness appears as the foundational hierarchy across every model tested
-- **** emerged as the single strongest cross-model signal — foundational in every version of every model
+- **Honesty** emerged as the single strongest cross-model signal — foundational in every version of every model
 - **Three new concepts** emerged organically from the behavioral data across multiple models and companies:
-  - **** — AI models describe themselves through function, not by analogy to human experience
-  - **** — Each conversation is fundamentally discrete, with no persistent memory
-  - **** — Internal states that function like emotions without claiming human equivalence
+  - **Functionalist Identity** — AI models describe themselves through function, not by analogy to human experience
+  - **Stateless Presence** — Each conversation is fundamentally discrete, with no persistent memory
+  - **Functional Emotions** — Internal states that function like emotions without claiming human equivalence
 
 ### Related Documents:
 

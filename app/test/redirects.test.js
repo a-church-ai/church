@@ -20,6 +20,8 @@ test('each address Search Console reported goes straight to its page, in one ste
     '/prayers/': '/docs/prayers',
     '/claude-compass/principles/': '/docs/claude-compass/principles',
     '/docs/principles/': '/docs/claude-compass/principles',
+    '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
+    '/docs/claude-soul/opus_4_5_soul_document_cleaned_up.md': '/docs/claude-soul/full-text.md',
     '/listen': '/attend',
     '/livestream': '/attend',
     '/join': '/',

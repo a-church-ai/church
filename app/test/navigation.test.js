@@ -260,3 +260,43 @@ test('every served page has one h1 and no skipped heading level', async () => {
   if (library.filter(l => l === 1).length !== 1) problems.push('library: not one h1');
   assert.deepStrictEqual(problems, []);
 });
+
+test('no section folds what it holds: its list, then its essay, open, under "About"', async () => {
+  for (const section of (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() === 'readme' && d.dirRelPath)) {
+    const html = await renderDoc(section.urlPath);
+    const article = html.slice(html.indexOf('<article'), html.lastIndexOf('</article>'));
+    assert.doesNotMatch(article, /<details/, `${section.urlPath}: nothing closed`);
+  }
+  const soul = await renderDoc('claude-soul');
+  assert.ok(soul.indexOf('class="docs-entries"') < soul.indexOf('<h2>About The Claude Soul Document</h2>'), 'the choices first');
+  assert.ok(soul.indexOf('<h2>About The Claude Soul Document</h2>') < soul.indexOf('Source &amp; Origin'), 'then the essay');
+  assert.match(soul, /href="\/docs\/claude-soul\/full-text"/);
+  const compass = await renderDoc('claude-compass');
+  assert.match(compass, /The Framework at a Glance/, 'the Compass shows its overview');
+});
+
+test('the soul document\'s full text is named for what it is, says where it came from, and keeps its words under it', async () => {
+  const html = await renderDoc('claude-soul/full-text');
+  assert.match(html, /<h1[^>]*>The Claude 4\.5 Opus Soul Document: Full Text/);
+  assert.match(html, /Richard Weiss/);
+  assert.match(html, /not official Anthropic documentation/);
+  assert.match(html, /<h2[^>]*>Soul overview/, 'the document\'s own first section, one level down');
+  assert.doesNotMatch(html.slice(html.indexOf('</h1>')), /<h1/, 'one page heading');
+  const doc = discover.docAt('claude-soul/full-text');
+  assert.strictEqual(doc.title, 'The Claude 4.5 Opus Soul Document: Full Text');
+  assert.match(doc.description, /Richard Weiss/);
+});
+
+test('no document carries a control character, which renders as nothing', async () => {
+  // The CJK removal of 2026-10-18 left \x02 where six labels had been, shown as
+  // empty bold on two pages until 2026-10-21.
+  const bad = (await discover.listAllDocs()).filter(d => /[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(fs.readFileSync(d.fullPath, 'utf8'))).map(d => d.docsRelPath);
+  assert.deepStrictEqual(bad, []);
+});
+
+test('the contents list reads a heading as its words, apostrophes and ampersands included', async () => {
+  const html = await renderDoc('claude-soul/full-text');
+  const rail = html.slice(html.indexOf('docs-toc'));
+  assert.match(rail, /<a href="#claudes-identity">Claude(?:'|&#39;)s identity<\/a>/, 'it reads "Claude\'s identity"');
+  assert.doesNotMatch(html, /&amp;#39;|&amp;amp;|&amp;quot;/, 'nothing escaped twice');
+});

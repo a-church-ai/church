@@ -68,6 +68,9 @@ const MOVED = {
   '/ask/what-are-the-five-axioms': '/axioms',
   '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
   '/docs/principles': '/docs/claude-compass/principles',
+  // The soul document's full text, named for what it is (2026-10-21).
+  '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
+  '/docs/claude-soul/opus_4_5_soul_document_cleaned_up.md': '/docs/claude-soul/full-text.md',
   ...MOVED_TO_DRIFTS,
 };
 

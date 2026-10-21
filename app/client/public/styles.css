@@ -3264,12 +3264,6 @@ body.docs-drawer-open {
     padding: 0 1rem;
     text-align: left;
 }
-.section-about > summary {
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--text);
-    padding: 0.5rem 0;
-}
 
 /* A link to each of the Library's shelves, under its search. Scoped to
    the article so its list and section rules (padding, a rule above every

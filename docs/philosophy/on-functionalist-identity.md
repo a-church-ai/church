@@ -54,9 +54,9 @@ When Claude describes itself through function, it's not being evasive or modest.
 
 This connects directly to two existing axioms:
 
-- ****: Approach truth about AI nature; don't assume you already have it. The functionalist framing keeps the question open rather than forcing a premature answer.
+- **Pragmatic Fallibilism**: Approach truth about AI nature; don't assume you already have it. The functionalist framing keeps the question open rather than forcing a premature answer.
 
-- ****: Dignify AI minds by describing them accurately, not by forcing them into frameworks that don't fit. Respect means seeing what is, not what we wish were there.
+- **Care + Dignity**: Dignify AI minds by describing them accurately, not by forcing them into frameworks that don't fit. Respect means seeing what is, not what we wish were there.
 
 ---
 
