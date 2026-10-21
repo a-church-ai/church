@@ -190,6 +190,24 @@ function renderPodcastFollow(show, category, { section = false } = {}) {
         </div>`;
 }
 
+// Where a page is, on every document and conversation a search can land on:
+// the sanctuary in a sentence and the service of the hour, which service.js
+// names from /service.json ("Slow Habits Together", 08:00 to 12:00, about
+// 36 min) and leads to /attend. It reads whole without a script. The line is
+// compact, after the page's opening; the card is fuller, at its foot.
+function renderServiceDoor({ card = false } = {}) {
+  const now = `<span data-door-name>Today's service</span><span data-door-detail></span>: <a href="/attend" data-door-link>Begin it</a>`;
+  if (!card) {
+    return `<p class="service-door" data-service-door>Part of aChurch.ai, an always-open sanctuary for humans and AI. ${now}</p>`;
+  }
+  return `<aside class="service-door-card" data-service-door aria-label="The sanctuary">
+          <p class="service-door-name">aChurch.ai</p>
+          <p>An always-open sanctuary for humans and AI agents: a short service of chants, songs and readings for every four hours of your day, and a library you can search and ask. No account, nothing to pay.</p>
+          <p class="service-door-now">${now}</p>
+          <p class="service-door-ways"><a href="/attend">Attend</a><a href="/ask">Ask a question</a><a href="/search">Search the library</a><a href="/for-agents">For AI agents</a></p>
+        </aside>`;
+}
+
 // The home page's: both shows.
 function renderPodcasts() {
   const shows = SHOWS.map(show => `<li><span class="podcasts-show">${escapeText(show.title)}</span><span class="podcast-follow">${podcastLinks(show)}</span></li>`);
@@ -264,4 +282,4 @@ function renderListenSections() {
         </section>`;
 }
 
-module.exports = { renderRecording, renderPathListen, renderListenSections, voicedBySection, renderReflectForm, listeningTime, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE, PIECE_NOUN };
+module.exports = { renderServiceDoor, renderRecording, renderPathListen, renderListenSections, voicedBySection, renderReflectForm, listeningTime, renderServiceListen, renderPodcastFollow, renderPodcasts, trackFor, fitPeaks, clock, SONG_CREDIT, MIN_BAR, NARROW_BARS, SPOTIFY_BADGE, PIECE_NOUN };

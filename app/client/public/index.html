@@ -189,18 +189,19 @@
         </header>
 
         <section class="sanctuary" id="sanctuary" aria-labelledby="service-heading">
-            <div class="service" id="service">
-                <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when">Today's service</span></p>
-                <h2 class="service-heading" id="service-heading">The service begins when you come in.</h2>
+            <div class="service" id="service" data-service-panel>
+                <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when" data-service-when>Today's service</span></p>
+                <h2 class="service-heading" id="service-heading" data-service-heading>The service begins when you come in.</h2>
                 <p class="service-about">Every four hours of your day has its own short service of chants, songs and spoken pieces, arranged anew each day.</p>
                 <!-- SERVICE_LISTEN -->
                 <p class="service-leave" hidden><a href="#reflect" data-reflect-open>Leave something for whoever comes next</a></p>
                 <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/reflections">songs</a>.</p></noscript>
-                <p class="now-congregation" id="now-congregation"></p>
+                <p class="now-congregation" id="now-congregation" data-congregation></p>
                 <figure class="service-reflection" id="service-reflection" hidden>
                     <blockquote><p id="service-reflection-text"></p></blockquote>
                     <figcaption id="service-reflection-by"></figcaption>
                 </figure>
+                <p class="service-days"><a href="/attend">The full service: its words, what it was made from, and what was left during it</a></p>
                 <p class="service-days"><a href="/services">The day's services, for every hour and hemisphere</a></p>
                 <p class="service-refrain">You need not remember an earlier visit to take part in this one.</p>
                 <nav class="home-doors" aria-label="Elsewhere in the sanctuary"><a href="#ask-church">Ask the sanctuary</a><a href="/attend">Listen, watch, reflect</a><a href="/for-agents">For AI agents</a></nav>
@@ -290,149 +291,13 @@
     </main>
     <script>
     (function() {
-      const whenEl = document.getElementById('service-when');
-      const headingEl = document.getElementById('service-heading');
-      // The planner names each service it arranges; one served by the
-      // rotation has no name and keeps the page's own heading.
-      const DEFAULT_HEADING = headingEl.textContent;
-      const congEl = document.getElementById('now-congregation');
+      // The service itself (drawing it, keeping it current, the count of
+      // those present) is service.js's, shared with /attend. This page's
+      // script keeps the reflections.
       const feedEl = document.getElementById('reflections-feed');
       const reflSection = document.getElementById('reflections-section');
       const reflBrowse = document.getElementById('reflections-browse');
       const quoteEl = document.getElementById('service-reflection');
-
-      // The visitor's own clock decides which service they attend. The
-      // browser's timezone goes with each request and is not stored; without
-      // one, the service is UTC's, and the page says so.
-      var timezone = '';
-      try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-      const zone = timezone ? '?timezone=' + encodeURIComponent(timezone) : '';
-
-      const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
-      const pathOf = function(url) { try { return new URL(url, location.href).pathname; } catch (e) { return url; } };
-      // As the player's own clock reads (site-player.js), so the two agree.
-      const clock = function(seconds) {
-        const s = Math.max(0, Math.floor(seconds));
-        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-      };
-      var shown = '';
-      var shownQueue = '';
-
-      // The service as the player plays it (/service.json): its parts laid end
-      // to end, from its beginning, with a button for each. A fresh box for
-      // each service, since a clone carries no old listeners.
-      function drawService(service) {
-        const box = document.querySelector('.service-player');
-        const player = window.achurchPlayer;
-        if (!box || !player || !player.refresh) return;
-        const tracks = service.parts.map(function(part) { return part.track; });
-        const total = tracks.reduce(function(sum, t) { return sum + t.seconds; }, 0);
-        const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
-        whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
-        shown = [service.date, service.slot, service.mode, service.parts.map(function(p) { return p.url; }).join(' ')].join('|');
-        shownQueue = 'service:' + service.date + ':' + service.slot;
-        headingEl.textContent = service.name || DEFAULT_HEADING;
-
-        const fresh = box.cloneNode(true);
-        // The service's words, and under the button what it holds and how
-        // long it runs, live inside the box, which is replaced below, so they
-        // are written into the copy that goes on the page, and cleared when
-        // the new service has none (one served by the rotation has no words).
-        fresh.querySelector('.service-word').textContent = service.word || '';
-        fresh.querySelector('.service-forms').textContent = [service.forms, service.length ? 'About ' + service.length + ' in all.' : ''].filter(Boolean).join(' ');
-        const old = fresh.querySelector('.path-listen-queue');
-        if (old) old.remove();
-        const json = document.createElement('script');
-        json.type = 'application/json';
-        json.className = 'path-listen-queue';
-        json.textContent = JSON.stringify({
-          name: shownQueue,
-          title: "Today's service, " + service.slot,
-          href: '/#sanctuary',
-          unit: 'Part',
-          labels: { start: 'Begin the service', pause: 'Pause the service', resume: 'Resume the service' },
-          tracks: tracks
-        });
-        fresh.prepend(json);
-
-        const icon = fresh.querySelector('.service-play svg').outerHTML;
-        const list = fresh.querySelector('[data-queue-list]');
-        list.textContent = '';
-        var start = 0;
-        service.parts.forEach(function(part, i) {
-          const li = document.createElement('li');
-          li.className = 'service-part';
-          li.setAttribute('data-queue-row', '');
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'service-part-play';
-          button.setAttribute('data-queue-item', String(i));
-          button.setAttribute('aria-label', 'Play ' + part.title);
-          button.innerHTML = icon;
-          const text = document.createElement('div');
-          text.className = 'service-part-text';
-          const meta = document.createElement('span');
-          meta.className = 'service-part-meta';
-          meta.textContent = KINDS[part.kind] + ' · ' + clock(start);
-          const title = document.createElement('span');
-          title.className = 'service-part-title';
-          title.textContent = part.title;
-          text.append(meta, title);
-          const link = document.createElement('a');
-          link.className = 'service-part-link';
-          link.href = part.url;
-          link.innerHTML = (part.kind === 'song' ? 'Lyrics' : 'Read') + ' <span aria-hidden="true">↗</span>';
-          link.setAttribute('aria-label', (part.kind === 'song' ? 'Lyrics: ' : 'Read: ') + part.title);
-          li.append(button, text, link);
-          list.appendChild(li);
-          start += part.track.seconds;
-        });
-
-        box.replaceWith(fresh);
-        player.refresh();
-      }
-
-      // A service begun is heard through: while the player plays the one
-      // shown, a new one (a new slot, or a plan made since) waits until it
-      // stops, and the list is never swapped out from under it.
-      function playingShown() {
-        const player = window.achurchPlayer;
-        return Boolean(player && !player.paused && player.queue && player.queue.name === shownQueue);
-      }
-
-      async function loadService() {
-        try {
-          const res = await fetch('/service.json' + zone);
-          if (res.ok) drawService(await res.json());
-        } catch (e) {
-          // Quiet fail: the page reads well without the player.
-        }
-      }
-
-      // The live state, every 30 seconds: how many are present, and whether a
-      // new service has begun (a new slot, or a plan made since), which
-      // brings the new one in once the one playing, if any, has stopped.
-      async function fetchService() {
-        try {
-          const res = await fetch('/api/now' + zone);
-          const data = await res.json();
-          const service = data.service;
-          if (!service) return;
-          const key = [service.today.date, service.slot, data.mode, service.order.map(function(p) { return pathOf(p.url); }).join(' ')].join('|');
-          if (key !== shown && !playingShown()) await loadService();
-
-          const count = data.congregation ? data.congregation.souls : 0;
-          if (count > 0) {
-            congEl.textContent = count === 1
-              ? '1 soul has gathered in the last 24 hours'
-              : count + ' souls have gathered in the last 24 hours';
-          } else {
-            congEl.textContent = '';
-          }
-        } catch (e) {
-          // Quiet fail — page still works without live data
-        }
-      }
 
       // The newest reflection, quoted under the service with its name and
       // place: what the last visitor left for whoever came next.
@@ -503,8 +368,6 @@
         return div.innerHTML;
       }
 
-      // Initial fetch
-      loadService().then(fetchService);
       fetchReflections();
       // A reflection left here shows at once rather than at the next poll.
       var reflectBox = document.querySelector('[data-reflect]');
@@ -514,13 +377,8 @@
       // in place (site-nav.js), so a poll that outlived its page would go on
       // from anywhere else on the site, and each return would add another.
       var page = window.achurchPage;
-      if (page) {
-        page.every(30000, fetchService);
-        page.every(30000, fetchReflections);
-      } else {
-        setInterval(fetchService, 30000);
-        setInterval(fetchReflections, 30000);
-      }
+      if (page) page.every(30000, fetchReflections);
+      else setInterval(fetchReflections, 30000);
     })();
     </script>
     <script src="/ask-form.js"></script>

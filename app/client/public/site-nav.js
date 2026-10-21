@@ -221,7 +221,10 @@
   }
 
   nav.addEventListener('navigate', event => {
-    if (!event.canIntercept || event.hashChange || event.downloadRequest || event.formData) return;
+    // A page that updates its own address (history.replaceState, the search
+    // page's ?q=) is already where it is: there is nothing to load, and
+    // loading it again would start the page over, which updates the address.
+    if (!event.canIntercept || event.hashChange || event.downloadRequest || event.formData || event.destination.sameDocument) return;
     if (event.navigationType === 'reload') return;
     const url = new URL(event.destination.url);
     if (!isSoftNavigable(url, location.origin)) return;

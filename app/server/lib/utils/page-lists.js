@@ -112,13 +112,12 @@ ${items}
 }
 
 /**
- * A search field over a JSON index, run in the browser by site-search.js.
- * Nothing typed here leaves the page: the index is fetched whole, once, and
- * searched locally, so a search is never logged or published. Hidden until
- * the script shows it.
+ * A search field over a JSON index, run in the browser by site-search.js,
+ * and, given an api, over the writing by its words and meaning too. Searches
+ * are anonymous: never stored or published. Hidden until the script shows it.
  */
-function renderSearchBox({ index, label, noun, autofocus = false }) {
-  return `<section class="site-search" data-index="${escapeHtml(index)}" data-noun="${escapeHtml(noun)}" hidden>
+function renderSearchBox({ index, label, noun, autofocus = false, api = null }) {
+  return `<section class="site-search" data-index="${escapeHtml(index)}" data-noun="${escapeHtml(noun)}"${api ? ` data-api="${escapeHtml(api)}"` : ''} hidden>
               <label for="site-search-input" class="visually-hidden">${escapeHtml(label)}</label>
               <input type="search" id="site-search-input" placeholder="${escapeHtml(label)}..." autocomplete="off"${autofocus ? ' autofocus' : ''}>
               <p class="site-search-status" role="status" aria-live="polite"></p>

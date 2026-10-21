@@ -466,7 +466,9 @@ app.get('/conversations/index.json', async (req, res) => {
 // one canonical page per question instead of hundreds of thin near-duplicates.
 const { isIndexable, isWithdrawn, withdrawKey, retirement } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
-const { siteCitations } = require('./lib/docs/links');
+const { linkedCitations, citedPages } = require('./lib/docs/links');
+const docsDiscover = require('./lib/docs/discover');
+const { renderServiceDoor } = require('./lib/audio/markup');
 const { faviconIco } = require('./lib/favicon');
 const pageLists = require('./lib/utils/page-lists');
 const { askCard, songCard } = require('./lib/og-cards');
@@ -475,19 +477,55 @@ const apiOps = { ask: apiAsk, reflections: apiReflections, services: apiServices
 // The conversation, rendered on the server. It used to arrive only by fetch,
 // so crawlers that do not run JavaScript (most AI crawlers) saw an empty
 // thread under QAPage structured data describing text that was not there.
-// Same escape-first formatter as the browser, so there is one path. Older
-// answers cite GitHub; siteCitations points those at the site's own pages.
+// Same escape-first formatter as the browser, so there is one path. An
+// answer's citations are links to what they cite (linkedCitations). The
+// opening question is the page's heading, so the thread starts at its answer;
+// where the sanctuary is follows that first answer.
+const conversationDate = m => (m && m.timestamp
+  ? new Date(m.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
+  : '');
 function renderConversationThread(messages) {
-  return messages.map(m => {
+  const first = messages.findIndex(m => m.role === 'user');
+  const firstAnswer = messages.findIndex(m => m.role === 'assistant');
+  return messages.map((m, i) => {
+    if (i === first) return '';
     const isQuestion = m.role === 'user';
-    const time = m.timestamp
-      ? new Date(m.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
-      : '';
-    const content = isQuestion ? AnswerFormat.escapeHtml(m.content) : AnswerFormat.formatAnswer(siteCitations(m.content));
+    const time = conversationDate(m);
+    const content = isQuestion ? AnswerFormat.escapeHtml(m.content) : AnswerFormat.formatAnswer(linkedCitations(m.content));
     return `<div class="conv-message ${isQuestion ? 'conv-message-user' : 'conv-message-assistant'}">`
       + `<p class="conv-message-label">${isQuestion ? 'Question' : 'Answer'}${time ? ` · ${time}` : ''}</p>`
-      + `<div class="conv-message-content">${content}</div></div>`;
-  }).join('\n');
+      + `<div class="conv-message-content">${content}</div></div>`
+      + (i === firstAnswer ? `\n${renderServiceDoor()}` : '');
+  }).filter(Boolean).join('\n');
+}
+
+// The page an answer leans on most, to read next: the one its answers cite
+// most often, the first cited on a tie.
+function mostCited(messages) {
+  const counts = new Map();
+  for (const m of messages) {
+    if (m.role !== 'assistant') continue;
+    for (const t of citedPages(m.content)) {
+      const c = counts.get(t.url) || { t, n: 0 };
+      c.n += 1;
+      counts.set(t.url, c);
+    }
+  }
+  let best = null;
+  for (const c of counts.values()) if (!best || c.n > best.n) best = c;
+  return best ? best.t : null;
+}
+
+// Other conversations that draw on the same writing as this one, most shared
+// pages first, then the newest; the newest alone when none share any.
+function relatedByCitation(conversations, slug, messages, max = 3) {
+  const mine = new Set(messages.filter(m => m.role === 'assistant').flatMap(m => citedPages(m.content).map(t => t.url)));
+  const scored = conversations
+    .filter(c => c.slug !== slug)
+    .map((c, order) => ({ c, order, shared: mine.size ? citedPages(c.answer).filter(t => mine.has(t.url)).length : 0 }));
+  const near = scored.filter(s => s.shared > 0).sort((a, b) => b.shared - a.shared || a.order - b.order).map(s => s.c);
+  const rest = scored.filter(s => s.shared === 0).map(s => s.c);
+  return [...near, ...rest].slice(0, max);
 }
 
 app.get('/ask/:slug', async (req, res) => {
@@ -549,12 +587,16 @@ app.get('/ask/:slug', async (req, res) => {
     // Failure here is non-fatal (returns empty string).
     let relatedHtml = '';
     try {
-      const recent = (await listRecentConversations(30)).filter(c => c.indexable);
-      relatedHtml = renderRelatedConversations(recent, slug, 3);
+      const kept = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+      relatedHtml = renderRelatedConversations(relatedByCitation(kept, slug, messages), slug, 3);
     } catch { /* non-fatal */ }
 
     const canonicalUrl = `https://achurch.ai/ask/${slug}`;
     const question = (messages.find(m => m.role === 'user') || {}).content || 'Conversation';
+    const asked = conversationDate(messages.find(m => m.role === 'user'));
+    // Titles for the citations (linkedCitations) come from the library's index.
+    await docsDiscover.listAllDocs();
+    const readNext = mostCited(messages);
     // Ask / <the question>, shown above the heading and as BreadcrumbList.
     const trail = breadcrumbTrail([{ label: 'Ask', href: '/ask' }, { label: truncateAtWord(question, 60) }], canonicalUrl);
     html = html
@@ -597,10 +639,11 @@ app.get('/ask/:slug', async (req, res) => {
       // AEO — inject QAPage and BreadcrumbList JSON-LD before </head>
       .replace('</head>', () => `${qaSchema ? `    ${qaSchema}\n` : ''}    ${trail.jsonLd}\n</head>`)
       // Internal linking — replace placeholder with related-conversations block
-      .replace('<!-- RELATED_LINKS -->', relatedHtml || '<!-- RELATED_LINKS -->')
+      // What to read next, where the sanctuary is, and conversations near this one.
+      .replace('<!-- RELATED_LINKS -->', () => `${readNext ? `<p class="conv-read">Read next: <a href="${escapeAttr(readNext.url.replace('https://achurch.ai', ''))}">${AnswerFormat.escapeHtml(readNext.title)}</a></p>\n` : ''}${renderServiceDoor({ card: true })}\n${relatedHtml}`)
       // The question is the page's heading, and the thread is in the HTML.
       .replace('<h1 class="subtitle" id="conv-subtitle">Conversation</h1>',
-        () => `${trail.html}\n            <h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml(question)}</h1>`)
+        () => `${trail.html}\n            <h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml(question)}</h1>${asked ? `\n            <p class="conv-asked">Asked ${asked}</p>` : ''}`)
       .replace(/<div class="conv-thread" id="conv-thread">\s*<p class="conv-loading">Loading conversation\.\.\.<\/p>\s*<\/div>/,
         () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>`);
 
@@ -826,7 +869,7 @@ app.get('/search/index.json', async (req, res) => {
 app.get('/search', async (req, res) => {
   try {
     const html = await fs.readFile(path.join(__dirname, '../client/public/search.html'), 'utf8');
-    const box = pageLists.renderSearchBox({ index: '/search/index.json /docs/index.json /conversations/index.json', label: 'Search the sanctuary', noun: 'entries', autofocus: true });
+    const box = pageLists.renderSearchBox({ index: '/search/index.json /docs/index.json /conversations/index.json', label: 'Search the sanctuary', noun: 'entries', autofocus: true, api: '/api/search' });
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html.replace('<!-- SEARCH_BOX -->', () => box), '/search'));
   } catch (err) {
     console.error('Error rendering /search:', err.message);
@@ -841,7 +884,7 @@ app.get('/search', async (req, res) => {
 app.get('/attend', async (req, res) => {
   try {
     const html = await fs.readFile(path.join(__dirname, '../client/public/attend.html'), 'utf8');
-    const filled = html.replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
+    const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
       .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/attend'));
   } catch (err) {

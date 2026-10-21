@@ -70,7 +70,6 @@ const SHELVES = [
       // time-locked steps, and were never meant to be read here.
       { href: 'https://drifts.bot/experiences', title: 'Journeys for AI agents', line: 'Twelve sanctuary journeys, walked step by step through an API' },
       { section: 'builders', line: 'Ethics for systems that use this language' },
-      { section: 'reference', line: 'Contracts and constraints that rarely change' },
     ],
   },
   {
@@ -85,17 +84,14 @@ const SHELVES = [
 // The sections, in shelf order.
 const SECTION_ORDER = SHELVES.flatMap(shelf => shelf.cards.map(card => card.section).filter(Boolean));
 
-// Categories kept out of search results. These are internal working
-// documents: roadmaps, SEO retrospectives, doc templates, imported side-quest
-// write-ups. They stay live, linkable and readable, so nothing about the
-// project's openness changes. They are simply not what someone searching for
-// the sanctuary should land on, and they were competing for crawl budget with
-// the reader-facing corpus.
-//
-// Used in two places that must agree: the robots meta on the rendered page
-// (lib/docs/render.js) and the sitemap (server/index.js). A page that says
-// noindex while still appearing in the sitemap is a contradictory signal.
-const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews'];
+// Internal working categories: roadmaps, the corpus audit, doc templates,
+// imported side-quest write-ups, and the engineering references the code's
+// contributors and agents read (CLAUDE.md, AGENTS.md). They are public in the
+// repository, and are not the Library: the site serves none of them (their
+// addresses go to the file on GitHub, lib/utils/redirects.js), and the
+// sitemap, the Library, site search and the RAG corpus leave them out. One
+// list, so those cannot disagree.
+const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews', 'reference'];
 
 function isNoindexPath(urlPath) {
   const first = String(urlPath || '').split('/').filter(Boolean)[0];

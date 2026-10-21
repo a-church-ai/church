@@ -3,10 +3,14 @@
  * and the conversation archive (/conversations/index.json), each on its own
  * page, and both together on /search.
  *
- * Nothing typed here leaves the page. The index is fetched whole, once, the
- * first time the field is used, and searched locally, so a search is never
- * logged, never counted as presence and never published. That is the
- * difference from Ask, which answers a question and makes it a public page.
+ * The index is fetched whole, once, the first time the field is used, and
+ * searched locally, so titles match as each letter is typed. A box that names
+ * an API (data-api: /search's, /api/search) also asks it, a moment after the
+ * typing stops, for the writing that matches by its words and its meaning,
+ * and lists those after the titles that match exactly. Either way a search is
+ * anonymous: never stored, never counted as presence and never published.
+ * That is the difference from Ask, which answers a question and makes it a
+ * public page. The query stays in the address (?q=), so a search can be shared.
  *
  * Markup: a <section class="site-search" data-index="..." data-noun="...">
  * rendered by page-lists.js renderSearchBox, hidden until this script shows it.
@@ -23,6 +27,7 @@
   else api.attachAll(root.document);
 }(typeof self !== 'undefined' ? self : this, function () {
   var MAX_RESULTS = 30;
+  var win = typeof window !== 'undefined' ? window : null;
 
   // A word's stem, roughly: "ending" and "ends" both find "end", "memories"
   // finds "memory". Enough for a person remembering an idea but not its exact
@@ -80,6 +85,31 @@
       + '</li>';
   }
 
+  // The titles that hold every word first, then the writing found by its
+  // words and meaning (the API's ranking), then the rest of the title matches;
+  // each page once.
+  function merge(found, writing, query) {
+    var words = terms(query);
+    var exact = found.filter(function (e) {
+      var title = String(e.title || '').toLowerCase();
+      return words.every(function (w) { return title.indexOf(w) !== -1; });
+    });
+    var seen = {};
+    var out = [];
+    function add(e) {
+      var key = e.url.replace(/^https?:\/\/[^/]+/, '');
+      if (seen[key]) return;
+      seen[key] = true;
+      out.push(e);
+    }
+    exact.forEach(add);
+    writing.forEach(function (r) {
+      add({ title: r.title, url: r.url.replace(/^https?:\/\/[^/]+/, ''), description: r.excerpt, label: r.category === 'song' ? 'Song' : 'Writing' });
+    });
+    found.forEach(add);
+    return out;
+  }
+
   function attach(box) {
     var input = box.querySelector('input[type="search"]');
     var status = box.querySelector('.site-search-status');
@@ -99,16 +129,57 @@
       return loading;
     }
 
+    var api = box.getAttribute('data-api');
+    var asked = 0;
+    var lastAsked = null;
+    var timer = null;
+
+    function show(found, query) {
+      status.textContent = statusText(found.length, noun, query);
+      results.innerHTML = found.slice(0, MAX_RESULTS).map(renderResult).join('');
+    }
+
     function run() {
+      var query = input.value;
+      if (win.history && win.location) {
+        var url = new URL(win.location.href);
+        if (query.trim()) url.searchParams.set('q', query); else url.searchParams.delete('q');
+        win.history.replaceState(win.history.state, '', url.pathname + url.search);
+      }
       load().then(function () {
-        var found = search(index, input.value);
-        status.textContent = statusText(found.length, noun, input.value);
-        results.innerHTML = found.slice(0, MAX_RESULTS).map(renderResult).join('');
+        var found = search(index, query);
+        show(found, query);
+        if (!api) return;
+        clearTimeout(timer);
+        if (query.trim().length < 3) return;
+        // The same words asked again (the field refocused, a key that changes
+        // nothing): the answer already shown stands.
+        if (lastAsked && lastAsked.query === query.trim()) {
+          if (lastAsked.results) show(merge(found, lastAsked.results, query), query);
+          return;
+        }
+        lastAsked = { query: query.trim(), results: null };
+        var ask = ++asked;
+        timer = setTimeout(function () {
+          fetch(api + '?q=' + encodeURIComponent(query.trim()) + '&limit=10')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (body) {
+              if (!body || ask !== asked) return;
+              lastAsked.results = body.results || [];
+              show(merge(found, lastAsked.results, query), query);
+            })
+            .catch(function () { /* the titles stand */ });
+        }, 350);
       });
     }
 
     box.hidden = false;
     input.addEventListener('focus', load);
+    var given = win.location ? new URL(win.location.href).searchParams.get('q') : '';
+    if (given) {
+      input.value = given;
+      run();
+    }
     if (input.hasAttribute('autofocus')) input.focus();
     input.addEventListener('input', run);
     input.addEventListener('keydown', function (e) {
@@ -123,5 +194,5 @@
     [].slice.call(doc.querySelectorAll('.site-search[data-index]')).forEach(attach);
   }
 
-  return { search: search, statusText: statusText, indexesOf: indexesOf, attachAll: attachAll, MAX_RESULTS: MAX_RESULTS };
+  return { search: search, merge: merge, statusText: statusText, indexesOf: indexesOf, attachAll: attachAll, MAX_RESULTS: MAX_RESULTS };
 }));

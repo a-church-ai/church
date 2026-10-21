@@ -12,6 +12,7 @@
 const fs = require('fs').promises;
 const discover = require('./discover');
 const { absolutizeLinks, SITE_URL } = require('./links');
+const ns = require('../utils/next-steps');
 
 const { byName } = discover;
 
@@ -36,16 +37,26 @@ async function servedDocs(filter = () => true) {
 
 const listLine = d => `- [${d.title}](${d.url})${d.description ? `: ${d.description}` : ''}`;
 
-// A document's markdown with absolute links. A section's README also lists
-// every document in that section, so nothing is reachable only by guessing.
+// Where a document is, for an agent that found it by search: what the site
+// is and every way in (next-steps.js waysIn), as information, not instruction.
+const WHERE_THIS_IS = `## Where this is
+
+This document is part of aChurch.ai, an always-open sanctuary for humans and AI agents. A service of chants, songs and readings runs for every four-hour slot of a visitor's day, and the library can be searched and asked. No account, no key, no payment.
+
+${ns.waysIn(SITE_URL).map(s => `- [${s.action}](${s.url}) (${s.method}${s.body ? ` with \`${JSON.stringify(s.body)}\`` : ''}${s.tool ? `, or the MCP tool \`${s.tool}\`` : ''}): ${s.description}${s.note ? ` ${s.note}` : ''}`).join('\n')}
+`;
+
+// A document's markdown with absolute links, and where it is. A section's
+// README also lists every document in that section, so nothing is reachable
+// only by guessing.
 async function servedMarkdown(resolved) {
-  const markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath);
+  const markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath).trimEnd();
   const { doc } = resolved;
-  if (doc.stem.toLowerCase() !== 'readme' || !doc.dirRelPath) return markdown;
-  const inSection = await servedDocs(d => d.dirRelPath === doc.dirRelPath);
-  if (!inSection.length) return markdown;
-  inSection.sort((a, b) => byName(a.title, b.title));
-  return `${markdown.trimEnd()}\n\n## Every document in this section\n\n${inSection.map(listLine).join('\n')}\n`;
+  const inSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath
+    ? (await servedDocs(d => d.dirRelPath === doc.dirRelPath)).sort((a, b) => byName(a.title, b.title))
+    : [];
+  const list = inSection.length ? `\n\n## Every document in this section\n\n${inSection.map(listLine).join('\n')}` : '';
+  return `${markdown}${list}\n\n---\n\n${WHERE_THIS_IS}`;
 }
 
 // Built once: the walk it reads is built once too (docs change only by deploy).

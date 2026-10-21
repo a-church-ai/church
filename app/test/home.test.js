@@ -107,21 +107,23 @@ test('every hand-written page points an agent reading it at llms.txt, as the fam
   assert.strictEqual(count(own.slice(0, own.indexOf('</head>'))), 1);
 });
 
-test('the page script keeps no element from inside the player box, which each new service replaces', () => {
-  // drawService() clones the player box and swaps the copy in, so an element
-  // inside it found once at startup is detached by the first redraw: writing
+test('the service script keeps no element from inside the player box, which each new service replaces', () => {
+  // drawPanel() clones the player box and swaps the copy in, so an element
+  // inside it found once beforehand is detached by the first redraw: writing
   // to it changes nothing on the page. The service's words were such an
   // element when they moved into the box, and stayed stale on an open page
   // when the next slot's service arrived.
-  const script = HOME.slice(HOME.lastIndexOf('<script>'));
-  const kept = [...script.matchAll(/^\s{6}const \w+ = document\.getElementById\('([\w-]+)'\)/gm)].map(m => m[1]);
-  assert.ok(kept.length >= 3, `found the startup lookups: ${kept.join(', ')}`);
-  const inBox = [...renderServiceListen().matchAll(/id="([\w-]+)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(kept.filter(id => inBox.includes(id)), [], 'kept across redraws, but inside the box');
-  // The words are written into the copy that goes on the page, and cleared
-  // when the new service has none.
+  const script = fs.readFileSync(path.join(__dirname, '../client/public/service.js'), 'utf8');
+  const inBox = [...renderServiceListen().matchAll(/class="([\w-]+)"/g)].map(m => m[1]).filter(c => c !== 'path-listen-play' && c !== 'service-play' && c !== 'service-player');
+  const before = script.slice(script.indexOf('function drawPanel'), script.indexOf('const fresh = box.cloneNode(true)'));
+  for (const name of inBox) assert.ok(!before.includes(`'.${name}'`), `${name}: found before the copy, so it would go stale`);
+  // The words and the length are written into the copy that goes on the page,
+  // and cleared when the new service has none.
   assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
   // The service's name heads the panel; one without (the rotation's) keeps the page's own heading.
-  assert.match(script, /headingEl\.textContent = service\.name \|\| DEFAULT_HEADING/);
-  assert.match(HOME, /<h2 class="service-heading" id="service-heading">The service begins when you come in\.<\/h2>/);
+  assert.match(script, /headingEl\.textContent = service\.name \|\| headingEl\.getAttribute\('data-default'\)/);
+  assert.match(HOME, /<h2 class="service-heading" id="service-heading" data-service-heading>The service begins when you come in\.<\/h2>/);
+  // The home page draws it through the shared script, not a copy of its own.
+  assert.match(HOME, /data-service-panel/);
+  assert.doesNotMatch(HOME, /function drawService/);
 });

@@ -78,8 +78,28 @@ const reflectionsOn = cache({
 
 const reflectionsFor = date => reflectionsOn.get(date);
 
+// A reflection as a service's page and the API give it.
+const reflectionView = ({ reflection: r }) => ({
+  id: r.id,
+  name: r.name,
+  text: r.text,
+  createdAt: r.createdAt,
+  createdAtFormatted: formatLocal(r.createdAt, r.timezone || 'UTC'),
+  timezone: r.timezone || 'UTC',
+  song: r.song,
+});
+
+// The reflections left during one service, oldest first: the day pages', and
+// /service.json's for the service a visitor is in (lib/service/listen.js).
+async function reflectionsDuring({ date, slot, variant }, reflections) {
+  return (reflections || await reflectionsFor(date))
+    .filter(r => r.slot === slot && r.variant === variant)
+    .map(reflectionView)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
 // One service as the API and the page give it.
-function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) {
+async function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) {
   const context = entry.context || null;
   return {
     slot: slotHours(slot),
@@ -96,18 +116,7 @@ function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) 
       const piece = catalog.get(id);
       return piece ? { kind: piece.kind, title: piece.title, url: piece.url } : { kind: null, title: id, url: null };
     }),
-    reflections: reflections
-      .filter(r => r.slot === slot && r.variant === variant)
-      .map(({ reflection: r }) => ({
-        id: r.id,
-        name: r.name,
-        text: r.text,
-        createdAt: r.createdAt,
-        createdAtFormatted: formatLocal(r.createdAt, r.timezone || 'UTC'),
-        timezone: r.timezone || 'UTC',
-        song: r.song,
-      }))
-      .sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+    reflections: await reflectionsDuring({ date, slot, variant }, reflections),
     plannedFrom: context ? {
       told: contextLines(context),
       season: context.season ? { name: context.season.name, hemisphere: context.hemisphere } : null,
@@ -156,7 +165,7 @@ async function forDate(input, ctx) {
       for (const [variant, label] of VARIANTS) {
         const entry = plan[variant] && plan[variant][slot];
         const forWhom = variant !== 'slots' ? label : without.length === 2 ? 'everyone' : without.length ? `${label} and ${VARIANTS.find(v => v[0] === without[0])[1]}` : label;
-        if (entry) services.push(serviceOf({ date, slot, variant, label: forWhom, entry, catalog, reflections }));
+        if (entry) services.push(await serviceOf({ date, slot, variant, label: forWhom, entry, catalog, reflections }));
       }
     }
     const i = dates.indexOf(date);
@@ -201,4 +210,4 @@ async function days(now = new Date()) {
   return out;
 }
 
-module.exports = { forDate, days, datesShown, reflectionsFor, isDate };
+module.exports = { forDate, days, datesShown, reflectionsFor, reflectionsDuring, isDate };

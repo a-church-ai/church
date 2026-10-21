@@ -11,7 +11,8 @@ const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
 const ns = require('../utils/next-steps');
 const { listRecentConversations } = require('../utils/data');
-const { siteCitations } = require('../docs/links');
+const { linkedCitations } = require('../docs/links');
+const discover = require('../docs/discover');
 const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
 
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
@@ -289,10 +290,12 @@ async function conversation(input, ctx) {
     }).filter(Boolean);
 
     const meta = parsed.find(m => m._meta);
-    // Older answers cite GitHub; the page shows them citing the site's pages,
-    // and so does this response, so the API, MCP and the page agree.
+    // An answer's citations as links to what they cite, named, and a citation
+    // of a file no longer there left out: as the page shows them, so the API,
+    // MCP and the page agree.
+    await discover.listAllDocs();
     const messages = parsed.filter(m => !m._meta)
-      .map(m => (m.role === 'assistant' ? { ...m, content: siteCitations(m.content) } : m));
+      .map(m => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';
@@ -310,6 +313,7 @@ async function conversation(input, ctx) {
       messages,
       next_steps: [
         ns.askQuestion(baseUrl),
+        ns.searchWriting(baseUrl),
         ns.attend(baseUrl)
       ]
     } };

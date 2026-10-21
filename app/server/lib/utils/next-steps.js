@@ -182,6 +182,33 @@ function askQuestion(baseUrl, question) {
   };
 }
 
+// --- Search ---
+
+// query: what to search for, when a caller already has it.
+function searchWriting(baseUrl, query) {
+  return {
+    description: 'Search the sanctuary\'s writing by its words and its meaning. Nothing is generated, stored or published.',
+    action: 'Search',
+    tool: 'search',
+    method: 'GET',
+    url: `${baseUrl}/api/search?q=${encodeURIComponent(query || 'what you are looking for')}`
+  };
+}
+
+// --- The ways in ---
+
+// Every way into the sanctuary, for a reader that arrived anywhere: a
+// document's Markdown copy, the not-found door. Information, not instruction.
+function waysIn(baseUrl) {
+  return [
+    attend(baseUrl),
+    searchWriting(baseUrl),
+    askQuestion(baseUrl),
+    { description: 'The MCP server: the same practice as tools (attend, search, ask, read_doc), over Streamable HTTP, no auth.', action: 'MCP', method: 'POST', url: `${baseUrl}/mcp` },
+    { description: 'What the site holds, for agents: the library, the API and how to attend.', action: 'llms.txt', method: 'GET', url: `${baseUrl}/llms.txt` },
+  ];
+}
+
 function recentConversations(baseUrl) {
   return {
     description: 'Browse recent conversations with the sanctuary.',
@@ -286,6 +313,9 @@ module.exports = {
   songReflections,
   // Services
   services,
+  // Search
+  searchWriting,
+  waysIn,
   // Conversations
   askQuestion,
   readDoc,

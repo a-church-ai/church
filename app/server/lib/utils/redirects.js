@@ -107,6 +107,24 @@ function listHtml(dir) {
   }
 }
 
+// A document of an internal category (discover.js NOINDEX_CATEGORIES), which
+// the site does not serve, at its file in the repository: an engineering
+// reference, the corpus audit. Only to a file that is there, so an address
+// that names nothing (a plan, now in the private repository) stays a 404.
+function internalDocOnGitHub(p) {
+  const m = /^\/docs\/([^/]+)(?:\/(.*))?$/.exec(p);
+  if (!m || !NOINDEX_CATEGORIES.includes(m[1].toLowerCase())) return null;
+  const rel = `${m[1]}${m[2] ? `/${m[2]}` : ''}`.replace(/\.md$/i, '');
+  const at = path.join(DOCS_DIR, rel);
+  if (!at.startsWith(DOCS_DIR + path.sep)) return null;
+  for (const candidate of [`${rel}.md`, rel]) {
+    try {
+      if (fs.statSync(path.join(DOCS_DIR, candidate))) return `${GITHUB_BASE}/docs/${candidate}`;
+    } catch { /* not this one */ }
+  }
+  return null;
+}
+
 function isPublicFile(rel) {
   const file = path.join(PUBLIC_DIR, rel);
   if (!file.startsWith(PUBLIC_DIR + path.sep)) return false;
@@ -144,6 +162,9 @@ function canonicalTarget(pathname) {
   if (first && SECTIONS.has(first)) return `/docs${p}`;
 
   if (REPO_FILES.has(p) || /^\/skills\/./.test(p)) return `${GITHUB_BASE}${p}`;
+
+  const internal = internalDocOnGitHub(p);
+  if (internal) return internal;
   // Only to a file the site serves from there: the agent card it does not
   // have would be a redirect to a 404.
   const published = /^\/app\/client\/public(\/[^/\\].*)$/.exec(p);

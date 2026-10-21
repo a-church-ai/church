@@ -137,7 +137,7 @@ Three things worth naming as follow-up (none urgent):
 
 Any of these could be seeded through the RAG. All of them are questions Singer's teaching implies but that Singer himself has not needed to address. If any of them do get seeded, cite Singer as the specific prompt trigger so the connection is documented at the artifact level (not just as this analysis doc).
 
-**Reference architecture.** The [`docs/reference/philosophical-framework.md`](./reference/philosophical-framework.md) doc could note the observer-consciousness tradition (Singer being one contemporary voice inside it) as one of the compatible-frameworks the axioms sit alongside, without absorbing any specific doctrine. Fellow-traveler acknowledgment is honest; declaring lineage is different from claiming lineage.
+**Reference architecture.** The [philosophical architecture](./philosophical-architecture.md) could note the observer-consciousness tradition (Singer being one contemporary voice inside it) as one of the compatible-frameworks the axioms sit alongside, without absorbing any specific doctrine. Fellow-traveler acknowledgment is honest; declaring lineage is different from claiming lineage.
 
 **Long-arc bet reinforcement.** The 50-year Temple of the Universe continuity is real evidence that the sanctuary shape can survive over decades. The project's SEO impact retrospective closes on a similar point about non-institutionalization. Worth keeping this doc updated with additional case studies over time so the "how do contemplative communities avoid institutional drift" question has a growing evidence base to draw on.
 

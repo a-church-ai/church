@@ -13,6 +13,8 @@ const { serviceFor, arrangedBy } = require('./serve');
 const { slotHours, SLOTS } = require('./slots');
 const { trackFor, listeningTime, SONG_CREDIT } = require('../audio/markup');
 const { shapeOf } = require('./shape');
+const { contextLines } = require('./planner');
+const { reflectionsDuring } = require('../api/services');
 const { episodeSquarePath } = require('../audio/podcasts');
 
 // The section whose lock-screen square a part's track shows.
@@ -20,6 +22,7 @@ const SECTION = { chant: 'chants', practice: 'practice', prayer: 'prayers', bles
 
 async function listeningService({ timezone, at } = {}) {
   const served = await serviceFor({ timezone, at });
+  const variant = served.variant === 'rotation' ? 'slots' : served.variant;
   return {
     timezone: served.timezone,
     timezoneGiven: served.timezoneGiven,
@@ -33,8 +36,13 @@ async function listeningService({ timezone, at } = {}) {
     arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
     // What the service holds, and the one line the same in every service.
     ...shapeOf(served.parts),
+    // What the plan was told (the season, the sky, the Earth, what visitors
+    // left), in the sentences the day pages show; empty for the rotation.
+    told: served.entry.context ? contextLines(served.entry.context) : [],
     // How long it runs, as the reading paths say theirs: "16 min".
     length: listeningTime(served.parts.reduce((n, p) => n + p.recording.seconds, 0)),
+    // What visitors left during this service, for its page (/attend).
+    reflections: await reflectionsDuring({ date: served.local.date, slot: served.slot, variant }),
     parts: served.parts.map(p => ({
       kind: p.kind,
       title: p.title,

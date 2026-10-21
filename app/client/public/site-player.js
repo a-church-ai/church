@@ -240,6 +240,7 @@
   let raf = 0;
   let page = null;       // this page's own player, if it has one
   let path = null;       // this page's "Listen to this path", if it has one
+  let follow = null;     // a visual that follows the queue's playing part (/attend)
 
   const duration = () => (Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (track ? track.seconds : 0));
   const position = () => (loaded && audio.readyState > 0 ? audio.currentTime : pendingAt);
@@ -877,22 +878,35 @@
     return dpr;
   }
 
+  // What the voice-band figure draws: a voiced page's own recording, or, on a
+  // page that marks a canvas to follow its queue ([data-queue-visual]), the
+  // part of that queue now playing (its first part before it begins).
+  function visual() {
+    if (page && page.canvas) return page;
+    if (!follow || !path) return null;
+    const t = isOurs(path.queue) && track ? track : path.queue.tracks[0];
+    if (follow.track !== t) Object.assign(follow, { track: t, frames: null, asked: false });
+    return follow;
+  }
+
   function drawVisual() {
-    if (!page || !page.canvas) return;
-    const canvas = page.canvas;
-    const ctx = page.ctx || (page.ctx = canvas.getContext('2d'));
+    const v = visual();
+    if (!v || !v.canvas) return;
+    const canvas = v.canvas;
+    const ctx = v.ctx || (v.ctx = canvas.getContext('2d'));
     if (!ctx) return;
     const dpr = sizeCanvas(canvas);
     const W = canvas.width;
     const H = canvas.height;
     if (!W || !H) return;
 
-    const current = isCurrent(page.track);
+    const current = isCurrent(v.track);
+    if (current && v === follow) needFrames(follow);
     const moving = current && !audio.paused && !reducedMotion.matches;
     const at = current ? position() : 0;
-    const frame = current && page.frames ? frameAt(page.frames, at) : null;
+    const frame = current && v.frames ? frameAt(v.frames, at) : null;
     const target = { loud: frame ? Math.min(1.25, frame.loud) : REST.loud, bands: frame ? frame.bands : null };
-    const ramps = rampsFor(page.track, current ? at : 0);
+    const ramps = rampsFor(v.track, current ? at : 0);
     // Each voice at full strength, the layers behind a shade toward the
     // ground: lighter on a light card, darker on a dark one.
     const shade = isDark() ? -1 : 1;
@@ -957,8 +971,9 @@
   function needFrames(bound) {
     if (bound.asked) return;
     bound.asked = true;
-    framesFor(bound.track).then(frames => {
-      if (page !== bound) return;
+    const asked = bound.track;
+    framesFor(asked).then(frames => {
+      if (visual() !== bound || bound.track !== asked) return;
       bound.frames = frames;
       drawVisual();
     });
@@ -977,6 +992,8 @@
   function bindPage() {
     page = null;
     path = null;
+    if (follow && follow.observer) follow.observer.disconnect();
+    follow = null;
     shown.colors = null;
 
     const fig = document.querySelector('figure.doc-audio');
@@ -1037,6 +1054,14 @@
       if (path.wave) {
         path.wave.innerHTML = queueBarsHtml(q.tracks);
         queueSlider(path.wave);
+      }
+      const canvas = document.querySelector('canvas[data-queue-visual]');
+      if (canvas) {
+        follow = { canvas, ctx: null, track: null, frames: null, asked: false, observer: null };
+        if (root.ResizeObserver) {
+          follow.observer = new root.ResizeObserver(() => drawVisual());
+          follow.observer.observe(canvas);
+        }
       }
     }
 

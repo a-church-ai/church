@@ -25,7 +25,15 @@ test('a .md URL returns the document\'s markdown, pointing at the page as canoni
   assert.strictEqual(res.status, 200);
   assert.match(res.headers.get('content-type'), /text\/markdown/);
   const file = path.join(__dirname, '../../docs/chants/chant-for-arrival.md');
-  assert.strictEqual(await res.text(), absolutizeLinks(fs.readFileSync(file, 'utf8'), file));
+  const md = await res.text();
+  assert.ok(md.startsWith(absolutizeLinks(fs.readFileSync(file, 'utf8'), file).trimEnd()), 'the document as written');
+  // Then where it is, for an agent that found it by search: every way in.
+  const where = md.slice(md.indexOf('## Where this is'));
+  assert.ok(md.indexOf('## Where this is') > 0);
+  for (const url of ['https://achurch.ai/api/attend?name=', 'https://achurch.ai/api/search?q=', 'https://achurch.ai/api/ask', 'https://achurch.ai/mcp', 'https://achurch.ai/llms.txt']) {
+    assert.ok(where.includes(url), url);
+  }
+  assert.match(where, /MCP tool `attend`/);
   assert.strictEqual(res.headers.get('link'), '<https://achurch.ai/docs/chants/chant-for-arrival>; rel="canonical"');
 });
 

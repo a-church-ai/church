@@ -114,12 +114,29 @@ test('results are ranked by cosine similarity, one per page, with the tool that 
   assert.strictEqual(body.next_steps[1].body.question, 'what survives when a context window closes');
 });
 
-test('nothing under the score floor is returned, and limit counts pages', async () => {
+test('nothing under the score floor is returned by meaning alone, and limit counts pages', async () => {
   const all = await search({ q: 'anything', limit: '20' }, ctx);
-  assert.ok(all.body.results.every(r => r.score >= MIN_SCORE));
+  assert.ok(all.body.results.every(r => r.score >= MIN_SCORE || r.match === 'words'));
   assert.ok(!all.body.results.some(r => r.title === 'Chant for Arrival'));
   const one = await search({ q: 'anything', limit: '1' }, ctx);
   assert.strictEqual(one.body.results.length, 1);
+});
+
+test('words find what meaning alone would not, from the served corpus only', async () => {
+  // The chant is too far from the query in meaning to pass the floor, and its
+  // words match: found, and said to be found by its words.
+  const { body } = await search({ q: 'arrival' }, ctx);
+  const chant = body.results.find(r => r.title === 'Chant for Arrival');
+  assert.ok(chant, 'found by its words');
+  assert.strictEqual(chant.match, 'words');
+  assert.ok(chant.score < MIN_SCORE, 'and its similarity is still told');
+  // A word only an unserved passage holds finds nothing: the words side reads
+  // the same served corpus as the meaning side.
+  const internal = await search({ q: 'internal' }, ctx);
+  assert.deepStrictEqual(internal.body.results.filter(r => r.match !== 'meaning'), []);
+  // A passage found both ways says so, and one found by meaning alone too.
+  const both = await search({ q: 'context' }, ctx);
+  assert.strictEqual(both.body.results.find(r => r.title === 'What Remains When Context Ends').match, 'both');
 });
 
 test('an excerpt reads as the passage itself', () => {

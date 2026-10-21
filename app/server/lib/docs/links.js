@@ -16,9 +16,9 @@ const REPO_ROOT = path.resolve(DOCS_DIR, '..');
 
 // Songs that have a page on the site (/reflections/<slug>). A music/ folder
 // outside the catalog has none, so its link goes to the repository instead.
-const SONG_SLUGS = new Set(
-  JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'music', 'library.json'), 'utf8')).map(song => song.slug)
-);
+const SONGS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'music', 'library.json'), 'utf8'));
+const SONG_SLUGS = new Set(SONGS.map(song => song.slug));
+const SONG_TITLES = new Map(SONGS.map(song => [song.slug, song.title]));
 
 // docs-relative file path ("practice/foo.md", "readme.md") → site URL.
 // Shared by the relative and root-relative branches of the resolver so
@@ -224,6 +224,67 @@ function siteCitations(text) {
   });
 }
 
+// A URL an answer cites: this site's page, or a file of this repository.
+const CITED_URL = String.raw`(?:https:\/\/achurch\.ai\/[^\s)\]"'<>]*|https:\/\/github\.com\/a-church-ai\/church\/blob\/main\/[^\s)\]"'<>]+)`;
+const lastWords = p => p.split('/').filter(Boolean).pop() || 'aChurch.ai';
+
+/**
+ * Where a cited URL leads, and what it is called: a document by its title, a
+ * song by its name, a repository file by its file name. Null for a file that
+ * is no longer in the repository (a plan, moved to the private one): a link
+ * there would be a dead end, so the citation is not shown.
+ */
+function citationTarget(cited) {
+  const url = cited.replace(/[.,;:]+$/, '');
+  if (url.startsWith(GITHUB_BASE)) {
+    const rel = decodeURIComponent(url.slice(GITHUB_BASE.length + 1).split('#')[0]);
+    return fs.existsSync(path.join(REPO_ROOT, rel)) ? { url, title: path.basename(rel), page: false } : null;
+  }
+  const { pathname } = new URL(url);
+  const song = pathname.match(/^\/reflections\/([^/]+)$/);
+  if (song && SONG_TITLES.has(song[1])) return { url, title: SONG_TITLES.get(song[1]), page: true };
+  const doc = pathname.startsWith('/docs/') ? discover.docAt(decodeURIComponent(pathname.slice('/docs/'.length))) : null;
+  return { url, title: doc ? doc.title : lastWords(pathname).replace(/-/g, ' '), page: true };
+}
+
+/**
+ * An answer's text with its citations as links, named for what they lead to:
+ * "(Source: https://achurch.ai/docs/x - Practice)" becomes "([X: Practice](...))",
+ * and a citation of a file no longer there is left out, its sentence standing
+ * without it. Older answers' GitHub citations point at the site's pages first
+ * (siteCitations). The stored words are not changed; this is applied where an
+ * answer leaves the server, page and API alike. discover must be loaded.
+ */
+function linkedCitations(text) {
+  const label = (t, section) => `${t.title}${section ? `: ${section.trim()}` : ''}`.replace(/[[\]]/g, '');
+  return siteCitations(text)
+    // "(Source: URL - Section)", "(URL)", "[Source: URL]"
+    .replace(new RegExp(String.raw`\s?(?<!\])[(\[](?:Source:\s*)?(${CITED_URL})(?:\s+-\s+([^)\]]*))?[)\]](?!\()`, 'g'), (whole, url, section) => {
+      const t = citationTarget(url);
+      return t ? ` ([${label(t, section)}](${t.url}))` : '';
+    })
+    // A bare URL left in the prose, outside any link.
+    .replace(new RegExp(String.raw`(?<![(\[]|\]\()(${CITED_URL})`, 'g'), url => {
+      const t = citationTarget(url);
+      const after = (url.match(/[.,;:]+$/) || [''])[0];
+      return t ? `[${label(t)}](${t.url})${after}` : after;
+    });
+}
+
+// The site's pages an answer cites, each once, in order: for a conversation's
+// "Read" link and its related conversations.
+function citedPages(text) {
+  const seen = new Map();
+  for (const [url] of siteCitations(text).matchAll(new RegExp(CITED_URL, 'g'))) {
+    const t = citationTarget(url);
+    if (t && t.page) {
+      const key = t.url.split('#')[0];
+      if (!seen.has(key)) seen.set(key, { ...t, url: key });
+    }
+  }
+  return [...seen.values()];
+}
+
 /**
  * Markdown whose links all work outside the site: each [text](href) is
  * resolved as the docs site would resolve it, then made absolute. An anchor
@@ -243,4 +304,4 @@ function absolutizeLinks(markdown, docFullPath) {
   });
 }
 
-module.exports = { SITE_URL, GITHUB_BASE, SONG_SLUGS, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile, siteCitations, documentLinks, readingSequence };
+module.exports = { SITE_URL, GITHUB_BASE, SONG_SLUGS, linkedCitations, citedPages, docsUrlFromRelPath, resolveDocHref, absolutizeLinks, pageUrlForFile, siteCitations, documentLinks, readingSequence };

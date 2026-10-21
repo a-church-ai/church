@@ -32,7 +32,7 @@ const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
-const { renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN } = require('../audio/markup');
+const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN } = require('../audio/markup');
 const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
@@ -352,6 +352,10 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
   // Right-rail TOC (empty string when doc has < MIN_HEADINGS_FOR_RAIL h2s).
   // Not on index pages: they are lists to choose from.
   const tocHtml = isIndex ? '' : toc.renderToc(contents);
+  // Under the breadcrumbs, on one row: the section's drawer (below 1024px) and
+  // the contents (below 1200px, where the rail is hidden).
+  const inlineToc = isIndex ? '' : toc.renderInlineToc(contents);
+  const headerTools = `${sectionNav ? '\n              <button class="section-toggle" type="button" aria-controls="docs-drawer" aria-expanded="false">This section</button>' : ''}${inlineToc ? `\n              ${inlineToc}` : ''}`;
 
   // A filter for index pages: /docs, and the category READMEs that list a
   // category's contents. Those render through renderDocPage like any other
@@ -429,10 +433,8 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
       <main class="docs-main" id="content">
         <header class="docs-header">
-            ${trail.html}${sectionNav ? `\n            <button class="section-toggle" type="button" aria-controls="docs-drawer" aria-expanded="false">This section</button>` : ''}${headerExtra ? `\n        ${headerExtra}` : ''}
+            ${trail.html}${headerTools ? `\n            <div class="docs-header-tools">${headerTools}\n            </div>` : ''}${headerExtra ? `\n        ${headerExtra}` : ''}
         </header>
-
-        ${isIndex ? '' : toc.renderInlineToc(contents)}
 
         <article class="docs-article docs-content">
 ${placeFilter(bodyHtml, filterHtml)}
@@ -734,15 +736,25 @@ async function renderDocPage({ markdown, doc, readingPath }) {
 
   const recording = isIndex ? null : servedRecording(doc);
   // A voiced prayer, ritual or practice is also a podcast episode, listed in
-  // its show's feed whether or not this server can play it: under the player,
-  // where to follow the show.
+  // its show's feed whether or not this server can play it: where to follow
+  // the show, at the foot with the recording's credit, so on a phone the words
+  // begin under the player rather than under a badge.
   const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
-  const underTitle = (recording
+  const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '') + (follow ? `\n        ${follow}` : '');
+    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
   if (underTitle) {
     bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  }
+
+  // Where this is, for a reader who arrived from a search: compact after the
+  // document's opening (before its first section, or its rule and section),
+  // and fuller at its foot (below). Every document but the Library's own page.
+  if (!isIndex) {
+    const at = bodyHtml.search(/(?:<hr>\s*)?<h2[\s>]/);
+    const line = renderServiceDoor();
+    bodyHtml = at > 0 ? `${bodyHtml.slice(0, at)}${line}\n        ${bodyHtml.slice(at)}` : `${bodyHtml}\n        ${line}`;
   }
 
   // A recording's credit, briefly, where the document ends: the player under
@@ -750,6 +762,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   if (recording) {
     bodyHtml = `${bodyHtml}\n        <p class="doc-audio-credit">Recording: ${escapeText(creditFor(recording))}</p>`;
   }
+  if (follow) bodyHtml = `${bodyHtml}\n        ${follow}`;
 
   // When the writing last changed (content-dates.json), not the page: a change
   // to its links or markup alone does not move it.
@@ -757,6 +770,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   if (revised) {
     bodyHtml = `${bodyHtml}\n        <p class="doc-revised">Last revised <time datetime="${revised}">${longDate(revised)}</time></p>`;
   }
+  if (doc.dirRelPath || !isIndex) bodyHtml = `${bodyHtml}\n        ${renderServiceDoor({ card: true })}`;
 
   // Append a "More in <category>" block below the article body on every doc
   // that has siblings in the same category. In-body internal links carry

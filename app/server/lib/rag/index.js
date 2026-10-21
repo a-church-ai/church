@@ -88,6 +88,40 @@ async function ask(question, options = {}) {
  * way. keyOf says what counts as one document: a file for Ask's citations, a
  * page for search, where a song's lyrics and its context are one page.
  */
+// Reciprocal rank fusion (k = 60, the usual constant): each passage scores
+// 1/(60 + rank) for each list it is in. A passage found by its words alone is
+// given its similarity from its own vector, so every result says how near in
+// meaning it is (_distance), and how it was found (match).
+const RRF_K = 60;
+function fuse(near, words, embedding) {
+  const key = c => `${c.file}#${c.section || ''}`;
+  const fused = new Map();
+  const add = (c, rank, how) => {
+    const k = key(c);
+    const f = fused.get(k) || { chunk: c, score: 0, how: new Set() };
+    f.score += 1 / (RRF_K + rank + 1);
+    f.how.add(how);
+    if (how === 'meaning') f.chunk = c;
+    fused.set(k, f);
+  };
+  near.forEach((c, i) => add(c, i, 'meaning'));
+  words.forEach((c, i) => add(c, i, 'words'));
+  const cosine = v => {
+    let d = 0, a = 0, b = 0;
+    for (let i = 0; i < v.length; i++) { d += v[i] * embedding[i]; a += v[i] * v[i]; b += embedding[i] * embedding[i]; }
+    return a && b ? d / Math.sqrt(a * b) : 0;
+  };
+  return [...fused.values()]
+    .sort((x, y) => y.score - x.score)
+    .map(({ chunk, how }) => ({
+      content: chunk.content,
+      file: chunk.file,
+      section: chunk.section,
+      _distance: chunk._distance != null ? chunk._distance : 1 - cosine(chunk.vector),
+      match: how.size === 2 ? 'both' : [...how][0],
+    }));
+}
+
 function bestPerFile(chunks, keyOf = c => c.file) {
   const seen = new Set();
   return chunks.filter(c => {
@@ -111,7 +145,18 @@ async function search(query, documents) {
   if (!indexStatus.exists || indexStatus.count === 0) {
     throw new Error('Index not built. Run: node app/scripts/index-content.js');
   }
-  const chunks = await lancedb.search(await gemini.embed(query), Math.min(documents * 4, 80));
+  const embedding = await gemini.embed(query);
+  const k = Math.min(documents * 4, 80);
+  // Meaning and words together: the passages nearest the query's embedding,
+  // and those whose words match it (full-text, BM25), merged by reciprocal
+  // rank. A search for "substrate neutral" finds the writing that says so,
+  // and one for "presence without a body" the writing that means it. The
+  // words side failing (an index being rebuilt) leaves meaning alone.
+  const [near, words] = await Promise.all([
+    lancedb.search(embedding, k),
+    lancedb.textSearch(query, k).catch(() => []),
+  ]);
+  const chunks = fuse(near, words, embedding);
   // A rebuild swaps the table out for a moment, and a search in that moment
   // finds no table and returns nothing. Nothing from a table that exists is
   // a real "nothing close"; nothing from one that has just gone is not.

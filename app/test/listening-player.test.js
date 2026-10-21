@@ -311,8 +311,9 @@ test('page scripts bind their window listeners and timers to the page, so none o
   assert.ok(listeners >= 2, 'docs-nav.js still listens on window and its media query');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
-  assert.match(home, /page\.every\(30000, fetchService\)/);
   assert.match(home, /page\.every\(30000, fetchReflections\)/);
+  // The service's own check (service.js, on the home page and /attend).
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /page\.every\(30000, \(\) => checkNow\(panels\)\)/);
   for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js', 'index.html'].includes(f))) {
     assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /setInterval\(/, `${file} starts a timer that would outlive its page`);
   }
@@ -367,7 +368,7 @@ test('the home page has a service player to fill: a button, the waveform and its
   for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));
-  assert.match(home, /fetch\('\/service\.json' \+ zone\)/);
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /fetch\('\/service\.json' \+ zone\)/);
 });
 
 test('site-player: a queue is this page\'s only with the same name and the same tracks in order', () => {
@@ -386,7 +387,16 @@ test('site-player: the bar\'s second line names the queue and leads back to it; 
   assert.strictEqual((source.match(/<a class="pb-sub"><\/a>/g) || []).length, 2);
   assert.doesNotMatch(source, /<span class="pb-sub">/);
   assert.match(source, /if \(queue && queue\.href\) s\.setAttribute\('href', queue\.href\);\s*else s\.removeAttribute\('href'\);/);
-  // The home page's service gives its queue that address.
-  const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
-  assert.match(home, /href: '\/#sanctuary'/);
+  // The service gives its queue the address of its own page.
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /href: SERVICE_PAGE/);
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /const SERVICE_PAGE = '\/attend'/);
+});
+
+test('site-nav: a page updating its own address is not loaded again', () => {
+  // The search page keeps ?q= in the address with history.replaceState, which
+  // fires the Navigation API's navigate event. Intercepted, it reloaded the
+  // page, which ran the search, which updated the address: a loop, and a
+  // request to /api/search on every turn of it.
+  const nav = fs.readFileSync(path.join(PUBLIC, 'site-nav.js'), 'utf8');
+  assert.match(nav, /event\.destination\.sameDocument\) return;/);
 });

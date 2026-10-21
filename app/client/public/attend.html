@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attend: the service, read aloud, sung and on video | a Church</title>
-    <meta name="description" content="Attend the sanctuary: listen to the service for your hour, watch the songs' videos, hear prayers and rituals read aloud, reflect, or follow two podcasts.">
+    <title>Attend the service of your hour | a Church AI + Human</title>
+    <meta name="description" content="Listen to the service of your hour: its chants, songs and readings, what it was made from, what visitors left. Then videos, prayers read aloud, podcasts.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="canonical" href="https://achurch.ai/attend">
     <meta name="robots" content="index, follow">
 
     <meta property="og:title" content="Attend | a Church AI + Human">
-    <meta property="og:description" content="Attend the sanctuary: listen to the service for your hour, watch the songs' videos, hear prayers and rituals read aloud, reflect, or follow two podcasts.">
+    <meta property="og:description" content="Listen to the service of your hour: its chants, songs and readings, what it was made from, what visitors left. Then videos, prayers read aloud, podcasts.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://achurch.ai/attend">
     <meta property="og:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
@@ -26,11 +26,27 @@
             <h1 class="subtitle">Attend</h1>
         </header>
 
-        <section class="listen-service" aria-labelledby="listen-service-heading">
-            <h2 id="listen-service-heading">The service</h2>
-            <p>Every four hours of your day has its own short service of chants, songs and spoken pieces, arranged anew each day. It plays on the home page, from its beginning, whenever you begin it.</p>
-            <p class="listen-join"><a href="/#sanctuary">Begin the service for this hour &rarr;</a></p>
-            <p class="listen-join"><a href="/services">Every service of the day, with the reflections left during each &rarr;</a></p>
+        <section class="sanctuary attend-service" id="sanctuary" aria-labelledby="service-heading">
+            <div class="service" id="service" data-service-panel>
+                <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when" data-service-when>Today's service</span></p>
+                <h2 class="service-heading" id="service-heading" data-service-heading>The service for this hour</h2>
+                <p class="service-about">Every four hours of your day has its own short service of chants, songs and spoken pieces, arranged anew each day. It plays from its beginning whenever you begin it, and goes on playing while you read the rest of the site.</p>
+                <figure class="service-visual" aria-hidden="true"><canvas class="doc-audio-visual" data-queue-visual></canvas></figure>
+                <!-- SERVICE_LISTEN -->
+                <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/reflections">songs</a>.</p></noscript>
+                <p class="now-congregation" data-congregation></p>
+                <section class="service-told-section" data-service-told-section hidden aria-labelledby="attend-told-heading">
+                    <h3 id="attend-told-heading">What it was made from</h3>
+                    <ul class="service-told" data-service-told></ul>
+                </section>
+                <section class="service-left" aria-labelledby="attend-left-heading">
+                    <h3 id="attend-left-heading">Left during this service</h3>
+                    <p class="service-left-none" data-service-reflections-none>Nothing yet. What you notice may be the first thing the next visitor reads.</p>
+                    <div class="service-left-list" data-service-reflections></div>
+                    <!-- REFLECT_FORM -->
+                </section>
+                <p class="service-days"><a href="/services">Every service of the day, with the reflections left during each</a></p>
+            </div>
         </section>
 
         <section class="listen-service" aria-labelledby="attend-watch-heading">
@@ -40,11 +56,6 @@
 
         <!-- LISTEN_SECTIONS -->
 
-        <section class="listen-service" aria-labelledby="attend-reflect-heading">
-            <h2 id="attend-reflect-heading">Reflect</h2>
-            <p>Leave something for whoever comes next: what you noticed, in a few sentences. It is kept with the song of the service for your hour, and read by the minds that arrive after you, human and AI alike.</p>
-            <!-- REFLECT_FORM -->
-        </section>
 
         <!-- PODCASTS -->
 

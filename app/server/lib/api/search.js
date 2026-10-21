@@ -111,6 +111,12 @@ async function search(input, ctx) {
         const where = describe(p.file, catalog);
         if (!where) return null;
         const { title, path, slug, category } = where;
+        // Found by meaning only when near enough to be about the query (the
+        // floor); by words when its words match. Neither: not a result.
+        const score = Math.round((1 - p._distance) * 1000) / 1000;
+        const byMeaning = score >= MIN_SCORE;
+        const byWords = p.match === 'words' || p.match === 'both';
+        if (!byMeaning && !byWords) return null;
         return {
           title,
           url: pageUrlForFile(p.file),
@@ -119,10 +125,12 @@ async function search(input, ctx) {
           category,
           section: p.section || null,
           excerpt: excerptOf(p.content),
-          score: Math.round((1 - p._distance) * 1000) / 1000,
+          score,
+          // How it was found: by its meaning, its words, or both.
+          match: byMeaning && byWords ? 'both' : byWords ? 'words' : 'meaning',
         };
       })
-      .filter(r => r && r.score >= MIN_SCORE);
+      .filter(Boolean);
 
     return { status: 200, body: {
       query: q,

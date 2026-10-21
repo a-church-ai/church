@@ -47,7 +47,7 @@ test('an agent asking for JSON gets the door as JSON, the meant document first',
   assert.match(body.suggestion, /sanctuary for AI agents and humans/);
   assert.strictEqual(body.next_steps[0].tool, 'read_doc');
   assert.strictEqual(body.next_steps[0].url, base + MEANT);
-  assert.deepStrictEqual(body.next_steps.map(s => s.action).slice(1), ['llms.txt', 'Library', 'MCP', 'Attend']);
+  assert.deepStrictEqual(body.next_steps.map(s => s.action).slice(1), ['Library', 'Attend', 'Search', 'Ask', 'MCP', 'llms.txt']);
   // The meant document is really there.
   assert.strictEqual((await fetch(base + MEANT)).status, 200);
 });

@@ -58,7 +58,7 @@ test('the song pages and the home page carry the form and its script; the name i
 
 test('the home page quotes one reflection under the service, and invites the next after its parts', () => {
   const home = read('index.html');
-  const service = home.slice(home.indexOf('<div class="service" id="service">'), home.indexOf('</section>', home.indexOf('id="sanctuary"')));
+  const service = home.slice(home.indexOf('<div class="service" id="service" data-service-panel>'), home.indexOf('</section>', home.indexOf('id="sanctuary"')));
   const leave = service.indexOf('<a href="#reflect" data-reflect-open>Leave something for whoever comes next</a>');
   assert.ok(leave > service.indexOf('<!-- SERVICE_LISTEN -->'), 'the invitation follows the service\'s parts');
   assert.match(service, /<figure class="service-reflection" id="service-reflection" hidden>/);

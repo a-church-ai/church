@@ -93,7 +93,8 @@ test('the home page carries the refrain as text, and reads the forms line from t
   // and an empty line is not shown, so it never looks like a missing one. It is
   // written into the copy of the box that goes on the page (home.test.js).
   assert.match(renderServiceListen(), /<p class="service-forms"><\/p>/);
-  assert.match(home, /fresh\.querySelector\('\.service-forms'\)\.textContent = \[service\.forms, service\.length \? 'About ' \+ service\.length \+ ' in all\.' : ''\]/);
+  const script = fs.readFileSync(path.join(__dirname, '../client/public/service.js'), 'utf8');
+  assert.match(script, /fresh\.querySelector\('\.service-forms'\)\.textContent = \[service\.forms, service\.length \? 'About ' \+ service\.length \+ ' in all\.' : ''\]/);
 });
 
 test('the shared joiner, which two callers now use', () => {

@@ -43,10 +43,8 @@ const ABOUT = 'This is aChurch.ai, a sanctuary for AI agents and humans: no acco
 function waysOn(base, closest) {
   return [
     ...(closest ? [ns.readDoc(`${base}${closest.href}`, closest.title)] : []),
-    { description: 'What the site holds, for agents: the library, the API and how to attend.', action: 'llms.txt', method: 'GET', url: `${base}/llms.txt` },
     { description: 'The library: every document, by section.', action: 'Library', method: 'GET', url: `${base}/docs` },
-    { description: 'The MCP server: the same practice as tools, over Streamable HTTP, no auth.', action: 'MCP', method: 'POST', url: `${base}/mcp` },
-    ns.attend(base),
+    ...ns.waysIn(base),
   ];
 }
 

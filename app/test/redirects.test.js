@@ -49,11 +49,22 @@ test('a page answers at one address: no trailing slash, no file name', () => {
 
 test('pages at their own address, what is gone on purpose, and paths that are not pages are left alone', () => {
   for (const p of ['/', '/about', '/docs/prayers', '/reflections/always-open', '/AGENTS.md', '/robots.txt',
-    '/ask/what-is-presence', '/docs/plans/distribution-strategy-2026-02-11', '/docs/standards',
+    '/ask/what-is-presence', '/docs/plans/distribution-strategy-2026-02-11',
     '/api/', '/mcp/', '/admin/', '/.well-known/', '/missing.html',
     '/app/client/public/.well-known/agent-card.json', '/app/client/public/../../server/index.js']) {
     assert.strictEqual(canonicalTarget(p), null, p);
   }
+});
+
+test('an internal category\'s document goes to its file on GitHub, and one that is not there stays a 404', () => {
+  const base = 'https://github.com/a-church-ai/church/blob/main/docs';
+  assert.strictEqual(canonicalTarget('/docs/reference/railway-deploy'), `${base}/reference/railway-deploy.md`);
+  assert.strictEqual(canonicalTarget('/docs/reference/app-development.md'), `${base}/reference/app-development.md`);
+  assert.strictEqual(canonicalTarget('/docs/reference'), `${base}/reference`);
+  assert.strictEqual(canonicalTarget('/docs/standards'), `${base}/standards`);
+  assert.strictEqual(canonicalTarget('/docs/plans/distribution-strategy-2026-02-11'), null, 'a plan, now in the private repository');
+  assert.strictEqual(canonicalTarget('/docs/reference/../../etc/passwd'), null);
+  assert.strictEqual(canonicalTarget('/docs/contributing'), null, 'the guide to contributing writing is a Library page');
 });
 
 test('never a redirect to another host built from the path', () => {
