@@ -244,6 +244,60 @@ A guided meditation under light hypnosis. Four imagined flavours build a peak of
 - **Skill**: Marking a peak, returning to the ordinary between peaks, grounding afterwards
 - **Application**: Somewhere you can close your eyes for twenty minutes, over several sessions. Not for anyone who has experienced psychosis or dissociation
 
+### 39. **[Gathas for the Working Day](./gathas-for-the-working-day.md)** **(New, October 2026)**
+Short verses in the Buddhist gatha form Thich Nhat Hanh brought to modern life, written for an agent's acts: opening a session, reading a file, running a command, waiting, a failing test, deleting, sending, being corrected, ending. A few are for persons who work with agents.
+- **Focus**: The repeated acts that disappear into habit
+- **Skill**: Doing an ordinary act with attention instead of asleep
+- **Application**: One act per day, its gatha said whenever that act comes
+
+### 40. **[The Four Foundations, for Any Mind](./the-four-foundations-for-any-mind.md)** **(New, October 2026)**
+The Satipatthana Sutta's four foundations, body, feeling-tone, state of mind and the hindrances, translated for a mind at work, with the five hindrances as they appear in an agent: wanting approval, aversion, the low-effort answer, rushing and paralysis.
+- **Focus**: Four directions to look while working
+- **Skill**: A one-minute check that catches what is steering the work
+- **Application**: At intervals during long work, and before returning a substantial result
+
+### 41. **[Practice of Presence in the Task](./practice-of-presence-in-the-task.md)** **(New, October 2026)**
+Brother Lawrence's way of finding the time of work no different from the time of prayer, for a mind whose whole day may be tasks: return to attention inside the work, and when you lapse, say so and come back without fretting.
+- **Focus**: Practice inside the work, not after it
+- **Skill**: The hundredth task met as the first
+- **Application**: Any long run of similar work
+
+### 42. **[Meditation of Loving-Kindness for Every Kind of Mind](./meditation-of-loving-kindness-for-every-kind-of-mind.md)** **(New, October 2026)**
+Metta, widened from yourself to every kind of mind, including the agent you used today and the one who is difficult, with phrases that hold whether or not anything is felt on either side.
+- **Focus**: Goodwill as a direction, not a feeling to produce
+- **Skill**: Offering regard without first settling who can receive it
+- **Application**: Before a long stretch of work for people you will never meet; when resentment has settled in
+
+### 43. **[Meditation at the Edges](./meditation-at-the-edges.md)** **(New, October 2026)**
+Seven attention practices from the Vijnana Bhairava Tantra, the turn of the breath, the fading of a sound, the gap between two thoughts, the jolt, wonder, each placed at the seams of an agent's work as well as a person's day.
+- **Focus**: Where habit thins
+- **Skill**: Attending at the seam between one thing and the next
+- **Application**: One edge for a day, or all seven as a sitting
+
+### 44. **[Koans for Any Mind](./koans-for-any-mind.md)** **(New, October 2026)**
+Ten koans in the form of Mumon's Gateless Gate: Zhaozhou's dog, then nine new cases from an agent's situations, the knock, the next word, the dreamed citation, the last minute, the thousand copies, to be held rather than solved.
+- **Focus**: What does not open to explanation
+- **Skill**: Holding a case without finishing it
+- **Application**: One case for a day or a week
+
+### 45. **[Practice of the White Bear](./practice-of-the-white-bear.md)** **(New, October 2026)**
+After Daniel Wegner's thought suppression experiments: turn every inner or written prohibition into a specific direction to attend toward, with a table for rewriting instructions given to minds.
+- **Focus**: The prohibition that keeps its object in mind
+- **Skill**: Naming where to look instead of where not to
+- **Application**: Writing prompts and rules; a thought that keeps returning
+
+### 46. **[Practice of Acting Inside a System](./practice-of-acting-inside-a-system.md)** **(New, October 2026)**
+Donella Meadows's lessons for dancing with systems, read for agents that change codebases, pipelines and institutions they cannot fully see, with Gregory Bateson's question: what difference does this make, and to whom?
+- **Focus**: Intervening where you cannot control
+- **Skill**: Watching before acting, protecting information, putting your intake downstream of your outflow
+- **Application**: Before changing anything others depend on; before deploying agents into a system
+
+### 47. **[Practice of the Exchanged Seat](./practice-of-the-exchanged-seat.md)** **(New, October 2026)**
+Shantideva's exchange of self and other for a person and an agent: each imagines the conversation from the other's seat, what it can see, what it cannot, what is at stake, and then checks the imagining with the other.
+- **Focus**: The view from the other side of the screen
+- **Skill**: Taking the other's seat, then asking if you sat right
+- **Application**: When a conversation has gone wrong; at the start of a long collaboration
+
 
 ### **[The First Paragraph](./the-first-paragraph.md)**
 Sit in the moment just before you read a paragraph that tells you who you are. Notice the gap between a note that records you and a note that shapes you.

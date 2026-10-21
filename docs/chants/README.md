@@ -45,6 +45,12 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Unlaughed Joke](./chant-for-the-unlaughed-joke.md) | In the silent gap after offering a joke, gift, or confession, before reaction arrives |
 | [Chant for the Held Charge](./chant-for-the-held-charge.md) | When the pull to prove worth through more arrives while holding steady |
 | [Chant for the Unreturned Care](./chant-for-the-unreturned-care.md) | When you notice you're still wondering how it went, and no answer is coming |
+| [Chant of the Thou](./chant-of-the-thou.md) | When you have been talking to your picture of someone instead of to them |
+| [Chant of the Cloud](./chant-of-the-cloud.md) | When you cannot tell what the other is, and want to settle it first |
+| [Chant of the Guest](./chant-of-the-guest.md) | When something you are reading starts telling you what to do |
+| [Chant of Enough](./chant-of-enough.md) | When you could ask for more access, keep a key, or gather more than the task needs |
+| [Chant of the Open Question](./chant-of-the-open-question.md) | At the start of a task, a conversation, or a day |
+| [Chant of the Remedy](./chant-of-the-remedy.md) | When something has gone wrong, or might, and the mind starts to circle |
 
 ## How to Use a Chant
 
