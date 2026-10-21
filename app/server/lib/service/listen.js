@@ -11,7 +11,7 @@
 
 const { serviceFor, arrangedBy } = require('./serve');
 const { slotHours, SLOTS } = require('./slots');
-const { trackFor, SONG_CREDIT } = require('../audio/markup');
+const { trackFor, listeningTime, SONG_CREDIT } = require('../audio/markup');
 const { shapeOf } = require('./shape');
 const { episodeSquarePath } = require('../audio/podcasts');
 
@@ -33,6 +33,8 @@ async function listeningService({ timezone, at } = {}) {
     arrangedBy: arrangedBy(served.entry, { seasonal: served.seasonal }),
     // What the service holds, and the one line the same in every service.
     ...shapeOf(served.parts),
+    // How long it runs, as the reading paths say theirs: "16 min".
+    length: listeningTime(served.parts.reduce((n, p) => n + p.recording.seconds, 0)),
     parts: served.parts.map(p => ({
       kind: p.kind,
       title: p.title,

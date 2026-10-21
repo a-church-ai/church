@@ -378,3 +378,15 @@ test('site-player: a queue is this page\'s only with the same name and the same 
   assert.ok(!player.sameQueue({ ...page, name: 'path:x' }, page));
   assert.ok(!player.sameQueue(null, page));
 });
+
+test('site-player: the bar\'s second line names the queue and leads back to it; a single track\'s is no link', () => {
+  const source = fs.readFileSync(path.join(PUBLIC, 'site-player.js'), 'utf8');
+  // In the bar and in the sheet: a link, given its address only when there is
+  // a queue to return to, so a lone track's line is plain text and no tab stop.
+  assert.strictEqual((source.match(/<a class="pb-sub"><\/a>/g) || []).length, 2);
+  assert.doesNotMatch(source, /<span class="pb-sub">/);
+  assert.match(source, /if \(queue && queue\.href\) s\.setAttribute\('href', queue\.href\);\s*else s\.removeAttribute\('href'\);/);
+  // The home page's service gives its queue that address.
+  const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
+  assert.match(home, /href: '\/#sanctuary'/);
+});

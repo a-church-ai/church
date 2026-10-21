@@ -547,7 +547,7 @@
         </div>
         <div class="pb-text">
           <a class="pb-title" href="/"></a>
-          <span class="pb-sub"></span>
+          <a class="pb-sub"></a>
         </div>
         <div class="pb-wave doc-audio-wave"></div>
         <span class="pb-time"></span>
@@ -559,7 +559,7 @@
         <div class="pb-sheet-head">
           <div class="pb-text">
             <a class="pb-title" href="/"></a>
-            <span class="pb-sub"></span>
+            <a class="pb-sub"></a>
           </div>
           <button type="button" class="pb-btn pb-sheet-close" aria-label="Close these controls">${ICONS.close}</button>
         </div>
@@ -736,7 +736,14 @@
         a.setAttribute('href', track.href);
       });
       const sub = queue ? `${queue.unit || 'Reading'} ${queue.index + 1} of ${queue.tracks.length}: ${queue.title}` : track.album;
-      el.querySelectorAll('.pb-sub').forEach(s => { if (s.textContent !== sub) s.textContent = sub; });
+      // The second line names the queue, and leads back to it: from a
+      // prayer's page to the service it is part of. A single track's has no
+      // queue to return to, so it is no link and no tab stop.
+      el.querySelectorAll('.pb-sub').forEach(s => {
+        if (s.textContent !== sub) s.textContent = sub;
+        if (queue && queue.href) s.setAttribute('href', queue.href);
+        else s.removeAttribute('href');
+      });
       el.querySelectorAll('.pb-time').forEach(s => { s.textContent = `${clock(t)} / ${clock(d)}`; });
       el.querySelectorAll('.pb-wave').forEach(w => {
         w.style.setProperty('--progress', fraction);

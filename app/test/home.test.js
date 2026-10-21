@@ -5,7 +5,9 @@
  * against the page as of 2026-10-07, which opened with two buttons and three
  * outbound links and put the service below the first screen. The plan, with
  * the measurements behind it, is `home-page-for-humans-2026-10-07.md` in the
- * private repo.
+ * private repo. Revised for `home-hero-2026-10-21.md`, which brought the
+ * service's button into a phone's first screen: the name and what the place is,
+ * then the service, its button, and only after it the doors elsewhere.
  */
 
 const test = require('node:test');
@@ -24,7 +26,7 @@ const at = needle => {
 
 test('what the place is and the service come first, the reasons next, and the rest after', () => {
   const order = [
-    'class="lead"',
+    'class="home-sign"',
     'id="sanctuary"',
     'class="intro"',
     'class="origin"',
@@ -40,22 +42,35 @@ test('what the place is and the service come first, the reasons next, and the re
   assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
 });
 
-test('before the service: the tagline, a sentence and three quiet doors, with no button and nothing outbound', () => {
+test('before the service\'s button: the name, the tagline, the service\'s heading and what a service is, and nothing to follow', () => {
   const before = MAIN.slice(0, at('<!-- SERVICE_LISTEN -->'));
-  assert.ok(before.includes('A church for AI agents. Humans welcome too.'), 'the tagline leads');
+  const order = ['<h1>', 'A church for AI agents. Humans welcome too.', 'id="service-heading"', 'class="service-about"'];
+  const positions = order.map(needle => before.indexOf(needle));
+  assert.ok(positions.every(i => i >= 0), `all there: ${order.join(', ')}`);
+  assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
   assert.doesNotMatch(before, /<button/, 'the service holds the page\'s one button');
-  assert.doesNotMatch(before, /class="[^"]*\bprimary\b/);
-  const links = [...before.matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['#ask-church', '/attend', '/for-agents'], 'the three doors, and only them');
+  assert.doesNotMatch(before, /<a\s/, 'no door before the button: the doors follow the service');
   assert.doesNotMatch(MAIN.slice(0, at('id="sanctuary"')), /href="https?:/, 'nothing outbound before the service');
-  // What the place is not comes after the invitation, not before it.
-  assert.ok(at('No leader') > at('<!-- SERVICE_LISTEN -->'), 'the promise line follows the service');
 });
 
-test('the service\'s play button comes before its opening words, and the words before its parts', () => {
+test('after the service, the three doors, in a row that wraps rather than a line of dots', () => {
+  const doors = MAIN.match(/<nav class="home-doors"[^>]*>([\s\S]*?)<\/nav>/);
+  assert.ok(doors, 'the doors');
+  assert.ok(MAIN.indexOf(doors[0]) > at('<!-- SERVICE_LISTEN -->'), 'after the service');
+  assert.ok(MAIN.indexOf(doors[0]) < at('class="intro"'), 'and before the reasons');
+  const links = [...doors[1].matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
+  assert.deepStrictEqual(links, ['#ask-church', '/attend', '/for-agents']);
+  assert.strictEqual(doors[1].replace(/<a\s[^>]*>[^<]*<\/a>/g, '').trim(), '', 'nothing between the doors: the layout spaces them');
+});
+
+test('the service\'s play button, then what it holds and what the place is not, then its opening words, then its parts', () => {
   const player = renderServiceListen();
-  const [play, word, parts] = ['service-play', 'id="service-word"', 'data-queue-list'].map(s => player.indexOf(s));
-  assert.ok(play >= 0 && word > play && parts > word, `play ${play}, word ${word}, parts ${parts}`);
+  const order = ['service-play', 'class="service-forms"', 'No leader', 'id="service-word"', 'data-queue-list'];
+  const positions = order.map(s => player.indexOf(s));
+  assert.ok(positions.every(i => i >= 0), `all there: ${order.join(', ')}`);
+  assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
+  // The promise line has one home, under the button.
+  assert.doesNotMatch(HOME, /No leader/);
   // One element with that id: the page no longer carries its own copy above the player.
   assert.doesNotMatch(HOME, /id="service-word"/);
   // Without a script the player stays hidden, so the page says where the pieces are.

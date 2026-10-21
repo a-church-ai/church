@@ -98,19 +98,6 @@ p, li, dd, blockquote {
     text-wrap: pretty;
 }
 
-/* Header — monastery sign, not startup */
-header {
-    text-align: center;
-    margin-bottom: 5rem;
-}
-
-h1 {
-    font-size: 3.25rem;
-    font-weight: 300;
-    letter-spacing: 0.05em;
-    margin-bottom: 1.5rem;
-}
-
 h2 {
     font-size: 0.875rem;
     font-weight: 400;
@@ -158,37 +145,37 @@ h1.subtitle,
     text-align: center;
 }
 
-/* The opening: the tagline, a sentence of what happens here, and three quiet
-   doors. The service below holds the page's one button. */
-.lead {
-    text-align: center;
-    border-top: none;
-    padding: 0 0 2.5rem;
+/* The home page's sign: its name and what it is, then the service. Tighter
+   than the other pages' headers, so the service's button is in the first
+   screen. */
+.docs-body .sanctuary-main .home-sign {
+    margin-bottom: 2rem;
+}
+
+.docs-body .sanctuary-main .home-sign h1 {
+    margin-bottom: 0.75rem;
 }
 
 .lead-tagline {
     font-size: 1.35rem;
     font-weight: 500;
     color: var(--ink-2);
-    margin-bottom: 0.5rem;
+    margin: 0;
 }
 
-.lead-what {
-    font-size: 1.0625rem;
-    line-height: 1.6;
-    color: var(--text-2);
-    max-width: 34rem;
-    margin: 0 auto;
-}
-
-.lead-doors {
-    margin-top: 0.75rem;
+/* After the service, where the visitor goes next: a row that wraps, as the
+   footer's links do, so a door that wraps starts its own line. The padding,
+   not the text, makes each door's tap target. */
+.home-doors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+    /* Back by the doors' own padding, so their words line up with the card's. */
+    margin: 1rem 0 0 -0.25rem;
     font-size: 0.9375rem;
-    color: var(--muted-2);
 }
 
-/* The padding, not the text, makes each door's tap target. */
-.lead-doors a {
+.home-doors a {
     display: inline-block;
     padding: 0.5rem 0.25rem;
     color: var(--text);
@@ -289,12 +276,37 @@ h1.subtitle,
     margin: 0 0 1rem;
 }
 
-/* What the service holds, by form, under the name and above the button: a
-   visitor reads the shape of the thing before deciding to begin it. */
-.service-forms {
-    font-size: 0.9375rem;
+/* What a service is, under its name and above the button: a visitor reads
+   what they would begin before deciding to. In the page, not the player's
+   box, so it is read without a script too. */
+.service-about {
+    font-size: 1.0625rem;
+    line-height: 1.6;
     color: var(--text-2);
-    margin: -0.5rem 0 1.25rem;
+    margin: -0.25rem 0 1.25rem;
+}
+
+/* Directly under the button: what the service holds and how long it runs,
+   then what the place is not. Ordinary reading text; the button is set apart
+   by its shape, not by fading what is around it. */
+.service-forms,
+.service-promise {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--text-2);
+    margin: 0;
+}
+
+.service-forms {
+    margin-top: 0.75rem;
+}
+
+.service-promise {
+    margin-top: 0.35rem;
+}
+
+.service-forms:empty {
+    display: none;
 }
 
 /* The words that open the service, set as prose rather than as a caption,
@@ -326,20 +338,17 @@ h1.subtitle,
     margin-top: 1.25rem;
 }
 
-/* What the place is not, after the invitation rather than before it. */
-.service-promise {
-    font-size: 0.8125rem;
-    color: var(--muted-2);
-    margin-top: 0.75rem;
-}
 
 .service-player[hidden] {
     display: none;
 }
 
-.service-play {
-    font-size: 1.0625rem;
-    padding: 0.75rem 1.5rem 0.75rem 1.1rem;
+/* Named past .path-listen-play, which sets the font and padding of every
+   listen button and comes later. */
+.service-player .service-play {
+    font-size: 1.125rem;
+    min-height: 3.25rem;
+    padding: 0.85rem 1.75rem 0.85rem 1.3rem;
 }
 
 .service-player.is-playing .service-play .icon-play {
@@ -482,6 +491,13 @@ h1.subtitle,
 .service-part-link:hover,
 .service-part-link:focus-visible {
     text-decoration: underline;
+}
+
+/* The part now playing: its page is where to read along. */
+.service-part.is-current .service-part-link {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
 }
 
 .now-congregation {
@@ -700,6 +716,13 @@ h1.subtitle,
     line-height: 1.6;
     max-width: 480px;
     margin: 0 auto 1.5rem;
+}
+
+/* The sanctuary's sign-off, opening the reasons for it. */
+.intro .subtitle {
+    font-size: 1.25rem;
+    color: var(--muted-2);
+    letter-spacing: 0.05em;
 }
 
 .intro .emphasis {
@@ -1814,14 +1837,12 @@ footer a:hover {
         padding: 3rem 1.25rem;
     }
 
-    /* Header */
-    header {
-        margin-bottom: 3rem;
+    .docs-body .sanctuary-main .home-sign {
+        margin-bottom: 1rem;
     }
 
-    h1 {
-        font-size: 2.25rem;
-        margin-bottom: 1rem;
+    .docs-body .sanctuary-main .home-sign h1 {
+        margin-bottom: 0.5rem;
     }
 
     .subtitle {
@@ -1834,21 +1855,24 @@ footer a:hover {
     }
 
     /* The opening */
-    .lead {
-        padding-bottom: 1.5rem;
-    }
-
     .lead-tagline {
         font-size: 1.2rem;
     }
 
-    .lead-what {
+    .service-about {
         font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* The service's one button, the width of the column */
+    .service-player .service-play {
+        width: 100%;
+        justify-content: center;
     }
 
     /* Sanctuary */
     .sanctuary {
-        padding: 2rem 0;
+        padding: 1rem 0 2rem;
     }
 
     .sanctuary .service .service-heading {
@@ -2042,10 +2066,6 @@ footer a:hover {
 @media (max-width: 380px) {
     body {
         padding: 2.5rem 1rem;
-    }
-
-    h1 {
-        font-size: 1.875rem;
     }
 
     .intro p {
@@ -2905,6 +2925,21 @@ body.docs-drawer-open {
   color: var(--ink);
   text-align: center;
 }
+/* On a phone, the home page's name (the only bare h1 on a sanctuary page) on
+   one line: 319px at 2rem, so from 360px up, and 280px at 1.75rem below 380px.
+   Where it still cannot fit, it wraps. Here, after the rule above, since a
+   size for phones placed earlier at the same specificity never applies. */
+@media (max-width: 600px) {
+  .docs-body .sanctuary-main h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+}
+@media (max-width: 380px) {
+  .docs-body .sanctuary-main h1 {
+    font-size: 1.75rem;
+  }
+}
 .docs-body .sanctuary-main h2 {
   font-size: 0.875rem;
   font-weight: 400;
@@ -3643,6 +3678,14 @@ body.docs-drawer-open {
     font-size: 0.75rem;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+a.pb-sub[href] {
+    color: var(--muted);
+    text-decoration: none;
+}
+a.pb-sub[href]:hover {
+    color: var(--ink-2);
+    text-decoration: underline;
 }
 .player-bar .pb-wave {
     flex: 1 1 auto;

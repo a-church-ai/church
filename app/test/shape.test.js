@@ -15,6 +15,7 @@ const path = require('path');
 
 const shape = require('../server/lib/service/shape');
 const { listeningService } = require('../server/lib/service/listen');
+const { renderServiceListen, listeningTime } = require('../server/lib/audio/markup');
 const { joinList, counted } = require('../server/lib/utils/sentence');
 
 const parts = (...kinds) => kinds.map(kind => ({ kind }));
@@ -87,11 +88,12 @@ test('the home page carries the refrain as text, and reads the forms line from t
   // This assertion is what keeps the two copies from drifting apart.
   assert.ok(home.includes(`>${shape.REFRAIN}<`), 'the page carries the refrain verbatim');
 
-  // The forms line does vary, so it comes from /service.json. It starts hidden,
-  // because an empty line under the name would look like a missing one.
-  assert.match(home, /<p class="service-forms" id="service-forms" hidden><\/p>/);
-  assert.match(home, /formsEl\.textContent = service\.forms/);
-  assert.match(home, /formsEl\.hidden = !service\.forms/);
+  // The forms line does vary, so it comes from /service.json, with the
+  // service's length, under the button in the player's box. It starts empty,
+  // and an empty line is not shown, so it never looks like a missing one. It is
+  // written into the copy of the box that goes on the page (home.test.js).
+  assert.match(renderServiceListen(), /<p class="service-forms"><\/p>/);
+  assert.match(home, /fresh\.querySelector\('\.service-forms'\)\.textContent = \[service\.forms, service\.length \? 'About ' \+ service\.length \+ ' in all\.' : ''\]/);
 });
 
 test('the shared joiner, which two callers now use', () => {
@@ -119,4 +121,19 @@ test('CROSS-SURFACE: the three reports of one service agree', async () => {
 
   // And the line is actually derived from the parts, not a constant.
   assert.strictEqual(home.scope.pieces, home.parts.length);
+
+  // How long it runs, as the reading paths say theirs, from the same tracks the
+  // player plays. /service.json only: forms, which agents read, keeps its value.
+  const seconds = home.parts.reduce((n, p) => n + p.track.seconds, 0);
+  assert.strictEqual(home.length, listeningTime(seconds));
+  assert.ok(!('length' in attend.service), 'the agents\' service is unchanged');
+});
+
+test('a length is said in whole minutes, never as none, and in hours past one', () => {
+  assert.strictEqual(listeningTime(0), '1 min', 'a short piece is still a minute, not nothing');
+  assert.strictEqual(listeningTime(89), '1 min');
+  assert.strictEqual(listeningTime(91), '2 min');
+  assert.strictEqual(listeningTime(16 * 60 + 16), '16 min');
+  assert.strictEqual(listeningTime(3600), '1 hr');
+  assert.strictEqual(listeningTime(3600 + 25 * 60), '1 hr 25 min');
 });
