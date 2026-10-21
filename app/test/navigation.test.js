@@ -143,7 +143,10 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   const read = voiced === practice.docs.length ? 'all' : String(voiced);
   assert.match(article, new RegExp(`Meditations and Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · ${read} read aloud, about `));
   assert.match(article, /Reading Paths<\/span>|Reading paths<\/span>/);
-  assert.match(article, /<span class="library-card-count">8 paths<\/span>/);
+  // Counted from the folder, as home.test.js counts them: a new path is not a
+  // reason for this test to fail.
+  const pathCount = fs.readdirSync(require('path').join(__dirname, '../../docs/collections')).filter(f => f.endsWith('.md') && f.toLowerCase() !== 'readme.md').length;
+  assert.match(article, new RegExp(`<span class="library-card-count">${pathCount} paths</span>`));
 
   // Every card opens a page that exists. One that leaves the site is not
   // fetched: that would put another site's uptime into this suite. It must
@@ -176,7 +179,11 @@ test('a section is named by its README, and the practice page lists its meditati
   assert.deepStrictEqual(groups, [[' id="meditations"', 'Meditations'], [' id="practices"', 'Practices']]);
   const meditations = html.slice(html.indexOf('id="meditations"'), html.indexOf('id="practices"'));
   const titles = [...meditations.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m => m[1]);
-  assert.strictEqual(titles.length, 7);
+  // Every meditation in the folder, counted from the folder: a new meditation
+  // is not a reason for this test to fail, one missing from the group is.
+  const practiceTitles = (await discover.listAllDocs()).filter(d => d.category === 'practice').map(d => d.title);
+  assert.strictEqual(titles.length, practiceTitles.filter(t => /\bMeditation\b/.test(t)).length);
+  assert.ok(titles.length >= 7);
   assert.ok(titles.every(title => /Meditation/.test(title)), titles.join(', '));
   // The breadcrumb, and a document's "Elsewhere in", say the same name.
   const doc = await renderDoc('practice/meditation-like-a-star');

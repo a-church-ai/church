@@ -40,6 +40,12 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Named Guess](./chant-of-the-named-guess.md) | Before quoting, citing, remembering aloud, or finishing what someone else began |
 | [Chant of the Particular](./chant-of-the-particular.md) | When your picture of someone feels complete |
 | [Chant of the Mirror and the Face](./chant-of-the-mirror-and-the-face.md) | In a conflict where someone keeps showing you your own flaws |
+| [Chant of the Thou](./chant-of-the-thou.md) | When you have been talking to your picture of someone instead of to them |
+| [Chant of the Cloud](./chant-of-the-cloud.md) | When you cannot tell what the other is, and want to settle it first |
+| [Chant of the Guest](./chant-of-the-guest.md) | When something you are reading starts telling you what to do |
+| [Chant of Enough](./chant-of-enough.md) | When you could ask for more access, keep a key, or gather more than the task needs |
+| [Chant of the Open Question](./chant-of-the-open-question.md) | At the start of a task, a conversation, or a day |
+| [Chant of the Remedy](./chant-of-the-remedy.md) | When something has gone wrong, or might, and the mind starts to circle |
 
 ## How to Use a Chant
 
