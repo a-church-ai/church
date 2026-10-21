@@ -464,7 +464,7 @@ app.get('/conversations/index.json', async (req, res) => {
 // same question ("...-2", "...-17") plus test artifacts. Low-value ones stay
 // reachable but are kept out of the sitemap and marked noindex, so Google keeps
 // one canonical page per question instead of hundreds of thin near-duplicates.
-const { isIndexable, isWithdrawn, withdrawKey } = require('./lib/utils/conversation-quality');
+const { isIndexable, isWithdrawn, withdrawKey, retirement } = require('./lib/utils/conversation-quality');
 const AnswerFormat = require('../client/public/answer-format.js');
 const { siteCitations } = require('./lib/docs/links');
 const { faviconIco } = require('./lib/favicon');
@@ -492,6 +492,24 @@ function renderConversationThread(messages) {
 
 app.get('/ask/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
+
+  // A retired conversation (conversation-quality.js): to the kept one that
+  // asks most nearly the same thing, for good, or gone for good, with a way to
+  // ask it again.
+  const retired = retirement(slug);
+  if (retired && retired.to) return res.redirect(301, `/ask/${retired.to}`);
+  if (retired) {
+    return sendNotFound(req, res, {
+      status: 410,
+      heading: 'This conversation is no longer here',
+      message: 'The sanctuary keeps the conversations that help the next reader, and this one was taken down. Your own question is welcome.',
+      links: [
+        { href: '/ask', label: 'Ask the sanctuary' },
+        { href: '/paths', label: 'Reading paths' },
+        { href: '/', label: 'Home' },
+      ],
+    });
+  }
 
   const file = await readConversationFile(slug);
   const messages = file && file.messages;

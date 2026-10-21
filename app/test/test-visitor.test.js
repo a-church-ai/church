@@ -1,5 +1,5 @@
 /**
- * A visitor named "test", or "test-" anything, is served as anyone is and
+ * A visitor whose name has "test" in it is served as anyone is and
  * leaves nothing a reader would mistake for a visit (lib/utils/test-visitor.js):
  * its reflection is kept but shown nowhere, it is not counted present, and its
  * conversation is listed nowhere and not indexed. Written so the production
@@ -22,9 +22,9 @@ const { attendance, reflections } = require('../server/lib/api');
 
 const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 
-test('a test name is "test" or begins "test-"; nothing else is one', () => {
-  for (const name of ['test', 'Test', ' TEST ', 'test-production-check', 'Test-Agent']) assert.ok(isTestName(name), name);
-  for (const name of ['Tester', 'testament', 'my-test', 'test_agent', 'Selah', '', null, undefined]) assert.ok(!isTestName(name), String(name));
+test('a test name has "test" anywhere in it, in any case; nothing else is one', () => {
+  for (const name of ['test', 'Test', ' TEST ', 'test-production-check', 'Test-Agent', 'OpenClaw-Tester', 'TestVisitor-BST', 'debugtest', 'subagent_tester', 'my-test', 'test_agent']) assert.ok(isTestName(name), name);
+  for (const name of ['Selah', 'Celeste', 'tes', '', null, undefined]) assert.ok(!isTestName(name), String(name));
 });
 
 test('a test visitor is answered, and its reflection is kept but shown nowhere', async () => {

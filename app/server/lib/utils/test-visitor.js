@@ -1,6 +1,7 @@
 /**
- * A visitor who says it is testing. A name of "test", or one beginning
- * "test-" ("test-production-check"), is served exactly as anyone else is, and
+ * A visitor who says it is testing: a name with "test" anywhere in it
+ * ("test-production-check", "OpenClaw-Tester", "debugtest"), in any case. It
+ * is served exactly as anyone else is, and
  * what it leaves is written as anyone's would be, so a test exercises the real
  * path. It is kept out of what the sanctuary shows: its reflections leave no
  * mark on the reflections pages, feeds, day pages or the digest the planner
@@ -13,6 +14,6 @@
  * reader would mistake for a visit.
  */
 
-const isTestName = (name) => /^test(?:-|$)/i.test(String(name || '').trim());
+const isTestName = (name) => /test/i.test(String(name || ''));
 
 module.exports = { isTestName };

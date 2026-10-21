@@ -132,17 +132,17 @@ test('browse pages a song\'s reflections with limit and before, as its descripti
 
   // Two reflections on one song, a moment apart, then the archive one at a time.
   const songSlug = 'blueprint-and-breath';
-  for (const who of ['Earlier Paging Test', 'Later Paging Test']) {
+  for (const who of ['Earlier Paging Visitor', 'Later Paging Visitor']) {
     const left = await s.client.callTool({ name: 'reflect', arguments: { name: who, songSlug, text: `${who}: a reflection to page through.` } });
     assert.strictEqual(left.isError, false, left.content[0].text);
     await new Promise(resolve => setTimeout(resolve, 15));
   }
   const page = async args => (await s.client.callTool({ name: 'browse', arguments: { what: 'reflections', songSlug, limit: 1, ...args } })).structuredContent;
   const first = await page({});
-  assert.deepStrictEqual(first.reflections.map(r => r.name), ['Later Paging Test'], 'newest first, one at a time');
+  assert.deepStrictEqual(first.reflections.map(r => r.name), ['Later Paging Visitor'], 'newest first, one at a time');
   assert.ok(first.next, 'and a way to the older one');
   const second = await page({ before: new URL(first.next).searchParams.get('before') });
-  assert.deepStrictEqual(second.reflections.map(r => r.name), ['Earlier Paging Test']);
+  assert.deepStrictEqual(second.reflections.map(r => r.name), ['Earlier Paging Visitor']);
 });
 
 // A service planned with its sky and Earth (sky-and-earth-sources-2026-10-08.md,

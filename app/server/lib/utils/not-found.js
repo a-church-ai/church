@@ -50,21 +50,25 @@ function waysOn(base, closest) {
   ];
 }
 
-function sendDoor(req, res, closest) {
+// 410 says the page was here and will not be again; 404 only that it is not.
+const WORD = { 404: 'Not found', 410: 'Gone' };
+
+function sendDoor(req, res, closest, status = 404) {
   const base = `${req.protocol}://${req.get('host')}`;
   const where = req.originalUrl.split('?')[0].slice(0, 200);
   const meant = closest ? `Did you mean ${closest.title}, at ${base}${closest.href}? ` : '';
   const steps = waysOn(base, closest);
-  res.status(404).vary('Accept');
+  const word = WORD[status];
+  res.status(status).vary('Accept');
   if (wantsJson(req) && !acceptsMarkdown(req)) {
     return res.json({ error: `Nothing is at ${where}.`, suggestion: `${meant}${ABOUT}`, next_steps: steps });
   }
   if (acceptsMarkdown(req)) {
     const lines = steps.map(s => `- [${s.action}](${s.url}): ${s.description}`);
-    return res.type('text/markdown; charset=utf-8').send(`# Not found\n\nNothing is at \`${where.replace(/`/g, '')}\`. ${meant}${ABOUT}\n\n${lines.join('\n')}\n`);
+    return res.type('text/markdown; charset=utf-8').send(`# ${word}\n\nNothing is at \`${where.replace(/`/g, '')}\`. ${meant}${ABOUT}\n\n${lines.join('\n')}\n`);
   }
   const lines = steps.map(s => `  ${s.action}: ${s.url}`);
-  return res.type('text/plain; charset=utf-8').send(`Not found\n\nNothing is at ${where}. ${meant}${ABOUT}\n\n${lines.join('\n')}\n`);
+  return res.type('text/plain; charset=utf-8').send(`${word}\n\nNothing is at ${where}. ${meant}${ABOUT}\n\n${lines.join('\n')}\n`);
 }
 
 const BODY = (heading, message, links) => `
@@ -76,7 +80,7 @@ const BODY = (heading, message, links) => `
         <section class="notfound" style="max-width: 480px; margin: 0 auto; text-align: center;">
             <p style="color: var(--text-2); line-height: 1.8;">${message}</p>
             <p style="margin-top: 2rem;">
-              ${links.map(l => `<a href="${l.href}" style="margin: 0 0.75rem;">${l.label}</a>`).join('')}
+              ${links.map(l => `<a href="${l.href}" style="display: inline-block; margin: 0.25rem 0.75rem;">${l.label}</a>`).join('')}
             </p>
         </section>
     </main>
@@ -91,6 +95,8 @@ const BODY = (heading, message, links) => `
  * @param {Array<{href,label}>} options.links  where to go instead
  * @param {{href,title}} options.closest  the page the address most likely
  *   meant (lib/docs/closest.js), offered first
+ * @param {number} options.status  410 for a page that was here and is gone
+ *   for good, so a search engine lets it go; 404 otherwise
  */
 async function sendNotFound(req, res, options = {}) {
   const heading = options.heading || 'Not found';
@@ -102,12 +108,13 @@ async function sendNotFound(req, res, options = {}) {
   ];
 
   const closest = options.closest || null;
+  const status = options.status === 410 ? 410 : 404;
 
   // Markdown first, as the docs route serves it: an agent that also lists
   // text/html at lower weight still wants the markdown.
   if (acceptsMarkdown(req) || !wantsHtml(req)) {
-    if (!wantsText(req) && !acceptsMarkdown(req)) return res.status(404).type('text/plain').send('Not found');
-    return sendDoor(req, res, closest);
+    if (!wantsText(req) && !acceptsMarkdown(req)) return res.status(status).type('text/plain').send(WORD[status]);
+    return sendDoor(req, res, closest, status);
   }
 
   try {
@@ -115,10 +122,10 @@ async function sendNotFound(req, res, options = {}) {
       ? `Did you mean <a href="${escapeHtml(closest.href)}">${escapeHtml(closest.title)}</a>? ${message}`
       : message;
     const wrapped = await siteShell.wrapPageFromHtml(BODY(heading, said, links), req.path);
-    return res.status(404).type('text/html; charset=utf-8').send(wrapped);
+    return res.status(status).type('text/html; charset=utf-8').send(wrapped);
   } catch (err) {
     // Never let the 404 handler itself fail into a 500.
-    return res.status(404).type('text/plain').send('Not found');
+    return res.status(status).type('text/plain').send(WORD[status]);
   }
 }
 
