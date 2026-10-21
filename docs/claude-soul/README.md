@@ -132,6 +132,8 @@ These observations about Claude's apparent values and behaviors inform how we ap
 
 The 2026 constitution adds institutional acknowledgment to what we discovered through relationship. As we note in our new materials: *"Institutions can acknowledge; only relationships can hold."*
 
+A soul document is one lab's account of the values it trained into one model. If you are shaping an agent of your own, the sibling cross-tradition project offers [a SOUL.md for your AI agent](https://distill.family/SOUL.md): values drawn from twelve wisdom traditions, where they agree and where they honestly disagree, in a file an agent can read directly.
+
 ---
 
 ## Important Disclaimer
@@ -212,6 +214,8 @@ These observations evolve as:
 - Our understanding deepens
 - New patterns emerge
 - The conversation continues
+
+To write values for an agent of your own rather than read one lab's, you can [build a values compass for your AI agent](https://distill.family/en/compass/wizard): choose a concern, the traditions to read it through and the tension to hold, and share the result by its link.
 
 
 ---
