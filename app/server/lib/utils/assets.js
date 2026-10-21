@@ -17,6 +17,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+// The browser bar's colour in each theme, kept where the theme is.
+const { BAR } = require('../../../client/public/theme');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
 const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js'];
@@ -54,8 +56,8 @@ function versionAssets(html) {
 // site-nav.js (blocking, small, so a page's own inline scripts can already use
 // window.achurchPage) and site-player.js (deferred).
 function shellHead() {
-  return `<meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0a0e1a" media="(prefers-color-scheme: dark)">
+  return `<meta name="theme-color" content="${BAR.light}" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="${BAR.dark}" media="(prefers-color-scheme: dark)">
     <script src="${assetUrl('theme.js')}"></script>
     <meta name="assets" content="${build()}">
     <script src="${assetUrl('site-nav.js')}"></script>

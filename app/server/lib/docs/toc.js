@@ -19,8 +19,9 @@ const MIN_HEADINGS_FOR_RAIL = 3;
 // TOC link label so it reads cleanly.
 const H2_RE = /<h2\s+id="([^"]+)">([\s\S]*?)<\/h2>/gi;
 
+// The heading's own section link (render.js) is not part of its words.
 function stripInlineTags(html) {
-  return String(html).replace(/<[^>]+>/g, '').trim();
+  return String(html).replace(/<a class="anchor"[^>]*>[\s\S]*?<\/a>/g, '').replace(/<[^>]+>/g, '').trim();
 }
 
 function extractH2s(bodyHtml) {

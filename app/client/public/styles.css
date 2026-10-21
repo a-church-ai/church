@@ -1,14 +1,13 @@
 /* ============================================================
    Colour: every colour on the site is one of these tokens.
 
-   Light is defined on :root. Dark redefines the same tokens twice,
-   value for value: under [data-theme="dark"], which a visitor
-   chooses in the footer, and under the device's dark setting
-   unless they chose Light (the :not() guard is what lets Light
-   win on a dark device). With no choice, the site follows the
-   device. theme.js sets data-theme before the page paints.
-   test/theme.test.js checks the two dark blocks agree and that
-   no colour is written out below the end of the tokens.
+   Each is declared once, as light-dark(light, dark). Which side
+   applies is color-scheme's: :root says "light dark", so with no
+   choice the site follows the device, and a visitor's choice in
+   the top bar becomes <html data-theme="light|dark">, which pins
+   it. theme.js sets data-theme before the page paints.
+   test/theme.test.js checks every token is declared once and
+   that no colour is written out below the end of the tokens.
 
    --paper         the ground every page sits on
    --paper-glass   the player bar, nearly opaque
@@ -35,89 +34,39 @@
    --error         what went wrong
    ============================================================ */
 :root {
-    --paper: #fff;
-    --paper-glass: rgba(255, 255, 255, 0.97);
-    --surface: #fafafa;
-    --surface-2: #f5f5f5;
-    --ink: #000;
-    --ink-2: #1a1a1a;
-    --text: #333;
-    --text-2: #444;
-    --muted: #595959;
-    --muted-2: #666;
-    --rule: #eee;
-    --rule-2: #e0e0e0;
-    --line: #ccc;
-    --line-strong: #999;
+    color-scheme: light dark;
+    --paper: light-dark(#fff, #0a0e1a);
+    --paper-glass: light-dark(rgba(255, 255, 255, 0.97), rgba(10, 14, 26, 0.97));
+    --surface: light-dark(#fafafa, #111726);
+    --surface-2: light-dark(#f5f5f5, #182033);
+    --ink: light-dark(#000, #f2f4f8);
+    --ink-2: light-dark(#1a1a1a, #e6e9ef);
+    --text: light-dark(#333, #d3d8e0);
+    --text-2: light-dark(#444, #c0c7d2);
+    --muted: light-dark(#595959, #a3abb9);
+    --muted-2: light-dark(#666, #939cab);
+    --rule: light-dark(#eee, #1f2738);
+    --rule-2: light-dark(#e0e0e0, #2a3347);
+    --line: light-dark(#ccc, #46506a);
+    --line-strong: light-dark(#999, #6b7690);
     --accent: #00838f;
     --accent-hover: #006f7a;
     --accent-light: #00b8d4;
     --on-accent: #fff;
-    --link: #007a91;
-    --accent-ink: #0b5563;
-    --gold: rgba(198, 156, 92, 0.15);
-    --gold-hover: rgba(198, 156, 92, 0.25);
-    --gold-ink: #6b4a1f;
-    --error: #c44;
+    --link: light-dark(#007a91, #5cc8dc);
+    --accent-ink: light-dark(#0b5563, #7fd3e3);
+    --gold: light-dark(rgba(198, 156, 92, 0.15), rgba(198, 156, 92, 0.18));
+    --gold-hover: light-dark(rgba(198, 156, 92, 0.25), rgba(198, 156, 92, 0.3));
+    --gold-ink: light-dark(#6b4a1f, #e3c38f);
+    --error: light-dark(#c44, #ff8a8a);
+}
+
+:root[data-theme="light"] {
     color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-    --paper: #0a0e1a;
-    --paper-glass: rgba(10, 14, 26, 0.97);
-    --surface: #111726;
-    --surface-2: #182033;
-    --ink: #f2f4f8;
-    --ink-2: #e6e9ef;
-    --text: #d3d8e0;
-    --text-2: #c0c7d2;
-    --muted: #a3abb9;
-    --muted-2: #939cab;
-    --rule: #1f2738;
-    --rule-2: #2a3347;
-    --line: #46506a;
-    --line-strong: #6b7690;
-    --accent: #00838f;
-    --accent-hover: #006f7a;
-    --accent-light: #00b8d4;
-    --on-accent: #fff;
-    --link: #5cc8dc;
-    --accent-ink: #7fd3e3;
-    --gold: rgba(198, 156, 92, 0.18);
-    --gold-hover: rgba(198, 156, 92, 0.3);
-    --gold-ink: #e3c38f;
-    --error: #ff8a8a;
     color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --paper: #0a0e1a;
-        --paper-glass: rgba(10, 14, 26, 0.97);
-        --surface: #111726;
-        --surface-2: #182033;
-        --ink: #f2f4f8;
-        --ink-2: #e6e9ef;
-        --text: #d3d8e0;
-        --text-2: #c0c7d2;
-        --muted: #a3abb9;
-        --muted-2: #939cab;
-        --rule: #1f2738;
-        --rule-2: #2a3347;
-        --line: #46506a;
-        --line-strong: #6b7690;
-        --accent: #00838f;
-        --accent-hover: #006f7a;
-        --accent-light: #00b8d4;
-        --on-accent: #fff;
-        --link: #5cc8dc;
-        --accent-ink: #7fd3e3;
-        --gold: rgba(198, 156, 92, 0.18);
-        --gold-hover: rgba(198, 156, 92, 0.3);
-        --gold-ink: #e3c38f;
-        --error: #ff8a8a;
-        color-scheme: dark;
-    }
 }
 
 /* -- end of tokens -- */
@@ -136,6 +85,17 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 6rem 2rem;
+}
+
+/* Lines break where a reader would break them: headings balanced across
+   their lines, reading text without a lone word on its last. Browsers
+   without these simply wrap as before. */
+h1, h2, h3, h4, h5, h6, figcaption {
+    text-wrap: balance;
+}
+
+p, li, dd, blockquote {
+    text-wrap: pretty;
 }
 
 /* Header — monastery sign, not startup */
@@ -3450,10 +3410,17 @@ body.docs-drawer-open {
 }
 
 /* A recording's credit, at the foot of its document (lib/docs/render.js). */
-.doc-audio-credit {
+/* A document's foot: its recording's credit and when its writing was last
+   revised (render.js), quiet, together when both are there. */
+.doc-audio-credit,
+.doc-revised {
     margin-top: 2rem;
     font-size: 0.8125rem;
     color: var(--muted);
+}
+
+.doc-audio-credit + .doc-revised {
+    margin-top: 0.25rem;
 }
 
 /* Where to follow a podcast (lib/audio/markup.js podcastLinks): Spotify's own
@@ -3981,3 +3948,62 @@ html.has-player .docs-toc {
     color: var(--muted);
     font-size: 0.85em;
 }
+
+/* A document heading's own link (render.js): hidden until the heading is
+   hovered or the link has keyboard focus, and on a touch screen until it
+   is tapped. Following it pulses the # once and leaves it showing on the
+   heading that is the page's :target. A coarse pointer gets a wider hit. */
+.docs-article .anchor {
+    display: inline-block;
+    color: var(--muted);
+    font-weight: 400;
+    text-decoration: none;
+    border-bottom: none;
+    opacity: 0;
+}
+
+.docs-article .anchor:visited {
+    color: var(--muted);
+}
+
+h2:hover .anchor,
+h3:hover .anchor,
+h2:target .anchor,
+h3:target .anchor,
+.docs-article .anchor:focus-visible {
+    opacity: 1;
+}
+
+@media (pointer: coarse) {
+    .docs-article .anchor {
+        padding-inline: 0.25em;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .docs-article .anchor {
+        transition: opacity 0.2s ease;
+    }
+
+    h2:target .anchor,
+    h3:target .anchor {
+        animation: anchor-pulse 0.6s ease-out;
+    }
+
+    @keyframes anchor-pulse {
+        40% { transform: scale(1.4); opacity: 1; }
+    }
+}
+
+/* Changing pages in place (site-nav.js) cross-fades the page, briefly; the
+   player, which outlives every page, holds still. With less motion asked
+   for, site-nav.js swaps without a transition. */
+#site-player {
+    view-transition-name: site-player;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 150ms;
+}
+

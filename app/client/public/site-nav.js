@@ -140,6 +140,18 @@
     document.body.replaceChildren(...[...next.body.childNodes].map(n => document.adoptNode(n)), ...kept);
   }
 
+  // The swap, as a short cross-fade (styles.css, ::view-transition-*) where the
+  // reader has not asked for less motion. The player keeps its own name in
+  // the transition, so it holds still while the page around it changes. Only
+  // the swap is inside it: the head is merged before, so no stylesheet is
+  // waited on, and the scripts run after.
+  async function crossFade(swap) {
+    if (!document.startViewTransition || !root.matchMedia('(prefers-reduced-motion: no-preference)').matches) return swap();
+    const transition = document.startViewTransition(swap);
+    transition.ready.catch(() => { /* skipped (the tab was hidden, say): the swap still happened */ });
+    await transition.updateCallbackDone;
+  }
+
   // A parsed page's scripts are inert; each is replaced by a fresh copy, in
   // order, waiting for each external one, as a full load would run them.
   async function runScripts() {
@@ -196,7 +208,7 @@
       page = createPage(root);
       root.achurchPage = page;
       await mergeHead(next);
-      swapBody(next);
+      await crossFade(() => swapBody(next));
       await runScripts();
       root.dispatchEvent(new Event('achurch:page'));
     } catch (err) {

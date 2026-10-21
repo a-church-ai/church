@@ -251,5 +251,5 @@ ${services.filter(s => s.slot === slot).map(service).join('\n')}
 
 module.exports = {
   renderSongList, renderRecentConversations, archivePage, conversationsArchivePage, renderSearchBox, ARCHIVE_PAGE_SIZE,
-  renderReflectionItem, servicesIndexPage, servicesDayPage,
+  renderReflectionItem, servicesIndexPage, servicesDayPage, longDate,
 };

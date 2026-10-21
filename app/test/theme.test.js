@@ -1,8 +1,9 @@
 /**
- * Light and dark. Every colour in the stylesheet is a token on :root, and the
- * dark theme redefines the tokens in two places: under [data-theme="dark"],
- * which a visitor chooses, and under the device's dark setting unless they
- * chose Light. A choice is kept in this browser (client/public/theme.js), set
+ * Light and dark. Every colour in the stylesheet is a token on :root, each
+ * declared once as light-dark(light, dark), and color-scheme decides which
+ * side applies: "light dark" follows the device, and a visitor's choice
+ * (data-theme) pins it. Until 2026-10-21 the dark values were written out
+ * twice more, for the choice and for the device. A choice is kept in this browser (client/public/theme.js), set
  * before the page paints, and offered in every page's footer; with none, the
  * site follows the device. Written to fail against the site as of 2026-10-07,
  * which had one theme and 335 colours written out by hand.
@@ -30,16 +31,20 @@ const block = (css, selector) => {
 };
 const tokens = body => Object.fromEntries([...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(m => [m[1], m[2].trim()]));
 
-test('every colour is a token, and both ways to be dark define every token the same', () => {
-  const light = tokens(block(CSS, ':root'));
-  const chosen = tokens(block(CSS, ':root[data-theme="dark"]'));
-  const device = tokens(block(CSS, '@media (prefers-color-scheme: dark) {\n    :root:not([data-theme="light"])'));
-  const names = Object.keys(light).filter(n => !/^--docs-|^--player-|^--card-/.test(n));
+test('every colour is a token, declared once for both themes, and color-scheme decides which applies', () => {
+  const declared = tokens(block(CSS, ':root'));
+  const names = Object.keys(declared);
   assert.ok(names.length >= 15, `${names.length} colour tokens`);
-  assert.deepStrictEqual(Object.keys(chosen).sort(), names.sort(), 'the chosen dark theme redefines every colour');
-  assert.deepStrictEqual(device, chosen, 'the device\'s dark is the chosen dark, value for value');
-  assert.match(block(CSS, ':root'), /color-scheme: light/);
-  assert.match(block(CSS, ':root[data-theme="dark"]'), /color-scheme: dark/);
+  const colour = String.raw`(?:#[0-9a-fA-F]{3,8}|rgba?\([^()]*\))`;
+  for (const name of names) {
+    assert.match(declared[name], new RegExp(`^(?:light-dark\\(${colour}, ${colour}\\)|${colour})$`), `${name} is a colour, or light-dark() of two`);
+  }
+  assert.ok(names.filter(n => /^light-dark\(/.test(declared[n])).length >= 15, 'most tokens differ between the themes');
+  assert.equal([...CSS.matchAll(/^\s*--paper:/gm)].length, 1, 'each token is declared once');
+  assert.doesNotMatch(CSS, /prefers-color-scheme/, 'the device is followed by color-scheme, not by a second copy of the tokens');
+  assert.match(block(CSS, ':root'), /color-scheme: light dark;/);
+  assert.match(block(CSS, ':root[data-theme="light"]'), /color-scheme: light;/);
+  assert.match(block(CSS, ':root[data-theme="dark"]'), /color-scheme: dark;/);
 
   // Outside the token blocks no colour is written out: a hex value, or black
   // or white at an opacity, would stay the same in the dark. Shadows and the
@@ -108,9 +113,20 @@ test('nothing on a page paints a colour of its own', () => {
   assert.doesNotMatch(notFound, /color:\s*#/);
 });
 
+test('the theme on show is one answer, theme.js\'s, which the player draws by', () => {
+  const theme = require('../client/public/theme');
+  const page = chosen => ({ documentElement: { getAttribute: () => chosen } });
+  const device = dark => ({ matchMedia: () => ({ matches: dark }) });
+  assert.equal(theme.resolved(page('light'), device(true)), 'light', 'a choice wins over a dark device');
+  assert.equal(theme.resolved(page('dark'), device(false)), 'dark', 'and over a light one');
+  assert.equal(theme.resolved(page(null), device(true)), 'dark', 'Auto follows the device');
+  assert.equal(theme.resolved(page(null), device(false)), 'light');
+  assert.match(read('site-player.js'), /achurchTheme\.resolved\(root\.document, root\) === 'dark'/);
+  assert.match(require('../server/lib/utils/assets').shellHead(), new RegExp(`content="${theme.BAR.light}"[^>]*light[\\s\\S]*content="${theme.BAR.dark}"[^>]*dark`), 'the bar colours come from theme.js');
+});
+
 test('the voice-band figure turns its layers toward the ground it is drawn on', () => {
   const player = read('site-player.js');
-  assert.match(player, /colorScheme === 'dark'/);
   assert.match(player, /colorAt\(ramp, 0\.5 \+ L \* 0\.03 \* shade\)/);
 });
 

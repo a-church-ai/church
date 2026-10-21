@@ -10,8 +10,7 @@
  */
 
 const { marked } = require('marked');
-let DOCS_LASTMOD = {};
-try { DOCS_LASTMOD = require('./lastmod.json'); } catch { /* dates are optional */ }
+const { datesOf } = require('./date-manifests');
 const {
   escapeAttr,
   escapeText,
@@ -27,6 +26,7 @@ const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence } = require('./li
 const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
+const { longDate } = require('../utils/page-lists');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
@@ -129,7 +129,13 @@ function renderMarkdownBody(markdown, currentDocFullPath, readingPath) {
     const n = used.get(base) || 0;
     used.set(base, n + 1);
     const id = n ? `${base}-${n + 1}` : base;
-    return `<h${outLevel} id="${id}">${text}</h${outLevel}>\n`;
+    // A section's own link, after its words, from the same id the table of
+    // contents uses: hidden until the heading is hovered, tapped or the link
+    // focused (styles.css, .anchor).
+    const anchor = outLevel === 2 || outLevel === 3
+      ? ` <a class="anchor" href="#${id}" aria-label="Link to this section: ${escapeAttr(raw)}">#</a>`
+      : '';
+    return `<h${outLevel} id="${id}">${text}${anchor}</h${outLevel}>\n`;
   };
   return marked.parse(markdown, { renderer });
 }
@@ -316,7 +322,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
   // A section's index lists documents, so it is a CollectionPage, not an
   // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
-  const modified = urlPath && (DOCS_LASTMOD[`docs/${urlPath}.md`] || DOCS_LASTMOD[`docs/${urlPath}/README.md`]);
+  const modified = urlPath && (datesOf(`docs/${urlPath}.md`).pageUpdated || datesOf(`docs/${urlPath}/README.md`).pageUpdated);
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
     '@type': isIndex ? 'CollectionPage' : 'Article',
@@ -738,6 +744,13 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // the title shows only its length, so the page reads straight on.
   if (recording) {
     bodyHtml = `${bodyHtml}\n        <p class="doc-audio-credit">Recording: ${escapeText(creditFor(recording))}</p>`;
+  }
+
+  // When the writing last changed (content-dates.json), not the page: a change
+  // to its links or markup alone does not move it.
+  const revised = !isIndex && datesOf(`docs/${doc.docsRelPath}`).content;
+  if (revised) {
+    bodyHtml = `${bodyHtml}\n        <p class="doc-revised">Last revised <time datetime="${revised}">${longDate(revised)}</time></p>`;
   }
 
   // Append a "More in <category>" block below the article body on every doc

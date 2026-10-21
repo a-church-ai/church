@@ -62,6 +62,16 @@
     }
   }
 
+  // The theme the page is drawn in: the choice on <html>, or else the
+  // device's. One answer for every script that draws in the theme's colours
+  // (site-player.js), since styles.css's color-scheme reads "light dark"
+  // under Auto and so cannot say which.
+  function resolved(doc, win) {
+    var chosen = doc.documentElement.getAttribute('data-theme');
+    if (chosen === 'light' || chosen === 'dark') return chosen;
+    return win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
   // The choice after this one, as the top bar's button goes round.
   function next(choice) {
     return CHOICES[(CHOICES.indexOf(choice) + 1) % CHOICES.length];
@@ -76,5 +86,5 @@
     apply(doc, choice);
   }
 
-  return { KEY: KEY, CHOICES: CHOICES, BAR: BAR, storageOf: storageOf, stored: stored, barFor: barFor, next: next, apply: apply, choose: choose };
+  return { KEY: KEY, CHOICES: CHOICES, BAR: BAR, storageOf: storageOf, stored: stored, barFor: barFor, resolved: resolved, next: next, apply: apply, choose: choose };
 }));

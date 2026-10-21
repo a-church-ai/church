@@ -34,4 +34,23 @@ function serializeManifest(manifest) {
   return `${JSON.stringify(sortManifest(manifest), null, 2)}\n`;
 }
 
-module.exports = { sortManifest, serializeManifest };
+// The two manifests, read once for every reader (the docs pages, the
+// sitemaps). Either may be missing in a checkout that has not generated it;
+// its dates are then absent, never invented.
+let LASTMOD = {};
+let CONTENT = {};
+try { LASTMOD = require('./lastmod.json'); } catch { console.warn('[dates] lib/docs/lastmod.json missing: pages carry no last-changed dates'); }
+try { CONTENT = require('./content-dates.json'); } catch { console.warn('[dates] lib/docs/content-dates.json missing: pages carry no created or revised dates'); }
+
+/**
+ * What the manifests hold for one file, by its path from the repository root
+ * (docs/practice/foo.md): when its page last changed (pageUpdated, the last
+ * commit), and when it was created and its writing last changed (created,
+ * content). Each is YYYY-MM-DD or null.
+ */
+function datesOf(file) {
+  const content = CONTENT[file] || {};
+  return { pageUpdated: LASTMOD[file] || null, created: content.created || null, content: content.content || null };
+}
+
+module.exports = { sortManifest, serializeManifest, datesOf };

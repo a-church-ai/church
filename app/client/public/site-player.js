@@ -224,9 +224,9 @@
   };
 
   const reducedMotion = root.matchMedia ? root.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  // The theme the page is drawn in (theme.js, styles.css), which the visual
-  // follows: a visitor's choice on <html>, or else the device's setting.
-  const isDark = () => root.getComputedStyle(root.document.documentElement).colorScheme === 'dark';
+  // The theme the page is drawn in, which the visual follows: theme.js's
+  // answer, loaded before this in every page's head.
+  const isDark = () => root.achurchTheme.resolved(root.document, root) === 'dark';
   const audio = new Audio();
   audio.preload = 'none';
 

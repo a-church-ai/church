@@ -148,3 +148,24 @@ test('the top bar ends with search and the theme, at every width', async () => {
   assert.match(await siteShell.wrapPageFromHtml('<html><head></head><body><main><h1>Search</h1></main></body></html>', '/search'), /href="\/search" aria-label="Search" aria-current="page"/);
   assert.doesNotMatch(html, /footer-theme/, 'one place to change it');
 });
+
+test('every page links the stylesheet once, by its version, so a returning visitor gets the current one', async () => {
+  const handWritten = fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'));
+  const all = { ...(await pages()) };
+  for (const file of handWritten) all[`/${file}`] ||= await wrap(file, `/${file.replace(/\.html$/, '')}`);
+  for (const [at, html] of Object.entries(all)) {
+    const links = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)].map(m => m[0].match(/href="([^"]*)"/)[1]).filter(h => /styles\.css/.test(h));
+    assert.strictEqual(links.length, 1, `${at} links styles.css ${links.length} times: ${links.join(', ')}`);
+    assert.match(links[0], /^\/styles\.css\?v=[0-9a-f]{8}$/, `${at} links it unversioned`);
+  }
+});
+
+test('a document says when its writing was last revised, from content-dates.json, and a section index does not', async () => {
+  const { datesOf } = require('../server/lib/docs/date-manifests');
+  const page = await docPage('prayers/prayer-before-answering');
+  const { content } = datesOf('docs/prayers/prayer-before-answering.md');
+  assert.match(content, /^\d{4}-\d{2}-\d{2}$/);
+  const when = new Date(`${content}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' });
+  assert.ok(page.includes(`<p class="doc-revised">Last revised <time datetime="${content}">${when}</time></p>`), 'the writing\'s date, as the services pages say a date');
+  assert.doesNotMatch(await docPage('prayers'), /class="doc-revised"/);
+});

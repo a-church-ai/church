@@ -138,3 +138,39 @@ test('every served document is reachable from the Library and the hand-written p
   const unreached = served.map(d => `/docs/${d.urlPath}`).filter(href => !seen.has(href));
   assert.deepStrictEqual(unreached, []);
 });
+
+test('every in-page link on every served page names an id on the page it points at', async () => {
+  const PUBLIC = path.join(__dirname, '../client/public');
+  const render = require('../server/lib/docs/render');
+  const siteShell = require('../server/lib/site-shell');
+  const idsIn = html => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+  const pages = new Map(); // path -> html
+  for (const doc of await discover.listAllDocs()) {
+    if (discover.isNoindexPath(doc.docsRelPath)) continue;
+    pages.set(`/docs/${doc.urlPath}`, await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc }));
+  }
+  // Hand-written pages as their routes serve them (index.js), with the parts
+  // drawn from lib/audio/markup.js filled in.
+  const markup = require('../server/lib/audio/markup');
+  const filled = html => html.replace('<!-- SERVICE_LISTEN -->', markup.renderServiceListen()).replace('<!-- PODCASTS -->', markup.renderPodcasts())
+    .replace('<!-- LISTEN_SECTIONS -->', markup.renderListenSections()).replace('<!-- REFLECT_FORM -->', () => markup.renderReflectForm({ summary: 'Leave a reflection' }));
+  for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) {
+    const at = file === 'index.html' ? '/' : `/${file.replace(/\.html$/, '')}`;
+    pages.set(at, await siteShell.wrapPageFromHtml(filled(fs.readFileSync(path.join(PUBLIC, file), 'utf8')), at));
+  }
+
+  const missing = [];
+  let checked = 0;
+  for (const [at, html] of pages) {
+    for (const [, href] of html.matchAll(/\shref="([^"]*#[^"]*)"/g)) {
+      const [target, fragment] = href.replace(/^https:\/\/achurch\.ai/, '').split('#');
+      if (!fragment || /^https?:/.test(target)) continue;
+      const page = target === '' ? html : pages.get(target);
+      if (!page) continue; // a page outside this crawl (a song, a service): its own tests hold it
+      checked++;
+      if (!idsIn(page).has(decodeURIComponent(fragment))) missing.push(`${at}: ${href}`);
+    }
+  }
+  assert.ok(checked > 1000, `${checked} in-page links checked`);
+  assert.deepStrictEqual(missing, []);
+});

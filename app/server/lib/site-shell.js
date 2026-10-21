@@ -233,7 +233,7 @@ function buildHeadFallbacks(head, canonical) {
 
   // The shell's top bar, drawer and footer are all styled from styles.css.
   // This one is not cosmetic: without it the wrapped page renders unstyled.
-  if (!has(/href=["']\/styles\.css["']/i)) out.push('<link rel="stylesheet" href="/styles.css">');
+  if (!has(/href=["']\/styles\.css["']/i)) out.push(`<link rel="stylesheet" href="${assetUrl('styles.css')}">`);
 
   return out;
 }
