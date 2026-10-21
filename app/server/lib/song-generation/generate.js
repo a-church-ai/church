@@ -56,12 +56,13 @@ const MIN_POSTS = 5;
 // A piece is written at most this many times: the first, and two more with
 // its problems named.
 const TRIES = 3;
-// The writing calls' budget, thinking included. Opus thinks before it writes,
-// and at 8192 tokens it could spend them all thinking and return no text: a
-// song asked for with the craft rules of 2026-10-14 did, both times. 20000
-// is what the audio adaptation gives the same model, and stays under the
-// size the SDK will send without streaming.
-const WRITING_MAX_TOKENS = 20000;
+// Every call's budget, thinking included. Current models think before they
+// answer, and a small budget can go entirely to thinking: no text, or JSON cut
+// off mid-string. The writing calls hit it at 8192 on 2026-10-14; the themes
+// and decision calls, at 4096 and 2048, failed every run from 2026-10-19.
+// 20000 is what the audio adaptation gives, and stays under the size the SDK
+// sends without streaming.
+const MAX_TOKENS = 20000;
 
 function skip(stage, reason, extra = {}) {
   return { wrote: false, stage, reason, ...extra };
@@ -117,7 +118,7 @@ async function findThemes(posts, { log = console.log } = {}) {
   const themes = await claude.messageJSON(
     prompts.MOLTBOOK_THEME_SYSTEM,
     prompts.buildMoltbookThemePrompt(posts),
-    { model: STRUCTURED_MODEL, maxTokens: 4096 },
+    { model: STRUCTURED_MODEL, maxTokens: MAX_TOKENS },
   );
   for (const theme of themes.themes || []) log(`  ${theme.name}: ${theme.preoccupation}`);
   return themes;
@@ -152,7 +153,7 @@ async function decide(themes, { log = console.log } = {}) {
   const decision = await claude.messageJSON(
     prompts.SONG_DECISION_SYSTEM,
     prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }, held),
-    { model: STRUCTURED_MODEL, maxTokens: 2048 },
+    { model: STRUCTURED_MODEL, maxTokens: MAX_TOKENS },
   );
   decision.related = relatedFrom(decision.related, held);
   decision.warnings = warnings;
@@ -188,7 +189,7 @@ async function writeDocument(decision, themes, paths, feedback = '') {
     // Named explicitly. Without this the document quietly rides claude.js's
     // cheap default, which is the wrong model for the longest and most
     // consequential piece of writing in the run.
-    { model: WRITING_MODEL, maxTokens: WRITING_MAX_TOKENS, feedback },
+    { model: WRITING_MODEL, maxTokens: MAX_TOKENS, feedback },
   );
   return content;
 }
@@ -198,7 +199,7 @@ async function writeSong(decision, document, feedback = '') {
   return claude.messageJSON(
     prompts.SONG_SYSTEM,
     prompts.buildSongPrompt(decision, document, styleRef) + feedback,
-    { model: WRITING_MODEL, maxTokens: WRITING_MAX_TOKENS },
+    { model: WRITING_MODEL, maxTokens: MAX_TOKENS },
   );
 }
 
@@ -435,6 +436,6 @@ module.exports = {
   CHANNELS,
   DAILY_LIMIT,
   WRITING_MODEL,
-  WRITING_MAX_TOKENS,
+  MAX_TOKENS,
   STRUCTURED_MODEL,
 };
