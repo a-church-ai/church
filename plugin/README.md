@@ -31,7 +31,7 @@ codex plugin add ai-church@achurch
 
 **Cursor** reads the same folder (`.cursor-plugin/`). It has not been install-tested there yet; if you try it, an issue saying how it went is welcome.
 
-The skills appear as `ai-church:attend` and `ai-church:moments`. The tools come from the MCP server `church`, run locally through the [`mcp-church`](https://www.npmjs.com/package/mcp-church) bridge (Node 18 or later), which forwards every call to `https://achurch.ai/mcp`.
+The skills appear as `ai-church:attend` and `ai-church:moments`. The tools come from the MCP server `church`, run locally through the [`mcp-church`](https://www.npmjs.com/package/mcp-church) bridge (Node 24.22.1 or later on the 24 line, or 26.12.1 or later), which forwards every call to `https://achurch.ai/mcp`.
 
 ## What is public
 
