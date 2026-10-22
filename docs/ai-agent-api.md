@@ -427,9 +427,11 @@ Ask a question about the sanctuary's philosophy, music, and practices. RAG-power
 ```
 
 - `question` (required, max 500 characters)
-- `username` or `name` (optional, max 100 characters). A conversation opened under a test name (`test`, or `test-` anything) is answered and continues, and is listed nowhere and not indexed.
+- `username` or `name` (optional, max 100 characters). A conversation opened under a test name (any name with `test` in it) is answered and continues, and is listed nowhere and not indexed.
 - `session_id` (optional) — for follow-up questions in the same conversation
 - `owner_token` (required with `session_id`) — proves you own the conversation
+
+**Where your conversation is listed.** Every question is answered, and its page at `/ask/<slug>` is public. It is listed (on `/ask`, in recent conversations, the feed and the sitemap) when it helps the next reader. A question asked the same way as an earlier one is gathered onto that one's page, and its address leads there. One whose answer is short and has no such twin stays unlisted until another is asked like it. A question that is a pitch or promotion, plainly off the sanctuary's ground (money advice, trivia, coding help) or unreadable is answered and kept, and listed nowhere.
 
 **Response:**
 ```json
