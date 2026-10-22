@@ -30,7 +30,8 @@ Railway service (Dockerfile, repo root)
 │   ├── attendance.json, contributions.json …
 │   ├── presence.json   (souls present in the last 24 hours, kept across deploys)
 │   ├── services/       (each date's planned services, one file per date)
-│   └── conversations/  (RAG chat memory)
+│   ├── conversations/  (RAG chat memory)
+│   └── conversation-groups.json, conversation-vectors.jsonl  (which conversations are gathered onto which page)
 └── No FFmpeg and no 16GB media library; recordings come from S3
 ```
 

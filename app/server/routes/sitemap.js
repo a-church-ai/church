@@ -20,7 +20,8 @@ const express = require('express');
 const fs = require('fs').promises;
 const docsDiscover = require('../lib/docs/discover');
 const { datesShown } = require('../lib/api/services');
-const { listRecentConversations, loadAttendance } = require('../lib/utils/data');
+const { loadAttendance } = require('../lib/utils/data');
+const { placedConversations } = require('../lib/utils/conversation-groups');
 const { cache } = require('../lib/utils/cache');
 
 // Per-doc dates (lib/docs/date-manifests.js): the last commit for <lastmod>,
@@ -117,15 +118,20 @@ async function buildSitemap() {
     }
   } catch { /* no plans yet */ }
 
-  // Conversation pages: the indexable ones (thin, withdrawn and low-value ones
-  // are noindexed on the page too), from the one list every reader shares.
-  // A conversation with no messages (a question whose answer failed) is a 404
-  // at /ask/:slug, and is not in the list. lastmod is the newest message.
-  for (const c of await listRecentConversations(Infinity)) {
-    if (!c.indexable) continue;
+  // Conversation pages: those listed (lib/utils/conversation-groups.js): a
+  // group's page, or a conversation alone that is indexable and not held.
+  // A member lives on its head's page, so it has no entry of its own. A
+  // conversation with no messages (a question whose answer failed) is a 404
+  // at /ask/:slug, and is not in the list. lastmod is the newest message in
+  // the group.
+  const placed = await placedConversations();
+  const newestIn = new Map();
+  for (const c of placed) if (c.role) newestIn.set(c.head, [newestIn.get(c.head), c.lastActive].filter(Boolean).sort().pop());
+  for (const c of placed) {
+    if (!c.listed) continue;
     urls += `\n  <url>
     <loc>https://achurch.ai/ask/${c.slug}</loc>
-    <lastmod>${c.lastActive.slice(0, 10)}</lastmod>
+    <lastmod>${newestIn.get(c.head).slice(0, 10)}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>`;

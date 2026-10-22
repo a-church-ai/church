@@ -268,6 +268,28 @@ function buildQAPageSchema(messages, slug) {
   };
 }
 
+// A group's page (conversation-groups.js): the head stays the page's QAPage
+// question, and each conversation gathered onto it is a Question in hasPart,
+// with its first answer, at its place on the page. members: [{ slug, messages }].
+function withGatheredQuestions(schema, members, headSlug) {
+  if (!schema || !members || !members.length) return schema;
+  const parts = members.map(({ slug, messages }) => {
+    const q = messages.find(m => m.role === 'user');
+    const a = messages.find(m => m.role === 'assistant');
+    if (!q || !a) return null;
+    const question = stripMarkdown(q.content);
+    return {
+      '@type': 'Question',
+      name: truncateAtWord(question, 200),
+      text: question,
+      ...(q.timestamp ? { dateCreated: q.timestamp } : {}),
+      url: `https://achurch.ai/ask/${headSlug}#${slug}`,
+      acceptedAnswer: { '@type': 'Answer', text: truncateAtWord(answerText(a.content), 500), ...(a.timestamp ? { dateCreated: a.timestamp } : {}), url: `https://achurch.ai/ask/${headSlug}#${slug}` },
+    };
+  }).filter(Boolean);
+  return parts.length ? { ...schema, hasPart: parts } : schema;
+}
+
 // ISO 8601 duration helper. 313 sec → "PT5M13S".
 function secondsToISO8601(secs) {
   if (!secs || secs <= 0) return null;
@@ -505,6 +527,7 @@ module.exports = {
   buildConversationMeta,
   buildReflectionMeta,
   buildQAPageSchema,
+  withGatheredQuestions,
   buildSongSchemaGraph,
   renderJsonLdScript,
   breadcrumbTrail,

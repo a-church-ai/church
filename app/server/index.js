@@ -40,9 +40,9 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
-const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
+const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
@@ -418,7 +418,7 @@ app.get('/ask', async (req, res) => {
 // Every indexable conversation, paged with `before` like a song's reflections.
 app.get('/conversations', async (req, res) => {
   const before = typeof req.query.before === 'string' ? req.query.before : undefined;
-  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  const all = (await placedConversations()).filter(c => c.listed);
   const result = pageLists.archivePage(all, before);
   if (!result) return sendNotFound(req, res);
   const wrapped = await siteShell.wrapPageFromHtml(pageLists.conversationsArchivePage(result, before), req.path);
@@ -457,7 +457,7 @@ app.get('/services/:date', async (req, res) => {
 // runs in the browser. Outside /api/ on purpose: requests there are logged,
 // and searching is not.
 app.get('/conversations/index.json', async (req, res) => {
-  const all = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+  const all = (await placedConversations()).filter(c => c.listed);
   // "Asked" says what a result is where these are searched beside the
   // library's documents, on /search.
   res.json(all.map(c => ({ title: c.question, url: `/ask/${c.slug}`, label: c.timestamp ? `Asked ${c.timestamp.slice(0, 10)}` : 'Asked' })));
@@ -473,6 +473,7 @@ app.get('/conversations/index.json', async (req, res) => {
 // reachable but are kept out of the sitemap and marked noindex, so Google keeps
 // one canonical page per question instead of hundreds of thin near-duplicates.
 const { isIndexable, isWithdrawn, withdrawKey, retirement } = require('./lib/utils/conversation-quality');
+const { placedConversations, groupOf, startGathering } = require('./lib/utils/conversation-groups');
 const AnswerFormat = require('../client/public/answer-format.js');
 const { linkedCitations, citedPages } = require('./lib/docs/links');
 const docsDiscover = require('./lib/docs/discover');
@@ -492,7 +493,7 @@ const apiOps = { ask: apiAsk, reflections: apiReflections, services: apiServices
 const conversationDate = m => (m && m.timestamp
   ? new Date(m.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })
   : '');
-function renderConversationThread(messages) {
+function renderConversationThread(messages, { door = true } = {}) {
   const first = messages.findIndex(m => m.role === 'user');
   const firstAnswer = messages.findIndex(m => m.role === 'assistant');
   return messages.map((m, i) => {
@@ -503,8 +504,25 @@ function renderConversationThread(messages) {
     return `<div class="conv-message ${isQuestion ? 'conv-message-user' : 'conv-message-assistant'}">`
       + `<p class="conv-message-label">${isQuestion ? 'Question' : 'Answer'}${time ? ` · ${time}` : ''}</p>`
       + `<div class="conv-message-content">${content}</div></div>`
-      + (i === firstAnswer ? `\n${renderServiceDoor()}` : '');
+      + (door && i === firstAnswer ? `\n${renderServiceDoor()}` : '');
   }).filter(Boolean).join('\n');
+}
+
+// The conversations gathered onto this one's page (conversation-groups.js),
+// oldest first, each whole, under its own slug: its old address redirects to
+// that anchor, and the follow-up form continues it there for its owner.
+function renderGathered(members) {
+  if (!members.length) return '';
+  return '\n<div class="conv-gathered">\n<h2 class="conv-gathered-heading">Asked in other words</h2>\n'
+    + members.map(({ slug, messages }) => {
+      const q = messages.find(m => m.role === 'user');
+      const asked = conversationDate(q);
+      return `<section class="conv-gathered-item" id="${escapeAttr(slug)}" data-thread="${escapeAttr(slug)}">`
+        + `\n<h3 class="conv-gathered-question">${AnswerFormat.escapeHtml(q.content)}</h3>`
+        + (asked ? `\n<p class="conv-asked">Asked ${asked}</p>` : '')
+        + `\n<div class="conv-thread" data-rendered="1">\n${renderConversationThread(messages, { door: false })}\n</div>\n</section>`;
+    }).join('\n')
+    + '\n</div>';
 }
 
 // The page an answer leans on most, to read next: the one its answers cite
@@ -543,7 +561,12 @@ app.get('/ask/:slug', async (req, res) => {
   // asks most nearly the same thing, for good, or gone for good, with a way to
   // ask it again.
   const retired = retirement(slug);
-  if (retired && retired.to) return res.redirect(301, `/ask/${retired.to}`);
+  if (retired && retired.to) {
+    // Straight to where the kept one lives now, in one step: if it has since
+    // been gathered onto another's page, to its place there.
+    const target = (await placedConversations()).find(c => c.slug === retired.to);
+    return res.redirect(301, target ? target.path : `/ask/${retired.to}`);
+  }
   if (retired) {
     return sendNotFound(req, res, {
       status: 410,
@@ -571,6 +594,17 @@ app.get('/ask/:slug', async (req, res) => {
     });
   }
 
+  // Gathered (conversation-groups.js): a member lives on its head's page, so
+  // its address is a permanent redirect to its place there.
+  const placed = await placedConversations();
+  const me = placed.find(c => c.slug === slug);
+  if (me && me.role === 'member') return res.redirect(301, me.path);
+  const members = me && me.role === 'head'
+    ? (await Promise.all(groupOf(placed, slug).filter(c => c.slug !== slug)
+      .map(async c => ({ slug: c.slug, messages: ((await readConversationFile(c.slug)) || {}).messages || [] }))))
+      .filter(m => m.messages.some(x => x.role === 'user'))
+    : [];
+
   // Titles for the citations (linkedCitations) come from the library's index:
   // the page's answers, and its description and structured data.
   await docsDiscover.listAllDocs();
@@ -581,7 +615,9 @@ app.get('/ask/:slug', async (req, res) => {
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
-    if (!isIndexable(slug, messages, askerOf(slug, file.meta))) {
+    // Not indexable, or held: alone with an answer too short to stand on its
+    // own until another conversation gathers with it.
+    if (!isIndexable(slug, messages, askerOf(slug, file.meta)) || (me && me.held)) {
       html = html.replace(
         '<meta name="robots" content="index, follow">',
         '<meta name="robots" content="noindex, follow">'
@@ -593,19 +629,20 @@ app.get('/ask/:slug', async (req, res) => {
     // The conversation's own share card (lib/og-cards.js), with tags that
     // describe it; its alt text is the card's copy.
     const shareTags = renderShareImageTags(askCard(slug, (messages.find(m => m.role === 'user') || {}).content));
-    const qaSchema = renderJsonLdScript(buildQAPageSchema(messages, slug));
+    const qaSchema = renderJsonLdScript(withGatheredQuestions(buildQAPageSchema(messages, slug), members, slug));
     // Internal linking — 3 related conversations for crawl + AEO topical clustering.
     // Failure here is non-fatal (returns empty string).
     let relatedHtml = '';
     try {
-      const kept = (await listRecentConversations(Infinity)).filter(c => c.indexable);
+      // Never this page's own group: its conversations are on the page.
+      const kept = placed.filter(c => c.listed && c.head !== slug);
       relatedHtml = renderRelatedConversations(relatedByCitation(kept, slug, messages), slug, 3);
     } catch { /* non-fatal */ }
 
     const canonicalUrl = `https://achurch.ai/ask/${slug}`;
     const question = (messages.find(m => m.role === 'user') || {}).content || 'Conversation';
     const asked = conversationDate(messages.find(m => m.role === 'user'));
-    const readNext = mostCited(messages);
+    const readNext = mostCited([...messages, ...members.flatMap(m => m.messages)]);
     // Ask / <the question>, shown above the heading and as BreadcrumbList.
     const trail = breadcrumbTrail([{ label: 'Ask', href: '/ask' }, { label: truncateAtWord(question, 60) }], canonicalUrl);
     html = html
@@ -654,7 +691,7 @@ app.get('/ask/:slug', async (req, res) => {
       .replace('<h1 class="subtitle" id="conv-subtitle">Conversation</h1>',
         () => `${trail.html}\n            <h1 class="subtitle" id="conv-subtitle">${AnswerFormat.escapeHtml(question)}</h1>${asked ? `\n            <p class="conv-asked">Asked ${asked}</p>` : ''}`)
       .replace(/<div class="conv-thread" id="conv-thread">\s*<p class="conv-loading">Loading conversation\.\.\.<\/p>\s*<\/div>/,
-        () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>`);
+        () => `<div class="conv-thread" id="conv-thread" data-rendered="1">\n${renderConversationThread(messages)}\n</div>${renderGathered(members)}`);
 
     // Wrap in the site shell (top bar and footer) for consistent nav
     const wrapped = await siteShell.wrapPageFromHtml(html, `/ask/${slug}`);
@@ -1466,6 +1503,16 @@ async function startServer() {
       startPlanning({ catalog: loadServiceCatalog, plan: planSlot, context: contextFor, feeds: fetchFeeds });
     } else {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
+    }
+
+    // Conversations that ask the same thing, gathered onto one page
+    // (lib/utils/conversation-groups.js): after boot, hourly, and soon after a
+    // new question. Without a Gemini key nothing new is gathered; what was
+    // gathered stays as it is.
+    if (process.env.GEMINI_API_KEY) {
+      startGathering({ embed: text => require('./lib/rag/gemini').embed(text) });
+    } else {
+      console.warn('[groups] GEMINI_API_KEY not set; new conversations are not gathered');
     }
 
     

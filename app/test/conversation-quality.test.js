@@ -75,7 +75,9 @@ test('a retired conversation\'s page: 301 to its twin, or 410 with a way to ask 
   const route = source.slice(source.indexOf("app.get('/ask/:slug'"));
   // Decided before the file is read, so a retired conversation's thread is never served.
   assert.ok(route.indexOf('retirement(slug)') < route.indexOf('readConversationFile(slug)'));
-  assert.match(route, /res\.redirect\(301, `\/ask\/\$\{retired\.to\}`\)/);
+  // To where the kept one lives now: its own page, or its place on its group's
+  // page (conversation-groups.js); server-groups.test.js follows it.
+  assert.match(route, /res\.redirect\(301, target \? target\.path : `\/ask\/\$\{retired\.to\}`\)/);
   assert.match(route, /status: 410/);
 
   const express = require('express');

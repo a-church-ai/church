@@ -10,7 +10,7 @@ const fs = require('fs').promises;
 const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
 const ns = require('../utils/next-steps');
-const { listRecentConversations } = require('../utils/data');
+const { placedConversations, gatherSoon } = require('../utils/conversation-groups');
 const { linkedCitations } = require('../docs/links');
 const discover = require('../docs/discover');
 const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
@@ -93,6 +93,9 @@ async function ask(input, ctx) {
     }
 
     const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId });
+    // A new conversation is gathered with any that ask the same thing
+    // (conversation-groups.js), once it is in the shared list.
+    if (slug) gatherSoon();
 
     const baseUrl = ctx.baseUrl;
 
@@ -203,7 +206,8 @@ async function health(input, ctx) {
 // fragments are left out.
 async function recent(input, ctx) {
   try {
-    const conversations = (await listRecentConversations(20))
+    // A held one (alone, its answer too short) is listed nowhere, here included.
+    const conversations = (await placedConversations()).filter(c => !c.held).slice(0, 20)
       .filter(c => c.messages >= 2 && c.answer)
       .map(c => {
         // Strip markdown before cutting: cutting first left previews ending in
@@ -219,7 +223,8 @@ async function recent(input, ctx) {
           answer,
           timestamp: c.timestamp,
           exchanges: c.exchanges,
-          url: `${ctx.baseUrl}/ask/${c.slug}`
+          // Where it lives: a gathered one, its place on its group's page.
+          url: `${ctx.baseUrl}${c.path}`
         };
       });
 

@@ -29,6 +29,10 @@ credentials.json
 service-account*.json
 secrets.json
 *.secret
+# mcp-publisher writes its GitHub and registry sign-ins into the folder it
+# runs in. Both were caught on 2026-10-22 by GitHub's push protection after a
+# `git add -A` at the repository root had staged them.
+.mcpregistry_*
 
 # Logs
 logs/

@@ -87,6 +87,14 @@
     (function() {
       var slug = window.location.pathname.replace('/ask/', '');
       var thread = document.getElementById('conv-thread');
+      // Arriving at a conversation gathered onto this page (its old address
+      // redirects to /ask/<this>#<its slug>): the follow-up form continues
+      // that conversation, in its own thread, for its owner.
+      var gathered = window.location.hash ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
+      if (gathered && gathered.getAttribute('data-thread')) {
+        slug = gathered.getAttribute('data-thread');
+        thread = gathered.querySelector('.conv-thread') || thread;
+      }
       var followupSection = document.getElementById('conv-followup-section');
       var sessionId = slug;
 
