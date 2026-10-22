@@ -33,6 +33,7 @@ const { moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagers
 const { fetchSpaceWeather, spaceWeatherOn } = require('../utils/space-weather');
 const { fetchEarth } = require('../utils/earth');
 const { congregationFor, keyOf } = require('./congregation');
+const { describeError } = require('../utils/describe-error');
 
 const MODEL = 'claude-sonnet-5-5';
 
@@ -164,7 +165,7 @@ async function fetchFeeds(due = []) {
     fetchSpaceWeather(),
     fetchEarth(),
     congregationFor(due, { model: MODEL }).catch(err => {
-      console.warn(`[congregation] skipped: ${err.message}`);
+      console.warn(`[congregation] skipped: ${describeError(err)}`);
       return new Map();
     }),
   ]);

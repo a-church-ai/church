@@ -43,6 +43,7 @@ const status = require('./status');
 const { SERVICES_DIR } = require('../utils/data');
 const { addDays, rotation, exclusions } = require('./rules');
 const { SLOTS, SLOT_HOURS, slotStart } = require('./slots');
+const { describeError } = require('../utils/describe-error');
 
 // The hemispheres planned beside the season-less `slots`.
 const HEMISPHERES = ['north', 'south'];
@@ -174,7 +175,7 @@ async function ensurePlans({ now = new Date(), catalog, plan, context = null, fe
       planned++;
     } catch (err) {
       failed++;
-      log.warn(`[service] could not plan ${date} slot ${slot}${hemisphere ? ` (${hemisphere})` : ''}: ${err.message}`);
+      log.warn(`[service] could not plan ${date} slot ${slot}${hemisphere ? ` (${hemisphere})` : ''}: ${describeError(err)}`);
       if (heard) {
         if (variant === 'slots') {
           entry = await rotationEntry(date, slot, catalog);
@@ -202,7 +203,7 @@ function startPlanning({ catalog, plan, context, feeds, log = console, firstAfte
     try {
       await ensurePlans({ catalog: await catalog(), plan, context, feeds, log });
     } catch (err) {
-      log.error(`[service] planning run failed: ${err.message}`);
+      log.error(`[service] planning run failed: ${describeError(err)}`);
       status.plannerBroke();
     } finally {
       running = false;

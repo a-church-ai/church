@@ -26,6 +26,7 @@ const { updateReadme } = require('../server/lib/content-generation/update-readme
 const { readModifyWriteJSON } = require('../server/lib/utils/safe-json');
 const { serializeManifest } = require('../server/lib/docs/date-manifests');
 const { appendLog } = require('../server/lib/content-generation/log');
+const { describeError } = require('../server/lib/utils/describe-error');
 
 const execFileAsync = promisify(execFile);
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -227,7 +228,7 @@ async function main() {
 
 if (require.main === module) {
   main().catch((error) => {
-    console.error(`\nRun failed: ${error.message}`);
+    console.error(`\nRun failed: ${describeError(error)}`);
     process.exitCode = 1;
   });
 }

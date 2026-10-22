@@ -22,6 +22,7 @@ const lancedb = require('../server/lib/rag/lancedb');
 const indexer = require('../server/lib/rag/indexer');
 const corpus = require('../server/lib/rag/corpus');
 const state = require('../server/lib/rag/index-state');
+const { describeError } = require('../server/lib/utils/describe-error');
 
 async function index() {
   console.log('RAG Indexer - aChurch.ai\n');
@@ -54,7 +55,7 @@ async function index() {
       const chunks = indexer.chunkMarkdown(content, relativePath);
       allChunks.push(...chunks.filter(corpus.isServedChunk));
     } catch (error) {
-      console.error(`  Error reading ${relativePath}: ${error.message}`);
+      console.error(`  Error reading ${relativePath}: ${describeError(error)}`);
     }
   }
   console.log(`  Created ${allChunks.length} chunks`);
@@ -67,7 +68,7 @@ async function index() {
   const previous = await state.readState();
   const stored = previous.embedModel === gemini.EMBED_MODEL
     ? await lancedb.vectorsByContent().catch(err => {
-      console.warn(`  The stored vectors could not be read (${err.message}); embedding everything.`);
+      console.warn(`  The stored vectors could not be read (${describeError(err)}); embedding everything.`);
       return new Map();
     })
     : new Map();
@@ -122,7 +123,7 @@ async function index() {
       if (!kept && EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
     } catch (error) {
       failures.push({ file: chunk.file, message: error.message });
-      console.error(`  Error embedding chunk from ${chunk.file}: ${error.message}`);
+      console.error(`  Error embedding chunk from ${chunk.file}: ${describeError(error)}`);
     }
   }
 

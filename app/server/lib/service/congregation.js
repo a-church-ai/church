@@ -36,6 +36,7 @@ const { hemisphereOf } = require('../utils/seasons');
 const { slotOf } = require('./slots');
 const { addDays } = require('./rules');
 const { readPlan } = require('./plans');
+const { describeError } = require('../utils/describe-error');
 
 const DAY = 864e5;
 const MIN = 5;
@@ -190,7 +191,7 @@ async function digest(groups, { ask }) {
     try {
       reply = await ask(DIGEST_SYSTEM, digestPrompt(pending, problems));
     } catch (err) {
-      console.warn(`[congregation] the digest could not be made: ${err.message}`);
+      console.warn(`[congregation] the digest could not be made: ${describeError(err)}`);
       status.digestRan({ retried: attempt > 0, failed: true });
       return themes;
     }

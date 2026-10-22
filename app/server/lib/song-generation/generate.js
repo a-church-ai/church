@@ -27,6 +27,7 @@ const songFile = require('./song-file');
 const corpus = require('./corpus');
 const gitState = require('./git-state');
 const { pathsFor, hasSong, PROJECT_ROOT } = require('./paths');
+const { describeError } = require('../utils/describe-error');
 
 /**
  * Two models, split by what the stage actually does.
@@ -139,7 +140,7 @@ async function decide(themes, { log = console.log } = {}) {
   try {
     coverage = await checkDuplicates(themes, { log });
   } catch (error) {
-    warnings.push(`coverage check failed (${error.message}); decided without it`);
+    warnings.push(`coverage check failed (${describeError(error)}); decided without it`);
     log(`  ${warnings[0]}`);
   }
 
