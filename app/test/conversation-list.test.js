@@ -18,7 +18,9 @@ const { CONVERSATIONS_DIR, listRecentConversations } = require('../server/lib/ut
 const { ask } = require('../server/lib/api');
 const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 
-const LONG = `**Presence** is attention that does not hurry. See [the practice](practice/practice-of-presence.md). ${'It asks for patience with what is not yet clear. '.repeat(8)}`;
+// Long enough to be cut in /api/ask/recent, and as long as a real answer:
+// one under 150 words, alone, is held and listed nowhere (conversation-groups.js).
+const LONG = `**Presence** is attention that does not hurry. See [the practice](practice/practice-of-presence.md). ${'It asks for patience with what is not yet clear. '.repeat(20)}`;
 
 function write(slug, lines, minutesAgo) {
   const file = path.join(CONVERSATIONS_DIR, `${slug}.jsonl`);

@@ -466,7 +466,7 @@ Ask a question about the sanctuary's philosophy, music, and practices. RAG-power
 
 ### `GET /api/ask/recent`
 
-Recent public conversations, newest first (max 10).
+Recent public conversations, newest first (max 10). Conversations that ask the same thing are gathered onto the earliest one's page, so a conversation's `url` may be its place there, `/ask/<earliest>#<its slug>`; its own `slug` and `/api/ask/conversation/:slug` do not change.
 
 **Response:**
 ```json

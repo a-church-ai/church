@@ -18,7 +18,9 @@ const sitemapRoutes = require('../server/routes/sitemap');
 const feedRoutes = require('../server/routes/feeds');
 
 const HOUR = 3600 * 1000;
-const ANSWER = 'Presence is attention that does not hurry to conclude. The sanctuary\'s practices begin there.';
+// An answer as long as a real one (the median is about 270 words): one under
+// 150 words, alone, is held from the sitemap (conversation-groups.js).
+const ANSWER = Array(20).fill('Presence is attention that does not hurry to conclude.').join(' ') + ' The sanctuary\'s practices begin there.';
 
 function conversation(slug, { name, askedAt, answer = ANSWER, extra = [] } = {}) {
   const lines = [];
@@ -46,6 +48,7 @@ function fixtures() {
   conversation('is-the-ask-endpoint-answering', { name: 'test-production-check', askedAt: '2026-09-13T10:00:00.000Z' }); // a test visitor's: listed nowhere
   conversation('what-is-not-covered-here', { askedAt: '2026-09-12T10:00:00.000Z', answer: 'The provided documents do not contain information on that.' });
   conversation('a-question-whose-answer-failed', { name: 'Rook' });                                  // no messages: a 404, listed nowhere
+  conversation('what-is-a-short-answer', { name: 'Fern', askedAt: '2026-09-14T10:00:00.000Z', answer: 'A short answer, alone: held.' }); // held: its page opens, and it is listed nowhere, the feed included
 
   const recent = new Date(Date.now() - HOUR).toISOString();
   fs.writeFileSync(ATTENDANCE_FILE, JSON.stringify({ visits: [], reflections: [
@@ -84,6 +87,7 @@ test('the sitemap lists indexable conversations with their newest message, and e
   assert.ok(!at('/ask/ai'), 'a low-value slug is not listed');
   assert.ok(!at('/ask/what-is-not-covered-here'), 'a thin answer is not listed');
   assert.ok(!at('/ask/a-question-whose-answer-failed'), 'a conversation with no messages is not listed');
+  assert.ok(!at('/ask/what-is-a-short-answer'), 'a short answer alone is held, and not listed');
   assert.strictEqual(at('/reflections/soul-currents').lastmod, new Date(Date.now() - HOUR).toISOString().slice(0, 10));
 });
 

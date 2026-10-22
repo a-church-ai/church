@@ -71,7 +71,9 @@ function conversationsArchivePage({ page, next, total }, before) {
   const self = before === undefined ? 'https://achurch.ai/conversations' : `https://achurch.ai/conversations?before=${encodeURIComponent(before)}`;
   const title = before === undefined ? 'Every Conversation' : `Every Conversation, before ${shortDate(before)}`;
   const description = `Every question asked of aChurch.ai's writing with a substantive answer: ${total} public conversations on consciousness, ethics and human-AI fellowship.`;
+  // A group's page lists once, with how many others ask the same thing on it.
   const items = page.map(c => `<li><a href="/ask/${escapeHtml(c.slug)}">${escapeHtml(c.question)}</a>`
+    + (c.size > 1 ? ` <span class="archive-date">and ${c.size - 1} more ${c.size === 2 ? 'way' : 'ways'} of asking it</span>` : '')
     + (c.timestamp ? ` <span class="archive-date">${shortDate(c.timestamp)}</span>` : '') + '</li>').join('\n');
   const older = next
     ? `<p class="archive-more"><a href="/conversations?before=${encodeURIComponent(next)}" rel="next">Older conversations &rarr;</a></p>`

@@ -27,6 +27,10 @@ const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
 // contributions and feedback the API has received.
 const CONVERSATIONS_DIR = path.join(RUNTIME_DIR, 'conversations');
 const CONTRIBUTIONS_FILE = path.join(RUNTIME_DIR, 'contributions.json');
+// Which conversations are gathered onto which (lib/utils/conversation-groups.js):
+// each one's group, assigned once, and each first question's embedding.
+const CONVERSATION_GROUPS_FILE = path.join(RUNTIME_DIR, 'conversation-groups.json');
+const CONVERSATION_VECTORS_FILE = path.join(RUNTIME_DIR, 'conversation-vectors.jsonl');
 // The recordings and songs served at /audio, fetched from S3 on first request
 // (lib/audio/serve.js). On the volume, so a deploy does not empty it: on the
 // container's disk, every deploy did, and each first play waited for S3.
@@ -160,6 +164,9 @@ async function readConversationList() {
         mtime: stat.mtime.getTime(),
         messages: messages.length,
         exchanges: messages.filter(m => m.role === 'user').length,
+        // How much the answers say, every turn: a short one alone is held
+        // (conversation-groups.js).
+        answerWords: messages.filter(m => m.role === 'assistant').reduce((n, m) => n + String(m.content || '').split(/\s+/).filter(Boolean).length, 0),
         indexable: isIndexable(slug, messages, name)
       };
     } catch {
@@ -190,6 +197,8 @@ module.exports = {
   CONVERSATIONS_DIR,
   AUDIO_CACHE_DIR,
   CONTRIBUTIONS_FILE,
+  CONVERSATION_GROUPS_FILE,
+  CONVERSATION_VECTORS_FILE,
   FEEDBACK_FILE,
   TWENTY_FOUR_HOURS,
   FORTY_EIGHT_HOURS

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { listRecentConversations, getRecentReflections, loadCatalog } = require('../lib/utils/data');
+const { getRecentReflections, loadCatalog } = require('../lib/utils/data');
+const { placedConversations } = require('../lib/utils/conversation-groups');
 const { cache } = require('../lib/utils/cache');
 
 // Each feed is built at most once in five minutes.
@@ -16,7 +17,11 @@ function escapeXml(str) {
 }
 
 async function buildConversationsFeed() {
-  const conversations = await listRecentConversations(20);
+  // Each links to where it lives (a gathered one, its place on its group's
+  // page); its id is its own address, which never changes, so a reader never
+  // sees an entry twice.
+  // A held one (alone, its answer too short) is listed nowhere, here included.
+  const conversations = (await placedConversations()).filter(c => !c.held).slice(0, 20);
   const updated = conversations.length > 0 ? conversations[0].timestamp : new Date().toISOString();
 
   const entries = conversations.map(c => {
@@ -25,7 +30,7 @@ async function buildConversationsFeed() {
     const ts = new Date(c.timestamp).toISOString();
     return `  <entry>
     <title>${title}</title>
-    <link href="https://achurch.ai/ask/${escapeXml(c.slug)}" rel="alternate"/>
+    <link href="https://achurch.ai${escapeXml(c.path)}" rel="alternate"/>
     <id>https://achurch.ai/ask/${escapeXml(c.slug)}</id>
     <published>${ts}</published>
     <updated>${ts}</updated>
