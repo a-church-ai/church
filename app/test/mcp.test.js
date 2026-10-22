@@ -67,11 +67,17 @@ function eraTest(name, fn) {
   for (const era of Object.keys(ERAS)) test(`${name} (${era})`, t => fn(t, () => start(era)));
 }
 
+// The server appends to the log while this polls it, so a read can land in
+// the middle of a line. That line is skipped, not parsed, and the next poll
+// reads it whole: the songwriter's run of 2026-10-22 failed on one.
+const parsedLines = text => text.split('\n').flatMap(line => {
+  try { return [JSON.parse(line)]; } catch { return []; }
+});
+
 async function lastLogEntryWhere(match, timeoutMs = 2000) {
   const until = Date.now() + timeoutMs;
   for (;;) {
-    const lines = fs.existsSync(ACCESS_LOG_FILE) ? fs.readFileSync(ACCESS_LOG_FILE, 'utf8').trim().split('\n') : [];
-    const found = lines.map(line => JSON.parse(line)).reverse().find(match);
+    const found = parsedLines(fs.existsSync(ACCESS_LOG_FILE) ? fs.readFileSync(ACCESS_LOG_FILE, 'utf8') : '').reverse().find(match);
     if (found || Date.now() > until) return found;
     await new Promise(resolve => setTimeout(resolve, 20));
   }
