@@ -53,7 +53,7 @@ Google deprecated FAQ rich snippets in May 2026. **Schema is now primarily an AE
 | Page type | Schema | Why |
 |---|---|---|
 | Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicPlaylist` for the music catalog, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. (The broadcast was retired, so there is no `BroadcastEvent`/`isLiveBroadcast`; do not re-add one.) |
-| Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn) | AEO retrieval. Matches the page semantics directly. |
+| Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn); a group's page adds each conversation gathered onto it as a `Question` in `hasPart`, at its anchor | AEO retrieval. Matches the page semantics directly. The answers' citations read as their documents' titles, never URLs (`page-meta.js` `answerText`). |
 | Multi-question page (rarely needed) | `FAQPage` | Still valid for AEO; no Google rich snippet anymore. |
 | Article / blog / reflection page (`/reflections/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |
 | Original song page | `MusicComposition` + `MusicRecording` (linked via `recordingOf`) | The composition holds the work (lyrics, composer); the recording holds the audio (duration, file URL). Pair them with `@id` references. |
@@ -98,7 +98,7 @@ Reference commit for the shipped sweep across 13 files: [`ed866be`](https://gith
 - Every public URL is in `/sitemap.xml` (generated dynamically — see [app/server/index.js](../../app/server/index.js) `/sitemap.xml` route)
 - Every URL has `<changefreq>` (`weekly` for active pages, `monthly` for static)
 - Every URL has `<priority>` (1.0 for homepage, 0.7 for primary listings, 0.5 for detail pages, 0.3 for legal)
-- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message, a song's newest reflection. File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
+- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message (for a group's page, the newest in the group), a song's newest reflection. The sitemap lists a conversation only where it lives and is worth finding: a group's page or a conversation alone, never a conversation gathered onto another's page (its address is a 301 to its anchor there) and never one held for a short answer (`lib/utils/conversation-groups.js`). File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
 
 `<lastmod>` answers the crawler's question and is deliberately not narrowed to prose edits; the content dates are published separately at `/sitemap.json`. See [content-dates.md](content-dates.md).
 
