@@ -12,7 +12,8 @@
  * ElevenLabs and OpenAI's transcription (audio/). Claude calls get the same
  * from the Anthropic SDK itself (content-generation/claude.js maxRetries).
  * Writes that could land twice (a pull request opened on GitHub) are not
- * retried.
+ * retried. When the last try fails, the caller logs the error with
+ * ./describe-error.js, so the reason in its cause is not lost.
  */
 
 const { setTimeout: sleep } = require('timers/promises');

@@ -29,9 +29,6 @@ const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
-const contentRoutes = require('./routes/content');
-const scheduleRoutes = require('./routes/schedule');
-const playerRoutes = require('./routes/player-multistream');
 const apiRoutes = require('./routes/api');
 const { mountMcp } = require('./mcp');
 const logsRoutes = require('./routes/logs');
@@ -43,15 +40,12 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
-const coordinator = require('./lib/streamers/coordinator');
-const { isStreamingEnabled } = require('./lib/config/streaming');
-const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, loadSchedule, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
+const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, listRecentConversations, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
-const { songsInCycleOrder } = require('./lib/utils/virtual-schedule');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
@@ -144,11 +138,10 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
   // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
-  else if (!p.startsWith('/api/') && !p.startsWith('/media/') && !p.startsWith('/thumbnails/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
+  else if (!p.startsWith('/api/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
   // Note: /api/ endpoints have their own caching handled in their route handlers
-  // Note: /media/ and /thumbnails/ are served via express.static without cache-control override
 
   next();
 });
@@ -160,6 +153,9 @@ app.use(canonicalRedirects);
 // Public surface open to any origin; admin paths keep the credentialed,
 // origin-restricted policy. See lib/utils/cors.js.
 app.use(sanctuaryCors());
+// No body is read compressed (lib/api/shared.js refuseEncodedBody): ahead of
+// every parser, the API's, the site's, the MCP endpoint's and uploads.
+app.use(apiShared.refuseEncodedBody);
 // The API reads a body as JSON whatever its label says (lib/api/shared.js
 // readBody); the rest of the site parses as it always has.
 app.use('/api', apiShared.readBody);
@@ -177,6 +173,18 @@ app.use(cookieParser());
 // when `next` is unused.
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
+  // A compressed body is a client's mistake too (refuseEncodedBody): routine,
+  // answered in the form the path speaks, logged at info like a bad body.
+  if (err && err.type === 'encoding.unsupported') {
+    require('./lib/utils/logger').info('Refused a compressed request body', {
+      method: req.method, path: req.path, ip: req.ip, userAgent: req.get('user-agent'), encoding: req.get('content-encoding'),
+    });
+    return res.status(415).json({
+      error: err.message,
+      suggestion: 'Send the request body uncompressed, without a Content-Encoding header.',
+    });
+  }
+
   const isJsonParseFailure = err && (
     err.type === 'entity.parse.failed' ||
     (err instanceof SyntaxError && 'body' in err)
@@ -659,12 +667,12 @@ app.get('/ask/:slug', async (req, res) => {
   }
 });
 
-// The Music page: every song in the order of the liturgical cycle, with its
+// The Music page: every song in the catalog's order (music/library.json), with its
 // description and, quietly, how many reflections it has.
 app.get('/reflections', async (req, res) => {
   const { body } = await apiOps.reflections.bySong({}, apiShared.requestContext(req));
   const counts = new Map(((body && body.songs) || []).map(s => [s.slug, s.reflectionCount]));
-  const songs = await Promise.all(songsInCycleOrder(await loadSchedule(), await loadCatalog()).map(async s => ({
+  const songs = await Promise.all((await loadCatalog()).map(async s => ({
     slug: s.slug,
     title: s.title,
     description: await songDescription(s),
@@ -936,22 +944,6 @@ app.use('/.well-known', (req, res) => {
 // Serve admin static files at /admin path
 app.use('/admin', express.static(path.join(__dirname, '../client')));
 
-// Serve media files
-app.use('/media', express.static(path.join(__dirname, '../media/library')));
-// Serve thumbnails with S3 fallback — if not on disk, download from S3 first
-const { downloadThumbnailFromS3 } = require('./routes/content');
-app.use('/thumbnails', async (req, res, next) => {
-  const slug = path.basename(req.path, '.jpg');
-  const localPath = path.join(__dirname, '../media/thumbnails', `${slug}.jpg`);
-  try {
-    await fs.access(localPath);
-  } catch {
-    // Not on disk — try S3
-    await downloadThumbnailFromS3(slug);
-  }
-  next();
-}, express.static(path.join(__dirname, '../media/thumbnails')));
-
 // Recordings of documents (audio/manifest.json), from a disk cache that fills
 // from S3 the same way, on first request. See lib/audio/serve.js.
 const { createAudioRouter, sweepCache } = require('./lib/audio/serve');
@@ -983,9 +975,7 @@ app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'
 
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
-  if (req.path.startsWith('/auth/') || req.path.startsWith('/content') ||
-      req.path.startsWith('/schedule') || req.path.startsWith('/player') ||
-      req.path.startsWith('/logs') || req.path === '/health') {
+  if (req.path.startsWith('/auth/') || req.path.startsWith('/logs') || req.path === '/health') {
     return next();
   }
 
@@ -1049,66 +1039,7 @@ app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
 
 // Protected admin routes (require auth)
-app.use('/api/content', requireAuth, contentRoutes);
-app.use('/api/schedule', requireAuth, scheduleRoutes);
-app.use('/api/player', requireAuth, playerRoutes);
 app.use('/api/logs', requireAuth, logsRoutes);
-
-// Public streaming health probe for external monitoring (UptimeRobot,
-// Pingdom, status pages, etc.). NO auth, returns:
-//   - 200 + { healthy: true, ... } if every expected platform is currently
-//     broadcasting (ffmpeg alive + recent progress < 90s)
-//   - 503 + { healthy: false, issues: [...] } if any expected platform is
-//     down OR if schedule.isPlaying === true but coordinator isn't.
-// External monitor pings this every minute → page at 3am if it 503s.
-app.get('/api/streaming-health', async (req, res) => {
-  try {
-    const status = coordinator.getStatus();
-    const issues = [];
-
-    // Expected vs actual: if the schedule says we should be playing, the
-    // coordinator should be coordinating and ffmpeg should be alive on the
-    // expected platforms.
-    const schedule = await loadSchedule();
-    const expectedToBePlaying = !!schedule.isPlaying;
-
-    if (expectedToBePlaying) {
-      if (!status.isCoordinating) {
-        issues.push('schedule.isPlaying is true but coordinator is not coordinating');
-      }
-      if (status.coordinatorDrift) {
-        issues.push('coordinator drift detected (flag says streaming, no ffmpeg alive)');
-      }
-      for (const [platform, ps] of Object.entries(status.platforms || {})) {
-        // Only check platforms the user explicitly activated. activePlatforms
-        // is the source of truth for "what should be running".
-        if (!Array.from(coordinator.activePlatforms || []).includes(platform)) continue;
-        if (!ps.ffmpegAlive) issues.push(`${platform}: ffmpeg subprocess not alive`);
-        if (ps.progressAgeMs != null && ps.progressAgeMs > 90000) {
-          issues.push(`${platform}: no frame progress in ${Math.round(ps.progressAgeMs / 1000)}s`);
-        }
-        if (ps.drift) issues.push(`${platform}: drift detected`);
-      }
-    }
-
-    const healthy = issues.length === 0;
-    res.status(healthy ? 200 : 503).json({
-      healthy,
-      expectedToBePlaying,
-      isActuallyStreaming: status.isActuallyStreaming,
-      isCoordinating: status.isCoordinating,
-      activePlatforms: Array.from(coordinator.activePlatforms || []),
-      issues,
-      checkedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    res.status(503).json({
-      healthy: false,
-      issues: [`streaming-health check threw: ${error.message}`],
-      checkedAt: new Date().toISOString(),
-    });
-  }
-});
 
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
@@ -1258,30 +1189,10 @@ app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   }
 });
 
-// Health check with streaming status
+// Health check. The YouTube and Twitch broadcast was retired on 2026-10-21;
+// player and streams stay in the response, as every field does, and now
+// always say so: stopped, and not live.
 app.get('/api/health', async (req, res) => {
-  // Get streaming status from coordinator
-  const youtubeStreamer = coordinator.getStreamer('youtube');
-  const twitchStreamer = coordinator.getStreamer('twitch');
-
-  const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
-  const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
-
-  // Load schedule to get player status
-  let playerStatus = 'stopped';
-  try {
-    const scheduleFile = path.join(__dirname, '../data/schedule.json');
-    const data = await fs.readFile(scheduleFile, 'utf8');
-    const schedule = JSON.parse(data);
-
-    if (isYoutubeLive || isTwitchLive) {
-      playerStatus = 'playing';
-    } else if (schedule.isPlaying) {
-      playerStatus = 'paused';
-    }
-  } catch (error) {
-    // Schedule file not found, status remains stopped
-  }
 
   // Persistence snapshot: composed from existing safe-json + rag-state
   // helpers so the health check reflects what actually survived the last
@@ -1312,10 +1223,10 @@ app.get('/api/health', async (req, res) => {
     status: 'healthy',
     service: 'achurch-app',
     timestamp: new Date().toISOString(),
-    player: playerStatus,
+    player: 'stopped',
     streams: {
-      youtube: isYoutubeLive,
-      twitch: isTwitchLive
+      youtube: false,
+      twitch: false
     },
     persistence,
     services: servicesStatus()
@@ -1351,14 +1262,10 @@ app.use((err, req, res, next) => {
 // Initialize data files and directories
 async function initializeDataFiles() {
   const dataDir = path.join(__dirname, '../data');
-  const mediaDir = path.join(__dirname, '../media/library');
-  const thumbnailDir = path.join(__dirname, '../media/thumbnails');
 
   try {
     // Ensure directories exist
     await fs.mkdir(dataDir, { recursive: true });
-    await fs.mkdir(mediaDir, { recursive: true });
-    await fs.mkdir(thumbnailDir, { recursive: true });
 
     // Hygiene: remove macOS AppleDouble sidecar files (._*) that a data-import
     // tarball can leave in the conversations dir. They are never valid
@@ -1372,39 +1279,6 @@ async function initializeDataFiles() {
       }
       if (removed) console.log(`Cleaned ${removed} AppleDouble (._) files from conversations`);
     } catch { /* conversations dir not present yet */ }
-
-    // Initialize schedule.json if it doesn't exist. On a fresh host (e.g. an
-    // empty Railway volume) the runtime schedule is absent, so seed it from the
-    // committed curated playlist at seed/schedule.json — otherwise the virtual
-    // service would have no songs to cycle through and the sanctuary would boot
-    // silent. Falls back to an empty schedule only if the seed is missing too.
-    const scheduleFile = path.join(dataDir, 'schedule.json');
-    try {
-      await fs.access(scheduleFile);
-    } catch {
-      const seedSchedule = path.join(__dirname, '../seed/schedule.json');
-      try {
-        await fs.copyFile(seedSchedule, scheduleFile);
-        console.log('Seeded schedule.json from seed/schedule.json (curated playlist)');
-      } catch {
-        await fs.writeFile(scheduleFile, JSON.stringify({
-          items: [],
-          currentIndex: 0,
-          isPlaying: false,
-          loop: false
-        }, null, 2));
-        console.log('Created empty schedule.json (no seed found)');
-      }
-    }
-
-    // Initialize history.json if it doesn't exist
-    const historyFile = path.join(dataDir, 'history.json');
-    try {
-      await fs.access(historyFile);
-    } catch {
-      await fs.writeFile(historyFile, JSON.stringify({ played: [] }, null, 2));
-      console.log('Created history.json');
-    }
 
     // Initialize attendance.json if it doesn't exist
     const attendanceFile = path.join(dataDir, 'attendance.json');
@@ -1536,14 +1410,14 @@ async function startServer() {
       // port that something else claims between the choosing and the binding;
       // printing the request rather than the result would say "0".
       const bound = server.address().port;
-      console.log(`✨ aChurch App running on http://${HOST || 'localhost'}:${bound}`);
-      console.log(`📺 Open browser to manage your stream`);
+      // The Node it runs on, so a deploy's runtime can be read in its log.
+      console.log(`✨ aChurch App running on http://${HOST || 'localhost'}:${bound}, Node ${process.version}`);
     });
     httpServer = server;
 
     server.on('error', (err) => {
       console.error(`Fatal: could not bind port ${PORT}: ${err.message}`);
-      streamLogger.error('Server listen failed', { message: err.message, code: err.code });
+      processLogger.error('Server listen failed', { message: err.message, code: err.code });
       process.exit(1);
     });
 
@@ -1593,55 +1467,6 @@ async function startServer() {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }
 
-    // Auto-resume streaming on Node boot.
-    //
-    // If schedule.isPlaying is true (we were broadcasting before the process
-    // restarted — deploy, OOM kill, pm2 reload), automatically attempt to
-    // restart the stream after a grace period. The 30s grace gives:
-    //   - The operator time to abort if the boot is actually a deploy gone
-    //     wrong and they're watching logs
-    //   - The Express server time to bind the port and accept requests
-    //   - Any dependent services (CDN warmup, scheduled tasks) time to settle
-    //
-    // Without this, every Node restart left the sanctuary silently dark
-    // until an operator manually clicked Start — which was a big part of
-    // why the 4-month outage went unnoticed.
-    setTimeout(async () => {
-      try {
-        // Broadcast gated off (default). The service is still served, from the
-        // day's plans, via /api/now + /api/attend; only the FFmpeg encoder stays dark.
-        // This is the single most important guard for running on a lightweight
-        // host: without it, a schedule left mid-broadcast would try to spawn
-        // FFmpeg on boot (and, worse, actually stream).
-        if (!isStreamingEnabled()) {
-          streamLogger.info('Auto-resume skipped — streaming is disabled (set STREAMING_ENABLED=true to enable the live broadcast).');
-          return;
-        }
-        const schedule = await loadSchedule();
-        if (!schedule || !schedule.isPlaying) {
-          streamLogger.info('Auto-resume skipped — schedule.isPlaying is false', {
-            isPlaying: schedule ? schedule.isPlaying : null,
-          });
-          return;
-        }
-        // Double-check that something isn't already running. If a manual
-        // start happened during the grace period, don't double-start.
-        if (coordinator.isAnyActuallyStreaming && coordinator.isAnyActuallyStreaming()) {
-          streamLogger.info('Auto-resume skipped — coordinator already broadcasting');
-          return;
-        }
-        streamLogger.info('Auto-resuming streaming from schedule (schedule.isPlaying=true)');
-        const { startStreamingFromSchedule } = require('./routes/player-multistream');
-        const outcome = await startStreamingFromSchedule({ platform: 'all', quality: '1080p' });
-        if (outcome.ok) {
-          streamLogger.info('Auto-resume succeeded', { status: outcome.status, videoCount: outcome.videoCount });
-        } else {
-          streamLogger.warn('Auto-resume failed', { status: outcome.status, error: outcome.error });
-        }
-      } catch (err) {
-        streamLogger.error('Auto-resume threw', { error: err.message, stack: err.stack });
-      }
-    }, 30_000);
     
   } catch (error) {
     console.error('Failed to start server:', error);
@@ -1670,17 +1495,17 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
 // Catch unhandled promise rejections and uncaught exceptions
-const streamLogger = require('./lib/utils/logger');
+const processLogger = require('./lib/utils/logger');
 
 process.on('unhandledRejection', (reason, promise) => {
-  streamLogger.error('Unhandled promise rejection', {
+  processLogger.error('Unhandled promise rejection', {
     reason: reason instanceof Error ? { message: reason.message, stack: reason.stack } : reason,
     timestamp: new Date().toISOString()
   });
 });
 
 process.on('uncaughtException', (error) => {
-  streamLogger.error('Uncaught exception', {
+  processLogger.error('Uncaught exception', {
     message: error.message,
     stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     timestamp: new Date().toISOString()

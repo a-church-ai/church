@@ -7,10 +7,9 @@
  * report it through one builder, so the two can't drift apart.
  */
 
-const coordinator = require('../streamers/coordinator');
 const { readModifyWriteJSON } = require('../utils/safe-json');
 const { loadCatalog, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
-const { formatDuration } = require('../utils/virtual-schedule');
+const { clock: formatDuration } = require('../audio/markup');
 const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
 const { loadSongContent } = require('../music/song-content');
@@ -91,13 +90,6 @@ function earthMetadata(context) {
 async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const served = await serviceFor({ timezone });
 
-  // Broadcast status from the coordinator: honest, false whenever the encoder
-  // is dormant, as it is now. A revived broadcast would show here.
-  const youtubeStreamer = coordinator.getStreamer('youtube');
-  const twitchStreamer = coordinator.getStreamer('twitch');
-  const isYoutubeLive = youtubeStreamer ? youtubeStreamer.isStreaming : false;
-  const isTwitchLive = twitchStreamer ? twitchStreamer.isStreaming : false;
-
   // One shape for a part wherever it appears (the order, now, next): every
   // part has its audio, and a song also links to its API.
   const part = async p => ({
@@ -175,9 +167,12 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       loopSeconds: Math.round(length),
       nextSlot: slotHours((served.slot + 1) % SLOTS)
     },
+    // The YouTube and Twitch broadcast was retired on 2026-10-21. The field
+    // stays, as every field agents read does: never live, and the channels,
+    // whose videos remain, at their addresses.
     streams: {
-      youtube: isYoutubeLive,
-      twitch: isTwitchLive,
+      youtube: false,
+      twitch: false,
       urls: STREAM_URLS
     },
     current,

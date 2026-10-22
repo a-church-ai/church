@@ -4,7 +4,7 @@ tldr: How Suno's paid plans grant commercial rights to AI-made music, and how aC
 
 # Music Rights and Licensing
 
-This document outlines the rights and ownership status of the music aChurch.ai uses: in its services, on its song pages, and in the 24/7 broadcast to YouTube and Twitch, which ran until it was switched off and is now dormant.
+This document outlines the rights and ownership status of the music aChurch.ai uses: in its services, on its song pages, and in the 24/7 broadcast to YouTube and Twitch, which ran until it was switched off and was retired on 2026-10-21.
 
 ## Overview
 
@@ -76,7 +76,7 @@ We have requested information from Twitch about:
 - The process to apply for a radio station-style broadcast exemption
 - Documentation required to verify our ownership rights
 
-**Status**: Not pursued further. The broadcast is dormant, so no exemption is needed for now.
+**Status**: Not pursued further. The broadcast was retired, so no exemption is needed.
 
 ## Recommendations
 
@@ -108,3 +108,4 @@ We have requested information from Twitch about:
 - **2026-02-07**: Document created following Twitch suspension; researched Suno licensing terms and Twitch exemption requirements
 - **2026-10-06**: The broadcast is dormant; the sanctuary now holds services planned for each visitor's hour, with spoken pieces and the songs between them. The recommendations above apply if the broadcast returns.
 - **2026-10-06**: The songs' audio is served from achurch.ai itself, taken from the music videos, so a service plays whole and each song's page plays it. It is the sanctuary's own site, not a third-party platform, so none of the platform policies above apply to it.
+- **2026-10-21**: The broadcast was retired and its code deleted. The songs' videos stay on YouTube, and the recommendations above would apply again to any new broadcast.

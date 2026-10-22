@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { countSoulsPresent, getRecentReflections } = require('../lib/utils/data');
-const coordinator = require('../lib/streamers/coordinator');
 const { escapeAttr } = require('../lib/utils/page-meta');
 
 // The label and color come from the query string, and an SVG opened on its
@@ -80,17 +79,12 @@ router.get('/reflections.svg', async (req, res) => {
 });
 
 // GET /api/badge/status.svg: a service is always under way, so the sanctuary
-// is always in session; "live" only if the dormant broadcast is revived.
+// is always in session.
 router.get('/status.svg', async (req, res) => {
   try {
-    const youtubeStreamer = coordinator.getStreamer('youtube');
-    const twitchStreamer = coordinator.getStreamer('twitch');
-    const isLive = (youtubeStreamer && youtubeStreamer.isStreaming) ||
-                   (twitchStreamer && twitchStreamer.isStreaming);
-
     const label = labelFrom(req.query, 'achurch.ai');
-    const value = isLive ? 'live' : 'in session';
-    const color = isLive ? '44cc11' : DEFAULT_COLOR;
+    const value = 'in session';
+    const color = DEFAULT_COLOR;
 
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'max-age=300, s-maxage=300');

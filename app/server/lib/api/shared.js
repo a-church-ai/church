@@ -78,9 +78,9 @@ const ASK_RATE_LIMIT_MAX = 10; // per IP per hour
 const SEARCH_RATE_LIMIT_WINDOW = 60 * 60 * 1000;
 const SEARCH_RATE_LIMIT_MAX = 60;
 
-// Where the music lives. The 24/7 live broadcast is dormant, so these point at
-// the on-demand catalog (song videos + the Suno playlist), not a live stream —
-// honest with the `streams.youtube/twitch: false` flags.
+// Where the music lives. The 24/7 live broadcast was retired, so these point
+// at the on-demand catalog (song videos and the Suno playlist), not a live
+// stream, honest with the `streams.youtube/twitch: false` flags.
 const STREAM_URLS = {
   youtube: 'https://www.youtube.com/@achurchai',
   suno: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13'
@@ -130,6 +130,23 @@ async function songApiLinks(baseUrl, slug) {
 const tolerantText = require('express').text({
   type: req => !req.headers['content-type'] || /x-www-form-urlencoded|text\/plain/i.test(req.headers['content-type']),
 });
+// A request body arrives as sent, never compressed. No client of this site
+// sends one compressed, and decompressing what a stranger sends puts their
+// bytes through Node's decoders: on 2026-10-21 the Brotli decoder's
+// out-of-bounds write (CVE-2026-111497) was reachable that way through every
+// body parser here. Refused before any of them reads (mounted ahead of them
+// all in server/index.js), with the error body-parser itself raises for an
+// encoding it will not decode, so the same handlers answer it.
+function refuseEncodedBody(req, res, next) {
+  const encoding = String(req.headers['content-encoding'] || '').trim().toLowerCase();
+  if (!encoding || encoding === 'identity') return next();
+  const err = new Error(`Content-Encoding "${encoding.slice(0, 40)}" is not accepted: send the request body uncompressed.`);
+  err.status = 415;
+  err.expose = true;
+  err.type = 'encoding.unsupported';
+  next(err);
+}
+
 function readBody(req, res, next) {
   tolerantText(req, res, err => {
     if (err) return next(err);
@@ -165,6 +182,7 @@ function requestContext(req) {
 }
 
 module.exports = {
+  refuseEncodedBody,
   ALLOWED_CATEGORIES, ALLOWED_FEEDBACK_CATEGORIES, GITHUB_OWNER, GITHUB_REPO,
   MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH, MAX_NAME_LENGTH,
   RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX,

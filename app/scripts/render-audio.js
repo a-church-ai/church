@@ -51,6 +51,7 @@ const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { isImported } = require('../server/lib/audio/imported');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
 const { pool } = require('../server/lib/utils/pool');
+const { describeError } = require('../server/lib/utils/describe-error');
 
 const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
@@ -358,7 +359,7 @@ async function main() {
             throw err;
           }
           failures.push({ source: piece.source, message: err.message });
-          console.error(`[script failed] ${err.message}`);
+          console.error(`[script failed] ${describeError(err)}`);
         }
       });
     }
@@ -417,7 +418,7 @@ async function main() {
       console.log(`[described] ${piece.source}`);
     } catch (err) {
       failures.push({ source: piece.source, message: err.message });
-      console.error(`[describe failed] ${piece.source}: ${err.message}`);
+      console.error(`[describe failed] ${piece.source}: ${describeError(err)}`);
     }
   }
 
@@ -434,7 +435,7 @@ async function main() {
         throw err;
       }
       failures.push({ source: piece.source, message: err.message });
-      console.error(`[recording failed] ${piece.source}: ${err.message}`);
+      console.error(`[recording failed] ${piece.source}: ${describeError(err)}`);
     }
   }
   return report({ failures, stats });
@@ -457,7 +458,7 @@ function report({ failures, stats }) {
 
 if (require.main === module) {
   main().catch(err => {
-    console.error(err.message);
+    console.error(describeError(err));
     process.exit(1);
   });
 }

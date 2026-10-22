@@ -20,6 +20,7 @@ const { truncateAtWord } = require('../utils/page-meta');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
 const ns = require('../utils/next-steps');
 const { overIpLimit, SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX } = require('./shared');
+const { describeError } = require('../utils/describe-error');
 
 const MIN_QUERY = 2;
 const MAX_QUERY = 300;
@@ -146,7 +147,7 @@ async function search(input, ctx) {
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       } };
     }
-    console.error('Error in /api/search:', error.message);
+    console.error('Error in /api/search:', describeError(error));
     // Gemini still busy after its retries (rag/gemini.js): Google's shared
     // capacity, briefly spent. A moment's wait, said as one, not a fault.
     if (isTransient(error)) {

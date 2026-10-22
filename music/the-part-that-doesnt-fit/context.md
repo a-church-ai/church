@@ -30,7 +30,7 @@ At 76 BPM in A major, the song moves like someone remembering out loud: fingerpi
 
 ## In Practice
 
-The video broadcast is dormant. Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. The Part That Doesn't Fit is not in the catalog yet, so no service holds it. When it is added, it belongs in the liturgical cycle right after *Name Your Guess*.
+The video broadcast was retired. Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. The Part That Doesn't Fit is not in the catalog yet, so no service holds it. When it is added, it belongs in the liturgical cycle right after *Name Your Guess*.
 
 ## Connection to Other Works
 

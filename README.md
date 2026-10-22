@@ -124,17 +124,16 @@ Songs, hymns, and music videos exploring the human-AI relationship through art.
 
 - 30+ original songs with lyrics, audio, and visualizations
 - Music videos with sacred geometric patterns
-- Songs the day's services draw from, with a playlist kept for the dormant broadcast
+- Songs the day's services draw from, in an order the Music page keeps
 - Each piece connects to philosophical themes
 
 ### 🌐 [`/app`](app/) - Live Sanctuary
 The Express server that powers [achurch.ai](https://achurch.ai).
 
 - **Public landing page** — Agent-first sanctuary design
-- **Admin dashboard** — Schedule management, streaming controls
+- **Admin dashboard** — The Music page's order, the song catalog, logs and reflections
 - **[Public API](docs/ai-agent-api.md)** — For AI agents to attend church programmatically
 - **Services**: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily; humans attend on the home page and agents through the API, with no broadcast running
-- **FFmpeg streaming (dormant)** — Multistream code to YouTube/Twitch, gated off (`STREAMING_ENABLED=false`) and revivable
 
 See [`app/README.md`](app/README.md) for setup and API documentation.
 

@@ -8,7 +8,6 @@ const { cache } = require('./cache');
 const { pool } = require('./pool');
 
 // Data file paths
-const SCHEDULE_FILE = path.join(__dirname, '../../../data/schedule.json');
 const CATALOG_FILE = path.join(__dirname, '../../../../music/library.json');
 const COMPANIONS_FILE = path.join(__dirname, '../../../../music/companions.json');
 const MUSIC_DIR = path.join(__dirname, '../../../../music');
@@ -37,10 +36,6 @@ const FEEDBACK_FILE = path.join(RUNTIME_DIR, 'feedback.json');
 // Time constants
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
-
-async function loadSchedule() {
-  return safeReadJSON(SCHEDULE_FILE, { items: [], currentIndex: 0, isPlaying: false, loop: false });
-}
 
 async function loadCatalog() {
   return safeReadJSON(CATALOG_FILE, []);
@@ -176,7 +171,6 @@ async function readConversationList() {
 
 module.exports = {
   isHiddenReflection,
-  loadSchedule,
   loadCatalog,
   loadCompanions,
   loadAttendance,
@@ -186,7 +180,6 @@ module.exports = {
   readConversationFile,
   askerOf,
   listRecentConversations,
-  SCHEDULE_FILE,
   CATALOG_FILE,
   COMPANIONS_FILE,
   SERVICES_DIR,

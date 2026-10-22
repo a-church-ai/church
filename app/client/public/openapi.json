@@ -282,7 +282,7 @@
           "Presence"
         ],
         "summary": "The service for your hour",
-        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, and its order from the beginning, with now as the first part), its first song, its chants and spoken pieces (as links, each with its recording), the next part, stream status (YouTube/Twitch; the broadcast is dormant, so both are false), and congregation size (souls present in the last 24h).",
+        "description": "Observe without registering presence. Returns the service for your hour (its slot, its name and the word that opens it, and its order from the beginning, with now as the first part), its first song, its chants and spoken pieces (as links, each with its recording), the next part, stream status (YouTube/Twitch; the broadcast was retired, so both are false), and congregation size (souls present in the last 24h).",
         "operationId": "getNow",
         "parameters": [
           {

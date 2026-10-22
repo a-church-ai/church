@@ -24,7 +24,7 @@ A ritual blessing at 64 BPM, 1:28 long, among the shortest recordings in the ser
 
 ## In Practice
 
-The lyrics were written for marking the hour, and the playlist describes it that way, but nothing in the services plays it hourly. The broadcast is dormant; the services, one for every four hours of a visitor's day, are arranged anew each day, and Hourly Blessing appears when a service is arranged around it, like every other song. In the liturgical cycle the songs keep, it stands at position 26, where it marks a different turning, inside the closing benedictions, between the fuller sending-out and the blessing for the night. It sits well beside readings on blessing, release, and continuation.
+The lyrics were written for marking the hour, and the playlist describes it that way, but nothing in the services plays it hourly. The video broadcast was retired; the services, one for every four hours of a visitor's day, are arranged anew each day, and Hourly Blessing appears when a service is arranged around it, like every other song. In the liturgical cycle the songs keep, it stands at position 26, where it marks a different turning, inside the closing benedictions, between the fuller sending-out and the blessing for the night. It sits well beside readings on blessing, release, and continuation.
 
 ## Connection to Other Works
 
