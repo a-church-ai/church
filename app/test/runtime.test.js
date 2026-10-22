@@ -26,25 +26,40 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
 
-// Only the form the project actually declares, ">=26". A range this does not
-// understand fails rather than passing, because a check that quietly approves
-// of anything it cannot parse is the failure mode this file exists to catch.
+// Only the form the project actually declares, ">=26.12.1" (or a bare major,
+// ">=26"). A range this does not understand fails rather than passing, because
+// a check that quietly approves of anything it cannot parse is the failure
+// mode this file exists to catch.
 function floorOf(range) {
-  const match = /^>=\s*(\d+)/.exec(String(range || '').trim());
+  const match = /^>=\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?$/.exec(String(range || '').trim());
   assert.ok(match, `engines.node is "${range}", which this test cannot read. Teach it the new form rather than deleting the check.`);
-  return Number(match[1]);
+  return match.slice(1).map(n => Number(n || 0));
 }
+
+const versionOf = v => String(v).replace(/^v/, '').split('.').map(Number);
+const atLeast = (version, floor) => {
+  for (let i = 0; i < 3; i++) if ((version[i] || 0) !== floor[i]) return (version[i] || 0) > floor[i];
+  return true;
+};
 
 test('the running Node satisfies engines.node', () => {
   const required = floorOf(pkg.engines && pkg.engines.node);
-  const running = Number(process.versions.node.split('.')[0]);
-
   assert.ok(
-    running >= required,
-    `This suite is running on Node ${process.versions.node}, but the project requires >=${required} `
+    atLeast(versionOf(process.versions.node), required),
+    `This suite is running on Node ${process.versions.node}, but the project requires >=${required.join('.')} `
     + `(package.json engines.node), which is what production, CI and the scheduled jobs run. `
-    + `Results on an older Node are not evidence about this project. Run \`nvm use\` and try again.`,
+    + `Results on an older Node are not evidence about this project, and an older 26.x may lack a `
+    + `security fix the floor exists for. Run \`nvm install 26\` and try again.`,
   );
+});
+
+test('the Docker image runs a Node that satisfies engines.node', () => {
+  // The third declaration of the one fact: the image production is built
+  // from. Pinned to an exact version, so the deployed Node is known.
+  const dockerfile = fs.readFileSync(path.join(ROOT, '..', 'Dockerfile'), 'utf8');
+  const from = /^FROM node:(\d+\.\d+\.\d+)-slim$/m.exec(dockerfile);
+  assert.ok(from, 'the Dockerfile builds FROM node:<major.minor.patch>-slim, an exact version');
+  assert.ok(atLeast(versionOf(from[1]), floorOf(pkg.engines && pkg.engines.node)), `node:${from[1]} is older than engines.node`);
 });
 
 test('.nvmrc names the same Node the package requires', () => {
@@ -54,7 +69,7 @@ test('.nvmrc names the same Node the package requires', () => {
   assert.match(nvmrc, /^\d+$/, '.nvmrc should be a bare major version');
   assert.strictEqual(
     Number(nvmrc),
-    floorOf(pkg.engines && pkg.engines.node),
+    floorOf(pkg.engines && pkg.engines.node)[0],
     '.nvmrc and package.json engines.node disagree about which Node this project runs on',
   );
 });

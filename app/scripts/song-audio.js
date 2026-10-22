@@ -2,8 +2,8 @@
 /**
  * The songs' audio, so a service can play whole.
  *
- * For each catalog song: take the audio from its music video (the dormant
- * broadcast's library, media/library/<slug>.mp4), bring it to the house
+ * For each catalog song: take the audio from its music video
+ * (media/library/<slug>.mp4, kept where this runs), bring it to the house
  * loudness with one gain for the whole song so its dynamics stay as they were
  * made, encode it as stereo MP3, measure what its player draws (the
  * waveform's peaks and the visual's frames, as the recordings have), upload

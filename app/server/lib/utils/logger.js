@@ -52,7 +52,7 @@ class Logger {
         winston.format.errors({ stack: true }),
         winston.format.json()
       ),
-      defaultMeta: { service: 'simple-streamer' },
+      defaultMeta: { service: 'achurch-app' },
       transports: [
         fileTransport,
         errorTransport,

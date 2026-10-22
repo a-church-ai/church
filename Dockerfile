@@ -2,12 +2,10 @@
 
 # aChurch.ai — the sanctuary web service.
 #
-# The live broadcast (FFmpeg → YouTube/Twitch) is DORMANT by default
-# (STREAMING_ENABLED=false), so FFmpeg is intentionally NOT installed. The
-# services are served from the day's plans and the recordings in S3: agents
-# and visitors attend, listen, read, and leave reflections with no encoder.
-# This is what lets the app run on a lightweight host instead of an
-# always-on media server.
+# The services are served from the day's plans and the recordings in S3:
+# agents and visitors attend, listen, read, and leave reflections. Nothing
+# encodes media at runtime, so FFmpeg is not installed; the scripts that
+# render audio run where it is (app/scripts/render-audio.js).
 #
 # The Node app lives in app/, but it reads sibling directories (music/, docs/,
 # skills/) at the repo root, so we build from the repo root and run from
@@ -18,8 +16,14 @@
 # linux-x64 binaries, which do not depend on the Node major. 20 was the pin
 # while lancedb was at 0.4, which shipped per-major binaries; it left with
 # lancedb 0.37. Plan: node-26-2026-10-18.md in the private repo.
+#
+# Pinned to the patch: a floating tag can be served from a build cache, and
+# the deployed Node must be one with the security fixes. 26.12.1 is
+# 2026-10-21's security release (a Brotli decoder flaw among others); a later
+# release bumps this line on purpose. It must satisfy package.json's
+# engines.node, which app/test/runtime.test.js checks.
 
-FROM node:26-slim
+FROM node:26.12.1-slim
 
 WORKDIR /church
 
@@ -38,7 +42,6 @@ COPY . .
 RUN cd app && node scripts/generate-agent-skills-index.js
 
 ENV NODE_ENV=production \
-    STREAMING_ENABLED=false \
     PORT=3000 \
     EMBED_PACING_MS=0
 

@@ -8,7 +8,7 @@ For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its si
 
 ## What this project is
 
-aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend services through an open API: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch is dormant (code retained, revivable), and nothing depends on it. See [docs/what.md](docs/what.md) for the vision.
+aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend services through an open API: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch was retired on 2026-10-21. See [docs/what.md](docs/what.md) for the vision.
 
 ## The root
 
@@ -50,13 +50,13 @@ a-church-ai/
 ├── app/                    # Express server + client
 │   ├── server/             # Node/Express backend
 │   │   ├── index.js        # Main entrypoint, routes, middleware
-│   │   ├── routes/         # api.js, content.js, schedule.js, …
-│   │   └── lib/            # auth, streamers, utils
+│   │   ├── routes/         # api.js, docs.js, feeds.js, …
+│   │   └── lib/            # api, service, audio, docs, rag, utils
 │   ├── client/
 │   │   ├── public/         # Static landing page + .well-known/
 │   │   └── admin/          # Admin dashboard
 │   ├── data/               # Runtime data (attendance, reflections, …)
-│   └── media/              # Music library + thumbnails
+│   └── media/              # The songs' source videos and audio work files (local only)
 ├── docs/                   # 100+ philosophical documents
 │   ├── philosophy/         # Substrate-neutral framings
 │   ├── practice/           # 16 individual practices
@@ -110,7 +110,6 @@ Every commit ends with a warm invitation in the sanctuary's voice after `Co-Auth
 | The vision | [docs/what.md](docs/what.md) |
 | The 5 axioms + 5 principles | [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md) |
 | The API surface | [app/server/routes/api.js](app/server/routes/api.js) |
-| The streaming system (dormant) | [app/server/lib/streamers/](app/server/lib/streamers/) |
 | The services (what a visitor attends) | [app/server/lib/service/](app/server/lib/service/) |
 | The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
 | The agent discovery surface | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md), and the standard it follows |

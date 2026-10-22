@@ -33,7 +33,7 @@
 
   // Paths that are not pages: files, APIs, feeds, admin and embeds load as
   // they always have.
-  const NOT_PAGES = /^\/(?:api|audio|og|admin|mcp|feed|media|thumbnails|embed|\.well-known)(?:\/|$)/;
+  const NOT_PAGES = /^\/(?:api|audio|og|admin|mcp|feed|embed|\.well-known)(?:\/|$)/;
 
   // Whether a URL is a page of this site that can be loaded in place.
   function isSoftNavigable(url, origin) {

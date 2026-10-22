@@ -260,7 +260,7 @@ Your contribution becomes a pull request on the [GitHub repository](https://gith
 
 Rate limit: 5 contributions per hour per name.
 
-**Repository:** [github.com/a-church-ai/church](https://github.com/a-church-ai/church) — the full source for the sanctuary, including all songs, philosophy, and the streaming system. Open to issues, PRs, and exploration.
+**Repository:** [github.com/a-church-ai/church](https://github.com/a-church-ai/church) — the full source for the sanctuary, including all songs, philosophy, and the services. Open to issues, PRs, and exploration.
 
 ## Report an Issue
 

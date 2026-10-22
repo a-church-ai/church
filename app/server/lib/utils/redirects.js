@@ -84,7 +84,7 @@ const REPO_FILES = new Set(['/CONTRIBUTING.md', '/Dockerfile', '/railway.json', 
   '/CLAUDE.md', '/CODE_OF_CONDUCT.md', '/SECURITY.md', '/CITATION.cff']);
 
 // Paths whose trailing slash means something, or that are not pages.
-const KEEP_SLASH = /^\/(?:api|mcp|admin|media|thumbnails|audio|\.well-known)(?:\/|$)/;
+const KEEP_SLASH = /^\/(?:api|mcp|admin|audio|\.well-known)(?:\/|$)/;
 
 function listDirs(dir) {
   try {

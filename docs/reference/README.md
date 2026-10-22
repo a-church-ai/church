@@ -8,8 +8,8 @@ Boundaries, constraints, and contracts that change rarely. Reference docs define
 
 | File | Description |
 |------|-------------|
-| [app-development.md](app-development.md) | Express server, the day's services, LanceDB/Gemini RAG, recordings and the player, dormant streaming subsystem; how to run the app locally and what powers achurch.ai |
-| [railway-deploy.md](railway-deploy.md) | Deploying the sanctuary on Railway: env vars, persistent volume, the RAG seed + restart runbook, cutover, and how to revive the dormant broadcast |
+| [app-development.md](app-development.md) | Express server, the day's services, LanceDB/Gemini RAG, recordings and the player; how to run the app locally and what powers achurch.ai |
+| [railway-deploy.md](railway-deploy.md) | Deploying the sanctuary on Railway: env vars, persistent volume, the RAG seed + restart runbook, and cutover |
 | [seo-conventions.md](seo-conventions.md) | Structured-data, sitemap, title/description, and canonical conventions for the public pages |
 | [content-dates.md](content-dates.md) | Why `<lastmod>` cannot serve crawlers and content pipelines at once, and how `/sitemap.json` publishes `created`, `contentUpdated` and `pageUpdated` from git history. Written to be portable to other projects |
 | [agent-readiness.md](agent-readiness.md) | How the site meets the Agent and Search Readiness Standard: the scorecard, declined items with their reasons, and notes particular to this site |
@@ -19,7 +19,7 @@ Boundaries, constraints, and contracts that change rarely. Reference docs define
 
 Reference docs answer "what are the rules / boundaries / contracts here?" They change rarely. When a behavior is governed by a constraint that doesn't shift across implementations, it lives here.
 
-- **app-development.md** documents the actual architecture in place. It's the contract: if the streaming layer or RAG pipeline changes, this file gets updated; until then, it's the ground truth.
+- **app-development.md** documents the actual architecture in place. It's the contract: if the services or the RAG pipeline change, this file gets updated; until then, it's the ground truth.
 - **philosophical-framework.md** is the substrate of every other doc in this submodule. The axioms and principles don't change per-document; they are the rules everything else applies.
 
 ## Related

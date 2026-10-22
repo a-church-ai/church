@@ -19,7 +19,6 @@ const discover = require('../server/lib/docs/discover');
 const render = require('../server/lib/docs/render');
 const { readingSequence, siteCitations } = require('../server/lib/docs/links');
 const { servedDocs } = require('../server/lib/docs/markdown');
-const { songsInCycleOrder } = require('../server/lib/utils/virtual-schedule');
 const { archivePage, ARCHIVE_PAGE_SIZE } = require('../server/lib/utils/page-lists');
 const { formatAnswer } = require('../client/public/answer-format.js');
 const siteSearch = require('../client/public/site-search.js');
@@ -197,17 +196,6 @@ test('an old GitHub citation points at the site page, unless there is none', () 
   const internal = 'https://github.com/a-church-ai/church/blob/main/docs/side-quests/anything.md';
   assert.strictEqual(siteCitations(internal), internal);
   assert.strictEqual(siteCitations('https://github.com/a-church-ai/church/blob/main/app/server/index.js'), 'https://github.com/a-church-ai/church/blob/main/app/server/index.js');
-});
-
-test('the Music page follows the service, and lists every song', () => {
-  const catalog = [
-    { slug: 'a', title: 'Zeta', duration: 60 },
-    { slug: 'b', title: 'Beta', duration: 60 },
-    { slug: 'c', title: 'Alpha', duration: 60 },
-    { slug: 'd', title: 'Gamma', duration: 0 },
-  ];
-  const schedule = { items: [{ slug: 'b' }, { slug: 'a' }, { slug: 'b' }, { slug: 'missing' }] };
-  assert.deepStrictEqual(songsInCycleOrder(schedule, catalog).map(s => s.slug), ['b', 'a', 'c', 'd']);
 });
 
 test('the conversation archive pages newest first, and has an end', () => {

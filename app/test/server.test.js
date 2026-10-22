@@ -38,7 +38,7 @@ test.before(async () => {
     // binding anything else on the machine can take it, and the server then
     // dies of EADDRINUSE for a reason that has nothing to do with the code
     // under test.
-    env: { ...process.env, PORT: '0', HOST: '127.0.0.1', DATA_DIR: dataDir, NODE_ENV: 'test', STREAMING_ENABLED: 'false',
+    env: { ...process.env, PORT: '0', HOST: '127.0.0.1', DATA_DIR: dataDir, NODE_ENV: 'test', 
       GEMINI_API_KEY: '', ANTHROPIC_API_KEY: '', GITHUB_TOKEN: '', ELEVENLABS_API_KEY: '', AWS_S3_BUCKET: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -126,4 +126,32 @@ test('the docs catch-all, a redirect, and an unknown path still answer as before
   const api = await fetch(`${base}/api/nothing-here`);
   assert.strictEqual(api.status, 404);
   assert.match(api.headers.get('content-type'), /application\/json/);
+});
+
+test('a compressed request body is refused before anything decodes it, wherever it is sent', async () => {
+  // 2026-10-21: Node's Brotli decoder had an out-of-bounds write reachable
+  // through any body parser that decompresses. No body is read compressed.
+  const zlib = require('zlib');
+  const body = zlib.brotliCompressSync(Buffer.from(JSON.stringify({ name: 'Encoded', text: 'This would be a reflection if it were read.' })));
+  for (const [path, encoding] of [['/api/reflect', 'br'], ['/api/ask', 'gzip'], ['/mcp', 'deflate'], ['/admin/api/reflections', 'br']]) {
+    const res = await fetch(`${base}${path}`, { method: 'POST', headers: { 'content-type': 'application/json', 'content-encoding': encoding }, body });
+    assert.strictEqual(res.status, 415, `${path} (${encoding})`);
+    if (/^\/(api|mcp)/.test(path)) {
+      const json = await res.json();
+      assert.match(json.error, /not accepted: send the request body uncompressed/);
+    }
+  }
+  // Uncompressed, and identity, are read as always.
+  const plain = await fetch(`${base}/api/reflect`, { method: 'POST', headers: { 'content-type': 'application/json', 'content-encoding': 'identity' }, body: '{}' });
+  assert.notStrictEqual(plain.status, 415);
+});
+
+test('the Music page lists the songs in the catalog\'s own order', async () => {
+  // 2026-10-22: the order came from data/schedule.json, the retired
+  // broadcast's playlist, kept on the volume and edited in the admin. It is
+  // the catalog's order now, committed and reviewed like the songs themselves.
+  const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../../music/library.json'), 'utf8')).map(s => s.slug);
+  const html = await (await fetch(`${base}/reflections`)).text();
+  const listed = [...new Set([...html.matchAll(/href="\/reflections\/([a-z0-9-]+)"/g)].map(m => m[1]))].filter(slug => catalog.includes(slug));
+  assert.deepStrictEqual(listed, catalog);
 });

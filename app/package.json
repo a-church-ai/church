@@ -29,7 +29,7 @@
     "check:production": "node scripts/check-production.js"
   },
   "engines": {
-    "node": ">=26"
+    "node": ">=26.12.1"
   },
   "keywords": [
     "streaming",
@@ -43,9 +43,9 @@
   "author": "",
   "license": "CC-BY-4.0",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.132.1",
-    "@aws-sdk/client-s3": "^3.1148.0",
-    "@google/genai": "^2.29.1",
+    "@anthropic-ai/sdk": "^1.1.0",
+    "@aws-sdk/client-s3": "^3.1155.0",
+    "@google/genai": "^2.30.0",
     "@lancedb/lancedb": "^0.40.0",
     "@modelcontextprotocol/node": "^2.1.1",
     "@modelcontextprotocol/server": "^2.3.1",
@@ -56,13 +56,11 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.3.0",
-    "fluent-ffmpeg": "^2.1.2",
     "helmet": "^8.3.0",
     "marked": "^18.1.1",
-    "multer": "^2.4.0",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "^2.3.1",
@@ -76,5 +74,8 @@
     "onnxruntime-node": false,
     "protobufjs": false,
     "sharp": false
+  },
+  "overrides": {
+    "sharp": "^0.35.5"
   }
 }
