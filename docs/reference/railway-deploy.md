@@ -177,6 +177,20 @@ By hand, after a deploy:
   with citations (only after step 4). Before seeding it returns a graceful
   *"Index not built"* error, not a crash.
 
+- The boot log names the Node it runs: `aChurch App running on ..., Node v26.12.1`.
+  The build log names the base image's digest (`FROM docker.io/library/node:...@sha256:...`),
+  which `docker buildx imagetools inspect node:<version>-slim` matches to a release.
+
+**Reading production's logs.** `railway logs -d -n 5000` reads the current
+deployment, and `--since` with `--filter` searches only that one too: a quiet
+result covers the hours since the last deploy, not the days asked for. For
+older ones, `railway deployment list --json` gives each deployment's id, and
+`railway logs -d -n 5000 <id>` reads it (`-n 50000` is refused as an invalid
+limit, `-n 5000` is accepted, and a deployment here logs about a hundred lines). After a change that could
+fail quietly, read every deployment back to it. A failed outside call names
+its reason (`lib/utils/describe-error.js`), so search for the reason as well
+as the job: `fetch failed`, `Connection error`, `ENHANCE_YOUR_CALM`, `GOAWAY`.
+
 Anything sent by hand goes under a test name (`test`, or `test-` anything,
 `app/server/lib/utils/test-visitor.js`): it is served as anyone is and kept out
 of the feed, the archive, the counts and the conversation lists, so checking
