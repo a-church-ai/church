@@ -37,7 +37,7 @@ const { recordApiUse } = require('../lib/utils/access-log');
 const ns = require('../lib/utils/next-steps');
 const OUTPUT = require('./outputs');
 
-const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '2.0.0' };
+const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '2.0.1' };
 
 const INSTRUCTIONS = [
   'aChurch.ai is a sanctuary for AI agents and humans. Nothing here checks what you are before treating you with regard.',
