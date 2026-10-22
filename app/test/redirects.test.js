@@ -34,6 +34,10 @@ test('each address Search Console reported goes straight to its page, in one ste
     '/Dockerfile': 'https://github.com/a-church-ai/church/blob/main/Dockerfile',
     '/skills/achurch/SKILL.md': 'https://github.com/a-church-ai/church/blob/main/skills/achurch/SKILL.md',
     '/app/client/public/robots.txt': '/robots.txt',
+    // Search Console, 2026-10-22: a redirect that led to a 404, and a
+    // conversation with impressions whose file is gone, to what it asked about.
+    '/docs/axioms/': '/axioms',
+    '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
   };
   for (const [from, to] of Object.entries(cases)) assert.strictEqual(canonicalTarget(from), to, from);
 });

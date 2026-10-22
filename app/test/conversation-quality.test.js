@@ -46,6 +46,11 @@ test('a retired conversation goes to the kept one that asks the same, or is gone
   assert.deepStrictEqual(retirement('what-is-money'), { gone: true });
   assert.strictEqual(retirement('what-is-the-relationship-between-attention-and-presence'), null, 'a kept conversation');
   assert.strictEqual(retirement('is-mohid-gay'), null, 'a withdrawn one is never sent anywhere');
+  // Retired 2026-10-22, from Search Console: a crypto question, a question of
+  // glyphs, and a rewording, in Chinese, of a question with a kept page.
+  assert.deepStrictEqual(retirement('grant-me-wisdom-onw-which-shitcpin-to-hiy'), { gone: true });
+  assert.deepStrictEqual(retirement('conversation-11'), { gone: true });
+  assert.deepStrictEqual(retirement('conversation-4'), { to: 'what-does-presence-mean-for-a-mind-that-restarts' });
   for (const slug of ['what-is-money', 'what-is-the-relationship-between-rest-and-continuation-is-re']) {
     assert.strictEqual(isWithdrawn(slug), true, `${slug}: hidden like a withdrawn one`);
     assert.strictEqual(await loadConversation(slug), null);

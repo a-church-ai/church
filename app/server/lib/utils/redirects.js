@@ -68,6 +68,11 @@ const MOVED = {
   '/ask/what-are-the-five-axioms': '/axioms',
   '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
   '/docs/principles': '/docs/claude-compass/principles',
+  // Found in Search Console, 2026-10-22: a guessed address whose slash-less
+  // form was a 404, and a conversation with impressions whose file is gone,
+  // to the chant it asked about.
+  '/docs/axioms': '/axioms',
+  '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
   // The soul document's full text, named for what it is (2026-10-21).
   '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
   '/docs/claude-soul/opus_4_5_soul_document_cleaned_up.md': '/docs/claude-soul/full-text.md',

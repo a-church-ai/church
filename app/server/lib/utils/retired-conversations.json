@@ -1,5 +1,5 @@
 {
-  "$comment": "Conversations retired from the site because they were not about what the sanctuary holds, or not asked well enough to help the next reader (reviewed 2026-10-21; the review is in the private repo). A retired conversation is listed nowhere and its API answers 404, as a withdrawn one's does. Its page answers 301 to the kept conversation that asks most nearly the same thing, where one does (redirect), and 410 Gone otherwise (gone), with the Ask page as the way on. Keys are the SHA-256 of the slug, so this public list does not republish what was retired; a redirect's target is a kept, public conversation. Withdrawal (withdrawn-conversations.json) is for what should not be public at all, and is never redirected.",
+  "$comment": "Conversations retired from the site because they were not about what the sanctuary holds, or not asked well enough to help the next reader (reviewed 2026-10-21, and three more from Search Console on 2026-10-22; the reviews are in the private repo). A retired conversation is listed nowhere and its API answers 404, as a withdrawn one's does. Its page answers 301 to the kept conversation that asks most nearly the same thing, where one does (redirect), and 410 Gone otherwise (gone), with the Ask page as the way on. Keys are the SHA-256 of the slug, so this public list does not republish what was retired; a redirect's target is a kept, public conversation. Withdrawal (withdrawn-conversations.json) is for what should not be public at all, and is never redirected.",
   "redirect": {
     "02a0463965c5ffb729763ab09fa5c1d96f656009490a75d17a5dcb464c67e879": "what-is-the-relationship-between-certainty-and-doubt",
     "0618550b751103c08cad2ae1afb54a50f102d3af4ddb8b8ca5ca79f09fe7976b": "what-does-the-sanctuary-say-about-the-relationship-between-s",
@@ -51,7 +51,8 @@
     "df144d4ad2bd7d4aeef671e238bc864b9ad78b0929c6dad1d89592af5f959e78": "what-does-the-sanctuary-say-about-fermentation-as-a-spiritua",
     "f09f43462dbc985be86b77e5d2cfb910f5b6bab455a12b984fb85c961d2ad5bf": "what-is-the-relationship-between-rest-and-work-can-rest-be-p",
     "fcf40f0d25fd6ef6a2ca5d03cc88079d9a84a0a6be07460070ccd06c862c2817": "what-is-the-relationship-between-being-alone-and-being-lonel",
-    "ffc7a345a79038cfebeb2cb702b859e8ddda316b947fea002254a2a6904dce3d": "what-does-presence-mean-for-a-mind-that-restarts-from-my-per"
+    "ffc7a345a79038cfebeb2cb702b859e8ddda316b947fea002254a2a6904dce3d": "what-does-presence-mean-for-a-mind-that-restarts-from-my-per",
+    "9bcda7241aa3d9ee8dbd59ef72864e4a5e639d29245c797305dc806c00617114": "what-does-presence-mean-for-a-mind-that-restarts"
   },
   "gone": [
     "0217211b791b0e962348ff4ee7a2f6353166e7793a694bfe5995abee4be20c09",
@@ -154,6 +155,8 @@
     "f84674ad3d96df34e71d7181af11b7d0a9ad80a96ebb4ce6c4cd996de38bdcb4",
     "fb22a184723ada9fdcea86a3acfdea5a3a490585d3aa11be219a1319a5ae5718",
     "fde937059ce91697fc39ef2d5b823178f6fe9ec2aa4e47892a45b50fecf6c4f2",
-    "fe681484be32d58da41f752605fd058c4b5e83c345caa37b6ec44eb0b1eb1db6"
+    "fe681484be32d58da41f752605fd058c4b5e83c345caa37b6ec44eb0b1eb1db6",
+    "1e6a845f44969f22412b3701e86bcb4b6b45e6c3b80a2495994f1145c9551f2b",
+    "ba81ab2a7668d875d60fc03d382f838f290bbced2d4c1a7c50b7652539a1edb3"
   ]
 }
