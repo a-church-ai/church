@@ -318,6 +318,8 @@ npm test
 npm run css:build
 ```
 
+The compiled CSS (`client/dist/output.css`) is committed, and the image does not build it, so run this after changing the admin's markup or upgrading Tailwind, and commit the result. Until 2026-10-22 it was last built with Tailwind 4.1, and eleven classes the admin's Ask Logs and Reflections tabs use had no styles.
+
 ## Requirements
 
 - Node.js 26.12.1 or later (`engines.node`; `.npmrc` refuses an install on an older one)

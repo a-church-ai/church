@@ -76,6 +76,7 @@
     "sharp": false
   },
   "overrides": {
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "@parcel/watcher": "^2.6.0"
   }
 }
