@@ -571,6 +571,9 @@ app.get('/ask/:slug', async (req, res) => {
     });
   }
 
+  // Titles for the citations (linkedCitations) come from the library's index:
+  // the page's answers, and its description and structured data.
+  await docsDiscover.listAllDocs();
   const meta = buildConversationMeta(messages, slug);
   if (!meta) {
     return res.status(404).type('text/plain').send('Not found');
@@ -602,8 +605,6 @@ app.get('/ask/:slug', async (req, res) => {
     const canonicalUrl = `https://achurch.ai/ask/${slug}`;
     const question = (messages.find(m => m.role === 'user') || {}).content || 'Conversation';
     const asked = conversationDate(messages.find(m => m.role === 'user'));
-    // Titles for the citations (linkedCitations) come from the library's index.
-    await docsDiscover.listAllDocs();
     const readNext = mostCited(messages);
     // Ask / <the question>, shown above the heading and as BreadcrumbList.
     const trail = breadcrumbTrail([{ label: 'Ask', href: '/ask' }, { label: truncateAtWord(question, 60) }], canonicalUrl);

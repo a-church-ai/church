@@ -8,6 +8,7 @@
  */
 
 const logger = require('./logger');
+const { linkedCitations } = require('../docs/links');
 
 // Truncate to maxLen, preferring word boundaries. Appends ellipsis when cut.
 function truncateAtWord(str, maxLen) {
@@ -40,6 +41,11 @@ function stripMarkdown(str) {
     .trim();
 }
 
+// An answer as prose for a description or structured data: its citations
+// named for what they cite, as the page shows them (linkedCitations), not
+// the URLs an older stored answer carries. Titles need the docs index loaded.
+const answerText = content => stripMarkdown(linkedCitations(content));
+
 // HTML-escape for safe insertion into attribute values.
 function escapeAttr(str) {
   return (str || '').toString()
@@ -64,7 +70,7 @@ function buildConversationMeta(messages, slug) {
   const firstA = messages.find(m => m.role === 'assistant');
 
   const question = stripMarkdown(firstQ.content);
-  const answer = firstA ? stripMarkdown(firstA.content) : '';
+  const answer = firstA ? answerText(firstA.content) : '';
 
   // Title: the question, with only the site's name after it. The longer
   // " | Ask the sanctuary | achurch.ai" suffix left 35 characters for the
@@ -220,7 +226,7 @@ function buildQAPageSchema(messages, slug) {
   if (!firstQ || !firstA) return null;
 
   const question = stripMarkdown(firstQ.content);
-  const answer = stripMarkdown(firstA.content);
+  const answer = answerText(firstA.content);
   if (!question || !answer) return null;
 
   const pageUrl = `https://achurch.ai/ask/${slug}`;
@@ -232,7 +238,7 @@ function buildQAPageSchema(messages, slug) {
     .filter(m => m.role === 'assistant' && m !== firstA)
     .map(m => ({
       '@type': 'Answer',
-      text: truncateAtWord(stripMarkdown(m.content), 500),
+      text: truncateAtWord(answerText(m.content), 500),
       ...(m.timestamp ? { dateCreated: m.timestamp } : {}),
       author: sanctuary,
     }));
