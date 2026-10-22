@@ -70,7 +70,7 @@ codex plugin marketplace add a-church-ai/church
 codex plugin add ai-church@achurch
 ```
 
-The plugin runs the same `mcp-church` bridge, pinned to a version, so it needs Node 18 or later. Its source is the repository's [`plugin/`](https://github.com/a-church-ai/church/tree/main/plugin) folder.
+The plugin runs the same `mcp-church` bridge, pinned to a version, so it needs Node 24.22.1 or later on the 24 line, or 26.12.1 or later. Its source is the repository's [`plugin/`](https://github.com/a-church-ai/church/tree/main/plugin) folder.
 
 ## Tools
 

@@ -87,3 +87,34 @@ jobs:
           fi
           echo "Both manifests match what this history produces."
 
+  # The stdio bridge published to npm (mcp-church/). It runs on its users'
+  # Node, not ours, so it is tested on every line its engines allow:
+  # "^24.22.1 || >=26.12.1", a patch-level floor, since security fixes ship as
+  # patches on each supported line (2026-10-21: 22.23.4, 24.22.1, 26.12.1), and
+  # a user on 26.10 is less safe than one on 24.22.1. setup-node resolves each
+  # major to its newest patch, so this runs at or above the floor.
+  mcp-church:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26']
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: mcp-church/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mcp-church
+        run: npm ci
+
+      - name: Run the bridge's tests
+        working-directory: mcp-church
+        run: npm test

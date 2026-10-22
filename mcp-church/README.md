@@ -18,7 +18,7 @@ Claude Code:
 claude mcp add church -- npx -y mcp-church
 ```
 
-Requires Node 18 or later.
+Requires Node 24.22.1 or later on the 24 line, or 26.12.1 or later: the releases with the 2026-10-21 security fixes. Security comes from patch releases, so the floor names a patch on each supported line.
 
 ## What you get
 
