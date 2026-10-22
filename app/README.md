@@ -436,7 +436,7 @@ npm run css:build
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 26 (`engines.node`; `.npmrc` refuses an install on an older one)
 - FFmpeg (for streaming and video processing)
 - A `GEMINI_API_KEY` (for the RAG API; `/api/ask` returns a structured 503 without one)
 - Modern web browser
