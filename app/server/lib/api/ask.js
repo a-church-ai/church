@@ -206,8 +206,9 @@ async function health(input, ctx) {
 // fragments are left out.
 async function recent(input, ctx) {
   try {
-    // A held one (alone, its answer too short) is listed nowhere, here included.
-    const conversations = (await placedConversations()).filter(c => !c.held).slice(0, 20)
+    // A held one (alone, its answer too short) or a screened-out one is
+    // listed nowhere, here included.
+    const conversations = (await placedConversations()).filter(c => !c.held && !c.screened).slice(0, 20)
       .filter(c => c.messages >= 2 && c.answer)
       .map(c => {
         // Strip markdown before cutting: cutting first left previews ending in

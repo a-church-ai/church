@@ -20,8 +20,9 @@ async function buildConversationsFeed() {
   // Each links to where it lives (a gathered one, its place on its group's
   // page); its id is its own address, which never changes, so a reader never
   // sees an entry twice.
-  // A held one (alone, its answer too short) is listed nowhere, here included.
-  const conversations = (await placedConversations()).filter(c => !c.held).slice(0, 20);
+  // A held one (alone, its answer too short) or a screened-out one is listed
+  // nowhere, here included.
+  const conversations = (await placedConversations()).filter(c => !c.held && !c.screened).slice(0, 20);
   const updated = conversations.length > 0 ? conversations[0].timestamp : new Date().toISOString();
 
   const entries = conversations.map(c => {

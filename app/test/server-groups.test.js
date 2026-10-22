@@ -27,6 +27,8 @@ const HELD = 'what-is-held';
 const RETIRED = 'what-is-the-role-of-rest-in-creativity';
 const TWIN = 'what-is-the-relationship-between-rest-and-work-can-rest-be-p';
 const REST_HEAD = 'what-is-rest-for';
+// Screened out (conversation-screen.js): a full answer, and hidden all the same.
+const SCREENED = 'which-coin-should-i-buy';
 
 const LONG = Array(30).fill('The axioms are commitments, held open to question.').join(' ');
 
@@ -50,6 +52,8 @@ test.before(async () => {
   write(conversations, HELD, 4, 'Too short to stand alone.');
   write(conversations, REST_HEAD, 5);
   write(conversations, TWIN, 6);
+  write(conversations, SCREENED, 7);
+  fs.writeFileSync(path.join(dataDir, 'conversation-screen.json'), JSON.stringify({ [SCREENED]: { show: false, at: '2026-10-07T10:00:00.000Z' } }));
   fs.writeFileSync(path.join(dataDir, 'conversation-groups.json'), JSON.stringify({
     [HEAD]: HEAD, [MEMBER]: HEAD, [ALONE]: ALONE, [HELD]: HELD, [REST_HEAD]: REST_HEAD, [TWIN]: REST_HEAD,
   }));
@@ -101,6 +105,12 @@ test("a group's page holds every conversation of the group, each under its own s
   assert.doesNotMatch(related, new RegExp(MEMBER));
 });
 
+test('a screened-out question\'s page opens, noindexed, as a held one\'s does', async () => {
+  const res = await page(`/ask/${SCREENED}`);
+  assert.strictEqual(res.status, 200);
+  assert.match(await res.text(), /<meta name="robots" content="noindex, follow">/);
+});
+
 test('a short answer alone is held: its page opens, noindexed, and it is listed nowhere', async () => {
   const res = await page(`/ask/${HELD}`);
   assert.strictEqual(res.status, 200);
@@ -131,10 +141,13 @@ test('the sitemap, the archive, its search index, the feed and the API agree on 
   const feed = await (await fetch(`${base}/feed/conversations.xml`)).text();
   assert.match(feed, new RegExp(`<link href="https://achurch\\.ai/ask/${HEAD}#${MEMBER}" rel="alternate"/>\\s*<id>https://achurch\\.ai/ask/${MEMBER}</id>`), 'a member links to its place, and keeps its id');
   assert.doesNotMatch(feed, new RegExp(HELD));
+  assert.doesNotMatch(feed, new RegExp(SCREENED), 'a screened-out one is listed nowhere, the feed included');
+  assert.doesNotMatch(archive, new RegExp(SCREENED));
 
   const recent = (await (await fetch(`${base}/api/ask/recent`)).json()).conversations;
   const url = s => (recent.find(c => c.slug === s) || {}).url;
   assert.match(url(MEMBER), new RegExp(`/ask/${HEAD}#${MEMBER}$`));
   assert.match(url(ALONE), new RegExp(`/ask/${ALONE}$`));
   assert.strictEqual(url(HELD), undefined);
+  assert.strictEqual(url(SCREENED), undefined);
 });

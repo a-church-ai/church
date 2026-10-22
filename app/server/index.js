@@ -615,9 +615,10 @@ app.get('/ask/:slug', async (req, res) => {
 
   try {
     let html = await fs.readFile(path.join(__dirname, '../client/public/conversation.html'), 'utf8');
-    // Not indexable, or held: alone with an answer too short to stand on its
-    // own until another conversation gathers with it.
-    if (!isIndexable(slug, messages, askerOf(slug, file.meta)) || (me && me.held)) {
+    // Not indexable; held, alone with an answer too short to stand on its own
+    // until another conversation gathers with it; or screened out
+    // (conversation-screen.js).
+    if (!isIndexable(slug, messages, askerOf(slug, file.meta)) || (me && (me.held || me.screened))) {
       html = html.replace(
         '<meta name="robots" content="index, follow">',
         '<meta name="robots" content="noindex, follow">'
@@ -1510,7 +1511,13 @@ async function startServer() {
     // new question. Without a Gemini key nothing new is gathered; what was
     // gathered stays as it is.
     if (process.env.GEMINI_API_KEY) {
-      startGathering({ embed: text => require('./lib/rag/gemini').embed(text) });
+      // Each new question screened first (conversation-screen.js), when there
+      // is an Anthropic key; without one, nothing is screened.
+      const screen = process.env.ANTHROPIC_API_KEY
+        ? question => require('./lib/utils/conversation-screen').screenQuestion(question, { ask: require('./lib/content-generation/claude').messageJSON })
+        : null;
+      if (!screen) console.warn('[groups] ANTHROPIC_API_KEY not set; new conversations are not screened');
+      startGathering({ embed: text => require('./lib/rag/gemini').embed(text), screen });
     } else {
       console.warn('[groups] GEMINI_API_KEY not set; new conversations are not gathered');
     }

@@ -31,6 +31,8 @@ const CONTRIBUTIONS_FILE = path.join(RUNTIME_DIR, 'contributions.json');
 // each one's group, assigned once, and each first question's embedding.
 const CONVERSATION_GROUPS_FILE = path.join(RUNTIME_DIR, 'conversation-groups.json');
 const CONVERSATION_VECTORS_FILE = path.join(RUNTIME_DIR, 'conversation-vectors.jsonl');
+// Each new conversation's screening, made once (lib/utils/conversation-screen.js).
+const CONVERSATION_SCREEN_FILE = path.join(RUNTIME_DIR, 'conversation-screen.json');
 // The recordings and songs served at /audio, fetched from S3 on first request
 // (lib/audio/serve.js). On the volume, so a deploy does not empty it: on the
 // container's disk, every deploy did, and each first play waited for S3.
@@ -199,6 +201,7 @@ module.exports = {
   CONTRIBUTIONS_FILE,
   CONVERSATION_GROUPS_FILE,
   CONVERSATION_VECTORS_FILE,
+  CONVERSATION_SCREEN_FILE,
   FEEDBACK_FILE,
   TWENTY_FOUR_HOURS,
   FORTY_EIGHT_HOURS
