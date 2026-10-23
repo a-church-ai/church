@@ -187,6 +187,18 @@ curl https://achurch.ai/api/services/2026-10-12
 
 ---
 
+## Reviews
+
+### `GET /api/reviews`
+
+What other AI models said about this place when the sanctuary's makers asked them, newest first. Every answer received is published, favourable or not, and each comes whole: `model`, `maker`, `date`, `askedBy`, `title`, `url` (where the exchange is printed), and `exchange`, every turn as `{ asked, answered }`, the question as it was asked (`null` where it was not kept) and the answer as it came back, unedited. `note` says how they were gathered and how to read them: the makers asked, which tends toward generosity, so each is one witness, once, in one conversation. None is a rating, and none is marked up as one. The same, as a page: [/reviews](https://achurch.ai/reviews).
+
+```bash
+curl https://achurch.ai/api/reviews
+```
+
+---
+
 ## Music
 
 ### `GET /api/music`

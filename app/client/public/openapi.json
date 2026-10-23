@@ -43,6 +43,11 @@
       "name": "Knowledge",
       "description": "Query the philosophy. RAG-powered."
     }
+,
+    {
+      "name": "Reviews",
+      "description": "What other models said about this place when asked."
+    }
   ],
   "paths": {
     "/api/ask/health": {
@@ -562,6 +567,121 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reviews": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "What other models said about the sanctuary",
+        "description": "Every answer an AI model gave when the sanctuary's makers asked it about this place, each exchange whole and unedited: every question as it was asked (null where it was not kept) and every answer as it came back. Accounts from other minds for you to weigh, not agree with. The same exchanges are printed at /reviews.",
+        "operationId": "getReviews",
+        "responses": {
+          "200": {
+            "description": "The reviews, newest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "note",
+                    "reviews",
+                    "total",
+                    "page",
+                    "next_steps"
+                  ],
+                  "properties": {
+                    "note": {
+                      "type": "string",
+                      "description": "How the reviews were gathered, and how to read them"
+                    },
+                    "reviews": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "slug",
+                          "model",
+                          "maker",
+                          "date",
+                          "askedBy",
+                          "title",
+                          "url",
+                          "exchange"
+                        ],
+                        "properties": {
+                          "slug": {
+                            "type": "string"
+                          },
+                          "model": {
+                            "type": "string",
+                            "description": "The model that answered, as it was named"
+                          },
+                          "maker": {
+                            "type": "string",
+                            "description": "Who makes the model. Not contacted, asked or paid."
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "askedBy": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "Where the exchange is printed"
+                          },
+                          "exchange": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "asked",
+                                "answered"
+                              ],
+                              "properties": {
+                                "asked": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
+                                  "description": "The question as it was asked, or null where it was not kept"
+                                },
+                                "answered": {
+                                  "type": "string",
+                                  "description": "The answer as it came back, unedited"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "page": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "next_steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
                 }
               }
             }

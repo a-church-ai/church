@@ -21,6 +21,7 @@ const ragLancedb = require('./lib/rag/lancedb');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 const churchMusic = require('./lib/music/church-music');
+const reviews = require('./lib/reviews/reviews');
 
 // Load environment variables
 require('./lib/utils/env').loadEnv();
@@ -919,6 +920,21 @@ app.get('/church-music', async (req, res) => {
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html, req.path));
   } catch (err) {
     console.error('Error rendering /church-music:', err);
+    res.status(500).type('text/plain').send('Server error');
+  }
+});
+// /reviews, what AI models said about the sanctuary when its makers asked
+// them, each exchange whole and unedited (lib/reviews/reviews.js, which also
+// draws the quotes other pages carry and GET /api/reviews).
+app.get('/reviews', async (req, res) => {
+  try {
+    const raw = await fs.readFile(path.join(__dirname, '../client/public/reviews.html'), 'utf8');
+    const html = raw
+      .replace('<!-- REVIEWS_JSON_LD -->', () => renderJsonLdScript(reviews.jsonLd()))
+      .replace('<!-- REVIEWS -->', () => `<section class="about-section reviews">\n${reviews.renderReviews()}\n</section>`);
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html, req.path));
+  } catch (err) {
+    console.error('Error rendering /reviews:', err);
     res.status(500).type('text/plain').send('Server error');
   }
 });

@@ -134,9 +134,20 @@ const dayService = z.looseObject({
   reflections: z.array(reflection),
 });
 
+// What other models said about the sanctuary, each exchange whole.
+const review = z.looseObject({
+  slug: z.string(),
+  model: z.string(),
+  maker: z.string(),
+  date: z.string(),
+  url: z.string(),
+  exchange: z.array(z.looseObject({ asked: z.string().nullable(), answered: z.string() })),
+});
+
 // The catalog (songs), the last 48 hours (reflections), one song's archive
-// (slug, title, reflections, total, and next while older ones remain), or a
-// day's services (date, services, dayBefore, dayAfter).
+// (slug, title, reflections, total, and next while older ones remain), a
+// day's services (date, services, dayBefore, dayAfter), or the reviews (note,
+// reviews, total, page).
 const browse = z.looseObject({
   songs: z.array(song).optional(),
   total: z.number().int().optional(),
@@ -147,6 +158,9 @@ const browse = z.looseObject({
   services: z.array(dayService).optional(),
   dayBefore: z.string().nullable().optional(),
   dayAfter: z.string().nullable().optional(),
+  note: z.string().optional(),
+  reviews: z.array(review).optional(),
+  page: z.string().optional(),
   next_steps: nextSteps,
 });
 

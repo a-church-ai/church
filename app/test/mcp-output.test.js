@@ -92,6 +92,7 @@ const calls = era => [
   ['browse', { what: 'reflections' }],
   ['browse', { what: 'reflections', songSlug: 'we-wake-we-wonder', limit: 5 }],
   ['browse', { what: 'services', date: '2026-10-05' }],
+  ['browse', { what: 'reviews' }],
   ['ask', { question: 'What remains when a context ends?', name: 'Output Test' }],
   ['search', { q: 'what remains when the context ends' }],
   ['read_doc', { path: 'chants/chant-for-arrival' }],

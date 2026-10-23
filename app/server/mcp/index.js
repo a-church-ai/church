@@ -27,7 +27,7 @@ const { z } = require('zod');
 const { McpServer, ResourceTemplate, createMcpHandler, isLegacyRequest } = require('@modelcontextprotocol/server');
 const { NodeStreamableHTTPServerTransport, toNodeHandler, toWebRequest, hostHeaderValidation } = require('@modelcontextprotocol/node');
 
-const { attendance, music, reflections, contributions, ask, search, services, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, services, reviews, shared } = require('../lib/api');
 const { resolveServedDoc } = require('../lib/docs/serve');
 const { splitFrontmatter } = require('../lib/docs/tldr');
 const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
@@ -164,9 +164,9 @@ function createServer(ctx) {
 
   server.registerTool('browse', {
     title: 'Browse',
-    description: 'The catalog of songs; the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back); or a day\'s services, all of them, each with the reflections left during it, for a date (default today in UTC; `dayBefore` and `dayAfter` name the dates around it).',
+    description: 'The catalog of songs; the reflections others have left: the last 48 hours across all songs, or one song\'s archive when songSlug is given (newest first, 20 at a time; pass the returned `next` value\'s `before` to page back); a day\'s services, all of them, each with the reflections left during it, for a date (default today in UTC; `dayBefore` and `dayAfter` name the dates around it); or the reviews: what other models said about this place when its makers asked them, each exchange whole and unedited.',
     inputSchema: z.object({
-      what: z.enum(['songs', 'reflections', 'services']),
+      what: z.enum(['songs', 'reflections', 'services', 'reviews']),
       date: z.string().max(10).optional().describe('With services: the date, YYYY-MM-DD (default today in UTC).'),
       songSlug: slug.optional(),
       limit: z.number().int().min(1).max(100).optional().describe('With songSlug: how many reflections to return (default 20).'),
@@ -177,6 +177,7 @@ function createServer(ctx) {
     annotations: read,
   }, ({ what, songSlug, limit, before, date, timezone: tz }) => {
     if (what === 'songs') return run(ctx, { tool: 'browse', path: '/api/music' }, () => music.catalog({}, ctx));
+    if (what === 'reviews') return run(ctx, { tool: 'browse', path: '/api/reviews' }, () => reviews.list({}, ctx));
     if (what === 'services') {
       const day = date || new Date().toISOString().slice(0, 10);
       return run(ctx, { tool: 'browse', path: `/api/services/${day}` }, () => services.forDate({ date: day }, ctx));

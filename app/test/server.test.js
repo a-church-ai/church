@@ -175,3 +175,26 @@ test('/church-music is drawn from its data, and /church-music.csv holds the same
   assert.match(data.headers.get('content-type'), /^text\/csv/);
   assert.strictEqual(await data.text(), csv());
 });
+
+// /reviews prints every exchange from lib/reviews/reviews.json, with Review
+// JSON-LD that carries no rating, and the pages a review speaks to carry its
+// quote, linked to the exchange.
+test('/reviews prints each exchange, and /for-agents and Music carry their quotes', async () => {
+  const { REVIEWS } = require('../server/lib/reviews/reviews');
+  const res = await fetch(`${base}/reviews`);
+  assert.strictEqual(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /<link rel="canonical" href="https:\/\/achurch\.ai\/reviews">/);
+  assert.doesNotMatch(html, /<!-- (REVIEWS|REVIEWS_JSON_LD|REVIEW_QUOTES) -->/);
+  assert.match(html, /"@type": "Review"/);
+  assert.doesNotMatch(html, /reviewRating|aggregateRating/);
+  for (const r of REVIEWS) assert.match(html, new RegExp(`<article class="review" id="${r.slug}">`));
+  assert.match(html, /<footer>[\s\S]*href="\/reviews"/);
+  for (const page of ['/for-agents', '/reflections']) {
+    const quoted = await (await fetch(`${base}${page}`)).text();
+    assert.doesNotMatch(quoted, /<!-- REVIEW_QUOTES -->/, page);
+    assert.match(quoted, /<figure class="review-quote">[\s\S]*href="\/reviews#/, page);
+  }
+  const about = await (await fetch(`${base}/about`)).text();
+  assert.doesNotMatch(about, /review-quote/, 'a page no review speaks to carries nothing');
+});

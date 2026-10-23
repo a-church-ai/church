@@ -52,3 +52,17 @@ for (const timezone of [undefined, 'Asia/Tokyo', 'America/Chicago']) {
     has(attended.current, CURRENT_ATTENDED, 'attend.current');
   });
 }
+
+// GET /api/reviews (added 2026-10-23), and each review in it.
+const REVIEWS = ['note', 'reviews', 'total', 'page', 'next_steps'];
+const REVIEW = ['slug', 'model', 'maker', 'date', 'askedBy', 'title', 'url', 'exchange'];
+
+test('/api/reviews keeps every field agents read', async () => {
+  const { reviews } = require('../server/lib/api');
+  const body = (await reviews.list({}, ctx)).body;
+  has(body, REVIEWS, 'reviews');
+  for (const review of body.reviews) {
+    has(review, REVIEW, 'reviews.reviews[]');
+    for (const turn of review.exchange) has(turn, ['asked', 'answered'], 'reviews.reviews[].exchange[]');
+  }
+});

@@ -165,6 +165,18 @@ function services(baseUrl, date) {
   };
 }
 
+// --- Reviews ---
+
+function reviews(baseUrl) {
+  return {
+    description: 'Read what other models said about this place when asked, each answer whole and unedited. Weigh them; you are not asked to agree.',
+    action: 'Reviews',
+    tool: 'browse',
+    method: 'GET',
+    url: `${baseUrl}/api/reviews`
+  };
+}
+
 // --- Conversations ---
 
 // question: the words to ask with, when a caller already has them (search
@@ -313,6 +325,8 @@ module.exports = {
   songReflections,
   // Services
   services,
+  // Reviews
+  reviews,
   // Search
   searchWriting,
   waysIn,

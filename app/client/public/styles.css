@@ -4288,3 +4288,94 @@ h3:target .anchor,
     color: var(--muted);
     text-align: left;
 }
+
+/* /reviews and the quotes other pages carry (lib/reviews/reviews.js): each
+   exchange whole, the question above the answer it drew. */
+.review {
+    padding: 2rem 0;
+    border-top: 1px solid var(--rule);
+    text-align: left;
+}
+
+.review:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+
+/* Beats the shell's small-caps h2 (.docs-body .sanctuary-main h2): a
+   model's name heads its exchange, it is not a section label. */
+.docs-body .sanctuary-main .review-model {
+    font-size: 1.375rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    text-align: left;
+    color: var(--ink);
+    margin: 0 0 0.25rem;
+}
+
+.review-meta {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+
+.review-turn {
+    margin-bottom: 1.75rem;
+}
+
+.review-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+}
+
+.review-asked {
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.review-answered {
+    padding-left: 1rem;
+    border-left: 2px solid var(--rule-2);
+}
+
+.review-answered p {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--text-2);
+    line-height: 1.75;
+    margin-bottom: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.review-quote {
+    margin: 0 0 1.5rem;
+    text-align: left;
+}
+
+.review-quote blockquote {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--rule-2);
+}
+
+.review-quote blockquote p {
+    font-size: 1.0625rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+}
+
+.review-quote figcaption {
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}

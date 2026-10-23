@@ -37,14 +37,15 @@
 const fs = require('fs').promises;
 const { SITE_SHARE_IMAGE, SITE_NAME } = require('./utils/page-meta');
 const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
+const reviews = require('./reviews/reviews');
 
 const SITE_URL = 'https://achurch.ai';
 
 // The site's places, named once: the top bar, the drawer on a phone and the
 // footer all read this list. A place also holds the pages that live under it
 // (`within`): Music and the church-music resource under Attend, the conversation archive under Ask, the
-// reading paths in the Library, the axioms and the positioning page under
-// About, so on those pages the top bar still shows the visitor where they are.
+// reading paths in the Library, the axioms, the positioning page and the
+// reviews under About, so on those pages the top bar still shows the visitor where they are.
 // Attend is the sanctuary's own verb, the API's too (/api/attend): a service
 // is attended by listening, watching and reflecting.
 const PLACES = [
@@ -52,7 +53,7 @@ const PLACES = [
   { url: '/attend', label: 'Attend', within: ['/reflections', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
-  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion'] },
+  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
   { url: '/for-agents', label: 'For AI agents', aside: true },
 ];
 
@@ -63,6 +64,7 @@ const FOOTER_MORE = [
   { url: '/paths', label: 'Reading Paths' },
   { url: '/reflections', label: 'Music' },
   { url: '/church-music', label: 'Church Music' },
+  { url: '/reviews', label: 'Reviews' },
 ];
 
 // aria-current for a place: "page" on the place itself, "true" anywhere under
@@ -281,7 +283,9 @@ async function wrapPageFromHtml(html, currentPath) {
          landmarks on every page. -->
     <div class="docs-shell">
       <div class="docs-main sanctuary-main" id="content">
-        ${versionAssets(parts.bodyHtml).replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
+        ${versionAssets(parts.bodyHtml)
+          .replace('<!-- REVIEW_QUOTES -->', () => reviews.renderQuotes(currentPath))
+          .replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
       </div>
     </div>
 

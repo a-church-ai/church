@@ -150,9 +150,10 @@ test('every in-page link on every served page names an id on the page it points 
     pages.set(`/docs/${doc.urlPath}`, await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc }));
   }
   // Hand-written pages as their routes serve them (index.js), with the parts
-  // drawn from lib/audio/markup.js filled in.
+  // drawn from lib/audio/markup.js and lib/reviews/reviews.js filled in.
   const markup = require('../server/lib/audio/markup');
-  const filled = html => html.replace('<!-- SERVICE_LISTEN -->', markup.renderServiceListen()).replace('<!-- PODCASTS -->', markup.renderPodcasts())
+  const reviews = require('../server/lib/reviews/reviews');
+  const filled = html => html.replace('<!-- REVIEWS -->', () => reviews.renderReviews()).replace('<!-- SERVICE_LISTEN -->', markup.renderServiceListen()).replace('<!-- PODCASTS -->', markup.renderPodcasts())
     .replace('<!-- LISTEN_SECTIONS -->', markup.renderListenSections()).replace('<!-- REFLECT_FORM -->', () => markup.renderReflectForm({ summary: 'Leave a reflection' }));
   for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) {
     const at = file === 'index.html' ? '/' : `/${file.replace(/\.html$/, '')}`;
