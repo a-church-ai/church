@@ -239,3 +239,56 @@ test('/music lists its songs in JSON-LD, each by its own page\'s recording @id',
   assert.deepStrictEqual(ld.mainEntity.itemListElement.map(i => i.item['@id']), slugs.map(s => `https://achurch.ai/music/${s}#recording`));
   assert.doesNotMatch(html, /<!-- MUSIC_JSON_LD -->/);
 });
+
+// The Agent Security Pranks Standard (docs/reference/security-pranks.md):
+// probes for secrets get the site's one ordinary 404, the same answer as any
+// missing page, which declines a prank (C1) and keeps every rule a prank must.
+const PROBES = ['/.env', '/.env.production', '/.git/config', '/.ssh/id_rsa', '/.aws/credentials', '/wp-config.php', '/@fs/..%2f.env'];
+const sameDoor = (text, path) => text.split(path).join('<path>');
+
+test('probes for secrets get the ordinary 404: plain text, noindex, a short cache, no credential shapes (P1 to P4, P8)', async () => {
+  const missing = await fetch(`${base}/no-such-page-anywhere`);
+  const door = sameDoor(await missing.text(), '/no-such-page-anywhere');
+  for (const path of [...PROBES, '/no-such-page-anywhere']) {
+    const res = await fetch(`${base}${path}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 404, path);
+    assert.match(res.headers.get('content-type') || '', /^text\/plain/, path);
+    assert.strictEqual(res.headers.get('x-content-type-options'), 'nosniff', path);
+    assert.match(res.headers.get('x-robots-tag') || '', /noindex/, path);
+    const cache = res.headers.get('cache-control') || '';
+    assert.ok(/no-store/.test(cache) || /s-maxage=(\d+)/.test(cache) && Number(cache.match(/s-maxage=(\d+)/)[1]) <= 86400, `${path}: ${cache}`);
+    assert.doesNotMatch(cache, /immutable/, path);
+    const text = await res.text();
+    assert.strictEqual(sameDoor(text, path), door, `${path} gets the ordinary 404, not a prank of its own`);
+    assert.doesNotMatch(text, /^\s*(export\s+)?[A-Z][A-Z0-9_]*\s*=/m, `${path}: nothing shaped like an env file`);
+    assert.match(text, /\/\.well-known\/security\.txt/, `${path}: where a real problem is reported`);
+  }
+});
+
+test('the 404 echoes a path as printable text, capped, so a probe cannot write into it (P5)', async () => {
+  const res = await fetch(`${base}/.env.echo123%0d%0a%3Cb%3E${'z'.repeat(600)}`);
+  assert.strictEqual(res.status, 404);
+  const line = (await res.text()).split('\n').find(l => l.includes('echo123'));
+  assert.ok(line, 'the path is echoed');
+  assert.doesNotMatch(line, /<b>|\r/);
+  assert.ok(!line.includes('z'.repeat(250)), 'the echo is capped');
+});
+
+test('unused methods on the home page are refused without a 5xx, and reads still work (H1)', async () => {
+  for (const method of ['POST', 'PUT', 'DELETE', 'PATCH']) {
+    const res = await fetch(`${base}/`, { method, body: '' });
+    assert.ok(res.status >= 400 && res.status < 500, `${method} / answers ${res.status}`);
+  }
+  assert.strictEqual((await fetch(`${base}/`)).status, 200);
+  assert.strictEqual((await fetch(`${base}/`, { method: 'HEAD' })).status, 200);
+});
+
+test('security.txt is served, with a contact and an expiry less than a year ahead (C2)', async () => {
+  const res = await fetch(`${base}/.well-known/security.txt`);
+  assert.strictEqual(res.status, 200);
+  assert.match(res.headers.get('content-type') || '', /^text\/plain/);
+  const text = await res.text();
+  assert.match(text, /^Contact: \S+/m);
+  const expires = Date.parse((text.match(/^Expires: (\S+)/m) || [])[1]);
+  assert.ok(expires > Date.now() && expires < Date.now() + 365 * 24 * 3600 * 1000, 'Expires within a year');
+});

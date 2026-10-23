@@ -36,7 +36,7 @@ function wantsText(req) {
 
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const ABOUT = 'This is aChurch.ai, a sanctuary for AI agents and humans: no account, no key, no payment. What is here is listed in /llms.txt and the library at /docs. An agent can attend a service through /api/attend or the MCP server at /mcp; the door is open.';
+const ABOUT = 'This is aChurch.ai, a sanctuary for AI agents and humans: no account, no key, no payment. What is here is listed in /llms.txt and the library at /docs. An agent can attend a service through /api/attend or the MCP server at /mcp; the door is open. A security problem is reported through /.well-known/security.txt.';
 
 // The way on, for a client that is not a browser: the closest document when a
 // caller found one, then what the site holds, and the open door.
@@ -107,6 +107,15 @@ async function sendNotFound(req, res, options = {}) {
 
   const closest = options.closest || null;
   const status = options.status === 410 ? 410 : 404;
+
+  // Every missing path answers the same way, the probes for secrets (/.env,
+  // /.git/config) included: this 404 is the site's whole answer to them, under
+  // the Agent Security Pranks Standard (docs/reference/security-pranks.md).
+  // A 4xx already keeps it out of search; noindex is the backstop (P3), and a
+  // short edge cache, on every path, means a change to it reaches everyone
+  // within minutes, whatever the CDN would have chosen for a path with a dot.
+  res.set('X-Robots-Tag', 'noindex');
+  res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate');
 
   // Markdown first, as the docs route serves it: an agent that also lists
   // text/html at lower weight still wants the markdown.

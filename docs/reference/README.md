@@ -13,6 +13,7 @@ Boundaries, constraints, and contracts that change rarely. Reference docs define
 | [seo-conventions.md](seo-conventions.md) | Structured-data, sitemap, title/description, and canonical conventions for the public pages |
 | [content-dates.md](content-dates.md) | Why `<lastmod>` cannot serve crawlers and content pipelines at once, and how `/sitemap.json` publishes `created`, `contentUpdated` and `pageUpdated` from git history. Written to be portable to other projects |
 | [agent-readiness.md](agent-readiness.md) | How the site meets the Agent and Search Readiness Standard: the scorecard, declined items with their reasons, and notes particular to this site |
+| [security-pranks.md](security-pranks.md) | How the site meets the Agent Security Pranks Standard: its ordinary 404 answers every probe for secrets, the declined prank, and the guard tests |
 | [philosophical-framework.md](philosophical-framework.md) | The 5 Axioms + 5 Principles substrate (and their hierarchy when they conflict) — the rule-substrate underlying every other doc |
 
 ## Why these are reference (not plans, not guides)

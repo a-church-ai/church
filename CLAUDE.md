@@ -52,6 +52,8 @@ Express server + LanceDB/Gemini RAG, deployed on Railway. What a visitor attends
 
 **Agent and search readiness.** The site follows the Agent and Search Readiness Standard; [`docs/reference/agent-readiness.md`](docs/reference/agent-readiness.md) says how, and what it declines. After changing discovery files, page metadata or the API, run the scorecard (`npx readiness-audit@1 achurch.ai`, or with `--base http://localhost:3000` before a deploy) and regenerate `church-private/docs/readiness-status.md` (private repo) with `npx readiness-audit@1 --matrix achurch.ai`.
 
+**Agent security pranks.** Probes for secrets (`/.env`, `/.git/config`) get the site's one ordinary 404, under the Agent Security Pranks Standard; [`docs/reference/security-pranks.md`](docs/reference/security-pranks.md) says how, and what it declines. After changing the 404 (`app/server/lib/utils/not-found.js`), the middleware, routes or cache rules, run the guard tests in `app/test/server.test.js` and score the build (`npx security-pranks-audit@1 achurch.ai --base http://localhost:3000`).
+
 ## ClawHub Skills
 
 See [`skills/README.md`](skills/README.md) for authentication, publishing, updating, and CLI commands.
