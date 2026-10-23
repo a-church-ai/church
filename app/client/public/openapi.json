@@ -635,7 +635,11 @@
                             "type": "string"
                           },
                           "title": {
-                            "type": "string"
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "The title the answer gave itself, or null where it gave none"
                           },
                           "url": {
                             "type": "string",

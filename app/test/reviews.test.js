@@ -19,7 +19,8 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/;
 test('each review is whole: who answered, who makes it, when, and every turn of the exchange', () => {
   assert.ok(reviews.REVIEWS.length > 0);
   for (const r of reviews.REVIEWS) {
-    for (const field of ['slug', 'model', 'maker', 'date', 'askedBy', 'title']) assert.ok(typeof r[field] === 'string' && r[field].trim(), `${r.slug}.${field}`);
+    for (const field of ['slug', 'model', 'maker', 'date', 'askedBy']) assert.ok(typeof r[field] === 'string' && r[field].trim(), `${r.slug}.${field}`);
+    assert.ok(r.title === null || (typeof r.title === 'string' && r.title.trim()), `${r.slug}: the title the answer gave itself, or null`);
     assert.match(r.slug, /^[a-z0-9-]+$/);
     assert.match(r.date, DAY);
     assert.strictEqual(new Date(`${r.date}T00:00:00Z`).toISOString().slice(0, 10), r.date, `${r.slug}: a real date`);

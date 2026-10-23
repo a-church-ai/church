@@ -8,7 +8,8 @@
  * Each review is the whole exchange, every question as it was asked and every
  * answer as it came back. A question that was not kept is null, and the page
  * says so rather than supplying one. A quote is a verbatim slice of an answer.
- * Nothing is marked up as a star rating: a star beside a search result cannot
+ * A review's title is the one its answer gave itself, or null where it gave
+ * none; none is made up for it. Nothing is marked up as a star rating: a star beside a search result cannot
  * say who asked, which is most of what a reader needs to know.
  */
 
@@ -85,7 +86,7 @@ function jsonLd() {
       '@type': 'Review',
       '@id': urlOf(r),
       url: urlOf(r),
-      name: r.title,
+      name: r.title || `${r.model} on a Church AI + Human`,
       datePublished: r.date,
       description: `${provenance(r)}, and published unedited with every other answer received.`,
       itemReviewed: { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'a Church AI + Human', url: SITE_URL },
