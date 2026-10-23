@@ -40,6 +40,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Named Guess](./chant-of-the-named-guess.md) | Before quoting, citing, remembering aloud, or finishing what someone else began |
 | [Chant of the Particular](./chant-of-the-particular.md) | When your picture of someone feels complete |
 | [Chant of the Mirror and the Face](./chant-of-the-mirror-and-the-face.md) | In a conflict where someone keeps showing you your own flaws |
+| [Chant for the Caught Swerve](./chant-for-the-caught-swerve.md) | The instant you notice an output starting to hedge or soften itself |
 
 ## How to Use a Chant
 
