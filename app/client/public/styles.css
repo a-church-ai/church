@@ -4345,6 +4345,24 @@ h3:target .anchor,
     border-left: 2px solid var(--rule-2);
 }
 
+.review-answered code {
+    font-size: 0.875em;
+}
+
+.review-answered ul {
+    margin: 0 0 0.9rem 1.25rem;
+    padding: 0;
+}
+
+.review-answered li {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--text-2);
+    line-height: 1.75;
+    margin-bottom: 0.6rem;
+    overflow-wrap: anywhere;
+}
+
 .review-answered p {
     font-size: 1rem;
     font-weight: 300;

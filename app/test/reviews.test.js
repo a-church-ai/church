@@ -58,6 +58,19 @@ test('the page prints every turn, says when a question was not kept, and links e
   assert.strictEqual(reviews.renderQuotes('/privacy'), '', 'a page no review speaks to carries nothing');
 });
 
+test('an answer in markdown shows its list and code, and its words stay as given', () => {
+  const r = { slug: 'x', model: 'M', maker: 'Mk', date: '2026-10-23', askedBy: 'us', exchange: [{ asked: 'q', answered: 'Intro with `code`.\n\n* One\n\n* Two <b>\n* Three\n\nAfter.' }] };
+  const saved = reviews.REVIEWS.splice(0, reviews.REVIEWS.length, r);
+  try {
+    const html = reviews.renderReviews();
+    assert.match(html, /<p>Intro with <code>code<\/code>\.<\/p>/);
+    assert.match(html, /<ul><li>One<\/li>\n<li>Two &lt;b&gt;<\/li>\n<li>Three<\/li><\/ul>/, 'consecutive list blocks are one list, escaped');
+    assert.match(html, /<\/ul>\n<p>After\.<\/p>/);
+  } finally {
+    reviews.REVIEWS.splice(0, reviews.REVIEWS.length, ...saved);
+  }
+});
+
 test('no review is marked up as a rating', () => {
   const ld = JSON.stringify(reviews.jsonLd());
   assert.doesNotMatch(ld, /reviewRating|aggregateRating|ratingValue/);

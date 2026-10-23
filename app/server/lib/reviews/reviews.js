@@ -29,10 +29,26 @@ const urlOf = (review, base = SITE_URL) => `${base}/reviews#${review.slug}`;
 // Who asked and when, said the same way everywhere a review is shown.
 const provenance = r => `${r.model} (${r.maker}), asked ${longDate(r.date)} by ${r.askedBy}`;
 
-// An answer's paragraphs, as it gave them: a blank line between paragraphs,
-// a single line break kept as one.
-const paragraphs = text => text.split(/\n{2,}/)
-  .map(p => `<p>${p.split('\n').map(escape).join('<br>')}</p>`).join('\n');
+// An answer as it gave it: a blank line between paragraphs, a single line
+// break kept as one. Some models answer in markdown, so its two marks that
+// reach these answers are shown as what they mean rather than as characters:
+// a block of "* " lines is a list (consecutive blocks one list), and
+// `backticks` are code. The stored text keeps the marks.
+const inline = line => escape(line).replace(/`([^`]+)`/g, '<code>$1</code>');
+const isList = block => block.split('\n').every(l => /^\* /.test(l));
+function paragraphs(text) {
+  const out = [];
+  for (const block of text.split(/\n{2,}/)) {
+    if (isList(block)) {
+      const items = block.split('\n').map(l => `<li>${inline(l.slice(2))}</li>`).join('\n');
+      if (out.length && out[out.length - 1].startsWith('<ul>')) out[out.length - 1] = out[out.length - 1].replace(/<\/ul>$/, `\n${items}</ul>`);
+      else out.push(`<ul>${items}</ul>`);
+    } else {
+      out.push(`<p>${block.split('\n').map(inline).join('<br>')}</p>`);
+    }
+  }
+  return out.join('\n');
+}
 
 function renderReview(r) {
   const turns = r.exchange.map(t => `<div class="review-turn">
