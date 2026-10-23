@@ -20,6 +20,7 @@ const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
+const churchMusic = require('./lib/music/church-music');
 
 // Load environment variables
 require('./lib/utils/env').loadEnv();
@@ -899,6 +900,31 @@ app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'
 // deliberate entry points instead of facing the full knowledge graph
 // (the "Wikipedia problem" of a large doc set with no on-ramps).
 app.get('/paths', (req, res) => sendWrappedPage(req, res, 'paths.html'));
+// /church-music, a resource on the traditions of church music and what people
+// search for about them. Its tables and charts are drawn from one data file
+// (lib/music/church-music.js), as is /church-music.csv, so they cannot disagree.
+app.get('/church-music', async (req, res) => {
+  try {
+    const raw = await fs.readFile(path.join(__dirname, '../client/public/church-music.html'), 'utf8');
+    const { DATA, renderTable, renderChart, renderCountries } = churchMusic;
+    const sections = { 'gregorian chant': 'chant', hymns: 'hymns', taize: 'taize', 'arvo part': 'minimalism', 'gospel music': 'gospel', spirituals: 'gospel', 'sacred harp': 'shape-note', 'worship music': 'worship' };
+    const key = { anchor: DATA.forms.anchor, terms: DATA.forms.terms.filter(t => t.term === DATA.forms.anchor || sections[t.term]) };
+    const html = raw
+      .replace('<!-- TOP_TABLE -->', () => renderTable(key, { caption: `Key searches, against "${DATA.forms.anchor}" = 100`, ids: sections }))
+      .replace('<!-- FORMS_CHART -->', () => renderChart(DATA.forms, { label: `Forms of church music, against "${DATA.forms.anchor}" = 100, log scale` }))
+      .replace('<!-- FORMS_TABLE -->', () => renderTable(DATA.forms, { caption: `Forms of church music, against "${DATA.forms.anchor}" = 100`, withChange: true }))
+      .replace('<!-- STYLES_CHART -->', () => renderChart(DATA.styles, { label: `Ways of playing hymns, against "${DATA.styles.anchor}" = 100, log scale` }))
+      .replace('<!-- STYLES_TABLE -->', () => renderTable(DATA.styles, { caption: `Ways of playing hymns, against "${DATA.styles.anchor}" = 100`, withChange: true }))
+      .replace('<!-- COUNTRIES_TABLE -->', () => renderCountries());
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html, req.path));
+  } catch (err) {
+    console.error('Error rendering /church-music:', err);
+    res.status(500).type('text/plain').send('Server error');
+  }
+});
+app.get('/church-music.csv', (req, res) => {
+  res.type('text/csv; charset=utf-8').set('Content-Disposition', 'inline; filename="church-music.csv"').send(churchMusic.csv());
+});
 // /search, the site's pages and songs, the Library and the conversations,
 // searched together in the browser (client/public/site-search.js), so nothing
 // typed is sent anywhere. The pages and songs come first, so a page or song

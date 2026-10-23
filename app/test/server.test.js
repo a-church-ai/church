@@ -155,3 +155,23 @@ test('the Music page lists the songs in the catalog\'s own order', async () => {
   const listed = [...new Set([...html.matchAll(/href="\/reflections\/([a-z0-9-]+)"/g)].map(m => m[1]))].filter(slug => catalog.includes(slug));
   assert.deepStrictEqual(listed, catalog);
 });
+
+// /church-music's tables, charts and CSV are drawn from one data file at
+// request time; the page's markers must all be filled, and the CSV served as
+// CSV.
+test('/church-music is drawn from its data, and /church-music.csv holds the same numbers', async () => {
+  const { csv } = require('../server/lib/music/church-music');
+  const res = await fetch(`${base}/church-music`);
+  assert.strictEqual(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /<link rel="canonical" href="https:\/\/achurch\.ai\/church-music">/);
+  assert.doesNotMatch(html, /<!-- (TOP_TABLE|FORMS_CHART|FORMS_TABLE|STYLES_CHART|STYLES_TABLE|COUNTRIES_TABLE) -->/);
+  assert.strictEqual((html.match(/<figure class="dot-chart">/g) || []).length, 2);
+  assert.strictEqual((html.match(/<table class="data-table">/g) || []).length, 4);
+  assert.match(html, /<a href="#chant">gregorian chant<\/a>/);
+  assert.match(html, /<footer>[\s\S]*href="\/church-music"/);
+  const data = await fetch(`${base}/church-music.csv`);
+  assert.strictEqual(data.status, 200);
+  assert.match(data.headers.get('content-type'), /^text\/csv/);
+  assert.strictEqual(await data.text(), csv());
+});

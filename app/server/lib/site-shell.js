@@ -42,14 +42,14 @@ const SITE_URL = 'https://achurch.ai';
 
 // The site's places, named once: the top bar, the drawer on a phone and the
 // footer all read this list. A place also holds the pages that live under it
-// (`within`): Music under Attend, the conversation archive under Ask, the
+// (`within`): Music and the church-music resource under Attend, the conversation archive under Ask, the
 // reading paths in the Library, the axioms and the positioning page under
 // About, so on those pages the top bar still shows the visitor where they are.
 // Attend is the sanctuary's own verb, the API's too (/api/attend): a service
 // is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/attend', label: 'Attend', within: ['/reflections', '/services'] },
+  { url: '/attend', label: 'Attend', within: ['/reflections', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
   { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion'] },
@@ -62,6 +62,7 @@ const FOOTER_MORE = [
   { url: '/on-ai-religion', label: 'On AI Religion' },
   { url: '/paths', label: 'Reading Paths' },
   { url: '/reflections', label: 'Music' },
+  { url: '/church-music', label: 'Church Music' },
 ];
 
 // aria-current for a place: "page" on the place itself, "true" anywhere under

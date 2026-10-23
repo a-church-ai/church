@@ -32,6 +32,8 @@
    --gold          the gold buttons
    --gold-ink      text on the gold buttons
    --error         what went wrong
+   --chart-1       the first series in a chart (/church-music: Google)
+   --chart-2       the second series in a chart (/church-music: YouTube)
    ============================================================ */
 :root {
     color-scheme: light dark;
@@ -59,6 +61,8 @@
     --gold-hover: light-dark(rgba(198, 156, 92, 0.25), rgba(198, 156, 92, 0.3));
     --gold-ink: light-dark(#6b4a1f, #e3c38f);
     --error: light-dark(#c44, #ff8a8a);
+    --chart-1: light-dark(#007a91, #5cc8dc);
+    --chart-2: light-dark(#a35a12, #e8a85c);
 }
 
 :root[data-theme="light"] {
@@ -4159,4 +4163,128 @@ h3:target .anchor,
 .conv-read {
     margin: 2rem 0 0;
     font-size: 1rem;
+}
+
+/* /church-music: a resource page with data. The kicker names the kind of page
+   above its title; the wide section gives the tables and charts room. */
+.page-kicker {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+}
+
+.about-section-wide {
+    max-width: 44rem;
+}
+
+.about-list {
+    padding-left: 1.25rem;
+}
+
+.about-list li {
+    margin-bottom: 0.5rem;
+}
+
+.data-table-wrap {
+    overflow-x: auto;
+    margin: 0 0 2rem;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    text-align: right;
+}
+
+.data-table caption {
+    caption-side: bottom;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    padding-top: 0.5rem;
+    text-align: left;
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+}
+
+.data-table thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    border-bottom-color: var(--rule-2);
+    vertical-align: bottom;
+}
+
+.data-table th[scope="row"],
+.data-table thead th:first-child {
+    text-align: left;
+    font-weight: 400;
+}
+
+.data-table th[scope="row"] strong {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.dot-chart {
+    margin: 0 0 1rem;
+    overflow-x: auto;
+}
+
+/* Scaled to fit a phone its labels would be too small to read, so below
+   560px it scrolls sideways instead, as the tables do. */
+.dot-chart svg {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: auto;
+}
+
+.dot-chart text {
+    font-size: 12px;
+    fill: var(--text);
+}
+
+.dot-chart .dot-chart-tick {
+    fill: var(--muted);
+    font-size: 11px;
+}
+
+.dot-chart-grid {
+    stroke: var(--rule);
+    stroke-width: 1;
+}
+
+.dot-chart-anchor {
+    stroke: var(--line-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+.dot-chart-span {
+    stroke: var(--line);
+    stroke-width: 2;
+}
+
+.dot-chart-google {
+    fill: var(--chart-1);
+}
+
+.dot-chart-youtube {
+    fill: var(--chart-2);
+}
+
+.dot-chart figcaption {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    text-align: left;
 }
