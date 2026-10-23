@@ -45,7 +45,7 @@ const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
 const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
-const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
+const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, buildMusicCollectionSchema, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
 const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
@@ -726,6 +726,8 @@ app.get('/music', async (req, res) => {
   const items = pageLists.renderSongList(songs);
   const playlistItems = renderPlaylistList(await listPlaylists());
   const fill = html => html
+    .replace('<!-- MUSIC_JSON_LD -->', () => renderJsonLdScript(buildMusicCollectionSchema(songs,
+      (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '')))
     .replace(/<div class="reflections-song-list" id="reflections-song-list">\s*<p class="reflections-loading">Loading reflections\.\.\.<\/p>\s*<\/div>/,
       () => `<div class="reflections-song-list" id="reflections-song-list" data-rendered="1">\n${items}\n</div>`)
     .replace('<!-- PLAYLISTS -->', () => playlistItems)

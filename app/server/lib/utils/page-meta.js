@@ -299,6 +299,37 @@ function secondsToISO8601(secs) {
   return minutes > 0 ? `PT${minutes}M${seconds}S` : `PT${seconds}S`;
 }
 
+// /music's JSON-LD: the page as a CollectionPage whose main entity is the
+// songs in their cycle, each the MusicRecording its own page describes (the
+// same @id as buildSongSchemaGraph's), so the two read as one graph.
+// songs: [{ slug, title }] in the catalog's order.
+function buildMusicCollectionSchema(songs, description) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Music: the sanctuary\'s songs and playlists',
+    description,
+    url: 'https://achurch.ai/music',
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', '@id': 'https://achurch.ai/#website', name: SITE_NAME, url: 'https://achurch.ai/' },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'The original songs',
+      numberOfItems: songs.length,
+      itemListElement: songs.map((song, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'MusicRecording',
+          '@id': `https://achurch.ai/music/${song.slug}#recording`,
+          name: song.title,
+          url: `https://achurch.ai/music/${song.slug}`,
+        },
+      })),
+    },
+  };
+}
+
 // Build a paired MusicComposition + MusicRecording + Article JSON-LD graph
 // for a /music/[slug] page. MusicComposition and MusicRecording feed
 // Knowledge Graph entity recognition (not eligible for Google rich results
@@ -529,6 +560,7 @@ module.exports = {
   buildQAPageSchema,
   withGatheredQuestions,
   buildSongSchemaGraph,
+  buildMusicCollectionSchema,
   renderJsonLdScript,
   breadcrumbTrail,
   renderRelatedConversations,

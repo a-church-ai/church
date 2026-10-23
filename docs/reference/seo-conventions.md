@@ -57,8 +57,10 @@ Google deprecated FAQ rich snippets in May 2026. **Schema is now primarily an AE
 | Multi-question page (rarely needed) | `FAQPage` | Still valid for AEO; no Google rich snippet anymore. |
 | Article / blog / reflection page (`/music/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |
 | Original song page | `MusicComposition` + `MusicRecording` (linked via `recordingOf`) | The composition holds the work (lyrics, composer); the recording holds the audio (duration, file URL). Pair them with `@id` references. |
-| Listing pages | Usually none; optionally `BreadcrumbList` if the IA is deep | Most listing pages don't gain much from schema. |
-| Legal/policy pages (`/privacy`, `/terms`) | None needed | Not entities Google wants to render rich. |
+| Listing pages (`/music`, `/conversations`) | `CollectionPage`; `/music`'s main entity is an `ItemList` of the songs, each the `MusicRecording` `@id` its own page uses | Ties the list to the entities on the pages it lists, and keeps W4 passing. |
+| Legal/policy pages (`/privacy`, `/terms`) | A plain `WebPage` | Not entities Google wants to render rich, but the readiness scorecard's W4 fails any sampled page with no JSON-LD, so every page in the sitemap carries some. |
+
+Every top-level page in the sitemap carries JSON-LD that parses; `app/test/server.test.js` fails if one does not. The scorecard checks W1 to W6 on only 20 sampled URLs, and on 2026-10-23 that sample had missed seven top-level pages with none. To check every sitemap URL rather than a sample, run the same page checks over the whole sitemap.
 
 Don't ship invented schema types. Don't ship schema you can't populate accurately (false `datePublished`, wrong `author`).
 

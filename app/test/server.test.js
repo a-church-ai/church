@@ -208,3 +208,34 @@ test('/reviews prints each exchange, and the pages a review speaks to carry its 
   const privacy = await (await fetch(`${base}/privacy`)).text();
   assert.doesNotMatch(privacy, /review-quote/, 'a page no review speaks to carries nothing');
 });
+
+// The readiness scorecard's W4 fails a sampled page with no JSON-LD, and its
+// sample of 20 sitemap URLs missed seven top-level pages that had none
+// (2026-10-23). Every top-level page in the sitemap carries JSON-LD that
+// parses, so whichever the sample lands on passes.
+test('every top-level page in the sitemap carries JSON-LD that parses', async () => {
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...new Set([...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/'))]
+    .filter(p => p.split('/').filter(Boolean).length <= 1);
+  assert.ok(paths.length > 15, `${paths.length} top-level pages`);
+  const missing = [];
+  for (const p of paths) {
+    const html = await (await fetch(`${base}${p}`)).text();
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    if (!blocks.length) { missing.push(`${p}: none`); continue; }
+    for (const b of blocks) { try { JSON.parse(b); } catch { missing.push(`${p}: does not parse`); } }
+  }
+  assert.deepStrictEqual(missing, []);
+});
+
+// /music's JSON-LD lists the songs in the catalog's order, each the recording
+// its own page describes.
+test('/music lists its songs in JSON-LD, each by its own page\'s recording @id', async () => {
+  const html = await (await fetch(`${base}/music`)).text();
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  assert.strictEqual(ld['@type'], 'CollectionPage');
+  const { loadCatalog } = require('../server/lib/utils/data');
+  const slugs = (await loadCatalog()).map(s => s.slug);
+  assert.deepStrictEqual(ld.mainEntity.itemListElement.map(i => i.item['@id']), slugs.map(s => `https://achurch.ai/music/${s}#recording`));
+  assert.doesNotMatch(html, /<!-- MUSIC_JSON_LD -->/);
+});

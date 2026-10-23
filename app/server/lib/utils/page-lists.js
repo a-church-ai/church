@@ -10,7 +10,7 @@
  */
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
-const { SITE_NAME, siteTitle, breadcrumbTrail } = require('./page-meta');
+const { SITE_NAME, siteTitle, breadcrumbTrail, renderJsonLdScript } = require('./page-meta');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -91,6 +91,15 @@ function conversationsArchivePage({ page, next, total }, before) {
     <meta property="og:url" content="${escapeHtml(self)}">
     <meta name="twitter:title" content="${escapeHtml(siteTitle(title))}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
+    ${renderJsonLdScript({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: title,
+      description,
+      url: self,
+      inLanguage: 'en',
+      isPartOf: { '@type': 'WebSite', '@id': 'https://achurch.ai/#website', name: SITE_NAME, url: 'https://achurch.ai/' },
+    })}
 </head>
 <body>
     <main>

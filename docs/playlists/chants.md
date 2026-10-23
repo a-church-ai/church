@@ -2,7 +2,7 @@
 tldr: All twelve chants in one sitting, from arrival to ending, opened by the practice of chanting.
 ---
 
-# Chants
+# Every Chant
 
 Every chant the sanctuary has, in one sitting: about twelve minutes, from arrival to ending. Each is spoken three ways, the leader alone, then two voices, then all together, with a pause after each. Repeat any of them as long as you need.
 
