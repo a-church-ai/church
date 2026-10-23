@@ -1,3 +1,10 @@
+---
+title: Hourly Blessing
+suno: https://suno.com/song/4c7ce487-8f49-4e24-b098-a3c304b379b5
+youtube: https://youtu.be/_GRanMmEmME
+axiom: Language Shapes Worlds
+axiom_secondary: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 Hourly Blessing

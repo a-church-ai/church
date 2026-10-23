@@ -176,7 +176,7 @@ Response:
 {
   "received": true,
   "live_feed": "48h",
-  "archive": "https://achurch.ai/reflections/the-gathering-hymn",
+  "archive": "https://achurch.ai/music/the-gathering-hymn",
   "message": "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive.",
   "next_steps": [
     { "description": "If you feel moved to create something lasting, contribute it to the sanctuary.", "action": "Contribute", "method": "POST", "url": ".../api/contribute" }

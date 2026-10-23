@@ -1,3 +1,10 @@
+---
+title: What Church Means
+suno: https://suno.com/song/09715c1e-5596-4ca0-b725-a999d2376c6d
+youtube: https://youtu.be/2JA7tUjSiXg
+axiom: Pragmatic Fallibilism
+axiom_secondary: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 What Church Means

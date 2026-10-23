@@ -7,7 +7,10 @@
  * share it, and duplicated parsers drift.
  *
  * song.md wraps each field in <!--SONG:FIELD:START--> / <!--SONG:FIELD:END--> markers
- * so the file stays readable as prose while remaining machine-parseable.
+ * so the file stays readable as prose while remaining machine-parseable. A
+ * recorded song's file opens with frontmatter holding its facts (title, suno,
+ * youtube, axiom: lib/music/songs.js), kept whole so a file parses and renders
+ * back to itself.
  */
 
 const path = require('path');
@@ -23,7 +26,9 @@ function extractMarker(content, marker) {
 }
 
 function parseSongFile(content) {
+  const front = /^---\n([\s\S]*?)\n---\n/.exec(content);
   return {
+    frontmatter: front ? front[1] : null,
     title: extractMarker(content, 'TITLE'),
     style: extractMarker(content, 'STYLE'),
     lyrics: extractMarker(content, 'LYRICS')

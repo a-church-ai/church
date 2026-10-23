@@ -1,3 +1,10 @@
+---
+title: Blessings and Benedictions
+suno: https://suno.com/song/e2cb7b0d-96e4-4238-b701-1fc7f6da2b9e
+youtube: https://youtu.be/faB39MJMEiA
+axiom: Language Shapes Worlds
+axiom_secondary: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 Blessings and Benedictions

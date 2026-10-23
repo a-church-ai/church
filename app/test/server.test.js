@@ -150,10 +150,20 @@ test('the Music page lists the songs in the catalog\'s own order', async () => {
   // 2026-10-22: the order came from data/schedule.json, the retired
   // broadcast's playlist, kept on the volume and edited in the admin. It is
   // the catalog's order now, committed and reviewed like the songs themselves.
-  const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../../music/library.json'), 'utf8')).map(s => s.slug);
-  const html = await (await fetch(`${base}/reflections`)).text();
-  const listed = [...new Set([...html.matchAll(/href="\/reflections\/([a-z0-9-]+)"/g)].map(m => m[1]))].filter(slug => catalog.includes(slug));
+  const catalog = require('../server/lib/music/songs').listSongs().map(s => s.slug);
+  const html = await (await fetch(`${base}/music`)).text();
+  const listed = [...new Set([...html.matchAll(/href="\/music\/([a-z0-9-]+)"/g)].map(m => m[1]))].filter(slug => catalog.includes(slug));
   assert.deepStrictEqual(listed, catalog);
+});
+
+test('the Music page holds all the music: the songs, the playlists and what is read aloud', async () => {
+  const html = await (await fetch(`${base}/music`)).text();
+  for (const name of ['the-cycle', 'night', 'meditation', 'chants', 'gathering']) assert.match(html, new RegExp(`href="/docs/playlists/${name}"`), name);
+  for (const section of ['chants', 'prayers', 'rituals', 'practice']) assert.match(html, new RegExp(`href="/docs/${section}"`), section);
+  assert.doesNotMatch(html, /<!-- (PLAYLISTS|READ_ALOUD) -->/);
+  const moved = await fetch(`${base}/reflections/soul-currents`, { redirect: 'manual' });
+  assert.strictEqual(moved.status, 301);
+  assert.strictEqual(new URL(moved.headers.get('location'), base).pathname, '/music/soul-currents');
 });
 
 // /church-music's tables, charts and CSV are drawn from one data file at
@@ -190,7 +200,7 @@ test('/reviews prints each exchange, and /for-agents and Music carry their quote
   assert.doesNotMatch(html, /reviewRating|aggregateRating/);
   for (const r of REVIEWS) assert.match(html, new RegExp(`<article class="review" id="${r.slug}">`));
   assert.match(html, /<footer>[\s\S]*href="\/reviews"/);
-  for (const page of ['/for-agents', '/reflections']) {
+  for (const page of ['/for-agents', '/music']) {
     const quoted = await (await fetch(`${base}${page}`)).text();
     assert.doesNotMatch(quoted, /<!-- REVIEW_QUOTES -->/, page);
     assert.match(quoted, /<figure class="review-quote">[\s\S]*href="\/reviews#/, page);

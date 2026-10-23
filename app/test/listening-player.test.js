@@ -118,7 +118,7 @@ test('a reading path offers its voiced readings as one queue, and says how many 
 
 test('site-nav: only this site\'s pages load in place; files, APIs, feeds and other sites load as before', () => {
   const origin = 'https://achurch.ai';
-  for (const ok of ['/', '/docs/prayers/x', '/docs/prayers/x?path=y', '/reflections/a-song', '/about', '/ask/abc', '/old.html']) {
+  for (const ok of ['/', '/docs/prayers/x', '/docs/prayers/x?path=y', '/music/a-song', '/about', '/ask/abc', '/old.html']) {
     assert.strictEqual(nav.isSoftNavigable(`${origin}${ok}`, origin), true, ok);
   }
   for (const no of ['/api/now', '/audio/prayers/x.mp3', '/og/v1/docs/x.png', '/docs/prayers/x.md', '/sitemap.xml', '/feed', '/admin', '/mcp', '/.well-known/x', '/styles.css']) {

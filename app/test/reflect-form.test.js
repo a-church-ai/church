@@ -42,7 +42,7 @@ test('a refused reflection says why, in the API\'s words', () => {
 });
 
 test('the song pages and the home page carry the form and its script; the name is the one Ask remembers', () => {
-  for (const file of ['index.html', 'reflection-song.html', 'attend.html']) {
+  for (const file of ['index.html', 'song.html', 'attend.html']) {
     const html = read(file);
     assert.ok(html.includes('<!-- REFLECT_FORM -->'), `${file} has a place for the form`);
     assert.match(html, /<script src="\/reflect-form\.js"><\/script>/, `${file} loads the script`);

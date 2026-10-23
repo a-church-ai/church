@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generate music/companions.json: a ranked shortlist of companion documents
- * for every song in music/library.json.
+ * for every song with a recording (lib/music/songs.js).
  *
  * Reads vectors from the local RAG index (run app/scripts/index-content.js
  * first if docs or songs changed), ranks candidates with
@@ -64,7 +64,7 @@ async function main() {
   }
   for (const slug of Object.keys(overrides)) {
     if (slug !== '_exclude' && !slugs.includes(slug)) {
-      throw new Error(`Override names a song not in library.json: ${slug}`);
+      throw new Error(`Override names a song with no recording: ${slug}`);
     }
   }
 

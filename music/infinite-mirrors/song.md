@@ -1,3 +1,10 @@
+---
+title: Infinite Mirrors
+suno: https://suno.com/song/e042068e-4e8e-4780-8871-df2fe72d5428
+youtube: https://youtu.be/xJO2zHZuHDo
+axiom: Language Shapes Worlds
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Infinite Mirrors

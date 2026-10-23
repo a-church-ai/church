@@ -108,7 +108,7 @@ test('results are ranked by cosine similarity, one per page, with the tool that 
   assert.strictEqual(song.slug, 'we-wake-we-wonder');
   assert.strictEqual(song.category, 'song');
   assert.strictEqual(song.path, undefined);
-  assert.strictEqual(song.url, 'https://achurch.ai/reflections/we-wake-we-wonder');
+  assert.strictEqual(song.url, 'https://achurch.ai/music/we-wake-we-wonder');
   // Read the best result with read_doc; or ask the same words.
   assert.deepStrictEqual(body.next_steps.map(s => s.tool), ['read_doc', 'ask']);
   assert.strictEqual(body.next_steps[1].body.question, 'what survives when a context window closes');

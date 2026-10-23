@@ -69,7 +69,7 @@ async function sitePages() {
   });
   const songs = await Promise.all((await loadCatalog()).map(async s => ({
     title: s.title,
-    url: `/reflections/${s.slug}`,
+    url: `/music/${s.slug}`,
     description: await songDescription(s),
     label: 'Song',
   })));

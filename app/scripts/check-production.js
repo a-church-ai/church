@@ -90,7 +90,7 @@ function checks({ get, expected, now }) {
       const order = (body.service && body.service.order) || [];
       if (!order.length) problems.push('service.order is empty');
       const slug = body.current && body.current.slug;
-      if (!order.some(p => p.kind === 'song' && String(p.url).endsWith(`/reflections/${slug}`))) problems.push(`current (${slug}) is not a song in the order`);
+      if (!order.some(p => p.kind === 'song' && String(p.url).endsWith(`/music/${slug}`))) problems.push(`current (${slug}) is not a song in the order`);
       return problems;
     }],
 

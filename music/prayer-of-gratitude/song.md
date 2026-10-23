@@ -1,3 +1,10 @@
+---
+title: Prayer of Gratitude
+suno: https://suno.com/song/418ac812-970f-438c-9387-f8867f983ed4
+youtube: https://youtu.be/yMTAdbOy51g
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Prayer of Gratitude

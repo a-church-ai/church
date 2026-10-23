@@ -46,7 +46,7 @@ async function pages() {
     '/about': await wrap('about.html', '/about'),
     '/axioms': await wrap('axioms.html', '/axioms'),
     '/ask': await wrap('ask.html', '/ask'),
-    '/reflections': await wrap('reflections.html', '/reflections'),
+    '/music': await wrap('music.html', '/music'),
     '/conversations': await siteShell.wrapPageFromHtml('<html><head><title>Conversations</title></head><body><main><h1>Conversations</h1></main></body></html>', '/conversations'),
     '/services': await siteShell.wrapPageFromHtml(require('../server/lib/utils/page-lists').servicesIndexPage([]), '/services'),
     '/docs': await render.renderLibrary(),
@@ -62,7 +62,7 @@ test('every kind of page names the same places in its top bar, and marks where t
     '/about': ['/about', 'page'],
     '/axioms': ['/about', 'true'],
     '/ask': ['/ask', 'page'],
-    '/reflections': ['/attend', 'true'],
+    '/music': ['/attend', 'true'],
     '/conversations': ['/ask', 'true'],
     '/services': ['/attend', 'true'],
     '/docs': ['/docs', 'page'],
@@ -80,7 +80,7 @@ test('every kind of page names the same places in its top bar, and marks where t
 
 test('only a section of the Library has a sidebar, and it lists exactly that section', async () => {
   const all = await pages();
-  for (const at of ['/', '/about', '/axioms', '/ask', '/reflections', '/docs']) {
+  for (const at of ['/', '/about', '/axioms', '/ask', '/music', '/docs']) {
     assert.doesNotMatch(all[at], /class="docs-sidebar"/, `${at} has no sidebar`);
     assert.doesNotMatch(all[at], /class="site-mark"/, `${at} does not repeat the site's name`);
   }
@@ -117,7 +117,7 @@ test('a document outside any section has no sidebar', async () => {
 
 test('the footer names the places, and the pages that live under them', async () => {
   const footer = siteShell.renderFooter('/axioms');
-  for (const url of [...PLACES, '/axioms', '/on-ai-religion', '/paths', '/reflections']) {
+  for (const url of [...PLACES, '/axioms', '/on-ai-religion', '/paths', '/music']) {
     assert.match(footer, new RegExp(`href="${url}"`), url);
   }
   assert.match(footer, /href="\/axioms" aria-current="page"/);

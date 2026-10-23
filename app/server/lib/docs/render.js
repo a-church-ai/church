@@ -22,7 +22,7 @@ const toc = require('./toc');
 const tldr = require('./tldr');
 const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
-const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence } = require('./links');
+const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence, playlistSequence } = require('./links');
 const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
@@ -32,7 +32,7 @@ const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
 const { recordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
-const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN } = require('../audio/markup');
+const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN, SONG_CREDIT } = require('../audio/markup');
 const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
@@ -248,7 +248,7 @@ function renderPathBar(readingPath, doc) {
 function renderSungAlongside(songs) {
   if (!songs || songs.length === 0) return '';
   const links = songs.map(s =>
-    `<a href="/reflections/${escapeAttr(s.slug)}"><em>${escapeText(s.title)}</em></a>`
+    `<a href="/music/${escapeAttr(s.slug)}"><em>${escapeText(s.title)}</em></a>`
   );
   const list = links.length === 1
     ? links[0]
@@ -280,6 +280,50 @@ function renderPathListenFor(name, collectionDoc) {
   return renderPathListen({ name, title: collectionDoc.title, href: `/docs/${collectionDoc.urlPath}`, tracks, readings: sequence.length });
 }
 
+// A playlist's own page (docs/playlists/<name>): "Listen to this playlist",
+// every piece it links in its order, songs among them, and the playlist as
+// structured data. Its pieces are the catalog's (lib/service/catalog.js
+// loadPlayable), so a song plays here as it does in a service.
+async function playlistFor(name, doc, title) {
+  const { loadPlayable } = require('../service/catalog');
+  const catalog = await loadPlayable();
+  const pieces = (playlistSequence(name) || []).map(id => catalog.get(id)).filter(Boolean);
+  const tracks = pieces.filter(p => canServe(p.recording.file)).map(p => trackFor(p.recording, {
+    title: p.title,
+    href: p.url,
+    category: p.category || 'music',
+    credit: p.kind === 'song' ? SONG_CREDIT : undefined,
+    artwork: episodeSquarePath(p, p.recording),
+  }));
+  const seconds = pieces.reduce((n, p) => n + p.seconds, 0);
+  const iso = t => `PT${Math.floor(Math.round(t) / 60)}M${Math.round(t) % 60}S`;
+  return {
+    listen: tracks.length ? renderPathListen({
+      name: `playlist:${name}`,
+      title,
+      href: `/docs/${doc.urlPath}`,
+      tracks,
+      readings: pieces.length,
+      unit: 'Piece',
+      noun: 'playlist',
+      order: "the playlist's order",
+    }) : '',
+    jsonLd: {
+      '@type': 'MusicPlaylist',
+      name: title,
+      url: `${SITE_URL}/docs/${doc.urlPath}`,
+      numTracks: pieces.length,
+      duration: iso(seconds),
+      track: pieces.map(p => ({
+        '@type': p.kind === 'song' ? 'MusicRecording' : 'CreativeWork',
+        name: p.title,
+        url: `${SITE_URL}${p.url}`,
+        duration: iso(p.seconds),
+      })),
+    },
+  };
+}
+
 function recordingJsonLd(recording) {
   const s = Math.round(recording.seconds);
   return {
@@ -309,7 +353,7 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
@@ -339,6 +383,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     ...(modified ? { dateModified: modified } : {}),
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
+    ...(playlist ? { mainEntity: playlist } : {}),
   });
 
   // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
@@ -704,6 +749,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   await discover.listAllDocs();
   const meta = extractMeta(markdown, doc.urlPath);
   const ownPath = doc.dirRelPath === 'collections' && doc.stem.toLowerCase() !== 'readme' ? doc.stem.toLowerCase() : null;
+  const ownPlaylist = doc.dirRelPath === 'playlists' && doc.stem.toLowerCase() !== 'readme'
+    ? await playlistFor(doc.stem.toLowerCase(), doc, meta.title) : null;
   const pathBar = readingPath && !ownPath ? renderPathBar(readingPath, doc) : null;
 
   // Render the body *without* frontmatter. Passed the raw file, marked reads
@@ -743,7 +790,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
   const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title }) : '';
+    : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
+    : ownPlaylist ? ownPlaylist.listen : '';
   if (underTitle) {
     bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
   }
@@ -809,6 +857,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     isIndex,
     headerExtra: pathBar ? pathBar.top : '',
     recording,
+    playlist: ownPlaylist && ownPlaylist.jsonLd,
   });
 }
 

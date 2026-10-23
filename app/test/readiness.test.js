@@ -143,7 +143,7 @@ test('conversation and song pages carry one heading: none written out in a comme
   // The question or the song's title is the page's one h1. A tag written out
   // in a script comment counts as another to anything reading the HTML for
   // headings, which is how the scorecard found three on every conversation.
-  for (const page of ['conversation.html', 'reflection-song.html']) {
+  for (const page of ['conversation.html', 'song.html']) {
     assert.strictEqual((fs.readFileSync(path.join(PUBLIC, page), 'utf8').match(/<h1[\s>]/gi) || []).length, 1, page);
   }
 });

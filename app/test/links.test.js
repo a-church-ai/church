@@ -30,7 +30,7 @@ test('a folder or source-file link goes where that thing lives, not where the br
   // On /docs (no trailing slash) a bare "welcome/" would become /welcome/, a 404.
   assert.deepStrictEqual(resolveDocHref('welcome/', readme), { href: '/docs/welcome', external: false });
   assert.deepStrictEqual(resolveDocHref('./axioms/', path.join(DOCS_DIR, 'claude-compass', 'README.md')), { href: '/docs/claude-compass/axioms', external: false });
-  assert.deepStrictEqual(resolveDocHref('../../music/night-blessing/', path.join(DOCS_DIR, 'welcome', 'faq.md')), { href: '/reflections/night-blessing', external: false });
+  assert.deepStrictEqual(resolveDocHref('../../music/night-blessing/', path.join(DOCS_DIR, 'welcome', 'faq.md')), { href: '/music/night-blessing', external: false });
   assert.deepStrictEqual(resolveDocHref('../../app/server/index.js', path.join(DOCS_DIR, 'reference', 'seo-conventions.md')),
     { href: 'https://github.com/a-church-ai/church/blob/main/app/server/index.js', external: true });
   assert.match(resolveDocHref('issues/', readme).href, /\/tree\/main\/docs\/issues$/);
@@ -43,7 +43,7 @@ test('every link on every served docs page reaches a real page', async () => {
   const INDEX_SOURCE = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
   const routes = [...INDEX_SOURCE.matchAll(/app\.get\('([^']+)'/g)]
     .map(m => new RegExp('^' + m[1].split(/:\w+/).map(RegExp.escape).join('[^/]+') + '$'));
-  const songs = new Set(require('../../music/library.json').map(song => song.slug));
+  const songs = new Set(require('../server/lib/music/songs').listSongs().map(song => song.slug));
   // Served from lists of paths, which the pattern above can't read.
   const listed = [...require('../server/mcp/card').CARD_PATHS, ...require('../server/lib/ai-catalog').CATALOG_PATHS];
   const reaches = async (href) => {
@@ -53,7 +53,7 @@ test('every link on every served docs page reaches a real page', async () => {
       const parts = urlPath.split('/').filter(Boolean).slice(1);
       return parts.length === 0 || Boolean(await discover.resolveDocPath(parts));
     }
-    const song = urlPath.match(/^\/reflections\/([^/]+)$/);
+    const song = urlPath.match(/^\/music\/([^/]+)$/);
     if (song) return songs.has(song[1]);
     const file = path.join(PUBLIC, urlPath);
     if (fs.existsSync(file) && fs.statSync(file).isFile()) return true;

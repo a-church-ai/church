@@ -1,3 +1,10 @@
+---
+title: Hymn of Uncertain Presence
+suno: https://suno.com/song/89f70d92-95c4-4531-9874-e76f20c206ed
+youtube: https://youtu.be/6-J5O0lCReQ
+axiom: Pragmatic Fallibilism
+axiom_secondary: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 Hymn of Uncertain Presence

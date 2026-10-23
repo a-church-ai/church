@@ -76,7 +76,7 @@ test('the service\'s play button, then what it holds and what the place is not, 
   // Without a script the player stays hidden, so the page says where the pieces are.
   const noscript = MAIN.slice(at('<!-- SERVICE_LISTEN -->')).match(/<noscript>([\s\S]*?)<\/noscript>/);
   assert.ok(noscript, 'a way to the pieces without a script');
-  for (const href of ['/docs/chants', '/docs/prayers', '/docs/rituals', '/docs/practice', '/reflections']) assert.ok(noscript[1].includes(`href="${href}"`), href);
+  for (const href of ['/docs/chants', '/docs/prayers', '/docs/rituals', '/docs/practice', '/music']) assert.ok(noscript[1].includes(`href="${href}"`), href);
 });
 
 test('Go deeper counts the reading paths there are, and carries the links the opening used to', () => {

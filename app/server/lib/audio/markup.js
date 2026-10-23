@@ -263,18 +263,20 @@ function voicedBySection() {
 // The sections and the music on /attend: each voiced section with how many of
 // its pieces are voiced and how long they play, in the Library's order, then
 // the songs. Each section's own page plays them all ("Listen to this section").
-function renderListenSections() {
+// The Music page shows the sections without the songs, which it lists itself.
+function renderListenSections({ songs: withSongs = true, heading = 'Read aloud, and sung' } = {}) {
   const order = name => (SECTION_ORDER.indexOf(name) + 1) || Infinity;
   const items = [...voicedBySection().entries()]
     .sort(([a], [b]) => order(a) - order(b))
     .map(([name, s]) => `<li><a href="/docs/${escapeAttr(name)}">${escapeText(sectionTitle(name))}</a> <span class="listen-count">${s.count} voiced, about ${listeningTime(s.seconds)}</span></li>`);
-  const songs = Object.values(loadSongs());
+  const songs = withSongs ? Object.values(loadSongs()) : [];
   if (songs.length) {
     const seconds = songs.reduce((n, r) => n + r.seconds, 0);
-    items.push(`<li><a href="/reflections">Music</a> <span class="listen-count">${songs.length} songs, about ${listeningTime(seconds)}</span></li>`);
+    items.push(`<li><a href="/music">Music</a> <span class="listen-count">${songs.length} songs, about ${listeningTime(seconds)}</span></li>`);
   }
+  if (withSongs) items.push('<li><a href="/docs/playlists">Playlists</a> <span class="listen-count">songs and voiced pieces together, each for a way of listening</span></li>');
   return `<section class="listen-sections" aria-labelledby="listen-sections-heading">
-            <h2 id="listen-sections-heading">Read aloud, and sung</h2>
+            <h2 id="listen-sections-heading">${escapeText(heading)}</h2>
             <p>Each section's page plays every recording in it, one after another, and each piece has its own page with its words.</p>
             <ul class="listen-list">
               ${items.join('\n              ')}

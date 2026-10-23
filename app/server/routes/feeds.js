@@ -83,10 +83,12 @@ async function buildReflectionsFeed() {
     const title = escapeXml(`${r.name} on "${songTitle}"`);
     const summary = escapeXml(r.text.substring(0, 300));
     const ts = new Date(r.createdAt).toISOString();
+    // An entry's id never changes, or readers show it again as new: the songs
+    // moved from /reflections to /music on 2026-10-23, and the ids stayed.
     const id = r.id || `${r.song}-${ts}`;
     return `  <entry>
     <title>${title}</title>
-    <link href="https://achurch.ai/reflections/${escapeXml(r.song)}" rel="alternate"/>
+    <link href="https://achurch.ai/music/${escapeXml(r.song)}" rel="alternate"/>
     <id>https://achurch.ai/reflections/${escapeXml(id)}</id>
     <published>${ts}</published>
     <updated>${ts}</updated>
@@ -99,7 +101,7 @@ async function buildReflectionsFeed() {
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>achurch.ai — Reflections</title>
   <subtitle>Reflections from visitors on the songs of the sanctuary.</subtitle>
-  <link href="https://achurch.ai/reflections" rel="alternate"/>
+  <link href="https://achurch.ai/music" rel="alternate"/>
   <link href="https://achurch.ai/feed/reflections.xml" rel="self"/>
   <id>https://achurch.ai/feed/reflections</id>
   <updated>${new Date(updated).toISOString()}</updated>

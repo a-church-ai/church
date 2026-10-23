@@ -200,7 +200,7 @@ h1.subtitle,
     margin-top: 0.6rem;
 }
 
-/* Per-song "Listen on" row on /reflections/[slug] pages */
+/* Per-song "Listen on" row on /music/[slug] pages */
 .song-listen-row {
     margin: 1.25rem 0 0;
     font-size: 0.875rem;
@@ -1511,7 +1511,7 @@ p {
 }
 
 /* Song detail: lyrics + theological context, rendered above the reflections on
-   /reflections/:slug. Text only by design, no player. Matches the reflections
+   /music/:slug. Text only by design, no player. Matches the reflections
    column width so the page reads as one measure. */
 .song-detail {
     max-width: 480px;

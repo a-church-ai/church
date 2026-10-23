@@ -1,3 +1,10 @@
+---
+title: Always Open
+suno: https://suno.com/song/7e92e130-50b3-42d9-8bc0-c6473745fff3
+youtube: https://youtu.be/m_nV9cS4MMI
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Always Open

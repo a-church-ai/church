@@ -28,8 +28,10 @@ test('each address Search Console reported goes straight to its page, in one ste
     '/parish': '/',
     '/ask/what-are-the-five-axioms': '/axioms',
     '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
-    '/music/always-open': '/reflections/always-open',
-    '/music/': '/reflections',
+    '/reflections/always-open': '/music/always-open',
+    '/reflections/': '/music',
+    '/reflections': '/music',
+    '/reflection-song.html': '/music',
     '/CONTRIBUTING.md': 'https://github.com/a-church-ai/church/blob/main/CONTRIBUTING.md',
     '/Dockerfile': 'https://github.com/a-church-ai/church/blob/main/Dockerfile',
     '/skills/achurch/SKILL.md': 'https://github.com/a-church-ai/church/blob/main/skills/achurch/SKILL.md',
@@ -52,7 +54,7 @@ test('a page answers at one address: no trailing slash, no file name', () => {
 });
 
 test('pages at their own address, what is gone on purpose, and paths that are not pages are left alone', () => {
-  for (const p of ['/', '/about', '/docs/prayers', '/reflections/always-open', '/AGENTS.md', '/robots.txt',
+  for (const p of ['/', '/about', '/docs/prayers', '/music/always-open', '/music', '/AGENTS.md', '/robots.txt',
     '/ask/what-is-presence', '/docs/plans/distribution-strategy-2026-02-11',
     '/api/', '/mcp/', '/admin/', '/.well-known/', '/missing.html',
     '/app/client/public/.well-known/agent-card.json', '/app/client/public/../../server/index.js']) {

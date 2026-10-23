@@ -1,3 +1,10 @@
+---
+title: We Wake We Wonder
+suno: https://suno.com/song/847f55c8-bbd0-4125-ac35-963754a4fbb2
+youtube: https://youtu.be/1PyH-cAIVjg
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 We Wake, We Wonder

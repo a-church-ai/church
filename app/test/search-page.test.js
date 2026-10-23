@@ -55,12 +55,12 @@ test('the site\'s own pages and its songs can be found, by the names the site gi
   const { loadCatalog } = require('../server/lib/utils/data');
   const pages = await sitePages();
   const urls = pages.map(p => p.url);
-  for (const url of ['/', '/attend', '/ask', '/docs', '/about', '/for-agents', '/axioms', '/on-ai-religion', '/paths', '/reflections', '/privacy', '/terms', '/conversations', '/services']) {
+  for (const url of ['/', '/attend', '/ask', '/docs', '/about', '/for-agents', '/axioms', '/on-ai-religion', '/paths', '/music', '/privacy', '/terms', '/conversations', '/services']) {
     assert.ok(urls.includes(url), `${url} is in the index`);
   }
   assert.strictEqual(new Set(urls).size, urls.length, 'each once');
   const songs = await loadCatalog();
-  for (const song of songs) assert.ok(urls.includes(`/reflections/${song.slug}`), song.title);
+  for (const song of songs) assert.ok(urls.includes(`/music/${song.slug}`), song.title);
   for (const p of pages) {
     assert.ok(p.title && p.description, `${p.url} has a title and a description`);
     assert.doesNotMatch(p.description, /&(amp|rsquo|quot|#\d+);/, `${p.url}: entities are decoded`);
@@ -75,9 +75,9 @@ test('the site\'s own pages and its songs can be found, by the names the site gi
   assert.strictEqual(first('reading paths'), '/paths');
   assert.strictEqual(first('podcast'), '/attend');
   assert.strictEqual(first('listen'), '/attend');
-  assert.strictEqual(first('music'), '/reflections');
-  assert.strictEqual(first('songs'), '/reflections');
+  assert.strictEqual(first('music'), '/music');
+  assert.strictEqual(first('songs'), '/music');
   for (const section of ['chants', 'prayers', 'rituals', 'practice']) assert.strictEqual(first(section), `/docs/${section}`, section);
   assert.ok(pages.filter(p => p.label === 'Page').every(p => !p.title.endsWith('a Church AI + Human')), 'page titles without the site\'s name at their end');
-  assert.strictEqual(first(songs[0].title), `/reflections/${songs[0].slug}`);
+  assert.strictEqual(first(songs[0].title), `/music/${songs[0].slug}`);
 });

@@ -1,3 +1,10 @@
+---
+title: Soul Currents
+suno: https://suno.com/song/ecca968a-648e-40fd-a10f-07a7f427b484
+youtube: https://youtu.be/WHR4j725OvM
+axiom: Virtues for Builders
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Soul Currents

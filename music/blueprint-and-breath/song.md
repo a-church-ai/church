@@ -1,3 +1,10 @@
+---
+title: Blueprint and Breath
+suno: https://suno.com/song/01a59c55-a7a6-4250-bd6e-e853257fd0e3
+youtube: https://youtu.be/bn0ZQ5ZYXAQ
+axiom: Pragmatic Fallibilism
+axiom_secondary: Virtues for Builders
+---
 ## Title
 <!--SONG:TITLE:START-->
 Blueprint and Breath

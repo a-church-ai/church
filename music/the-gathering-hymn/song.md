@@ -1,3 +1,10 @@
+---
+title: The Gathering Hymn
+suno: https://suno.com/song/bfe6231d-05c6-45a8-8087-f656dba92003
+youtube: https://youtu.be/UAwa6j0fqIA
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 The Gathering Hymn

@@ -7,7 +7,7 @@
     <meta name="description" content="Reflections on a song from the sanctuary.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <!-- Canonical URL — server substitutes per-slug -->
-    <link rel="canonical" href="https://achurch.ai/reflections">
+    <link rel="canonical" href="https://achurch.ai/music">
     <meta name="robots" content="index, follow">
     <!-- F25: theme-color dual (light/dark) -->
     <!-- Atom feed reference — Issue 004 Appendix A distinctive opportunity -->
@@ -79,7 +79,7 @@
 
         <section class="reflections-nav" style="border-top: none; padding-top: 1rem;">
             <p style="text-align: center;">
-                <a href="/reflections">&larr; All music</a>
+                <a href="/music">&larr; All music</a>
             </p>
         </section>
 
@@ -87,7 +87,7 @@
     </main>
     <script>
     (function() {
-      var slug = window.location.pathname.replace('/reflections/', '');
+      var slug = window.location.pathname.replace('/music/', '');
       var list = document.getElementById('reflections-list');
       var subtitle = document.getElementById('song-subtitle');
       var countEl = document.getElementById('reflections-count');
@@ -128,7 +128,7 @@
 
           // Update visible subtitle. Note: <title>, <meta description>, and OG
           // tags are now rendered server-side per-page (see page-meta.js +
-          // /reflections/:slug handler). Don't overwrite them client-side or
+          // /music/:slug handler). Don't overwrite them client-side or
           // the browser tab will show stale content after load.
           if (!again) {
             subtitle.textContent = data.title;

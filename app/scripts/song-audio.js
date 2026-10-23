@@ -2,7 +2,8 @@
 /**
  * The songs' audio, so a service can play whole.
  *
- * For each catalog song: take the audio from its music video
+ * For each song with a music video (its song.md names one on YouTube): take
+ * the audio from that video
  * (media/library/<slug>.mp4, kept where this runs), bring it to the house
  * loudness with one gain for the whole song so its dynamics stay as they were
  * made, encode it as stereo MP3, measure what its player draws (the
@@ -31,7 +32,7 @@ const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frame
 const { uploadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadSongs, saveSongRecording } = require('../server/lib/audio/manifest');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
-const { loadCatalog } = require('../server/lib/utils/data');
+const { songFolders } = require('../server/lib/music/songs');
 
 const LIBRARY_DIR = path.join(__dirname, '../media/library');
 const WORK_DIR = path.join(__dirname, '../media/audio-work/songs');
@@ -75,9 +76,10 @@ async function main() {
   const force = args.includes('--force');
   const only = args.filter(a => !a.startsWith('--'));
 
-  const catalog = await loadCatalog();
+  // Every song with a video, made or not: a song is listed once its audio is.
+  const catalog = songFolders().filter(f => f.data.youtube).map(f => ({ slug: f.slug, title: f.data.title }));
   const unknown = only.filter(slug => !catalog.some(s => s.slug === slug));
-  if (unknown.length) throw new Error(`Not in the catalog: ${unknown.join(', ')}`);
+  if (unknown.length) throw new Error(`No song with a video: ${unknown.join(', ')}`);
   const songs = loadSongs();
   const missing = [];
   const todo = [];

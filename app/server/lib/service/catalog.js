@@ -1,7 +1,8 @@
 /**
- * What a service can hold: every voiced chant, practice, prayer and ritual,
- * and every song with its audio, with what the planner and the rules need to
- * know about each. Every piece can be played, so a service plays whole.
+ * Everything that plays, and what a service can hold of it: every voiced
+ * chant, practice, prayer and ritual, and every song with its audio, with what
+ * the planner, the rules and the playlists need to know about each. Every
+ * piece can be played, so a service and a playlist play whole.
  *
  * Built once per process from sources that change only by deploy: the docs
  * index (titles, summaries), the audio manifest (what is voiced, how long,
@@ -30,10 +31,12 @@ const BLESSING_TITLE = /^(Blessings?|Benediction)\b/;
 // How many of a song's nearest pieces the planner is shown.
 const NEAR = 4;
 
+let playable = null;
 let cached = null;
 
-async function loadServiceCatalog() {
-  if (cached) return cached;
+// Every piece that plays, the playlists' catalog (docs/playlists/), by id.
+async function loadPlayable() {
+  if (playable) return playable;
   const manifest = loadManifest();
   const entries = new Map();
 
@@ -70,18 +73,25 @@ async function loadServiceCatalog() {
       summary: await songDescription(song),
       seconds: recording.seconds,
       hours: null,
-      url: `/reflections/${song.slug}`,
+      url: `/music/${song.slug}`,
       recording,
       near: (shortlists[song.slug] || []).map(c => c.path).filter(path => entries.has(path)).slice(0, NEAR),
     });
   }
 
-  // What can never fit a service (a 37-minute prayer) isn't offered at all.
+  playable = entries;
+  return playable;
+}
+
+// What a service can hold: what plays, less what can never fit a service (a
+// 37-minute prayer), which a playlist can still hold.
+async function loadServiceCatalog() {
+  if (cached) return cached;
+  const entries = new Map(await loadPlayable());
   const all = [...entries.values()];
   for (const entry of all) if (!fits(entry, all)) entries.delete(entry.id);
-
   cached = entries;
   return cached;
 }
 
-module.exports = { loadServiceCatalog, BLESSING_TITLE };
+module.exports = { loadServiceCatalog, loadPlayable, BLESSING_TITLE };

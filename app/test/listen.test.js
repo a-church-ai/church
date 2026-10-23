@@ -74,7 +74,7 @@ test('/attend is the service itself, with what it was made from and what was lef
     assert.match(html, new RegExp(`<a href="/docs/${section}">[^<]+</a>[^<]*<span class="listen-count">${n} voiced, about [^<]+</span>`), section);
   }
   const songs = Object.keys(loadSongs()).length;
-  assert.match(html, new RegExp(`<a href="/reflections">Music</a>[^<]*<span class="listen-count">${songs} songs, about [^<]+</span>`));
+  assert.match(html, new RegExp(`<a href="/music">Music</a>[^<]*<span class="listen-count">${songs} songs, about [^<]+</span>`));
 
   const page = fs.readFileSync(path.join(PUBLIC, 'attend.html'), 'utf8');
   const order = ['data-service-panel', 'data-queue-visual', '<!-- SERVICE_LISTEN -->', 'data-service-told', 'data-service-reflections', '<!-- REFLECT_FORM -->', 'https://www.youtube.com/@achurchai', '<!-- LISTEN_SECTIONS -->', '<!-- PODCASTS -->', '<!-- SITE_FOOTER -->'];

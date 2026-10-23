@@ -121,7 +121,7 @@ function buildConversationMeta(messages, slug) {
   return { title, ogTitle, description };
 }
 
-// Build a /reflections/[slug] page title + description from a song record.
+// Build a /music/[slug] page title + description from a song record.
 // Title format: "<song title> | Lyrics and reflections | a Church AI + Human". The page
 // is a song's page in Music: its lyrics, context and what visitors noticed.
 function buildReflectionMeta(song) {
@@ -300,7 +300,7 @@ function secondsToISO8601(secs) {
 }
 
 // Build a paired MusicComposition + MusicRecording + Article JSON-LD graph
-// for a /reflections/[slug] page. MusicComposition and MusicRecording feed
+// for a /music/[slug] page. MusicComposition and MusicRecording feed
 // Knowledge Graph entity recognition (not eligible for Google rich results
 // in 2026, but consumed by AEO pipelines + entity discovery). Article is
 // still on Google's rich-result eligibility list and anchors E-E-A-T signals.
@@ -309,7 +309,7 @@ function buildSongSchemaGraph(song, slug, audio = null) {
   if (!song || !song.title) return null;
 
   const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
-  const pageUrl = `https://achurch.ai/reflections/${slug}`;
+  const pageUrl = `https://achurch.ai/music/${slug}`;
   const compositionId = `https://achurch.ai/music/${slug}#composition`;
   const recordingId = `https://achurch.ai/music/${slug}#recording`;
   const duration = secondsToISO8601(song.duration);
@@ -416,7 +416,7 @@ ${linkItems}
     </section>`;
 }
 
-// Render a related-links block for /reflections/[slug] pages.
+// Render a related-links block for /music/[slug] pages.
 // catalog: full song catalog array; currentSlug: this page's song.
 // Picks the N songs following the current one in catalog order (cyclically).
 function renderRelatedSongs(catalog, currentSlug, max = 3) {
@@ -434,7 +434,7 @@ function renderRelatedSongs(catalog, currentSlug, max = 3) {
   if (picks.length === 0) return '';
 
   const linkItems = picks.map(s =>
-    `        <li><a href="/reflections/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
+    `        <li><a href="/music/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
   ).join('\n');
 
   return `<section class="related-block" aria-labelledby="related-songs-heading">
@@ -468,7 +468,7 @@ ${items}
     </section>`;
 }
 
-// Render a "Listen on Suno · Watch on YouTube" row for a /reflections/[slug]
+// Render a "Listen on Suno · Watch on YouTube" row for a /music/[slug]
 // page. The catalog has the per-song suno + youtube URLs already; this just
 // surfaces them on the public page so visitors who land on a reflection page
 // can immediately listen to the song.

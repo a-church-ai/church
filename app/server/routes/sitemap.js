@@ -20,7 +20,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const docsDiscover = require('../lib/docs/discover');
 const { datesShown } = require('../lib/api/services');
-const { loadAttendance } = require('../lib/utils/data');
+const { loadAttendance, loadCatalog } = require('../lib/utils/data');
 const { placedConversations } = require('../lib/utils/conversation-groups');
 const { cache } = require('../lib/utils/cache');
 
@@ -52,7 +52,7 @@ async function buildSitemap() {
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://achurch.ai/reflections</loc>
+    <loc>https://achurch.ai/music</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
@@ -163,10 +163,12 @@ async function buildSitemap() {
         songLastmod.set(r.song, date);
       }
     }
-    for (const [slug, lastmod] of songLastmod) {
+    // Every song has a page, reflected on or not: until 2026-10-23 only the
+    // songs with a reflection were listed here.
+    for (const { slug } of await loadCatalog()) {
+      const lastmod = songLastmod.get(slug);
       urls += `\n  <url>
-    <loc>https://achurch.ai/reflections/${slug}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <loc>https://achurch.ai/music/${slug}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''}
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`;

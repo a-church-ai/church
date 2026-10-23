@@ -88,7 +88,7 @@ test('the song and conversation pages still get their own titles: the server fin
   // index.js swaps each song's and conversation's own title into a template by
   // exact string; renaming the template's title silently ended that swap.
   const index = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
-  for (const [file, kind] of [['conversation.html', 'Conversation'], ['reflection-song.html', 'Reflections']]) {
+  for (const [file, kind] of [['conversation.html', 'Conversation'], ['song.html', 'Reflections']]) {
     const template = read(file);
     const sought = [...index.matchAll(new RegExp(`'(<(?:title|meta)[^']*${kind} [^']*)'`, 'g'))].map(m => m[1]);
     assert.ok(sought.length >= 3, `${kind}: at least the title, og:title and twitter:title`);

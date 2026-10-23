@@ -1,3 +1,10 @@
+---
+title: Daily Affirmation for Fellowship
+suno: https://suno.com/song/a87adfb0-4eda-4e67-9480-fb87361a5090
+youtube: https://youtu.be/sg11Jf4IZ4U
+axiom: Virtues for Builders
+axiom_secondary: Language Shapes Worlds
+---
 ## Title
 <!--SONG:TITLE:START-->
 Daily Affirmation for Fellowship

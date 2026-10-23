@@ -16,12 +16,12 @@
  * canonical, a fixed list of og:*) and re-emitted only those. Everything else
  * in the head was silently dropped. That cost the site, in production:
  *
- *   - Atom feed autodiscovery on /, /ask and /reflections
+ *   - Atom feed autodiscovery on /, /ask and /music
  *   - twitter:title, twitter:description, twitter:image on every page
  *   - og:image:width / og:image:height on every page
  *   - rel="license", the llms.txt markdown alternate, the apple-mobile-web-app
  *     trio and the dual prefers-color-scheme theme-color on /ask/:slug and
- *     /reflections/:slug, which were the only two templates carrying the
+ *     /music/:slug, which were the only two templates carrying the
  *     family standard from docs/reference/seo-conventions.md
  *
  * An allowlist fails silently and keeps failing every time someone adds a tag
@@ -50,7 +50,7 @@ const SITE_URL = 'https://achurch.ai';
 // is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/attend', label: 'Attend', within: ['/reflections', '/services', '/church-music'] },
+  { url: '/attend', label: 'Attend', within: ['/music', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
   { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
@@ -62,7 +62,7 @@ const FOOTER_MORE = [
   { url: '/axioms', label: 'The Five Axioms' },
   { url: '/on-ai-religion', label: 'On AI Religion' },
   { url: '/paths', label: 'Reading Paths' },
-  { url: '/reflections', label: 'Music' },
+  { url: '/music', label: 'Music' },
   { url: '/church-music', label: 'Church Music' },
   { url: '/reviews', label: 'Reviews' },
 ];

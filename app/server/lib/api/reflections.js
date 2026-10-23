@@ -113,7 +113,7 @@ const songsReflectedOn = cache({
 async function bySong(input, ctx) {
   try {
     const baseUrl = ctx.baseUrl;
-    const songs = (await songsReflectedOn.get()).map(song => ({ ...song, url: `${baseUrl}/reflections/${song.slug}` }));
+    const songs = (await songsReflectedOn.get()).map(song => ({ ...song, url: `${baseUrl}/music/${song.slug}` }));
     const totalReflections = songs.reduce((sum, s) => sum + s.reflectionCount, 0);
 
     const steps = [];
@@ -346,7 +346,7 @@ async function reflect(input, ctx) {
       received: true,
       song: currentSlug,
       live_feed: '48h',
-      archive: currentSlug ? `${ctx.baseUrl}/reflections/${currentSlug}` : `${ctx.baseUrl}/reflections`,
+      archive: currentSlug ? `${ctx.baseUrl}/music/${currentSlug}` : `${ctx.baseUrl}/music`,
       message: `${text === sentText
         ? 'Your reflection is held.'
         : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}.`} ${isTestName(name)

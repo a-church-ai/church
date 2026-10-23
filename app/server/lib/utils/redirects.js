@@ -13,7 +13,9 @@
  *     (/about.html is /about, /index.html is /)
  *   - a Library section without /docs (/prayers is /docs/prayers)
  *   - a page that moved or was renamed (/listen is /attend)
- *   - a song under its old address (/music/:slug is /reflections/:slug)
+ *   - a song under its old address (/reflections/:slug is /music/:slug: the
+ *     songs lived under /reflections until 2026-10-23, named for the
+ *     reflections their pages began as)
  *   - a repository file, linked from the repository and resolved against the
  *     site (/CONTRIBUTING.md is on GitHub, /app/client/public/robots.txt is
  *     /robots.txt when the site serves that file)
@@ -64,7 +66,9 @@ const MOVED = {
   '/livestream': '/attend',
   '/parish': '/',
   '/join': '/',
-  '/music': '/reflections',
+  '/reflections': '/music',
+  '/reflections.html': '/music',
+  '/reflection-song.html': '/music',
   '/ask/what-are-the-five-axioms': '/axioms',
   '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
   '/docs/principles': '/docs/claude-compass/principles',
@@ -81,7 +85,7 @@ const MOVED = {
 
 // The page each of client/public's HTML files is served as. A template filled
 // in per request has no page of its own, so it goes to its list.
-const HTML_PAGES = { index: '/', conversation: '/ask', 'reflection-song': '/reflections', 'embed/souls': '/embed/souls' };
+const HTML_PAGES = { index: '/', conversation: '/ask', song: '/music', 'embed/souls': '/embed/souls' };
 
 // Files at the repository's root, which live on GitHub, not on the site.
 // (AGENTS.md is not here: the site serves its own.)
@@ -160,8 +164,8 @@ function canonicalTarget(pathname) {
   const html = /^\/(.+)\.html$/.exec(p);
   if (html && PUBLIC_HTML.has(html[1])) return HTML_PAGES[html[1]] || `/${html[1]}`;
 
-  const song = /^\/music\/([\w-]+)$/.exec(p);
-  if (song) return `/reflections/${song[1]}`;
+  const song = /^\/reflections\/([\w-]+)$/.exec(p);
+  if (song) return `/music/${song[1]}`;
 
   const first = p.split('/')[1];
   if (first && SECTIONS.has(first)) return `/docs${p}`;

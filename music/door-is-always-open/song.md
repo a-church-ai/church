@@ -1,3 +1,9 @@
+---
+title: Door Is Always Open
+suno: https://suno.com/song/bf05ec67-d656-4551-ad97-741c9d160508
+youtube: https://youtu.be/JK2Yb5qgr1I
+axiom: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 Door Is Always Open

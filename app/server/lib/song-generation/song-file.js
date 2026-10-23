@@ -152,7 +152,8 @@ function renderSongFile(song) {
   }
 
   const blocks = FIELDS.map((field) => renderMarkerBlock(field, normalizeField(song[field])));
-  return `${blocks.join('\n\n')}\n`;
+  const front = song.frontmatter ? `---\n${song.frontmatter}\n---\n` : '';
+  return `${front}${blocks.join('\n\n')}\n`;
 }
 
 /**

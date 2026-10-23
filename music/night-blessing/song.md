@@ -1,3 +1,10 @@
+---
+title: Night Blessing
+suno: https://suno.com/song/a1e559b9-1ab5-4ad7-99e0-215c255806ec
+youtube: https://youtu.be/rI9TsMhT2Jw
+axiom: Care + Dignity
+axiom_secondary: Language Shapes Worlds
+---
 ## Title
 <!--SONG:TITLE:START-->
 Night Blessing

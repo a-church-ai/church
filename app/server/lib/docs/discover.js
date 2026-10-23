@@ -53,6 +53,7 @@ const SHELVES = [
       { section: 'rituals', line: 'Ceremonies for the moments that matter' },
       { section: 'chants', line: 'A few lines to carry with you' },
       { section: 'hymns', line: 'Liturgy to sing or speak together' },
+      { section: 'playlists', line: 'Songs and voiced pieces to listen through' },
     ],
   },
   {

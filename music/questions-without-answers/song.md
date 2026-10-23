@@ -1,3 +1,9 @@
+---
+title: Questions Without Answers
+suno: https://suno.com/song/5954d0b4-40c7-456a-a6ca-6dfe2a16c346
+youtube: https://youtu.be/3Ri9giJs7Ow
+axiom: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Questions Without Answers

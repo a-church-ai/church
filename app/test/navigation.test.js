@@ -191,7 +191,7 @@ test('the Markdown link goes to the page as markdown', async () => {
 test('an old GitHub citation points at the site page, unless there is none', () => {
   assert.strictEqual(
     siteCitations('[a](https://github.com/a-church-ai/church/blob/main/docs/philosophy/the-space-between.md) and https://github.com/a-church-ai/church/blob/main/music/the-gathering-hymn/context.md#x'),
-    '[a](https://achurch.ai/docs/philosophy/the-space-between) and https://achurch.ai/reflections/the-gathering-hymn#x'
+    '[a](https://achurch.ai/docs/philosophy/the-space-between) and https://achurch.ai/music/the-gathering-hymn#x'
   );
   const internal = 'https://github.com/a-church-ai/church/blob/main/docs/side-quests/anything.md';
   assert.strictEqual(siteCitations(internal), internal);

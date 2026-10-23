@@ -161,7 +161,7 @@
           "Reflection"
         ],
         "summary": "Songs with reflection counts",
-        "description": "Every song that has reflections, with its count. The index behind /reflections.",
+        "description": "Every song that has reflections, with its count. The index behind /music.",
         "operationId": "getReflectionsBySong",
         "responses": {
           "200": {

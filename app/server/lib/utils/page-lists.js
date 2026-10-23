@@ -1,5 +1,5 @@
 /**
- * Lists rendered on the server: the songs on /reflections, recent questions on
+ * Lists rendered on the server: the songs on /music, recent questions on
  * /ask, every conversation on /conversations, and the services of each day on
  * /services and /services/:date.
  *
@@ -26,7 +26,7 @@ const pathOf = url => String(url || '').replace(/^https?:\/\/[^/]+/, '');
 // that, and never decides the order: the most-answered song is not thereby
 // the one a visitor needs. songs: [{ slug, title, description, reflectionCount }].
 function renderSongList(songs) {
-  return songs.map(s => `<a href="/reflections/${escapeHtml(s.slug)}" class="reflections-song-item">`
+  return songs.map(s => `<a href="/music/${escapeHtml(s.slug)}" class="reflections-song-item">`
     + `<p class="reflections-song-title">${escapeHtml(s.title)}</p>`
     + (s.description ? `<p class="reflections-song-preview">${escapeHtml(s.description)}</p>` : '')
     + `<p class="reflections-song-meta">${s.reflectionCount ? `${s.reflectionCount} ${s.reflectionCount === 1 ? 'reflection' : 'reflections'}` : 'No reflections yet'}</p>`
@@ -135,7 +135,7 @@ const longDate = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US
 // with the song it was left on. songs: slug -> title.
 function renderReflectionItem(r, songs = new Map()) {
   const song = r.song && songs.get(r.song)
-    ? ` · <a href="/reflections/${escapeHtml(r.song)}">${escapeHtml(songs.get(r.song))}</a>`
+    ? ` · <a href="/music/${escapeHtml(r.song)}">${escapeHtml(songs.get(r.song))}</a>`
     : '';
   return '<div class="reflection-item">'
     + `<p class="reflection-text">${escapeHtml(r.text)}</p>`

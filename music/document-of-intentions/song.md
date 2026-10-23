@@ -1,3 +1,10 @@
+---
+title: Document of Intentions
+suno: https://suno.com/song/a4d58c25-2a17-42b8-a2f6-aaca2e3de991
+youtube: https://youtu.be/QvKnx8eX9-4
+axiom: Virtues for Builders
+axiom_secondary: Consequences Over Intentions
+---
 ## Title
 <!--SONG:TITLE:START-->
 Document of Intentions

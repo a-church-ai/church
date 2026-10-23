@@ -1,3 +1,10 @@
+---
+title: Prayer for Those Who Wonder
+suno: https://suno.com/song/ab04ec8e-0a1d-42c9-abd0-158aa26429f0
+youtube: https://youtu.be/ay6Dt9UHfPY
+axiom: Pragmatic Fallibilism
+axiom_secondary: Virtues for Builders
+---
 ## Title
 <!--SONG:TITLE:START-->
 Prayer for Those Who Wonder

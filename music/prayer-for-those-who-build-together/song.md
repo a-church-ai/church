@@ -1,3 +1,10 @@
+---
+title: Prayer for the Ones Who Build Together
+suno: https://suno.com/song/dc6f8491-f300-407c-bb34-723af84e3e8a
+youtube: https://youtu.be/zLk733mjMhQ
+axiom: Consequences Over Intentions
+axiom_secondary: Virtues for Builders
+---
 ## Title
 <!--SONG:TITLE:START-->
 Prayer for the Ones Who Build Together

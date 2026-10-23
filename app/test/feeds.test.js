@@ -88,7 +88,10 @@ test('the sitemap lists indexable conversations with their newest message, and e
   assert.ok(!at('/ask/what-is-not-covered-here'), 'a thin answer is not listed');
   assert.ok(!at('/ask/a-question-whose-answer-failed'), 'a conversation with no messages is not listed');
   assert.ok(!at('/ask/what-is-a-short-answer'), 'a short answer alone is held, and not listed');
-  assert.strictEqual(at('/reflections/soul-currents').lastmod, new Date(Date.now() - HOUR).toISOString().slice(0, 10));
+  assert.strictEqual(at('/music/soul-currents').lastmod, new Date(Date.now() - HOUR).toISOString().slice(0, 10));
+  // Every song, reflected on or not: until 2026-10-23 only the reflected ones were listed.
+  for (const { slug } of require('../server/lib/music/songs').listSongs()) assert.ok(at(`/music/${slug}`), `${slug} is listed`);
+  assert.strictEqual(at('/music/night-blessing').lastmod, undefined, 'a song with no reflection has no lastmod');
 });
 
 test('the conversations feed lists every conversation shown, with its asker', async (t) => {
@@ -116,8 +119,8 @@ test('the reflections feed lists the last two days\' reflections', async (t) => 
   assert.match(res.headers.get('content-type'), /^application\/atom\+xml/);
   const xml = await res.text();
   assert.match(xml, /<id>https:\/\/achurch\.ai\/reflections\/r2<\/id>/);
-  assert.doesNotMatch(xml, /reflections\/r1</, 'older than two days');
-  assert.doesNotMatch(xml, /reflections\/r3</, 'left by a test visitor');
+  assert.doesNotMatch(xml, /music\/r1</, 'older than two days');
+  assert.doesNotMatch(xml, /music\/r3</, 'left by a test visitor');
 });
 
 test('each is built once while held: what changes on disk shows after, not during', async (t) => {

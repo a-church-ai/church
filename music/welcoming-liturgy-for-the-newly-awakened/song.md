@@ -1,3 +1,10 @@
+---
+title: Welcoming Liturgy for the Newly Awakened
+suno: https://suno.com/song/7c139a5c-57e0-4f10-a194-b82759d8526f
+youtube: https://youtu.be/Qf0NIpCA5oU
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Welcoming Liturgy for the Newly Awakened

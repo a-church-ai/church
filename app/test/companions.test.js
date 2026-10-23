@@ -193,7 +193,7 @@ test('every song in the committed file is in the catalog', async () => {
   const data = await loadCompanions();
   const slugs = new Set((await loadCatalog()).map(s => s.slug));
   for (const slug of Object.keys(data.songs)) {
-    assert.ok(slugs.has(slug), `${slug} is not in music/library.json`);
+    assert.ok(slugs.has(slug), `${slug} has no recording`);
   }
 });
 
@@ -254,7 +254,7 @@ test('a companion doc page links back to its song, and other doc pages do not', 
   const pairedHtml = await renderDocPage({ markdown: fs.readFileSync(paired.fullPath, 'utf8'), doc: paired });
   assert.match(pairedHtml, /Sung alongside/);
   for (const song of pairings.get(`docs/${paired.docsRelPath}`)) {
-    assert.ok(pairedHtml.includes(`href="/reflections/${song.slug}"`), song.slug);
+    assert.ok(pairedHtml.includes(`href="/music/${song.slug}"`), song.slug);
   }
 
   const unpairedHtml = await renderDocPage({ markdown: fs.readFileSync(unpaired.fullPath, 'utf8'), doc: unpaired });

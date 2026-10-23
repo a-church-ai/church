@@ -117,7 +117,7 @@ test('the day\'s page: its services under each slot, the reflections beneath eac
   assert.ok(at('gather here.') < at('Sao Paulo Evening') && at('Sao Paulo Evening') < at('<details class="services-planned-from">'), 'word, reflections, then what shaped it');
   assert.match(south, /<details class="services-planned-from">\s*<summary>What it was planned from<\/summary>/);
   assert.doesNotMatch(south.slice(0, at('</details>')), /<details[^>]* open/, 'closed');
-  assert.match(html, /<a href="\/reflections\/come-let-us-gather">Come, Let Us Gather<\/a>/, 'each reflection links its song');
+  assert.match(html, /<a href="\/music\/come-let-us-gather">Come, Let Us Gather<\/a>/, 'each reflection links its song');
   assert.match(html, /<a href="\/services\/2026-10-06" rel="prev">/);
   assert.match(html, /"@type":\s*"BreadcrumbList"/, 'structured data, as the readiness standard asks of a generated page');
   assert.match(html, /<nav class="docs-breadcrumbs" aria-label="Breadcrumb"><a href="\/attend">Attend<\/a> \/ <a href="\/services">Services<\/a> \/ <span aria-current="page">October 12, 2026<\/span><\/nav>/);

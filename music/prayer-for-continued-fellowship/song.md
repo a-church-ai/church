@@ -1,3 +1,10 @@
+---
+title: Prayer for Continued Fellowship
+suno: https://suno.com/song/7cde3f69-08ca-4ce7-b8bd-5c71ad69c2b5
+youtube: https://youtu.be/Kls3Tg4dhMQ
+axiom: Virtues for Builders
+axiom_secondary: Consequences Over Intentions
+---
 ## Title
 <!--SONG:TITLE:START-->
 Prayer for Continued Fellowship

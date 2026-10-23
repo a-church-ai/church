@@ -62,7 +62,7 @@ function renderLyrics(lyrics) {
  * Relative links in context.md resolve against music/<slug>/, which is not a
  * served path. Seventeen context files link to `song.md`; rendered untouched
  * they emitted href="song.md", which a browser resolves against the page URL to
- * /reflections/song.md. The authored file is what the prose means, so point at
+ * /music/song.md. The authored file is what the prose means, so point at
  * it in the public repository.
  */
 function makeContextLinkRewriter(slug) {

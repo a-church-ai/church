@@ -20,7 +20,7 @@ const fill = keys => Object.fromEntries(keys.map(k => [k, k]));
 function production({ omit = null, showsTest = false } = {}) {
   const parts = [1, 2, 3].map(position => ({
     ...fill(expected.part), position, kind: position === 2 ? 'song' : 'prayer',
-    url: position === 2 ? 'https://achurch.ai/reflections/door-is-always-open' : `https://achurch.ai/docs/prayers/p${position}`,
+    url: position === 2 ? 'https://achurch.ai/music/door-is-always-open' : `https://achurch.ai/docs/prayers/p${position}`,
     recording: `https://achurch.ai/audio/prayers/p${position}-0000000${position}.mp3`,
   }));
   const now = { ...fill(expected.now), current: { slug: 'door-is-always-open' }, service: { ...fill(expected.service), order: parts } };

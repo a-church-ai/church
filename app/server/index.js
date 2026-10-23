@@ -21,6 +21,7 @@ const ragLancedb = require('./lib/rag/lancedb');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 const churchMusic = require('./lib/music/church-music');
+const { listPlaylists, renderPlaylistList } = require('./lib/music/playlists');
 const reviews = require('./lib/reviews/reviews');
 
 // Load environment variables
@@ -396,7 +397,7 @@ app.get('/admin', (req, res) => {
 });
 
 // Serve conversations listing page
-// /ask and /reflections render their lists on the server (see
+// /ask and /music render their lists on the server (see
 // lib/utils/page-lists.js); /conversations lists every indexable conversation.
 async function sendPageWithList(req, res, publicName, placeholder, listHtml) {
   try {
@@ -708,9 +709,12 @@ app.get('/ask/:slug', async (req, res) => {
   }
 });
 
-// The Music page: every song in the catalog's order (music/library.json), with its
-// description and, quietly, how many reflections it has.
-app.get('/reflections', async (req, res) => {
+// The Music page: all the music. Every song in The Cycle's order
+// (lib/music/songs.js), with its description and, quietly, how many
+// reflections it has; the playlists (lib/music/playlists.js); and each voiced
+// section. Until 2026-10-23 it was /reflections, named for the reflections
+// the song pages began as, and held the songs alone.
+app.get('/music', async (req, res) => {
   const { body } = await apiOps.reflections.bySong({}, apiShared.requestContext(req));
   const counts = new Map(((body && body.songs) || []).map(s => [s.slug, s.reflectionCount]));
   const songs = await Promise.all((await loadCatalog()).map(async s => ({
@@ -720,23 +724,33 @@ app.get('/reflections', async (req, res) => {
     reflectionCount: counts.get(s.slug) || 0,
   })));
   const items = pageLists.renderSongList(songs);
-  sendPageWithList(req, res, 'reflections.html',
-    /<div class="reflections-song-list" id="reflections-song-list">\s*<p class="reflections-loading">Loading reflections\.\.\.<\/p>\s*<\/div>/,
-    `<div class="reflections-song-list" id="reflections-song-list" data-rendered="1">\n${items}\n</div>`);
+  const playlistItems = renderPlaylistList(await listPlaylists());
+  const fill = html => html
+    .replace(/<div class="reflections-song-list" id="reflections-song-list">\s*<p class="reflections-loading">Loading reflections\.\.\.<\/p>\s*<\/div>/,
+      () => `<div class="reflections-song-list" id="reflections-song-list" data-rendered="1">\n${items}\n</div>`)
+    .replace('<!-- PLAYLISTS -->', () => playlistItems)
+    .replace('<!-- READ_ALOUD -->', () => renderListenSections({ songs: false, heading: 'Read aloud' }));
+  try {
+    const html = fill(await fs.readFile(path.join(__dirname, '../client/public/music.html'), 'utf8'));
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(html, req.path));
+  } catch (err) {
+    console.error('Error rendering music.html:', err.message);
+    sendWrappedPage(req, res, 'music.html');
+  }
 });
 
 // Serve song reflection detail pages with dynamic <title>, meta description, and OG tags.
 // SEO note: same dual-target pattern as /ask/:slug — <title>/<meta description>
 // drive Google SERP snippets, OG tags drive social previews.
-// /music/:slug, the address a visitor guesses for a song, is redirected here
+// /reflections/:slug, a song's address until 2026-10-23, is redirected here
 // by lib/utils/redirects.js: two URLs with the same lyrics would compete.
 
-app.get('/reflections/:slug', async (req, res) => {
+app.get('/music/:slug', async (req, res) => {
   const slug = req.params.slug.replace(/[^a-zA-Z0-9_-]/g, '');
 
   // A slug that is not in the catalog is a 404, not a generic page. Serving the
-  // raw template with a 200 made every unknown URL a soft 404: /reflections/anything
-  // answered with the "Reflections" shell, and the /music/:slug redirect below
+  // raw template with a 200 made every unknown URL a soft 404: /music/anything
+  // answered with the "Reflections" shell, and the /reflections/:slug redirect
   // funnels arbitrary slugs straight here. Same rule as /ask/:slug, and for the
   // same reason: a silent fallback lets crawlers index garbage URLs as
   // duplicate-content pages.
@@ -748,7 +762,7 @@ app.get('/reflections/:slug', async (req, res) => {
       heading: 'No such song',
       message: 'That song is not in the catalog. The sanctuary has twenty-eight; one of them may be the one you meant.',
       links: [
-        { href: '/reflections', label: 'All songs' },
+        { href: '/music', label: 'All songs' },
         { href: '/paths', label: 'Reading paths' },
         { href: '/', label: 'Home' },
       ],
@@ -756,7 +770,7 @@ app.get('/reflections/:slug', async (req, res) => {
   }
 
   try {
-    let html = await fs.readFile(path.join(__dirname, '../client/public/reflection-song.html'), 'utf8');
+    let html = await fs.readFile(path.join(__dirname, '../client/public/song.html'), 'utf8');
 
     {
       const safeTitle = escapeAttr(meta.title);
@@ -768,7 +782,7 @@ app.get('/reflections/:slug', async (req, res) => {
       const listed = songRecordingFor(slug);
       const songAudio = listed && canServe(listed.file) ? listed : null;
       const playerHtml = songAudio
-        ? renderRecording(songAudio, { title: song.title, href: `/reflections/${slug}`, category: 'music', credit: SONG_CREDIT })
+        ? renderRecording(songAudio, { title: song.title, href: `/music/${slug}`, category: 'music', credit: SONG_CREDIT })
         : '';
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
@@ -784,9 +798,9 @@ app.get('/reflections/:slug', async (req, res) => {
       const listenLinksHtml = renderSongListenLinks(song);
       const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
 
-      const canonicalUrl = `https://achurch.ai/reflections/${slug}`;
+      const canonicalUrl = `https://achurch.ai/music/${slug}`;
       // Music / <the song>, shown above the heading and as BreadcrumbList.
-      const trail = breadcrumbTrail([{ label: 'Music', href: '/reflections' }, { label: song.title || slug }], canonicalUrl);
+      const trail = breadcrumbTrail([{ label: 'Music', href: '/music' }, { label: song.title || slug }], canonicalUrl);
       html = html
         // SERP snippet — <title> and <meta name="description">
         .replace(
@@ -799,7 +813,7 @@ app.get('/reflections/:slug', async (req, res) => {
         )
         // Canonical URL — per-page
         .replace(
-          '<link rel="canonical" href="https://achurch.ai/reflections">',
+          '<link rel="canonical" href="https://achurch.ai/music">',
           `<link rel="canonical" href="${canonicalUrl}">`
         )
         // Social preview — OG tags
@@ -853,14 +867,14 @@ app.get('/reflections/:slug', async (req, res) => {
     }
 
     // Wrap in the site shell (top bar and footer) for consistent nav
-    const wrapped = await siteShell.wrapPageFromHtml(html, `/reflections/${slug}`);
+    const wrapped = await siteShell.wrapPageFromHtml(html, `/music/${slug}`);
     res.set('Content-Type', 'text/html');
     res.send(wrapped);
   } catch (err) {
     // Genuine error (fs read failure, schema build throw). Do NOT fall back to
     // sending the raw template: the 404 above exists so the template's fallback
     // strings never reach a real response, and this path would undo that.
-    console.error('Error rendering /reflections/:slug:', err);
+    console.error('Error rendering /music/:slug:', err);
     res.status(500).type('text/plain').send('Server error');
   }
 });

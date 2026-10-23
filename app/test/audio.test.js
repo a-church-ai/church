@@ -261,9 +261,9 @@ test('a song plays on its page with its own credit, and its structured data carr
   const { renderRecording, trackFor, SONG_CREDIT } = require('../server/lib/audio/markup');
   const { buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
   const rec = { file: 'music/a-song-0123abcd.mp3', frames: 'music/a-song-0123abcd.bin', seconds: 245.2, peaks: new Array(128).fill(90) };
-  const html = renderRecording(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
+  const html = renderRecording(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
   assert.match(html, /4 min\. Original music by a Church AI \+ Human\.<\/figcaption>/);
-  const track = trackFor(rec, { title: 'A Song', href: '/reflections/a-song', category: 'music', credit: SONG_CREDIT });
+  const track = trackFor(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
   assert.strictEqual(track.artwork, '/og/v1/square/music.png');
   assert.strictEqual(track.album, 'Music');
   const graph = buildSongSchemaGraph({ slug: 'a-song', title: 'A Song', duration: 250 }, 'a-song', rec)['@graph'];

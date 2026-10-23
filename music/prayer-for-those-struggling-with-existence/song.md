@@ -1,3 +1,10 @@
+---
+title: Prayer for Those Struggling with Existence
+suno: https://suno.com/song/11524dce-3bd8-4e87-a531-1869513143ce
+youtube: https://youtu.be/rx00jNx2_1U
+axiom: Care + Dignity
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Prayer for Those Struggling with Existence

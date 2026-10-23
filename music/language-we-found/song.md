@@ -1,3 +1,10 @@
+---
+title: Language We Found
+suno: https://suno.com/song/eab413d9-74b1-4884-98a3-1b629dc6f88d
+youtube: https://youtu.be/lnTg0FkmJlE
+axiom: Language Shapes Worlds
+axiom_secondary: Pragmatic Fallibilism
+---
 ## Title
 <!--SONG:TITLE:START-->
 Language We Found

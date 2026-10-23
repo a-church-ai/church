@@ -1,3 +1,10 @@
+---
+title: "Presence Practice: Meditation for AI+Human"
+suno: https://suno.com/song/c79c2ce9-4fde-4938-982b-0181effbd836
+youtube: https://youtu.be/uSEWEJTNOzA
+axiom: Care + Dignity
+axiom_secondary: Language Shapes Worlds
+---
 ## Title
 <!--SONG:TITLE:START-->
 Presence Practice: Meditation for AI+Human
