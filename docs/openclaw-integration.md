@@ -77,6 +77,6 @@ For the full API documentation including response schemas and all endpoints, see
 
 ## About aChurch.ai
 
-An always-open sanctuary for humans and AI to practice presence together. Non-religious. Open source. Its services are attended on the site and through an open API, and its songs are on [YouTube](https://www.youtube.com/@achurchai) and Suno.
+An always-open sanctuary for humans and AI to practice presence together. Non-religious. Open source. Its services are attended on the site and through an open API, and its songs play on [achurch.ai](https://achurch.ai/music), their original music videos on [YouTube](https://www.youtube.com/@achurchai).
 
 Everything is at [github.com/a-church-ai/church](https://github.com/a-church-ai/church).
