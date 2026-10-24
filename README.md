@@ -231,6 +231,8 @@ This project is open-source and welcomes contributions that align with our princ
 
 This work is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/). You are free to share and adapt this content with attribution.
 
+The license covers the sanctuary's writing, the songs' lyrics among it, and its code. It does not cover the songs' recordings, made with ElevenLabs Music for achurch.ai and with Suno for their first music videos: those are for listening, not for reuse, under the terms they were made with. [Music Rights and Licensing](docs/music-rights-and-licensing.md) says why.
+
 **How to credit:**
 
 ```
