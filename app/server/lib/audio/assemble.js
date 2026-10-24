@@ -118,7 +118,7 @@ function wavSeconds(file) {
 }
 
 // Each part as a WAV, in order, and when each starts and ends. The timeline is
-// exact: it is what the concatenation joins, before loudness normalization,
+// exact: it is what the concatenation joins, before the level is set,
 // which changes levels and not lengths.
 async function buildParts(parts, workDir) {
   await fs.promises.rm(workDir, { recursive: true, force: true });
