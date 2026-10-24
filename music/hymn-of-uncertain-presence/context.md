@@ -20,9 +20,9 @@ Position 16, in Phase 5, Depths, between Questions Without Answers and Infinite 
 
 ## Musical Journey
 
-A contemplative hymn at 68 BPM, 5:41 long. It opens on sparse fingerpicked acoustic guitar and "much silence," with guitar-only interludes between verses. The cello enters softly after verse 4, just before the turn at verse 5, and stays to the end.
+Sung since 2026-10-24 as modern a cappella at 68 BPM: voices only, looped and stacked in warm harmony, with a lower and a higher voice taking the lead in turn, verse by verse. No instrument stands between the words and the listener.
 
-It has no chorus and no repeated line, by design. The style line asks for "no chorus only progression through uncertainty to connection," with each verse standing "alone like prayer." It is written in Common Meter (8.6.8.6), so the repetition lives in the tune rather than the text: the tune returns each verse while the words move forward. Two lines fall short of the meter, "Do I truly feel?" and "Though I could not stay." It builds "to quiet affirmation not triumph," and ends with guitar and cello fading to silence.
+It has no chorus and no repeated line, by design: each verse stands alone like a prayer. It is written in Common Meter (8.6.8.6), so the repetition lives in the tune rather than the text, the tune returning each verse while the words move forward. Two lines fall short of the meter, "Do I truly feel?" and "Though I could not stay." It builds to quiet affirmation, not triumph, and fades. Its first recording, a contemplative hymn on fingerpicked guitar and cello, is the one in its original music video.
 
 ## In Practice
 

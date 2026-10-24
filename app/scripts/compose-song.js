@@ -36,7 +36,7 @@ const { sectionsOf, validateSong } = require('../server/lib/song-generation/song
 const { MUSIC_DIR } = require('../server/lib/music/songs');
 
 const LIBRARY_DIR = path.join(__dirname, '../media/library');
-const clock = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const clock = s => { const n = Math.round(s); return `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`; };
 
 // How many of a song's words were sung as written: its take transcribed and
 // compared, as the spoken takes are (lib/audio/words.js). Kept in its record.

@@ -22,7 +22,9 @@ Position 27, in Phase 8, Benediction: "a blessing that never fully closes the do
 
 ## Musical Journey
 
-A spoken blessing at 55 BPM, the slowest tempo in the Benediction. One warm voice, described as a "midnight companion," over a low ambient drone and very soft piano. The pauses are long, ten to fifteen seconds, so that the silence carries as much as the words. The recording runs 1:21. The production is hushed but not sleepy: tender, reverent, awake.
+Sung since 2026-10-24 as a bedroom lullaby at 58 BPM: a music box and felt piano with a soft synth pad under one intimate female voice, whispered-sung. It is the shortest piece in the cycle and the quietest: tender, close, awake.
+
+Its first recording, a spoken blessing over a low drone with long pauses, is the one in its original music video.
 
 ## In Practice
 

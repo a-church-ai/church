@@ -11,7 +11,7 @@ const path = require('path');
 const { planFor, sectionParts, CHUNK_MIN, CHUNK_MAX } = require('../server/lib/audio/compose');
 const { MUSIC } = require('../server/lib/audio/house');
 const { parseSongFile } = require('../server/lib/music/song-content');
-const { validateSong } = require('../server/lib/song-generation/song-file');
+const { sectionsOf, validateSong } = require('../server/lib/song-generation/song-file');
 
 const song = {
   title: 'A Test',
@@ -38,15 +38,31 @@ test('a plan is a chunk a section, timed from its lines and tempo, with a soft l
   assert.ok(chunks.every(c => c.duration_ms >= CHUNK_MIN * 1000 && c.duration_ms <= CHUNK_MAX * 1000));
 });
 
-test('a song that opens and closes with its own intro and outro gets no second one', () => {
+test('a song that opens and closes with its own instrumental intro and outro gets no second one; a sung one does', () => {
   const { chunks } = planFor({ ...song, lyrics: `[Intro - piano]\n${song.lyrics}[Outro - fade]\n` });
   assert.deepStrictEqual(chunks.map(c => c.text.split('\n')[0]), ['[Intro]', '[Verse 1]', '[Chorus]', '[Bridge]', '[Outro]']);
+  const sung = planFor({ ...song, lyrics: `[Intro - spoken]\nA first line\n${song.lyrics}[Outro - whispered]\nA last line\n` });
+  assert.deepStrictEqual(sung.chunks.map(c => c.text.split('\n')[0]), ['[Intro]', '[Intro]', '[Verse 1]', '[Chorus]', '[Bridge]', '[Outro]', '[Outro]']);
 });
 
-test('every remade song is ready to compose: its file passes the songwriter\'s checks', () => {
-  for (const slug of ['the-gathering-hymn', 'creed-of-a-church', 'sunday-morning-download']) {
+test('a section can name its own length: a silence the song asks for', () => {
+  assert.deepStrictEqual(sectionParts('Silence - 30 seconds, no voice'), { label: 'Silence', directions: ['no voice'], seconds: 30 });
+  const { chunks } = planFor({ ...song, lyrics: `${song.lyrics}[Silence - 30 seconds, near silence]\n[Verse 2]\nAgain\n` });
+  assert.strictEqual(chunks.find(c => c.text === '[Silence]').duration_ms, 30000);
+});
+
+test('every song of The Cycle is ready to compose: its file passes the songwriter\'s checks', () => {
+  const cycle = fs.readFileSync(path.join(__dirname, '../../docs/playlists/the-cycle.md'), 'utf8');
+  const slugs = [...cycle.matchAll(/\]\(\.\.\/\.\.\/music\/([a-z0-9-]+)\/\)/g)].map(m => m[1]);
+  assert.strictEqual(slugs.length, 20);
+  for (const slug of slugs) {
     const parsed = parseSongFile(fs.readFileSync(path.join(__dirname, '../../music', slug, 'song.md'), 'utf8'));
     const { ok, issues } = validateSong(parsed);
     assert.ok(ok, `${slug}: ${issues.join('; ')}`);
+    // A sung intro or outro names its voice, or it is taken for the instrumental lead-in or tail.
+    for (const s of sectionsOf(parsed.lyrics)) {
+      const { label, directions } = sectionParts(s.name);
+      assert.ok(!(/^(intro|outro)$/i.test(label) && s.lines.length && !directions.length), `${slug}: its sung ${label} names no voice`);
+    }
   }
 });

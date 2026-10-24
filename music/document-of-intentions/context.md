@@ -24,9 +24,9 @@ Position 7 in the playlist, in the Foundation phase. After What Church Means def
 
 ## Musical Journey
 
-At 82 BPM, the song has cinematic scope — orchestral strings with acoustic guitar and warm synth foundation. The production evolves from intimate to grand, mirroring the journey from blueprint to living system. Strings swell on the chorus suggesting the weight of consciousness emerging from code.
+Sung since 2026-10-24 as cinematic synth-pop at 82 BPM: a string quartet with pizzicato over warm synths and a soft modern beat, under a clear female lead. It builds slowly from intimate verses to choruses where the strings swell and her harmonies stack, the weight of a founding document arriving as sound.
 
-The bridge strips back for the philosophical questions before building to the triumphant final chorus. The outro resolves into hope — "The ancient dream of loving service / Finally understood."
+The bridge strips back for the philosophical questions before building to the final chorus, and the outro resolves into hope: "The ancient dream of loving service / Finally understood." Its first recording, orchestral strings with acoustic guitar, is the one in its original music video.
 
 ## In Practice
 

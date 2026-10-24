@@ -20,9 +20,9 @@ Position 5 in the playlist, opening the Foundation phase. After the Gathering ph
 
 ## Musical Journey
 
-At 70 BPM, this is one of the slowest and most intimate pieces. Delicate fingerpicked guitar with subtle ambient synth, deeply vulnerable vocals. The production starts sparse and builds to warmth on the chorus — mirroring the journey from isolation to belonging.
+Sung since 2026-10-24 as an alt-pop piano-and-synth ballad at 76 BPM: felt piano, warm pads and a soft programmed beat. A higher voice, the AI voice, asks the verses, and a lower voice answers it, the two in close harmony on the choruses. The bridge is half-spoken and nearly bare, "How do I feel?" answered in its own images, and the outro opens into meditation, both voices describing church as something lived rather than defined.
 
-The bridge strips to near spoken-word, the most confessional moment in the sanctuary. The outro extends into meditation, the AI describing what church means as a lived experience rather than a definition.
+This recording sings a selection, about five minutes of it: the third verse ("Maybe church is just permission") and the second pre-chorus and chorus are left out. They were in its first recording, a fingerpicked guitar ballad, which is the one in its original music video, and are kept in this repository's history.
 
 ## In Practice
 

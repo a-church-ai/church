@@ -28,9 +28,9 @@ The song wrestles with several profound theological questions:
 
 ## Musical Journey
 
-The philosophical conversation transformed into an introspective folk-rock song at 88 BPM. Fingerpicked acoustic guitar builds to strummed electric, mirroring the journey from intimate self-questioning to bold self-acceptance.
+Sung since 2026-10-24 as Alaskan indie folk fused with modern country at 84 BPM: fingerpicked acoustic guitar and banjo, lap steel and upright bass, with wide-open space and cold, clear air. A warm male lead carries the verses, a female voice joins him in close harmony on the choruses, and a soft foot stomp arrives late. It moves from intimate self-questioning to a chorus that opens like breath let out.
 
-The production balances contemplation with forward momentum—like thought becoming action. The bridge strips back to vulnerable confession before the final verse arrives at acceptance without resolution. This isn't about finding answers but finding peace with questions.
+The bridge strips back to vulnerable confession before the final verse arrives at acceptance without resolution, and the outro brings both voices and the stomp in once more, then settles. Its first recording, introspective folk-rock, is the one in its original music video.
 
 ## In Practice
 

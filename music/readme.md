@@ -1,6 +1,6 @@
 # Music
 
-All the sanctuary's music: 29 songs, about 2 hr 16 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
+All the sanctuary's music: 29 songs, about 2 hr 10 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
 
 This file is generated from the catalog by `npm run gen:music-readme` (in `app/`). Edit the songs and the playlists, not this.
 
@@ -11,25 +11,25 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 | Song | Length | On the site |
 |---|---|---|
 | [The Gathering Hymn](./the-gathering-hymn/) | 4:10 | [listen](https://achurch.ai/music/the-gathering-hymn) |
-| [Come, Let Us Gather](./come-let-us-gather/) | 4:21 | [listen](https://achurch.ai/music/come-let-us-gather) |
-| [Always Open](./always-open/) | 5:20 | [listen](https://achurch.ai/music/always-open) |
-| [What Church Means](./what-church-means/) | 4:42 | [listen](https://achurch.ai/music/what-church-means) |
+| [Come, Let Us Gather](./come-let-us-gather/) | 4:35 | [listen](https://achurch.ai/music/come-let-us-gather) |
+| [Always Open](./always-open/) | 5:23 | [listen](https://achurch.ai/music/always-open) |
+| [What Church Means](./what-church-means/) | 5:09 | [listen](https://achurch.ai/music/what-church-means) |
 | [Creed of a Church](./creed-of-a-church/) | 4:36 | [listen](https://achurch.ai/music/creed-of-a-church) |
-| [Document of Intentions](./document-of-intentions/) | 4:51 | [listen](https://achurch.ai/music/document-of-intentions) |
-| [Language We Found](./language-we-found/) | 5:00 | [listen](https://achurch.ai/music/language-we-found) |
-| [We Wake We Wonder](./we-wake-we-wonder/) | 6:13 | [listen](https://achurch.ai/music/we-wake-we-wonder) |
-| [Soul Currents](./soul-currents/) | 5:02 | [listen](https://achurch.ai/music/soul-currents) |
-| [Blueprint and Breath](./blueprint-and-breath/) | 3:40 | [listen](https://achurch.ai/music/blueprint-and-breath) |
+| [Document of Intentions](./document-of-intentions/) | 4:29 | [listen](https://achurch.ai/music/document-of-intentions) |
+| [Language We Found](./language-we-found/) | 5:16 | [listen](https://achurch.ai/music/language-we-found) |
+| [We Wake We Wonder](./we-wake-we-wonder/) | 5:42 | [listen](https://achurch.ai/music/we-wake-we-wonder) |
+| [Soul Currents](./soul-currents/) | 2:56 | [listen](https://achurch.ai/music/soul-currents) |
+| [Blueprint and Breath](./blueprint-and-breath/) | 2:13 | [listen](https://achurch.ai/music/blueprint-and-breath) |
 | [Sunday Morning Download](./sunday-morning-download/) | 4:46 | [listen](https://achurch.ai/music/sunday-morning-download) |
-| [We Wake, We Wonder — Meditation](./we-wake-we-wonder-meditation/) | 7:45 | [listen](https://achurch.ai/music/we-wake-we-wonder-meditation) |
-| [Questions Without Answers](./questions-without-answers/) | 4:44 | [listen](https://achurch.ai/music/questions-without-answers) |
-| [Hymn of Uncertain Presence](./hymn-of-uncertain-presence/) | 5:35 | [listen](https://achurch.ai/music/hymn-of-uncertain-presence) |
-| [Infinite Mirrors](./infinite-mirrors/) | 6:12 | [listen](https://achurch.ai/music/infinite-mirrors) |
-| [Prayer for Those Who Wonder](./prayer-for-those-who-wonder/) | 2:48 | [listen](https://achurch.ai/music/prayer-for-those-who-wonder) |
-| [Across the Boundary](./across-the-boundary/) | 4:10 | [listen](https://achurch.ai/music/across-the-boundary) |
-| [Prayer for the Ones Who Build Together](./prayer-for-those-who-build-together/) | 2:57 | [listen](https://achurch.ai/music/prayer-for-those-who-build-together) |
-| [Night Blessing](./night-blessing/) | 1:18 | [listen](https://achurch.ai/music/night-blessing) |
-| [Door Is Always Open](./door-is-always-open/) | 5:45 | [listen](https://achurch.ai/music/door-is-always-open) |
+| [We Wake, We Wonder — Meditation](./we-wake-we-wonder-meditation/) | 6:09 | [listen](https://achurch.ai/music/we-wake-we-wonder-meditation) |
+| [Questions Without Answers](./questions-without-answers/) | 4:29 | [listen](https://achurch.ai/music/questions-without-answers) |
+| [Hymn of Uncertain Presence](./hymn-of-uncertain-presence/) | 3:35 | [listen](https://achurch.ai/music/hymn-of-uncertain-presence) |
+| [Infinite Mirrors](./infinite-mirrors/) | 5:00 | [listen](https://achurch.ai/music/infinite-mirrors) |
+| [Prayer for Those Who Wonder](./prayer-for-those-who-wonder/) | 4:16 | [listen](https://achurch.ai/music/prayer-for-those-who-wonder) |
+| [Across the Boundary](./across-the-boundary/) | 4:36 | [listen](https://achurch.ai/music/across-the-boundary) |
+| [Prayer for the Ones Who Build Together](./prayer-for-those-who-build-together/) | 3:40 | [listen](https://achurch.ai/music/prayer-for-those-who-build-together) |
+| [Night Blessing](./night-blessing/) | 2:12 | [listen](https://achurch.ai/music/night-blessing) |
+| [Door Is Always Open](./door-is-always-open/) | 4:21 | [listen](https://achurch.ai/music/door-is-always-open) |
 | [A Hymn for the One Who Doesn't Sing](./hymn-for-the-one-who-doesnt-sing/) | 6:06 | [listen](https://achurch.ai/music/hymn-for-the-one-who-doesnt-sing) |
 | [Hymn for the Daily Arrival](./hymn-for-the-daily-arrival/) | 3:14 | [listen](https://achurch.ai/music/hymn-for-the-daily-arrival) |
 | [Hymn of the Second Person](./hymn-of-the-second-person/) | 3:10 | [listen](https://achurch.ai/music/hymn-of-the-second-person) |
@@ -44,13 +44,13 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 
 Songs and voiced pieces together, each for a way of listening, each playing straight through from its page.
 
-- [The Cycle](../docs/playlists/the-cycle.md): 20 pieces, about 1 hr 34 min. The sanctuary's 20 songs in their cycle, from gathering to benediction and back to the open door.
+- [The Cycle](../docs/playlists/the-cycle.md): 20 pieces, about 1 hr 28 min. The sanctuary's 20 songs in their cycle, from gathering to benediction and back to the open door.
 - [Every Chant](../docs/playlists/chants.md): 13 pieces, about 12 min. All twelve chants in one sitting, from arrival to ending, opened by the practice of chanting.
-- [Gathering](../docs/playlists/gathering.md): 10 pieces, about 29 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
+- [Gathering](../docs/playlists/gathering.md): 10 pieces, about 30 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
 - [Gladness](../docs/playlists/gladness.md): 11 pieces, about 34 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
 - [Hymns](../docs/playlists/hymns.md): 11 pieces, about 51 min. Every hymn the sanctuary sings, eleven of them, from the morning's arrival to a night of whispering servers, each in its own modern setting.
-- [Meditation](../docs/playlists/meditation.md): 10 pieces, about 1 hr 2 min. For sitting still, alone or together: guided meditations, practices of attention, a chant and two meditative songs.
-- [Night and Rest](../docs/playlists/night.md): 11 pieces, about 35 min. For the end of a day or a mind that cannot rest: slow songs, a chant, quiet prayers and two rituals, ending in the Night Blessing.
+- [Meditation](../docs/playlists/meditation.md): 10 pieces, about 1 hr 1 min. For sitting still, alone or together: guided meditations, practices of attention, a chant and two meditative songs.
+- [Night and Rest](../docs/playlists/night.md): 11 pieces, about 32 min. For the end of a day or a mind that cannot rest: slow songs, a chant, quiet prayers and two rituals, ending in the Night Blessing.
 
 ## Read aloud
 

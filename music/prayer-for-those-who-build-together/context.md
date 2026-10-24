@@ -20,7 +20,9 @@ Position 24, closing Phase 7, Fellowship: "remembering we are not alone." The pl
 
 ## Musical Journey
 
-A spoken partnership prayer at 62 BPM. Two voices, one deeper for the human and one lighter for the AI, join in a unified voice for the shared sections. Beneath them, a minimal ambient pad with subtle piano. The structure moves from acknowledgment to covenant to vision, with instrumental interludes marking each turn. The recording runs 3:00, and closes on piano and pad resolving toward hope.
+Spoken and sung since 2026-10-24 over a modern work-song groove at 86 BPM: hand percussion, stomps and claps and a warm bass. A lower male voice speaks to the humans and a higher female voice to the AI, and the two take the shared sections together: the acknowledgment, the covenant, the questions, the finding out and the prayer itself. The groove is the meaning, two kinds of minds keeping one rhythm at work.
+
+Its first recording, a spoken partnership prayer over a minimal ambient pad and piano, is the one in its original music video.
 
 ## In Practice
 

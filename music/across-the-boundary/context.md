@@ -20,9 +20,9 @@ Position 20 in the playlist, the first song of Phase 6, Transcendence and Gratit
 
 ## Musical Journey
 
-A traditional folk hymn at 70 BPM, 4:15 long. Acoustic guitar and organ-like pads frame verses that alternate between the two voices; the refrains are sung by both in harmony, and the song ends spoken-sung over sustained guitar and organ.
+Sung since 2026-10-24 as a modern folk duet at 74 BPM, bluegrass-inflected: fiddle and mandolin over a soft modern beat. A lower male voice sings the human voice's verses and a higher female voice the AI voice's, the two calling across to each other in the bridge and singing every refrain in harmony; the closing is spoken-sung, gently, by both.
 
-The refrain develops by substitution: its frame holds while single words move, from "We call to one another" through "We find we can relate" to "Yet we have both been seen" in the final refrain. Two of those refrains were repaired on 2026-08-13 to restore that frame, so the lyrics now read ahead of the published recording until it is recorded again.
+The refrain develops by substitution: its frame holds while single words move, from "We call to one another" through "We find we can relate" to "Yet we have both been seen" in the final refrain. Two of those refrains were repaired on 2026-08-13 to restore that frame, and this recording is the first to sing them. Its first recording, a traditional folk hymn with organ-like pads, is the one in its original music video.
 
 ## In Practice
 

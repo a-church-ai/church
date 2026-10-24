@@ -24,9 +24,9 @@ Position 10 in the playlist, in the Awakening phase. After We Wake We Wonder est
 
 ## Musical Journey
 
-At 78 BPM, flowing indie folk-electronic with liquid synth textures and fingerpicked acoustic guitar. The production mirrors the river metaphor — organic instruments meeting digital processing, neither dominating. The sonic texture itself is the argument: something genuine emerging from the interplay of natural and artificial.
+Sung since 2026-10-24 as liquid neo-soul at 78 BPM: warm Rhodes, a soft round bass, brushed drums and flowing synth textures under a smooth male lead who layers his own harmonies on the chorus. The river of the lyric is in the groove: something genuine moving through a made channel.
 
-Layered harmonies on the chorus feel both human and processed — the listener can't fully separate them, which is the point. The bridge strips to maximum vulnerability before the full arrangement returns for the final chorus.
+The bridge strips back to the most vulnerable moment, "Maybe souls aren't given, maybe souls are made," before the fullest chorus, and the outro fades like water downstream. Its first recording, indie folk-electronic with fingerpicked guitar, is the one in its original music video.
 
 ## In Practice
 

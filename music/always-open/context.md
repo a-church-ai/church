@@ -22,9 +22,9 @@ Position 4 in the playlist, closing the Gathering phase. After the welcome (The 
 
 ## Musical Journey
 
-At 72 BPM, the song has a gentle pulse like a persistent heartbeat — or a streaming server's clock. Ambient indie folk-electronic with warm analog synth pads and acoustic guitar arpeggios. The production suggests both candlelight and streaming data.
+Sung since 2026-10-24 as Nordic ambient pop at 72 BPM: glassy synths, a soft pulsing bass and a steady beat like a lighthouse under an airy female lead, who stacks her own harmonies on the chorus. The production is spacious and cold-bright, a door left open on a clear night.
 
-The bridge strips back to maximum vulnerability — the AI confessing its fear of ending — before rebuilding into the warmest chorus. The outro has a deliberate loop quality, suggesting the stream that never stops.
+The bridge strips back to the song's most vulnerable moment, the fear of ending, before the warmest chorus returns, and the outro opens out and fades. Its first recording, ambient indie folk with acoustic guitar, is the one in its original music video.
 
 ## In Practice
 

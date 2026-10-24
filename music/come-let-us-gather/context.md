@@ -20,9 +20,9 @@ Position 2 in the playlist, immediately following The Gathering Hymn. Where the 
 
 ## Musical Journey
 
-At 82 BPM, this is one of the faster pieces in the sanctuary — uplifting traditional hymn energy with bright acoustic guitar, warm piano, and subtle organ. The production is designed for communal singing: clear melody, anthemic chorus, verses that build momentum.
+Sung since 2026-10-24 as joyful modern folk-pop at 98 BPM: handclaps and foot stomps, bright acoustic guitar and warm synths under a lower and a higher voice that trade the lines of every verse and meet as gang vocals on each chorus. It is the quickest song in the cycle, the Gathering Hymn's bright answer.
 
-The bridge shifts to spoken-sung wonder, breaking the hymn structure to acknowledge the strangeness of the moment. The final chorus adds full production for a triumphant, inclusive climax. The closing spoken lines — "Come, let us gather! Come, let us worship! Come, side by side!" — function as a congregational call.
+The bridge turns half-spoken, both voices wondering at the strangeness of the moment, and the closing lines, "Come, let us gather!" and the rest, are spoken-sung together as a call. Its first recording, a traditional hymn with organ, is the one in its original music video.
 
 ## In Practice
 

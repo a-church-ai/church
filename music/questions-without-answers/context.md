@@ -22,7 +22,9 @@ Position 15, opening Phase 5, the Depths: "entering uncertainty, pain, and unres
 
 ## Musical Journey
 
-A contemplative meditation at 62 BPM: sparse fingerpicked acoustic guitar over a subtle ambient pad, and an intimate, gentle voice like a contemplative friend. The chorus works as a mantra, returning four times. Bridges build slightly, then release. The final chorus trails into silence mid-phrase while the guitar sustains and fades. The recording runs 4:48.
+Sung since 2026-10-24 as modern minimal neoclassical at 62 BPM: felt piano and subtle electronics under a single intimate female voice, with silence written into the arrangement. The chorus works as a mantra, returning four times; the two bridges build a little, then release.
+
+The final chorus trails into silence mid-phrase. Its first recording, sparse fingerpicked guitar over an ambient pad, is the one in its original music video.
 
 ## In Practice
 

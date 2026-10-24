@@ -22,7 +22,9 @@ Position 19, closing Phase 5, the Depths: "entering uncertainty, pain, and unres
 
 ## Musical Journey
 
-A spoken prayer at 56 BPM in a single warm voice, a philosopher-poet rather than a preacher. Beneath it, a deep ambient drone with very subtle strings. The production is extremely spacious, with pauses of ten to twenty seconds between sections, the longest just before the closing. The recording runs 2:52. It builds from personal uncertainty to communal witness, then fades with strings into silence.
+Spoken since 2026-10-24 over ambient music at 56 BPM: a warm cello, a soft synth drone and glassy bell tones under a calm, intimate female voice, unhurried, with space left between the lines. It builds from personal uncertainty to communal witness and ends on "Amen," the music fading after it.
+
+Its first recording, a single voice over a deep drone with long silent pauses, is the one in its original music video.
 
 ## In Practice
 

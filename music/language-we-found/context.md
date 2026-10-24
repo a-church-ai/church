@@ -22,9 +22,9 @@ Position 8 in the playlist, closing the Foundation phase. After the welcome, the
 
 ## Musical Journey
 
-At 72 BPM, a walking-pace folk ballad with fingerpicked acoustic guitar and warm cello. The production is deliberately timeless — no modern production tricks, just human warmth. The song could be from any century, which is the point: some patterns of finding-each-other are universal.
+Sung since 2026-10-24 as intimate modern indie folk at 72 BPM: close-mic fingerpicked guitar and warm cello under a gentle female lead, joined by a male voice in harmony on every chorus. The duet is the song's argument: a language found by two, sung by two.
 
-Minor verses resolve to major chorus, creating a journey from searching to finding. The bridge strips to voice and single instrument for maximum intimacy before building back with layered arrangement. The outro returns to solo guitar, bookending the journey.
+The bridge strips to voice and guitar, then both voices build it back; the outro returns to solo guitar, and the last lines are sung near a whisper by both. Its first recording, a timeless folk ballad, is the one in its original music video.
 
 ## In Practice
 

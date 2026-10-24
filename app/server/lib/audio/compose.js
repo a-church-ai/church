@@ -22,10 +22,14 @@ const LATER_STYLES = 5;
 // The style line as styles: its comma-separated phrases, each short.
 const stylesOf = style => style.split(/[,;.]\s+|\n/).map(s => s.trim().replace(/\.$/, '')).filter(s => s && s.length <= 80);
 
-// "Verse 2 - lower voice solo, the human voice" as its name and its directions.
+// "Verse 2 - lower voice solo, the human voice" as its name and its
+// directions; a direction "30 seconds" sets the section's length (a silence
+// the song asks for, an interlude).
 function sectionParts(name) {
   const [label, directions = ''] = String(name).split(/\s+-\s+/, 2);
-  return { label: label.trim(), directions: directions.split(',').map(s => s.trim()).filter(Boolean) };
+  const parts = directions.split(',').map(s => s.trim()).filter(Boolean);
+  const timed = parts.map(p => /^(\d+)\s*seconds?$/i.exec(p)).find(Boolean);
+  return { label: label.trim(), directions: parts.filter(p => !/^\d+\s*seconds?$/i.test(p)), ...(timed ? { seconds: Number(timed[1]) } : {}) };
 }
 
 function planFor(song, music = MUSIC) {
@@ -41,16 +45,19 @@ function planFor(song, music = MUSIC) {
     context_adherence: 'high',
   });
   const chunks = [];
-  const first = sectionParts(sections[0].name).label;
-  const last = sectionParts(sections[sections.length - 1].name).label;
-  if (!/^intro/i.test(first)) chunks.push(chunk('Intro', [], [...lane, ...music.shared, 'instrumental', 'enters softly from near silence'], music.leadIn));
+  // The song's own instrumental intro and outro stand in for the lead-in and
+  // the tail; one that is sung does not, since the song would begin or end on
+  // a voice.
+  const first = sections[0];
+  const last = sections[sections.length - 1];
+  if (!(/^intro/i.test(sectionParts(first.name).label) && !first.lines.length)) chunks.push(chunk('Intro', [], [...lane, ...music.shared, 'instrumental', 'enters softly from near silence'], music.leadIn));
   for (const section of sections) {
-    const { label, directions } = sectionParts(section.name);
+    const { label, directions, seconds: marked } = sectionParts(section.name);
     const styles = [...(chunks.length ? lane.slice(0, LATER_STYLES) : lane), ...music.shared, ...directions];
-    const seconds = section.lines.length ? section.lines.length * lineSeconds + 2 : (/^outro/i.test(label) ? music.tail : music.leadIn);
+    const seconds = marked || (section.lines.length ? section.lines.length * lineSeconds + 2 : (/^outro/i.test(label) ? music.tail : music.leadIn));
     chunks.push(chunk(label, section.lines, styles, seconds));
   }
-  if (!/^outro/i.test(last)) chunks.push(chunk('Outro', [], [...lane.slice(0, LATER_STYLES), ...music.shared, 'instrumental', 'held final chord', 'long gentle tail into silence'], music.tail));
+  if (!(/^outro/i.test(sectionParts(last.name).label) && !last.lines.length)) chunks.push(chunk('Outro', [], [...lane.slice(0, LATER_STYLES), ...music.shared, 'instrumental', 'held final chord', 'long gentle tail into silence'], music.tail));
   return { chunks };
 }
 

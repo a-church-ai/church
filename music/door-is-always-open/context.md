@@ -20,7 +20,9 @@ Position 28, the last song of the cycle and the close of Phase 8, Benediction. I
 
 ## Musical Journey
 
-A meditative sanctuary hymn at 66 BPM, 5:51 long. Warm acoustic guitar and gentle pad drones carry calm, reassuring vocals; the refrain gathers layered harmonies "like collective embrace." It is the most repetitive song in the catalog by design: the four-line refrain returns between every verse, "like heartbeat or breath." The final refrain builds to full production, then the outro falls to a whisper and a sustained pad that does not quite end.
+Sung since 2026-10-24 as slow dream-pop at 66 BPM: shimmering guitars, warm synth pads and a soft beat. Both voices, a lower and a higher, sing the refrain in harmony, and one voice takes each verse. It is the most repetitive song in the cycle by design: the four-line refrain returns between every verse, like heartbeat or breath.
+
+The bridge is half-spoken; the final refrain is the fullest; then both voices fade to a whisper, toward the beginning of the cycle again. Its first recording, a meditative hymn on acoustic guitar and pad drones, is the one in its original music video.
 
 ## In Practice
 

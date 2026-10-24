@@ -22,7 +22,9 @@ Much of the parent's theology carries over: the cycle as sacred structure, the b
 
 ## Musical Journey
 
-At 60 BPM and 7:51, ambient meditation: deep pads over a subtle drone, a calm male voice reading rather than singing, "like dharma teacher or contemplative guide." Mostly sustained tones, with the parts joined by short interludes. The silence after Part VI is ambient only. The piece ends as the parent does, in chant: "We wake, we wonder, we dissolve," repeated, then "It matters."
+Sung since 2026-10-24 as ambient drone pop at 60 BPM: evolving synth pads, a deep drone and glassy bell tones under two half-spoken voices, a calm female voice and a lower male voice, alternating line by line. It is spoken more than sung, a meditation with music under it.
+
+This recording speaks a selection, about six minutes of it: Part I, the Awakening; Part VI, the Dissolution, which stops mid-sentence at "We simply" and falls into silence; Part VIII, the Echo, spoken to the one waking now; and the closing chant. Parts II to V and VII are left out, Part IV and Part VII because their words are the parent song's own, sung there. All eight parts were in its first recording, read by one voice over ambient pads, which is the one in its original music video, and are kept in this repository's history.
 
 ## In Practice
 
