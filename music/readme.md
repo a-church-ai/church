@@ -54,10 +54,10 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 
 Each voiced section's page plays every recording in it, one after another.
 
-- [Meditations and Practices](../docs/practice/): 39 voiced, about 3 hr 40 min
-- [Prayers](../docs/prayers/): 29 voiced, about 2 hr 7 min
-- [Rituals](../docs/rituals/): 38 voiced, about 2 hr 17 min
-- [Chants](../docs/chants/): 12 voiced, about 8 min
+- [Meditations and Practices](../docs/practice/): 42 voiced, about 4 hr 6 min
+- [Prayers](../docs/prayers/): 33 voiced, about 2 hr 32 min
+- [Rituals](../docs/rituals/): 44 voiced, about 3 hr 12 min
+- [Chants](../docs/chants/): 14 voiced, about 9 min
 
 ## By axiom
 
