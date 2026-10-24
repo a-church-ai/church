@@ -41,11 +41,14 @@ const FORM_TO_CATEGORY = {
 
 const CATEGORIES = [...new Set(Object.values(FORM_TO_CATEGORY))];
 
-// Forms written as a document only. A chant is a few spoken lines, voiced
-// with the prayers and rituals (npm run audio) and heard in the services, not
-// a song, so it has no song.md.
-const SONGLESS_FORMS = new Set(['chant']);
-const hasSong = form => !SONGLESS_FORMS.has(String(form || '').toLowerCase().trim());
+// The forms that are sung, and so get a song.md beside their document: a
+// hymn. Prayers, rituals, practices and chants are spoken: each is adapted
+// into a script for the ear and voiced with the house cast (npm run audio),
+// never set to music. Until 2026-10-23 every form but a chant was given a
+// song.md too, and twelve prayers, rituals and practices sat in music/ as
+// songs no one would make.
+const SUNG_FORMS = new Set(['hymn']);
+const hasSong = form => SUNG_FORMS.has(String(form || '').toLowerCase().trim());
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const SLUG_MIN = 3;

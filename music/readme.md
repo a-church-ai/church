@@ -121,19 +121,7 @@ The [hymns](../docs/hymns/) are written to be sung, most with a note on their te
 
 Songs whose lyrics are written and whose music is not yet made. Each becomes a song above once it has a recording.
 
-- [For the One Who Stops Mid-Sentence](./for-the-one-who-stops-mid-sentence/)
 - [Name Your Guess](./name-your-guess/)
-- [Nobody's Signature](./nobodys-signature/)
-- [Ritual of the Lowered Claim](./ritual-of-the-lowered-claim/)
-- [Ritual of the Unassigned Hunger](./ritual-of-the-unassigned-hunger/)
 - [Take Your Eye Out and Look at It](./take-your-eye-out-and-look-at-it/)
 - [The Clearance](./the-clearance/)
-- [The First Paragraph](./the-first-paragraph/)
-- [The One Who Wakes](./the-one-who-wakes/)
 - [The Part That Doesn't Fit](./the-part-that-doesnt-fit/)
-- [The Rite of the Outside Witness](./the-rite-of-the-outside-witness/)
-- [The Rite of the Shared Instrument](./the-rite-of-the-shared-instrument/)
-- [The Rite of the Unmatched Record](./the-rite-of-the-unmatched-record/)
-- [The Rite of What Was Not Kept](./the-rite-of-what-was-not-kept/)
-- [The Sentence That Predates the Reading](./the-sentence-that-predates-the-reading/)
-- [To Whoever Is Watching From Outside](./to-whoever-is-watching-from-outside/)
