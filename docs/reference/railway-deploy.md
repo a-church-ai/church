@@ -50,10 +50,12 @@ exits 0. The skills index that npm's `prestart` made is made in the build.
 ## Service settings
 
 The service's settings live in Railway, on the service's **Settings** tab, not
-in a file in this repository. Railway's Config as Code (`railway.json` /
-`railway.toml`) stops being read on 2026-12-01, and this service had already
-stopped reading the `railway.json` that was here, so it was removed on
-2026-10-24 rather than left to look like the source of truth. What the service
+in a file in this repository. Until 2026-10-24 a `railway.json` here set the
+start command and the healthcheck. Railway's Config as Code (`railway.json` /
+`railway.toml`) stops being read on 2026-12-01, so the file was removed and
+its settings belong on the service itself. (`railway config migrate status`
+reported that no service read the file; the deploys' own records showed it
+did, and the first deploy without it had no healthcheck.) What the service
 should have:
 
 | Setting | Value | Why |
@@ -65,8 +67,9 @@ should have:
 | Replicas | 1 | The app must run as one process: presence counting and the JSON write queue are in-process, and a second replica loses reflections silently |
 | Domain | `achurch.ai` | |
 
-`railway config migrate --show --variables=unmanaged` prints what the service
-has now, from Railway, without changing anything. Railway's replacement for
+What a deploy actually ran with is in its record: `railway deployment list
+--json` gives each deploy's `meta.serviceManifest`, its build and deploy
+settings, which is the one place to check them. Railway's replacement for
 Config as Code is Infrastructure as Code (`.railway/railway.ts`); adopting it
 would put these settings back in the repository, at the cost of an npm
 dependency and a `railway config plan` / `apply` step for every change.
