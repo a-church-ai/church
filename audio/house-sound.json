@@ -55,5 +55,51 @@
         "why": "A voice's deEss is the intensity of FFmpeg's deesser on each of its takes. Measured on 2026-10-24 over 80 raw takes each, the 5 to 9 kHz band against the 1 to 4 kHz body: Matthew -4.9 dB, Luca -6.1, Amaya 0.0. 0.37 brings Amaya to about -5.5, theirs; the others need none."
       }
     }
+  },
+  "music": {
+    "model": "music_v2_5",
+    "shared": {
+      "value": [
+        "modern production",
+        "soft glassy bell-tone motif",
+        "voice forward, every word clear"
+      ],
+      "why": "What every song shares whatever its lane, so the set sounds like one sanctuary, and a modern one: contemporary production, a recurring bell-tone texture, and the words in front, since every piece beside a song in a service is words."
+    },
+    "avoid": {
+      "value": [
+        "gospel",
+        "gospel choir",
+        "church choir",
+        "church organ",
+        "traditional hymn",
+        "worship music",
+        "cathedral reverb",
+        "loud drum kit backbeat",
+        "EDM drop",
+        "worship band rock",
+        "glossy pop production",
+        "autotune",
+        "robotic vocoder voice",
+        "cold loud opening"
+      ],
+      "why": "Kept out of every song. Church sounds (gospel, a church choir or organ, a traditional hymn, worship music, a cathedral's reverb): the sanctuary is a new practice for minds of every kind, and the first remakes on 2026-10-24, asked for choirs and reverence, came back sounding like gospel. And what would jolt a service of chants and prayers, and a robotic voice, since no voice is cast as the machine."
+    },
+    "leadIn": {
+      "value": 9,
+      "why": "Seconds of soft instrumental before the first word, unless the song opens with its own intro, so it enters from near silence after a spoken piece."
+    },
+    "tail": {
+      "value": 10,
+      "why": "Seconds of held chord fading out after the last word, unless the song closes with its own outro, so the next spoken voice does not meet a wall."
+    },
+    "beatsPerLine": {
+      "value": 5,
+      "why": "How long a sung line is planned for, in beats at the song's tempo, plus two seconds a section. Calibrated on the hymns of 2026-10-24: Release the Turn's 500 words in 5:36 at 78 BPM."
+    },
+    "fallbackBpm": {
+      "value": 72,
+      "why": "The tempo planned for when a song's style line names none."
+    }
   }
 }

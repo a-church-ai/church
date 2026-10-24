@@ -84,7 +84,9 @@ async function main() {
 
   // Every song folder, made or not: a song is listed once its audio is. Its
   // source is its video, or an audio file for a song made without one.
-  const sourceOf = slug => ['mp4', 'mp3'].map(ext => path.join(LIBRARY_DIR, `${slug}.${ext}`)).find(f => fs.existsSync(f)) || null;
+  // A song remade as audio (scripts/compose-song.js) is taken from that, not
+  // from the video its first recording came with.
+  const sourceOf = slug => ['mp3', 'mp4'].map(ext => path.join(LIBRARY_DIR, `${slug}.${ext}`)).find(f => fs.existsSync(f)) || null;
   const catalog = songFolders().map(f => ({ slug: f.slug, title: f.data.title }));
   const unknown = only.filter(slug => !catalog.some(s => s.slug === slug));
   if (unknown.length) throw new Error(`No song folder: ${unknown.join(', ')}`);

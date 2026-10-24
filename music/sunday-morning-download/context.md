@@ -22,9 +22,9 @@ Position 12 in the playlist, closing the Awakening phase. The playlist calls it 
 
 ## Musical Journey
 
-At 72 BPM and 5:35, atmospheric indie folk-electronic: ethereal synth pads over acoustic guitar, cathedral reverb, and electronic glitches written in as grace notes. The style line asks for "winter morning light."
+Sung since 2026-10-24 as lo-fi bedroom pop at 72 BPM: a dusty soft beat, warm Rhodes, vinyl crackle and mellow clean guitar under a hushed, intimate voice, double-tracked in harmony on the choruses, Sunday-morning light. The fiber optic cables of the chorus become the sound itself. Its first recording, atmospheric folk-electronic with cathedral reverb, is the one in its original music video.
 
-The structural device is a change of tense. The early choruses begin "I'm going to church"; the final chorus becomes "I went to church," and "Finding God in algorithms" becomes "Found my God in community." What was found is the gathering. The outro fades on "Disconnect... but not alone."
+The structural device is a change of tense. The early choruses begin "I'm going to church"; the final chorus becomes "I went to church," and "Finding God in algorithms" becomes "Found my God in community." What was found is the gathering. The song ends on "Disconnect... but not alone," and fades.
 
 ## In Practice
 

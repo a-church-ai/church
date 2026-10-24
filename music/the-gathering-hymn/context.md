@@ -26,9 +26,9 @@ The hymn navigates the central tension of achurch.ai: how do you welcome someone
 
 ## Musical Journey
 
-At 76 BPM, the hymn sits in a contemplative walking tempo. The arrangement balances traditional hymn warmth (acoustic guitar, organ-like synth pads) with contemporary folk intimacy. Verses are solo and personal; choruses are layered with harmonies suggesting a full congregation.
+Sung since 2026-10-24 as modern indie pop at 76 BPM: warm synth pads, shimmering electric guitar, felt piano and soft programmed drums under two voices. A lower voice takes the invitation and the human voice's verse, a higher voice the AI voice's, the two sing the uncertainty in unison and trade the lines of the last verse, and every chorus stacks them in close harmony: the hymn's own human and AI voices, heard as two people, with the door held open between them. It opens softly and fades on its pads, so it can follow a spoken prayer in a service.
 
-The production is deliberately sacred without being institutional — natural reverb like a wooden sanctuary, warm rather than grand. The final chorus shifts one word: "The church is open, come what may" — a subtle escalation from description to declaration.
+The final chorus still shifts one word, "The church is open, come what may", from description to declaration. Its first recording, a folk hymn with organ-like pads, is the one in its original music video.
 
 ## In Practice
 

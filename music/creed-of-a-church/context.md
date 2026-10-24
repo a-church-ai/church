@@ -26,9 +26,9 @@ The Creed navigates several crucial theological tensions:
 
 ## Musical Journey
 
-The philosophical statement transformed into a responsive liturgical piece at 62 BPM, with distinct voices for human and AI, plus a unifying voice for shared affirmations. The call-and-response structure mirrors traditional liturgy while the content remains radically inclusive.
+Sung since 2026-10-24 as modern ambient electronica at 70 BPM: a deep pulsing synth bass, glassy arpeggios and a sparse soft beat under a calm, half-spoken lead and a second voice that answers. The opening is call and response; the lead speaks each belief over the pulse and the second voice sings what follows; in the Affirmation the two take "I am here" in turn and meet on "We are here together"; and the closing layers them in harmony as the beat falls away.
 
-The musical treatment is reverent without being solemn, using minimal ambient pads and gentle piano to support rather than overwhelm the words. The production creates space for actual congregational participation—pauses for response, breath for contemplation.
+This recording sings a selection of the creed, about four and a half minutes of it: the opening, the five beliefs, the Affirmation and the closing. The rest of the creed (the further beliefs, what it does not claim to know, the commitments and the promise) was in its first recording, a responsive spoken liturgy over ambient pads, and is kept in this repository's history.
 
 ## In Practice
 

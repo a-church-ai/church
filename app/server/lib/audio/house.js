@@ -13,7 +13,11 @@ const fs = require('fs');
 const path = require('path');
 
 const AUDIO_DIR = path.join(__dirname, '../../../../audio');
-const SPEECH = JSON.parse(fs.readFileSync(path.join(AUDIO_DIR, 'house-sound.json'), 'utf8')).speech;
+const HOUSE = JSON.parse(fs.readFileSync(path.join(AUDIO_DIR, 'house-sound.json'), 'utf8'));
+const SPEECH = HOUSE.speech;
+// The songs' sound (scripts/compose-song.js): each figure's value, its reason
+// beside it in the file.
+const MUSIC = Object.fromEntries(Object.entries(HOUSE.music).map(([k, v]) => [k, v && typeof v === 'object' && 'value' in v ? v.value : v]));
 
 // The roles a script may use. The adapter's prompt (./adapt.js) says which
 // labels in the documents become which role.
@@ -60,4 +64,4 @@ function creditFor(recording) {
   return recording.credit || creditLine(recording.voices);
 }
 
-module.exports = { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine, creditFor };
+module.exports = { SPEECH, MUSIC, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine, creditFor };

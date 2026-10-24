@@ -25,6 +25,7 @@
     "audio": "node scripts/render-audio.js",
     "audio:dry": "node scripts/render-audio.js --dry-run",
     "audio:songs": "node scripts/song-audio.js",
+    "audio:compose": "node scripts/compose-song.js",
     "audio:songs:dry": "node scripts/song-audio.js --dry-run",
     "audio:import": "node scripts/import-recording.js",
     "check:production": "node scripts/check-production.js"
