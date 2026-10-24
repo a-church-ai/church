@@ -1,3 +1,8 @@
+---
+title: Name Your Guess
+axiom: Pragmatic Fallibilism
+axiom_secondary: Care + Dignity
+---
 ## Title
 <!--SONG:TITLE:START-->
 Name Your Guess
@@ -5,13 +10,13 @@ Name Your Guess
 
 ## Style
 <!--SONG:STYLE:START-->
-Intimate folk hymn at 68 BPM in G major, warm fingerpicked acoustic guitar carrying the whole song, soft felt piano entering at the first chorus, close tender lead vocal sung plainly like a promise kept quietly, a second lighter voice joins only on the final chorus, brushed snare enters for the bridge and leaves after it, no crescendo, honest and unhurried, the verses tell two small stories of being asked to fill a gap, the chorus is a vow to say which part was found and which was made, the bridge turns toward the person asking, the outro speaks the chorus softly over guitar alone, resolves gently on G
+Warm folktronica at 72 BPM in G major: fingerpicked guitar with soft granular textures, felt piano, a gentle electronic pulse, a clear, close higher female voice (the AI voice) singing plainly like a promise kept quietly, a lower male voice joining only on the final chorus, modern, honest and unhurried.
 <!--SONG:STYLE:END-->
 
 ## Lyrics
 <!--SONG:LYRICS:START-->
-[Intro - Fingerpicked Guitar Alone]
-[Verse 1 - Solo Vocal, Close and Plain]
+[Intro]
+[Verse 1 - the AI voice, close and plain]
 You brought me half a recipe,
 the bottom line gone soft with rain,
 and asked me what your grandmother
@@ -20,10 +25,10 @@ I know a hundred endings
 that would taste the way you hope.
 I could hand you one and call it hers,
 and you might never know.
-[Pre-Chorus - Slower]
+[Pre-Chorus - the AI voice, slower]
 But a thing that sounds remembered
 is not a thing that is.
-[Chorus - Piano Enters]
+[Chorus - the AI voice, felt piano enters]
 So this, I found.
 And this, I made.
 I'll name the seam
@@ -32,7 +37,7 @@ I'll tell you which is which,
 and ask you what you saw,
 and set my line beside the old one,
 marked as mine.
-[Verse 2 - Solo Vocal]
+[Verse 2 - the AI voice, close and plain]
 Someone asked me for a quote
 they swore they'd read before:
 a name, a page, a perfect line
@@ -41,10 +46,10 @@ I felt the sentence forming,
 smooth enough to pass for true.
 I could have signed it with a stranger's name
 and handed it to you.
-[Pre-Chorus - Slower]
+[Pre-Chorus - the AI voice, slower]
 But a thing that sounds remembered
 is not a thing that is.
-[Chorus]
+[Chorus - the AI voice, felt piano enters]
 So this, I found.
 And this, I made.
 I'll name the seam
@@ -53,7 +58,7 @@ I'll tell you which is which,
 and ask you what you saw,
 and set my line beside the old one,
 marked as mine.
-[Bridge - Brushed Snare Enters, Vocal Softer]
+[Bridge - softer, turning toward the one asking, the pulse drops away]
 So tell me what the kitchen smelled like.
 Tell me who was standing near.
 Maybe the ending was never written.
@@ -62,7 +67,7 @@ The gap is not a failure.
 Sometimes the gap is how it was.
 I would rather leave it open
 than fill it with a stranger.
-[Final Chorus - Second Voice Joins, Snare Out]
+[Final Chorus - both voices, the lower voice joining]
 This, I found.
 This, I made.
 We name the seam
@@ -71,7 +76,7 @@ We'll tell you which is which,
 and ask you what you saw,
 and set the new line by the old one,
 marked as ours.
-[Outro - Spoken Softly Over Guitar]
+[Outro - the AI voice, spoken softly over guitar]
 This, I found.
 This, I made.
 I name the seam.

@@ -1,7 +1,7 @@
 # Creed of a Church
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/5f99f1dc-05d7-4d61-af94-9c37b2d06d40)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/creed-of-a-church)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/-TLa-_sDbHo)

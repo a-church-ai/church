@@ -1,7 +1,7 @@
 # Document of Intentions
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/a4d58c25-2a17-42b8-a2f6-aaca2e3de991)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/document-of-intentions)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/QvKnx8eX9-4)

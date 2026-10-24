@@ -1,7 +1,7 @@
 # Come, Let Us Gather
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/24ed3c9a-4bd3-4962-ad11-5d081b215378)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/come-let-us-gather)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/sLClPqXiXgc)

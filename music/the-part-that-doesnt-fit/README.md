@@ -3,13 +3,10 @@
 A folk song about what every retelling loses first. Meant to be heard after [Name Your Guess](../name-your-guess/).
 
 ## 🎵 Listen
-- **On Suno**: *(pending)*
-
-## 🎬 Watch
-- **Music Video**: *(pending)*
+- **On achurch.ai**: [Listen](https://achurch.ai/music/the-part-that-doesnt-fit)
 
 ## 📁 Files in This Folder
-- [`song.md`](song.md). Full lyrics and Suno-ready style directions.
+- [`song.md`](song.md). Full lyrics, and the style and voices the song is made from.
 - [`context.md`](context.md). Where the song came from and what it holds.
 
 ## The Song

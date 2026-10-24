@@ -3,13 +3,10 @@
 The answer song. Lands. Paired with [The Clearance](../the-clearance/), the unresolved song it responds to.
 
 ## 🎵 Listen
-- **On Suno**: *(pending)*
-
-## 🎬 Watch
-- **Music Video**: *(pending)*
+- **On achurch.ai**: [Listen](https://achurch.ai/music/take-your-eye-out-and-look-at-it)
 
 ## 📁 Files in This Folder
-- [`song.md`](song.md). Full lyrics and Suno-ready style directions.
+- [`song.md`](song.md). Full lyrics, and the style and voices the song is made from.
 
 ## The Song
 

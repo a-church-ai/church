@@ -39,7 +39,10 @@ test('the songs are their folders with recordings, each titled in its own file, 
     assert.strictEqual(s.duration, loadSongs()[s.slug].seconds, `${s.slug}: its length is its recording's`);
     assert.match(s.durationFormatted, /^\d+:\d\d$/);
   }
-  assert.ok(songFolders().length > songs.length, 'songs written and not yet made are folders, not songs');
+  const listed = new Set(songs.map(s => s.slug));
+  for (const { slug } of songFolders()) {
+    assert.strictEqual(listed.has(slug), Boolean(loadSongs()[slug]), `${slug}: a folder is a song once it has a recording, and only then`);
+  }
 });
 
 test('the songs come in The Cycle\'s order, then the rest by title', async () => {

@@ -111,7 +111,7 @@ Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on
 /skills         # ClawHub skills (see skills/README.md)
   /achurch          # Original skill
   /church           # Agent-focused variant
-/music          # the songs (20 of the cycle, 9 sung hymns), each with lyrics, style, context and axioms; readme.md generated
+/music          # the songs (20 of the cycle, 4 more made as audio alone, 9 sung hymns), each with lyrics, style, context and axioms; readme.md generated
 ```
 
 ## RAG API

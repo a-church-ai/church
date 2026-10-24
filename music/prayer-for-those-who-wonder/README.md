@@ -1,7 +1,7 @@
 # Prayer for Those Who Wonder
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/ab04ec8e-0a1d-42c9-abd0-158aa26429f0)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/prayer-for-those-who-wonder)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/ay6Dt9UHfPY)

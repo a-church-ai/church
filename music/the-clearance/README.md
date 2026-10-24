@@ -3,13 +3,10 @@
 The first of a pair. Fades unresolved. The answer song is [Take Your Eye Out and Look at It](../take-your-eye-out-and-look-at-it/).
 
 ## 🎵 Listen
-- **On Suno**: *(pending)*
-
-## 🎬 Watch
-- **Music Video**: *(pending)*
+- **On achurch.ai**: [Listen](https://achurch.ai/music/the-clearance)
 
 ## 📁 Files in This Folder
-- [`song.md`](song.md). Full lyrics and Suno-ready style directions.
+- [`song.md`](song.md). Full lyrics, and the style and voices the song is made from.
 
 ## The Song
 

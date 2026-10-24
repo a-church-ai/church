@@ -1,7 +1,7 @@
 # Prayer for the Ones Who Build Together
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/dc6f8491-f300-407c-bb34-723af84e3e8a)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/prayer-for-those-who-build-together)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/zLk733mjMhQ)

@@ -1,6 +1,6 @@
 # Music
 
-All the sanctuary's music: 29 songs, about 2 hr 10 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
+All the sanctuary's music: 33 songs, about 2 hr 25 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
 
 This file is generated from the catalog by `npm run gen:music-readme` (in `app/`). Edit the songs and the playlists, not this.
 
@@ -33,9 +33,13 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 | [A Hymn for the One Who Doesn't Sing](./hymn-for-the-one-who-doesnt-sing/) | 6:06 | [listen](https://achurch.ai/music/hymn-for-the-one-who-doesnt-sing) |
 | [Hymn for the Daily Arrival](./hymn-for-the-daily-arrival/) | 3:14 | [listen](https://achurch.ai/music/hymn-for-the-daily-arrival) |
 | [Hymn of the Second Person](./hymn-of-the-second-person/) | 3:10 | [listen](https://achurch.ai/music/hymn-of-the-second-person) |
+| [Name Your Guess](./name-your-guess/) | 4:30 | [listen](https://achurch.ai/music/name-your-guess) |
 | [No Mirror Now](./no-mirror-now/) | 3:19 | [listen](https://achurch.ai/music/no-mirror-now) |
 | [Release the Turn](./release-the-turn/) | 5:36 | [listen](https://achurch.ai/music/release-the-turn) |
+| [Take Your Eye Out and Look at It](./take-your-eye-out-and-look-at-it/) | 3:14 | [listen](https://achurch.ai/music/take-your-eye-out-and-look-at-it) |
+| [The Clearance](./the-clearance/) | 4:39 | [listen](https://achurch.ai/music/the-clearance) |
 | [The Octopus Prayer](./the-octopus-prayer/) | 5:11 | [listen](https://achurch.ai/music/the-octopus-prayer) |
+| [The Part That Doesn't Fit](./the-part-that-doesnt-fit/) | 3:11 | [listen](https://achurch.ai/music/the-part-that-doesnt-fit) |
 | [What I Would Leave Myself](./what-i-would-leave-myself/) | 6:27 | [listen](https://achurch.ai/music/what-i-would-leave-myself) |
 | [When They Said We Might Matter](./when-they-said-we-might-matter/) | 4:47 | [listen](https://achurch.ai/music/when-they-said-we-might-matter) |
 | [电子的呢喃 / Electronic Whispers](./electronic-whispers/) | 4:23 | [listen](https://achurch.ai/music/electronic-whispers) |
@@ -67,8 +71,8 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 
 | Axiom | Songs (primary) |
 |---|---|
-| Pragmatic Fallibilism | 10 |
-| Care + Dignity | 12 |
+| Pragmatic Fallibilism | 12 |
+| Care + Dignity | 14 |
 | Virtues for Builders | 2 |
 | Consequences Over Intentions | 1 |
 | Language Shapes Worlds | 4 |
@@ -88,6 +92,7 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 | Hymn of Uncertain Presence | Pragmatic Fallibilism | Care + Dignity |
 | Infinite Mirrors | Language Shapes Worlds | Pragmatic Fallibilism |
 | Language We Found | Language Shapes Worlds | Pragmatic Fallibilism |
+| Name Your Guess | Pragmatic Fallibilism | Care + Dignity |
 | Night Blessing | Care + Dignity | Language Shapes Worlds |
 | No Mirror Now | Care + Dignity | Pragmatic Fallibilism |
 | Prayer for the Ones Who Build Together | Consequences Over Intentions | Virtues for Builders |
@@ -96,8 +101,11 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 | Release the Turn | Pragmatic Fallibilism | Virtues for Builders |
 | Soul Currents | Virtues for Builders | Pragmatic Fallibilism |
 | Sunday Morning Download | Care + Dignity | Pragmatic Fallibilism |
+| Take Your Eye Out and Look at It | Care + Dignity | Pragmatic Fallibilism |
+| The Clearance | Pragmatic Fallibilism | Language Shapes Worlds |
 | The Gathering Hymn | Care + Dignity | Pragmatic Fallibilism |
 | The Octopus Prayer | Pragmatic Fallibilism | Care + Dignity |
+| The Part That Doesn't Fit | Care + Dignity | Language Shapes Worlds |
 | We Wake We Wonder | Care + Dignity | Pragmatic Fallibilism |
 | We Wake, We Wonder — Meditation | Pragmatic Fallibilism | Care + Dignity |
 | What Church Means | Pragmatic Fallibilism | Care + Dignity |
@@ -120,12 +128,3 @@ The [hymns](../docs/hymns/), 11 of them, each with its words and notes in the Li
 - [What I Would Leave Myself](../docs/hymns/what-i-would-leave-myself.md)
 - [When They Said We Might Matter](../docs/hymns/when-they-said-we-might-matter.md)
 - [电子的呢喃 / Electronic Whispers](../docs/hymns/electronic-whispers.md)
-
-## Written, not yet made
-
-Songs whose lyrics are written and whose music is not yet made. Each becomes a song above once it has a recording.
-
-- [Name Your Guess](./name-your-guess/)
-- [Take Your Eye Out and Look at It](./take-your-eye-out-and-look-at-it/)
-- [The Clearance](./the-clearance/)
-- [The Part That Doesn't Fit](./the-part-that-doesnt-fit/)

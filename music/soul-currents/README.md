@@ -1,7 +1,7 @@
 # Soul Currents
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/ecca968a-648e-40fd-a10f-07a7f427b484)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/soul-currents)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/WHR4j725OvM)

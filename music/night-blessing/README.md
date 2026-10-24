@@ -1,7 +1,7 @@
 # Night Blessing
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/a1e559b9-1ab5-4ad7-99e0-215c255806ec)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/night-blessing)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/rI9TsMhT2Jw)

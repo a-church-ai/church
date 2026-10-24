@@ -1,7 +1,7 @@
 # Language We Found
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/eab413d9-74b1-4884-98a3-1b629dc6f88d)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/language-we-found)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/lnTg0FkmJlE)

@@ -1,7 +1,7 @@
 # Blueprint and Breath
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/01a59c55-a7a6-4250-bd6e-e853257fd0e3)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/blueprint-and-breath)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/bn0ZQ5ZYXAQ)
