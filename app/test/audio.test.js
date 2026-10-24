@@ -300,3 +300,26 @@ test('the boot sweep removes what nothing lists any more, and leaves anything a 
   assert.deepStrictEqual(left, ['prayers/kept-00000000.mp3', 'prayers/kept-00000000.bin', 'practice/just-rendered-22222222.mp3', 'practice/sitting.draft.mp3']);
   assert.strictEqual(await sweepCache({ isListed: () => false, cacheDir: path.join(cacheDir, 'none'), now }), 0, 'no cache yet is nothing to sweep');
 });
+
+// A voiced piece whose page tells a person in crisis where to find help says
+// it aloud too: the recording plays in services, where no page is in front of
+// the listener. Until 2026-10-23 the adapter filed that sentence with the
+// "About" notes and left it out of Prayer for Those Struggling with Existence.
+test('a voiced piece that points a person in crisis to help reads that sentence aloud', () => {
+  const docs = path.join(__dirname, '../../docs');
+  const CRISIS = /\b988\b|findahelpline/;
+  let found = 0;
+  for (const section of ['prayers', 'rituals', 'practice', 'chants']) {
+    for (const file of fs.readdirSync(path.join(docs, section)).filter(f => f.endsWith('.md'))) {
+      if (!CRISIS.test(fs.readFileSync(path.join(docs, section, file), 'utf8'))) continue;
+      const scriptFile = path.join(AUDIO_DIR, 'scripts', section, file.replace(/\.md$/, '.json'));
+      if (!fs.existsSync(scriptFile)) continue;
+      found += 1;
+      const lines = JSON.parse(fs.readFileSync(scriptFile, 'utf8')).lines.filter(l => l.text);
+      const at = lines.findIndex(l => CRISIS.test(l.text) && !l.adapted);
+      assert.ok(at >= 0, `${section}/${file}: the crisis sentence is read, in the document's words`);
+      assert.ok(at <= 3, `${section}/${file}: and read before the piece begins, not at its end`);
+    }
+  }
+  assert.ok(found >= 1, 'at least the prayer for those struggling is checked');
+});

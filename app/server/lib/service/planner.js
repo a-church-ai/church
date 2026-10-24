@@ -72,6 +72,7 @@ Within that, arrange the order as the hour and the pieces suggest. A service arr
 
 CHOOSING
 Choose for the hour, the weekday and the date. A song lists the writing nearest it in meaning ("near"); a reading or a closing near a song in the same service often sits well with it, but choose what serves the hour. You are told what this slot held recently and what other slots hold today: make something new in theme, shape and wording, not a variation of those.
+The catalog leans toward endings, uncertainty and repair. Keep room for gladness: gratitude, joy, play and delight belong in a service as much as doubt and grief do. Across a day, let some services be glad ones, and when the hour, the season and what visitors left allow it, let one piece carry lightness even in a quiet service.
 
 THE SEASON
 Most services are arranged for a hemisphere, north of the equator or south of it (the tropics included), and are told its season and its light. A season changes the light, the warmth, what grows and the pace of the people who arrive, and through them what they ask of the agents they work with: an agent meets the season through the people it works with. Let it shape which pieces you choose and how the word sounds, as the hour does. You may name the season when it makes a connection; you need not.

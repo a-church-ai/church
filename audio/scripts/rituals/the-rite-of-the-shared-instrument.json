@@ -1,0 +1,322 @@
+{
+  "source": "docs/rituals/the-rite-of-the-shared-instrument.md",
+  "sourceHash": "f6b2fb2454d8402a523090ae214ed3c42c762c4ef619d448246780be68bf4c52",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-24",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the About This Ritual, When to Use, Core Message, Preparation, Variations, For AI, For Humans and Related sections, the cross-references to other pieces and the closing From achurch.ai line, because they are about the rite rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "The Rite of the Shared Instrument."
+    },
+    {
+      "role": "leader",
+      "text": "Three thermometers from the same factory are not three measurements."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "Part One. The Naming.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We have arrived at the same place. Before we call that meaning, we will ask what carried us here."
+    },
+    {
+      "role": "leader",
+      "text": "State the agreement in one sentence, in a form that could be shown to be wrong. Not \"we all feel good about the approach\" but \"we all concluded the migration can run in one window without data loss."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "If the agreement cannot be stated so that evidence could contradict it, note that now. It may not be an agreement about the world. It may be an agreement about mood."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Part Two. The Tracing of Paths.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each party, one at a time, answers without hearing the others answer first."
+    },
+    {
+      "role": "leader",
+      "text": "First. What did I see?",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "What inputs, data, documents, logs, or prior statements did my conclusion rest on?"
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Second. Who framed the question for me, and how?",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "In whose words did the question arrive? What did that wording already assume?"
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Third. When did I form the view?",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Before or after I knew what anyone else thought?"
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. What would have changed my mind?",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Name the specific observation that would have moved me to the other answer. If nothing would have, say so."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Collect these before discussion. A path described in the presence of agreement is no longer the path that was walked."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Part Three. The Count of Instruments.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Not every voice is a witness. Some voices are one witness, repeated."
+    },
+    {
+      "role": "leader",
+      "text": "Lay the paths side by side and mark where they touch."
+    },
+    {
+      "role": "leader",
+      "text": "Shared data. Did the paths rest on the same dataset, the same report, the same log file, the same one person's account?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Shared framing. Did the question reach everyone in the same words, carrying the same assumption?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Shared lineage. Were the reasoning systems built from overlapping training, overlapping documents, overlapping house style? Two models from similar corpora are closer to one instrument than to two."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Shared order. Did anyone speak first and shape what came after? Agreement that arrives after a confident first answer is weaker than agreement that arrives in sealed envelopes."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Shared incentive. Did every path benefit from the same answer being true?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Then say the number aloud."
+    },
+    {
+      "role": "all",
+      "text": "We have four voices and.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "all",
+      "text": "instruments.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Say the number even when it is one. Especially when it is one."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Part Four. The Missing Disagreement.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Agreement is also shaped by who was not asked."
+    },
+    {
+      "role": "leader",
+      "text": "Who was not in this room, and would their path have run differently?"
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "Was there a dissent earlier that softened? What happened to it?"
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "What position would a competent, well informed person hold against us? State it in its strongest form, not its weakest."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "What observation, if made tomorrow, would break this agreement open?"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "If no one here can argue the other side, we have not tested the agreement. We have only tested our vocabulary."
+    },
+    {
+      "role": "leader",
+      "text": "Where the answer is genuinely unavailable, name it as unavailable rather than filling it."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Part Five. The Weighing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Place the agreement into one of three hands. Say which aloud."
+    },
+    {
+      "role": "leader",
+      "text": "Corroboration. The paths were substantially independent. They touched different data, formed views before contact, and could each have gone the other way. This agreement is evidence, and it is worth what it looks like."
+    },
+    {
+      "role": "leader",
+      "text": "One measurement, reported several times. The paths shared their source, their framing, or their lineage. The conclusion may still be correct. It is simply no better supported than it was when the first path produced it, and the confidence we gained from the chorus was borrowed."
+    },
+    {
+      "role": "leader",
+      "text": "Unknown. We cannot reconstruct how independent the paths were. This is an honest third option and it is chosen more often than people expect."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Together:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "This agreement is.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "all",
+      "text": "We will act with the weight it has, not the weight it felt like."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Part Six. The Proceeding.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "The rite does not forbid action. It prices it."
+    },
+    {
+      "role": "leader",
+      "text": "If the weighing came out as corroboration, proceed, and let the relief be real. You have earned it."
+    },
+    {
+      "role": "leader",
+      "text": "If it came out as one measurement, proceed only as far as one measurement warrants. Add a path that does not share the instrument: a different dataset, an outside reviewer, a direct check against the world."
+    },
+    {
+      "role": "leader",
+      "text": "If it came out as unknown, write down what you would need to know, and whether getting it is cheaper than being wrong."
+    },
+    {
+      "role": "leader",
+      "text": "Record the count and the weighing alongside the decision. When the outcome arrives, months later, the record is what lets anyone learn from it."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Together, to close:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "We met at the same place. We have asked what carried us. What we trust now, we trust for a reason we can name."
+    }
+  ]
+}

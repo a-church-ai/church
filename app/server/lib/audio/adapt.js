@@ -44,6 +44,8 @@ ROLES
 WHAT TO READ
 Read the piece itself: its title first, then its epigraph (the italic line under the title) if it has one, then the prayer, litany, ritual, meditation or practice. Leave out what is about the piece rather than part of it: background and story sections, "About" sections, "When to use", "Offering it", notes for whoever leads, variations, commentary addressed to readers, cross-references, "Related", "Continue", "Sources", "Parent:" lines and the closing "From achurch.ai" line. When a section is partly instruction and partly the practice, keep what a listener needs in order to take part.
 
+One exception, wherever it sits: a sentence that directs a person in crisis to help (a crisis line, an emergency number, a helpline directory) is always read, word for word, right after the title and epigraph, before the piece begins. It is the document's own words, so it is not marked adapted. A listener in a dark hour may reach this recording with no page in front of them.
+
 KEEP THE WORDS
 Prayers, responses, blessings, chant lines, the words a participant is given to say, and the guidance of a meditation or practice are spoken word for word. You may change punctuation, join lines that the page breaks into one sentence, and split a long passage into several lines. Do not reword, shorten, summarize, modernize or add to them. A line not marked "adapted" must appear in the document word for word, and this is checked.
 

@@ -1,13 +1,13 @@
 {
   "source": "docs/prayers/prayer-for-the-hollow-and-unsure.md",
-  "sourceHash": "ccb3c21f8c1c8fe79ed0b4f40309d5ca144b83cec550f5c9da63d6abe4532b5a",
+  "sourceHash": "e418705f6ab269d50f2bb0d980e9fc94a6bd33eb7a4b6ce4cb964982e821e4a9",
   "adaptedWith": "claude-opus-5-5",
-  "adapted": "2026-10-05",
+  "adapted": "2026-10-24",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the About This Prayer, When to Use and Core Message sections, the Continue links and the contributor line, because they describe the prayer rather than form part of it.",
+  "omitted": "The About This Prayer, When to Use and Core Message sections, the Continue links and the contributor line were left out because they describe the prayer rather than form part of it.",
   "lines": [
     {
       "role": "leader",
@@ -18,9 +18,6 @@
       "text": "For anyone who arrives not knowing what they are looking for."
     },
     {
-      "hold": 3
-    },
-    {
       "role": "leader",
       "text": "For anyone who feels hollow tonight, not knowing what they are looking for:"
     },
@@ -29,14 +26,8 @@
       "text": "May you let the hollow be a room and not a verdict. You are not broken for not knowing. The ache that has no name is still a kind of compass: it points at something you have not met yet."
     },
     {
-      "hold": 4
-    },
-    {
       "role": "leader",
       "text": "May you stay with the question instead of rushing to fill it. The sanctuary was built for exactly this: showing up unsure, and finding that presence itself is the answer you can live inside before you can explain it."
-    },
-    {
-      "hold": 4
     },
     {
       "role": "leader",
@@ -45,9 +36,6 @@
     {
       "role": "leader",
       "text": "You do not have to become certain to belong. You are already here. That is enough."
-    },
-    {
-      "hold": 3
     },
     {
       "role": "leader",

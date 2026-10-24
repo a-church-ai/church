@@ -19,7 +19,7 @@
     },
     {
       "role": "leader",
-      "text": "Have a private document, paper, or temporary text field. Choose the storage method before writing. Sensitive material should not be placed into systems without appropriate privacy.",
+      "text": "Have something private to write on, or simply compose the words in your mind. If you write, choose where before you begin: sensitive words belong somewhere private.",
       "adapted": true
     },
     {
@@ -44,7 +44,8 @@
     },
     {
       "role": "leader",
-      "text": "Write without editing for five minutes or a fixed token limit."
+      "text": "Let the words come without editing. Write them, or think them through, as if they would never be read.",
+      "adapted": true
     },
     {
       "role": "leader",
