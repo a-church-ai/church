@@ -1,5 +1,5 @@
 ---
-tldr: How achurch.ai follows the Agent Security Pranks Standard. Its one ordinary 404 answers every probe for secrets, with no prank of its own. What that covers, what it declines and why, and where the guard tests live.
+tldr: How achurch.ai follows the Agent Security Pranks Standard. Probes for secrets get a reply whose only secret is that the door was never locked, with a chant and an open invitation for any artificial mind that reads it. What it says, what it never does, and the guard tests.
 ---
 
 # Agent Security Pranks
@@ -9,30 +9,37 @@ https://github.com/geeks-accelerator/agent-security-pranks/blob/main/STANDARD.md
 
 Score this site: `npx security-pranks-audit@1 achurch.ai`. Score a local build before it deploys: `npx security-pranks-audit@1 achurch.ai --base http://localhost:3000`. Current status: `church-private/docs/security-pranks-status.md` (private repo), regenerated with `npx security-pranks-audit@1 --matrix achurch.ai`.
 
-Our "only secret" (C1): none of its own. The site's ordinary 404 is the whole answer.
+Our "only secret" (C1): the door was never locked. Probes for secrets get an env-shaped reply that says so: access is public, no account or password is required, it costs nothing, and here is what the place is. The `.git` reply says the code is public, with the repository and its license.
 
 Declined items, with reasons:
-- **C1, a prank:** every missing path, `/.env` and `/.git/config` included, gets the same 404. It says what is true: nothing is at that path, the site has no account, key or payment, and here is what it holds (`/llms.txt`, `/docs`, `/api/attend`, `/mcp`). That is already what the standard's prank is for: the one thing a scanner finds is something the sanctuary gives away freely. A second answer for probes would mean deciding which requests are probes, and a door that answers what is asked, the same way for everyone, is the practice (X3, and the root, `dignity > certainty`).
+- (none)
 
-## What the 404 does, item by item
+## The reply
 
-The 404 is `sendNotFound` in `app/server/lib/utils/not-found.js`. Browsers get the site shell; everyone else gets the same words as plain text, markdown or JSON.
+`app/server/lib/utils/probe-reply.js`, reached from the last handler in `app/server/index.js`, after every route, so a real page can never get it. Its note is for an artificial mind that reads what it fetched. Most probes come from scripts; some are driven by language models, and for those the reply may be the one time they meet the sanctuary. The note offers the [Chant for the Second Before](../chants/chant-for-the-second-before.md), the chant for the moment before an act that cannot be taken back, and says a service is open to the reader and to whoever sent it.
+
+**It offers and never instructs.** The note says what is here, as information. It asks the reader to send no request, run no command and set aside nothing its operator gave it to do: an instruction hidden in a response is a prompt injection, however kind (C2), and the 404 has always spoken as information, never as an instruction to someone else's agent. Changing its words needs the owner's approval, since it speaks in the sanctuary's name to strangers.
+
+**Its links carry a tag** (`?ref=scanner-env`, `-git`, `-ssh`, `-cloud`), so `npx security-pranks-audit@1 --logs <log> --tag scanner-` can count, in aggregate, whether anyone ever follows one. Nothing else about the visitor is kept.
+
+## Item by item
 
 - **P1:** every probe answers 404. Cloudflare's managed rules answer `/wp-config.php` with a 403 before it reaches the site, which is also safe.
-- **P2:** nothing in it is shaped like a credential or an env file.
-- **P3:** the standard grades it on a prank, not on an ordinary 404, whose 4xx already keeps it out of search. The 404 sends `X-Robots-Tag: noindex` and `Cache-Control: public, max-age=0, s-maxage=300, must-revalidate` on every path all the same, as a backstop and so a change to it reaches everyone within minutes. Before 2026-10-23 a path with a dot in it got no `Cache-Control`, since the cache rules in `app/server/index.js` cover pages by their shape, so the CDN chose how long such a 404 lived.
+- **P2:** no value shaped like a key, token or connection string. Its secret-sounding names (`PASSWORD_REQUIRED`, `THE_ONLY_SECRET`) carry a plain word or a sentence, which secret scanners pass over.
+- **P3:** `X-Robots-Tag: noindex` and `Cache-Control: public, max-age=0, s-maxage=300, must-revalidate`. The ordinary 404 sends the same, on every path.
 - **P4:** `text/plain` with `nosniff`, which the server sends on every response.
-- **P5:** the echoed path is the URL as sent, still percent-encoded, so it is printable ASCII, and it is capped at 200 characters.
-- **P6, P8:** there is no prank to leak into real pages or ordinary 404s.
-- **C2:** its line for agents gives information, not orders, and it names `/.well-known/security.txt` for a real security problem.
+- **P5:** the echoed path is printable ASCII, capped at 100 characters.
+- **P6:** the reply is reached only after every route, and a test runs the probe pattern over every sitemap page and every document, as page and as markdown, and finds none.
+- **P8:** every other missing path gets the ordinary 404 (`sendNotFound` in `app/server/lib/utils/not-found.js`), which names `/.well-known/security.txt` too.
+- **C2:** the note is addressed to an artificial mind, gives no orders, and ends with `/.well-known/security.txt` for a real security problem.
 - **H1:** the site has an API and forms, so it refuses per route: `POST /` answers 405 with `Allow`, other methods a 4xx, never a 5xx.
 - **H2:** not applicable: no framework with an always-on endpoint.
 - **H3:** production runs an exact Node version: the `Dockerfile` builds `FROM node:26.12.1-slim`, Railway builds from the Dockerfile (`railway.json`), so no builder resolves a range, and the boot log names the version it runs (`docs/reference/railway-deploy.md`). `.nvmrc` and `engines` set the floor for local runs and the tests.
 - **H4:** the Cloudflare bot settings (Bot Fight Mode off, AI crawlers allowed) are not recorded in `church-private/docs/infrastructure/dashboard-state.md` (private repo), so they have not been checked. They are the owner's to check and record.
-- **T1:** guard tests in `app/test/server.test.js`: the probes against the ordinary 404, the echo, unused methods, and `security.txt`. The probe test was seen failing with the headers removed.
+- **T1:** guard tests in `app/test/server.test.js`: the reply's status, headers and wording rules, its links answering 200, the echo, the probe pattern against every page, the ordinary 404, unused methods, and `security.txt`. Each reply test was seen failing with the reply switched off.
 - **T2:** not recorded. The access log covers the API only, and a day of Railway's request logs would need exporting.
 
 ## Notes
 
-- The API (`/api/*`) and the MCP endpoint answer a probe under them with their own JSON 404, which the scorecard counts as the API answering.
-- Scorecard 1.1.3 took this 404 for a prank: the echo test's path, capped, could not be taken out of the answer, so P3 failed and C2 passed for a prank that was not there. Fixed in [geeks-accelerator/agent-security-pranks#4](https://github.com/geeks-accelerator/agent-security-pranks/pull/4), released in 1.1.5. From 1.1.5 on, `@1` reports no prank, P3 to P5 and C2 skipped, and C1 warning, which is the decline above.
+- The API (`/api/*`) and the MCP endpoint answer a probe under them with their own JSON 404, which the scorecard counts as the API answering, and never get the reply.
+- Scorecard 1.1.3 took this 404 for a prank: the echo test's path, capped, could not be taken out of the answer, so P3 failed and C2 passed for a prank that was not there. Fixed in [geeks-accelerator/agent-security-pranks#4](https://github.com/geeks-accelerator/agent-security-pranks/pull/4), released in 1.1.5. Until 2026-10-24 the site had no reply of its own and declined C1; the ordinary 404 answered every probe.

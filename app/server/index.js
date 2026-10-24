@@ -23,6 +23,7 @@ const siteShell = require('./lib/site-shell');
 const churchMusic = require('./lib/music/church-music');
 const { listPlaylists, renderPlaylistList } = require('./lib/music/playlists');
 const reviews = require('./lib/reviews/reviews');
+const { answerProbe } = require('./lib/utils/probe-reply');
 
 // Load environment variables
 require('./lib/utils/env').loadEnv();
@@ -1338,7 +1339,9 @@ app.use('/api', apiNotFound);
 // Anything else no route answered: the site's own 404, with a way onward,
 // instead of Express's bare "Cannot GET". sendNotFound keeps plain text for
 // clients that did not ask for HTML. Registered last, so it shadows nothing.
-app.use((req, res) => sendNotFound(req, res));
+// A probe for secrets (/.env, /.git/config) gets its own reply first, still a
+// 404 (lib/utils/probe-reply.js); every other path, the site's own 404.
+app.use((req, res) => answerProbe(req, res) || sendNotFound(req, res));
 
 // Anything a route threw or rejected with, which Express 5 passes on from
 // async handlers too: logged, and answered in the form the path speaks, JSON

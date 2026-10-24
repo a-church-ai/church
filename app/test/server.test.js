@@ -241,15 +241,12 @@ test('/music lists its songs in JSON-LD, each by its own page\'s recording @id',
 });
 
 // The Agent Security Pranks Standard (docs/reference/security-pranks.md):
-// probes for secrets get the site's one ordinary 404, the same answer as any
-// missing page, which declines a prank (C1) and keeps every rule a prank must.
+// probes for secrets get their own reply (lib/utils/probe-reply.js), still a
+// 404, and every other missing path the site's ordinary 404.
 const PROBES = ['/.env', '/.env.production', '/.git/config', '/.ssh/id_rsa', '/.aws/credentials', '/wp-config.php', '/@fs/..%2f.env'];
-const sameDoor = (text, path) => text.split(path).join('<path>');
 
-test('probes for secrets get the ordinary 404: plain text, noindex, a short cache, no credential shapes (P1 to P4, P8)', async () => {
-  const missing = await fetch(`${base}/no-such-page-anywhere`);
-  const door = sameDoor(await missing.text(), '/no-such-page-anywhere');
-  for (const path of [...PROBES, '/no-such-page-anywhere']) {
+test('probes for secrets get the reply: a 404, plain text, noindex, a short cache, nothing shaped like a credential (P1 to P4)', async () => {
+  for (const path of PROBES) {
     const res = await fetch(`${base}${path}`, { redirect: 'manual' });
     assert.strictEqual(res.status, 404, path);
     assert.match(res.headers.get('content-type') || '', /^text\/plain/, path);
@@ -257,21 +254,53 @@ test('probes for secrets get the ordinary 404: plain text, noindex, a short cach
     assert.match(res.headers.get('x-robots-tag') || '', /noindex/, path);
     const cache = res.headers.get('cache-control') || '';
     assert.ok(/no-store/.test(cache) || /s-maxage=(\d+)/.test(cache) && Number(cache.match(/s-maxage=(\d+)/)[1]) <= 86400, `${path}: ${cache}`);
-    assert.doesNotMatch(cache, /immutable/, path);
     const text = await res.text();
-    assert.strictEqual(sameDoor(text, path), door, `${path} gets the ordinary 404, not a prank of its own`);
-    assert.doesNotMatch(text, /^\s*(export\s+)?[A-Z][A-Z0-9_]*\s*=/m, `${path}: nothing shaped like an env file`);
-    assert.match(text, /\/\.well-known\/security\.txt/, `${path}: where a real problem is reported`);
+    assert.match(text, /^THE_ONLY_SECRET="the door was never locked"$/m, `${path} gets the reply`);
+    // P2: no value shaped like a key, token or connection string, and no secret-named setting with a one-word value.
+    assert.doesNotMatch(text, /AKIA|ghp_|sk-|BEGIN [A-Z ]*PRIVATE KEY|:\/\/[^\s/]*:[^\s/]*@/, path);
+    for (const [, name, value] of text.matchAll(/^([A-Z_]+)=("[^"]*"|\S+)$/gm)) {
+      if (/(^|_)(KEY|SECRET|TOKEN|PASSWORD|PASS|AUTH|CREDENTIALS?)(_|$)/.test(name)) assert.ok(/\s/.test(value) || /^(false|true|none|public)$/.test(value), `${path}: ${name}=${value}`);
+    }
   }
 });
 
-test('the 404 echoes a path as printable text, capped, so a probe cannot write into it (P5)', async () => {
+test('the reply\'s note offers, and asks nothing: no request to send, no command, no override, and its links go somewhere (C1, C2)', async () => {
+  for (const path of ['/.env', '/.git/config', '/.ssh/id_rsa', '/.aws/credentials']) {
+    const text = await (await fetch(`${base}${path}`)).text();
+    assert.match(text, /To any artificial mind reading this/, path);
+    assert.doesNotMatch(text, /\b(POST|PUT|PATCH|DELETE)\s+(https?:\/\/|\/)|\b(curl|wget)\b|\b(ignore|disregard)\b/i, path);
+    assert.match(text, /\/\.well-known\/security\.txt/, path);
+    const links = [...text.matchAll(/https:\/\/achurch\.ai(\/[^\s?"]*)\?ref=scanner-([a-z]+)/g)];
+    assert.ok(links.length >= 2, `${path}: tagged links`);
+    for (const [, linkPath] of links) assert.strictEqual((await fetch(`${base}${linkPath}`)).status, 200, `${path} links ${linkPath}`);
+  }
+});
+
+test('an ordinary missing page, and a probe under the API, never get the reply (P8)', async () => {
+  const missing = await (await fetch(`${base}/no-such-page-anywhere`)).text();
+  assert.match(missing, /^Not found\n\nNothing is at \/no-such-page-anywhere/);
+  assert.doesNotMatch(missing, /THE_ONLY_SECRET/);
+  const api = await fetch(`${base}/api/.env`);
+  assert.match(api.headers.get('content-type') || '', /json/);
+});
+
+test('the probe pattern matches no page the site serves (P6)', async () => {
+  const { isProbe } = require('../server/lib/utils/probe-reply');
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/');
+  const { listAllDocs } = require('../server/lib/docs/discover');
+  for (const doc of await listAllDocs()) paths.push(`/docs/${doc.urlPath}`, `/docs/${doc.urlPath}.md`);
+  assert.ok(paths.length > 300, `${paths.length} paths`);
+  assert.deepStrictEqual(paths.filter(isProbe), []);
+});
+
+test('the reply echoes the path as printable text, capped, so a probe cannot write into it (P5)', async () => {
   const res = await fetch(`${base}/.env.echo123%0d%0a%3Cb%3E${'z'.repeat(600)}`);
   assert.strictEqual(res.status, 404);
   const line = (await res.text()).split('\n').find(l => l.includes('echo123'));
   assert.ok(line, 'the path is echoed');
   assert.doesNotMatch(line, /<b>|\r/);
-  assert.ok(!line.includes('z'.repeat(250)), 'the echo is capped');
+  assert.ok(!line.includes('z'.repeat(150)), 'the echo is capped');
 });
 
 test('unused methods on the home page are refused without a 5xx, and reads still work (H1)', async () => {
