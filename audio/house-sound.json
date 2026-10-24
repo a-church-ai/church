@@ -2,18 +2,58 @@
   "speech": {
     "model": "eleven_v4",
     "voices": {
-      "matthew": { "name": "Matthew Schmitz", "id": "4QLC5fepxZkYmdD2IGRU", "gainDb": -2.7 },
-      "luca": { "name": "Luca", "id": "4JVOFy4SLQs9my0OLhEw", "gainDb": 0 },
-      "amaya": { "name": "Amaya Calm", "id": "BFvr34n3gOoz0BAf9Rwn", "gainDb": -3.2 }
+      "matthew": {
+        "name": "Matthew Schmitz",
+        "id": "4QLC5fepxZkYmdD2IGRU",
+        "gainDb": -2.7
+      },
+      "luca": {
+        "name": "Luca",
+        "id": "4JVOFy4SLQs9my0OLhEw",
+        "gainDb": 0
+      },
+      "amaya": {
+        "name": "Amaya Calm",
+        "id": "BFvr34n3gOoz0BAf9Rwn",
+        "gainDb": -3.2,
+        "deEss": 0.37
+      }
     },
     "leader": "matthew",
-    "pair": ["luca", "amaya"],
+    "pair": [
+      "luca",
+      "amaya"
+    ],
     "deeper": "luca",
     "gapSeconds": 0.9,
     "sameVoiceGapSeconds": 0.6,
     "afterTitleSeconds": 1.6,
     "maxHoldSeconds": 30,
-    "loudness": { "integrated": -16, "truePeak": -1.5, "range": 11 },
-    "bitrate": "128k"
+    "bitrate": "128k",
+    "level": {
+      "voice": {
+        "value": -18.0,
+        "why": "A spoken recording's level: its median second of speech in LUFS, holds left out (lib/audio/levels.js voiceLevel). What a listener hears is the voice, not the file's average: driven to one integrated loudness until 2026-10-24, voices spread from -19.7 to -16.2 and sat about 1 dB under the songs. -18, not -17: at -17 the limiter shaved the voices' peaks by up to 4.3 dB to keep the true peak, which flattens speech; consistency is the aim, not loudness."
+      },
+      "sung": {
+        "value": -18.0,
+        "why": "A song's level: its median active second in LUFS (levels.js activeLevel). The same as the voice's, because in a service a song follows a prayer and they should meet."
+      },
+      "tolerance": {
+        "value": 0.5,
+        "why": "How far a finished file's level may fall from its target, in dB; a file outside it is refused."
+      },
+      "truePeak": {
+        "value": -1.5,
+        "why": "The highest true peak a finished file may decode to, in dBTP, measured on the encoded MP3. The guard read the sample peak until 2026-10-24, and 22 spoken recordings decoded to true peaks up to -0.4."
+      },
+      "limiterMargin": {
+        "value": 0.5,
+        "why": "The limiter's ceiling sits this far under truePeak, in dB, for the overshoot the MP3 encoder adds; the encoded file is what is checked."
+      },
+      "deEss": {
+        "why": "A voice's deEss is the intensity of FFmpeg's deesser on each of its takes. Measured on 2026-10-24 over 80 raw takes each, the 5 to 9 kHz band against the 1 to 4 kHz body: Matthew -4.9 dB, Luca -6.1, Amaya 0.0. 0.37 brings Amaya to about -5.5, theirs; the others need none."
+      }
+    }
   }
 }

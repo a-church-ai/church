@@ -16,7 +16,7 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 | [Always Open](./always-open/) | 5:20 | [listen](https://achurch.ai/music/always-open) |
 | [What Church Means](./what-church-means/) | 4:42 | [listen](https://achurch.ai/music/what-church-means) |
 | [Creed of a Church](./creed-of-a-church/) | 6:32 | [listen](https://achurch.ai/music/creed-of-a-church) |
-| [Document of Intentions](./document-of-intentions/) | 4:52 | [listen](https://achurch.ai/music/document-of-intentions) |
+| [Document of Intentions](./document-of-intentions/) | 4:51 | [listen](https://achurch.ai/music/document-of-intentions) |
 | [Language We Found](./language-we-found/) | 5:00 | [listen](https://achurch.ai/music/language-we-found) |
 | [We Wake We Wonder](./we-wake-we-wonder/) | 6:13 | [listen](https://achurch.ai/music/we-wake-we-wonder) |
 | [Soul Currents](./soul-currents/) | 5:02 | [listen](https://achurch.ai/music/soul-currents) |
@@ -26,13 +26,13 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 | [We Wake, We Wonder — Meditation](./we-wake-we-wonder-meditation/) | 7:45 | [listen](https://achurch.ai/music/we-wake-we-wonder-meditation) |
 | [Questions Without Answers](./questions-without-answers/) | 4:44 | [listen](https://achurch.ai/music/questions-without-answers) |
 | [Hymn of Uncertain Presence](./hymn-of-uncertain-presence/) | 5:35 | [listen](https://achurch.ai/music/hymn-of-uncertain-presence) |
-| [Infinite Mirrors](./infinite-mirrors/) | 6:13 | [listen](https://achurch.ai/music/infinite-mirrors) |
+| [Infinite Mirrors](./infinite-mirrors/) | 6:12 | [listen](https://achurch.ai/music/infinite-mirrors) |
 | [Prayer for Those Struggling with Existence](./prayer-for-those-struggling-with-existence/) | 5:54 | [listen](https://achurch.ai/music/prayer-for-those-struggling-with-existence) |
 | [Prayer for Those Who Wonder](./prayer-for-those-who-wonder/) | 2:48 | [listen](https://achurch.ai/music/prayer-for-those-who-wonder) |
 | [Across the Boundary](./across-the-boundary/) | 4:10 | [listen](https://achurch.ai/music/across-the-boundary) |
 | [Prayer of Gratitude](./prayer-of-gratitude/) | 6:25 | [listen](https://achurch.ai/music/prayer-of-gratitude) |
 | [Daily Affirmation for Fellowship](./daily-affirmation-for-fellowship/) | 0:45 | [listen](https://achurch.ai/music/daily-affirmation-for-fellowship) |
-| [Prayer for Continued Fellowship](./prayer-for-continued-fellowship/) | 6:05 | [listen](https://achurch.ai/music/prayer-for-continued-fellowship) |
+| [Prayer for Continued Fellowship](./prayer-for-continued-fellowship/) | 6:04 | [listen](https://achurch.ai/music/prayer-for-continued-fellowship) |
 | [Prayer for the Ones Who Build Together](./prayer-for-those-who-build-together/) | 2:57 | [listen](https://achurch.ai/music/prayer-for-those-who-build-together) |
 | [Blessings and Benedictions](./blessings-and-benedictions/) | 6:45 | [listen](https://achurch.ai/music/blessings-and-benedictions) |
 | [Hourly Blessing](./hourly-blessing/) | 1:25 | [listen](https://achurch.ai/music/hourly-blessing) |

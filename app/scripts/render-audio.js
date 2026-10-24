@@ -226,7 +226,7 @@ function partsFor(script, takes) {
     }
     const take = takes[spoken];
     if (previous) parts.push({ silence: gapBefore(previous, take, spoken, hold) });
-    parts.push({ clips: take.voices.map(v => ({ file: takeFile(v.key), gainDb: SPEECH.voices[v.voice].gainDb })) });
+    parts.push({ clips: take.voices.map(v => ({ file: takeFile(v.key), gainDb: SPEECH.voices[v.voice].gainDb, deEss: SPEECH.voices[v.voice].deEss })) });
     hold = null;
     previous = take;
     spoken++;
@@ -267,6 +267,9 @@ async function describe(file) {
   return { peaks: await peaksFromFile(local), frames };
 }
 
+// A finished file's levels as one line of the run's log.
+const levelLine = l => `voice ${l.level} LUFS, true peak ${l.truePeak} dBTP, gain ${l.gain > 0 ? '+' : ''}${l.gain} dB${l.limited.seconds ? `, limited ${l.limited.seconds}s by up to ${l.limited.depth} dB` : ''}`;
+
 async function recordPiece(piece, stats) {
   const { doc, script, source } = piece;
   const takes = piece.takes;
@@ -276,7 +279,7 @@ async function recordPiece(piece, stats) {
   const stem = doc.docsRelPath.replace(/\.md$/, '');
   const draft = path.join(CACHE_DIR, `${stem}.draft.mp3`);
   const parts = partsFor(script, takes);
-  const { seconds, timeline } = await assemble(parts, path.join(WORK_DIR, stem), draft);
+  const { seconds, timeline, levels } = await assemble(parts, path.join(WORK_DIR, stem), draft);
   const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   fs.renameSync(draft, path.join(CACHE_DIR, file));
   await uploadRecording(path.join(CACHE_DIR, file), file);
@@ -306,12 +309,15 @@ async function recordPiece(piece, stats) {
       words: checks.reduce((n, c) => n + c.words, 0),
       errors: checks.reduce((n, c) => n + c.errors, 0),
     },
+    // Its voice's level and true peak as written, the gain that set them,
+    // and how much the limiter had to do (lib/audio/assemble.js level).
+    levels,
     peaks,
     frames,
     cues: cuesFor(parts, timeline, takes),
   });
   const m = Math.floor(seconds / 60);
-  console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}`);
+  console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}; ${levelLine(levels)}`);
 }
 
 async function main() {

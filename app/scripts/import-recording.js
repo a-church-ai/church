@@ -6,7 +6,7 @@
  * The document must already hold the recording's words, exactly, in its
  * "## The Meditation" section (lib/audio/imported.js). Then:
  *   1. encode it as the songs are (lib/audio/assemble.js encodeWhole): one
- *      gain for the whole of it to the house loudness, stereo MP3. Its own
+ *      gain for the whole of it to the house level, stereo MP3. Its own
  *      tags are dropped, since they can name people its page does not, and
  *      its chapter marks are kept;
  *   2. transcribe it whole with each word's time, check its words against the
@@ -77,14 +77,13 @@ async function main() {
   await fs.promises.mkdir(WORK_DIR, { recursive: true });
   const draft = path.join(WORK_DIR, `${path.basename(stem)}.mp3`);
   // The file's and the stream's tags go; the chapters keep their titles.
-  const loudness = await encodeWhole(input, draft, ['-map', '0:a:0', '-map_metadata:g', '-1', '-map_metadata:s', '-1', '-map_chapters', '0', '-id3v2_version', '3']);
-  if (!loudness.linear) throw new Error('loudnorm could not reach the house loudness with one gain, and would have compressed the recording. Lower the source\'s peaks first.');
+  const levels = await encodeWhole(input, draft, ['-map', '0:a:0', '-map_metadata:g', '-1', '-map_metadata:s', '-1', '-map_chapters', '0', '-id3v2_version', '3']);
   const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   const local = path.join(CACHE_DIR, file);
   await fs.promises.mkdir(path.dirname(local), { recursive: true });
   fs.renameSync(draft, local);
   const length = await seconds(local);
-  console.log(`[encoded] ${file}: ${clock(length)}, ${(fs.statSync(local).size / 1e6).toFixed(1)} MB, from ${loudness.measured} LUFS to ${loudness.target}`);
+  console.log(`[encoded] ${file}: ${clock(length)}, ${(fs.statSync(local).size / 1e6).toFixed(1)} MB, at ${levels.level} LUFS (gain ${levels.gain > 0 ? '+' : ''}${levels.gain} dB), true peak ${levels.truePeak} dBTP`);
 
   // 2. Hear it. A small mono copy, under OpenAI's 25 MB.
   const small = path.join(WORK_DIR, `${path.basename(stem)}.heard.mp3`);
@@ -121,6 +120,7 @@ async function main() {
   await saveRecording(source, {
     file,
     seconds: Math.round(length * 10) / 10,
+    levels,
     // The enclosure length in the podcast feeds: the file's own size.
     bytes: fs.statSync(local).size,
     voices: [],

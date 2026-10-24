@@ -5,15 +5,17 @@
  * For each song with a source in media/library (kept where this runs): its
  * music video (<slug>.mp4), or for a song made as audio alone, such as a
  * hymn sung with ElevenLabs Music, the audio file itself (<slug>.mp3). Take
- * the audio from it, bring it to the house
- * loudness with one gain for the whole song so its dynamics stay as they were
- * made, encode it as stereo MP3, measure what its player draws (the
+ * the audio from it, set it to the house level by what is sung, with one
+ * gain for the whole song so its dynamics stay as they were made
+ * (lib/audio/assemble.js encodeWhole), encode it as stereo MP3, measure what
+ * its player draws (the
  * waveform's peaks and the visual's frames, as the recordings have), upload
  * both to S3 under audio/music/, and record it in audio/songs.json, which
  * lets /audio serve it and puts it in the services.
  *
- * A song is made again only when its source changes (by size), or with
- * --force. This runs where FFmpeg and the S3 keys are, like render-audio.js.
+ * A song is made again when its source changes (by size) or the house level
+ * does (levelKey), or with --force. This runs where FFmpeg and the S3 keys
+ * are, like render-audio.js.
  *
  * Usage, from app/:
  *   node scripts/song-audio.js                      every song that needs it
@@ -27,7 +29,7 @@ require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
-const { seconds, encodeWhole } = require('../server/lib/audio/assemble');
+const { seconds, encodeWhole, WHOLE_KEY } = require('../server/lib/audio/assemble');
 const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
 const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frames');
 const { uploadRecording, bucket } = require('../server/lib/audio/storage');
@@ -43,7 +45,7 @@ const sha = data => crypto.hash('sha256', data);
 async function makeSong(song, video, previous) {
   await fs.promises.mkdir(WORK_DIR, { recursive: true });
   const draft = path.join(WORK_DIR, `${song.slug}.mp3`);
-  const loudness = await encodeWhole(video, draft);
+  const levels = await encodeWhole(video, draft);
 
   const file = `music/${song.slug}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   const local = path.join(CACHE_DIR, file);
@@ -62,7 +64,10 @@ async function makeSong(song, video, previous) {
     bytes: fs.statSync(local).size,
     source: path.relative(path.join(__dirname, '..'), video),
     sourceBytes: fs.statSync(video).size,
-    loudness: { measured: loudness.measured, target: loudness.target },
+    // What is sung, as written, and what set it; levelKey says which house
+    // level it was set to, so a change to that re-makes the song.
+    levels,
+    levelKey: WHOLE_KEY,
     published: previous ? previous.published : now.toISOString(),
     rendered: now.toISOString().slice(0, 10),
     peaks: await peaksFromFile(local),
@@ -84,17 +89,21 @@ async function main() {
   const unknown = only.filter(slug => !catalog.some(s => s.slug === slug));
   if (unknown.length) throw new Error(`No song folder: ${unknown.join(', ')}`);
   const songs = loadSongs();
+  // A listed song whose source is not on this machine cannot be made again:
+  // that is an error. A folder with neither a source nor a recording is a
+  // song written and not yet made, and waits.
   const missing = [];
+  const unmade = [];
   const todo = [];
   for (const song of catalog.filter(s => !only.length || only.includes(s.slug))) {
     const video = sourceOf(song.slug);
-    if (!video) { missing.push(song.slug); continue; }
+    if (!video) { (songs[song.slug] ? missing : unmade).push(song.slug); continue; }
     const done = songs[song.slug];
-    if (!force && done && done.sourceBytes === fs.statSync(video).size) continue;
+    if (!force && done && done.sourceBytes === fs.statSync(video).size && done.levelKey === WHOLE_KEY) continue;
     todo.push({ song, video, previous: done });
   }
 
-  console.log(`${todo.length} of ${catalog.length} songs to make${missing.length ? `; ${missing.length} have no source in media/library: ${missing.join(', ')}` : ''}.`);
+  console.log(`${todo.length} of ${catalog.length - unmade.length} songs to make${missing.length ? `; ${missing.length} have no source in media/library: ${missing.join(', ')}` : ''}.${unmade.length ? ` Not yet made: ${unmade.join(', ')}.` : ''}`);
   if (dryRun) {
     todo.forEach(t => console.log(`  ${t.song.slug}`));
     return;
@@ -105,7 +114,7 @@ async function main() {
   for (const { song, video, previous } of todo) {
     try {
       const record = await makeSong(song, video, previous);
-      console.log(`[song] ${song.slug}: ${record.seconds}s, ${(record.bytes / 1e6).toFixed(1)} MB, from ${record.loudness.measured} LUFS`);
+      console.log(`[song] ${song.slug}: ${record.seconds}s, ${(record.bytes / 1e6).toFixed(1)} MB, sung at ${record.levels.level} LUFS (gain ${record.levels.gain > 0 ? '+' : ''}${record.levels.gain} dB), true peak ${record.levels.truePeak} dBTP${record.levels.limited.seconds ? `, limited ${record.levels.limited.seconds}s by up to ${record.levels.limited.depth} dB` : ''}`);
     } catch (err) {
       failures.push(`${song.slug}: ${err.message.split('\n')[0]}`);
       console.error(`[song failed] ${song.slug}: ${err.message.split('\n')[0]}`);

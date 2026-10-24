@@ -34,9 +34,10 @@ const SILENCE_RMS = 0.001;
 const INT16_SCALE = 32768;
 const PEAKS_SAMPLE_RATE = 8000;
 
+// Shared with frames.js and levels.js.
 function percentile(values, p) {
   if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
+  const sorted = Float64Array.from(values).sort();
   const rank = (p / 100) * (sorted.length - 1);
   const low = Math.floor(rank);
   const high = Math.ceil(rank);
@@ -73,12 +74,12 @@ function peaksFromPcm(samples, buckets = BUCKETS) {
   return peaks;
 }
 
-// Decode an audio file to mono signed 16-bit samples at `sampleRate`, with
-// FFmpeg on the machine that renders. The production image has none, and
-// nothing here runs there.
-function decodePcm(file, sampleRate) {
+// Decode an audio file to signed 16-bit samples at `sampleRate`, mono unless
+// asked for more channels (then interleaved), with FFmpeg on the machine that
+// renders. The production image has none, and nothing here runs there.
+function decodePcm(file, sampleRate, channels = 1) {
   return new Promise((resolve, reject) => {
-    const proc = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', file, '-f', 's16le', '-ac', '1', '-ar', String(sampleRate), 'pipe:1']);
+    const proc = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', file, '-f', 's16le', '-ac', String(channels), '-ar', String(sampleRate), 'pipe:1']);
     const chunks = [];
     let stderr = '';
     proc.stdout.on('data', c => chunks.push(c));
@@ -98,4 +99,4 @@ async function peaksFromFile(file) {
   return peaksFromPcm(await decodePcm(file, PEAKS_SAMPLE_RATE));
 }
 
-module.exports = { peaksFromPcm, peaksFromFile, decodePcm, BUCKETS, PEAK_MAX };
+module.exports = { peaksFromPcm, peaksFromFile, decodePcm, rmsOf, percentile, BUCKETS, PEAK_MAX, INT16_SCALE };

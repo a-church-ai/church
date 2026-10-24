@@ -323,3 +323,71 @@ test('a voiced piece that points a person in crisis to help reads that sentence 
   }
   assert.ok(found >= 1, 'at least the prayer for those struggling is checked');
 });
+
+// ---- Levels (lib/audio/levels.js, assemble.js level) ----
+// Until 2026-10-24 every recording was driven to one integrated loudness,
+// which left the voices about 1 dB under the songs and spread them over
+// 3.5 dB. Now each file is set where it is heard: a voice while it speaks, a
+// song while it is sung. These hold the measure to BS.1770's own calibration
+// and every finished file to the house figures.
+const levels = require('../server/lib/audio/levels');
+const { WHOLE_KEY } = require('../server/lib/audio/assemble');
+const { loadSongs } = require('../server/lib/audio/manifest');
+
+const R = levels.LEVEL_SAMPLE_RATE;
+// Interleaved 16-bit samples: a 997 Hz sine at `dbfs` peak for each [start, end)
+// second range, in every channel; silence elsewhere.
+function tone(totalSeconds, ranges, channels = 1) {
+  const out = new Int16Array(totalSeconds * R * channels);
+  for (const [start, end, dbfs] of ranges) {
+    const amp = 10 ** (dbfs / 20) * 32767;
+    for (let i = start * R; i < end * R; i++) {
+      for (let c = 0; c < channels; c++) out[i * channels + c] = Math.round(amp * Math.sin((2 * Math.PI * 997 * i) / R));
+    }
+  }
+  return out;
+}
+
+test('a level is loudness as BS.1770 defines it: a 997 Hz sine at -20 dBFS reads -23.0 LUFS, and a second channel adds 3 dB', () => {
+  const mono = levels.activeLevel(tone(6, [[0, 6, -20]]), R);
+  assert.ok(Math.abs(mono - -23.01) < 0.1, `mono ${mono}`);
+  const stereo = levels.activeLevel(tone(6, [[0, 6, -20]], 2), R, 2);
+  assert.ok(Math.abs(stereo - mono - 3.01) < 0.1, `stereo ${stereo}`);
+});
+
+test('a voice is measured only where it speaks: what sits in its holds does not move it', () => {
+  // Speech at -20 dBFS in two spans; something three times as loud between them.
+  const samples = tone(9, [[0, 3, -20], [3, 6, -10], [6, 9, -20]]);
+  const voice = levels.voiceLevel(samples, R, [{ start: 0, end: 3 }, { start: 6, end: 9 }]);
+  assert.ok(Math.abs(voice - -23.01) < 0.1, `${voice}`);
+});
+
+test('a song is measured where it is sung: a quiet intro and tail do not pull it down', () => {
+  const song = levels.activeLevel(tone(20, [[0, 4, -45], [4, 16, -20], [16, 20, -45]]), R);
+  assert.ok(Math.abs(song - -23.01) < 0.1, `${song}`);
+});
+
+test('the limiter\'s work is counted before it limits: the seconds a gain would push past the ceiling, and how far', () => {
+  const samples = tone(4, [[0, 2, -20], [2, 4, -30]]);
+  assert.deepStrictEqual(levels.overLimit(samples, R, 19, -2), { seconds: 2, depth: 1 });
+  assert.deepStrictEqual(levels.overLimit(samples, R, 10, -2), { seconds: 0, depth: 0 });
+});
+
+test('every house level figure carries its reason', () => {
+  for (const [name, figure] of Object.entries(SPEECH.level)) assert.ok(figure.why && figure.why.length > 40, `${name}: why`);
+  for (const name of ['voice', 'sung', 'tolerance', 'truePeak', 'limiterMargin']) assert.ok(Number.isFinite(SPEECH.level[name].value), name);
+});
+
+test('every recording and song is at the house level, under the true-peak ceiling, set to the current figures', () => {
+  const L = Object.fromEntries(Object.entries(SPEECH.level).map(([k, v]) => [k, v.value]));
+  const within = (l, target, what) => {
+    assert.ok(l && Number.isFinite(l.level), `${what}: no levels; make it again (npm run audio, npm run audio:songs)`);
+    assert.ok(Math.abs(l.level - target) <= L.tolerance, `${what}: ${l.level} LUFS, not ${target} within ${L.tolerance}`);
+    assert.ok(l.truePeak <= L.truePeak, `${what}: true peak ${l.truePeak} over ${L.truePeak}`);
+  };
+  for (const [source, r] of Object.entries(loadManifest())) if (!isImported(r)) within(r.levels, L.voice, source);
+  for (const [slug, r] of Object.entries(loadSongs())) {
+    within(r.levels, L.sung, slug);
+    assert.strictEqual(r.levelKey, WHOLE_KEY, `${slug}: set to other figures than the house's; npm run audio:songs`);
+  }
+});
