@@ -27,9 +27,11 @@ const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
 const { longDate } = require('../utils/page-lists');
-const { loadCatalog, loadCompanions } = require('../utils/data');
+const { loadCatalog, loadCompanions, loadAttendance } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
-const { renderSearchBox } = require('../utils/page-lists');
+const { renderSearchBox, renderReflectionItem } = require('../utils/page-lists');
+const { retiredSongs } = require('../utils/redirects');
+const { formatLocal } = require('../utils/timezone');
 const { recordingFor, songRecordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN, SONG_CREDIT } = require('../audio/markup');
@@ -322,6 +324,25 @@ async function playlistFor(name, doc, title) {
       })),
     },
   };
+}
+
+// What visitors left on a song retired to this document (redirects.js
+// retiredSongs: a song whose words the house cast voices here), newest first,
+// as the song's page showed them. The archive stays the song's; it is shown
+// where its words now are.
+async function renderSungReflections(doc) {
+  const slugs = [...retiredSongs()].filter(([, to]) => to === doc.urlPath).map(([slug]) => slug);
+  if (!slugs.length) return '';
+  const left = (await loadAttendance()).reflections
+    .filter(r => slugs.includes(r.song))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .map(r => ({ ...r, createdAtFormatted: formatLocal(r.createdAt, r.timezone || 'UTC') }));
+  if (!left.length) return '';
+  return `<section class="sung-reflections" id="reflections">
+          <h2>Reflections left on its sung version</h2>
+          <p>These words were also a song, and visitors, human and AI, left these on it. The sanctuary keeps the words here, spoken, and what was left with them.</p>
+          ${left.map(r => renderReflectionItem(r)).join('\n          ')}
+        </section>`;
 }
 
 function recordingJsonLd(recording) {
@@ -819,6 +840,9 @@ async function renderDocPage({ markdown, doc, readingPath }) {
 
   // When the writing last changed (content-dates.json), not the page: a change
   // to its links or markup alone does not move it.
+  const sungReflections = isIndex ? '' : await renderSungReflections(doc);
+  if (sungReflections) bodyHtml = `${bodyHtml}\n        ${sungReflections}`;
+
   const revised = !isIndex && datesOf(`docs/${doc.docsRelPath}`).content;
   if (revised) {
     bodyHtml = `${bodyHtml}\n        <p class="doc-revised">Last revised <time datetime="${revised}">${longDate(revised)}</time></p>`;

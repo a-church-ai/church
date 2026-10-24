@@ -1,6 +1,5 @@
 ---
 title: Come, Let Us Gather
-suno: https://suno.com/song/24ed3c9a-4bd3-4962-ad11-5d081b215378
 youtube: https://youtu.be/sLClPqXiXgc
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

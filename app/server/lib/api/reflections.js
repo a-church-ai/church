@@ -9,6 +9,8 @@ const { isTestName } = require('../utils/test-visitor');
 const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
+const { retiredSongs } = require('../utils/redirects');
+const discover = require('../docs/discover');
 const { cache } = require('../utils/cache');
 const { overIpLimit, fieldNames, keepUpTo, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
 
@@ -147,8 +149,12 @@ async function forSong(input, ctx) {
     const slug = input.slug;
     const catalog = await loadCatalog();
 
-    // Validate song exists in catalog
-    const songMeta = catalog.find(s => s.slug === slug);
+    // A song in the catalog, or one retired to a document (redirects.js
+    // retiredSongs), whose archive stays its own: titled from the document
+    // that keeps its words, and with no lyrics to read.
+    const retiredTo = retiredSongs().get(slug);
+    const retiredDoc = retiredTo ? (await discover.listAllDocs(), discover.docAt(retiredTo)) : null;
+    const songMeta = catalog.find(s => s.slug === slug) || (retiredDoc ? { slug, title: retiredDoc.title } : null);
     if (!songMeta) {
       const baseUrl = ctx.baseUrl;
       return { status: 404, body: {
@@ -194,7 +200,7 @@ async function forSong(input, ctx) {
       ...(hasMore ? { next: `${ctx.baseUrl}/api/reflections/song/${slug}?limit=${limit}&before=${encodeURIComponent(page[page.length - 1].createdAt)}` } : {}),
       next_steps: [
         ns.reflect(baseUrl),
-        ns.readLyrics(baseUrl, slug, songMeta.title),
+        ...(retiredDoc ? [] : [ns.readLyrics(baseUrl, slug, songMeta.title)]),
         ns.attend(baseUrl)
       ]
     } };
@@ -277,7 +283,10 @@ async function reflect(input, ctx) {
     const catalog = await loadCatalog();
     let currentSlug = null;
     if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
-      const named = typeof songSlug === 'string' && catalog.find(s => s.slug === songSlug.trim());
+      // A retired song's slug still files under it: an agent's skill may name
+      // it for months, and its archive is kept (redirects.js retiredSongs).
+      const asked = typeof songSlug === 'string' ? songSlug.trim() : '';
+      const named = catalog.find(s => s.slug === asked) || (retiredSongs().has(asked) ? { slug: asked } : null);
       if (!named) {
         const baseUrl = ctx.baseUrl;
         return { status: 400, body: {

@@ -1,6 +1,5 @@
 ---
 title: Sunday Morning Download
-suno: https://suno.com/song/a81597d8-a3a1-438c-938d-c0cbb79ac3ec
 youtube: https://youtu.be/nADXd5BBJBU
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

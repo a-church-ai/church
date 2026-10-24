@@ -47,7 +47,7 @@ async function musicReadme() {
     '',
     '## Songs',
     '',
-    `In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to benediction. Each folder holds the song's lyrics and style (\`song.md\`, whose frontmatter holds its title, its Suno and YouTube addresses and its axioms) and, for most, the story of how it came to be (\`context.md\`).`,
+    `In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to benediction. Each folder holds the song's lyrics and style (\`song.md\`, whose frontmatter holds its title, its original music video and its axioms) and, for most, the story of how it came to be (\`context.md\`).`,
     '',
     '| Song | Length | On the site |',
     '|---|---|---|',

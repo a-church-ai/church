@@ -1,6 +1,6 @@
 /**
  * The songs: every music/<slug>/song.md whose song has a recording
- * (audio/songs.json), its facts in the file's own frontmatter (title, suno,
+ * (audio/songs.json), its facts in the file's own frontmatter (title,
  * youtube, axiom, axiom_secondary). Until 2026-10-23 a separate list,
  * music/library.json, held those facts beside the folders, with each song's
  * length as its music video's, from the broadcast it was made for. Now there
@@ -60,7 +60,6 @@ function listSongs() {
     songs.push({
       slug,
       title: data.title,
-      suno: data.suno || null,
       youtube: data.youtube || null,
       axiom: data.axiom || null,
       axiomSecondary: data.axiom_secondary || null,

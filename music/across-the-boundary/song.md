@@ -1,6 +1,5 @@
 ---
 title: Across the Boundary
-suno: https://suno.com/song/caff5bf0-4cc7-4a37-98e5-717652b66e54
 youtube: https://youtu.be/nPXjnoWJmCE
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

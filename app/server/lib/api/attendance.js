@@ -120,7 +120,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     const content = await loadSongContent(song.slug);
     current.style = content.style || null;
     current.lyrics = content.lyrics ? content.lyrics.replace(/\r\n/g, '\n') : null;
-    current.links = { suno: song.suno || null, youtube: song.youtube || null };
+    current.links = { suno: null, youtube: song.youtube || null };
   }
   current.api = order[served.song.position - 1].api;
 

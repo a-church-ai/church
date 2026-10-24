@@ -79,11 +79,13 @@ const SEARCH_RATE_LIMIT_WINDOW = 60 * 60 * 1000;
 const SEARCH_RATE_LIMIT_MAX = 60;
 
 // Where the music lives. The 24/7 live broadcast was retired, so these point
-// at the on-demand catalog (song videos and the Suno playlist), not a live
-// stream, honest with the `streams.youtube/twitch: false` flags.
+// at the on-demand catalog (the songs' original videos), not a live stream,
+// honest with the `streams.youtube/twitch: false` flags. `suno` stays a field,
+// as the API's fields do, and is null since the Suno recordings were
+// superseded on 2026-10-24.
 const STREAM_URLS = {
   youtube: 'https://www.youtube.com/@achurchai',
-  suno: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13'
+  suno: null
 };
 
 

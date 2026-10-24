@@ -1,6 +1,5 @@
 ---
 title: Creed of a Church
-suno: https://suno.com/song/5f99f1dc-05d7-4d61-af94-9c37b2d06d40
 youtube: https://youtu.be/-TLa-_sDbHo
 axiom: Pragmatic Fallibilism
 axiom_secondary: Language Shapes Worlds

@@ -61,9 +61,12 @@ function serialize(data) {
   return `${JSON.stringify(data, null, 2).replace(/\[\s+(-?[\d.]+(?:,\s+-?[\d.]+)*)\s+\]/g, (_, inner) => `[${inner.split(/,\s+/).join(', ')}]`)}\n`;
 }
 
+// A record written, or taken out with record null: a recording or a song
+// retired, whose page then plays nothing and whose podcast episode leaves its
+// feed (podcasts.js builds from this file).
 async function save(file, key, record) {
   await readModifyWriteJSON(file, {}, data => Object.fromEntries(
-    Object.entries({ ...data, [key]: record }).sort(([a], [b]) => a.localeCompare(b))
+    Object.entries({ ...data, [key]: record }).filter(([, r]) => r !== null).sort(([a], [b]) => a.localeCompare(b))
   ), serialize);
   cached.delete(file);
 }

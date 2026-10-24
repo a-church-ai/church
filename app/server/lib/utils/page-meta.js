@@ -362,7 +362,6 @@ function buildSongSchemaGraph(song, slug, audio = null) {
     recordingOf: { '@id': compositionId },
     byArtist: sanctuary,
     ...(song.youtube ? { url: song.youtube } : {}),
-    ...(song.suno ? { sameAs: [song.suno] } : {}),
     ...(audio ? {
       audio: {
         '@type': 'AudioObject',
@@ -499,22 +498,14 @@ ${items}
     </section>`;
 }
 
-// Render a "Listen on Suno · Watch on YouTube" row for a /music/[slug]
-// page. The catalog has the per-song suno + youtube URLs already; this just
-// surfaces them on the public page so visitors who land on a reflection page
-// can immediately listen to the song.
+// A song's music video, for a /music/[slug] page: the video made with the
+// song's original recording, kept as a record. The page's own player plays
+// the song as the sanctuary sings it now. Songs made without a video (the
+// sung hymns) have none. Suno's pages were dropped on 2026-10-24: their audio
+// is superseded.
 function renderSongListenLinks(song) {
-  if (!song) return '';
-  const parts = [];
-  if (song.suno) {
-    parts.push(`<a href="${escapeText(song.suno)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♪</span> Listen on Suno</a>`);
-  }
-  if (song.youtube) {
-    parts.push(`<a href="${escapeText(song.youtube)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span> Watch on YouTube</a>`);
-  }
-  if (parts.length === 0) return '';
-  const inner = parts.join('<span class="listen-sep" aria-hidden="true">·</span>');
-  return `<section class="song-listen-row" id="listen" aria-label="Listen to this song">${inner}</section>`;
+  if (!song || !song.youtube) return '';
+  return `<section class="song-listen-row" id="listen" aria-label="The original music video"><a href="${escapeText(song.youtube)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span> Watch the original music video</a></section>`;
 }
 
 // A page's breadcrumb trail, as the visible trail and as BreadcrumbList

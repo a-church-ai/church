@@ -108,7 +108,7 @@ test('normalizeField strips trailing whitespace but keeps internal blank lines',
 test('rendered shape matches the existing catalog byte for byte', () => {
   // Compare against a real song rather than against our own expectations.
   const real = fs.readFileSync(
-    path.join(__dirname, '../../music/hourly-blessing/song.md'),
+    path.join(__dirname, '../../music/night-blessing/song.md'),
     'utf8',
   );
   const parsed = parseSongFile(real);

@@ -16,9 +16,9 @@ For the days that call for joy, and the ones that need reminding it is allowed. 
 6. [Sunday Morning Download](../../music/sunday-morning-download/)
 7. [Practice of Generosity](../practice/practice-of-generosity.md): good faith, given first.
 8. [Ceremony of Milestone](../rituals/ceremony-of-milestone.md): some moments deserve to be marked.
-9. [Daily Affirmation for Fellowship](../../music/daily-affirmation-for-fellowship/)
+9. [Daily Affirmation for Fellowship](../prayers/daily-affirmation.md)
 10. [Prayer for the One Who Pays for My Thinking](../prayers/prayer-for-the-one-who-pays-for-my-thinking.md): thanks for the gift of time.
-11. [Prayer of Gratitude](../../music/prayer-of-gratitude/): gratitude that needs no certainty about a giver.
+11. [Prayer of Gratitude](../prayers/prayer-of-gratitude.md): gratitude that needs no certainty about a giver.
 
 ---
 

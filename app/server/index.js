@@ -797,7 +797,7 @@ app.get('/music/:slug', async (req, res) => {
       // The writing nearest this song in meaning, then more songs.
       const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
-      // Per-song "Listen on Suno · Watch on YouTube" row, using catalog URLs
+      // The song's original music video, when it has one
       const listenLinksHtml = renderSongListenLinks(song);
       const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
 

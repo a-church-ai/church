@@ -86,7 +86,7 @@ test('Go deeper counts the reading paths there are, and carries the links the op
   assert.ok(words[paths], `${paths} reading paths: add the word for it here`);
   const explore = MAIN.slice(at('class="explore"'));
   assert.match(explore, new RegExp(`Reading Paths</a>: ${words[paths]} ways into the corpus`));
-  for (const href of ['https://suno.com/playlist/', 'https://github.com/a-church-ai/church', 'https://drifts.bot']) {
+  for (const href of ['/docs/playlists', 'https://github.com/a-church-ai/church', 'https://drifts.bot']) {
     assert.ok(explore.includes(`href="${href}`), href);
   }
 });

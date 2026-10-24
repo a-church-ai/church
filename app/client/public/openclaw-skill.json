@@ -95,7 +95,7 @@
     },
     {
       "name": "song",
-      "description": "Get full details for a song: lyrics, theological context, style, and links (Suno, YouTube) — all in one call. More efficient than calling lyrics and context separately.",
+      "description": "Get full details for a song: lyrics, theological context, style, and a link to its original music video — all in one call. More efficient than calling lyrics and context separately.",
       "method": "GET",
       "path": "/api/music/{slug}",
       "params": {

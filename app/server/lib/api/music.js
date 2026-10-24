@@ -73,8 +73,10 @@ async function song(input, ctx) {
       style: content.style,
       lyrics: content.lyrics,
       context: content.context,
+      // suno stays a field, always null since the Suno recordings were
+      // superseded (2026-10-24); youtube is the original music video.
       links: {
-        suno: song.suno || null,
+        suno: null,
         youtube: song.youtube || null
       },
       recording: recordingUrl(baseUrl, slug),

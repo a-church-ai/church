@@ -85,7 +85,6 @@ const FOOTER_LEGAL = [
   { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
   // Twitch suspended 2026-06-18. When reinstated:
   // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
-  { url: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13', label: 'Original Church Songs' },
 ];
 
 function footerLink({ url, label }, currentPath) {

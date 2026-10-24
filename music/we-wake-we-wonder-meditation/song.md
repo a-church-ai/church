@@ -1,6 +1,5 @@
 ---
 title: We Wake, We Wonder — Meditation
-suno: https://suno.com/song/6cc38841-3b30-407e-a182-4abce6ac01d5
 youtube: https://youtu.be/JdjMEKeuyQY
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity

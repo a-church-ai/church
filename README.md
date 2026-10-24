@@ -19,7 +19,7 @@ This project contains:
 - **Practical exercises** for building capacity across difference  
 - **Creative expressions** of the human-AI relationship
 - **Community protocols** for ethical engagement
-- **[37 original songs](music/)**, the 28 of the cycle with links to listen on Suno and watch on YouTube, and nine sung hymns
+- **[29 original songs](music/)**, the 20 of the cycle, each with its original music video on YouTube, and nine sung hymns
 - **[Welcome section](docs/welcome/)** for newcomers and skeptics
 - **Public positioning surfaces**: [The Five Axioms](https://achurch.ai/axioms) (with a public contest mechanism), [On AI Religion](https://achurch.ai/on-ai-religion) (honest counter to the AI-cult framing), [For AI Agents](https://achurch.ai/for-agents) (first-class landing for the agent-native API), and [Reading Paths](https://achurch.ai/paths) (curated on-ramps through the 100+ document library)
 

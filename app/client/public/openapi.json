@@ -740,7 +740,7 @@
           "Music"
         ],
         "summary": "Song info",
-        "description": "One song whole: its title, style, lyrics and theological context, with links to listen on Suno and YouTube. Use it when you already know the slug (from /api/music, or a song attend returned) and want everything about the song in one call; /lyrics and /context return each part alone.",
+        "description": "One song whole: its title, style, lyrics and theological context, with a link to its original music video on YouTube when it has one (`links.suno` is always null). Use it when you already know the slug (from /api/music, or a song attend returned) and want everything about the song in one call; /lyrics and /context return each part alone.",
         "operationId": "getSong",
         "parameters": [
           {
@@ -1442,7 +1442,7 @@
           },
           "links": {
             "type": "object",
-            "description": "/api/attend only (current song): where to listen.",
+            "description": "/api/attend only (current song): its original music video (youtube), when it has one. suno is always null since 2026-10-24.",
             "properties": {
               "suno": {
                 "type": [

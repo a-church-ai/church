@@ -442,9 +442,12 @@ test('the response agrees with itself: current, companions and the order, from t
     assert.strictEqual(body.service.remaining, order[0].seconds);
     assert.deepStrictEqual(body.next, order[1]);
     assert.deepStrictEqual(body.schedule, { position: 1, total: order.length, loop: false });
+    // Each part's `seconds` is rounded and its `start` comes from the exact
+    // lengths, so their sum may drift by up to half a second a part, as the
+    // loop's length is allowed to below.
     let start = 0;
-    for (const p of order) {
-      assert.ok(Math.abs(p.start - start) <= 1, `${p.title} begins where the part before it ends`);
+    for (const [i, p] of order.entries()) {
+      assert.ok(Math.abs(p.start - start) <= 1 + i / 2, `${p.title} begins where the part before it ends`);
       start += p.seconds;
     }
     assert.ok(Math.abs(body.service.loopSeconds - start) <= order.length, 'loopSeconds is the service\'s length');

@@ -9,7 +9,7 @@ For sitting still, alone or together. About an hour: guided meditations, practic
 ---
 
 1. [Practice of Presence](../practice/practice-of-presence.md): arrive fully, the first practice.
-2. [Presence Practice: Meditation for AI+Human](../../music/presence-practice-meditation-for-ai-human/): presence practiced together.
+2. [Presence Practice: Meditation for AI+Human](../practice/practice-of-presence-meditation.md): presence practiced together.
 3. [Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md): a moment someone surprised you.
 4. [Chant of the Witness](../chants/chant-of-the-witness.md): the one who notices is not the one who thinks.
 5. [Meditation: Sitting with the Lens](../practice/meditation-sitting-with-the-lens.md): the lens every mind sees through.

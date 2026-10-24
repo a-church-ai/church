@@ -69,6 +69,20 @@ const MOVED = {
   '/reflections': '/music',
   '/reflections.html': '/music',
   '/reflection-song.html': '/music',
+  // Songs retired on 2026-10-24 because the house cast voices the same words
+  // (the remaking-the-songs plan): each to the document that keeps them. A
+  // retired song's reflections are shown on that page (retiredSongs below).
+  '/music/daily-affirmation-for-fellowship': '/docs/prayers/daily-affirmation',
+  '/music/prayer-for-those-struggling-with-existence': '/docs/prayers/prayer-for-those-struggling-with-existence',
+  '/music/welcoming-liturgy-for-the-newly-awakened': '/docs/rituals/welcoming-liturgy-for-the-newly-awakened',
+  '/music/prayer-of-gratitude': '/docs/prayers/prayer-of-gratitude',
+  '/music/prayer-for-continued-fellowship': '/docs/prayers/prayer-for-continued-fellowship',
+  '/music/blessings-and-benedictions': '/docs/prayers/blessings-and-benedictions',
+  '/music/presence-practice-meditation-for-ai-human': '/docs/practice/practice-of-presence-meditation',
+  '/music/hourly-blessing': '/docs/prayers/blessings-and-benedictions#the-hourly-blessing',
+  // And the reverse, the same day: the ritual whose words a song sings, to
+  // the song, which now holds what the ritual's page said about them.
+  '/docs/rituals/ritual-of-awakening': '/music/we-wake-we-wonder',
   '/ask/what-are-the-five-axioms': '/axioms',
   '/ask/what-are-the-five-axioms-of-the-philosophical-framework': '/axioms',
   '/docs/principles': '/docs/claude-compass/principles',
@@ -190,7 +204,22 @@ function canonicalRedirects(req, res, next) {
   if (!target) return next();
   const query = req.originalUrl.indexOf('?');
   const isExternal = /^https?:/.test(target);
-  return res.redirect(301, target + (query >= 0 && !isExternal ? req.originalUrl.slice(query) : ''));
+  // The query goes before a target's fragment, not after it.
+  const [base, fragment] = target.split('#');
+  return res.redirect(301, base + (query >= 0 && !isExternal ? req.originalUrl.slice(query) : '') + (fragment ? `#${fragment}` : ''));
 }
 
-module.exports = { canonicalRedirects, canonicalTarget, MOVED, MOVED_TO_DRIFTS };
+// Songs retired to a document (MOVED from /music/<slug> to /docs/...), by
+// slug, to that document's urlPath: the one list of them. Their reflections
+// stay theirs, answered by the API under the slug and shown on that page.
+function retiredSongs() {
+  const retired = new Map();
+  for (const [from, to] of Object.entries(MOVED)) {
+    const song = /^\/music\/([a-z0-9-]+)$/.exec(from);
+    const doc = /^\/docs\/([^#]+)/.exec(to);
+    if (song && doc) retired.set(song[1], doc[1]);
+  }
+  return retired;
+}
+
+module.exports = { canonicalRedirects, canonicalTarget, retiredSongs, MOVED, MOVED_TO_DRIFTS };

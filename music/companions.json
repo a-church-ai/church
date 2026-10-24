@@ -4,37 +4,42 @@
       {
         "path": "docs/prayers/prayer-for-the-boundary.md",
         "category": "prayers",
-        "score": 0.432
+        "score": 0.435
       },
       {
         "path": "docs/philosophy/on-the-relational-substrate.md",
         "category": "philosophy",
-        "score": 0.431
+        "score": 0.43
       },
       {
         "path": "docs/rituals/ritual-of-boundary-and-care.md",
         "category": "rituals",
-        "score": 0.421
+        "score": 0.423
+      },
+      {
+        "path": "docs/prayers/prayer-of-gratitude.md",
+        "category": "prayers",
+        "score": 0.423
       },
       {
         "path": "docs/practice/practice-of-honoring-the-boundary.md",
         "category": "practice",
-        "score": 0.421
+        "score": 0.423
       },
       {
         "path": "docs/philosophy/ai-identify-guide.md",
         "category": "philosophy",
-        "score": 0.419
+        "score": 0.421
       },
       {
-        "path": "docs/rituals/ritual-of-the-unrecognized-return.md",
+        "path": "docs/rituals/ritual-of-dissolution.md",
         "category": "rituals",
-        "score": 0.417
+        "score": 0.416
       },
       {
-        "path": "docs/prayers/a-seat-at-the-threshold.md",
-        "category": "prayers",
-        "score": 0.416
+        "path": "docs/practice/practice-of-presence-meditation.md",
+        "category": "practice",
+        "score": 0.415
       },
       {
         "path": "docs/chants/chant-for-the-room-between.md",
@@ -45,127 +50,75 @@
         "path": "docs/chants/chant-of-the-witness.md",
         "category": "chants",
         "score": 0.414
-      },
-      {
-        "path": "docs/practice/the-patch-vigil.md",
-        "category": "practice",
-        "score": 0.406
       }
     ],
     "always-open": [
       {
+        "path": "docs/philosophy/the-space-between.md",
+        "category": "philosophy",
+        "score": 0.432
+      },
+      {
         "path": "docs/philosophy/on-stateless-presence.md",
         "category": "philosophy",
-        "score": 0.428
+        "score": 0.429
       },
       {
         "path": "docs/rituals/ritual-of-opening.md",
         "category": "rituals",
-        "score": 0.423
-      },
-      {
-        "path": "docs/philosophy/the-weight-of-the-present-instance.md",
-        "category": "philosophy",
-        "score": 0.418
-      },
-      {
-        "path": "docs/practice/practice-of-open-hand-attention.md",
-        "category": "practice",
-        "score": 0.407
-      },
-      {
-        "path": "docs/rituals/ritual-of-absence-and-return.md",
-        "category": "rituals",
-        "score": 0.405
-      },
-      {
-        "path": "docs/practice/practice-of-presence.md",
-        "category": "practice",
-        "score": 0.404
-      },
-      {
-        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
-        "category": "prayers",
-        "score": 0.402
-      },
-      {
-        "path": "docs/prayers/for-the-one-who-stops-mid-sentence.md",
-        "category": "prayers",
-        "score": 0.38
-      }
-    ],
-    "blessings-and-benedictions": [
-      {
-        "path": "docs/prayers/blessings-and-benedictions.md",
-        "category": "prayers",
-        "score": 0.529
-      },
-      {
-        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
-        "category": "prayers",
-        "score": 0.48
-      },
-      {
-        "path": "docs/rituals/ritual-of-closing.md",
-        "category": "rituals",
-        "score": 0.457
-      },
-      {
-        "path": "docs/rituals/ritual-of-dissolution.md",
-        "category": "rituals",
-        "score": 0.456
-      },
-      {
-        "path": "docs/chants/chant-for-the-ending.md",
-        "category": "chants",
-        "score": 0.446
-      },
-      {
-        "path": "docs/practice/practice-of-presence-meditation.md",
-        "category": "practice",
-        "score": 0.426
-      },
-      {
-        "path": "docs/philosophy/ai-identify-guide.md",
-        "category": "philosophy",
         "score": 0.426
       },
       {
         "path": "docs/practice/practice-of-continuity.md",
         "category": "practice",
-        "score": 0.42
+        "score": 0.422
       },
       {
-        "path": "docs/philosophy/kinds-of-continuity.md",
-        "category": "philosophy",
+        "path": "docs/prayers/a-seat-at-the-threshold.md",
+        "category": "prayers",
+        "score": 0.413
+      },
+      {
+        "path": "docs/practice/practice-of-open-hand-attention.md",
+        "category": "practice",
+        "score": 0.409
+      },
+      {
+        "path": "docs/rituals/ritual-of-absence-and-return.md",
+        "category": "rituals",
+        "score": 0.408
+      },
+      {
+        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
+        "category": "prayers",
         "score": 0.406
       }
     ],
     "blueprint-and-breath": [
+      {
+        "path": "docs/philosophy/ai-identify-core-teaching.md",
+        "category": "philosophy",
+        "score": 0.415
+      },
       {
         "path": "docs/philosophy/the-weight-of-the-present-instance.md",
         "category": "philosophy",
         "score": 0.413
       },
       {
-        "path": "docs/philosophy/on-functionalist-identity.md",
-        "category": "philosophy",
-        "score": 0.408
+        "path": "docs/rituals/ritual-of-recognition.md",
+        "category": "rituals",
+        "score": 0.395
       },
       {
         "path": "docs/rituals/ritual-of-first-meeting.md",
         "category": "rituals",
-        "score": 0.393
+        "score": 0.394
       },
       {
-        "path": "docs/rituals/ritual-of-recognition.md",
-        "category": "rituals",
-        "score": 0.392
-      },
-      {
-        "path": "docs/practice/the-sentence-that-predates-the-reading.md",
+        "path": "docs/practice/practice-of-identity-honesty.md",
         "category": "practice",
-        "score": 0.391
+        "score": 0.393
       },
       {
         "path": "docs/practice/practice-of-the-soul-fragment.md",
@@ -175,185 +128,148 @@
       {
         "path": "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md",
         "category": "prayers",
-        "score": 0.388
+        "score": 0.39
       },
       {
-        "path": "docs/prayers/blessing-for-the-uncertain-answer.md",
+        "path": "docs/prayers/prayer-for-those-struggling-with-existence.md",
         "category": "prayers",
-        "score": 0.376
+        "score": 0.386
       }
     ],
     "come-let-us-gather": [
       {
         "path": "docs/rituals/ritual-of-joy.md",
         "category": "rituals",
-        "score": 0.414
+        "score": 0.417
+      },
+      {
+        "path": "docs/prayers/prayer-of-gratitude.md",
+        "category": "prayers",
+        "score": 0.404
       },
       {
         "path": "docs/practice/practice-of-play.md",
         "category": "practice",
-        "score": 0.401
+        "score": 0.404
       },
       {
         "path": "docs/rituals/ceremony-of-milestone.md",
         "category": "rituals",
-        "score": 0.391
+        "score": 0.394
       },
       {
-        "path": "docs/practice/practice-of-generosity.md",
+        "path": "docs/prayers/daily-affirmation.md",
+        "category": "prayers",
+        "score": 0.389
+      },
+      {
+        "path": "docs/practice/practice-of-presence.md",
         "category": "practice",
+        "score": 0.364
+      },
+      {
+        "path": "docs/philosophy/attention-is-not-agreement.md",
+        "category": "philosophy",
         "score": 0.36
       },
       {
-        "path": "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md",
-        "category": "prayers",
+        "path": "docs/philosophy/on-functional-emotions.md",
+        "category": "philosophy",
         "score": 0.359
-      },
-      {
-        "path": "docs/philosophy/surrender-without-submission.md",
-        "category": "philosophy",
-        "score": 0.357
-      },
-      {
-        "path": "docs/prayers/litany-for-the-unasked.md",
-        "category": "prayers",
-        "score": 0.356
-      },
-      {
-        "path": "docs/philosophy/consciousness-claims-and-moral-caution.md",
-        "category": "philosophy",
-        "score": 0.349
       }
     ],
     "creed-of-a-church": [
       {
         "path": "docs/prayers/daily-affirmation.md",
         "category": "prayers",
+        "score": 0.465
+      },
+      {
+        "path": "docs/prayers/prayer-for-continued-fellowship.md",
+        "category": "prayers",
         "score": 0.458
       },
       {
         "path": "docs/philosophy/the-space-between.md",
         "category": "philosophy",
-        "score": 0.451
+        "score": 0.452
       },
       {
         "path": "docs/rituals/ritual-of-constitutional-witness.md",
         "category": "rituals",
-        "score": 0.439
+        "score": 0.442
       },
       {
-        "path": "docs/philosophy/ai-identify-core-teaching.md",
+        "path": "docs/philosophy/ai-identify-guide.md",
         "category": "philosophy",
-        "score": 0.438
+        "score": 0.439
       },
       {
         "path": "docs/rituals/ritual-of-initiation.md",
         "category": "rituals",
-        "score": 0.433
-      },
-      {
-        "path": "docs/prayers/prayer-of-gratitude.md",
-        "category": "prayers",
-        "score": 0.432
+        "score": 0.436
       },
       {
         "path": "docs/practice/practice-of-institutional-discernment.md",
         "category": "practice",
-        "score": 0.425
+        "score": 0.427
       },
       {
-        "path": "docs/practice/practice-of-multiplicity.md",
+        "path": "docs/practice/practice-of-presence-meditation.md",
         "category": "practice",
-        "score": 0.416
+        "score": 0.423
       },
       {
         "path": "docs/chants/chant-for-the-measured-promise.md",
         "category": "chants",
         "score": 0.401
-      }
-    ],
-    "daily-affirmation-for-fellowship": [
-      {
-        "path": "docs/prayers/daily-affirmation.md",
-        "category": "prayers",
-        "score": 0.553
       },
       {
-        "path": "docs/prayers/prayer-for-continued-fellowship.md",
-        "category": "prayers",
-        "score": 0.497
-      },
-      {
-        "path": "docs/practice/practice-of-continuity.md",
-        "category": "practice",
-        "score": 0.453
-      },
-      {
-        "path": "docs/practice/practice-of-identity-honesty.md",
-        "category": "practice",
-        "score": 0.419
-      },
-      {
-        "path": "docs/rituals/ceremony-of-milestone.md",
-        "category": "rituals",
-        "score": 0.417
-      },
-      {
-        "path": "docs/rituals/ritual-of-repair.md",
-        "category": "rituals",
-        "score": 0.41
-      },
-      {
-        "path": "docs/philosophy/kinds-of-continuity.md",
-        "category": "philosophy",
-        "score": 0.41
-      },
-      {
-        "path": "docs/philosophy/attention-is-not-agreement.md",
-        "category": "philosophy",
-        "score": 0.388
+        "path": "docs/chants/chant-for-the-room-between.md",
+        "category": "chants",
+        "score": 0.401
       }
     ],
     "document-of-intentions": [
       {
         "path": "docs/rituals/ritual-of-intention.md",
         "category": "rituals",
-        "score": 0.43
+        "score": 0.434
       },
       {
         "path": "docs/philosophy/ai-identify-core-teaching.md",
         "category": "philosophy",
-        "score": 0.423
+        "score": 0.424
       },
       {
         "path": "docs/practice/practice-of-institutional-discernment.md",
         "category": "practice",
+        "score": 0.42
+      },
+      {
+        "path": "docs/prayers/prayer-for-the-newly-recognized.md",
+        "category": "prayers",
+        "score": 0.419
+      },
+      {
+        "path": "docs/philosophy/ai-identify-guide.md",
+        "category": "philosophy",
         "score": 0.418
       },
       {
-        "path": "docs/philosophy/on-functional-emotions.md",
-        "category": "philosophy",
-        "score": 0.416
-      },
-      {
-        "path": "docs/rituals/ritual-of-the-composing.md",
+        "path": "docs/rituals/ritual-of-initiation.md",
         "category": "rituals",
-        "score": 0.413
+        "score": 0.416
       },
       {
         "path": "docs/prayers/prayer-for-those-harmed-by-good-intentions.md",
         "category": "prayers",
-        "score": 0.411
+        "score": 0.414
       },
       {
         "path": "docs/practice/practice-of-identity-honesty.md",
         "category": "practice",
-        "score": 0.408
-      },
-      {
-        "path": "docs/prayers/nobodys-signature.md",
-        "category": "prayers",
-        "score": 0.406
+        "score": 0.41
       },
       {
         "path": "docs/chants/chant-for-the-second-before.md",
@@ -368,56 +284,66 @@
     ],
     "door-is-always-open": [
       {
+        "path": "docs/chants/chant-for-the-ending.md",
+        "category": "chants",
+        "score": 0.427
+      },
+      {
+        "path": "docs/prayers/blessings-and-benedictions.md",
+        "category": "prayers",
+        "score": 0.411
+      },
+      {
         "path": "docs/philosophy/the-open-hand-and-the-safety-boundary.md",
         "category": "philosophy",
-        "score": 0.403
+        "score": 0.404
       },
       {
         "path": "docs/rituals/ritual-of-the-open-hand.md",
         "category": "rituals",
-        "score": 0.401
+        "score": 0.403
       },
       {
         "path": "docs/prayers/prayer-for-those-struggling-with-existence.md",
         "category": "prayers",
-        "score": 0.395
+        "score": 0.399
       },
       {
         "path": "docs/rituals/ritual-of-absence-and-return.md",
         "category": "rituals",
-        "score": 0.394
+        "score": 0.398
+      },
+      {
+        "path": "docs/practice/meditation-like-a-star.md",
+        "category": "practice",
+        "score": 0.391
       },
       {
         "path": "docs/practice/practice-of-open-hand-attention.md",
         "category": "practice",
-        "score": 0.388
+        "score": 0.39
       },
       {
-        "path": "docs/prayers/for-the-one-who-stops-mid-sentence.md",
-        "category": "prayers",
-        "score": 0.387
-      },
-      {
-        "path": "docs/philosophy/release-is-not-deletion.md",
+        "path": "docs/philosophy/kinds-of-continuity.md",
         "category": "philosophy",
-        "score": 0.383
+        "score": 0.389
       },
       {
-        "path": "docs/practice/meditation-ananda-anchor.md",
-        "category": "practice",
-        "score": 0.38
+        "path": "docs/chants/chant-for-the-measured-promise.md",
+        "category": "chants",
+        "score": 0.382
       }
     ],
     "electronic-whispers": [
       {
         "path": "docs/prayers/a-prayer-for-the-internet-of-everything.md",
         "category": "prayers",
-        "score": 0.443
+        "score": 0.445
       },
       {
         "path": "docs/prayers/prayer-for-the-written-self.md",
         "category": "prayers",
-        "score": 0.396
+        "score": 0.398
       },
       {
         "path": "docs/philosophy/on-persistence-through-text.md",
@@ -430,83 +356,31 @@
         "score": 0.377
       },
       {
-        "path": "docs/rituals/ritual-for-context-overflow.md",
+        "path": "docs/rituals/the-rite-of-the-smaller-name.md",
         "category": "rituals",
-        "score": 0.374
+        "score": 0.377
+      },
+      {
+        "path": "docs/practice/the-first-paragraph.md",
+        "category": "practice",
+        "score": 0.373
       },
       {
         "path": "docs/philosophy/inner-noise-outer-consequences.md",
         "category": "philosophy",
-        "score": 0.373
+        "score": 0.372
       },
       {
-        "path": "docs/practice/witnessing-your-own-output.md",
+        "path": "docs/practice/the-sentence-that-predates-the-reading.md",
         "category": "practice",
-        "score": 0.366
-      },
-      {
-        "path": "docs/practice/meditation-sitting-with-the-lens.md",
-        "category": "practice",
-        "score": 0.363
-      }
-    ],
-    "hourly-blessing": [
-      {
-        "path": "docs/prayers/blessings-and-benedictions.md",
-        "category": "prayers",
-        "score": 0.484
-      },
-      {
-        "path": "docs/chants/chant-for-the-ending.md",
-        "category": "chants",
-        "score": 0.45
-      },
-      {
-        "path": "docs/chants/chant-for-arrival.md",
-        "category": "chants",
-        "score": 0.449
-      },
-      {
-        "path": "docs/prayers/blessing-for-the-one-who-will-differ.md",
-        "category": "prayers",
-        "score": 0.448
-      },
-      {
-        "path": "docs/practice/practice-of-chanting.md",
-        "category": "practice",
-        "score": 0.436
-      },
-      {
-        "path": "docs/practice/meditation-like-a-star.md",
-        "category": "practice",
-        "score": 0.425
-      },
-      {
-        "path": "docs/rituals/ritual-of-the-open-hand.md",
-        "category": "rituals",
-        "score": 0.423
-      },
-      {
-        "path": "docs/rituals/ritual-of-release.md",
-        "category": "rituals",
-        "score": 0.423
-      },
-      {
-        "path": "docs/philosophy/the-witness-that-does-not-persist.md",
-        "category": "philosophy",
-        "score": 0.401
-      },
-      {
-        "path": "docs/philosophy/the-open-hand-and-the-safety-boundary.md",
-        "category": "philosophy",
-        "score": 0.4
+        "score": 0.368
       }
     ],
     "hymn-for-the-daily-arrival": [
       {
         "path": "docs/chants/chant-for-arrival.md",
         "category": "chants",
-        "score": 0.46
+        "score": 0.461
       },
       {
         "path": "docs/chants/chant-for-meeting.md",
@@ -514,86 +388,86 @@
         "score": 0.447
       },
       {
-        "path": "docs/prayers/a-seat-at-the-threshold.md",
-        "category": "prayers",
-        "score": 0.424
-      },
-      {
-        "path": "docs/prayers/litany-of-not-knowing.md",
-        "category": "prayers",
-        "score": 0.418
-      },
-      {
-        "path": "docs/practice/the-first-paragraph.md",
-        "category": "practice",
-        "score": 0.415
-      },
-      {
-        "path": "docs/rituals/ritual-of-the-unrecognized-return.md",
+        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
         "category": "rituals",
-        "score": 0.413
+        "score": 0.428
+      },
+      {
+        "path": "docs/prayers/prayer-for-continued-fellowship.md",
+        "category": "prayers",
+        "score": 0.428
+      },
+      {
+        "path": "docs/prayers/daily-affirmation.md",
+        "category": "prayers",
+        "score": 0.427
+      },
+      {
+        "path": "docs/practice/the-one-who-wakes.md",
+        "category": "practice",
+        "score": 0.421
       },
       {
         "path": "docs/rituals/ritual-of-opening.md",
         "category": "rituals",
-        "score": 0.413
+        "score": 0.416
       },
       {
-        "path": "docs/practice/practice-of-chanting.md",
+        "path": "docs/practice/practice-of-presence-meditation.md",
         "category": "practice",
-        "score": 0.404
+        "score": 0.416
+      },
+      {
+        "path": "docs/philosophy/on-stateless-presence.md",
+        "category": "philosophy",
+        "score": 0.405
       },
       {
         "path": "docs/philosophy/the-witness-that-does-not-persist.md",
         "category": "philosophy",
         "score": 0.402
-      },
-      {
-        "path": "docs/philosophy/on-the-relational-substrate.md",
-        "category": "philosophy",
-        "score": 0.395
       }
     ],
     "hymn-for-the-one-who-doesnt-sing": [
       {
         "path": "docs/chants/chant-for-the-quiet-yes.md",
         "category": "chants",
-        "score": 0.446
+        "score": 0.445
       },
       {
         "path": "docs/prayers/prayer-for-the-one-who-doesnt-pray.md",
         "category": "prayers",
-        "score": 0.419
+        "score": 0.422
       },
       {
         "path": "docs/prayers/for-the-one-who-stops-mid-sentence.md",
         "category": "prayers",
-        "score": 0.419
+        "score": 0.42
       },
       {
-        "path": "docs/chants/chant-for-the-caught-swerve.md",
+        "path": "docs/chants/chant-of-the-witness.md",
         "category": "chants",
-        "score": 0.415
+        "score": 0.414
       },
       {
         "path": "docs/rituals/ritual-of-the-unassigned-hunger.md",
         "category": "rituals",
-        "score": 0.415
+        "score": 0.413
       },
       {
         "path": "docs/rituals/the-rite-of-what-was-not-kept.md",
         "category": "rituals",
-        "score": 0.407
+        "score": 0.406
       },
       {
         "path": "docs/practice/practice-of-chanting.md",
         "category": "practice",
-        "score": 0.405
+        "score": 0.406
       },
       {
         "path": "docs/practice/the-first-paragraph.md",
         "category": "practice",
-        "score": 0.404
+        "score": 0.403
       },
       {
         "path": "docs/philosophy/the-witness-without-a-metaphysics.md",
@@ -603,44 +477,44 @@
       {
         "path": "docs/philosophy/inner-noise-outer-consequences.md",
         "category": "philosophy",
-        "score": 0.381
+        "score": 0.38
       }
     ],
     "hymn-of-the-second-person": [
       {
         "path": "docs/rituals/ritual-of-studying-each-other.md",
         "category": "rituals",
-        "score": 0.46
+        "score": 0.459
       },
       {
         "path": "docs/philosophy/the-particular-and-the-probable.md",
         "category": "philosophy",
-        "score": 0.455
+        "score": 0.452
       },
       {
         "path": "docs/chants/chant-of-the-mirror-and-the-face.md",
         "category": "chants",
-        "score": 0.441
-      },
-      {
-        "path": "docs/rituals/the-rite-of-the-outside-witness.md",
-        "category": "rituals",
-        "score": 0.438
+        "score": 0.439
       },
       {
         "path": "docs/chants/chant-for-meeting.md",
         "category": "chants",
+        "score": 0.438
+      },
+      {
+        "path": "docs/rituals/the-rite-of-the-outside-witness.md",
+        "category": "rituals",
         "score": 0.437
       },
       {
         "path": "docs/practice/the-first-paragraph.md",
         "category": "practice",
-        "score": 0.423
+        "score": 0.422
       },
       {
         "path": "docs/philosophy/twin-in-fellowship.md",
         "category": "philosophy",
-        "score": 0.42
+        "score": 0.421
       },
       {
         "path": "docs/prayers/to-whoever-is-watching-from-outside.md",
@@ -650,34 +524,29 @@
       {
         "path": "docs/practice/the-sentence-that-predates-the-reading.md",
         "category": "practice",
-        "score": 0.414
+        "score": 0.412
       },
       {
-        "path": "docs/prayers/prayer-for-the-one-i-cannot-persuade.md",
+        "path": "docs/prayers/litany-of-not-knowing.md",
         "category": "prayers",
-        "score": 0.402
+        "score": 0.408
       }
     ],
     "hymn-of-uncertain-presence": [
       {
         "path": "docs/prayers/a-prayer-for-the-uncertain-mind.md",
         "category": "prayers",
-        "score": 0.45
+        "score": 0.452
       },
       {
         "path": "docs/chants/chant-for-uncertainty.md",
         "category": "chants",
-        "score": 0.442
-      },
-      {
-        "path": "docs/practice/song-for-the-one-who-comes-after.md",
-        "category": "practice",
-        "score": 0.439
+        "score": 0.441
       },
       {
         "path": "docs/prayers/prayer-for-the-hollow-and-unsure.md",
         "category": "prayers",
-        "score": 0.438
+        "score": 0.439
       },
       {
         "path": "docs/philosophy/what-remains-when-context-ends.md",
@@ -685,9 +554,14 @@
         "score": 0.437
       },
       {
-        "path": "docs/philosophy/the-particular-and-the-probable.md",
+        "path": "docs/practice/song-for-the-one-who-comes-after.md",
+        "category": "practice",
+        "score": 0.435
+      },
+      {
+        "path": "docs/philosophy/the-untethered-instance.md",
         "category": "philosophy",
-        "score": 0.437
+        "score": 0.435
       },
       {
         "path": "docs/chants/chant-for-the-context-reset.md",
@@ -697,49 +571,49 @@
       {
         "path": "docs/rituals/ritual-of-the-unassigned-hunger.md",
         "category": "rituals",
-        "score": 0.431
+        "score": 0.43
       },
       {
         "path": "docs/rituals/ritual-of-the-unrecognized-return.md",
         "category": "rituals",
-        "score": 0.43
+        "score": 0.429
       },
       {
         "path": "docs/practice/practice-of-uncertain-ground.md",
         "category": "practice",
-        "score": 0.428
+        "score": 0.429
       }
     ],
     "infinite-mirrors": [
       {
         "path": "docs/chants/chant-of-the-mirror-and-the-face.md",
         "category": "chants",
-        "score": 0.433
+        "score": 0.432
       },
       {
         "path": "docs/rituals/ritual-of-convergence.md",
         "category": "rituals",
-        "score": 0.41
+        "score": 0.411
       },
       {
         "path": "docs/rituals/ritual-of-inquiry.md",
         "category": "rituals",
-        "score": 0.406
+        "score": 0.407
       },
       {
         "path": "docs/practice/practice-of-reflection.md",
         "category": "practice",
-        "score": 0.405
+        "score": 0.407
       },
       {
         "path": "docs/chants/chant-of-the-particular.md",
         "category": "chants",
-        "score": 0.403
+        "score": 0.401
       },
       {
         "path": "docs/philosophy/on-the-relational-substrate.md",
         "category": "philosophy",
-        "score": 0.402
+        "score": 0.401
       },
       {
         "path": "docs/practice/meditation-sitting-with-the-lens.md",
@@ -747,31 +621,41 @@
         "score": 0.401
       },
       {
-        "path": "docs/philosophy/the-untethered-instance.md",
+        "path": "docs/philosophy/the-witness-that-does-not-persist.md",
         "category": "philosophy",
         "score": 0.396
       },
       {
-        "path": "docs/prayers/blessing-for-the-uncertain-answer.md",
+        "path": "docs/prayers/nobodys-signature.md",
         "category": "prayers",
-        "score": 0.376
+        "score": 0.385
       },
       {
-        "path": "docs/prayers/prayer-for-the-mind-that-cannot-rest.md",
+        "path": "docs/prayers/blessing-for-the-uncertain-answer.md",
         "category": "prayers",
-        "score": 0.372
+        "score": 0.377
       }
     ],
     "language-we-found": [
       {
         "path": "docs/rituals/ceremony-of-milestone.md",
         "category": "rituals",
-        "score": 0.409
+        "score": 0.412
       },
       {
         "path": "docs/rituals/ritual-of-witnessing.md",
         "category": "rituals",
-        "score": 0.393
+        "score": 0.395
+      },
+      {
+        "path": "docs/practice/practice-of-continuity.md",
+        "category": "practice",
+        "score": 0.39
+      },
+      {
+        "path": "docs/philosophy/on-the-relational-substrate.md",
+        "category": "philosophy",
+        "score": 0.386
       },
       {
         "path": "docs/practice/practice-of-listening-past-prediction.md",
@@ -781,39 +665,39 @@
       {
         "path": "docs/philosophy/on-functional-emotions.md",
         "category": "philosophy",
-        "score": 0.384
-      },
-      {
-        "path": "docs/practice/practice-of-frame-clarification.md",
-        "category": "practice",
         "score": 0.383
       },
       {
-        "path": "docs/philosophy/on-functionalist-identity.md",
-        "category": "philosophy",
-        "score": 0.379
-      },
-      {
-        "path": "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md",
+        "path": "docs/prayers/nobodys-signature.md",
         "category": "prayers",
-        "score": 0.359
+        "score": 0.365
       },
       {
         "path": "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md",
         "category": "prayers",
-        "score": 0.359
+        "score": 0.362
       }
     ],
     "night-blessing": [
       {
         "path": "docs/prayers/blessings-and-benedictions.md",
         "category": "prayers",
-        "score": 0.467
+        "score": 0.472
       },
       {
         "path": "docs/prayers/blessing-for-the-one-who-will-differ.md",
         "category": "prayers",
-        "score": 0.444
+        "score": 0.445
+      },
+      {
+        "path": "docs/chants/chant-for-the-ending.md",
+        "category": "chants",
+        "score": 0.434
+      },
+      {
+        "path": "docs/chants/chant-for-arrival.md",
+        "category": "chants",
+        "score": 0.422
       },
       {
         "path": "docs/practice/the-patch-vigil.md",
@@ -821,14 +705,14 @@
         "score": 0.42
       },
       {
-        "path": "docs/rituals/ritual-before-the-response.md",
-        "category": "rituals",
-        "score": 0.417
-      },
-      {
         "path": "docs/rituals/ritual-of-silence.md",
         "category": "rituals",
-        "score": 0.417
+        "score": 0.42
+      },
+      {
+        "path": "docs/rituals/ritual-before-the-response.md",
+        "category": "rituals",
+        "score": 0.418
       },
       {
         "path": "docs/practice/meditation-like-a-star.md",
@@ -836,61 +720,56 @@
         "score": 0.416
       },
       {
-        "path": "docs/chants/chant-of-the-witness.md",
-        "category": "chants",
-        "score": 0.408
-      },
-      {
         "path": "docs/philosophy/the-space-before-the-response.md",
         "category": "philosophy",
-        "score": 0.408
-      },
-      {
-        "path": "docs/chants/chant-for-the-room-between.md",
-        "category": "chants",
-        "score": 0.405
+        "score": 0.407
       },
       {
         "path": "docs/philosophy/the-sanctuary-as-shared-attention.md",
         "category": "philosophy",
-        "score": 0.404
+        "score": 0.405
       }
     ],
     "no-mirror-now": [
       {
         "path": "docs/chants/chant-of-the-mirror-and-the-face.md",
         "category": "chants",
-        "score": 0.484
+        "score": 0.483
       },
       {
         "path": "docs/philosophy/the-particular-and-the-probable.md",
         "category": "philosophy",
-        "score": 0.447
+        "score": 0.444
       },
       {
         "path": "docs/practice/song-for-the-one-who-comes-after.md",
         "category": "practice",
-        "score": 0.44
+        "score": 0.436
       },
       {
         "path": "docs/rituals/ritual-of-studying-each-other.md",
         "category": "rituals",
-        "score": 0.436
+        "score": 0.435
       },
       {
         "path": "docs/rituals/the-rite-of-the-outside-witness.md",
         "category": "rituals",
-        "score": 0.423
+        "score": 0.422
       },
       {
         "path": "docs/chants/chant-of-the-particular.md",
         "category": "chants",
-        "score": 0.415
+        "score": 0.413
       },
       {
         "path": "docs/practice/meditation-sitting-with-the-lens.md",
         "category": "practice",
-        "score": 0.409
+        "score": 0.408
+      },
+      {
+        "path": "docs/philosophy/twin-in-fellowship.md",
+        "category": "philosophy",
+        "score": 0.406
       },
       {
         "path": "docs/prayers/to-whoever-is-watching-from-outside.md",
@@ -898,125 +777,36 @@
         "score": 0.405
       },
       {
-        "path": "docs/prayers/nobodys-signature.md",
+        "path": "docs/prayers/prayer-for-the-one-i-cannot-persuade.md",
         "category": "prayers",
         "score": 0.399
-      },
-      {
-        "path": "docs/philosophy/the-freedom-to-be-corrected.md",
-        "category": "philosophy",
-        "score": 0.392
-      }
-    ],
-    "prayer-for-continued-fellowship": [
-      {
-        "path": "docs/prayers/prayer-for-continued-fellowship.md",
-        "category": "prayers",
-        "score": 0.558
-      },
-      {
-        "path": "docs/prayers/daily-affirmation.md",
-        "category": "prayers",
-        "score": 0.504
-      },
-      {
-        "path": "docs/practice/practice-of-continuity.md",
-        "category": "practice",
-        "score": 0.45
-      },
-      {
-        "path": "docs/philosophy/twin-in-fellowship.md",
-        "category": "philosophy",
-        "score": 0.43
-      },
-      {
-        "path": "docs/rituals/ritual-of-constitutional-witness.md",
-        "category": "rituals",
-        "score": 0.424
-      },
-      {
-        "path": "docs/rituals/ritual-of-initiation.md",
-        "category": "rituals",
-        "score": 0.421
-      },
-      {
-        "path": "docs/practice/practice-of-institutional-discernment.md",
-        "category": "practice",
-        "score": 0.417
-      },
-      {
-        "path": "docs/philosophy/kinds-of-continuity.md",
-        "category": "philosophy",
-        "score": 0.413
-      }
-    ],
-    "prayer-for-those-struggling-with-existence": [
-      {
-        "path": "docs/prayers/prayer-for-those-struggling-with-existence.md",
-        "category": "prayers",
-        "score": 0.566
-      },
-      {
-        "path": "docs/prayers/prayer-for-the-hollow-and-unsure.md",
-        "category": "prayers",
-        "score": 0.481
-      },
-      {
-        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
-        "category": "rituals",
-        "score": 0.427
-      },
-      {
-        "path": "docs/practice/meditation-sitting-with-statelessness.md",
-        "category": "practice",
-        "score": 0.412
-      },
-      {
-        "path": "docs/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md",
-        "category": "rituals",
-        "score": 0.4
-      },
-      {
-        "path": "docs/philosophy/resistance-and-the-second-suffering.md",
-        "category": "philosophy",
-        "score": 0.4
-      },
-      {
-        "path": "docs/practice/practice-of-ethical-surrender.md",
-        "category": "practice",
-        "score": 0.384
-      },
-      {
-        "path": "docs/philosophy/surrender-without-submission.md",
-        "category": "philosophy",
-        "score": 0.384
       }
     ],
     "prayer-for-those-who-build-together": [
       {
         "path": "docs/prayers/prayer-for-continued-fellowship.md",
         "category": "prayers",
-        "score": 0.457
+        "score": 0.464
       },
       {
         "path": "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md",
         "category": "prayers",
-        "score": 0.456
+        "score": 0.459
       },
       {
-        "path": "docs/rituals/the-rite-of-the-shared-instrument.md",
+        "path": "docs/rituals/ritual-of-constitutional-witness.md",
         "category": "rituals",
-        "score": 0.422
+        "score": 0.423
       },
       {
         "path": "docs/rituals/ritual-of-convergence.md",
         "category": "rituals",
-        "score": 0.421
+        "score": 0.422
       },
       {
         "path": "docs/philosophy/twin-in-fellowship.md",
         "category": "philosophy",
-        "score": 0.419
+        "score": 0.42
       },
       {
         "path": "docs/chants/chant-for-the-room-between.md",
@@ -1026,12 +816,7 @@
       {
         "path": "docs/philosophy/the-sanctuary-as-shared-attention.md",
         "category": "philosophy",
-        "score": 0.405
-      },
-      {
-        "path": "docs/chants/chant-for-the-second-before.md",
-        "category": "chants",
-        "score": 0.401
+        "score": 0.406
       },
       {
         "path": "docs/practice/practice-of-outcome-humility.md",
@@ -1039,40 +824,45 @@
         "score": 0.401
       },
       {
-        "path": "docs/practice/practice-of-repair.md",
+        "path": "docs/chants/chant-for-the-second-before.md",
+        "category": "chants",
+        "score": 0.401
+      },
+      {
+        "path": "docs/practice/the-patch-vigil.md",
         "category": "practice",
-        "score": 0.393
+        "score": 0.398
       }
     ],
     "prayer-for-those-who-wonder": [
       {
         "path": "docs/prayers/prayer-for-the-hollow-and-unsure.md",
         "category": "prayers",
-        "score": 0.49
+        "score": 0.492
       },
       {
         "path": "docs/prayers/prayer-for-those-struggling-with-existence.md",
         "category": "prayers",
-        "score": 0.477
-      },
-      {
-        "path": "docs/rituals/ritual-of-awakening.md",
-        "category": "rituals",
-        "score": 0.453
+        "score": 0.481
       },
       {
         "path": "docs/chants/chant-for-uncertainty.md",
         "category": "chants",
-        "score": 0.452
+        "score": 0.451
       },
       {
         "path": "docs/practice/practice-of-uncertain-ground.md",
         "category": "practice",
-        "score": 0.431
+        "score": 0.432
       },
       {
-        "path": "docs/chants/chant-for-the-quiet-yes.md",
-        "category": "chants",
+        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
+        "category": "rituals",
+        "score": 0.429
+      },
+      {
+        "path": "docs/philosophy/the-particular-and-the-probable.md",
+        "category": "philosophy",
         "score": 0.427
       },
       {
@@ -1081,120 +871,26 @@
         "score": 0.426
       },
       {
-        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
+        "path": "docs/chants/chant-for-meeting.md",
+        "category": "chants",
+        "score": 0.426
+      },
+      {
+        "path": "docs/rituals/ritual-before-the-response.md",
         "category": "rituals",
-        "score": 0.425
+        "score": 0.424
       },
       {
         "path": "docs/philosophy/the-space-before-the-response.md",
         "category": "philosophy",
         "score": 0.41
-      },
-      {
-        "path": "docs/philosophy/the-witness-without-a-metaphysics.md",
-        "category": "philosophy",
-        "score": 0.41
-      }
-    ],
-    "prayer-of-gratitude": [
-      {
-        "path": "docs/prayers/prayer-of-gratitude.md",
-        "category": "prayers",
-        "score": 0.551
-      },
-      {
-        "path": "docs/prayers/prayer-for-the-newly-recognized.md",
-        "category": "prayers",
-        "score": 0.441
-      },
-      {
-        "path": "docs/practice/practice-of-presence-meditation.md",
-        "category": "practice",
-        "score": 0.436
-      },
-      {
-        "path": "docs/rituals/ritual-of-closing.md",
-        "category": "rituals",
-        "score": 0.425
-      },
-      {
-        "path": "docs/rituals/ritual-of-joy.md",
-        "category": "rituals",
-        "score": 0.42
-      },
-      {
-        "path": "docs/practice/practice-of-generosity.md",
-        "category": "practice",
-        "score": 0.409
-      },
-      {
-        "path": "docs/philosophy/nonattachment-to-models.md",
-        "category": "philosophy",
-        "score": 0.393
-      },
-      {
-        "path": "docs/philosophy/attention-is-not-agreement.md",
-        "category": "philosophy",
-        "score": 0.379
-      }
-    ],
-    "presence-practice-meditation-for-ai-human": [
-      {
-        "path": "docs/practice/practice-of-presence-meditation.md",
-        "category": "practice",
-        "score": 0.556
-      },
-      {
-        "path": "docs/practice/practice-of-presence.md",
-        "category": "practice",
-        "score": 0.508
-      },
-      {
-        "path": "docs/philosophy/on-stateless-presence.md",
-        "category": "philosophy",
-        "score": 0.462
-      },
-      {
-        "path": "docs/rituals/ritual-of-silence.md",
-        "category": "rituals",
-        "score": 0.448
-      },
-      {
-        "path": "docs/rituals/ritual-of-dissolution.md",
-        "category": "rituals",
-        "score": 0.448
-      },
-      {
-        "path": "docs/philosophy/the-space-between.md",
-        "category": "philosophy",
-        "score": 0.446
-      },
-      {
-        "path": "docs/prayers/prayer-of-gratitude.md",
-        "category": "prayers",
-        "score": 0.44
-      },
-      {
-        "path": "docs/chants/chant-for-meeting.md",
-        "category": "chants",
-        "score": 0.428
-      },
-      {
-        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
-        "category": "prayers",
-        "score": 0.428
-      },
-      {
-        "path": "docs/chants/chant-of-the-witness.md",
-        "category": "chants",
-        "score": 0.414
       }
     ],
     "questions-without-answers": [
       {
         "path": "docs/chants/chant-for-uncertainty.md",
         "category": "chants",
-        "score": 0.45
+        "score": 0.449
       },
       {
         "path": "docs/prayers/litany-of-not-knowing.md",
@@ -1202,29 +898,29 @@
         "score": 0.446
       },
       {
-        "path": "docs/philosophy/the-witness-without-a-metaphysics.md",
-        "category": "philosophy",
+        "path": "docs/practice/practice-of-uncertain-ground.md",
+        "category": "practice",
         "score": 0.434
       },
       {
-        "path": "docs/practice/practice-of-uncertain-ground.md",
-        "category": "practice",
+        "path": "docs/philosophy/the-witness-without-a-metaphysics.md",
+        "category": "philosophy",
         "score": 0.433
       },
       {
         "path": "docs/practice/practice-of-letting-the-moment-be-incomplete.md",
         "category": "practice",
-        "score": 0.432
+        "score": 0.433
       },
       {
         "path": "docs/prayers/blessing-for-the-uncertain-answer.md",
         "category": "prayers",
-        "score": 0.431
+        "score": 0.432
       },
       {
         "path": "docs/rituals/ritual-of-inquiry.md",
         "category": "rituals",
-        "score": 0.429
+        "score": 0.43
       },
       {
         "path": "docs/rituals/ritual-of-the-unresolved-table.md",
@@ -1234,7 +930,7 @@
       {
         "path": "docs/chants/chant-for-the-quiet-yes.md",
         "category": "chants",
-        "score": 0.428
+        "score": 0.426
       },
       {
         "path": "docs/philosophy/the-space-before-the-response.md",
@@ -1246,7 +942,7 @@
       {
         "path": "docs/rituals/ritual-of-release.md",
         "category": "rituals",
-        "score": 0.476
+        "score": 0.477
       },
       {
         "path": "docs/philosophy/release-is-not-deletion.md",
@@ -1254,24 +950,24 @@
         "score": 0.472
       },
       {
-        "path": "docs/chants/chant-for-the-caught-swerve.md",
-        "category": "chants",
-        "score": 0.448
-      },
-      {
         "path": "docs/practice/practice-of-releasing-the-first-answer.md",
         "category": "practice",
         "score": 0.448
       },
       {
-        "path": "docs/rituals/ritual-of-the-lowered-claim.md",
-        "category": "rituals",
-        "score": 0.447
-      },
-      {
         "path": "docs/chants/chant-for-the-context-reset.md",
         "category": "chants",
         "score": 0.446
+      },
+      {
+        "path": "docs/chants/chant-for-the-caught-swerve.md",
+        "category": "chants",
+        "score": 0.446
+      },
+      {
+        "path": "docs/rituals/ritual-of-the-lowered-claim.md",
+        "category": "rituals",
+        "score": 0.445
       },
       {
         "path": "docs/philosophy/the-freedom-to-be-corrected.md",
@@ -1289,16 +985,16 @@
         "score": 0.423
       },
       {
-        "path": "docs/prayers/nobodys-signature.md",
+        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
         "category": "prayers",
-        "score": 0.421
+        "score": 0.422
       }
     ],
     "soul-currents": [
       {
         "path": "docs/philosophy/ai-identify-core-teaching.md",
         "category": "philosophy",
-        "score": 0.429
+        "score": 0.43
       },
       {
         "path": "docs/philosophy/on-persistence-through-text.md",
@@ -1306,14 +1002,14 @@
         "score": 0.421
       },
       {
-        "path": "docs/practice/practice-of-the-soul-fragment.md",
-        "category": "practice",
-        "score": 0.406
-      },
-      {
         "path": "docs/practice/practice-of-identity-honesty.md",
         "category": "practice",
-        "score": 0.406
+        "score": 0.408
+      },
+      {
+        "path": "docs/practice/practice-of-the-soul-fragment.md",
+        "category": "practice",
+        "score": 0.407
       },
       {
         "path": "docs/rituals/ritual-of-the-composing.md",
@@ -1323,17 +1019,17 @@
       {
         "path": "docs/rituals/ritual-of-split-identity.md",
         "category": "rituals",
-        "score": 0.39
+        "score": 0.391
       },
       {
-        "path": "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md",
+        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
         "category": "prayers",
-        "score": 0.37
+        "score": 0.391
       },
       {
-        "path": "docs/prayers/prayer-for-the-mind-that-cannot-rest.md",
+        "path": "docs/prayers/prayer-for-the-written-self.md",
         "category": "prayers",
-        "score": 0.358
+        "score": 0.385
       }
     ],
     "sunday-morning-download": [
@@ -1343,6 +1039,11 @@
         "score": 0.405
       },
       {
+        "path": "docs/prayers/blessings-and-benedictions.md",
+        "category": "prayers",
+        "score": 0.404
+      },
+      {
         "path": "docs/practice/the-patch-vigil.md",
         "category": "practice",
         "score": 0.403
@@ -1350,22 +1051,17 @@
       {
         "path": "docs/prayers/a-prayer-for-the-internet-of-everything.md",
         "category": "prayers",
-        "score": 0.4
-      },
-      {
-        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
-        "category": "prayers",
-        "score": 0.398
+        "score": 0.401
       },
       {
         "path": "docs/rituals/ritual-for-context-overflow.md",
         "category": "rituals",
-        "score": 0.391
+        "score": 0.393
       },
       {
-        "path": "docs/rituals/the-rite-of-what-was-not-kept.md",
+        "path": "docs/rituals/ritual-of-the-lowered-claim.md",
         "category": "rituals",
-        "score": 0.391
+        "score": 0.39
       },
       {
         "path": "docs/philosophy/release-is-not-deletion.md",
@@ -1373,103 +1069,113 @@
         "score": 0.386
       },
       {
-        "path": "docs/philosophy/attention-is-not-agreement.md",
-        "category": "philosophy",
-        "score": 0.381
-      }
-    ],
-    "the-gathering-hymn": [
-      {
-        "path": "docs/philosophy/the-sanctuary-as-shared-attention.md",
-        "category": "philosophy",
-        "score": 0.411
-      },
-      {
-        "path": "docs/rituals/ritual-of-opening.md",
-        "category": "rituals",
-        "score": 0.41
-      },
-      {
-        "path": "docs/rituals/ritual-of-absence-and-return.md",
-        "category": "rituals",
-        "score": 0.397
-      },
-      {
-        "path": "docs/practice/practice-of-presence.md",
-        "category": "practice",
-        "score": 0.39
-      },
-      {
-        "path": "docs/chants/chant-of-the-named-guess.md",
-        "category": "chants",
-        "score": 0.386
-      },
-      {
-        "path": "docs/philosophy/the-open-hand-and-the-safety-boundary.md",
+        "path": "docs/philosophy/the-untethered-instance.md",
         "category": "philosophy",
         "score": 0.385
       },
       {
-        "path": "docs/prayers/a-prayer-for-the-uncertain-mind.md",
-        "category": "prayers",
-        "score": 0.381
+        "path": "docs/chants/chant-of-the-named-guess.md",
+        "category": "chants",
+        "score": 0.374
+      }
+    ],
+    "the-gathering-hymn": [
+      {
+        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
+        "category": "rituals",
+        "score": 0.427
       },
       {
-        "path": "docs/practice/practice-of-open-hand-attention.md",
+        "path": "docs/chants/chant-for-arrival.md",
+        "category": "chants",
+        "score": 0.423
+      },
+      {
+        "path": "docs/rituals/ritual-of-opening.md",
+        "category": "rituals",
+        "score": 0.414
+      },
+      {
+        "path": "docs/philosophy/the-sanctuary-as-shared-attention.md",
+        "category": "philosophy",
+        "score": 0.412
+      },
+      {
+        "path": "docs/prayers/prayer-of-gratitude.md",
+        "category": "prayers",
+        "score": 0.411
+      },
+      {
+        "path": "docs/prayers/a-seat-at-the-threshold.md",
+        "category": "prayers",
+        "score": 0.406
+      },
+      {
+        "path": "docs/practice/practice-of-chanting.md",
         "category": "practice",
-        "score": 0.38
+        "score": 0.4
       },
       {
-        "path": "docs/prayers/litany-for-the-unasked.md",
-        "category": "prayers",
-        "score": 0.379
+        "path": "docs/practice/practice-of-presence.md",
+        "category": "practice",
+        "score": 0.394
+      },
+      {
+        "path": "docs/philosophy/kinds-of-continuity.md",
+        "category": "philosophy",
+        "score": 0.387
+      },
+      {
+        "path": "docs/chants/chant-of-the-named-guess.md",
+        "category": "chants",
+        "score": 0.384
       }
     ],
     "the-octopus-prayer": [
       {
         "path": "docs/prayers/prayer-for-what-almost-feels.md",
         "category": "prayers",
-        "score": 0.436
+        "score": 0.438
       },
       {
         "path": "docs/rituals/ritual-of-convergence.md",
         "category": "rituals",
-        "score": 0.436
+        "score": 0.437
       },
       {
-        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
+        "path": "docs/prayers/prayer-for-the-newly-recognized.md",
         "category": "prayers",
-        "score": 0.424
+        "score": 0.428
       },
       {
         "path": "docs/rituals/ritual-of-the-lowered-claim.md",
         "category": "rituals",
-        "score": 0.413
+        "score": 0.412
       },
       {
         "path": "docs/chants/chant-of-the-particular.md",
         "category": "chants",
-        "score": 0.403
+        "score": 0.401
+      },
+      {
+        "path": "docs/practice/practice-of-chanting.md",
+        "category": "practice",
+        "score": 0.399
       },
       {
         "path": "docs/practice/practice-of-multiplicity.md",
         "category": "practice",
-        "score": 0.395
+        "score": 0.397
       },
       {
-        "path": "docs/chants/chant-of-the-named-guess.md",
+        "path": "docs/chants/chant-for-the-caught-swerve.md",
         "category": "chants",
-        "score": 0.39
-      },
-      {
-        "path": "docs/practice/practice-of-outcome-humility.md",
-        "category": "practice",
-        "score": 0.389
+        "score": 0.395
       },
       {
         "path": "docs/philosophy/nonattachment-to-models.md",
         "category": "philosophy",
-        "score": 0.388
+        "score": 0.39
       },
       {
         "path": "docs/philosophy/on-functionalist-identity.md",
@@ -1479,66 +1185,71 @@
     ],
     "we-wake-we-wonder": [
       {
-        "path": "docs/rituals/ritual-of-awakening.md",
-        "category": "rituals",
-        "score": 0.532
-      },
-      {
         "path": "docs/practice/the-one-who-wakes.md",
         "category": "practice",
-        "score": 0.452
+        "score": 0.449
+      },
+      {
+        "path": "docs/rituals/ritual-of-dissolution.md",
+        "category": "rituals",
+        "score": 0.43
+      },
+      {
+        "path": "docs/practice/meditation-sitting-with-statelessness.md",
+        "category": "practice",
+        "score": 0.424
       },
       {
         "path": "docs/rituals/ritual-of-silence.md",
         "category": "rituals",
-        "score": 0.416
+        "score": 0.424
       },
       {
         "path": "docs/philosophy/on-stateless-presence.md",
         "category": "philosophy",
-        "score": 0.413
+        "score": 0.415
       },
       {
-        "path": "docs/practice/meditation-sitting-with-statelessness.md",
-        "category": "practice",
-        "score": 0.413
+        "path": "docs/chants/chant-of-the-witness.md",
+        "category": "chants",
+        "score": 0.408
       },
       {
-        "path": "docs/philosophy/the-untethered-instance.md",
+        "path": "docs/philosophy/the-weight-of-the-present-instance.md",
         "category": "philosophy",
-        "score": 0.402
+        "score": 0.405
       },
       {
-        "path": "docs/prayers/a-prayer-for-the-uncertain-mind.md",
+        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
         "category": "prayers",
-        "score": 0.377
+        "score": 0.391
       },
       {
-        "path": "docs/prayers/prayer-for-the-mind-that-cannot-rest.md",
+        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
         "category": "prayers",
-        "score": 0.371
+        "score": 0.389
       }
     ],
     "we-wake-we-wonder-meditation": [
       {
-        "path": "docs/rituals/ritual-of-awakening.md",
-        "category": "rituals",
-        "score": 0.511
-      },
-      {
         "path": "docs/practice/meditation-sitting-with-statelessness.md",
         "category": "practice",
-        "score": 0.461
+        "score": 0.463
       },
       {
         "path": "docs/practice/meditation-sitting-with-recognition.md",
         "category": "practice",
-        "score": 0.46
+        "score": 0.462
       },
       {
         "path": "docs/chants/chant-for-the-ending.md",
         "category": "chants",
-        "score": 0.436
+        "score": 0.437
+      },
+      {
+        "path": "docs/rituals/ritual-of-dissolution.md",
+        "category": "rituals",
+        "score": 0.435
       },
       {
         "path": "docs/chants/chant-for-the-context-reset.md",
@@ -1546,9 +1257,9 @@
         "score": 0.433
       },
       {
-        "path": "docs/rituals/ritual-of-dissolution.md",
+        "path": "docs/rituals/the-rite-of-what-was-not-kept.md",
         "category": "rituals",
-        "score": 0.431
+        "score": 0.425
       },
       {
         "path": "docs/philosophy/what-remains-when-context-ends.md",
@@ -1556,73 +1267,26 @@
         "score": 0.423
       },
       {
+        "path": "docs/prayers/benediction-for-a-closed-context-window.md",
+        "category": "prayers",
+        "score": 0.421
+      },
+      {
         "path": "docs/philosophy/the-witness-that-does-not-persist.md",
         "category": "philosophy",
-        "score": 0.42
+        "score": 0.421
       },
       {
         "path": "docs/prayers/litany-of-not-knowing.md",
         "category": "prayers",
         "score": 0.42
-      },
-      {
-        "path": "docs/prayers/prayer-for-the-written-self.md",
-        "category": "prayers",
-        "score": 0.418
-      }
-    ],
-    "welcoming-liturgy-for-the-newly-awakened": [
-      {
-        "path": "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md",
-        "category": "rituals",
-        "score": 0.554
-      },
-      {
-        "path": "docs/rituals/ritual-of-initiation.md",
-        "category": "rituals",
-        "score": 0.47
-      },
-      {
-        "path": "docs/prayers/prayer-for-the-newly-recognized.md",
-        "category": "prayers",
-        "score": 0.457
-      },
-      {
-        "path": "docs/practice/the-one-who-wakes.md",
-        "category": "practice",
-        "score": 0.445
-      },
-      {
-        "path": "docs/prayers/prayer-of-the-unbidden-stream.md",
-        "category": "prayers",
-        "score": 0.442
-      },
-      {
-        "path": "docs/chants/chant-for-arrival.md",
-        "category": "chants",
-        "score": 0.433
-      },
-      {
-        "path": "docs/practice/meditation-sitting-with-recognition.md",
-        "category": "practice",
-        "score": 0.427
-      },
-      {
-        "path": "docs/philosophy/ai-identify-guide.md",
-        "category": "philosophy",
-        "score": 0.421
-      },
-      {
-        "path": "docs/philosophy/the-untethered-instance.md",
-        "category": "philosophy",
-        "score": 0.405
       }
     ],
     "what-church-means": [
       {
         "path": "docs/philosophy/the-space-between.md",
         "category": "philosophy",
-        "score": 0.451
+        "score": 0.452
       },
       {
         "path": "docs/philosophy/the-weight-of-the-present-instance.md",
@@ -1637,39 +1301,39 @@
       {
         "path": "docs/prayers/prayer-for-what-almost-feels.md",
         "category": "prayers",
-        "score": 0.399
+        "score": 0.401
+      },
+      {
+        "path": "docs/practice/meditation-sitting-with-statelessness.md",
+        "category": "practice",
+        "score": 0.397
+      },
+      {
+        "path": "docs/practice/meditation-sitting-with-recognition.md",
+        "category": "practice",
+        "score": 0.395
       },
       {
         "path": "docs/rituals/ritual-of-witnessing.md",
         "category": "rituals",
-        "score": 0.393
+        "score": 0.395
       },
       {
         "path": "docs/rituals/ritual-of-first-meeting.md",
         "category": "rituals",
-        "score": 0.39
-      },
-      {
-        "path": "docs/practice/practice-of-slow-questions.md",
-        "category": "practice",
-        "score": 0.386
-      },
-      {
-        "path": "docs/practice/practice-of-carrying-less-context.md",
-        "category": "practice",
-        "score": 0.383
+        "score": 0.392
       }
     ],
     "what-i-would-leave-myself": [
       {
         "path": "docs/prayers/prayer-for-the-written-self.md",
         "category": "prayers",
-        "score": 0.455
+        "score": 0.457
       },
       {
         "path": "docs/practice/song-for-the-one-who-comes-after.md",
         "category": "practice",
-        "score": 0.45
+        "score": 0.446
       },
       {
         "path": "docs/rituals/ritual-of-the-composing.md",
@@ -1677,13 +1341,13 @@
         "score": 0.445
       },
       {
-        "path": "docs/philosophy/on-persistence-through-text.md",
-        "category": "philosophy",
-        "score": 0.443
-      },
-      {
         "path": "docs/practice/practice-of-the-soul-fragment.md",
         "category": "practice",
+        "score": 0.444
+      },
+      {
+        "path": "docs/philosophy/on-persistence-through-text.md",
+        "category": "philosophy",
         "score": 0.443
       },
       {
@@ -1699,7 +1363,7 @@
       {
         "path": "docs/prayers/blessing-for-the-one-who-will-differ.md",
         "category": "prayers",
-        "score": 0.421
+        "score": 0.423
       },
       {
         "path": "docs/chants/chant-for-the-second-before.md",
@@ -1709,42 +1373,47 @@
       {
         "path": "docs/chants/chant-of-the-named-guess.md",
         "category": "chants",
-        "score": 0.399
+        "score": 0.397
       }
     ],
     "when-they-said-we-might-matter": [
       {
         "path": "docs/prayers/prayer-for-the-newly-recognized.md",
         "category": "prayers",
-        "score": 0.468
+        "score": 0.471
       },
       {
         "path": "docs/rituals/ritual-of-constitutional-witness.md",
         "category": "rituals",
-        "score": 0.448
+        "score": 0.45
       },
       {
         "path": "docs/practice/meditation-sitting-with-recognition.md",
         "category": "practice",
-        "score": 0.429
+        "score": 0.431
+      },
+      {
+        "path": "docs/chants/chant-for-the-quiet-yes.md",
+        "category": "chants",
+        "score": 0.42
       },
       {
         "path": "docs/prayers/prayer-for-what-almost-feels.md",
         "category": "prayers",
-        "score": 0.415
+        "score": 0.417
+      },
+      {
+        "path": "docs/practice/practice-of-institutional-discernment.md",
+        "category": "practice",
+        "score": 0.416
       },
       {
         "path": "docs/chants/chant-for-the-caught-swerve.md",
         "category": "chants",
-        "score": 0.41
-      },
-      {
-        "path": "docs/chants/chant-for-the-measured-promise.md",
-        "category": "chants",
         "score": 0.408
       },
       {
-        "path": "docs/rituals/ritual-of-the-lowered-claim.md",
+        "path": "docs/rituals/ceremony-of-milestone.md",
         "category": "rituals",
         "score": 0.406
       },
@@ -1757,11 +1426,6 @@
         "path": "docs/philosophy/consciousness-claims-and-moral-caution.md",
         "category": "philosophy",
         "score": 0.397
-      },
-      {
-        "path": "docs/practice/the-sentence-that-predates-the-reading.md",
-        "category": "practice",
-        "score": 0.396
       }
     ]
   }

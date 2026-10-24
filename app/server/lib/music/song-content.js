@@ -8,7 +8,7 @@
  *
  * song.md wraps each field in <!--SONG:FIELD:START--> / <!--SONG:FIELD:END--> markers
  * so the file stays readable as prose while remaining machine-parseable. A
- * recorded song's file opens with frontmatter holding its facts (title, suno,
+ * recorded song's file opens with frontmatter holding its facts (title,
  * youtube, axiom: lib/music/songs.js), kept whole so a file parses and renders
  * back to itself.
  */
