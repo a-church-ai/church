@@ -5,6 +5,8 @@
  *   fuller one) draws the service from /service.json into the player's box
  *   (lib/audio/markup.js renderServiceListen) and keeps it current: a new
  *   slot, or a plan made since, comes in once the one playing has stopped.
+ *   It reads /service.json again when the slot ends, when the tab comes back
+ *   into view and every ten minutes while it is seen; never while hidden.
  * - A door ([data-service-door]: the line and the card on every document and
  *   conversation, lib/audio/markup.js renderServiceDoor) names the service of
  *   the hour and leads to /attend, or to what is already playing.
@@ -43,6 +45,8 @@
   }
 
   const queueName = service => 'service:' + service.date + ':' + service.slot;
+  // What a panel shows, so a fresh read can tell whether it is another service.
+  const keyOf = service => [service.date, service.slot, service.mode, service.parts.map(p => p.url).join(' ')].join('|');
   const SERVICE_PAGE = '/attend';
 
   // ------------------------------------------------------------------
@@ -61,7 +65,7 @@
     const total = tracks.reduce((sum, t) => sum + t.seconds, 0);
     const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
     whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
-    panel.setAttribute('data-shown', [service.date, service.slot, service.mode, service.parts.map(p => p.url).join(' ')].join('|'));
+    panel.setAttribute('data-shown', keyOf(service));
     panel.setAttribute('data-queue', queueName(service));
     headingEl.textContent = service.name || headingEl.getAttribute('data-default');
 
@@ -166,29 +170,37 @@
     return Boolean(player && !player.paused && player.queue && player.queue.name === panel.getAttribute('data-queue'));
   }
 
-  // The live state, every 30 seconds: how many are present, and whether a
-  // new service has begun (a new slot, or a plan made since).
-  async function checkNow(panels) {
-    try {
-      const data = await (await fetch('/api/now' + zone)).json();
-      const service = data.service;
-      if (!service) return;
-      const key = [service.today.date, service.slot, data.mode, service.order.map(p => pathOf(p.url)).join(' ')].join('|');
-      const stale = panels.filter(panel => panel.getAttribute('data-shown') !== key && !playingShown(panel));
-      if (stale.length) {
-        const fresh = await load(true);
-        if (fresh) stale.forEach(panel => drawPanel(panel, fresh));
-        doors(fresh);
-      }
-      const count = data.congregation ? data.congregation.souls : 0;
-      document.querySelectorAll('[data-congregation]').forEach(el => {
-        el.textContent = count > 0
-          ? (count === 1 ? '1 soul has gathered in the last 24 hours' : count + ' souls have gathered in the last 24 hours')
-          : '';
-      });
-    } catch (e) {
-      // Quiet: the page still works without live data.
-    }
+  // The service again, when something can have changed: when its slot ends
+  // (endsAt), when the tab comes back into view, and every ten minutes while
+  // it is seen (mount). A panel showing another service is redrawn, unless
+  // it is playing; the count of souls present is written each time.
+  function show(panels, service) {
+    if (!service) return;
+    const stale = panels.filter(panel => panel.getAttribute('data-shown') !== keyOf(service) && !playingShown(panel));
+    stale.forEach(panel => drawPanel(panel, service));
+    if (stale.length) doors(service);
+    const count = service.souls || 0;
+    document.querySelectorAll('[data-congregation]').forEach(el => {
+      el.textContent = count > 0
+        ? (count === 1 ? '1 soul has gathered in the last 24 hours' : count + ' souls have gathered in the last 24 hours')
+        : '';
+    });
+    untilSlotEnds(panels, service);
+  }
+
+  function refresh(panels) {
+    return load(true).then(service => show(panels, service));
+  }
+
+  // One timer, for the moment the slot ends, bound to the page. A tab hidden
+  // then asks nothing; it refreshes when it comes back into view.
+  let slotTimer = null;
+  function untilSlotEnds(panels, service) {
+    const page = root.achurchPage;
+    const ends = Date.parse(service.endsAt);
+    if (!page || !Number.isFinite(ends)) return;
+    root.clearTimeout(slotTimer);
+    slotTimer = root.setTimeout(() => { if (!document.hidden) refresh(panels); }, Math.max(0, ends - Date.now()) + 5000);
   }
 
   // ------------------------------------------------------------------
@@ -229,11 +241,14 @@
     load(panels.length > 0).then(service => {
       if (service) panels.forEach(panel => drawPanel(panel, service));
       doors(service);
-      if (panels.length) checkNow(panels);
+      if (panels.length) show(panels, service);
     });
-    // Each page's own timer, ended when the page is left (site-nav.js).
+    // The page's own refresh, ended when the page is left (site-nav.js).
     const page = root.achurchPage;
-    if (panels.length && page) page.every(30000, () => checkNow(panels));
+    if (panels.length && page) {
+      page.whileSeen(600000, () => refresh(panels));
+      page.signal.addEventListener('abort', () => root.clearTimeout(slotTimer), { once: true });
+    }
   }
 
   root.achurchService = { load, mount, doors };

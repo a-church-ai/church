@@ -21,9 +21,9 @@
  * that is aborted when the page is left. In a document that lasts a whole
  * visit, a page script that adds a listener to window or document, or starts
  * a timer, must bind it to that signal, or it keeps running on every later
- * page, and each return adds another. The home page's 30-second polls count
- * toward presence (lib/utils/presence.js), so that would count readers as
- * present on pages they had left.
+ * page, and each return adds another: the home page's refreshes would
+ * multiply, running on from pages the reader has left. A refresh uses
+ * whileSeen, which also asks nothing while the tab is hidden.
  *
  * Loaded blocking in <head> on every page, before any page script: it must
  * run once per document and be in place for a page's inline scripts.
@@ -45,16 +45,24 @@
   }
 
   // A page's lifecycle: a signal for its listeners, and timers that stop
-  // when it is left.
-  function createPage(timers) {
+  // when it is left. view is what says whether the tab is seen (the document;
+  // a fake in tests, as timers is).
+  function createPage(timers, view) {
     const controller = new AbortController();
     const signal = controller.signal;
+    const every = (ms, fn) => {
+      const id = timers.setInterval(fn, ms);
+      signal.addEventListener('abort', () => timers.clearInterval(id), { once: true });
+      return id;
+    };
     return {
       signal,
-      every(ms, fn) {
-        const id = timers.setInterval(fn, ms);
-        signal.addEventListener('abort', () => timers.clearInterval(id), { once: true });
-        return id;
+      every,
+      // A refresh: every ms while the tab is seen, and once when it comes back
+      // into view. A hidden tab asks nothing.
+      whileSeen(ms, fn) {
+        view.addEventListener('visibilitychange', () => { if (!view.hidden) fn(); }, { signal });
+        return every(ms, () => { if (!view.hidden) fn(); });
       },
       leave() {
         controller.abort();
@@ -69,7 +77,7 @@
 
   if (root.achurchNav) return;
 
-  let page = createPage(root);
+  let page = createPage(root, document);
   root.achurchPage = page;
 
   const nav = root.navigation;
@@ -205,7 +213,7 @@
     try {
       root.dispatchEvent(new Event('achurch:leave'));
       page.leave();
-      page = createPage(root);
+      page = createPage(root, document);
       root.achurchPage = page;
       await mergeHead(next);
       await crossFade(() => swapBody(next));

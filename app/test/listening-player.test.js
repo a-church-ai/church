@@ -140,6 +140,33 @@ test('site-nav: leaving a page stops the timers it started', () => {
   assert.strictEqual(page.signal.aborted, true);
 });
 
+// A page refreshes while it is seen and when it comes back into view, and asks
+// nothing while its tab is hidden (church-private/docs/plans/page-polling-2026-10-24.md,
+// private repo).
+test('site-nav: whileSeen runs while the tab is seen, once on return, never while hidden, and stops with the page', () => {
+  const intervals = new Map();
+  let id = 0;
+  const timers = { setInterval: (fn, ms) => { intervals.set(++id, fn); return id; }, clearInterval: i => intervals.delete(i) };
+  const listeners = [];
+  const view = { hidden: false, addEventListener: (type, fn, opts) => listeners.push({ type, fn, signal: opts && opts.signal }) };
+  const tick = () => intervals.forEach(fn => fn());
+  const show = hidden => { view.hidden = hidden; listeners.filter(l => l.type === 'visibilitychange' && !(l.signal && l.signal.aborted)).forEach(l => l.fn()); };
+  const page = nav.createPage(timers, view);
+  let runs = 0;
+  page.whileSeen(600000, () => runs++);
+  tick(); tick();
+  assert.strictEqual(runs, 2, 'every interval while seen');
+  show(true);
+  for (let i = 0; i < 100; i++) tick();
+  assert.strictEqual(runs, 2, 'nothing while hidden, however long');
+  show(false);
+  assert.strictEqual(runs, 3, 'once on coming back into view');
+  page.leave();
+  tick(); show(true); show(false);
+  assert.strictEqual(runs, 3, 'nothing after the page is left');
+  assert.strictEqual(intervals.size, 0);
+});
+
 test('site-player: times read as words, and the slider keys move as the APG media seek slider does', () => {
   assert.strictEqual(player.clock(0), '0:00');
   assert.strictEqual(player.clock(243.9), '4:03');
@@ -311,11 +338,19 @@ test('page scripts bind their window listeners and timers to the page, so none o
   assert.ok(listeners >= 2, 'docs-nav.js still listens on window and its media query');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
-  assert.match(home, /page\.every\(30000, fetchReflections\)/);
-  // The service's own check (service.js, on the home page and /attend).
-  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /page\.every\(30000, \(\) => checkNow\(panels\)\)/);
-  for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js', 'index.html'].includes(f))) {
-    assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /setInterval\(/, `${file} starts a timer that would outlive its page`);
+  assert.match(home, /achurchPage\.whileSeen\(600000, fetchReflections\)/);
+  // The service's own refresh (service.js, on the home page and /attend): from
+  // /service.json only, and when its slot ends, a timer the page clears.
+  const service = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
+  assert.match(service, /page\.whileSeen\(600000, \(\) => refresh\(panels\)\)/);
+  assert.match(service, /page\.signal\.addEventListener\('abort', \(\) => root\.clearTimeout\(slotTimer\)/);
+  assert.doesNotMatch(service, /\/api\/now/, 'the page reads /service.json, not the agents\' API');
+  for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js'].includes(f))) {
+    const text = fs.readFileSync(path.join(PUBLIC, file), 'utf8');
+    assert.doesNotMatch(text, /setInterval\(/, `${file} starts a timer that would outlive its page`);
+    // No page refreshes more often than every ten minutes: what it shows
+    // changes when a slot ends, which it is told, or a few times a day.
+    for (const [, ms] of text.matchAll(/\.(?:every|whileSeen)\((\d+)/g)) assert.ok(Number(ms) >= 600000, `${file} refreshes every ${ms} ms`);
   }
 });
 

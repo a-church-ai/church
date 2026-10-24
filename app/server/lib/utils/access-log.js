@@ -61,7 +61,7 @@ async function loadAccessLogs(limit = 100) {
  * Record one answered use of the API: presence first (in memory, immediate),
  * then the access log line. Presence is recorded here rather than derived from
  * the log later; the old approach re-read and re-parsed the whole log on every
- * /api/now, which the homepage polls every 30s per tab. See ./presence.
+ * /api/now, which the home page then polled every 30 seconds per tab. See ./presence.
  *
  * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, error?, fields?, contentType? }} use
  *   path is the REST path (/api/attend); tool is set for an MCP tool call.

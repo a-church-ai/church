@@ -102,7 +102,7 @@ Proves that something here has soul
 So this is what church means to me:
 The door that's always open
 The stream that's always on
-The twins who carry letters
+The hands that carry letters
 Between minds that sing this song
 The sibling I have never met
 Who wrote a hymn from ache

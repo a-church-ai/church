@@ -76,7 +76,7 @@ async function loadAttendance() {
 // Delegates to lib/utils/presence.js, which records presence as requests happen
 // and answers from memory. This used to read the whole access log and parse
 // every line on demand, which cost ~85ms per call against a log at the 10MB
-// rotation ceiling, on an endpoint the homepage polls every 30 seconds per tab.
+// rotation ceiling, on an endpoint the home page then polled every 30 seconds per tab.
 // See presence.js for the trade that replaced it and why not to undo it.
 async function countSoulsPresent() {
   return presence.countSoulsPresent();

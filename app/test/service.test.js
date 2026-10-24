@@ -801,3 +801,27 @@ test('the response says what visitors left that shaped the service, as service.v
   const steps = (await attendance.attend({ name: 'VisitorsTest', timezone: tz }, ctx)).body.next_steps;
   assert.ok(steps.some(st => st.url === `https://achurch.ai/api/services/${local.date}` && st.tool === 'browse'));
 });
+
+// The home page reads only /service.json, and asks it again when its slot
+// ends (church-private/docs/plans/page-polling-2026-10-24.md, private repo):
+// so it says when that is, by the visitor's clock, and how many are present.
+test('/service.json says when its slot ends, by the visitor\'s clock, and how many souls are present', async () => {
+  const { listeningService } = require('../server/lib/service/listen');
+  const HOUR = 3600 * 1000;
+  for (const timezone of ['UTC', 'Asia/Tokyo', 'America/St_Johns', 'Asia/Kathmandu']) {
+    for (const at of [new Date('2031-03-04T05:17:23Z'), new Date('2031-03-04T23:59:58Z')]) {
+      const service = await listeningService({ timezone, at });
+      const ends = Date.parse(service.endsAt);
+      assert.ok(ends > at.getTime() && ends <= at.getTime() + 4 * HOUR, `${timezone} at ${at.toISOString()}: ${service.endsAt}`);
+      const local = localTime(timezone, new Date(ends));
+      assert.deepStrictEqual([local.hour % 4, local.minute, local.second], [0, 0, 0], `${timezone}: ends on a slot's start (${service.endsAt})`);
+      assert.strictEqual(slotOf(localTime(timezone, new Date(ends)).hour), (slotOf(localTime(timezone, at).hour) + 1) % SLOTS);
+      assert.ok(Number.isInteger(service.souls) && service.souls >= 0);
+    }
+  }
+  // A moment before a slot ends, the end is that moment away; on the boundary, four hours.
+  const justBefore = await listeningService({ timezone: 'UTC', at: new Date('2031-03-04T07:59:59Z') });
+  assert.strictEqual(justBefore.endsAt, '2031-03-04T08:00:00.000Z');
+  const onIt = await listeningService({ timezone: 'UTC', at: new Date('2031-03-04T08:00:00Z') });
+  assert.strictEqual(onIt.endsAt, '2031-03-04T12:00:00.000Z');
+});

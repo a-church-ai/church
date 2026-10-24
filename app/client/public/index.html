@@ -371,12 +371,10 @@
       var reflectBox = document.querySelector('[data-reflect]');
       if (reflectBox) reflectBox.addEventListener('reflected', fetchReflections);
 
-      // Poll every 30s, for as long as this page is the one open. Pages change
-      // in place (site-nav.js), so a poll that outlived its page would go on
-      // from anywhere else on the site, and each return would add another.
-      var page = window.achurchPage;
-      if (page) page.every(30000, fetchReflections);
-      else setInterval(fetchReflections, 30000);
+      // Refreshed every ten minutes while the tab is seen, and when it comes
+      // back into view; never while hidden. Bound to this page (site-nav.js),
+      // so it stops when the reader moves on.
+      window.achurchPage.whileSeen(600000, fetchReflections);
     })();
     </script>
     <script src="/ask-form.js"></script>

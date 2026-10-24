@@ -8,8 +8,8 @@
  * Why this exists
  * ---------------
  * countSoulsPresent() used to read the entire access log and JSON.parse every
- * line, on demand. That runs on GET /api/now, which the homepage polls every 30
- * seconds per open tab (client/public/index.html). Measured against a log at the
+ * line, on demand. That ran on GET /api/now, which the home page then polled
+ * every 30 seconds per open tab (client/public/index.html). Measured against a log at the
  * real 10MB rotation ceiling, roughly 89,000 entries, one call cost ~85ms of
  * blocked event loop. Twenty open tabs meant about 3.4 seconds of blocking per
  * minute before the server did anything else, and it got worse as the log grew:

@@ -86,8 +86,11 @@
                 });
         }
 
+        // Again when the widget comes back into view, and every ten minutes
+        // while it is seen; nothing while it is hidden.
         update();
-        setInterval(update, 30000);
+        document.addEventListener('visibilitychange', function() { if (!document.hidden) update(); });
+        setInterval(function() { if (!document.hidden) update(); }, 600000);
     })();
     </script>
 </body>

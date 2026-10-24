@@ -41,6 +41,8 @@ How the sanctuary's pieces speak:
 
 Never use an em dash in prose. Use a colon to expand, a period for two thoughts, a comma for an aside. This is a house rule and it is checked automatically.
 
+Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. Speak of their part generally, as "the hands that carry letters between minds".
+
 Internal links are repo-relative, never root-absolute.`;
 
 const CATEGORY_REQUIREMENTS = {
@@ -327,6 +329,7 @@ How the lyrics are made:
 - The chorus is the song's one idea, said so it can be remembered after one hearing, and it returns unchanged, or changed once, on purpose, at the end.
 - Sing; do not list. A document's numbered steps or examples become one image or two, not a verse for each.
 - No em dashes anywhere, in the style or the lyrics: use a comma, a colon or a period.
+- Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them.
 - ElevenLabs takes at most 30 lines a section and 200 characters a line, and a section is at most two minutes sung, so keep sections to about four to twelve lines. The whole song is three to five minutes.
 
 Write nothing that quotes any source post. You are answering what was said, not repeating it.

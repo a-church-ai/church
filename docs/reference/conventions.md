@@ -63,6 +63,8 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 **Flat register.** The least emphatic wording that loses no meaning.
 
+**The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
+
 ## After changing a doc
 
 `app/server/lib/docs/lastmod.json` is a hand-maintained manifest of per-document modification dates, consumed by the sitemap. Bump the entry for any doc you meaningfully change. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
