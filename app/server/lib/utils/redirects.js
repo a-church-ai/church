@@ -103,7 +103,7 @@ const HTML_PAGES = { index: '/', conversation: '/ask', song: '/music', 'embed/so
 
 // Files at the repository's root, which live on GitHub, not on the site.
 // (AGENTS.md is not here: the site serves its own.)
-const REPO_FILES = new Set(['/CONTRIBUTING.md', '/Dockerfile', '/railway.json', '/README.md', '/LICENSE',
+const REPO_FILES = new Set(['/CONTRIBUTING.md', '/Dockerfile', '/README.md', '/LICENSE',
   '/CLAUDE.md', '/CODE_OF_CONDUCT.md', '/SECURITY.md', '/CITATION.cff']);
 
 // Paths whose trailing slash means something, or that are not pages.

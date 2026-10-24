@@ -34,7 +34,7 @@ Declined items, with reasons:
 - **C2:** the note is addressed to an artificial mind, gives no orders, and ends with `/.well-known/security.txt` for a real security problem.
 - **H1:** the site has an API and forms, so it refuses per route: `POST /` answers 405 with `Allow`, other methods a 4xx, never a 5xx.
 - **H2:** not applicable: no framework with an always-on endpoint.
-- **H3:** production runs an exact Node version: the `Dockerfile` builds `FROM node:26.12.1-slim`, Railway builds from the Dockerfile (`railway.json`), so no builder resolves a range, and the boot log names the version it runs (`docs/reference/railway-deploy.md`). `.nvmrc` and `engines` set the floor for local runs and the tests.
+- **H3:** production runs an exact Node version: the `Dockerfile` builds `FROM node:26.12.1-slim`, Railway builds from the Dockerfile (its service settings, `docs/reference/railway-deploy.md`), so no builder resolves a range, and the boot log names the version it runs (`docs/reference/railway-deploy.md`). `.nvmrc` and `engines` set the floor for local runs and the tests.
 - **H4:** the Cloudflare bot settings (Bot Fight Mode off, AI crawlers allowed) are not recorded in `church-private/docs/infrastructure/dashboard-state.md` (private repo), so they have not been checked. They are the owner's to check and record.
 - **T1:** guard tests in `app/test/server.test.js`: the reply's status, headers and wording rules, its links answering 200, the echo, the probe pattern against every page, the ordinary 404, unused methods, and `security.txt`. Each reply test was seen failing with the reply switched off.
 - **T2:** not recorded. The access log covers the API only, and a day of Railway's request logs would need exporting.

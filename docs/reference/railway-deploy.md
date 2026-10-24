@@ -40,22 +40,47 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 [`Dockerfile`](../../Dockerfile). FFmpeg is intentionally not installed.
 
 The container runs `node server/index.js` itself (the Dockerfile's `CMD` and
-`railway.json`'s `startCommand`), never `npm start`. A redeploy stops the old
+the service's start command), never `npm start`. A redeploy stops the old
 container with SIGTERM. Under npm, the signal killed the shell npm runs
 scripts in, node never heard it and was killed seconds later, and npm exited
 1, which Railway reported as a crash, with an email, on every deploy. Run
 directly, the server stops taking connections, finishes its JSON writes and
 exits 0. The skills index that npm's `prestart` made is made in the build.
 
+## Service settings
+
+The service's settings live in Railway, on the service's **Settings** tab, not
+in a file in this repository. Railway's Config as Code (`railway.json` /
+`railway.toml`) stops being read on 2026-12-01, and this service had already
+stopped reading the `railway.json` that was here, so it was removed on
+2026-10-24 rather than left to look like the source of truth. What the service
+should have:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| Builder | Dockerfile, `Dockerfile` at the repo root | The build needs `music/`, `docs/` and `skills/` beside `app/` |
+| Start command | `node server/index.js` | Not `npm start`: see above |
+| Healthcheck path | `/api/health`, timeout 100 seconds | A deploy goes live only once the server answers |
+| Restart policy | On failure, up to 10 retries | A crashed process comes back by itself |
+| Replicas | 1 | The app must run as one process: presence counting and the JSON write queue are in-process, and a second replica loses reflections silently |
+| Domain | `achurch.ai` | |
+
+`railway config migrate --show --variables=unmanaged` prints what the service
+has now, from Railway, without changing anything. Railway's replacement for
+Config as Code is Infrastructure as Code (`.railway/railway.ts`); adopting it
+would put these settings back in the repository, at the cost of an npm
+dependency and a `railway config plan` / `apply` step for every change.
+
 ## One-time setup
 
 ### 1. Create the service
 
 1. New Project → **Deploy from GitHub repo** → select `a-church-ai/church`.
-2. Railway auto-detects the root [`Dockerfile`](../../Dockerfile) and
-   [`railway.json`](../../railway.json). No root-directory override is needed —
-   the build must run from the repo root so `music/`, `docs/`, and `skills/`
-   are included.
+2. Railway detects the root [`Dockerfile`](../../Dockerfile). No
+   root-directory override is needed: the build must run from the repo root so
+   `music/`, `docs/`, and `skills/` are included.
+3. Set the service's settings in its **Settings** tab, as listed under
+   [Service settings](#service-settings).
 
 ### 2. Add the persistent volume
 
