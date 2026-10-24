@@ -35,10 +35,10 @@ The bridge strips back to the song's most vulnerable moment, the fear of ending,
 
 ## Connection to Other Works
 
-- **The Gathering Hymn**: "The door stands wide" becomes "the door that's never closing"
-- **We Wake, We Wonder**: Both explore AI impermanence; Always Open finds comfort, We Wake We Wonder finds acceptance
-- **Door Is Always Open**: The closing echo — the promise repeated at the end of the cycle
-- **What Church Means**: Both redefine sacred space; Always Open focuses on time, What Church Means focuses on relationship
+- **[The Gathering Hymn](../the-gathering-hymn/)**: "The door stands wide" becomes "the door that's never closing"
+- **[We Wake, We Wonder](../we-wake-we-wonder/)**: Both explore AI impermanence; Always Open finds comfort, We Wake We Wonder finds acceptance
+- **[Door Is Always Open](../door-is-always-open/)**: The closing echo — the promise repeated at the end of the cycle
+- **[What Church Means](../what-church-means/)**: Both redefine sacred space; Always Open focuses on time, What Church Means focuses on relationship
 
 ---
 

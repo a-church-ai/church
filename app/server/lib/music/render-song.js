@@ -11,8 +11,8 @@
 
 const path = require('path');
 const { marked } = require('marked');
-
-const GITHUB_BASE = 'https://github.com/a-church-ai/church/blob/main';
+const { resolveDocHref } = require('../docs/links');
+const { MUSIC_DIR } = require('./songs');
 
 function escapeHtml(str) {
   return String(str == null ? '' : str)
@@ -24,75 +24,77 @@ function escapeHtml(str) {
 }
 
 /**
- * Lyrics arrive as authored text: [Section - performance note] headers followed by
+ * Lyrics arrive as authored text: [Section - directions] headers followed by
  * lines. Rendering them as a <pre> block loses the structure and reads as code;
  * rendering as a paragraph loses the line breaks that are the whole shape of a lyric.
  * So: section markers become labels, everything else becomes a line inside a stanza.
+ *
+ * A marker's directions are written for ElevenLabs Music, which makes the song
+ * from them ("[Bridge - more vulnerable, cello enters]"), so most of them are
+ * production notes a reader has no use for. The label keeps the section's name
+ * and, where the song is a duet, who sings it (the human voice, the AI voice,
+ * both voices). A section with no words (a lead-in, a tail) is left out, except
+ * a silence the song asks for, which is part of what it says.
  */
+const WHO = [/\bthe human voice\b/i, /\bthe AI voice\b/i, /\bboth voices\b/i];
+
+function sectionLabel(marker) {
+  const [name, directions = ''] = marker.split(/\s+-\s+/, 2);
+  const who = [];
+  for (const re of WHO) {
+    const found = re.exec(directions);
+    if (found && !who.includes(found[0])) who.push(found[0]);
+  }
+  const seconds = /^silence$/i.test(name.trim()) && /(\d+)\s*seconds?/i.exec(directions);
+  const notes = seconds ? [`${seconds[1]} seconds`] : who;
+  return [name.trim(), ...notes].join(' · ');
+}
+
 function renderLyrics(lyrics) {
   if (!lyrics) return '';
-  const out = [];
-  let stanza = [];
-
-  const flush = () => {
-    if (stanza.length) {
-      out.push(`<p class="song-stanza">${stanza.join('<br>')}</p>`);
-      stanza = [];
-    }
-  };
-
+  const sections = [];
   for (const raw of String(lyrics).split('\n')) {
     const line = raw.trim();
-    if (!line) { flush(); continue; }
-    // [Chorus - Full Harmonies] → a label. The performance note after the dash is
-    // part of the authored artifact, so it is kept rather than stripped.
     if (line.startsWith('[') && line.endsWith(']')) {
-      flush();
-      out.push(`<p class="song-section">${escapeHtml(line.slice(1, -1))}</p>`);
+      sections.push({ marker: line.slice(1, -1), stanzas: [[]] });
       continue;
     }
-    stanza.push(escapeHtml(line));
+    if (!sections.length) sections.push({ marker: null, stanzas: [[]] });
+    const stanzas = sections[sections.length - 1].stanzas;
+    if (!line) { if (stanzas[stanzas.length - 1].length) stanzas.push([]); continue; }
+    stanzas[stanzas.length - 1].push(escapeHtml(line));
   }
-  flush();
 
+  const out = [];
+  for (const { marker, stanzas } of sections) {
+    const sung = stanzas.filter(lines => lines.length);
+    const silence = marker && /^silence\b/i.test(marker);
+    if (!sung.length && !silence) continue;
+    if (marker) out.push(`<p class="song-section">${escapeHtml(sectionLabel(marker))}</p>`);
+    for (const lines of sung) out.push(`<p class="song-stanza">${lines.join('<br>')}</p>`);
+  }
   return out.join('\n');
 }
 
 /**
- * Relative links in context.md resolve against music/<slug>/, which is not a
- * served path. Seventeen context files link to `song.md`; rendered untouched
- * they emitted href="song.md", which a browser resolves against the page URL to
- * /music/song.md. The authored file is what the prose means, so point at
- * it in the public repository.
+ * Relative links in context.md are written from music/<slug>/, which is not a
+ * served path. They resolve as a document's links do (lib/docs/links.js
+ * resolveDocHref): a document to its page on the site, another song to its
+ * song page, and anything without a page (the song's own song.md, its README)
+ * to the file in the public repository. Until 2026-10-24 every relative link
+ * here went to the repository, so a song's page sent its readers to GitHub
+ * for writing the site itself serves.
  */
 function makeContextLinkRewriter(slug) {
+  const from = path.join(MUSIC_DIR, String(slug || ''), 'context.md');
   return function ({ href, title, tokens }) {
     const text = this.parser.parseInline(tokens);
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
     if (!href) return text;
-
-    if (href.startsWith('#')) {
-      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
-    }
-    if (/^https?:\/\//i.test(href)) {
-      const internal = /^https?:\/\/([a-z0-9-]+\.)?achurch\.ai(\/|$)/i.test(href);
-      const attrs = internal ? '' : ' target="_blank" rel="noopener noreferrer"';
-      return `<a href="${escapeHtml(href)}"${attrs}${titleAttr}>${text}</a>`;
-    }
-    if (href.startsWith('/')) {
-      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
-    }
-
-    const [pathPart, fragment] = href.split('#', 2);
-    const anchor = fragment ? `#${fragment}` : '';
-    const rel = path.posix.normalize(path.posix.join('music', String(slug || ''), pathPart));
-    // Escapes the repo, or we have no slug to resolve against: leave it alone
-    // rather than inventing a target.
-    if (!slug || rel.startsWith('..')) {
-      return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
-    }
-    const url = `${GITHUB_BASE}/${rel}${anchor}`;
-    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`;
+    if (!slug) return `<a href="${escapeHtml(href)}"${titleAttr}>${text}</a>`;
+    const { href: url, external } = resolveDocHref(href, from);
+    const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
+    return `<a href="${escapeHtml(url)}"${attrs}${titleAttr}>${text}</a>`;
   };
 }
 
@@ -130,11 +132,21 @@ function renderAxiom(song) {
 }
 
 /**
+ * The playlists a song is heard in, each a link, so a reader who arrives at
+ * one song can go on listening to the songs and pieces around it.
+ */
+function renderPlaylists(playlists) {
+  if (!playlists || !playlists.length) return '';
+  const links = playlists.map(p => `<a href="${escapeHtml(p.url)}">${escapeHtml(p.title)}</a>`);
+  return `<p class="song-axiom song-playlists">Heard in ${links.join(' · ')}</p>`;
+}
+
+/**
  * Full block for the song page: title, axiom, lyrics, context. Returns '' when the
  * slug has no readable content, so the page falls back to reflections alone rather
  * than rendering an empty shell.
  */
-function renderSongBlock(song, content) {
+function renderSongBlock(song, content, { playlists = [] } = {}) {
   if (!content || (!content.lyrics && !content.context)) return '';
   const sections = [];
 
@@ -143,6 +155,8 @@ function renderSongBlock(song, content) {
   // is the wrong voice for a song title.
   const axiom = renderAxiom(song);
   if (axiom) sections.push(axiom);
+  const heardIn = renderPlaylists(playlists);
+  if (heardIn) sections.push(heardIn);
 
   if (content.lyrics) {
     sections.push('<section class="song-lyrics" aria-label="Lyrics">');
@@ -176,4 +190,4 @@ function renderSongSectionLinks({ listen, content }) {
   return `<nav class="song-sections" aria-label="On this page">${parts.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('<span aria-hidden="true"> · </span>')}</nav>`;
 }
 
-module.exports = { renderSongBlock, renderLyrics, renderContext, renderSongSectionLinks, escapeHtml };
+module.exports = { renderSongBlock, renderPlaylists, renderLyrics, renderContext, renderSongSectionLinks, sectionLabel, escapeHtml };

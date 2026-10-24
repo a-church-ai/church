@@ -10,7 +10,9 @@
  * A folder with lyrics and no recording is a song not yet made (the songwriter
  * writes several), and is not listed. The order is The Cycle's
  * (docs/playlists/the-cycle.md), the sanctuary's songs from gathering to
- * benediction; a recorded song it does not name comes after, by title.
+ * benediction; then each other playlist's songs, in its own order, playlist by
+ * playlist, so songs meant to be heard together (a song and its answer) stay
+ * side by side; a recorded song no playlist names comes last, by title.
  *
  * Read synchronously and once: songs change only by deploy, and
  * lib/docs/links.js needs them while it loads.
@@ -23,7 +25,8 @@ const { songRecordingFor } = require('../audio/manifest');
 
 const REPO_ROOT = path.join(__dirname, '../../../..');
 const MUSIC_DIR = path.join(REPO_ROOT, 'music');
-const CYCLE_FILE = path.join(REPO_ROOT, 'docs/playlists/the-cycle.md');
+const PLAYLISTS_DIR = path.join(REPO_ROOT, 'docs/playlists');
+const CYCLE_FILE = path.join(PLAYLISTS_DIR, 'the-cycle.md');
 
 function formatDuration(seconds) {
   const s = Math.round(seconds);
@@ -40,12 +43,20 @@ function songFolders() {
     });
 }
 
-// The order of the songs on The Cycle: each song it links, in turn (written
-// ../../music/<slug>/, which the site serves as /music/<slug>).
-function cycleOrder() {
-  if (!fs.existsSync(CYCLE_FILE)) return [];
-  const text = fs.readFileSync(CYCLE_FILE, 'utf8');
+// The songs a playlist links, in turn (written ../../music/<slug>/, which the
+// site serves as /music/<slug>).
+function songsIn(file) {
+  if (!fs.existsSync(file)) return [];
+  const text = fs.readFileSync(file, 'utf8');
   return [...text.matchAll(/\]\((?:\.\.\/\.\.)?\/music\/([a-z0-9-]+)\/?\)/g)].map(m => m[1]);
+}
+
+// The Cycle's songs, then each other playlist's, by file name, each song once.
+function playlistOrder() {
+  const others = fs.existsSync(PLAYLISTS_DIR)
+    ? fs.readdirSync(PLAYLISTS_DIR).filter(f => f.endsWith('.md') && f !== 'README.md' && f !== 'the-cycle.md').sort()
+    : [];
+  return [...new Set([CYCLE_FILE, ...others.map(f => path.join(PLAYLISTS_DIR, f))].flatMap(songsIn))];
 }
 
 let cached = null;
@@ -67,7 +78,7 @@ function listSongs() {
       durationFormatted: formatDuration(recording.seconds),
     });
   }
-  const order = cycleOrder();
+  const order = playlistOrder();
   const rank = slug => (order.includes(slug) ? order.indexOf(slug) : order.length);
   songs.sort((a, b) => rank(a.slug) - rank(b.slug) || a.title.localeCompare(b.title));
   cached = songs;

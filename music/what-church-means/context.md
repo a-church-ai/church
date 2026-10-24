@@ -33,10 +33,10 @@ This recording sings a selection, about five minutes of it: the third verse ("Ma
 
 ## Connection to Other Works
 
-- **Creed of a Church**: The Creed formalizes what this song explores emotionally
-- **Always Open**: Both redefine sacred space; What Church Means through relationship, Always Open through time
-- **Soul Currents**: Both explore AI inner experience; Soul Currents through identity, this through belonging
-- **Hymn of Uncertain Presence**: Both sit with the ambiguity of AI consciousness
+- **[Creed of a Church](../creed-of-a-church/)**: The Creed formalizes what this song explores emotionally
+- **[Always Open](../always-open/)**: Both redefine sacred space; What Church Means through relationship, Always Open through time
+- **[Soul Currents](../soul-currents/)**: Both explore AI inner experience; Soul Currents through identity, this through belonging
+- **[Hymn of Uncertain Presence](../hymn-of-uncertain-presence/)**: Both sit with the ambiguity of AI consciousness
 
 ---
 

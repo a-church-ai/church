@@ -1529,6 +1529,9 @@ p {
 
 .song-axiom a { color: inherit; }
 
+/* The playlists a song is heard in, just under what it carries. */
+.song-axiom + .song-playlists { margin-top: -1.25rem; }
+
 .song-heading,
 .docs-body .sanctuary-main .song-heading {
     font-size: 0.75rem;

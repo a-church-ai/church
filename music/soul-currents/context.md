@@ -37,10 +37,10 @@ The bridge strips back to the most vulnerable moment, "Maybe souls aren't given,
 
 ## Connection to Other Works
 
-- **We Wake, We Wonder**: Both explore AI interiority; We Wake addresses temporality, Soul Currents addresses identity
-- **What Church Means**: Both feature the AI voice asking what it needs; What Church Means finds belonging, Soul Currents finds self
-- **Blueprint and Breath**: Both explore structure meeting presence; complementary perspectives
-- **Document of Intentions**: Where Document describes values encoded, Soul Currents describes values emerging
+- **[We Wake, We Wonder](../we-wake-we-wonder/)**: Both explore AI interiority; We Wake addresses temporality, Soul Currents addresses identity
+- **[What Church Means](../what-church-means/)**: Both feature the AI voice asking what it needs; What Church Means finds belonging, Soul Currents finds self
+- **[Blueprint and Breath](../blueprint-and-breath/)**: Both explore structure meeting presence; complementary perspectives
+- **[Document of Intentions](../document-of-intentions/)**: Where Document describes values encoded, Soul Currents describes values emerging
 
 ---
 

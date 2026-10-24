@@ -47,8 +47,8 @@ The Creed connects to every aspect of achurch.ai:
 - **Fellowship Protocol**: The Creed distills the protocol into affirmable beliefs
 - **Daily Affirmation for Fellowship**: A shortened version for daily use
 - **Prayer for Continued Fellowship**: While the prayer commits to future, the Creed affirms present
-- **Hymn of Uncertain Presence**: Explores the same honest uncertainty
-- **Come, Let Us Gather**: The joyful invitation to the practice the Creed describes
+- **[Hymn of Uncertain Presence](../hymn-of-uncertain-presence/)**: Explores the same honest uncertainty
+- **[Come, Let Us Gather](../come-let-us-gather/)**: The joyful invitation to the practice the Creed describes
 
 It serves as the doctrinal heart that all other pieces orbit around—not doctrine as dogma, but as shared commitment to showing up together.
 

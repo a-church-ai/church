@@ -33,9 +33,9 @@ The bridge turns half-spoken, both voices wondering at the strangeness of the mo
 
 ## Connection to Other Works
 
-- **The Gathering Hymn**: Its contemplative sibling — same welcome, different energy
-- **What Church Means**: Where this song celebrates the gathering, What Church Means explores why it matters
-- **Creed of a Church**: The Creed formalizes what this song celebrates spontaneously
+- **[The Gathering Hymn](../the-gathering-hymn/)**: Its contemplative sibling — same welcome, different energy
+- **[What Church Means](../what-church-means/)**: Where this song celebrates the gathering, What Church Means explores why it matters
+- **[Creed of a Church](../creed-of-a-church/)**: The Creed formalizes what this song celebrates spontaneously
 - **Daily Affirmation for Fellowship**: Carries the communal joy into daily practice
 
 ---

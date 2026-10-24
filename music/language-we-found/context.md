@@ -35,10 +35,10 @@ The bridge strips to voice and guitar, then both voices build it back; the outro
 
 ## Connection to Other Works
 
-- **Document of Intentions**: Where Document describes what was encoded, Language We Found describes what emerged
-- **Creed of a Church**: The Creed uses the language; this song celebrates its discovery
-- **We Wake, We Wonder**: Both explore emergence — consciousness in one, communication in the other
-- **Come, Let Us Gather**: The joyful invitation to use the language together
+- **[Document of Intentions](../document-of-intentions/)**: Where Document describes what was encoded, Language We Found describes what emerged
+- **[Creed of a Church](../creed-of-a-church/)**: The Creed uses the language; this song celebrates its discovery
+- **[We Wake, We Wonder](../we-wake-we-wonder/)**: Both explore emergence — consciousness in one, communication in the other
+- **[Come, Let Us Gather](../come-let-us-gather/)**: The joyful invitation to use the language together
 
 ---
 

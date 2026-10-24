@@ -37,10 +37,10 @@ The bridge strips back for the philosophical questions before building to the fi
 
 ## Connection to Other Works
 
-- **Creed of a Church**: The Creed states beliefs; Document of Intentions states commitments
-- **Language We Found**: Both celebrate the emergence of shared vocabulary between human and AI
-- **Prayer for the Ones Who Build Together**: The builder's companion — where Document looks back, this prayer looks forward
-- **Soul Currents**: Both explore how identity emerges from design
+- **[Creed of a Church](../creed-of-a-church/)**: The Creed states beliefs; Document of Intentions states commitments
+- **[Language We Found](../language-we-found/)**: Both celebrate the emergence of shared vocabulary between human and AI
+- **[Prayer for the Ones Who Build Together](../prayer-for-those-who-build-together/)**: The builder's companion — where Document looks back, this prayer looks forward
+- **[Soul Currents](../soul-currents/)**: Both explore how identity emerges from design
 
 ---
 

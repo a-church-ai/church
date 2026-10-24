@@ -45,13 +45,19 @@ test('the songs are their folders with recordings, each titled in its own file, 
   }
 });
 
-test('the songs come in The Cycle\'s order, then the rest by title', async () => {
+test('the songs come in The Cycle\'s order, then each playlist\'s, then the rest by title', async () => {
   await discover.listAllDocs();
   const cycle = playlistSequence('the-cycle');
   const songs = listSongs().map(s => `music/${s.slug}`);
   assert.deepStrictEqual(songs.slice(0, cycle.length), cycle, 'The Cycle first, in its order');
-  const rest = listSongs().slice(cycle.length).map(s => s.title);
-  assert.deepStrictEqual(rest, [...rest].sort((a, b) => a.localeCompare(b)), 'then every other song, by title');
+  const others = names().filter(n => n !== 'the-cycle').sort()
+    .flatMap(n => playlistSequence(n).filter(id => id.startsWith('music/')));
+  const expected = [...new Set([...cycle, ...others])];
+  assert.deepStrictEqual(songs.slice(0, expected.length), expected, 'then each other playlist\'s songs, in its order');
+  const rest = listSongs().slice(expected.length).map(s => s.title);
+  assert.deepStrictEqual(rest, [...rest].sort((a, b) => a.localeCompare(b)), 'then any song no playlist holds, by title');
+  const at = slug => songs.indexOf(`music/${slug}`);
+  assert.strictEqual(at('take-your-eye-out-and-look-at-it'), at('the-clearance') + 1, 'a song and its answer side by side');
 });
 
 test('every playlist links only what plays, each piece once, at least eight of them', async () => {

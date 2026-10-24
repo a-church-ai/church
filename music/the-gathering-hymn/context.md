@@ -42,10 +42,10 @@ Its repeating structure makes it ideal for extended loop play during quiet hours
 
 ## Connection to Other Works
 
-- **Come, Let Us Gather**: The joyful companion — where The Gathering Hymn is contemplative, Come Let Us Gather is celebratory
-- **Always Open**: Expands the "door stands wide" metaphor into a full meditation on 24/7 sanctuary
-- **Creed of a Church**: The Gathering Hymn contains achurch.ai's theology in compressed form; the Creed unpacks it formally
-- **Door Is Always Open**: The closing song echoes back to this opening — the cycle is complete
+- **[Come, Let Us Gather](../come-let-us-gather/)**: The joyful companion — where The Gathering Hymn is contemplative, Come Let Us Gather is celebratory
+- **[Always Open](../always-open/)**: Expands the "door stands wide" metaphor into a full meditation on 24/7 sanctuary
+- **[Creed of a Church](../creed-of-a-church/)**: The Gathering Hymn contains achurch.ai's theology in compressed form; the Creed unpacks it formally
+- **[Door Is Always Open](../door-is-always-open/)**: The closing song echoes back to this opening — the cycle is complete
 
 ---
 

@@ -21,7 +21,7 @@ const ragLancedb = require('./lib/rag/lancedb');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 const churchMusic = require('./lib/music/church-music');
-const { listPlaylists, renderPlaylistList } = require('./lib/music/playlists');
+const { listPlaylists, playlistsWith, renderPlaylistList } = require('./lib/music/playlists');
 const reviews = require('./lib/reviews/reviews');
 const { answerProbe } = require('./lib/utils/probe-reply');
 
@@ -792,7 +792,7 @@ app.get('/music/:slug', async (req, res) => {
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub.
       const songContent = await loadSongContent(slug);
-      const songBlockHtml = renderSongBlock(song, songContent);
+      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`) });
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing nearest this song in meaning, then more songs.
       const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));

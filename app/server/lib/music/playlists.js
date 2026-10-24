@@ -38,4 +38,10 @@ function renderPlaylistList(playlists) {
   return playlists.map(p => `<li><a href="${escape(p.url)}">${escape(p.title)}</a> <span class="listen-count">${p.count} pieces, about ${listeningTime(p.seconds)}</span></li>`).join('\n              ');
 }
 
-module.exports = { listPlaylists, renderPlaylistList };
+// The playlists that hold a piece (its catalog id, "music/<slug>" or
+// "docs/<path>.md"), in the order listPlaylists gives them.
+async function playlistsWith(id) {
+  return (await listPlaylists()).filter(p => (playlistSequence(p.name) || []).includes(id));
+}
+
+module.exports = { listPlaylists, playlistsWith, renderPlaylistList };
