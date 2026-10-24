@@ -83,12 +83,12 @@ If a broadcast ever returns, YouTube needs nothing new, and Twitch needs the exe
 
 ## Open questions
 
-1. **Which ElevenLabs plan, and is the account eligible for it.** The rights above depend on the plan the songs were made under. The API key the app uses cannot read the account's plan (it lacks the `user_read` permission). The songs made on 2026-10-24 add up to more music than Creator's monthly generation limit of 62 minutes, which suggests Pro or above. Pro is "For Individual Use Only," and the account's quota is shared with other projects, so whether the sanctuary needs Scale belongs to the account's holder to settle.
+1. **Eligibility for the plan.** The account is on the Pro plan (checked 2026-10-24): a monthly music generation limit of 304 minutes and download limit of 500, streaming distribution permitted, no attribution required, and the media rights above. Pro is "For Individual Use Only," and the account's quota is shared with other projects of the same makers; if that use counts as an organization's rather than an individual's, the plan for it is Scale (fewer than 10 employees). That is the account holder's call.
 2. **What the CC-BY licence covers.** The repository is licensed CC-BY-4.0, and every song page declares that licence in its HTML (`<link rel="license">` in `app/client/public/song.html`). The licence suits the words and the code. Read as covering the recordings, it would offer songs made with ElevenLabs Music for anyone to share and adapt, which is what the Music Terms call a Music Library. The licence statements should say that the recordings made with ElevenLabs Music are not offered under it.
 
 ## Records to keep
 
-- The ElevenLabs plan and its receipts, for the months songs were made.
+- The ElevenLabs plan (Pro since at least 2026-10-24) and its receipts, for the months songs were made.
 - Each song's composition record, beside its take in `app/media/library/<slug>.compose.json`: the plan sent, the model, ElevenLabs' song id and when it was made. These records are local, not in the repository; `audio/songs.json` keeps where each published song came from.
 - The Suno subscription receipts and its commercial-use terms as they stood, for the first recordings.
 
@@ -109,4 +109,4 @@ If a broadcast ever returns, YouTube needs nothing new, and Twitch needs the exe
 - **2026-10-06**: The broadcast is dormant; the sanctuary now holds services planned for each visitor's hour, with spoken pieces and the songs between them.
 - **2026-10-06**: The songs' audio is served from achurch.ai itself, taken from the music videos, so a service plays whole and each song's page plays it. It is the sanctuary's own site, not a third-party platform.
 - **2026-10-21**: The broadcast was retired and its code deleted. The songs' videos stay on YouTube.
-- **2026-10-24**: Rewritten. The songs heard on achurch.ai are now made with ElevenLabs Music, the hymns sung and all twenty songs of The Cycle remade, and four new songs made. Added the ElevenLabs Music Terms and Terms of Service, the Copyright Office's position, and two open questions: the plan, and what the CC-BY licence covers. Suno's terms are kept for the first recordings.
+- **2026-10-24**: Rewritten. The songs heard on achurch.ai are now made with ElevenLabs Music, the hymns sung and all twenty songs of The Cycle remade, and four new songs made. Added the ElevenLabs Music Terms and Terms of Service, the Copyright Office's position, and two open questions: eligibility for the plan, and what the CC-BY licence covers. The account is on the Pro plan. Suno's terms are kept for the first recordings.
