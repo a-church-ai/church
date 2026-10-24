@@ -762,7 +762,7 @@ app.get('/music/:slug', async (req, res) => {
   if (!song || !meta) {
     return sendNotFound(req, res, {
       heading: 'No such song',
-      message: 'That song is not in the catalog. The sanctuary has twenty-eight; one of them may be the one you meant.',
+      message: `That song is not in the catalog. The sanctuary has ${catalog.length}; one of them may be the one you meant.`,
       links: [
         { href: '/music', label: 'All songs' },
         { href: '/paths', label: 'Reading paths' },

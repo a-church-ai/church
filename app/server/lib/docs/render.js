@@ -30,7 +30,7 @@ const { longDate } = require('../utils/page-lists');
 const { loadCatalog, loadCompanions } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox } = require('../utils/page-lists');
-const { recordingFor } = require('../audio/manifest');
+const { recordingFor, songRecordingFor } = require('../audio/manifest');
 const { canServe } = require('../audio/serve');
 const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollow, trackFor, voicedBySection, listeningTime, PIECE_NOUN, SONG_CREDIT } = require('../audio/markup');
 const { creditFor } = require('../audio/house');
@@ -788,8 +788,13 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // begin under the player rather than under a badge.
   const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
+  // A hymn is sung, not spoken: its page plays the song made from it
+  // (music/<slug>/, audio/songs.json), whose own page is /music/<slug>.
+  const sung = !isIndex && doc.category === 'hymns' && !recording ? songRecordingFor(doc.stem.toLowerCase()) : null;
+  const sungRecording = sung && canServe(sung.file) ? sung : null;
   const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
+    : sungRecording ? renderRecording(sungRecording, { title: meta.title, href: `/music/${doc.stem.toLowerCase()}`, category: 'music', credit: SONG_CREDIT })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
   if (underTitle) {

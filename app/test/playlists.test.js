@@ -33,17 +33,22 @@ test('the songs are their folders with recordings, each titled in its own file, 
   const songs = listSongs();
   assert.deepStrictEqual(songs.map(s => s.slug).sort(), Object.keys(loadSongs()).sort(), 'one song for each recording');
   for (const s of songs) {
-    assert.ok(s.title && s.youtube && s.suno && s.axiom, `${s.slug}: its facts are in its frontmatter`);
+    assert.ok(s.title, `${s.slug}: its title is in its frontmatter`);
+    // A song from a music video names it; a hymn sung for the sanctuary has none.
+    assert.ok(!s.youtube || /^https:\/\/youtu\.be\//.test(s.youtube), `${s.slug}: a YouTube address, if any`);
     assert.strictEqual(s.duration, loadSongs()[s.slug].seconds, `${s.slug}: its length is its recording's`);
     assert.match(s.durationFormatted, /^\d+:\d\d$/);
   }
   assert.ok(songFolders().length > songs.length, 'songs written and not yet made are folders, not songs');
 });
 
-test('the songs come in The Cycle\'s order, and The Cycle holds every song once', async () => {
+test('the songs come in The Cycle\'s order, then the rest by title', async () => {
   await discover.listAllDocs();
   const cycle = playlistSequence('the-cycle');
-  assert.deepStrictEqual(cycle, listSongs().map(s => `music/${s.slug}`));
+  const songs = listSongs().map(s => `music/${s.slug}`);
+  assert.deepStrictEqual(songs.slice(0, cycle.length), cycle, 'The Cycle first, in its order');
+  const rest = listSongs().slice(cycle.length).map(s => s.title);
+  assert.deepStrictEqual(rest, [...rest].sort((a, b) => a.localeCompare(b)), 'then every other song, by title');
 });
 
 test('every playlist links only what plays, each piece once, at least eight of them', async () => {

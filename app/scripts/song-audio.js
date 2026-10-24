@@ -2,16 +2,17 @@
 /**
  * The songs' audio, so a service can play whole.
  *
- * For each song with a music video (its song.md names one on YouTube): take
- * the audio from that video
- * (media/library/<slug>.mp4, kept where this runs), bring it to the house
+ * For each song with a source in media/library (kept where this runs): its
+ * music video (<slug>.mp4), or for a song made as audio alone, such as a
+ * hymn sung with ElevenLabs Music, the audio file itself (<slug>.mp3). Take
+ * the audio from it, bring it to the house
  * loudness with one gain for the whole song so its dynamics stay as they were
  * made, encode it as stereo MP3, measure what its player draws (the
  * waveform's peaks and the visual's frames, as the recordings have), upload
  * both to S3 under audio/music/, and record it in audio/songs.json, which
  * lets /audio serve it and puts it in the services.
  *
- * A song is made again only when its video changes (by size), or with
+ * A song is made again only when its source changes (by size), or with
  * --force. This runs where FFmpeg and the S3 keys are, like render-audio.js.
  *
  * Usage, from app/:
@@ -76,22 +77,24 @@ async function main() {
   const force = args.includes('--force');
   const only = args.filter(a => !a.startsWith('--'));
 
-  // Every song with a video, made or not: a song is listed once its audio is.
-  const catalog = songFolders().filter(f => f.data.youtube).map(f => ({ slug: f.slug, title: f.data.title }));
+  // Every song folder, made or not: a song is listed once its audio is. Its
+  // source is its video, or an audio file for a song made without one.
+  const sourceOf = slug => ['mp4', 'mp3'].map(ext => path.join(LIBRARY_DIR, `${slug}.${ext}`)).find(f => fs.existsSync(f)) || null;
+  const catalog = songFolders().map(f => ({ slug: f.slug, title: f.data.title }));
   const unknown = only.filter(slug => !catalog.some(s => s.slug === slug));
-  if (unknown.length) throw new Error(`No song with a video: ${unknown.join(', ')}`);
+  if (unknown.length) throw new Error(`No song folder: ${unknown.join(', ')}`);
   const songs = loadSongs();
   const missing = [];
   const todo = [];
   for (const song of catalog.filter(s => !only.length || only.includes(s.slug))) {
-    const video = path.join(LIBRARY_DIR, `${song.slug}.mp4`);
-    if (!fs.existsSync(video)) { missing.push(song.slug); continue; }
+    const video = sourceOf(song.slug);
+    if (!video) { missing.push(song.slug); continue; }
     const done = songs[song.slug];
     if (!force && done && done.sourceBytes === fs.statSync(video).size) continue;
     todo.push({ song, video, previous: done });
   }
 
-  console.log(`${todo.length} of ${catalog.length} songs to make${missing.length ? `; ${missing.length} have no video in media/library: ${missing.join(', ')}` : ''}.`);
+  console.log(`${todo.length} of ${catalog.length} songs to make${missing.length ? `; ${missing.length} have no source in media/library: ${missing.join(', ')}` : ''}.`);
   if (dryRun) {
     todo.forEach(t => console.log(`  ${t.song.slug}`));
     return;

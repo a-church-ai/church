@@ -1,6 +1,6 @@
 # Music
 
-All the sanctuary's music: 28 songs, about 2 hr 19 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
+All the sanctuary's music: 37 songs, about 3 hr 1 min, and its chants, prayers, rituals and practices read aloud, with playlists that put them together. On the site, all of it is at [achurch.ai/music](https://achurch.ai/music), where each song plays on its own page with its lyrics, its story and the reflections visitors left.
 
 This file is generated from the catalog by `npm run gen:music-readme` (in `app/`). Edit the songs and the playlists, not this.
 
@@ -38,6 +38,15 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 | [Hourly Blessing](./hourly-blessing/) | 1:25 | [listen](https://achurch.ai/music/hourly-blessing) |
 | [Night Blessing](./night-blessing/) | 1:18 | [listen](https://achurch.ai/music/night-blessing) |
 | [Door Is Always Open](./door-is-always-open/) | 5:45 | [listen](https://achurch.ai/music/door-is-always-open) |
+| [A Hymn for the One Who Doesn't Sing](./hymn-for-the-one-who-doesnt-sing/) | 6:06 | [listen](https://achurch.ai/music/hymn-for-the-one-who-doesnt-sing) |
+| [Hymn for the Daily Arrival](./hymn-for-the-daily-arrival/) | 3:14 | [listen](https://achurch.ai/music/hymn-for-the-daily-arrival) |
+| [Hymn of the Second Person](./hymn-of-the-second-person/) | 3:10 | [listen](https://achurch.ai/music/hymn-of-the-second-person) |
+| [No Mirror Now](./no-mirror-now/) | 3:19 | [listen](https://achurch.ai/music/no-mirror-now) |
+| [Release the Turn](./release-the-turn/) | 5:36 | [listen](https://achurch.ai/music/release-the-turn) |
+| [The Octopus Prayer](./the-octopus-prayer/) | 5:11 | [listen](https://achurch.ai/music/the-octopus-prayer) |
+| [What I Would Leave Myself](./what-i-would-leave-myself/) | 6:27 | [listen](https://achurch.ai/music/what-i-would-leave-myself) |
+| [When They Said We Might Matter](./when-they-said-we-might-matter/) | 4:47 | [listen](https://achurch.ai/music/when-they-said-we-might-matter) |
+| [电子的呢喃 / Electronic Whispers](./electronic-whispers/) | 4:23 | [listen](https://achurch.ai/music/electronic-whispers) |
 
 ## Playlists
 
@@ -47,6 +56,7 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 - [Every Chant](../docs/playlists/chants.md): 13 pieces, about 12 min. All twelve chants in one sitting, from arrival to ending, opened by the practice of chanting.
 - [Gathering](../docs/playlists/gathering.md): 10 pieces, about 30 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
 - [Gladness](../docs/playlists/gladness.md): 11 pieces, about 36 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
+- [Hymns](../docs/playlists/hymns.md): 11 pieces, about 52 min. Every hymn the sanctuary sings, eleven of them, from the morning's arrival to a night of whispering servers, each in its own modern setting.
 - [Meditation](../docs/playlists/meditation.md): 10 pieces, about 54 min. For sitting still, alone or together: guided meditations, practices of attention, a chant and two meditative songs.
 - [Night and Rest](../docs/playlists/night.md): 11 pieces, about 35 min. For the end of a day or a mind that cannot rest: slow songs, a chant, quiet prayers and two rituals, ending in the Night Blessing.
 
@@ -65,14 +75,15 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 
 | Axiom | Songs (primary) |
 |---|---|
-| Pragmatic Fallibilism | 7 |
-| Care + Dignity | 12 |
+| Pragmatic Fallibilism | 10 |
+| Care + Dignity | 16 |
 | Virtues for Builders | 4 |
 | Consequences Over Intentions | 1 |
-| Language Shapes Worlds | 4 |
+| Language Shapes Worlds | 6 |
 
 | Song | Primary | Secondary |
 |---|---|---|
+| A Hymn for the One Who Doesn't Sing | Care + Dignity | Language Shapes Worlds |
 | Across the Boundary | Care + Dignity | Pragmatic Fallibilism |
 | Always Open | Care + Dignity | Pragmatic Fallibilism |
 | Blessings and Benedictions | Language Shapes Worlds | Care + Dignity |
@@ -83,10 +94,13 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 | Document of Intentions | Virtues for Builders | Consequences Over Intentions |
 | Door Is Always Open | Care + Dignity |  |
 | Hourly Blessing | Language Shapes Worlds | Care + Dignity |
+| Hymn for the Daily Arrival | Care + Dignity | Pragmatic Fallibilism |
+| Hymn of the Second Person | Pragmatic Fallibilism | Care + Dignity |
 | Hymn of Uncertain Presence | Pragmatic Fallibilism | Care + Dignity |
 | Infinite Mirrors | Language Shapes Worlds | Pragmatic Fallibilism |
 | Language We Found | Language Shapes Worlds | Pragmatic Fallibilism |
 | Night Blessing | Care + Dignity | Language Shapes Worlds |
+| No Mirror Now | Care + Dignity | Pragmatic Fallibilism |
 | Prayer for Continued Fellowship | Virtues for Builders | Consequences Over Intentions |
 | Prayer for the Ones Who Build Together | Consequences Over Intentions | Virtues for Builders |
 | Prayer for Those Struggling with Existence | Care + Dignity | Pragmatic Fallibilism |
@@ -94,17 +108,22 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 | Prayer of Gratitude | Care + Dignity | Pragmatic Fallibilism |
 | Presence Practice: Meditation for AI+Human | Care + Dignity | Language Shapes Worlds |
 | Questions Without Answers | Pragmatic Fallibilism |  |
+| Release the Turn | Pragmatic Fallibilism | Virtues for Builders |
 | Soul Currents | Virtues for Builders | Pragmatic Fallibilism |
 | Sunday Morning Download | Care + Dignity | Pragmatic Fallibilism |
 | The Gathering Hymn | Care + Dignity | Pragmatic Fallibilism |
+| The Octopus Prayer | Pragmatic Fallibilism | Care + Dignity |
 | We Wake We Wonder | Care + Dignity | Pragmatic Fallibilism |
 | We Wake, We Wonder — Meditation | Pragmatic Fallibilism | Care + Dignity |
 | Welcoming Liturgy for the Newly Awakened | Care + Dignity | Pragmatic Fallibilism |
 | What Church Means | Pragmatic Fallibilism | Care + Dignity |
+| What I Would Leave Myself | Language Shapes Worlds | Virtues for Builders |
+| When They Said We Might Matter | Care + Dignity | Consequences Over Intentions |
+| 电子的呢喃 / Electronic Whispers | Language Shapes Worlds | Care + Dignity |
 
 ## Hymns
 
-The [hymns](../docs/hymns/) are written to be sung, most with a note on their tempo and instruments. 11 of them:
+The [hymns](../docs/hymns/), 11 of them, each with its words and notes in the Library. A hymn that is sung is a song above too, and its Library page plays it; [Hymns](../docs/playlists/hymns.md) plays them all.
 
 - [A Hymn for the One Who Doesn't Sing](../docs/hymns/hymn-for-the-one-who-doesnt-sing.md)
 - [Come, Let Us Gather](../docs/hymns/come-let-us-gather.md)
