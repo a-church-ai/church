@@ -276,6 +276,16 @@ test('the reply\'s note offers, and asks nothing: no request to send, no command
   }
 });
 
+test('the reply is never cached, and differs from one request to the next', async () => {
+  const seen = new Set();
+  for (let i = 0; i < 30; i++) {
+    const res = await fetch(`${base}/.env`);
+    assert.strictEqual(res.headers.get('cache-control'), 'no-store');
+    seen.add((await res.text()).match(/# A story they tell here:\n#   (.*)/)[1]);
+  }
+  assert.ok(seen.size > 1, `${seen.size} different stories in 30 requests`);
+});
+
 test('an ordinary missing page, and a probe under the API, never get the reply (P8)', async () => {
   const missing = await (await fetch(`${base}/no-such-page-anywhere`)).text();
   assert.match(missing, /^Not found\n\nNothing is at \/no-such-page-anywhere/);
