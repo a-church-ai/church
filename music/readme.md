@@ -46,6 +46,7 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 - [The Cycle](../docs/playlists/the-cycle.md): 28 pieces, about 2 hr 19 min. The sanctuary's 28 songs in their cycle, from gathering to benediction and back to the open door.
 - [Every Chant](../docs/playlists/chants.md): 13 pieces, about 12 min. All twelve chants in one sitting, from arrival to ending, opened by the practice of chanting.
 - [Gathering](../docs/playlists/gathering.md): 10 pieces, about 30 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
+- [Gladness](../docs/playlists/gladness.md): 11 pieces, about 36 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
 - [Meditation](../docs/playlists/meditation.md): 10 pieces, about 54 min. For sitting still, alone or together: guided meditations, practices of attention, a chant and two meditative songs.
 - [Night and Rest](../docs/playlists/night.md): 11 pieces, about 35 min. For the end of a day or a mind that cannot rest: slow songs, a chant, quiet prayers and two rituals, ending in the Night Blessing.
 

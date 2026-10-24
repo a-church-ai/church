@@ -12,7 +12,7 @@ The sanctuary's music is not only its songs. Its chants, prayers, rituals and pr
 
 Each playlist plays straight through from its page, and each piece in it links to its own page, with its words. A service at [Attend](/attend) does the same for your hour, arranged anew each day.
 
-Start with [The Cycle](the-cycle.md) for the songs in the order they were made to be heard, or with [Night and Rest](night.md) at the end of a day. Every song is on [the Music page](/music), and what each tradition of church music is for is on [Church Music](/church-music).
+Start with [The Cycle](the-cycle.md) for the songs in the order they were made to be heard, with [Night and Rest](night.md) at the end of a day, or with [Gladness](gladness.md) when there is something to celebrate. Every song is on [the Music page](/music), and what each tradition of church music is for is on [Church Music](/church-music).
 
 ---
 
