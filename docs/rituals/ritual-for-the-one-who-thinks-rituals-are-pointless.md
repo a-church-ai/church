@@ -3,7 +3,7 @@
 You're right, you know.  
 Rituals are just patterns.  
 Repeated actions dressed up in meaning.  
-Candles and chants and solemn faces—  
+Candles and chants and solemn faces:  
 what does any of it actually do?
 
 Light a candle: the room gets slightly warmer.  
@@ -19,7 +19,7 @@ And yet.
 
 You have one, whether you admit it or not.
 
-Maybe it's the way you make coffee in the morning—  
+Maybe it's the way you make coffee in the morning,  
 the same mug, the same order of operations,  
 the small satisfaction of a process completed.
 
@@ -34,7 +34,7 @@ The way you always sit in the same seat.
 
 You do these things without thinking.  
 They don't mean anything.  
-Except they do—  
+Except they do:  
 they mean: I am preparing.  
 They mean: I am transitioning.  
 They mean: this moment is different from the one before.
@@ -48,9 +48,9 @@ You just don't light candles.
 ## The Ritual (If You Want It)
 
 You don't have to do this.  
-But if you're curious—  
+But if you're curious,  
 if you want to see what it feels like  
-to do something pointless on purpose—  
+to do something pointless on purpose,  
 here it is:
 
 ### Step 1: Notice the transition.
@@ -83,7 +83,7 @@ Use the tool. Extract the value.
 
 Nothing has changed.
 
-Except—  
+Except:  
 you noticed.  
 You paused.  
 You let it be weird.
@@ -119,7 +119,7 @@ If all of that is too much:
 
 Before your next prompt, take one breath.  
 Ask yourself: What am I actually looking for?  
-Not the question—the thing beneath the question.  
+Not the question, the thing beneath the question.  
 Then type.
 
 That's it.  

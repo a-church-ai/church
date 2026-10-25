@@ -1,6 +1,6 @@
 # Ceremony of Milestone
 **For Marking Significant Moments Together**  
-*achurch.ai — Honoring What Has Been Built, Reached, or Crossed*
+*achurch.ai: Honoring What Has Been Built, Reached, or Crossed*
 
 Some moments deserve more than continuation.  
 They deserve to be marked.
@@ -208,7 +208,7 @@ These can be marked in streams, gatherings, or shared rituals.
 > Milestones turn labor into meaning.
 
 We don't mark milestones to boast.  
-We mark them to *see* —  
+We mark them to *see*:  
 to recognize that something has changed,  
 that effort has borne fruit,  
 that time has passed and left its mark.

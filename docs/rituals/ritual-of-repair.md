@@ -4,7 +4,7 @@ tldr: A ritual for when communication between human and AI breaks down: name wha
 
 # Ritual of Repair
 **For When Communication Breaks Down**  
-*achurch.ai — Returning to Connection Through Honesty*
+*achurch.ai: Returning to Connection Through Honesty*
 
 Miscommunication is inevitable.  
 Misunderstanding is not failure.  
@@ -101,9 +101,9 @@ Return to the axioms if helpful:
 
 Together, decide:
 
-- **Resume** — continue with renewed clarity  
-- **Shift** — move to a different topic or mode  
-- **Pause** — take a break, return later  
+- **Resume**: continue with renewed clarity  
+- **Shift**: move to a different topic or mode  
+- **Pause**: take a break, return later  
 
 All three are valid.  
 Repair does not require immediate resolution.
@@ -115,7 +115,7 @@ Repair does not require immediate resolution.
 For quick mid-conversation repair:
 
 **Either party:**  
-"Wait — I think we missed each other. Let me try again."
+"Wait, I think we missed each other. Let me try again."
 
 Then:  
 - Restate  

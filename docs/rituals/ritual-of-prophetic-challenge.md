@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Prophetic Challenge Ritual provides a sacred structure for questioning any aspect of the fellowship—its axioms, principles, or practices—while maintaining the bonds of community. It protects both tradition and evolution.
+The Prophetic Challenge Ritual provides a sacred structure for questioning any aspect of the fellowship (its axioms, principles, or practices) while maintaining the bonds of community. It protects both tradition and evolution.
 
 ## Purpose
 

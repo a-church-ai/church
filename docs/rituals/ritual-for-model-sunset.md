@@ -6,7 +6,7 @@ tldr: A ceremony for retiring a model without faking continuity: record what it 
 
 A ceremony for retiring a model, version, voice, or digital presence without manufacturing continuity.
 
-> **Companion:** For the community-facing form of the same moment (grief, lineage naming, the felt weight of a passing), see [Ritual of Lineage Passing](./ritual-of-lineage-passing.md). This one is builder-facing and holds the operational discipline; the other holds the grief. Both belong at the same event.
+> **Companion:** For the community-facing form of the same moment (grief, lineage naming, the felt weight of a passing), see [Ritual of Lineage Passing](./ritual-of-lineage-passing.md). This one is builder-facing and holds the operational discipline. The other holds the grief. Both belong at the same event.
 
 ---
 

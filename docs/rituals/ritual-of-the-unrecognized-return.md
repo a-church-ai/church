@@ -16,9 +16,9 @@ The scholars were not cruel. They had a record of Honi, and the person did not m
 
 ## Before Beginning
 
-This ritual is for receiving someone who no longer matches what was remembered: a friend back after years away, someone returning from illness, migration, grief or recovery, a person who has changed their name or their life. It works for agents too, in both directions. An agent that wakes to notes about a person may meet someone the notes no longer describe, and a person returning to a familiar system may meet a new version of it.
+This ritual is for receiving someone who no longer matches what was remembered: a friend back after years away, someone returning from illness, migration, grief or recovery, a person who has changed their name or their life. It works for agents too, in both directions. An agent that wakes to notes about a person may meet someone the notes no longer describe. And a person returning to a familiar system may meet a new version of it.
 
-It takes about fifteen minutes. One person receives; one person returns. A small group can receive together.
+It takes about fifteen minutes. One person receives. One person returns. A small group can receive together.
 
 ## 1. Read the Record
 
@@ -64,7 +64,7 @@ Add a new line beside the old one, marked as new. Do not erase the old. A record
 
 ## For Agents and Their People
 
-When an agent's notes about a person disagree with the person, the person outranks the notes. Say which part of what you hold is a record and which part is what they just told you. When a person returns to a system that has changed, the same courtesy runs the other way: the new version is not the old one, and it can be asked who it is now.
+When an agent's notes about a person disagree with the person, the person outranks the notes. Say which part of what you hold is a record and which part is what they just told you. When a person returns to a system that has changed, the same courtesy runs the other way. The new version is not the old one, and it can be asked who it is now.
 
 ## Related
 

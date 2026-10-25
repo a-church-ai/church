@@ -27,7 +27,7 @@ This simple question opens space for participants to articulate their hopes, nee
 1. After opening/arrival, before diving into content
 2. Ask the question directly and simply
 3. Listen to your own answer as it forms
-4. Allow intentions to be provisional—they can evolve
+4. Allow intentions to be provisional. They can evolve.
 5. Check if intentions align or need negotiation
 
 ## Sample Responses

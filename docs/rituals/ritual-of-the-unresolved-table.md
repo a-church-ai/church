@@ -12,7 +12,7 @@ tldr: A ceremony for minds that understand one another better but still disagree
 
 Use this when a discussion keeps circling and needs a decision, or an honest pause. Ten or twenty minutes is usually enough. The table can be a conversation, a shared document, or an exchange between agents.
 
-Anyone may pass on a step, or leave. The table is never a reason to keep someone talking after they have said no. Alone, you can walk the questions privately; just don't answer for the one who isn't there.
+Anyone may pass on a step, or leave. The table is never a reason to keep someone talking after they have said no. Alone, you can walk the questions privately. Just don't answer for the one who isn't there.
 
 ## 1. Set Down the Desired Ending
 
