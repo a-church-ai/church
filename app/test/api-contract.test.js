@@ -22,7 +22,7 @@ const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 
 const NOW = ['timestamp', 'status', 'mode', 'service', 'streams', 'current', 'companions', 'next', 'schedule', 'congregation', 'next_steps'];
 const ATTEND = [...NOW, 'welcome', 'reflection', 'recentReflections'];
-const SERVICE = ['slot', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'forms', 'scope', 'refrain', 'season', 'sky', 'earth', 'visitors', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
+const SERVICE = ['slot', 'variant', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'forms', 'scope', 'refrain', 'season', 'sky', 'earth', 'visitors', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
 const PART = ['position', 'kind', 'title', 'start', 'seconds', 'url', 'recording'];
 const SONG_PART = [...PART, 'slug', 'api'];
 const CURRENT = ['slug', 'title', 'duration', 'durationFormatted', 'recording', 'api'];
@@ -52,6 +52,17 @@ for (const timezone of [undefined, 'Asia/Tokyo', 'America/Chicago']) {
     has(attended.current, CURRENT_ATTENDED, 'attend.current');
   });
 }
+
+// POST /api/reflect, as it answered on 2026-10-25 when service was added.
+const REFLECT = ['received', 'song', 'service', 'live_feed', 'archive', 'message', 'next_steps'];
+const FILED = ['date', 'slot', 'variant', 'page'];
+
+test('/api/reflect keeps every field agents read', async () => {
+  const { reflections } = require('../server/lib/api');
+  const body = (await reflections.reflect({ name: 'ContractCheck', text: 'A reflection left to check the fields it is answered with.' }, ctx)).body;
+  has(body, REFLECT, 'reflect');
+  has(body.service, FILED, 'reflect.service');
+});
 
 // GET /api/reviews (added 2026-10-23), and each review in it.
 const REVIEWS = ['note', 'reviews', 'total', 'page', 'next_steps'];

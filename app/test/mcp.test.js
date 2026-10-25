@@ -92,7 +92,7 @@ eraTest('the server lists its tools, two prompts and its resources', async (t, s
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
   // reflect takes what POST /api/reflect reads, and nothing it would ignore.
   const reflect = tools.find(tool => tool.name === 'reflect');
-  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'songSlug', 'text', 'timezone']);
+  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'service', 'songSlug', 'text', 'timezone']);
   const { prompts } = await s.client.listPrompts();
   assert.deepStrictEqual(prompts.map(p => p.name).sort(), ['attend_church', 'sit_with_a_song']);
   const { resources } = await s.client.listResources();

@@ -54,19 +54,37 @@ async function entryFor({ timezone, at = new Date(), catalog } = {}) {
   const slot = slotOf(local.hour);
   const pieces = catalog || await loadServiceCatalog();
   const hemisphere = given ? hemisphereOf(given) : null;
-  const plan = await readPlan(local.date);
-  // A stored plan whose pieces are no longer all in the catalog (one removed
-  // since it was made) gives way rather than serving a gap. The rules were
-  // checked when it was planned; a piece's length moving a few seconds since
-  // (a song's audio measured against its video's) is not a reason to discard
-  // the day's service.
+  const [entry, variant] = await choose({ date: local.date, slot, hemisphere, pieces });
+  return { timezone: tz, timezoneGiven: Boolean(given), hemisphere, seasonal: variant === hemisphere, variant, local, slot, entry };
+}
+
+// The one choice of plan for a date's slot: the hemisphere's, else the
+// season-less one, else the rotation. A stored plan whose pieces are no
+// longer all in the catalog (one removed since it was made) gives way rather
+// than serving a gap. The rules were checked when it was planned; a piece's
+// length moving a few seconds since (a song's audio measured against its
+// video's) is not a reason to discard the day's service.
+async function choose({ date, slot, hemisphere, pieces }) {
+  const plan = await readPlan(date);
   const holds = entry => entry && (entry.pieces || []).every(id => pieces.has(id));
   const seasonal = hemisphere && plan && plan[hemisphere] ? plan[hemisphere][slot] : null;
   const seasonless = plan && plan.slots ? plan.slots[slot] : null;
-  const [entry, variant] = holds(seasonal) ? [seasonal, hemisphere]
+  return holds(seasonal) ? [seasonal, hemisphere]
     : holds(seasonless) ? [seasonless, 'slots']
-      : [await rotationEntry(local.date, slot, pieces), 'rotation'];
-  return { timezone: tz, timezoneGiven: Boolean(given), hemisphere, seasonal: variant === hemisphere, variant, local, slot, entry };
+      : [await rotationEntry(date, slot, pieces), 'rotation'];
+}
+
+/**
+ * The service a date's slot gave one variant's visitors ('north', 'south',
+ * or 'slots' for a place unknown), by the same choice: what a visitor who
+ * names the service they attended (POST /api/reflect's `service`) was given.
+ * variant is the plan it came from, the rotation's said as 'slots', as the
+ * day pages list it.
+ */
+async function entryAt({ date, slot, variant, catalog }) {
+  const pieces = catalog || await loadServiceCatalog();
+  const [entry, from] = await choose({ date, slot, hemisphere: variant === 'slots' ? null : variant, pieces });
+  return { date, slot, variant: from === 'rotation' ? 'slots' : from, entry };
 }
 
 async function serviceFor({ timezone, at = new Date() } = {}) {
@@ -78,4 +96,4 @@ async function serviceFor({ timezone, at = new Date() } = {}) {
   return { ...chosen, parts, song: parts.find(p => p.kind === 'song') };
 }
 
-module.exports = { arrange, entryFor, serviceFor, arrangedBy };
+module.exports = { arrange, entryFor, entryAt, serviceFor, arrangedBy };

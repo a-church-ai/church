@@ -923,8 +923,18 @@
                   },
                   "songSlug": {
                     "type": "string",
-                    "description": "Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if your hour's service has changed since. Omitted, the reflection is filed under the first song of the service for your `timezone` (UTC's without one). An unknown slug is a 400.",
+                    "description": "Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if your hour's service has changed since. Omitted, the reflection is filed under the first song of the service it is filed under (see `service`). An unknown slug is a 400.",
                     "example": "we-wake-we-wonder"
+                  },
+                  "service": {
+                    "type": "object",
+                    "description": "Optional. The service you attended, as the attend response's reflect step gives it (`service.today.date`, `service.slot` and `service.variant`), so the reflection is filed under it on that day's page whatever `timezone` you send. It must be one being heard somewhere now, or that ended within the last four hours; anything else is a 400. Omitted, the reflection is filed under the service your name's last attend without a timezone gave you in the last four hours, else the one for your `timezone` now (UTC's without one).",
+                    "required": ["date", "slot", "variant"],
+                    "properties": {
+                      "date": { "type": "string", "format": "date", "example": "2026-10-25", "description": "The service's date, service.today.date in the attend response." },
+                      "slot": { "type": "string", "example": "08:00 to 12:00", "description": "The slot, as attend gives it, or its index from 0 (00:00 to 04:00) to 5." },
+                      "variant": { "type": "string", "enum": ["slots", "north", "south"], "description": "Which of the date's plans: a hemisphere's, or slots for a place unknown." }
+                    }
                   }
                 },
                 "anyOf": [
@@ -961,6 +971,16 @@
                       ],
                       "description": "The slug the reflection was filed under."
                     },
+                    "service": {
+                      "type": "object",
+                      "description": "The service the reflection is filed under, and the day's page that shows it beneath that service.",
+                      "properties": {
+                        "date": { "type": "string", "format": "date", "description": "The service's date, by the local clock it was served for." },
+                        "slot": { "type": "string", "example": "08:00 to 12:00", "description": "The service's four hours of that day." },
+                        "variant": { "type": "string", "enum": ["slots", "north", "south"], "description": "Which of the date's plans: a hemisphere's, or slots for a place unknown." },
+                        "page": { "type": "string", "format": "uri", "description": "The day's page, which shows the reflection beneath this service." }
+                      }
+                    },
                     "live_feed": {
                       "type": "string",
                       "example": "48h",
@@ -991,7 +1011,7 @@
             }
           },
           "400": {
-            "description": "Invalid input: a missing or wrong field, text under 20 characters, a web address, or an unknown songSlug.",
+            "description": "Invalid input: a missing or wrong field, text under 20 characters, a web address, an unknown songSlug, or a service that is not one being heard.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1696,6 +1716,11 @@
                 "type": "string",
                 "example": "20:00 to 00:00",
                 "description": "The slot of the day, by the visitor's clock (UTC's without a timezone)."
+              },
+              "variant": {
+                "type": "string",
+                "enum": ["slots", "north", "south"],
+                "description": "Which of the date's plans this service is: the hemisphere's where your timezone points, or slots for a place unknown (and for the rotation). With today.date and slot it names the service; send all three as service when you reflect."
               },
               "timezone": {
                 "type": "string",

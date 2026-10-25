@@ -13,8 +13,10 @@
  * so no single voice steers a service. Fresh first: a reflection that already
  * shaped one of the variant's services is used again only when too few fresh
  * ones remain, so a hemisphere's slots through a day do not all hear the same
- * handful. Where a visitor was comes from the reflection's own timezone and
- * time; nothing new is stored about anyone.
+ * handful. Where a visitor was is the service they were served (filed.js): the
+ * one the reflection keeps, else its own timezone and time, with an older
+ * reflection left after UTC's service while filed by its timezone put back
+ * with UTC's; nothing new is stored about anyone.
  *
  * How they reach the planner: never as words. One call a planning run reads
  * each chosen group, fenced as data and without names (the Moltbook fence,
@@ -36,6 +38,8 @@ const { hemisphereOf } = require('../utils/seasons');
 const { slotOf } = require('./slots');
 const { addDays } = require('./rules');
 const { readPlan } = require('./plans');
+const { storedService, servedInUtc } = require('./filed');
+const { loadServiceCatalog } = require('./catalog');
 const { describeError } = require('../utils/describe-error');
 
 const DAY = 864e5;
@@ -58,8 +62,11 @@ const keyOf = (date, slot, variant) => `${date}|${slot}|${variant}`;
 
 // Where a visitor was when they reflected: the variant their services are
 // planned for ('north', 'south', or 'slots' for a place unknown) and their
-// local slot, from the timezone the reflection keeps (UTC when none).
+// local slot: the service the reflection keeps, else from the timezone it
+// keeps (UTC when none).
 function whereLeft(reflection) {
+  const stored = storedService(reflection);
+  if (stored) return { variant: stored.variant, slot: stored.slot };
   const tz = resolveTimezone(reflection.timezone) || 'UTC';
   return {
     variant: hemisphereOf(tz) || 'slots',
@@ -233,14 +240,19 @@ async function digest(groups, { ask }) {
  * date|slot|variant to { tier, days, reflections, themes, ids }, for the
  * services whose group gave themes. Reflections come through loadAttendance,
  * so one hidden as spam never reaches the model. ask defaults to the planner's
- * model by way of messageJSON; load and read are injectable for tests.
+ * model by way of messageJSON; load, read and catalog are injectable for tests.
  */
-async function congregationFor(due, { now = new Date(), model, ask, load = loadAttendance, read = readPlan } = {}) {
+async function congregationFor(due, { now = new Date(), model, ask, load = loadAttendance, read = readPlan, catalog } = {}) {
   const call = ask || ((system, user) => messageJSON(system, user, { model, maxTokens: 8000 }));
   const at = now.getTime();
   const recent = ((await load()).reflections || [])
     .filter(r => r && r.id && typeof r.text === 'string' && at - Date.parse(r.createdAt) < OLDEST_DAYS * DAY);
-  const placed = recent.map(reflection => ({ reflection, ...whereLeft(reflection) }));
+  const pieces = catalog || await loadServiceCatalog();
+  const placed = [];
+  for (const reflection of recent) {
+    const utc = await servedInUtc(reflection, pieces);
+    placed.push({ reflection, ...(utc ? { variant: utc.variant, slot: utc.slot } : whereLeft(reflection)) });
+  }
 
   // What already shaped each variant's services over the window, then each
   // group chosen here, in the order the services are due.

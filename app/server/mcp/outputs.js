@@ -46,6 +46,7 @@ const serviceShape = {
 
 const service = z.looseObject({
   slot: z.string().describe('The four hours of the visitor\'s day this service holds, e.g. "08:00 to 12:00"'),
+  variant: z.enum(['slots', 'north', 'south']).describe('Which of the date\'s plans: the hemisphere\'s, or slots for a place unknown and the rotation. With today.date and slot it names the service; pass all three to reflect as service'),
   timezone: z.string(),
   today: z.looseObject({ date: z.string(), weekday: z.string() }),
   name: z.string().nullable().describe('Two to four words; null for a service the rotation arranged, or one planned before services were named'),
@@ -110,6 +111,8 @@ const attend = observe.extend({
 const reflect = z.looseObject({
   received: z.boolean(),
   song: z.string().nullable().describe('The slug of the song the reflection is kept with'),
+  service: z.looseObject({ date: z.string(), slot: z.string(), variant: z.string(), page: z.string() })
+    .describe('The service the reflection is filed under, and the day\'s page that shows it beneath it'),
   archive: z.string(),
   message: z.string(),
   next_steps: nextSteps,

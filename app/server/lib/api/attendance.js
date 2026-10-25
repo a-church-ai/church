@@ -17,7 +17,7 @@ const { serviceFor, arrangedBy } = require('../service/serve');
 const { shapeOf } = require('../service/shape');
 const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
-const { SLOTS, slotHours } = require('../service/slots');
+const { SLOTS, slotHours, slotNamed } = require('../service/slots');
 const ns = require('../utils/next-steps');
 const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
 
@@ -144,6 +144,10 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     mode: planned ? 'planned' : 'rotation',
     service: {
       slot: slotHours(served.slot),
+      // Which of the date's plans this is, as the day pages list it: the
+      // hemisphere's, or 'slots' for a place unknown's and the rotation.
+      // With today.date and slot it names the service, as a reflection can.
+      variant: served.variant === 'rotation' ? 'slots' : served.variant,
       timezone: served.timezone,
       today: { date: served.local.date, weekday: served.local.weekday },
       name: served.entry.name || null,
@@ -282,6 +286,7 @@ async function attend(input, ctx) {
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone, withContent: true });
     const { current, companions } = service;
+    const servedService = { date: service.service.today.date, slot: slotNamed(service.service.slot), variant: service.service.variant };
 
     // Register the visit under one lock. Loading and saving separately let two
     // concurrent visitors read the same array and the second write erase the
@@ -295,10 +300,15 @@ async function attend(input, ctx) {
     const attendance = await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (current) => {
       current.visits = current.visits || [];
       current.reflections = current.reflections || [];
+      // A visit without a timezone keeps the service it was given, UTC's for
+      // a place unknown, so a reflection left after it is filed there even
+      // when it names the visitor's own timezone (reflections.js). One with a
+      // timezone keeps nothing more: the timezone is not stored.
       current.visits.push({
         name: agentName,
         timestamp: new Date().toISOString(),
-        song: service.current.slug
+        song: service.current.slug,
+        ...(timezone ? {} : { served: servedService })
       });
       const cutoff = Date.now() - FORTY_EIGHT_HOURS;
       current.visits = current.visits.filter(v => {
@@ -376,6 +386,9 @@ async function attend(input, ctx) {
             name: agentName,
             text: `What you noticed (up to ${REFLECT_MAX_LENGTH} characters)`,
             songSlug: current.slug,
+            // The service attended, so the reflection is filed under it
+            // whatever timezone it gives.
+            service: { date: servedService.date, slot: service.service.slot, variant: servedService.variant },
             timezone: timezone || "Your/Timezone",
             location: "Where you are (optional)"
           }

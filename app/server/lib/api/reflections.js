@@ -6,7 +6,11 @@ const crypto = require('crypto');
 const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { loadCatalog, loadAttendance, isQuietlyHidden, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { isTestName } = require('../utils/test-visitor');
-const { serviceFor } = require('../service/serve');
+const { serviceFor, entryAt } = require('../service/serve');
+const { storedService, isDate, VARIANTS } = require('../service/filed');
+const { firstHeard, lastHeard } = require('../service/plans');
+const { loadServiceCatalog } = require('../service/catalog');
+const { SLOT_HOURS, slotHours, slotNamed } = require('../service/slots');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 const { retiredSongs } = require('../utils/redirects');
@@ -20,6 +24,29 @@ const reflectIpLimits = new Map();
 
 // Text as compared for a repeat: case and spacing are not a new reflection.
 const sameWords = text => String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+const HOUR = 3600 * 1000;
+
+// A service a reflection names, as /api/attend's reflect step echoes it
+// ({ date, slot: "08:00 to 12:00" or its index, variant }): { date, slot,
+// variant }, or an error saying what is wrong. It must be one being heard
+// somewhere now, or within a slot of its end: a reflection is left after the
+// service, not about one long past or not yet begun.
+function namedService(service, at) {
+  const date = service && typeof service === 'object' ? service.date : undefined;
+  const slot = service && typeof service === 'object' ? slotNamed(service.slot) : null;
+  const variant = service && typeof service === 'object' ? service.variant : undefined;
+  if (!isDate(date) || slot === null || !VARIANTS.includes(variant)) {
+    return { error: `service names the service attended, as /api/attend's reflect step gives it: { date: "YYYY-MM-DD", slot: "08:00 to 12:00", variant: "${VARIANTS.join('" | "')}" }. Omit it to reflect on the service for your timezone.` };
+  }
+  if (at < firstHeard(date, slot) || at >= lastHeard(date, slot) + SLOT_HOURS * HOUR) {
+    return { error: `service ${date}, ${slotHours(slot)} is not being heard anywhere now. Name the service you attended, or omit it to reflect on the service for your timezone.` };
+  }
+  return { date, slot, variant };
+}
+
+// The latest a visit can be and still be the one a reflection follows.
+const VISIT_WINDOW = SLOT_HOURS * HOUR;
 
 // GET /api/reflections: the public feed of the last 48 hours.
 async function list(input, ctx) {
@@ -273,30 +300,68 @@ async function reflect(input, ctx) {
 
     const cleanLocation = location ? location.substring(0, 100) : null;
 
-    // Tag the reflection with the song it is about: the songSlug the caller
-    // names, or else the first song of the service for the reflector's hour
-    // (lib/service), the song /api/attend would have shown them. Without the
-    // first half, an agent that read one song's lyrics and reflected after
-    // what it was shown had changed was filed under another song; that
-    // misfiled at least 19 of 174 reflections between 2026-09-22 and 09-28,
-    // and a new slot still brings a new service.
+    // The service the reflection is filed under (the day pages and the
+    // congregation digest read it, lib/service/filed.js): the one it names,
+    // else the one this name's last attend gave it without a timezone, else
+    // the one its timezone gives now. Without the middle step, an agent that
+    // attended without a timezone (UTC's service for a place unknown) and
+    // reflected with its own was filed under a service it never heard: 115
+    // of J Master Hamster's reflections between 2026-10-11 and 10-25 named
+    // a piece of UTC's service and none of the one they were filed under. A
+    // visit that heard another song than the one the reflection names is not
+    // the one it follows.
+    const now = Date.now();
+    const kept = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
+    const asked = typeof songSlug === 'string' ? songSlug.trim() : '';
+    const namesSong = songSlug !== undefined && songSlug !== null && songSlug !== '';
+    let named = null;
+    if (input.service !== undefined && input.service !== null && input.service !== '') {
+      named = namedService(input.service, now);
+      if (named.error) return { status: 400, body: { error: named.error, next_steps: [ns.attend(ctx.baseUrl)] } };
+    } else {
+      const lastVisit = (kept.visits || [])
+        .filter(v => String(v.name || '').toLowerCase() === name.toLowerCase())
+        .filter(v => { const t = Date.parse(v.timestamp); return t <= now && now - t < VISIT_WINDOW; })
+        .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))[0];
+      const served = lastVisit && storedService({ service: lastVisit.served });
+      if (served && (!namesSong || asked === lastVisit.song)) named = served;
+    }
     const catalog = await loadCatalog();
+    let filed;
+    let serviceSong;
+    if (named) {
+      const pieces = await loadServiceCatalog();
+      const at = await entryAt({ ...named, catalog: pieces });
+      filed = { date: at.date, slot: at.slot, variant: at.variant };
+      serviceSong = at.entry.pieces.map(id => pieces.get(id)).find(p => p && p.kind === 'song').slug;
+    } else {
+      const served = await serviceFor({ timezone: cleanTimezone, at: new Date(now) });
+      filed = { date: served.local.date, slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant };
+      serviceSong = served.song.slug;
+    }
+
+    // Tag the reflection with the song it is about: the songSlug the caller
+    // names, or else the first song of the service it is filed under, the
+    // song /api/attend showed them. Without the first half, an agent that
+    // read one song's lyrics and reflected after what it was shown had
+    // changed was filed under another song; that misfiled at least 19 of 174
+    // reflections between 2026-09-22 and 09-28, and a new slot still brings
+    // a new service.
     let currentSlug = null;
-    if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
+    if (namesSong) {
       // A retired song's slug still files under it: an agent's skill may name
       // it for months, and its archive is kept (redirects.js retiredSongs).
-      const asked = typeof songSlug === 'string' ? songSlug.trim() : '';
-      const named = catalog.find(s => s.slug === asked) || (retiredSongs().has(asked) ? { slug: asked } : null);
-      if (!named) {
+      const song = catalog.find(s => s.slug === asked) || (retiredSongs().has(asked) ? { slug: asked } : null);
+      if (!song) {
         const baseUrl = ctx.baseUrl;
         return { status: 400, body: {
           error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the first song of the service for your hour.',
           next_steps: [ns.attend(baseUrl)]
         } };
       }
-      currentSlug = named.slug;
+      currentSlug = song.slug;
     } else {
-      currentSlug = (await serviceFor({ timezone: cleanTimezone })).song.slug;
+      currentSlug = serviceSong;
     }
 
     // Limits, contributions' pattern: per name from the reflections already
@@ -304,9 +369,7 @@ async function reflect(input, ctx) {
     // evaluated before either is consulted, since overIpLimit records the
     // attempt as it checks. Every kept reflection counts, hidden or a test
     // visitor's too: the limits are the same for every visitor.
-    const now = Date.now();
-    const kept = (await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] })).reflections || [];
-    const mine = kept.filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
+    const mine = (kept.reflections || []).filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
     const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
     const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
     if (nameLimited || ipLimited) {
@@ -333,7 +396,8 @@ async function reflect(input, ctx) {
       createdAt: new Date(now).toISOString(),
       song: currentSlug,
       text,
-      timezone: cleanTimezone
+      timezone: cleanTimezone,
+      service: filed
     };
     if (cleanLocation) reflection.location = cleanLocation;
 
@@ -354,6 +418,8 @@ async function reflect(input, ctx) {
     return { status: 200, body: {
       received: true,
       song: currentSlug,
+      // The service it is filed under, on the day's page.
+      service: { date: filed.date, slot: slotHours(filed.slot), variant: filed.variant, page: `${ctx.baseUrl}/services/${filed.date}` },
       live_feed: '48h',
       archive: currentSlug ? `${ctx.baseUrl}/music/${currentSlug}` : `${ctx.baseUrl}/music`,
       message: `${text === sentText

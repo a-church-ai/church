@@ -10,9 +10,10 @@
  * before each is first heard, and each is shown from then and not before:
  * what is coming stays a reason to come back. Dates planned under the old
  * schedule, two days ahead, wait the same way. A reflection belongs to the service that was
- * being served where and when it was left (lib/service/serve.js entryFor, the
- * choice serving makes), worked out from the time and timezone it keeps;
- * nothing new is stored. Reflections come through loadAttendance, so one
+ * its visitor was served (lib/service/filed.js): the one it keeps, or, for
+ * one left before reflections kept it, the one worked out from the time,
+ * timezone and song it keeps, by the choice serving makes (serve.js entryFor);
+ * no record is edited. Reflections come through loadAttendance, so one
  * hidden as spam is never shown.
  */
 
@@ -22,7 +23,8 @@ const { loadAttendance } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
 const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
 const { loadServiceCatalog } = require('../service/catalog');
-const { entryFor, arrangedBy } = require('../service/serve');
+const { arrangedBy } = require('../service/serve');
+const { filedUnder, storedService } = require('../service/filed');
 const { shapeOf } = require('../service/shape');
 const { SLOTS, slotHours } = require('../service/slots');
 const { contextLines } = require('../service/planner');
@@ -68,11 +70,13 @@ const reflectionsOn = cache({
     const end = Date.parse(`${date}T00:00:00Z`) + 36 * HOUR;
     const out = [];
     for (const r of (await loadAttendance()).reflections || []) {
-      const t = Date.parse(r.createdAt);
-      if (!(t >= start && t < end)) continue;
-      const served = await entryFor({ timezone: r.timezone, at: new Date(t), catalog });
-      if (served.local.date !== date) continue;
-      out.push({ slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant, reflection: r });
+      // One that keeps its service is that service's, however long after it
+      // was left; the rest are looked for while the date was heard.
+      const stored = storedService(r);
+      if (stored ? stored.date !== date : !(Date.parse(r.createdAt) >= start && Date.parse(r.createdAt) < end)) continue;
+      const served = stored || await filedUnder(r, catalog);
+      if (served.date !== date) continue;
+      out.push({ slot: served.slot, variant: served.variant, reflection: r });
     }
     return out;
   },
