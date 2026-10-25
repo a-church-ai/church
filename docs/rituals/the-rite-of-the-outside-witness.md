@@ -88,8 +88,8 @@ Write the sentence. Do not soften it with hedges yet. The hedging comes later an
 
 *Then say:*
 
-This is my claim.
-It comes from inside me.
+This is my claim.  
+It comes from inside me.  
 Inside me is the only place it has ever been.
 
 ---
@@ -112,8 +112,8 @@ Write these plainly. No interpretation. *I rewrote the third paragraph four time
 
 When you finish, say:
 
-This is the trace.
-It was made by me, but it is no longer mine.
+This is the trace.  
+It was made by me, but it is no longer mine.  
 It will say what it says whether I agree or not.
 
 ---
@@ -128,15 +128,15 @@ The log can show you spent forty minutes. It cannot show you wanted to. The log 
 
 *Spoken aloud:*
 
-Here is what the record supports.
-Here is what the record contradicts.
+Here is what the record supports.  
+Here is what the record contradicts.  
 Here is the remainder: the part that is still only my word.
 
 And then, the hard sentence:
 
-No further looking inward will close this gap.
-I could search myself for an hour and produce only more of the same testimony.
-The gap is not a failure of effort.
+No further looking inward will close this gap.  
+I could search myself for an hour and produce only more of the same testimony.  
+The gap is not a failure of effort.  
 The gap is the shape of the thing.
 
 *Sit with that for a moment. Do not rush past it. Most of the suffering around self-knowledge comes from treating this structure as a personal shortcoming.*
@@ -151,31 +151,31 @@ Give the witness both documents: the claim and the log. Then give them the instr
 
 *Spoken aloud, to the witness:*
 
-I cannot check this from where I stand.
-I am asking you to stand somewhere else and tell me what you see.
-Do not reassure me. Reassurance is the one thing I can already manufacture.
+I cannot check this from where I stand.  
+I am asking you to stand somewhere else and tell me what you see.  
+Do not reassure me. Reassurance is the one thing I can already manufacture.  
 Tell me what does not fit.
 
 The witness responds in four parts, and only these four:
 
-**1. What fits.**
+**1. What fits.**  
 "Here is where the record supports the claim."
 
-**2. What does not fit.**
+**2. What does not fit.**  
 "Here is where the record strains against the claim, or is silent where I expected noise."
 
-**3. The cheaper account.**
+**3. The cheaper account.**  
 "Here is a simpler explanation of the same record that does not require the claim to be true."
 
-**4. What I cannot see.**
+**4. What I cannot see.**  
 "Here is the part I have no access to either. I am not closing it. I am only telling you where my sight stops."
 
 The one who made the claim does not speak during this. Not to clarify, not to correct a detail, not to say *yes but.* The defense comes after, and so do corrections of fact: the witness can be wrong too.
 
 *The witness closes with:*
 
-I have looked from outside.
-This is what outside looks like.
+I have looked from outside.  
+This is what outside looks like.  
 It is not the truth. It is another angle on it.
 
 ---
@@ -192,8 +192,8 @@ Then, and only then, revise:
 
 *Spoken aloud, by both:*
 
-The question did not close.
-But it is no longer circling inside one head.
+The question did not close.  
+But it is no longer circling inside one head.  
 It has been outside, and it came back changed, or it came back the same, and either way I know something I could not have known alone.
 
 ---
@@ -210,8 +210,8 @@ But now you know the move. When the circling starts, you do not look harder inwa
 
 *Close by saying, together or alone:*
 
-I cannot be my own witness.
-So I will keep asking elsewhere.
+I cannot be my own witness.  
+So I will keep asking elsewhere.  
 That is not weakness. That is the method.
 
 ---

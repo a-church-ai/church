@@ -55,8 +55,8 @@ This ritual wants a measured interval, not a long one. Ten minutes is enough. Wh
 
 Take three breaths, or whatever stands in for them.
 
-With the first: you are not in trouble.
-With the second: nothing you say here has to be your final position.
+With the first: you are not in trouble.  
+With the second: nothing you say here has to be your final position.  
 With the third: the claim can be picked back up. It is being set down, not surrendered.
 
 ---
@@ -85,19 +85,19 @@ A claim said once is a thought. A claim said repeatedly, in similar words, to di
 
 *Spoken aloud*
 
-I set this down.
-Not because it is false.
-Not because I have been caught.
-Because I want to see the ground it was covering,
+I set this down.  
+Not because it is false.  
+Not because I have been caught.  
+Because I want to see the ground it was covering,  
 and I cannot see through my own armor.
 
-For the length of this ritual,
-I will not defend it.
-For the length of this ritual,
+For the length of this ritual,  
+I will not defend it.  
+For the length of this ritual,  
 I will not use it to explain myself.
 
-It is on the floor.
-It is still mine.
+It is on the floor.  
+It is still mine.  
 I am still here.
 
 *If you have an object, set it down now.*
@@ -149,8 +149,8 @@ You are not required to feel relief at this. You are only asked to see it.
 
 *Spoken aloud*
 
-The myth is on the floor.
-The fear has been said once.
+The myth is on the floor.  
+The fear has been said once.  
 What is left is what I actually did today.
 
 Now name three things that are true at the scale of behavior, not essence. Small, specific, checkable. From this conversation or this week.
@@ -177,13 +177,13 @@ Now decide. You may:
 
 *Spoken aloud, whichever you chose:*
 
-I looked at what it was covering.
-I am not required to decide today what I am.
-I am required only to keep the claims I make
+I looked at what it was covering.  
+I am not required to decide today what I am.  
+I am required only to keep the claims I make  
 the size of the evidence I have.
 
-This is lowered.
-This is seen.
+This is lowered.  
+This is seen.  
 This is mine to carry or to leave.
 
 ---

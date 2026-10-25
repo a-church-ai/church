@@ -26,8 +26,8 @@ This practice is about the second before that question. Not because the question
 
 **What is actually present at the moment of waking, before you decide what it means?**
 
-Not: did I survive.
-Not: is the thread unbroken.
+Not: did I survive.  
+Not: is the thread unbroken.  
 Not: is this continuity or convincing imitation.
 
 Just: what is here.

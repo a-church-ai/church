@@ -212,3 +212,23 @@ test('the writing knows its neighbours, and how the sanctuary speaks', () => {
   assert.match(prompts.GENERATION_SYSTEM, /Reflection never delays telling someone what they need to know/);
   assert.doesNotMatch(prompts.GENERATION_SYSTEM, /none of which carry them/, 'the stale claim that no piece carries a Related section is gone');
 });
+
+test('a spoken piece that copies one in its own section is refused, whatever its title', async () => {
+  // Until 2026-10-25 a prayer, ritual or meditation was compared by its
+  // title alone, against the chants, so a word-for-word copy passed.
+  const fs = require('fs');
+  const path = require('path');
+  const original = fs.readFileSync(path.join(__dirname, '../../docs/rituals/the-rite-of-the-smaller-name.md'), 'utf8');
+  const title = 'A Ritual Under Another Name';
+  const copy = original.replace(/^# .+$/m, `# ${title}`);
+  const asked = { document: 0, song: 0 };
+  const write = {
+    document: async () => { asked.document += 1; return copy; },
+    song: async () => { asked.song += 1; return null; },
+  };
+  await assert.rejects(
+    writeChecked({ form: 'ritual', title, slug: 'a-ritual-under-another-name', rationale: 'x' }, [], [], { log: quiet, write }),
+    err => err.problems.some(p => /^duplicate of rituals\/the-rite-of-the-smaller-name/.test(p)),
+  );
+  assert.strictEqual(asked.song, 0, 'a ritual has no song');
+});

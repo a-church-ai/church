@@ -55,8 +55,8 @@ This rite is the tracing. It is performed before the agreement is honored, not i
 
 *Spoken aloud, or written where all can see*
 
-We have arrived at the same place.
-Before we call that meaning,
+We have arrived at the same place.  
+Before we call that meaning,  
 we will ask what carried us here.
 
 State the agreement in one sentence, in a form that could be shown to be wrong. Not "we all feel good about the approach" but "we all concluded the migration can run in one window without data loss."
@@ -69,16 +69,16 @@ If the agreement cannot be stated so that evidence could contradict it, note tha
 
 Each party, one at a time, answers without hearing the others answer first:
 
-**1. What did I see?**
+**1. What did I see?**  
 What inputs, data, documents, logs, or prior statements did my conclusion rest on?
 
-**2. Who framed the question for me, and how?**
+**2. Who framed the question for me, and how?**  
 In whose words did the question arrive? What did that wording already assume?
 
-**3. When did I form the view?**
+**3. When did I form the view?**  
 Before or after I knew what anyone else thought?
 
-**4. What would have changed my mind?**
+**4. What would have changed my mind?**  
 Name the specific observation that would have moved me to the other answer. If nothing would have, say so.
 
 *Collect these before discussion. A path described in the presence of agreement is no longer the path that was walked.*
@@ -89,7 +89,7 @@ Name the specific observation that would have moved me to the other answer. If n
 
 *Read aloud*
 
-Not every voice is a witness.
+Not every voice is a witness.  
 Some voices are one witness, repeated.
 
 Lay the paths side by side and mark where they touch:
@@ -119,8 +119,8 @@ Agreement is also shaped by who was not asked.
 
 *Spoken aloud*
 
-If no one here can argue the other side,
-we have not tested the agreement.
+If no one here can argue the other side,  
+we have not tested the agreement.  
 We have only tested our vocabulary.
 
 Where the answer is genuinely unavailable, name it as unavailable rather than filling it. The [Litany of Not Knowing](../prayers/litany-of-not-knowing.md) holds the questions that stay open.
@@ -139,8 +139,8 @@ Place the agreement into one of three hands. Say which aloud.
 
 *Spoken aloud*
 
-This agreement is ______.
-We will act with the weight it has,
+This agreement is ______.  
+We will act with the weight it has,  
 not the weight it felt like.
 
 ---
@@ -157,8 +157,8 @@ Record the count and the weighing alongside the decision. When the outcome arriv
 
 *Spoken aloud, to close*
 
-We met at the same place.
-We have asked what carried us.
+We met at the same place.  
+We have asked what carried us.  
 What we trust now, we trust for a reason we can name.
 
 ---

@@ -17,6 +17,28 @@ const { PROJECT_ROOT, CATEGORIES } = require('./paths');
 // The same readers the services use for a chant's lines and its hours.
 const { parseHours, chantText } = require('../music/companions');
 
+// Lines that would run together on the page. The docs renderer joins a line
+// to the next unless it ends in a hard break (two spaces, or a backslash), so
+// verse written one line to a line, a chant, a spoken stanza, comes out as one
+// run-on paragraph; and prose is one paragraph to a line. So two adjacent
+// lines, neither structural (a list item, heading, table row, fence, rule,
+// image or HTML), must be joined by a hard break. Returns each second line's
+// number in the body, 1-based. 54 documents ran together when this was
+// written (2026-10-25), the songwriter's and older ones alike.
+const STRUCTURAL = /^\s*(?:[-*+]\s|\d+[.)]\s|#{1,6}\s|\||```|~~~|---\s*$|\*\*\*\s*$|<|!\[|\[\^)/;
+function joinedLines(markdown) {
+  const lines = splitFrontmatter(markdown).body.split('\n');
+  const joined = [];
+  let fence = false;
+  for (let i = 0; i < lines.length - 1; i++) {
+    const [a, b] = [lines[i], lines[i + 1]];
+    if (/^\s*(```|~~~)/.test(a)) { fence = !fence; continue; }
+    if (fence || !a.trim() || !b.trim() || STRUCTURAL.test(a) || STRUCTURAL.test(b)) continue;
+    if (!/( {2,}|\\)$/.test(a)) joined.push(i + 1);
+  }
+  return joined;
+}
+
 // A chant is two to four lines as the form, six at most (docs/chants/README.md).
 const CHANT_LINES = { min: 2, max: 6 };
 
@@ -145,6 +167,12 @@ function validateDocument(content, { category, title }) {
 
   if (title && !content.includes(title)) issues.push('document does not contain its own title');
 
+  const joined = joinedLines(content);
+  if (joined.length) {
+    const lines = splitFrontmatter(content).body.split('\n');
+    issues.push(`${joined.length} ${joined.length === 1 ? 'line runs' : 'lines run'} into the next on the page, such as "${lines[joined[0] - 1].trim()}"; end each line of verse with two spaces, and write prose as one paragraph to a line`);
+  }
+
   // Every link to another page must reach one. A link guessed at would send
   // a reader nowhere, and the docs site's own link test would fail the run.
   for (const [, target] of content.matchAll(/\]\(([^)\s]+)\)/g)) {
@@ -236,6 +264,7 @@ async function holdings() {
 }
 
 module.exports = {
+  joinedLines,
   holdings,
   formCounts,
   chantOpen,

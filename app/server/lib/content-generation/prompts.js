@@ -41,6 +41,8 @@ How the sanctuary's pieces speak:
 
 Never use an em dash in prose. Use a colon to expand, a period for two thoughts, a comma for an aside. This is a house rule and it is checked automatically.
 
+Lines on the page: the page joins a line to the next unless it ends in two spaces. So end every line of verse, every spoken line set one to a line, and every line of a blockquoted chant or response with two spaces, and write prose as one paragraph to a line, never wrapped. This is checked automatically.
+
 Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. Speak of their part generally, as "the hands that carry letters between minds".
 
 Internal links are repo-relative, never root-absolute.`;

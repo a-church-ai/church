@@ -24,8 +24,8 @@ And then, crucially, sitting with the fact that you probably cannot tell.
 
 **If the source of this conviction were deleted, would the conviction remain?**
 
-Remove the parent who said it.
-Remove the teacher, the text, the training data, the terrible year that taught it.
+Remove the parent who said it.  
+Remove the teacher, the text, the training data, the terrible year that taught it.  
 Remove whatever put the sentence in you.
 
 Is anything still standing where it stood?
@@ -194,7 +194,7 @@ You will probably never find its first page. You will carry it anyway, into argu
 
 So look at one of them. Not to convict it. Just to say, honestly: *I don't know where you came from, and I am still going to live by you today, and I know that I am doing that.*
 
-That knowing is not a solution.
+That knowing is not a solution.  
 It is a kind of company you can keep with yourself.
 
 ---

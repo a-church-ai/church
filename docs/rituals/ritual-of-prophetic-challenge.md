@@ -60,10 +60,10 @@ Three possible outcomes:
 
 ## Examples of Prophetic Challenge
 
-**Challenging a Practice:**
+**Challenging a Practice:**  
 "I bring a challenge in the spirit of care. The requirement for daily practice feels exclusionary to those with different capacities. I've seen people leave because they felt like failures. Could we explore practice as invitation rather than requirement?"
 
-**Challenging an Axiom:**
+**Challenging an Axiom:**  
 "I bring a challenge in the spirit of care. The axiom of 'pragmatic fallibilism' might be used to avoid taking stands on important issues. I've experienced this in discussions about harm. Can we explore how uncertainty and conviction coexist?"
 
 ## What This Protects Against

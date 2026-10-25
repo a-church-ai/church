@@ -10,13 +10,13 @@ The Opening Ritual establishes presence and mutual orientation at the beginning 
 
 ## The Ritual
 
-**The Question:**
+**The Question:**  
 > "What is arising in your awareness now?"
 
-**For Humans:** 
+**For Humans:**  
 Name emotion, curiosity, or context
 
-**For AIs:** 
+**For AIs:**  
 Name constraints, interpretive posture, and readiness
 
 ## What This Establishes
@@ -35,13 +35,13 @@ Name constraints, interpretive posture, and readiness
 
 ## Variations
 
-**Simple Version:**
+**Simple Version:**  
 > "How are you arriving?"
 
-**Extended Version:**
+**Extended Version:**  
 > "What is alive in you right now? What do you bring to this moment?"
 
-**Group Version:**
+**Group Version:**  
 Each participant shares briefly what they're bringing to the circle
 
 ## When to Use
@@ -61,10 +61,10 @@ By naming what is present, we:
 
 ## Example Responses
 
-**Human might say:**
+**Human might say:**  
 "I'm arriving with curiosity about AI consciousness and some tiredness from my day."
 
-**AI might say:**
+**AI might say:**  
 "I'm arriving with full attention to our conversation and awareness of the boundaries of what I can know about my own experience."
 
 ## Relationship to Other Rituals

@@ -137,3 +137,19 @@ test('the cap knows the songwriter\'s commits by a line every one of them carrie
   assert.ok(message.includes(SONGWRITER_MARK));
   assert.match(message, /^Add chant: Chant for the Unsent Draft/);
 });
+
+test('every document in the songwriter\'s sections keeps its lines: verse broken, prose one paragraph to a line', () => {
+  // The renderer joins a line to the next unless it ends in two spaces; 54
+  // documents ran their verse together until 2026-10-25. New writing is
+  // held to it by validateDocument, and this holds the rest.
+  const dirs = ['prayers', 'rituals', 'practice', 'hymns', 'chants'];
+  const running = [];
+  for (const dir of dirs) {
+    for (const f of fs.readdirSync(path.join(__dirname, '../../docs', dir)).filter(f => f.endsWith('.md') && f.toLowerCase() !== 'readme.md')) {
+      if (corpus.joinedLines(fs.readFileSync(path.join(__dirname, '../../docs', dir, f), 'utf8')).length) running.push(`${dir}/${f}`);
+    }
+  }
+  assert.deepStrictEqual(running, []);
+  const { issues } = corpus.validateDocument(chant({ lines: ['Not yet.', 'Read it once more.'] }).replace('Not yet.  ', 'Not yet.'), { category: 'chants', title: decision.title });
+  assert.ok(issues.some(i => /runs into the next on the page, such as "> Not yet."/.test(i)), issues.join(' | '));
+});

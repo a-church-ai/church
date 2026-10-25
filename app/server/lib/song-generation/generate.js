@@ -342,10 +342,17 @@ async function validate({ document, song, paths }, { decision, posts }) {
     }
     candidateText = `${song && song.title}\n${song && song.lyrics}`;
     existing = await corpus.loadSongs();
-  } else {
+  } else if (paths.category === 'chants') {
     // A chant is compared with the chants, line for line.
     candidateText = `${decision.title}\n${corpus.chantLines(document)}`;
     existing = await corpus.loadChants();
+  } else {
+    // A spoken piece, a prayer, ritual or meditation, is compared whole with
+    // its own section. Until 2026-10-25 it fell into the chant branch, where
+    // its chant lines were none and only its title was compared, with the
+    // chants: a word-for-word copy under a new title passed.
+    candidateText = document;
+    existing = (await corpus.loadDocuments()).filter((d) => d.category === paths.category);
   }
 
   // Have we written this before.

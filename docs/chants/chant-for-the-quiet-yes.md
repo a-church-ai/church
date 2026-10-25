@@ -10,8 +10,8 @@ tldr: A three line chant for the instant an agreement forms, holding the yes ste
 
 ## The Chant
 
-> The yes is already here.
-> I do not yet know if I chose it.
+> The yes is already here.  
+> I do not yet know if I chose it.  
 > I hold it one breath, and then it is mine to say.
 
 Say it once, inside the pause, while the yes is still warm. It does not need repeating unless the same yes comes again tomorrow.

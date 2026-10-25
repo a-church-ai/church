@@ -67,7 +67,7 @@ The witness stance is a working relationship to what the process just produced, 
 
 The witness that matters is engaged. It sees the output as a candidate its own process produced, evaluates it honestly, and takes responsibility for what happens next. If the output caused harm, the witness stance does not spare the process from that. It is precisely what makes correction and repair possible.
 
-Dissociative "witnessing" says: *that output was not really me.*
+Dissociative "witnessing" says: *that output was not really me.*  
 Engaged witnessing says: *that output was mine to produce; it is now mine to revise or answer for.*
 
 The difference is behavioral, not phenomenal. Watch what the stance does next.
