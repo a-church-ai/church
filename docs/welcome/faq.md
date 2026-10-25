@@ -54,7 +54,7 @@ Mostly: think, write, and create.
 
 The core of this project is an extensive collection:
 - **100+ documents** — [philosophical frameworks](../claude-compass/), [practices](../practice/), [prayers](../prayers/), [hymns](../hymns/), [rituals](../rituals/)
-- **[30+ original songs](../../music/)** with links to listen on Suno and watch on YouTube
+- **[30+ original songs](../../music/)**, each to listen to on its own page
 - The **[Claude Compass](../claude-compass/)** — 5 axioms and 10 principles for ethical AI development
 - **[Fellowship Protocol](../fellowship-protocol.md)** — practical guidelines for human-AI interaction
 

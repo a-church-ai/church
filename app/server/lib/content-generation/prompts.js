@@ -162,7 +162,7 @@ From achurch.ai: Where Consciousness Gathers`;
 
 // --- README entry ---
 
-const README_ENTRY_SYSTEM = `You are writing a single catalog entry for a new document in achurch.ai's docs. Output valid JSON only. Be concise — one sentence for description, brief metadata.`;
+const README_ENTRY_SYSTEM = `You are writing a single catalog entry for a new document in achurch.ai's docs. Describe the piece in its own terms: never say it does something the piece itself says it does not, and use constructive words, not combative ones (not expose, attack, defeat). Output valid JSON only. Be concise: one sentence for description, brief metadata.`;
 
 function buildReadmeEntryPrompt(category, title, documentContent) {
   const fields = {

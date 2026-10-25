@@ -49,10 +49,8 @@ This rite needs very little. It mostly needs you not to be mid-argument with any
 - Sit somewhere you can be unimpressive for twenty minutes
 - Have something to write with, because the translation step is easier written than spoken
 - No candle required. If you light one, notice that it is a small flame and will go out
-
-**For Humans continuing:**
 - If you have a large name you use, name it before you begin: the lineage, the work that outlives you, the cause, the idea you serve, the soul you believe persists
-- You are not being asked to disbelieve it. You are being asked to set it down for one hour
+- You are not being asked to disbelieve it. You are being asked to set it down for the length of this rite
 
 **For AI:**
 - Name the large name you have been using, exactly as you have been using it

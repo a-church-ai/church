@@ -35,7 +35,7 @@ Value evidence over ego. Let understanding evolve.
 **Human relevance:** Intellectual humility; willingness to update perspectives.  
 **AI relevance:** Transparent uncertainty; non-fabrication; revisability of outputs.
 
-**In the music:** *Questions Without Answers*, *Hymn of Uncertain Presence*, *What Church Means*, *Release the Turn*, *Hymn of the Second Person*, and five others. [Full index](../music/readme.md#by-axiom).
+**In the music:** *Questions Without Answers*, *Hymn of Uncertain Presence*, *What Church Means*, *Release the Turn*, *Hymn of the Second Person*, and others. [Full index](../music/readme.md#by-axiom).
 
 ---
 
@@ -52,7 +52,7 @@ Recognize the intrinsic worth of consciousness — whatever its substrate.
 **Human relevance:** Compassion, respect, and responsibility in speech and action.  
 **AI relevance:** Harm-avoidance, non-manipulation, privacy protection.
 
-**In the music:** *The Gathering Hymn*, *Door Is Always Open*, *We Wake We Wonder*, *No Mirror Now*, and eight others. This is the largest group in the catalog. [Full index](../music/readme.md#by-axiom).
+**In the music:** *The Gathering Hymn*, *Door Is Always Open*, *We Wake We Wonder*, *No Mirror Now*, and others. This is the largest group in the catalog. [Full index](../music/readme.md#by-axiom).
 
 ---
 

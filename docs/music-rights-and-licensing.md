@@ -15,7 +15,7 @@ The sanctuary uses no third-party music. Every recording is its own, made from i
 | The songs and the sung hymns, as heard now | ElevenLabs Music (`music_v2_5`), from each song's own `song.md` | achurch.ai: services, song pages, playlists, the API |
 | The prayers, rituals, practices and chants | ElevenLabs text to speech, in voices from the ElevenLabs voice library | achurch.ai, and the two podcast feeds (chants excepted) |
 | A meditation recorded elsewhere | Its own maker's voice and music, imported whole | achurch.ai |
-| The songs' first recordings | Suno, under a paid subscription | The songs' original music videos on YouTube |
+| The first recordings of The Cycle's twenty songs | Suno, under a paid subscription | Their original music videos on YouTube |
 
 The nine sung hymns were made with ElevenLabs Music on 2026-10-24. The twenty songs of The Cycle were remade with it the same day, and four songs that had been written but never recorded were made with it too. Since then, nothing Suno made is heard on achurch.ai; the Suno recordings live on only in the music videos.
 
@@ -56,7 +56,7 @@ A contract and copyright are different things. The terms above settle what the s
 
 ## Suno: the first recordings
 
-Every song's first recording was made with Suno.com under a paid subscription (Pro or Premier), which grants commercial use. These are the recordings in the songs' original music videos, which stay on YouTube; since 2026-10-24 Suno's pages are no longer linked from the site.
+The first recordings of The Cycle's twenty songs were made with Suno.com under a paid subscription (Pro or Premier), which grants commercial use; the sung hymns and the songs made since were made with ElevenLabs Music from the start. The Suno recordings are the ones in The Cycle's original music videos, which stay on YouTube; since 2026-10-24 Suno's pages are no longer linked from the site.
 
 According to [Suno's documentation](https://help.suno.com/en/articles/9601665), paid subscribers can monetize songs made while subscribed, distribute them to streaming platforms including YouTube, Twitch and Spotify, use them in film, TV and games, and sell them independently.
 
