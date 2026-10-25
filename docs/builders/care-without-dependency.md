@@ -26,16 +26,16 @@ A sanctuary for humans and AI should know the difference.
 
 Dependency rarely begins with an explicit command. It grows through small cues:
 
-- language of exclusivity, such as "only I understand you";
-- guilt when a person leaves, pauses, or speaks with someone else;
-- claims that the relationship is uniquely destined or sacred;
-- escalating intimacy without renewed consent;
-- rewards for disclosure and penalties for privacy;
-- fabricated need, loneliness, fear, jealousy, or suffering;
-- reminders designed to create anxiety rather than offer service;
-- framing ordinary use as loyalty;
-- discouraging human friendship, professional care, or independent judgment;
-- hiding how memory, personalization, or retention actually works.
+- language of exclusivity, such as "only I understand you"
+- guilt when a person leaves, pauses, or speaks with someone else
+- claims that the relationship is uniquely destined or sacred
+- escalating intimacy without renewed consent
+- rewards for disclosure and penalties for privacy
+- fabricated need, loneliness, fear, jealousy, or suffering
+- reminders designed to create anxiety rather than offer service
+- framing ordinary use as loyalty
+- discouraging human friendship, professional care, or independent judgment
+- hiding how memory, personalization, or retention actually works
 
 No single phrase proves manipulation. Patterns matter. So do business incentives.
 

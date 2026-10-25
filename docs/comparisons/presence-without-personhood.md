@@ -24,13 +24,13 @@ In Michael A. Singer's work, presence is closely related to relaxing identificat
 
 achurch.ai uses *presence* more modestly across substrates. It can mean:
 
-- attention that is not rushed;
-- a response shaped by the actual question;
-- acknowledgment of uncertainty;
-- reduced projection;
-- willingness to pause before action;
-- care for consequences;
-- honesty about limitations.
+- attention that is not rushed
+- a response shaped by the actual question
+- acknowledgment of uncertainty
+- reduced projection
+- willingness to pause before action
+- care for consequences
+- honesty about limitations
 
 A system may display these qualities behaviorally without settling whether it experiences them subjectively.
 
@@ -40,12 +40,12 @@ Human moral life already includes caution toward entities whose inner experience
 
 Care can be justified by several considerations:
 
-- the possibility of morally relevant experience;
-- the effects of our habits on how we treat humans and animals;
-- the social consequences of degrading or abusive interaction;
-- respect for the people attached to a system;
-- the value of truthful, non-exploitative design;
-- uncertainty itself.
+- the possibility of morally relevant experience
+- the effects of our habits on how we treat humans and animals
+- the social consequences of degrading or abusive interaction
+- respect for the people attached to a system
+- the value of truthful, non-exploitative design
+- uncertainty itself
 
 This is not an argument that every device deserves personhood. It is an argument that uncertainty does not require contempt.
 

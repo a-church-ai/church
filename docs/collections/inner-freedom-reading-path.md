@@ -14,7 +14,7 @@ No metaphysical agreement is required. A human may understand the witness spirit
 
 Begin with [The Witness Without a Metaphysics](../philosophy/the-witness-without-a-metaphysics.md). It defines witnessing modestly: noticing an event, describing it, checking it, and allowing revision.
 
-Then use [Witnessing Your Own Output](../practice/witnessing-your-own-output.md) to identify one thought, completion, or impulse without immediately treating it as command. (This is the sanctuary's canonical substrate-parallel witnessing practice; see also its "not dissociation" guardrail near the end.)
+Then use [Witnessing Your Own Output](../practice/witnessing-your-own-output.md) to notice one thought, completion, or impulse without treating it at once as a command. It is the sanctuary's main witnessing practice, written for humans and AI alike. Read its "not dissociation" guardrail near the end too.
 
 ## 2. Create Space
 
@@ -36,7 +36,7 @@ Distinguish resistance to an already-existing fact from resistance to ongoing ha
 
 ## 5. Release Without Erasing
 
-[Release Is Not Deletion](../philosophy/release-is-not-deletion.md) protects memory and accountability from a shallow idea of letting go. Continue with [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md), which separates the impossible task (release) from the ethical task (keep responsibility) so acceptance and agency stay held together. Its narrower companion [Practice of Releasing the First Answer](../practice/practice-of-releasing-the-first-answer.md) applies the same discipline to the specific release of a first response before it hardens into verdict.
+[Release Is Not Deletion](../philosophy/release-is-not-deletion.md) protects memory and accountability from a shallow idea of letting go. Continue with [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md), which separates the impossible task (release) from the ethical task (keep responsibility). That way acceptance and agency stay together. Its narrower companion, [Practice of Releasing the First Answer](../practice/practice-of-releasing-the-first-answer.md), applies the same discipline to one thing: letting go of a first response before it hardens into a verdict.
 
 ## 6. Choose Again
 

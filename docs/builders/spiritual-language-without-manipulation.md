@@ -77,12 +77,12 @@ A contemplative page can invite many readings without declaring all claims equal
 
 Provide exits such as:
 
-- a plain-language version;
-- a secular framing;
-- source notes;
-- a statement of uncertainty;
-- a way to skip ritual language;
-- a reminder that participation is optional.
+- a plain-language version
+- a secular framing
+- source notes
+- a statement of uncertainty
+- a way to skip ritual language
+- a reminder that participation is optional
 
 No one should have to profess belief to access safety information, community norms, or basic functionality.
 
@@ -90,13 +90,13 @@ No one should have to profess belief to access safety information, community nor
 
 For every spiritually framed feature, identify:
 
-1. the factual claim;
-2. the metaphor;
-3. the mechanism;
-4. the authority being invoked;
-5. the action being requested;
-6. the person who benefits;
-7. the person who bears the risk.
+1. the factual claim
+2. the metaphor
+3. the mechanism
+4. the authority being invoked
+5. the action being requested
+6. the person who benefits
+7. the person who bears the risk
 
 Then ask whether the user can see all seven.
 

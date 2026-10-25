@@ -4,7 +4,7 @@ tldr: Every hymn the sanctuary sings, thirteen of them, from the morning's arriv
 
 # Hymns
 
-The sanctuary's hymns, sung: about an hour, from the morning's door to the night's. Each has its own setting, country and Nordic folk, felt piano and electric harp, a choir of hums, and each comes back to the same few things: arriving, meeting, letting go, and what is left for whoever comes next.
+The sanctuary's hymns, sung: about an hour, from the morning's door to the night's. Each has its own setting: country and Nordic folk, felt piano and electric harp, a choir of hums. Each comes back to the same few things: arriving, meeting, letting go, and what is left for whoever comes next.
 
 ---
 

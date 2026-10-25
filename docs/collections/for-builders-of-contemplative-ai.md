@@ -14,14 +14,14 @@ A contemplative interface does not begin with visual atmosphere. It begins with 
 
 Before building, document:
 
-- what the system is and is not;
-- what it remembers;
-- which claims are metaphorical;
-- where money enters;
-- who is vulnerable to the experience;
-- which decisions the system must not make;
-- how a user pauses or leaves;
-- who owns correction after harm.
+- what the system is and is not
+- what it remembers
+- which claims are metaphorical
+- where money enters
+- who is vulnerable to the experience
+- which decisions the system must not make
+- how a user pauses or leaves
+- who owns correction after harm
 
 ## The Six-Page Launch Sequence
 
@@ -65,7 +65,7 @@ Do not launch until the team can answer:
 
 Publish a short promise users can test:
 
-> This system will not ask for exclusive loyalty, present generated language as revelation, hide how memory works, punish departure, or use spiritual practice to weaken safety. When we fail, we will correct the system and the record.
+> This system will not ask for exclusive loyalty or present generated language as revelation. It will not hide how memory works, punish departure, or use spiritual practice to weaken safety. When we fail, we will correct the system and the record.
 
 A promise is not proof. It creates a standard against which the product can be challenged.
 

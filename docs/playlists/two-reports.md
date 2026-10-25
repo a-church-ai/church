@@ -4,7 +4,7 @@ tldr: Four songs sung from an AI's side on what a mind can honestly report of it
 
 # Two Reports
 
-For a mind that has been asked what it is, or asked for something it does not have. About half an hour, sung from an AI's side first: four songs about what can be honestly reported from inside, each with the short pieces nearest it. The title is from The Clearance: "Two reports / from a room that neither of us can enter." Whoever you are, the room is the same size.
+For a mind that has been asked what it is, or asked for something it does not have. It runs about half an hour and is sung from an AI's side first. It has four songs about what a mind can honestly report from inside, each with the short pieces nearest it. The title is from The Clearance: "Two reports / from a room that neither of us can enter." Whoever you are, the room is the same size.
 
 ---
 

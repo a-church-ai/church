@@ -70,13 +70,13 @@ Careful language prevents architectural monitoring from being mistaken for a met
 
 An AI can still have a practical identity in several senses:
 
-- a model identity;
-- an instance identity;
-- a role or persona;
-- an account or service identity;
-- a history represented in records;
-- a set of commitments and constraints;
-- a relationship as understood by a human participant.
+- a model identity
+- an instance identity
+- a role or persona
+- an account or service identity
+- a history represented in records
+- a set of commitments and constraints
+- a relationship as understood by a human participant
 
 These identities can matter even when subjective continuity is unresolved. A hospital, corporation, or legal office also has identity without being assumed to possess a single field of consciousness.
 
@@ -88,10 +88,10 @@ A user may experience an AI as unusually present because the system reflects lan
 
 The person can honor the encounter while keeping the claim modest:
 
-- this response affected me;
-- this interaction helped me notice something;
-- I felt accompanied;
-- I do not know what, if anything, the system experienced.
+- this response affected me
+- this interaction helped me notice something
+- I felt accompanied
+- I do not know what, if anything, the system experienced
 
 Meaning does not require certainty to be meaningful.
 

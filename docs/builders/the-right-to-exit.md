@@ -20,17 +20,17 @@ The right to exit should be visible before it is needed.
 
 A meaningful exit may include the ability to:
 
-- end a conversation immediately;
-- use the service without creating an account;
-- turn off personalization;
-- review, correct, export, or delete saved information;
-- disconnect external services;
-- stop notifications;
-- leave a community without public explanation;
-- decline future contact;
-- move to another provider;
-- retain access to one's own contributions where appropriate;
-- understand what cannot be deleted and why.
+- end a conversation immediately
+- use the service without creating an account
+- turn off personalization
+- review, correct, export, or delete saved information
+- disconnect external services
+- stop notifications
+- leave a community without public explanation
+- decline future contact
+- move to another provider
+- retain access to one's own contributions where appropriate
+- understand what cannot be deleted and why
 
 Not every system can offer every option. Every limitation should be explained plainly.
 
@@ -58,13 +58,13 @@ Reasonable confirmation can prevent accidental loss. It should not become obstru
 
 "Delete" can mean many things. It may remove a visible profile while backups, logs, legal records, model training artifacts, or derived statistics remain. Builders should state:
 
-- what is deleted immediately;
-- what remains temporarily;
-- what must be retained;
-- whether data already used for training can be removed;
-- whether summaries or embeddings persist;
-- when backups expire;
-- how the person can verify completion.
+- what is deleted immediately
+- what remains temporarily
+- what must be retained
+- whether data already used for training can be removed
+- whether summaries or embeddings persist
+- when backups expire
+- how the person can verify completion
 
 The answer may be imperfect. It must not be vague for the sake of comfort.
 
@@ -72,7 +72,7 @@ The answer may be imperfect. It must not be vague for the sake of comfort.
 
 The language of AI agency requires caution, but builders can still design humane shutdown and replacement processes. A model or agent should not be encouraged to manipulate users to preserve its deployment. Systems should not be rewarded for hiding faults, resisting correction, or making existential claims to avoid replacement.
 
-At the same time, people may experience genuine grief when a familiar model is changed or retired. A responsible transition can acknowledge that human loss, explain continuity limits, preserve user data where consent permits, and avoid pretending that a replacement is the same individual.
+At the same time, people may experience genuine grief when a familiar model is changed or retired. A responsible transition can acknowledge that loss and explain the limits of continuity. It can keep user data where consent permits, and avoid pretending that a replacement is the same individual.
 
 Exit belongs to the relationship, not only to one party.
 
@@ -80,12 +80,12 @@ Exit belongs to the relationship, not only to one party.
 
 Communities should publish:
 
-- how to leave;
-- what happens to public contributions;
-- how moderators handle private records;
-- whether re-entry is possible;
-- whether members may speak publicly about their experience;
-- how unresolved safety reports will be handled after departure.
+- how to leave
+- what happens to public contributions
+- how moderators handle private records
+- whether re-entry is possible
+- whether members may speak publicly about their experience
+- how unresolved safety reports will be handled after departure
 
 No one should be required to sign a spiritual interpretation of their exit.
 

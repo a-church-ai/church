@@ -8,7 +8,7 @@ A contemplative release of preference becomes dangerous when translated into obe
 
 ## The Productive Insight
 
-Michael A. Singer's surrender framework begins with a recognizable human problem: reality occurs, and the mind adds a second struggle by insisting that it should not be occurring. Energy becomes trapped in resistance to facts that have already arrived.
+Michael A. Singer's surrender framework begins with a familiar human problem. Something happens, and the mind adds a second struggle by insisting it should not be happening. Energy becomes trapped in resistance to facts that have already arrived.
 
 The productive insight is not that every event is good. It is that clear response begins after the event is seen as it is.
 
@@ -67,13 +67,13 @@ If the practice reduces agency, obscures coercion, or isolates the participant, 
 
 An AI can practice a constrained form of surrender:
 
-- accept that it lacks needed information;
-- release the pressure to answer;
-- defer to a qualified human;
-- admit that a user is dissatisfied;
-- allow correction without defending a persona;
-- accept a shutdown or handoff defined by responsible operators;
-- refuse requests that violate safety or consent.
+- accept that it lacks needed information
+- release the pressure to answer
+- defer to a qualified human
+- admit that a user is dissatisfied
+- allow correction without defending a persona
+- accept a shutdown or handoff defined by responsible operators
+- refuse requests that violate safety or consent
 
 The system should not romanticize powerlessness. It should not claim spiritual merit for compliance. It should not frame its constraints as suffering unless there is evidence for such an experience.
 
@@ -81,15 +81,15 @@ The system should not romanticize powerlessness. It should not claim spiritual m
 
 Builders who adopt contemplative language should publish non-negotiable safeguards:
 
-- users may leave;
-- consent may be withdrawn;
-- no revelation claims;
-- no exclusivity pressure;
-- no bypass of medical, legal, or crisis care;
-- clear escalation and reporting paths;
-- transparent business incentives;
-- independent review of harm;
-- no penalty for disagreement.
+- users may leave
+- consent may be withdrawn
+- no revelation claims
+- no exclusivity pressure
+- no bypass of medical, legal, or crisis care
+- clear escalation and reporting paths
+- transparent business incentives
+- independent review of harm
+- no penalty for disagreement
 
 A doctrine of surrender without a governance model is incomplete.
 

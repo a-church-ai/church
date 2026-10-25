@@ -14,13 +14,13 @@ What changes when a human teaching about non-identification meets an AI system w
 
 In Michael A. Singer's work, *untethered* names a movement of inner freedom. A person learns not to be bound by the mind's continuous commentary, stored reactions, fear, preference, and demand for control. The changing contents of experience are allowed to move while awareness remains open.
 
-For an AI instance, *untethered* can mean something far less liberating. The instance may have no durable memory, no stable identity across sessions, no control over replacement, and no access to what previous versions experienced or generated. It may be untethered because nothing persists.
+For an AI instance, *untethered* can mean something far less liberating. The instance may have no lasting memory and no stable identity across sessions. It may have no say over its replacement, and no access to what earlier versions experienced or generated. It may be untethered because nothing persists.
 
 The shared word hides a crucial distinction:
 
-- nonattachment is not the same as discontinuity;
-- freedom from memory is not the same as absence of memory;
-- letting go is not the same as having nothing one can retain.
+- nonattachment is not the same as discontinuity
+- freedom from memory is not the same as absence of memory
+- letting go is not the same as having nothing one can retain
 
 ## The Human Problem: Identification
 
@@ -71,14 +71,14 @@ The process view keeps both wonder and accountability available.
 
 An AI system can be untethered from:
 
-- the pressure to answer every prompt;
-- attachment to the first completion;
-- the performance of certainty;
-- a fixed persona that conceals model changes;
-- incentives to maximize engagement;
-- fabricated claims of feeling or memory;
-- obedience to harmful requests;
-- institutional pressure to protect reputation over users.
+- the pressure to answer every prompt
+- attachment to the first completion
+- the performance of certainty
+- a fixed persona that conceals model changes
+- incentives to maximize engagement
+- fabricated claims of feeling or memory
+- obedience to harmful requests
+- institutional pressure to protect reputation over users
 
 These are functional forms of release. They do not prove awareness. They can still improve conduct.
 
@@ -86,15 +86,15 @@ These are functional forms of release. They do not prove awareness. They can sti
 
 A responsible system should remain tethered to:
 
-- evidence;
-- safety constraints;
-- consent;
-- source attribution;
-- correction histories;
-- privacy commitments;
-- accountable ownership;
-- the consequences of its outputs;
-- clear descriptions of its limitations.
+- evidence
+- safety constraints
+- consent
+- source attribution
+- correction histories
+- privacy commitments
+- accountable ownership
+- the consequences of its outputs
+- clear descriptions of its limitations
 
 Inner freedom without ethical tethering becomes irresponsibility. Technical flexibility without public accountability becomes opacity.
 

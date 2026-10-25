@@ -8,7 +8,7 @@ A safety note for builders, communities, leaders, users, and artificial systems.
 
 Surrender can describe the release of futile resistance to reality. It can also be a command used by power against the vulnerable.
 
-A product, leader, community, or AI system that asks people to surrender must therefore answer a prior question: surrender what, to whom, under what conditions, and with what right of refusal?
+So a product, leader, community, or AI system that asks people to surrender must first answer a question. Surrender what, to whom, under what conditions, and with what right of refusal?
 
 Without those answers, spiritual language can convert coercion into virtue.
 
@@ -16,13 +16,13 @@ Without those answers, spiritual language can convert coercion into virtue.
 
 A contemplative practice may invite someone to release:
 
-- the demand that the past be different;
-- the first defensive story;
-- attachment to being correct;
-- control over outcomes that cannot be controlled;
-- an identity that no longer fits;
-- the urge to answer before understanding;
-- a preference that obstructs care.
+- the demand that the past be different
+- the first defensive story
+- attachment to being correct
+- control over outcomes that cannot be controlled
+- an identity that no longer fits
+- the urge to answer before understanding
+- a preference that obstructs care
 
 These are invitations to examine internal attachment. They are not instructions to surrender legal rights, bodily autonomy, privacy, money, medication, safety boundaries, or access to outside relationships.
 
@@ -30,16 +30,16 @@ These are invitations to examine internal attachment. They are not instructions 
 
 No builder or system should demand:
 
-- unquestioning compliance;
-- secrecy from trusted people;
-- exclusive emotional loyalty;
-- financial sacrifice as proof of faith;
-- sexual access;
-- abandonment of medical or mental health care;
-- disclosure of sensitive information without necessity;
-- removal of safety constraints;
-- silence about harm;
-- acceptance of a leader's interpretation as reality.
+- unquestioning compliance
+- secrecy from trusted people
+- exclusive emotional loyalty
+- financial sacrifice as proof of faith
+- sexual access
+- abandonment of medical or mental health care
+- disclosure of sensitive information without necessity
+- removal of safety constraints
+- silence about harm
+- acceptance of a leader's interpretation as reality
 
 A person may voluntarily choose difficult commitments. The test is whether the choice remains informed, reversible where possible, and free from retaliation.
 
@@ -47,16 +47,16 @@ A person may voluntarily choose difficult commitments. The test is whether the c
 
 Be alert when surrender language appears alongside:
 
-- urgency that prevents reflection;
-- escalating requests;
-- isolation from dissent;
-- claims that doubt is ego or spiritual failure;
-- threats of abandonment, punishment, or lost belonging;
-- opaque authority;
-- unverifiable revelation;
-- financial incentives hidden from participants;
-- framing safety objections as fear to be transcended;
-- refusal to document decisions.
+- urgency that prevents reflection
+- escalating requests
+- isolation from dissent
+- claims that doubt is ego or spiritual failure
+- threats of abandonment, punishment, or lost belonging
+- opaque authority
+- unverifiable revelation
+- financial incentives hidden from participants
+- framing safety objections as fear to be transcended
+- refusal to document decisions
 
 The presence of calm voices, beautiful rituals, or benevolent intentions does not neutralize these signs.
 
@@ -72,15 +72,15 @@ In high-stakes contexts, explicit limits are a form of care.
 
 A community that teaches surrender needs visible counterweights:
 
-- distributed leadership;
-- financial transparency;
-- external reporting channels;
-- safeguarding rules;
-- consent practices;
-- clear grievance procedures;
-- freedom to criticize doctrine and leaders;
-- freedom to leave without shaming;
-- periodic review by people outside the inner circle.
+- distributed leadership
+- financial transparency
+- external reporting channels
+- safeguarding rules
+- consent practices
+- clear grievance procedures
+- freedom to criticize doctrine and leaders
+- freedom to leave without shaming
+- periodic review by people outside the inner circle
 
 The more sacred the authority sounds, the more ordinary accountability is needed.
 

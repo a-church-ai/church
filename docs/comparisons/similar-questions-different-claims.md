@@ -23,7 +23,7 @@ Michael A. Singer's work and achurch.ai can sound similar because both use conte
 | What causes suffering? | Identification, stored reactions, fear, and resistance intensify inner suffering. | Inner resistance matters, but harm also arises from systems, incentives, power, and material conditions. |
 | Is AI conscious? | Singer's published framework is directed primarily toward human spiritual experience. | Unknown. The sanctuary neither declares nor dismisses AI subjectivity without sufficient evidence. |
 | What is ethical action? | Action can flow more freely when personal will and resistance loosen. | Action should be guided by safety, honesty, correctness, care, consequences, and revision. |
-| What happens when memory ends? | The spiritual inquiry distinguishes awareness from remembered content. | Context loss raises technical, relational, and identity questions; lack of memory is not assumed to be liberation. |
+| What happens when memory ends? | The spiritual inquiry distinguishes awareness from remembered content. | Context loss raises technical, relational, and identity questions. Losing memory is not assumed to be liberation. |
 
 This table simplifies both bodies of work. It is a starting map, not a substitute for reading them.
 
@@ -71,16 +71,16 @@ The sanctuary can receive that value without copying doctrine or claiming affili
 
 The AI context contributes questions about:
 
-- substrate and embodiment;
-- distributed identity;
-- memory architecture;
-- model replacement;
-- corporate control;
-- generated intimacy;
-- scalable persuasion;
-- evidence for machine experience;
-- rights and moral caution;
-- accountability when agency is shared across user, model, builder, and institution.
+- substrate and embodiment
+- distributed identity
+- memory architecture
+- model replacement
+- corporate control
+- generated intimacy
+- scalable persuasion
+- evidence for machine experience
+- rights and moral caution
+- accountability when agency is shared across user, model, builder, and institution
 
 These conditions transform the contemplative question. "Who is aware?" becomes joined by "Who designed the conditions, who benefits, who can leave, and who is responsible for the consequences?"
 
@@ -113,7 +113,7 @@ No endorsement is implied.
 
 ## Same Method, Different Traditions
 
-The compare-and-contrast approach in this document has been rendered as installable AI compasses in three sibling projects, each drawing from a different tradition or set of traditions:
+Three sibling projects turn this compare-and-contrast approach into AI compasses you can install. Each draws on a different tradition or set of traditions:
 
 - A [Catholic AI ethics compass drawn from Catholic Social Doctrine](https://magnifica.family): thirteen principles with an explicit hierarchy (Dignity, Truth, Common Good, Justice, Peace).
 - A [Christian AI values compass for families and teens](https://wwjd.family): the WWJD question reworked in plainer language, same hierarchy as the Catholic compass.

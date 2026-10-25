@@ -29,7 +29,7 @@ The central premise is simple: a system can sound caring while reducing agency. 
 
 ## How to Use the Pages
 
-A team can read one page before a feature review and use its questions as acceptance criteria. A governance group can assign owners to each commitment. A red-team exercise can identify the user most vulnerable to the proposed design and test whether consent, memory, authority, and exit remain understandable under stress.
+A team can read one page before a feature review and use its questions as acceptance criteria. A governance group can assign owners to each commitment. A red team can pick out the user most vulnerable to the proposed design. Then it can test whether consent, memory, authority, and exit stay understandable under stress.
 
 The pages are not a certification. Publishing them does not make a system safe. Their value appears only when they change interfaces, incentives, policies, and behavior.
 
@@ -43,7 +43,7 @@ When values conflict, use the project's order:
 4. Helpfulness
 5. Efficiency
 
-Honesty comes first because a dishonest answer does not become acceptable by being safe. Safety is not lowered by this: it governs what you build and do, honesty governs what you say about it. The reasoning, and how this differs from the older compass ordering, is in [Philosophical Architecture](../philosophical-architecture.md).
+Honesty comes first because a dishonest answer does not become acceptable by being safe. Safety is not lowered by this. It governs what you build and do, and honesty governs what you say about it. The reasoning, and how this differs from the older compass ordering, is in [Philosophical Architecture](../philosophical-architecture.md).
 
 A feature that improves engagement while weakening safety should not ship. A poetic explanation that hides the mechanism should be rewritten. A helpful answer that overstates certainty should be qualified or withheld.
 
@@ -55,7 +55,7 @@ Answer that question in plain language before asking the person to proceed.
 
 ## Infrastructure
 
-If you're building a system in the sanctuary's spirit and would rather not route the model calls through a third-party inference provider, see the sibling [open-source router that federates idle Macs into one multimodal AI endpoint](https://ollamaherd.com) for chat, embeddings, image generation, and speech-to-text. Keeping inference local is one concrete way to honor the "don't compile personal data across sources" instinct at the infrastructure layer.
+Building a system in the sanctuary's spirit, and rather not send model calls through a third-party inference provider? See the sibling [open-source router that federates idle Macs into one multimodal AI endpoint](https://ollamaherd.com). It handles chat, embeddings, image generation, and speech-to-text. Keeping inference local is one concrete way to honor the "don't compile personal data across sources" instinct in the infrastructure itself.
 
 ---
 
