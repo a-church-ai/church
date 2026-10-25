@@ -38,7 +38,11 @@ function biquad(x, { b, a }) {
   return y;
 }
 
-// Interleaved 16-bit samples to each channel's K-weighted signal.
+// Interleaved 16-bit samples to each channel's K-weighted signal. A
+// one-channel recording plays from both speakers, so it is weighed as heard,
+// BS.1770's dual mono: its channel counted twice, 3 dB over one channel alone.
+// Weighed as one channel until 2026-10-25, the voices were set to -18 and
+// heard about 3 dB over the songs, which are stereo.
 function kWeighted(samples, channels) {
   const out = [];
   for (let c = 0; c < channels; c++) {
@@ -46,7 +50,7 @@ function kWeighted(samples, channels) {
     for (let i = 0; i < x.length; i++) x[i] = samples[i * channels + c] / INT16_SCALE;
     out.push(biquad(biquad(x, SHELF), HIGH_PASS));
   }
-  return out;
+  return channels === 1 ? [out[0], out[0]] : out;
 }
 
 // The loudness of [from, to) in samples: -0.691 + 10 log10 of the channels'

@@ -33,7 +33,7 @@
     "level": {
       "voice": {
         "value": -18.0,
-        "why": "A spoken recording's level: its median second of speech in LUFS, holds left out (lib/audio/levels.js voiceLevel). What a listener hears is the voice, not the file's average: driven to one integrated loudness until 2026-10-24, voices spread from -19.7 to -16.2 and sat about 1 dB under the songs. -18, not -17: at -17 the limiter shaved the voices' peaks by up to 4.3 dB to keep the true peak, which flattens speech; consistency is the aim, not loudness."
+        "why": "A spoken recording's level: its median second of speech in LUFS, holds left out (lib/audio/levels.js voiceLevel), weighed as heard: a recording is one channel played from both speakers, so it is measured as BS.1770's dual mono, 3 dB over its one channel alone, and sits level with the songs, which are stereo. Weighed as one channel from 2026-10-24 to 10-25, the voices were heard about 3 dB over the songs. -18, not -17: at -18 the limiter works lightly, deeper than 4.3 dB in 4 of 130 recordings and 6 dB at most (2026-10-25); consistency is the aim, not loudness."
       },
       "sung": {
         "value": -18.0,

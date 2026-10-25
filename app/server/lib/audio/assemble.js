@@ -16,7 +16,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { SPEECH } = require('./house');
+const { SPEECH, SPEECH_VALUES } = require('./house');
 const { decodePcm } = require('./peaks');
 const { LEVEL_SAMPLE_RATE, voiceLevel, activeLevel, overLimit } = require('./levels');
 
@@ -36,7 +36,7 @@ function run(cmd, args) {
 
 const ffmpeg = args => run('ffmpeg', ['-hide_banner', '-nostdin', '-y', ...args]);
 const WAV = ['-ac', '1', '-ar', '44100', '-c:a', 'pcm_s16le'];
-const LEVEL = Object.fromEntries(Object.entries(SPEECH.level).map(([k, v]) => [k, v.value]));
+const LEVEL = SPEECH_VALUES.level;
 // How far off its target a first encode may land before it is corrected.
 const LEVEL_CORRECTION = 0.1;
 
@@ -181,7 +181,7 @@ const WHOLE_BITRATE = '192k';
 // What a song's or an imported recording's levelling depends on: the house
 // level and the encoding. A song record keeps it, so a change to either
 // re-makes the songs (scripts/song-audio.js), as renderKey does the speech.
-const WHOLE_KEY = crypto.hash('sha256', JSON.stringify([SPEECH.level, WHOLE_BITRATE])).slice(0, 16);
+const WHOLE_KEY = crypto.hash('sha256', JSON.stringify([LEVEL, WHOLE_BITRATE])).slice(0, 16);
 
 // Audio made elsewhere, a song from its video or a meditation brought in
 // whole, set to the house level by what is sung, as stereo MP3. One gain for

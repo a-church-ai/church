@@ -15,6 +15,15 @@ const path = require('path');
 const AUDIO_DIR = path.join(__dirname, '../../../../audio');
 const HOUSE = JSON.parse(fs.readFileSync(path.join(AUDIO_DIR, 'house-sound.json'), 'utf8'));
 const SPEECH = HOUSE.speech;
+// The house sound's figures without the reasons written beside them: what a
+// recording or a song is made from, and so what their keys hash, so that
+// rewording a reason re-makes nothing.
+const valuesOf = v => (Array.isArray(v) ? v.map(valuesOf)
+  : v && typeof v === 'object'
+    ? ('value' in v ? v.value : Object.fromEntries(Object.entries(v).filter(([k]) => k !== 'why').map(([k, x]) => [k, valuesOf(x)])))
+    : v);
+const SPEECH_VALUES = valuesOf(SPEECH);
+
 // The songs' sound (scripts/compose-song.js): each figure's value, its reason
 // beside it in the file.
 const MUSIC = Object.fromEntries(Object.entries(HOUSE.music).map(([k, v]) => [k, v && typeof v === 'object' && 'value' in v ? v.value : v]));
@@ -64,4 +73,4 @@ function creditFor(recording) {
   return recording.credit || creditLine(recording.voices);
 }
 
-module.exports = { SPEECH, MUSIC, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine, creditFor };
+module.exports = { SPEECH, SPEECH_VALUES, valuesOf, MUSIC, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine, creditFor };

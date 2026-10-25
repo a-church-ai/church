@@ -348,29 +348,44 @@ function tone(totalSeconds, ranges, channels = 1) {
   return out;
 }
 
-test('a level is loudness as BS.1770 defines it: a 997 Hz sine at -20 dBFS reads -23.0 LUFS, and a second channel adds 3 dB', () => {
-  const mono = levels.activeLevel(tone(6, [[0, 6, -20]]), R);
-  assert.ok(Math.abs(mono - -23.01) < 0.1, `mono ${mono}`);
+test('a level is loudness as BS.1770 defines it, as heard: a 997 Hz sine at -20 dBFS in both channels reads -20.0 LUFS, and so does the same sine in one channel, which plays from both speakers', () => {
   const stereo = levels.activeLevel(tone(6, [[0, 6, -20]], 2), R, 2);
-  assert.ok(Math.abs(stereo - mono - 3.01) < 0.1, `stereo ${stereo}`);
+  assert.ok(Math.abs(stereo - -19.99) < 0.1, `stereo ${stereo}`);
+  const mono = levels.activeLevel(tone(6, [[0, 6, -20]]), R);
+  assert.ok(Math.abs(mono - stereo) < 0.05, `mono ${mono}: a one-channel file weighed as dual mono`);
+  // So a voice, mono, and a song, stereo, set to the same figure sound the same.
+  const voice = levels.voiceLevel(tone(6, [[0, 6, -20]]), R, [{ start: 0, end: 6 }]);
+  assert.ok(Math.abs(voice - stereo) < 0.05, `voice ${voice} against song ${stereo}`);
 });
 
 test('a voice is measured only where it speaks: what sits in its holds does not move it', () => {
   // Speech at -20 dBFS in two spans; something three times as loud between them.
   const samples = tone(9, [[0, 3, -20], [3, 6, -10], [6, 9, -20]]);
   const voice = levels.voiceLevel(samples, R, [{ start: 0, end: 3 }, { start: 6, end: 9 }]);
-  assert.ok(Math.abs(voice - -23.01) < 0.1, `${voice}`);
+  assert.ok(Math.abs(voice - -19.99) < 0.1, `${voice}`);
 });
 
 test('a song is measured where it is sung: a quiet intro and tail do not pull it down', () => {
-  const song = levels.activeLevel(tone(20, [[0, 4, -45], [4, 16, -20], [16, 20, -45]]), R);
-  assert.ok(Math.abs(song - -23.01) < 0.1, `${song}`);
+  const song = levels.activeLevel(tone(20, [[0, 4, -45], [4, 16, -20], [16, 20, -45]], 2), R, 2);
+  assert.ok(Math.abs(song - -19.99) < 0.1, `${song}`);
 });
 
 test('the limiter\'s work is counted before it limits: the seconds a gain would push past the ceiling, and how far', () => {
   const samples = tone(4, [[0, 2, -20], [2, 4, -30]]);
   assert.deepStrictEqual(levels.overLimit(samples, R, 19, -2), { seconds: 2, depth: 1 });
   assert.deepStrictEqual(levels.overLimit(samples, R, 10, -2), { seconds: 0, depth: 0 });
+});
+
+test('a recording and a song are keyed by the house sound\'s figures, never by the reasons written beside them', () => {
+  const { SPEECH_VALUES, valuesOf } = require('../server/lib/audio/house');
+  assert.ok(!JSON.stringify(SPEECH_VALUES).includes('"why"'), 'no reason in what the keys hash');
+  assert.strictEqual(SPEECH_VALUES.level.voice, SPEECH.level.voice.value);
+  // A reworded reason leaves the values, and so both keys, as they are.
+  const reworded = JSON.parse(JSON.stringify(SPEECH));
+  reworded.level.voice.why = 'Reworded.';
+  assert.deepStrictEqual(valuesOf(reworded), SPEECH_VALUES);
+  const crypto = require('crypto');
+  assert.strictEqual(crypto.hash('sha256', JSON.stringify([valuesOf(reworded).level, '192k'])).slice(0, 16), WHOLE_KEY);
 });
 
 test('every house level figure carries its reason', () => {

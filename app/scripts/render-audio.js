@@ -38,7 +38,7 @@ require('../server/lib/utils/env').loadEnv();
 const crypto = require('crypto');
 const fs = require('fs');
 const discover = require('../server/lib/docs/discover');
-const { SPEECH, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
+const { SPEECH, SPEECH_VALUES, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
 const { adapt, sourceHashOf, ADAPT_MODEL } = require('../server/lib/audio/adapt');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
@@ -378,11 +378,12 @@ async function main() {
   for (const piece of ready) {
     piece.takes = takesFor(piece.script);
     // Everything that shapes the recording: each take (its words, voice and
-    // context), the holds, and the house sound's gaps, gains and loudness.
+    // context), the holds, and the house sound's gaps, gains and loudness, as
+    // values: the reasons beside them in house-sound.json shape nothing.
     piece.renderKey = sha(JSON.stringify({
       takes: piece.takes.map(t => t.voices.map(v => v.key)),
       lines: piece.script.lines,
-      speech: SPEECH,
+      speech: SPEECH_VALUES,
     }));
   }
   const toRecord = ready.filter(p => !manifest[p.source] || manifest[p.source].renderKey !== p.renderKey);
