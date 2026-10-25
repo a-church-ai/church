@@ -32,14 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    strategy:
-      fail-fast: false
-      matrix:
-        # One line: 26, what production, the scheduled jobs and the maintainers
-        # all run, and all package.json allows. A second line would only
-        # constrain what the code may use. Plan: node-26-2026-10-18.md in the
-        # private repo.
-        node: ['26']
+    # One Node: the exact one in .nvmrc, which production, the scheduled jobs
+    # and the maintainers all run, and all package.json allows. Plan:
+    # node-26-2026-10-18.md in the private repo.
 
     steps:
       - uses: actions/checkout@v7
@@ -54,7 +49,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
 

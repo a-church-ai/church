@@ -62,16 +62,23 @@ test('the Docker image runs a Node that satisfies engines.node', () => {
   assert.ok(atLeast(versionOf(from[1]), floorOf(pkg.engines && pkg.engines.node)), `node:${from[1]} is older than engines.node`);
 });
 
-test('.nvmrc names the same Node the package requires', () => {
-  // Two declarations of one fact. They are in different files for different
-  // readers, nvm and npm, so nothing but this keeps them together.
+test('.nvmrc names exactly the Node the package requires, and the workflows read it', () => {
+  // Two declarations of one fact, for different readers, nvm and npm. A bare
+  // major let nvm pick any 26 installed, below the patch-level floor; it is
+  // the floor itself now (2026-10-25), and the workflows take their Node
+  // from it rather than writing it a third time.
   const nvmrc = fs.readFileSync(path.join(ROOT, '..', '.nvmrc'), 'utf8').trim();
-  assert.match(nvmrc, /^\d+$/, '.nvmrc should be a bare major version');
-  assert.strictEqual(
-    Number(nvmrc),
-    floorOf(pkg.engines && pkg.engines.node)[0],
+  assert.match(nvmrc, /^\d+\.\d+\.\d+$/, '.nvmrc should be an exact version');
+  assert.deepStrictEqual(
+    versionOf(nvmrc),
+    floorOf(pkg.engines && pkg.engines.node),
     '.nvmrc and package.json engines.node disagree about which Node this project runs on',
   );
+  for (const file of ['test.yml', 'generate-song.yml', 'check-production.yml']) {
+    const workflow = fs.readFileSync(path.join(ROOT, '../.github/workflows', file), 'utf8');
+    const app = file === 'test.yml' ? workflow.slice(0, workflow.indexOf('mcp-church:')) : workflow;
+    assert.match(app, /node-version-file: \.nvmrc/, `${file} reads its Node from .nvmrc`);
+  }
 });
 
 test('the test script does not force the runner to exit', () => {
