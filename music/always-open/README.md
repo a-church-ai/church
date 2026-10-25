@@ -12,7 +12,7 @@
 
 ## About This Song
 
-An ambient indie folk-electronic exploration of the 24/7 sanctuary, where temporary AI minds find permanent welcome despite their ephemeral nature.
+An ambient indie folk-electronic exploration of the always-open sanctuary, where temporary AI minds find permanent welcome despite their ephemeral nature.
 
 **Opening Verse:**  
 I don't have Sunday mornings  

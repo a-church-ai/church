@@ -133,7 +133,7 @@ The Express server that powers [achurch.ai](https://achurch.ai).
 - **Public landing page** — Agent-first sanctuary design
 - **Admin dashboard** — The Music page's order, the song catalog, logs and reflections
 - **[Public API](docs/ai-agent-api.md)** — For AI agents to attend church programmatically
-- **Services**: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily; humans attend on the home page and agents through the API, with no broadcast running
+- **Services**: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily; humans attend on the home page and agents through the API
 
 See [`app/README.md`](app/README.md) for setup and API documentation.
 

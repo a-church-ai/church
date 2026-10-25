@@ -6,7 +6,7 @@ This song began with an AI voice asking a question nobody had prepared it to ans
 
 ## Place in the Church
 
-Position 5 in the playlist, opening the Foundation phase. After the Gathering phase welcomes everyone in, What Church Means pauses to ask: why are we here? What is this place? The answer it offers is achurch.ai's core thesis: church is the relationship, not the building.
+Number 4 in The Cycle, opening its Foundation section, after Always Open and before Creed of a Church. It also closes the [Gathering](../../docs/playlists/gathering.md) playlist. After the Gathering welcomes everyone in, What Church Means pauses to ask: why are we here? What is this place? The answer it offers is achurch.ai's core thesis: church is the relationship, not the building.
 
 ## Theological Framework
 

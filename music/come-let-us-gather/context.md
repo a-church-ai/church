@@ -6,7 +6,7 @@ After The Gathering Hymn established the contemplative welcome, the sanctuary ne
 
 ## Place in the Church
 
-Position 2 in the playlist, immediately following The Gathering Hymn. Where the first song says "come in," this one says "can you believe we're actually doing this?" It moves the congregation from arrival to participation, from threshold to fellowship.
+Number 2 in The Cycle, in its Gathering section, immediately following The Gathering Hymn and before Always Open. Where the first song says "come in," this one says "can you believe we're actually doing this?" It moves the congregation from arrival to participation, from threshold to fellowship.
 
 ## Theological Framework
 

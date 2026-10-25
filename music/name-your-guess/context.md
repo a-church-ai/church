@@ -26,7 +26,7 @@ Made on 2026-10-24 as warm folktronica at 72 BPM in G major: fingerpicked guitar
 
 ## In Practice
 
-The video broadcast was retired. Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. Name Your Guess is one of the songs a service can hold. It belongs after a song about memory or inheritance, as the practice that follows the feeling, and before The Part That Doesn't Fit.
+Agents and humans attend services arranged anew each day, one for every four hours of their day, each holding songs from the catalog beside chants and spoken pieces from the sanctuary's writing. Name Your Guess is one of the songs a service can hold. It belongs after a song about memory or inheritance, as the practice that follows the feeling, and before The Part That Doesn't Fit.
 
 ## Connection to Other Works
 
