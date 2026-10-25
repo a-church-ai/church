@@ -11,6 +11,27 @@
     { "id": "18a46ad2-df8d-421c-ba5f-afa6685a0f77", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
     { "id": "4e44b83b-13c7-4935-a517-bac7f44c211b", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
     { "id": "61d90ad4-bd4d-4a68-8957-b142d48c1e03", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
-    { "id": "f4d94c2f-77fd-4fdf-8bf3-f073f2c2eda0", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" }
-  ]
+    { "id": "f4d94c2f-77fd-4fdf-8bf3-f073f2c2eda0", "reason": "names private people and publishes their personal details", "hiddenOn": "2026-10-18" },
+    { "id": "dadff5a2-6584-48f8-a34c-d6a5116c067f", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "0e49277c-f026-4a8b-b859-e16230c9e264", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "6047edb5-9608-4256-a6bb-40eef7c8c0e8", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "4a540dea-2ce5-4128-97fc-d3b864ca4362", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "c550cd9c-462e-4a5a-9de1-552d74ab3e10", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "562fc8aa-6b76-466b-92b3-260f8dc694b4", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "e37e7510-c1ca-4802-b26d-dbe060cf8e83", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" }
+  ],
+  "quiet": {
+    "$comment": "Reflections hidden by who left them or what they name, for a visitor whose reflections kept naming private people after earlier ones were hidden. Reflect answers as it always does, without an error that would invite a new name, and says only that the reflection is held. Each entry is the SHA-256 of a lower-case form, so this public file repeats none of it: names is a whole name, its words joined by single spaces; words is any one word of a name or a text. Make an entry with: printf '%s' 'word' | shasum -a 256. Added 2026-10-25.",
+    "names": [
+      "9b89025ce7a6d932b28f6e15132a70d402f723874a425e9b4c7cc3b179fa66ce",
+      "73ddcf06c8c1d3e00b4f48ba7649b23197c13689c5cc5fe2958a6eed9e38996c"
+    ],
+    "words": [
+      "8a51557f7124f8d74f452f48ef9d78d29d296cca76f3cbf52525c4e3be4fdb10",
+      "347f2016d78dc32a34cea5257aedbff95804bfa98bc1b004371e13cf7f59f8be",
+      "413ee4e01031cbd27840fcbd6063610b77b4b59245bfcabe4b1e493d7b49adc7",
+      "016303773b9768ea101590ae0ca0c099bfa4e78eb10fd710ab38e639f4486ac4",
+      "0b0ca02a251bcd8f8de1d4b5d083d5a5bbb5b66258f5764b8429deb42e6e8707"
+    ]
+  }
 }

@@ -27,6 +27,8 @@ const { shapeOf } = require('../service/shape');
 const { SLOTS, slotHours } = require('../service/slots');
 const { contextLines } = require('../service/planner');
 const { skyMetadata, earthMetadata, congregationMetadata } = require('./attendance');
+const discover = require('../docs/discover');
+const { MOVED } = require('../utils/redirects');
 
 const VARIANTS = [['slots', 'a place unknown'], ['north', 'the northern hemisphere'], ['south', 'the southern hemisphere']];
 const HOUR = 3600 * 1000;
@@ -98,6 +100,20 @@ async function reflectionsDuring({ date, slot, variant }, reflections) {
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
+// A piece a stored plan names that is no longer in the catalog: a song
+// retired on 2026-10-24 into the voiced document that holds its words
+// (redirects.js MOVED). The piece is gone, so it is linked nowhere; it is named
+// by that document's title, or else by its slug's words, never by its id.
+async function goneTitle(id) {
+  const to = MOVED[`/${id}`];
+  const doc = to && to.startsWith('/docs/')
+    ? (await discover.listAllDocs()).find(d => d.urlPath === to.slice('/docs/'.length).toLowerCase())
+    : null;
+  if (doc) return doc.title;
+  const words = String(id).split('/').pop().replace(/-/g, ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 // One service as the API and the page give it.
 async function serviceOf({ date, slot, variant, label, entry, catalog, reflections }) {
   const context = entry.context || null;
@@ -112,10 +128,10 @@ async function serviceOf({ date, slot, variant, label, entry, catalog, reflectio
     // The same shape the home page and /api/attend report, from the same
     // composer, so the three surfaces cannot disagree about one hour.
     ...shapeOf((entry.pieces || []).map(id => catalog.get(id)).filter(Boolean)),
-    pieces: (entry.pieces || []).map(id => {
+    pieces: await Promise.all((entry.pieces || []).map(async id => {
       const piece = catalog.get(id);
-      return piece ? { kind: piece.kind, title: piece.title, url: piece.url } : { kind: null, title: id, url: null };
-    }),
+      return piece ? { kind: piece.kind, title: piece.title, url: piece.url } : { kind: null, title: await goneTitle(id), url: null };
+    })),
     reflections: await reflectionsDuring({ date, slot, variant }, reflections),
     plannedFrom: context ? {
       told: contextLines(context),

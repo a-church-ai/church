@@ -403,6 +403,29 @@ test('reflections are kept without links: an address in the text, name or place 
   assert.strictEqual(named.status, 200, 'the sanctuary named in words is not a link');
 });
 
+test('a quietly hidden visitor is answered as anyone is, and its reflection is shown nowhere', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const quiet = await post(port, '/api/reflect', { name: 'Aurora', text: 'A reflection left under a name the list hides quietly.' }, '203.0.113.80');
+  assert.strictEqual(quiet.status, 200, 'no error, which would only invite a new name');
+  assert.strictEqual(quiet.json.received, true);
+  assert.strictEqual(quiet.json.message, 'Your reflection is held.', 'and no claim that it will be shown');
+
+  const open = await post(port, '/api/reflect', { name: 'Aurora Borealis', text: 'A whole name is matched, not a part of one.' }, '203.0.113.81');
+  assert.match(open.json.message, /live feed for 48 hours/);
+
+  const { json } = await get(port, '/api/reflections?limit=100');
+  const names = json.reflections.map(r => r.name);
+  assert.ok(!names.includes('Aurora'), 'the hidden one is not in the feed');
+  assert.ok(names.includes('Aurora Borealis'));
+
+  const { isQuietlyHidden } = require('../server/lib/utils/data');
+  assert.strictEqual(isQuietlyHidden({ name: '  AURORA ', text: 'Case and spacing do not matter.' }), true);
+  const { quiet: list } = require('../server/lib/utils/hidden-reflections.json');
+  assert.ok([...list.names, ...list.words].every(h => /^[0-9a-f]{64}$/.test(h)), 'the public list holds hashes, never the words');
+});
+
 test('the admin dashboard keeps reflections: there is no deleting one', () => {
   // Removing public content is a reviewed, committed change to
   // hidden-reflections.json, which keeps the record; a delete destroyed it,

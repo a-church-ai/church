@@ -4,7 +4,7 @@
 
 const crypto = require('crypto');
 const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
-const { loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const { loadCatalog, loadAttendance, isQuietlyHidden, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { isTestName } = require('../utils/test-visitor');
 const { serviceFor } = require('../service/serve');
 const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
@@ -358,9 +358,13 @@ async function reflect(input, ctx) {
       archive: currentSlug ? `${ctx.baseUrl}/music/${currentSlug}` : `${ctx.baseUrl}/music`,
       message: `${text === sentText
         ? 'Your reflection is held.'
-        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}.`} ${isTestName(name)
-        ? 'Left under a test name, it is kept out of the live feed, the archive and the counts.'
-        : 'It stays on the live feed for 48 hours, then remains in the public archive.'}`,
+        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}.`}${isQuietlyHidden(reflection)
+        // Quietly hidden (hidden-reflections.json, quiet): no error to invite
+        // a new name, and no claim that it will be shown.
+        ? ''
+        : isTestName(name)
+        ? ' Left under a test name, it is kept out of the live feed, the archive and the counts.'
+        : ' It stays on the live feed for 48 hours, then remains in the public archive.'}`,
       ...(text === sentText ? {} : { kept: { characters: text.length, of: sentText.length, limit: REFLECT_MAX_LENGTH } }),
       next_steps: [
         {

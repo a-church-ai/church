@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const crypto = require('crypto');
 const { isWithdrawn, isIndexable } = require('./conversation-quality');
 const { isTestName } = require('./test-visitor');
 const { safeReadJSON } = require('./safe-json');
@@ -59,9 +60,23 @@ async function loadCompanions() {
 // (./test-visitor.js). Filtered here, where every reader loads attendance, so a
 // hidden reflection is gone from the whole site; the reflect write path writes
 // to the file directly and keeps the record.
-const HIDDEN_REFLECTIONS = new Set(require('./hidden-reflections.json').hidden.map(h => h.id));
+const HIDDEN = require('./hidden-reflections.json');
+const HIDDEN_REFLECTIONS = new Set(HIDDEN.hidden.map(h => h.id));
 
-const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(r && r.name);
+// The list's quiet entries: hashes of whole names and of single words, so the
+// public file names no one (hidden-reflections.json, quiet.$comment).
+const QUIET_NAMES = new Set(HIDDEN.quiet.names);
+const QUIET_WORDS = new Set(HIDDEN.quiet.words);
+const sha256 = s => crypto.createHash('sha256').update(s).digest('hex');
+const wordsOf = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').match(/[\p{L}\p{N}]+/gu) || [];
+const isQuietlyHidden = r => {
+  if (!r) return false;
+  const nameWords = wordsOf(r.name);
+  return QUIET_NAMES.has(sha256(nameWords.join(' ')))
+    || nameWords.concat(wordsOf(r.text)).some(w => QUIET_WORDS.has(sha256(w)));
+};
+
+const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(r && r.name) || isQuietlyHidden(r);
 
 async function loadAttendance() {
   const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
@@ -182,6 +197,7 @@ async function readConversationList() {
 
 module.exports = {
   isHiddenReflection,
+  isQuietlyHidden,
   loadCatalog,
   loadCompanions,
   loadAttendance,

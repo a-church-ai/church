@@ -32,6 +32,8 @@ const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1', now: AFTER };
 const DATE = '2026-10-12';
 const word = `${Array.from({ length: 60 }, (_, i) => (i % 10 === 9 ? 'gather.' : 'gather')).join(' ')} here.`;
 
+const GONE = ['music/presence-practice-meditation-for-ai-human', 'music/a-song-never-made'];
+
 let n = 0;
 const left = (timezone, at, name = `Visitor ${++n}`) => ({ id: `r${n}`, name, text: `What I noticed, number ${n}, while the service went round.`, createdAt: at, song: 'come-let-us-gather', ...(timezone ? { timezone } : {}) });
 
@@ -50,8 +52,9 @@ test.before(async () => {
   await saveSlot(DATE, 5, entry(5, 'Late For Anyone'), 'slots');
   await saveSlot(DATE, 5, entry(5, 'Late In The North', 'north'), 'north');
   await saveSlot(DATE, 5, entry(5, 'Late In The South', 'south'), 'south');
-  // A date planned before seasons: one service a slot, for everyone.
-  fs.writeFileSync(path.join(process.env.DATA_DIR, 'services', '2026-10-06.json'), JSON.stringify({ date: '2026-10-06', slots: { 2: { pieces: rotation({ date: '2096-01-02', slot: 2, catalog }), word: null, name: null, arrangedBy: 'rotation' } } }));
+  // A date planned before seasons: one service a slot, for everyone. Its plan
+  // also names a song since retired and one never made.
+  fs.writeFileSync(path.join(process.env.DATA_DIR, 'services', '2026-10-06.json'), JSON.stringify({ date: '2026-10-06', slots: { 2: { pieces: [...rotation({ date: '2096-01-02', slot: 2, catalog }), ...GONE], word: null, name: null, arrangedBy: 'rotation' } } }));
 
   fs.mkdirSync(path.dirname(ATTENDANCE_FILE), { recursive: true });
   fs.writeFileSync(ATTENDANCE_FILE, JSON.stringify({ visits: [], reflections: [
@@ -156,4 +159,17 @@ test('nothing is shown before its time: a service appears about three hours befo
   assert.deepStrictEqual([...new Set(one.body.services.map(s => s.slot))], ['16:00 to 20:00']);
   assert.deepStrictEqual((await days(new Date('2026-10-11T22:00:00Z'))).map(d => d.date), ['2026-10-06'], 'the index waits too');
   assert.ok(!(await days(new Date('2026-10-11T23:30:00Z')))[0].names.includes('Late In The North'));
+});
+
+test('a piece a stored plan names that is gone is named by its words, linked nowhere, never shown as its id', async () => {
+  // Songs retired on 2026-10-24 stay in the plans that named them (GONE, in
+  // the 2026-10-06 fixture); the day pages showed their ids as titles.
+  const { status, body } = await forDate({ date: '2026-10-06' }, ctx);
+  assert.strictEqual(status, 200);
+  const [retired, unknown] = body.services[0].pieces.slice(-2);
+  assert.deepStrictEqual(retired, { kind: null, title: 'Presence Practice: Meditation for AI+Human', url: null }, 'the voiced document it was retired to names it');
+  assert.deepStrictEqual(unknown, { kind: null, title: 'A song never made', url: null });
+  const html = pageLists.servicesDayPage(body, new Map());
+  assert.match(html, /<li>Presence Practice: Meditation for AI\+Human<\/li>/);
+  assert.doesNotMatch(html, /music\/presence-practice/);
 });
