@@ -40,6 +40,9 @@ async function listeningService({ timezone, at = new Date() } = {}) {
     date: served.local.date,
     weekday: served.local.weekday,
     slot: slotHours(served.slot),
+    // Which of the date's plans this is; with date and slot it names the
+    // service, which the reflection form beside the panel sends.
+    variant,
     nextSlot: slotHours((served.slot + 1) % SLOTS),
     // When this slot's service gives way to the next, so the page asks again
     // then and not before.

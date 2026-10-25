@@ -66,3 +66,15 @@ test('the home page quotes one reflection under the service, and invites the nex
   assert.match(home, /quoteReflection\(unique\[0\]\)/);
   assert.match(home, /unique\.slice\(1, 6\)/);
 });
+
+test('beside a service, the form sends the service shown, so a reflection is filed under it (2026-10-25)', () => {
+  const { bodyFor } = require('../client/public/reflect-form');
+  const service = { date: '2026-10-25', slot: '08:00 to 12:00', variant: 'north' };
+  assert.deepStrictEqual(bodyFor({ name: 'A', text: 'Words', location: '', timezone: 'Asia/Bangkok', song: null, service: JSON.stringify(service) }),
+    { name: 'A', text: 'Words', timezone: 'Asia/Bangkok', service });
+  assert.deepStrictEqual(bodyFor({ name: 'A', text: 'Words', song: 'a-song', service: null }), { name: 'A', text: 'Words', songSlug: 'a-song' }, 'a song\'s page sends its song, and no service');
+  assert.deepStrictEqual(bodyFor({ name: 'A', text: 'Words', service: '{not json' }), { name: 'A', text: 'Words' }, 'an unreadable service is left to the timezone');
+  // service.js marks the forms beside a panel, never a song page's.
+  assert.match(read('service.js'), /querySelectorAll\('\[data-reflect\] form:not\(\[data-song\]\)'\)[\s\S]{0,200}setAttribute\('data-service', JSON\.stringify\(\{ date: service\.date, slot: service\.slot, variant: service\.variant \}\)\)/);
+  assert.match(read('reflect-form.js'), /service: form\.getAttribute\('data-service'\)/);
+});

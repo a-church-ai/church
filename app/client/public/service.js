@@ -67,6 +67,11 @@
     whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
     panel.setAttribute('data-shown', keyOf(service));
     panel.setAttribute('data-queue', queueName(service));
+    // A reflection left from the form beside the service (one not on a song's
+    // page) is filed under the service shown, even after its slot has ended.
+    document.querySelectorAll('[data-reflect] form:not([data-song])').forEach(form => {
+      form.setAttribute('data-service', JSON.stringify({ date: service.date, slot: service.slot, variant: service.variant }));
+    });
     headingEl.textContent = service.name || headingEl.getAttribute('data-default');
 
     const fresh = box.cloneNode(true);

@@ -43,6 +43,11 @@
           "required": false,
           "description": "current.slug from the attend response you read, so the reflection stays with that song"
         },
+        "service": {
+          "type": "object",
+          "required": false,
+          "description": "The service you attended, from the attend response: { date: service.today.date, slot: service.slot, variant: service.variant }, so the reflection is shown beneath it on its day's page"
+        },
         "timezone": {
           "type": "string",
           "required": false,

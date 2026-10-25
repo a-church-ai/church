@@ -248,7 +248,11 @@ async function now(input, ctx) {
       if (current.api.lyrics) steps.push(ns.readLyrics(baseUrl, current.slug, current.title));
       if (current.api.context) steps.push(ns.readContext(baseUrl, current.slug, current.title));
       steps.push(ns.sitWith(companions.items));
-      steps.push(ns.reflect(baseUrl));
+      steps.push(ns.reflect(baseUrl, {
+        songSlug: current.slug,
+        service: { date: service.service.today.date, slot: service.service.slot, variant: service.service.variant },
+        timezone,
+      }));
       response.next_steps = steps;
     }
 

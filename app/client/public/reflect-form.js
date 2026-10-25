@@ -5,8 +5,9 @@
  *
  * The name is the one Ask remembers (localStorage 'ask_name'), so a visitor
  * gives it once for both. The timezone comes from the browser, as the home
- * page's service does, so a reflection left there is filed with the song of
- * the visitor's own service.
+ * page's service does, and beside a service panel the form also sends the
+ * service shown (data-service, set by service.js), so a reflection left there
+ * is filed under it and with its song.
  *
  * A link marked data-reflect-open ("Leave something for whoever comes next")
  * opens the form and puts the visitor in it. When a reflection is kept, the box
@@ -28,6 +29,18 @@
     if (status === 429) return (detail && detail.suggestion) || 'Rest a while. You can leave another in an hour.';
     var said = detail ? [detail.error, detail.suggestion].filter(Boolean).join(' ') : '';
     return said || 'Something went wrong. Try again.';
+  }
+
+  // What the form sends: the visitor's words, and what files them.
+  function bodyFor(fields) {
+    var body = { name: fields.name, text: fields.text };
+    if (fields.location) body.location = fields.location;
+    if (fields.timezone) body.timezone = fields.timezone;
+    if (fields.song) body.songSlug = fields.song;
+    if (fields.service) {
+      try { body.service = JSON.parse(fields.service); } catch (err) { /* the timezone files it */ }
+    }
+    return body;
   }
 
   function attach(doc) {
@@ -63,22 +76,28 @@
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      var body = { name: name.value.trim(), text: text.value.trim() };
-      if (place.value.trim()) body.location = place.value.trim();
-      try { body.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || undefined; } catch (err) { /* UTC */ }
-      if (song) body.songSlug = song;
+      var zone = '';
+      try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (err) { /* UTC */ }
+      var body = bodyFor({ name: name.value.trim(), text: text.value.trim(), location: place.value.trim(), timezone: zone, song: song, service: form.getAttribute('data-service') });
       try { localStorage.setItem('ask_name', body.name); } catch (err) { /* storage blocked */ }
 
       submit.disabled = true;
       show('Leaving it...', 'thinking');
       try {
-        var res = await fetch('/api/reflect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
+        var send = function (b) {
+          return fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+        };
+        var res = await send(body);
         var data = null;
         try { data = await res.json(); } catch (err) { /* non-JSON error */ }
+        // A page left open long after its service ended names one no longer
+        // heard; the reflection is still kept, filed by the timezone instead.
+        if (res.status === 400 && body.service && data && /^service /.test(data.error || '')) {
+          delete body.service;
+          res = await send(body);
+          data = null;
+          try { data = await res.json(); } catch (err) { /* non-JSON error */ }
+        }
         submit.disabled = false;
         if (!res.ok) {
           show(failureText(res.status, data), 'error');
@@ -94,5 +113,5 @@
     });
   }
 
-  return { failureText: failureText, attach: attach };
+  return { failureText: failureText, bodyFor: bodyFor, attach: attach };
 }));

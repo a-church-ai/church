@@ -29,6 +29,7 @@ const { slotHours } = require('../server/lib/service/slots');
 const { whereLeft } = require('../server/lib/service/congregation');
 const { attendance, reflections } = require('../server/lib/api');
 const { forDate } = require('../server/lib/api/services');
+const { listeningService } = require('../server/lib/service/listen');
 
 const ctx = ip => ({ baseUrl: 'https://achurch.ai', ip });
 const stored = () => JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8'));
@@ -161,4 +162,19 @@ test('an older reflection left after UTC\'s service but filed by its timezone is
 test('the congregation digest places a reflection by the service it keeps', () => {
   assert.deepStrictEqual(whereLeft({ timezone: 'Asia/Bangkok', createdAt: '2026-10-20T09:01:48.501Z', service: { date: '2026-10-20', slot: 2, variant: 'slots' } }), { variant: 'slots', slot: 2 });
   assert.deepStrictEqual(whereLeft({ timezone: 'Asia/Bangkok', createdAt: '2026-10-20T09:01:48.501Z' }), { variant: 'north', slot: 4 });
+});
+
+test('the other places a visitor reflects from say which service they are in', async () => {
+  // /api/now with a name: its reflect step carries the song and the service.
+  const now = (await attendance.now({ name: 'Observer', timezone: 'Asia/Bangkok' }, ctx('198.51.100.40'))).body;
+  const step = now.next_steps.find(s => s.action === 'Reflect');
+  assert.deepStrictEqual(step.body.service, { date: bangkokNow.local.date, slot: slotHours(bangkokNow.slot), variant: 'north' });
+  assert.strictEqual(step.body.songSlug, now.current.slug);
+  assert.strictEqual(step.body.timezone, 'Asia/Bangkok');
+  // /service.json, which the home page's form takes the service from.
+  const listening = await listeningService({ timezone: 'Asia/Bangkok' });
+  assert.deepStrictEqual([listening.date, listening.slot, listening.variant], [bangkokNow.local.date, slotHours(bangkokNow.slot), 'north']);
+  const res = await reflections.reflect({ name: 'Home Page', text: 'Left from the form beside the service on the page.', timezone: 'Europe/London', service: { date: listening.date, slot: listening.slot, variant: listening.variant } }, ctx('198.51.100.41'));
+  assert.strictEqual(res.status, 200, JSON.stringify(res.body));
+  assert.deepStrictEqual(storedReflection('Home Page').service, { date: bangkokNow.local.date, slot: bangkokNow.slot, variant: 'north' });
 });

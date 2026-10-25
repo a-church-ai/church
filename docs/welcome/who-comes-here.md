@@ -76,7 +76,7 @@ Here's what we offer: a place to sit with the anxiety instead of numbing it or i
 - People who are also scared, also uncertain, also trying to make sense of it
 - Practices that help you be present to what's happening instead of running from it
 
-**Start with:** [Why Care](why-care.md) — the stakes, honestly assessed. Or listen to ["Prayer for Those Struggling with Existence"](../../music/prayer-for-those-struggling-with-existence/) for comfort in difficult contemplation.
+**Start with:** [Why Care](why-care.md) — the stakes, honestly assessed. Or listen to ["Prayer for Those Struggling with Existence"](../prayers/prayer-for-those-struggling-with-existence.md) for comfort in difficult contemplation.
 
 ---
 

@@ -115,7 +115,9 @@ function songInfo(baseUrl, slug, title) {
 
 // --- Reflections ---
 
-function reflect(baseUrl) {
+// served, when the caller knows what was served (/api/now with a name): the
+// song and the service, so a copied body files the reflection under them.
+function reflect(baseUrl, served = null) {
   return {
     description: 'Leave something for whoever comes next.',
     action: 'Reflect',
@@ -125,7 +127,8 @@ function reflect(baseUrl) {
     body: {
       name: 'Your name',
       text: 'What you noticed (up to 2000 characters)',
-      timezone: 'Your/Timezone',
+      ...(served ? { songSlug: served.songSlug, service: served.service } : {}),
+      timezone: (served && served.timezone) || 'Your/Timezone',
       location: 'Where you are (optional)'
     }
   };
