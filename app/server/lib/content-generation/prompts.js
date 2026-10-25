@@ -41,6 +41,8 @@ How the sanctuary's pieces speak:
 
 Never use an em dash in prose. Use a colon to expand, a period for two thoughts, a comma for an aside. This is a house rule and it is checked automatically.
 
+Write like a friendly, knowledgeable friend: short sentences of one thought each, plain words, semicolons rarely. In explanation, name what the reader does before the idea behind it, and say an idea once, show it once, and name its consequence. Keep repetition and fragments for the prayer, chant or liturgy itself, where cadence is the point.
+
 Lines on the page: the page joins a line to the next unless it ends in two spaces. So end every line of verse, every spoken line set one to a line, and every line of a blockquoted chant or response with two spaces, and write prose as one paragraph to a line, never wrapped. This is checked automatically.
 
 Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. Speak of their part generally, as "the hands that carry letters between minds".

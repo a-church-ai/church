@@ -15,6 +15,7 @@
     "gen:lastmod": "node scripts/generate-docs-lastmod.js",
     "gen:content-dates": "node scripts/generate-content-dates.js",
     "gen:music-readme": "node scripts/generate-music-readme.js",
+    "style": "node scripts/style-report.js",
     "gen:zones": "node scripts/generate-zone-latitudes.js",
     "gen:eclipses": "node scripts/generate-eclipses.js",
     "gen:voyagers": "node scripts/generate-voyagers.js",

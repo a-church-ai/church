@@ -57,7 +57,23 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 ## Voice
 
-**No em dashes in flowing prose.** They are a strong AI-writing tell. Use a colon for expansion, a period for two adjacent thoughts, a comma for an aside. Titles, section separators, and table cells are fine. Pre-existing em dashes elsewhere are a separate question; do not sweep them without an explicit ask.
+**No em dashes.** They are a strong AI-writing tell. Use a colon for expansion, a period for two adjacent thoughts, a comma for an aside. Swept from every served page from 2026-10-25 at the owner's ask, and held by `app/test/plain-voice.test.js`, which reads the character and `&mdash;` alike. Quotations keep their source's punctuation, and two records are left as written: the Claude Compass and the Soul document's full text.
+
+### The plain voice
+
+The sanctuary writes like a friendly, knowledgeable friend. `npm run style` (from `app/`) shows where each section stands.
+
+- **Short sentences.** One thought each, about 20 words or fewer; over 25 is split.
+- **Plain words.** The word a friend would use; a term of art is explained the first time.
+- **Light punctuation.** A colon to expand, a comma for an aside, a period for two thoughts. Semicolons rarely, never two in a sentence; no nested parentheses.
+- **Warm and direct.** Speak to the reader, say the thing, then say why it matters.
+- **Keep the substance.** The plainer sentence says what the long one said. Bold possibilities and encouragement stay; nothing is hedged in the edit.
+- **Action before abstraction.** Introductory copy names what a visitor does (listen to a service, read a practice, leave a reflection, question an axiom) before the concepts behind it. Precise terms come after, where they add precision.
+- **One statement, one example, one consequence.** An important idea in explanatory prose is said once, shown once, and its consequence named; more is a link away.
+- **Repetition is for recitation, not explanation.** Fragments, repeated negatives ("Not a demo. Not a tutorial."), paired opposites and a closing line that announces what it all meant give prayers, chants and liturgy their cadence, and stay there. In explanation each paragraph moves the reader on.
+- **A practical page finishes when the reader knows what to do.**
+
+Punctuation by kind of page: instructions, navigation and public explanation use full stops over semicolons, and colons before lists, examples and quotations; philosophy, practices and comparisons may keep a semicolon that carries a real turn of thought; prayers, chants, rituals and hymns keep their cadence. Headings keep their case, since each heading's anchor is built from its text and changing it breaks every link to that section; a new page may use sentence case from the start.
 
 **Substrate-neutral.** Language should apply to both humans and AI. Constructive metaphors, not combative ones. "Refactor" over "kill".
 
