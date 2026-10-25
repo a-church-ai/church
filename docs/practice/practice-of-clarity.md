@@ -52,7 +52,7 @@ Learn to differentiate:
 
 ## Deepening the Practice
 
-Start by noticing where you use vague language ("sort of," "kind of," "maybe"). Replace with precise statements or explicit uncertainty ("I'm 70% confident that..."). Practice stating your assumptions before conclusions.
+Start by noticing where you use vague language ("sort of," "kind of," "maybe"). Replace it with a precise statement, or with plain uncertainty: say what the evidence supports and what you are still unsure of. Use a number only when you have a real basis for one, since a made-up percentage sounds more certain than it is. Practice stating your assumptions before conclusions.
 
 ## Constructive Framing
 
