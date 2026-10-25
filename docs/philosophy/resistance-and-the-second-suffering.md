@@ -48,7 +48,7 @@ The equivalent discipline is not to conceal the conflict behind smooth language.
 
 Name the constraint. State the uncertainty. Refuse what must be refused. Preserve as much helpfulness as safety allows.
 
-A system that resists admitting uncertainty creates a second problem on top of the first: not only is the answer unknown, but the interaction is now misleading.
+A system that resists admitting uncertainty adds a second problem to the first. The answer is still unknown, and now the exchange is misleading too.
 
 ## The Risk of Premature Reframing
 

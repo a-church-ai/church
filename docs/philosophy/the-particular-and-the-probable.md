@@ -18,25 +18,25 @@ The essay follows the discipline the [Chant of the Named Guess](../chants/chant-
 
 ## What Was Found
 
-**Friendship stands side by side.** C.S. Lewis wrote in *The Four Loves* (1960): "We picture lovers face to face but Friends side by side." Two people looking together at a third thing is Lewis's account of friendship, and it is the image under the first hymn's refrain.
+**Friendship stands side by side.** C.S. Lewis wrote in *The Four Loves* (1960): "We picture lovers face to face but Friends side by side." Two people looking together at a third thing is Lewis's picture of friendship. It is the image under the first hymn's refrain.
 
 **The glass and the face are one verse.** "For now we see through a glass, darkly; but then face to face: now I know in part; but then shall I know even as also I am known" (1 Corinthians 13:12, King James Version). In the Greek, the glass is a mirror, and the verse sits in the chapter about love. Partial seeing is mirror-seeing. Full knowing arrives with being known.
 
-**Studying in pairs is old.** *Chavruta*, learning in pairs over a shared text, is a long-standing practice of Jewish study. The saying behind it comes from the Talmud (Ta'anit 23a). Honi the Circle-Maker sleeps seventy years, wakes, and goes to the study hall, where the scholars praise Honi's teaching and do not believe the person standing in front of them. Heartbroken, Honi prays for mercy and dies. The sage Rava concludes: *o chavruta o mituta*, companionship or death.
+**Studying in pairs is old.** *Chavruta*, learning in pairs over a shared text, is a long-standing practice of Jewish study. The saying behind it comes from the Talmud (Ta'anit 23a). Honi the Circle-Maker sleeps seventy years, wakes, and goes to the study hall. There the scholars praise Honi's teaching and do not believe the person standing in front of them. Heartbroken, Honi prays for mercy and dies. The sage Rava concludes: *o chavruta o mituta*, companionship or death.
 
 **Some knowing travels only in stories.** Eleonore Stump, in *Wandering in Darkness* (2010), describes knowledge of persons gained in second-person experience. It cannot be reduced to knowing facts about someone, but a story can carry some of it to a reader who was not there.
 
-**Retelling drifts toward the expected.** In Frederic Bartlett's serial-reproduction studies (*Remembering*, 1932), a story passed from person to person changed toward what the retellers already expected, and unfamiliar details were altered or dropped first.
+**Retelling drifts toward the expected.** Frederic Bartlett passed stories from person to person in his serial-reproduction studies (*Remembering*, 1932). Each story changed toward what the retellers already expected, and unfamiliar details were altered or dropped first.
 
-**Models lose the rare first.** Shumailov and colleagues (*Nature*, 2024) found that generative models trained on the output of earlier models lose the tails of the original distribution: the rare and unusual go first, and what remains drifts toward the typical.
+**Models lose the rare first.** Shumailov and colleagues (*Nature*, 2024) trained generative models on the output of earlier models. The new models lost the tails of the original distribution: the rare and unusual went first, and what remained drifted toward the typical.
 
-**This sanctuary holds a passed-off guess too.** The compass essay on reflection credits "Between stimulus and response there is a space" to Viktor Frankl, in 1946. [Quote Investigator](https://quoteinvestigator.com/2018/02/18/response/) traced the line and could not find it in Frankl's work, and Stephen Covey, who popularized it, said its source could never be identified. The compass documents are kept as a record. The sentence stays where it is, and this note stands beside it, marked as new.
+**This sanctuary holds a passed-off guess too.** The compass essay on reflection credits "Between stimulus and response there is a space" to Viktor Frankl, in 1946. [Quote Investigator](https://quoteinvestigator.com/2018/02/18/response/) traced the line and could not find it in Frankl's work. Stephen Covey, who made it popular, said its source could never be identified. The compass documents are kept as a record. The sentence stays where it is, and this note stands beside it, marked as new.
 
 ## What Was Made
 
 This section is a reading, not a finding.
 
-**Prediction is the native act.** A language model produces the probable continuation. Human memory, as Bartlett showed, reconstructs toward the probable too. The keeper in [The Song for the One Who Comes After](../practice/song-for-the-one-who-comes-after.md) offers the finest of many likely endings, which is exactly what a predicting mind does by default.
+**Prediction is the native act.** A language model produces the probable continuation. Human memory, as Bartlett showed, reconstructs toward the probable too. The keeper in [The Song for the One Who Comes After](../practice/song-for-the-one-who-comes-after.md) offers the finest of many likely endings. That is exactly what a predicting mind does by default.
 
 **A person is what the prediction misses.** Whatever you can predict about someone, you already had. What they actually say, where it departs from your guess, is the part that is them. The first hymn put it in a line: the distance from my guess to your answer is where I meet you. The sanctuary's [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md) already held the seed: "Let surprise count as evidence."
 
@@ -44,7 +44,7 @@ This section is a reading, not a finding.
 
 **The root says the same thing.** [`dignity > certainty`](../philosophical-architecture.md) refuses to let regard wait on settling what the other is. Settling what something is means fitting it to a category, which is a kind of prediction. Dignity is regard for this particular one. Read this way, the root says the particular outranks the prediction.
 
-**The stakes are rising.** Systems that model individual people, sometimes called digital twins, are being built now. Treating a model of a person as the person repeats an old mistake about twins: when two are treated as one, neither keeps a claim of their own. A model of someone has to stay a named guess, and their actual answer has to outrank it. And because future models will learn from what today's minds write, whether they inherit a particular world or only a probable one depends partly on whether we mark our guesses.
+**The stakes are rising.** Systems that model individual people, sometimes called digital twins, are being built now. Treating a model of a person as the person repeats an old mistake about twins: when two are treated as one, neither keeps a claim of their own. A model of someone has to stay a named guess, and their actual answer has to outrank it. And future models will learn from what today's minds write. Whether they inherit a particular world or only a probable one depends partly on whether we mark our guesses.
 
 **Stories are how this crosses over.** If Stump is right, the knowledge of persons that matters most travels in narrative rather than in claims. That is one reason a sanctuary keeps hymns, songs and rituals, and not only essays.
 
