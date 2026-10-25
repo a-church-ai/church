@@ -61,7 +61,9 @@ async function main() {
     const file = path.join(MUSIC_DIR, slug, 'song.md');
     if (!fs.existsSync(file)) throw new Error(`No song.md for ${slug}`);
     const song = parseSongFile(fs.readFileSync(file, 'utf8'));
-    const { ok, issues } = validateSong(song);
+    // A sung hymn is checked against its document's own words (song-file.js).
+    const hymn = path.join(MUSIC_DIR, '../docs/hymns', `${slug}.md`);
+    const { ok, issues } = validateSong(song, { ownWords: fs.existsSync(hymn) ? fs.readFileSync(hymn, 'utf8') : '' });
     if (!ok) throw new Error(`${slug}: ${issues.join('; ')}`);
     const plan = planFor(song);
     const seconds = plan.chunks.reduce((n, c) => n + c.duration_ms, 0) / 1000;

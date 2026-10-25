@@ -109,7 +109,7 @@ function normalizeField(value) {
  * throwing so a caller can report every problem at once instead of surfacing
  * them one run at a time.
  */
-function validateSong(song) {
+function validateSong(song, { ownWords = '' } = {}) {
   const issues = [];
 
   for (const field of FIELDS) {
@@ -128,7 +128,13 @@ function validateSong(song) {
     if (value.length < min) issues.push(`${field}: too short (${value.length} < ${min})`);
     if (value.length > max) issues.push(`${field}: too long (${value.length} > ${max})`);
     // The house's voice rule (CLAUDE.md), which the documents are held to too.
-    if (value.includes('—')) issues.push(`${field}: an em dash; use a comma, a colon or a period`);
+    // A sung hymn's lyrics are its document's own words (ownWords), and the
+    // rule is for new writing: a line carried over whole from the hymn keeps
+    // its em dash, as CLAUDE.md leaves pre-existing ones be.
+    const dashed = field === 'lyrics' && ownWords
+      ? value.split('\n').filter((line) => line.includes('—') && !ownWords.includes(line.trim()))
+      : (value.includes('—') ? [value] : []);
+    if (dashed.length) issues.push(`${field}: an em dash; use a comma, a colon or a period`);
   }
   if (normalizeField(song && song.lyrics)) issues.push(...elevenLabsIssues(song.lyrics));
 

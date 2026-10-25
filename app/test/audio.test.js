@@ -400,7 +400,14 @@ test('every recording and song is at the house level, under the true-peak ceilin
     assert.ok(Math.abs(l.level - target) <= L.tolerance, `${what}: ${l.level} LUFS, not ${target} within ${L.tolerance}`);
     assert.ok(l.truePeak <= L.truePeak, `${what}: true peak ${l.truePeak} over ${L.truePeak}`);
   };
-  for (const [source, r] of Object.entries(loadManifest())) if (!isImported(r)) within(r.levels, L.voice, source);
+  for (const [source, r] of Object.entries(loadManifest())) {
+    // A recording made elsewhere is set as a song is, by what is sung over it
+    // (import-recording.js, encodeWhole).
+    if (isImported(r)) {
+      within(r.levels, L.sung, source);
+      assert.strictEqual(r.levelKey, WHOLE_KEY, `${source}: set to other figures than the house's; import it again (npm run audio:import)`);
+    } else within(r.levels, L.voice, source);
+  }
   for (const [slug, r] of Object.entries(loadSongs())) {
     within(r.levels, L.sung, slug);
     assert.strictEqual(r.levelKey, WHOLE_KEY, `${slug}: set to other figures than the house's; npm run audio:songs`);

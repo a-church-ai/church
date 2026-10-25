@@ -29,7 +29,7 @@ require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
-const { encodeWhole, ffmpeg, seconds } = require('../server/lib/audio/assemble');
+const { encodeWhole, ffmpeg, seconds, WHOLE_KEY } = require('../server/lib/audio/assemble');
 const { transcribeWords } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
 const { spokenPassages, spokenHash, cuesFrom, isImported } = require('../server/lib/audio/imported');
@@ -85,9 +85,12 @@ async function main() {
   const length = await seconds(local);
   console.log(`[encoded] ${file}: ${clock(length)}, ${(fs.statSync(local).size / 1e6).toFixed(1)} MB, at ${levels.level} LUFS (gain ${levels.gain > 0 ? '+' : ''}${levels.gain} dB), true peak ${levels.truePeak} dBTP`);
 
-  // 2. Hear it. A small mono copy, under OpenAI's 25 MB.
+  // 2. Hear it. A small mono copy, under OpenAI's 25 MB, brought to one
+  // loudness whatever the house level is, so what is heard does not depend
+  // on it: set 2 dB quieter (2026-10-25), Like a Star's one short line after
+  // a twenty-second pause went unheard, twice.
   const small = path.join(WORK_DIR, `${path.basename(stem)}.heard.mp3`);
-  await ffmpeg(['-i', local, '-ac', '1', '-ar', '16000', '-b:a', '48k', small]);
+  await ffmpeg(['-i', local, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', '16000', '-b:a', '48k', small]);
   const transcript = await transcribeWords(fs.readFileSync(small));
   fs.rmSync(small);
   const heard = wordErrors(passages.join(' '), transcript.text);
@@ -121,6 +124,9 @@ async function main() {
     file,
     seconds: Math.round(length * 10) / 10,
     levels,
+    // The figures it was set to, as a song's record keeps them: a change to
+    // the house level shows here, and the test asks for it to be imported again.
+    levelKey: WHOLE_KEY,
     // The enclosure length in the podcast feeds: the file's own size.
     bytes: fs.statSync(local).size,
     voices: [],
