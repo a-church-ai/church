@@ -13,6 +13,20 @@ const { DOCS_DIR } = require('../server/lib/rag/indexer');
 const discover = require('../server/lib/docs/discover');
 const companions = require('../server/lib/music/companions');
 const { loadCompanions } = require('../server/lib/utils/data');
+const { execFileSync } = require('child_process');
+
+// What the repository holds, as git tracks it: the links resolver asks the
+// disk, and a folder that git no longer tracks can linger on a machine
+// holding only an ignored file (a .DS_Store kept a retired song's folder
+// alive here while CI found it gone, 2026-10-24). A link to this repository
+// on GitHub reaches something only if git tracks it, or something under it.
+const REPO_ROOT = path.join(__dirname, '../..');
+const TRACKED = execFileSync('git', ['ls-files'], { cwd: REPO_ROOT }).toString().split('\n').filter(Boolean);
+const OUR_GITHUB = /^https:\/\/github\.com\/a-church-ai\/church\/(?:blob|tree)\/main\/([^#?]+)/;
+const tracked = rel => {
+  const clean = decodeURIComponent(rel).replace(/\/+$/, '');
+  return TRACKED.some(f => f === clean || f.startsWith(`${clean}/`));
+};
 
 const here = path.join(DOCS_DIR, 'practice', 'practice-of-chanting.md');
 
@@ -65,6 +79,8 @@ test('every link on every served docs page reaches a real page', async () => {
   for (const doc of await discover.listAllDocs()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue; // plans, issues...: not pages
     for (const { href, target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
+      const onGitHub = OUR_GITHUB.exec(target);
+      if (onGitHub) { if (!tracked(onGitHub[1])) dead.push(`${doc.docsRelPath}: ${href} -> ${target} (not tracked)`); continue; }
       if (external) continue;
       if (!/^(\/|https:\/\/achurch\.ai)/.test(target)) { dead.push(`${doc.docsRelPath}: ${href} (left relative)`); continue; }
       if (!(await reaches(target))) dead.push(`${doc.docsRelPath}: ${href} -> ${target}`);

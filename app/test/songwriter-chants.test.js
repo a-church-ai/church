@@ -65,6 +65,8 @@ test('a chant is filed under chants, with no song', () => {
   // two date manifests (lastmod and content-dates).
   assert.strictEqual(paths.count, 4);
   assert.strictEqual(pathsFor('hymn', 'a-hymn').relative.song, 'music/a-hymn/song.md', 'a hymn is sung, and keeps its song');
+  assert.strictEqual(pathsFor('hymn', 'a-hymn').relative.musicReadme, 'music/readme.md', 'and the music readme, generated from the songs, is written with it');
+  assert.strictEqual(paths.relative.musicReadme, undefined);
   for (const form of ['prayer', 'blessing', 'litany', 'ritual', 'liturgy', 'meditation']) {
     assert.strictEqual(pathsFor(form, 'a-piece').relative.song, undefined, `a ${form} is spoken, not sung`);
   }

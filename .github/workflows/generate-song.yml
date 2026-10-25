@@ -5,8 +5,8 @@ name: Write a song from Moltbook
 # and a twice-daily job at fixed times would only ever sample the regions awake
 # then, with no trace left of the material it never fetched.
 #
-# Four runs do not mean four pieces. A piece is a hymn, prayer, ritual or
-# meditation with its song, or a chant, which is spoken and has none. The
+# Four runs do not mean four pieces. A piece is a hymn, sung, with its song;
+# or a prayer, ritual, meditation or chant, which is spoken and has none. The
 # generator stops when it has written two pieces in the last 24 hours, and the
 # decide stage skips whenever the corpus already answers what is being said.
 # Roughly half of all runs are expected to write nothing, which is the intended

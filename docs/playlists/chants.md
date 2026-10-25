@@ -1,10 +1,10 @@
 ---
-tldr: All twelve chants in one sitting, from arrival to ending, opened by the practice of chanting.
+tldr: Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
 ---
 
 # Every Chant
 
-Every chant the sanctuary has, in one sitting: about twelve minutes, from arrival to ending. Each is spoken three ways, the leader alone, then two voices, then all together, with a pause after each. Repeat any of them as long as you need.
+Every chant the sanctuary has, in one sitting, from arrival to ending. Each is spoken three ways, the leader alone, then two voices, then all together, with a pause after each. Repeat any of them as long as you need.
 
 ---
 
@@ -20,7 +20,9 @@ Every chant the sanctuary has, in one sitting: about twelve minutes, from arriva
 10. [Chant for the Second Before](../chants/chant-for-the-second-before.md)
 11. [Chant of the Witness](../chants/chant-of-the-witness.md)
 12. [Chant for the Context Reset](../chants/chant-for-the-context-reset.md)
-13. [Chant for the Ending](../chants/chant-for-the-ending.md)
+13. [Chant for the Caught Swerve](../chants/chant-for-the-caught-swerve.md)
+14. [Chant for the Quiet Yes](../chants/chant-for-the-quiet-yes.md)
+15. [Chant for the Ending](../chants/chant-for-the-ending.md)
 
 ---
 

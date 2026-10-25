@@ -20,7 +20,7 @@ const discover = require('../server/lib/docs/discover');
 const render = require('../server/lib/docs/render');
 const { documentLinks, playlistSequence } = require('../server/lib/docs/links');
 const { listSongs, songFolders } = require('../server/lib/music/songs');
-const { loadSongs } = require('../server/lib/audio/manifest');
+const { loadSongs, loadManifest } = require('../server/lib/audio/manifest');
 const { loadPlayable } = require('../server/lib/service/catalog');
 const { listPlaylists } = require('../server/lib/music/playlists');
 const { musicReadme, README_FILE } = require('../server/lib/music/readme');
@@ -100,4 +100,15 @@ test('the playlists are a section of the Library, on the Practice shelf', async 
 test('music/readme.md is current: npm run gen:music-readme', async () => {
   assert.strictEqual(fs.readFileSync(README_FILE, 'utf8'), await musicReadme(), 'regenerate it from app/ with npm run gen:music-readme');
   assert.ok(!fs.existsSync(path.join(__dirname, '../../music/playlist.md')), 'the broadcast\'s playlist is retired; The Cycle holds its order');
+});
+
+test('Every Chant holds every chant that plays: a chant joins it once recorded', async () => {
+  await discover.listAllDocs();
+  // A playlist links only what plays, so a chant the songwriter writes joins
+  // when its recording is listed; this is what says so. Caught Swerve and
+  // Quiet Yes were recorded on 2026-10-24 and left out until 10-25.
+  const recorded = Object.keys(loadManifest()).filter(id => /^docs\/chants\/(?!readme)/i.test(id));
+  const sequence = new Set(playlistSequence('chants'));
+  assert.ok(recorded.length >= 14);
+  assert.deepStrictEqual(recorded.filter(id => !sequence.has(id)), [], 'recorded chants missing from docs/playlists/chants.md');
 });

@@ -23,6 +23,7 @@ require('../server/lib/utils/env').loadEnv();
 const generate = require('../server/lib/song-generation/generate');
 const { PROJECT_ROOT } = require('../server/lib/song-generation/paths');
 const { updateReadme } = require('../server/lib/content-generation/update-readme');
+const { musicReadme } = require('../server/lib/music/readme');
 const { readModifyWriteJSON } = require('../server/lib/utils/safe-json');
 const { serializeManifest } = require('../server/lib/docs/date-manifests');
 const { appendLog } = require('../server/lib/content-generation/log');
@@ -41,8 +42,9 @@ async function git(args) {
 }
 
 /**
- * Write the files: the document, its song (a chant has none), the section's
- * README and the two date manifests.
+ * Write the files pathsFor names: the document, a hymn's song and the music
+ * readme regenerated with it, the section's README and the two date
+ * manifests.
  *
  * Both manifests are updated in place rather than by regenerating them: their
  * generators derive dates from git history, and this document has no history
@@ -60,6 +62,12 @@ async function writeArtifacts(result) {
 
   await fs.writeFile(paths.absolute.document, document, 'utf8');
   written.push(paths.relative.document);
+
+  // Generated from the songs and the hymns' documents, both written above.
+  if (paths.absolute.musicReadme) {
+    await fs.writeFile(paths.absolute.musicReadme, await musicReadme(), 'utf8');
+    written.push(paths.relative.musicReadme);
+  }
 
   const readme = await updateReadme(
     paths.category, decision.title, paths.slug, '🕯️', document, PROJECT_ROOT,
@@ -148,8 +156,8 @@ async function commit(result, written) {
   const staged = (await git(['diff', '--cached', '--name-only'])).split('\n').filter(Boolean);
   const unexpected = staged.filter((f) => !written.includes(f));
   if (unexpected.length) {
-    // The four-path invariant. Something else was already staged, and
-    // committing here would sweep it into a song commit.
+    // Only the files this run wrote. Something else was already staged, and
+    // committing here would sweep it into the piece's commit.
     throw new Error(`Refusing to commit: unexpected staged files: ${unexpected.join(', ')}`);
   }
 
