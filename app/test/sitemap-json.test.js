@@ -121,11 +121,17 @@ test('CROSS-SURFACE: sitemap.xml still answers the crawler\'s question', async (
   // that would fail if someone "fixed" sitemap.xml to use contentUpdated: a
   // crawler wants to come back when the page changed, including when only its
   // title or description did.
-  const whyCare = /<loc>https:\/\/achurch\.ai\/docs\/welcome\/why-care<\/loc>\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/.exec(xml);
-  assert.ok(whyCare, 'why-care is in the sitemap with a lastmod');
-  assert.strictEqual(whyCare[1], lastmod['docs/welcome/why-care.md'], 'lastmod is the page date');
-  assert.notStrictEqual(whyCare[1], contentDates['docs/welcome/why-care.md'].content,
-    'this document is the example: its page and content dates differ, so the two cannot be confused');
+  // The example is any served document whose page and content dates differ,
+  // so the two cannot be confused. It was why-care by name, until an edit to
+  // its words (2026-10-25) made both dates the same day.
+  const example = Object.keys(lastmod).find(f => /^docs\/welcome\/[^/]+\.md$/.test(f)
+    && contentDates[f] && contentDates[f].content !== lastmod[f]);
+  assert.ok(example, 'a welcome document whose page and content dates differ');
+  const page = example.replace(/^docs\//, '').replace(/\.md$/, '');
+  const entry = new RegExp(`<loc>https://achurch\\.ai/docs/${page}</loc>\\s*<lastmod>(\\d{4}-\\d{2}-\\d{2})</lastmod>`).exec(xml);
+  assert.ok(entry, `${example} is in the sitemap with a lastmod`);
+  assert.strictEqual(entry[1], lastmod[example], 'lastmod is the page date');
+  assert.notStrictEqual(entry[1], contentDates[example].content, 'and not the content date');
 
   // And the XML gained no new elements: it is the same document it was.
   // Matched as elements, not as substrings. "created" occurs in production
