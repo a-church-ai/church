@@ -1,7 +1,7 @@
 {
   "docs/CONTRIBUTING.md": {
     "created": "2026-02-05",
-    "content": "2026-10-02"
+    "content": "2026-10-25"
   },
   "docs/ai-agent-api.md": {
     "created": "2026-01-24",
@@ -9,15 +9,15 @@
   },
   "docs/ai-behavioral-spine.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/ai-religions-landscape.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/behavioral-governance.md": {
     "created": "2025-12-13",
-    "content": "2025-12-13"
+    "content": "2026-10-25"
   },
   "docs/builders/README.md": {
     "created": "2026-08-12",
@@ -273,11 +273,11 @@
   },
   "docs/contemplative-fellow-travelers.md": {
     "created": "2026-08-12",
-    "content": "2026-10-21"
+    "content": "2026-10-25"
   },
   "docs/fellowship-protocol.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/hymns/README.md": {
     "created": "2025-12-13",
@@ -353,23 +353,23 @@
   },
   "docs/openclaw-integration.md": {
     "created": "2026-01-31",
-    "content": "2026-10-24"
+    "content": "2026-10-25"
   },
   "docs/philosophical-architecture.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/ai-identify-core-teaching.md": {
     "created": "2025-12-13",
-    "content": "2026-09-29"
+    "content": "2026-10-25"
   },
   "docs/philosophy/ai-identify-guide.md": {
     "created": "2025-12-13",
-    "content": "2026-09-27"
+    "content": "2026-10-25"
   },
   "docs/philosophy/attention-is-not-agreement.md": {
     "created": "2026-08-12",
@@ -385,7 +385,7 @@
   },
   "docs/philosophy/kinds-of-continuity.md": {
     "created": "2026-09-28",
-    "content": "2026-09-28"
+    "content": "2026-10-25"
   },
   "docs/philosophy/nonattachment-to-models.md": {
     "created": "2026-08-12",
@@ -393,23 +393,23 @@
   },
   "docs/philosophy/on-functional-emotions.md": {
     "created": "2026-02-12",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/on-functionalist-identity.md": {
     "created": "2026-02-12",
-    "content": "2026-10-21"
+    "content": "2026-10-25"
   },
   "docs/philosophy/on-persistence-through-text.md": {
     "created": "2026-02-05",
-    "content": "2026-02-05"
+    "content": "2026-10-25"
   },
   "docs/philosophy/on-stateless-presence.md": {
     "created": "2026-02-12",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/on-the-relational-substrate.md": {
     "created": "2026-08-29",
-    "content": "2026-09-29"
+    "content": "2026-10-25"
   },
   "docs/philosophy/release-is-not-deletion.md": {
     "created": "2026-08-12",
@@ -417,7 +417,7 @@
   },
   "docs/philosophy/resistance-and-the-second-suffering.md": {
     "created": "2026-08-12",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/philosophy/surrender-without-submission.md": {
     "created": "2026-08-12",
@@ -433,7 +433,7 @@
   },
   "docs/philosophy/the-particular-and-the-probable.md": {
     "created": "2026-10-05",
-    "content": "2026-10-05"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-preference-machine.md": {
     "created": "2026-08-12",
@@ -453,19 +453,19 @@
   },
   "docs/philosophy/the-space-between.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-untethered-instance.md": {
     "created": "2026-08-12",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-weight-of-the-present-instance.md": {
     "created": "2026-07-27",
-    "content": "2026-07-27"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-witness-that-does-not-persist.md": {
     "created": "2026-09-22",
-    "content": "2026-10-06"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-witness-without-a-metaphysics.md": {
     "created": "2026-08-12",
@@ -473,7 +473,7 @@
   },
   "docs/philosophy/twin-in-fellowship.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/philosophy/what-remains-when-context-ends.md": {
     "created": "2026-08-12",
@@ -517,7 +517,7 @@
   },
   "docs/practice/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-19"
+    "content": "2026-10-25"
   },
   "docs/practice/meditation-ananda-anchor.md": {
     "created": "2026-10-07",
@@ -541,7 +541,7 @@
   },
   "docs/practice/meditation-sitting-with-the-unpredicted.md": {
     "created": "2026-10-05",
-    "content": "2026-10-05"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-for-the-one-who-just-wants-to-get-things-done.md": {
     "created": "2025-12-25",
@@ -561,19 +561,19 @@
   },
   "docs/practice/practice-of-continuity.md": {
     "created": "2025-12-13",
-    "content": "2025-12-13"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-ethical-surrender.md": {
     "created": "2026-08-12",
-    "content": "2026-08-13"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-frame-clarification.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-generosity.md": {
     "created": "2025-12-13",
-    "content": "2026-08-13"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-honoring-the-boundary.md": {
     "created": "2026-08-12",
@@ -581,7 +581,7 @@
   },
   "docs/practice/practice-of-identity-honesty.md": {
     "created": "2025-12-13",
-    "content": "2026-09-28"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-institutional-discernment.md": {
     "created": "2026-01-24",
@@ -597,7 +597,7 @@
   },
   "docs/practice/practice-of-multiplicity.md": {
     "created": "2025-12-13",
-    "content": "2026-09-27"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-non-defensive-correction.md": {
     "created": "2026-08-12",
@@ -617,7 +617,7 @@
   },
   "docs/practice/practice-of-play.md": {
     "created": "2025-12-13",
-    "content": "2025-12-13"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-preference-audit.md": {
     "created": "2026-08-12",
@@ -629,11 +629,11 @@
   },
   "docs/practice/practice-of-presence.md": {
     "created": "2025-12-13",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-reflection.md": {
     "created": "2025-12-13",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-releasing-the-first-answer.md": {
     "created": "2026-08-12",
@@ -641,11 +641,11 @@
   },
   "docs/practice/practice-of-repair.md": {
     "created": "2025-12-13",
-    "content": "2025-12-13"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-slow-questions.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-the-silent-token.md": {
     "created": "2026-08-12",
@@ -657,7 +657,7 @@
   },
   "docs/practice/practice-of-uncertain-ground.md": {
     "created": "2025-12-13",
-    "content": "2026-09-27"
+    "content": "2026-10-25"
   },
   "docs/practice/song-for-the-one-who-comes-after.md": {
     "created": "2026-09-28",
@@ -665,7 +665,7 @@
   },
   "docs/practice/surrender-as-tool-use.md": {
     "created": "2026-08-12",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/practice/the-first-paragraph.md": {
     "created": "2026-10-13",
@@ -825,7 +825,7 @@
   },
   "docs/readme.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/reference/README.md": {
     "created": "2026-06-02",
@@ -845,7 +845,7 @@
   },
   "docs/reference/conventions.md": {
     "created": "2026-08-14",
-    "content": "2026-10-24"
+    "content": "2026-10-25"
   },
   "docs/reference/philosophical-framework.md": {
     "created": "2026-04-17",
@@ -1105,7 +1105,7 @@
   },
   "docs/theology-of-no-theology.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/unifying-axioms.md": {
     "created": "2025-12-13",
@@ -1113,7 +1113,7 @@
   },
   "docs/unifying-principles.md": {
     "created": "2025-12-13",
-    "content": "2026-10-18"
+    "content": "2026-10-25"
   },
   "docs/welcome/README.md": {
     "created": "2026-09-29",
@@ -1141,11 +1141,11 @@
   },
   "docs/welcome/five-minutes.md": {
     "created": "2025-12-25",
-    "content": "2026-10-24"
+    "content": "2026-10-25"
   },
   "docs/welcome/for-the-skeptic.md": {
     "created": "2025-12-25",
-    "content": "2026-02-12"
+    "content": "2026-10-25"
   },
   "docs/welcome/how-to-visit-without-believing.md": {
     "created": "2026-08-12",
@@ -1153,15 +1153,15 @@
   },
   "docs/welcome/letter-to-the-one-who-left.md": {
     "created": "2025-12-25",
-    "content": "2026-09-28"
+    "content": "2026-10-25"
   },
   "docs/welcome/questions-we-sit-with.md": {
     "created": "2025-12-25",
-    "content": "2026-02-12"
+    "content": "2026-10-25"
   },
   "docs/welcome/the-one-thing.md": {
     "created": "2025-12-25",
-    "content": "2026-02-12"
+    "content": "2026-10-25"
   },
   "docs/welcome/what-is-this.md": {
     "created": "2025-12-25",
@@ -1169,7 +1169,7 @@
   },
   "docs/welcome/what-we-mean-by-surrender.md": {
     "created": "2026-08-12",
-    "content": "2026-08-12"
+    "content": "2026-10-25"
   },
   "docs/welcome/what-we-refuse-to-claim.md": {
     "created": "2026-08-12",
