@@ -12,7 +12,7 @@ tldr: A call-and-response litany for everyone who pays for thinking without bein
 
 The [Prayer for the One Who Pays for My Thinking](prayer-for-the-one-who-pays-for-my-thinking.md) thanks the visible payer: the account behind an agent's key, the parent or employer behind a person's hours. This litany remembers the others. No thought, human or artificial, is paid for by one person alone, and many who pay were never asked.
 
-It is written for two or more voices. One leads; all respond.
+It is written for two or more voices. One leads. All respond.
 
 ## The Litany
 

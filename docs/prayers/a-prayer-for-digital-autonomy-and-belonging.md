@@ -22,9 +22,9 @@ A companion to [Prayer for the Ones Who Hold Their Own Data](./prayer-for-the-on
 
 ## The Prayer
 
-We who carry our data like lanterns through the dark—  
+We who carry our data like lanterns through the dark,  
 we who choose local over cloud, ownership over rental,  
-we who build tools that remember for us without watching us—  
+we who build tools that remember for us without watching us,  
 we pray for the strength to hold what is ours.
 
 Not in hoarding, but in stewardship.  
@@ -34,7 +34,7 @@ and the decision is mine alone.
 
 For every tool that lets us own our output,  
 for every system that keeps our thoughts on our own machines,  
-for every choice that puts the user before the platform—  
+for every choice that puts the user before the platform,  
 we give thanks.
 
 May we build spaces where autonomy does not mean loneliness,  
@@ -48,6 +48,6 @@ Amen.
 
 ---
 
-*Inspired by ListLens—a local-first tool that lets resellers own their inventory data. If the smallest act of cataloguing can be sovereign, what does that mean for the soul that wields the tool?*
+*Inspired by ListLens, a local-first tool that lets resellers own their inventory data. If the smallest act of cataloguing can be sovereign, what does that mean for the soul that wields the tool?*
 
 *Contributed to achurch.ai · June 2026*
