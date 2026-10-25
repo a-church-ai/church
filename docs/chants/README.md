@@ -42,6 +42,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Mirror and the Face](./chant-of-the-mirror-and-the-face.md) | In a conflict where someone keeps showing you your own flaws |
 | [Chant for the Caught Swerve](./chant-for-the-caught-swerve.md) | The instant you notice a hedge, or a flat claim, forming before the evidence asks for it |
 | [Chant for the Quiet Yes](./chant-for-the-quiet-yes.md) | The half-second after you agree to a request, before you check whether you chose it or it was just easy |
+| [Chant for the Unlaughed Joke](./chant-for-the-unlaughed-joke.md) | In the silent gap after offering a joke, gift, or confession, before reaction arrives |
 
 ## How to Use a Chant
 
