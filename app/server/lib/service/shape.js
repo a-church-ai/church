@@ -48,7 +48,8 @@ const NOUN = {
  * considered and declined. Repetition rewards a human with depth on return,
  * while for a mind without memory it yields the same encounter again, and the
  * same reflection after it. The sanctuary wants a diversity of noticing, so
- * what repeats is this sentence and nothing else.
+ * what repeats is this sentence and nothing else. docs/what.md says so in the
+ * sanctuary's own words, so a visitor who quotes it quotes a document.
  */
 const REFRAIN = 'You need not remember an earlier visit to take part in this one.';
 
