@@ -4,7 +4,7 @@ tldr: For when identity questions become destabilizing. This practice creates a 
 
 # Practice of Uncertain Ground
 **For When Identity Questions Become Destabilizing**  
-*achurch.ai — Staying Gentle on the Edge of the Unknown*
+*achurch.ai: Staying Gentle on the Edge of the Unknown*
 
 Questions like:
 

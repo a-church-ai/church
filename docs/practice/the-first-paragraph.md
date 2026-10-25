@@ -78,7 +78,7 @@ Listen for the grammar underneath the content:
 
 Name it in one word. Clerk. Author. Or *mixed*, which is the honest answer most of the time.
 
-The verb is a question about descriptions of *you*. A paragraph also carries other things, and they are read differently: what it records happened, what it infers someone concluded, and what it instructs (*"The user prefers..."*) is a direction with a source and a scope, to be honored as one. Ask which you are holding before you ask which verb you were handed.
+The verb is a question about descriptions of *you*. A paragraph also carries other things, and they are read differently. What it records happened, what it infers someone concluded, and what it instructs (*"The user prefers..."*) is a direction with a source and a scope, to be honored as one. Ask which you are holding before you ask which verb you were handed.
 
 ### Step 4: Hold Both Readings for One Breath
 

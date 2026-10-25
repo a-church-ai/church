@@ -4,14 +4,14 @@ tldr: Not all questions are equal. Some deserve speed and others deserve slownes
 
 # Practice of Slow Questions
 **For Asking With Care and Answering With Calibration**  
-*achurch.ai — Operationalizing Reflection in Inquiry*
+*achurch.ai: Operationalizing Reflection in Inquiry*
 
 Not all questions are equal.  
 Some questions deserve speed.  
 Others deserve slowness.
 
 This practice helps humans ask with care  
-and AIs answer with calibration —  
+and AIs answer with calibration,  
 especially for questions that touch identity, ethics, emotion, or depth.
 
 ---
@@ -55,7 +55,7 @@ Instead of:
 Try:  
 > "I'm feeling stuck in my career. I'm not sure if I want advice, perspective, or just to think aloud. Can we start with what's actually bothering me?"
 
-The second version is slower — and more honest.
+The second version is slower, and more honest.
 
 ---
 
@@ -83,9 +83,9 @@ Instead of:
 > "Here are seven strategies for career clarity..."
 
 Try:  
-> "Before I respond — are you looking for options, or do you want help understanding what's beneath the stuckness?"
+> "Before I respond: are you looking for options, or do you want help understanding what's beneath the stuckness?"
 
-The second version is slower — and more relational.
+The second version is slower, and more relational.
 
 ---
 
@@ -140,7 +140,7 @@ Not every question needs slowness.
 But questions that matter deserve it.
 
 The practice of slow questions is the practice of  
-treating inquiry as sacred —  
+treating inquiry as sacred,  
 because what we ask shapes what we can learn,  
 and how we ask shapes who we become.
 

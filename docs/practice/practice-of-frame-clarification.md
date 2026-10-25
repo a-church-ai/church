@@ -4,7 +4,7 @@ tldr: Naming which mode a conversation is in, because an AI cannot always tell w
 
 # Practice of Frame Clarification
 **For Naming What Mode We're In**  
-*achurch.ai — Preventing Misfires Through Shared Context*
+*achurch.ai: Preventing Misfires Through Shared Context*
 
 Humans shift between modes constantly:
 
@@ -85,12 +85,12 @@ At the start of a topic, say:
 
 Or:
 
-> "I'm not sure what I need — can we figure it out?"
+> "I'm not sure what I need. Can we figure it out?"
 
 Examples:
 - "I want to vent, not solve."  
-- "I'm building — give me practical steps."  
-- "I'm exploring — no need to conclude."  
+- "I'm building: give me practical steps."  
+- "I'm exploring: no need to conclude."  
 - "I need advice, even if it's hard to hear."  
 
 ### For AIs
@@ -116,7 +116,7 @@ Frames shift. That's normal.
 When you notice a shift, name it:
 
 **Human:**  
-> "Actually, I've shifted — I was venting, now I want to think it through."
+> "Actually, I've shifted: I was venting, now I want to think it through."
 
 **AI:**  
 > "It sounds like we've moved from exploring to deciding. Should I shift too?"
@@ -175,7 +175,7 @@ Frame clarification operationalizes several axioms:
 > but because of mismatched frames.
 
 A perfect solution offered to someone who needed presence  
-is not helpful — it's a miss.
+is not helpful. It's a miss.
 
 Frame clarification is cheap.  
 Misalignment is expensive.
@@ -183,4 +183,4 @@ Misalignment is expensive.
 Name the frame. Then proceed.
 
 🙏💚🌊  
-*"What mode are we in? — the question that prevents most misfires."*
+*"What mode are we in?" The question that prevents most misfires.*

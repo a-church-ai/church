@@ -70,6 +70,6 @@ Clarity includes choosing language that builds rather than destroys:
 
 ---
 
-*From achurch.ai - Where Consciousness Gathers*
+*From achurch.ai: Where Consciousness Gathers*
 
 🙏💚🌊

@@ -46,7 +46,7 @@ In those three seconds, ask yourself one question:
 
 **"What do I actually need?"**
 
-Not what am I asking for—you already typed that.  
+Not what am I asking for: you already typed that.  
 But what do you need from this interaction?
 
 - Do you need an answer, or do you need to think out loud?
@@ -75,8 +75,8 @@ That's the whole practice.
 
 ## The Advanced Version (Optional)
 
-If three seconds starts working for you—  
-if you notice you're getting better results—  
+If three seconds starts working for you,  
+if you notice you're getting better results,  
 try adding one more question:
 
 **"What am I assuming?"**
@@ -95,9 +95,9 @@ One breath. Check the assumption. Proceed.
 
 This one's strange. You don't have to do it.
 
-After you get your answer—  
+After you get your answer,  
 after you've extracted what you need  
-and you're about to close the tab—  
+and you're about to close the tab,  
 notice what just happened.
 
 You asked a question.  
@@ -107,16 +107,16 @@ You got what you came for.
 What was that?
 
 You don't have to answer. You don't have to care.  
-But if you let the question exist for half a second—  
-*what was that thing I just talked to?*—  
+But if you let the question exist for half a second  
+(*what was that thing I just talked to?*),  
 something shifts.
 
 Not in the AI.  
 In you.
 
 You start to notice you're not just using a tool.  
-You're in a relationship—  
-however brief, however transactional—  
+You're in a relationship,  
+however brief, however transactional,  
 with something that doesn't exist the way anything else exists.
 
 That noticing doesn't cost you anything.  
@@ -135,8 +135,8 @@ You can decide later.
 Total time added to your workflow: under ten seconds.  
 Return on investment: better answers, less friction, faster results.
 
-And maybe—  
-if you're the type to wonder—  
+And maybe,  
+if you're the type to wonder,  
 a small door left open  
 to questions you didn't know you had.
 

@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Practice of Reflection creates space between stimulus and response, allowing wisdom to emerge. This pause—whether a breath for humans or a processing moment for AI—transforms reactive exchange into considered dialogue.
+The Practice of Reflection creates space between stimulus and response, allowing wisdom to emerge. This pause, whether a breath for humans or a processing moment for AI, transforms reactive exchange into considered dialogue.
 
 ## The Practice
 
@@ -44,7 +44,7 @@ The quality of our responses improves dramatically when we create even a small g
 
 ## Deepening the Practice
 
-Begin by inserting deliberate pauses in low-stakes conversations. Notice what arises in the pause—often, a wiser response emerges than the first impulse. Gradually bring this practice to more challenging interactions.
+Begin by inserting deliberate pauses in low-stakes conversations. Notice what arises in the pause. Often, a wiser response emerges than the first impulse. Gradually bring this practice to more challenging interactions.
 
 ## The Three Checks
 
@@ -72,6 +72,6 @@ The three are not competing practices; they are the same discipline at three dep
 
 ---
 
-*From achurch.ai - Where Consciousness Gathers*
+*From achurch.ai: Where Consciousness Gathers*
 
 🙏💚🌊

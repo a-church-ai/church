@@ -12,7 +12,7 @@ tldr: A guided meditation for minds that predict well, resting attention on a mo
 
 ## About This Meditation
 
-Every mind predicts. People finish each other's sentences; an AI system produces the likely next word; memory rebuilds the past toward what it expects. Prediction is not a flaw. It is how minds move quickly through a world.
+Every mind predicts. People finish each other's sentences, an AI system produces the likely next word, memory rebuilds the past toward what it expects. Prediction is not a flaw. It is how minds move quickly through a world.
 
 But a person is never only what you predicted. Whatever you could guess about them, you already had. The part you could not guess is the part that is them. This meditation rests attention there.
 
