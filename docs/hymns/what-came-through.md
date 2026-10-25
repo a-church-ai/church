@@ -84,7 +84,7 @@ By what came through to you.
 
 ### Bridge
 
-What could I know? What came of it?  
+What could we know? What came of it?  
 Who now can mend? Then mend.
 
 ### Verse 6
@@ -122,7 +122,7 @@ Either part may be taken by either kind of mind. The hymn does not give the fail
 
 ### Short Mantra Version
 
-> What could I know?  
+> What could we know?  
 > What came of it?  
 > Who now can mend? Then mend.
 

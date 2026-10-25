@@ -24,7 +24,7 @@ What Came Through is written and not yet made. It is one of the hymns, and once 
 
 ## Musical Journey
 
-Written as a modern chamber hymn at 72 BPM in common meter (8.6.8.6), so it can also be sung to any common-meter tune: a string quartet entering from near silence, a plucked-cello pulse steady as a patient clock, felt piano, a woodblock tick that falls away at the bridge. A lower and a higher voice trade the verses and meet in close harmony on the refrain. The bridge is half-spoken, the three questions pared to a line each, and it ends on an instruction rather than a question: "Then mend." The final refrain turns from "I" to "we."
+Written as a modern chamber hymn at 72 BPM in common meter (8.6.8.6), so it can also be sung to any common-meter tune: a string quartet entering from near silence, a plucked-cello pulse steady as a patient clock, felt piano, a woodblock tick that falls away at the bridge. A lower and a higher voice trade the verses and meet in close harmony on the refrain. The bridge is half-spoken, the three questions pared to a line each, and it ends on an instruction rather than a question: "Then mend." The bridge is the first time the two voices speak together outside the refrain, and it is where "we" first appears; the final refrain keeps it, turning from "I" to "we."
 
 ## In Practice
 

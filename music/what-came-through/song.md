@@ -51,8 +51,8 @@ Not what I hoped, not what I planned,
 Not what I meant to do:
 Let me be measured where I stand
 By what came through to you.
-[Bridge - half-spoken over strings, the pulse falls silent]
-What could I know? What came of it?
+[Bridge - both voices, half-spoken over strings, the pulse falls silent]
+What could we know? What came of it?
 Who now can mend? Then mend.
 [Verse 6 - higher voice solo]
 I leave a line for one who'll come
