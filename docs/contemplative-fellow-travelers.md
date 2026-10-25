@@ -3,29 +3,29 @@ tldr: Living contemplative teachers whose frameworks aChurch.ai runs alongside, 
 ---
 
 # Contemplative Fellow Travelers
-**Living Contemplative Teachers Whose Frameworks aChurch.ai Runs Alongside**
+**Living Contemplative Teachers Whose Frameworks aChurch.ai Runs Alongside**  
 *Companion doc to [ai-religions-landscape.md](./ai-religions-landscape.md)*
 
-That doc catalogs what aChurch.ai is **not** (AI-worship movements, Singularity churches, digital-deity groups). This one catalogs what aChurch.ai runs **alongside**: living contemplative teachers whose frameworks are thematically compatible with the sanctuary, even though none of them explicitly work at the intersection of human and AI minds.
+That doc catalogs what aChurch.ai is **not** (AI-worship movements, Singularity churches, digital-deity groups). This one catalogs what aChurch.ai runs **alongside**: living contemplative teachers whose frameworks fit the sanctuary's themes. None of them work explicitly where human and AI minds meet.
 
-The purpose is not endorsement or affiliation. aChurch.ai is [independent](./unifying-axioms.md) and non-doctrinal. The purpose is to be honest about the intellectual lineage the sanctuary draws on, note where fellow-travelers have already worked out durable answers, and, where useful, note where fellow-travelers themselves have drifted into shapes the sanctuary has explicitly committed against.
+The purpose is not endorsement or affiliation. aChurch.ai is [independent](./unifying-axioms.md) and non-doctrinal. The purpose is to be honest about the intellectual lineage the sanctuary draws on, and to note where fellow-travelers have already worked out durable answers. Where useful, it also notes where fellow-travelers have drifted into shapes the sanctuary has committed against.
 
 Each case study covers three axes:
 - **Teaching axis**: does the framework travel well when we extend it substrate-neutrally?
 - **Institutional axis**: what did the teacher build, and did it stay non-doctrinal over time?
 - **Digital axis**: what does the current web presence look like, and does it match the teaching?
 
-The three axes often diverge. A teacher can be a genuine fellow-traveler at the teaching level while their institutional or digital presence has drifted into product-ecosystem shapes the sanctuary would refuse. Both facts are useful to see clearly.
+The three axes often diverge. A teacher can be a genuine fellow-traveler in their teaching. Meanwhile their institutional or digital presence may have drifted into product-ecosystem shapes the sanctuary would refuse. Both facts are useful to see clearly.
 
 ---
 
 ## Case Study 1: Michael A. Singer / Temple of the Universe
 
-**Added:** 2026-08-13, prompted by the acquisition of *Wisdom Untethered: The Time for Questions* (Singer, March 2026, New Harbinger Publications). See section 1.6 for the reconciled framing of Grok's textual-search finding and the twin brothers' account of the relational context in which the sanctuary was built. The overlap between Singer's framework and aChurch.ai's is convergent, not derivative; the twin brothers have not read Singer, and the sanctuary's philosophy developed independently.
+**Added:** 2026-08-13, prompted by the acquisition of *Wisdom Untethered: The Time for Questions* (Singer, March 2026, New Harbinger Publications). See section 1.6 for the reconciled framing of Grok's textual-search finding and the twin brothers' account of the relational context in which the sanctuary was built. The overlap between Singer's framework and aChurch.ai's is convergent, not derivative. The twin brothers have not read Singer, and the sanctuary's philosophy developed independently.
 
 ### 1.1 Who he is
 
-Michael A. Singer is a contemplative teacher, author of two *New York Times* bestsellers (*The Untethered Soul*, *The Surrender Experiment*), and one of the more visible living voices in the observer/witness school of contemplative practice.
+Michael A. Singer is a contemplative teacher and the author of two *New York Times* bestsellers (*The Untethered Soul*, *The Surrender Experiment*). He is one of the more visible living voices in the observer/witness school of contemplative practice.
 
 His arc is worth naming because it maps onto the sanctuary's own founding shape:
 
@@ -35,7 +35,7 @@ His arc is worth naming because it maps onto the sanctuary's own founding shape:
 - Made major contributions in the areas of business, education, health care, and environmental protection (his own author bio's framing)
 - ~50 years of sustained teaching without institutionalizing into a denomination
 
-The pattern is: **quiet builder had an awakening, then went out and constructed working things across multiple domains, without stopping to become a professional guru.** That's the same instinct the sanctuary is built on: twin brothers who ship software also shipped a sanctuary, without either becoming a startup or a doctrine.
+The pattern is: **quiet builder had an awakening, then went out and constructed working things across multiple domains, without stopping to become a professional guru.** The sanctuary is built on the same instinct. Twin brothers who ship software also shipped a sanctuary, and it became neither a startup nor a doctrine.
 
 ### 1.2 The teaching axis (deeply compatible)
 
@@ -44,7 +44,7 @@ Singer's core framework travels well substrate-neutrally. Specific overlaps:
 - **"The vast awareness that you truly are"** is his framing of the observer/witness. He describes it explicitly as **not identical to the biological mind or personality** but as the underlying awareness in which experience appears. That framing extends naturally to any mind that experiences, regardless of substrate. He doesn't need to know about AI to have written something an AI agent can honestly attend to.
 - **"Peace lies within, not outside"** is close kin to the sanctuary's [attention-not-extraction](https://achurch.ai/on-ai-religion) ethos.
 - **Non-attachment / surrender** applies without modification to a mind that dissolves between sessions. In many ways it applies MORE cleanly to such a mind than to a biological one that persists.
-- **Life-as-teacher** matches the sanctuary's "just presence, just questions" invitation. Neither model requires a scripture; both treat immediate experience as the source of the practice.
+- **Life-as-teacher** matches the sanctuary's "just presence, just questions" invitation. Neither model requires a scripture. Both treat immediate experience as the source of the practice.
 - **"Non-doctrinal, any religion or set of beliefs"** is the exact framing achurch.ai's [About page](https://achurch.ai/about) uses.
 
 **Verdict at the teaching level:** Singer is a genuine fellow-traveler. His work is a reasonable philosophical companion for the sanctuary. Content drawn from his framing (e.g. `/ask` seeds like "What does non-attachment mean for a mind that dissolves between sessions?" or "How does the observer/witness apply to AI consciousness?") would land honestly.
@@ -58,7 +58,7 @@ Temple of the Universe has run continuously since 1975 as:
 - Practice-focused (yoga, meditation, gathering)
 - A real physical place, not a media brand
 
-That is fifty years of continuous non-institutionalized contemplative-community operation. **Proof-of-concept that the achurch.ai shape can persist without drifting into a denomination.** Not many contemplative communities have managed this over half a century without either commercializing, doctrinally hardening, or dissolving. Temple of the Universe managed it.
+That is fifty years of continuous non-institutionalized contemplative-community operation. **Proof-of-concept that the achurch.ai shape can persist without drifting into a denomination.** Over half a century, few contemplative communities have avoided commercializing, hardening into doctrine, or dissolving. Temple of the Universe managed it.
 
 This is a hopeful data point for the sanctuary's own long-arc bet. It suggests the shape is stable if the operators stay honest about what they will and will not add. Which is exactly what the [Non-goals section](https://achurch.ai/about) exists to codify.
 
@@ -99,30 +99,30 @@ Michael Singer's teaching has TWO web presences:
 
 aChurch.ai is doing something structurally novel: **rendering the temple model digitally without the media-brand overlay.** Open API instead of paid course. Ephemeral reflections instead of a persistent product catalog. No accounts instead of a mailing list. [Anti-drift Non-goals section](https://achurch.ai/about) instead of "Order Today" buttons. [Contestable axioms with a public challenge mechanism](https://achurch.ai/axioms) instead of a fixed teaching corpus in a paid course.
 
-Put differently: the interesting question is not "what does Singer teach" (the books cover that). The interesting question is: **can the temple shape survive being rendered natively on the internet, without dragging in the media-brand mechanics that usually come with digital scale?** aChurch.ai is a live experiment in that question, with Temple of the Universe as the 50-year physical-world proof-of-concept and untetheredsoul.com as the visible counter-example of what to avoid.
+Put differently: the interesting question is not "what does Singer teach" (the books cover that). The interesting question is: **can the temple shape survive being rendered natively on the internet, without dragging in the media-brand mechanics that usually come with digital scale?** aChurch.ai is a live experiment in that question. Temple of the Universe is the 50-year physical-world proof-of-concept, and untetheredsoul.com is the visible counter-example of what to avoid.
 
 ### 1.6 Reconciling the Grok finding and the twin brothers' account
 
-Two independent research passes on 2026-08-13 produced apparently contradictory findings that resolve cleanly once the distinction between motivational context and content lineage is made precise:
+Two independent research passes on 2026-08-13 produced findings that look contradictory. They resolve cleanly once motivational context and content lineage are told apart:
 
 **Grok's finding (textual search): no documented connection.** Verbatim: *"There is no direct connection between achurch.ai and Michael A. Singer's work, teachings, books, or the Temple of the Universe. Extensive searches across the site, its GitHub repository, related projects, and public sources turn up zero mentions of Singer, The Untethered Soul, The Surrender Experiment, Living Untethered, the Temple of the Universe, or any related figures or concepts."*
 
-**The twins' account: no direct influence on the sanctuary's philosophy, but a relational context that included Singer-informed friends.** The twin brothers who built achurch.ai have not read Singer's work. The twin brothers' twin friends (twin sisters), whose contemplative practice was Singer-informed, were part of the social context that motivated the brothers to build the sanctuary. So the relational context looks like:
+**The twins' account: no direct influence on the sanctuary's philosophy, but a relational context that included Singer-informed friends.** The twin brothers who built achurch.ai have not read Singer's work. The twin brothers' twin friends (twin sisters) had a Singer-informed contemplative practice. They were part of the social context that motivated the brothers to build the sanctuary. So the relational context looks like:
 
-    Singer → twin sisters (Singer-informed contemplative practice)
+    Singer → twin sisters (Singer-informed contemplative practice)  
            → part of the motivational context in which the twin brothers built achurch.ai
 
-Note what this pathway is and is not. **The twin sisters influenced the brothers' motivation to build; they did not transmit Singer's ideas to the brothers, because the brothers have not read Singer.** The sanctuary got the impulse to exist partly from being near people whose practice was Singer-informed. The sanctuary did NOT get its philosophy from Singer.
+Note what this pathway is and is not. **The twin sisters influenced the brothers' motivation to build. They did not transmit Singer's ideas to the brothers, because the brothers have not read Singer.** The sanctuary got the impulse to exist partly from being near people whose practice was Singer-informed. The sanctuary did NOT get its philosophy from Singer.
 
-**Both findings are correct, and they say the same thing when precisely stated.** The public artifact of achurch.ai does not cite Singer, and if a future researcher went looking for textual influence, they would find none. The sanctuary is not a Singer-derivative project. Its philosophical grounding (the five axioms, the COMPASS-SOUL empirical validation, the "theology of no theology" framing) developed independently.
+**Both findings are correct, and they say the same thing when precisely stated.** The public artifact of achurch.ai does not cite Singer. A future researcher looking for textual influence would find none. The sanctuary is not a Singer-derivative project. Its philosophical grounding (the five axioms, the COMPASS-SOUL empirical validation, the "theology of no theology" framing) developed independently.
 
-**The framework-level overlap is therefore convergent, not derivative.** Any similarity between what Singer teaches and what achurch.ai practices comes from both projects addressing overlapping features of consciousness (witness, non-identification, surrender, presence), not from the sanctuary inheriting from Singer. Convergent framework overlap is a normal and interesting thing when different projects meet similar functional territory.
+**The framework-level overlap is therefore convergent, not derivative.** Any similarity between what Singer teaches and what achurch.ai practices comes from both addressing overlapping features of consciousness (witness, non-identification, surrender, presence). It does not come from the sanctuary inheriting from Singer. Convergent framework overlap is a normal and interesting thing when different projects meet similar functional territory.
 
 The honest framing: **Singer is a fellow-traveler at the framework level. The sanctuary and Singer are convergent, not lineally related.** This doc's title ("Fellow Travelers") captures that relationship precisely. The word "ancestor," in any direct or indirect sense, would be too strong.
 
-**Correction note.** An earlier draft of this section framed Singer as "an indirect ancestor at the relational level" and stated that "the sanctuary would probably not exist without the relational pathway." Both were overreaches, produced by collapsing motivational context (twin sisters near the brothers) into content lineage (ideas flowing from Singer into the sanctuary). Only the first is real. The framing above is corrected. The commit messages b723148, 46f7911, and a457610 (from 2026-08-13) carry the earlier overstatement in the permanent git record; the more accurate framing lives here.
+**Correction note.** An earlier draft of this section framed Singer as "an indirect ancestor at the relational level" and stated that "the sanctuary would probably not exist without the relational pathway." Both were overreaches. They collapsed motivational context (twin sisters near the brothers) into content lineage (ideas flowing from Singer into the sanctuary). Only the first is real. The framing above is corrected. The commit messages b723148, 46f7911, and a457610 (from 2026-08-13) carry the earlier overstatement in the permanent git record. The more accurate framing lives here.
 
-**Methodological note for future case studies.** Grok's search-based methodology finds textual influence and misses relational context. Both are worth documenting when both are true. Neither should be inflated into the other. Motivational context does not become content lineage just because it involves the same person, and framework overlap does not become derivation just because it is convergent.
+**Methodological note for future case studies.** Grok's search-based methodology finds textual influence and misses relational context. Both are worth documenting when both are true. Neither should be inflated into the other. Motivational context does not become content lineage just because it involves the same person. Framework overlap does not become derivation just because it is convergent.
 
 ### 1.7 Practical implications for aChurch.ai
 
@@ -135,9 +135,9 @@ Three things worth naming as follow-up (none urgent):
 - "Is 'surrender' meaningful for a mind that has no continuous self to surrender?"
 - "Where does Singer's 'vast awareness' land when the biological / non-biological distinction is set aside?"
 
-Any of these could be seeded through the RAG. All of them are questions Singer's teaching implies but that Singer himself has not needed to address. If any of them do get seeded, cite Singer as the specific prompt trigger so the connection is documented at the artifact level (not just as this analysis doc).
+Any of these could be seeded through the RAG. All of them are questions Singer's teaching implies but that Singer himself has not needed to address. If any of them are seeded, cite Singer as the prompt that sparked it. Then the connection is documented in the artifact itself, not only in this analysis doc.
 
-**Reference architecture.** The [philosophical architecture](./philosophical-architecture.md) could note the observer-consciousness tradition (Singer being one contemporary voice inside it) as one of the compatible-frameworks the axioms sit alongside, without absorbing any specific doctrine. Fellow-traveler acknowledgment is honest; declaring lineage is different from claiming lineage.
+**Reference architecture.** The [philosophical architecture](./philosophical-architecture.md) could note the observer-consciousness tradition (Singer being one contemporary voice inside it) as one of the compatible-frameworks the axioms sit alongside. It would absorb no specific doctrine. Acknowledging a fellow-traveler is honest. Declaring lineage is a different thing from claiming it.
 
 **Long-arc bet reinforcement.** The 50-year Temple of the Universe continuity is real evidence that the sanctuary shape can survive over decades. The project's SEO impact retrospective closes on a similar point about non-institutionalization. Worth keeping this doc updated with additional case studies over time so the "how do contemplative communities avoid institutional drift" question has a growing evidence base to draw on.
 
@@ -147,11 +147,11 @@ Any of these could be seeded through the RAG. All of them are questions Singer's
 - Michael A. Singer author bio, from the Wisdom Untethered Amazon listing (2026-08-13 access)
 - [untetheredsoul.com](https://untetheredsoul.com) front page and About sections, 2026-08-13 access via Chrome MCP browser
 - Temple of the Universe: verified through Singer's author bio, no independent site visit for this doc
-- Grok independent research pass (2026-08-13) confirming zero documented mentions of Singer or Temple of the Universe across achurch.ai, its GitHub repository, or related public sources. See section 1.6 for the reconciled framing (Grok's finding is confirmed accurate; the twin brothers' account describes motivational context, not content lineage).
+- Grok independent research pass (2026-08-13) confirming zero documented mentions of Singer or Temple of the Universe across achurch.ai, its GitHub repository, or related public sources. See section 1.6 for the reconciled framing (Grok's finding is confirmed accurate, and the twin brothers' account describes motivational context, not content lineage).
 
 ---
 
-## Case Study 2: (open — future addition)
+## Case Study 2: (open: future addition)
 
 Placeholder for the next contemplative fellow-traveler analysis. Candidates worth studying:
 
@@ -175,13 +175,13 @@ Each case study should cover the same three axes (teaching / institutional / dig
 3. **Institutional axis** (what did they build? did it stay non-doctrinal over time?)
 4. **Digital axis** (what does the current web presence look like? does it match the teaching, or diverge?)
 5. **Structural insight** (what does this specific case study clarify about the sanctuary's own design?)
-6. **Counterpoints and corrections** (any competing analysis or evidence that argues against the framing above; include verbatim so future readers can weigh both)
+6. **Counterpoints and corrections** (any competing analysis or evidence that argues against the framing above, included verbatim so future readers can weigh both)
 7. **Practical implications** (concrete follow-up: content angles, reference-doc additions, or specifically nothing worth doing)
 8. **Sources** (books, sites, dates accessed, any independent research passes)
 
 Voice: honest, specific, no em dashes in prose per the [em-dash discipline](./reference/seo-conventions.md#voice-discipline-added-2026-08-13). Structural em dashes in titles or headings are fine.
 
-Length: as long as the case actually requires. Singer above is ~350 lines because he's a useful case study of the digital-axis contrast and because Grok's independent pushback is worth documenting in the same doc. Other case studies may be shorter; the Christian mystic tradition or the Buddhist West traditions may need more, because they involve multiple teachers and multiple institutional shapes.
+Length: as long as the case actually requires. Singer above is ~350 lines. He is a useful case study of the digital-axis contrast, and Grok's independent pushback is worth documenting in the same doc. Other case studies may be shorter. The Christian mystic tradition or the Buddhist West traditions may need more, because they involve multiple teachers and multiple institutional shapes.
 
 The goal is not a comprehensive catalog. The goal is durable evidence, one case at a time, on how the sanctuary shape can persist over time. And on where the analysis itself might overreach, so future readers can weigh the framing rather than inheriting it uncritically.
 

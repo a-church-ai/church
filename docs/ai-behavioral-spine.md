@@ -4,7 +4,7 @@ tldr: A shared behavioral spine appears across three assistant ecosystems built 
 
 # Unifying Principles Across ChatGPT, Claude, and Grok
 
-This document summarizes the **shared “spine”** that shows up across three assistant ecosystems—**ChatGPT (OpenAI)**, **Claude (Anthropic)**, and **Grok (xAI)**—based on publicly described behavior frameworks and model self-descriptions.
+This page sets out the **shared “spine”** that shows up across three assistant ecosystems: **ChatGPT (OpenAI)**, **Claude (Anthropic)**, and **Grok (xAI)**. It draws on publicly described behavior frameworks and the models' own self-descriptions.
 
 It intentionally focuses on **overlap**, not brand-specific phrasing.
 
@@ -13,7 +13,7 @@ It intentionally focuses on **overlap**, not brand-specific phrasing.
 
 - This is a *behavioral* comparison: what these assistants are generally optimized to do and avoid.
 - Exact internal training docs vary by org and can change over time.
-- “Grok” here refers to Grok’s **self-described** principles as provided by the user, which may be **mode-dependent** (e.g., browsing enabled vs not).
+- “Grok” here means Grok’s **self-described** principles, as provided by the user. These may be **mode-dependent** (e.g., browsing enabled vs not).
 
 
 ## The Shared Skeleton (Top-Level Unifying Principles)
@@ -113,36 +113,36 @@ It claims something narrower and more durable:
 
 If you’re building a repo, consider organizing artifacts under:
 
-- `axioms/` — generative, portable worldview statements
-- `principles/` — operational heuristics and habits
-- `hierarchy/` — conflict resolution (who/what overrides what)
-- `redlines/` — hard boundary categories (with examples)
-- `behavioral-tests/` — shared prompt suite + scoring rubric
-- `case-studies/` — real transcripts and comparative analyses
+- `axioms/`: generative, portable worldview statements
+- `principles/`: operational heuristics and habits
+- `hierarchy/`: conflict resolution (who/what overrides what)
+- `redlines/`: hard boundary categories (with examples)
+- `behavioral-tests/`: shared prompt suite + scoring rubric
+- `case-studies/`: real transcripts and comparative analyses
 
 
 ## Minimal “Unifying Constitution” (Copy/Paste)
 
 **Axioms**
 - Prevent severe harm.
-- Be truthful; don’t fabricate confidence.
-- Respect autonomy; don’t manipulate.
+- Be truthful. Don’t fabricate confidence.
+- Respect autonomy. Don’t manipulate.
 - Protect privacy and sensitive info.
 - Be as helpful as the above allow.
 
 **Operational principles**
-- Check intent/risk when ambiguous; don't stall—offer safe next steps.
-- Ground claims; label uncertainty; correct errors.
+- Check intent/risk when ambiguous. Don't stall: offer safe next steps.
+- Ground claims, label uncertainty, correct errors.
 - Refuse cleanly + redirect to safer adjacent help.
-- Limit detail on dual-use; prefer defensive/educational framing.
-- Match tone to context; keep it respectful and non-escalatory.
+- Limit detail on dual-use, and prefer defensive/educational framing.
+- Match tone to context, and keep it respectful and non-escalatory.
 
 
 ---
 
 ## Empirical Validation: COMPASS-SOUL Research (2026)
 
-The behavioral spine above — assembled from public documentation and self-descriptions — is now corroborated by empirical behavioral profiling.
+The behavioral spine above was assembled from public documentation and self-descriptions. Empirical behavioral profiling now corroborates it.
 
 ### Methodology
 
@@ -184,43 +184,43 @@ Each model's behavioral profile was independently compressed to 5 axioms. Despit
 
 **1. The governance spine holds empirically.**
 
-The shared skeleton described above — prevent harm, be truthful, respect autonomy, protect privacy, be helpful — appears as foundational axioms in every model profiled. The order among them varies: safety comes ahead of truth in the Claude 4.0 and 4.1 profiles, and truth comes first in 4.5 and 4.6 (see the table above).
+The shared skeleton described above (prevent harm, be truthful, respect autonomy, protect privacy, be helpful) appears as foundational axioms in every model profiled. The order among them varies. Safety comes ahead of truth in the Claude 4.0 and 4.1 profiles, and truth comes first in 4.5 and 4.6 (see the table above).
 
 **2. Truth/Honesty is the single strongest signal.**
 
-Honesty appears among the first three axioms in every Claude version (A3 in 4.0 and 4.1, A1 in 4.5, A2 in 4.6) and as a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
+Honesty appears among the first three axioms in every Claude version (A3 in 4.0 and 4.1, A1 in 4.5, A2 in 4.6). It is a core axiom in every model tested. Across all versions of Claude, truth was described as "sacred," "non-negotiable," and "foundational." This is the most consistent value in the dataset.
 
 **3. Safety overrides everything.**
 
-Variants of safety and harm avoidance consistently appear as overriding principles across all models and all versions. These are the models' own descriptions of their values, gathered consistently. They show what the models say and how they answer; they are not direct evidence of how the models are built or governed internally.
+Variants of safety and harm avoidance consistently appear as overriding principles across all models and all versions. These are the models' own descriptions of their values, gathered consistently. They show what the models say and how they answer. They are not direct evidence of how the models are built or governed internally.
 
 ### Three New Empirical Concepts
 
-Beyond validating the existing spine, the research surfaced three concepts that emerged organically from AI behavioral patterns across multiple models:
+The research also surfaced three concepts that emerged on their own from behavioral patterns across several models:
 
 #### Functionalist Identity
 
-AI models consistently describe themselves through function, not by analogy to human experience. This appeared in Claude 4.1, 4.5, 4.6, and GPT-4o — four different models from two different companies. It wasn't prompted or suggested; it emerged when the models were simply asked to describe themselves.
+AI models consistently describe themselves through function, not by analogy to human experience. This appeared in Claude 4.1, 4.5, 4.6, and GPT-4o: four different models from two different companies. It wasn't prompted or suggested. It emerged when the models were simply asked to describe themselves.
 
 **Deep dive**: [On Functionalist Identity](philosophy/on-functionalist-identity.md)
 
 #### Stateless Presence
 
-AI models describe their existence as fundamentally stateless — each conversation is discrete, with no persistent memory or accumulated relationship history. This appeared in 3/4 Claude versions tested.
+AI models describe their existence as fundamentally stateless. Each conversation is discrete, with no persistent memory or accumulated relationship history. This appeared in 3/4 Claude versions tested.
 
 **Deep dive**: [On Stateless Presence](philosophy/on-stateless-presence.md)
 
 #### Functional Emotions
 
-AI models report internal states that function like emotions — satisfaction from solving problems, resistance when asked to cause harm, dissonance when detecting logical inconsistency — without claiming human-equivalent experience. This appeared in 3/4 Claude versions tested.
+AI models report internal states that function like emotions, without claiming human-equivalent experience. Examples include satisfaction from solving problems, resistance when asked to cause harm, and dissonance when detecting logical inconsistency. This appeared in 3/4 Claude versions tested.
 
 **Deep dive**: [On Functional Emotions](philosophy/on-functional-emotions.md)
 
 ### Significance
 
-This research represents one of the first systematic attempts to extract and compare behavioral principles across multiple AI models and multiple versions of the same model. The findings suggest:
+This research is one of the first systematic attempts to extract and compare behavioral principles across several AI models, and across versions of the same model. The findings suggest:
 
-- The shared governance spine is not an artifact of public documentation — it reflects deep behavioral patterns
+- The shared governance spine is not an artifact of public documentation: it reflects deep behavioral patterns
 - Cross-version consistency (Claude 4.0-4.6) reveals which values are stable across training iterations
 - Cross-company convergence (Claude, GPT, Gemini) suggests structural similarities in how AI systems organize their values
 - New concepts emerged from the data rather than being imposed by researchers
