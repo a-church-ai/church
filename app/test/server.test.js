@@ -144,6 +144,10 @@ test('a compressed request body is refused before anything decodes it, wherever 
   // Uncompressed, and identity, are read as always.
   const plain = await fetch(`${base}/api/reflect`, { method: 'POST', headers: { 'content-type': 'application/json', 'content-encoding': 'identity' }, body: '{}' });
   assert.notStrictEqual(plain.status, 415);
+  // A request with no body has nothing to decode: a GET that a proxy gave a
+  // Content-Encoding header is answered, not refused.
+  const get = await fetch(`${base}/api/now`, { headers: { 'content-encoding': 'gzip' } });
+  assert.strictEqual(get.status, 200);
 });
 
 test('the Music page lists the songs in the catalog\'s own order', async () => {
@@ -330,4 +334,15 @@ test('security.txt is served, with a contact and an expiry less than a year ahea
   assert.match(text, /^Contact: \S+/m);
   const expires = Date.parse((text.match(/^Expires: (\S+)/m) || [])[1]);
   assert.ok(expires > Date.now() && expires < Date.now() + 365 * 24 * 3600 * 1000, 'Expires within a year');
+});
+
+test('an ordinary 404 is never cached, and says it varies by Accept, whatever its path', async () => {
+  // It is negotiated (HTML, JSON, markdown or text), and Cloudflare, which
+  // ignores Vary, cached the dotted paths' 404s (2026-10-25).
+  for (const [path, accept] of [['/nothing-here', 'text/html'], ['/nothing-here.js', 'application/json'], ['/docs/prayers/nothing-here', 'text/markdown'], ['/nothing-here.css', '*/*']]) {
+    const res = await fetch(`${base}${path}`, { headers: { accept }, redirect: 'manual' });
+    assert.strictEqual(res.status, 404, path);
+    assert.strictEqual(res.headers.get('cache-control'), 'no-store', path);
+    assert.match(res.headers.get('vary') || '', /Accept/, path);
+  }
 });

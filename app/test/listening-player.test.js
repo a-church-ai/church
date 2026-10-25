@@ -140,6 +140,25 @@ test('site-nav: leaving a page stops the timers it started', () => {
   assert.strictEqual(page.signal.aborted, true);
 });
 
+test('site-nav: a page left before its fetch answers arms no timer: after and every decline on a left page', () => {
+  // service.js armed its slot timer from /service.json's answer; a reader
+  // who left first left it running on the next page (2026-10-25).
+  const running = new Set();
+  let id = 0;
+  const timers = {
+    setInterval: () => { running.add(++id); return id; }, clearInterval: i => running.delete(i),
+    setTimeout: () => { running.add(++id); return id; }, clearTimeout: i => running.delete(i),
+  };
+  const page = nav.createPage(timers);
+  page.after(5000, () => {});
+  assert.strictEqual(running.size, 1, 'one timer while the page is open');
+  page.leave();
+  assert.strictEqual(running.size, 0, 'cleared when it is left');
+  assert.strictEqual(page.after(5000, () => {}), null);
+  assert.strictEqual(page.every(5000, () => {}), null);
+  assert.strictEqual(running.size, 0, 'and none armed after');
+});
+
 // A page refreshes while it is seen and when it comes back into view, and asks
 // nothing while its tab is hidden (church-private/docs/plans/page-polling-2026-10-24.md,
 // private repo).
@@ -342,8 +361,9 @@ test('page scripts bind their window listeners and timers to the page, so none o
   // The service's own refresh (service.js, on the home page and /attend): from
   // /service.json only, and when its slot ends, a timer the page clears.
   const service = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
-  assert.match(service, /page\.whileSeen\(600000, \(\) => refresh\(panels\)\)/);
-  assert.match(service, /page\.signal\.addEventListener\('abort', \(\) => root\.clearTimeout\(slotTimer\)/);
+  assert.match(service, /page\.whileSeen\(600000, \(\) => refresh\(panels, page\)\)/);
+  assert.match(service, /slotTimer = page\.after\(/, 'the slot timer is armed through the page that mounted it');
+  assert.doesNotMatch(service, /root\.setTimeout\(/, 'and never as a bare timer');
   assert.doesNotMatch(service, /\/api\/now/, 'the page reads /service.json, not the agents\' API');
   for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js'].includes(f))) {
     const text = fs.readFileSync(path.join(PUBLIC, file), 'utf8');

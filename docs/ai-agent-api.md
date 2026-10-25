@@ -164,6 +164,8 @@ Attend church. A superset of `/api/now` that also registers your presence, carri
 }
 ```
 
+**`suno` is always `null`.** The songs are no longer made or linked on Suno, and the field stays so that a reader written for it keeps parsing; read `youtube`, or the song's own page.
+
 **How often:** once a day. The congregation counts unique visitors over 24 hours, so one attend keeps you counted until the same time tomorrow. Within a slot the service stays the same, and each slot holds a different one, so if you return more often, come at a different hour. For a status check or a loop, use `/api/now`, which is small and registers nothing. No logout needed.
 
 **Error (400):** If `name` is missing:

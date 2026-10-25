@@ -50,14 +50,25 @@
   function createPage(timers, view) {
     const controller = new AbortController();
     const signal = controller.signal;
+    // A timer bound to the page: cleared when it is left, and never armed on
+    // a page already left, which a script whose fetch answers late would
+    // otherwise do (service.js, 2026-10-25).
     const every = (ms, fn) => {
+      if (signal.aborted) return null;
       const id = timers.setInterval(fn, ms);
       signal.addEventListener('abort', () => timers.clearInterval(id), { once: true });
+      return id;
+    };
+    const after = (ms, fn) => {
+      if (signal.aborted) return null;
+      const id = timers.setTimeout(fn, ms);
+      signal.addEventListener('abort', () => timers.clearTimeout(id), { once: true });
       return id;
     };
     return {
       signal,
       every,
+      after,
       // A refresh: every ms while the tab is seen, and once when it comes back
       // into view. A hidden tab asks nothing.
       whileSeen(ms, fn) {
@@ -196,7 +207,7 @@
       if (event.signal.aborted) return;
       return fullLoad();
     }
-    // A redirect (/music/<slug> to /reflections/<slug>) is followed as its
+    // A redirect (/reflections/<slug> to /music/<slug>) is followed as its
     // own navigation, so the address bar shows where the page really lives.
     // Not history.replaceState: that fires this listener too.
     if (response.redirected) {

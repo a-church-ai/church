@@ -57,7 +57,7 @@ function sendDoor(req, res, closest, status = 404) {
   const meant = closest ? `Did you mean ${closest.title}, at ${base}${closest.href}? ` : '';
   const steps = waysOn(base, closest);
   const word = WORD[status];
-  res.status(status).vary('Accept');
+  res.status(status);
   if (wantsJson(req) && !acceptsMarkdown(req)) {
     return res.json({ error: `Nothing is at ${where}.`, suggestion: `${meant}${ABOUT}`, next_steps: steps });
   }
@@ -111,11 +111,15 @@ async function sendNotFound(req, res, options = {}) {
   // Every missing path answers the same way, the probes for secrets (/.env,
   // /.git/config) included: this 404 is the site's whole answer to them, under
   // the Agent Security Pranks Standard (docs/reference/security-pranks.md).
-  // A 4xx already keeps it out of search; noindex is the backstop (P3), and a
-  // short edge cache, on every path, means a change to it reaches everyone
-  // within minutes, whatever the CDN would have chosen for a path with a dot.
+  // A 4xx already keeps it out of search; noindex is the backstop (P3). It is
+  // never cached: it is negotiated (HTML, JSON, markdown or plain text by
+  // Accept), and Cloudflare, which ignores Vary, cached the dotted paths'
+  // 404s and could hand a browser an agent's answer or the reverse
+  // (2026-10-25), with its own four-hour browser lifetime on top. A 404 is
+  // small; answering each from the server costs little.
   res.set('X-Robots-Tag', 'noindex');
-  res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate');
+  res.set('Cache-Control', 'no-store');
+  res.vary('Accept');
 
   // Markdown first, as the docs route serves it: an agent that also lists
   // text/html at lower weight still wants the markdown.

@@ -143,3 +143,19 @@ test('nothing is served from docs/experiences any more', async (t) => {
   assert.strictEqual(res.status, 301, 'a permanent redirect, so search engines move the page');
   assert.strictEqual(res.headers.get('location'), 'https://drifts.bot/experience/the-confessional', 'its own journey, and no query carried to another site');
 });
+
+test('every old address reaches its page in one step: a target is never itself redirected', () => {
+  // Until 2026-10-25 /reflections/<retired song> went to /music/<slug> and
+  // only then to its document, and a section named without /docs to a
+  // renamed document the same way. canonicalTarget now follows its own rules
+  // until they settle.
+  const { MOVED } = require('../server/lib/utils/redirects');
+  const spellings = Object.keys(MOVED).flatMap(k => [k, `${k}/`, k.replace(/^\/docs(?=\/)/, ''), k.replace(/^\/music\//, '/reflections/')]);
+  const chained = [];
+  for (const from of new Set(spellings)) {
+    const to = canonicalTarget(from);
+    if (to && to.startsWith('/') && canonicalTarget(to.split('#')[0])) chained.push(`${from} -> ${to} -> ${canonicalTarget(to.split('#')[0])}`);
+  }
+  assert.deepStrictEqual(chained, []);
+  assert.strictEqual(canonicalTarget('/reflections/hourly-blessing'), '/docs/prayers/blessings-and-benedictions#the-hourly-blessing');
+});

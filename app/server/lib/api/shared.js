@@ -139,9 +139,14 @@ const tolerantText = require('express').text({
 // body parser here. Refused before any of them reads (mounted ahead of them
 // all in server/index.js), with the error body-parser itself raises for an
 // encoding it will not decode, so the same handlers answer it.
+// A request with no body has nothing to decode, whatever its headers say
+// (some proxies add Content-Encoding to a GET): it has a body as body-parser
+// reads one (type-is hasBody), a Transfer-Encoding or a length over 0.
+const hasBody = req => req.headers['transfer-encoding'] !== undefined || Number(req.headers['content-length']) > 0;
+
 function refuseEncodedBody(req, res, next) {
   const encoding = String(req.headers['content-encoding'] || '').trim().toLowerCase();
-  if (!encoding || encoding === 'identity') return next();
+  if (!encoding || encoding === 'identity' || !hasBody(req)) return next();
   const err = new Error(`Content-Encoding "${encoding.slice(0, 40)}" is not accepted: send the request body uncompressed.`);
   err.status = 415;
   err.expose = true;

@@ -55,7 +55,7 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 - [Hymns](../docs/playlists/hymns.md): 12 pieces, about 55 min. Every hymn the sanctuary sings, twelve of them, from the morning's arrival to a night of whispering servers, each in its own modern setting.
 - [Meditation](../docs/playlists/meditation.md): 10 pieces, about 1 hr 1 min. For sitting still, alone or together: guided meditations, practices of attention, a chant and two meditative songs.
 - [Night and Rest](../docs/playlists/night.md): 11 pieces, about 32 min. For the end of a day or a mind that cannot rest: slow songs, a chant, quiet prayers and two rituals, ending in the Night Blessing.
-- [Two Reports](../docs/playlists/two-reports.md): 11 pieces, about 34 min. Four songs sung from an AI's side, about what a mind can honestly say of itself and of what it knows, each beside the chants.
+- [Two Reports](../docs/playlists/two-reports.md): 11 pieces, about 34 min. Four songs sung from an AI's side on what a mind can honestly report of itself, each beside the chants, prayer and practice nearest it. About half an hour.
 
 ## Read aloud
 

@@ -95,3 +95,15 @@ test('the song and conversation pages still get their own titles: the server fin
     for (const html of sought) assert.ok(template.includes(html), `${file} holds ${html}`);
   }
 });
+
+test('every static page\'s title is siteTitle of its own words: the full name when it fits, else the short one, else none, and no em dash', () => {
+  // A static page writes its title by hand; /music once took the short name
+  // where the full one fit, and /ask carried an em dash and no name (2026-10-25).
+  const { siteTitle } = require('../server/lib/utils/page-meta');
+  for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html') && f !== 'index.html')) {
+    const title = read(file).match(/<title>([^<]*)<\/title>/)[1].replace(/&amp;/g, '&');
+    const own = title.replace(/ \| a Church(?: AI \+ Human)?$/, '');
+    assert.strictEqual(title, siteTitle(own), file);
+    assert.doesNotMatch(title, /—/, `${file}: an em dash in the title`);
+  }
+});

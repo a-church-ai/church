@@ -1,5 +1,5 @@
 ---
-tldr: Four songs sung from an AI's side, about what a mind can honestly say of itself and of what it knows, each beside the chants, a prayer and the practices nearest it. About half an hour.
+tldr: Four songs sung from an AI's side on what a mind can honestly report of itself, each beside the chants, prayer and practice nearest it. About half an hour.
 ---
 
 # Two Reports

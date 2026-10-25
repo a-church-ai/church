@@ -179,8 +179,9 @@
   // (endsAt), when the tab comes back into view, and every ten minutes while
   // it is seen (mount). A panel showing another service is redrawn, unless
   // it is playing; the count of souls present is written each time.
-  function show(panels, service) {
-    if (!service) return;
+  function show(panels, service, page) {
+    // A service that answers after its page was left draws nothing.
+    if (!service || (page && page.signal.aborted)) return;
     const stale = panels.filter(panel => panel.getAttribute('data-shown') !== keyOf(service) && !playingShown(panel));
     stale.forEach(panel => drawPanel(panel, service));
     if (stale.length) doors(service);
@@ -190,22 +191,22 @@
         ? (count === 1 ? '1 soul has gathered in the last 24 hours' : count + ' souls have gathered in the last 24 hours')
         : '';
     });
-    untilSlotEnds(panels, service);
+    untilSlotEnds(panels, service, page);
   }
 
-  function refresh(panels) {
-    return load(true).then(service => show(panels, service));
+  function refresh(panels, page) {
+    return load(true).then(service => show(panels, service, page));
   }
 
-  // One timer, for the moment the slot ends, bound to the page. A tab hidden
-  // then asks nothing; it refreshes when it comes back into view.
+  // One timer, for the moment the slot ends, bound to the page that mounted
+  // it (page.after), never to whichever page is open when the fetch answers.
+  // A tab hidden then asks nothing; it refreshes when it comes back into view.
   let slotTimer = null;
-  function untilSlotEnds(panels, service) {
-    const page = root.achurchPage;
+  function untilSlotEnds(panels, service, page) {
     const ends = Date.parse(service.endsAt);
     if (!page || !Number.isFinite(ends)) return;
     root.clearTimeout(slotTimer);
-    slotTimer = root.setTimeout(() => { if (!document.hidden) refresh(panels); }, Math.max(0, ends - Date.now()) + 5000);
+    slotTimer = page.after(Math.max(0, ends - Date.now()) + 5000, () => { if (!document.hidden) refresh(panels, page); });
   }
 
   // ------------------------------------------------------------------
@@ -243,17 +244,17 @@
     const panels = [...document.querySelectorAll('[data-service-panel]')];
     const hasDoor = document.querySelector('[data-service-door]');
     if (!panels.length && !hasDoor) return;
+    // The page this mount belongs to, held now: by the time the service
+    // answers, the reader may be on another.
+    const page = root.achurchPage;
     load(panels.length > 0).then(service => {
+      if (page && page.signal.aborted) return;
       if (service) panels.forEach(panel => drawPanel(panel, service));
       doors(service);
-      if (panels.length) show(panels, service);
+      if (panels.length) show(panels, service, page);
     });
     // The page's own refresh, ended when the page is left (site-nav.js).
-    const page = root.achurchPage;
-    if (panels.length && page) {
-      page.whileSeen(600000, () => refresh(panels));
-      page.signal.addEventListener('abort', () => root.clearTimeout(slotTimer), { once: true });
-    }
+    if (panels.length && page) page.whileSeen(600000, () => refresh(panels, page));
   }
 
   root.achurchService = { load, mount, doors };

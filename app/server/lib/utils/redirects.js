@@ -165,9 +165,26 @@ const PUBLIC_HTML = new Set(listHtml(PUBLIC_DIR));
 
 /**
  * Where a path belongs, or null when it is already the page's own address.
- * `pathname` is the decoded path without its query.
+ * `pathname` is the decoded path without its query. One step is taken, then
+ * another from where it led, until a step leads nowhere new, so every old
+ * spelling goes to its page in one redirect: until 2026-10-25 a rule whose
+ * target was itself a moved address (/reflections/<retired song>, a section
+ * named without /docs, a renamed document) took two.
  */
 function canonicalTarget(pathname) {
+  let target = step(pathname);
+  const seen = new Set([pathname]);
+  while (target && target.startsWith('/') && !seen.has(target)) {
+    seen.add(target);
+    const [base, fragment] = target.split('#');
+    const next = step(base);
+    if (!next) break;
+    target = fragment && !next.includes('#') ? `${next}#${fragment}` : next;
+  }
+  return target;
+}
+
+function step(pathname) {
   // Never a target that starts //, which a browser reads as another host.
   if (/^\/[\/\\]/.test(pathname)) return null;
   let p = pathname;

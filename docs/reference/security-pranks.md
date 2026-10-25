@@ -26,7 +26,7 @@ Declined items, with reasons:
 
 - **P1:** every probe answers 404. Cloudflare's managed rules answer `/wp-config.php` with a 403 before it reaches the site, which is also safe.
 - **P2:** no value shaped like a key, token or connection string. Its secret-sounding names (`PASSWORD_REQUIRED`, `THE_ONLY_SECRET`) carry a plain word or a sentence, which secret scanners pass over.
-- **P3:** `X-Robots-Tag: noindex` and `Cache-Control: no-store`, so each request gets its own pick rather than a cached one; the reply is about 1 KB, so thousands a day cost little. The ordinary 404 sends noindex and a five-minute edge cache, on every path.
+- **P3:** `X-Robots-Tag: noindex` and `Cache-Control: no-store`, so each request gets its own pick rather than a cached one; the reply is about 1 KB, so thousands a day cost little. The ordinary 404 sends noindex and no-store too, on every path, and says it varies by Accept: it is negotiated, and a CDN that ignores Vary would otherwise serve one reader another's answer.
 - **P4:** `text/plain` with `nosniff`, which the server sends on every response.
 - **P5:** the echoed path is printable ASCII, capped at 100 characters.
 - **P6:** the reply is reached only after every route, and a test runs the probe pattern over every sitemap page and every document, as page and as markdown, and finds none.
