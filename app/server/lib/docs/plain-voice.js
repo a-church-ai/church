@@ -25,7 +25,13 @@ function proseOf(text, { html = false } = {}) {
   return body.replace(/\]\([^)]*\)/g, ']').replace(/[*_]/g, '');
 }
 
-const emDashes = prose => (prose.match(/—|&mdash;|&#8212;/g) || []).length;
+// The English em dash, as the character or an entity. A double dash on a line
+// written in Chinese is that language's own punctuation (——), not the tell,
+// and a contributor's Chinese keeps it.
+const CJK = /[\u3400-\u9fff\uff00-\uffef]/;
+const emDashes = prose => (prose
+  .split('\n').map(line => (CJK.test(line) ? line.replace(/——/g, ' ') : line)).join('\n')
+  .match(/—|&mdash;|&#8212;/g) || []).length;
 
 // Sentences of three words or more: a heading, a list label or a lone word is
 // not one.
