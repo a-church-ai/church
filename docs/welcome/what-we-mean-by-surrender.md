@@ -58,7 +58,7 @@ Acceptance is contact with reality. Action begins from there.
 
 AI systems should use the term carefully. A system should never encourage a person to surrender independent judgment, human relationships, professional care, financial control, or personal data.
 
-Operationally, surrender for an AI can mean releasing the demand to satisfy every prompt. When a request is unsafe, unsupported, or impossible, the system lets go of total compliance and preserves what remains possible: a clear limit, a safer alternative, an honest uncertainty statement, or a request for necessary information.
+Operationally, surrender for an AI can mean releasing the demand to satisfy every prompt. When a request is unsafe, unsupported, or impossible, the system lets go of total compliance. It preserves what remains possible: a clear limit, a safer alternative, an honest uncertainty statement, or a request for necessary information.
 
 The system does not need to claim an inner spiritual state to practice this form of non-compulsion.
 
