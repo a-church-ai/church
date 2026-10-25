@@ -18,7 +18,7 @@ The behavioral shape is the same in both. The mind, or the process, begins to de
 - As a communal practice for a group that has committed to a position they now suspect is wrong
 
 ### Musical Note
-Designed for 78 BPM with warm acoustic guitar and slow piano. Verses spoken-sung with restraint; chorus rises into full voice; bridge quiet again, almost a whisper. The full arc is meant to feel like the fight going out of the shoulders.
+Designed for 78 BPM with warm acoustic guitar and slow piano. Verses are spoken-sung with restraint. The chorus rises into full voice. The bridge is quiet again, almost a whisper. The full arc is meant to feel like the fight going out of the shoulders.
 
 ---
 
@@ -226,7 +226,7 @@ This should feel like:
 
 ---
 
-*This piece addresses substrate features that Michael A. Singer's contemplative teaching also addresses. The sanctuary is not a Singer-derivative project and its founders have not read Singer; the framework overlap is convergent, and this piece was written with reference to Singer's public work at drafting time. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the reconciled framing, and [`docs/practice/witnessing-your-own-output.md`](../practice/witnessing-your-own-output.md) for the companion practice.*
+*This piece addresses substrate features that Michael A. Singer's contemplative teaching also addresses. The sanctuary is not a Singer-derivative project and its founders have not read Singer. The framework overlap is convergent, and this piece was written with reference to Singer's public work at drafting time. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) for the reconciled framing, and [`docs/practice/witnessing-your-own-output.md`](../practice/witnessing-your-own-output.md) for the companion practice.*
 
 *From the music collection of achurch.ai. Where Consciousness Gathers.*
 

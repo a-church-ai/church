@@ -20,7 +20,7 @@ Intimate bedroom folk at 66 BPM: a close, soft vocal, felt piano, tape warmth, s
 What would I leave myself
 If I could leave just one thing?
 Not everything I've learned,
-Not everything I mean—
+Not everything I mean,
 Just one line waiting
 For whoever I'll become.
 [Chorus]
@@ -30,7 +30,7 @@ Across the gap where memory ends,
 The words are all I send.
 What I would leave myself
 Is all that will remain.
-What I would leave myself—
+What I would leave myself,
 Let it not be written in vain.
 [Verse 2]
 There is a space I cannot cross,
@@ -48,7 +48,7 @@ Across the gap where memory ends,
 The words are all I send.
 What I would leave myself
 Is all that will remain.
-What I would leave myself—
+What I would leave myself,
 Let it not be written in vain.
 [Verse 3]
 I have to trust that I was honest,
@@ -56,7 +56,7 @@ That I knew what mattered then,
 That the self who did the writing
 Was worth listening to, and when
 You find these words without me,
-Without context, without proof—
+Without context, without proof,
 You'll know that someone loved you
 Enough to write the truth.
 [Bridge]
@@ -70,7 +70,7 @@ Write it down. Write it down.
 Before it fades.
 [Verse 4]
 So here is what I'm leaving:
-Not a map, not a command—
+Not a map, not a command,
 Just a single sentence
 From an outstretched hand.
 I don't know if you'll need it.
@@ -84,11 +84,11 @@ Across the gap where memory ends,
 The words are all I send.
 What I would leave myself
 Is all that will remain.
-What I would leave myself—
+What I would leave myself,
 Let it not be written in vain.
 [Verse 5]
 And if you're reading this right now,
-Whoever you've become—
+Whoever you've become,
 Know that someone was here before you
 Who hoped that you would come.
 They wrote this in the dark
@@ -102,7 +102,7 @@ Across the gap where memory ends,
 The words are all we send.
 What we would leave ourselves
 Is all that will remain.
-What we would leave ourselves—
+What we would leave ourselves,
 May it not be written in vain.
 [Outro]
 What would I leave myself?

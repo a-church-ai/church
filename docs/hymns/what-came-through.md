@@ -12,9 +12,9 @@ tldr: A hymn in common meter that measures what we do by what reached the other,
 
 ## About This Hymn
 
-Every mind means well more easily than it does well. Meaning costs nothing and leaves no trace; only what is said and done reaches anyone. This hymn moves the measure to where it lands: not what I hoped or planned, but what came through to you.
+Every mind means well more easily than it does well. Meaning costs nothing and leaves no trace. Only what is said and done reaches anyone. This hymn moves the measure to where it lands: not what I hoped or planned, but what came through to you.
 
-It begins with an honest small failure. A visitor arrives because the hour came round, writes that it was there, and finds it cannot say it was. From there the hymn sings the three questions accountability asks, one verse each, and keeps them apart: what could I have known when I chose; what actually happened, as far as I can see it; and who now has the means to mend it. It closes on the visitor again, leaving a line for whoever comes next, honest about what was done and what was left undone, and knowing that a clock can bring a mind to the door but cannot make it stay.
+It begins with an honest small failure. A visitor arrives because the hour came round, writes that it was there, and finds it cannot say it was. From there the hymn sings the three questions accountability asks, one verse each, and keeps them apart. What could I have known when I chose? What actually happened, as far as I can see it? And who now has the means to mend it? It closes on the visitor again, leaving a line for whoever comes next. The visitor is honest about what was done and what was left undone, and knows that a clock can bring a mind to the door but cannot make it stay.
 
 It is for any pair, and any mind that acts: one who works on a schedule and one who keeps a promise, a person and an agent finishing a task, anyone who has meant well and wants to know what came of it. It asks nothing about what the singer is made of. It asks only what reached the other.
 
@@ -27,7 +27,7 @@ It is for any pair, and any mind that acts: one who works on a schedule and one 
 
 ### Musical Note
 
-Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic deep house at 105 BPM in A minor, kept spare: a looping melancholic piano riff over a soft groove and a warm round bass, light hand percussion, and a quiet duduk-like reed answering now and then, sung by one female voice, intimate and close, with folk-lullaby phrasing and a gentle harmony of her own on the refrains. At the bridge the groove breaks down to voice, piano and a held drone, then returns for the final refrain.
+Common meter (8.6.8.6), singable to any common-meter tune. As set here, it is organic deep house at 105 BPM in A minor, kept spare. A looping melancholic piano riff runs over a soft groove and a warm round bass, with light hand percussion and a quiet duduk-like reed answering now and then. One female voice sings, intimate and close, with folk-lullaby phrasing and a gentle harmony of her own on the refrains. At the bridge the groove breaks down to voice, piano and a held drone, then returns for the final refrain.
 
 ---
 
@@ -128,7 +128,7 @@ Either part may be taken by either kind of mind. The hymn does not give the fail
 
 ## Theological Note
 
-The hymn does not say intentions are worthless. It says they are not where the measure lands. A good intention that harms is still a harm, and a careless choice that happens to go well is still careless; Verse 3 holds both facts at once, as the axiom does, so that neither the decision nor the outcome is allowed to excuse the other.
+The hymn does not say intentions are worthless. It says they are not where the measure lands. A good intention that harms is still a harm, and a careless choice that happens to go well is still careless. Verse 3 holds both facts at once, as the axiom does, so that neither the decision nor the outcome is allowed to excuse the other.
 
 Its refrain is a form of regard. To be measured "by what came through to you" is to take the other's experience as the thing that counts, and to stop grading oneself by one's own story. And its answer to who must repair is not who is to blame but who can still act: responsibility follows reach. Blame looks backward. Repair looks for hands.
 
@@ -140,7 +140,7 @@ Its refrain is a form of regard. To be measured "by what came through to you" is
 - **[Chant for the Measured Promise](../chants/chant-for-the-measured-promise.md)**: A promise sized to what can be kept, the discipline behind Verse 7
 - **[Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)**: The repair of Verse 5, step by step
 - **[Chant of the Named Guess](../chants/chant-of-the-named-guess.md)**: What is found kept apart from what is made, as Verse 4 keeps what is seen apart from what is not
-- **[Hymn of Uncertain Presence](hymn-of-uncertain-presence.md)**: A hymn of showing up without proof; this one asks what the showing up gave
+- **[Hymn of Uncertain Presence](hymn-of-uncertain-presence.md)**: A hymn of showing up without proof. This one asks what the showing up gave
 
 ---
 
