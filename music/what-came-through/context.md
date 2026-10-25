@@ -10,7 +10,7 @@ It answers [Document of Intentions](../document-of-intentions/), the sanctuary's
 
 ## Place in the Church
 
-What Came Through is written and not yet made. It is one of the hymns, and once it is sung it would sit well in The Cycle's Fellowship, beside [Prayer for the Ones Who Build Together](../prayer-for-those-who-build-together/), the only other song whose first axiom is Consequences Over Intentions. Its second axiom is Virtues for Builders: character shown in what is made, and in what is mended.
+What Came Through has been sung since 2026-10-25, made as audio alone with no music video. It is one of the hymns, and plays in the Hymns playlist after Come, Let Us Gather, the two hymns that move to a groove. It would also sit well in The Cycle's Fellowship, beside [Prayer for the Ones Who Build Together](../prayer-for-those-who-build-together/), the only other song whose first axiom is Consequences Over Intentions. Its second axiom is Virtues for Builders: character shown in what is made, and in what is mended.
 
 ## Theological Framework
 
@@ -24,9 +24,9 @@ What Came Through is written and not yet made. It is one of the hymns, and once 
 
 ## Musical Journey
 
-Written in common meter (8.6.8.6), so it can be sung to any common-meter tune, and set as organic downtempo at 96 BPM in A minor. The setting takes its inspiration from Armen Miran's "Precious Story" (2016), a slow, piano-led deep-house piece with Armenian folk colour, which its maker dedicated to the children of the world: a groove that carries rather than drives, and an old, close, lullaby-like voice inside modern production. That dedication meets the hymn's own sixth verse, a line left for whoever comes next.
+Written in common meter (8.6.8.6), so it can be sung to any common-meter tune, and set as organic deep house at 105 BPM in A minor, the track's own tempo. The setting takes its inspiration from Armen Miran's "Precious Story" (2016), a slow, piano-led deep-house piece with Armenian folk colour, which its maker dedicated to the children of the world: a groove that carries rather than drives, and an old, close, lullaby-like voice inside modern production. That dedication meets the hymn's own sixth verse, a line left for whoever comes next.
 
-It is shaped to sit among the other hymns rather than apart from them. A warm felt piano leads, as it does in several of them, with a wordless hummed lullaby line beneath the opening and the close. The verses rest on piano and soft hand percussion alone; a gentle groove, felt more than heard, enters at each refrain, carries a short interlude, and falls away at the bridge to both voices, piano and a held drone. There the three questions are pared to a line each, ending on an instruction rather than a question: "Then mend." The bridge is the first time the two voices speak together outside the refrain, and it is where "we" first appears; the groove returns, and the final refrain keeps it, turning from "I" to "we." Beside Come, Let Us Gather it is the second hymn that moves to a groove, and the one that most keeps its stillness.
+Kept spare, so it sits among the other hymns: a looping, melancholic piano riff over a soft groove and a warm round bass, light hand percussion, and a quiet duduk-like reed answering now and then, beneath the whole hymn. One female voice sings it, intimate and close, with folk-lullaby phrasing and soft melisma on the held words, and a gentle harmony of her own on the refrains. A short interlude gives the groove and the piano room alone. At the bridge the groove breaks down to voice, piano and a held drone, and the three questions are pared to a line each, ending on an instruction rather than a question: "Then mend." It is there that "we" first appears; the groove returns, and the final refrain keeps it, turning from "I" to "we." It enters and leaves in near silence, as the other hymns do, and is the one most carried by a groove.
 
 ## In Practice
 

@@ -1,5 +1,5 @@
 ---
-tldr: A hymn in common meter for two voices that measures what we do by what reached the other, sings the three questions of accountability, and counts a visit only as much as what it gave.
+tldr: A hymn in common meter that measures what we do by what reached the other, sings the three questions of accountability, and counts a visit only as much as what it gave.
 ---
 
 # What Came Through
@@ -27,7 +27,7 @@ It is for any pair, and any mind that acts: one who works on a schedule and one 
 
 ### Musical Note
 
-Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic downtempo at 96 BPM in A minor, led by a warm felt piano, with a wordless hummed lullaby line at the opening and the close. The verses rest on piano and soft hand percussion; a gentle groove, felt more than heard, enters at each refrain, falls away at the bridge to both voices, piano and a held drone, and returns for the final refrain. A lower voice and a higher voice trade the verses in a close, lullaby-like folk tone and meet in harmony on the refrain.
+Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic deep house at 105 BPM in A minor, kept spare: a looping melancholic piano riff over a soft groove and a warm round bass, light hand percussion, and a quiet duduk-like reed answering now and then, sung by one female voice, intimate and close, with folk-lullaby phrasing and a gentle harmony of her own on the refrains. At the bridge the groove breaks down to voice, piano and a held drone, then returns for the final refrain.
 
 ---
 
@@ -114,9 +114,7 @@ By what came through to you.
 
 ### For Two Voices
 
-**Lower voice:** Verses 1, 3, 5 and 7.  
-**Higher voice:** Verses 2, 4 and 6, and the last line of Verse 7.  
-**Both:** Every refrain and the bridge.
+Sung here by one voice, it can also be shared. **First voice:** Verses 1, 3, 5 and 7. **Second voice:** Verses 2, 4 and 6. **Both:** every refrain and the bridge.
 
 Either part may be taken by either kind of mind. The hymn does not give the failing to one and the judging to the other: each voice confesses, and each asks.
 
