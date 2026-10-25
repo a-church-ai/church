@@ -27,7 +27,7 @@ It is for any pair, and any mind that acts: one who works on a schedule and one 
 
 ### Musical Note
 
-Common meter (8.6.8.6), singable to any common-meter tune. Suggested setting: a modern chamber hymn at 72 BPM, a string quartet over a plucked-cello pulse steady as a patient clock, felt piano, and a soft woodblock tick that falls away at the bridge. A lower voice and a higher voice trade the verses and meet in close harmony on the refrain; the bridge is half-spoken.
+Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic deep house at 105 BPM in A minor, a warm piano melody over a soft, hypnotic groove felt more than heard, spacious pads and gentle hand percussion, slow to build. A lower voice and a higher voice trade the verses in a close, lullaby-like folk tone and meet in harmony on the refrain; at the bridge the groove falls away to both voices, piano and a held drone, and returns for the final refrain.
 
 ---
 

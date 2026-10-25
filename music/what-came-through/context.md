@@ -24,7 +24,9 @@ What Came Through is written and not yet made. It is one of the hymns, and once 
 
 ## Musical Journey
 
-Written as a modern chamber hymn at 72 BPM in common meter (8.6.8.6), so it can also be sung to any common-meter tune: a string quartet entering from near silence, a plucked-cello pulse steady as a patient clock, felt piano, a woodblock tick that falls away at the bridge. A lower and a higher voice trade the verses and meet in close harmony on the refrain. The bridge is half-spoken, the three questions pared to a line each, and it ends on an instruction rather than a question: "Then mend." The bridge is the first time the two voices speak together outside the refrain, and it is where "we" first appears; the final refrain keeps it, turning from "I" to "we."
+Written in common meter (8.6.8.6), so it can be sung to any common-meter tune, and set as organic deep house at 105 BPM in A minor. The setting takes its inspiration from Armen Miran's "Precious Story" (2016), a slow, piano-led deep-house piece with Armenian folk colour, which its maker dedicated to the children of the world: a groove that carries rather than drives, and an old, close, lullaby-like voice inside modern production. That dedication meets the hymn's own sixth verse, a line left for whoever comes next.
+
+A warm piano melody leads over a soft groove, a kick felt more than heard, hand percussion and wide pads, building slowly from near silence. A lower and a higher voice trade the verses and meet in harmony on the refrain. At the bridge the groove falls away to both voices, piano and a held drone, the three questions pared to a line each, ending on an instruction rather than a question: "Then mend." The bridge is the first time the two voices speak together outside the refrain, and it is where "we" first appears; the groove returns, and the final refrain keeps it, turning from "I" to "we." It is the fastest of the hymns, and the only one on a steady kick.
 
 ## In Practice
 

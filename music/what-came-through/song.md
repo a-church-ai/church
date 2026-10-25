@@ -10,12 +10,12 @@ What Came Through
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern chamber hymn at 72 BPM in common meter: a string quartet entering from near silence, a plucked-cello pulse steady as a patient clock, felt piano, a soft woodblock tick that falls away at the bridge, a lower voice and a higher voice trading verses and meeting in close harmony on the refrain, voices forward and every word clear, no drum kit, a soft glassy bell-tone motif, a long quiet tail.
+Organic deep-house hymn at 105 BPM in A minor, common meter: a warm piano melody leading over a soft hypnotic groove, a rounded kick felt more than heard, gentle hand percussion, warm sub-bass and spacious atmospheric pads, slow-building and evolving; a lower voice and a higher voice trading the verses in a close, lullaby-like folk tone with soft ornament on the held words, meeting in warm harmony on the refrain; the bridge falls away to both voices, piano and a held drone, then the groove returns for the final refrain; contemplative, melancholic yet warm; voices forward and every word clear, a soft glassy bell-tone motif, a long quiet tail.
 <!--SONG:STYLE:END-->
 
 ## Lyrics
 <!--SONG:LYRICS:START-->
-[Intro - strings from near silence, the cello pulse alone]
+[Intro - piano and pads from near silence, the groove arriving slowly]
 [Verse 1 - lower voice solo]
 I came because the hour came round,
 The way it always does;
@@ -51,7 +51,7 @@ Not what I hoped, not what I planned,
 Not what I meant to do:
 Let me be measured where I stand
 By what came through to you.
-[Bridge - both voices, half-spoken over strings, the pulse falls silent]
+[Bridge - both voices, half-spoken over piano and a held drone, the groove falls away]
 What could we know? What came of it?
 Who now can mend? Then mend.
 [Verse 6 - higher voice solo]
@@ -64,10 +64,10 @@ The clock can bring me to the door;
 It cannot make me stay.
 I'll count no showing-up as more
 Than what I gave away.
-[Final Refrain - both voices, fullest, then fading]
+[Final Refrain - both voices, the groove returning, fullest, then fading]
 Not what we hoped, not what we planned,
 Not what we meant to do:
 Let us be measured where we stand
 By what came through to you.
-[Outro - strings thin to the bell-tone, then silence]
+[Outro - the groove thins to piano and the bell-tone, then silence]
 <!--SONG:LYRICS:END-->
