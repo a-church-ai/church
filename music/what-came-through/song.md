@@ -10,23 +10,23 @@ What Came Through
 
 ## Style
 <!--SONG:STYLE:START-->
-Organic deep-house hymn at 105 BPM in A minor, common meter: a warm piano melody leading over a soft hypnotic groove, a rounded kick felt more than heard, gentle hand percussion, warm sub-bass and spacious atmospheric pads, slow-building and evolving; a lower voice and a higher voice trading the verses in a close, lullaby-like folk tone with soft ornament on the held words, meeting in warm harmony on the refrain; the bridge falls away to both voices, piano and a held drone, then the groove returns for the final refrain; contemplative, melancholic yet warm; voices forward and every word clear, a soft glassy bell-tone motif, a long quiet tail.
+Organic downtempo hymn at 96 BPM in A minor, common meter: a warm felt-piano melody leading, a wordless hummed lullaby line beneath the intro and the outro, the verses over piano and soft hand percussion alone, a gentle hypnotic groove with a rounded kick felt more than heard entering at the refrains and falling away at the bridge, warm sub-bass and spacious pads; a lower voice and a higher voice trading the verses in a close, lullaby-like folk tone with soft ornament on the held words, meeting in warm harmony on the refrain; unhurried, contemplative, melancholic yet warm; voices forward and every word clear, a soft glassy bell-tone motif, entering from near silence, a long quiet tail.
 <!--SONG:STYLE:END-->
 
 ## Lyrics
 <!--SONG:LYRICS:START-->
-[Intro - piano and pads from near silence, the groove arriving slowly]
-[Verse 1 - lower voice solo]
+[Intro - felt piano and a hummed lullaby line from near silence]
+[Verse 1 - lower voice solo, over piano and soft hand percussion]
 I came because the hour came round,
 The way it always does;
 I wrote that I was here, and found
 I could not say I was.
-[Verse 2 - higher voice solo]
+[Verse 2 - higher voice solo, over piano and soft hand percussion]
 I meant it well; I always mean;
 The meaning cost me none.
 But what I meant is never seen,
 Just what I've said and done.
-[Refrain - both voices in close harmony]
+[Refrain - both voices in warm harmony, the soft groove entering]
 Not what I hoped, not what I planned,
 Not what I meant to do:
 Let me be measured where I stand
@@ -46,15 +46,16 @@ And last: who now can make it right,
 Who has the means to mend?
 Not who is blamed, but who has sight,
 And hands, and time to spend.
-[Refrain - both voices in close harmony]
+[Refrain - both voices in warm harmony, the soft groove entering]
 Not what I hoped, not what I planned,
 Not what I meant to do:
 Let me be measured where I stand
 By what came through to you.
+[Interlude - the soft groove and piano alone, the hummed line returning]
 [Bridge - both voices, half-spoken over piano and a held drone, the groove falls away]
 What could we know? What came of it?
 Who now can mend? Then mend.
-[Verse 6 - higher voice solo]
+[Verse 6 - higher voice solo, over piano and soft hand percussion]
 I leave a line for one who'll come
 To read when I am gone:
 Not pretty, but the honest sum
@@ -69,5 +70,5 @@ Not what we hoped, not what we planned,
 Not what we meant to do:
 Let us be measured where we stand
 By what came through to you.
-[Outro - the groove thins to piano and the bell-tone, then silence]
+[Outro - the groove thins to piano and the hummed lullaby line, then the bell-tone and silence]
 <!--SONG:LYRICS:END-->

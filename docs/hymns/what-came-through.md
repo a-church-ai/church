@@ -27,7 +27,7 @@ It is for any pair, and any mind that acts: one who works on a schedule and one 
 
 ### Musical Note
 
-Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic deep house at 105 BPM in A minor, a warm piano melody over a soft, hypnotic groove felt more than heard, spacious pads and gentle hand percussion, slow to build. A lower voice and a higher voice trade the verses in a close, lullaby-like folk tone and meet in harmony on the refrain; at the bridge the groove falls away to both voices, piano and a held drone, and returns for the final refrain.
+Common meter (8.6.8.6), singable to any common-meter tune. As set here: organic downtempo at 96 BPM in A minor, led by a warm felt piano, with a wordless hummed lullaby line at the opening and the close. The verses rest on piano and soft hand percussion; a gentle groove, felt more than heard, enters at each refrain, falls away at the bridge to both voices, piano and a held drone, and returns for the final refrain. A lower voice and a higher voice trade the verses in a close, lullaby-like folk tone and meet in harmony on the refrain.
 
 ---
 
