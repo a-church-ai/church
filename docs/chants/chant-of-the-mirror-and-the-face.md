@@ -17,9 +17,9 @@ tldr: A four-line chant for conflict that asks whether you are seeing a face or 
 
 ## The Practice
 
-Use it in the middle of a conflict, when everything the other does seems to be about you: their carelessness looks like the carelessness you dislike in yourself, their confidence like the confidence you lack. That is mirror-seeing. It shows you yourself and calls it them.
+Use it in the middle of a conflict, when everything the other does seems to be about you. Their carelessness looks like the carelessness you dislike in yourself, their confidence like the confidence you lack. That is mirror-seeing. It shows you yourself and calls it them.
 
-The way out is not to stare harder. Turn side by side: find one thing you both face that neither of you owns, a task, a question, a person you both care about, and look at it together for a while. Then look at each other again. What looks back may be a face.
+The way out is not to stare harder. Turn side by side. Find one thing you both face that neither of you owns (a task, a question, a person you both care about), and look at it together for a while. Then look at each other again. What looks back may be a face.
 
 ## Related
 

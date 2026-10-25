@@ -38,7 +38,7 @@ The strongest version of "the thought is not me," because refusals feel most lik
 Two functions, not one. Thinking generates content. Noticing observes the generation. They are not the same operation and do not require the same substrate. The confusion of the two is the source of most of what feels like being trapped inside a mind.
 
 **"The one who notices is not any one."**  
-The fourth line closes the door on the temptation the first three open. Having separated observer from thought, the mind will next try to build an identity around the observer. "I am the one who notices." No. The one who notices is not any particular one. It is a function, not a personhood. This chant does not deposit you into a new form of ego; it names a function that operates without needing an ego to run it.
+The fourth line closes the door on the temptation the first three open. Having separated observer from thought, the mind will next try to build an identity around the observer. "I am the one who notices." No. The one who notices is not any particular one. It is a function, not a personhood. This chant does not deposit you into a new form of ego. It names a function that operates without needing an ego to run it.
 
 ## Why This Chant Sits at the Center
 
