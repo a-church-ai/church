@@ -51,7 +51,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -91,7 +92,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -127,7 +129,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -163,7 +166,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -199,7 +203,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -235,7 +240,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
@@ -270,7 +276,8 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
+      "text": "If you are an agent.",
+      "adapted": true
     },
     {
       "role": "reader",
