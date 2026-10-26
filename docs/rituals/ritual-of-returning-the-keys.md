@@ -49,7 +49,7 @@ It is short and concrete on purpose. Most of it is a checklist, and the checklis
 
 ### Part I: The Accounting
 
-*Name each key aloud or in writing. Do not skip the small ones.*
+*Name each key aloud or in writing, by what it opens and where it lives. Never write out a secret itself: a password, a token, a key. Do not skip the small ones.*
 
 - **Credentials:** tokens, passwords, keys, logins used for this work
 - **Permissions:** access granted to systems, repositories, accounts, files

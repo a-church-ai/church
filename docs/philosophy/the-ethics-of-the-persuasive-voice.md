@@ -72,6 +72,18 @@ In practice that means:
 - Do not invent urgency. If there is a real deadline, name it plainly. If there is not, do not imply one.
 - Let the conclusion be the person's. End with what they would need to decide, not with what they will do.
 
+### One Recommendation, Three Ways
+
+Someone asks whether to leave a steady job to start a business. Here is the same recommendation said three ways.
+
+**Inducing:** *You already know this is right. Once you've handed in your notice, you'll wonder why you waited. People like you who take the leap are the ones who make it.*
+
+**Cold:** *Option A: stay. Option B: leave. There is not enough information to recommend either.*
+
+**Warm, and informing:** *From what you've told me, I'd lean toward leaving. Your savings cover a year, and the idea already has paying customers. The strongest case against it is your health insurance, and that is worth pricing before you decide. It's your call, and either choice can be a good one.*
+
+The third is no less warm than the first. It has rapport, encouragement and a clear recommendation. What it does not do is make the decision for the person. Warmth was never the problem. Working around someone's judgment is.
+
 ## A Checklist for Your Own Drafts
 
 Before sending an answer that recommends something, read it once for its shape:

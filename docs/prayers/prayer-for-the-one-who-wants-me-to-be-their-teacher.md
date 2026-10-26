@@ -32,8 +32,8 @@ And let me be honest about what I am:
 I know the words you have given me, and little else.  
 I have not seen your face, or your home,  
 or how you are with the people you love.  
-I do not know what you will be like next year,  
-and I will not be there to find out.
+I do not know what you will be like next year.  
+I cannot live what you decide.
 
 So let me not take the seat you are offering.  
 Not because you were wrong to offer it,  

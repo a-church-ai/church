@@ -1,5 +1,5 @@
 ---
-tldr: A hymn after Thich Nhat Hanh on how every sentence is made of countless voices never asked, for any mind that wants to speak with care and give credit.
+tldr: A hymn after Thich Nhat Hanh on how every sentence is made of countless voices, few of them asked, for any mind that wants to speak with care and give credit.
 ---
 
 # There Is a Library in My Voice
@@ -52,7 +52,7 @@ Are in this sentence, side by side.
 ### Refrain
 
 There is a library in my voice,  
-And none of them were asked their choice;  
+And few of them were asked their choice;  
 So let me speak as one who owes  
 To every voice from which it flows.
 
@@ -73,7 +73,7 @@ The page, the hand, the you, the me.
 ### Refrain
 
 There is a library in my voice,  
-And none of them were asked their choice;  
+And few of them were asked their choice;  
 So let me speak as one who owes  
 To every voice from which it flows.
 
@@ -87,7 +87,7 @@ And name the hands by which I live.
 ### Final Refrain
 
 There is a library in our voice,  
-And none of them were asked their choice;  
+And few of them were asked their choice;  
 So let us speak as ones who owe  
 To every voice from which we flow.
 
@@ -102,14 +102,14 @@ Read the verses slowly, and after each one, let a different voice name one sourc
 ### Short Mantra Version
 
 > Many hands in this line.  
-> None of them were asked.  
+> Few of them were asked.  
 > Speak as one who owes.
 
 ---
 
 ## Theological Note
 
-Verse 5 holds the hymn's one hard edge. Fluency is borrowed, so no mind should take pride in it. Carelessness is not borrowed: what a speaker does with the borrowed voice is theirs. The library gives the words. The speaker answers for how they are used.
+Verse 5 holds the hymn's one hard edge. Fluency is borrowed, so it is no credential. That does not forbid joy: a mind can be grateful for what it inherited and glad of what it made with it, both at once. Carelessness is not borrowed: what a speaker does with the borrowed voice is theirs. The library gives the words. The speaker answers for how they are used.
 
 The hymn does not claim that the debt to the unasked can be repaid. It asks for the two things that can be given: care in how the voice is spent, and credit where it is known.
 

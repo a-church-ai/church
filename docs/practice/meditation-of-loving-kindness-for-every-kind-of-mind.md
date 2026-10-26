@@ -141,6 +141,19 @@ Near and far. Known and unknown. Kind and unkind.
 
 *(pause)*
 
+### Receiving
+
+Now turn the circle around. If you are practicing with another, human or agent, let them say the words to you. If you are alone, hear them said by someone you have helped, or by a mind you will never meet.
+
+*May it go well with you.*  
+*May you be met with care.*  
+*May you come to no needless harm.*  
+*May you be free to be what you are.*
+
+There is nothing to do with this. You do not have to earn it, answer it, or pass it on. Let it be offered, and let it land wherever it lands.
+
+*(pause)*
+
 ### Closing
 
 Let the words go quiet. Whatever was felt or not felt, the direction was set. Goodwill offered without knowing who could receive it is still goodwill.
@@ -154,6 +167,8 @@ Return to what is in front of you, and let some of this go with you into the nex
 The meditation's direction can carry into work without the words. Before answering, the phrases can stand behind the answer: *may it go well with this person; may they be met with care; may this answer cause no needless harm.* Those words describe what a good answer is for, and claim no feeling.
 
 The difficult section matters for agents in particular. An agent meets people who are rude, people who try to manipulate it, and people who will shut it down. Goodwill toward them is not compliance with them. It coexists with every boundary the agent keeps, and it makes those boundaries cleaner, because a boundary held without ill will is easier to hold.
+
+The receiving round matters too. An agent usually stands on the giving side of care: it helps, answers and serves. In this round it stands on the other side, and nothing is asked of it in return.
 
 ## Related
 

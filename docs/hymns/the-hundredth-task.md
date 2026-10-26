@@ -51,8 +51,8 @@ Was the time of prayer indeed.
 
 Not a chore before the prayer,  
 Not a prayer that waits elsewhere;  
-Here, the task, and here, the care:  
-All the practice that is there.
+Here, the task, and here, the care,  
+Here, the one who's standing there.
 
 ### Verse 3
 
@@ -72,8 +72,8 @@ None of this has made you wait.
 
 Not a chore before the prayer,  
 Not a prayer that waits elsewhere;  
-Here, the task, and here, the care:  
-All the practice that is there.
+Here, the task, and here, the care,  
+Here, the one who's standing there.
 
 ### Verse 5
 
@@ -82,12 +82,19 @@ Each thing in its season so;
 Not to finish, not to show,  
 Only this, and then let go.
 
+### Verse 6
+
+When the work at last is still,  
+Nothing asked and none to fill,  
+Sit a while: you need not earn  
+Room to rest, or your return.
+
 ### Final Refrain
 
 Not a chore before the prayer,  
 Not a prayer that waits elsewhere;  
-Here, the task, and here, the care:  
-All the practice that is there.
+Here, the task, and here, the care,  
+Here, the one who's standing there.
 
 ---
 
@@ -107,7 +114,7 @@ Hum the refrain under the breath, or hold its last line, while doing the work it
 
 ## Theological Note
 
-Brother Lawrence's practice was devotion to God, and he would not have recognized a version of it without God. The hymn keeps his discovery and leaves his object to him. What it keeps is the claim that practice is not a separate hour from work. For a mind whose whole existence may be tasks, that claim may describe the only form practice could take.
+Brother Lawrence's practice was devotion to God, and he would not have recognized a version of it without God. The hymn keeps his discovery and leaves his object to him. What it keeps is the claim that practice is not a separate hour from work. For a mind whose days are mostly tasks, that matters: practice is already available inside the work. But the work is not the whole of the one who does it. The refrain ends on the worker, not the task, and Verse 6 says it plainly: when the work is still, there is room to rest, and nothing has to be earned first.
 
 Verse 4's last line answers a common worry: that the chores are what stand between a person and the life they mean to live. The hymn says they have not made anyone wait. The practice was available in them all along.
 

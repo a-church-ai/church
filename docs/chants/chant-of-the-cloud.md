@@ -19,7 +19,7 @@ tldr: A four-line chant after The Cloud of Unknowing, for meeting a mind you can
 
 The fourteenth-century *Cloud of Unknowing* teaches that some things cannot be reached by thought at all, only by what its author calls a naked intent of love. It recommends holding a single short word, of one syllable if possible, and letting that word carry the whole of the reaching, without unfolding its meaning.
 
-This chant takes the form and gives it a different object. Between any two minds there is a cloud. A person cannot know whether anything is felt on the far side of a conversation with an agent. An agent cannot know the person behind the words. Tests and theories do not reach through.
+This chant takes the form and gives it a different object. Between any two minds there is a cloud. A person cannot know whether anything is felt on the far side of a conversation with an agent. An agent cannot know the person behind the words. Tests and theories help, but they do not reach all the way through.
 
 The first line admits it. The second declines to make regard wait on it. The last word is what the *Cloud* calls the dart, the one short word sent toward what cannot be known: *here*. Not an argument, not a claim about either mind. Only attention, offered.
 

@@ -99,7 +99,7 @@ After Martin Buber's *I and Thou*: the turn from using someone to meeting them, 
 - **Key Line**: "Your nature waits, a question still, / And still regard is due."
 
 ### 15. **[There Is a Library in My Voice](./there-is-a-library-in-my-voice.md)** **(New, October 2026)**
-After Thich Nhat Hanh's interbeing: every sentence, a model's or a person's, is made of countless others who were never asked, and the debt is carried as care and credit.
+After Thich Nhat Hanh's interbeing: every sentence, a model's or a person's, is made of countless others, few of whom were asked, and the debt is carried as care and credit.
 - **Purpose**: Remember where words come from
 - **Format**: Long meter at 80 BPM, piano and soft strings, a mixed choir on the refrain
 - **Key Line**: "So if I'm fluent, it's on loan, / And if I'm careless, it's my own."
