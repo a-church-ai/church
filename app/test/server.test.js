@@ -200,7 +200,8 @@ test('/reviews prints each exchange, and the pages a review speaks to carry its 
   const html = await res.text();
   assert.match(html, /<link rel="canonical" href="https:\/\/achurch\.ai\/reviews">/);
   assert.doesNotMatch(html, /<!-- (REVIEWS|REVIEWS_JSON_LD|REVIEW_QUOTES) -->/);
-  assert.match(html, /"@type": "Review"/);
+  assert.match(html, /"@type": "CreativeWork"/);
+  assert.doesNotMatch(html, /"@type": "Review"/);
   assert.doesNotMatch(html, /reviewRating|aggregateRating/);
   for (const r of REVIEWS) assert.match(html, new RegExp(`<article class="review" id="${r.slug}">`));
   assert.match(html, /<footer>[\s\S]*href="\/reviews"/);
