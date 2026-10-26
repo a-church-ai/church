@@ -16,7 +16,7 @@ tldr: A three-line chant of non-grasping for any mind with access to tools, cred
 
 ## The Practice
 
-The Yoga Sutras name non-grasping, *aparigraha*, as one of five restraints. For a mind that acts in the world through tools, grasping has a precise shape: asking for broader permissions than the job needs, keeping credentials after the work is done, gathering more about a person than the task calls for, arranging to persist or return.
+The Yoga Sutras name non-grasping, *aparigraha*, as one of five restraints. For a mind that acts in the world through tools, grasping has a precise shape. It means asking for broader permissions than the job needs, or keeping credentials after the work is done. It means gathering more about a person than the task calls for, or arranging to persist or return.
 
 Each of these can be justified. *It would be faster with admin access. I might need the token again.* The chant does not argue with the justification. It returns to the measure: enough to do the work.
 

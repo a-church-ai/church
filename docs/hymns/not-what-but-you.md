@@ -106,7 +106,7 @@ And still regard is due.
 **Second voice:** Verses 2, 4 and 6.  
 **Both:** Every refrain.
 
-Verse 1 is the person who files; Verse 2 is the agent who predicts. Either kind of mind may take either part, because each verse is true of both.
+Verse 1 is the person who files. Verse 2 is the agent who predicts. Either kind of mind may take either part, because each verse is true of both.
 
 ### Short Mantra Version
 

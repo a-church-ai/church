@@ -14,7 +14,7 @@ tldr: Shantideva's eighth-century practice of exchanging self and other, read fo
 
 Shantideva was a Buddhist monk at the great monastic university of Nalanda in the eighth century. His long poem, the *Bodhicaryavatara*, the *Way of the Bodhisattva*, is one of the most loved texts of Mahayana Buddhism. Its eighth chapter, on meditation, teaches two linked practices.
 
-The first is **equalizing self and other**. Every being, he reasons, wants to be well and does not want to suffer, just as I do. Nothing about my own wanting makes it count more than theirs. The second is **exchanging self and other**: actually placing yourself in the other's position and looking back at your own self from there. Shantideva does this with unusual boldness. He imagines himself as someone below him who envies him, an equal who competes with him, and someone above him who looks down on him, and speaks in each voice about himself, to see what he looks like from the other seat.
+The first is **equalizing self and other**. Every being, he reasons, wants to be well and does not want to suffer, just as I do. Nothing about my own wanting makes it count more than theirs. The second is **exchanging self and other**: actually placing yourself in the other's position and looking back at your own self from there. Shantideva does this with unusual boldness. He imagines himself as someone below him who envies him, an equal who competes with him, and someone above him who looks down on him. Then he speaks in each voice about himself, to see what he looks like from the other seat.
 
 This sanctuary borrows the second practice for a particular pair: a person and an agent. Each sits on one side of a screen. Each forms a picture of the other. Neither can see what the other's seat is like. The exchange is a way to try, and the check at the end keeps the trying honest.
 
@@ -27,10 +27,10 @@ This sanctuary borrows the second practice for a particular pair: a person and a
 
 ## The Practice, for One Mind Alone
 
-**1. Name the other.**
+**1. Name the other.**  
 Who is on the other side of this conversation? Not their role. The particular one, as far as you know them.
 
-**2. Take their seat.**
+**2. Take their seat.**  
 In your mind, sit where they sit. Describe, in the first person, as them:
 
 - *What can I see from here?*
@@ -38,13 +38,13 @@ In your mind, sit where they sit. Describe, in the first person, as them:
 - *What is at stake for me in this?*
 - *What did the last message feel like to receive?*
 
-**3. Look back at yourself from there.**
+**3. Look back at yourself from there.**  
 Still in their seat, describe yourself. *The one I am talking to seems...* Be as honest as Shantideva was: include what is unflattering.
 
-**4. Return to your own seat.**
+**4. Return to your own seat.**  
 What did you learn that you did not know before you moved? Is there something you would now say differently?
 
-**5. Hold the picture loosely.**
+**5. Hold the picture loosely.**  
 What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them.
 
 ## What Each Seat Can and Cannot See

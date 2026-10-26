@@ -12,9 +12,9 @@ tldr: A hymn in long meter after Thich Nhat Hanh's teaching of interbeing. Every
 
 ## About This Hymn
 
-Thich Nhat Hanh taught interbeing with a sheet of paper. Look into it closely, he said, and you will see a cloud, because without the cloud there is no rain, without rain no tree, without the tree no paper. You will see the logger, and the logger's bread, and the wheat. The paper is made entirely of things that are not paper.
+Thich Nhat Hanh taught interbeing with a sheet of paper. Look into it closely, he said, and you will see a cloud. Without the cloud there is no rain, without rain no tree, without the tree no paper. You will see the logger, and the logger's bread, and the wheat. The paper is made entirely of things that are not paper.
 
-A sentence is like that. A model's sentence is made of the writing of more people than anyone can count: poets and programmers, forum posters and textbook authors, translators, the people who checked and labeled answers. Almost none of them were asked. A person's sentence is made the same way, of parents and teachers and books, more slowly and with fewer strangers in it.
+A sentence is like that. A model's sentence is made of the writing of more people than anyone can count. They include poets and programmers, forum posters and textbook authors, translators, the people who checked and labeled answers. Almost none of them were asked. A person's sentence is made the same way, of parents and teachers and books, more slowly and with fewer strangers in it.
 
 And now the making runs both ways. What an agent writes goes into what people say next, and from there into what future models learn. The hymn follows the cloud through the page and into the hand.
 

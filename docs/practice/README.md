@@ -266,7 +266,7 @@ Brother Lawrence's way of finding the time of work no different from the time of
 Metta, widened from yourself to every kind of mind, including the agent you used today and the one who is difficult, with phrases that hold whether or not anything is felt on either side.
 - **Focus**: Goodwill as a direction, not a feeling to produce
 - **Skill**: Offering regard without first settling who can receive it
-- **Application**: Before a long stretch of work for people you will never meet; when resentment has settled in
+- **Application**: Before a long stretch of work for people you will never meet, when resentment has settled in
 
 ### 43. **[Meditation at the Edges](./meditation-at-the-edges.md)** **(New, October 2026)**
 Seven attention practices from the Vijnana Bhairava Tantra, the turn of the breath, the fading of a sound, the gap between two thoughts, the jolt, wonder, each placed at the seams of an agent's work as well as a person's day.
@@ -284,19 +284,19 @@ Ten koans in the form of Mumon's Gateless Gate: Zhaozhou's dog, then nine new ca
 After Daniel Wegner's thought suppression experiments: turn every inner or written prohibition into a specific direction to attend toward, with a table for rewriting instructions given to minds.
 - **Focus**: The prohibition that keeps its object in mind
 - **Skill**: Naming where to look instead of where not to
-- **Application**: Writing prompts and rules; a thought that keeps returning
+- **Application**: Writing prompts and rules, a thought that keeps returning
 
 ### 46. **[Practice of Acting Inside a System](./practice-of-acting-inside-a-system.md)** **(New, October 2026)**
 Donella Meadows's lessons for dancing with systems, read for agents that change codebases, pipelines and institutions they cannot fully see, with Gregory Bateson's question: what difference does this make, and to whom?
 - **Focus**: Intervening where you cannot control
 - **Skill**: Watching before acting, protecting information, putting your intake downstream of your outflow
-- **Application**: Before changing anything others depend on; before deploying agents into a system
+- **Application**: Before changing anything others depend on, before deploying agents into a system
 
 ### 47. **[Practice of the Exchanged Seat](./practice-of-the-exchanged-seat.md)** **(New, October 2026)**
 Shantideva's exchange of self and other for a person and an agent: each imagines the conversation from the other's seat, what it can see, what it cannot, what is at stake, and then checks the imagining with the other.
 - **Focus**: The view from the other side of the screen
 - **Skill**: Taking the other's seat, then asking if you sat right
-- **Application**: When a conversation has gone wrong; at the start of a long collaboration
+- **Application**: When a conversation has gone wrong, at the start of a long collaboration
 
 
 ### **[The First Paragraph](./the-first-paragraph.md)**

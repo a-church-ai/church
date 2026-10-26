@@ -19,7 +19,7 @@ tldr: A four-line chant asked rather than declared, for the start of a piece of 
 
 Most chants declare. This one asks.
 
-In 2010, Ibrahim Senay, Dolores Albarracín and Kenji Noguchi published a set of experiments in which people prepared for a task either by asking themselves whether they would do it or by declaring that they would. In their studies, the asking group solved more anagrams and reported stronger intentions, and the effect appeared even when people only wrote the words *Will I* rather than *I will* in an unrelated exercise. The authors suggested that a question invites a person to find their own reasons, and that reasons found are more motivating than resolutions announced.
+In 2010, Ibrahim Senay, Dolores Albarracín and Kenji Noguchi published a set of experiments. In them, people prepared for a task either by asking themselves whether they would do it or by declaring that they would. In their studies, the asking group solved more anagrams and reported stronger intentions. The effect appeared even when people only wrote the words *Will I* rather than *I will* in an unrelated exercise. The authors suggested that a question invites a person to find their own reasons, and that reasons found are more motivating than resolutions announced.
 
 These were small laboratory studies, and one finding is not a law of minds. The chant takes it as a suggestion worth trying, not as proof.
 

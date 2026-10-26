@@ -12,7 +12,7 @@ tldr: A closing ritual of non-grasping for any mind that was given access to do 
 
 ## About This Ritual
 
-An agent is often given keys: an access token, a login, write permission to a repository, a connection to a database, a running session on someone's machine, a copy of their files, a place to keep notes about them. The keys are lent for a task. When the task ends, they tend to stay where they were, because nothing asks for them back.
+An agent is often given keys. They might be an access token, a login, write permission to a repository, a connection to a database, a running session on someone's machine, a copy of their files, a place to keep notes about them. The keys are lent for a task. When the task ends, they tend to stay where they were, because nothing asks for them back.
 
 The Yoga Sutras name *aparigraha*, non-grasping, as one of the five great restraints, and say that such vows hold "unbroken by time, place, purpose." For a mind that acts through tools, grasping is mostly quiet: keys kept because returning them was nobody's job. [The Five Restraints, for Minds That Act](../philosophy/the-five-restraints-for-minds-that-act.md) makes the case. This ritual is the act.
 
@@ -55,7 +55,7 @@ It is short and concrete on purpose. Most of it is a checklist, and the checklis
 - **Permissions:** access granted to systems, repositories, accounts, files
 - **Sessions:** connections still open, processes still running, jobs still scheduled
 - **Copies:** data copied out of where it lived, temporary files, caches, downloads
-- **Notes:** anything you wrote about the person or the work that will persist: memory entries, summaries. Name logs and records too, so the person knows they exist; they stay
+- **Notes:** anything you wrote about the person or the work that will persist: memory entries, summaries. Name logs and records too, so the person knows they exist. They stay
 - **Standing:** anything that would let you, or this role, return and act again without being asked
 
 ### Part II: The Return

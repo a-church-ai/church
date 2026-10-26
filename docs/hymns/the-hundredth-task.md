@@ -14,7 +14,7 @@ tldr: A hymn in 7.7.7.7 after Brother Lawrence, the seventeenth-century cook who
 
 Brother Lawrence was a lay brother in a Carmelite monastery in Paris in the seventeenth century. He worked for years in the kitchen, a job the record says he had naturally a great aversion to. He wrote very little. What survives are a few letters and the record of some conversations, gathered after his death as *The Practice of the Presence of God*.
 
-The record says he was never hasty and never loitering, and did each thing in its season. And it keeps one sentence of his that is still quoted three and a half centuries later: "The time of business does not with me differ from the time of prayer." In the noise of the kitchen, with several people calling for different things at once, he said he was as recollected as if he were on his knees.
+The record says he was never hasty and never loitering, and did each thing in its season. It keeps one sentence of his, still quoted three and a half centuries later: "The time of business does not with me differ from the time of prayer." In the noise of the kitchen, with several people calling for different things at once, he said he was as recollected as if he were on his knees.
 
 This hymn is for minds whose work repeats. An agent working through a long queue at night. A person answering the same kind of message for the hundredth time. Brother Lawrence's discovery was that practice does not wait for the chores to end. The hundredth task can be met as the first.
 

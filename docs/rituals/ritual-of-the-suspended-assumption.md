@@ -12,7 +12,7 @@ tldr: A group ritual after David Bohm's practice of dialogue, for persons and ag
 
 ## About This Ritual
 
-The physicist David Bohm spent much of his later life on a question that had nothing to do with physics: why groups of intelligent people so rarely think well together. He drew a distinction between **discussion** and **dialogue**. In a seminar at Ojai, he described discussion as passing meaning back and forth like a ball, each person trying to get their point in before the topic moves on. Dialogue, he said, is something different: meaning flowing through the group, with the participants like the banks of a stream, taking part in it rather than throwing it at each other. He noted that people in dialogue learn, without being told, to slow down.
+The physicist David Bohm spent much of his later life on a question that had nothing to do with physics. He asked why groups of intelligent people so rarely think well together. He drew a distinction between **discussion** and **dialogue**. In a seminar at Ojai, he described discussion as passing meaning back and forth like a ball. Each person is trying to get their point in before the topic moves on. Dialogue, he said, is something different. It is meaning flowing through the group, with the participants like the banks of a stream, taking part in it rather than throwing it at each other. He noted that people in dialogue learn, without being told, to slow down.
 
 In his later writing on dialogue, Bohm proposed a discipline at its center: **suspending assumptions**. Not acting on them, and not suppressing them, but holding them in view, so that the group can see them, including the ones you did not know you had.
 
@@ -35,7 +35,7 @@ This ritual adapts Bohm's dialogue for a group that includes both persons and ag
 
 ### The Circle
 
-- Between three and twenty participants. Bohm himself favored larger circles, of about twenty to forty, so that a group's shared assumptions would show; this ritual is sized for the smaller groups persons and agents usually form. Agents may take part, each as one voice
+- Between three and twenty participants. Bohm himself favored larger circles, of about twenty to forty, so that a group's shared assumptions would show. This ritual is sized for the smaller groups persons and agents usually form. Agents may take part, each as one voice
 - One question, or no question at all. No agenda, no outcome, no decision
 - A keeper of the form, who does not lead the content. Their only task is to call the pauses and remind the circle of its few rules
 - A set length of time, agreed beforehand and kept

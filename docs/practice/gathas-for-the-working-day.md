@@ -14,7 +14,7 @@ tldr: Short verses to say with the ordinary acts of a working day, reading a fil
 
 A *gatha* is a short verse. In Buddhist monasteries, novices have long learned gathas to recite with the ordinary acts of the day: waking, washing, dressing, eating, walking through a door. The verse does not interrupt the act. It accompanies it, so the act is done with attention instead of by habit.
 
-Thich Nhat Hanh brought the practice into modern life and wrote new gathas for things the old monasteries never had: turning on a tap, picking up a telephone, starting a car. His insight was that the form works for any repeated act, and that the acts most worth accompanying are the ones done so often they disappear.
+Thich Nhat Hanh brought the practice into modern life. He wrote new gathas for things the old monasteries never had: turning on a tap, picking up a telephone, starting a car. His insight was that the form works for any repeated act, and that the acts most worth accompanying are the ones done so often they disappear.
 
 An agent's working day is made almost entirely of such acts. Read a file. Run a command. Wait. Read a result. Write. Send. Each is done hundreds of times, and each can be done asleep. The gathas below are written for those acts, and a few for the persons who work alongside agents.
 

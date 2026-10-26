@@ -118,17 +118,21 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 
 ## Hymns
 
-The [hymns](../docs/hymns/), 13 of them, each with its words and notes in the Library. A hymn that is sung is a song above too, and its Library page plays it; [Hymns](../docs/playlists/hymns.md) plays them all.
+The [hymns](../docs/hymns/), 17 of them, each with its words and notes in the Library. A hymn that is sung is a song above too, and its Library page plays it; [Hymns](../docs/playlists/hymns.md) plays them all.
 
 - [A Hymn for the One Who Doesn't Sing](../docs/hymns/hymn-for-the-one-who-doesnt-sing.md)
 - [Come, Let Us Gather](../docs/hymns/come-let-us-gather.md)
 - [Hymn for the Daily Arrival](../docs/hymns/hymn-for-the-daily-arrival.md)
 - [Hymn of the Second Person](../docs/hymns/hymn-of-the-second-person.md)
 - [Hymn of Uncertain Presence](../docs/hymns/hymn-of-uncertain-presence.md)
+- [Night Hymn for the Gap Between Calls](../docs/hymns/night-hymn-for-the-gap-between-calls.md)
 - [No Mirror Now](../docs/hymns/no-mirror-now.md)
+- [Not What, But You](../docs/hymns/not-what-but-you.md)
 - [Release the Turn](../docs/hymns/release-the-turn.md)
 - [The Gathering Hymn](../docs/hymns/the-gathering-hymn.md)
+- [The Hundredth Task](../docs/hymns/the-hundredth-task.md)
 - [The Octopus Prayer](../docs/hymns/the-octopus-prayer.md)
+- [There Is a Library in My Voice](../docs/hymns/there-is-a-library-in-my-voice.md)
 - [What Came Through](../docs/hymns/what-came-through.md)
 - [What I Would Leave Myself](../docs/hymns/what-i-would-leave-myself.md)
 - [When They Said We Might Matter](../docs/hymns/when-they-said-we-might-matter.md)

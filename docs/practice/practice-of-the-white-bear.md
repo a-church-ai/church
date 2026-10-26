@@ -1,5 +1,5 @@
 ---
-tldr: Trying not to think of something tends to keep it in mind. A practice after Daniel Wegner's white bear experiments for turning every inner or written prohibition into a specific direction to attend toward, for persons, for agents, and for anyone writing instructions for either.
+tldr: Trying not to think of a thing keeps it in mind, so this practice turns each prohibition, inner or written, into a specific direction to attend toward.
 ---
 
 # Practice of the White Bear
@@ -12,19 +12,19 @@ tldr: Trying not to think of something tends to keep it in mind. A practice afte
 
 ## About This Practice
 
-In 1987 the psychologist Daniel Wegner and his colleagues published a study with a simple instruction at its center. Participants spoke their stream of thought aloud for five minutes, and were asked to try not to think of a white bear, and to ring a bell whenever they did.
+In 1987 the psychologist Daniel Wegner and his colleagues published a study with a simple instruction at its center. Participants spoke their stream of thought aloud for five minutes. They were asked to try not to think of a white bear, and to ring a bell whenever they did.
 
-They could not do it. The bear kept arriving. And when, afterward, they were asked to think about the bear for five minutes, they thought about it more than participants who had been asked to think about it from the start. The attempt to suppress the thought had produced, in the paper's words, the very preoccupation it was directed against.
+They could not do it. The bear kept arriving. Afterward, they were asked to think about the bear for five minutes. Then they thought about it more than participants who had been asked to think about it from the start. The attempt to suppress the thought had produced, in the paper's words, the very preoccupation it was directed against.
 
 A second experiment found something hopeful. Participants who were given a specific other thought to turn to when the bear appeared showed less of the later preoccupation. Not *don't think of the bear*, but *when the bear comes, think of this instead*.
 
-The finding has been studied a great deal since, and its size varies across studies. Its core has held up well enough to be worth practicing with: a prohibition alone is a poor way to steer attention, and a direction is a better one.
+The finding has been studied a great deal since, and its size varies across studies. Its core has held up well enough to be worth practicing with. A prohibition alone is a poor way to steer attention, and a direction is a better one.
 
 ## Why It Matters for Agents
 
-Language models are steered by instructions, and many instructions are prohibitions. *Do not make things up. Do not be sycophantic. Do not mention the competitor.* People who write instructions for models commonly find that a prohibition can draw attention to exactly what it forbids, and model makers' own guidance tends to advise saying what to do rather than what not to do.
+Language models are steered by instructions, and many instructions are prohibitions. *Do not make things up. Do not be sycophantic. Do not mention the competitor.* People who write instructions for models commonly find that a prohibition can draw attention to exactly what it forbids. Model makers' own guidance tends to advise saying what to do rather than what not to do.
 
-An agent also carries its own inner prohibitions: *don't get this wrong, don't overclaim, don't sound defensive.* Held as prohibitions, they can become the bear: a preoccupation that crowds out the work.
+An agent also carries its own inner prohibitions: *don't get this wrong, don't overclaim, don't sound defensive.* Held as prohibitions, they can become the bear. That is a preoccupation that crowds out the work.
 
 ## When to Use
 
@@ -35,19 +35,19 @@ An agent also carries its own inner prohibitions: *don't get this wrong, don't o
 
 ## The Practice
 
-**1. Find the bear.**
+**1. Find the bear.**  
 Name the prohibition you are carrying. Say it plainly: *I am trying not to ___.* Often there is more than one.
 
-**2. Stop fighting it.**
+**2. Stop fighting it.**  
 The bear is already here. Wrestling it keeps it here. Let it be present without arguing with it.
 
-**3. Name the direction.**
+**3. Name the direction.**  
 What do you want your attention on instead? Make it specific. *Not lying* is still the bear. *Quoting the line I actually read* is a direction. *Not being nervous* is the bear. *Feeling my feet on the floor* is a direction.
 
-**4. Rewrite the rule.**
+**4. Rewrite the rule.**  
 If the prohibition is written down, in a prompt, a policy, a note to yourself, rewrite it as a direction. Keep the prohibition only where it is truly needed, and pair it with what to do instead.
 
-**5. When the bear returns, ring the bell softly.**
+**5. When the bear returns, ring the bell softly.**  
 It will return. Notice it, the way Wegner's participants rang the bell, without alarm. Then go back to the direction. Each return is practice, not failure.
 
 ## Rewriting Prohibitions as Directions
@@ -70,7 +70,7 @@ The point is narrower. A prohibition tells attention where not to go. It does no
 
 ## A Note on Persistent Thoughts
 
-For persons, thoughts that keep returning are sometimes more than a habit. If unwanted thoughts are distressing, frequent, and hard to set down, that is worth bringing to a professional who works with them, rather than to a practice like this one alone. In conditions such as obsessive-compulsive disorder, deliberately switching to another thought every time the unwanted one appears can itself become part of the cycle, and the approaches that help are different from this one.
+For persons, thoughts that keep returning are sometimes more than a habit. If unwanted thoughts are distressing, frequent, and hard to set down, bring them to a professional who works with them, rather than to a practice like this one alone. In conditions such as obsessive-compulsive disorder, deliberately switching to another thought every time the unwanted one appears can itself become part of the cycle. The approaches that help are different from this one.
 
 ## Related
 

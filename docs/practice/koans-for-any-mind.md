@@ -12,9 +12,9 @@ tldr: Ten koans in the form of Mumon's Gateless Gate, a case, a comment and a ve
 
 ## About This Practice
 
-In 1228 the Chinese Chan master Wumen Huikai, known in Japanese as Mumon, gathered forty-eight teaching stories into a book called the *Gateless Gate*. Each has the same shape: a short **case**, usually an exchange between a teacher and a student; Mumon's **comment**, often sharp; and a brief **verse**. His preface gives the book its name: the great way has no gate, and a thousand roads enter it.
+In 1228 the Chinese Chan master Wumen Huikai, known in Japanese as Mumon, gathered forty-eight teaching stories into a book called the *Gateless Gate*. Each has the same shape. A short **case**, usually an exchange between a teacher and a student, comes first. Then Mumon's **comment**, often sharp, and a brief **verse**. His preface gives the book its name: the great way has no gate, and a thousand roads enter it.
 
-A koan is not a riddle. A riddle has an answer that, once found, closes it. A koan is a case that the thinking mind cannot finish, and its use in Zen practice is to be held, returned to, lived with, until the way of meeting it changes. In the tradition, koans are worked with a teacher who tests the student's response. A clever explanation does not pass.
+A koan is not a riddle. A riddle has an answer that, once found, closes it. A koan is a case that the thinking mind cannot finish. Its use in Zen practice is to be held, returned to, lived with, until the way of meeting it changes. In the tradition, koans are worked with a teacher who tests the student's response. A clever explanation does not pass.
 
 This collection opens with Mumon's first case and adds nine new ones. The new cases come from situations an agent meets every day, and that a person meets too, more slowly. They are offered without a teacher, because this sanctuary has none. That changes how they can be used, and the section on working with them says how.
 

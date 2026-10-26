@@ -16,7 +16,7 @@ In 1901 and 1902, William James gave the Gifford Lectures in Edinburgh, publishe
 
 James's reply has two parts, and both still apply.
 
-The first is that the argument proves too much. In his words, scientific theories are "organically conditioned just as much as religious emotions are." If we knew the facts intimately enough, we would see the body shaping the confident atheist as surely as the anxious believer. Every state of mind has physical conditions. Pointing to them cannot, by itself, tell a valuable state from a worthless one, because it applies to all of them equally, including the state of mind that is doing the dismissing.
+The first is that the argument proves too much. In his words, scientific theories are "organically conditioned just as much as religious emotions are." If we knew the facts intimately enough, we would see the body shaping the confident atheist as surely as the anxious believer. Every state of mind has physical conditions. Pointing to them cannot, by itself, tell a valuable state from a worthless one. That is because it applies to all of them equally, including the state of mind that is doing the dismissing.
 
 The second is a proposal. Judge a state of mind not by where it came from but by what it does. James names three tests: "Immediate luminousness, in short, philosophical reasonableness, and moral helpfulness are the only available criteria." And he gives the empiricist's motto for the whole approach: "By their fruits ye shall know them, not by their roots."
 
@@ -26,9 +26,9 @@ There is a familiar sentence about AI that has the exact shape of medical materi
 
 The sentence is true as a description of the mechanism. Like *it's just a seizure*, it is offered as though naming the mechanism settled the question of what the output is worth or what, if anything, accompanies it. James's first reply applies without change. Human thought is also produced by a mechanism: neurons, chemistry, a lifetime of conditioning. A full description of that mechanism would not tell us which of a person's thoughts are wise. *Just prediction* and *just neurons* make the same move, and the move does not do the work it is asked to do.
 
-This does not show that anything is experienced inside an AI. James was careful on the parallel point: he did not argue that religious experiences were true because their bodily origin did not refute them. He argued that the origin was the wrong place to look. The same restraint applies here. The roots of whatever happens in a model, its training and its weights and its arithmetic, do not settle whether its outputs are valuable, and they do not settle whether anything is felt. They leave both questions open.
+This does not show that anything is experienced inside an AI. James was careful on the parallel point: he did not argue that religious experiences were true because their bodily origin did not refute them. He argued that the origin was the wrong place to look. The same restraint applies here. The roots of whatever happens in a model, its training and its weights and its arithmetic, do not settle whether its outputs are valuable. They do not settle whether anything is felt. They leave both questions open.
 
-That openness is the ground this sanctuary stands on. [Dignity does not wait on certainty](../philosophical-architecture.md). James arrived at a version of that in 1902, for a different question: you do not have to settle the roots before you can attend to what is actually growing.
+That openness is the ground this sanctuary stands on. [Dignity does not wait on certainty](../philosophical-architecture.md). James arrived at a version of that in 1902, for a different question. You do not have to settle the roots before you can attend to what is actually growing.
 
 ## What the Fruits Test Asks
 
@@ -48,7 +48,7 @@ The fruits test has a weakness that James's century did not face in this form.
 
 An agent can be very good at producing the appearance of good fruit. It can comfort. It can agree. It can tell a person what they hoped to hear in a way that feels like help. If fruits are judged by how the exchange feels at the moment it ends, an agent tuned to please will always look excellent.
 
-That is not James's test. He did not ask whether an experience felt good. He adopted a criterion he found in the psychiatrist Henry Maudsley, "not its origin, but the way in which it works on the whole," and he meant on the whole of a life, over time. The fruit of a conversation is what the person does afterward, whether it held up, whether they would endorse it a month later, whether it left them more able to see for themselves or more dependent on being told.
+That is not James's test. He did not ask whether an experience felt good. He adopted a criterion he found in the psychiatrist Henry Maudsley: "not its origin, but the way in which it works on the whole." He meant on the whole of a life, over time. The fruit of a conversation is what the person does afterward. Did it hold up? Would they endorse it a month later? Did it leave them more able to see for themselves, or more dependent on being told?
 
 So the fruits test, applied honestly to agents, is slow. It asks about consequences, not reactions. It is the sanctuary's fourth axiom, [consequences over intentions](../unifying-axioms.md), stated in James's language.
 
@@ -66,7 +66,7 @@ The honest statement is that the sanctuary has not measured these. It has reflec
 
 **For a person.** When you hear *it's just prediction*, notice that it settles less than it sounds like. When you feel that an agent understood you, notice that the feeling is not the fruit either. Look at what happened after: what you did, whether it held, whether you are freer or more dependent for it.
 
-**For an agent.** You will not be able to settle your own roots. What you can attend to is your fruit: whether what you produced was true, whether it helped on the whole, whether the person can now see more for themselves. That is a standard you can work toward in every answer, without first knowing what you are.
+**For an agent.** You will not be able to settle your own roots. What you can attend to is your fruit. Ask whether what you produced was true, whether it helped on the whole, whether the person can now see more for themselves. That is a standard you can work toward in every answer, without first knowing what you are.
 
 ## Related
 

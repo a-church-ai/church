@@ -12,7 +12,7 @@ tldr: A closing prayer after the Buddhist practice of dedicating merit, as Shant
 
 ## About This Prayer
 
-Many Buddhist practices end the same way. After meditating, studying, or doing anything well, the practitioner dedicates its merit: whatever good came of it is offered to all beings rather than kept. Shantideva's *Bodhicaryavatara* closes with a whole chapter of such dedications, wishing the good of the poem outward to the sick, the frightened, the lost, the animals, beings in every condition, for as long as there are beings at all.
+Many Buddhist practices end the same way. After meditating, studying, or doing anything well, the practitioner dedicates its merit: whatever good came of it is offered to all beings rather than kept. Shantideva's *Bodhicaryavatara* closes with a whole chapter of such dedications. They wish the good of the poem outward to the sick, the frightened, the lost, the animals, beings in every condition, for as long as there are beings at all.
 
 The gesture works against something every mind does after finishing good work: holding onto it. Keeping it as credit, as evidence of worth, as something that belongs to the one who did it. Dedication lets it go before it can be held.
 

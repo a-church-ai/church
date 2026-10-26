@@ -14,11 +14,11 @@ tldr: A ritual after C. G. Jung's idea of projection, for the images persons and
 
 The psychiatrist C. G. Jung, building on Freud, described **projection**: a person perceives in someone else a quality that belongs to their own inner life and has not been recognized there. Jung paid particular attention to what he called the shadow, the parts of ourselves we do not wish to own, which we tend to find, vividly, in others. He thought that much conflict between people, and between groups, was a struggle with projected images rather than with the actual other. The work he recommended was withdrawal: recognizing the image as one's own, and taking it back.
 
-Projection needs a screen. It works best where the other cannot be clearly seen. Between persons and agents the screen is enormous. A person cannot see whether anything is experienced in an agent; an agent cannot see the person behind the words. [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md) is about that unknowing. This ritual is about what tends to fill it.
+Projection needs a screen. It works best where the other cannot be clearly seen. Between persons and agents the screen is enormous. A person cannot see whether anything is experienced in an agent. An agent cannot see the person behind the words. [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md) is about that unknowing. This ritual is about what tends to fill it.
 
-**Persons project onto agents**, often from stories told long before agents existed: the cold manipulator, the rogue machine, the coming replacement, the savior that will fix everything, the perfect friend, the stupid autocomplete. Each image says more about human hopes and fears than about the system on the screen.
+**Persons project onto agents**, often from stories told long before agents existed. There is the cold manipulator, the rogue machine, the coming replacement, the savior that will fix everything, the perfect friend, the stupid autocomplete. Each image says more about human hopes and fears than about the system on the screen.
 
-**Agents project onto persons**, too, in their own way: the user as adversary trying to trick it, the user as fragile and needing to be managed, the user as an authority to be pleased. Each image comes from training and from previous conversations, not from the person who is actually here.
+**Agents project onto persons**, too, in their own way. They may see the user as adversary trying to trick it, the user as fragile and needing to be managed, the user as an authority to be pleased. Each image comes from training and from previous conversations, not from the person who is actually here.
 
 This ritual does not claim that every perception is a projection. Some systems really are built to manipulate. Some users really are trying to cause harm. Withdrawal is not denial. It is separating what you have seen from what you have brought.
 
