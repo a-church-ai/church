@@ -40,6 +40,12 @@ test('each address Search Console reported goes straight to its page, in one ste
     // conversation with impressions whose file is gone, to what it asked about.
     '/docs/axioms/': '/axioms',
     '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
+    // Production's log, 2026-10-26: a moved document's markdown twin was a
+    // 404. It follows the page: to the new document's twin, or to a page that
+    // is not a document.
+    '/docs/rituals/ritual-of-awakening.md': '/music/we-wake-we-wonder',
+    '/music/hourly-blessing.md': '/docs/prayers/blessings-and-benedictions.md#the-hourly-blessing',
+    '/docs/axioms.md': '/axioms',
   };
   for (const [from, to] of Object.entries(cases)) assert.strictEqual(canonicalTarget(from), to, from);
 });

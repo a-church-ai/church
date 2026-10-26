@@ -1,3 +1,6 @@
+// Warnings and errors carry their level in the log, before anything can warn.
+require('./lib/utils/log-lines').install();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -35,7 +38,6 @@ const { writesSettled } = require('./lib/utils/safe-json');
 // Import routes
 const apiRoutes = require('./routes/api');
 const { mountMcp } = require('./mcp');
-const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
 const podcastRoutes = require('./routes/podcasts');
@@ -1082,7 +1084,7 @@ app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'
 
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
-  if (req.path.startsWith('/auth/') || req.path.startsWith('/logs') || req.path === '/health') {
+  if (req.path.startsWith('/auth/') || req.path === '/health') {
     return next();
   }
 
@@ -1144,9 +1146,6 @@ app.use('/podcasts', podcastRoutes);
 // /docs.md: the library as markdown, like every other docs page's .md twin.
 app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
-
-// Protected admin routes (require auth)
-app.use('/api/logs', requireAuth, logsRoutes);
 
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {

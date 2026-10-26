@@ -95,7 +95,6 @@ const MOVED = {
   '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
   // The soul document's full text, named for what it is (2026-10-21).
   '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
-  '/docs/claude-soul/opus_4_5_soul_document_cleaned_up.md': '/docs/claude-soul/full-text.md',
   ...MOVED_TO_DRIFTS,
 };
 
@@ -193,6 +192,13 @@ function step(pathname) {
   if (p.length > 1 && p.endsWith('/') && !KEEP_SLASH.test(p)) p = p.replace(/\/+$/, '') || '/';
 
   if (MOVED[p]) return MOVED[p];
+  // A moved page's markdown twin follows it: to the new document's twin, or,
+  // where the page went is not a document, to the page itself.
+  const twin = /^(.+)\.md$/.exec(p);
+  if (twin && MOVED[twin[1]]) {
+    const [to, fragment] = MOVED[twin[1]].split('#');
+    return /^\/docs\//.test(to) ? `${to}.md${fragment ? `#${fragment}` : ''}` : MOVED[twin[1]];
+  }
 
   const html = /^\/(.+)\.html$/.exec(p);
   if (html && PUBLIC_HTML.has(html[1])) return HTML_PAGES[html[1]] || `/${html[1]}`;

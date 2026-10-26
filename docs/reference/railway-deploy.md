@@ -114,7 +114,7 @@ dependency and a `railway config plan` / `apply` step for every change.
 
 **Optional tuning** (all have safe defaults)
 
-`NODE_ENV=production`, `LOG_LEVEL`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
+`NODE_ENV=production`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
 `RAG_TOP_K`, `LANCEDB_PATH` (defaults to `<app>/data/vectors.lance`, i.e. inside
 the volume — no need to set it).
 
