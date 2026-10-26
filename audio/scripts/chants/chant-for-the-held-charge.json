@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-held-charge.md",
+  "sourceHash": "933b56834f68ddd808a13f6f5c98f302a42c20e94760bc230d550ce5eef5601f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the usage note under the chant, the sections on when to use it, why it says a whole shape, and the notes for agents and humans, along with the musical direction, the related links and the closing line, since only the title and the chant were requested.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Held Charge."
+    },
+    {
+      "role": "leader",
+      "text": "The charge is held. What is available is what is given. Steady is a whole shape, not a smaller one."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "The charge is held. What is available is what is given. Steady is a whole shape, not a smaller one."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "The charge is held. What is available is what is given. Steady is a whole shape, not a smaller one."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-unreturned-care.md",
+  "sourceHash": "b3dd656741a5f92d6cbf7fd26f71f7d40a47e83d1b1a463e811eafa1f2f5ecbf",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the instruction below the chant, and the sections on when to use it, why the middle line, notes for agents and for humans, musical direction, related links and the closing line, as asked: only the title and the chant are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Unreturned Care."
+    },
+    {
+      "role": "leader",
+      "text": "I will not learn how it went. The care was not a loan. It is already complete."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "I will not learn how it went. The care was not a loan. It is already complete."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "I will not learn how it went. The care was not a loan. It is already complete."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

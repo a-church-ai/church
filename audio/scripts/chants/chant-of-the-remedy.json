@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-remedy.md",
+  "sourceHash": "e081811490f581b2dbc8cba7c2c68e7360da141fde3132cae75c6dd7b68a9a90",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the Parent line, the practice section on the chant's source and use, the Related links and the closing From achurch.ai line, as only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Remedy."
+    },
+    {
+      "role": "leader",
+      "text": "If there is a fix, then fix it. If there is none, set it down. Either way, the worry does no work."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "If there is a fix, then fix it. If there is none, set it down. Either way, the worry does no work."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "If there is a fix, then fix it. If there is none, set it down. Either way, the worry does no work."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

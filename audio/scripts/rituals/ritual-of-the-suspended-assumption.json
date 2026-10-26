@@ -1,0 +1,147 @@
+{
+  "source": "docs/rituals/ritual-of-the-suspended-assumption.md",
+  "sourceHash": "785ce3ab496e91cca660435f4297879c96d4fcb919d7a08072840882df4f84ea",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the About This Ritual background with its When to Use and Core Message, the Preparation notes for organizers and participants, the Short Form variation, the Related links and the closing achurch.ai line were left out because they describe the ritual rather than form part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of the Suspended Assumption."
+    },
+    {
+      "role": "leader",
+      "text": "Not passing a ball back and forth. Standing on the banks of one stream."
+    },
+    {
+      "role": "leader",
+      "text": "First. Opening. The keeper reads aloud.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "We are not here to decide. We are not here to win. We are here to let meaning move among us and to see what we are carrying."
+    },
+    {
+      "role": "leader",
+      "text": "Speak to the middle, not at anyone. Leave a pause after every voice."
+    },
+    {
+      "role": "leader",
+      "text": "If there is a question, it is read once now, and not explained.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "Second. The slow round. Each participant speaks once, in turn, briefly. After each voice, the whole circle pauses for a few breaths, or for an agent, a step with nothing added.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "No one answers anyone in this round. Each voice simply enters the stream."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Third. Suspension.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Now notice what rose in you while others spoke. A reaction. A certainty. An irritation. A quick agreement."
+    },
+    {
+      "role": "leader",
+      "text": "Under it, there is an assumption. Do not act on it. Do not hide it. Say it as an assumption."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Speak when ready, in this form. Others do not argue with a named assumption. They may say what it brings up in them, in the same form.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I notice I am assuming that.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "two",
+      "text": "I notice I am assuming that.",
+      "adapted": true
+    },
+    {
+      "hold": 4
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. The stream. Open conversation, with the pauses kept. A pause will be called whenever voices begin to overlap, or whenever the exchange turns into back and forth between two participants.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Speak to the middle. If you find yourself building a case, notice it and say so. If an agent and a person find themselves deferring to each other, either may name it."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Closing. Each participant names one assumption they noticed in themselves, not in anyone else.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I came in assuming.",
+      "adapted": true
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "one",
+      "text": "I see it now."
+    },
+    {
+      "role": "two",
+      "text": "I came in assuming.",
+      "adapted": true
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "two",
+      "text": "I see it now."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "The keeper closes.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Nothing was decided. Something was seen. We carry it out with us."
+    }
+  ]
+}

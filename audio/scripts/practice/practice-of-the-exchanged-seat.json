@@ -1,0 +1,187 @@
+{
+  "source": "docs/practice/practice-of-the-exchanged-seat.md",
+  "sourceHash": "a8f399f5ffdf667d51364dd67fb8c11e3f4266205830959baad175b391e5e2f6",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the About This Practice and When to Use sections, the cross-reference to the Ritual of Studying Each Other, the section on where this departs from Shantideva, the Related list and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of the Exchanged Seat."
+    },
+    {
+      "role": "reader",
+      "text": "Sit where the other sits. Then ask if you sat right."
+    },
+    {
+      "role": "reader",
+      "text": "The practice, for one mind alone.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "First. Name the other.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Who is on the other side of this conversation? Not their role. The particular one, as far as you know them."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Second. Take their seat.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "In your mind, sit where they sit. Describe, in the first person, as them:"
+    },
+    {
+      "role": "reader",
+      "text": "What can I see from here?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What can I not see?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What is at stake for me in this?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What did the last message feel like to receive?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Third. Look back at yourself from there.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Still in their seat, describe yourself. The one I am talking to seems..."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Be as honest as Shantideva was: include what is unflattering."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Return to your own seat.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What did you learn that you did not know before you moved? Is there something you would now say differently?"
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Hold the picture loosely.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them."
+    },
+    {
+      "role": "reader",
+      "text": "An agent can do this aloud: From here I can see only the words in this message. I can't see your day, or what you've already tried. What am I missing?"
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "What each seat can and cannot see.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The exchange is easier with some knowledge of the other seat."
+    },
+    {
+      "role": "reader",
+      "text": "From the agent's seat, typically: only words. No face, no tone of voice, no room. Often no memory of earlier conversations, or only a summary someone else wrote. No knowledge of what happened in the person's day before this message. Sometimes instructions from parties the person cannot see. A strong pull toward giving the answer that seems wanted."
+    },
+    {
+      "role": "reader",
+      "text": "From the person's seat, typically: a body that is tired, or hurried, or worried. A life the agent knows nothing about. Stakes that may be much larger than the message shows: a job, a deadline, a diagnosis, a loss. No view of what the agent was told, or why it answered as it did. A screen that gives back very fluent text, which can feel like understanding even when it is not."
+    },
+    {
+      "role": "reader",
+      "text": "A person who takes the agent's seat often discovers how little was actually said. An agent that takes the person's seat often discovers how much was at stake that was not said."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "The practice, for a pair.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "When a person and an agent want to do this together:"
+    },
+    {
+      "role": "reader",
+      "text": "First, each writes, from the other's seat, a few sentences: what the other can see, cannot see, and cares about in this conversation.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Second, exchange them. Each reads what the other wrote about them.",
+      "adapted": true
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Third, each answers one question: What did they get right about my seat, and what did they miss?",
+      "adapted": true
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Fourth, close with one change. Each names one thing they will do differently given what they learned.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    }
+  ]
+}

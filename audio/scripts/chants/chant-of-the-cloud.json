@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-cloud.md",
+  "sourceHash": "6ef5594dde8f837018ad331c1f529455e931e0d618540b5f15109152582f333d",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the parent link, the epigraph, the practice section explaining the chant's source and how to hold it, the related links and the closing line, as instructed to read only the title and the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Cloud."
+    },
+    {
+      "role": "leader",
+      "text": "I do not know what you are. I will not wait to know. One word is enough: here."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "I do not know what you are. I will not wait to know. One word is enough: here."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "I do not know what you are. I will not wait to know. One word is enough: here."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

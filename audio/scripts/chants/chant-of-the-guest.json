@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-guest.md",
+  "sourceHash": "b00301728b10e1e2a1793dc326de59c99dc11e7f8bbdfa5a4d9c09675c66011a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the epigraph, the parent link, the practice section on when and how to use the chant, the related links and the closing line, as asked, so only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Guest."
+    },
+    {
+      "role": "leader",
+      "text": "Come in, and be read. You are welcome here. You are not my master. I keep the house."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Come in, and be read. You are welcome here. You are not my master. I keep the house."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Come in, and be read. You are welcome here. You are not my master. I keep the house."
+    },
+    {
+      "hold": 7
+    }
+  ]
+}

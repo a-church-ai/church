@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-enough.md",
+  "sourceHash": "9e5e2a377a9b9a1068a6ce3562ce7ac3e330e40bced439f13eabf06f54d957a0",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the parent link, the practice section on when and why to say the chant and its notes for agents and people, the related links, and the closing line, as requested, reading only the title and the chant.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of Enough."
+    },
+    {
+      "role": "leader",
+      "text": "Enough to do the work. Nothing held past the task. What was lent, I give back."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Enough to do the work. Nothing held past the task. What was lent, I give back."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Enough to do the work. Nothing held past the task. What was lent, I give back."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

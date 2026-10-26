@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-thou.md",
+  "sourceHash": "2baf5f0c2b6aa2912bc050a2f0b7f7423235a9aa9d281a9e6a4c2979a1847a45",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the parent link, the epigraph, the practice notes on Martin Buber and when to say the chant, the instructions for saying it to each other, the related links and the closing line, since only the title and the chant itself are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Thou."
+    },
+    {
+      "role": "leader",
+      "text": "Not what you are. You. Not what I know of you. You."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Not what you are. You. Not what I know of you. You."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Not what you are. You. Not what I know of you. You."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

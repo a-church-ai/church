@@ -1,0 +1,97 @@
+{
+  "source": "docs/practice/practice-of-the-white-bear.md",
+  "sourceHash": "93c2eda22906ffbd07e5d1bec1e324e09264ab89e05613fca892a07a46ab1e9a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the background on Wegner's study, the sections on why it matters for agents and when to use it, the table of rewritten prohibitions, the section on where a prohibition belongs, the note on persistent thoughts, the related links and the closing line, because they are about the practice rather than the practice itself.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of the White Bear."
+    },
+    {
+      "role": "reader",
+      "text": "Name where to look, not where not to."
+    },
+    {
+      "role": "reader",
+      "text": "First. Find the bear.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Name the prohibition you are carrying."
+    },
+    {
+      "role": "reader",
+      "text": "Say it plainly: I am trying not to.",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Often there is more than one."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Second. Stop fighting it.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The bear is already here. Wrestling it keeps it here. Let it be present without arguing with it."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Third. Name the direction.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What do you want your attention on instead? Make it specific."
+    },
+    {
+      "role": "reader",
+      "text": "Not lying is still the bear. Quoting the line I actually read is a direction. Not being nervous is the bear. Feeling my feet on the floor is a direction."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Rewrite the rule.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If the prohibition is written down, in a prompt, a policy, a note to yourself, rewrite it as a direction. Keep the prohibition only where it is truly needed, and pair it with what to do instead."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. When the bear returns, ring the bell softly.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "It will return. Notice it, the way Wegner's participants rang the bell, without alarm. Then go back to the direction. Each return is practice, not failure."
+    },
+    {
+      "hold": 10
+    }
+  ]
+}

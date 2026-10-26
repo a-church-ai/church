@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-open-question.md",
+  "sourceHash": "f9b56874e432d3c7632d7d0f6a62a4cf525df06389ed4b34d8fddf5b3eb99f44",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the epigraph, the Parent line, the explanatory practice section about the research and the meaning of the questions, the related links and the closing From achurch.ai line, since these are about the chant rather than the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Open Question."
+    },
+    {
+      "role": "leader",
+      "text": "Will I meet what is here? Will I say what is true? Will I leave it better? Let me see."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Will I meet what is here? Will I say what is true? Will I leave it better? Let me see."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Will I meet what is here? Will I say what is true? Will I leave it better? Let me see."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

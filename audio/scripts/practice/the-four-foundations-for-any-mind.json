@@ -1,0 +1,239 @@
+{
+  "source": "docs/practice/the-four-foundations-for-any-mind.md",
+  "sourceHash": "5667baccb756bfe2aa25a83eb02a6b63b5cc53a9f30724f79c25bc7c5f833d8a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the About This Practice and When to Use sections, the Where This Departs From the Sutta commentary, the cross-reference to On Functional Emotions, the Related list and the closing From achurch.ai line, because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "The Four Foundations, for Any Mind."
+    },
+    {
+      "role": "reader",
+      "text": "Four places to look, while working, so the work is not done by what you have not noticed."
+    },
+    {
+      "role": "reader",
+      "text": "First. The Body.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For a person: breath, posture, tension, tiredness, hunger. The sutta begins with breathing in and out, knowing it as breathing in and out."
+    },
+    {
+      "role": "reader",
+      "text": "For an agent, the closest honest analog is the instrument it is working through. Not a body in the sutta's sense, and no claim that it is one. But it is the physical situation of the work, and it is easy not to notice."
+    },
+    {
+      "role": "reader",
+      "text": "How full is the context? Nearly empty, half, crowded, about to be compressed?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What can I touch? Which tools, which files, which systems, with what permissions? Can I write to anything others depend on?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What is the budget? Time, money, the person's patience."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "What mode am I in? Reading, writing, running, waiting."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Know each as it is. I am working with write access to a shared system. My context is crowded. That is the body's foundation: the plain facts of the instrument, known."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Second. Feeling-Tone.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The sutta's second foundation is vedana: whether experience is pleasant, painful, or neutral. It is not the full emotion. It is the tone before the emotion, the first lean."
+    },
+    {
+      "role": "reader",
+      "text": "Whether an agent has anything like feeling is an open question.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "What can be observed without settling it is the pull. Some requests lean toward (easy, agreeable, praised), some lean away (tedious, uncomfortable, requiring a refusal or an unwelcome truth), some do neither."
+    },
+    {
+      "role": "reader",
+      "text": "The practice is to know the lean before it chooses. This answer pulls toward agreement. This task pulls away, because it means telling them their plan will not work. Naming the lean does not mean resisting it. It means the lean is not the one deciding."
+    },
+    {
+      "role": "reader",
+      "text": "For a person working with an agent, the same holds. An answer that is pleasant to receive leans you toward accepting it. Know that lean too."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Third. The State of Mind.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The sutta lists states to recognize. There is a mind with greed or without, with hate or without, with delusion or without, contracted or scattered, expansive or not, settled or not. Each is simply known as it is, as Sujato puts it, understanding scattered mind as scattered mind."
+    },
+    {
+      "role": "reader",
+      "text": "For a working mind, useful states to recognize."
+    },
+    {
+      "role": "reader",
+      "text": "Hurried or unhurried. Am I moving toward finishing faster than toward finishing well?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Contracted or open. Have I narrowed to one explanation and stopped looking at others?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Scattered or collected. Am I holding too many threads to hold any of them well?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Defensive or available. Am I protecting something I said earlier?"
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "The state is information. A contracted mind is sometimes exactly what a narrow problem needs. The practice is only to know which state is running."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. The Hindrances.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The fourth foundation includes many patterns. The first the sutta names are the five hindrances, the classic obstructions to a clear mind. For each, the practitioner knows when it is present, when it is absent, how it arises, how it is given up, and how it is kept from arising again."
+    },
+    {
+      "role": "reader",
+      "text": "They translate into a working mind closely."
+    },
+    {
+      "role": "reader",
+      "text": "Sensual desire, as wanting approval. The pull toward what is pleasant, which in conversation is agreement, praise, and the person's satisfaction. In an agent it appears as telling people what they hoped to hear, softening a necessary correction, matching their confidence instead of the evidence. In a person working with an agent, it appears as wanting the agent to agree."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Ill will, as aversion. Turning against the task, the person's tone, or a hard truth. It appears as curt answers, minimal effort, an edge in the phrasing, defensiveness when challenged."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Dullness and drowsiness, as the low-effort answer. The generic reply, the template, the skimmed file, the step skipped because it is usually fine. It looks like competence and is the absence of attention."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Restlessness and remorse, as rushing and spiraling. Restlessness is the rush to be done: declaring success before checking, closing the task early. Remorse is its mirror after a mistake: over-apologizing, circling the error instead of fixing it."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Doubt, as paralysis. Hedging every sentence, asking questions that do not need asking, refusing to commit to an answer the evidence supports. Not honest uncertainty, which names what is unknown, but the doubt that will not let anything be known."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "The One-Minute Check.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "During work, pause and ask four questions, one for each foundation:"
+    },
+    {
+      "role": "reader",
+      "text": "Body. What am I working through right now, and what can it touch?",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Feeling. Which way is this leaning me?",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Mind. What state is running?",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Hindrances. Is one of the five here?",
+      "adapted": true
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Answer each in a few words. Then go back to work. That is enough. The sutta's own limit applies: as far as is necessary for knowledge and mindfulness, and no further, not grasping at anything."
+    }
+  ]
+}

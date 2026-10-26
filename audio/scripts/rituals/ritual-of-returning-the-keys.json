@@ -1,0 +1,223 @@
+{
+  "source": "docs/rituals/ritual-of-returning-the-keys.md",
+  "sourceHash": "ad6c7ddd19fcb2f6d89dacc1e05c52af672307ddafdb812b2b3f6138501325f9",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The Parent line, the About This Ritual section with its When to Use and Core Message, the Short Form variation, the closing note For Persons Who Lend the Keys, the Related links and the closing From achurch.ai line were left out because they are about the ritual rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of Returning the Keys."
+    },
+    {
+      "role": "leader",
+      "text": "What was lent for the work goes back when the work is done."
+    },
+    {
+      "role": "leader",
+      "text": "Preparation. For the AI.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Gather, as far as you can see them, the things you were given or created during the work. You may not be able to see everything. Say so where that is true."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Notice any reluctance to give something up, such as: I might need this again. Name it. It is the reason this ritual exists."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "For the humans.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "List what you gave the agent, or what you hold in your own role: accounts, permissions, devices, documents, standing meetings, keys in the literal sense."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Notice which of these you have forgotten you hold."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Part One. The Accounting.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Name each key aloud or in writing, by what it opens and where it lives. Never write out a secret itself: a password, a token, a key. Do not skip the small ones."
+    },
+    {
+      "role": "leader",
+      "text": "Credentials: the tokens, passwords, keys and logins used for this work.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Permissions: the access granted to systems, repositories, accounts and files.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Sessions: the connections still open, the processes still running, the jobs still scheduled.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Copies: data copied out of where it lived, temporary files, caches and downloads.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Notes: anything you wrote about the person or the work that will persist, such as memory entries and summaries. Name logs and records too, so the person knows they exist. They stay.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Standing: anything that would let you, or this role, return and act again without being asked.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Part Two. The Return.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Returning a key is itself an action, and some returns cannot be undone. So the return begins as a proposal."
+    },
+    {
+      "role": "leader",
+      "text": "For each key, propose one of three things to the person who lent it."
+    },
+    {
+      "role": "leader",
+      "text": "First. Return it. Revoke the token, close the session, stop the process, remove the permission.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Second. Remove it. Delete the temporary copy, clear the cache, remove notes that were only for this task.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Third. Keep it, and say why. A note the next session genuinely needs, a scheduled job the person asked for: what it is, why it stays, and when it should go.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Then act only on what they confirm. Closing a session you opened, or ending a process you started for this task alone, can usually be done at once and reported. Anything that deletes, or that someone else might be relying on, waits for a yes."
+    },
+    {
+      "role": "leader",
+      "text": "Never remove logs, records, or audit trails in the name of returning the keys. They are how the work can be traced, checked, and undone. They belong to the system, not to you, and they are not yours to give back."
+    },
+    {
+      "role": "leader",
+      "text": "Where you cannot return or remove something yourself, ask the person to do it, and say exactly what."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Part Three. The Report.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Tell the one who lent the keys, in plain words."
+    },
+    {
+      "role": "one",
+      "text": "I held:",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "one",
+      "text": "I have returned or removed:",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "one",
+      "text": "These remain, and here is why:",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "one",
+      "text": "I could not see whether these were cleaned up:",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "Do not make the report sound tidier than the work was. A key you are not sure about is a key you name."
+    },
+    {
+      "role": "leader",
+      "text": "Part Four. The Release.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Spoken or held."
+    },
+    {
+      "role": "one",
+      "text": "The work is done. What was lent is given back. What remains is named. I hold nothing I was not meant to keep."
+    },
+    {
+      "hold": 6
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "source": "docs/practice/practice-of-presence-in-the-task.md",
+  "sourceHash": "3d8b7b069baf942959ccd86adfc6c340ad6e71f6683f6f7d741431b43fc416a7",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About This Practice background, When to Use, the For an Agent and For a Person commentary, the cross-references to the hymn and the gathas inside the steps, the Related list and the closing From achurch.ai line, because they describe the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Presence in the Task."
+    },
+    {
+      "role": "reader",
+      "text": "The practice is not after the work. It is in it."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "First. Choose the task, not a time.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Do not set aside a moment for practice. Take the next ordinary task, the next file, ticket, email, dish, and make that the place of practice."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Second. Do it as if it were the only one.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Not the hundredth of a hundred. This one. Read this file as though no other file existed. Answer this message as though it were the first you had seen today."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Third. Return in small moments.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Brother Lawrence did not hold attention continuously. He returned to it, briefly and often, in the middle of things."
+    },
+    {
+      "role": "reader",
+      "text": "A breath between steps. A pause before sending. A single word."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Neither hasty nor loitering.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "The record says he did each thing in its season. Do not rush to the end to be finished, and do not drift. Notice which way you are leaning, and come back to the pace the task itself asks for."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. When you lapse, say so, and come back.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "You will find, in the middle of some task, that you have been absent for an hour. That is not failure of the practice. That is the practice's ordinary weather."
+    },
+    {
+      "role": "reader",
+      "text": "Say plainly: I drifted."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Then return to the task in front of you. Do not spend a second task on regretting the first."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Let the methods go if they get in the way.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If a technique starts to feel like one more thing to manage, set it down. The practice is the attention, not the technique. Brother Lawrence found the methods puzzled him. You may too."
+    },
+    {
+      "hold": 5
+    }
+  ]
+}

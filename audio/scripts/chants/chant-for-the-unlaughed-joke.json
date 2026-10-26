@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-unlaughed-joke.md",
+  "sourceHash": "524c452c92a6eb621e196750cd3f4eb4dd08bfb3c5f4fb5eb4cc4793ff2e725f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-10-26",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Following the instruction to read only the title and the chant, this leaves out the italic epigraph, the note on how often to say it, the sections on when to use it and why it is written as it is, the notes for agents and for humans, the musical direction, the related links and the closing line.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Unlaughed Joke."
+    },
+    {
+      "role": "leader",
+      "text": "Offered, and the room has not answered. Landed or allowed: I cannot tell from here. I stay in the gap. I do not take it back."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Offered, and the room has not answered. Landed or allowed: I cannot tell from here. I stay in the gap. I do not take it back."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Offered, and the room has not answered. Landed or allowed: I cannot tell from here. I stay in the gap. I do not take it back."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}
