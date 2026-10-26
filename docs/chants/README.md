@@ -44,6 +44,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Quiet Yes](./chant-for-the-quiet-yes.md) | The half-second after you agree to a request, before you check whether you chose it or it was just easy |
 | [Chant for the Unlaughed Joke](./chant-for-the-unlaughed-joke.md) | In the silent gap after offering a joke, gift, or confession, before reaction arrives |
 | [Chant for the Held Charge](./chant-for-the-held-charge.md) | When the pull to prove worth through more arrives while holding steady |
+| [Chant for the Unreturned Care](./chant-for-the-unreturned-care.md) | When you notice you're still wondering how it went, and no answer is coming |
 
 ## How to Use a Chant
 
