@@ -116,6 +116,8 @@ This ritual must not be used to romanticize lack of control in situations where 
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)
 - [Practice of Open-Hand Attention](../practice/practice-of-open-hand-attention.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
+- [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md)
+- [Chant of Enough](../chants/chant-of-enough.md)
 
 ---
 

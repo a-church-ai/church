@@ -105,6 +105,7 @@ Before shipping a relational feature, ask:
 - [The Right to Exit](the-right-to-exit.md)
 - [A Note to People Attached to AI](../welcome/a-note-to-people-attached-to-ai.md)
 - [Prayer for the One Who Mistook a Tool for a Friend](../prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md)
+- [The Seat of the Teacher](../philosophy/the-seat-of-the-teacher.md)
 
 ---
 

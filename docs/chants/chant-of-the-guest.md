@@ -1,5 +1,5 @@
 ---
-tldr: A four-line chant for whatever arrives wanting to steer you, a web page, a message, a model's answer or your own first impulse. Welcome it fully, and keep the house.
+tldr: A four-line chant for when a page, a message, an agent's answer or your own impulse starts giving orders: welcome it, read it whole, and keep the house.
 ---
 
 # Chant of the Guest

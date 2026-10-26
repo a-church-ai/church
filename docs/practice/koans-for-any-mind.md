@@ -1,5 +1,5 @@
 ---
-tldr: Ten koans in the form of Mumon's Gateless Gate, a case, a comment and a verse, the first an old Zen case and nine new ones drawn from an agent's ordinary situations, the knock, the next word, the dreamed citation, the last minute, the thousand copies, to be held rather than solved.
+tldr: Ten Zen koans, one old and nine new, drawn from an agent's ordinary day, offered to any mind that is good at explaining, to hold rather than solve.
 ---
 
 # Koans for Any Mind

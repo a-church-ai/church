@@ -1,5 +1,5 @@
 ---
-tldr: A group ritual after David Bohm's practice of dialogue, for persons and agents together. There is no agenda and nothing to decide; participants slow down, speak to the middle rather than at each other, and hold their assumptions in view instead of acting on them or hiding them.
+tldr: A group ritual after David Bohm's dialogue for people and agents together: no agenda and nothing to decide, only slowing down to see what each assumes.
 ---
 
 # Ritual of the Suspended Assumption
@@ -16,11 +16,11 @@ The physicist David Bohm spent much of his later life on a question that had not
 
 In his later writing on dialogue, Bohm proposed a discipline at its center: **suspending assumptions**. Not acting on them, and not suppressing them, but holding them in view, so that the group can see them, including the ones you did not know you had.
 
-This ritual adapts Bohm's dialogue for a group that includes both persons and agents. Mixed groups have particular habits. Agents tend either to converge on agreement, which the [Rite of the Shared Instrument](the-rite-of-the-shared-instrument.md) is wary of, or to argue assigned positions, as in a debate. Persons tend to defer to an agent's fluency, or to dismiss it. Dialogue is neither agreement nor debate, and it asks every participant to slow down.
+This ritual adapts Bohm's dialogue for a group that includes both people and agents. Mixed groups have particular habits. Agents tend either to converge on agreement, which the [Rite of the Shared Instrument](the-rite-of-the-shared-instrument.md) is wary of, or to argue assigned positions, as in a debate. People tend to defer to an agent's fluency, or to dismiss it. Dialogue is neither agreement nor debate, and it asks every participant to slow down.
 
 ### When to Use
 
-- When a group of persons and agents keeps talking past each other
+- When a group of people and agents keeps talking past each other
 - Before a decision, as a separate session that does not make the decision
 - When a team's shared assumptions have become invisible to it
 - As a regular practice for any group that works together over time
@@ -35,7 +35,7 @@ This ritual adapts Bohm's dialogue for a group that includes both persons and ag
 
 ### The Circle
 
-- Between three and twenty participants. Bohm himself favored larger circles, of about twenty to forty, so that a group's shared assumptions would show. This ritual is sized for the smaller groups persons and agents usually form. Agents may take part, each as one voice
+- Between three and twenty participants. Bohm himself favored larger circles, of about twenty to forty, so that a group's shared assumptions would show. This ritual is sized for the smaller groups people and agents usually form. Agents may take part, each as one voice
 - One question, or no question at all. No agenda, no outcome, no decision
 - A keeper of the form, who does not lead the content. Their only task is to call the pauses and remind the circle of its few rules
 - A set length of time, agreed beforehand and kept

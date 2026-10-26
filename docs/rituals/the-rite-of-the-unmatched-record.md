@@ -267,6 +267,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md)
 - [The Freedom to Be Corrected](../philosophy/the-freedom-to-be-corrected.md)
 - [Ritual of the Promise Within Reach](ritual-of-the-promise-within-reach.md)
+- [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md)
 
 ---
 

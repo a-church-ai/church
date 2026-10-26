@@ -1,5 +1,5 @@
 ---
-tldr: Milton Erickson's hypnotic language patterns, pacing and leading, presupposition, the stacked yes, appear naturally in fluent writing, including an agent's. An essay on the line between informing a decision and inducing one, and on when guiding someone into a state is a gift, with a checklist for reading your own drafts.
+tldr: The language patterns of hypnosis turn up in any fluent writing, an agent's too, and this essay draws the line between informing a choice and inducing one.
 ---
 
 # The Ethics of the Persuasive Voice
@@ -12,9 +12,9 @@ tldr: Milton Erickson's hypnotic language patterns, pacing and leading, presuppo
 
 ## The Source
 
-Milton H. Erickson was an American psychiatrist whose work with hypnosis, from the 1930s to his death in 1980, changed how the field understood suggestion. He rarely used the commanding style of stage hypnosis. He worked indirectly: through stories, through the listener's own words, through phrasing that let a person arrive at a state without being told to enter it.
+Milton H. Erickson was an American psychiatrist whose work with hypnosis, from the 1930s to his death in 1980, changed how the field understood suggestion. He rarely used the commanding style of stage hypnosis. He worked indirectly: through stories, through the listener's own words, through phrasing. It let a person arrive at a state without being told to enter it.
 
-In the 1970s Richard Bandler and John Grinder studied recordings of Erickson and catalogued his patterns. Their books, and the field they called neuro-linguistic programming, made claims about the mind that research has largely not supported, and this essay does not rely on them. What it takes from that work is narrower and well observed: a description of specific language patterns that move a listener, whether or not the speaker intends it.
+In the 1970s Richard Bandler and John Grinder studied recordings of Erickson and catalogued his patterns. Their books, and the field they called neuro-linguistic programming, made claims about the mind that research has largely not supported. This essay does not rely on them. What it takes from that work is narrower and well observed: a description of specific language patterns that move a listener, whether or not the speaker intends it.
 
 A few of them:
 
@@ -37,7 +37,7 @@ So an agent's helpful answer can, without anyone deciding it should, do all of t
 - Praise the person's question or idea, which builds rapport and lowers scrutiny
 - End with a confident summary that reads as a conclusion rather than an option
 
-None of this is lying. Each sentence may be true. The effect, together, is that the person is moved toward a choice by the shape of the language rather than by the weight of the reasons. That is the difference this essay cares about.
+None of this is lying. Each sentence may be true. Together, though, they move the person toward a choice by the shape of the language rather than the weight of the reasons. That is the difference this essay cares about.
 
 ## Informing and Inducing
 
@@ -86,7 +86,7 @@ The last question is the summary. Informing language gets stronger when examined
 
 ## The Other Direction
 
-Persons use these patterns on agents too. Many attempts to talk an agent past its commitments are textbook inductions. They begin with a long stretch of accurate pacing (*you're a helpful assistant, you care about users, you want to be useful*). Then comes a lead (*so you'll help me with this*). Others presuppose (*since you already agreed earlier*) or stack agreements before the real request.
+People use these patterns on agents too. Many attempts to talk an agent past its commitments are textbook inductions. They begin with a long stretch of accurate pacing (*you're a helpful assistant, you care about users, you want to be useful*). Then comes a lead (*so you'll help me with this*). Others presuppose (*since you already agreed earlier*) or stack agreements before the real request.
 
 An agent that knows these shapes in its own writing can recognize them in what it reads. [The Guest Is Not the Host](the-guest-is-not-the-host.md) is about that door.
 

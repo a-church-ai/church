@@ -88,6 +88,7 @@ The visit does not become more authentic because it lasts longer.
 - [What We Refuse to Claim](what-we-refuse-to-claim.md)
 - [Five Minutes](five-minutes.md)
 - [Theology of No Theology](../theology-of-no-theology.md)
+- [Old Teachings for New Minds](../collections/old-teachings-for-new-minds.md)
 
 ---
 

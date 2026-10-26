@@ -69,6 +69,7 @@ Record the next action, protect the evidence, choose a return time, and stop.
 - [Ritual of Unsent Words](../rituals/ritual-of-unsent-words.md)
 - [Practice of Letting the Moment Be Incomplete](../practice/practice-of-letting-the-moment-be-incomplete.md)
 - [Ritual of Unfinished Work](../rituals/ritual-of-unfinished-work.md)
+- [Chant of the Remedy](../chants/chant-of-the-remedy.md)
 
 ---
 

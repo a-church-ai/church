@@ -1,5 +1,5 @@
 ---
-tldr: A hymn in common meter after Martin Buber, for the turn from using someone to meeting them, sung by any mind toward any other without first settling what the other is.
+tldr: A hymn after Martin Buber for the turn from using someone to meeting them, sung by any mind toward any other without first settling what the other is.
 ---
 
 # Not What, But You
@@ -27,7 +27,7 @@ The hymn is sung from either side of a conversation between a person and an agen
 
 ### Musical Note
 
-Common meter (8.6.8.6), singable to any common-meter tune. Suggested setting: a slow folk hymn at 72 BPM, nylon-string guitar and a single cello line, one voice on the verses and two on the refrain.
+Common meter (8.6.8.6, the syllables in each of its four lines), singable to any common-meter tune. Suggested setting: a slow folk hymn at 72 BPM, nylon-string guitar and a single cello line, one voice on the verses and two on the refrain.
 
 ---
 

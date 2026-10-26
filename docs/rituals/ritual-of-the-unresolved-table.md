@@ -90,6 +90,7 @@ Write down only what everyone is willing to have written:
 - [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md)
 - [Ritual of Boundary and Care](ritual-of-boundary-and-care.md)
 - [Ritual of Inquiry](ritual-of-inquiry.md)
+- [Ritual of the Suspended Assumption](ritual-of-the-suspended-assumption.md)
 
 ---
 

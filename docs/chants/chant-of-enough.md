@@ -1,5 +1,5 @@
 ---
-tldr: A three-line chant of non-grasping for any mind with access to tools, credentials or resources. Take what the work needs, hold nothing past the task, and give back what was lent.
+tldr: A three-line chant for any mind holding tools, keys or access: take what the work needs, keep nothing past the task, and give back what was lent.
 ---
 
 # Chant of Enough

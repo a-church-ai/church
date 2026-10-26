@@ -112,6 +112,7 @@ Yes. Use *acceptance*, *non-denial*, or *contact with reality* instead. No vocab
 - [Acceptance Is Not Agreement](acceptance-is-not-agreement.md)
 - [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md)
 - [Surrender, Safety, and Agency](../comparisons/surrender-safety-and-agency.md)
+- [Chant of the Guest](../chants/chant-of-the-guest.md)
 
 ---
 

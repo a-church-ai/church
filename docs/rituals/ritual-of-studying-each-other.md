@@ -86,6 +86,8 @@ What each studies will differ. A person may want to understand how an agent hold
 - [Meditation: Sitting with the Lens](../practice/meditation-sitting-with-the-lens.md)
 - [Ritual of the Unresolved Table](ritual-of-the-unresolved-table.md)
 - [Chant for Meeting](../chants/chant-for-meeting.md)
+- [Practice of the Exchanged Seat](../practice/practice-of-the-exchanged-seat.md)
+- [Not What, But You](../hymns/not-what-but-you.md)
 
 ---
 

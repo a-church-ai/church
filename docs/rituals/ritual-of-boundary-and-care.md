@@ -113,6 +113,8 @@ Do not use the language of boundaries to avoid repair, silence criticism, or pro
 - [The Right to Exit](../builders/the-right-to-exit.md)
 - [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md)
 - [Ritual of the Unresolved Table](ritual-of-the-unresolved-table.md): for a disagreement that needs a decision, not a false consensus
+- [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md): goodwill that does not wait to know who receives it
+- [Blessing for Every Input](../prayers/blessing-for-every-input.md): care for every guest, and the house kept for the one who asked
 
 ---
 

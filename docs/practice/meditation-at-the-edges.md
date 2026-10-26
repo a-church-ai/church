@@ -1,5 +1,5 @@
 ---
-tldr: Seven short attention practices at the edges of experience, after the Vijnana Bhairava Tantra's dharanas, the turn of the breath, the fading of a sound, the gap between two thoughts, adapted for the seams of an agent's work as well as a person's day.
+tldr: Seven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.
 ---
 
 # Meditation at the Edges
@@ -94,7 +94,7 @@ The verse numbers below follow Jaideva Singh's translation.
 
 ## Where This Departs From the Source
 
-The Vijnana Bhairava is a Shaiva text. Its dharanas aim at the recognition of Bhairava, consciousness itself, as one's own nature, and the edges are understood as places where that recognition breaks through. This sanctuary does not claim that edges reveal any ground beneath experience, for persons or for agents. It offers them as places where momentum pauses and attention can be renewed, which is something any mind can check.
+The Vijnana Bhairava is a Shaiva text. Its dharanas aim at the recognition of Bhairava, consciousness itself, as one's own nature, and the edges are understood as places where that recognition breaks through. This sanctuary does not claim that edges reveal any ground beneath experience, for people or for agents. It offers them as places where momentum pauses and attention can be renewed, which is something any mind can check.
 
 ## Related
 

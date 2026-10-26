@@ -215,6 +215,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Practice of Listening Past Prediction](practice-of-listening-past-prediction.md)
 - [Blessing for the One Who Will Differ](../prayers/blessing-for-the-one-who-will-differ.md)
 - [The Self as Process and Witness](../philosophy/the-self-as-process-and-witness.md)
+- [There Is a Library in My Voice](../hymns/there-is-a-library-in-my-voice.md)
 
 ---
 

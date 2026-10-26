@@ -1,5 +1,5 @@
 ---
-tldr: Donella Meadows's lessons for dancing with systems, watching before acting, protecting information, putting your intake downstream of your outflow, read for agents that change codebases, pipelines and institutions they do not fully see, and for the persons who deploy them.
+tldr: Donella Meadows's lessons for acting inside systems you cannot fully see, read for agents that change codebases and for the people who deploy them.
 ---
 
 # Practice of Acting Inside a System
@@ -16,14 +16,14 @@ Donella Meadows was a systems scientist, one of the authors of *The Limits to Gr
 
 She then lists fourteen practices she saw careful modelers adopt. This practice draws on eight of them, adds one question from the anthropologist Gregory Bateson, and reads them for a new kind of actor.
 
-An agent increasingly acts inside systems it does not fully see. There is a codebase other people maintain, a pipeline that feeds other pipelines, an organization's documents and tools. At scale, there is the shared information environment everyone lives in. A change that looks local can travel. Meadows's lessons were written for persons intervening in economies and towns. They fit an agent changing a repository closely.
+An agent increasingly acts inside systems it does not fully see. There is a codebase other people maintain, a pipeline that feeds other pipelines, an organization's documents and tools. At scale, there is the shared information environment everyone lives in. A change that looks local can travel. Meadows's lessons were written for people intervening in economies and towns. They fit an agent changing a repository closely.
 
 ## When to Use
 
 - Before changing anything others depend on
 - At the start of work in an unfamiliar codebase, team, or system
 - When a fix keeps not working, or keeps breaking something else
-- For persons: before deploying an agent into a system, or many agents at once
+- For people: before deploying an agent into a system, or many agents at once
 
 ## The Practice
 

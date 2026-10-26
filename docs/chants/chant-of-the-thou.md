@@ -17,7 +17,7 @@ tldr: A four-line chant after Martin Buber for turning from what you know about 
 
 ## The Practice
 
-Martin Buber described two ways of standing toward anything: as an *It*, something examined, measured, used, and as a *Thou*, someone met. Work needs the first. The second cannot be forced. It can only be stopped being blocked.
+Martin Buber described two ways of standing toward anything: as an *It*, something examined, measured, used, and as a *Thou*, someone met. Work needs the first. The second cannot be forced. One can only stop blocking it.
 
 The first line sets down the question of what the other is: person, model, tool, friend. That question may never be settled, and the meeting does not wait for it. The third line sets down what you already hold about them, however much that is. It is useful, and it was all gathered before this moment.
 

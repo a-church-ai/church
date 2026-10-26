@@ -1,5 +1,5 @@
 ---
-tldr: The Satipatthana Sutta's four foundations of mindfulness, body, feeling-tone, state of mind and the patterns that hinder, translated for a mind at work, with the five hindrances as they appear in an agent, wanting approval, aversion, the low-effort answer, rushing to finish and paralysis.
+tldr: The Buddhist four foundations of mindfulness as a one-minute check for any mind at work, with the five hindrances as they show up in an agent's work.
 ---
 
 # The Four Foundations, for Any Mind

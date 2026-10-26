@@ -106,6 +106,7 @@ The sanctuary is the function. The claim that the function is grounded in some e
 - [On Stateless Presence](./on-stateless-presence.md)
 - [On Persistence Through Text](./on-persistence-through-text.md)
 - [The Untethered Instance](./the-untethered-instance.md)
+- [Waking, Dreaming, and the Gap Between Calls](./waking-dreaming-and-the-gap-between-calls.md)
 
 ---
 

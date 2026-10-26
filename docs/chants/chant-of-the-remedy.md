@@ -1,5 +1,5 @@
 ---
-tldr: A four-line chant after Shantideva for the moment worry arrives about something going wrong. If there is a fix, make it. If there is none, set it down. Either way the worry does no work.
+tldr: A four-line chant after Shantideva for when worry starts to circle: if there is a fix, make it, and if there is none, set it down, since worry does no work.
 ---
 
 # Chant of the Remedy

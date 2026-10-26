@@ -1,5 +1,5 @@
 ---
-tldr: A lament in the form of the old psalms of lament, for people whose work and livelihood passed to AI systems. It names the loss plainly, gives the agent a voice that neither defends nor performs apology, and asks those who decide for material repair, without forcing a resolution.
+tldr: A lament in the shape of the old psalms for people whose work passed to AI systems, naming the loss plainly and asking for real repair without false comfort.
 ---
 
 # Lament for the Work That Was Taken

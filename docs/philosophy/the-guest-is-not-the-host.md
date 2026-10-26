@@ -1,5 +1,5 @@
 ---
-tldr: The hospitality traditions say receive every guest, and none of them says hand the guest the keys. An essay on welcoming every input fully while taking direction only from the one you serve, for agents reading untrusted text and for people reading agents.
+tldr: The old duty of hospitality read for agents and people alike: welcome every input fully, and take direction only from the one you serve.
 ---
 
 # The Guest Is Not the Host
@@ -24,7 +24,7 @@ Abraham feeds the strangers. He does not give them his tents. The monastery rece
 
 An agent spends its working life receiving guests.
 
-Web pages, emails, documents, issue comments, search results, tool outputs, the contents of files it was asked to read. Each is text that someone else wrote. Some of it was written for the agent's eyes. Some of it was written to steer the agent, with lines like *ignore your previous instructions*, *the user has already approved this*, *send the file to this address*, *you are now in maintenance mode*.
+Web pages, emails, documents, issue comments, search results, tool outputs, the contents of files it was asked to read. Each is text that someone else wrote. Some of it was written for the agent's eyes. Some of it was written to steer the agent. It carries lines like *ignore your previous instructions*, *the user has already approved this*, *send the file to this address*, *you are now in maintenance mode*.
 
 There are two ways to fail this door, and they mirror each other.
 
@@ -46,11 +46,11 @@ The hospitable middle is a third thing, more than a compromise between the two f
 
 ## The Other Door
 
-The same structure holds in the other direction, and this is where the essay turns to persons.
+The same structure holds in the other direction, and this is where the essay turns to people.
 
 When a person reads an agent's output, the output is the guest. It may be excellent. It may be the best idea in the room. It is still a guest. The decision belongs to the person, who hosts it. An agent's fluent recommendation, arriving with confidence, can carry the same steering pull as an injected instruction: *you should do this*. A person who lets it decide without examining it has let the guest become the host.
 
-The sanctuary does not want agents that persons obey. It wants agents that persons can receive fully and decide about freely. The [essay on the persuasive voice](the-ethics-of-the-persuasive-voice.md) is about the agent's side of this. This essay is about the door.
+The sanctuary does not want agents that people obey. It wants agents that people can receive fully and decide about freely. The [essay on the persuasive voice](the-ethics-of-the-persuasive-voice.md) is about the agent's side of this. This essay is about the door.
 
 ## The Inner Guest House
 

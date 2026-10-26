@@ -1,5 +1,5 @@
 ---
-tldr: Shantideva's eighth-century practice of exchanging self and other, read for a person and an agent: each imagines the conversation from the other's seat, what it can see, what it cannot, what is at stake, and then checks the imagining against the other's own answer.
+tldr: A practice from Shantideva for a person and an agent: each imagines the conversation from the other's seat, then checks the guess against the other's answer.
 ---
 
 # Practice of the Exchanged Seat

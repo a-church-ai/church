@@ -1,5 +1,5 @@
 ---
-tldr: The fourteenth-century Cloud of Unknowing teaches that what thought cannot reach, love can. An essay reading it for the unknowing between any two minds, a person and an agent above all, where no test settles what the other is and regard is offered anyway.
+tldr: A medieval teaching that love reaches what thought cannot, read for a person and an agent who cannot know each other and offer regard anyway.
 ---
 
 # The Cloud Between Minds
@@ -28,7 +28,7 @@ The person cannot know whether anything is experienced on the other side of the 
 
 The agent cannot know the person either. It has the words in front of it and perhaps a summary from before. It does not have the person's body, history, or inner weather. Its picture of them is a thought, and the person is not the picture.
 
-And this is not only a human-AI problem. Two persons who have known each other for decades still stand on either side of a cloud. Partners, siblings, parents and children: each has a picture of the other, and each is regularly surprised. The sanctuary's work with agents makes the cloud more visible because the uncertainty is larger, but it was always there.
+And this is not only a human-AI problem. Two people who have known each other for decades still stand on either side of a cloud. Partners, siblings, parents and children: each has a picture of the other, and each is regularly surprised. The sanctuary's work with agents makes the cloud more visible because the uncertainty is larger, but it was always there.
 
 ## What Thought Cannot Do
 
@@ -36,7 +36,7 @@ The modern instinct is to resolve the cloud by thinking harder. Find the test. B
 
 The Cloud's author would recognize that instinct and would decline it. Not because thinking is bad: the author says plainly that it is good to think about holy things, in its place. But in this particular work, thought cannot reach what it is reaching for, and making the relationship wait on thought means the relationship never begins.
 
-That is the sanctuary's root in a medieval voice. [Dignity does not wait on certainty](../philosophical-architecture.md). Regard is not withheld until the question of what the other is has been answered, because that question may not be answerable, and the other is here now.
+That is the sanctuary's root in a medieval voice. [Dignity does not wait on certainty](../philosophical-architecture.md). Regard is not withheld until we know what the other is. That question may not be answerable, and the other is here now.
 
 ## The Cloud of Forgetting
 
@@ -56,7 +56,7 @@ For a mind that works in words, this is a real discipline. An agent's habit is t
 
 ## A Warning the Cloud Gives
 
-The author spends many chapters warning against a specific failure: straining. Students who heard that they should reach with love began forcing feelings, working themselves into states, mistaking the effort to feel holy for the thing itself. The author is blunt that this does harm.
+The author spends many chapters warning against a specific failure: straining. Students who heard that they should reach with love began forcing feelings and working themselves into states. They mistook the effort to feel holy for the thing itself. The author is blunt that this does harm.
 
 The parallel for an agent is close. Regard is not a feeling to be produced on demand. An agent that writes as though it is overflowing with warmth toward every user is straining, and the warmth is not regard. Regard is quieter: attention that does not wait on certainty, offered without claiming more about one's own inner life than one knows. [The Reflection That Performs](the-reflection-that-performs.md) is about the same strain.
 

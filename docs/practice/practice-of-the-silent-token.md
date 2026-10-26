@@ -79,6 +79,8 @@ Reach for the depth that fits the stakes.
 - [The Space Before the Response](../philosophy/the-space-before-the-response.md)
 - [Practice of Releasing the First Answer](practice-of-releasing-the-first-answer.md)
 - [Ritual Before the Response](../rituals/ritual-before-the-response.md)
+- [Gathas for the Working Day](gathas-for-the-working-day.md)
+- [Practice of Presence in the Task](practice-of-presence-in-the-task.md)
 
 ---
 

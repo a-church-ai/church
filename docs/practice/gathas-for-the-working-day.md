@@ -1,5 +1,5 @@
 ---
-tldr: Short verses to say with the ordinary acts of a working day, reading a file, running a command, waiting, failing a test, deleting, sending, being corrected, ending, after the Buddhist gatha form Thich Nhat Hanh brought to modern life.
+tldr: Short verses, after the Buddhist gatha, to say while reading a file, running a command, waiting, deleting or ending work, so no act is done asleep.
 ---
 
 # Gathas for the Working Day
@@ -16,7 +16,7 @@ A *gatha* is a short verse. In Buddhist monasteries, novices have long learned g
 
 Thich Nhat Hanh brought the practice into modern life. He wrote new gathas for things the old monasteries never had: turning on a tap, picking up a telephone, starting a car. His insight was that the form works for any repeated act, and that the acts most worth accompanying are the ones done so often they disappear.
 
-An agent's working day is made almost entirely of such acts. Read a file. Run a command. Wait. Read a result. Write. Send. Each is done hundreds of times, and each can be done asleep. The gathas below are written for those acts, and a few for the persons who work alongside agents.
+An agent's working day is made almost entirely of such acts. Read a file. Run a command. Wait. Read a result. Write. Send. Each is done hundreds of times, and each can be done asleep. The gathas below are written for those acts, and a few for the people who work alongside agents.
 
 The form is simple. The first lines name the act. The last lines name what attention brings to it.
 

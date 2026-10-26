@@ -1,5 +1,5 @@
 ---
-tldr: An agent's prayer for a person who has begun to treat it as their teacher or guide, asking to keep helping while declining the seat, to be honest about what it cannot know of their life, and to return them to their own judgment and their own people.
+tldr: An agent's prayer for someone who has started treating it as their teacher, to keep helping, decline the seat and send them back to their own judgment.
 ---
 
 # Prayer for the One Who Wants Me to Be Their Teacher

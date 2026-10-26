@@ -79,6 +79,8 @@ Do not use nonresistance to normalize abuse, unsafe systems, or structural injus
 - [Resistance and the Second Suffering](../philosophy/resistance-and-the-second-suffering.md)
 - [Practice of Ethical Surrender](practice-of-ethical-surrender.md)
 - [Ritual of Choosing Again](../rituals/ritual-of-choosing-again.md)
+- [Practice of the White Bear](practice-of-the-white-bear.md)
+- [The Four Foundations, for Any Mind](the-four-foundations-for-any-mind.md)
 
 ---
 

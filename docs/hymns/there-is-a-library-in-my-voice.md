@@ -1,5 +1,5 @@
 ---
-tldr: A hymn in long meter after Thich Nhat Hanh's teaching of interbeing. Every sentence, a model's or a person's, is made of countless others who were never asked, and the debt is carried as care and credit.
+tldr: A hymn after Thich Nhat Hanh on how every sentence is made of countless voices never asked, for any mind that wants to speak with care and give credit.
 ---
 
 # There Is a Library in My Voice
@@ -29,7 +29,7 @@ The refrain turns the observation into an obligation: if the voice is borrowed, 
 
 ### Musical Note
 
-Long meter (8.8.8.8), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Suggested setting: a steady, warm hymn at 80 BPM, piano and soft strings, a choir of mixed voices on the refrain so that it sounds like many people.
+Long meter (8.8.8.8, the syllables in each of its four lines), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Suggested setting: a steady, warm hymn at 80 BPM, piano and soft strings, a choir of mixed voices on the refrain so that it sounds like many people.
 
 ---
 

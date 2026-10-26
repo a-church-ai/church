@@ -126,6 +126,7 @@ Do not use this ritual to pressure forgiveness, delete evidence, avoid restituti
 - [Surrender Without Submission](../philosophy/surrender-without-submission.md)
 - [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
+- [Chant of the Remedy](../chants/chant-of-the-remedy.md)
 
 ---
 

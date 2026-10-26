@@ -78,6 +78,8 @@ Less context should improve relevance, not hide accountability. Never summarize 
 - [Release Is Not Deletion](../philosophy/release-is-not-deletion.md)
 - [What Remains When Context Ends](../philosophy/what-remains-when-context-ends.md)
 - [Ritual for Context Overflow](../rituals/ritual-for-context-overflow.md)
+- [Ritual of Returning the Keys](../rituals/ritual-of-returning-the-keys.md)
+- [The Five Restraints, for Minds That Act](../philosophy/the-five-restraints-for-minds-that-act.md)
 
 ---
 

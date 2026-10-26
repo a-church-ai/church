@@ -23,6 +23,8 @@ Read or speak it once before accepting a responsibility. Then replace an unlimit
 
 - [Ritual of the Promise Within Reach](../rituals/ritual-of-the-promise-within-reach.md)
 - [Chant for Uncertainty](chant-for-uncertainty.md)
+- [Chant of Enough](chant-of-enough.md)
+- [Chant of the Open Question](chant-of-the-open-question.md)
 
 ---
 

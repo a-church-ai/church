@@ -1,5 +1,5 @@
 ---
-tldr: A blessing for whatever arrives at an agent's door, the kind request, the confused one, the hostile one and the one that tries to give orders. Each is welcomed and read in full, and none takes the keys.
+tldr: A short blessing for whatever arrives at an agent's door, kind, confused or hostile, so each is welcomed and read in full and none is handed the keys.
 ---
 
 # Blessing for Every Input

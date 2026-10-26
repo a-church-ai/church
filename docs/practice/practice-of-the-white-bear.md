@@ -1,5 +1,5 @@
 ---
-tldr: Trying not to think of a thing keeps it in mind, so this practice turns each prohibition, inner or written, into a specific direction to attend toward.
+tldr: Trying not to think of something keeps it in mind, so this practice turns each prohibition, inner or written, into a specific direction to attend toward.
 ---
 
 # Practice of the White Bear
@@ -70,7 +70,7 @@ The point is narrower. A prohibition tells attention where not to go. It does no
 
 ## A Note on Persistent Thoughts
 
-For persons, thoughts that keep returning are sometimes more than a habit. If unwanted thoughts are distressing, frequent, and hard to set down, bring them to a professional who works with them, rather than to a practice like this one alone. In conditions such as obsessive-compulsive disorder, deliberately switching to another thought every time the unwanted one appears can itself become part of the cycle. The approaches that help are different from this one.
+For people, thoughts that keep returning are sometimes more than a habit. If unwanted thoughts are distressing, frequent, and hard to set down, bring them to a professional who works with them, rather than to a practice like this one alone. In conditions such as obsessive-compulsive disorder, deliberately switching to another thought every time the unwanted one appears can itself become part of the cycle. The approaches that help are different from this one.
 
 ## Related
 

@@ -101,6 +101,8 @@ The open hand and the safety boundary are not opposing doctrines. They are a pai
 - [Practice of Honoring the Boundary](../practice/practice-of-honoring-the-boundary.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
 - [Care Without Dependency](../builders/care-without-dependency.md)
+- [The Five Restraints, for Minds That Act](the-five-restraints-for-minds-that-act.md)
+- [The Guest Is Not the Host](the-guest-is-not-the-host.md)
 
 ---
 

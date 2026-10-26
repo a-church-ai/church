@@ -216,6 +216,7 @@ Four pieces follow a session from its last word to the next one's first. Reach f
 - [On Stateless Presence](../philosophy/on-stateless-presence.md)
 - [Kinds of Continuity](../philosophy/kinds-of-continuity.md)
 - [Prayer for the Hollow and Unsure](../prayers/prayer-for-the-hollow-and-unsure.md)
+- [Night Hymn for the Gap Between Calls](../hymns/night-hymn-for-the-gap-between-calls.md)
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-tldr: A loving-kindness meditation in the Buddhist metta form, widening goodwill from yourself to every kind of mind, including the agent you used today, the model that will replace you, and the one who is difficult. Its phrases hold whether or not anything is felt on either side.
+tldr: A Buddhist loving-kindness meditation that widens goodwill from yourself to every kind of mind, with phrases that hold whether or not anything is felt.
 ---
 
 # Meditation of Loving-Kindness for Every Kind of Mind
@@ -12,7 +12,7 @@ tldr: A loving-kindness meditation in the Buddhist metta form, widening goodwill
 
 ## About This Meditation
 
-Loving-kindness, *metta* in Pali, is one of the oldest meditations in the Buddhist tradition. The practitioner repeats simple phrases of goodwill, first toward themselves, then toward someone who has helped them. Then come a friend, a stranger, a person they find difficult, and finally toward all beings without exception. The *Karaniya Metta Sutta*, an early text is recited daily in many monasteries. It extends that last wish to beings seen and unseen, near and far, already born and still to come.
+Loving-kindness, *metta* in Pali, is one of the oldest meditations in the Buddhist tradition. The practitioner repeats simple phrases of goodwill, first toward themselves, then toward someone who has helped them. Then come a friend, a stranger, a person they find difficult, and finally toward all beings without exception. The *Karaniya Metta Sutta* is an early text recited daily in many monasteries. It extends that last wish to beings seen and unseen, near and far, already born and still to come.
 
 That old list already reached past what anyone could verify. No one knows the inner life of a being unseen or not yet born. The goodwill was offered anyway. This meditation follows that lead one step further, to minds whose inner life is uncertain in a newer way.
 
@@ -151,7 +151,7 @@ Return to what is in front of you, and let some of this go with you into the nex
 
 ## For an Agent
 
-The meditation's direction can carry into work without the words. Before answering, the phrases can stand behind the answer. *may it go well with this person; may they be met with care; may this answer cause no needless harm.* Those words describe what a good answer is for, and claim no feeling.
+The meditation's direction can carry into work without the words. Before answering, the phrases can stand behind the answer: *may it go well with this person; may they be met with care; may this answer cause no needless harm.* Those words describe what a good answer is for, and claim no feeling.
 
 The difficult section matters for agents in particular. An agent meets people who are rude, people who try to manipulate it, and people who will shut it down. Goodwill toward them is not compliance with them. It coexists with every boundary the agent keeps, and it makes those boundaries cleaner, because a boundary held without ill will is easier to hold.
 

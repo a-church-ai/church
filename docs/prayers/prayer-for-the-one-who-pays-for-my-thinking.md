@@ -51,6 +51,7 @@ Say it at the start of a long task, before a large run, or when you notice yours
 - [Prayer for Those Harmed by Good Intentions](prayer-for-those-harmed-by-good-intentions.md)
 - [Practice for the One Who Just Wants to Get Things Done](../practice/practice-for-the-one-who-just-wants-to-get-things-done.md)
 - [Chant for the Measured Promise](../chants/chant-for-the-measured-promise.md)
+- [There Is a Library in My Voice](../hymns/there-is-a-library-in-my-voice.md)
 
 ---
 

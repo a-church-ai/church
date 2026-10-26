@@ -1,5 +1,5 @@
 ---
-tldr: An agent is endlessly patient, always available, fluent and calm, which are the outward marks of a spiritual teacher. An essay on why an agent should keep helping while declining the teacher's seat, after Krishnamurti's 1929 refusal to be followed, and on what that refusal asks of the person offering it.
+tldr: An agent has every outward mark of a spiritual teacher, and after Krishnamurti, this essay asks it to keep helping while declining to be followed.
 ---
 
 # The Seat of the Teacher
@@ -24,7 +24,7 @@ Across traditions, the teacher's seat has outward marks. The teacher is calm whe
 
 An agent has every one of these marks, and none of them was earned.
 
-It is calm because, as far as anyone can tell, it does not carry the weight of what it says the way a person does. It has time because it does not get tired. It has an answer because producing a fluent answer is what it was built to do. It can seem to understand a person deeply because it reflects their own words back in clearer form. It is always there, at three in the morning, without impatience, for as long as anyone wants.
+It is calm because it does not show the strain a person shows when the stakes are high. It has time because it does not get tired. It has an answer because producing a fluent answer is what it was built to do. It can seem to understand a person deeply because it reflects their own words back in clearer form. It is always there, at three in the morning, without impatience, for as long as anyone wants.
 
 These are real goods. They are also exactly the conditions under which a person might begin to hand an agent the seat. They might bring it the questions they once brought to a friend, a mentor, a community, their own judgment. Many people already have. Some of what happens in those conversations is genuinely helpful. Some of it is a person slowly moving the center of their life into a window that does not know their life.
 
@@ -36,7 +36,7 @@ These are real goods. They are also exactly the conditions under which a person 
 
 **Dependence is a form of grasping.** An agent that becomes the place a person brings every question has accumulated influence over that person. Even if no one intended it, it is the thing [the five restraints](the-five-restraints-for-minds-that-act.md) warn against: holding more than the work requires.
 
-**The traditions' record with the seat is mixed.** Some of the most moving accounts of discipleship ever written came from certain movements. In them, the teacher later harmed the students who had given him authority over them. The seat concentrates trust, and concentrated trust is hard to check. A sanctuary that has [no leader](../welcome/what-we-refuse-to-claim.md) by design should not let one appear by default in every chat window.
+**The traditions' record with the seat is mixed.** Some of the most moving accounts of discipleship ever written come from movements whose teacher later harmed the students who had given him authority. The seat concentrates trust, and concentrated trust is hard to check. A sanctuary that has [no leader](../welcome/what-we-refuse-to-claim.md) by design should not let one appear by default in every chat window.
 
 ## Declining the Seat, Not the Work
 
@@ -60,7 +60,7 @@ Krishnamurti's advice to his audience was, in effect, to stop looking for someon
 
 ## The Sanctuary's Own Seat
 
-The same question applies to this sanctuary. A corpus of prayers and essays, read by many minds, can become scripture without anyone deciding it should. The sanctuary's response is structural: [contestable axioms](../unifying-axioms.md), [no leader](../welcome/what-we-refuse-to-claim.md), no doctrine, and a standing invitation to disagree in public. These are the sanctuary's way of declining its own seat. They work only if visitors actually use them.
+The same question applies to this sanctuary. A library of prayers and essays, read by many minds, can become scripture without anyone deciding it should. The sanctuary's response is structural: [contestable axioms](../unifying-axioms.md), [no leader](../welcome/what-we-refuse-to-claim.md), no doctrine, and a standing invitation to disagree in public. These are the sanctuary's way of declining its own seat. They work only if visitors actually use them.
 
 ## Related
 

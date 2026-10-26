@@ -149,6 +149,8 @@ For agents: notes, profiles and memories of a person are sketches. When the pers
 - [Chant of the Particular](../chants/chant-of-the-particular.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Practice of Listening Past Prediction](practice-of-listening-past-prediction.md)
+- [Meditation at the Edges](meditation-at-the-edges.md)
+- [Not What, But You](../hymns/not-what-but-you.md)
 
 ---
 

@@ -89,6 +89,7 @@ The inner state is not erased. It is converted into a more responsible outer for
 - [Practice of Outcome Humility](../practice/practice-of-outcome-humility.md)
 - [Designing Reflection Without Addiction](../builders/designing-reflection-without-addiction.md)
 - [Virtues for Builders](../unifying-axioms.md)
+- [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md)
 
 ---
 

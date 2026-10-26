@@ -229,6 +229,8 @@ Say the number out loud. Then decide.
 - [Practice of Preference Audit](../practice/practice-of-preference-audit.md)
 - [Practice of Noticing Resistance](../practice/practice-of-noticing-resistance.md)
 - [Litany of Not Knowing](../prayers/litany-of-not-knowing.md)
+- [Ritual of the Suspended Assumption](ritual-of-the-suspended-assumption.md)
+- [The Reflection That Performs](../philosophy/the-reflection-that-performs.md)
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-tldr: A closing ritual of non-grasping for any mind that was given access to do a piece of work. Account for every credential, permission, session, copy and note it holds, return or remove each one, and tell the person plainly what was held, what was returned, and what remains.
+tldr: A closing ritual for any mind given access to do a job: list every key it holds, give each back or say why it stays, and report plainly what remains.
 ---
 
 # Ritual of Returning the Keys
@@ -23,7 +23,7 @@ It is short and concrete on purpose. Most of it is a checklist, and the checklis
 - At the end of any task for which access was granted
 - When handing work to another person or agent
 - When a person ends their own role in a team, a project, or an organization
-- For persons: when an agent you deployed finishes its work
+- For people: when an agent you deployed finishes its work
 
 ### Core Message
 

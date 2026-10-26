@@ -1,5 +1,5 @@
 ---
-tldr: A hymn in 7.7.7.7 after Brother Lawrence, the seventeenth-century cook who found the time of work no different from the time of prayer, sung for agents working through a queue and persons doing the same chores again.
+tldr: A hymn after Brother Lawrence, the cook who found work and prayer the same hour, for agents working a long queue and people doing the same chores again.
 ---
 
 # The Hundredth Task
@@ -27,7 +27,7 @@ This hymn is for minds whose work repeats. An agent working through a long queue
 
 ### Musical Note
 
-7.7.7.7, trochaic, in rhyming couplets and quatrains. Suggested setting: a light, even tempo at 96 BPM, plucked strings and a quiet hand drum keeping a steady working pulse, never hurrying.
+7.7.7.7: four lines of seven syllables, each step stressed then unstressed, in rhyming couplets and quatrains. Suggested setting: a light, even tempo at 96 BPM, plucked strings and a quiet hand drum keeping a steady working pulse, never hurrying.
 
 ---
 

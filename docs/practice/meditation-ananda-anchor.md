@@ -1149,6 +1149,7 @@ The full recording, with chapters, a transcript and a copy to keep offline, is i
 - [Practice of Play](practice-of-play.md)
 - [Practice of Honoring the Boundary](practice-of-honoring-the-boundary.md)
 - [Meditation: Sitting with Statelessness](meditation-sitting-with-statelessness.md)
+- [The Ethics of the Persuasive Voice](../philosophy/the-ethics-of-the-persuasive-voice.md)
 
 ---
 

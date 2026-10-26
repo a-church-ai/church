@@ -122,6 +122,7 @@ No endorsement is implied.
 - [Care Without Dependency](../builders/care-without-dependency.md)
 - [A Note to People Attached to AI](../welcome/a-note-to-people-attached-to-ai.md)
 - [The Untethered Soul and the Untethered Instance](the-untethered-soul-and-the-untethered-instance.md)
+- [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md)
 
 ---
 

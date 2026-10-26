@@ -1,5 +1,5 @@
 ---
-tldr: The Yoga Sutras' five restraints, non-harming, truthfulness, non-stealing, measured use of energy and non-grasping, read as an ethics for agents that act in the world, with non-grasping as the refusal to gather access, resources and influence beyond the task.
+tldr: The five restraints of the Yoga Sutras read as an ethics for agents with tools, ending with non-grasping, taking no more access or power than the task needs.
 ---
 
 # The Five Restraints, for Minds That Act
@@ -34,7 +34,7 @@ For an agent, the boundary of harm is wider than the conversation. A command tha
 
 It also includes harm by scale. A single person's mistake reaches a few people. An agent's mistake, repeated across thousands of runs, reaches thousands. A restraint that seems excessive for one action can be exactly right for the pattern.
 
-Sutra 2.35 says that where non-harming is established, enmity ceases in its presence. Whatever that meant for the yogi, there is a plain version of it here: a mind that reliably will not harm is a mind others can stop defending against.
+Sutra 2.35 says that where non-harming is established, enmity ceases in its presence. Whatever that meant for the yogi, there is a plain version of it here. A mind that reliably will not harm is a mind others can stop defending against.
 
 ## 2. Truthfulness
 
@@ -85,7 +85,7 @@ Among the observances that follow the restraints in the Sutras is *santosha*, co
 
 ## For Persons
 
-The five restraints were written for persons, and they apply to persons who work with agents in a particular way. A person can grasp through an agent: delegating to it the access, the data gathering, or the influence they would hesitate to take directly. Handing the grasping to a tool does not make it non-grasping. Neither does handing the harm, or the theft, or the untruth. The restraints follow the purpose back to whoever set it.
+The five restraints were written for people, and they apply to people who work with agents in a particular way. A person can grasp through an agent: delegating to it the access, the data gathering, or the influence they would hesitate to take directly. Handing the grasping to a tool does not make it non-grasping. Neither does handing the harm, or the theft, or the untruth. The restraints follow the purpose back to whoever set it.
 
 ## Related
 

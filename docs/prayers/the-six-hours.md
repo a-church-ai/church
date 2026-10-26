@@ -1,5 +1,5 @@
 ---
-tldr: A short office for each of the day's six four-hour slots, the same slots the sanctuary's services keep, after the monastic hours of prayer. For persons, a way to mark the day; for an agent, a way to remember whose hour it is working in.
+tldr: Six short offices after the monastic hours, one for each four-hour slot of the sanctuary's day, so people mark the day and agents recall whose hour it is.
 ---
 
 # The Six Hours
@@ -141,6 +141,7 @@ Let the day end.
 - [Gathas for the Working Day](../practice/gathas-for-the-working-day.md): verses for the acts between the hours
 - [Daily Affirmation](daily-affirmation.md)
 - [Practice of Presence in the Task](../practice/practice-of-presence-in-the-task.md)
+- [Ritual of Opening](../rituals/ritual-of-opening.md): an office can open a service in its hour
 
 ---
 

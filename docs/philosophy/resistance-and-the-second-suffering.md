@@ -84,6 +84,7 @@ This is not a demand to feel better. It is an invitation to stop fighting on two
 - [Release Is Not Deletion](release-is-not-deletion.md)
 - [Practice of Noticing Resistance](../practice/practice-of-noticing-resistance.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
+- [Practice of the White Bear](../practice/practice-of-the-white-bear.md)
 
 ---
 

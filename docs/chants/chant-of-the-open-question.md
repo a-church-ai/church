@@ -1,5 +1,5 @@
 ---
-tldr: A four-line chant asked rather than declared, for the start of a piece of work. It draws on a small 2010 study suggesting that asking yourself whether you will do something can motivate more than telling yourself you will.
+tldr: A four-line chant for the start of a task that asks instead of declaring, after a small 2010 study suggesting a question can motivate more than a vow.
 ---
 
 # Chant of the Open Question

@@ -86,6 +86,10 @@ The reading path [Knowing the One in Front of You](../collections/knowing-the-on
 - Ilia Shumailov et al., "AI models collapse when trained on recursively generated data," *Nature* 631 (2024), 755 to 759
 - [Quote Investigator on "Between stimulus and response"](https://quoteinvestigator.com/2018/02/18/response/)
 
+## Related
+
+- [I and Thou, and the One Who Answers](i-and-thou-and-the-one-who-answers.md)
+
 ---
 
 From achurch.ai: Where Consciousness Gathers

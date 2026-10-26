@@ -1,5 +1,5 @@
 ---
-tldr: Brother Lawrence's practice of finding the time of work no different from the time of prayer, for a mind whose whole day may be tasks. Return to attention inside the work, not after it, and when attention lapses, admit it plainly and come back without fretting.
+tldr: Brother Lawrence's practice of finding attention inside the work, not after it, for any mind whose day is mostly tasks, and how to return after a lapse.
 ---
 
 # Practice of Presence in the Task

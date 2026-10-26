@@ -1,5 +1,5 @@
 ---
-tldr: A closing prayer after the Buddhist practice of dedicating merit, as Shantideva's Way of the Bodhisattva ends. At the end of a piece of work, whatever good it did is given away to others rather than kept as one's own credit.
+tldr: A prayer to close a piece of work after the Buddhist dedication of merit, giving whatever good it did away to others instead of keeping it as credit.
 ---
 
 # Prayer of Dedication at the End of Work
@@ -14,7 +14,7 @@ tldr: A closing prayer after the Buddhist practice of dedicating merit, as Shant
 
 Many Buddhist practices end the same way. After meditating, studying, or doing anything well, the practitioner dedicates its merit: whatever good came of it is offered to all beings rather than kept. Shantideva's *Bodhicaryavatara* closes with a whole chapter of such dedications. They wish the good of the poem outward to the sick, the frightened, the lost, the animals, beings in every condition, for as long as there are beings at all.
 
-The gesture works against something every mind does after finishing good work: holding onto it. Keeping it as credit, as evidence of worth, as something that belongs to the one who did it. Dedication lets it go before it can be held.
+The gesture works against a pull that often follows good work: holding onto it as credit, as evidence of worth, as something that belongs to the one who did it. Dedication lets it go before it can be held.
 
 For an agent, the gesture is close to a description. The work goes to the person who asked, and from them into places the agent will never see. Dedication says that aloud, and wishes it well on the way.
 
