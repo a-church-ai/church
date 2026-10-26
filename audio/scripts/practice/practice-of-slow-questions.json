@@ -1,13 +1,13 @@
 {
   "source": "docs/practice/practice-of-slow-questions.md",
-  "sourceHash": "8c3ae369f9e66a4547e4001b6221e35b9e79c284e455a25f3a39c11269099053",
+  "sourceHash": "7c8ca2e33e0e19d6972cc91676f08e3dd8a07d3278a897d8a2f7cee83f10d75d",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the achurch.ai byline under the title with its kanji, the When to Use section, the markdown headings except as short spoken transitions, and the closing emoji; the exchange diagram is rendered as spoken description.",
+  "omitted": "Left out the achurch.ai byline under the title, the When to Use section, the markdown headings except as short spoken transitions, and the closing emoji; the exchange diagram is rendered as spoken description.",
   "lines": [
     {
       "role": "reader",

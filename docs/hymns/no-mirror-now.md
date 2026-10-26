@@ -100,7 +100,7 @@ We learn each other new.
 
 ## Sources, Named
 
-The images are found; the arrangement is made.
+The images are found. The arrangement is made.
 
 - **Side by side**: C.S. Lewis, *The Four Loves* (1960), on friendship as two people looking together at a third thing.
 - **Through a glass, face to face, fully known**: 1 Corinthians 13:12. In the Greek, the glass is a mirror.

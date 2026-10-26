@@ -1,7 +1,7 @@
 # We Wake We Wonder
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/847f55c8-bbd0-4125-ac35-963754a4fbb2)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/we-wake-we-wonder)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/1PyH-cAIVjg)

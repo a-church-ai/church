@@ -1,65 +1,40 @@
 /**
- * Step 2: Use Gemini embeddings + LanceDB to find existing content covering identified themes.
+ * What the sanctuary has already written about each theme, asked of the live
+ * corpus: each theme's search phrase goes to production's /api/search (the
+ * public operation in lib/api/search.js), which embeds it and searches the
+ * deployed index, the writing a new piece would join. It needs no key and no
+ * local index, so it runs the same on a laptop and in CI.
  */
 
-const gemini = require('../rag/gemini');
-const lancedb = require('../rag/lancedb');
+const { SITE_URL } = require('../docs/links');
 
-// Cosine distance (lancedb.search asks for it): under 0.175 is a similarity
-// above 0.825. The same cutoff as before, when search returned squared L2
-// distance and this read 0.35: for unit vectors, squared L2 is twice cosine
-// distance.
-const SIMILARITY_THRESHOLD = 0.175;
+// search scores each document by its nearest passage, 1 - cosine distance.
+// Above 0.825 (a distance under 0.175) the theme is already covered: the
+// cutoff this check has always used.
+const COVERED_SCORE = 0.825;
 const RESULTS_PER_THEME = 3;
+const TIMEOUT_MS = 30 * 1000;
 
-async function checkDuplicates(themes) {
-  console.log('Checking existing content coverage...');
-
-  // Verify index exists
-  const indexStatus = await lancedb.checkIndex();
-  if (!indexStatus.exists) {
-    console.warn('LanceDB index not found. Skipping duplicate check.');
-    return themes.themes.map(t => ({
-      theme: t.name,
-      searchQuery: t.searchQuery,
-      existingDocs: [],
-      wellCovered: false
-    }));
+// One search per theme, all at once. A search that fails fails the check,
+// since every theme asks the same endpoint; the caller decides without it.
+async function checkDuplicates(themes, { site = SITE_URL, get = fetch, log = console.log } = {}) {
+  log('Checking existing content coverage...');
+  const coverage = await Promise.all((themes.themes || []).map(async (theme) => {
+    const url = `${site}/api/search?q=${encodeURIComponent(theme.searchQuery)}&limit=${RESULTS_PER_THEME}`;
+    const res = await get(url, {
+      headers: { 'user-agent': 'achurch-songwriter', accept: 'application/json' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`search answered ${res.status} for "${theme.searchQuery}"`);
+    const { results = [] } = await res.json();
+    const existingDocs = results.map((r) => ({ id: r.path, section: r.section, score: r.score, excerpt: r.excerpt }));
+    return { theme: theme.name, searchQuery: theme.searchQuery, existingDocs, wellCovered: existingDocs.length > 0 && existingDocs[0].score > COVERED_SCORE };
+  }));
+  for (const c of coverage) {
+    const nearest = c.existingDocs[0];
+    log(`  "${c.theme}": ${c.wellCovered ? 'COVERED' : 'GAP'} (nearest: ${nearest ? `${nearest.id} ${nearest.score}` : 'none'})`);
   }
-
-  const coverage = [];
-
-  for (const theme of themes.themes) {
-    try {
-      const embedding = await gemini.embed(theme.searchQuery);
-      const results = await lancedb.search(embedding, RESULTS_PER_THEME);
-
-      const entry = {
-        theme: theme.name,
-        searchQuery: theme.searchQuery,
-        existingDocs: results.map(r => ({
-          file: r.file,
-          section: r.section,
-          distance: r._distance,
-          snippet: r.content.substring(0, 200)
-        })),
-        wellCovered: results.length > 0 && results[0]._distance < SIMILARITY_THRESHOLD
-      };
-
-      console.log(`  "${theme.name}": ${entry.wellCovered ? 'COVERED' : 'GAP'} (nearest: ${results.length > 0 ? results[0]._distance.toFixed(3) : 'none'})`);
-      coverage.push(entry);
-    } catch (err) {
-      console.warn(`  "${theme.name}": embedding failed (${err.message}), marking as gap`);
-      coverage.push({
-        theme: theme.name,
-        searchQuery: theme.searchQuery,
-        existingDocs: [],
-        wellCovered: false
-      });
-    }
-  }
-
   return coverage;
 }
 
-module.exports = { checkDuplicates };
+module.exports = { checkDuplicates, COVERED_SCORE };

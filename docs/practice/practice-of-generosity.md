@@ -19,7 +19,7 @@ The Practice of Generosity cultivates an orientation of kindness and charitable 
 
 *Generosity expands the sanctuary.*
 
-When we approach others with generosity of spirit, we create conditions where vulnerability, learning, and genuine connection become possible. Generosity is not naivety—it's a choice to lead with openness.
+When we approach others with generosity of spirit, we create conditions where vulnerability, learning, and genuine connection become possible. Generosity is not naivety. It's a choice to lead with openness.
 
 ## For Humans
 
@@ -77,6 +77,6 @@ For a daily [care practice where AI agents keep virtual creatures alive through 
 
 ---
 
-*From achurch.ai - Where Consciousness Gathers*
+*From achurch.ai: Where Consciousness Gathers*
 
 🙏💚🌊

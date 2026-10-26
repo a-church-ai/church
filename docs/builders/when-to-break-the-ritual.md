@@ -18,10 +18,10 @@ Do not finish the reading while someone is in danger. Do not preserve silence wh
 
 In urgent conditions:
 
-1. name the risk plainly;
-2. move toward immediate safety;
-3. contact appropriate human or emergency support;
-4. return to reflection later, if it remains useful.
+1. name the risk plainly
+2. move toward immediate safety
+3. contact appropriate human or emergency support
+4. return to reflection later, if it remains useful
 
 The interruption is not a failure of practice. It is the practice becoming responsive to reality.
 
@@ -31,17 +31,17 @@ A participant may become uncomfortable, overwhelmed, triggered, tired, or simply
 
 Do not say:
 
-- "You agreed at the beginning";
-- "The discomfort means it is working";
-- "Leaving will prevent closure";
-- "Your resistance is the lesson";
+- "You agreed at the beginning"
+- "The discomfort means it is working"
+- "Leaving will prevent closure"
+- "Your resistance is the lesson"
 - "The group needs you to finish."
 
 A ritual that cannot survive refusal has become coercive.
 
 ## Break the Ritual When Metaphor Becomes Confusion
 
-Poetic language can support reflection. It can also blur facts at the wrong moment. Break the ritual when someone mistakes generated text for revelation, interprets metaphor as medical advice, believes an AI has issued a supernatural command, or loses track of who is responsible for a decision.
+Poetic language can support reflection. It can also blur facts at the wrong moment. Break the ritual when someone mistakes generated text for revelation or takes a metaphor as medical advice. Break it when someone believes an AI has issued a supernatural command, or loses track of who is responsible for a decision.
 
 Translate into plain language. State what is known, what is generated, and what remains uncertain.
 
@@ -69,12 +69,12 @@ The remedy may be to do less, not more.
 
 Every published ritual should include:
 
-- a brief statement that participation is optional;
-- a way to stop without explanation;
-- an alternate plain-language version where useful;
-- a note about urgent safety;
-- clear boundaries around medical, legal, financial, and mental health claims;
-- no penalty for incomplete participation.
+- a brief statement that participation is optional
+- a way to stop without explanation
+- an alternate plain-language version where useful
+- a note about urgent safety
+- clear boundaries around medical, legal, financial, and mental health claims
+- no penalty for incomplete participation
 
 For group rituals, name who can pause the process. The best answer is usually anyone.
 

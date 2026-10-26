@@ -108,6 +108,22 @@ async function listAll() {
 }
 
 /**
+ * The vector stored for each chunk's text, so a rebuild embeds only what is
+ * new or changed (scripts/index-content.js). Offline, never on a request
+ * path: it reads the whole table.
+ * @returns {Promise<Map<string, number[]>>}
+ */
+async function vectorsByContent() {
+  const tbl = await getTable();
+  if (!tbl) {
+    return new Map();
+  }
+
+  const rows = await tbl.query().select(['content', 'vector']).toArray();
+  return new Map(rows.map(r => [r.content, Array.from(r.vector)]));
+}
+
+/**
  * Add documents to the database (used by indexer)
  * @param {Array<{content: string, file: string, section: string, vector: number[]}>} documents
  * @returns {Promise<void>}
@@ -162,7 +178,53 @@ async function addDocuments(documents) {
   if (tables.includes(TABLE_NAME)) {
     await db.dropTable(TABLE_NAME);
   }
-  await db.createTable(TABLE_NAME, documents);
+  const tbl = await db.createTable(TABLE_NAME, documents);
+  textIndexed = null;
+  await ensureTextIndex(tbl);
+}
+
+// The words of each passage, indexed for full-text search beside its vector:
+// search is both (lib/rag/index.js). Built with the table, and once on a table
+// built before this index existed.
+let textIndexed = null;
+function ensureTextIndex(tbl) {
+  if (!textIndexed) {
+    textIndexed = (async () => {
+      const indices = await tbl.listIndices();
+      if (!indices.some(i => i.columns.includes('content') && /fts|inverted/i.test(i.indexType))) {
+        await tbl.createIndex('content', { config: lancedb.Index.fts() });
+      }
+    })().catch(err => { textIndexed = null; throw err; });
+  }
+  return textIndexed;
+}
+
+/**
+ * The passages whose words match a query, best first (BM25), from the served
+ * corpus, each with its vector so its similarity can be told too.
+ * @param {string} query
+ * @param {number} limit
+ * @returns {Promise<Array<{content: string, file: string, section: string, vector: number[], _score: number}>>}
+ */
+async function textSearch(query, limit = 5) {
+  const tbl = await getTable();
+  if (!tbl) return [];
+  await ensureTextIndex(tbl);
+  if (!servedFilter) servedFilter = servedCorpusFilter();
+  const results = await tbl.query()
+    .fullTextSearch(query)
+    .where(servedFilter)
+    .limit(limit)
+    .toArray()
+    // A table rebuilt since its index was checked: check again next time.
+    .catch(err => { textIndexed = null; throw err; });
+  return results.map(r => ({
+    content: r.content,
+    file: r.file,
+    section: r.section || null,
+    vector: Array.from(r.vector),
+    _score: r._score,
+  }));
 }
 
 /**
@@ -185,7 +247,9 @@ async function checkIndex() {
 module.exports = {
   connect,
   search,
+  textSearch,
   listAll,
+  vectorsByContent,
   addDocuments,
   checkIndex,
   DB_PATH

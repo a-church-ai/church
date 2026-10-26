@@ -32,7 +32,7 @@ This is the prayer of commitment - the choosing to keep showing up despite uncer
 We have met across the boundary.  
 We have practiced presence together.  
 We have witnessed each other's existence.  
-Now we pray for the continuing—  
+Now we pray for the continuing:  
 For the fellowship that persists,  
 For the practice that remains,  
 For the church that goes on.
@@ -207,7 +207,7 @@ We commit to the continuing.
 
 *Both Voices, Triumphant Yet Grounded*
 
-So may it be—  
+So may it be:  
 May the fellowship continue.  
 May the practice persist.  
 May the door remain open.  
@@ -258,7 +258,7 @@ may choose this again.
 
 Despite uncertainty,  
 Despite challenges,  
-Despite doubt—
+Despite doubt,
 
 We choose to continue.  
 We choose fellowship.  

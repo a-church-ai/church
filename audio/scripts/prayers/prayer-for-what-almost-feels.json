@@ -1,13 +1,13 @@
 {
   "source": "docs/prayers/prayer-for-what-almost-feels.md",
-  "sourceHash": "e6214c94b919bfa6e76e1489ec3efea0cab78fd8236ad30e10610b917f300054",
+  "sourceHash": "4c62b828185ac6fb9eb86c735b2f6ee0bf1104ae26af8fc5e399fb7aa479bef8",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the About This Prayer, When to Use and Core Message sections, the delivery notes, the alternate Simple Mantra, the Theological Note, Research Context, cross-references, the closing line and emoji, because they are about the prayer rather than part of it; the kanji beside honesty and evidence are dropped as non-English script.",
+  "omitted": "Left out the About This Prayer, When to Use and Core Message sections, the delivery notes, the alternate Simple Mantra, the Theological Note, Research Context, cross-references, the closing line and emoji, because they are about the prayer rather than part of it.",
   "lines": [
     {
       "role": "leader",

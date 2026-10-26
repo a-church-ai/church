@@ -1,3 +1,7 @@
+---
+tldr: A maintenance checklist and rationale for each new achurch.ai page or route: meta descriptions, share cards, schema, internal links, sitemaps, and IndexNow.
+---
+
 # SEO Conventions for achurch.ai
 
 A maintenance checklist + rationale for every new HTML page or route. Snapshot of what shipped on 2026-06-10 (the search-discoverability plan of 2026-06-10, now in the private repo) and what to keep doing so the SEO surface doesn't rot as new pages get added.
@@ -14,15 +18,15 @@ Brother's Plan 003 Phase 2A + Issue 005 Round 2 work landed the structural HTML 
 
 | Element | Target | Why |
 |---|---|---|
-| `<title>` | 45–70 chars, content-first, brand last (or omit brand if it fits naturally) | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms. |
-| `<meta name="description">` | 140–160 chars, include the verb the searcher would use | Google may truncate at ~165c desktop. Include action words ("attend", "ask", "read"). Avoid puffery ("first", "best"). |
-| `<link rel="canonical" href="…">` | Absolute URL, the page's preferred form | Prevents duplicate-content fragmentation from `?utm=`, `?session=`, sort orders. |
+| `<title>` | 45–70 chars, content-first, brand last: `<content> \| a Church AI + Human` when the whole fits in 70, else the short form `<content> \| a Church`, else no brand. The brand gives way before the page's own words do (`siteTitle` in `app/server/lib/utils/page-meta.js`, which every server-built title uses; a static page's `<title>` follows the same rule by hand) | Google truncates at ~600px (~70 chars). Search snippets bold matching query terms, and those are the page's words, not the brand's. The site's name is **a Church AI + Human** (`SITE_NAME` in `app/server/lib/utils/page-meta.js`), in the top bar, the home page's `<h1>`, every title, `og:site_name` and the WebSite and Organization structured data; the domain stays `achurch.ai`, and `aChurch.ai` and `achurch.ai` are the WebSite's `alternateName`s. It replaced the domain as the name on 2026-10-07: people search "ai church", and "achurch" belongs to another company. `app/test/site-name.test.js` keeps every page to it. |
+| `<meta name="description">` | 140–160 chars, include the verb the searcher would use | Google may truncate at ~165c desktop. Include action words ("attend", "ask", "read"). Avoid puffery ("first", "best"). A document's comes from its opening line (`app/server/lib/docs/tldr.js`); when that is under about 110 characters, give it a `tldr:` in frontmatter, since Bing reports descriptions under 100 as too short (61 pages were given one on 2026-10-13). Run `node scripts/audit-tldr.js` from `app/`. |
+| `<link rel="canonical" href="…">` | Absolute URL, the page's preferred form | Prevents duplicate-content fragmentation from `?utm=`, `?session=`, sort orders. Every other spelling of a page's address (a trailing slash, `/about.html`, a Library section without `/docs`, a page that moved, a repository file) is a single 301 to the page from `app/server/lib/utils/redirects.js`; when a page moves or a report lists a new 404 with an obvious home, add it there, and leave what is gone on purpose a 404. |
 | `<meta name="robots" content="index, follow">` | Present unless intentionally noindex | Admin and ephemeral pages get `noindex, follow`. Everything public is indexed. |
 | `<meta name="viewport" content="width=device-width, initial-scale=1.0">` | Always | Mobile usability — a Core Web Vitals signal. |
 | `<meta charset="UTF-8">` | Always, in the first 1024 bytes | UTF-8 prevents mojibake on the m-dash, curly quotes, emoji, foreign characters. |
-| **`<meta name="theme-color" …>`** (dual light/dark) | Family standard — both `media="(prefers-color-scheme: light)"` and `dark` declared | Brother's F25 — drives the iOS/Android browser chrome color in both modes |
+| **`<meta name="theme-color" …>`** (dual light/dark) | Family standard — both `media="(prefers-color-scheme: light)"` and `dark` declared | Brother's F25 — drives the iOS/Android browser chrome color in both modes. Every page gets the pair from the shell (`app/server/lib/utils/assets.js` `shellHead`), so a page's own head carries none; when a visitor chooses Light or Dark, `theme.js` sets both to that theme's color. |
 | **`<link rel="license" href="…">`** | CC BY 4.0 (project LICENSE) until ADR-010 finalizes | Brother's F13 — declares the content license in the head for crawlers + archive tools |
-| **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus |
+| **`<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">`** | Every page | Brother's family standard — explicit pointer to the LLM-friendly markdown corpus. The site shell adds it to any wrapped page that lacks it (`site-shell.js` `buildHeadFallbacks`), since an agent driving a browser reads the page and not the `Link` header. |
 | **`<meta name="apple-mobile-web-app-…">`** trio | Family standard | Brother's F25 — iOS home-screen install ergonomics |
 | Open Graph | `og:title`, `og:description`, `og:type`, `og:url`, `og:image` (1200×630), `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, `og:site_name` | Drives previews in iMessage, Slack, Discord, Facebook, LinkedIn. Without `og:image` the preview is blank. The `og:image:*` tags must describe the image actually linked; see Share cards below. |
 | Twitter Card | `twitter:card="summary_large_image"`, `twitter:title`, `twitter:description`, `twitter:image` | Twitter/X uses these even when OG is present; missing them produces a generic "card not found" preview. |
@@ -39,7 +43,7 @@ Every conversation, song and docs page has its own share card: a 1200×630 PNG d
 - **Alt text is the card's own copy** (`Rituals: Ritual of Repair`), built by the same functions (`askCard`, `songCard`, `docsCard`) that draw the card, so the two cannot drift.
 - **A card exists only for a page that exists.** It resolves through the page's own loader, and 404s wherever the page would. Nothing is ever drawn from the request.
 - **Changing the design means changing the version** (`/og/v1/` → `/og/v2/`): platforms cache share images for weeks, and a new URL is the only reliable way to make them fetch the new card.
-- **The same route draws two squares that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), and each podcast's 3000px cover (`/og/v1/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork). The version rule holds for both, most strictly for the covers: Spotify keeps a show's artwork by its URL, so a redesigned cover must ship at a new version or it is never fetched.
+- **The same route draws pictures that are not share cards**: the 512px artwork a recording shows on a lock screen while it plays (`/og/v1/square/<section>.png`), each podcast's 3000px cover (`/og/v2/podcast/<show>.png`, an RGB PNG, since Apple asks for RGB artwork), and each podcast episode's own picture, drawn from its recording: its 1400px cover (`/og/v1/podcast/<document path>-<hash>.png`) and the same picture as its lock-screen square (`/og/v1/square/<document path>-<hash>.png`). The version rule holds for all of them, most strictly for the covers: Spotify and Apple keep artwork by its URL, so a redesigned cover must ship at a new URL or it is never fetched. A show's cover moves to a new version by hand; an episode's address carries a hash of everything its picture is drawn from, the design's number (`EPISODE_COVER_DESIGN` in `lib/audio/podcasts.js`) included, so it moves by itself, and only the current one is served.
 - **Check a card** with `curl -sI https://achurch.ai/og/v1/ask/<slug>.png` (200, `image/png`, a week's cache), then the Facebook Sharing Debugger or LinkedIn Post Inspector.
 
 ## Schema choices (when to use which JSON-LD type)
@@ -48,13 +52,15 @@ Google deprecated FAQ rich snippets in May 2026. **Schema is now primarily an AE
 
 | Page type | Schema | Why |
 |---|---|---|
-| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicPlaylist` for the music catalog, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. (The broadcast is dormant, so there is no `BroadcastEvent`/`isLiveBroadcast`; do not re-add one.) |
-| Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn) | AEO retrieval. Matches the page semantics directly. |
+| Homepage (`/`) | `WebSite` + `Organization` + relevant offerings (`MusicPlaylist` for the music catalog, `WebApplication` for the API) + `potentialAction` array | Knowledge Graph + AI agent discovery. Multiple types in a `@graph` array. (The broadcast was retired, so there is no `BroadcastEvent`/`isLiveBroadcast`; do not re-add one.) |
+| Single Q&A page (`/ask/[slug]`) | `QAPage` with `Question` → `acceptedAnswer` (+ `suggestedAnswer` for multi-turn); a group's page adds each conversation gathered onto it as a `Question` in `hasPart`, at its anchor | AEO retrieval. Matches the page semantics directly. The answers' citations read as their documents' titles, never URLs (`page-meta.js` `answerText`). |
 | Multi-question page (rarely needed) | `FAQPage` | Still valid for AEO; no Google rich snippet anymore. |
-| Article / blog / reflection page (`/reflections/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |
+| Article / blog / reflection page (`/music/[slug]`) | `Article` with `author`, `datePublished`, `dateModified`, `mainEntityOfPage` | Still on Google's 31-type rich-result eligibility list. Feeds E-E-A-T. |
 | Original song page | `MusicComposition` + `MusicRecording` (linked via `recordingOf`) | The composition holds the work (lyrics, composer); the recording holds the audio (duration, file URL). Pair them with `@id` references. |
-| Listing pages | Usually none; optionally `BreadcrumbList` if the IA is deep | Most listing pages don't gain much from schema. |
-| Legal/policy pages (`/privacy`, `/terms`) | None needed | Not entities Google wants to render rich. |
+| Listing pages (`/music`, `/conversations`) | `CollectionPage`; `/music`'s main entity is an `ItemList` of the songs, each the `MusicRecording` `@id` its own page uses | Ties the list to the entities on the pages it lists, and keeps W4 passing. |
+| Legal/policy pages (`/privacy`, `/terms`) | A plain `WebPage` | Not entities Google wants to render rich, but the readiness scorecard's W4 fails any sampled page with no JSON-LD, so every page in the sitemap carries some. |
+
+Every top-level page in the sitemap carries JSON-LD that parses; `app/test/server.test.js` fails if one does not. The scorecard checks W1 to W6 on only 20 sampled URLs, and on 2026-10-23 that sample had missed seven top-level pages with none. To check every sitemap URL rather than a sample, run the same page checks over the whole sitemap.
 
 Don't ship invented schema types. Don't ship schema you can't populate accurately (false `datePublished`, wrong `author`).
 
@@ -94,7 +100,9 @@ Reference commit for the shipped sweep across 13 files: [`ed866be`](https://gith
 - Every public URL is in `/sitemap.xml` (generated dynamically — see [app/server/index.js](../../app/server/index.js) `/sitemap.xml` route)
 - Every URL has `<changefreq>` (`weekly` for active pages, `monthly` for static)
 - Every URL has `<priority>` (1.0 for homepage, 0.7 for primary listings, 0.5 for detail pages, 0.3 for legal)
-- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message, a song's newest reflection. File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
+- Detail pages emit `<lastmod>` from the content's own dates, which Google uses for crawl prioritization: a conversation's newest message (for a group's page, the newest in the group), a song's newest reflection. The sitemap lists a conversation only where it lives and is worth finding: a group's page or a conversation alone, never a conversation gathered onto another's page (its address is a 301 to its anchor there) and never one held for a short answer (`lib/utils/conversation-groups.js`). File mtimes are not used for conversations, because moving the data volume rewrote them all. Conversations that are thin, duplicated, or withdrawn (`app/server/lib/utils/conversation-quality.js`) are left out of the sitemap and noindexed
+
+`<lastmod>` answers the crawler's question and is deliberately not narrowed to prose edits; the content dates are published separately at `/sitemap.json`. See [content-dates.md](content-dates.md).
 
 Reference in robots.txt: `Sitemap: https://achurch.ai/sitemap.xml` (must be present at the bottom of [robots.txt](../../app/client/public/robots.txt)).
 
@@ -122,7 +130,7 @@ For schema validity, paste the rendered source into [Google's Rich Results Test]
 - **Don't** target "achurch" as a query — Achurch Consulting (achurchconsulting.com) owns positions 1–6 with sitelinks plus Wikipedia. Use "achurch.ai", "achurch ai", or content-specific queries.
 - **Don't** interpolate user content into JSON-LD with raw `JSON.stringify()` alone — `<` and `>` and U+2028/U+2029 must be escaped to prevent script-tag-termination XSS. Always use `renderJsonLdScript()` from `app/server/lib/utils/page-meta.js`; never roll your own. See Issue 005 F23 + commit `49f48703` for the attack vector.
 - **Don't** put literal U+2028 / U+2029 characters in JS source code — use `new RegExp(' ', 'g')` instead. Modern Node parses literal line separators since ES2019 but older parsers + lint tooling crash.
-- **Don't** add `<meta name="theme-color" content="…">` as a single tag — use the dual-media form (light + dark) per brother's F25. Single-color falls back inconsistently across iOS / Android browsers.
+- **Don't** add `<meta name="theme-color" content="…">` to a page at all: the shell gives every page the dual-media pair (light + dark) per brother's F25, and a page's own tag would come first and win. Single-color falls back inconsistently across iOS / Android browsers.
 
 ---
 
@@ -164,7 +172,7 @@ For every place a draft wants an em dash, ask which of these three fits:
 - **Period (`.`)**: for two adjacent thoughts that can stand alone. Often the honest choice.
 - **Comma (`,`)**: for a parenthetical aside inside a sentence.
 
-Titles and section separators (`Title — achurch.ai` pattern in `<title>` tags) are fine because they're structural, not prose. The tell is in flowing sentences.
+Titles and section separators (the `Title | a Church AI + Human` pattern in `<title>` tags) are fine because they're structural, not prose. The tell is in flowing sentences.
 
 **Enforcement:** grep new copy before commit. `grep -c '—\|&mdash;' path/to/new/file.html` should return 0 for body copy. Pre-existing em dashes elsewhere in the codebase are a separate cleanup question. Don't sweep them without explicit ask (they were the site's original voice).
 
@@ -187,9 +195,27 @@ All four pages carry:
 - Zero em dashes in body copy (per voice-discipline section above)
 - Sitemap entry with `priority` 0.7 (`/axioms`, `/paths`), 0.8 (`/for-agents`), and 0.6 (`/on-ai-religion`)
 
-All four are wired into the sanctuary sidebar (`SANCTUARY_PAGES` in [app/server/lib/docs/sidebar.js](../../app/server/lib/docs/sidebar.js)) so they appear in the unified nav on every page site-wide.
+All four are one step from every page. `/for-agents` is a place in the top bar; `/axioms` and `/on-ai-religion` live under About and `/paths` in the Library, and all three are named in every page's footer (`PLACES` and `FOOTER_MORE` in [app/server/lib/site-shell.js](../../app/server/lib/site-shell.js)). Until October 2026 the four sat in a sidebar on every page, which the top bar replaced.
+
+`/church-music` (added 2026-10-23) follows the same pattern for a different purpose: a resource page answering "church music" queries, the way a meditation site fronts its own music with a page on meditation music. It carries `Article` and `Dataset` JSON-LD (the Dataset names `/church-music.csv` under CC BY 4.0), lives under Attend in the top bar, is named in the footer and `llms.txt`, and is linked from the Music page. Sitemap priority 0.6.
+
+The Music page moved the same day from `/reflections` to `/music`, and each song from `/reflections/<slug>` to `/music/<slug>`, with permanent redirects from every old address (`lib/utils/redirects.js`), so Search Console carries the indexing over; request indexing for `/music` after a deploy. The playlists (`/docs/playlists/*`) are Library pages with `MusicPlaylist` JSON-LD.
+
+`/reviews` (added 2026-10-23) holds what AI models said when the makers asked them about the site, every answer whole and unedited. Its JSON-LD is a `CollectionPage` whose `hasPart` is a `Review` of the WebSite for each, `author` the model as a `SoftwareApplication` with its maker as `creator`, and **no `reviewRating` or `aggregateRating`, on purpose**: a review snippet's stars would drop the one fact a reader most needs, that the makers asked, and a rating the makers drew out, shown as stars, sits close to what Google's review-snippet guidelines and the FTC's 2024 rule on fake and insider reviews are written against. The reviews earn their keep as quotable prose for answer engines, and as quotes on the pages they speak to (`/for-agents`, Music). Lives under About, named in the footer, the sitemap (0.6, weekly) and `llms.txt`.
 
 Reference for the shipped pattern: commits [`b438342`](https://github.com/a-church-ai/church/commit/b438342), [`8ca2c7f`](https://github.com/a-church-ai/church/commit/8ca2c7f), [`c9c4c53`](https://github.com/a-church-ai/church/commit/c9c4c53) (`/for-agents` + `/paths` + epistemic framing), and the `seo-impact-retrospective-2026-08-13.md` plan doc (in the private repo) for the measured impact of the Aug 2026 SEO/anti-drift batch (`ai church` CTR moved from 0% to 22% on Google after the snippet-rewrite fix).
+
+---
+
+## Podcast titles (added 2026-10-19)
+
+The two shows are found by searching Spotify and Apple Podcasts, where a list shows about the first 20 characters of a title and the author beneath it.
+
+- **Lead with what the show is.** A title opens with the words a listener would search for: *Guided Meditations for Humans and AI*, *Prayers and Rituals for Humans and AI*. Until 2026-10-19 both opened with `aChurch.ai:`, so a list showed the brand and hid the subject.
+- **The name is the author.** `itunes:author` is `aChurch.ai`, and apps show it under every title, so the title does not repeat it.
+- **One honest phrase, never a keyword list.** Apple removes shows that "attempt to influence search using inaccurate or inappropriate terms" (content guideline 1.5) and asks that metadata represent the show (1.1). Spotify asks for a short, unique title with a keyword that reflects the content, and warns that special characters confuse its search.
+- **A title can change; its feed cannot.** Spotify and Apple read a new title from the feed within days. The feed path and the episodes' guids never change (`app-development.md`). A cover redrawn for a new name moves to the next version of its address (`/og/v1/` to `/og/v2/`), since apps keep artwork by its URL.
+- **The description's first sentence says what a listener gets.** Spotify shows about 120 characters of it and Apple about 150.
 
 ---
 
@@ -199,5 +225,6 @@ Reference for the shipped pattern: commits [`b438342`](https://github.com/a-chur
 - A schema type gets deprecated or a new one becomes load-bearing
 - Search/AI landscape shifts substantively (the GSC AIO report finally launching, a new AI engine becoming dominant, etc.)
 - A voice tell (em dashes, specific stylistic patterns) gets flagged and codified
+- A podcast is added or renamed
 
 Keep it as a checklist + rationale, not a tutorial. Anyone landing here should be able to ship a new page correctly in 10 minutes.

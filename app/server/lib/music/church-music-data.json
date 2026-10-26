@@ -1,0 +1,64 @@
+{
+  "$comment": "What people search for, about church music: Google Trends, collected 2026-10-23 by hand in a browser. Each value is a term's mean weekly interest over the window divided by its anchor's, times 100, computed from the chart's own data table (not Trends' rounded averages). Five terms per comparison: an anchor and four. 'google' is web search, 'youtube' is YouTube search. 'change5y' is the mean of the last 52 weeks over the mean of the first 52 in a five-year window, as a percentage, and null where the term's weekly values are too small to measure (under about 2). Rendered by lib/music/church-music.js on /church-music and as /church-music.csv. Research note: church-private/docs/research/church-music-styles-2026-10-23.md (private repo).",
+  "collected": "2026-10-23",
+  "window": "the 12 months to 2026-10-18, worldwide",
+  "forms": {
+    "anchor": "church music",
+    "terms": [
+      { "term": "church music", "google": 100, "youtube": 100, "change5y": { "google": 198, "youtube": 23 } },
+      { "term": "gospel music", "google": 74.5, "youtube": 737.1, "change5y": { "google": 5, "youtube": 33 } },
+      { "term": "christian music", "google": 103.8, "youtube": 484.1, "change5y": { "google": 68, "youtube": 57 } },
+      { "term": "hymns", "google": 112.8, "youtube": 304.2, "change5y": { "google": 23, "youtube": 21 } },
+      { "term": "worship music", "google": 41.5, "youtube": 564.2, "change5y": { "google": 55, "youtube": 70 } },
+      { "term": "praise and worship", "google": 34.8, "youtube": 604.9, "change5y": { "google": -16, "youtube": 24 } },
+      { "term": "gregorian chant", "google": 14.2, "youtube": 109.1, "change5y": { "google": 32, "youtube": 80 } },
+      { "term": "choir music", "google": 28.5, "youtube": 52.2, "change5y": { "google": 91, "youtube": 1 } },
+      { "term": "organ music", "google": 23.5, "youtube": 39.5, "change5y": { "google": 95, "youtube": -15 } },
+      { "term": "spirituals", "google": 9.5, "youtube": 44.8, "change5y": { "google": 17, "youtube": 65 } },
+      { "term": "taize", "google": 15.6, "youtube": 21.0, "change5y": { "google": 4, "youtube": -10 } },
+      { "term": "sacred music", "google": 15.9, "youtube": 13.2, "change5y": null },
+      { "term": "catholic hymns", "google": 7.5, "youtube": 17.1, "change5y": null },
+      { "term": "old hymns", "google": 5.0, "youtube": 13.1, "change5y": null },
+      { "term": "arvo part", "google": 4.6, "youtube": 8.6, "change5y": null },
+      { "term": "sacred harp", "google": 1.9, "youtube": 2.4, "change5y": null },
+      { "term": "christian meditation music", "google": 0.1, "youtube": 6.3, "change5y": null }
+    ]
+  },
+  "styles": {
+    "anchor": "piano hymns",
+    "terms": [
+      { "term": "piano hymns", "google": 100, "youtube": 100, "change5y": { "google": 19, "youtube": -23 } },
+      { "term": "instrumental hymns", "google": 72.2, "youtube": 198.9, "change5y": { "google": -4, "youtube": -6 } },
+      { "term": "choir hymns", "google": 48.1, "youtube": 55.3, "change5y": { "google": 116, "youtube": 26 } },
+      { "term": "guitar hymns", "google": 40.1, "youtube": 25.5, "change5y": null },
+      { "term": "relaxing hymns", "google": 8.1, "youtube": 35.7, "change5y": null },
+      { "term": "organ hymns", "google": 19.2, "youtube": 14.7, "change5y": null },
+      { "term": "hymns for sleep", "google": 4.6, "youtube": 9.2, "change5y": null },
+      { "term": "violin hymns", "google": 5.9, "youtube": 6.9, "change5y": null },
+      { "term": "folk hymns", "google": 12.6, "youtube": 1.9, "change5y": null },
+      { "term": "acoustic hymns", "google": 3.1, "youtube": 4.0, "change5y": null },
+      { "term": "cello hymns", "google": 1.1, "youtube": 10.3, "change5y": null },
+      { "term": "harp hymns", "google": 0.7, "youtube": 6.3, "change5y": null },
+      { "term": "flute hymns", "google": 0.6, "youtube": 0.8, "change5y": null },
+      { "term": "bluegrass hymns", "google": 0.1, "youtube": 2.2, "change5y": null },
+      { "term": "celtic hymns", "google": 0.1, "youtube": 1.9, "change5y": null },
+      { "term": "a cappella hymns", "google": 0, "youtube": 0.3, "change5y": null },
+      { "term": "lofi hymns", "google": 0, "youtube": 0.1, "change5y": null }
+    ]
+  },
+  "countries": {
+    "anchor": "church music",
+    "places": [
+      { "code": "US", "name": "United States" },
+      { "code": "GB", "name": "United Kingdom" },
+      { "code": "NG", "name": "Nigeria" },
+      { "code": "PH", "name": "Philippines" }
+    ],
+    "terms": [
+      { "term": "hymns", "values": { "US": { "google": 132.2, "youtube": 210.7 }, "GB": { "google": 219.4, "youtube": 484.8 }, "NG": { "google": 1211.4, "youtube": 1948.1 }, "PH": { "google": 236.2, "youtube": 446.4 } } },
+      { "term": "gospel music", "values": { "US": { "google": 72.9, "youtube": 377.8 }, "GB": { "google": 36.7, "youtube": 511.3 }, "NG": { "google": 924.4, "youtube": 2502.2 }, "PH": { "google": 36.6, "youtube": 270.3 } } },
+      { "term": "worship music", "values": { "US": { "google": 52.3, "youtube": 431.1 }, "GB": { "google": 28.9, "youtube": 420.7 }, "NG": { "google": 274.4, "youtube": 1605.5 }, "PH": { "google": 121.7, "youtube": 968 } } },
+      { "term": "gregorian chant", "values": { "US": { "google": 17.3, "youtube": 92.6 }, "GB": { "google": 11, "youtube": 144 }, "NG": { "google": 0.8, "youtube": 30.4 }, "PH": { "google": 21.4, "youtube": 222.7 } } }
+    ]
+  }
+}

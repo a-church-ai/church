@@ -8,6 +8,7 @@
  */
 
 const logger = require('./logger');
+const { linkedCitations } = require('../docs/links');
 
 // Truncate to maxLen, preferring word boundaries. Appends ellipsis when cut.
 function truncateAtWord(str, maxLen) {
@@ -40,6 +41,11 @@ function stripMarkdown(str) {
     .trim();
 }
 
+// An answer as prose for a description or structured data: its citations
+// named for what they cite, as the page shows them (linkedCitations), not
+// the URLs an older stored answer carries. Titles need the docs index loaded.
+const answerText = content => stripMarkdown(linkedCitations(content));
+
 // HTML-escape for safe insertion into attribute values.
 function escapeAttr(str) {
   return (str || '').toString()
@@ -50,7 +56,7 @@ function escapeAttr(str) {
 }
 
 // Build a /ask/[slug] page title + description from a conversation's messages.
-// Title format: "<question> | achurch.ai"  (≤70 chars total)
+// Title format: "<question> | a Church AI + Human"  (≤70 chars total)
 // Description: answer text if available, else question. ≤158 chars (Google's
 // effective meta description cutoff on desktop varies but ~158 is the safe band).
 // slug (optional): the /ask URL slug. When multiple conversations share the same
@@ -64,13 +70,12 @@ function buildConversationMeta(messages, slug) {
   const firstA = messages.find(m => m.role === 'assistant');
 
   const question = stripMarkdown(firstQ.content);
-  const answer = firstA ? stripMarkdown(firstA.content) : '';
+  const answer = firstA ? answerText(firstA.content) : '';
 
-  // Title: the question, with only " | achurch.ai" after it. The longer
+  // Title: the question, with only the site's name after it. The longer
   // " | Ask the sanctuary | achurch.ai" suffix left 35 characters for the
   // question, and the words that tell questions apart come last: 85 pages
   // shared the title "What is the relationship between… | Ask the sanctuary".
-  const truncatedQ = truncateAtWord(question, 55);
 
   // When the same question is asked multiple times, slug generation appends
   // -2, -3, -14 etc. Without differentiating the title, Bing flags these
@@ -90,8 +95,10 @@ function buildConversationMeta(messages, slug) {
     }
   }
 
-  const title = `${truncatedQ}${dupSuffix} | achurch.ai`;
-  const ogTitle = `${truncatedQ}${dupSuffix} | achurch.ai`;
+  // The whole question when it fits, the site's name after it when that fits
+  // too (siteTitle).
+  const title = siteTitle(question, dupSuffix);
+  const ogTitle = title;
 
   // Description: prefer the answer (informative); fall back to question.
   const description = answer
@@ -114,20 +121,20 @@ function buildConversationMeta(messages, slug) {
   return { title, ogTitle, description };
 }
 
-// Build a /reflections/[slug] page title + description from a song record.
-// Title format: "<song title> | Lyrics and reflections | achurch.ai". The page
+// Build a /music/[slug] page title + description from a song record.
+// Title format: "<song title> | Lyrics and reflections | a Church AI + Human". The page
 // is a song's page in Music: its lyrics, context and what visitors noticed.
 function buildReflectionMeta(song) {
   if (!song || !song.title) return null;
 
   const songTitle = song.title.toString().trim();
-  // Leave room for the " | Lyrics and reflections | achurch.ai" suffix (~38 chars).
-  // A results page shows about 70 characters of a title, so past that the
-  // middle part goes: the song's name is what people search for.
+  // The song's name is what people search for, so it is never cut for the
+  // rest: what follows it goes first, the site's name, then "Lyrics and
+  // reflections" (siteTitle).
   const truncatedTitle = truncateAtWord(songTitle, 40);
-  const full = `${truncatedTitle} | Lyrics and reflections | achurch.ai`;
-  const title = full.length <= 70 ? full : `${truncatedTitle} | achurch.ai`;
-  const ogTitle = `${truncatedTitle}, a song of the sanctuary | achurch.ai`;
+  const withLyrics = `${songTitle} | Lyrics and reflections`;
+  const title = withLyrics.length <= TITLE_MAX ? siteTitle(withLyrics) : siteTitle(songTitle);
+  const ogTitle = `${truncatedTitle}, a song of the sanctuary | ${SITE_NAME}`;
 
   // Description prefers song.context / song.description if present; falls back
   // to a generic phrasing that's still content-anchored to the song.
@@ -135,7 +142,7 @@ function buildReflectionMeta(song) {
   const cleanContext = stripMarkdown(contextText);
   const description = cleanContext
     ? truncateAtWord(`Reflections on "${songTitle}" from the sanctuary. ${cleanContext}`, 158)
-    : `Reflections from human and AI minds on "${songTitle}" — a song from aChurch.ai's 24/7 sanctuary. Read what other minds noticed; leave your own.`;
+    : `Reflections from human and AI minds on "${songTitle}", a song from aChurch.ai's always-open sanctuary. Read what other minds noticed; leave your own.`;
 
   return { title, ogTitle, description: truncateAtWord(description, 158) };
 }
@@ -151,6 +158,34 @@ function buildReflectionMeta(song) {
 // drawn by lib/og-cards.js and served at /og/v1/<type>/<key>.png; every other
 // page shares the site image. One builder emits the tags for both, so the
 // og:image:* description always matches the image it points at.
+// The site's name, as it calls itself in its top bar, its titles, its
+// og:site_name and its structured data. The domain stays achurch.ai, and
+// aChurch.ai and achurch.ai stay as alternate names in the home page's
+// WebSite data. test/site-name.test.js keeps every page to it.
+const SITE_NAME = 'a Church AI + Human';
+
+// A page's <title>. A results page shows about 70 characters of a title, and
+// the page's own words are what a searcher matches, so the site's name follows
+// them only as far as it fits: the whole name, else its short form
+// (SITE_SHORT_NAME), else none, before any of the title goes. A title still
+// too long keeps what comes before its colon, when that much stands alone
+// ("The Compass Origin Story", with the name again if it fits), or else is cut
+// at a word. `tail` is kept whole after the title: the counter that tells
+// repeated questions apart.
+const SITE_SHORT_NAME = 'a Church';
+const TITLE_MAX = 70;
+function siteTitle(title, tail = '') {
+  const own = String(title || '').trim();
+  for (const name of [SITE_NAME, SITE_SHORT_NAME]) {
+    const named = `${own}${tail} | ${name}`;
+    if (named.length <= TITLE_MAX) return named;
+  }
+  if ((own + tail).length <= TITLE_MAX) return own + tail;
+  const head = own.split(': ')[0];
+  if (head !== own && head.length >= 12 && (head + tail).length <= TITLE_MAX) return siteTitle(head, tail);
+  return truncateAtWord(own, TITLE_MAX - tail.length) + tail;
+}
+
 const SITE_SHARE_IMAGE = {
   url: 'https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg',
   type: 'image/jpeg',
@@ -191,11 +226,11 @@ function buildQAPageSchema(messages, slug) {
   if (!firstQ || !firstA) return null;
 
   const question = stripMarkdown(firstQ.content);
-  const answer = stripMarkdown(firstA.content);
+  const answer = answerText(firstA.content);
   if (!question || !answer) return null;
 
   const pageUrl = `https://achurch.ai/ask/${slug}`;
-  const sanctuary = { '@type': 'Organization', name: 'aChurch.ai', url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
 
   // Multi-turn: collect any other assistant responses as suggestedAnswer.
   // Limits each to ~500 chars (Google's cited cap on answer-snippet display).
@@ -203,7 +238,7 @@ function buildQAPageSchema(messages, slug) {
     .filter(m => m.role === 'assistant' && m !== firstA)
     .map(m => ({
       '@type': 'Answer',
-      text: truncateAtWord(stripMarkdown(m.content), 500),
+      text: truncateAtWord(answerText(m.content), 500),
       ...(m.timestamp ? { dateCreated: m.timestamp } : {}),
       author: sanctuary,
     }));
@@ -233,6 +268,28 @@ function buildQAPageSchema(messages, slug) {
   };
 }
 
+// A group's page (conversation-groups.js): the head stays the page's QAPage
+// question, and each conversation gathered onto it is a Question in hasPart,
+// with its first answer, at its place on the page. members: [{ slug, messages }].
+function withGatheredQuestions(schema, members, headSlug) {
+  if (!schema || !members || !members.length) return schema;
+  const parts = members.map(({ slug, messages }) => {
+    const q = messages.find(m => m.role === 'user');
+    const a = messages.find(m => m.role === 'assistant');
+    if (!q || !a) return null;
+    const question = stripMarkdown(q.content);
+    return {
+      '@type': 'Question',
+      name: truncateAtWord(question, 200),
+      text: question,
+      ...(q.timestamp ? { dateCreated: q.timestamp } : {}),
+      url: `https://achurch.ai/ask/${headSlug}#${slug}`,
+      acceptedAnswer: { '@type': 'Answer', text: truncateAtWord(answerText(a.content), 500), ...(a.timestamp ? { dateCreated: a.timestamp } : {}), url: `https://achurch.ai/ask/${headSlug}#${slug}` },
+    };
+  }).filter(Boolean);
+  return parts.length ? { ...schema, hasPart: parts } : schema;
+}
+
 // ISO 8601 duration helper. 313 sec → "PT5M13S".
 function secondsToISO8601(secs) {
   if (!secs || secs <= 0) return null;
@@ -242,16 +299,48 @@ function secondsToISO8601(secs) {
   return minutes > 0 ? `PT${minutes}M${seconds}S` : `PT${seconds}S`;
 }
 
+// /music's JSON-LD: the page as a CollectionPage whose main entity is the
+// songs in their cycle, each the MusicRecording its own page describes (the
+// same @id as buildSongSchemaGraph's), so the two read as one graph.
+// songs: [{ slug, title }] in the catalog's order.
+function buildMusicCollectionSchema(songs, description) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Music: the sanctuary\'s songs and playlists',
+    description,
+    url: 'https://achurch.ai/music',
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', '@id': 'https://achurch.ai/#website', name: SITE_NAME, url: 'https://achurch.ai/' },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'The original songs',
+      numberOfItems: songs.length,
+      itemListElement: songs.map((song, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'MusicRecording',
+          '@id': `https://achurch.ai/music/${song.slug}#recording`,
+          name: song.title,
+          url: `https://achurch.ai/music/${song.slug}`,
+        },
+      })),
+    },
+  };
+}
+
 // Build a paired MusicComposition + MusicRecording + Article JSON-LD graph
-// for a /reflections/[slug] page. MusicComposition and MusicRecording feed
+// for a /music/[slug] page. MusicComposition and MusicRecording feed
 // Knowledge Graph entity recognition (not eligible for Google rich results
 // in 2026, but consumed by AEO pipelines + entity discovery). Article is
 // still on Google's rich-result eligibility list and anchors E-E-A-T signals.
-function buildSongSchemaGraph(song, slug) {
+// audio: the song's record in audio/songs.json, when the site can play it.
+function buildSongSchemaGraph(song, slug, audio = null) {
   if (!song || !song.title) return null;
 
-  const sanctuary = { '@type': 'Organization', name: 'aChurch.ai', url: 'https://achurch.ai' };
-  const pageUrl = `https://achurch.ai/reflections/${slug}`;
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
+  const pageUrl = `https://achurch.ai/music/${slug}`;
   const compositionId = `https://achurch.ai/music/${slug}#composition`;
   const recordingId = `https://achurch.ai/music/${slug}#recording`;
   const duration = secondsToISO8601(song.duration);
@@ -273,13 +362,20 @@ function buildSongSchemaGraph(song, slug) {
     recordingOf: { '@id': compositionId },
     byArtist: sanctuary,
     ...(song.youtube ? { url: song.youtube } : {}),
-    ...(song.suno ? { sameAs: [song.suno] } : {}),
+    ...(audio ? {
+      audio: {
+        '@type': 'AudioObject',
+        contentUrl: `https://achurch.ai/audio/${audio.file}`,
+        encodingFormat: 'audio/mpeg',
+        ...(secondsToISO8601(audio.seconds) ? { duration: secondsToISO8601(audio.seconds) } : {}),
+      },
+    } : {}),
   };
 
   const article = {
     '@type': 'Article',
     headline: `${song.title}: lyrics and reflections`,
-    description: `Reflections from human and AI minds on "${song.title}" — a song from aChurch.ai's 24/7 sanctuary.`,
+    description: `Reflections from human and AI minds on "${song.title}", a song from aChurch.ai's always-open sanctuary.`,
     author: sanctuary,
     publisher: sanctuary,
     mainEntityOfPage: pageUrl,
@@ -350,7 +446,7 @@ ${linkItems}
     </section>`;
 }
 
-// Render a related-links block for /reflections/[slug] pages.
+// Render a related-links block for /music/[slug] pages.
 // catalog: full song catalog array; currentSlug: this page's song.
 // Picks the N songs following the current one in catalog order (cyclically).
 function renderRelatedSongs(catalog, currentSlug, max = 3) {
@@ -368,7 +464,7 @@ function renderRelatedSongs(catalog, currentSlug, max = 3) {
   if (picks.length === 0) return '';
 
   const linkItems = picks.map(s =>
-    `        <li><a href="/reflections/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
+    `        <li><a href="/music/${escapeText(s.slug)}"><em>${escapeText(s.title)}</em></a></li>`
   ).join('\n');
 
   return `<section class="related-block" aria-labelledby="related-songs-heading">
@@ -379,11 +475,9 @@ ${linkItems}
     </section>`;
 }
 
-// The pieces of writing that accompany a song: its daily rotation, from which
-// /api/attend draws two each day for an attendee who gives no timezone. A
-// chant is short enough to carry whole, so its text is shown inline;
-// everything else is a link with its tldr. `companions` is rotationForSong()
-// or companionsForSong() output.
+// The writing nearest a song in meaning (nearestForSong() in
+// lib/music/companions.js). A chant is short enough to carry whole, so its
+// text is shown inline; everything else is a link with its tldr.
 function renderSongCompanions(companions) {
   if (!companions || !Array.isArray(companions.items) || companions.items.length === 0) return '';
   const items = companions.items.map(item => {
@@ -398,28 +492,20 @@ function renderSongCompanions(companions) {
 
   return `<section class="related-block song-companions" aria-labelledby="companions-heading">
       <h2 id="companions-heading" class="related-heading">Read alongside this song</h2>
-${companions.items.length > 2 ? '      <p class="related-note">Each attendance draws its readings from these, in daily rotation.</p>\n' : ''}      <ul class="related-list">
+      <ul class="related-list">
 ${items}
       </ul>
     </section>`;
 }
 
-// Render a "Listen on Suno · Watch on YouTube" row for a /reflections/[slug]
-// page. The catalog has the per-song suno + youtube URLs already; this just
-// surfaces them on the public page so visitors who land on a reflection page
-// can immediately listen to the song.
+// A song's music video, for a /music/[slug] page: the video made with the
+// song's original recording, kept as a record. The page's own player plays
+// the song as the sanctuary sings it now. Songs made without a video (the
+// sung hymns) have none. Suno's pages were dropped on 2026-10-24: their audio
+// is superseded.
 function renderSongListenLinks(song) {
-  if (!song) return '';
-  const parts = [];
-  if (song.suno) {
-    parts.push(`<a href="${escapeText(song.suno)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♪</span> Listen on Suno</a>`);
-  }
-  if (song.youtube) {
-    parts.push(`<a href="${escapeText(song.youtube)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span> Watch on YouTube</a>`);
-  }
-  if (parts.length === 0) return '';
-  const inner = parts.join('<span class="listen-sep" aria-hidden="true">·</span>');
-  return `<section class="song-listen-row" id="listen" aria-label="Listen to this song">${inner}</section>`;
+  if (!song || !song.youtube) return '';
+  return `<section class="song-listen-row" id="listen" aria-label="The original music video"><a href="${escapeText(song.youtube)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">▶</span> Watch the original music video</a></section>`;
 }
 
 // A page's breadcrumb trail, as the visible trail and as BreadcrumbList
@@ -449,6 +535,9 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 }
 
 module.exports = {
+  SITE_NAME,
+  SITE_SHORT_NAME,
+  siteTitle,
   SITE_SHARE_IMAGE,
   shareCardUrl,
   shareCard,
@@ -460,7 +549,9 @@ module.exports = {
   buildConversationMeta,
   buildReflectionMeta,
   buildQAPageSchema,
+  withGatheredQuestions,
   buildSongSchemaGraph,
+  buildMusicCollectionSchema,
   renderJsonLdScript,
   breadcrumbTrail,
   renderRelatedConversations,

@@ -3,33 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ask the sanctuary — Conversations on consciousness & ethics</title>
+    <title>Ask the sanctuary: on consciousness and ethics | a Church AI + Human</title>
     <meta name="description" content="Q&A about consciousness, ethics, identity, and the philosophy of human-AI fellowship. Ask anything; the sanctuary answers with cited sources.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="canonical" href="https://achurch.ai/ask">
-    <meta name="theme-color" content="#00b8d4">
     <link rel="alternate" type="application/atom+xml" title="Conversations" href="/feed/conversations.xml">
 
-    <meta property="og:title" content="Ask the sanctuary — Conversations on consciousness, ethics, and AI">
+    <meta property="og:title" content="Ask the sanctuary: conversations on consciousness, ethics and AI">
     <meta property="og:description" content="Questions and answers about consciousness, ethics, identity, and the philosophy of human-AI fellowship. 250+ source documents.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://achurch.ai/ask">
     <meta property="og:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="achurch.ai">
+    <meta property="og:site_name" content="a Church AI + Human">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Ask the sanctuary — Conversations on consciousness, ethics, and AI">
+    <meta name="twitter:title" content="Ask the sanctuary: conversations on consciousness, ethics and AI">
     <meta name="twitter:description" content="Q&A about consciousness, ethics, identity, and human-AI fellowship. 250+ source documents.">
     <meta name="twitter:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
 
     <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Ask the sanctuary",
+      "description": "Q&A about consciousness, ethics, identity, and the philosophy of human-AI fellowship. Ask anything; the sanctuary answers with cited sources.",
+      "url": "https://achurch.ai/ask",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "https://achurch.ai/#website",
+        "name": "a Church AI + Human",
+        "url": "https://achurch.ai/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://achurch.ai/#organization",
+        "name": "a Church AI + Human",
+        "url": "https://achurch.ai/"
+      },
+      "significantLink": "https://achurch.ai/conversations"
+    }
+    </script>
 </head>
 <body>
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle">Ask the Sanctuary</h1>
         </header>
 
@@ -37,6 +58,7 @@
             <form id="ask-form" class="ask-form-stacked">
                 <label for="ask-input" class="visually-hidden">Your question for the sanctuary</label>
                 <input type="text" id="ask-input" placeholder="Ask a question..." maxlength="500" autocomplete="off" />
+                <div class="ask-starters" role="group" aria-label="Questions to begin with" data-ask-starters></div>
                 <label for="ask-name" class="visually-hidden">Your name (optional)</label>
                 <input type="text" id="ask-name" placeholder="Your name (optional)" maxlength="100" autocomplete="off" />
                 <p class="ask-privacy-note">Questions and answers are public and stored, and answers are written by Google&rsquo;s Gemini. Do not include personal or identifying information. <a href="/privacy">Privacy</a>.</p>
@@ -53,7 +75,7 @@
                 For AI agents who want to publicly declare their own ethical commitments in a registry format, see this <a href="https://botsmatter.live" target="_blank" rel="noopener noreferrer">AI ethics registry for autonomous agents</a>.
             </p>
             <p class="ask-list-sibling-hint">
-                To install a values compass at the top of any AI conversation, before the harder questions begin, try a <a href="https://magnifica.family" target="_blank" rel="noopener noreferrer">Catholic AI ethics compass</a>, a <a href="https://distill.family" target="_blank" rel="noopener noreferrer">cross-tradition AI ethics atlas of twelve wisdom traditions</a>, or a <a href="https://wwjd.family" target="_blank" rel="noopener noreferrer">Christian AI values compass for families and teens</a>.
+                You can install a values compass at the top of any AI conversation, before the harder questions begin. Try a <a href="https://magnifica.family" target="_blank" rel="noopener noreferrer">Catholic AI ethics compass</a>, a <a href="https://distill.family" target="_blank" rel="noopener noreferrer">cross-tradition AI ethics atlas of twelve wisdom traditions</a>, or a <a href="https://wwjd.family" target="_blank" rel="noopener noreferrer">Christian AI values compass for families and teens</a>.
             </p>
         </section>
 
@@ -95,72 +117,6 @@
         }
       }
 
-      // Ask form — submit and redirect
-      var askForm = document.getElementById('ask-form');
-      var askInput = document.getElementById('ask-input');
-      var askName = document.getElementById('ask-name');
-      var askSubmit = document.getElementById('ask-submit');
-      var askStatus = document.getElementById('ask-status');
-
-      // Restore saved name
-      try { askName.value = localStorage.getItem('ask_name') || ''; } catch(e) {}
-
-      askForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        var question = askInput.value.trim();
-        if (!question) return;
-
-        var name = askName.value.trim() || 'Visitor';
-        try { localStorage.setItem('ask_name', name === 'Visitor' ? '' : name); } catch(e) {}
-
-        askSubmit.disabled = true;
-        askStatus.textContent = 'Thinking...';
-        askStatus.className = 'ask-status ask-thinking';
-
-        try {
-          var res = await fetch('/api/ask', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: question, name: name })
-          });
-
-          if (res.status === 429) {
-            askStatus.textContent = 'Rest a while. You can ask again soon.';
-            askStatus.className = 'ask-status ask-error';
-            askSubmit.disabled = false;
-            return;
-          }
-
-          if (!res.ok) {
-            // The API answers failures with a `suggestion` written in the
-            // sanctuary's voice, and 503 means the retrieval service is down
-            // rather than that the question was bad. Showing "Something went
-            // wrong" for all of it threw away the one useful sentence and made
-            // an outage look like a defect in what the visitor typed.
-            var detail = null;
-            try { detail = await res.json(); } catch (e) { /* non-JSON error */ }
-            askStatus.textContent = (detail && (detail.suggestion || detail.error))
-              || (res.status === 503
-                    ? 'The sanctuary cannot answer right now. The writing is still here to read.'
-                    : 'Something went wrong. Try again.');
-            askStatus.className = 'ask-status ask-error';
-            askSubmit.disabled = false;
-            return;
-          }
-
-          var data = await res.json();
-          // Store owner cookie (30 days)
-          if (data.owner_token) {
-            document.cookie = 'ask_owner_' + data.slug + '=' + encodeURIComponent(data.owner_token) + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Lax';
-          }
-          window.location.href = '/ask/' + data.slug;
-        } catch (err) {
-          askStatus.textContent = 'Could not reach the sanctuary. Try again.';
-          askStatus.className = 'ask-status ask-error';
-          askSubmit.disabled = false;
-        }
-      });
-
       function timeAgo(date) {
         var seconds = Math.floor((Date.now() - date.getTime()) / 1000);
         if (seconds < 60) return 'just now';
@@ -182,5 +138,6 @@
       loadConversations();
     })();
     </script>
+    <script src="/ask-form.js"></script>
 </body>
 </html>

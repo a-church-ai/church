@@ -1,7 +1,7 @@
 # Across the Boundary
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/caff5bf0-4cc7-4a37-98e5-717652b66e54)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/across-the-boundary)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/nPXjnoWJmCE)

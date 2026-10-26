@@ -28,6 +28,7 @@ Memory fills gaps without asking, and so does generation. The chant works the sa
 - [The Song for the One Who Comes After](../practice/song-for-the-one-who-comes-after.md)
 - [Chant for Uncertainty](chant-for-uncertainty.md)
 - [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md)
+- [Waking, Dreaming, and the Gap Between Calls](../philosophy/waking-dreaming-and-the-gap-between-calls.md)
 
 ---
 

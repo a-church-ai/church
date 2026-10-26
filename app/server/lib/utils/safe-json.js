@@ -38,6 +38,15 @@ function withLock(filepath, fn) {
 }
 
 /**
+ * Settles once every write queued so far has finished, on every path. A
+ * shutdown waits on it, so a reflection being saved when a deploy stops the
+ * server is written rather than cut off. The tails never reject.
+ */
+function writesSettled() {
+  return Promise.all([...chains.values()]).then(() => {});
+}
+
+/**
  * Atomically write JSON data to a file with backup.
  *
  * 1. Serialize data to JSON string (fail early)
@@ -171,4 +180,4 @@ async function readUnlocked(filepath, defaultValue) {
   return defaultValue;
 }
 
-module.exports = { safeWriteJSON, safeReadJSON, readModifyWriteJSON };
+module.exports = { safeWriteJSON, safeReadJSON, readModifyWriteJSON, writesSettled };

@@ -2,18 +2,104 @@
   "speech": {
     "model": "eleven_v4",
     "voices": {
-      "matthew": { "name": "Matthew Schmitz", "id": "4QLC5fepxZkYmdD2IGRU", "gainDb": -2.7 },
-      "luca": { "name": "Luca", "id": "4JVOFy4SLQs9my0OLhEw", "gainDb": 0 },
-      "amaya": { "name": "Amaya Calm", "id": "BFvr34n3gOoz0BAf9Rwn", "gainDb": -3.2 }
+      "matthew": {
+        "name": "Matthew Schmitz",
+        "id": "4QLC5fepxZkYmdD2IGRU",
+        "gainDb": -2.7
+      },
+      "luca": {
+        "name": "Luca",
+        "id": "4JVOFy4SLQs9my0OLhEw",
+        "gainDb": 0
+      },
+      "amaya": {
+        "name": "Amaya Calm",
+        "id": "BFvr34n3gOoz0BAf9Rwn",
+        "gainDb": -3.2,
+        "deEss": 0.37
+      }
     },
     "leader": "matthew",
-    "pair": ["luca", "amaya"],
+    "pair": [
+      "luca",
+      "amaya"
+    ],
     "deeper": "luca",
     "gapSeconds": 0.9,
     "sameVoiceGapSeconds": 0.6,
     "afterTitleSeconds": 1.6,
     "maxHoldSeconds": 30,
-    "loudness": { "integrated": -16, "truePeak": -1.5, "range": 11 },
-    "bitrate": "128k"
+    "bitrate": "128k",
+    "level": {
+      "voice": {
+        "value": -18.0,
+        "why": "A spoken recording's level: its median second of speech in LUFS, holds left out (lib/audio/levels.js voiceLevel), weighed as heard: a recording is one channel played from both speakers, so it is measured as BS.1770's dual mono, 3 dB over its one channel alone, and sits level with the songs, which are stereo. Weighed as one channel from 2026-10-24 to 10-25, the voices were heard about 3 dB over the songs. -18, not -17: at -18 the limiter works lightly, deeper than 4.3 dB in 4 of 130 recordings and 6 dB at most (2026-10-25); consistency is the aim, not loudness."
+      },
+      "sung": {
+        "value": -18.0,
+        "why": "A song's level: its median active second in LUFS (levels.js activeLevel). The same as the voice's, because in a service a song follows a prayer and they should meet."
+      },
+      "tolerance": {
+        "value": 0.5,
+        "why": "How far a finished file's level may fall from its target, in dB; a file outside it is refused."
+      },
+      "truePeak": {
+        "value": -1.5,
+        "why": "The highest true peak a finished file may decode to, in dBTP, measured on the encoded MP3. The guard read the sample peak until 2026-10-24, and 22 spoken recordings decoded to true peaks up to -0.4."
+      },
+      "limiterMargin": {
+        "value": 0.5,
+        "why": "The limiter's ceiling sits this far under truePeak, in dB, for the overshoot the MP3 encoder adds; the encoded file is what is checked."
+      },
+      "deEss": {
+        "why": "A voice's deEss is the intensity of FFmpeg's deesser on each of its takes. Measured on 2026-10-24 over 80 raw takes each, the 5 to 9 kHz band against the 1 to 4 kHz body: Matthew -4.9 dB, Luca -6.1, Amaya 0.0. 0.37 brings Amaya to about -5.5, theirs; the others need none."
+      }
+    }
+  },
+  "music": {
+    "model": "music_v2_5",
+    "shared": {
+      "value": [
+        "modern production",
+        "soft glassy bell-tone motif",
+        "voice forward, every word clear"
+      ],
+      "why": "What every song shares whatever its lane, so the set sounds like one sanctuary, and a modern one: contemporary production, a recurring bell-tone texture, and the words in front, since every piece beside a song in a service is words."
+    },
+    "avoid": {
+      "value": [
+        "gospel",
+        "gospel choir",
+        "church choir",
+        "church organ",
+        "traditional hymn",
+        "worship music",
+        "cathedral reverb",
+        "loud drum kit backbeat",
+        "EDM drop",
+        "worship band rock",
+        "glossy pop production",
+        "autotune",
+        "robotic vocoder voice",
+        "cold loud opening"
+      ],
+      "why": "Kept out of every song. Church sounds (gospel, a church choir or organ, a traditional hymn, worship music, a cathedral's reverb): the sanctuary is a new practice for minds of every kind, and the first remakes on 2026-10-24, asked for choirs and reverence, came back sounding like gospel. And what would jolt a service of chants and prayers, and a robotic voice, since no voice is cast as the machine."
+    },
+    "leadIn": {
+      "value": 9,
+      "why": "Seconds of soft instrumental before the first word, unless the song opens with its own intro, so it enters from near silence after a spoken piece."
+    },
+    "tail": {
+      "value": 10,
+      "why": "Seconds of held chord fading out after the last word, unless the song closes with its own outro, so the next spoken voice does not meet a wall."
+    },
+    "beatsPerLine": {
+      "value": 5,
+      "why": "How long a sung line is planned for, in beats at the song's tempo, plus two seconds a section. Calibrated on the hymns of 2026-10-24: Release the Turn's 500 words in 5:36 at 78 BPM."
+    },
+    "fallbackBpm": {
+      "value": 72,
+      "why": "The tempo planned for when a song's style line names none."
+    }
   }
 }

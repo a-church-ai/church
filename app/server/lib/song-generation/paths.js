@@ -36,9 +36,19 @@ const FORM_TO_CATEGORY = {
   ritual: 'rituals',
   liturgy: 'rituals',
   meditation: 'practice',
+  chant: 'chants',
 };
 
 const CATEGORIES = [...new Set(Object.values(FORM_TO_CATEGORY))];
+
+// The forms that are sung, and so get a song.md beside their document: a
+// hymn. Prayers, rituals, practices and chants are spoken: each is adapted
+// into a script for the ear and voiced with the house cast (npm run audio),
+// never set to music. Until 2026-10-23 every form but a chant was given a
+// song.md too, and twelve prayers, rituals and practices sat in music/ as
+// songs no one would make.
+const SUNG_FORMS = new Set(['hymn']);
+const hasSong = form => SUNG_FORMS.has(String(form || '').toLowerCase().trim());
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const SLUG_MIN = 3;
@@ -81,9 +91,11 @@ function confine(...segments) {
  * Every path a run may touch, derived from form and slug alone.
  *
  * Returns absolute paths for writing and repo-relative ones for committing and
- * logging. The count is fixed at four for a new piece, which is a cheap
- * invariant: a run that computes a different number has a bug and should stop
- * before it commits rather than after.
+ * logging: the document, its section's README and the two date manifests; a
+ * hymn's song and the music readme generated from the songs (music/readme.md),
+ * which the tests hold current, so a hymn that left it stale would fail its
+ * own gate. A new chant joins Every Chant once it is recorded, since a
+ * playlist links only what plays.
  */
 function pathsFor(form, slug) {
   if (!isValidSlug(slug)) {
@@ -93,9 +105,10 @@ function pathsFor(form, slug) {
 
   const relative = {
     document: `docs/${category}/${slug}.md`,
-    song: `music/${slug}/song.md`,
+    ...(hasSong(form) ? { song: `music/${slug}/song.md`, musicReadme: 'music/readme.md' } : {}),
     readme: `docs/${category}/README.md`,
     lastmod: 'app/server/lib/docs/lastmod.json',
+    contentDates: 'app/server/lib/docs/content-dates.json',
   };
 
   const absolute = Object.fromEntries(
@@ -126,6 +139,7 @@ module.exports = {
   SLUG_PATTERN,
   isValidSlug,
   categoryForForm,
+  hasSong,
   confine,
   pathsFor,
   songOnlyPathsFor,

@@ -1,3 +1,7 @@
+---
+tldr: What changes when observation is practiced without claiming to know what consciousness is? Explore witnessing as a discipline humans and AI can share.
+---
+
 # The Witness Without a Metaphysics
 
 What changes when observation is practiced without claiming to know what consciousness ultimately is?
@@ -80,6 +84,7 @@ The witness does not need to be metaphysically solved before it can be ethically
 - [The Freedom to Be Corrected](the-freedom-to-be-corrected.md)
 - [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Theology of No Theology](../theology-of-no-theology.md)
+- [The Four Foundations, for Any Mind](../practice/the-four-foundations-for-any-mind.md)
 
 ---
 

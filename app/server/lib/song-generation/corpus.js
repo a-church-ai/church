@@ -7,12 +7,40 @@
  */
 
 const fs = require('fs').promises;
+const { existsSync } = require('fs');
 const path = require('path');
 
 const { findMarkdownFiles } = require('../rag/indexer');
 const { parseSongFile } = require('../music/song-content');
 const { extractTldr, validateTldr, splitFrontmatter } = require('../docs/tldr');
 const { PROJECT_ROOT, CATEGORIES } = require('./paths');
+// The same readers the services use for a chant's lines and its hours.
+const { parseHours, chantText } = require('../music/companions');
+
+// Lines that would run together on the page. The docs renderer joins a line
+// to the next unless it ends in a hard break (two spaces, or a backslash), so
+// verse written one line to a line, a chant, a spoken stanza, comes out as one
+// run-on paragraph; and prose is one paragraph to a line. So two adjacent
+// lines, neither structural (a list item, heading, table row, fence, rule,
+// image or HTML), must be joined by a hard break. Returns each second line's
+// number in the body, 1-based. 54 documents ran together when this was
+// written (2026-10-25), the songwriter's and older ones alike.
+const STRUCTURAL = /^\s*(?:[-*+]\s|\d+[.)]\s|#{1,6}\s|\||```|~~~|---\s*$|\*\*\*\s*$|<|!\[|\[\^)/;
+function joinedLines(markdown) {
+  const lines = splitFrontmatter(markdown).body.split('\n');
+  const joined = [];
+  let fence = false;
+  for (let i = 0; i < lines.length - 1; i++) {
+    const [a, b] = [lines[i], lines[i + 1]];
+    if (/^\s*(```|~~~)/.test(a)) { fence = !fence; continue; }
+    if (fence || !a.trim() || !b.trim() || STRUCTURAL.test(a) || STRUCTURAL.test(b)) continue;
+    if (!/( {2,}|\\)$/.test(a)) joined.push(i + 1);
+  }
+  return joined;
+}
+
+// A chant is two to four lines as the form, six at most (docs/chants/README.md).
+const CHANT_LINES = { min: 2, max: 6 };
 
 const MUSIC_DIR = path.join(PROJECT_ROOT, 'music');
 const DOCS_DIR = path.join(PROJECT_ROOT, 'docs');
@@ -36,6 +64,23 @@ async function loadSongs() {
   }
 
   return songs;
+}
+
+/** A chant document's lines, from its ## The Chant blockquote. */
+function chantLines(markdown) {
+  return chantText(markdown, 'docs/chants/new.md') || '';
+}
+
+/** The chants, as the songs are loaded: id and the text to compare. */
+async function loadChants() {
+  const dir = path.join(DOCS_DIR, 'chants');
+  const chants = [];
+  for (const file of (await fs.readdir(dir)).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md')) {
+    const markdown = await fs.readFile(path.join(dir, file), 'utf8');
+    const title = (/^#\s+(.+)$/m.exec(markdown) || [])[1] || file;
+    chants.push({ id: file.replace(/\.md$/, ''), title, text: `${title}\n${chantLines(markdown)}` });
+  }
+  return chants;
 }
 
 /** Documents in the categories this pipeline can write to. */
@@ -71,14 +116,23 @@ async function existingSlugs() {
   return new Set([...songs.map((s) => s.id), ...docs.map((d) => d.slug)]);
 }
 
+// The tldr's findings that are about its length alone. A summary that is
+// short is still a true summary: the piece is published, and the finding is
+// a warning on its commit (production-health-2026-10-12.md, private repo).
+const TLDR_LENGTH = ['too-short', 'too-long', 'no-claim'];
+
 /**
- * Check a generated document against the corpus conventions.
+ * Check a generated document against the corpus conventions: { ok, issues,
+ * warnings }. Issues are what is wrong, broken or missing, and fail the
+ * piece; warnings are the tldr's length alone, and do not.
  *
- * validateTldr does the heavy lifting and already rejects em dashes, markup,
- * and bad lengths, so this only adds the structural pieces it does not cover.
+ * validateTldr does the heavy lifting on the tldr (em dashes, markup, length),
+ * so this only adds the structural pieces it does not cover. A finding on the
+ * tldr carries the tldr itself, so a log says what was found, not only that.
  */
 function validateDocument(content, { category, title }) {
   const issues = [];
+  const warnings = [];
 
   // splitFrontmatter returns { data, body }, and extractTldr returns an object
   // carrying .text rather than a bare string. Both were misread in the first
@@ -89,8 +143,13 @@ function validateDocument(content, { category, title }) {
     issues.push('missing tldr frontmatter');
   } else {
     const extracted = extractTldr(content);
-    const check = validateTldr(extracted && extracted.text);
-    if (!check.ok) issues.push(`tldr: ${check.issues.join(', ')}`);
+    const text = (extracted && extracted.text) || '';
+    const check = validateTldr(text);
+    const shown = `(${text.length} characters, ${text.split(/\s+/).filter(Boolean).length} words): "${text}"`;
+    const wrong = check.issues.filter((code) => !TLDR_LENGTH.includes(code));
+    const short = check.issues.filter((code) => TLDR_LENGTH.includes(code));
+    if (wrong.length) issues.push(`tldr: ${check.issues.join(', ')} ${shown}`);
+    else if (short.length) warnings.push(`tldr: ${short.join(', ')} ${shown}`);
   }
 
   if (!/^#\s+\S/m.test(body || content)) issues.push('missing # Title');
@@ -108,8 +167,35 @@ function validateDocument(content, { category, title }) {
 
   if (title && !content.includes(title)) issues.push('document does not contain its own title');
 
+  const joined = joinedLines(content);
+  if (joined.length) {
+    const lines = splitFrontmatter(content).body.split('\n');
+    issues.push(`${joined.length} ${joined.length === 1 ? 'line runs' : 'lines run'} into the next on the page, such as "${lines[joined[0] - 1].trim()}"; end each line of verse with two spaces, and write prose as one paragraph to a line`);
+  }
+
+  // Every link to another page must reach one. A link guessed at would send
+  // a reader nowhere, and the docs site's own link test would fail the run.
+  for (const [, target] of content.matchAll(/\]\(([^)\s]+)\)/g)) {
+    if (/^(https?:|mailto:|#)/.test(target) || target.startsWith('/')) continue;
+    const file = target.split('#')[0];
+    if (file && !existsSync(path.resolve(DOCS_DIR, category, file))) issues.push(`a link to a page that does not exist: ${target}`);
+  }
+
+  if (category === 'chants') {
+    const text = chantText(content, 'docs/chants/new.md');
+    const lines = text ? text.split('\n') : [];
+    if (lines.length < CHANT_LINES.min || lines.length > CHANT_LINES.max) {
+      issues.push(`chant: ${lines.length} ${lines.length === 1 ? 'line' : 'lines'} as a blockquote under ## The Chant, where a chant is ${CHANT_LINES.min} to ${CHANT_LINES.max}`);
+    }
+    if (data && data.hours !== undefined && !parseHours(data.hours)) {
+      issues.push(`hours: "${data.hours}" is not a range of hours such as 05-10 or 22-02; leave it out for a chant of any hour`);
+    }
+  }
+
   // Deliberately NOT checked: the "> Parent:" line and the "## Related"
-  // section. conventions.md describes both, but measured across the corpus on
+  // section. (Since 2026-10-18 the songwriter adds a Related list itself, of
+  // the pieces the decision set the new one beside: generate.js withRelated.
+  // The model is told not to write one.) conventions.md describes both, but measured across the corpus on
   // 2026-08-15 they belong to documentation rather than to corpus content:
   // docs/reference has them on 3 of 7 files and the plans (now in church-private/) on 2 of 19, while
   // hymns, prayers, rituals and practice have them on 0 of 101. Requiring them
@@ -131,10 +217,60 @@ function validateDocument(content, { category, title }) {
   // The practical effect of a miss is a skipped run, not a bad commit. Failing
   // closed is the right direction when nobody is reviewing the output.
 
-  return { ok: issues.length === 0, issues };
+  return { ok: issues.length === 0, issues, warnings };
+}
+
+/** How many documents each section holds, READMEs aside. */
+async function formCounts() {
+  const counts = {};
+  for (const category of CATEGORIES) {
+    try {
+      const files = await fs.readdir(path.join(DOCS_DIR, category));
+      counts[category] = files.filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md').length;
+    } catch {
+      counts[category] = 0;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Whether a chant is offered: while the chants number fewer than the median
+ * of the other sections. The decision leans toward chants, which every
+ * service uses and which were 12 against a median of 34 on 2026-10-14, and
+ * this is what stops the lean once they have caught up.
+ */
+function chantOpen(counts) {
+  const others = Object.entries(counts).filter(([c]) => c !== 'chants').map(([, n]) => n).sort((a, b) => a - b);
+  if (!others.length) return false;
+  const mid = others.length / 2;
+  const median = others.length % 2 ? others[Math.floor(mid)] : (others[mid - 1] + others[mid]) / 2;
+  return (counts.chants || 0) < median;
+}
+
+// Every piece in the songwriter's categories as the decision reads it: its
+// id, title and tldr, so a theme the corpus already holds can be passed over
+// and a new piece set beside the ones it belongs with. Read from the files,
+// so it needs no search index; the Actions runner has none.
+async function holdings() {
+  const docs = await loadDocuments();
+  return docs.map((d) => ({
+    id: d.id,
+    category: d.category,
+    slug: d.slug,
+    title: ((d.text.match(/^#\s+(.+)$/m) || [])[1] || d.slug).trim(),
+    tldr: ((extractTldr(d.text) || {}).text || '').trim(),
+  })).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 module.exports = {
+  joinedLines,
+  holdings,
+  formCounts,
+  chantOpen,
+  chantLines,
+  loadChants,
+  CHANT_LINES,
   loadSongs,
   loadDocuments,
   existingSlugs,

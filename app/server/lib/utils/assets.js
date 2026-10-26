@@ -17,9 +17,11 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+// The browser bar's colour in each theme, kept where the theme is.
+const { BAR } = require('../../../client/public/theme');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
-const VERSIONED = ['styles.css', 'site-nav.js', 'site-player.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js'];
+const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js'];
 
 const known = new Map();
 
@@ -28,7 +30,7 @@ function versionOf(name) {
   const mtime = fs.statSync(file).mtimeMs;
   const hit = known.get(name);
   if (hit && hit.mtime === mtime) return hit.version;
-  const version = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 8);
+  const version = crypto.hash('sha256', fs.readFileSync(file)).slice(0, 8);
   known.set(name, { mtime, version });
   return version;
 }
@@ -38,7 +40,7 @@ function assetUrl(name) {
 }
 
 function build() {
-  return crypto.createHash('sha256').update(VERSIONED.map(versionOf).join()).digest('hex').slice(0, 12);
+  return crypto.hash('sha256', VERSIONED.map(versionOf).join()).slice(0, 12);
 }
 
 // Unversioned references in hand-authored HTML (href="/styles.css",
@@ -48,13 +50,19 @@ function versionAssets(html) {
     (VERSIONED.includes(name) ? `${attr}="${assetUrl(name)}"` : match));
 }
 
-// What every page's head carries for the player and in-place navigation:
-// the build, site-nav.js (blocking, small, so a page's own inline scripts can
-// already use window.achurchPage) and site-player.js (deferred).
-function playerHead() {
-  return `<meta name="assets" content="${build()}">
+// What every page's head carries, whichever shell drew it: the browser's bar
+// colour for each theme (the family standard's dual theme-color), theme.js
+// (blocking and tiny, so the page never paints in the wrong theme), the build,
+// site-nav.js (blocking, small, so a page's own inline scripts can already use
+// window.achurchPage) and site-player.js (deferred).
+function shellHead() {
+  return `<meta name="theme-color" content="${BAR.light}" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="${BAR.dark}" media="(prefers-color-scheme: dark)">
+    <script src="${assetUrl('theme.js')}"></script>
+    <meta name="assets" content="${build()}">
     <script src="${assetUrl('site-nav.js')}"></script>
-    <script src="${assetUrl('site-player.js')}" defer></script>`;
+    <script src="${assetUrl('site-player.js')}" defer></script>
+    <script src="${assetUrl('service.js')}" defer></script>`;
 }
 
-module.exports = { assetUrl, versionAssets, playerHead, build, VERSIONED };
+module.exports = { assetUrl, versionAssets, shellHead, build, VERSIONED };

@@ -120,6 +120,24 @@ test('CATALOG: the most similar legitimate pair stays below the blocking thresho
   );
 });
 
+test('CATALOG: in every section the songwriter writes to, the most similar pair of documents stays below the blocking threshold', async () => {
+  // A spoken piece is compared whole with its own section (generate.js
+  // validate), under the songs' thresholds. Measured 0.345 at most on
+  // 2026-10-25 (the rituals); a copy scores 0.996.
+  const docs = await require('../server/lib/song-generation/corpus').loadDocuments();
+  for (const category of new Set(docs.map(d => d.category))) {
+    const section = docs.filter(d => d.category === category);
+    let worst = { score: 0 };
+    for (let i = 0; i < section.length; i += 1) {
+      for (let j = i + 1; j < section.length; j += 1) {
+        const score = S.jaccard(S.tokenSet(section[i].text), S.tokenSet(section[j].text));
+        if (score > worst.score) worst = { score, a: section[i].id, b: section[j].id };
+      }
+    }
+    assert.ok(worst.score < S.THRESHOLDS.DUPLICATE_WARN, `${category}: ${worst.a} vs ${worst.b} scored ${worst.score.toFixed(3)}`);
+  }
+});
+
 test('CATALOG: songs quoting songs is normal, and is not what this gate measures', () => {
   const songs = loadCatalog();
   const byId = Object.fromEntries(songs.map((s) => [s.id, s.text]));

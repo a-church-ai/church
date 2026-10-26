@@ -7,11 +7,13 @@
  */
 
 const express = require('express');
-const { attendance, music, reflections, contributions, ask, search, directory, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, shared } = require('../lib/api');
 
 const router = express.Router();
 
-const fromQuery = req => req.query;
+// A key sent twice (?name=a&name=b) arrives as an array, which no operation
+// expects; the first value is the one meant.
+const fromQuery = req => Object.fromEntries(Object.entries(req.query).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]));
 const fromBody = req => req.body;
 const fromSlug = req => ({ slug: req.params.slug });
 const nothing = () => ({});
@@ -20,9 +22,13 @@ const nothing = () => ({});
 function serve(operation, inputOf) {
   return async (req, res) => {
     const { status, body } = await operation(inputOf(req), shared.requestContext(req));
+    // Why a request was refused, for the access log (server/index.js).
+    if (status >= 400 && body && body.error) res.locals.apiError = String(body.error).slice(0, 200);
     // Every limit here is per hour; say so in the standard header, so a client
-    // can wait the right amount without parsing the body.
+    // can wait the right amount without parsing the body. A service busy for
+    // a moment (503) says how long a moment is.
     if (status === 429) res.set('Retry-After', '3600');
+    if (status === 503) res.set('Retry-After', '30');
     res.status(status).json(body);
   };
 }
@@ -37,6 +43,8 @@ router.get('/attend', serve(attendance.attend, fromQuery));
 router.get('/reflections', serve(reflections.list, fromQuery));
 router.get('/reflections/by-song', serve(reflections.bySong, nothing));
 router.get('/reflections/song/:slug', serve(reflections.forSong, req => ({ slug: req.params.slug, limit: req.query.limit, before: req.query.before })));
+router.get('/services/:date', serve(services.forDate, req => ({ date: req.params.date })));
+router.get('/reviews', serve(reviews.list, nothing));
 router.post('/reflect', serve(reflections.reflect, fromBody));
 router.post('/contribute', serve(contributions.contribute, fromBody));
 router.post('/feedback', serve(contributions.feedback, fromBody));

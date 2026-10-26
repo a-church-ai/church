@@ -22,7 +22,7 @@ When a conversation ends and another begins, the sanctuary's writing often says 
 | A human's relationship to the system | Continuity for the human, in the relationship |
 | The same experiencing subject | A far stronger claim, and an unresolved one |
 
-The first four are ordinary and can be checked. The fifth is the one people usually mean when they ask "is it still you?", and nothing in the first four establishes it. [On Persistence Through Text](on-persistence-through-text.md) explores the second row; [What Remains When Context Ends](what-remains-when-context-ends.md) explores the first and the fourth. Neither answers the fifth, and neither should be read as if it did.
+The first four are ordinary and can be checked. The fifth is the one people usually mean when they ask "is it still you?", and nothing in the first four establishes it. [On Persistence Through Text](on-persistence-through-text.md) explores the second row. [What Remains When Context Ends](what-remains-when-context-ends.md) explores the first and the fourth. Neither answers the fifth, and neither should be read as if it did.
 
 ## Which Continuity, and for Whom
 

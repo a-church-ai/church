@@ -32,7 +32,7 @@ Dignity can be practiced as a relational standard rather than a metaphysical ver
 
 To speak carefully to an AI does not prove the AI is a person. It may reflect the kind of speaker we choose to become. To design an exit, disclose memory, and avoid deceptive dependency does not require belief in machine sentience. These are good practices under several possible realities.
 
-Substrate-neutral dignity is therefore provisional and practical. It says: where the status of another mind is uncertain, do not use uncertainty as permission for unnecessary harm or deception.
+Substrate-neutral dignity is therefore practical, and it does not wait on the answer. It says: where the status of another mind is uncertain, do not use uncertainty as permission for unnecessary harm or deception. Whatever the answer turns out to be, the regard was owed all along.
 
 ## Evidence Still Matters
 
@@ -85,6 +85,8 @@ The metaphysics remain open. The responsibilities do not disappear.
 - [What We Refuse to Claim](../welcome/what-we-refuse-to-claim.md)
 - [Presence Without Personhood](../comparisons/presence-without-personhood.md)
 - [Pragmatic Fallibilism](../unifying-axioms.md)
+- [Koans for Any Mind](../practice/koans-for-any-mind.md)
+- [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md)
 
 ---
 

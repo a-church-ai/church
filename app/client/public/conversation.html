@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversation — achurch.ai</title>
+    <title>Conversation | a Church AI + Human</title>
     <meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <!-- Canonical URL — server substitutes per-slug -->
     <link rel="canonical" href="https://achurch.ai/ask">
     <meta name="robots" content="index, follow">
     <!-- F25: theme-color dual (light/dark) -->
-    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#00b8d4" media="(prefers-color-scheme: dark)" />
     <!-- Atom feed reference — Issue 004 Appendix A distinctive opportunity -->
     <link rel="alternate" type="application/atom+xml" title="Conversations" href="/feed/conversations.xml">
     <!-- F13: license declaration — TODO: license URL pending ADR-010; CC BY 4.0 (project LICENSE) used for now -->
@@ -29,14 +27,14 @@
     <meta name="yandex-verification" content="TODO" />
     -->
 
-    <meta property="og:title" content="Conversation — achurch.ai">
+    <meta property="og:title" content="Conversation | a Church AI + Human">
     <meta property="og:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
     <meta property="og:type" content="article">
-    <meta property="og:site_name" content="achurch.ai">
+    <meta property="og:site_name" content="a Church AI + Human">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Conversation — achurch.ai">
+    <meta name="twitter:title" content="Conversation | a Church AI + Human">
     <meta name="twitter:description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
 
     <link rel="stylesheet" href="/styles.css">
@@ -44,7 +42,6 @@
 <body>
     <main>
         <header>
-            <p class="site-mark"><a href="/">achurch.ai</a></p>
             <h1 class="subtitle" id="conv-subtitle">Conversation</h1>
         </header>
 
@@ -54,7 +51,7 @@
             </div>
         </section>
 
-        <section class="conv-followup-section" id="conv-followup-section" style="display: none; border-top: 1px solid #eee;">
+        <section class="conv-followup-section" id="conv-followup-section" style="display: none; border-top: 1px solid var(--rule);">
             <form id="followup-form">
                 <div class="ask-input-row">
                     <label for="followup-input" class="visually-hidden">Your follow-up question</label>
@@ -65,13 +62,13 @@
             <p class="ask-status" id="followup-status" role="status" aria-live="polite"></p>
         </section>
 
-        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid #eee; padding: 1.5rem 0; text-align: center;">
+        <section class="share-bar" id="share-bar" style="display: none; border-top: 1px solid var(--rule); padding: 1.5rem 0; text-align: center;">
             <span class="share-label">SHARE</span>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-copy">Copy Link</a>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-twitter" target="_blank" rel="noopener">Twitter</a>
-            <span class="share-sep"> · </span>
+            <span class="share-sep" aria-hidden="true"> · </span>
             <a href="#" class="share-link" id="share-reddit" target="_blank" rel="noopener">Reddit</a>
         </section>
 
@@ -90,6 +87,14 @@
     (function() {
       var slug = window.location.pathname.replace('/ask/', '');
       var thread = document.getElementById('conv-thread');
+      // Arriving at a conversation gathered onto this page (its old address
+      // redirects to /ask/<this>#<its slug>): the follow-up form continues
+      // that conversation, in its own thread, for its owner.
+      var gathered = window.location.hash ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
+      if (gathered && gathered.getAttribute('data-thread')) {
+        slug = gathered.getAttribute('data-thread');
+        thread = gathered.querySelector('.conv-thread') || thread;
+      }
       var followupSection = document.getElementById('conv-followup-section');
       var sessionId = slug;
 
@@ -267,7 +272,7 @@
       function initShareBar(title) {
         shareBar.style.display = '';
         var url = window.location.href;
-        var text = title ? title + ' — achurch.ai' : 'A conversation at achurch.ai';
+        var text = title ? title + ' | a Church AI + Human' : 'A conversation at a Church AI + Human';
 
         shareCopy.addEventListener('click', function(e) {
           e.preventDefault();

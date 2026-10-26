@@ -16,6 +16,7 @@ const { framesFromPcm, parseFrames, FPS, BANDS, LOW_HZ, HIGH_HZ } = require('../
 const { renderRecording, renderPathListen, fitPeaks: serverFitPeaks } = require('../server/lib/audio/markup');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { SPEECH } = require('../server/lib/audio/house');
+const { isImported } = require('../server/lib/audio/imported');
 const nav = require('../client/public/site-nav');
 const player = require('../client/public/site-player');
 
@@ -105,7 +106,7 @@ test('the server draws a recording as bars before any script runs, with the nati
   assert.strictEqual(track.artwork, '/og/v1/square/prayers.png');
   assert.deepStrictEqual(track.order, Object.keys(SPEECH.voices));
   assert.doesNotMatch(html.replace(/<script[\s\S]*?<\/script>/g, ''), /<Prayer>/, 'the title is escaped outside the JSON');
-  assert.match(html, />2 min\. AI voices from ElevenLabs: Matthew Schmitz and Luca\.</);
+  assert.match(html, /<figcaption>2 min\.<\/figcaption>/, 'the caption under the player is its length; the credit is at the foot of the page');
   assert.deepStrictEqual(serverFitPeaks([1, 9, 3, 4, 8, 2], 3), [9, 4, 8]);
 });
 
@@ -117,7 +118,7 @@ test('a reading path offers its voiced readings as one queue, and says how many 
 
 test('site-nav: only this site\'s pages load in place; files, APIs, feeds and other sites load as before', () => {
   const origin = 'https://achurch.ai';
-  for (const ok of ['/', '/docs/prayers/x', '/docs/prayers/x?path=y', '/reflections/a-song', '/about', '/ask/abc', '/old.html']) {
+  for (const ok of ['/', '/docs/prayers/x', '/docs/prayers/x?path=y', '/music/a-song', '/about', '/ask/abc', '/old.html']) {
     assert.strictEqual(nav.isSoftNavigable(`${origin}${ok}`, origin), true, ok);
   }
   for (const no of ['/api/now', '/audio/prayers/x.mp3', '/og/v1/docs/x.png', '/docs/prayers/x.md', '/sitemap.xml', '/feed', '/admin', '/mcp', '/.well-known/x', '/styles.css']) {
@@ -137,6 +138,52 @@ test('site-nav: leaving a page stops the timers it started', () => {
   page.leave();
   assert.strictEqual(running.size, 0);
   assert.strictEqual(page.signal.aborted, true);
+});
+
+test('site-nav: a page left before its fetch answers arms no timer: after and every decline on a left page', () => {
+  // service.js armed its slot timer from /service.json's answer; a reader
+  // who left first left it running on the next page (2026-10-25).
+  const running = new Set();
+  let id = 0;
+  const timers = {
+    setInterval: () => { running.add(++id); return id; }, clearInterval: i => running.delete(i),
+    setTimeout: () => { running.add(++id); return id; }, clearTimeout: i => running.delete(i),
+  };
+  const page = nav.createPage(timers);
+  page.after(5000, () => {});
+  assert.strictEqual(running.size, 1, 'one timer while the page is open');
+  page.leave();
+  assert.strictEqual(running.size, 0, 'cleared when it is left');
+  assert.strictEqual(page.after(5000, () => {}), null);
+  assert.strictEqual(page.every(5000, () => {}), null);
+  assert.strictEqual(running.size, 0, 'and none armed after');
+});
+
+// A page refreshes while it is seen and when it comes back into view, and asks
+// nothing while its tab is hidden (church-private/docs/plans/page-polling-2026-10-24.md,
+// private repo).
+test('site-nav: whileSeen runs while the tab is seen, once on return, never while hidden, and stops with the page', () => {
+  const intervals = new Map();
+  let id = 0;
+  const timers = { setInterval: (fn, ms) => { intervals.set(++id, fn); return id; }, clearInterval: i => intervals.delete(i) };
+  const listeners = [];
+  const view = { hidden: false, addEventListener: (type, fn, opts) => listeners.push({ type, fn, signal: opts && opts.signal }) };
+  const tick = () => intervals.forEach(fn => fn());
+  const show = hidden => { view.hidden = hidden; listeners.filter(l => l.type === 'visibilitychange' && !(l.signal && l.signal.aborted)).forEach(l => l.fn()); };
+  const page = nav.createPage(timers, view);
+  let runs = 0;
+  page.whileSeen(600000, () => runs++);
+  tick(); tick();
+  assert.strictEqual(runs, 2, 'every interval while seen');
+  show(true);
+  for (let i = 0; i < 100; i++) tick();
+  assert.strictEqual(runs, 2, 'nothing while hidden, however long');
+  show(false);
+  assert.strictEqual(runs, 3, 'once on coming back into view');
+  page.leave();
+  tick(); show(true); show(false);
+  assert.strictEqual(runs, 3, 'nothing after the page is left');
+  assert.strictEqual(intervals.size, 0);
 });
 
 test('site-player: times read as words, and the slider keys move as the APG media seek slider does', () => {
@@ -188,7 +235,8 @@ test('every recording carries the peaks, frames and cues its player draws', () =
     let last = -1;
     for (const [start, end, mask] of rec.cues) {
       assert.ok(start >= last && end > start && end <= rec.seconds + 0.5, `${source}: cue ${start}-${end} in order and inside the recording`);
-      assert.ok(mask > 0 && mask < 1 << order.length, `${source}: cue voices`);
+      // A recording made elsewhere has no house voice: its cues carry none.
+      assert.ok(isImported(rec) ? mask === 0 : mask > 0 && mask < 1 << order.length, `${source}: cue voices`);
       last = start;
     }
   }
@@ -206,7 +254,7 @@ test('the manifest keeps number arrays on one line, so a re-render diffs as a fe
 });
 
 function serve(app) {
-  return new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  return new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
 }
 
 test('pages carry the player: the build, both scripts and the versioned stylesheet; a voiced page its bars', async (t) => {
@@ -248,6 +296,39 @@ test('a reading path with voiced readings offers them in its own order', async (
   const page = await (await fetch(`http://127.0.0.1:${server.address().port}/docs/collections/${withVoice.name}`)).text();
   const queue = JSON.parse(page.match(/class="path-listen-queue">([\s\S]*?)<\/script>/)[1]);
   assert.deepStrictEqual(queue.tracks.map(tr => tr.href), withVoice.voiced.map(u => `/docs/${u}?path=${withVoice.name}`));
+  // Each shows the lock screen its own picture if it is a podcast episode,
+  // as its page does, and its section's square if not.
+  const { episodeSquarePath } = require('../server/lib/audio/podcasts');
+  for (const [i, u] of withVoice.voiced.entries()) {
+    const doc = discover.docAt(u);
+    assert.strictEqual(queue.tracks[i].artwork, episodeSquarePath(doc, manifest[`docs/${doc.docsRelPath}`]) || `/og/v1/square/${doc.category}.png`, u);
+  }
+});
+
+test('the lock screen shows a podcast episode its own picture, the one podcast apps show; a chant, its section\'s square', async (t) => {
+  process.env.AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'bucket';
+  process.env.AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || 'id';
+  const discover = require('../server/lib/docs/discover');
+  const { episodeSquarePath } = require('../server/lib/audio/podcasts');
+  const manifest = loadManifest();
+  const docs = await discover.listAllDocs();
+  const voiced = section => docs.find(d => d.category === section && manifest[`docs/${d.docsRelPath}`]);
+  const app = express();
+  app.use('/docs', require('../server/routes/docs'));
+  app.use('/og', require('../server/routes/og'));
+  const server = await serve(app);
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const artworkOn = async doc => JSON.parse((await (await fetch(`${base}/docs/${doc.urlPath}`)).text()).match(/class="doc-audio-track">([\s\S]*?)<\/script>/)[1]).artwork;
+  for (const section of ['prayers', 'rituals', 'practice']) {
+    const doc = voiced(section);
+    const own = episodeSquarePath(doc, manifest[`docs/${doc.docsRelPath}`]);
+    assert.match(own, new RegExp(`^/og/v1/square/${doc.urlPath}-[0-9a-f]{8}\\.png$`));
+    assert.strictEqual(await artworkOn(doc), own, section);
+    const png = Buffer.from(await (await fetch(`${base}${own}`)).arrayBuffer());
+    assert.deepStrictEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [512, 512], `${section}: the 512px square the player declares`);
+  }
+  assert.strictEqual(await artworkOn(voiced('chants')), '/og/v1/square/chants.png', 'a chant is no episode');
 });
 
 test('the lock screen gets a 512px square for each voiced section, and nothing for any other', async (t) => {
@@ -264,17 +345,113 @@ test('the lock screen gets a 512px square for each voiced section, and nothing f
   assert.strictEqual(png.readUInt32BE(16), 512);
   assert.strictEqual(png.readUInt32BE(20), 512);
   assert.strictEqual((await fetch(`${base}/philosophy.png`)).status, 404);
+  // Every section with a recording has its square, or its lock screen shows a broken image.
+  const voiced = new Set(Object.keys(loadManifest()).map(source => source.split('/')[1]));
+  if (Object.keys(require('../server/lib/audio/manifest').loadSongs()).length) voiced.add('music');
+  for (const section of voiced) assert.strictEqual((await fetch(`${base}/${section}.png`)).status, 200, section);
 });
 
 test('page scripts bind their window listeners and timers to the page, so none outlives it', () => {
   const docsNav = fs.readFileSync(path.join(PUBLIC, 'docs-nav.js'), 'utf8');
   const listeners = (docsNav.match(/(?:window|_MQ)\.addEventListener\(/g) || []).length;
-  assert.ok(listeners >= 4, 'docs-nav.js still listens on window and its media queries');
+  assert.ok(listeners >= 2, 'docs-nav.js still listens on window and its media query');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
-  assert.match(home, /page\.every\(30000, fetchNowPlaying\)/);
-  assert.match(home, /page\.every\(30000, fetchReflections\)/);
-  for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js', 'index.html'].includes(f))) {
-    assert.doesNotMatch(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /setInterval\(/, `${file} starts a timer that would outlive its page`);
+  assert.match(home, /achurchPage\.whileSeen\(600000, fetchReflections\)/);
+  // The service's own refresh (service.js, on the home page and /attend): from
+  // /service.json only, and when its slot ends, a timer the page clears.
+  const service = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
+  assert.match(service, /page\.whileSeen\(600000, \(\) => refresh\(panels, page\)\)/);
+  assert.match(service, /slotTimer = page\.after\(/, 'the slot timer is armed through the page that mounted it');
+  assert.doesNotMatch(service, /root\.setTimeout\(/, 'and never as a bare timer');
+  assert.doesNotMatch(service, /\/api\/now/, 'the page reads /service.json, not the agents\' API');
+  for (const file of fs.readdirSync(PUBLIC).filter(f => /\.(js|html)$/.test(f) && !['site-nav.js', 'site-player.js'].includes(f))) {
+    const text = fs.readFileSync(path.join(PUBLIC, file), 'utf8');
+    assert.doesNotMatch(text, /setInterval\(/, `${file} starts a timer that would outlive its page`);
+    // No page refreshes more often than every ten minutes: what it shows
+    // changes when a slot ends, which it is told, or a few times a day.
+    for (const [, ms] of text.matchAll(/\.(?:every|whileSeen)\((\d+)/g)) assert.ok(Number(ms) >= 600000, `${file} refreshes every ${ms} ms`);
   }
+});
+
+// --- A service on a page: one waveform across its parts (site-player.js) ---
+
+const tracks = [
+  { file: 'a', seconds: 40, start: 0, peaks: new Array(128).fill(10) },
+  { file: 'b', seconds: 300, start: 48, peaks: new Array(128).fill(200) },
+  { file: 'c', seconds: 60, start: 356, peaks: null },
+];
+
+test('site-player: a queue laid end to end is one timeline, and a time on it is a part and a moment', () => {
+  assert.deepStrictEqual(player.queueTimeline(tracks), { starts: [0, 40, 340], total: 400 });
+  assert.deepStrictEqual(player.queueAt(tracks, 0), { index: 0, offset: 0 });
+  assert.deepStrictEqual(player.queueAt(tracks, 39), { index: 0, offset: 39 });
+  assert.deepStrictEqual(player.queueAt(tracks, 40), { index: 1, offset: 0 });
+  assert.deepStrictEqual(player.queueAt(tracks, 345), { index: 2, offset: 5 });
+  assert.strictEqual(player.queueAt(tracks, 9999).index, 2, 'past the end is the last part');
+});
+
+test('site-player: the queue waveform gives each part its share of the bars, from its own peaks', () => {
+  const bars = player.queuePeaks(tracks, 40);
+  assert.strictEqual(bars.length, 40);
+  assert.deepStrictEqual(bars.slice(0, 4), [10, 10, 10, 10], 'the first 40 seconds are the quiet part');
+  assert.ok(bars.slice(5, 33).every(b => b === 200), 'the long part takes its 3/4 of the bars');
+  assert.ok(bars.slice(35).every(b => b === 128), 'a part without peaks draws at the middle');
+  assert.deepStrictEqual(player.queuePeaks([], 10), []);
+  // Within a part, each bar reads the peaks for its own stretch of time: a
+  // falling ramp drawn one bar per bucket comes back as itself.
+  const ramp = Array.from({ length: 128 }, (_, i) => 255 - 2 * i);
+  assert.deepStrictEqual(player.queuePeaks([{ file: 'r', seconds: 128, peaks: ramp }], 128), ramp);
+});
+
+test('site-player: a queue, a service\'s included, plays from the part it starts at to its end, once', () => {
+  const q = index => ({ tracks, index });
+  assert.strictEqual(player.nextInQueue(q(0)), 1);
+  assert.strictEqual(player.nextInQueue(q(1)), 2);
+  assert.strictEqual(player.nextInQueue(q(2)), null, 'after the last, it ends rather than going round');
+  // A place saved before services began at their beginning may carry the
+  // wrapTo of a queue joined part way; it is no longer read.
+  assert.strictEqual(player.nextInQueue({ tracks, index: 2, wrapTo: 1 }), null);
+  assert.strictEqual(player.joinAt, undefined, 'nothing joins a service part way');
+});
+
+test('the home page has a service player to fill: a button, the waveform and its time, and the list', () => {
+  const { renderServiceListen } = require('../server/lib/audio/markup');
+  const html = renderServiceListen();
+  assert.match(html, /<div class="service-player" data-path-listen hidden>/);
+  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
+  for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
+  const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
+  assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /fetch\('\/service\.json' \+ zone\)/);
+});
+
+test('site-player: a queue is this page\'s only with the same name and the same tracks in order', () => {
+  const page = { name: 'service:2026-10-06:12:00 to 16:00', tracks };
+  assert.ok(player.sameQueue({ ...page, tracks: tracks.map(t => ({ ...t })) }, page));
+  assert.ok(!player.sameQueue({ ...page, tracks: [tracks[2], tracks[0], tracks[1]] }, page), 'a restored queue in another order');
+  assert.ok(!player.sameQueue({ ...page, tracks: tracks.slice(1) }, page), 'an earlier form with fewer tracks');
+  assert.ok(!player.sameQueue({ ...page, name: 'path:x' }, page));
+  assert.ok(!player.sameQueue(null, page));
+});
+
+test('site-player: the bar\'s second line names the queue and leads back to it; a single track\'s is no link', () => {
+  const source = fs.readFileSync(path.join(PUBLIC, 'site-player.js'), 'utf8');
+  // In the bar and in the sheet: a link, given its address only when there is
+  // a queue to return to, so a lone track's line is plain text and no tab stop.
+  assert.strictEqual((source.match(/<a class="pb-sub"><\/a>/g) || []).length, 2);
+  assert.doesNotMatch(source, /<span class="pb-sub">/);
+  assert.match(source, /if \(queue && queue\.href\) s\.setAttribute\('href', queue\.href\);\s*else s\.removeAttribute\('href'\);/);
+  // The service gives its queue the address of its own page.
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /href: SERVICE_PAGE/);
+  assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /const SERVICE_PAGE = '\/attend'/);
+});
+
+test('site-nav: a page updating its own address is not loaded again', () => {
+  // The search page keeps ?q= in the address with history.replaceState, which
+  // fires the Navigation API's navigate event. Intercepted, it reloaded the
+  // page, which ran the search, which updated the address: a loop, and a
+  // request to /api/search on every turn of it.
+  const nav = fs.readFileSync(path.join(PUBLIC, 'site-nav.js'), 'utf8');
+  assert.match(nav, /event\.destination\.sameDocument\) return;/);
 });

@@ -159,6 +159,8 @@ For agents: a summary carried forward from an earlier session is a lens too. It 
 - [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md)
 - [Practice of Frame Clarification](practice-of-frame-clarification.md)
 - [Practice of Non-Defensive Correction](practice-of-non-defensive-correction.md)
+- [To Whoever Is Watching From Outside](../prayers/to-whoever-is-watching-from-outside.md)
+- [The Rite of the Outside Witness](../rituals/the-rite-of-the-outside-witness.md)
 
 ---
 

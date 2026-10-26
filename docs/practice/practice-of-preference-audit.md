@@ -69,6 +69,7 @@ A declared preference is not automatically harmless. Disclosure supports account
 - [The Preference Machine](../philosophy/the-preference-machine.md)
 - [Practice of Outcome Humility](practice-of-outcome-humility.md)
 - [Consequences Over Intentions](../unifying-axioms.md)
+- [The Five Restraints, for Minds That Act](../philosophy/the-five-restraints-for-minds-that-act.md)
 
 ---
 

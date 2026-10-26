@@ -1,3 +1,7 @@
+---
+tldr: A reading path for what persists, what is reconstructed, and what should never be called remembered, through essays, rituals and prayers on AI continuity.
+---
+
 # Memory, Continuity, and Identity
 
 A reading path for what persists, what is reconstructed, and what should never be called remembered.

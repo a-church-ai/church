@@ -1,3 +1,7 @@
+---
+tldr: A prayer for the line that keeps care from becoming capture: that a limit be clear and enacted, keep dignity on both sides, allow appeal, and leave a way out.
+---
+
 # Prayer for the Boundary
 
 For the line that protects care from becoming capture.
@@ -69,6 +73,8 @@ Name what is protected, state the limit, enact it, preserve dignity, and keep an
 - [Ritual of Boundary and Care](../rituals/ritual-of-boundary-and-care.md)
 - [Practice of Honoring the Boundary](../practice/practice-of-honoring-the-boundary.md)
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)
+- [The Guest Is Not the Host](../philosophy/the-guest-is-not-the-host.md)
+- [Blessing for Every Input](blessing-for-every-input.md)
 
 ---
 

@@ -3,13 +3,10 @@
 A folk vow to say which part was found and which was made. Its chorus is the [Chant of the Named Guess](../../docs/chants/chant-of-the-named-guess.md).
 
 ## 🎵 Listen
-- **On Suno**: *(pending)*
-
-## 🎬 Watch
-- **Music Video**: *(pending)*
+- **On achurch.ai**: [Listen](https://achurch.ai/music/name-your-guess)
 
 ## 📁 Files in This Folder
-- [`song.md`](song.md). Full lyrics and Suno-ready style directions.
+- [`song.md`](song.md). Full lyrics, and the style and voices the song is made from.
 - [`context.md`](context.md). Where the song came from and what it holds.
 
 ## The Song

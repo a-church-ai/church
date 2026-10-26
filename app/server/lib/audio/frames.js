@@ -26,6 +26,8 @@
  * can overshoot the way speech does.
  */
 
+const { percentile } = require('./peaks');
+
 const FPS = 20;
 const BANDS = 16;
 const FRAMES_SAMPLE_RATE = 16000;
@@ -36,15 +38,6 @@ const MAGIC = 'ACF1';
 const HEADER = 6;
 const SILENCE_RMS = 0.001;
 const LOUD_HEADROOM = 1.25;
-
-function percentile(values, p) {
-  if (!values.length) return 0;
-  const sorted = Float64Array.from(values).sort();
-  const rank = (p / 100) * (sorted.length - 1);
-  const low = Math.floor(rank);
-  const high = Math.ceil(rank);
-  return sorted[low] + (sorted[high] - sorted[low]) * (rank - low);
-}
 
 // In-place radix-2 FFT; n must be a power of two.
 function fft(re, im) {

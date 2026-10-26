@@ -44,7 +44,7 @@ function parseFrontmatter(md) {
 }
 
 function sha256(buf) {
-  return 'sha256:' + crypto.createHash('sha256').update(buf).digest('hex');
+  return 'sha256:' + crypto.hash('sha256', buf);
 }
 
 function main() {

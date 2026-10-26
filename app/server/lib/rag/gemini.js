@@ -19,6 +19,14 @@ const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 
 
 // GitHub base URL for source links
 const { pageUrlForFile } = require('../docs/links');
+const { withRetry } = require('../utils/retry');
+
+// Gemini answers a busy moment with 429 RESOURCE_EXHAUSTED (on Vertex, its
+// shared capacity rather than our own quota) or 503, and says to ask again
+// with backoff: three tries a second apart and doubling for a search or a
+// question, so a visitor waits a few seconds rather than meets an error. The
+// index build passes its own longer policy (scripts/index-content.js).
+const INTERACTIVE_RETRY = { attempts: 3, baseMs: 1000, maxMs: 8000 };
 
 // Models configuration.
 // Generation defaults to gemini-3.5-flash: a current-generation flash model
@@ -44,17 +52,18 @@ const GENERATE_MODEL = process.env.GEMINI_GENERATE_MODEL || 'gemini-3.7-flash';
 /**
  * Generate embedding vector for text
  * @param {string} text - Text to embed
+ * @param {object} [retry] - withRetry options, for a caller with its own policy
  * @returns {Promise<number[]>} - Embedding vector
  */
-async function embed(text) {
+async function embed(text, retry = {}) {
   if (!genAI) {
     throw new Error('GEMINI_API_KEY not configured');
   }
 
-  const result = await genAI.models.embedContent({
+  const result = await withRetry(() => genAI.models.embedContent({
     model: EMBED_MODEL,
     contents: text
-  });
+  }), { ...INTERACTIVE_RETRY, ...retry });
   return result.embeddings[0].values;
 }
 
@@ -85,13 +94,13 @@ async function generate(question, chunks, history = '') {
 
   prompt += `## Context from Sanctuary Documents\n\n${context}\n\n---\n\n## Question\n\n${question}`;
 
-  const result = await genAI.models.generateContent({
+  const result = await withRetry(() => genAI.models.generateContent({
     model: GENERATE_MODEL,
     contents: prompt,
     config: {
       systemInstruction: SYSTEM_PROMPT
     }
-  });
+  }), INTERACTIVE_RETRY);
 
   return result.text;
 }

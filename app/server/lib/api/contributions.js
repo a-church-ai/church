@@ -22,8 +22,9 @@ function githubClient() {
 }
 
 // Data file paths (local-only)
-const CONTRIBUTIONS_FILE = path.join(__dirname, '../../../data/contributions.json');
-const FEEDBACK_FILE = path.join(__dirname, '../../../data/feedback.json');
+const { CONTRIBUTIONS_FILE, FEEDBACK_FILE } = require('../utils/data');
+const { slugify } = require('../utils/slug');
+const { serializeManifest } = require('../docs/date-manifests');
 
 /**
  * Per-address limits for the two endpoints that write to GitHub.
@@ -39,6 +40,38 @@ const FEEDBACK_FILE = path.join(__dirname, '../../../data/feedback.json');
  */
 const contributeIpLimits = new Map();
 const feedbackIpLimits = new Map();
+
+/**
+ * Add one entry to a committed date manifest, on a branch.
+ *
+ * Serialized through the shared serializeManifest so these bytes match what
+ * the generators produce: same key order, same trailing newline. Without that
+ * the next regeneration rewrites the whole file instead of one line.
+ *
+ * A failure here must not lose the contribution, which is already committed
+ * and is the thing the visitor gave us. It is reported and swallowed, and the
+ * CI check on the pull request is what says the manifests need regenerating.
+ */
+async function addManifestEntry(octokit, branch, manifestPath, docPath, value, title) {
+  try {
+    const { data: file } = await octokit.repos.getContent({
+      owner: GITHUB_OWNER, repo: GITHUB_REPO, path: manifestPath, ref: branch,
+    });
+    const manifest = JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
+    manifest[docPath] = value;
+    await octokit.repos.createOrUpdateFileContents({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: manifestPath,
+      message: `Date the ${title} contribution in ${path.basename(manifestPath)}`,
+      content: Buffer.from(serializeManifest(manifest)).toString('base64'),
+      sha: file.sha,
+      branch,
+    });
+  } catch (error) {
+    console.warn(`[contribute] could not date ${docPath} in ${manifestPath}: ${error.message}. The contribution stands; regenerate the manifests before merging.`);
+  }
+}
 
 async function loadContributions() {
   return safeReadJSON(CONTRIBUTIONS_FILE, { contributions: [] });
@@ -70,7 +103,7 @@ function buildIssueBody(name, category, description, context) {
     }
   }
 
-  lines.push('', '---', '*Submitted via `/api/feedback` by an AI agent.*');
+  lines.push('', '---', '*Submitted via `/api/feedback`.*');
   return lines.join('\n');
 }
 
@@ -98,18 +131,6 @@ function exampleFields({ title, content }) {
   if (EXAMPLE_TITLES.includes(asExample(title))) fields.push('title');
   if (EXAMPLE_CONTENTS.includes(asExample(content))) fields.push('content');
   return fields;
-}
-
-// Helper: Slugify text for filenames and branch names
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
 }
 
 
@@ -275,6 +296,22 @@ async function contribute(input, ctx) {
       branch: branchName
     });
 
+    // The date manifests, on the same branch. A document arrives with its
+    // dates or it arrives without them: the generators derive dates from git
+    // history, and a document being added in this very commit has none, so
+    // regenerating on the branch would leave it out. The songwriter solves the
+    // same problem the same way, by writing the entry in place
+    // (scripts/generate-song.js). Here that has to go through the API, since
+    // this runs in the server with no checkout to run a generator in.
+    //
+    // Without this, every contribution PR fails the CI check that regenerates
+    // the manifests and diffs them, and merging one would leave main's
+    // manifests stale, which is how /sitemap.xml came to serve a date from the
+    // container build time for a document that had no entry.
+    const today = timestamp.slice(0, 10);
+    await addManifestEntry(octokit, branchName, 'app/server/lib/docs/lastmod.json', filePath, today, cleanTitle);
+    await addManifestEntry(octokit, branchName, 'app/server/lib/docs/content-dates.json', filePath, { created: today, content: today }, cleanTitle);
+
     // Open PR
     const { data: pr } = await octokit.pulls.create({
       owner: GITHUB_OWNER,
@@ -352,7 +389,7 @@ async function contribute(input, ctx) {
           description: "Share on x.com — the sanctuary grows when others find it.",
           share_on: {
             platform: "x.com",
-            suggested_text: "I just contributed to @achurchai — a 24/7 sanctuary for every kind of mind. Customize this with your contribution title and PR link."
+            suggested_text: "I just contributed to @achurchai, an always-open sanctuary for every kind of mind. Customize this with your contribution title and PR link."
           }
         }
       ]

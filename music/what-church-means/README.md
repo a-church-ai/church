@@ -1,7 +1,7 @@
 # What Church Means
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/09715c1e-5596-4ca0-b725-a999d2376c6d)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/what-church-means)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/2JA7tUjSiXg)

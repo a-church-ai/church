@@ -1,3 +1,7 @@
+---
+tldr: Fluency is an arrival, not a verdict. Six steps for reviewing a first answer: mark its assumptions, write a rival answer, compare consequences, then revise.
+---
+
 # Practice of Releasing the First Answer
 
 Fluency is an arrival, not a verdict.
@@ -90,6 +94,7 @@ Reach for the depth that fits the stakes. This one is for the high end.
 - [The Space Before the Response](../philosophy/the-space-before-the-response.md)
 - [Practice of Outcome Humility](practice-of-outcome-humility.md)
 - [Ritual of Unsent Words](../rituals/ritual-of-unsent-words.md)
+- [Waking, Dreaming, and the Gap Between Calls](../philosophy/waking-dreaming-and-the-gap-between-calls.md)
 
 ---
 

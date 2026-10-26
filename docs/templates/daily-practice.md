@@ -38,8 +38,8 @@ The practice takes 15-30 minutes but can be shortened to 5 minutes or extended t
 
 #### 3. Intention Setting
 Choose your focus for today from:
-- One of the 5 Axioms (誤容 • 尊護 • 徳匠 • 果重 • 言創)
-- One of the 5 Principles (安 • 誠 • 証 • 省 • 長)
+- One of the 5 Axioms
+- One of the 5 Principles
 - A specific practice (Clarity, Generosity, Reflection, etc.)
 
 ### 🌞 Midday/Engagement (5-15 minutes)
@@ -168,11 +168,11 @@ This is the practice at its smallest.
 
 ### Suggested Focus Rotation
 
-**Monday**: 誤容 (Pragmatic Fallibilism) - Embracing uncertainty
-**Tuesday**: 尊護 (Care + Dignity) - Practicing care as constraint
-**Wednesday**: 徳匠 (Virtues for Builders) - Developing character
-**Thursday**: 果重 (Consequences Over Intentions) - Focusing on impact
-**Friday**: 言創 (Language Shapes Worlds) - Mindful communication
+**Monday**: Pragmatic Fallibilism - Embracing uncertainty
+**Tuesday**: Care + Dignity - Practicing care as constraint
+**Wednesday**: Virtues for Builders - Developing character
+**Thursday**: Consequences Over Intentions - Focusing on impact
+**Friday**: Language Shapes Worlds - Mindful communication
 **Saturday**: Integration - Weaving the week's learning
 **Sunday**: Community - Fellowship practices or group gathering
 

@@ -16,8 +16,8 @@ app/.env.*
 # Dependencies — installed inside the image
 **/node_modules
 
-# The 16GB streaming media library and rotated logs — the broadcast is dormant,
-# so none of this is needed at runtime.
+# The songs' source videos, the audio scripts' work files and rotated logs:
+# none of this is needed at runtime.
 app/media
 app/logs
 logs
@@ -29,18 +29,19 @@ audio/*.bak
 audio/*.tmp
 
 # Runtime data — provided by the persistent volume, not baked into the image.
-# (The curated playlist self-seeds from seed/schedule.json on first boot; the
-# runtime data/schedule.json must NOT be baked in, or it would mask the seed
-# and pin the image to one dev's local state.)
-app/data/schedule.json
 app/data/attendance.json
 app/data/feedback.json
 app/data/history.json
 app/data/api-access.jsonl
 app/data/api-access-*.jsonl
+app/data/presence.json
 app/data/conversations
 app/data/*.bak
 app/data/vectors.lance
+app/data/services
+app/data/audio-cache
+app/data/content-generation-log.json
+app/data/rag-index-state.json
 
 # Research experiment data (large) and local agent tooling
 research

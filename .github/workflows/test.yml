@@ -1,0 +1,115 @@
+name: Tests
+
+# The repository's actual CI, and until now it did not have one.
+#
+# The test suite was only ever run inside generate-song.yml, a scheduled job
+# that writes songs. That job is the wrong place to learn the suite is broken:
+# its failures read as "no song today", so a thirty-run failure streak went
+# unnoticed, and the commits that fixed it were never verified either, because
+# the next scheduled run was hours away.
+#
+# This runs on every push and every pull request, which is when a regression is
+# cheapest to find. generate-song.yml keeps its own test step, and that is not
+# duplication: this one guards the branch, that one guards the commit the job is
+# about to make on its own.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push makes an in-flight run of the same branch irrelevant.
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # One Node: the exact one in .nvmrc, which production, the scheduled jobs
+    # and the maintainers all run, and all package.json allows. Plan:
+    # node-26-2026-10-18.md in the private repo.
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The date manifests are derived from git history, and the step below
+          # regenerates them to prove they are current. actions/checkout
+          # defaults to fetch-depth 1, which truncates that history: every
+          # document would look created at the shallow boundary. The generators
+          # refuse on a shallow clone rather than write a plausible lie, so
+          # without this the step fails instead of checking anything.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Run the test suite
+        working-directory: app
+        # No secrets and no app/data: a fresh checkout is exactly what a new
+        # contributor has, and the suite is expected to pass there.
+        run: npm test
+
+      - name: The date manifests are current
+        working-directory: app
+        # A manifest derived from history can go stale silently, and a stale one
+        # is how /sitemap.xml came to serve dates a day behind with one document
+        # missing entirely (so it fell back to mtime, which in the image is the
+        # build time). The in-repo test catches a page date behind its content
+        # date, which is only one direction of staleness: both manifests stale
+        # together violates nothing. Regenerating and diffing catches every
+        # direction, because the generators are deterministic given history.
+        run: |
+          npm run gen:lastmod
+          npm run gen:content-dates
+          if ! git diff --quiet -- server/lib/docs/lastmod.json server/lib/docs/content-dates.json; then
+            echo "::error::The date manifests are stale. Run 'npm run gen:lastmod' and 'npm run gen:content-dates' in app/ and commit the result."
+            git --no-pager diff --stat -- server/lib/docs/lastmod.json server/lib/docs/content-dates.json
+            exit 1
+          fi
+          echo "Both manifests match what this history produces."
+
+  # The stdio bridge published to npm (mcp-church/). It runs on its users'
+  # Node, not ours, so it is tested on every line its engines allow:
+  # "^24.22.1 || >=26.12.1", a patch-level floor, since security fixes ship as
+  # patches on each supported line (2026-10-21: 22.23.4, 24.22.1, 26.12.1), and
+  # a user on 26.10 is less safe than one on 24.22.1. setup-node resolves each
+  # major to its newest patch, so this runs at or above the floor.
+  mcp-church:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26']
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: mcp-church/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mcp-church
+        run: npm ci
+
+      - name: Run the bridge's tests
+        working-directory: mcp-church
+        run: npm test

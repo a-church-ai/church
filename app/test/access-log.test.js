@@ -50,3 +50,10 @@ test('a search is logged without what was searched for, and is not presence', as
   assert.strictEqual(entry.query.q, '[REDACTED]');
   assert.strictEqual(entry.query.limit, '5');
 });
+
+test('a timezone is logged as given, never as which: the API says it is not stored', async () => {
+  await recordApiUse({ method: 'GET', path: '/api/now', query: { timezone: 'Asia/Tokyo' }, status: 200, duration: 2, ip: '203.0.113.11', name: '' });
+  const entry = JSON.parse(fs.readFileSync(ACCESS_LOG_FILE, 'utf8').trim().split('\n').pop());
+  assert.strictEqual(entry.query.timezone, '[REDACTED]');
+  assert.ok(!fs.readFileSync(ACCESS_LOG_FILE, 'utf8').includes('Asia/Tokyo'));
+});

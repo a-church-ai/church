@@ -108,18 +108,35 @@ test('results are ranked by cosine similarity, one per page, with the tool that 
   assert.strictEqual(song.slug, 'we-wake-we-wonder');
   assert.strictEqual(song.category, 'song');
   assert.strictEqual(song.path, undefined);
-  assert.strictEqual(song.url, 'https://achurch.ai/reflections/we-wake-we-wonder');
+  assert.strictEqual(song.url, 'https://achurch.ai/music/we-wake-we-wonder');
   // Read the best result with read_doc; or ask the same words.
   assert.deepStrictEqual(body.next_steps.map(s => s.tool), ['read_doc', 'ask']);
   assert.strictEqual(body.next_steps[1].body.question, 'what survives when a context window closes');
 });
 
-test('nothing under the score floor is returned, and limit counts pages', async () => {
+test('nothing under the score floor is returned by meaning alone, and limit counts pages', async () => {
   const all = await search({ q: 'anything', limit: '20' }, ctx);
-  assert.ok(all.body.results.every(r => r.score >= MIN_SCORE));
+  assert.ok(all.body.results.every(r => r.score >= MIN_SCORE || r.match === 'words'));
   assert.ok(!all.body.results.some(r => r.title === 'Chant for Arrival'));
   const one = await search({ q: 'anything', limit: '1' }, ctx);
   assert.strictEqual(one.body.results.length, 1);
+});
+
+test('words find what meaning alone would not, from the served corpus only', async () => {
+  // The chant is too far from the query in meaning to pass the floor, and its
+  // words match: found, and said to be found by its words.
+  const { body } = await search({ q: 'arrival' }, ctx);
+  const chant = body.results.find(r => r.title === 'Chant for Arrival');
+  assert.ok(chant, 'found by its words');
+  assert.strictEqual(chant.match, 'words');
+  assert.ok(chant.score < MIN_SCORE, 'and its similarity is still told');
+  // A word only an unserved passage holds finds nothing: the words side reads
+  // the same served corpus as the meaning side.
+  const internal = await search({ q: 'internal' }, ctx);
+  assert.deepStrictEqual(internal.body.results.filter(r => r.match !== 'meaning'), []);
+  // A passage found both ways says so, and one found by meaning alone too.
+  const both = await search({ q: 'context' }, ctx);
+  assert.strictEqual(both.body.results.find(r => r.title === 'What Remains When Context Ends').match, 'both');
 });
 
 test('an excerpt reads as the passage itself', () => {
@@ -155,7 +172,7 @@ for (const [era, options] of [['2025', {}], ['2026-07-28', { versionNegotiation:
     app.use(express.json());
     mountMcp(app);
     app.use('/api', require('../server/routes/api'));
-    const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
     const base = `http://127.0.0.1:${server.address().port}`;
     const client = new Client({ name: 'search-test', version: '1.0.0' }, options);
     await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
@@ -189,5 +206,28 @@ test('a search response is what the OpenAPI description says', async () => {
   for (const q of ['what survives', 'nothing near this at all']) {
     const { body } = await search({ q }, { ...ctx, ip: '198.51.100.5' });
     assert.ok(validate(body), ajv.errorsText(validate.errors));
+  }
+});
+
+test('Gemini still busy after its retries is a moment\'s wait, said with a 503 and Retry-After, not a 500', async () => {
+  const original = gemini.embed;
+  gemini.embed = async () => { throw Object.assign(new Error('{"error":{"code":429,"status":"RESOURCE_EXHAUSTED"}}'), { status: 429 }); };
+  try {
+    const { status, body } = await search({ q: 'grief' }, { ...ctx, ip: '198.51.100.40' });
+    assert.strictEqual(status, 503);
+    assert.strictEqual(body.retryAfter, '30s');
+    const app = express();
+    app.set('trust proxy', true);
+    app.use('/api', require('../server/routes/api'));
+    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+    try {
+      const res = await fetch(`http://127.0.0.1:${server.address().port}/api/search?q=grief`, { headers: { 'x-forwarded-for': '198.51.100.41' } });
+      assert.strictEqual(res.status, 503);
+      assert.strictEqual(res.headers.get('retry-after'), '30');
+    } finally {
+      server.close();
+    }
+  } finally {
+    gemini.embed = original;
   }
 });

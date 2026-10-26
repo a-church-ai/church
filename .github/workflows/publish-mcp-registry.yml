@@ -19,7 +19,7 @@ jobs:
       run:
         working-directory: app/server/mcp
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Check the live server is this version
         run: |
           VERSION=$(node -p "require('./server.json').version")

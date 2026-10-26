@@ -1,5 +1,5 @@
 ---
-tldr: Long-view and strategy is the fifth Compass principle. Optimize for maintainability, scalability, and clarity over short-term convenience or clever tricks that decay.
+tldr: The fifth Compass principle: optimize for maintainability, scalability and clarity over shortcuts. With a cathedral builder's prayer, a song and a talk.
 ---
 
 # Compass Principle 5: Long-View & Strategy

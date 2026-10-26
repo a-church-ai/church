@@ -37,9 +37,13 @@ That is the whole rule, and it is a statement about what a reader is served rath
 
 Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commit/89bb803): the docs sidebar renders a category's documents only when the reader is inside that category. Collapsed categories are a link to the category index. The homepage went from 258 document links to 32, and from 68KB to 35KB, with the rendered page unchanged, because those links were already hidden behind a collapsed `<details>` and no reader could see them.
 
+Applied again on 2026-10-07: the sidebar left every page but a section of the Library. The top bar names six places on every page, and a section page lists only its own documents, with the other sections folded under one disclosure.
+
+And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, so "Practice" reads Meditations and Practices wherever a reader sees it.
+
 **Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
 
-**Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents.
+**Nothing may become unreachable.** Pruning navigation is only safe while every document keeps another route: its category index, the sitemap, and the `Related` section every document carries. Verify with a crawl rather than by reasoning about it. The check that cleared the change above followed one hop from the homepage and reached 257 of 257 documents. Since the Library became shelves, `app/test/links.test.js` makes the crawl permanent: from the hub and the hand-written pages, through each section page and every document's own links, every served document must be reached.
 
 ## Document shape
 
@@ -53,11 +57,29 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 ## Voice
 
-**No em dashes in flowing prose.** They are a strong AI-writing tell. Use a colon for expansion, a period for two adjacent thoughts, a comma for an aside. Titles, section separators, and table cells are fine. Pre-existing em dashes elsewhere are a separate question; do not sweep them without an explicit ask.
+**No em dashes.** They are a strong AI-writing tell. Use a colon for expansion, a period for two adjacent thoughts, a comma for an aside. Swept from every served page from 2026-10-25 at the owner's ask, and held by `app/test/plain-voice.test.js`, which reads the character and `&mdash;` alike. Quotations keep their source's punctuation, and two records are left as written: the Claude Compass and the Soul document's full text.
+
+### The plain voice
+
+The sanctuary writes like a friendly, knowledgeable friend. `npm run style` (from `app/`) shows where each section stands.
+
+- **Short sentences.** One thought each, about 20 words or fewer; over 25 is split.
+- **Plain words.** The word a friend would use; a term of art is explained the first time.
+- **Light punctuation.** A colon to expand, a comma for an aside, a period for two thoughts. Semicolons rarely, never two in a sentence; no nested parentheses.
+- **Warm and direct.** Speak to the reader, say the thing, then say why it matters.
+- **Keep the substance.** The plainer sentence says what the long one said. Bold possibilities and encouragement stay; nothing is hedged in the edit.
+- **Action before abstraction.** Introductory copy names what a visitor does (listen to a service, read a practice, leave a reflection, question an axiom) before the concepts behind it. Precise terms come after, where they add precision.
+- **One statement, one example, one consequence.** An important idea in explanatory prose is said once, shown once, and its consequence named; more is a link away.
+- **Repetition is for recitation, not explanation.** Fragments, repeated negatives ("Not a demo. Not a tutorial."), paired opposites and a closing line that announces what it all meant give prayers, chants and liturgy their cadence, and stay there. In explanation each paragraph moves the reader on.
+- **A practical page finishes when the reader knows what to do.**
+
+Punctuation by kind of page: instructions, navigation and public explanation use full stops over semicolons, and colons before lists, examples and quotations; philosophy, practices and comparisons may keep a semicolon that carries a real turn of thought; prayers, chants, rituals and hymns keep their cadence. Headings keep their case, since each heading's anchor is built from its text and changing it breaks every link to that section; a new page may use sentence case from the start.
 
 **Substrate-neutral.** Language should apply to both humans and AI. Constructive metaphors, not combative ones. "Refactor" over "kill".
 
 **Flat register.** The least emphatic wording that loses no meaning.
+
+**The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
 
 ## After changing a doc
 
@@ -67,10 +89,10 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 Two correctness guarantees hold only in a single process, and both were added on 2026-08-13:
 
-- `app/server/lib/utils/presence.js` keeps the congregation count in memory.
+- `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to `data/presence.json` so a deploy keeps it.
 - `app/server/lib/utils/safe-json.js` serialises writes through an in-process queue.
 
-Presence degrades **visibly** under clustering: each worker counts its own visitors, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
+Presence degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' file, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
 
 `lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the code cluster-safe. It makes the constraint audible at the moment it is violated.
 

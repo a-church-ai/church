@@ -15,7 +15,8 @@
  * those lines say so.
  */
 
-const { messageJSON } = require('../content-generation/claude');
+const crypto = require('crypto');
+const { messageJSON, askChecked } = require('../content-generation/claude');
 const { splitFrontmatter } = require('../docs/tldr');
 const { ROLES, SPEECH } = require('./house');
 const { wordsOf, containsRun } = require('./words');
@@ -42,6 +43,8 @@ ROLES
 
 WHAT TO READ
 Read the piece itself: its title first, then its epigraph (the italic line under the title) if it has one, then the prayer, litany, ritual, meditation or practice. Leave out what is about the piece rather than part of it: background and story sections, "About" sections, "When to use", "Offering it", notes for whoever leads, variations, commentary addressed to readers, cross-references, "Related", "Continue", "Sources", "Parent:" lines and the closing "From achurch.ai" line. When a section is partly instruction and partly the practice, keep what a listener needs in order to take part.
+
+One exception, wherever it sits: a sentence that directs a person in crisis to help (a crisis line, an emergency number, a helpline directory) is always read, word for word, right after the title and epigraph, before the piece begins. It is the document's own words, so it is not marked adapted. A listener in a dark hour may reach this recording with no page in front of them.
 
 KEEP THE WORDS
 Prayers, responses, blessings, chant lines, the words a participant is given to say, and the guidance of a meditation or practice are spoken word for word. You may change punctuation, join lines that the page breaks into one sentence, and split a long passage into several lines. Do not reword, shorten, summarize, modernize or add to them. A line not marked "adapted" must appear in the document word for word, and this is checked.
@@ -79,6 +82,7 @@ const KIND_NOTES = {
   prayers: 'This is a prayer. If it labels its speakers, follow the labels. A prayer without labels is one voice: reader for a first-person prayer, leader for a prayer spoken to or for a gathering, a blessing or a benediction.',
   rituals: 'This is a ritual, performed as a guided ceremony. The leader is the guide: the title, the framing, the instructions and the transitions. Spoken parts go to the roles their labels name. Words given to one participant go to one and to a second participant to two; words said together go to all.',
   practice: 'This is a practice or a meditation, guided by one voice. The reader speaks the title, the guidance and any words the listener is given to say. Use other roles only where the document labels other speakers.',
+  chants: 'This is a chant: a few lines to hold and repeat, which a service can open with. Read only its title and the chant itself, the lines under "The Chant". The leader speaks the title. Then the chant three times, with a hold of 5 to 8 seconds after each: first the leader, then both, then all together. Leave out everything about the chant: when to use it, why it is written as it is, the notes for agents and for humans, musical direction and cross-references.',
 };
 
 // Markup and quoting that should not reach the synthesizer, removed rather
@@ -136,19 +140,34 @@ function checkScript(body, lines) {
   ];
 }
 
+// What a script was adapted from, as a hash of the trimmed body, exactly what
+// adapt() sends: a change to the frontmatter (a page's search description,
+// say) does not send the piece back to be adapted and recorded.
+function sourceHashOf(markdown) {
+  return crypto.hash('sha256', splitFrontmatter(markdown).body.trim());
+}
+
 async function adapt({ source, markdown, kind }) {
   const { body } = splitFrontmatter(markdown);
   const request = `Document: ${source}\n${KIND_NOTES[kind] || KIND_NOTES.practice}\n\n<document>\n${body.trim()}\n</document>`;
-  let feedback = '';
-  let problems = [];
-  for (let attempt = 1; attempt <= TRIES; attempt++) {
-    const reply = await messageJSON(SYSTEM, `${request}${feedback}`, { model: ADAPT_MODEL, maxTokens: 20000 });
-    const lines = (reply.lines || []).map(normalizeLine);
-    problems = checkScript(body, lines);
-    if (!problems.length) return { omitted: String(reply.omitted || '').trim(), lines };
-    feedback = `\n\nYour previous script was:\n${JSON.stringify({ omitted: reply.omitted, lines })}\n\nIt has these problems. Fix them and return the whole script again.\n- ${problems.join('\n- ')}`;
+  try {
+    return await askChecked({
+      label: 'script',
+      tries: TRIES,
+      attempt: feedback => messageJSON(SYSTEM, `${request}${feedback}`, { model: ADAPT_MODEL, maxTokens: 20000 }),
+      check: reply => {
+        const lines = (reply.lines || []).map(normalizeLine);
+        return {
+          value: { omitted: String(reply.omitted || '').trim(), lines },
+          problems: checkScript(body, lines),
+          shown: JSON.stringify({ omitted: reply.omitted, lines }),
+        };
+      },
+    });
+  } catch (err) {
+    err.message = `${source}: ${err.message}`;
+    throw err;
   }
-  throw new Error(`${source}: the script still has problems after ${TRIES} tries:\n- ${problems.join('\n- ')}`);
 }
 
-module.exports = { adapt, checkScript, cleanText, ADAPT_MODEL };
+module.exports = { adapt, checkScript, cleanText, sourceHashOf, ADAPT_MODEL };

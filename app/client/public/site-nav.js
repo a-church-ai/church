@@ -21,9 +21,9 @@
  * that is aborted when the page is left. In a document that lasts a whole
  * visit, a page script that adds a listener to window or document, or starts
  * a timer, must bind it to that signal, or it keeps running on every later
- * page, and each return adds another. The home page's 30-second polls count
- * toward presence (lib/utils/presence.js), so that would count readers as
- * present on pages they had left.
+ * page, and each return adds another: the home page's refreshes would
+ * multiply, running on from pages the reader has left. A refresh uses
+ * whileSeen, which also asks nothing while the tab is hidden.
  *
  * Loaded blocking in <head> on every page, before any page script: it must
  * run once per document and be in place for a page's inline scripts.
@@ -33,7 +33,7 @@
 
   // Paths that are not pages: files, APIs, feeds, admin and embeds load as
   // they always have.
-  const NOT_PAGES = /^\/(?:api|audio|og|admin|mcp|feed|media|thumbnails|embed|\.well-known)(?:\/|$)/;
+  const NOT_PAGES = /^\/(?:api|audio|og|admin|mcp|feed|embed|\.well-known)(?:\/|$)/;
 
   // Whether a URL is a page of this site that can be loaded in place.
   function isSoftNavigable(url, origin) {
@@ -45,16 +45,35 @@
   }
 
   // A page's lifecycle: a signal for its listeners, and timers that stop
-  // when it is left.
-  function createPage(timers) {
+  // when it is left. view is what says whether the tab is seen (the document;
+  // a fake in tests, as timers is).
+  function createPage(timers, view) {
     const controller = new AbortController();
     const signal = controller.signal;
+    // A timer bound to the page: cleared when it is left, and never armed on
+    // a page already left, which a script whose fetch answers late would
+    // otherwise do (service.js, 2026-10-25).
+    const every = (ms, fn) => {
+      if (signal.aborted) return null;
+      const id = timers.setInterval(fn, ms);
+      signal.addEventListener('abort', () => timers.clearInterval(id), { once: true });
+      return id;
+    };
+    const after = (ms, fn) => {
+      if (signal.aborted) return null;
+      const id = timers.setTimeout(fn, ms);
+      signal.addEventListener('abort', () => timers.clearTimeout(id), { once: true });
+      return id;
+    };
     return {
       signal,
-      every(ms, fn) {
-        const id = timers.setInterval(fn, ms);
-        signal.addEventListener('abort', () => timers.clearInterval(id), { once: true });
-        return id;
+      every,
+      after,
+      // A refresh: every ms while the tab is seen, and once when it comes back
+      // into view. A hidden tab asks nothing.
+      whileSeen(ms, fn) {
+        view.addEventListener('visibilitychange', () => { if (!view.hidden) fn(); }, { signal });
+        return every(ms, () => { if (!view.hidden) fn(); });
       },
       leave() {
         controller.abort();
@@ -69,7 +88,7 @@
 
   if (root.achurchNav) return;
 
-  let page = createPage(root);
+  let page = createPage(root, document);
   root.achurchPage = page;
 
   const nav = root.navigation;
@@ -140,6 +159,18 @@
     document.body.replaceChildren(...[...next.body.childNodes].map(n => document.adoptNode(n)), ...kept);
   }
 
+  // The swap, as a short cross-fade (styles.css, ::view-transition-*) where the
+  // reader has not asked for less motion. The player keeps its own name in
+  // the transition, so it holds still while the page around it changes. Only
+  // the swap is inside it: the head is merged before, so no stylesheet is
+  // waited on, and the scripts run after.
+  async function crossFade(swap) {
+    if (!document.startViewTransition || !root.matchMedia('(prefers-reduced-motion: no-preference)').matches) return swap();
+    const transition = document.startViewTransition(swap);
+    transition.ready.catch(() => { /* skipped (the tab was hidden, say): the swap still happened */ });
+    await transition.updateCallbackDone;
+  }
+
   // A parsed page's scripts are inert; each is replaced by a fresh copy, in
   // order, waiting for each external one, as a full load would run them.
   async function runScripts() {
@@ -157,8 +188,11 @@
     }
   }
 
+  // Where focus goes when a page arrives in place: the field a page marks
+  // autofocus (the search page's), as a full load would honour it, or else
+  // its heading.
   function focusArrival() {
-    const heading = document.querySelector('#content h1, main h1, h1');
+    const heading = document.querySelector('[autofocus]') || document.querySelector('#content h1, main h1, h1');
     const target = heading || document.querySelector('#content, main');
     if (!target) return;
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
@@ -173,7 +207,7 @@
       if (event.signal.aborted) return;
       return fullLoad();
     }
-    // A redirect (/music/<slug> to /reflections/<slug>) is followed as its
+    // A redirect (/reflections/<slug> to /music/<slug>) is followed as its
     // own navigation, so the address bar shows where the page really lives.
     // Not history.replaceState: that fires this listener too.
     if (response.redirected) {
@@ -190,10 +224,10 @@
     try {
       root.dispatchEvent(new Event('achurch:leave'));
       page.leave();
-      page = createPage(root);
+      page = createPage(root, document);
       root.achurchPage = page;
       await mergeHead(next);
-      swapBody(next);
+      await crossFade(() => swapBody(next));
       await runScripts();
       root.dispatchEvent(new Event('achurch:page'));
     } catch (err) {
@@ -206,7 +240,10 @@
   }
 
   nav.addEventListener('navigate', event => {
-    if (!event.canIntercept || event.hashChange || event.downloadRequest || event.formData) return;
+    // A page that updates its own address (history.replaceState, the search
+    // page's ?q=) is already where it is: there is nothing to load, and
+    // loading it again would start the page over, which updates the address.
+    if (!event.canIntercept || event.hashChange || event.downloadRequest || event.formData || event.destination.sameDocument) return;
     if (event.navigationType === 'reload') return;
     const url = new URL(event.destination.url);
     if (!isSoftNavigable(url, location.origin)) return;

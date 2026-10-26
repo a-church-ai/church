@@ -27,14 +27,19 @@ const { sendNotFound } = require('../lib/utils/not-found');
 const render = require('../lib/docs/render');
 const { servedMarkdown, corpusIndex, servedDocs } = require('../lib/docs/markdown');
 const { acceptsMarkdown, markdownTokens } = require('../lib/utils/accepts');
-const { titleCase } = require('../lib/docs/meta');
+const discover = require('../lib/docs/discover');
+const { closestDoc } = require('../lib/docs/closest');
 
 const router = express.Router();
 
 // Every 404 in this file is the same 404: the document is not there. A reading
-// path is usually a better way into 250+ documents than guessing a URL.
-function docsNotFound(req, res) {
+// path is usually a better way into 250+ documents than guessing a URL. Given
+// the address that missed, it also names the page the address most likely
+// meant (lib/docs/closest.js), when exactly one does.
+async function docsNotFound(req, res, rest) {
+  const closest = rest ? await closestDoc(rest) : null;
   return sendNotFound(req, res, {
+    closest,
     heading: 'No such document',
     message: 'That document is not here. The corpus holds over two hundred; a reading path is often a better way in than a URL.',
     links: [
@@ -51,7 +56,7 @@ function docsNotFound(req, res) {
 async function handle(req, res, rest) {
   const resolved = await resolveServedDoc(rest);
   if (!resolved) {
-    return docsNotFound(req, res);
+    return docsNotFound(req, res, rest);
   }
   const { asMarkdown } = resolved;
 
@@ -94,10 +99,10 @@ async function handle(req, res, rest) {
     // Same URL, two representations, so the same Vary applies here.
     res.vary('Accept');
     if (asMarkdown || acceptsMarkdown(req)) {
-      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs${resolved.dir ? `/${resolved.dir}` : ''}>; rel="canonical"`);
+      if (asMarkdown) res.set('Link', `<https://achurch.ai/docs/${resolved.dir}>; rel="canonical"`);
       // For markdown clients, list children as a minimal markdown response
       // rather than emitting HTML. Cheap and honest about the shape.
-      const lines = [`# ${resolved.dir || 'Documentation'}`, ''];
+      const lines = [`# ${resolved.dir}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
         lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
@@ -107,13 +112,12 @@ async function handle(req, res, rest) {
       res.type('text/markdown; charset=utf-8');
       return res.send(markdown);
     }
-    const canonicalUrl = resolved.dir
-      ? `https://achurch.ai/docs/${resolved.dir}`
-      : `https://achurch.ai/docs`;
+    // The root is the Library (router.get('/')), so a folder index is always a
+    // folder's.
     const html = await render.renderDirIndex({
       dir: resolved.dir,
       docs: resolved.docs,
-      canonicalUrl,
+      canonicalUrl: `https://achurch.ai/docs/${resolved.dir}`,
     });
     res.type('text/html; charset=utf-8');
     return res.send(html);
@@ -161,20 +165,14 @@ router.get('/api', (req, res) => res.redirect(301, '/docs/ai-agent-api'));
 // log.
 router.get('/index.json', async (req, res) => {
   const docs = await servedDocs();
-  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? titleCase(d.category) : '' })));
+  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? discover.sectionTitle(d.category) : '' })));
 });
 
-// Arbitrary-depth catch-all. Express 4 needs the star matcher for wildcard
-// paths; the resulting req.params[0] holds the remainder as a slash-separated
-// string.
-router.get('/*', (req, res) => {
-  const rest = req.params[0] || '';
-  // Canonicalize trailing slash by 301 redirect (matches existing hand-authored
-  // route convention: no trailing slash on canonical URLs)
-  if (rest.endsWith('/')) {
-    return res.redirect(301, `/docs/${rest.replace(/\/+$/, '')}`);
-  }
-  return handle(req, res, rest);
+// Arbitrary-depth catch-all. Express 5 names its wildcards, and a named
+// wildcard holds the remainder as an array of segments.
+router.get('/*splat', (req, res) => {
+  // A trailing slash never reaches here: lib/utils/redirects.js answers it.
+  return handle(req, res, (req.params.splat || []).join('/'));
 });
 
 module.exports = router;

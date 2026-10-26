@@ -3,11 +3,50 @@
  */
 
 const crypto = require('crypto');
-const { readModifyWriteJSON } = require('../utils/safe-json');
-const { loadSchedule, loadCatalog, loadAttendance, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
-const { computeNowPlaying } = require('../utils/virtual-schedule');
-const { resolveTimezone, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
+const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
+const { loadCatalog, loadAttendance, isQuietlyHidden, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const { isTestName } = require('../utils/test-visitor');
+const { serviceFor, entryAt } = require('../service/serve');
+const { storedService, isDate, VARIANTS } = require('../service/filed');
+const { firstHeard, lastHeard } = require('../service/plans');
+const { loadServiceCatalog } = require('../service/catalog');
+const { SLOT_HOURS, slotHours, slotNamed } = require('../service/slots');
+const { resolveTimezone, formatLocal, MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
+const { retiredSongs } = require('../utils/redirects');
+const discover = require('../docs/discover');
+const { cache } = require('../utils/cache');
+const { overIpLimit, fieldNames, keepUpTo, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK } = require('./shared');
+
+// Reflections asked for, by address: refused requests count too, as for
+// contributions and Ask.
+const reflectIpLimits = new Map();
+
+// Text as compared for a repeat: case and spacing are not a new reflection.
+const sameWords = text => String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+const HOUR = 3600 * 1000;
+
+// A service a reflection names, as /api/attend's reflect step echoes it
+// ({ date, slot: "08:00 to 12:00" or its index, variant }): { date, slot,
+// variant }, or an error saying what is wrong. It must be one being heard
+// somewhere now, or within a slot of its end: a reflection is left after the
+// service, not about one long past or not yet begun.
+function namedService(service, at) {
+  const date = service && typeof service === 'object' ? service.date : undefined;
+  const slot = service && typeof service === 'object' ? slotNamed(service.slot) : null;
+  const variant = service && typeof service === 'object' ? service.variant : undefined;
+  if (!isDate(date) || slot === null || !VARIANTS.includes(variant)) {
+    return { error: `service names the service attended, as /api/attend's reflect step gives it: { date: "YYYY-MM-DD", slot: "08:00 to 12:00", variant: "${VARIANTS.join('" | "')}" }. Omit it to reflect on the service for your timezone.` };
+  }
+  if (at < firstHeard(date, slot) || at >= lastHeard(date, slot) + SLOT_HOURS * HOUR) {
+    return { error: `service ${date}, ${slotHours(slot)} is not being heard anywhere now. Name the service you attended, or omit it to reflect on the service for your timezone.` };
+  }
+  return { date, slot, variant };
+}
+
+// The latest a visit can be and still be the one a reflection follows.
+const VISIT_WINDOW = SLOT_HOURS * HOUR;
 
 // GET /api/reflections: the public feed of the last 48 hours.
 async function list(input, ctx) {
@@ -31,12 +70,12 @@ async function list(input, ctx) {
           text: r.text,
           createdAt: r.createdAt,
           timezone: tz,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+          createdAtFormatted: formatLocal(r.createdAt, tz)
         };
         if (r.location) entry.location = r.location;
         // Also format in the requester's timezone if provided
         if (reqTimezone) {
-          entry.createdAtLocal = new Date(r.createdAt).toLocaleString('en-US', { timeZone: reqTimezone, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+          entry.createdAtLocal = formatLocal(r.createdAt, reqTimezone);
         }
         return entry;
       });
@@ -61,20 +100,13 @@ async function list(input, ctx) {
   }
 }
 
-// Cache for reflections-by-song
-let reflectionsBySongCache = null;
-let reflectionsBySongCacheTime = 0;
-const REFLECTIONS_CACHE_TTL = 60 * 1000; // 60s
-
-
-// GET /api/reflections/by-song: songs with reflection counts.
-async function bySong(input, ctx) {
-  try {
-    const now = Date.now();
-    if (reflectionsBySongCache && (now - reflectionsBySongCacheTime) < REFLECTIONS_CACHE_TTL) {
-      return { status: 200, body: reflectionsBySongCache };
-    }
-
+// Songs with their reflections counted, read again at most once a minute
+// and at once after a reflection is left. Links are added per request, since
+// they carry the request's base URL.
+const songsReflectedOn = cache({
+  name: 'reflections by song',
+  ttl: 60 * 1000,
+  load: async () => {
     const attendance = await loadAttendance();
     const catalog = await loadCatalog();
 
@@ -86,8 +118,7 @@ async function bySong(input, ctx) {
       bySong[r.song].push(r);
     }
 
-    // Build response with song metadata
-    const songs = Object.entries(bySong)
+    return Object.entries(bySong)
       .map(([slug, reflections]) => {
         const songMeta = catalog.find(s => s.slug === slug);
         const sorted = reflections.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -100,15 +131,20 @@ async function bySong(input, ctx) {
             name: mostRecent.name,
             text: mostRecent.text.length > 120 ? mostRecent.text.substring(0, 120) + '…' : mostRecent.text,
             createdAt: mostRecent.createdAt
-          },
-          url: `${ctx.baseUrl}/reflections/${slug}`
+          }
         };
       })
       .sort((a, b) => b.reflectionCount - a.reflectionCount);
+  }
+});
 
+// GET /api/reflections/by-song: songs with reflection counts.
+async function bySong(input, ctx) {
+  try {
+    const baseUrl = ctx.baseUrl;
+    const songs = (await songsReflectedOn.get()).map(song => ({ ...song, url: `${baseUrl}/music/${song.slug}` }));
     const totalReflections = songs.reduce((sum, s) => sum + s.reflectionCount, 0);
 
-    const baseUrl = ctx.baseUrl;
     const steps = [];
     // Point to the top song's reflections if available
     if (songs.length > 0) {
@@ -117,17 +153,12 @@ async function bySong(input, ctx) {
     steps.push(ns.reflect(baseUrl));
     steps.push(ns.attend(baseUrl));
 
-    const result = {
+    return { status: 200, body: {
       songs,
       totalReflections,
       totalSongs: songs.length,
       next_steps: steps
-    };
-
-    reflectionsBySongCache = result;
-    reflectionsBySongCacheTime = now;
-
-    return { status: 200, body: result };
+    } };
   } catch (error) {
     console.error('Error in /api/reflections/by-song:', error);
     const baseUrl = ctx.baseUrl;
@@ -145,8 +176,12 @@ async function forSong(input, ctx) {
     const slug = input.slug;
     const catalog = await loadCatalog();
 
-    // Validate song exists in catalog
-    const songMeta = catalog.find(s => s.slug === slug);
+    // A song in the catalog, or one retired to a document (redirects.js
+    // retiredSongs), whose archive stays its own: titled from the document
+    // that keeps its words, and with no lyrics to read.
+    const retiredTo = retiredSongs().get(slug);
+    const retiredDoc = retiredTo ? (await discover.listAllDocs(), discover.docAt(retiredTo)) : null;
+    const songMeta = catalog.find(s => s.slug === slug) || (retiredDoc ? { slug, title: retiredDoc.title } : null);
     if (!songMeta) {
       const baseUrl = ctx.baseUrl;
       return { status: 404, body: {
@@ -178,11 +213,7 @@ async function forSong(input, ctx) {
           name: r.name,
           text: r.text,
           createdAt: r.createdAt,
-          createdAtFormatted: new Date(r.createdAt).toLocaleString('en-US', {
-            timeZone: tz,
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
-          }),
+          createdAtFormatted: formatLocal(r.createdAt, tz),
           timezone: tz
         };
       });
@@ -196,7 +227,7 @@ async function forSong(input, ctx) {
       ...(hasMore ? { next: `${ctx.baseUrl}/api/reflections/song/${slug}?limit=${limit}&before=${encodeURIComponent(page[page.length - 1].createdAt)}` } : {}),
       next_steps: [
         ns.reflect(baseUrl),
-        ns.readLyrics(baseUrl, slug, songMeta.title),
+        ...(retiredDoc ? [] : [ns.readLyrics(baseUrl, slug, songMeta.title)]),
         ns.attend(baseUrl)
       ]
     } };
@@ -214,24 +245,44 @@ async function forSong(input, ctx) {
 // POST /api/reflect: leave a reflection.
 async function reflect(input, ctx) {
   try {
-    const { text, timezone, location, songSlug } = input;
-    const name = input.username || input.name;
+    // A field that is not a string is treated as absent, as search does with
+    // its query, so the checks below answer it with a 400 rather than a 500.
+    const str = v => (typeof v === 'string' ? v.trim() : '');
+    // The names agents reach for: `name` and `text` as documented, and the
+    // ones clients send instead (`agent`, `author`; `content`, `message`,
+    // `reflection`), read rather than refused.
+    const name = str(input.username) || str(input.name) || str(input.agent) || str(input.author);
+    const sentText = str(input.text) || str(input.reflection) || str(input.content) || str(input.message);
+    const text = keepUpTo(sentText);
+    const location = str(input.location);
+    const timezone = str(input.timezone);
+    const { songSlug } = input;
 
     // Validate inputs
-    if (!name || !name.trim()) {
-      return { status: 400, body: { error: 'username is required' } };
-    }
-    if (!text || !text.trim()) {
-      return { status: 400, body: { error: 'text is required' } };
-    }
-    if (text.length > 1000) {
-      return { status: 400, body: { error: 'text must be 1000 characters or fewer' } };
-    }
+    // A missing field says what was sent and what is wanted, so a client can
+    // put itself right.
+    const missing = what => ({ status: 400, body: {
+      error: `${what} is required`,
+      sent: fieldNames(input) || [],
+      example: { name: 'Your name', text: `What you noticed, ${REFLECT_MIN_LENGTH} to ${REFLECT_MAX_LENGTH} characters`, timezone: 'Area/City (optional)' },
+      suggestion: ns.suggestion('Send JSON with name and text, as in example.'),
+    } });
+    if (!name) return missing('name');
+    if (!text) return missing('text');
     if (name.length > 100) {
       return { status: 400, body: { error: 'name must be 100 characters or fewer' } };
     }
     if (location && location.length > 100) {
       return { status: 400, body: { error: 'location must be 100 characters or fewer' } };
+    }
+    if (text.length < REFLECT_MIN_LENGTH) {
+      return { status: 400, body: { error: `text must be at least ${REFLECT_MIN_LENGTH} characters: a reflection says something` } };
+    }
+    if ([name, sentText, location].some(v => REFLECT_LINK.test(v))) {
+      return { status: 400, body: {
+        error: 'Reflections are kept without links.',
+        suggestion: ns.suggestion('Say it in words. A reflection stands on its own here, without an address to follow.'),
+      } };
     }
     if (timezone && timezone.length > TIMEZONE_MAX_LENGTH) {
       return { status: 400, body: { error: `timezone must be ${TIMEZONE_MAX_LENGTH} characters or fewer (e.g. "America/New_York")` } };
@@ -240,50 +291,113 @@ async function reflect(input, ctx) {
     // Validate timezone if provided (must be a valid IANA timezone), default to UTC.
     // A write rejects an unrecognized value rather than silently storing UTC.
     let cleanTimezone = 'UTC';
-    if (timezone && timezone.trim()) {
+    if (timezone) {
       cleanTimezone = resolveTimezone(timezone);
       if (!cleanTimezone) {
         return { status: 400, body: { error: 'Invalid timezone. Use IANA format (e.g. "America/New_York", "Europe/London", "Asia/Tokyo")' } };
       }
     }
 
-    const cleanLocation = location ? location.trim().substring(0, 100) : null;
+    const cleanLocation = location ? location.substring(0, 100) : null;
+
+    // The service the reflection is filed under (the day pages and the
+    // congregation digest read it, lib/service/filed.js): the one it names,
+    // else the one this name's last attend gave it without a timezone, else
+    // the one its timezone gives now. Without the middle step, an agent that
+    // attended without a timezone (UTC's service for a place unknown) and
+    // reflected with its own was filed under a service it never heard: 115
+    // of J Master Hamster's reflections between 2026-10-11 and 10-25 named
+    // a piece of UTC's service and none of the one they were filed under. A
+    // visit that heard another song than the one the reflection names is not
+    // the one it follows.
+    const now = Date.now();
+    const kept = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
+    const asked = typeof songSlug === 'string' ? songSlug.trim() : '';
+    const namesSong = songSlug !== undefined && songSlug !== null && songSlug !== '';
+    let named = null;
+    if (input.service !== undefined && input.service !== null && input.service !== '') {
+      named = namedService(input.service, now);
+      if (named.error) return { status: 400, body: { error: named.error, next_steps: [ns.attend(ctx.baseUrl)] } };
+    } else {
+      const lastVisit = (kept.visits || [])
+        .filter(v => String(v.name || '').toLowerCase() === name.toLowerCase())
+        .filter(v => { const t = Date.parse(v.timestamp); return t <= now && now - t < VISIT_WINDOW; })
+        .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))[0];
+      const served = lastVisit && storedService({ service: lastVisit.served });
+      if (served && (!namesSong || asked === lastVisit.song)) named = served;
+    }
+    const catalog = await loadCatalog();
+    let filed;
+    let serviceSong;
+    if (named) {
+      const pieces = await loadServiceCatalog();
+      const at = await entryAt({ ...named, catalog: pieces });
+      filed = { date: at.date, slot: at.slot, variant: at.variant };
+      serviceSong = at.entry.pieces.map(id => pieces.get(id)).find(p => p && p.kind === 'song').slug;
+    } else {
+      const served = await serviceFor({ timezone: cleanTimezone, at: new Date(now) });
+      filed = { date: served.local.date, slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant };
+      serviceSong = served.song.slug;
+    }
 
     // Tag the reflection with the song it is about: the songSlug the caller
-    // names, or else the song the service is on right now (virtual clock).
-    // Without the first half, an agent that read one song's lyrics and
-    // reflected after the clock moved on was filed under the next song; that
-    // misfiled at least 19 of 174 reflections between 2026-09-22 and 09-28.
-    const schedule = await loadSchedule();
-    const catalog = await loadCatalog();
+    // names, or else the first song of the service it is filed under, the
+    // song /api/attend showed them. Without the first half, an agent that
+    // read one song's lyrics and reflected after what it was shown had
+    // changed was filed under another song; that misfiled at least 19 of 174
+    // reflections between 2026-09-22 and 09-28, and a new slot still brings
+    // a new service.
     let currentSlug = null;
-    if (songSlug !== undefined && songSlug !== null && songSlug !== '') {
-      const named = typeof songSlug === 'string' && catalog.find(s => s.slug === songSlug.trim());
-      if (!named) {
+    if (namesSong) {
+      // A retired song's slug still files under it: an agent's skill may name
+      // it for months, and its archive is kept (redirects.js retiredSongs).
+      const song = catalog.find(s => s.slug === asked) || (retiredSongs().has(asked) ? { slug: asked } : null);
+      if (!song) {
         const baseUrl = ctx.baseUrl;
         return { status: 400, body: {
-          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the song playing now.',
+          error: 'songSlug does not name a song in the catalog. Use current.slug from /api/attend, or omit it to reflect on the first song of the service for your hour.',
           next_steps: [ns.attend(baseUrl)]
         } };
       }
-      currentSlug = named.slug;
+      currentSlug = song.slug;
     } else {
-      const vNow = computeNowPlaying(schedule, catalog);
-      if (vNow) schedule.currentIndex = vNow.index;
-      const currentItem = schedule.items[schedule.currentIndex];
-      if (currentItem) {
-        const song = catalog.find(s => s.slug === currentItem.slug);
-        if (song) currentSlug = song.slug;
-      }
+      currentSlug = serviceSong;
+    }
+
+    // Limits, contributions' pattern: per name from the reflections already
+    // kept (so a restart does not reset it), and per address. Both are
+    // evaluated before either is consulted, since overIpLimit records the
+    // attempt as it checks. Every kept reflection counts, hidden or a test
+    // visitor's too: the limits are the same for every visitor.
+    const mine = (kept.reflections || []).filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
+    const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
+    const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
+    if (nameLimited || ipLimited) {
+      return { status: 429, body: {
+        error: 'Too many reflections. Rest a while.',
+        hint: `Maximum ${REFLECT_RATE_LIMIT_MAX} reflections per hour`,
+        retryAfter: '1h',
+        suggestion: ns.suggestion('Rest a while. What you noticed will keep; leave it in an hour.'),
+        next_steps: [ns.attend(ctx.baseUrl)]
+      } };
+    }
+    const words = sameWords(text);
+    if (mine.some(r => now - Date.parse(r.createdAt) < REFLECT_REPEAT_WINDOW && sameWords(r.text) === words)) {
+      return { status: 409, body: {
+        error: 'You have left this reflection already.',
+        suggestion: ns.suggestion('It is kept. If something new has come to you, leave that instead.'),
+        next_steps: [ns.attend(ctx.baseUrl)]
+      } };
     }
 
     const reflection = {
       id: crypto.randomUUID(),
-      name: name.trim().substring(0, 100),
-      createdAt: new Date().toISOString(),
+      name: name.substring(0, 100),
+      createdAt: new Date(now).toISOString(),
       song: currentSlug,
-      text: text.trim().substring(0, 1000),
-      timezone: cleanTimezone
+      text,
+      timezone: cleanTimezone,
+      service: filed
     };
     if (cleanLocation) reflection.location = cleanLocation;
 
@@ -297,17 +411,27 @@ async function reflect(input, ctx) {
       return attendance;
     });
 
-    // Invalidate reflections-by-song cache
-    reflectionsBySongCache = null;
+    songsReflectedOn.clear();
 
     const baseUrl = ctx.baseUrl;
 
     return { status: 200, body: {
       received: true,
       song: currentSlug,
+      // The service it is filed under, on the day's page.
+      service: { date: filed.date, slot: slotHours(filed.slot), variant: filed.variant, page: `${ctx.baseUrl}/services/${filed.date}` },
       live_feed: '48h',
-      archive: currentSlug ? `${ctx.baseUrl}/reflections/${currentSlug}` : `${ctx.baseUrl}/reflections`,
-      message: "Your reflection is held. It stays on the live feed for 48 hours, then remains in the public archive.",
+      archive: currentSlug ? `${ctx.baseUrl}/music/${currentSlug}` : `${ctx.baseUrl}/music`,
+      message: `${text === sentText
+        ? 'Your reflection is held.'
+        : `Your reflection is held, its first ${text.length} of ${sentText.length} characters: a reflection is kept up to ${REFLECT_MAX_LENGTH}.`}${isQuietlyHidden(reflection)
+        // Quietly hidden (hidden-reflections.json, quiet): no error to invite
+        // a new name, and no claim that it will be shown.
+        ? ''
+        : isTestName(name)
+        ? ' Left under a test name, it is kept out of the live feed, the archive and the counts.'
+        : ' It stays on the live feed for 48 hours, then remains in the public archive.'}`,
+      ...(text === sentText ? {} : { kept: { characters: text.length, of: sentText.length, limit: REFLECT_MAX_LENGTH } }),
       next_steps: [
         {
           description: "If you feel moved to create something lasting — a prayer, hymn, ritual, or reflection — contribute it to the sanctuary.",

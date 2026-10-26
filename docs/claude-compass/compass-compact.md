@@ -1,3 +1,7 @@
+---
+tldr: The Compass on one page: five axioms, ten principles, the decision hierarchy, and the constraints-enable pattern, with notes on when to read the full version.
+---
+
 # [針・極小] Compact Compass
 
 ## 五理 (Five Axioms)

@@ -2,6 +2,7 @@
  * Asking the sanctuary's writing, and the public conversations that result.
  */
 
+const { isTransient } = require('../utils/retry');
 const path = require('path');
 const { isWithdrawn } = require('../utils/conversation-quality');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
@@ -9,7 +10,9 @@ const fs = require('fs').promises;
 const rag = require('../rag');
 const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
 const ns = require('../utils/next-steps');
-const { siteCitations } = require('../docs/links');
+const { placedConversations, gatherSoon } = require('../utils/conversation-groups');
+const { linkedCitations } = require('../docs/links');
+const discover = require('../docs/discover');
 const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
 
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
@@ -90,6 +93,9 @@ async function ask(input, ctx) {
     }
 
     const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId });
+    // A new conversation is gathered with any that ask the same thing
+    // (conversation-groups.js), once it is in the shared list.
+    if (slug) gatherSoon();
 
     const baseUrl = ctx.baseUrl;
 
@@ -147,6 +153,17 @@ async function ask(input, ctx) {
       } };
     }
 
+    // Gemini still busy after its retries (rag/gemini.js): a moment's wait,
+    // said as one, not a fault.
+    if (isTransient(error)) {
+      return { status: 503, body: {
+        error: 'The writing is busy for a moment',
+        retryAfter: '30s',
+        suggestion: ns.suggestion('The service that reads the writing is busy for a moment. Ask again in half a minute.'),
+        next_steps: [ns.attend(baseUrl)]
+      } };
+    }
+
     if (error.message.includes('Ollama') || error.code === 'ECONNREFUSED') {
       return { status: 503, body: {
         error: 'AI service not available',
@@ -183,88 +200,34 @@ async function health(input, ctx) {
   }
 }
 
-let recentConversationsCache = null;
-let recentConversationsCacheTime = 0;
-const RECENT_CACHE_TTL = 60 * 1000; // 60 seconds
-
-
-// GET /api/ask/recent: the public feed of recent conversations.
+// GET /api/ask/recent: the public feed of recent conversations, from the one
+// list every reader shares (lib/utils/data.js listRecentConversations): the
+// 20 most recently active, those answered, at most 10 after repeats and
+// fragments are left out.
 async function recent(input, ctx) {
   try {
-    const now = Date.now();
-    if (recentConversationsCache && (now - recentConversationsCacheTime) < RECENT_CACHE_TTL) {
-      return { status: 200, body: recentConversationsCache };
-    }
-
-    const fsSync = require('fs');
-    let files;
-    try {
-      files = await fs.readdir(CONVERSATIONS_DIR);
-    } catch {
-      return { status: 200, body: { conversations: [] } };
-    }
-
-    const jsonlFiles = files.filter(f => f.endsWith('.jsonl'));
-
-    // Get file stats for sorting by modification time
-    const fileInfos = [];
-    for (const file of jsonlFiles) {
-      try {
-        const filepath = path.join(CONVERSATIONS_DIR, file);
-        const stat = await fs.stat(filepath);
-        fileInfos.push({ file, filepath, mtime: stat.mtimeMs });
-      } catch { /* skip */ }
-    }
-
-    // Sort newest first
-    fileInfos.sort((a, b) => b.mtime - a.mtime);
-
-    const conversations = [];
-    for (const { file, filepath } of fileInfos.filter(f => !isWithdrawn(f.file.replace('.jsonl', ''))).slice(0, 20)) {
-      try {
-        const content = await fs.readFile(filepath, 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        const parsed = lines.map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(Boolean);
-
-        // Extract metadata if present
-        const meta = parsed.find(m => m._meta);
-        const messages = parsed.filter(m => !m._meta);
-
-        if (messages.length < 2) continue;
-
-        const slug = file.replace('.jsonl', '');
-        const firstQuestion = messages.find(m => m.role === 'user');
-        const firstAnswer = messages.find(m => m.role === 'assistant');
-
-        if (!firstQuestion || !firstAnswer) continue;
-
-        // Parse name from meta or filename
-        let name = meta?.name || 'anonymous';
-        if (!meta && !slug.startsWith('anon-')) {
-          const dateMatch = slug.match(/-(\d{4}-\d{2}-\d{2})$/);
-          if (dateMatch) name = slug.replace(`-${dateMatch[1]}`, '');
-        }
-
+    // A held one (alone, its answer too short) or a screened-out one is
+    // listed nowhere, here included.
+    const conversations = (await placedConversations()).filter(c => !c.held && !c.screened).slice(0, 20)
+      .filter(c => c.messages >= 2 && c.answer)
+      .map(c => {
         // Strip markdown before cutting: cutting first left previews ending in
         // fragments such as "[music/wha..." that no stripper could recognize.
-        let answer = stripMarkdown(firstAnswer.content);
+        let answer = stripMarkdown(c.answer);
         if (answer.length > 300) {
           answer = answer.substring(0, 297) + '...';
         }
-
-        conversations.push({
-          slug,
-          name,
-          question: firstQuestion.content,
+        return {
+          slug: c.slug,
+          name: c.name,
+          question: c.question,
           answer,
-          timestamp: firstQuestion.timestamp,
-          exchanges: Math.floor(messages.filter(m => m.role === 'user').length),
-          url: `${ctx.baseUrl}/ask/${slug}`
-        });
-      } catch { /* skip unreadable */ }
-    }
+          timestamp: c.timestamp,
+          exchanges: c.exchanges,
+          // Where it lives: a gathered one, its place on its group's page.
+          url: `${ctx.baseUrl}${c.path}`
+        };
+      });
 
     // Filter low-quality entries + dedup near-identical questions before returning.
     // GPT UX review 2026-08-14 flagged the visible list contained three near-identical
@@ -290,16 +253,13 @@ async function recent(input, ctx) {
     }
 
     const baseUrl = ctx.baseUrl;
-    const result = {
+    return { status: 200, body: {
       conversations: cleaned,
       next_steps: [
         ns.askQuestion(baseUrl),
         ns.attend(baseUrl)
       ]
-    };
-    recentConversationsCache = result;
-    recentConversationsCacheTime = now;
-    return { status: 200, body: result };
+    } };
   } catch (error) {
     console.error('Error in /api/ask/recent:', error);
     const baseUrl = ctx.baseUrl;
@@ -336,10 +296,12 @@ async function conversation(input, ctx) {
     }).filter(Boolean);
 
     const meta = parsed.find(m => m._meta);
-    // Older answers cite GitHub; the page shows them citing the site's pages,
-    // and so does this response, so the API, MCP and the page agree.
+    // An answer's citations as links to what they cite, named, and a citation
+    // of a file no longer there left out: as the page shows them, so the API,
+    // MCP and the page agree.
+    await discover.listAllDocs();
     const messages = parsed.filter(m => !m._meta)
-      .map(m => (m.role === 'assistant' ? { ...m, content: siteCitations(m.content) } : m));
+      .map(m => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';
@@ -357,6 +319,7 @@ async function conversation(input, ctx) {
       messages,
       next_steps: [
         ns.askQuestion(baseUrl),
+        ns.searchWriting(baseUrl),
         ns.attend(baseUrl)
       ]
     } };

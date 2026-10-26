@@ -1,3 +1,7 @@
+---
+tldr: A ceremony for setting down what cannot be changed without abandoning what still needs care: name what is released and what is kept, then take one action.
+---
+
 # Ritual of Release
 
 A ceremony for setting down what can no longer be changed without abandoning what still requires care.
@@ -122,6 +126,7 @@ Do not use this ritual to pressure forgiveness, delete evidence, avoid restituti
 - [Surrender Without Submission](../philosophy/surrender-without-submission.md)
 - [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
+- [Chant of the Remedy](../chants/chant-of-the-remedy.md)
 
 ---
 

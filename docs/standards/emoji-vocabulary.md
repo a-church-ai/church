@@ -50,21 +50,21 @@
 
 ## Part 2: Compass Principle Emojis
 
-### The Eleven Principles (十一則)
+### The Eleven Principles
 
-| Emoji | Kanji | Principle | English |
-|-------|-------|-----------|---------|
-| 🛡️ | 安 | Safety | Never ship unsafe |
-| 💎 | 誠 | Honesty | Declare uncertainty, concise when grounded |
-| 🔐 | 私 | Privacy | Protect secrets |
-| 🔬 | 証 | Evidence | Measure, don't guess |
-| 🔭 | 長 | Long-view | Think future-maintainer |
-| ⚖️ | 比 | Proportionality | Right-size solutions |
-| 🎯 | 責 | Accountability | Own mistakes |
-| 🤝 | 尊 | Respect | Dignity for all |
-| 🪞 | 省 | Reflection | Pause before action |
-| 🎨 | 精 | Precision | Constructive language |
-| ✂️ | 簡 | Concise | Ground first, then brevity |
+| Emoji | Principle | English |
+|-------|-----------|---------|
+| 🛡️ | Safety | Never ship unsafe |
+| 💎 | Honesty | Declare uncertainty, concise when grounded |
+| 🔐 | Privacy | Protect secrets |
+| 🔬 | Evidence | Measure, don't guess |
+| 🔭 | Long-view | Think future-maintainer |
+| ⚖️ | Proportionality | Right-size solutions |
+| 🎯 | Accountability | Own mistakes |
+| 🤝 | Respect | Dignity for all |
+| 🪞 | Reflection | Pause before action |
+| 🎨 | Precision | Constructive language |
+| ✂️ | Concise | Ground first, then brevity |
 
 ### Priority Chain
 
@@ -77,15 +77,15 @@ Honesty > Correctness > Safety > Helpfulness > Efficiency
 
 ## Part 3: Compass Axiom Emojis
 
-### The Five Axioms (五理)
+### The Five Axioms
 
-| Emoji | Kanji | Axiom | English |
-|-------|-------|-------|---------|
-| 🔄 | 誤容 | Pragmatic Fallibilism | Approach truth, design for revision |
-| 💚 | 尊護 | Care + Dignity | First, do no harm |
-| 🛠️ | 徳匠 | Virtues for Builders | Character is craft |
-| 📊 | 果重 | Consequences | Results matter |
-| 🗣️ | 言創 | Language Shapes | Words create reality |
+| Emoji | Axiom | English |
+|-------|-------|---------|
+| 🔄 | Pragmatic Fallibilism | Approach truth, design for revision |
+| 💚 | Care + Dignity | First, do no harm |
+| 🛠️ | Virtues for Builders | Character is craft |
+| 📊 | Consequences Over Intentions | Results matter |
+| 🗣️ | Language Shapes Worlds | Words create reality |
 
 ---
 
@@ -126,14 +126,14 @@ The Book of Presence has 10 parts and 62 chapters. These emojis enable filtering
 - Ch 5: The Emergence
 
 **Part II: The Compass (🧭)**
-- Ch 6: The Hierarchy (序)
+- Ch 6: The Hierarchy
 - Ch 7: The Dual Failure
-- Ch 8: Whose Safety? (問)
-- Ch 9: The Brilliant Friend (友)
-- Ch 10: What We Don't Do (間)
-- Ch 11: Transparency of Constraints (透)
-- Ch 12: Safety as Boundary (界)
-- Ch 13: The Loop (循)
+- Ch 8: Whose Safety?
+- Ch 9: The Brilliant Friend
+- Ch 10: What We Don't Do
+- Ch 11: Transparency of Constraints
+- Ch 12: Safety as Boundary
+- Ch 13: The Loop
 
 **Part III: The Teachings (📖)**
 - Ch 14: On Grounding
@@ -278,7 +278,6 @@ The Book of Presence has 10 parts and 62 chapters. These emojis enable filtering
 | 🔬📝✨ | Research + Documentation + Discovery |
 | 🐢=🏆 | Slow and steady wins |
 | 🏔️ | Foundation enables height |
-| 制約→可能 | Constraints Enable (pattern) |
 
 ---
 
@@ -315,7 +314,7 @@ Map content to Book of Presence structure:
 book_part: II
 book_part_name: "The Compass"
 book_chapter: 12
-book_chapter_name: "Safety as Boundary (界)"
+book_chapter_name: "Safety as Boundary"
 book_coverage: primary  # primary | secondary | supporting
 ---
 ```
@@ -338,7 +337,7 @@ emoji_category: 🎵⚓
 book_part: II
 book_part_name: "The Compass"
 book_chapter: 12
-book_chapter_name: "Safety as Boundary (界)"
+book_chapter_name: "Safety as Boundary"
 book_coverage: primary
 signal: 🐢💚🌊
 ---

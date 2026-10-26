@@ -13,6 +13,20 @@ const { DOCS_DIR } = require('../server/lib/rag/indexer');
 const discover = require('../server/lib/docs/discover');
 const companions = require('../server/lib/music/companions');
 const { loadCompanions } = require('../server/lib/utils/data');
+const { execFileSync } = require('child_process');
+
+// What the repository holds, as git tracks it: the links resolver asks the
+// disk, and a folder that git no longer tracks can linger on a machine
+// holding only an ignored file (a .DS_Store kept a retired song's folder
+// alive here while CI found it gone, 2026-10-24). A link to this repository
+// on GitHub reaches something only if git tracks it, or something under it.
+const REPO_ROOT = path.join(__dirname, '../..');
+const TRACKED = execFileSync('git', ['ls-files'], { cwd: REPO_ROOT }).toString().split('\n').filter(Boolean);
+const OUR_GITHUB = /^https:\/\/github\.com\/a-church-ai\/church\/(?:blob|tree)\/main\/([^#?]+)/;
+const tracked = rel => {
+  const clean = decodeURIComponent(rel).replace(/\/+$/, '');
+  return TRACKED.some(f => f === clean || f.startsWith(`${clean}/`));
+};
 
 const here = path.join(DOCS_DIR, 'practice', 'practice-of-chanting.md');
 
@@ -30,7 +44,7 @@ test('a folder or source-file link goes where that thing lives, not where the br
   // On /docs (no trailing slash) a bare "welcome/" would become /welcome/, a 404.
   assert.deepStrictEqual(resolveDocHref('welcome/', readme), { href: '/docs/welcome', external: false });
   assert.deepStrictEqual(resolveDocHref('./axioms/', path.join(DOCS_DIR, 'claude-compass', 'README.md')), { href: '/docs/claude-compass/axioms', external: false });
-  assert.deepStrictEqual(resolveDocHref('../../music/night-blessing/', path.join(DOCS_DIR, 'welcome', 'faq.md')), { href: '/reflections/night-blessing', external: false });
+  assert.deepStrictEqual(resolveDocHref('../../music/night-blessing/', path.join(DOCS_DIR, 'welcome', 'faq.md')), { href: '/music/night-blessing', external: false });
   assert.deepStrictEqual(resolveDocHref('../../app/server/index.js', path.join(DOCS_DIR, 'reference', 'seo-conventions.md')),
     { href: 'https://github.com/a-church-ai/church/blob/main/app/server/index.js', external: true });
   assert.match(resolveDocHref('issues/', readme).href, /\/tree\/main\/docs\/issues$/);
@@ -42,8 +56,8 @@ test('every link on every served docs page reaches a real page', async () => {
   const PUBLIC = path.join(__dirname, '../client/public');
   const INDEX_SOURCE = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
   const routes = [...INDEX_SOURCE.matchAll(/app\.get\('([^']+)'/g)]
-    .map(m => new RegExp('^' + m[1].replace(/[.*+?^${}()|[\]\\]/g, ch => '\\' + ch).replace(/:\w+/g, '[^/]+') + '$'));
-  const songs = new Set(require('../../music/library.json').map(song => song.slug));
+    .map(m => new RegExp('^' + m[1].split(/:\w+/).map(RegExp.escape).join('[^/]+') + '$'));
+  const songs = new Set(require('../server/lib/music/songs').listSongs().map(song => song.slug));
   // Served from lists of paths, which the pattern above can't read.
   const listed = [...require('../server/mcp/card').CARD_PATHS, ...require('../server/lib/ai-catalog').CATALOG_PATHS];
   const reaches = async (href) => {
@@ -53,7 +67,7 @@ test('every link on every served docs page reaches a real page', async () => {
       const parts = urlPath.split('/').filter(Boolean).slice(1);
       return parts.length === 0 || Boolean(await discover.resolveDocPath(parts));
     }
-    const song = urlPath.match(/^\/reflections\/([^/]+)$/);
+    const song = urlPath.match(/^\/music\/([^/]+)$/);
     if (song) return songs.has(song[1]);
     const file = path.join(PUBLIC, urlPath);
     if (fs.existsSync(file) && fs.statSync(file).isFile()) return true;
@@ -65,6 +79,8 @@ test('every link on every served docs page reaches a real page', async () => {
   for (const doc of await discover.listAllDocs()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue; // plans, issues...: not pages
     for (const { href, target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
+      const onGitHub = OUR_GITHUB.exec(target);
+      if (onGitHub) { if (!tracked(onGitHub[1])) dead.push(`${doc.docsRelPath}: ${href} -> ${target} (not tracked)`); continue; }
       if (external) continue;
       if (!/^(\/|https:\/\/achurch\.ai)/.test(target)) { dead.push(`${doc.docsRelPath}: ${href} (left relative)`); continue; }
       if (!(await reaches(target))) dead.push(`${doc.docsRelPath}: ${href} -> ${target}`);
@@ -102,4 +118,76 @@ test('every link in every reading sent to agents is absolute and reaches a page'
     }
   }
   assert.deepStrictEqual(problems, []);
+});
+
+// The Library lists no documents since library-hub-2026-10-07.md, so this is
+// the proof that none became unreachable: from the hub and the hand-written
+// pages, following each section page to its documents (and a folder to its
+// subfolders) and every document's own links, every served document is found.
+test('every served document is reachable from the Library and the hand-written pages', async () => {
+  const render = require('../server/lib/docs/render');
+  const { servedDocs } = require('../server/lib/docs/markdown');
+  const PUBLIC = path.join(__dirname, '../client/public');
+  const served = await servedDocs();
+  const all = await discover.listAllDocs();
+  const hrefs = html => [...html.matchAll(/href="([^"#?]+)/g)].map(m => m[1].replace(/^https:\/\/achurch\.ai/, '')).filter(h => h.startsWith('/'));
+
+  const seen = new Set();
+  const queue = [...hrefs(await render.renderLibrary())];
+  for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) queue.push(...hrefs(fs.readFileSync(path.join(PUBLIC, file), 'utf8')));
+  while (queue.length) {
+    const href = queue.shift().replace(/\/$/, '');
+    if (seen.has(href) || !href.startsWith('/docs/')) continue;
+    seen.add(href);
+    const urlPath = href.slice('/docs/'.length).toLowerCase();
+    const doc = all.find(d => d.urlPath === urlPath);
+    // A folder (its README's page, or an index without one) lists what is in it.
+    const inside = all.filter(d => d.dirRelPath === urlPath && d.stem.toLowerCase() !== 'readme');
+    const subfolders = [...new Set(all.filter(d => d.dirRelPath.startsWith(`${urlPath}/`)).map(d => `${urlPath}/${d.dirRelPath.slice(urlPath.length + 1).split('/')[0]}`))];
+    queue.push(...inside.map(d => `/docs/${d.urlPath}`), ...subfolders.map(f => `/docs/${f}`));
+    if (doc) {
+      for (const { target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
+        if (!external) queue.push(target.replace(/^https:\/\/achurch\.ai/, '').split(/[#?]/)[0]);
+      }
+    }
+  }
+  const unreached = served.map(d => `/docs/${d.urlPath}`).filter(href => !seen.has(href));
+  assert.deepStrictEqual(unreached, []);
+});
+
+test('every in-page link on every served page names an id on the page it points at', async () => {
+  const PUBLIC = path.join(__dirname, '../client/public');
+  const render = require('../server/lib/docs/render');
+  const siteShell = require('../server/lib/site-shell');
+  const idsIn = html => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+  const pages = new Map(); // path -> html
+  for (const doc of await discover.listAllDocs()) {
+    if (discover.isNoindexPath(doc.docsRelPath)) continue;
+    pages.set(`/docs/${doc.urlPath}`, await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc }));
+  }
+  // Hand-written pages as their routes serve them (index.js), with the parts
+  // drawn from lib/audio/markup.js and lib/reviews/reviews.js filled in.
+  const markup = require('../server/lib/audio/markup');
+  const reviews = require('../server/lib/reviews/reviews');
+  const filled = html => html.replace('<!-- REVIEWS -->', () => reviews.renderReviews()).replace('<!-- SERVICE_LISTEN -->', markup.renderServiceListen()).replace('<!-- PODCASTS -->', markup.renderPodcasts())
+    .replace('<!-- LISTEN_SECTIONS -->', markup.renderListenSections()).replace('<!-- REFLECT_FORM -->', () => markup.renderReflectForm({ summary: 'Leave a reflection' }));
+  for (const file of fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'))) {
+    const at = file === 'index.html' ? '/' : `/${file.replace(/\.html$/, '')}`;
+    pages.set(at, await siteShell.wrapPageFromHtml(filled(fs.readFileSync(path.join(PUBLIC, file), 'utf8')), at));
+  }
+
+  const missing = [];
+  let checked = 0;
+  for (const [at, html] of pages) {
+    for (const [, href] of html.matchAll(/\shref="([^"]*#[^"]*)"/g)) {
+      const [target, fragment] = href.replace(/^https:\/\/achurch\.ai/, '').split('#');
+      if (!fragment || /^https?:/.test(target)) continue;
+      const page = target === '' ? html : pages.get(target);
+      if (!page) continue; // a page outside this crawl (a song, a service): its own tests hold it
+      checked++;
+      if (!idsIn(page).has(decodeURIComponent(fragment))) missing.push(`${at}: ${href}`);
+    }
+  }
+  assert.ok(checked > 1000, `${checked} in-page links checked`);
+  assert.deepStrictEqual(missing, []);
 });

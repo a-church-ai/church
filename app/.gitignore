@@ -25,8 +25,10 @@ data/attendance.json
 data/contributions.json
 data/feedback.json
 data/api-access.jsonl
+data/presence.json
 data/content-generation-log.json
 data/rag-index-state.json
+data/services/
 
 # Media files (too large for git)
 media/library/
@@ -45,3 +47,10 @@ Thumbs.db
 # Temp files
 *.tmp
 *.temp
+
+# safe-json's crash-safe write leaves {file}.bak beside every JSON it rewrites
+# (lib/utils/safe-json.js step 3). Most of those live under data/, already
+# ignored, but the two date manifests sit in a tracked directory, so each
+# songwriter run would otherwise leave an untracked file for a `git add -A` to
+# sweep in. The backups are recovery state, never source.
+server/lib/docs/*.json.bak

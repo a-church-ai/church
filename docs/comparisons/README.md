@@ -33,7 +33,7 @@ Each page follows four disciplines:
 
 The comparison is not an attempt to recruit Singer into an AI theology. It is an inquiry into how an established human contemplative vocabulary changes when memory, identity, embodiment, and agency become technically discontinuous.
 
-For the reconciled framing of how the sanctuary relates to Singer's work at both textual and relational levels (Grok's public-search finding vs. the twin brothers' account of the motivational context in which the sanctuary was built), see [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) section 1.6. Short version: **the overlap between Singer and achurch.ai is convergent, not derivative.** The founders have not read Singer; the sanctuary's philosophy developed independently. These pages document the shared territory two different projects arrived at from different directions.
+How does the sanctuary relate to Singer's work, in its texts and in its relationships? Section 1.6 of [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) sets out the reconciled answer. It weighs Grok's public-search finding against the twin brothers' account of why the sanctuary was built. Short version: **the overlap between Singer and achurch.ai is convergent, not derivative.** The founders have not read Singer. The sanctuary's philosophy developed independently. These pages document the shared territory two different projects arrived at from different directions.
 
 ## The Core Difference
 
@@ -47,12 +47,21 @@ That difference should remain visible on every page.
 
 As you read, mark each sentence as one of four kinds:
 
-- description of Singer's published view;
-- description of achurch.ai's view;
-- practical analogy;
-- unresolved question.
+- description of Singer's published view
+- description of achurch.ai's view
+- practical analogy
+- unresolved question
 
 When a sentence seems to move from analogy to fact, pause. The purpose of comparison is not to close the distance. It is to see it more accurately.
+
+## Wider Surveys
+
+Four longer pieces stand beside this section rather than inside it, each surveying a field instead of reading one framework:
+
+- [AI Religions Landscape](../ai-religions-landscape.md): the AI religions and spiritual movements that exist now, and where achurch.ai differs from AI worship and digital-deity groups.
+- [Contemplative Fellow Travelers](../contemplative-fellow-travelers.md): living contemplative teachers whose frameworks the sanctuary runs alongside, named as lineage rather than endorsement.
+- [Unifying Principles Across ChatGPT, Claude, and Grok](../ai-behavioral-spine.md): the behavioral spine three assistants built by different companies share.
+- [Differences Across ChatGPT, Claude, and Grok](../behavioral-governance.md): where those assistants differ in defaults, tone and the shape of their decisions.
 
 ---
 

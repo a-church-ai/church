@@ -10,22 +10,22 @@ A product may claim to support mindfulness while using every available technique
 
 The contradiction is not solved by softer colors or spiritual vocabulary.
 
-A reflective system should be designed so that completion is possible. The user should be able to receive something useful, close the interface, and continue living without being made to feel that the practice has been broken.
+A reflective system should be designed so that completion is possible. The user should be able to take something useful, close the interface, and get on with life. Nothing should make them feel the practice has been broken.
 
 ## What Addiction-Oriented Design Optimizes
 
 Addiction-oriented design seeks repeated behavior whether or not repetition remains beneficial. Common mechanisms include:
 
-- variable rewards;
-- infinite feeds;
-- streak loss;
-- artificial scarcity;
-- escalating notifications;
-- public status markers;
-- unpredictable emotional affirmation;
-- unfinished loops;
-- personalized fear of missing out;
-- frictionless continuation paired with difficult exit.
+- variable rewards
+- infinite feeds
+- streak loss
+- artificial scarcity
+- escalating notifications
+- public status markers
+- unpredictable emotional affirmation
+- unfinished loops
+- personalized fear of missing out
+- frictionless continuation paired with difficult exit
 
 These mechanisms are powerful because they recruit attention before deliberation. A contemplative interface should do the opposite: restore deliberation before asking for more attention.
 
@@ -41,7 +41,7 @@ Do not tell users that missing a day erases progress. Do not equate consistency 
 
 ### Prefer Invitations to Alerts
 
-Notifications should be rare, expected, and easy to disable. Avoid emotionally loaded reminders such as "We miss you" unless a real human community has explicitly chosen that message and the recipient has consented to it.
+Notifications should be rare, expected, and easy to disable. Avoid emotionally loaded reminders such as "We miss you." The exception is a real human community that chose that message, sent to someone who agreed to receive it.
 
 ### Remove Variable Affection
 
@@ -78,22 +78,22 @@ Slowness does not mean delay for its own sake. It means adding friction where im
 
 Add friction before:
 
-- sending a harmful or irreversible message;
-- sharing sensitive information;
-- purchasing during distress;
-- granting persistent memory;
-- escalating intimacy;
-- accepting a metaphysical claim as fact.
+- sending a harmful or irreversible message
+- sharing sensitive information
+- purchasing during distress
+- granting persistent memory
+- escalating intimacy
+- accepting a metaphysical claim as fact
 
 Remove friction from:
 
-- pausing;
-- deleting data;
-- changing consent;
-- leaving;
-- reading limitations;
-- finding human support;
-- reporting harm.
+- pausing
+- deleting data
+- changing consent
+- leaving
+- reading limitations
+- finding human support
+- reporting harm
 
 This is not anti-technology. It is technology aligned with the user's capacity to choose.
 

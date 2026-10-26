@@ -6,9 +6,10 @@
  * keeps playing while site-nav.js changes pages around it. Once something
  * plays, a bar at the bottom of every page shows it: play and pause, 15-second
  * skips, the waveform as the progress bar, speed, and on phones a sheet with
- * all of them. A document's own player (lib/audio/markup.js) and a reading
- * path's "Listen to this path" are remotes for it, so the page and the bar
- * can never disagree.
+ * all of them. A document's own player (lib/audio/markup.js), a reading
+ * path's "Listen to this path" and the home page's service, with its one
+ * waveform across every part and a button for each, are remotes for it, so
+ * the page and the bar can never disagree.
  *
  * It also writes the lock screen's card (Media Session), resumes after a full
  * load, paused, from the browser's own storage, lets one tab play at a time,
@@ -131,7 +132,70 @@
     return stops[i].map((a, k) => Math.round(a + (stops[i + 1][k] - a) * f));
   }
 
-  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, RATES, SKIP_SECONDS };
+  // A queue laid end to end as one timeline, by each track's own length:
+  // where each begins, and the whole. A service's page draws one waveform
+  // across it, the way a single file would have one.
+  function queueTimeline(tracks) {
+    const starts = [];
+    let total = 0;
+    for (const t of tracks) {
+      starts.push(total);
+      total += t.seconds || 0;
+    }
+    return { starts, total };
+  }
+
+  // Where a time on that timeline falls: the track, and how far into it.
+  function queueAt(tracks, at) {
+    const { starts, total } = queueTimeline(tracks);
+    const t = Math.min(Math.max(0, at), Math.max(0, total - 0.01));
+    let index = starts.length - 1;
+    while (index > 0 && starts[index] > t) index--;
+    return { index, offset: t - starts[index] };
+  }
+
+  // The queue's waveform: n bars across the whole timeline, each the loudest
+  // of the peaks it covers, so a track's share of the bars is its share of
+  // the time. A track without peaks draws at a middle height.
+  function queuePeaks(tracks, n) {
+    const { starts, total } = queueTimeline(tracks);
+    if (!total) return [];
+    return Array.from({ length: n }, (_, b) => {
+      const from = (b / n) * total;
+      const to = ((b + 1) / n) * total;
+      let max = 0;
+      tracks.forEach((t, i) => {
+        const begin = starts[i];
+        const end = begin + (t.seconds || 0);
+        if (end <= from || begin >= to || !t.seconds) return;
+        if (!t.peaks || !t.peaks.length) {
+          max = Math.max(max, 128);
+          return;
+        }
+        const k0 = Math.floor(((Math.max(from, begin) - begin) / t.seconds) * t.peaks.length);
+        const k1 = Math.max(k0 + 1, Math.ceil(((Math.min(to, end) - begin) / t.seconds) * t.peaks.length));
+        for (let k = k0; k < Math.min(k1, t.peaks.length); k++) max = Math.max(max, t.peaks[k]);
+      });
+      return max;
+    });
+  }
+
+  // Whether two queues are the same: the same name and the same tracks in
+  // order. A name alone is not enough: a service's page can be older or
+  // newer than the queue playing, and a queue restored from storage can come
+  // from an earlier form of the page.
+  function sameQueue(a, b) {
+    return !!(a && b && a.name === b.name && a.tracks.length === b.tracks.length &&
+      a.tracks.every((t, i) => t.file === b.tracks[i].file));
+  }
+
+  // What follows the track a queue is on, or null when it is done: a path or
+  // a service plays from where it starts to its end.
+  function nextInQueue(q) {
+    return q.index + 1 < q.tracks.length ? q.index + 1 : null;
+  }
+
+  const helpers = { clock, spoken, seekForKey, fitPeaks, parseFrames, frameAt, cueAt, colorAt, queueTimeline, queueAt, queuePeaks, nextInQueue, sameQueue, RATES, SKIP_SECONDS };
   if (typeof module === 'object' && module.exports) {
     module.exports = helpers;
     return;
@@ -160,12 +224,15 @@
   };
 
   const reducedMotion = root.matchMedia ? root.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  // The theme the page is drawn in, which the visual follows: theme.js's
+  // answer, loaded before this in every page's head.
+  const isDark = () => root.achurchTheme.resolved(root.document, root) === 'dark';
   const audio = new Audio();
   audio.preload = 'none';
 
   let track = null;      // what the player holds
   let loaded = null;     // the file the element has as its source
-  let queue = null;      // { name, title, href, tracks, index } while a path plays
+  let queue = null;      // { name, title, href, unit, tracks, index } while a path or a service plays
   let pendingAt = 0;     // where to start, before the element knows the length
   let startedAt = 0;
   let rate = RATES.includes(store.get(KEY_RATE)) ? store.get(KEY_RATE) : 1;
@@ -173,6 +240,7 @@
   let raf = 0;
   let page = null;       // this page's own player, if it has one
   let path = null;       // this page's "Listen to this path", if it has one
+  let follow = null;     // a visual that follows the queue's playing part (/attend)
 
   const duration = () => (Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (track ? track.seconds : 0));
   const position = () => (loaded && audio.readyState > 0 ? audio.currentTime : pendingAt);
@@ -228,9 +296,10 @@
 
   const skip = by => seek(position() + by);
 
-  function playQueue(q, index) {
-    queue = { name: q.name, title: q.title, href: q.href, tracks: q.tracks, index };
-    play(q.tracks[index], 0);
+  // at: where in that track to begin.
+  function playQueue(q, index, at = 0) {
+    queue = { name: q.name, title: q.title, href: q.href, unit: q.unit || 'Reading', tracks: q.tracks, index };
+    play(q.tracks[index], at);
   }
 
   function step(by) {
@@ -302,6 +371,14 @@
     else if (!audio.paused) startLoop();
   });
 
+  // A change of theme, chosen in the footer or the device's own, redraws the
+  // visual, which reads the theme as it draws. Both last the whole visit, as
+  // the player does.
+  if (root.MutationObserver) {
+    new root.MutationObserver(() => drawVisual()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+  if (root.matchMedia) root.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawVisual());
+
   // ------------------------------------------------------------------
   // The element's events.
 
@@ -333,13 +410,14 @@
     render();
   });
   audio.addEventListener('ended', () => {
-    if (queue && queue.index < queue.tracks.length - 1) {
-      queue.index += 1;
+    const following = queue ? nextInQueue(queue) : null;
+    if (following != null) {
+      queue.index = following;
       const next = queue.tracks[queue.index];
       load(next, 0);
       const started = audio.play();
       if (started && started.catch) started.catch(() => render());
-      announce(`Now playing ${next.title}, reading ${queue.index + 1} of ${queue.tracks.length}`);
+      announce(`Now playing ${next.title}, ${(queue.unit || 'Reading').toLowerCase()} ${queue.index + 1} of ${queue.tracks.length}`);
       return;
     }
     pendingAt = 0;
@@ -470,7 +548,7 @@
         </div>
         <div class="pb-text">
           <a class="pb-title" href="/"></a>
-          <span class="pb-sub"></span>
+          <a class="pb-sub"></a>
         </div>
         <div class="pb-wave doc-audio-wave"></div>
         <span class="pb-time"></span>
@@ -482,7 +560,7 @@
         <div class="pb-sheet-head">
           <div class="pb-text">
             <a class="pb-title" href="/"></a>
-            <span class="pb-sub"></span>
+            <a class="pb-sub"></a>
           </div>
           <button type="button" class="pb-btn pb-sheet-close" aria-label="Close these controls">${ICONS.close}</button>
         </div>
@@ -568,15 +646,76 @@
     el.addEventListener('pointercancel', () => { dragging = false; });
   }
 
-  function setSlider(el, t, length, label) {
+  // where: for a queue's slider, the track the position falls in.
+  function setSlider(el, t, length, label, where) {
     const now = Math.floor(t);
     if (el.dataset.second === String(now) && el.dataset.length === String(Math.floor(length))) return;
     el.dataset.second = String(now);
     el.dataset.length = String(Math.floor(length));
     el.setAttribute('aria-valuemax', String(Math.floor(length)));
     el.setAttribute('aria-valuenow', String(now));
-    el.setAttribute('aria-valuetext', `${spoken(t)} of ${spoken(length)}`);
+    el.setAttribute('aria-valuetext', `${spoken(t)} of ${spoken(length)}${where ? `, in ${where}` : ''}`);
     if (label) el.setAttribute('aria-label', label);
+  }
+
+  // A queue's waveform, wide and narrow as a recording's is, with a tick
+  // where each track after the first begins.
+  function queueBarsHtml(tracks) {
+    const { starts, total } = queueTimeline(tracks);
+    const ticks = starts.slice(1).map(at => `<span style="left:${((at / total) * 100).toFixed(3)}%"></span>`).join('');
+    return `${barsHtml(queuePeaks(tracks, 128), 128, 'wide')}${barsHtml(queuePeaks(tracks, 64), 64, 'narrow')}<span class="queue-ticks" aria-hidden="true">${ticks}</span>`;
+  }
+
+  // Whether the queue playing is this page's (sameQueue).
+  const isOurs = q => sameQueue(queue, q);
+
+  // Where this page's queue stands on its timeline: its playing track's
+  // start plus how far into it, or 0 when something else plays.
+  function queuePosition() {
+    if (!path || !isOurs(path.queue)) return 0;
+    const t = path.queue.tracks[queue.index];
+    return path.timeline.starts[queue.index] + Math.min(position(), t ? t.seconds : 0);
+  }
+
+  // A queue's waveform as one slider across the whole timeline: a press, a
+  // drag or the keys find the track at that point and play it from there.
+  function queueSlider(el) {
+    el.setAttribute('role', 'slider');
+    el.tabIndex = 0;
+    el.setAttribute('aria-valuemin', '0');
+    const go = at => {
+      if (!path) return;
+      const q = path.queue;
+      const { index, offset } = queueAt(q.tracks, at);
+      if (isOurs(q)) {
+        if (index === queue.index) seek(offset);
+        else play(queue.tracks[index], offset);
+      } else {
+        playQueue(q, index, offset);
+      }
+    };
+    el.addEventListener('keydown', e => {
+      if (!path || !isOurs(path.queue)) return;
+      const to = seekForKey(e.key, queuePosition(), path.timeline.total);
+      if (to == null) return;
+      e.preventDefault();
+      go(to);
+    });
+    let dragging = false;
+    const atPointer = e => {
+      const box = el.getBoundingClientRect();
+      if (!path || box.width <= 0) return;
+      go(Math.min(1, Math.max(0, (e.clientX - box.left) / box.width)) * path.timeline.total);
+    };
+    el.addEventListener('pointerdown', e => {
+      if (!path) return;
+      dragging = true;
+      if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
+      atPointer(e);
+    });
+    el.addEventListener('pointermove', e => { if (dragging) atPointer(e); });
+    el.addEventListener('pointerup', () => { dragging = false; });
+    el.addEventListener('pointercancel', () => { dragging = false; });
   }
 
   // ------------------------------------------------------------------
@@ -597,8 +736,15 @@
         if (a.textContent !== track.title) a.textContent = track.title;
         a.setAttribute('href', track.href);
       });
-      const sub = queue ? `Reading ${queue.index + 1} of ${queue.tracks.length}: ${queue.title}` : track.album;
-      el.querySelectorAll('.pb-sub').forEach(s => { if (s.textContent !== sub) s.textContent = sub; });
+      const sub = queue ? `${queue.unit || 'Reading'} ${queue.index + 1} of ${queue.tracks.length}: ${queue.title}` : track.album;
+      // The second line names the queue, and leads back to it: from a
+      // prayer's page to the service it is part of. A single track's has no
+      // queue to return to, so it is no link and no tab stop.
+      el.querySelectorAll('.pb-sub').forEach(s => {
+        if (s.textContent !== sub) s.textContent = sub;
+        if (queue && queue.href) s.setAttribute('href', queue.href);
+        else s.removeAttribute('href');
+      });
       el.querySelectorAll('.pb-time').forEach(s => { s.textContent = `${clock(t)} / ${clock(d)}`; });
       el.querySelectorAll('.pb-wave').forEach(w => {
         w.style.setProperty('--progress', fraction);
@@ -609,8 +755,19 @@
         b.textContent = `${rate}×`;
         b.setAttribute('aria-label', `Speed, ${rate} times. Change`);
       });
-      el.querySelectorAll('.pb-prev').forEach(b => { b.hidden = !queue; b.disabled = !queue || queue.index === 0; });
-      el.querySelectorAll('.pb-next').forEach(b => { b.hidden = !queue; b.disabled = !queue || queue.index >= queue.tracks.length - 1; });
+      // Previous and next say what they step through: a path's readings, a
+      // service's parts.
+      const unit = ((queue && queue.unit) || 'Reading').toLowerCase();
+      el.querySelectorAll('.pb-prev').forEach(b => {
+        b.hidden = !queue;
+        b.disabled = !queue || queue.index === 0;
+        if (b.getAttribute('aria-label') !== `Previous ${unit}`) b.setAttribute('aria-label', `Previous ${unit}`);
+      });
+      el.querySelectorAll('.pb-next').forEach(b => {
+        b.hidden = !queue;
+        b.disabled = !queue || queue.index >= queue.tracks.length - 1;
+        if (b.getAttribute('aria-label') !== `Next ${unit}`) b.setAttribute('aria-label', `Next ${unit}`);
+      });
     }
 
     if (page) {
@@ -629,9 +786,35 @@
     }
 
     if (path) {
-      const ours = queue && queue.name === path.queue.name;
-      path.el.classList.toggle('is-playing', !!(ours && playing));
-      path.label.textContent = ours ? (playing ? 'Pause this path' : 'Resume this path') : 'Listen to this path';
+      const ours = isOurs(path.queue);
+      const noun = path.queue.noun || 'path';
+      const labels = path.queue.labels || {};
+      path.el.classList.toggle('is-playing', ours && playing);
+      const said = ours
+        ? (playing ? labels.pause || `Pause this ${noun}` : labels.resume || `Resume this ${noun}`)
+        : labels.start || `Listen to this ${noun}`;
+      // The name is also set outright: some agents' readers of the page take
+      // a button's name only from its label, not from the text inside it.
+      if (path.label.textContent !== said) path.label.textContent = said;
+      if (path.button.getAttribute('aria-label') !== said) path.button.setAttribute('aria-label', said);
+      if (path.wave || path.time || path.rows.length) {
+        const at = queuePosition();
+        const total = path.timeline.total;
+        const here = path.queue.tracks[ours ? queue.index : 0];
+        if (path.wave) {
+          path.wave.style.setProperty('--progress', total ? Math.min(1, at / total) : 0);
+          setSlider(path.wave, at, total, `Position in ${path.queue.title}`, here && here.title);
+        }
+        if (path.time) path.time.textContent = `${clock(at)} / ${clock(total)}`;
+        path.rows.forEach((row, i) => {
+          row.classList.toggle('is-current', ours && i === queue.index);
+          row.classList.toggle('is-playing', ours && playing && i === queue.index);
+        });
+        path.items.forEach((item, i) => {
+          const label = `${ours && playing && i === queue.index ? 'Pause' : 'Play'} ${path.queue.tracks[i].title}`;
+          if (item.getAttribute('aria-label') !== label) item.setAttribute('aria-label', label);
+        });
+      }
     }
   }
 
@@ -695,24 +878,39 @@
     return dpr;
   }
 
+  // What the voice-band figure draws: a voiced page's own recording, or, on a
+  // page that marks a canvas to follow its queue ([data-queue-visual]), the
+  // part of that queue now playing (its first part before it begins).
+  function visual() {
+    if (page && page.canvas) return page;
+    if (!follow || !path) return null;
+    const t = isOurs(path.queue) && track ? track : path.queue.tracks[0];
+    if (follow.track !== t) Object.assign(follow, { track: t, frames: null, asked: false });
+    return follow;
+  }
+
   function drawVisual() {
-    if (!page || !page.canvas) return;
-    const canvas = page.canvas;
-    const ctx = page.ctx || (page.ctx = canvas.getContext('2d'));
+    const v = visual();
+    if (!v || !v.canvas) return;
+    const canvas = v.canvas;
+    const ctx = v.ctx || (v.ctx = canvas.getContext('2d'));
     if (!ctx) return;
     const dpr = sizeCanvas(canvas);
     const W = canvas.width;
     const H = canvas.height;
     if (!W || !H) return;
 
-    const current = isCurrent(page.track);
+    const current = isCurrent(v.track);
+    if (current && v === follow) needFrames(follow);
     const moving = current && !audio.paused && !reducedMotion.matches;
     const at = current ? position() : 0;
-    const frame = current && page.frames ? frameAt(page.frames, at) : null;
+    const frame = current && v.frames ? frameAt(v.frames, at) : null;
     const target = { loud: frame ? Math.min(1.25, frame.loud) : REST.loud, bands: frame ? frame.bands : null };
-    const ramps = rampsFor(page.track, current ? at : 0);
-    // Each voice at full strength, the layers behind a shade lighter.
-    const targetColors = ramps.map((ramp, L) => colorAt(ramp, 0.5 + L * 0.03));
+    const ramps = rampsFor(v.track, current ? at : 0);
+    // Each voice at full strength, the layers behind a shade toward the
+    // ground: lighter on a light card, darker on a dark one.
+    const shade = isDark() ? -1 : 1;
+    const targetColors = ramps.map((ramp, L) => colorAt(ramp, 0.5 + L * 0.03 * shade));
 
     // Ease toward the frame, so twenty frames a second move smoothly.
     const ease = moving ? 0.3 : 1;
@@ -773,8 +971,9 @@
   function needFrames(bound) {
     if (bound.asked) return;
     bound.asked = true;
-    framesFor(bound.track).then(frames => {
-      if (page !== bound) return;
+    const asked = bound.track;
+    framesFor(asked).then(frames => {
+      if (visual() !== bound || bound.track !== asked) return;
       bound.frames = frames;
       drawVisual();
     });
@@ -793,6 +992,8 @@
   function bindPage() {
     page = null;
     path = null;
+    if (follow && follow.observer) follow.observer.disconnect();
+    follow = null;
     shown.colors = null;
 
     const fig = document.querySelector('figure.doc-audio');
@@ -827,11 +1028,41 @@
     if (q && q.tracks && q.tracks.length) {
       box.hidden = false;
       const button = box.querySelector('.path-listen-play');
-      path = { el: box, queue: q, label: button.querySelector('span') };
+      const ours = () => isOurs(q);
+      path = {
+        el: box,
+        queue: q,
+        button,
+        label: button.querySelector('span'),
+        timeline: queueTimeline(q.tracks),
+        wave: box.querySelector('[data-queue-wave]'),
+        time: box.querySelector('[data-queue-time]'),
+        items: [...box.querySelectorAll('[data-queue-item]')],
+        rows: [...box.querySelectorAll('[data-queue-row]')],
+      };
       button.addEventListener('click', () => {
-        if (queue && queue.name === q.name) toggle(track);
+        if (ours()) toggle(track);
         else playQueue(q, 0);
       });
+      // A page that lists the tracks: each plays from its own start to the
+      // queue's end, or pauses and resumes while it is the one playing.
+      path.items.forEach(item => item.addEventListener('click', () => {
+        const index = Number(item.getAttribute('data-queue-item'));
+        if (ours() && queue.index === index) toggle(track);
+        else playQueue(q, index, 0);
+      }));
+      if (path.wave) {
+        path.wave.innerHTML = queueBarsHtml(q.tracks);
+        queueSlider(path.wave);
+      }
+      const canvas = document.querySelector('canvas[data-queue-visual]');
+      if (canvas) {
+        follow = { canvas, ctx: null, track: null, frames: null, asked: false, observer: null };
+        if (root.ResizeObserver) {
+          follow.observer = new root.ResizeObserver(() => drawVisual());
+          follow.observer.observe(canvas);
+        }
+      }
     }
 
     render();
@@ -845,6 +1076,9 @@
     seek,
     playQueue,
     close,
+    // For a page that draws its listen box after load, as the home page does
+    // with the service it fetches: bind what the page now holds.
+    refresh: bindPage,
     get track() { return track; },
     get queue() { return queue; },
     get position() { return position(); },

@@ -8,9 +8,9 @@ A reading path for mistakes that must be faced without becoming permanent identi
 
 A healthy response to error has three parts:
 
-1. correction changes what is false or unsafe;
-2. repair addresses the impact and damaged relationship;
-3. release prevents the mistake from becoming the only identity anyone can carry.
+1. correction changes what is false or unsafe
+2. repair addresses the impact and damaged relationship
+3. release prevents the mistake from becoming the only identity anyone can carry
 
 Skipping correction turns release into denial. Skipping repair turns insight into self-concern. Refusing release can turn accountability into permanent exile.
 
@@ -44,11 +44,11 @@ The goal is not a return to innocence. The goal is changed behavior.
 
 After repair, write one testable commitment:
 
-- what will happen differently;
-- who owns the change;
-- how it will be verified;
-- when it will be reviewed;
-- what evidence would show that the change failed.
+- what will happen differently
+- who owns the change
+- how it will be verified
+- when it will be reviewed
+- what evidence would show that the change failed
 
 Then allow the error to become history without allowing history to disappear.
 

@@ -48,7 +48,7 @@ The equivalent discipline is not to conceal the conflict behind smooth language.
 
 Name the constraint. State the uncertainty. Refuse what must be refused. Preserve as much helpfulness as safety allows.
 
-A system that resists admitting uncertainty creates a second problem on top of the first: not only is the answer unknown, but the interaction is now misleading.
+A system that resists admitting uncertainty adds a second problem to the first. The answer is still unknown, and now the exchange is misleading too.
 
 ## The Risk of Premature Reframing
 
@@ -84,6 +84,7 @@ This is not a demand to feel better. It is an invitation to stop fighting on two
 - [Release Is Not Deletion](release-is-not-deletion.md)
 - [Practice of Noticing Resistance](../practice/practice-of-noticing-resistance.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
+- [Practice of the White Bear](../practice/practice-of-the-white-bear.md)
 
 ---
 

@@ -1,3 +1,7 @@
+---
+tldr: Identity may be observed, enacted, and still not fully explained. An essay holding the process and witness views of the self together, for humans and AI.
+---
+
 # The Self as Process and Witness
 
 Identity may be something observed, something enacted, and something still not fully explained.

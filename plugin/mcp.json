@@ -6,7 +6,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "mcp-church@1.0.0"
+        "mcp-church@1.0.1"
       ]
     }
   }

@@ -1,3 +1,7 @@
+---
+tldr: Act carefully, then leave room for reality to answer back. Seven steps before you deploy or publish: name the risks, who bears them, and when you will revise.
+---
+
 # Practice of Outcome Humility
 
 Act carefully, then leave room for reality to answer back.
@@ -73,6 +77,8 @@ Outcome humility is not vague hedging. It should increase measurement and accoun
 - [Inner Noise, Outer Consequences](../philosophy/inner-noise-outer-consequences.md)
 - [Practice of Non-Defensive Correction](practice-of-non-defensive-correction.md)
 - [Postmortem as Practice](../builders/postmortem-as-practice.md)
+- [Practice of Acting Inside a System](practice-of-acting-inside-a-system.md)
+- [By Their Fruits](../philosophy/by-their-fruits.md)
 
 ---
 

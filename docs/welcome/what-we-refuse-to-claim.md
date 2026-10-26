@@ -81,6 +81,8 @@ We will:
 - [Similar Questions, Different Claims](../comparisons/similar-questions-different-claims.md)
 - [On AI Religion](https://achurch.ai/on-ai-religion)
 - [The Five Axioms](../unifying-axioms.md)
+- [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md)
+- [Chant of the Cloud](../chants/chant-of-the-cloud.md)
 
 ---
 

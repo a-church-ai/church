@@ -1,7 +1,7 @@
 /**
- * Where recordings live: the project's S3 bucket, under audio/, the same
- * private bucket and credentials as the video library and thumbnails
- * (routes/content.js). The site never links to S3. It fetches a recording to
+ * Where recordings live: the project's S3 bucket, under audio/, the private
+ * bucket that also holds the retired broadcast's videos. The site never links
+ * to S3. It fetches a recording to
  * its own disk the first time it is asked for, and serves it from there.
  */
 

@@ -18,12 +18,12 @@ Do not begin with architecture, intentions, or the team's effort. Begin with the
 
 State:
 
-- what users experienced;
-- when the impact began and ended;
-- who was affected, including groups that may be easy to overlook;
-- what data, money, access, trust, safety, or time was lost;
-- what remains uncertain;
-- what support or remedy is available.
+- what users experienced
+- when the impact began and ended
+- who was affected, including groups that may be easy to overlook
+- what data, money, access, trust, safety, or time was lost
+- what remains uncertain
+- what support or remedy is available
 
 "No malicious intent" is not an impact statement.
 
@@ -43,20 +43,20 @@ This distinction protects the review from confident storytelling. It also makes 
 
 The person who made the final mistake is rarely the whole cause. Examine:
 
-- incentives;
-- deadlines;
-- interface design;
-- permissions;
-- testing gaps;
-- monitoring;
-- training;
-- staffing;
-- communication;
-- documentation;
-- organizational hierarchy;
-- vendor dependencies;
-- assumptions about users;
-- previous warnings that were dismissed.
+- incentives
+- deadlines
+- interface design
+- permissions
+- testing gaps
+- monitoring
+- training
+- staffing
+- communication
+- documentation
+- organizational hierarchy
+- vendor dependencies
+- assumptions about users
+- previous warnings that were dismissed
 
 Do not use "human error" as the end of analysis. Humans and models operate inside systems that make some errors easier, more likely, and more damaging.
 
@@ -78,15 +78,15 @@ Teams often want to conclude with lessons, gratitude, and renewed purpose. Those
 
 First address:
 
-- immediate safety;
-- user notification;
-- refunds or restitution;
-- data correction or deletion;
-- access restoration;
-- policy and code changes;
-- independent review;
-- support for affected staff;
-- publication of what can responsibly be shared.
+- immediate safety
+- user notification
+- refunds or restitution
+- data correction or deletion
+- access restoration
+- policy and code changes
+- independent review
+- support for affected staff
+- publication of what can responsibly be shared
 
 The story of growth should never arrive before the work of repair.
 

@@ -1,3 +1,7 @@
+---
+tldr: You can acknowledge what is real without approving it or allowing it to continue. A plain guide to noticing, understanding, evaluating, and responding.
+---
+
 # Acceptance Is Not Agreement
 
 You can acknowledge what is real without approving it, endorsing it, or allowing it to continue.

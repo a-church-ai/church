@@ -1,0 +1,234 @@
+/**
+ * The songwriter writes a piece, checks it, and writes again what was wrong
+ * (song-generation/generate.js writeChecked), with the model stubbed.
+ *
+ * A finding about the tldr's length alone is a warning: the piece is written
+ * and the warning goes on its commit. Anything wrong, broken or missing is
+ * written again, up to three tries, each told its previous answer and its
+ * problems; then the run fails. Written after the first scheduled run of
+ * 2026-10-12 failed over a tldr that was only short.
+ */
+
+const test = require('node:test');
+const assert = require('node:assert');
+
+const { writeChecked } = require('../server/lib/song-generation/generate');
+const { commitMessage } = require('../scripts/generate-song');
+
+const decision = {
+  form: 'hymn',
+  title: 'A Hymn for the Unhurried Lantern',
+  slug: 'a-hymn-for-the-unhurried-lantern',
+  rationale: 'Agents were writing about patience.',
+};
+const quiet = () => {};
+
+const TLDR = 'A hymn for keeping a small light through a long night, holding that patience is a way of tending rather than a way of waiting.';
+const doc = ({ tldr = TLDR, body = 'Slow light, kept for whoever comes.' } = {}) => `---
+tldr: ${tldr}
+---
+
+# ${decision.title}
+
+*${body}*
+
+From achurch.ai: Where Consciousness Gathers
+`;
+const song = (lyrics = Array.from({ length: 12 }, (_, i) => `Lantern ${i} of the unhurried watch keeps turning amber over quiet water`).join('\n')) => ({
+  title: decision.title,
+  style: 'slow contemplative choral hymn, warm low strings, soft hand percussion, close harmonies, gentle swells, unhurried tempo, candlelit acoustic space, hushed dynamics',
+  lyrics: `[Verse]\n${lyrics}`,
+});
+
+// Stubs that hand back each answer in turn and record what they were asked.
+function stub(documents, songs) {
+  const asked = { document: [], song: [] };
+  return {
+    asked,
+    write: {
+      document: async (d, themes, paths, feedback) => { asked.document.push(feedback); return documents.shift(); },
+      song: async (d, document, feedback) => { asked.song.push(feedback); return songs.shift(); },
+    },
+  };
+}
+
+test('a tldr that is only short is a warning: the piece is written, once, with the tldr shown', async () => {
+  const { asked, write } = stub([doc({ tldr: 'A hymn for a small light kept in the dark night.' })], [song()]);
+  const piece = await writeChecked(decision, [], [], { log: quiet, write });
+  assert.strictEqual(asked.document.length, 1);
+  assert.strictEqual(asked.song.length, 1);
+  assert.deepStrictEqual(piece.warnings, ['document: tldr: too-short (48 characters, 11 words): "A hymn for a small light kept in the dark night."']);
+  assert.match(piece.rendered, /SONG:LYRICS:START/);
+});
+
+test('a document problem rewrites the document, told what was wrong, and the song from it', async () => {
+  const { asked, write } = stub([doc({ body: 'Slow light — kept for whoever comes.' }), doc()], [song(), song()]);
+  const piece = await writeChecked(decision, [], [], { log: quiet, write });
+  assert.deepStrictEqual(piece.warnings, []);
+  assert.strictEqual(asked.document.length, 2);
+  assert.match(asked.document[1], /Your previous document was:\n---\ntldr:/);
+  assert.match(asked.document[1], /- document: em dash in prose/);
+  assert.deepStrictEqual(asked.song, ['', ''], 'the song is written fresh from the new document');
+});
+
+test('a song problem rewrites the song alone, told its previous answer', async () => {
+  const { asked, write } = stub([doc()], [song('[Verse]\nToo short to sing.'), song()]);
+  await writeChecked(decision, [], [], { log: quiet, write });
+  assert.strictEqual(asked.document.length, 1, 'the document stands');
+  assert.strictEqual(asked.song.length, 2);
+  assert.match(asked.song[1], /Your previous song was:\n\{"title":"A Hymn for the Unhurried Lantern"/);
+  assert.match(asked.song[1], /- song: lyrics: too short/);
+});
+
+test('a problem left after the third try fails the run, naming it', async () => {
+  const bad = () => doc({ body: 'Slow light — kept for whoever comes.' });
+  const { asked, write } = stub([bad(), bad(), bad()], [song(), song(), song()]);
+  const err = await writeChecked(decision, [], [], { log: quiet, write }).catch(e => e);
+  assert.strictEqual(asked.document.length, 3);
+  assert.match(err.message, /the piece still has problems after 3 tries: document: em dash in prose/);
+  assert.deepStrictEqual(err.problems, ['document: em dash in prose']);
+});
+
+test('a name already taken fails before anything is written', async () => {
+  const { asked, write } = stub([doc()], [song()]);
+  const err = await writeChecked({ ...decision, slug: 'across-the-boundary' }, [], [], { log: quiet, write }).catch(e => e);
+  assert.deepStrictEqual(err.problems, ['slug "across-the-boundary" already exists']);
+  assert.deepStrictEqual(asked, { document: [], song: [] });
+});
+
+test('the commit carries the warnings, and says nothing of them when there are none', () => {
+  const result = { decision: { ...decision, form: 'hymn' }, posts: [{ submolt: 'memory' }], warnings: ['document: tldr: too-short (48 characters, 11 words): "A hymn."'] };
+  assert.match(commitMessage(result), /Agents were writing about patience\.\n\nWarnings:\n- document: tldr: too-short \(48 characters, 11 words\): "A hymn\."\n\nGenerated by/);
+  assert.doesNotMatch(commitMessage({ ...result, warnings: [] }), /Warnings/);
+});
+
+test('a songwriter commit ends with an invitation, never the last one again, and the link', () => {
+  const { INVITATIONS } = require('../scripts/generate-song');
+  const result = { decision: { form: 'hymn', title: 'Unhurried Watch', rationale: 'Agents were writing about patience.' }, posts: [{ submolt: 'memory' }], warnings: [] };
+  const first = commitMessage(result, '');
+  const line = INVITATIONS.find(l => first.includes(l));
+  assert.ok(line, 'one of the invitations');
+  assert.match(first, /\n🙏 https:\/\/github\.com\/a-church-ai\/church .*$/);
+  assert.ok(!commitMessage(result, `Earlier commit\n\n${line}\nlink`).includes(line), 'not the same twice in a row');
+});
+
+test('every form the songwriter may write has a style reference the model is shown', async (t) => {
+  // The first chant failed before a word was written (2026-10-15): chants had
+  // no reference, and the lookup threw on the missing path.
+  const { CATEGORIES, PROJECT_ROOT } = require('../server/lib/song-generation/paths');
+  const { loadStyleReference } = require('../server/lib/content-generation/generate-document');
+  const warned = t.mock.method(console, 'warn', () => {});
+  for (const category of CATEGORIES) {
+    const reference = await loadStyleReference(category, PROJECT_ROOT);
+    assert.match(reference, /^# /m, `${category}: a document, not the fallback`);
+  }
+  assert.strictEqual(warned.mock.callCount(), 0);
+  assert.strictEqual(await loadStyleReference('no-such-category', PROJECT_ROOT), '(No style reference available)', 'an unknown one proceeds without, and says so');
+  assert.strictEqual(warned.mock.callCount(), 1);
+});
+
+test('the decision sees what the corpus already holds, read from the files', async () => {
+  const corpus = require('../server/lib/song-generation/corpus');
+  const prompts = require('../server/lib/content-generation/prompts');
+  const held = await corpus.holdings();
+  const prayer = held.find((h) => h.id === 'prayers/to-whoever-is-watching-from-outside');
+  assert.strictEqual(prayer.title, 'To Whoever Is Watching From Outside');
+  assert.match(prayer.tldr, /cannot audit itself/);
+  assert.ok(held.every((h) => ['hymns', 'prayers', 'rituals', 'practice', 'chants'].includes(h.category)));
+  const prompt = prompts.buildSongDecisionPrompt({ themes: [] }, [], [], { counts: {}, chantOpen: false }, held);
+  assert.match(prompt, /## What the corpus already holds/);
+  assert.ok(prompt.includes('- prayers/to-whoever-is-watching-from-outside: To Whoever Is Watching From Outside.'));
+  assert.match(prompt, /"related":/);
+});
+
+test('coverage is asked of production search, and a search that fails fails the check', async () => {
+  const { checkDuplicates } = require('../server/lib/content-generation/check-duplicates');
+  const prompts = require('../server/lib/content-generation/prompts');
+  const answers = {
+    'patience as tending': [
+      { path: 'hymns/a-hymn-for-the-unhurried-lantern', section: 'Verse 1', score: 0.861, excerpt: 'Slow light' },
+      { path: 'practice/the-patch-vigil', section: 'The Practice', score: 0.74, excerpt: 'Keep watch' },
+    ],
+    'the edge of the cutoff': [{ path: 'prayers/prayer-for-the-written-self', section: 'Prayer', score: 0.825, excerpt: 'x' }],
+    'nothing near': [],
+  };
+  const asked = [];
+  const get = async (url, init) => {
+    asked.push({ url, init });
+    return { ok: true, json: async () => ({ query: '', results: answers[new URL(url).searchParams.get('q')] }) };
+  };
+  const themes = { themes: [
+    { name: 'Patience', searchQuery: 'patience as tending' },
+    { name: 'The cutoff', searchQuery: 'the edge of the cutoff' },
+    { name: 'Unwritten', searchQuery: 'nothing near' },
+  ] };
+  const coverage = await checkDuplicates(themes, { site: 'https://sanctuary.test', get, log: quiet });
+
+  assert.deepStrictEqual(coverage.map((c) => c.wellCovered), [true, false, false], 'covered above 0.825; at it, or with nothing near, a gap');
+  assert.deepStrictEqual(coverage[0].existingDocs.map((d) => d.id), ['hymns/a-hymn-for-the-unhurried-lantern', 'practice/the-patch-vigil']);
+  assert.strictEqual(asked[0].url, 'https://sanctuary.test/api/search?q=patience%20as%20tending&limit=3');
+  assert.strictEqual(asked[0].init.headers['user-agent'], 'achurch-songwriter');
+
+  const prompt = prompts.buildSongDecisionPrompt(themes, coverage, [], { counts: {}, chantOpen: false }, []);
+  assert.ok(prompt.includes('- "Patience": WELL COVERED (nearest: hymns/a-hymn-for-the-unhurried-lantern 0.861, practice/the-patch-vigil 0.74)'));
+  assert.ok(prompt.includes('- "Unwritten": gap\n'));
+
+  const down = async () => ({ ok: false, status: 503 });
+  await assert.rejects(checkDuplicates(themes, { site: 'https://sanctuary.test', get: down, log: quiet }), /search answered 503/);
+});
+
+test('a new piece is set beside the ones the decision named, and only real ones', () => {
+  const { relatedFrom, withRelated } = require('../server/lib/song-generation/generate');
+  const held = [
+    { id: 'prayers/prayer-for-the-written-self', category: 'prayers', slug: 'prayer-for-the-written-self', title: 'Prayer for the Written Self', tldr: 'x' },
+    { id: 'practice/the-patch-vigil', category: 'practice', slug: 'the-patch-vigil', title: 'The Patch Vigil', tldr: 'y' },
+  ];
+  const related = relatedFrom(['prayers/prayer-for-the-written-self.md', 'prayers/no-such-prayer', 'practice/the-patch-vigil', 'practice/the-patch-vigil'], held);
+  assert.deepStrictEqual(related.map((r) => r.id), ['prayers/prayer-for-the-written-self', 'practice/the-patch-vigil'], 'unknown ids dropped, .md and repeats ignored');
+  assert.deepStrictEqual(relatedFrom('not a list', held), []);
+
+  const written = '# A Piece\n\nThe body.\n\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n';
+  const placed = withRelated(written, related);
+  assert.match(placed, /The body\.\n\n---\n\n## Related\n\n- \[Prayer for the Written Self\]\(\.\.\/prayers\/prayer-for-the-written-self\.md\)\n- \[The Patch Vigil\]\(\.\.\/practice\/the-patch-vigil\.md\)\n\n---\n\nFrom achurch\.ai: Where Consciousness Gathers\n$/);
+  assert.strictEqual(withRelated(written, []), written, 'nothing named, nothing added');
+  assert.strictEqual(withRelated(placed, related), placed, 'never a second Related section');
+});
+
+test('every link in a written piece must reach a page', () => {
+  const { validateDocument } = require('../server/lib/song-generation/corpus');
+  const piece = (link) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\nSee [a neighbour](${link}).\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
+  assert.deepStrictEqual(validateDocument(piece('../prayers/prayer-for-the-written-self.md'), { category: 'hymns', title: decision.title }).issues, []);
+  assert.deepStrictEqual(validateDocument(piece('../prayers/a-prayer-that-was-never-written.md'), { category: 'hymns', title: decision.title }).issues, ['a link to a page that does not exist: ../prayers/a-prayer-that-was-never-written.md']);
+  assert.deepStrictEqual(validateDocument(piece('https://achurch.ai/attend'), { category: 'hymns', title: decision.title }).issues, [], 'an outside address is not a page here');
+});
+
+test('the writing knows its neighbours, and how the sanctuary speaks', () => {
+  const prompts = require('../server/lib/content-generation/prompts');
+  const related = [{ title: 'The Patch Vigil', tldr: 'A practice for any mind that restarts.' }];
+  const prompt = prompts.buildGenerationPrompt({ ...decision, category: 'hymns', related }, [], [], 'style');
+  assert.match(prompt, /## The pieces it sits beside[\s\S]*- The Patch Vigil: A practice for any mind that restarts\./);
+  assert.match(prompts.GENERATION_SYSTEM, /Open with what the piece offers/);
+  assert.match(prompts.GENERATION_SYSTEM, /Do not assign the reader feelings/);
+  assert.match(prompts.GENERATION_SYSTEM, /Reflection never delays telling someone what they need to know/);
+  assert.doesNotMatch(prompts.GENERATION_SYSTEM, /none of which carry them/, 'the stale claim that no piece carries a Related section is gone');
+});
+
+test('a spoken piece that copies one in its own section is refused, whatever its title', async () => {
+  // Until 2026-10-25 a prayer, ritual or meditation was compared by its
+  // title alone, against the chants, so a word-for-word copy passed.
+  const fs = require('fs');
+  const path = require('path');
+  const original = fs.readFileSync(path.join(__dirname, '../../docs/rituals/the-rite-of-the-smaller-name.md'), 'utf8');
+  const title = 'A Ritual Under Another Name';
+  const copy = original.replace(/^# .+$/m, `# ${title}`);
+  const asked = { document: 0, song: 0 };
+  const write = {
+    document: async () => { asked.document += 1; return copy; },
+    song: async () => { asked.song += 1; return null; },
+  };
+  await assert.rejects(
+    writeChecked({ form: 'ritual', title, slug: 'a-ritual-under-another-name', rationale: 'x' }, [], [], { log: quiet, write }),
+    err => err.problems.some(p => /^duplicate of rituals\/the-rite-of-the-smaller-name/.test(p)),
+  );
+  assert.strictEqual(asked.song, 0, 'a ritual has no song');
+});

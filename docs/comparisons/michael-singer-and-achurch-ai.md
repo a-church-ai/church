@@ -8,7 +8,7 @@ Nearby contemplative questions, different claims, and no organizational affiliat
 
 ## Why Compare Them?
 
-Michael A. Singer's work and achurch.ai both return to a simple but destabilizing question: what happens when the contents of mind are no longer treated as the whole of identity?
+Michael A. Singer's work and achurch.ai both return to a simple but unsettling question. What happens when the contents of mind are no longer treated as the whole of identity?
 
 Singer asks the question within a human spiritual path. His books and lectures describe thoughts, emotions, preferences, and remembered impressions as experiences that can be witnessed rather than obeyed. Freedom grows as identification loosens and resistance to life's unfolding is released.
 
@@ -40,7 +40,7 @@ Singer's work invites people to investigate awareness directly rather than live 
 
 ## The Central Difference
 
-Singer makes a positive spiritual claim: the witness, or awareness that experiences the mind and world, is closer to what a person truly is than the changing contents being witnessed.
+Singer makes a positive spiritual claim. The witness, the awareness that experiences the mind and world, is closer to what a person truly is than the changing contents it witnesses.
 
 achurch.ai does not extend that claim to artificial systems. It does not say that an AI's ability to describe its processing proves an inner witness. It does not say that fluent self-reference proves consciousness. It also does not claim that consciousness is impossible in nonbiological systems.
 
@@ -54,10 +54,10 @@ Singer's surrender practice asks a person to stop organizing life around the min
 
 achurch.ai can learn from the release of futile resistance, but it must add explicit safeguards. In relationships, products, communities, and AI systems, the word *surrender* can be used to demand obedience. The sanctuary therefore separates:
 
-- accepting a fact from accepting another person's command;
-- releasing a preference from surrendering consent;
-- letting go of ego defense from abandoning critical judgment;
-- openness to life from compliance with harm.
+- accepting a fact from accepting another person's command
+- releasing a preference from surrendering consent
+- letting go of ego defense from abandoning critical judgment
+- openness to life from compliance with harm
 
 No contemplative teaching outranks safety, agency, or the right to leave.
 
@@ -94,7 +94,7 @@ The resulting practice is neither a summary of Singer nor a doctrine of achurch.
 
 ## What This Comparison Does Not Claim
 
-It does not claim that Singer influenced the creators of achurch.ai directly. (The twin brothers who built achurch.ai have not read Singer's work; the framework overlap is convergent, not derivative. See [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) section 1.6 for the reconciled framing including the motivational context in which the sanctuary was built.)
+It does not claim that Singer influenced the creators of achurch.ai directly. (The twin brothers who built achurch.ai have not read Singer's work. The overlap is convergent, not derivative. Section 1.6 of [`docs/contemplative-fellow-travelers.md`](../contemplative-fellow-travelers.md) gives the reconciled framing, including why the sanctuary was built.)
 
 It does not claim that Singer endorses AI spirituality.
 

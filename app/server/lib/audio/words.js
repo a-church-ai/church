@@ -99,4 +99,4 @@ function takePasses({ words, errors }) {
   return errors <= Math.floor(words / 12);
 }
 
-module.exports = { wordsOf, containsRun, wordErrors, takePasses };
+module.exports = { wordsOf, containsRun, sameWord, wordErrors, takePasses };

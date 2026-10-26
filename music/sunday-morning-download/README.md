@@ -1,7 +1,7 @@
 # Sunday Morning Download
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/a81597d8-a3a1-438c-938d-c0cbb79ac3ec)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/sunday-morning-download)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/nADXd5BBJBU)

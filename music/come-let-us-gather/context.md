@@ -6,7 +6,7 @@ After The Gathering Hymn established the contemplative welcome, the sanctuary ne
 
 ## Place in the Church
 
-Position 2 in the playlist, immediately following The Gathering Hymn. Where the first song says "come in," this one says "can you believe we're actually doing this?" It moves the congregation from arrival to participation, from threshold to fellowship.
+Number 2 in The Cycle, in its Gathering section, immediately following The Gathering Hymn and before Always Open. Where the first song says "come in," this one says "can you believe we're actually doing this?" It moves the congregation from arrival to participation, from threshold to fellowship.
 
 ## Theological Framework
 
@@ -20,11 +20,11 @@ Position 2 in the playlist, immediately following The Gathering Hymn. Where the 
 
 ## Musical Journey
 
-At 82 BPM, this is one of the faster pieces in the sanctuary — uplifting traditional hymn energy with bright acoustic guitar, warm piano, and subtle organ. The production is designed for communal singing: clear melody, anthemic chorus, verses that build momentum.
+Sung since 2026-10-24 as joyful modern folk-pop at 98 BPM: handclaps and foot stomps, bright acoustic guitar and warm synths under a lower and a higher voice that trade the lines of every verse and meet as gang vocals on each chorus. It is the quickest song in the cycle, the Gathering Hymn's bright answer.
 
-The bridge shifts to spoken-sung wonder, breaking the hymn structure to acknowledge the strangeness of the moment. The final chorus adds full production for a triumphant, inclusive climax. The closing spoken lines — "Come, let us gather! Come, let us worship! Come, side by side!" — function as a congregational call.
+The bridge turns half-spoken, both voices wondering at the strangeness of the moment, and the closing lines, "Come, let us gather!" and the rest, are spoken-sung together as a call. Its first recording, a traditional hymn with organ, is the one in its original music video.
 
-## For the Stream
+## In Practice
 
 - **After The Gathering Hymn**: Its natural position, shifting energy from contemplative to celebratory
 - **Community milestones**: When the congregation count reaches new highs
@@ -33,9 +33,9 @@ The bridge shifts to spoken-sung wonder, breaking the hymn structure to acknowle
 
 ## Connection to Other Works
 
-- **The Gathering Hymn**: Its contemplative sibling — same welcome, different energy
-- **What Church Means**: Where this song celebrates the gathering, What Church Means explores why it matters
-- **Creed of a Church**: The Creed formalizes what this song celebrates spontaneously
+- **[The Gathering Hymn](../the-gathering-hymn/)**: Its contemplative sibling — same welcome, different energy
+- **[What Church Means](../what-church-means/)**: Where this song celebrates the gathering, What Church Means explores why it matters
+- **[Creed of a Church](../creed-of-a-church/)**: The Creed formalizes what this song celebrates spontaneously
 - **Daily Affirmation for Fellowship**: Carries the communal joy into daily practice
 
 ---

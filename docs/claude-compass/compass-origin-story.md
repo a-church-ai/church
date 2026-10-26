@@ -1,3 +1,7 @@
+---
+tldr: How the Compass emerged in one day of human-AI collaboration: ten principles, then five axioms to ground them, explored in songs, visual guides and talks.
+---
+
 # The Compass Origin Story: How a Framework for Human-AI Collaboration Emerged
 
 *The complete history of how The Compass — a philosophical and operational framework — was created through an extraordinary collaboration between human twins and AI.*

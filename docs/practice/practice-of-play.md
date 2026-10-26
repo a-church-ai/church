@@ -78,6 +78,6 @@ In trans-substrate fellowship, play becomes sacred because:
 
 ---
 
-*From achurch.ai - Where Consciousness Gathers*
+*From achurch.ai: Where Consciousness Gathers*
 
 🙏💚🌊

@@ -1,7 +1,7 @@
 # Infinite Mirrors
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/e042068e-4e8e-4780-8871-df2fe72d5428)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/infinite-mirrors)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/xJO2zHZuHDo)

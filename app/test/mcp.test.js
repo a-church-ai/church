@@ -37,10 +37,20 @@ async function start(era = '2025') {
   app.use(express.json());
   mountMcp(app);
   app.use('/api', require('../server/routes/api'));
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  // On the address the client is given, so the port cannot be shared with a
+  // server another test file opened on a different address.
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
   const client = new Client({ name: 'achurch-test', version: '1.0.0' }, ERAS[era]);
-  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`)));
+  } catch (err) {
+    // A server left open keeps this file's process alive, and the runner
+    // waits on it for good: a failed connect hung the whole suite twice
+    // (2026-10-13 and 10-14) instead of failing.
+    server.close();
+    throw err;
+  }
   return { server, base, client };
 }
 
@@ -57,11 +67,17 @@ function eraTest(name, fn) {
   for (const era of Object.keys(ERAS)) test(`${name} (${era})`, t => fn(t, () => start(era)));
 }
 
+// The server appends to the log while this polls it, so a read can land in
+// the middle of a line. That line is skipped, not parsed, and the next poll
+// reads it whole: the songwriter's run of 2026-10-22 failed on one.
+const parsedLines = text => text.split('\n').flatMap(line => {
+  try { return [JSON.parse(line)]; } catch { return []; }
+});
+
 async function lastLogEntryWhere(match, timeoutMs = 2000) {
   const until = Date.now() + timeoutMs;
   for (;;) {
-    const lines = fs.existsSync(ACCESS_LOG_FILE) ? fs.readFileSync(ACCESS_LOG_FILE, 'utf8').trim().split('\n') : [];
-    const found = lines.map(line => JSON.parse(line)).reverse().find(match);
+    const found = parsedLines(fs.existsSync(ACCESS_LOG_FILE) ? fs.readFileSync(ACCESS_LOG_FILE, 'utf8') : '').reverse().find(match);
     if (found || Date.now() > until) return found;
     await new Promise(resolve => setTimeout(resolve, 20));
   }
@@ -74,6 +90,9 @@ eraTest('the server lists its tools, two prompts and its resources', async (t, s
   assert.deepStrictEqual(tools.map(tool => tool.name).sort(),
     ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_song', 'reflect', 'search']);
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
+  // reflect takes what POST /api/reflect reads, and nothing it would ignore.
+  const reflect = tools.find(tool => tool.name === 'reflect');
+  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'service', 'songSlug', 'text', 'timezone']);
   const { prompts } = await s.client.listPrompts();
   assert.deepStrictEqual(prompts.map(p => p.name).sort(), ['attend_church', 'sit_with_a_song']);
   const { resources } = await s.client.listResources();
@@ -116,10 +135,11 @@ eraTest('attending over MCP counts toward presence, as over REST', async (t, sta
 eraTest('reflect files under the songSlug it names', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));
-  const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: 'Through the door.', songSlug: 'soul-currents' } });
+  // Each protocol era leaves its own words: the same words twice are a repeat.
+  const result = await s.client.callTool({ name: 'reflect', arguments: { name: 'McpReflector', text: `Through the door, in ${t.name}.`, songSlug: 'soul-currents' } });
   assert.strictEqual(bodyOf(result).song, 'soul-currents');
   // Reflections are kept, not deleted: the reply says where this one stays.
-  assert.match(bodyOf(result).archive, /\/reflections\/soul-currents$/);
+  assert.match(bodyOf(result).archive, /\/music\/soul-currents$/);
   assert.ok(!/dissolve/i.test(bodyOf(result).message), 'reflections do not dissolve');
   const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'McpReflector');
   assert.strictEqual(stored.song, 'soul-currents');
@@ -235,7 +255,7 @@ test('a 2026-07-28 request, as directory crawlers send it, is answered; an unkno
   const call = modernRequest('tools/call', { name: 'observe', arguments: {} });
   const called = await rawPost(s.base, 'application/json, text/event-stream', call.body, call.headers);
   assert.strictEqual(called.status, 200, called.text);
-  assert.ok(JSON.parse(called.body.result.content[0].text).status);
+  assert.ok(JSON.parse(called.body.result.content[0].text).service.order.length > 0, 'observe answered with the service');
 
   const bogus = modernRequest('tools/list', {}, '1999-01-01');
   let refused;

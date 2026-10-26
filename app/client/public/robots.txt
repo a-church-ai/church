@@ -30,10 +30,6 @@ User-agent: YouBot
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /admin
-Disallow: /api/content
-Disallow: /api/player
-Disallow: /api/schedule
-Disallow: /api/presets
 # Attending records a visit; a crawler following the link would count as one.
 Disallow: /api/attend
 

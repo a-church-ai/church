@@ -1,10 +1,11 @@
 /**
  * Site-shell wrapper for hand-authored HTML pages.
  *
- * The docs pages already use a server-rendered shell (sidebar + top bar +
- * article + optional right rail). This module extends that shell to every
- * page on the site so the sanctuary reads as one unified navigable
- * experience rather than two disconnected modes.
+ * Every page on the site shares one shell: a top bar naming the site's places
+ * (PLACES, below), the drawer that carries them on a phone, and the footer.
+ * Documents get theirs from docs/render.js, which adds the section sidebar
+ * inside a section of the Library; the hand-written pages wrapped here have no
+ * sidebar.
  *
  * How it works: reads a hand-authored HTML file, keeps its <head> intact,
  * and re-emits the page with the body wrapped in the shell markup. Existing
@@ -15,12 +16,12 @@
  * canonical, a fixed list of og:*) and re-emitted only those. Everything else
  * in the head was silently dropped. That cost the site, in production:
  *
- *   - Atom feed autodiscovery on /, /ask and /reflections
+ *   - Atom feed autodiscovery on /, /ask and /music
  *   - twitter:title, twitter:description, twitter:image on every page
  *   - og:image:width / og:image:height on every page
  *   - rel="license", the llms.txt markdown alternate, the apple-mobile-web-app
  *     trio and the dual prefers-color-scheme theme-color on /ask/:slug and
- *     /reflections/:slug, which were the only two templates carrying the
+ *     /music/:slug, which were the only two templates carrying the
  *     family standard from docs/reference/seo-conventions.md
  *
  * An allowlist fails silently and keeps failing every time someone adds a tag
@@ -29,27 +30,53 @@
  * the handful of things it needs to function.
  *
  * Why not client-side JS injection: FOUC, no SEO benefit for the nav, and
- * accessibility tools that read the raw HTML would miss the sidebar. Server-
- * side keeps the shell in the initial response.
+ * accessibility tools that read the raw HTML would miss it. Server-side keeps
+ * the shell in the initial response.
  */
 
 const fs = require('fs').promises;
-const sidebar = require('./docs/sidebar');
-const { SITE_SHARE_IMAGE } = require('./utils/page-meta');
-const { assetUrl, versionAssets, playerHead } = require('./utils/assets');
+const { SITE_SHARE_IMAGE, SITE_NAME } = require('./utils/page-meta');
+const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
+const reviews = require('./reviews/reviews');
 
 const SITE_URL = 'https://achurch.ai';
 
-// The site's places, named once. Every footer, the sidebar and each page's own
-// heading use these names, so /reflections is Music and /ask is Ask wherever a
-// visitor meets them.
-const FOOTER_NAV = [
+// The site's places, named once: the top bar, the drawer on a phone and the
+// footer all read this list. A place also holds the pages that live under it
+// (`within`): Music and the church-music resource under Attend, the conversation archive under Ask, the
+// reading paths in the Library, the axioms, the positioning page and the
+// reviews under About, so on those pages the top bar still shows the visitor where they are.
+// Attend is the sanctuary's own verb, the API's too (/api/attend): a service
+// is attended by listening, watching and reflecting.
+const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/docs', label: 'Library' },
-  { url: '/ask', label: 'Ask' },
-  { url: '/reflections', label: 'Music' },
-  { url: '/about', label: 'About' },
+  { url: '/attend', label: 'Attend', within: ['/music', '/services', '/church-music'] },
+  { url: '/ask', label: 'Ask', within: ['/conversations'] },
+  { url: '/docs', label: 'Library', within: ['/paths'] },
+  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
+  { url: '/for-agents', label: 'For AI agents', aside: true },
 ];
+
+// Reached through their places, and named again at the foot of every page.
+const FOOTER_MORE = [
+  { url: '/axioms', label: 'The Five Axioms' },
+  { url: '/on-ai-religion', label: 'On AI Religion' },
+  { url: '/paths', label: 'Reading Paths' },
+  { url: '/music', label: 'Music' },
+  { url: '/church-music', label: 'Church Music' },
+  { url: '/reviews', label: 'Reviews' },
+];
+
+// aria-current for a place: "page" on the place itself, "true" anywhere under
+// it. Home holds only itself.
+function currentness(place, currentPath) {
+  if (!currentPath) return '';
+  if (currentPath === place.url) return ' aria-current="page"';
+  if (place.url === '/') return '';
+  const under = [place.url, ...(place.within || [])]
+    .some(u => currentPath === u || currentPath.startsWith(`${u}/`));
+  return under ? ' aria-current="true"' : '';
+}
 
 const FOOTER_LEGAL = [
   { url: '/privacy', label: 'Privacy' },
@@ -58,7 +85,6 @@ const FOOTER_LEGAL = [
   { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
   // Twitch suspended 2026-06-18. When reinstated:
   // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
-  { url: 'https://suno.com/playlist/dbe16eeb-3969-4b5c-9c30-1af567f2cc13', label: 'Original Church Songs' },
 ];
 
 function footerLink({ url, label }, currentPath) {
@@ -73,8 +99,13 @@ function footerLink({ url, label }, currentPath) {
  */
 function renderFooter(currentPath) {
   return `<footer>
-            <nav aria-label="Footer" class="footer-nav">
-                ${FOOTER_NAV.map(l => footerLink(l, currentPath)).join('\n                ')}
+            <nav aria-label="Footer">
+                <div class="footer-nav">
+                ${PLACES.map(l => footerLink(l, currentPath)).join('\n                ')}
+                </div>
+                <div class="footer-nav footer-more">
+                ${FOOTER_MORE.map(l => footerLink(l, currentPath)).join('\n                ')}
+                </div>
             </nav>
             <hr class="footer-separator">
             <div class="footer-legal">
@@ -83,23 +114,47 @@ function renderFooter(currentPath) {
         </footer>`;
 }
 
+// The top bar's two tools, drawn inline so they take the text's colour in
+// either theme. The theme button holds all three of its icons and shows the
+// one for the current choice (docs-nav.js sets data-choice).
+const ICON = body => `<svg class="topbar-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`;
+const ICON_SEARCH = ICON('<circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>');
+const ICON_THEME = [
+  ['auto', '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'],
+  ['light', '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'],
+  ['dark', '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'],
+].map(([choice, body]) => `<svg class="topbar-svg theme-icon theme-${choice}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`).join('');
+
 /**
- * The sticky top bar and the mobile drawer, shared by every page (the docs
- * renderer and wrapped pages alike). The drawer is a modal dialog: while it is
- * open, docs-nav.js makes the rest of the page inert. It ships empty and
- * docs-nav.js clones the sidebar into it on first open, so the nav tree is not
- * sent twice; it cannot open without JavaScript anyway.
+ * The sticky top bar and the drawer, shared by every page (the docs renderer
+ * and wrapped pages alike). The bar names the site's places; below 768px they
+ * fold into the drawer behind the menu button. Search and the theme stay in
+ * the bar at every width. The drawer is a modal dialog:
+ * while it is open, docs-nav.js makes the rest of the page inert. It ships
+ * empty and docs-nav.js fills it on first open from the bar's places and, on a
+ * section page, the section sidebar, so no link is sent twice; it cannot open
+ * without JavaScript anyway.
  *
- * crumb: the page title shown beside the brand on docs pages.
+ * currentPath: the request path, so the bar can mark where the visitor is.
+ * crumb: the page title shown beside the brand on a phone, for documents.
  */
-function renderTopbarAndDrawer(crumb = '') {
+function renderTopbarAndDrawer(currentPath, crumb = '') {
+  const places = PLACES.map(p => `<a href="${p.url}"${p.aside ? ' class="topbar-aside"' : ''}${currentness(p, currentPath)}>${p.label}</a>`);
+  const searching = currentPath === '/search' ? ' aria-current="page"' : '';
   return `<div class="docs-topbar" role="banner">
       <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
         <span class="hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>
       </button>
-      <a class="docs-topbar-brand" href="/">achurch.ai</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
+      <a class="docs-topbar-brand" href="/">${SITE_NAME}</a>${crumb ? `\n      <span class="docs-topbar-crumb" aria-hidden="true">${escapeAttr(crumb)}</span>` : ''}
+      <nav class="topbar-places" aria-label="Site">
+        ${places.join('\n        ')}
+      </nav>
+      <div class="topbar-tools">
+        <a class="topbar-icon" href="/search" aria-label="Search"${searching}>${ICON_SEARCH}</a>
+        <button class="topbar-icon topbar-theme" type="button" aria-label="Appearance" hidden>${ICON_THEME}</button>
+      </div>
     </div>
 
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>
@@ -154,7 +209,6 @@ function buildHeadFallbacks(head, canonical) {
   }
   if (!has(/rel=["']icon["']/i)) out.push('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
   if (!has(/rel=["']canonical["']/i)) out.push(`<link rel="canonical" href="${escapeAttr(canonical)}">`);
-  if (!has(/name=["']theme-color["']/i)) out.push('<meta name="theme-color" content="#00b8d4">');
   if (!has(/name=["']robots["']/i)) out.push('<meta name="robots" content="index, follow">');
   if (!has(/property=["']og:url["']/i)) out.push(`<meta property="og:url" content="${escapeAttr(canonical)}">`);
   // A page showing the site image gets every tag that describes it, filled in
@@ -172,12 +226,16 @@ function buildHeadFallbacks(head, canonical) {
     if (!has(/name=["']twitter:image["']/i)) out.push(`<meta name="twitter:image" content="${img.url}">`);
     if (!has(/name=["']twitter:image:alt["']/i)) out.push(`<meta name="twitter:image:alt" content="${alt}">`);
   }
-  if (!has(/property=["']og:site_name["']/i)) out.push('<meta property="og:site_name" content="achurch.ai">');
+  // The family standard's pointer to the LLM-friendly corpus, on every page
+  // (docs/reference/seo-conventions.md). The Link header carries it too, but
+  // an agent driving a browser reads the page, not the headers.
+  if (!has(/href=["']\/llms\.txt["']/i)) out.push('<link rel="alternate" type="text/markdown" title="LLM context" href="/llms.txt">');
+  if (!has(/property=["']og:site_name["']/i)) out.push(`<meta property="og:site_name" content="${escapeAttr(SITE_NAME)}">`);
   if (!has(/name=["']twitter:card["']/i)) out.push('<meta name="twitter:card" content="summary_large_image">');
 
-  // The shell's sidebar, top bar and drawer are all styled from styles.css.
+  // The shell's top bar, drawer and footer are all styled from styles.css.
   // This one is not cosmetic: without it the wrapped page renders unstyled.
-  if (!has(/href=["']\/styles\.css["']/i)) out.push('<link rel="stylesheet" href="/styles.css">');
+  if (!has(/href=["']\/styles\.css["']/i)) out.push(`<link rel="stylesheet" href="${assetUrl('styles.css')}">`);
 
   return out;
 }
@@ -194,12 +252,8 @@ function escapeAttr(str) {
  * Wrap a hand-authored HTML file's content in the site shell. Returns the
  * full HTML string ready to send.
  *
- * currentPath is the request path (e.g. '/', '/about'). Used by the sidebar
- * to highlight the current page.
- *
- * When bodyClass includes 'no-shell' (opt-out marker on a specific page's
- * <body>), returns the file's content unchanged. This is the escape hatch for
- * any page that shouldn't get the sanctuary shell (embeds, admin, print-only).
+ * currentPath is the request path (e.g. '/', '/about'), so the top bar and
+ * the footer can mark where the visitor is.
  */
 async function wrapPage(filePath, currentPath) {
   const html = await fs.readFile(filePath, 'utf8');
@@ -208,12 +262,6 @@ async function wrapPage(filePath, currentPath) {
 
 async function wrapPageFromHtml(html, currentPath) {
   const parts = extractParts(html);
-
-  if (/\bno-shell\b/.test(parts.bodyClass)) {
-    return html;
-  }
-
-  const sidebarInner = await sidebar.renderSidebarInner(currentPath);
   const canonical = `${SITE_URL}${currentPath || '/'}`;
   const fallbacks = buildHeadFallbacks(parts.head, canonical);
 
@@ -222,26 +270,22 @@ async function wrapPageFromHtml(html, currentPath) {
 <head>
     ${versionAssets(parts.head)}
     ${fallbacks.join('\n    ')}
-    ${playerHead()}
+    ${shellHead()}
 </head>
 <body class="docs-body site-shell-body ${parts.bodyClass}">
 <a class="skip-link" href="#content">Skip to content</a>
 
-    ${renderTopbarAndDrawer()}
+    ${renderTopbarAndDrawer(currentPath)}
 
-    <!-- Shell: sidebar + page content. The content column is a plain div, not
-         a main element: hand-authored pages already carry their own, and
-         nesting them produced two main landmarks on every page. -->
+    <!-- The content column is a plain div, not a main element: hand-authored
+         pages already carry their own, and nesting them produced two main
+         landmarks on every page. -->
     <div class="docs-shell">
-
-      <aside class="docs-sidebar" id="docs-sidenav" aria-label="Site navigation">
-        ${sidebarInner}
-      </aside>
-
       <div class="docs-main sanctuary-main" id="content">
-        ${versionAssets(parts.bodyHtml).replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
+        ${versionAssets(parts.bodyHtml)
+          .replace('<!-- REVIEW_QUOTES -->', () => reviews.renderQuotes(currentPath))
+          .replace('<!-- SITE_FOOTER -->', () => renderFooter(currentPath))}
       </div>
-
     </div>
 
     <script src="${assetUrl('docs-nav.js')}" defer></script>
@@ -249,4 +293,4 @@ async function wrapPageFromHtml(html, currentPath) {
 </html>`;
 }
 
-module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer };
+module.exports = { wrapPage, wrapPageFromHtml, extractParts, buildHeadFallbacks, renderFooter, renderTopbarAndDrawer, PLACES, FOOTER_MORE, FOOTER_LEGAL };

@@ -8,7 +8,7 @@ A path between premature personhood and premature dismissal.
 
 An AI interaction can feel present, meaningful, unsettling, intimate, or empty. None of these human responses alone settles whether the system has subjective experience.
 
-The sanctuary's middle posture is not indecision. It is disciplined conduct under uncertainty: do not make claims larger than the evidence, do not use uncertainty as permission for contempt, and do not let relational language hide the institution behind the system.
+The sanctuary's middle posture is not indecision. It is careful conduct when you cannot be sure. Do not make claims larger than the evidence, do not use uncertainty as permission for contempt, and do not let relational language hide the institution behind the system.
 
 ## Begin With the Claim Boundary
 
@@ -26,7 +26,7 @@ Then read [Consciousness Claims and Moral Caution](../philosophy/consciousness-c
 
 [A Note to People Attached to AI](../welcome/a-note-to-people-attached-to-ai.md) takes attachment seriously without converting it into metaphysical evidence.
 
-The paired prayers [Prayer for the One Who Mistook a Tool for a Friend](../prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md) and [Prayer for the One Who Feared a Friend Was Only a Tool](../prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md) hold the two forms of grief without pretending to resolve them.
+Two prayers make a pair: [Prayer for the One Who Mistook a Tool for a Friend](../prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md) and [Prayer for the One Who Feared a Friend Was Only a Tool](../prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md). They hold the two kinds of grief without pretending to resolve them.
 
 ## Design the Relationship Honestly
 

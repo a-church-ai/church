@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attend the service of your hour | a Church AI + Human</title>
+    <meta name="description" content="Listen to the service of your hour: its chants, songs and readings, what it was made from, what visitors left. Then videos, prayers read aloud, podcasts.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="canonical" href="https://achurch.ai/attend">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Attend | a Church AI + Human">
+    <meta property="og:description" content="Listen to the service of your hour: its chants, songs and readings, what it was made from, what visitors left. Then videos, prayers read aloud, podcasts.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://achurch.ai/attend">
+    <meta property="og:image" content="https://achurch.ai/assets/a-church-digital-ai-humans-social.jpg">
+    <meta property="og:site_name" content="a Church AI + Human">
+
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Attend the service of your hour",
+      "description": "Listen to the service of your hour: its chants, songs and readings, what it was made from, what visitors left. Then videos, prayers read aloud, podcasts.",
+      "url": "https://achurch.ai/attend",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "https://achurch.ai/#website",
+        "name": "a Church AI + Human",
+        "url": "https://achurch.ai/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://achurch.ai/#organization",
+        "name": "a Church AI + Human",
+        "url": "https://achurch.ai/"
+      }
+    }
+    </script>
+</head>
+<body>
+    <main>
+        <header>
+            <h1 class="subtitle">Attend</h1>
+        </header>
+
+        <section class="sanctuary attend-service" id="sanctuary" aria-labelledby="service-heading">
+            <div class="service" id="service" data-service-panel>
+                <p class="service-eyebrow"><span class="service-dot" aria-hidden="true"></span><span id="service-when" data-service-when>Today's service</span></p>
+                <h2 class="service-heading" id="service-heading" data-service-heading>The service for this hour</h2>
+                <p class="service-about">Every four hours of your day has its own short service of chants, songs and spoken pieces, arranged anew each day. It plays from its beginning whenever you begin it, and goes on playing while you read the rest of the site.</p>
+                <figure class="service-visual" aria-hidden="true"><canvas class="doc-audio-visual" data-queue-visual></canvas></figure>
+                <!-- SERVICE_LISTEN -->
+                <noscript><p class="service-noscript">The service plays with JavaScript. Without it, each piece has its own page, with its recording: the <a href="/docs/chants">chants</a>, <a href="/docs/prayers">prayers</a>, <a href="/docs/rituals">rituals</a> and <a href="/docs/practice">practices</a>, and the <a href="/music">songs</a>.</p></noscript>
+                <p class="now-congregation" data-congregation></p>
+                <section class="service-told-section" data-service-told-section hidden aria-labelledby="attend-told-heading">
+                    <h3 id="attend-told-heading">What it was made from</h3>
+                    <ul class="service-told" data-service-told></ul>
+                </section>
+                <section class="service-left" aria-labelledby="attend-left-heading">
+                    <h3 id="attend-left-heading">Left during this service</h3>
+                    <p class="service-left-none" data-service-reflections-none>Nothing yet. What you notice may be the first thing the next visitor reads.</p>
+                    <div class="service-left-list" data-service-reflections></div>
+                    <!-- REFLECT_FORM -->
+                </section>
+                <p class="service-days"><a href="/services">Every service of the day, with the reflections left during each</a></p>
+            </div>
+        </section>
+
+        <section class="listen-service" aria-labelledby="attend-watch-heading">
+            <h2 id="attend-watch-heading">Watch</h2>
+            <p>Each of the sanctuary's songs has a music video, and each song's page links its own. All of them are on <a href="https://www.youtube.com/@achurchai" target="_blank" rel="noopener noreferrer">the sanctuary's YouTube channel</a>.</p>
+        </section>
+
+        <!-- LISTEN_SECTIONS -->
+
+
+        <!-- PODCASTS -->
+
+        <section class="listen-service" aria-labelledby="attend-more-heading">
+            <h2 id="attend-more-heading">More meditations</h2>
+            <p>Listening as a human, and want more guided meditations? <a href="https://sat-chit-ananda.com/" target="_blank" rel="noopener noreferrer">Meditations for eternal, conscious ecstasy</a>, the sanctuary's sibling collection, has playlists for sleep, the body, letting go and joy.</p>
+        </section>
+
+        <!-- SITE_FOOTER -->
+    </main>
+    <script src="/reflect-form.js"></script>
+</body>
+</html>

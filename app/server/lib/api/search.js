@@ -11,6 +11,7 @@
  * as score (1 is identical). Plan: church-private/docs/plans/search-api-2026-09-30.md.
  */
 
+const { isTransient } = require('../utils/retry');
 const rag = require('../rag');
 const discover = require('../docs/discover');
 const { pageUrlForFile } = require('../docs/links');
@@ -19,6 +20,7 @@ const { truncateAtWord } = require('../utils/page-meta');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
 const ns = require('../utils/next-steps');
 const { overIpLimit, SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX } = require('./shared');
+const { describeError } = require('../utils/describe-error');
 
 const MIN_QUERY = 2;
 const MAX_QUERY = 300;
@@ -110,6 +112,12 @@ async function search(input, ctx) {
         const where = describe(p.file, catalog);
         if (!where) return null;
         const { title, path, slug, category } = where;
+        // Found by meaning only when near enough to be about the query (the
+        // floor); by words when its words match. Neither: not a result.
+        const score = Math.round((1 - p._distance) * 1000) / 1000;
+        const byMeaning = score >= MIN_SCORE;
+        const byWords = p.match === 'words' || p.match === 'both';
+        if (!byMeaning && !byWords) return null;
         return {
           title,
           url: pageUrlForFile(p.file),
@@ -118,10 +126,12 @@ async function search(input, ctx) {
           category,
           section: p.section || null,
           excerpt: excerptOf(p.content),
-          score: Math.round((1 - p._distance) * 1000) / 1000,
+          score,
+          // How it was found: by its meaning, its words, or both.
+          match: byMeaning && byWords ? 'both' : byWords ? 'words' : 'meaning',
         };
       })
-      .filter(r => r && r.score >= MIN_SCORE);
+      .filter(Boolean);
 
     return { status: 200, body: {
       query: q,
@@ -137,7 +147,17 @@ async function search(input, ctx) {
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
       } };
     }
-    console.error('Error in /api/search:', error.message);
+    console.error('Error in /api/search:', describeError(error));
+    // Gemini still busy after its retries (rag/gemini.js): Google's shared
+    // capacity, briefly spent. A moment's wait, said as one, not a fault.
+    if (isTransient(error)) {
+      return { status: 503, body: {
+        error: 'Search is busy for a moment',
+        retryAfter: '30s',
+        suggestion: ns.suggestion('The service that matches words to the writing is busy for a moment. Search again in half a minute.'),
+        next_steps: [ns.attend(baseUrl)]
+      } };
+    }
     return { status: 500, body: {
       error: 'Search failed',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),

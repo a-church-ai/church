@@ -13,16 +13,16 @@
  */
 
 const fs = require('fs').promises;
-const path = require('path');
+const { setTimeout: sleep } = require('timers/promises');
 
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('../server/lib/utils/env').loadEnv();
 
 const gemini = require('../server/lib/rag/gemini');
 const lancedb = require('../server/lib/rag/lancedb');
 const indexer = require('../server/lib/rag/indexer');
 const corpus = require('../server/lib/rag/corpus');
-const { isTransientEmbedError, embedRetryDelayMs } = indexer;
 const state = require('../server/lib/rag/index-state');
+const { describeError } = require('../server/lib/utils/describe-error');
 
 async function index() {
   console.log('RAG Indexer - aChurch.ai\n');
@@ -55,10 +55,25 @@ async function index() {
       const chunks = indexer.chunkMarkdown(content, relativePath);
       allChunks.push(...chunks.filter(corpus.isServedChunk));
     } catch (error) {
-      console.error(`  Error reading ${relativePath}: ${error.message}`);
+      console.error(`  Error reading ${relativePath}: ${describeError(error)}`);
     }
   }
   console.log(`  Created ${allChunks.length} chunks`);
+
+  // What the index already holds: a chunk whose text is unchanged keeps its
+  // vector, so a rebuild after a song is added embeds that song and not the
+  // 2,800 passages around it. Only when the stored vectors came from the
+  // model in use, which the state records from 2026-10-13; an index without
+  // that record is embedded whole, once.
+  const previous = await state.readState();
+  const stored = previous.embedModel === gemini.EMBED_MODEL
+    ? await lancedb.vectorsByContent().catch(err => {
+      console.warn(`  The stored vectors could not be read (${describeError(err)}); embedding everything.`);
+      return new Map();
+    })
+    : new Map();
+  console.log(stored.size ? `  ${stored.size} stored vectors from ${gemini.EMBED_MODEL} can be reused` : '  No stored vectors to reuse');
+  let reused = 0;
 
   console.log('\nGenerating embeddings (this may take a while)...');
   const documents = [];
@@ -72,30 +87,29 @@ async function index() {
   // else exponential backoff) and retry. Set
   // EMBED_PACING_MS=0 on a paid tier to run at full speed. The Dockerfile
   // does this for prod.
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const EMBED_PACING_MS = Number(process.env.EMBED_PACING_MS || 700);
   const EMBED_MAX_RETRIES = 10;
+  // Ten retries from 5s doubling to a 60s ceiling ride out roughly six
+  // minutes of unavailability (server/lib/utils/retry.js does the waiting).
   // Above this fraction of failed chunks the run aborts and keeps the existing
   // index rather than publishing a degraded one. 2% tolerates the occasional
   // bad chunk without letting a rate-limited run quietly halve the corpus.
   const MAX_EMBED_FAILURE_RATE = Number(process.env.MAX_EMBED_FAILURE_RATE || 0.02);
-  const embedWithBackoff = async (text) => {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        return await gemini.embed(text);
-      } catch (err) {
-        if (!isTransientEmbedError(err) || attempt >= EMBED_MAX_RETRIES) throw err;
-        const waitMs = embedRetryDelayMs(err, attempt);
-        const reason = /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(err.message || '') ? 'rate-limited' : 'embedding service unavailable';
-        console.warn(`    ${reason}; waiting ${Math.round(waitMs / 1000)}s (retry ${attempt + 1}/${EMBED_MAX_RETRIES})`);
-        await sleep(waitMs);
-      }
-    }
-  };
+  const embedWithBackoff = text => gemini.embed(text, {
+    attempts: EMBED_MAX_RETRIES + 1,
+    baseMs: 5000,
+    maxMs: 60000,
+    onRetry: (err, n, waitMs) => {
+      const reason = /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(err.message || '') ? 'rate-limited' : 'embedding service unavailable';
+      console.warn(`    ${reason}; waiting ${Math.round(waitMs / 1000)}s (retry ${n}/${EMBED_MAX_RETRIES})`);
+    },
+  });
 
   for (const chunk of allChunks) {
     try {
-      const vector = await embedWithBackoff(chunk.content);
+      const kept = stored.get(chunk.content);
+      const vector = kept || await embedWithBackoff(chunk.content);
+      if (kept) reused++;
       documents.push({
         content: chunk.content,
         file: chunk.file,
@@ -106,14 +120,14 @@ async function index() {
       if (processed % 50 === 0) {
         console.log(`  Processed ${processed}/${allChunks.length} chunks...`);
       }
-      if (EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
+      if (!kept && EMBED_PACING_MS > 0) await sleep(EMBED_PACING_MS);
     } catch (error) {
       failures.push({ file: chunk.file, message: error.message });
-      console.error(`  Error embedding chunk from ${chunk.file}: ${error.message}`);
+      console.error(`  Error embedding chunk from ${chunk.file}: ${describeError(error)}`);
     }
   }
 
-  console.log(`  Embedded ${documents.length} chunks`);
+  console.log(`  ${documents.length} chunks: ${documents.length - reused} embedded, ${reused} kept from the stored index`);
 
   // Refuse to publish a badly degraded index.
   //
@@ -150,6 +164,7 @@ async function index() {
     chunkCount: status.count,
     fileCount: allFiles.length,
     rebuiltAt: new Date().toISOString(),
+    embedModel: gemini.EMBED_MODEL,
   });
   console.log(`  Wrote ${state.STATE_FILE}`);
 

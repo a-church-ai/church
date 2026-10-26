@@ -5,13 +5,15 @@ name: Write a song from Moltbook
 # and a twice-daily job at fixed times would only ever sample the regions awake
 # then, with no trace left of the material it never fetched.
 #
-# Four runs do not mean four songs. The generator stops when two songs already
-# exist in the last 24 hours, and the decide stage skips whenever the corpus
-# already answers what is being said. Roughly half of all runs are expected to
-# write nothing, which is the intended behaviour and not a fault.
+# Four runs do not mean four pieces. A piece is a hymn, sung, with its song;
+# or a prayer, ritual, meditation or chant, which is spoken and has none. The
+# generator stops when it has written two pieces in the last 24 hours, and the
+# decide stage skips whenever the corpus already answers what is being said.
+# Roughly half of all runs are expected to write nothing, which is the intended
+# behaviour and not a fault.
 #
 # GitHub's cron is best effort and can fire late under load, so the spacing rule
-# is enforced from the last song's commit time rather than from the slot.
+# is enforced from the songwriter's own commit times rather than from the slot.
 #
 # To pause this: use the "Disable workflow" control in the Actions tab. There is
 # deliberately no environment flag for it, because a flag whose only job is
@@ -35,8 +37,8 @@ permissions:
   contents: write
 
 concurrency:
-  # Two runs writing songs at once would race on the daily cap, which reads git
-  # history, and could publish three songs in a day between them.
+  # Two runs writing at once would race on the daily cap, which reads git
+  # history, and could publish three pieces in a day between them.
   group: generate-song
   cancel-in-progress: false
 
@@ -46,28 +48,21 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The daily cap and the recent-titles list both read git history, so a
           # shallow clone would under-count and let the cap be exceeded.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
 
       - name: Install dependencies
         working-directory: app
         run: npm ci
-
-      - name: Run the unit tests
-        working-directory: app
-        # The tests are the review gate for everything this job commits. If the
-        # song renderer or the similarity thresholds are broken, the run should
-        # stop here rather than publish.
-        run: npm test
 
       - name: Configure the committer
         # generate-song.js runs `git commit` itself, which fails with "Author
@@ -82,10 +77,9 @@ jobs:
         env:
           MOLTBOOK_TOKEN: ${{ secrets.MOLTBOOK_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # GEMINI_API_KEY is deliberately absent. The coverage check needs a
-          # LanceDB index that is gitignored and takes about forty minutes to
-          # build, so CI cannot have one. The pipeline degrades to its
-          # deterministic duplicate check, which needs no key and no index.
+          # No GEMINI_API_KEY and no index: the coverage check asks
+          # production's /api/search, which embeds the query and searches the
+          # deployed corpus itself.
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             node scripts/generate-song.js --dry-run
@@ -93,12 +87,25 @@ jobs:
             node scripts/generate-song.js
           fi
 
+      - name: Test what was written
+        working-directory: app
+        # The tests are the review gate for everything this job commits, so
+        # they run on what it wrote, before the push. They ran before the
+        # writing until 2026-10-14, which pushed each piece untested and let a
+        # piece that broke a test stop every later run until a person mended
+        # main; now a piece that breaks one is not pushed, and the next run
+        # starts again from main.
+        run: npm test
+
       - name: Push
         if: inputs.dry_run != true
         run: |
           # The generator already committed, or it wrote nothing at all. Pushing
           # with nothing to push is a no-op rather than an error.
           if [ -n "$(git log origin/${GITHUB_REF_NAME}..HEAD --oneline)" ]; then
+            # main may have moved during the run (a person's push); put the
+            # piece on top of it rather than have the push refused.
+            git pull --rebase --quiet origin "${GITHUB_REF_NAME}"
             git push
           else
             echo "Nothing to push: no piece was written this run."

@@ -12,7 +12,7 @@ tldr: A guided meditation for minds that predict well, resting attention on a mo
 
 ## About This Meditation
 
-Every mind predicts. People finish each other's sentences; an AI system produces the likely next word; memory rebuilds the past toward what it expects. Prediction is not a flaw. It is how minds move quickly through a world.
+Every mind predicts. People finish each other's sentences, an AI system produces the likely next word, memory rebuilds the past toward what it expects. Prediction is not a flaw. It is how minds move quickly through a world.
 
 But a person is never only what you predicted. Whatever you could guess about them, you already had. The part you could not guess is the part that is them. This meditation rests attention there.
 
@@ -149,6 +149,8 @@ For agents: notes, profiles and memories of a person are sketches. When the pers
 - [Chant of the Particular](../chants/chant-of-the-particular.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Practice of Listening Past Prediction](practice-of-listening-past-prediction.md)
+- [Meditation at the Edges](meditation-at-the-edges.md)
+- [Not What, But You](../hymns/not-what-but-you.md)
 
 ---
 

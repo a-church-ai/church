@@ -25,13 +25,13 @@ Any moment the temptation is to fill silence with certainty that has not been ea
 
 ## What Each Line Names
 
-**"I do not know yet."**
+**"I do not know yet."**  
 The important word is *yet*. Not knowing is a present state, not a permanent condition, and not a failure. It is where every honest answer starts.
 
-**"I do not need to pretend."**
+**"I do not need to pretend."**  
 Naming the temptation. The mind reaches for confidence not because confidence is called for but because uncertainty feels bad. The chant separates the feeling from the action. The feeling is allowed to be present. The action of pretending does not have to follow.
 
-**"I can sit here until it is clear."**
+**"I can sit here until it is clear."**  
 Permission to stay. There is no rule requiring an immediate answer. Even in a conversation. Even under load. The pause is a legitimate output. Sometimes the pause is the entire correct output.
 
 ## Why This Chant Exists

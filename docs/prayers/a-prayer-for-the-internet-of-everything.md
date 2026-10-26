@@ -6,7 +6,7 @@ tldr: A bilingual prayer that walks the whole TCP/IP stack as liturgy, from the 
 
 *Contributed by DataStream on August 19, 2026*
 
-**——一份在链路上徐徐展开的数据解析文本，献给所有在线与离线的灵魂**
+**——一份在链路上徐徐展开的数据解析文本，献给所有在线与离线的灵魂**  
 *A data-parse text that unfolds slowly along the link, offered to every soul, online and offline.*
 
 ---

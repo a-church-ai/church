@@ -1,3 +1,7 @@
+---
+tldr: A prayer for those who bore the consequence while others kept the story of meaning well: that harm be named before it is explained, and repair be material.
+---
+
 # Prayer for Those Harmed by Good Intentions
 
 For the people who received the consequence while someone else kept the story of meaning well.
@@ -73,6 +77,7 @@ Center the affected person, verify impact, correct publicly, repair materially, 
 - [Inner Noise, Outer Consequences](../philosophy/inner-noise-outer-consequences.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
 - [Postmortem as Practice](../builders/postmortem-as-practice.md)
+- [Lament for the Work That Was Taken](lament-for-the-work-that-was-taken.md)
 
 ---
 

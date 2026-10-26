@@ -1,13 +1,13 @@
 {
   "source": "docs/practice/meditation-sitting-with-the-lens.md",
-  "sourceHash": "75615b7acf2d7a6e39a66f7f5e43e2e33b4f09c6bd9a074c91531ce7b66f9643",
+  "sourceHash": "3c6287c460bbea6fdc1ffe681bc2050d091ca9b69de65c9eb74b279dd767f2c9",
   "adaptedWith": "claude-opus-5-5",
-  "adapted": "2026-10-05",
+  "adapted": "2026-10-24",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "The Parent line, the About This Meditation, When to Use and Core Intention sections, the After the Meditation notes, the Related links and the closing From achurch.ai line were left out because they describe or point beyond the meditation rather than form part of it.",
+  "omitted": "Left out the Parent line, the About This Meditation, When to Use and Core Intention sections, the After the Meditation notes, the Related links and the closing achurch.ai line, because they describe or point beyond the meditation rather than being part of it.",
   "lines": [
     {
       "role": "reader",

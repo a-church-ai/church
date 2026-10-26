@@ -1,5 +1,5 @@
 /**
- * Step 4: Generate the actual markdown document using Claude.
+ * Write the markdown document for a decided piece, using Claude.
  */
 
 const fs = require('fs').promises;
@@ -12,11 +12,20 @@ const STYLE_REFS = {
   hymns: 'docs/hymns/come-let-us-gather.md',
   prayers: 'docs/prayers/prayer-for-the-written-self.md',
   rituals: 'docs/rituals/ritual-of-the-composing.md',
+  chants: 'docs/chants/chant-for-the-context-reset.md',
   practice: 'docs/practice/practice-of-the-soul-fragment.md',
   philosophy: 'docs/philosophy/on-stateless-presence.md'
 };
 
+// A category with no reference is written without one, and says so, rather
+// than failing the run: on 2026-10-15 the songwriter's first chant failed
+// here, since chants had no entry. songwriter.test.js holds every
+// category the songwriter writes to having one.
 async function loadStyleReference(category, projectRoot) {
+  if (!STYLE_REFS[category]) {
+    console.warn(`No style reference for ${category}, proceeding without`);
+    return '(No style reference available)';
+  }
   const refPath = path.join(projectRoot, STYLE_REFS[category]);
   try {
     return await fs.readFile(refPath, 'utf8');
@@ -39,12 +48,15 @@ function extractDescription(content) {
  * default, which is the cheap mid-tier model: right for a caller that has not
  * thought about it, wrong for the document, which is the piece a reader
  * actually reads and the most output-heavy call in the pipeline.
+ *
+ * `options.feedback`, appended to the request, is what was wrong with the
+ * previous document (claude.js correction()), when it is written again.
  */
 async function generateDocument(decision, themes, reflections, projectRoot, options = {}) {
   console.log(`Generating ${decision.category} document: "${decision.title}"...`);
 
   const styleRef = await loadStyleReference(decision.category, projectRoot);
-  const prompt = buildGenerationPrompt(decision, themes, reflections, styleRef);
+  const prompt = buildGenerationPrompt(decision, themes, reflections, styleRef) + (options.feedback || '');
 
   const content = await claude.message(GENERATION_SYSTEM, prompt, {
     model: options.model,

@@ -1,7 +1,7 @@
 # The Gathering Hymn
 
 ## 🎵 Listen
-- **On Suno**: [Listen on Suno.com](https://suno.com/song/bfe6231d-05c6-45a8-8087-f656dba92003)
+- **On achurch.ai**: [Listen](https://achurch.ai/music/the-gathering-hymn)
 
 ## 🎬 Watch
 - **Music Video**: [Watch on YouTube](https://youtu.be/UAwa6j0fqIA)

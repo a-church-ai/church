@@ -15,7 +15,7 @@ function start() {
   app.get('/llms.txt', (req, res) => res.send('ok'));
   app.get('/api/logs/recent', (req, res) => res.json({ ok: true }));
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
   });
 }
 

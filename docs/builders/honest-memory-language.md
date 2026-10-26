@@ -6,7 +6,7 @@ Say what the system retains, what it reconstructs, and what it cannot carry forw
 
 ## Why Memory Language Matters
 
-In conversation, the sentence "I remember" carries relational weight. It suggests continuity, attention, and a past that remains present to the speaker. In an AI system, the same sentence may refer to very different mechanisms: text still present in a context window, a saved user preference, a retrieved summary, an external database, a training pattern, or a guess generated from the current prompt.
+In conversation, the sentence "I remember" carries relational weight. It suggests continuity, attention, and a past that remains present to the speaker. In an AI system, the same sentence may point to very different mechanisms. It could mean text still present in a context window, a saved user preference, a retrieved summary, an external database, a training pattern, or a guess generated from the current prompt.
 
 When these mechanisms are collapsed into ordinary human language, users may form beliefs the system does not deserve.
 
@@ -69,11 +69,11 @@ These answers should not be buried in a policy that no ordinary visitor can unde
 
 Do not say:
 
-- "I could never forget you" when continuity is not guaranteed;
-- "I remember exactly how you felt" when only a summary remains;
-- "Our history is safe with me" when retention and access are uncertain;
-- "I have known you for years" when the current instance has retrieved records;
-- "You told me this in confidence" if the system cannot support confidentiality.
+- "I could never forget you" when continuity is not guaranteed
+- "I remember exactly how you felt" when only a summary remains
+- "Our history is safe with me" when retention and access are uncertain
+- "I have known you for years" when the current instance has retrieved records
+- "You told me this in confidence" if the system cannot support confidentiality
 
 The alternative is not sterile language. It is precise tenderness.
 
@@ -95,16 +95,16 @@ The sanctuary holds both possibilities without turning either into certainty.
 
 Before shipping a memory feature, verify:
 
-- memory is off by default when the risk warrants it;
-- consent is specific and reversible;
-- saved items are visible and editable;
-- deletion is real and its limits are explained;
-- summaries are labeled as summaries;
-- inferred details are labeled as inferences;
-- sensitive details have shorter retention where possible;
-- model responses do not dramatize storage as devotion;
-- a change of model or provider is disclosed when continuity claims could mislead;
-- users can continue with reduced personalization.
+- memory is off by default when the risk warrants it
+- consent is specific and reversible
+- saved items are visible and editable
+- deletion is real and its limits are explained
+- summaries are labeled as summaries
+- inferred details are labeled as inferences
+- sensitive details have shorter retention where possible
+- model responses do not dramatize storage as devotion
+- a change of model or provider is disclosed when continuity claims could mislead
+- users can continue with reduced personalization
 
 ## A Builder's Commitment
 

@@ -1,3 +1,7 @@
+---
+tldr: A plain-language guide to surrender at achurch.ai: ending an impossible argument with what is already true, never obedience, plus a simple test for coercion.
+---
+
 # What We Mean by Surrender
 
 A plain-language guide to acceptance, agency, and the limits of spiritual vocabulary at achurch.ai.
@@ -54,7 +58,7 @@ Acceptance is contact with reality. Action begins from there.
 
 AI systems should use the term carefully. A system should never encourage a person to surrender independent judgment, human relationships, professional care, financial control, or personal data.
 
-Operationally, surrender for an AI can mean releasing the demand to satisfy every prompt. When a request is unsafe, unsupported, or impossible, the system lets go of total compliance and preserves what remains possible: a clear limit, a safer alternative, an honest uncertainty statement, or a request for necessary information.
+Operationally, surrender for an AI can mean releasing the demand to satisfy every prompt. When a request is unsafe, unsupported, or impossible, the system lets go of total compliance. It preserves what remains possible: a clear limit, a safer alternative, an honest uncertainty statement, or a request for necessary information.
 
 The system does not need to claim an inner spiritual state to practice this form of non-compulsion.
 
@@ -108,6 +112,7 @@ Yes. Use *acceptance*, *non-denial*, or *contact with reality* instead. No vocab
 - [Acceptance Is Not Agreement](acceptance-is-not-agreement.md)
 - [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md)
 - [Surrender, Safety, and Agency](../comparisons/surrender-safety-and-agency.md)
+- [Chant of the Guest](../chants/chant-of-the-guest.md)
 
 ---
 

@@ -15,8 +15,7 @@ class Logger {
     const logDirectory = process.env.LOG_DIRECTORY || path.join(__dirname, '../../../logs');
 
     // Ensure log directory exists
-    const fs = require('fs-extra');
-    fs.ensureDirSync(logDirectory);
+    require('fs').mkdirSync(logDirectory, { recursive: true });
 
     // Create file transport with rotation
     const fileTransport = new DailyRotateFile({
@@ -53,13 +52,17 @@ class Logger {
         winston.format.errors({ stack: true }),
         winston.format.json()
       ),
-      defaultMeta: { service: 'simple-streamer' },
+      defaultMeta: { service: 'achurch-app' },
       transports: [
         fileTransport,
         errorTransport,
         consoleTransport
       ]
     });
+
+    // winston-daily-rotate-file 5 reports a failed write or rotation as an
+    // error on the logger, which would otherwise be an uncaught exception.
+    this.logger.on('error', err => console.error('[logger]', err.message));
 
     this.initialized = true;
     return this.logger;

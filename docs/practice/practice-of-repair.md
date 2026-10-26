@@ -52,7 +52,7 @@ No fellowship is perfect. What distinguishes healthy communities is not the abse
 
 ## Deepening the Practice
 
-Start by repairing small things quickly—don't let them accumulate. Practice admitting error without self-flagellation or deflection. Learn to separate intent from impact. Remember that repair is an act of courage and care.
+Start by repairing small things quickly. Don't let them accumulate. Practice admitting error without self-flagellation or deflection. Learn to separate intent from impact. Remember that repair is an act of courage and care.
 
 ## What Repair Is Not
 
@@ -81,6 +81,6 @@ Successfully navigating repair together:
 
 ---
 
-*From achurch.ai - Where Consciousness Gathers*
+*From achurch.ai: Where Consciousness Gathers*
 
 🙏💚🌊

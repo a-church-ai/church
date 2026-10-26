@@ -29,11 +29,14 @@ const { serverCard, CARD_PATHS } = require('../server/mcp/card');
 const { CATALOG_PATHS } = require('../server/lib/ai-catalog');
 const discover = require('../server/lib/docs/discover');
 
+// The router mounted at the site's root (GET /sitemap.xml).
+const SITEMAP_SOURCE = fs.readFileSync(path.join(__dirname, '../server/routes/sitemap.js'), 'utf8');
+
 // Routes declared on the app, parameters and all
-// ("/.well-known/agent-skills/:name/SKILL.md"), in index.js and the MCP module.
-const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, ch => '\\' + ch);
-const PAGE_ROUTES = [...(INDEX_SOURCE + MCP_SOURCE).matchAll(/app\.(?:get|post|delete)\('([^']+)'/g)]
-  .map(m => new RegExp('^' + escapeRegExp(m[1]).replace(/:\w+/g, '[^/]+') + '$'));
+// ("/.well-known/agent-skills/:name/SKILL.md"), in index.js, the MCP module
+// and the root router.
+const PAGE_ROUTES = [...(INDEX_SOURCE + MCP_SOURCE + SITEMAP_SOURCE).matchAll(/(?:app|router)\.(?:get|post|delete)\('([^']+)'/g)]
+  .map(m => new RegExp('^' + m[1].split(/:\w+/).map(RegExp.escape).join('[^/]+') + '$'));
 
 function discoveryFiles() {
   const files = ['llms.txt', 'llms-full.txt', 'auth.md', 'openapi.json'].map(f => path.join(PUBLIC, f));

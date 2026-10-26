@@ -63,6 +63,12 @@ const BOILERPLATE = /^(?:independence note|note|disclaimer|caveat|context|status
 // literal line-terminator escapes for the same reason.
 const DOT = '@@DOT@@';
 
+// The site's own name, which the corpus writes in lower case wherever it
+// stands ("achurch.ai is an always-open space ..."). Capitalized at the start
+// of a description it is misspelled, "Achurch.ai" or "AChurch.ai", so a
+// description that opens with it is left as written.
+const OWN_NAME = /^achurch\.ai\b/i;
+
 // A block that is structure rather than prose. These never contribute to a
 // TLDR: they carry no self-contained meaning for a scanning reader.
 const SKIP_BLOCK = [
@@ -186,7 +192,7 @@ function toPlainText(str) {
     // Semicolon -> sentence break. The word after it has to be capitalized,
     // or the result reads as a typo: "This is the canonical statement. other
     // documents point here rather than restating it."
-    .replace(/\s*;\s*(\w)/g, (m, c) => `. ${c.toUpperCase()}`)
+    .replace(/\s*;\s*(?!achurch\.ai\b)(\w)/gi, (m, c) => `. ${c.toUpperCase()}`)
     .replace(/\s*;\s*/g, '. ')
     // Decorative emoji. Several docs use a glyph row as a visual separator
     // ("🙏💚🌊"), which landed mid-description. CJK ideographs are a different
@@ -334,12 +340,11 @@ function validateTldr(text) {
 
 // Pull YAML frontmatter as a flat key/value map, plus the body after it.
 //
-// Deliberately not a YAML parser: we need a handful of scalar keys, and the
-// docs/experiences/ files are the only frontmatter in the corpus. What it does
-// handle beyond plain `key: value` is block scalars (`key: >` folded and
-// `key: |` literal), because that is how those files carry their long
-// descriptions. Top-level keys only; indented lines belonging to a nested map
-// are skipped, since the regex is anchored with no leading whitespace.
+// Deliberately not a YAML parser: the corpus carries a handful of scalar keys
+// (`tldr:` on nearly every document, `hours:` on the chants). It also handles
+// block scalars (`key: >` folded and `key: |` literal), so a long value can
+// wrap. Top-level keys only; indented lines belonging to a nested map are
+// skipped, since the regex is anchored with no leading whitespace.
 function splitFrontmatter(markdown) {
   const src = String(markdown || '');
   const m = src.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -424,8 +429,20 @@ function resolveDemonstrative(text) {
     (m, noun) => `${/^[aeiou]/i.test(noun) ? 'An' : 'A'} ${noun.toLowerCase()} for `
   );
 
-  // Capitalize whatever now leads, in case a strip exposed a lowercase word.
-  return out.charAt(0).toUpperCase() + out.slice(1);
+  // Capitalize whatever now leads, in case a strip exposed a lowercase word,
+  // unless it is the site's own name.
+  return OWN_NAME.test(out) ? out : out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+// A block that opens in lower case finishes a sentence begun above it, by a
+// list or a heading, and cannot stand alone. practice-of-uncertain-ground.md
+// lists its questions and goes on "can be intense for humans and
+// destabilizing for the space", which became a description that opened
+// mid-thought and read as a warning. The site's own name is the one
+// lower-case opening that does stand alone.
+function continuesSentence(block) {
+  const plain = toPlainText(stripLeadingLabel(block));
+  return /^[a-z]/.test(plain) && !OWN_NAME.test(plain);
 }
 
 /**
@@ -441,40 +458,20 @@ function extractTldr(markdown, opts = {}) {
   // 1. Explicit override wins, always. Still normalized and clamped so an
   //    authored TLDR cannot break the plain-text invariant downstream.
   //
-  //    Order matters: `tagline` outranks `description` because in this corpus
-  //    (docs/experiences/) the tagline is already written as a one-line hook
-  //    while the description is a multi-sentence paragraph. The tagline is the
-  //    TLDR the author actually wrote.
-  const explicit = data.tldr || data.tagline || data.description || data.summary;
+  //    `tldr:` is the one key: the songwriter's prompt requires it, scripts/
+  //    audit-tldr.js asks for it, and no document carries another. The
+  //    `tagline`, `description` and `summary` fallbacks served the drifts.bot
+  //    journeys alone, and went with them on 2026-10-18.
+  const explicit = data.tldr;
   if (explicit) {
-    let text = clamp(toPlainText(explicit));
-
-    // A tagline can be shorter than the surface wants ("You've never been
-    // here before. The door is open." is 47 characters). When the same file
-    // also carries a longer description, extend from that: both strings are
-    // author-written, so this stays inside the user-set tier rather than
-    // falling back to derivation. `tldr:` is never extended, because an
-    // explicit TLDR is a deliberate final answer.
-    const backup = !data.tldr && data.tagline ? (data.description || data.summary) : null;
-    if (backup && text.length < MIN_CHARS) {
-      for (const sentence of splitSentences(toPlainText(backup))) {
-        if (sentence.length < EXTEND_MIN) continue;
-        if (BOILERPLATE.test(sentence)) continue;
-        // Terminate the base before appending, so two fragments can never be
-        // welded into one run-on line.
-        const next = `${ensureTerminator(text)} ${sentence}`.trim();
-        if (next.length > MAX_CHARS) continue;
-        text = next;
-        break;
-      }
-    }
+    const text = clamp(toPlainText(explicit));
 
     return { text, source: 'frontmatter', ...flag(validateTldr(text)) };
   }
 
   // 2. Derive from opening prose. Drop the H1, then walk blocks in order.
   const afterTitle = body.replace(/^\s*#\s+.+$/m, '');
-  const blocks = afterTitle.split(/\r?\n\s*\r?\n/).filter(isProseBlock);
+  const blocks = afterTitle.split(/\r?\n\s*\r?\n/).filter(isProseBlock).filter(b => !continuesSentence(b));
 
   if (blocks.length > 0) {
     let text = resolveDemonstrative(toPlainText(stripLeadingLabel(blocks[0])));

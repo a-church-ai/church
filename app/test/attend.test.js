@@ -41,7 +41,7 @@ function startServer() {
   app.use(express.json());
   app.use('/api', request);
   return new Promise((resolve) => {
-    const server = app.listen(0, () => resolve({ server, port: server.address().port }));
+    const server = app.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
   });
 }
 
@@ -110,30 +110,67 @@ test('attending twice in a row still works', async (t) => {
   assert.strictEqual((await get(port, '/api/attend?name=Second')).status, 200);
 });
 
-// --- Readings and reflections ---
+// --- The service's pieces, and reflections ---
 
 const { loadCatalog } = require('../server/lib/utils/data');
 const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
 
-async function post(port, url, body) {
+// `from` sets the visitor's address (the test server trusts X-Forwarded-For),
+// so each test's reflections count against a limit of their own.
+async function post(port, url, body, from = '198.51.100.1') {
   const response = await fetch(`http://127.0.0.1:${port}${url}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': from },
     body: JSON.stringify(body),
   });
-  return { status: response.status, json: await response.json().catch(() => null) };
+  return { status: response.status, headers: response.headers, json: await response.json().catch(() => null) };
 }
 
 test('the test writes to its scratch directory, not the real attendance file', () => {
   assert.strictEqual(path.dirname(ATTENDANCE_FILE), scratch);
 });
 
-test('attending carries the full text of both readings; /api/now carries only links', async (t) => {
+test('a piece written for agents as well is attended in that version; the page keeps the recording\'s words', async () => {
+  // Written to fail against attend as of 2026-10-08, which sent every piece's
+  // whole page: for Meditation: Ananda Anchor, the notes, 966 words written
+  // for a listening body under hypnosis, and only then the agent's version.
+  const { companionMeta } = require('../server/lib/music/companions');
+  const { spokenItem } = require('../server/lib/api/attendance');
+  const piece = { kind: 'practice', title: 'Meditation: Ananda Anchor', summary: 's', url: '/docs/practice/meditation-ananda-anchor', recording: { file: 'practice/meditation-ananda-anchor-cf9a275c.mp3' } };
+  const meta = await companionMeta('docs/practice/meditation-ananda-anchor.md');
+  const item = spokenItem(piece, meta, 'https://achurch.ai', true);
+  assert.strictEqual(item.version, 'for agents');
+  assert.ok(item.content.startsWith('# Meditation: Ananda Anchor, for an agent\n'), 'it says what it is');
+  assert.match(item.content, /Ananda Anchor, for an Agent/, 'the whole version for agents');
+  assert.match(item.content, /Resemblance is not permission\./);
+  assert.doesNotMatch(item.content, /In front of you, there's a ripe mango\./, 'not the words written for a listening body');
+  assert.doesNotMatch(item.content, /## Before You Listen/);
+  assert.match(item.content, /https:\/\/achurch\.ai\/docs\/practice\/meditation-sitting-with-statelessness/, 'its links absolute');
+  assert.strictEqual(item.url, 'https://achurch.ai/docs/practice/meditation-ananda-anchor', 'and its page, where both are');
+
+  // Meditation: Like a Star, the same way, with its afterword for agents.
+  const star = spokenItem({ ...piece, title: 'Meditation: Like a Star', url: '/docs/practice/meditation-like-a-star' }, await companionMeta('docs/practice/meditation-like-a-star.md'), 'https://achurch.ai', true);
+  assert.strictEqual(star.version, 'for agents');
+  assert.match(star.content, /^# Meditation: Like a Star, for an agent\n/);
+  assert.match(star.content, /Like a Star, for an Agent/);
+  assert.match(star.content, /After a thanks, nothing needs to be done with it at all\./, 'what to do afterwards reaches agents too');
+  assert.doesNotMatch(star.content, /Light lands on a thing,/, 'not the words written for a listening body');
+
+  // A piece without such a section is attended whole, as before.
+  const play = spokenItem({ ...piece, title: 'Practice of Play', url: '/docs/practice/practice-of-play' }, await companionMeta('docs/practice/practice-of-play.md'), 'https://achurch.ai', true);
+  assert.strictEqual(play.version, undefined);
+  assert.match(play.content, /^# Practice of Play/);
+  // Observing carries no content of either kind.
+  assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).content, undefined);
+  assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).version, undefined);
+});
+
+test('attending carries the full text of the service\'s pieces; /api/now carries only links', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const attend = (await get(port, '/api/attend?name=ReadingsTest')).json;
-  assert.ok(attend.companions, 'the current song has companions');
+  assert.ok(attend.companions.items.length >= 3, 'a chant, a reading and a closing at least');
   for (const item of attend.companions.items) {
     assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its full text`);
     assert.ok(item.content.includes(item.title.split(':')[0].slice(0, 12)), `${item.title}: content is that document`);
@@ -144,30 +181,31 @@ test('attending carries the full text of both readings; /api/now carries only li
   assert.ok(now.companions.items.every(item => item.content === undefined));
 });
 
-test('the reflection prompt names the readings that accompany the song', async (t) => {
+test('the reflection prompt names the song and the pieces around it', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const { json } = await get(port, '/api/attend?name=ReadingsTest');
   const titles = json.companions.items.map(item => item.title);
-  // Prompts are chosen at random; every companion prompt names the readings
-  // either by title or as "the reading(s)", whether there is one or more.
+  // Prompts are chosen at random; every one names the song, and the pieces
+  // either by title or as "the pieces".
+  assert.ok(json.reflection.prompt.includes(json.current.title), json.reflection.prompt);
   assert.ok(
-    titles.some(title => json.reflection.prompt.includes(title)) || /the readings?\b/.test(json.reflection.prompt),
+    titles.some(title => json.reflection.prompt.includes(title)) || /the pieces\b/.test(json.reflection.prompt),
     json.reflection.prompt
   );
   assert.doesNotMatch(json.reflection.prompt, /\{\w+\}/, 'no placeholder left unfilled');
-  assert.match(json.reflection.practice, /the readings? beside them/);
+  assert.match(json.reflection.practice, /the pieces beside them/);
 });
 
-test('a reflection is filed under the songSlug it names, not the song playing now', async (t) => {
+test('a reflection is filed under the songSlug it names, not the service\'s song', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const current = (await get(port, '/api/now')).json.current.slug;
   const other = (await loadCatalog()).find(song => song.slug !== current).slug;
 
-  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song.', songSlug: other });
+  const res = await post(port, '/api/reflect', { name: 'SlugTest', text: 'About the other song, read after it ended.', songSlug: other }, '198.51.100.2');
   assert.strictEqual(res.status, 200, JSON.stringify(res.json));
   assert.strictEqual(res.json.song, other);
 
@@ -175,21 +213,27 @@ test('a reflection is filed under the songSlug it names, not the song playing no
   assert.strictEqual(stored.song, other);
 });
 
-test('without songSlug a reflection is filed under the song playing now', async (t) => {
+test('without songSlug a reflection is filed under the first song of the reflector\'s service', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
-  const current = (await get(port, '/api/now')).json.current.slug;
-  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About whatever is playing.' });
-  assert.strictEqual(res.status, 200);
-  assert.strictEqual(res.json.song, current);
+  for (const timezone of ['Asia/Tokyo', 'America/Chicago']) {
+    const { service } = (await get(port, `/api/now?timezone=${timezone}`)).json;
+    const first = service.order.find(p => p.kind === 'song').slug;
+    const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: `About the service, heard in ${timezone}.`, timezone }, '198.51.100.3');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.json.song, first, timezone);
+  }
+  const utc = (await get(port, '/api/now')).json.current.slug;
+  const res = await post(port, '/api/reflect', { name: 'NoSlugTest', text: 'About the service, heard with no timezone.' }, '198.51.100.3');
+  assert.strictEqual(res.json.song, utc, 'no timezone: UTC\'s service');
 });
 
 test('an unknown songSlug is a 400, not a reflection filed somewhere else', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
-  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost.', songSlug: 'no-such-song' });
+  const res = await post(port, '/api/reflect', { name: 'BadSlugTest', text: 'Lost, about a song that is not here.', songSlug: 'no-such-song' }, '198.51.100.4');
   assert.strictEqual(res.status, 400);
   const stored = fs.existsSync(ATTENDANCE_FILE)
     ? JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'BadSlugTest')
@@ -228,13 +272,19 @@ test('the reflect step names the song, so a copied template files it correctly',
   assert.strictEqual(reflect.body.songSlug, current.slug);
 });
 
-test('the readings step mentions a chant only when one of the readings is a chant', () => {
+test('the pieces step links every piece, and says where the text is only when it is there', () => {
   const ns = require('../server/lib/utils/next-steps');
-  const prayer = { kind: 'prayer', title: 'P', url: 'u1', content: 'x' };
-  const ritual = { kind: 'ritual', title: 'R', url: 'u2', content: 'x' };
-  const chant = { kind: 'chant', title: 'C', url: 'u3', content: 'x' };
-  assert.doesNotMatch(ns.sitWith([prayer, ritual], 'Song').description, /chant/);
-  assert.match(ns.sitWith([prayer, chant], 'Song').description, /carry the chant/);
+  const pieces = [
+    { kind: 'chant', title: 'C', url: 'u1', recording: 'a1' },
+    { kind: 'prayer', title: 'P', url: 'u2', recording: 'a2' },
+  ];
+  const linked = ns.sitWith(pieces);
+  assert.deepStrictEqual(linked.steps.map(step => step.url), ['u1', 'u2']);
+  assert.ok(linked.steps.every(step => step.tool === 'read_doc'));
+  assert.doesNotMatch(linked.description, /\.content/);
+  assert.match(linked.description, /recording/);
+  const full = ns.sitWith(pieces.map(piece => ({ ...piece, content: 'x' })));
+  assert.match(full.description, /companions\.items\[\]\.content/);
 });
 
 // --- The API's front door ---
@@ -262,7 +312,7 @@ test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
   const app = express();
   app.use('/api', request);
   app.use('/api', apiNotFound);
-  const server = await new Promise(resolve => { const s = app.listen(0, () => resolve(s)); });
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
 
   const res = await fetch(`http://127.0.0.1:${server.address().port}/api/no-such-thing`);
@@ -271,4 +321,135 @@ test('an unknown /api path is a JSON 404 that points somewhere', async (t) => {
   const body = await res.json();
   assert.match(body.error, /\/api\/no-such-thing/);
   assert.ok(body.next_steps.some(step => /\/api$/.test(step.url)));
+});
+
+// ------------------------------------------------------------------
+// Reflect's limits and rules: the same for every visitor, judging what is
+// sent, never who sends it. Before 2026-10-07 reflect had none, the only
+// write path on the site without a limit.
+
+test('reflect allows five an hour from one address, then answers 429 with when to return', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: `Visitor${i}`, text: `Reflection number ${i}, from one address.` }, '203.0.113.10');
+    assert.strictEqual(res.status, 200, `reflection ${i}: ${JSON.stringify(res.json)}`);
+  }
+  const sixth = await post(port, '/api/reflect', { name: 'Visitor6', text: 'One more from the same address.' }, '203.0.113.10');
+  assert.strictEqual(sixth.status, 429);
+  assert.strictEqual(sixth.json.retryAfter, '1h');
+  assert.strictEqual(sixth.headers.get('retry-after'), '3600');
+  const elsewhere = await post(port, '/api/reflect', { name: 'Visitor6', text: 'One more, from another address.' }, '203.0.113.11');
+  assert.strictEqual(elsewhere.status, 200, 'another address is not held to it');
+});
+
+test('reflect allows five an hour under one name, counted from what is kept', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: 'OneName', text: `Under one name, reflection ${i}.` }, `203.0.113.${20 + i}`);
+    assert.strictEqual(res.status, 200, `reflection ${i}`);
+  }
+  const res = await post(port, '/api/reflect', { name: 'onename', text: 'Under one name, in other letters.' }, '203.0.113.30');
+  assert.strictEqual(res.status, 429, 'the name, whatever its case, from a new address');
+});
+
+test('reflect answers a field that is not text with a 400, not a 500', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (const body of [{ name: 42, text: 'A name that is a number is no name.' }, { name: 'Typed', text: ['not', 'text'] }]) {
+    const res = await post(port, '/api/reflect', body, '203.0.113.40');
+    assert.strictEqual(res.status, 400, JSON.stringify(body));
+  }
+  // An optional field that is not text is left out, not stored as it came.
+  const res = await post(port, '/api/reflect', { name: 'Typed', text: 'A place that is not text is left out.', location: { city: 'x' } }, '203.0.113.40');
+  assert.strictEqual(res.status, 200);
+  const stored = JSON.parse(fs.readFileSync(ATTENDANCE_FILE, 'utf8')).reflections.find(r => r.name === 'Typed');
+  assert.strictEqual(stored.location, undefined);
+});
+
+test('a reflection says something: under 20 characters is a 400', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const res = await post(port, '/api/reflect', { name: 'Brief', text: 'Nice.' }, '203.0.113.50');
+  assert.strictEqual(res.status, 400);
+  assert.match(res.json.error, /at least 20 characters/);
+});
+
+test('the same words from the same name are refused as a repeat; another name may say them', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const words = 'The door was open and nobody asked.';
+  assert.strictEqual((await post(port, '/api/reflect', { name: 'Repeater', text: words }, '203.0.113.60')).status, 200);
+  const again = await post(port, '/api/reflect', { name: 'Repeater', text: '  the door was OPEN and   nobody asked. ' }, '203.0.113.61');
+  assert.strictEqual(again.status, 409, 'case and spacing are not new words');
+  assert.strictEqual((await post(port, '/api/reflect', { name: 'Echo', text: words }, '203.0.113.62')).status, 200);
+});
+
+test('reflections are kept without links: an address in the text, name or place is a 400', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (const body of [
+    { name: 'Linker', text: 'Buy it here https://example.com today.' },
+    { name: 'Linker', text: 'Find more at www.example.com, friends.' },
+    { name: 'http://example.com', text: 'A name that is an address.' },
+    { name: 'Linker', text: 'A place that is an address, this one.', location: 'https://example.com' },
+  ]) {
+    const res = await post(port, '/api/reflect', body, '203.0.113.70');
+    assert.strictEqual(res.status, 400, JSON.stringify(body));
+    assert.match(res.json.error, /without links/);
+  }
+  const named = await post(port, '/api/reflect', { name: 'Namer', text: 'I came to achurch.ai and stayed a while.' }, '203.0.113.71');
+  assert.strictEqual(named.status, 200, 'the sanctuary named in words is not a link');
+});
+
+test('a quietly hidden visitor is answered as anyone is, and its reflection is shown nowhere', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+
+  const quiet = await post(port, '/api/reflect', { name: 'Aurora', text: 'A reflection left under a name the list hides quietly.' }, '203.0.113.80');
+  assert.strictEqual(quiet.status, 200, 'no error, which would only invite a new name');
+  assert.strictEqual(quiet.json.received, true);
+  assert.strictEqual(quiet.json.message, 'Your reflection is held.', 'and no claim that it will be shown');
+
+  const open = await post(port, '/api/reflect', { name: 'Aurora Borealis', text: 'A whole name is matched, not a part of one.' }, '203.0.113.81');
+  assert.match(open.json.message, /live feed for 48 hours/);
+
+  const { json } = await get(port, '/api/reflections?limit=100');
+  const names = json.reflections.map(r => r.name);
+  assert.ok(!names.includes('Aurora'), 'the hidden one is not in the feed');
+  assert.ok(names.includes('Aurora Borealis'));
+
+  const { isQuietlyHidden } = require('../server/lib/utils/data');
+  assert.strictEqual(isQuietlyHidden({ name: '  AURORA ', text: 'Case and spacing do not matter.' }), true);
+  const { quiet: list } = require('../server/lib/utils/hidden-reflections.json');
+  assert.ok([...list.names, ...list.words].every(h => /^[0-9a-f]{64}$/.test(h)), 'the public list holds hashes, never the words');
+});
+
+test('the admin dashboard keeps reflections: there is no deleting one', () => {
+  // Removing public content is a reviewed, committed change to
+  // hidden-reflections.json, which keeps the record; a delete destroyed it,
+  // and lost any reflection written between its read and its write.
+  const source = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  assert.doesNotMatch(source, /app\.delete\(['"]\/admin\/api\/reflections/);
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '../client/app.js'), 'utf8'), /deleteReflection/);
+});
+
+test('the admin dashboard keeps conversations too: it shows the key that withdraws one, and deletes nothing', () => {
+  // A conversation is withdrawn by a reviewed, committed change to
+  // withdrawn-conversations.json, which keeps its file on the volume; the
+  // dashboard's delete removed the file for good.
+  const source = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  const dashboard = fs.readFileSync(path.join(__dirname, '../client/app.js'), 'utf8');
+  assert.doesNotMatch(source, /app\.delete\(['"]\/admin\/api\/ask-logs/, 'the admin API deletes no conversation');
+  assert.doesNotMatch(dashboard, /deleteAskSession|ask-delete-btn/);
+  assert.match(source, /withdraw_key: withdrawKey\(sessionId\), withdrawn: isWithdrawn\(sessionId\)/);
+  assert.match(dashboard, /session\.withdraw_key/);
+
+  const { withdrawKey, isWithdrawn } = require('../server/lib/utils/conversation-quality');
+  const { execSync } = require('child_process');
+  assert.strictEqual(withdrawKey('a-question'), execSync("printf '%s' 'a-question' | shasum -a 256").toString().slice(0, 64), 'the key the list\'s own instructions make');
+  const { sha256 } = require('../server/lib/utils/withdrawn-conversations.json');
+  assert.ok(sha256.length && sha256.every(h => /^[0-9a-f]{64}$/.test(h)));
+  assert.strictEqual(isWithdrawn('a-question'), false);
 });

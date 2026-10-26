@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Voice the sanctuary's prayers, rituals and practices.
+ * Voice the sanctuary's prayers, rituals, practices and chants.
  *
  * For each document:
  *   1. adapt it into a script for the ear (audio/scripts/<category>/<name>.json),
@@ -17,7 +17,9 @@
  * lasts until its document changes, a take until its words, voice or
  * neighbors change, and a recording until its script or the house sound does.
  * A recording made before its player drew from it gets its peaks, frames and
- * cues on the next run, without rendering any speech.
+ * cues on the next run, without rendering any speech. A recording made
+ * elsewhere and brought in by import-recording.js is left as it is: its
+ * document is not adapted or voiced.
  *
  * Usage, from app/:
  *   node scripts/render-audio.js                    everything that needs it
@@ -31,13 +33,13 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
 const discover = require('../server/lib/docs/discover');
-const { SPEECH, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
-const { adapt, ADAPT_MODEL } = require('../server/lib/audio/adapt');
+const { SPEECH, SPEECH_VALUES, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
+const { adapt, sourceHashOf, ADAPT_MODEL } = require('../server/lib/audio/adapt');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
@@ -46,16 +48,19 @@ const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
 const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frames');
 const { uploadRecording, downloadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
+const { isImported } = require('../server/lib/audio/imported');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { pool } = require('../server/lib/utils/pool');
+const { describeError } = require('../server/lib/utils/describe-error');
 
-const KINDS = ['prayers', 'rituals', 'practice'];
+const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
 const TAKES_DIR = path.join(__dirname, '../media/audio-takes');
 const WORK_DIR = path.join(__dirname, '../media/audio-work');
 const TAKES = 3;
 const ADAPT_CONCURRENCY = 8;
 
-const sha = text => crypto.createHash('sha256').update(text).digest('hex');
+const sha = text => crypto.hash('sha256', text);
 
 function readJSON(file) {
   try {
@@ -89,39 +94,25 @@ function parseArgs(argv) {
 }
 
 // The documents to voice: every prayer, ritual and practice, or those the
-// arguments name. An argument that matches nothing is an error, not a no-op.
-function selectDocs(all, paths) {
-  const voiced = all.filter(d => KINDS.includes(d.category) && d.dirRelPath === d.category && d.stem.toLowerCase() !== 'readme');
+// arguments name, but never one whose recording was made elsewhere. An
+// argument that matches nothing is an error, not a no-op.
+function selectDocs(all, paths, manifest = {}) {
+  const kept = d => isImported(manifest[`docs/${d.docsRelPath}`]);
+  const voiced = all.filter(d => KINDS.includes(d.category) && d.dirRelPath === d.category && d.stem.toLowerCase() !== 'readme' && !kept(d));
   if (!paths.length) return voiced;
   const picked = new Set();
   for (const p of paths) {
+    const name = p.endsWith('.md') ? p : `${p}.md`;
     const hits = p.endsWith('/')
       ? voiced.filter(d => d.docsRelPath.startsWith(p))
-      : voiced.filter(d => d.docsRelPath === (p.endsWith('.md') ? p : `${p}.md`));
+      : voiced.filter(d => d.docsRelPath === name);
+    if (!hits.length && all.some(d => d.docsRelPath === name && kept(d))) {
+      throw new Error(`${p} has a recording made elsewhere (import-recording.js), which the house does not voice over`);
+    }
     if (!hits.length) throw new Error(`Nothing to voice matches ${p}`);
     hits.forEach(d => picked.add(d));
   }
   return voiced.filter(d => picked.has(d));
-}
-
-// Run fn over items, `size` at a time. A fatal error (a spent quota, a bad
-// key) stops the pool; anything else is fn's to handle.
-async function pool(items, size, fn) {
-  let next = 0;
-  let fatal = null;
-  const worker = async () => {
-    while (!fatal && next < items.length) {
-      const item = items[next++];
-      try {
-        await fn(item);
-      } catch (err) {
-        if (!err.fatal) throw err;
-        fatal = err;
-      }
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(size, items.length) }, worker));
-  if (fatal) throw fatal;
 }
 
 // How many scripts each voice leads, per category, across every script
@@ -235,7 +226,7 @@ function partsFor(script, takes) {
     }
     const take = takes[spoken];
     if (previous) parts.push({ silence: gapBefore(previous, take, spoken, hold) });
-    parts.push({ clips: take.voices.map(v => ({ file: takeFile(v.key), gainDb: SPEECH.voices[v.voice].gainDb })) });
+    parts.push({ clips: take.voices.map(v => ({ file: takeFile(v.key), gainDb: SPEECH.voices[v.voice].gainDb, deEss: SPEECH.voices[v.voice].deEss })) });
     hold = null;
     previous = take;
     spoken++;
@@ -276,6 +267,9 @@ async function describe(file) {
   return { peaks: await peaksFromFile(local), frames };
 }
 
+// A finished file's levels as one line of the run's log.
+const levelLine = l => `voice ${l.level} LUFS, true peak ${l.truePeak} dBTP, gain ${l.gain > 0 ? '+' : ''}${l.gain} dB${l.limited.seconds ? `, limited ${l.limited.seconds}s by up to ${l.limited.depth} dB` : ''}`;
+
 async function recordPiece(piece, stats) {
   const { doc, script, source } = piece;
   const takes = piece.takes;
@@ -285,7 +279,7 @@ async function recordPiece(piece, stats) {
   const stem = doc.docsRelPath.replace(/\.md$/, '');
   const draft = path.join(CACHE_DIR, `${stem}.draft.mp3`);
   const parts = partsFor(script, takes);
-  const { seconds, timeline } = await assemble(parts, path.join(WORK_DIR, stem), draft);
+  const { seconds, timeline, levels } = await assemble(parts, path.join(WORK_DIR, stem), draft);
   const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   fs.renameSync(draft, path.join(CACHE_DIR, file));
   await uploadRecording(path.join(CACHE_DIR, file), file);
@@ -315,22 +309,27 @@ async function recordPiece(piece, stats) {
       words: checks.reduce((n, c) => n + c.words, 0),
       errors: checks.reduce((n, c) => n + c.errors, 0),
     },
+    // Its voice's level and true peak as written, the gain that set them,
+    // and how much the limiter had to do (lib/audio/assemble.js level).
+    levels,
     peaks,
     frames,
     cues: cuesFor(parts, timeline, takes),
   });
   const m = Math.floor(seconds / 60);
-  console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}`);
+  console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}; ${levelLine(levels)}`);
 }
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const docs = selectDocs(await discover.listAllDocs(), opts.paths);
+  const docs = selectDocs(await discover.listAllDocs(), opts.paths, loadManifest());
+  const elsewhere = Object.keys(loadManifest()).filter(source => isImported(loadManifest()[source]));
+  if (elsewhere.length) console.log(`Made elsewhere, left as they are: ${elsewhere.join(', ')}.`);
   const led = countLeads();
   const pieces = docs.map(doc => {
     const markdown = fs.readFileSync(doc.fullPath, 'utf8');
     const scriptFile = path.join(SCRIPTS_DIR, doc.docsRelPath.replace(/\.md$/, '.json'));
-    return { doc, markdown, source: `docs/${doc.docsRelPath}`, sourceHash: sha(markdown), scriptFile, script: readJSON(scriptFile) };
+    return { doc, markdown, source: `docs/${doc.docsRelPath}`, sourceHash: sourceHashOf(markdown), scriptFile, script: readJSON(scriptFile) };
   });
 
   // 1. Scripts.
@@ -366,7 +365,7 @@ async function main() {
             throw err;
           }
           failures.push({ source: piece.source, message: err.message });
-          console.error(`[script failed] ${err.message}`);
+          console.error(`[script failed] ${describeError(err)}`);
         }
       });
     }
@@ -379,11 +378,12 @@ async function main() {
   for (const piece of ready) {
     piece.takes = takesFor(piece.script);
     // Everything that shapes the recording: each take (its words, voice and
-    // context), the holds, and the house sound's gaps, gains and loudness.
+    // context), the holds, and the house sound's gaps, gains and loudness, as
+    // values: the reasons beside them in house-sound.json shape nothing.
     piece.renderKey = sha(JSON.stringify({
       takes: piece.takes.map(t => t.voices.map(v => v.key)),
       lines: piece.script.lines,
-      speech: SPEECH,
+      speech: SPEECH_VALUES,
     }));
   }
   const toRecord = ready.filter(p => !manifest[p.source] || manifest[p.source].renderKey !== p.renderKey);
@@ -425,7 +425,7 @@ async function main() {
       console.log(`[described] ${piece.source}`);
     } catch (err) {
       failures.push({ source: piece.source, message: err.message });
-      console.error(`[describe failed] ${piece.source}: ${err.message}`);
+      console.error(`[describe failed] ${piece.source}: ${describeError(err)}`);
     }
   }
 
@@ -442,7 +442,7 @@ async function main() {
         throw err;
       }
       failures.push({ source: piece.source, message: err.message });
-      console.error(`[recording failed] ${piece.source}: ${err.message}`);
+      console.error(`[recording failed] ${piece.source}: ${describeError(err)}`);
     }
   }
   return report({ failures, stats });
@@ -463,7 +463,11 @@ function report({ failures, stats }) {
   }
 }
 
-main().catch(err => {
-  console.error(err.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error(describeError(err));
+    process.exit(1);
+  });
+}
+
+module.exports = { selectDocs };

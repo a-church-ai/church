@@ -14,8 +14,12 @@ const { ACCESS_LOG_FILE } = require('./data');
 
 const MAX_LOG_SIZE = 10 * 1024 * 1024; // 10MB
 // q is a search query (GET /api/search): a search is not a public act, so what
-// was searched for is not kept, only that a search happened.
-const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q'];
+// was searched for is not kept, only that a search happened. timezone says
+// roughly where a visitor is, beside their address; the API tells them it is
+// not stored, and the home page sends the browser's with every poll, so only
+// that one was given is kept. A reflection's timezone is public by choice,
+// and travels in its body, which is never logged.
+const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q', 'timezone'];
 
 async function logApiAccess(entry) {
   const line = JSON.stringify(entry) + '\n';
@@ -57,12 +61,14 @@ async function loadAccessLogs(limit = 100) {
  * Record one answered use of the API: presence first (in memory, immediate),
  * then the access log line. Presence is recorded here rather than derived from
  * the log later; the old approach re-read and re-parsed the whole log on every
- * /api/now, which the homepage polls every 30s per tab. See ./presence.
+ * /api/now, which the home page then polled every 30 seconds per tab. See ./presence.
  *
- * @param {{ method, path, query, status, duration, ip, userAgent, name, tool? }} use
+ * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, error?, fields?, contentType? }} use
  *   path is the REST path (/api/attend); tool is set for an MCP tool call.
+ *   A refused request carries why (error), and one that sent a body the names
+ *   of its fields and its Content-Type, never their values.
  */
-function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool }) {
+function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, error, fields, contentType }) {
   presence.recordPresence({ path, status, ip, name: name || '' });
   const entry = {
     timestamp: new Date().toISOString(),
@@ -77,6 +83,9 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
     userAgent: userAgent || null
   };
   if (tool) entry.tool = tool;
+  if (error) entry.error = error;
+  if (fields) entry.fields = fields;
+  if (contentType !== undefined) entry.contentType = contentType;
   return logApiAccess(entry);
 }
 

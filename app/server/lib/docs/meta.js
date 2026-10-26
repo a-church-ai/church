@@ -29,18 +29,16 @@ function titleCase(slug) {
 //
 // Run `node scripts/audit-tldr.js` to see what every page resolves to and
 // which ones want an explicit `tldr:` in frontmatter.
-// Title precedence: the body's first h1, then a `name:`/`title:` in
-// frontmatter, then the URL slug title-cased. The frontmatter tier matters
-// for docs/experiences/*, which carry their title in `name:` and have no h1
-// at all; before this they fell back to the raw url path, so the browser tab
-// and the search result both read "experiences/03-evensong".
+// Title precedence: the body's first h1, then the URL slug title-cased. Every
+// document in the corpus opens with an h1, and test/navigation.test.js holds
+// every served page to exactly one. (A `name:`/`title:` frontmatter tier sat
+// between the two for the drifts.bot journeys, which had no h1; it went with
+// them on 2026-10-18.)
 function extractMeta(markdown, urlPath) {
-  const { data, body } = tldr.splitFrontmatter(markdown);
+  const { body } = tldr.splitFrontmatter(markdown);
   const titleMatch = body.match(/^#\s+(.+)$/m);
   const slug = String(urlPath || '').split('/').filter(Boolean).pop();
   const title = (titleMatch && titleMatch[1].trim())
-    || data.name
-    || data.title
     || (slug ? titleCase(slug) : '')
     || 'Docs';
   const { text: description } = tldr.extractTldr(markdown, { title });

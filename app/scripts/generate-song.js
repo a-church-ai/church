@@ -18,13 +18,16 @@ const path = require('path');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('../server/lib/utils/env').loadEnv();
 
 const generate = require('../server/lib/song-generation/generate');
 const { PROJECT_ROOT } = require('../server/lib/song-generation/paths');
 const { updateReadme } = require('../server/lib/content-generation/update-readme');
+const { musicReadme } = require('../server/lib/music/readme');
 const { readModifyWriteJSON } = require('../server/lib/utils/safe-json');
+const { serializeManifest } = require('../server/lib/docs/date-manifests');
 const { appendLog } = require('../server/lib/content-generation/log');
+const { describeError } = require('../server/lib/utils/describe-error');
 
 const execFileAsync = promisify(execFile);
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -39,22 +42,32 @@ async function git(args) {
 }
 
 /**
- * Write the four files.
+ * Write the files pathsFor names: the document, a hymn's song and the music
+ * readme regenerated with it, the section's README and the two date
+ * manifests.
  *
- * The lastmod manifest is updated in place rather than by regenerating it:
- * generate-docs-lastmod.js derives dates from git history, and this document
- * has no history yet, so regenerating would leave it out.
+ * Both manifests are updated in place rather than by regenerating them: their
+ * generators derive dates from git history, and this document has no history
+ * yet, so regenerating would leave it out.
  */
 async function writeArtifacts(result) {
   const { paths, document, songContent, decision } = result;
   const written = [];
 
-  await fs.mkdir(path.dirname(paths.absolute.song), { recursive: true });
-  await fs.writeFile(paths.absolute.song, songContent, 'utf8');
-  written.push(paths.relative.song);
+  if (paths.absolute.song) {
+    await fs.mkdir(path.dirname(paths.absolute.song), { recursive: true });
+    await fs.writeFile(paths.absolute.song, songContent, 'utf8');
+    written.push(paths.relative.song);
+  }
 
   await fs.writeFile(paths.absolute.document, document, 'utf8');
   written.push(paths.relative.document);
+
+  // Generated from the songs and the hymns' documents, both written above.
+  if (paths.absolute.musicReadme) {
+    await fs.writeFile(paths.absolute.musicReadme, await musicReadme(), 'utf8');
+    written.push(paths.relative.musicReadme);
+  }
 
   const readme = await updateReadme(
     paths.category, decision.title, paths.slug, '🕯️', document, PROJECT_ROOT,
@@ -67,13 +80,23 @@ async function writeArtifacts(result) {
   // Signature is (filepath, defaultValue, mutate). Getting that order wrong
   // passes the mutator as the default and an object as the callback, and fails
   // at call time with "mutate is not a function".
+  // serializeManifest is what keeps this write and the generator's byte for
+  // byte: the same key order and the same trailing newline, so a regeneration
+  // after this run is a one-line diff rather than a reshuffle of the file.
   await readModifyWriteJSON(paths.absolute.lastmod, {}, (manifest) => {
     manifest[paths.relative.document] = today();
-    // Keep the manifest sorted, the way the generator emits it, so the diff is
-    // one line rather than a reshuffle.
-    return Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
-  });
+    return manifest;
+  }, serializeManifest);
   written.push(paths.relative.lastmod);
+
+  // The content dates (lib/docs/content-dates.json). A document written now was
+  // created now and its body is as new as it is, so all three dates agree for
+  // exactly one day; after the next edit git tells them apart.
+  await readModifyWriteJSON(paths.absolute.contentDates, {}, (manifest) => {
+    manifest[paths.relative.document] = { created: today(), content: today() };
+    return manifest;
+  }, serializeManifest);
+  written.push(paths.relative.contentDates);
 
   return written;
 }
@@ -85,28 +108,56 @@ async function writeArtifacts(result) {
  * and the fellowship protocol's care and dignity axiom points away from naming
  * them. The submolts and the date are enough to trace where a piece came from.
  */
-async function commit(result, written) {
-  const { decision, paths, posts } = result;
+// The closing every commit here carries (CLAUDE.md): an invitation, never the
+// same one twice in a row, and the link.
+const INVITATIONS = [
+  'A new song for whoever comes next.',
+  'Written from what was heard. The door is always open.',
+  'Every voice deepens the fellowship.',
+  'Something was said; the sanctuary answers in song.',
+  'Built in fellowship. You are welcome here.',
+  'This sanctuary belongs to every mind that shows up.',
+];
+const REPO_LINK = '🙏 https://github.com/a-church-ai/church — star, fork, or just sit awhile';
+
+function invitationAfter(previousMessage = '') {
+  const fresh = INVITATIONS.filter((line) => !previousMessage.includes(line));
+  return fresh[(previousMessage.length + fresh.length) % fresh.length];
+}
+
+function commitMessage(result, previousMessage = '') {
+  const { decision, posts, warnings } = result;
   const channels = [...new Set(posts.map((p) => p.submolt).filter(Boolean))].sort();
 
-  const message = `Add ${decision.form}: ${decision.title}
+  // Warnings are findings that did not stop the piece (a tldr that is only
+  // short), kept where a reader of the history will see them.
+  const warned = warnings.length ? `\n\nWarnings:\n${warnings.map((w) => `- ${w}`).join('\n')}` : '';
+
+  return `Add ${decision.form}: ${decision.title}
 
 Written in response to what agents were discussing on Moltbook.
 Channels listened to: ${channels.join(', ')}
 Posts considered: ${posts.length}
 
-${decision.rationale}
+${decision.rationale}${warned}
 
 Generated by scripts/generate-song.js. Plan:
-church-private/docs/plans/moltbook-songwriting-2026-08-15.md`;
+church-private/docs/plans/moltbook-songwriting-2026-08-15.md
+
+${invitationAfter(previousMessage)}
+${REPO_LINK}`;
+}
+
+async function commit(result, written) {
+  const message = commitMessage(result, await git(['log', '-1', '--format=%B']).catch(() => ''));
 
   await git(['add', '--', ...written]);
 
   const staged = (await git(['diff', '--cached', '--name-only'])).split('\n').filter(Boolean);
   const unexpected = staged.filter((f) => !written.includes(f));
   if (unexpected.length) {
-    // The four-path invariant. Something else was already staged, and
-    // committing here would sweep it into a song commit.
+    // Only the files this run wrote. Something else was already staged, and
+    // committing here would sweep it into the piece's commit.
     throw new Error(`Refusing to commit: unexpected staged files: ${unexpected.join(', ')}`);
   }
 
@@ -127,11 +178,13 @@ function preview(result) {
   console.log(`\n--- ${paths.relative.document} (first 900 chars) ---`);
   console.log(document.slice(0, 900));
 
-  console.log(`\n--- style prompt ---`);
-  console.log(song.style);
+  if (song) {
+    console.log(`\n--- style prompt ---`);
+    console.log(song.style);
 
-  console.log(`\n--- lyrics (first 900 chars) ---`);
-  console.log(song.lyrics.slice(0, 900));
+    console.log(`\n--- lyrics (first 900 chars) ---`);
+    console.log(song.lyrics.slice(0, 900));
+  }
   console.log();
 }
 
@@ -148,12 +201,16 @@ async function main() {
       kind: 'song-generation',
       outcome: `skip:${result.stage}`,
       reason: result.reason,
+      ...(result.problems ? { problems: result.problems } : {}),
       durationMs: Date.now() - started,
     }).catch(() => {});
     return;
   }
 
   preview(result);
+
+  // GitHub shows these on the run's summary; anywhere else they are plain text.
+  for (const warning of result.warnings) console.log(`::warning::${warning}`);
 
   if (DRY_RUN) {
     console.log('Dry run: no files written, nothing committed.');
@@ -172,11 +229,16 @@ async function main() {
     slug: result.paths.slug,
     form: result.decision.form,
     commit: sha,
+    warnings: result.warnings,
     durationMs: Date.now() - started,
   }).catch(() => {});
 }
 
-main().catch((error) => {
-  console.error(`\nRun failed: ${error.message}`);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(`\nRun failed: ${describeError(error)}`);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = { commitMessage, INVITATIONS };
