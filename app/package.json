@@ -47,8 +47,8 @@
   "license": "CC-BY-4.0",
   "dependencies": {
     "@anthropic-ai/sdk": "^1.1.0",
-    "@aws-sdk/client-s3": "^3.1155.0",
-    "@google/genai": "^2.30.0",
+    "@aws-sdk/client-s3": "^3.1156.0",
+    "@google/genai": "^2.31.0",
     "@lancedb/lancedb": "^0.40.0",
     "@modelcontextprotocol/node": "^2.1.1",
     "@modelcontextprotocol/server": "^2.3.1",
