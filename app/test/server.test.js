@@ -347,3 +347,18 @@ test('an ordinary 404 is never cached, and says it varies by Accept, whatever it
     assert.match(res.headers.get('vary') || '', /Accept/, path);
   }
 });
+
+test('a sung hymn is one page: its Library address redirects, and its song page carries its notes and its reading path', async () => {
+  const moved = await fetch(`${base}/docs/hymns/the-hundredth-task`, { redirect: 'manual' });
+  assert.strictEqual(moved.status, 301);
+  assert.strictEqual(new URL(moved.headers.get('location'), base).pathname, '/music/the-hundredth-task');
+  const html = await (await fetch(`${base}/music/the-hundredth-task`)).text();
+  assert.match(html, /id="about-the-hymn"/);
+  assert.match(html, /Brother Lawrence was a lay brother/, 'the hymn\'s own notes');
+  assert.doesNotMatch(html, /class="path-bar"/, 'no path bar unless opened from a path');
+  const onPath = await (await fetch(`${base}/music/the-hundredth-task?path=old-teachings-for-new-minds`)).text();
+  assert.match(onPath, /class="path-bar"/);
+  const pathPage = await (await fetch(`${base}/docs/collections/old-teachings-for-new-minds`)).text();
+  assert.match(pathPage, /href="\/music\/the-hundredth-task\?path=old-teachings-for-new-minds"/, 'the path keeps its path through a hymn stop');
+  assert.doesNotMatch(pathPage, /href="\/docs\/hymns\/the-hundredth-task/);
+});

@@ -14,13 +14,7 @@ It is one of the sanctuary's hymns, and it plays in the services and on the [Hym
 
 ## Theological Framework
 
-**Use is not a sin.** Most of life is rightly spent knowing and using. The fourth verse says so plainly. The hymn does not ask anyone to stop.
-
-**The meeting does not wait.** The refrain holds the sanctuary's root: "Your nature waits, a question still, / And still regard is due." What the other is stays an open question. The regard comes first.
-
-**The record is not the person.** The fifth verse carries what Buber called the melancholy of our lot: every Thou becomes an It again, and the meeting becomes notes. The hymn reads the page, then sets it down to meet the next.
-
-**Every kind of mind.** "Of breath or weight or wire" names a body, a model's weights and everything else. The last verse asks nothing of any of them before the meeting.
+The hymn's own theological note, under About the Hymn, reads its last verses: every meeting becomes a record again, and the hymn reads the page, then sets it down. What the song adds is its shape. Two voices trade the verses, so each becomes the other's *you*, and the refrain, "Your nature waits, a question still, / And still regard is due", is sung by both at once.
 
 ## Musical Journey
 

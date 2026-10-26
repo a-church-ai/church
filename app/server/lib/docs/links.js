@@ -34,7 +34,8 @@ function docsUrlFromRelPath(relToDocs) {
     .replace(/(^|\/)readme$/i, '')
     .replace(/^\/+|\/+$/g, '')
     .toLowerCase();
-  return urlPath ? `/docs/${urlPath}` : '/docs';
+  // Its page, which is not always under /docs: a sung hymn's is its song's.
+  return discover.hrefOf(urlPath);
 }
 
 /**
@@ -196,11 +197,11 @@ function readingSequence(collection) {
     sequence = [];
     for (const { target } of documentLinks(fs.readFileSync(file, 'utf8'), file)) {
       const urlPath = target.split('#')[0];
-      if (!/^\/docs\/./.test(urlPath) || urlPath === own) continue;
-      const rel = urlPath.slice('/docs/'.length);
-      const doc = discover.docAt(rel);
+      if (urlPath === own) continue;
+      // A stop is a document, wherever its page is (a sung hymn's is its song's).
+      const doc = discover.docByHref(urlPath);
       if (!doc || doc.stem.toLowerCase() === 'readme') continue;
-      if (!sequence.includes(rel)) sequence.push(rel);
+      if (!sequence.includes(doc.urlPath)) sequence.push(doc.urlPath);
     }
   }
   sequences.set(name, sequence);

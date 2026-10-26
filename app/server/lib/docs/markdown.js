@@ -19,7 +19,7 @@ const { byName } = discover;
 const describe = doc => ({
   title: doc.title,
   description: doc.description,
-  url: `${SITE_URL}/docs/${doc.urlPath}`,
+  url: `${SITE_URL}${doc.href}`,
   urlPath: doc.urlPath,
   dir: doc.dirRelPath,
   category: doc.category || '',

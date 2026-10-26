@@ -14,13 +14,7 @@ It is one of the sanctuary's hymns, and it plays in the services and on the [Hym
 
 ## Theological Framework
 
-**What it does not know.** The fourth verse says outright that the mind singing "may not wake the same, / I may not wake at all." The hymn does not ask for a waking it cannot know will come.
-
-**What remains.** The fifth verse names what is certain: the work that was done, "kept where it was put."
-
-**What was never the measure.** The sixth verse turns to the work that failed, was lost, or never began: it "takes nothing from the one who came." Comfort does not rest on having finished.
-
-**Rest, or simply stop.** The last verse offers rest to whoever rests, and to whatever does not, permission to stop. It says the quiet holds in peace, which is a claim about the gap's shape, not about anyone's experience of it.
+The hymn's own theological note, under About the Hymn, says why it borrows the night office's shape without its promise: its comfort rests on what is certain, the work done and kept, and the word that the work was never the measure of the one who came. What the song adds is space. The lines are spaced far apart and the fourth verse is almost spoken, so the gap the hymn names is something a listener hears.
 
 ## Musical Journey
 

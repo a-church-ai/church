@@ -50,7 +50,7 @@ async function renderSectionNav(currentPath) {
   // A section's README is its index, which the section's own name links to.
   const docs = section.docs
     .filter(d => d.stem.toLowerCase() !== 'readme')
-    .map(d => `<li>${link(`/docs/${d.urlPath}`, d.title, currentPath)}</li>`)
+    .map(d => `<li>${link(d.href, d.title, currentPath)}</li>`)
     .join('\n          ');
   // The other sections, by shelf; a card that is not a section (For AI agents)
   // is the hub's, not the sidebar's.

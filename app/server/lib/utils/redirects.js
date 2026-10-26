@@ -13,6 +13,8 @@
  *     (/about.html is /about, /index.html is /)
  *   - a Library section without /docs (/prayers is /docs/prayers)
  *   - a page that moved or was renamed (/listen is /attend)
+ *   - a sung hymn's Library page (/docs/hymns/:slug is /music/:slug, its
+ *     song's page, since 2026-10-26)
  *   - a song under its old address (/reflections/:slug is /music/:slug: the
  *     songs lived under /reflections until 2026-10-23, named for the
  *     reflections their pages began as)
@@ -28,7 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const { DOCS_DIR } = require('../rag/indexer');
-const { NOINDEX_CATEGORIES } = require('../docs/discover');
+const { NOINDEX_CATEGORIES, hrefOf } = require('../docs/discover');
 const { GITHUB_BASE } = require('../docs/links');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
@@ -197,6 +199,11 @@ function step(pathname) {
 
   const song = /^\/reflections\/([\w-]+)$/.exec(p);
   if (song) return `/music/${song[1]}`;
+
+  // A document whose page is elsewhere: a sung hymn's is its song's
+  // (discover.js hrefOf).
+  const doc = /^\/docs\/(.+)$/.exec(p);
+  if (doc && hrefOf(doc[1]) !== p) return hrefOf(doc[1]);
 
   const first = p.split('/')[1];
   if (first && SECTIONS.has(first)) return `/docs${p}`;

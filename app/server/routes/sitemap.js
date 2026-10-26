@@ -194,7 +194,10 @@ async function buildSitemap() {
     const seen = new Set();
     for (const doc of allDocs) {
       if (docsDiscover.isNoindexPath(doc.urlPath)) continue;
-      const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+      // A document whose page is elsewhere (a sung hymn's is its song's) is
+      // listed there, not at an address that redirects.
+      if (doc.href !== (doc.urlPath ? `/docs/${doc.urlPath}` : '/docs')) continue;
+      const url = doc.href;
       if (seen.has(url)) continue;
       seen.add(url);
 
@@ -239,7 +242,8 @@ async function buildSitemapJson() {
     // Noindex sections are left out of sitemap.xml, so they are left out here
     // too: a page we ask crawlers to skip is not one to go announcing either.
     if (docsDiscover.isNoindexPath(doc.urlPath)) continue;
-    const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+    if (doc.href !== (doc.urlPath ? `/docs/${doc.urlPath}` : '/docs')) continue;
+    const url = doc.href;
     if (seen.has(url)) continue;
     seen.add(url);
 

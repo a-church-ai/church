@@ -100,14 +100,14 @@ async function readDoc(docPath) {
       url: `${SITE_URL}/docs${resolved.dir ? `/${resolved.dir}` : ''}`,
       documents: resolved.docs
         .filter(d => d.stem.toLowerCase() !== 'readme')
-        .map(d => ({ path: d.urlPath, title: d.title, url: `${SITE_URL}/docs/${d.urlPath}` })),
+        .map(d => ({ path: d.urlPath, title: d.title, url: `${SITE_URL}${d.href}` })),
     };
   }
   const { body } = splitFrontmatter(await servedMarkdown(resolved));
   return {
     path: resolved.doc.urlPath,
     title: resolved.doc.title,
-    url: `${SITE_URL}/docs/${resolved.doc.urlPath}`,
+    url: `${SITE_URL}${resolved.doc.href}`,
     content: body.trim(),
   };
 }

@@ -17,6 +17,7 @@ const path = require('path');
 const fs = require('fs');
 const { findMarkdownFiles, DOCS_DIR } = require('../rag/indexer');
 const { extractMeta, titleCase } = require('./meta');
+const { songRecordingFor } = require('../audio/manifest');
 
 // The Library's shelves (/docs): how its sections are grouped there, and the
 // order sections take wherever they are listed (the section sidebar, the site
@@ -99,6 +100,20 @@ function isNoindexPath(urlPath) {
   return Boolean(first) && NOINDEX_CATEGORIES.includes(first.toLowerCase());
 }
 
+// Where a document's page is: /docs/<urlPath>, except a hymn that is sung,
+// whose page is its song's (/music/<slug>), words, notes, recording and
+// reflections together. Until 2026-10-26 a sung hymn was two pages with the
+// same words, and search engines kept only one of them. A hymn hands over the
+// moment its song has a recording, so one the songwriter writes today keeps
+// its Library page until it is made. Everything that links, lists, redirects
+// or cites a document reads this, not /docs/<urlPath>.
+function hrefOf(urlPath) {
+  const p = String(urlPath || '');
+  const hymn = /^hymns\/([a-z0-9-]+)$/.exec(p);
+  if (hymn && songRecordingFor(hymn[1])) return `/music/${hymn[1]}`;
+  return p ? `/docs/${p}` : '/docs';
+}
+
 let cache = null;
 
 // Display order for names: numbers compare as numbers, so "Principle 2"
@@ -125,6 +140,7 @@ async function buildCache() {
       fullPath: f.fullPath,
       docsRelPath: relToDocs.replace(/\\/g, '/'),  // Windows-safe
       urlPath: buildUrlPath(dirRelToDocs, stem),
+      href: hrefOf(buildUrlPath(dirRelToDocs, stem)),
       dirRelPath: dirRelToDocs,
       filename,
       stem,
@@ -283,6 +299,13 @@ async function listAllDocs() {
   return c.docs;
 }
 
+// The document whose page is at this address (its href): for a link that
+// lands on a sung hymn's song page, the hymn. Null before the walk is built.
+function docByHref(href) {
+  if (!cache) return null;
+  return cache.docs.find(d => d.href === href) || null;
+}
+
 // The document an index chunk came from: its `file` is repository-relative
 // ("docs/practice/foo.md"), as the RAG index and the song companions record
 // it. Null for a file outside docs/ or before the walk is built.
@@ -310,6 +333,8 @@ module.exports = {
   docByFile,
   byName,
   isNoindexPath,
+  hrefOf,
+  docByHref,
   sectionTitle,
   cardFor,
   SHELVES,

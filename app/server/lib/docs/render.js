@@ -81,8 +81,10 @@ function makeLinkRewriter(currentDocFullPath, readingPath) {
       const doc = discover.docAt(docPath);
       if (doc) label = escapeText(doc.title);
     }
-    if (docPath && sequence.includes(docPath)) {
-      const [base, anchor] = resolved.split('#');
+    // A stop on this page's reading path keeps the path, whether its page is
+    // under /docs or elsewhere (a sung hymn's is its song's).
+    const [base, anchor] = resolved.split('#');
+    if (!external && sequence.some(stop => discover.hrefOf(stop) === base)) {
       target = `${base}?path=${readingPath}${anchor ? `#${anchor}` : ''}`;
     }
     return `<a href="${escapeAttr(target)}"${attrs}${titleAttr}>${label}</a>`;
@@ -204,7 +206,7 @@ function renderRelatedDocs(currentDoc, allDocs) {
     : Array.from({ length: ELSEWHERE_COUNT }, (_, i) => siblings[(start + i) % siblings.length]);
   const categoryLabel = discover.sectionTitle(category);
   const items = picks.map(d =>
-    `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a></li>`
+    `        <li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a></li>`
   ).join('\n');
   const categoryHref = `/docs/${escapeAttr(category)}`;
 
@@ -228,7 +230,7 @@ function renderPathBar(readingPath, doc) {
   if (at === -1) return null;
   const collection = discover.docAt(`collections/${readingPath}`);
   if (!collection) return null;
-  const link = (urlPath, rel, text) => `<a href="/docs/${escapeAttr(urlPath)}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
+  const link = (urlPath, rel, text) => `<a href="${escapeAttr(discover.hrefOf(urlPath))}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
   const prev = at > 0 ? sequence[at - 1] : null;
   const next = at < sequence.length - 1 ? sequence[at + 1] : null;
   const titleOf = urlPath => escapeText((discover.docAt(urlPath) || { title: urlPath }).title);
@@ -273,9 +275,14 @@ function renderPathListenFor(name, collectionDoc) {
   const tracks = [];
   for (const urlPath of sequence) {
     const reading = discover.docAt(urlPath);
-    const recording = reading && servedRecording(reading);
+    if (!reading) continue;
+    const recording = servedRecording(reading);
+    // A sung hymn's stop plays its song, on its song's page.
+    const sung = !recording && reading.href.startsWith('/music/') ? songRecordingFor(reading.href.slice('/music/'.length)) : null;
     if (recording) {
-      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+      tracks.push(trackFor(recording, { title: reading.title, href: `${reading.href}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+    } else if (sung && canServe(sung.file)) {
+      tracks.push(trackFor(sung, { title: reading.title, href: `${reading.href}?path=${name}`, category: 'music', credit: SONG_CREDIT }));
     }
   }
   if (!tracks.length) return '';
@@ -704,7 +711,7 @@ function renderSectionListen(dir, label, docs) {
 // numbers as numbers. Used by directory indexes and category pages.
 function renderEntryItems(docs) {
   return byTitle(docs).map(d =>
-    `<li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
+    `<li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
   ).join('\n            ');
 }
 
@@ -809,13 +816,10 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // begin under the player rather than under a badge.
   const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
-  // A hymn is sung, not spoken: its page plays the song made from it
-  // (music/<slug>/, audio/songs.json), whose own page is /music/<slug>.
-  const sung = !isIndex && doc.category === 'hymns' && !recording ? songRecordingFor(doc.stem.toLowerCase()) : null;
-  const sungRecording = sung && canServe(sung.file) ? sung : null;
+  // (A sung hymn has no Library page to play its song on: its page is its
+  // song's, discover.js hrefOf, and this address redirects there.)
   const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : sungRecording ? renderRecording(sungRecording, { title: meta.title, href: `/music/${doc.stem.toLowerCase()}`, category: 'music', credit: SONG_CREDIT })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
   if (underTitle) {
@@ -890,4 +894,4 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle, renderPathBar };

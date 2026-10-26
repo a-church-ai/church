@@ -38,7 +38,7 @@ async function closestDoc(rest) {
   // In the section the address named, or else the one document anywhere.
   const pick = named.find(d => section && d.category === section) || (named.length === 1 ? named[0] : null);
   if (!pick || !(await resolveServedDoc(pick.urlPath))) return null;
-  return { href: `/docs/${pick.urlPath}`, title: pick.title };
+  return { href: pick.href, title: pick.title };
 }
 
 module.exports = { closestDoc, slug };

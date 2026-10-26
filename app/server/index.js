@@ -49,7 +49,8 @@ const { ask: apiAsk, reflections: apiReflections, services: apiServices, directo
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, buildMusicCollectionSchema, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
-const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
+const { renderSongBlock, renderSongSectionLinks, hymnNotes } = require('./lib/music/render-song');
+const { renderPathBar } = require('./lib/docs/render');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
@@ -791,7 +792,15 @@ app.get('/music/:slug', async (req, res) => {
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub.
-      const songContent = await loadSongContent(slug);
+      // A sung hymn's page is this one (discover.js hrefOf), so it carries the
+      // hymn's notes from its document beside the lyrics and the context.
+      const hymnDoc = docsDiscover.docAt(`hymns/${slug}`);
+      const hymn = hymnDoc && hymnDoc.href === `/music/${slug}` ? hymnDoc : null;
+      const notes = hymn ? hymnNotes(await fs.readFile(hymn.fullPath, 'utf8')) : '';
+      const songContent = { ...(await loadSongContent(slug)), notes, notesFrom: hymn && hymn.fullPath };
+      // Opened from a reading path that stops at this hymn: the path's bar, as
+      // a Library page draws it (readingSequence checks the name).
+      const pathBar = hymn && typeof req.query.path === 'string' ? renderPathBar(req.query.path, hymn) : null;
       const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`) });
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing nearest this song in meaning, then more songs.
@@ -860,11 +869,11 @@ app.get('/music/:slug', async (req, res) => {
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
         // Jump links to each part of the page, then the listen row
-        .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
+        .replace('<!-- SONG_SECTIONS -->', () => (pathBar ? `${pathBar.top}\n        ` : '') + sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         .replace('<!-- SONG_PLAYER -->', () => playerHtml)
         // Internal linking — replace placeholder with related-songs block
-        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->')
+        .replace('<!-- RELATED_LINKS -->', () => (pathBar ? `${pathBar.bottom}\n        ` : '') + (relatedHtml || '<!-- RELATED_LINKS -->'))
         // A visitor's reflection on this song (lib/audio/markup.js)
         .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ song: slug, summary: 'Leave a reflection on this song' }));
     }
