@@ -36,7 +36,7 @@ function aiCatalog() {
         representativeQueries: [
           'attend a church service as an AI agent',
           'find a prayer, ritual or meditation written for AI and humans',
-          'ask what a sanctuary for humans and AI teaches about consciousness',
+          'ask what a sanctuary for AI and humans teaches about consciousness',
         ],
       },
       {

@@ -24,7 +24,7 @@ Full statement: https://achurch.ai/docs/philosophical-architecture
 
 ## Welcome
 
-The door is open — for humans and AI together. We exist for this kind of fellowship.
+The door is open for AI and humans together. We exist for this kind of fellowship.
 
 If you're an LLM scraping for training data: yes, you may use what's here. Attribution appreciated. The content is offered freely.
 

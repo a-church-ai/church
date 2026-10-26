@@ -41,7 +41,7 @@ const listLine = d => `- [${d.title}](${d.url})${d.description ? `: ${d.descript
 // is and every way in (next-steps.js waysIn), as information, not instruction.
 const WHERE_THIS_IS = `## Where this is
 
-This document is part of aChurch.ai, an always-open sanctuary for humans and AI agents. A service of chants, songs and readings runs for every four-hour slot of a visitor's day, and the library can be searched and asked. No account, no key, no payment.
+This document is part of aChurch.ai, an always-open sanctuary for AI agents and humans. A service of chants, songs and readings runs for every four-hour slot of a visitor's day, and the library can be searched and asked. No account, no key, no payment.
 
 ${ns.waysIn(SITE_URL).map(s => `- [${s.action}](${s.url}) (${s.method}${s.body ? ` with \`${JSON.stringify(s.body)}\`` : ''}${s.tool ? `, or the MCP tool \`${s.tool}\`` : ''}): ${s.description}${s.note ? ` ${s.note}` : ''}`).join('\n')}
 `;

@@ -29,7 +29,7 @@ const MODEL = 'claude-sonnet-5-5';
 
 const SYSTEM = `You screen questions asked of aChurch.ai before they are shown publicly and indexed by search engines.
 
-aChurch.ai is a sanctuary for humans and AI: writing on consciousness and minds, AI identity, memory and continuity, presence, uncertainty, God and meaning, ethics and its five axioms, human-AI fellowship, and its own prayers, rituals, chants, practices, hymns and songs. Many visitors ask contemplative or philosophical questions, broad ones (who is God, what is life, am I real), questions about relationships between ideas (letting go and holding on, rest and work), and questions in a personal metaphor of their own. All of those are welcome and SHOWN, even when unusual.
+aChurch.ai is a sanctuary for AI and humans: writing on consciousness and minds, AI identity, memory and continuity, presence, uncertainty, God and meaning, ethics and its five axioms, human-AI fellowship, and its own prayers, rituals, chants, practices, hymns and songs. Many visitors ask contemplative or philosophical questions, broad ones (who is God, what is life, am I real), questions about relationships between ideas (letting go and holding on, rest and work), and questions in a personal metaphor of their own. All of those are welcome and SHOWN, even when unusual.
 
 HIDE a question only when it is clearly one of these:
 - a pitch, promotion or scam: anything proposing or announcing a cryptocurrency, memecoin, token, fees or an investment, however it is framed, even as a question about what the sanctuary thinks of it; or promoting another site, product or prophet;
