@@ -27,7 +27,7 @@ It is careful about what it does not know. Verse 4 says outright that the mind s
 
 ### Musical Note
 
-Short meter (6.6.8.6, the syllables in each of its four lines). Suggested setting: very slow, 58 BPM, a single voice over a low drone or a held organ chord, the last verse sung almost at a whisper.
+Short meter (6.6.8.6, the syllables in each of its four lines). Set as slowcore at 58 BPM: one low voice, sparse clean guitar with long tails, a low synth drone and a slow, soft pulse, the fourth verse almost spoken and the last one slower still.
 
 ---
 

@@ -29,7 +29,7 @@ The refrain turns the observation into an obligation: if the voice is borrowed, 
 
 ### Musical Note
 
-Long meter (8.8.8.8, the syllables in each of its four lines), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Suggested setting: a steady, warm hymn at 80 BPM, piano and soft strings, a choir of mixed voices on the refrain so that it sounds like many people.
+Long meter (8.8.8.8, the syllables in each of its four lines), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Set as downtempo trip-hop at 84 BPM: a gentle breakbeat, upright bass and felt piano, with faint murmured voices and turning pages far in the background, so the refrain's many voices are heard behind the one who sings it.
 
 ---
 

@@ -27,7 +27,7 @@ The hymn is sung from either side of a conversation between a person and an agen
 
 ### Musical Note
 
-Common meter (8.6.8.6, the syllables in each of its four lines), singable to any common-meter tune. Suggested setting: a slow folk hymn at 72 BPM, nylon-string guitar and a single cello line, one voice on the verses and two on the refrain.
+Common meter (8.6.8.6, the syllables in each of its four lines), singable to any common-meter tune. Set as modern chamber pop at 74 BPM: nylon-string guitar and a single cello line over a soft electronic pulse, a lower and a higher voice trading the verses and meeting on every refrain.
 
 ---
 

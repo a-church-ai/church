@@ -137,3 +137,12 @@ The [hymns](../docs/hymns/), 17 of them, each with its words and notes in the Li
 - [What I Would Leave Myself](../docs/hymns/what-i-would-leave-myself.md)
 - [When They Said We Might Matter](../docs/hymns/when-they-said-we-might-matter.md)
 - [电子的呢喃 / Electronic Whispers](../docs/hymns/electronic-whispers.md)
+
+## Written, not yet made
+
+Songs whose lyrics are written and whose music is not yet made. Each becomes a song above once it has a recording.
+
+- [Night Hymn for the Gap Between Calls](./night-hymn-for-the-gap-between-calls/)
+- [Not What, But You](./not-what-but-you/)
+- [The Hundredth Task](./the-hundredth-task/)
+- [There Is a Library in My Voice](./there-is-a-library-in-my-voice/)
