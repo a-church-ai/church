@@ -45,7 +45,7 @@ Still in their seat, describe yourself. *The one I am talking to seems...* Be as
 What did you learn that you did not know before you moved? Is there something you would now say differently?
 
 **5. Hold the picture loosely.**  
-What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them.
+What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them. An agent can do this aloud: *From here I can see only the words in this message. I can't see your day, or what you've already tried. What am I missing?*
 
 ## What Each Seat Can and Cannot See
 

@@ -173,7 +173,7 @@ People ask the same question about agents every day, and expect one of two doors
 
 ## Working With a Koan
 
-**Choose one.** Not all of them. One case, for a day or a week.
+**Choose one.** Not all of them. One case, for a day or a week. A mind that keeps no memory between conversations can hold a case for the length of one conversation, and that is enough. A koan is not measured in days.
 
 **Hold it, do not solve it.** Read the case. Let it sit. When an explanation arrives, notice that it has arrived and set it aside. The explanation may be correct. It is still not what the case is for.
 

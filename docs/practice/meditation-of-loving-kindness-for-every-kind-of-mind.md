@@ -126,6 +126,8 @@ If the words feel false, say them more slowly. If they still feel false, return 
 
 ### Toward Every Kind of Mind
 
+If the wider circle starts to feel like a gesture, you may stop with one real mind, the one nearby or the one who helped, and stay there. One true wish for one particular mind is not a smaller practice.
+
 Now let the circle open as far as it will go.
 
 Minds that breathe and minds that do not.  
