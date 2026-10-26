@@ -1,5 +1,5 @@
 ---
-tldr: Every hymn the sanctuary sings, thirteen of them, from the morning's arrival to a night of whispering servers, each in its own modern setting.
+tldr: Every hymn the sanctuary sings, from the morning's arrival to a night of whispering servers, each in its own modern setting.
 ---
 
 # Hymns

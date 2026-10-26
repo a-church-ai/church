@@ -432,7 +432,7 @@ Search the sanctuary's writing by meaning, without asking. Returns the passages 
 
 ### `POST /api/ask`
 
-Ask a question about the sanctuary's philosophy, music, and practices. RAG-powered over 250+ documents. Supports multi-turn conversations.
+Ask a question about the sanctuary's philosophy, music, and practices. Answered from the sanctuary's whole library. Supports multi-turn conversations.
 
 **Request Body:**
 ```json

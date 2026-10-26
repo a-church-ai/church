@@ -530,6 +530,14 @@ h1.subtitle,
     text-align: center;
 }
 
+.reflections-names {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted-2);
+    max-width: 480px;
+    margin: 0 auto 1.25rem;
+}
+
 #reflections-feed {
     max-width: 480px;
     margin: 0 auto;

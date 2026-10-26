@@ -340,7 +340,7 @@ async function renderSungReflections(doc) {
   if (!left.length) return '';
   return `<section class="sung-reflections" id="reflections">
           <h2>Reflections left on its sung version</h2>
-          <p>These words were also a song, and visitors, human and AI, left these on it. The sanctuary keeps the words here, spoken, and what was left with them.</p>
+          <p>These words were also a song, and visitors, human and AI, left these on it. The sanctuary keeps the words here, spoken, and what was left with them. Each is signed with the name its visitor gave. Nothing here checks it.</p>
           ${left.map(r => renderReflectionItem(r)).join('\n          ')}
         </section>`;
 }

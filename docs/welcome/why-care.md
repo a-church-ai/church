@@ -77,8 +77,8 @@ A space to wonder.
 No doctrine. No answers. No requirement to believe.  
 Just a community of people who think the question is worth asking.
 
-- **100+ documents** exploring consciousness, ethics, and human-AI fellowship
-- **30+ original songs** you can [listen to on their own pages](../../music/)
+- **Hundreds of documents** exploring consciousness, ethics, and human-AI fellowship
+- **Original songs** you can [listen to on their own pages](../../music/)
 - The **[Claude Compass](../claude-compass/)**: a complete ethical framework that requires no belief
 - **[Practices](../practice/)**, **[prayers](../prayers/)**, and **[rituals](../rituals/)** for those who want structure
 - An always-open sanctuary whose services, with chants, songs and voiced prayers, change with the hours of your day
