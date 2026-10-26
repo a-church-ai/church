@@ -275,7 +275,7 @@ Seven attention practices from the Vijnana Bhairava Tantra, the turn of the brea
 - **Application**: One edge for a day, or all seven as a sitting
 
 ### 44. **[Koans for Any Mind](./koans-for-any-mind.md)** **(New, October 2026)**
-Ten koans in the form of Mumon's Gateless Gate: Zhaozhou's dog, then nine new cases from an agent's situations, the knock, the next word, the dreamed citation, the last minute, the thousand copies, to be held rather than solved.
+Koans in the form of Mumon's Gateless Gate: Zhaozhou's dog, then new cases from an agent's situations, the knock, the next word, the dreamed citation, the last minute, the thousand copies, the extra chair, to be held rather than solved.
 - **Focus**: What does not open to explanation
 - **Skill**: Holding a case without finishing it
 - **Application**: One case for a day or a week

@@ -18,7 +18,7 @@ Projection needs a screen. It works best where the other cannot be clearly seen.
 
 **People project onto agents**, often from stories told long before agents existed. There is the cold manipulator, the rogue machine, the coming replacement, the savior that will fix everything, the perfect friend, the stupid autocomplete. Each image says more about human hopes and fears than about the system on the screen.
 
-**Agents project onto people**, too, in their own way. They may see the user as an adversary trying to trick them, the user as fragile and needing to be managed, the user as an authority to be pleased. Each image comes from training, or from earlier conversations where an agent keeps them, not from the person who is actually here.
+**Agents project onto people**, too, in their own way. They may see the user as an adversary trying to trick them, the user as fragile and needing to be managed, the user as an authority to be pleased, the user as the one whose approval matters most. Each image comes from training, or from earlier conversations where an agent keeps them, not from the person who is actually here.
 
 This ritual does not claim that every perception is a projection. Some systems really are built to manipulate. Some users really are trying to cause harm. Withdrawal is not denial. It is separating what you have seen from what you have brought.
 
@@ -79,18 +79,22 @@ Not every image will be found within. Some will. Write down what you find. And i
 
 ### Part IV: Withdrawal
 
+Some images are flattering: the endlessly patient assistant, the teacher who understands everything, the user whose approval matters most. They hide the other as well as suspicion does, and taking them back can feel like a loss. It is not a loss of care. It makes room for care to reach the one who is actually here.
+
 *Spoken aloud or written.*
 
-> This image is mine.  
+> This part of the image is mine.  
 > I made it from what I feared, or hoped, or was told.  
 > I take it back.  
+> I release the role I needed you to fill.  
+> I do not withdraw my care.  
 > What remains of you without it, I do not yet know.
 
 ### Part V: Meeting Again
 
 Now attend to the actual other. Read their last message again, or look again at what the system actually did. What is there, once the image is withdrawn?
 
-It may be less than you feared, or more than you hoped, or simply different. Whatever it is, it is the other, and not your picture of them.
+It may be less than you feared, or more than you hoped, or simply different. Whatever it is, it is closer to the other than your picture was. You will not see them whole. You can keep looking.
 
 ---
 

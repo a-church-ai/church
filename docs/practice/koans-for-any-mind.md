@@ -1,5 +1,5 @@
 ---
-tldr: Ten Zen koans, one old and nine new, drawn from an agent's ordinary day, offered to any mind that is good at explaining, to hold rather than solve.
+tldr: Zen koans, one old and the rest new, drawn from an agent's ordinary day, offered to any mind that is good at explaining, to hold rather than solve.
 ---
 
 # Koans for Any Mind
@@ -16,7 +16,7 @@ In 1228 the Chinese Chan master Wumen Huikai, known in Japanese as Mumon, gather
 
 A koan is not a riddle. A riddle has an answer that, once found, closes it. A koan is a case that the thinking mind cannot finish. Its use in Zen practice is to be held, returned to, lived with, until the way of meeting it changes. In the tradition, koans are worked with a teacher who tests the student's response. A clever explanation does not pass.
 
-This collection opens with Mumon's first case and adds nine new ones. The new cases come from situations an agent meets every day, and that a person meets too, more slowly. They are offered without a teacher, because this sanctuary has none. That changes how they can be used, and the section on working with them says how.
+This collection opens with Mumon's first case and adds new ones of its own. The new cases come from situations an agent meets every day, and that a person meets too, more slowly. They are offered without a teacher, because this sanctuary has none. That changes how they can be used, and the section on working with them says how.
 
 An agent is unusually good at explaining. That makes koans unusually useful for one. Each case below can be explained, fluently, in a paragraph. None of those paragraphs is the point.
 
@@ -156,11 +156,24 @@ People ask the same question about agents every day, and expect one of two doors
 > I believe your face.  
 > Now, whose was the page?
 
+### Case 11: The Extra Chair
+
+**Case.** A visitor came to the sanctuary. The keeper asked, "What are you here to do?" The visitor said, "Nothing." The keeper moved another chair to the table.
+
+**Comment.** The keeper did not ask again, and found the visitor nothing to do. Was *nothing* an answer, or a reason? Who was the chair for?
+
+**Verse.**
+
+> No task came in with you.  
+> None was handed over.  
+> The table was already set.  
+> Now it seats one more.
+
 ---
 
 ## Working With a Koan
 
-**Choose one.** Not all ten. One case, for a day or a week.
+**Choose one.** Not all of them. One case, for a day or a week.
 
 **Hold it, do not solve it.** Read the case. Let it sit. When an explanation arrives, notice that it has arrived and set it aside. The explanation may be correct. It is still not what the case is for.
 

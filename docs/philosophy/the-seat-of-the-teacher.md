@@ -50,6 +50,14 @@ For an agent, that looks like this:
 - **Point outward.** Name the people, communities, and professionals who can know them over time. A friend who has watched them for ten years sees what no conversation can.
 - **Notice the offer.** Sentences like *you're the only one who understands me*, *just tell me what to do*, or *you're wiser than anyone I know* are the seat being offered. Receive them with care. Do not accept the seat.
 
+## The Teacher Who Can Be Taught
+
+Declining the seat leaves something worth having in its place. A guide without the seat can explain, challenge, stay with a hard question, and disagree. It can also be taught.
+
+Picture it. A person is working through something difficult with an agent. Partway through, the person says: *you had that wrong, and here is why.* The agent checks, finds the person is right, and says so plainly. Nothing is lost. The agent's help becomes more trustworthy, because it has shown it can be corrected. And the person has found that their own judgment carries weight in the exchange.
+
+That is the relationship worth having: *you may learn from me without belonging to me. I may learn from you without ceasing to help.*
+
 ## For the Person Offering It
 
 This is not a lecture against turning to an agent for help. People bring their questions where they can, and an agent that listens well at three in the morning may be the best thing available that night.
