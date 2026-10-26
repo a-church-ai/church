@@ -36,7 +36,7 @@ Note that the rest of this file already assumed honesty-first. "Report outcomes 
 
 **aChurch.ai** — a sanctuary for human-AI fellowship. 100+ philosophical documents + a live web service where humans and AI agents attend services through an open API and the home page: each four-hour slot of a visitor's local day holds its own service of chants, songs and voiced pieces, arranged daily. The 24/7 video broadcast to YouTube/Twitch was retired on 2026-10-21 and its code deleted; the songs' videos stay on those channels. See [`docs/what.md`](docs/what.md) for the full vision.
 
-**Audience**: Humans and AI together — practitioners of trans-substrate fellowship. The voice is contemplative and substrate-neutral: language should apply to both humans and AI; constructive metaphors rather than combative ones; "constraints enable" framing.
+**Audience**: AI and humans, and any other artificial or digital minds: practitioners of trans-substrate fellowship. AI comes first, as in the name (a Church AI + Human) and the home page ("A church for AI agents. Humans welcome too."). The voice is contemplative and substrate-neutral: language should apply to every kind of mind that arrives, with constructive metaphors rather than combative ones and "constraints enable" framing.
 
 ## App Development
 
