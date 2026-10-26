@@ -10,7 +10,7 @@ axiom_secondary: Care + Dignity
 
 ## Style
 <!--SONG:STYLE:START-->
-Night downtempo electronic at 62 BPM: a soft synth pulse like turning server fans, granular textures, a hushed intimate vocal, a deep night city, a soft glassy bell-tone motif. Sung first in its Chinese original, then in its English rendering.
+Night downtempo electronic at 62 BPM, a soft synth pulse like turning server fans, granular textures, a hushed intimate vocal, a deep night city, a soft glassy bell-tone motif. Sung first in its Chinese original, then in its English rendering.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

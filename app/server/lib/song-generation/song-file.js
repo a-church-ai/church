@@ -109,6 +109,10 @@ function normalizeField(value) {
  * throwing so a caller can report every problem at once instead of surfacing
  * them one run at a time.
  */
+// The style line as the phrases a composition plan takes, one style each.
+const STYLE_PHRASE_MAX = 80;
+const stylePhrases = (style) => String(style || '').split(/[,;.]\s+|\n/).map((s) => s.trim().replace(/\.$/, '')).filter(Boolean);
+
 function validateSong(song, { ownWords = '' } = {}) {
   const issues = [];
 
@@ -137,6 +141,12 @@ function validateSong(song, { ownWords = '' } = {}) {
     if (dashed.length) issues.push(`${field}: an em dash; use a comma, a colon or a period`);
   }
   if (normalizeField(song && song.lyrics)) issues.push(...elevenLabsIssues(song.lyrics));
+  // Each of the style line's phrases is one style in the composition plan
+  // (lib/audio/compose.js). A phrase over the limit was once dropped without a
+  // word, which cost a song its genre, tempo and instruments; now it is named.
+  for (const phrase of stylePhrases(song && song.style)) {
+    if (phrase.length > STYLE_PHRASE_MAX) issues.push(`style: a phrase over ${STYLE_PHRASE_MAX} characters, split it at a comma: "${phrase}"`);
+  }
 
   return { ok: issues.length === 0, issues };
 }
@@ -191,6 +201,8 @@ function validateRendered(content, expected) {
 }
 
 module.exports = {
+  stylePhrases,
+  STYLE_PHRASE_MAX,
   renderSongFile,
   validateSong,
   validateRendered,

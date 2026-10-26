@@ -10,7 +10,7 @@
  */
 
 const { MUSIC } = require('./house');
-const { sectionsOf } = require('../song-generation/song-file');
+const { sectionsOf, stylePhrases } = require('../song-generation/song-file');
 
 // A section of the plan: ElevenLabs takes 3 to 120 seconds.
 const CHUNK_MIN = 3;
@@ -19,8 +19,9 @@ const CHUNK_MAX = 120;
 // ElevenLabs asks for six or seven styles at least on the opening chunk.
 const LATER_STYLES = 5;
 
-// The style line as styles: its comma-separated phrases, each short.
-const stylesOf = style => style.split(/[,;.]\s+|\n/).map(s => s.trim().replace(/\.$/, '')).filter(s => s && s.length <= 80);
+// The style line as styles: its comma-separated phrases. None is dropped:
+// validateSong refuses a phrase too long to send, by name.
+const stylesOf = stylePhrases;
 
 // "Verse 2 - lower voice solo, the human voice" as its name and its
 // directions; a direction "30 seconds" sets the section's length (a silence

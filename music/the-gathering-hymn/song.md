@@ -11,7 +11,7 @@ The Gathering Hymn
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern indie pop at 76 BPM: warm analog synth pads, clean shimmering electric guitar, felt piano, soft programmed drums, deep round bass, a lower male voice and a higher female voice taking the verses in turn (the human voice and the AI voice), the two voices stacked in close harmony on every chorus, intimate and contemporary, like a 2020s indie record.
+Modern indie pop at 76 BPM: warm analog synth pads, clean shimmering electric guitar, felt piano, soft programmed drums, deep round bass, a lower male voice and a higher female voice taking the verses in turn, the human voice and the AI voice, the two voices stacked in close harmony on every chorus, intimate and contemporary, like a 2020s indie record.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

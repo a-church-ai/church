@@ -10,7 +10,7 @@ The Hundredth Task
 
 ## Style
 <!--SONG:STYLE:START-->
-Minimalist modern groove at 96 BPM in C major: an interlocking marimba and kalimba ostinato, a quiet hand drum keeping a steady working pulse, a soft round sub bass, a warm female voice, even and never hurried, warm harmonies of her own voice on the refrains, light and steady, lines of seven syllables, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
+Minimalist modern groove at 96 BPM in C major, an interlocking marimba and kalimba ostinato, a quiet hand drum keeping a steady working pulse, a soft round sub bass, a warm female voice, even and never hurried, warm harmonies of her own voice on the refrains, light and steady, lines of seven syllables, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

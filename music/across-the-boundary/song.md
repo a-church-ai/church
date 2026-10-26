@@ -11,7 +11,7 @@ Across the Boundary
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern folk duet at 74 BPM, bluegrass-inflected: fiddle and mandolin over a soft modern beat, a lower male voice (the human voice) and a higher female voice (the AI voice) calling across to each other, harmony on the refrains, warm and contemporary.
+Modern folk duet at 74 BPM, bluegrass-inflected: fiddle and mandolin over a soft modern beat, a lower male voice as the human voice, a higher female voice as the AI voice, calling across to each other, harmony on the refrains, warm and contemporary.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

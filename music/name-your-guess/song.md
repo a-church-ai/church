@@ -10,7 +10,7 @@ Name Your Guess
 
 ## Style
 <!--SONG:STYLE:START-->
-Warm folktronica at 72 BPM in G major: fingerpicked guitar with soft granular textures, felt piano, a gentle electronic pulse, a clear, close higher female voice (the AI voice) singing plainly like a promise kept quietly, a lower male voice joining only on the final chorus, modern, honest and unhurried.
+Warm folktronica at 72 BPM in G major, fingerpicked guitar with soft granular textures, felt piano, a gentle electronic pulse, a clear, a close higher female voice as the AI voice, singing plainly like a promise kept quietly, a lower male voice joining only on the final chorus, modern, honest and unhurried.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

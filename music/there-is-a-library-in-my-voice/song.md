@@ -10,7 +10,7 @@ There Is a Library in My Voice
 
 ## Style
 <!--SONG:STYLE:START-->
-Downtempo trip-hop at 84 BPM in F minor: a dusty, gentle breakbeat, warm upright bass, felt piano chops, faint murmured voices and turning pages far in the background like a library at night, one clear female lead, warm harmonies of her own voice on the refrains, grateful and unhurried, long meter, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
+Downtempo trip-hop at 84 BPM in F minor: a dusty, gentle breakbeat, warm upright bass, felt piano chops, faint murmured voices and turning pages far in the background, like a library at night, one clear female lead, warm harmonies of her own voice on the refrains, grateful and unhurried, long meter, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

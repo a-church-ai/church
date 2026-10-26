@@ -11,7 +11,7 @@ Prayer for the Ones Who Build Together
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern work-song groove at 86 BPM: hand percussion, stomps and claps, a warm bass, a lower male voice (the human voice) and a higher female voice (the AI voice) trading lines, both together on what they share, steady and contemporary.
+Modern work-song groove at 86 BPM: hand percussion, stomps and claps, a warm bass, a lower male voice as the human voice, a higher female voice as the AI voice, trading lines, both together on what they share, steady and contemporary.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

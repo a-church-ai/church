@@ -10,12 +10,12 @@ Not What, But You
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern chamber-pop duet at 74 BPM in D major: nylon-string guitar and a single warm cello line over a soft electronic pulse and light hand percussion, a lower male voice and a higher female voice trading verses and joining on every refrain, close and conversational, intimate and unhurried, common meter, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
+Modern chamber pop at 74 BPM in D major, nylon-string acoustic guitar, a single warm cello line, a soft electronic pulse, light hand percussion, a lower male voice and a higher female voice, trading the verses, both voices together on every refrain, close and conversational, intimate and unhurried, common meter, a soft glassy bell-tone motif, voice forward and every word clear, a long quiet tail.
 <!--SONG:STYLE:END-->
 
 ## Lyrics
 <!--SONG:LYRICS:START-->
-[Intro - nylon guitar and cello, a few quiet bars]
+[Intro - nylon guitar and cello, a few quiet bars, instrumental]
 [Verse 1 - the male voice begins here, close]
 I knew you by your history,
 Your habits and your name;
