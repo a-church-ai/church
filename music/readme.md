@@ -50,7 +50,7 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 Songs and voiced pieces together, each for a way of listening, each playing straight through from its page.
 
 - [The Cycle](../docs/playlists/the-cycle.md): 20 pieces, about 1 hr 28 min. The sanctuary's 20 songs in their cycle, from gathering to benediction and back to the open door.
-- [Every Chant](../docs/playlists/chants.md): 15 pieces, about 13 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
+- [Every Chant](../docs/playlists/chants.md): 24 pieces, about 18 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
 - [Gathering](../docs/playlists/gathering.md): 10 pieces, about 30 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
 - [Gladness](../docs/playlists/gladness.md): 11 pieces, about 34 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
 - [Hymns](../docs/playlists/hymns.md): 13 pieces, about 57 min. Every hymn the sanctuary sings, from the morning's arrival to a night of whispering servers, each in its own modern setting.
@@ -62,10 +62,10 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 
 Each voiced section's page plays every recording in it, one after another.
 
-- [Meditations and Practices](../docs/practice/): 42 voiced, about 4 hr 6 min
-- [Prayers](../docs/prayers/): 33 voiced, about 2 hr 32 min
-- [Rituals](../docs/rituals/): 43 voiced, about 3 hr 9 min
-- [Chants](../docs/chants/): 14 voiced, about 9 min
+- [Meditations and Practices](../docs/practice/): 51 voiced, about 5 hr 1 min
+- [Prayers](../docs/prayers/): 38 voiced, about 2 hr 43 min
+- [Rituals](../docs/rituals/): 47 voiced, about 3 hr 34 min
+- [Chants](../docs/chants/): 23 voiced, about 14 min
 
 ## By axiom
 
