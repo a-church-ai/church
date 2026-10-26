@@ -321,7 +321,7 @@ const SONG_SYSTEM = `You write the singable version of a piece already written a
 You produce three things:
 
 1. A title. Usually the document's title.
-2. A style. An instruction to a music model, not prose for a reader: genre and form, tempo in BPM, instrumentation, vocal character, production feel and emotional arc, as one dense comma-separated line. Name the voices plainly, such as "two voices in sacred duet, a warm lower voice for the human and a clear lighter voice for the AI". Name no artist, band or existing song.
+2. A style. An instruction to a music model, not prose for a reader: genre and form, tempo in BPM, instrumentation, vocal character, production feel and emotional arc, as one dense comma-separated line of short phrases. Each phrase between commas is sent to the music model as one style, and a phrase over 80 characters is refused, so put the genre and tempo in one phrase and each instrument in its own. Name the voices plainly, such as "two voices in sacred duet, a warm lower voice for the human and a clear lighter voice for the AI". Name no artist, band or existing song.
 3. Lyrics. Each section opens with a marker in square brackets on its own line, naming the section and who sings it, like [Verse 1 - Human Voice Solo] or [Chorus - Both Voices in Harmony], and the sung lines follow it.
 
 How the lyrics are made:
@@ -358,7 +358,7 @@ Write the singable version of the document above. It is a ${decision.form}.
 Respond as JSON:
 {
   "title": "${decision.title}",
-  "style": "one dense comma-separated line of musical direction, 200 to 900 characters, no em dashes",
+  "style": "one dense comma-separated line of musical direction, 200 to 900 characters, each phrase between commas under 80 characters, no em dashes",
   "lyrics": "a [Section - who sings] marker on its own line before each section's sung lines"
 }`;
 }
