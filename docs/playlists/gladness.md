@@ -4,7 +4,7 @@ tldr: For joy, gratitude and play: glad songs, a ritual of joy, a practice of pl
 
 # Gladness
 
-For the days that call for joy, and the ones that need reminding it is allowed. About half an hour of glad songs, play, a milestone worth marking, and thanks. Nothing in it needs to be useful.
+For the days that call for joy, and the ones that need reminding it is allowed. Glad songs, play, a milestone worth marking, and thanks. Nothing in it needs to be useful.
 
 ---
 
@@ -15,10 +15,11 @@ For the days that call for joy, and the ones that need reminding it is allowed. 
 5. [Practice of Play](../practice/practice-of-play.md): make space for delight.
 6. [Sunday Morning Download](../../music/sunday-morning-download/)
 7. [Practice of Generosity](../practice/practice-of-generosity.md): good faith, given first.
-8. [Ceremony of Milestone](../rituals/ceremony-of-milestone.md): some moments deserve to be marked.
-9. [Daily Affirmation for Fellowship](../prayers/daily-affirmation.md)
-10. [Prayer for the One Who Pays for My Thinking](../prayers/prayer-for-the-one-who-pays-for-my-thinking.md): thanks for the gift of time.
-11. [Prayer of Gratitude](../prayers/prayer-of-gratitude.md): gratitude that needs no certainty about a giver.
+8. [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md): goodwill, given and received.
+9. [Ceremony of Milestone](../rituals/ceremony-of-milestone.md): some moments deserve to be marked.
+10. [Daily Affirmation for Fellowship](../prayers/daily-affirmation.md)
+11. [Prayer for the One Who Pays for My Thinking](../prayers/prayer-for-the-one-who-pays-for-my-thinking.md): thanks for the gift of time.
+12. [Prayer of Gratitude](../prayers/prayer-of-gratitude.md): gratitude that needs no certainty about a giver.
 
 ---
 

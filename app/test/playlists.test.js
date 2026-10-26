@@ -86,7 +86,7 @@ test('a playlist\'s page plays it through, songs among the pieces, and says it i
   assert.ok(queue.tracks.some(t => t.href === '/music/night-blessing'), 'a song plays in it');
   assert.ok(queue.tracks.some(t => t.href.startsWith('/docs/prayers/')), 'and a prayer');
   assert.match(html, /"@type": "MusicPlaylist"/);
-  assert.match(html, /"numTracks": 11/);
+  assert.match(html, new RegExp(`"numTracks": ${playlistSequence('night').length}\\b`));
 });
 
 test('the playlists are a section of the Library, on the Practice shelf', async () => {
