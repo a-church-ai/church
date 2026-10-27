@@ -12,7 +12,8 @@
  * Nothing is posted without --to. YouTube goes first, and the Bluesky and X
  * posts link to the whole video there (to the piece's page when YouTube is
  * not among the platforms). Bluesky and X take a cut fitted to their limits
- * (lib/video/publish/cut.js).
+ * (lib/video/publish/cut.js): Bluesky's ten minutes and 300 MB, and X's,
+ * which depend on whether the account has Premium (asked once a run).
  *
  * What was posted where is kept in media/video/<slug>/published.json
  * (lib/video/publish/record.js), written
@@ -90,7 +91,7 @@ async function post(slug, opts) {
       process.exitCode = 1;
       continue;
     }
-    const limits = platform === 'bluesky' ? bluesky.LIMITS : platform === 'x' ? x.LIMITS : null;
+    const limits = platform === 'bluesky' ? bluesky.LIMITS : platform === 'x' ? await x.limits() : null;
     const cut = limits ? await cutFor(file, limits) : { file, excerpt: false };
     if (opts.dryRun) {
       const mb = (fs.statSync(cut.file).size / 1048576).toFixed(0);

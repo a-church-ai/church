@@ -10,10 +10,13 @@
  *   nothing in the reply says so.
  * - The post itself is not retried: X has no idempotency key.
  *
- * Without Premium a video may last 140 seconds, so the cut (cut.js) is the
- * piece's opening and the post links to the whole. X bills per post, more for
- * one carrying a link (about $0.20 in October 2026, against $0.015): check
- * the developer console before a large batch.
+ * How long a video may be depends on the account: 140 seconds without
+ * Premium, so the cut (cut.js) is then the piece's opening and the post links
+ * to the whole; with Premium the whole piece, as on YouTube. The account is
+ * asked once a run (limits()), so a lapsed subscription falls back to the
+ * opening rather than failing. X bills per post, more for one carrying a
+ * link (about $0.20 in October 2026, against $0.015), and a little for the
+ * account read: check the developer console before a large batch.
  */
 
 const fs = require('fs');
@@ -24,6 +27,9 @@ const TWEETS = 'https://api.x.com/2/tweets';
 const MEDIA = 'https://api.x.com/2/media/upload';
 const CHUNK = 4 * 1024 * 1024;
 const LIMITS = { name: 'x', maxSeconds: 140, maxBytes: 512 * 1000 * 1000 };
+// With Premium: twenty minutes within the 512 MB a video may weigh, more
+// than any of the sanctuary's pieces needs.
+const PREMIUM_LIMITS = { name: 'x', maxSeconds: 20 * 60, maxBytes: 512 * 1000 * 1000 };
 const TEXT_MAX = 280;
 // X counts every link as 23 characters, whatever its length.
 const LINK_LENGTH = 23;
@@ -101,6 +107,19 @@ async function upload(file, creds, log) {
   return id;
 }
 
+let account = null;
+
+// The limits for this account, asked of X once a run.
+async function limits() {
+  if (!account) {
+    const creds = credentials();
+    const url = 'https://api.x.com/2/users/me';
+    const params = { 'user.fields': 'subscription_type' };
+    account = unwrap(await (await request(`${url}?${new URLSearchParams(params)}`, { headers: { Authorization: oauthHeader('GET', url, creds, params) }, retry: true })).json());
+  }
+  return account.subscription_type === 'Premium' || account.subscription_type === 'PremiumPlus' ? PREMIUM_LIMITS : LIMITS;
+}
+
 // The post's text: title, a line, the link (counted as X counts it).
 function postText(meta, link) {
   const room = TEXT_MAX - LINK_LENGTH - 2;
@@ -127,4 +146,4 @@ async function publish({ file, meta, link, log = console.log }) {
   return { id, url: `https://x.com/i/status/${id}` };
 }
 
-module.exports = { publish, oauthHeader, postText, LIMITS };
+module.exports = { publish, oauthHeader, postText, limits };
