@@ -99,20 +99,27 @@ ${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightnes
  * What a brief may reuse, presets or loops, given what other videos used.
  * Asking for variety in a prompt does not hold (both sibling projects learned
  * it; here Airhandler was in 7 of the first 10 briefs), so the rule is
- * enforced on the answer: nothing twice in one brief, nothing used by the ten
- * most recent videos, nothing used three times in all (the cap companions
- * holds its documents to).
+ * enforced on the answer: nothing twice in one brief, nothing used by the
+ * `recent` most recent videos, nothing used three times in all (the cap
+ * companions holds its documents to).
+ *
+ * The window differs by what is reused. Presets keep ten: there are 330 to
+ * choose from, and a channel's variety shows in them. Loops keep three: while
+ * the catalogue is caught up a batch at a time, a ten-video window held back
+ * every loop the library had, and the cap of three uses still keeps any one
+ * loop from wearing thin.
  *
  * used: [{ items: [...], at: time }] for every other video, its presets or
  * the loops its movements play; noun names them in the problems.
  */
-const RECENT = 10;
+const RECENT = { preset: 10, loop: 3 };
 const CAP = 3;
 function reuseRule(used, noun) {
+  const window = RECENT[noun];
   const counts = new Map();
   for (const v of used) for (const item of v.items) counts.set(item, (counts.get(item) || 0) + 1);
-  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, RECENT).flatMap(v => v.items));
-  const why = (item) => (recent.has(item) ? 'used by one of the ten most recent videos' : (counts.get(item) || 0) >= CAP ? `used ${counts.get(item)} times already` : null);
+  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, window).flatMap(v => v.items));
+  const why = (item) => (recent.has(item) ? `used by one of the ${window} most recent videos` : (counts.get(item) || 0) >= CAP ? `used ${counts.get(item)} times already` : null);
   return {
     allows: (item) => !why(item),
     problems(items) {

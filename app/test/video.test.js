@@ -79,6 +79,15 @@ test('the reuse rule refuses a repeat, a recent item and an overused one, and al
   assert.match(problems[1], /movement 3.*3 times/);
 });
 
+test('loops keep a shorter recency window than presets, so a catch-up batch can reuse them', () => {
+  const used = Array.from({ length: 5 }, (_, i) => ({ items: [`video ${i}`], at: i }));
+  const presets = reuseRule(used, 'preset');
+  const loops = reuseRule(used, 'loop');
+  assert.strictEqual(presets.allows('video 0'), false, 'a preset from five videos ago is still recent');
+  assert.strictEqual(loops.allows('video 0'), true, 'a loop from five videos ago may be reused');
+  assert.strictEqual(loops.allows('video 4'), false, 'a loop from one of the three most recent may not');
+});
+
 test('the finished video fails its report when black, silent, the wrong length or unevenly exposed', () => {
   const fine = { duration: 60.1, seconds: 60, audio: true, samples: [90, 110, 100, 95, 105], movements: [100, 90, 110] };
   assert.deepStrictEqual(problemsOf(fine), []);
