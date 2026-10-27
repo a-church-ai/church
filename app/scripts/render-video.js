@@ -27,9 +27,9 @@ const fs = require('fs');
 const path = require('path');
 const { describeError } = require('../server/lib/utils/describe-error');
 const { pool } = require('../server/lib/utils/pool');
-const { downloadRecording } = require('../server/lib/audio/storage');
-const { analyse, beatGrid, movementEdges, describeMovement, envelope } = require('../server/lib/video/analysis');
-const { writeBrief, reuseRule, MOVEMENTS } = require('../server/lib/video/brief');
+const { analyse, describeMovement, envelope } = require('../server/lib/video/analysis');
+const { pieceFor, allPieces, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
+const { writeBrief, reuseRule } = require('../server/lib/video/brief');
 const library = require('../server/lib/video/library');
 const lancedb = require('../server/lib/rag/lancedb');
 const { makeStill, makeClip, spent, VIDEO_MODEL } = require('../server/lib/video/loops');
@@ -37,11 +37,7 @@ const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
 const { compose, baseFootage, titleCard, FPS } = require('../server/lib/video/compose');
 
-const ROOT = path.join(__dirname, '../..');
 const OUT = library.VIDEO_DIR;
-const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
-const between = (text, name) => (text.match(new RegExp(`<!--SONG:${name}:START-->([\\s\\S]*?)<!--SONG:${name}:END-->`)) || [])[1]?.trim() || '';
-const KINDS = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
 // The recording the preset survey plays each preset against: a spoken
 // prayer, the hardest case for presets tuned to music.
 const SURVEY_RECORDING = 'prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3';
@@ -58,47 +54,6 @@ function parseArgs(argv) {
   if (!(opts.concurrency >= 1)) throw new Error('--concurrency takes a positive number');
   if (!opts.slugs.length && !opts.surveyPresets) throw new Error('Name the pieces to render: npm run video -- <slug> [<slug> ...]');
   return opts;
-}
-
-// A piece by its slug: a song with a recording in audio/songs.json, or a
-// voiced document in audio/manifest.json whose file is named by the slug.
-// One that matches nothing is an error, not a no-op.
-function pieceFor(slug) {
-  const songs = JSON.parse(read('audio/songs.json'));
-  if (songs[slug]) return { slug, kind: 'song', song: `music/${slug}/song.md`, audio: songs[slug].file };
-  const manifest = JSON.parse(read('audio/manifest.json'));
-  const doc = Object.keys(manifest).find(k => path.basename(k, '.md') === slug && !manifest[k].imported);
-  if (doc) return { slug, kind: KINDS[doc.split('/')[1]] || 'piece', doc, audio: manifest[doc].file };
-  throw new Error(`no recording for ${slug}: not a song in audio/songs.json nor a voiced document in audio/manifest.json`);
-}
-
-// The piece's words, and for a song the tempo its style states; for a voiced
-// piece, the house cast who speak it.
-function pieceText(piece) {
-  if (piece.song) {
-    const song = read(piece.song);
-    const style = between(song, 'STYLE');
-    const bpm = Number((style.match(/(\d{2,3})\s*BPM/i) || [])[1]) || null;
-    return { title: between(song, 'TITLE'), text: `Style: ${style}\n\nLyrics:\n${between(song, 'LYRICS')}`, bpm };
-  }
-  const doc = read(piece.doc).replace(/^---[\s\S]*?---\n/, '');
-  const recording = JSON.parse(read('audio/manifest.json'))[piece.doc];
-  const voices = recording?.voices?.length ? `${recording.voices.length} voice(s) of the house cast (${recording.voices.join(', ')})` : null;
-  return { title: doc.match(/^# (.+)$/m)[1].trim(), text: doc.replace(/\n## Related[\s\S]*$/, '').trim(), voices };
-}
-
-async function recordingIn(file, dir) {
-  const local = path.join(dir, path.basename(file));
-  if (!fs.existsSync(local)) await downloadRecording(file, local);
-  return local;
-}
-
-// Every recording, as a piece: the hub penalty compares a loop with all of them.
-function allPieces() {
-  const songs = Object.keys(JSON.parse(read('audio/songs.json')));
-  const manifest = JSON.parse(read('audio/manifest.json'));
-  const docs = Object.keys(manifest).filter(k => !manifest[k].imported).map(k => path.basename(k, '.md'));
-  return [...songs, ...docs].map(pieceFor);
 }
 
 /**
@@ -140,8 +95,7 @@ async function render(piece) {
   const audio = await recordingIn(piece.audio, dir);
   const analysis = await analyse(audio, FPS);
   const { title, text, bpm, voices } = pieceText(piece);
-  const grid = bpm ? beatGrid(analysis, bpm) : null;
-  const edges = movementEdges(analysis, MOVEMENTS, { grid });
+  const { grid, edges } = shapeOf(analysis, bpm);
   const sound = edges.slice(0, -1).map((from, i) => describeMovement(analysis, from, edges[i + 1]));
   log(`${title}: ${analysis.seconds.toFixed(1)}s, movements change at ${edges.slice(1, -1).map(e => e.toFixed(1) + 's').join(' and ')}${grid ? `, ${bpm} BPM, downbeat at ${grid.downbeat.toFixed(2)}s` : ''}`);
 
