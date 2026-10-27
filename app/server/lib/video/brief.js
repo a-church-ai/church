@@ -44,7 +44,7 @@ Rules for the motion:
 
 Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. Prefer slow, fluid, luminous presets for quiet or spoken pieces and allow more energy for chants and songs.
 
-Loops from the library: you may be offered loops made for earlier videos. You may give one of them to at most ${MAX_REUSED} movement, and only where it truly belongs: the same image and feeling the movement needs, a pace that suits how it sounds, a palette that sits with the other movements. Then that movement is { "loop": "its id", "reason": "one sentence on why it belongs", "preset": "..." }, with no still or motion of its own. When none belongs, write every movement new; that is a good answer.
+Loops from the library: you may be offered loops made for earlier videos. Prefer one of them to writing a new movement whenever it already shows what a movement needs, the same image or a close variation of it, with a pace that suits how the movement sounds and a palette that sits with the others. A new loop costs $1.22 and one of twenty requests a day; a reused one costs nothing, and the video around it (its presets, palette, mandala and pulse) makes it new. Give a library loop to at most ${MAX_REUSED} movement. That movement is { "loop": "its id", "reason": "one sentence on why it belongs", "preset": "..." }, with no still or motion of its own. Write every movement new only when no offered loop shows what any movement needs.
 
 Return only JSON:
 {
