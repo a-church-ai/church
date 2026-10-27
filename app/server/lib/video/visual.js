@@ -21,15 +21,16 @@ const W = 1280;
 const H = 720;
 const BATCH = 15;
 const PRESET_PACKS = ['butterchurnPresets', 'butterchurnPresetsExtra', 'butterchurnPresetsExtra2', 'butterchurnPresetsMD1'];
-const MODULES = path.join(__dirname, '../../node_modules');
+const MODULES = path.join(__dirname, '../../../node_modules');
 
-function presetNames() {
-  const names = new Set();
-  for (const pack of PRESET_PACKS) {
-    const mod = require(`butterchurn-presets/lib/${pack}.min.js`);
-    for (const name of Object.keys((mod.getPresets || mod.default.getPresets)())) names.add(name);
-  }
-  return [...names];
+// A headless Chrome page with butterchurn and every preset pack loaded.
+async function butterchurnPage(width, height) {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+  const page = await browser.newPage({ viewport: { width, height } });
+  await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
+  await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
+  for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
+  return { browser, page };
 }
 
 function encoder(file, fps) {
@@ -131,12 +132,8 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
   const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, edges });
   if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
-  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+  const { browser, page } = await butterchurnPage(W, H);
   try {
-    const page = await browser.newPage({ viewport: { width: W, height: H } });
-    await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
-    await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
-    for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
     await page.evaluate(pageSetup, {
       W, H, fps, packs: PRESET_PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges
     });
@@ -204,12 +201,8 @@ function pageSurvey({ W, H, fps, packs }) {
 }
 
 async function surveyPresets(analysis, { from = 20, seconds = 6, fps = 30, log = console.log } = {}) {
-  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+  const { browser, page } = await butterchurnPage(640, 360);
   try {
-    const page = await browser.newPage({ viewport: { width: 640, height: 360 } });
-    await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
-    await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
-    for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
     await page.evaluate(pageSurvey, { W: 640, H: 360, fps, packs: PRESET_PACKS });
     const names = await page.evaluate(() => window.surveyNames);
     const waves = Array.from({ length: seconds * fps }, (_, i) => analysis.waveform(from * fps + i));
@@ -231,11 +224,10 @@ async function surveyPresets(analysis, { from = 20, seconds = 6, fps = 30, log =
 
 // The presets the brief may choose from, with how they look under a voice.
 function presetChoices({ minBrightness = 0.1 } = {}) {
-  if (!fs.existsSync(SURVEY_FILE)) return presetNames().map(name => ({ name }));
   const survey = JSON.parse(fs.readFileSync(SURVEY_FILE, 'utf8'));
   return Object.entries(survey)
     .filter(([, s]) => !s.error && s.brightness >= minBrightness)
     .map(([name, s]) => ({ name, ...s }));
 }
 
-module.exports = { renderLayers, presetNames, surveyPresets, presetChoices };
+module.exports = { renderLayers, surveyPresets, presetChoices };

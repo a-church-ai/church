@@ -12,7 +12,10 @@
  */
 
 const { spawnSync } = require('child_process');
+const { run, ffmpeg } = require('../audio/assemble');
 
+// Raw frames, read synchronously: the frames are binary, and assemble.js's
+// runner collects its output as text.
 function frames(file, { width, height, gray = false, args = [] }) {
   const out = spawnSync('ffmpeg', ['-v', 'error', ...args, '-i', file, '-vf', `scale=${width}:${height}`, '-f', 'rawvideo', '-pix_fmt', gray ? 'gray' : 'rgb24', '-'], { maxBuffer: 1 << 30 });
   if (out.status !== 0) throw new Error(`ffmpeg could not read ${file}: ${String(out.stderr).slice(-300)}`);
@@ -100,8 +103,8 @@ function frameChanges(file) {
  * that show sit at the seam, where the model eases out of and into the still
  * it was given (mvplanner measured that ease in 78% of its clips).
  */
-function loopMotion(file, change = frameChanges(file)) {
-  return motionOf(change, probeFps(file));
+async function loopMotion(file, change = frameChanges(file)) {
+  return motionOf(change, await probeFps(file));
 }
 
 function motionOf(change, fps) {
@@ -141,11 +144,11 @@ function framesToKeep(change) {
  * meets. Frames are only ever dropped, never repeated, so ffmpeg's select
  * does it. Returns the new file and its motion before and after.
  */
-function evenLoop(file, out) {
+async function evenLoop(file, out) {
   const change = frameChanges(file);
-  const before = loopMotion(file, change);
+  const before = await loopMotion(file, change);
   const keep = framesToKeep(change);
-  const fps = probeFps(file);
+  const fps = await probeFps(file);
   // Runs of consecutive kept frames, so the expression stays short.
   const runs = [];
   for (const k of keep) {
@@ -154,26 +157,25 @@ function evenLoop(file, out) {
     else runs.push([k, k]);
   }
   const expr = runs.map(([a, b]) => (a === b ? `eq(n,${a})` : `between(n,${a},${b})`)).join('+');
-  const result = spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', file, '-vf', `select='${expr}',setpts=N/(${fps.toFixed(3)}*TB)`, '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', out], { encoding: 'utf8' });
-  if (result.status !== 0) throw new Error(`ffmpeg could not even ${file}: ${result.stderr.slice(-300)}`);
-  return { file: out, kept: keep.length, of: change.length + 1, before, after: loopMotion(out) };
+  await ffmpeg(['-i', file, '-vf', `select='${expr}',setpts=N/(${fps.toFixed(3)}*TB)`, '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', out]);
+  return { file: out, kept: keep.length, of: change.length + 1, before, after: await loopMotion(out) };
 }
 
-function probeFps(file) {
-  const out = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', '-of', 'csv=p=0', file], { encoding: 'utf8' }).stdout.trim();
-  const [a, b] = out.split('/').map(Number);
+async function probeFps(file) {
+  const { stdout } = await run('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', '-of', 'csv=p=0', file]);
+  const [a, b] = stdout.trim().split('/').map(Number);
   return b ? a / b : a || 24;
 }
 
-function probe(file) {
-  const out = spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration,size:stream=codec_type', '-of', 'json', file], { encoding: 'utf8' });
-  return JSON.parse(out.stdout || '{}');
+async function probe(file) {
+  const { stdout } = await run('ffprobe', ['-v', 'error', '-show_entries', 'format=duration,size:stream=codec_type', '-of', 'json', file]);
+  return JSON.parse(stdout || '{}');
 }
 
 // Mean luma (Y, in limited range as the video stores it) at a moment.
-function lumaAt(file, t) {
-  const out = spawnSync('ffmpeg', ['-v', 'info', '-ss', t.toFixed(2), '-i', file, '-frames:v', '1', '-vf', 'signalstats,metadata=print:key=lavfi.signalstats.YAVG', '-f', 'null', '-'], { encoding: 'utf8' });
-  const m = /YAVG=([0-9.]+)/.exec(out.stderr);
+async function lumaAt(file, t) {
+  const { stderr } = await run('ffmpeg', ['-hide_banner', '-nostdin', '-ss', t.toFixed(2), '-i', file, '-frames:v', '1', '-vf', 'signalstats,metadata=print:key=lavfi.signalstats.YAVG', '-f', 'null', '-']);
+  const m = /YAVG=([0-9.]+)/.exec(stderr);
   return m ? Number(m[1]) : null;
 }
 
@@ -186,11 +188,11 @@ function lumaAt(file, t) {
  *   black video through), all under 42 fails
  * - each movement's brightness within half and twice the median's
  */
-function reportVideo({ file, seconds, edges }) {
-  const info = probe(file);
+async function reportVideo({ file, seconds, edges }) {
+  const info = await probe(file);
   const duration = Number(info.format?.duration);
-  const samples = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => lumaAt(file, f * seconds)).filter(v => v !== null);
-  const movements = edges.slice(0, -1).map((from, i) => lumaAt(file, (from + edges[i + 1]) / 2)).filter(v => v !== null);
+  const samples = (await Promise.all([0.1, 0.3, 0.5, 0.7, 0.9].map(f => lumaAt(file, f * seconds)))).filter(v => v !== null);
+  const movements = (await Promise.all(edges.slice(0, -1).map((from, i) => lumaAt(file, (from + edges[i + 1]) / 2)))).filter(v => v !== null);
   const problems = problemsOf({ duration, seconds, audio: !!info.streams?.some(s => s.codec_type === 'audio'), samples, movements });
   return {
     file,

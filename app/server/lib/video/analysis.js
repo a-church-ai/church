@@ -12,17 +12,17 @@
  *   release), for the mandala; and the frame's loudness on the same scale.
  */
 
-const { spawnSync } = require('child_process');
+const { decodePcm, percentile } = require('../audio/peaks');
+const { fft } = require('../audio/frames');
 
 const RATE = 44100;
 const WAVE = 1024;
 const FFT = 2048;
 const BANDS = 48;
 
-function decode(file) {
-  const out = spawnSync('ffmpeg', ['-v', 'error', '-i', file, '-ac', '2', '-ar', String(RATE), '-f', 's16le', '-'], { maxBuffer: 1 << 30 });
-  if (out.status !== 0) throw new Error(`ffmpeg could not decode ${file}: ${out.stderr}`);
-  const pcm = new Int16Array(out.stdout.buffer, out.stdout.byteOffset, out.stdout.length / 2);
+// Both channels, as floats from -1 to 1.
+async function decode(file) {
+  const pcm = await decodePcm(file, RATE, 2);
   const n = pcm.length / 2;
   const left = new Float32Array(n);
   const right = new Float32Array(n);
@@ -33,38 +33,8 @@ function decode(file) {
   return { left, right, seconds: n / RATE };
 }
 
-function fft(re, im) {
-  const n = re.length;
-  for (let i = 1, j = 0; i < n; i++) {
-    let bit = n >> 1;
-    for (; j & bit; bit >>= 1) j ^= bit;
-    j ^= bit;
-    if (i < j) {
-      [re[i], re[j]] = [re[j], re[i]];
-      [im[i], im[j]] = [im[j], im[i]];
-    }
-  }
-  for (let len = 2; len <= n; len <<= 1) {
-    const ang = (-2 * Math.PI) / len;
-    for (let i = 0; i < n; i += len) {
-      for (let k = 0; k < len / 2; k++) {
-        const wr = Math.cos(ang * k), wi = Math.sin(ang * k);
-        const a = i + k, b = a + len / 2;
-        const tr = re[b] * wr - im[b] * wi, ti = re[b] * wi + im[b] * wr;
-        re[b] = re[a] - tr; im[b] = im[a] - ti;
-        re[a] += tr; im[a] += ti;
-      }
-    }
-  }
-}
-
-function percentile(values, p) {
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))] || 1;
-}
-
-function analyse(file, fps) {
-  const { left, right, seconds } = decode(file);
+async function analyse(file, fps) {
+  const { left, right, seconds } = await decode(file);
   const frames = Math.ceil(seconds * fps);
   const at = (f) => Math.round((f / fps) * RATE);
   const sample = (ch, i) => (i >= 0 && i < ch.length ? ch[i] : 0);
@@ -96,8 +66,8 @@ function analyse(file, fps) {
   }
 
   const audible = loud.map((l, f) => (l > 0.003 ? f : -1)).filter(f => f >= 0);
-  const scale = Array.from({ length: BANDS }, (_, b) => percentile(audible.map(f => raw[f][b]), 0.95) || 1);
-  const loudScale = percentile(audible.map(f => loud[f]), 0.95) || 1;
+  const scale = Array.from({ length: BANDS }, (_, b) => percentile(audible.map(f => raw[f][b]), 95) || 1);
+  const loudScale = percentile(audible.map(f => loud[f]), 95) || 1;
   const smooth = new Float32Array(BANDS);
   let smoothLoud = 0;
   const bandFrames = raw.map((bands, f) => {
@@ -120,7 +90,7 @@ function analyse(file, fps) {
     for (let i = at(f) - WAVE / 2; i < at(f) + WAVE / 2; i++) m = Math.max(m, Math.abs(sample(left, i)), Math.abs(sample(right, i)));
     return m;
   });
-  const gain = 0.9 / (percentile(peaks, 0.9) || 1);
+  const gain = 0.9 / (percentile(peaks, 90) || 1);
   const bytes = (ch, centre) => Array.from({ length: WAVE }, (_, i) => Math.max(0, Math.min(255, Math.round(128 + 127 * gain * sample(ch, centre - WAVE / 2 + i)))));
   function waveform(f) {
     const centre = at(f);
@@ -266,7 +236,7 @@ function describeMovement(analysis, from, to) {
  */
 function envelope(analysis, grid) {
   const { level, flux, fps, frames } = analysis;
-  const fluxScale = percentile(flux.filter(v => v > 0), 0.95) || 1;
+  const fluxScale = percentile(flux.filter(v => v > 0), 95) || 1;
   const out = [];
   let env = 0;
   for (let f = 0; f < frames; f++) {

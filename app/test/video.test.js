@@ -1,12 +1,12 @@
 /**
- * The video pipeline's checks and rules (scripts/video/), on numbers and pixel
+ * The video pipeline's checks and rules (lib/video/), on numbers and pixel
  * buffers made here, so the tests need neither ffmpeg nor any model.
  */
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { stillDefectsOf, motionOf, framesToKeep, problemsOf } = require('../scripts/video/checks');
-const { presetRule } = require('../scripts/video/brief');
+const { stillDefectsOf, motionOf, framesToKeep, problemsOf } = require('../server/lib/video/checks');
+const { presetRule } = require('../server/lib/video/brief');
 
 const W = 128, H = 72;
 function image(pixel) {

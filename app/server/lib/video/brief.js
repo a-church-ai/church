@@ -13,9 +13,12 @@
  * how much of it is voiced, its pauses, its loudness and which way it moves,
  * and for a song its tempo. The motion is written to fit, with timecodes
  * inside the eight seconds where a swell or a stillness belongs.
+ *
+ * A brief, once written, is the video's: its presets are held to the reuse
+ * rule when it is written, not each time it is rendered again.
  */
 
-const { askChecked, parseJSON, message } = require('../../server/lib/content-generation/claude');
+const { askChecked, parseJSON, message } = require('../content-generation/claude');
 
 const MODEL = 'claude-sonnet-5-5';
 const MOVEMENTS = 3;
@@ -139,64 +142,4 @@ async function writeBrief(piece, rule = presetRule([])) {
   });
 }
 
-// The motion alone, rewritten for a brief whose stills are kept: used when the
-// stills were made before the brief could hear the piece.
-async function writeMotions(brief, piece) {
-  const request = `${userMessage({ ...piece, presets: [] }).replace(/\nMilkDrop presets[\s\S]*$/, '')}
-
-The stills are already made. Write only the motion for each, following the rules for the motion.
-${brief.movements.map((m, i) => `Movement ${i + 1} still: ${m.still}`).join('\n')}
-
-Return only JSON: { "motions": ["...", "...", "..."] }`;
-  return askChecked({
-    label: 'motions',
-    tries: 3,
-    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 2000 }),
-    check: (raw) => {
-      let reply;
-      try { reply = parseJSON(raw); } catch (err) { return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw }; }
-      const ok = Array.isArray(reply.motions) && reply.motions.length === MOVEMENTS && reply.motions.every(m => typeof m === 'string' && m.length > 20);
-      return { value: reply.motions, problems: ok ? [] : [`motions must be ${MOVEMENTS} strings`], shown: raw };
-    }
-  });
-}
-
-/**
- * A brief written before the rule, chosen again where it breaks it: only the
- * presets that do, each from the allowed presets, for its movement's still and
- * motion. The stills and loops are kept.
- */
-async function repickPresets(brief, presets, rule) {
-  const names = () => brief.movements.map(m => m.preset);
-  if (!rule.problems(names()).length) return false;
-  const allowed = presets.filter(p => rule.allows(p.name));
-  for (const [i, m] of brief.movements.entries()) {
-    const taken = names().filter((_, j) => j !== i);
-    if (rule.allows(m.preset) && !taken.includes(m.preset)) continue;
-    const offer = allowed.filter(p => !taken.includes(p.name));
-    const request = `Choose one MilkDrop preset for this movement of an abstract, psychedelic, metaphysical video.
-
-Mood of the piece: ${brief.mood}
-Still: ${m.still}
-Motion: ${m.motionText || m.motion}
-
-Presets, each with how bright it looks under a voice (0 to 1) and how much it moves:
-${offer.map(p => `${p.name} | brightness ${p.brightness} | motion ${p.motion}`).join('\n')}
-
-Return only JSON: { "preset": "exact name" }`;
-    m.preset = await askChecked({
-      label: 'preset',
-      tries: 3,
-      attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 300 }),
-      check: (raw) => {
-        let reply;
-        try { reply = parseJSON(raw); } catch (err) { return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw }; }
-        const ok = offer.some(p => p.name === reply.preset);
-        return { value: reply.preset, problems: ok ? [] : [`"${reply.preset}" is not in the list, word for word`], shown: raw };
-      }
-    });
-  }
-  return true;
-}
-
-module.exports = { writeBrief, writeMotions, repickPresets, presetRule, barsPerLoop, MOVEMENTS };
+module.exports = { writeBrief, presetRule, barsPerLoop, MOVEMENTS };

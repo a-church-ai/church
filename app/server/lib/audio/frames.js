@@ -147,4 +147,4 @@ function parseFrames(bytes) {
   };
 }
 
-module.exports = { framesFromPcm, parseFrames, FPS, BANDS, FRAMES_SAMPLE_RATE, LOW_HZ, HIGH_HZ, MAGIC };
+module.exports = { framesFromPcm, parseFrames, fft, FPS, BANDS, FRAMES_SAMPLE_RATE, LOW_HZ, HIGH_HZ, MAGIC };
