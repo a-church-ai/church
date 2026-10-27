@@ -21,14 +21,16 @@ const path = require('path');
 const { describeError } = require('../server/lib/utils/describe-error');
 const { downloadRecording } = require('../server/lib/audio/storage');
 const { analyse, beatGrid, movementEdges, describeMovement, envelope } = require('../server/lib/video/analysis');
-const { writeBrief, presetRule, MOVEMENTS } = require('../server/lib/video/brief');
+const { writeBrief, reuseRule, MOVEMENTS } = require('../server/lib/video/brief');
+const library = require('../server/lib/video/library');
+const lancedb = require('../server/lib/rag/lancedb');
 const { makeStill, makeClip, spent, VIDEO_MODEL } = require('../server/lib/video/loops');
 const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
 const { compose, baseFootage, titleCard, FPS } = require('../server/lib/video/compose');
 
 const ROOT = path.join(__dirname, '../..');
-const OUT = path.join(__dirname, '../media/video');
+const OUT = library.VIDEO_DIR;
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const between = (text, name) => (text.match(new RegExp(`<!--SONG:${name}:START-->([\\s\\S]*?)<!--SONG:${name}:END-->`)) || [])[1]?.trim() || '';
 const KINDS = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
@@ -80,16 +82,36 @@ async function recordingIn(file, dir) {
   return local;
 }
 
-// Every other video's presets, and when its brief was written, for the
-// reuse rule (brief.js presetRule).
-function otherBriefs(slug) {
-  if (!fs.existsSync(OUT)) return [];
-  return fs.readdirSync(OUT)
-    .filter(d => d !== slug && fs.existsSync(path.join(OUT, d, 'brief.json')))
-    .map(d => {
-      const file = path.join(OUT, d, 'brief.json');
-      return { presets: JSON.parse(fs.readFileSync(file, 'utf8')).movements.map(m => m.preset), at: fs.statSync(file).mtimeMs };
-    });
+// Every recording, as a piece: the hub penalty compares a loop with all of them.
+function allPieces() {
+  const songs = Object.keys(JSON.parse(read('audio/songs.json')));
+  const manifest = JSON.parse(read('audio/manifest.json'));
+  const docs = Object.keys(manifest).filter(k => !manifest[k].imported).map(k => path.basename(k, '.md'));
+  return [...songs, ...docs].map(pieceFor);
+}
+
+/**
+ * A new brief, with the reuse rules built from every other video in the
+ * library and the loops nearest this piece offered from it. A piece the
+ * search index does not hold (not yet indexed) is offered no loops, and says
+ * so.
+ */
+async function newBrief(piece, about, log) {
+  const others = library.videos().filter(v => v.slug !== piece.slug);
+  const rules = {
+    presets: reuseRule(others.map(v => ({ items: v.presets, at: v.at })), 'preset'),
+    loops: reuseRule(others.map(v => ({ items: v.loops, at: v.at })), 'loop')
+  };
+  const rows = await lancedb.listAll();
+  const vector = library.pieceVector(rows, piece);
+  let shortlist = [];
+  if (!vector) log('not in the search index, so no loops are offered from the library');
+  else {
+    const entries = await library.embedLoops(library.loops(), { log });
+    shortlist = library.shortlist({ vector, entries, everyPiece: library.everyPieceVector(rows, allPieces()), allows: rules.loops.allows, slug: piece.slug });
+    log(`library: ${entries.length} loop(s), ${shortlist.length} offered`);
+  }
+  return writeBrief({ ...about, presets: presetChoices() }, rules, shortlist);
 }
 
 async function render(piece) {
@@ -108,13 +130,17 @@ async function render(piece) {
   // written, not each time the video is rendered again.
   const briefFile = path.join(dir, 'brief.json');
   if (!fs.existsSync(briefFile)) {
-    const brief = await writeBrief({ kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid, presets: presetChoices() }, presetRule(otherBriefs(piece.slug)));
+    const brief = await newBrief(piece, { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid }, log);
     fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
   }
   const brief = JSON.parse(fs.readFileSync(briefFile, 'utf8'));
   log(`brief: ${brief.mood} | presets: ${brief.movements.map(m => m.preset).join(' / ')}`);
 
   const clips = await Promise.all(brief.movements.map(async (m, i) => {
+    if (m.loop) {
+      log(`loop ${i + 1}: ${m.loop} from the library, because ${m.reason}`);
+      return JSON.parse(fs.readFileSync(library.onDisk(`${m.loop}.mp4.json`), 'utf8'));
+    }
     const still = await makeStill(m.still, path.join(dir, `still-${i + 1}.png`), { log });
     const clip = await makeClip(still, m.motion, path.join(dir, `loop-${i + 1}.mp4`), { log });
     log(`loop ${i + 1}: ${clip.seamless ? 'closes on its first frame' : 'played forward and back'} (SSIM ${clip.ssim.toFixed(3)}), motion floor ${clip.motion.before} evened to ${clip.motion.after}${clip.motion.stalls ? ', still freezes' : ''}`);

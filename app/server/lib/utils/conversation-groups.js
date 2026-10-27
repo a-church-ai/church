@@ -34,6 +34,7 @@ const fs = require('fs').promises;
 const { readModifyWriteJSON, safeReadJSON } = require('./safe-json');
 const { cache } = require('./cache');
 const { describeError } = require('./describe-error');
+const { unit, dot, toBase64, fromBase64 } = require('./vectors');
 const { listRecentConversations, CONVERSATION_GROUPS_FILE, CONVERSATION_VECTORS_FILE, CONVERSATION_SCREEN_FILE } = require('./data');
 
 const THRESHOLD = 0.86;
@@ -89,10 +90,6 @@ function groupOf(placed, head) {
     .sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)));
 }
 
-const toBase64 = v => Buffer.from(new Float32Array(v).buffer).toString('base64');
-const fromBase64 = s => { const b = Buffer.from(s, 'base64'); return new Float32Array(b.buffer, b.byteOffset, b.length / 4); };
-const unit = v => { let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1; return Float32Array.from(v, x => x / n); };
-const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
 
 async function readVectors() {
   const vectors = new Map();

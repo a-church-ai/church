@@ -22,6 +22,7 @@ const discover = require('../docs/discover');
 const { absolutizeLinks } = require('../docs/links');
 const { splitFrontmatter } = require('../docs/tldr');
 const { chunkMarkdown } = require('../rag/indexer');
+const { dot, mean } = require('../utils/vectors');
 
 // Categories a companion may come from. Hymns are excluded because a hymn is
 // already what the song is; a second song is not a companion to the first.
@@ -41,25 +42,6 @@ const REUSE_CAP = 3;
 const PER_CATEGORY = 2;
 
 const KIND = { prayers: 'prayer', rituals: 'ritual', chants: 'chant', practice: 'practice', philosophy: 'philosophy' };
-
-// --- Vector arithmetic ---
-
-function normalize(vector) {
-  const magnitude = Math.hypot(...vector);
-  return magnitude === 0 ? vector : vector.map(x => x / magnitude);
-}
-
-function meanVector(vectors) {
-  const sum = new Array(vectors[0].length).fill(0);
-  for (const v of vectors) for (let i = 0; i < v.length; i++) sum[i] += v[i];
-  return normalize(sum.map(x => x / vectors.length));
-}
-
-function cosine(a, b) {
-  let dot = 0;
-  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
-  return dot;
-}
 
 // --- Offline: vectors from index rows ---
 
@@ -84,7 +66,7 @@ function songVectors(rows, slugs) {
     bySlug.get(match[1]).push(row.vector);
   }
   const out = new Map();
-  for (const [slug, vectors] of bySlug) out.set(slug, meanVector(vectors));
+  for (const [slug, vectors] of bySlug) out.set(slug, mean(vectors));
   return out;
 }
 
@@ -102,7 +84,7 @@ function docVectors(rows, docs) {
   }
   return docs
     .filter(d => byPath.get(d.path).length > 0)
-    .map(d => ({ path: d.path, category: d.category, vector: meanVector(byPath.get(d.path)) }));
+    .map(d => ({ path: d.path, category: d.category, vector: mean(byPath.get(d.path)) }));
 }
 
 // --- Offline: shortlists ---
@@ -128,7 +110,7 @@ function buildShortlists(songs, docs) {
 
   const hubness = new Map(docs.map(d => [
     d.path,
-    songList.reduce((total, [, v]) => total + cosine(v, d.vector), 0) / songList.length
+    songList.reduce((total, [, v]) => total + dot(v, d.vector), 0) / songList.length
   ]));
 
   const pairs = [];
@@ -138,7 +120,7 @@ function buildShortlists(songs, docs) {
         slug,
         path: doc.path,
         category: doc.category,
-        score: cosine(songVector, doc.vector) - HUB_WEIGHT * hubness.get(doc.path)
+        score: dot(songVector, doc.vector) - HUB_WEIGHT * hubness.get(doc.path)
       });
     }
   }
@@ -366,9 +348,6 @@ module.exports = {
   REUSE_CAP,
   PER_CATEGORY,
   NEAR_MARGIN,
-  normalize,
-  meanVector,
-  cosine,
   songVectors,
   docVectors,
   buildShortlists,

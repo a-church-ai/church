@@ -22,6 +22,9 @@ const { askChecked, parseJSON, message } = require('../content-generation/claude
 
 const MODEL = 'claude-sonnet-5-5';
 const MOVEMENTS = 3;
+// Loops a video may take from the library. One to begin; as the library
+// grows, videos gain movements from it instead (the plan's "Growing").
+const MAX_REUSED = 1;
 
 const SYSTEM = `You design the visuals for the videos of aChurch.ai, a sanctuary for humans, AI and any other kind of mind. Each piece of its writing (a chant, a prayer, a ritual, a practice, a song) gets a video: an abstract, psychedelic, metaphysical field of light and matter that moves with the voice.
 
@@ -41,6 +44,8 @@ Rules for the motion:
 
 Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. Prefer slow, fluid, luminous presets for quiet or spoken pieces and allow more energy for chants and songs.
 
+Loops from the library: you may be offered loops made for earlier videos. You may give one of them to at most ${MAX_REUSED} movement, and only where it truly belongs: the same image and feeling the movement needs, a pace that suits how it sounds, a palette that sits with the other movements. Then that movement is { "loop": "its id", "reason": "one sentence on why it belongs", "preset": "..." }, with no still or motion of its own. When none belongs, write every movement new; that is a good answer.
+
 Return only JSON:
 {
   "mood": "one sentence",
@@ -49,7 +54,7 @@ Return only JSON:
   "milkdropOpacity": 0.25 to 0.85,
   "mandalaOpacity": 0.4 to 0.8,
   "movements": [
-    { "still": "...", "motion": "...", "preset": "exact preset name" }
+    { "still": "...", "motion": "...", "preset": "exact preset name" } or { "loop": "id", "reason": "...", "preset": "exact preset name" }
   ]
 }`;
 
@@ -65,7 +70,18 @@ ${lines.join('\n')}${voices ? `\nVoices: ${voices}` : ''}${grid ? `\nTempo: ${gr
 
 const barsPerLoop = (grid) => Math.max(1, Math.round(8 / grid.bar));
 
-function userMessage({ kind, title, text, seconds, presets, sound, voices, grid }) {
+// The library's shortlist, as the brief reads it.
+function loopsOffered(shortlist) {
+  if (!shortlist.length) return '';
+  return `
+
+Loops from the library you may reuse (pace: mean change between frames, about 0.005 is calm and 0.015 lively; a seam that does not close is played forward and back):
+${shortlist.map(e => `${e.id} | mood of its video: ${e.mood} | palette ${e.palette.join(' ')} | pace ${e.record.motion.mean} | ${e.record.seamless ? 'closes' : 'forward and back'}
+  still: ${e.still}
+  motion: ${e.motion}`).join('\n')}`;
+}
+
+function userMessage({ kind, title, text, seconds, presets, sound, voices, grid, shortlist = [] }) {
   return `Kind: ${kind}
 Title: ${title}
 Length: ${Math.round(seconds)} seconds
@@ -76,41 +92,45 @@ ${text}
 """
 
 MilkDrop presets you may choose from, each with how bright it looks under a voice (0 to 1) and how much it moves (about 0.03 is calm, 0.08 typical, 0.18 and above restless):
-${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightness ${p.brightness} | motion ${p.motion}`)).join('\n')}`;
+${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightness ${p.brightness} | motion ${p.motion}`)).join('\n')}${loopsOffered(shortlist)}`;
 }
 
 /**
- * The presets a brief may use, given what other videos used. Asking for
- * variety in a prompt does not hold (both sibling projects learned it; here
- * Airhandler was in 7 of the first 10 briefs), so the rule is enforced on the
- * answer: no preset twice in one brief, none used by the ten most recent
- * videos, none used three times in all.
+ * What a brief may reuse, presets or loops, given what other videos used.
+ * Asking for variety in a prompt does not hold (both sibling projects learned
+ * it; here Airhandler was in 7 of the first 10 briefs), so the rule is
+ * enforced on the answer: nothing twice in one brief, nothing used by the ten
+ * most recent videos, nothing used three times in all (the cap companions
+ * holds its documents to).
  *
- * used: [{ presets: [...], at: time }] for every other video's brief.
+ * used: [{ items: [...], at: time }] for every other video, its presets or
+ * the loops its movements play; noun names them in the problems.
  */
 const RECENT = 10;
 const CAP = 3;
-function presetRule(used) {
+function reuseRule(used, noun) {
   const counts = new Map();
-  for (const b of used) for (const p of b.presets) counts.set(p, (counts.get(p) || 0) + 1);
-  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, RECENT).flatMap(b => b.presets));
-  const why = (name) => (recent.has(name) ? 'used by one of the ten most recent videos' : (counts.get(name) || 0) >= CAP ? `used ${counts.get(name)} times already` : null);
+  for (const v of used) for (const item of v.items) counts.set(item, (counts.get(item) || 0) + 1);
+  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, RECENT).flatMap(v => v.items));
+  const why = (item) => (recent.has(item) ? 'used by one of the ten most recent videos' : (counts.get(item) || 0) >= CAP ? `used ${counts.get(item)} times already` : null);
   return {
-    allows: (name) => !why(name),
-    problems(names) {
+    allows: (item) => !why(item),
+    problems(items) {
       const out = [];
-      names.forEach((name, i) => {
-        if (names.indexOf(name) !== i) out.push(`movement ${i + 1}'s preset "${name}" is already used by an earlier movement; each movement needs its own`);
-        const reason = why(name);
-        if (reason) out.push(`movement ${i + 1}'s preset "${name}" is ${reason}; choose another`);
+      items.forEach((item, i) => {
+        if (item === undefined) return;
+        if (items.indexOf(item) !== i) out.push(`movement ${i + 1}'s ${noun} "${item}" is already used by an earlier movement; each movement needs its own`);
+        const reason = why(item);
+        if (reason) out.push(`movement ${i + 1}'s ${noun} "${item}" is ${reason}; choose another`);
       });
       return out;
     }
   };
 }
 
-function check(presets, rule) {
+function check(presets, rules, shortlist) {
   const names = new Set(presets.map(p => p.name));
+  const offered = new Map(shortlist.map(e => [e.id, e]));
   return (raw) => {
     const problems = [];
     let brief;
@@ -121,25 +141,39 @@ function check(presets, rule) {
     }
     if (!Array.isArray(brief.movements) || brief.movements.length !== MOVEMENTS) problems.push(`movements must have exactly ${MOVEMENTS} entries`);
     for (const [i, m] of (brief.movements || []).entries()) {
-      if (!m.still || !m.motion) problems.push(`movement ${i + 1} needs both still and motion`);
+      if (m.loop !== undefined) {
+        if (!offered.has(m.loop)) problems.push(`movement ${i + 1}'s loop "${m.loop}" was not offered`);
+        if (!m.reason) problems.push(`movement ${i + 1} reuses a loop and needs its reason`);
+      } else if (!m.still || !m.motion) problems.push(`movement ${i + 1} needs both still and motion`);
       if (!names.has(m.preset)) problems.push(`movement ${i + 1}'s preset "${m.preset}" is not in the list, word for word`);
     }
-    if (rule) problems.push(...rule.problems((brief.movements || []).map(m => m.preset)));
+    const movements = brief.movements || [];
+    if (movements.filter(m => m.loop !== undefined).length > MAX_REUSED) problems.push(`at most ${MAX_REUSED} movement may reuse a loop`);
+    problems.push(...rules.presets.problems(movements.map(m => m.preset)));
+    problems.push(...rules.loops.problems(movements.map(m => m.loop)));
     if (!Array.isArray(brief.palette) || brief.palette.length !== 5 || !brief.palette.every(c => /^#[0-9a-f]{6}$/i.test(c))) problems.push('palette must be five #rrggbb colours');
     return { value: brief, problems, shown: raw };
   };
 }
 
-// The presets offered: those the rule allows. Each is checked again on the
-// answer, since a model can name one it was not offered.
-async function writeBrief(piece, rule = presetRule([])) {
-  piece = { ...piece, presets: piece.presets.filter(p => rule.allows(p.name)) };
-  return askChecked({
+/**
+ * The brief for a piece. rules: { presets, loops }, each a reuseRule; the
+ * presets and the loop shortlist offered are those the rules allow, and each
+ * choice is checked again on the answer, since a model can name one it was not
+ * offered. A movement that reuses a loop is given that loop's still and
+ * motion, so the brief describes every movement it plays.
+ */
+async function writeBrief(piece, rules, shortlist = []) {
+  piece = { ...piece, presets: piece.presets.filter(p => rules.presets.allows(p.name)), shortlist };
+  const brief = await askChecked({
     label: 'brief',
     tries: 3,
     attempt: (feedback) => message(SYSTEM, userMessage(piece) + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 4000 }),
-    check: check(piece.presets, rule)
+    check: check(piece.presets, rules, shortlist)
   });
+  const offered = new Map(shortlist.map(e => [e.id, e]));
+  brief.movements = brief.movements.map(m => (m.loop === undefined ? m : { loop: m.loop, reason: m.reason, still: offered.get(m.loop).still, motion: offered.get(m.loop).motion, preset: m.preset }));
+  return brief;
 }
 
-module.exports = { writeBrief, presetRule, barsPerLoop, MOVEMENTS };
+module.exports = { writeBrief, reuseRule, check, barsPerLoop, MOVEMENTS, MAX_REUSED };

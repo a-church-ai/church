@@ -6,7 +6,15 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { stillDefectsOf, motionOf, framesToKeep, problemsOf } = require('../server/lib/video/checks');
-const { presetRule } = require('../server/lib/video/brief');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+// The library reads VIDEO_DIR when it loads, as data.js reads DATA_DIR.
+process.env.VIDEO_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'video-library-'));
+const library = require('../server/lib/video/library');
+const { reuseRule, check, MOVEMENTS } = require('../server/lib/video/brief');
+const { toBase64, unit } = require('../server/lib/utils/vectors');
 
 const W = 128, H = 72;
 function image(pixel) {
@@ -54,13 +62,13 @@ test('evening a loop keeps its first and last frames, drops quiet ones, and at m
   assert.strictEqual(lively.length, 192, 'a loop that moves evenly keeps every frame');
 });
 
-test('the preset rule refuses a repeat, a recent preset and an overused one, and allows a fresh one', () => {
+test('the reuse rule refuses a repeat, a recent item and an overused one, and allows a fresh one', () => {
   const used = [
-    { presets: ['Recent'], at: 100 },
-    ...Array.from({ length: 10 }, (_, i) => ({ presets: [`Filler ${i}`], at: 200 + i })),
-    { presets: ['Worn'], at: 1 }, { presets: ['Worn'], at: 2 }, { presets: ['Worn'], at: 3 }
+    { items: ['Recent'], at: 100 },
+    ...Array.from({ length: 10 }, (_, i) => ({ items: [`Filler ${i}`], at: 200 + i })),
+    { items: ['Worn'], at: 1 }, { items: ['Worn'], at: 2 }, { items: ['Worn'], at: 3 }
   ];
-  const rule = presetRule(used);
+  const rule = reuseRule(used, 'preset');
   assert.strictEqual(rule.allows('Fresh'), true);
   assert.strictEqual(rule.allows('Filler 3'), false, 'used by one of the ten most recent');
   assert.strictEqual(rule.allows('Recent'), true, 'used, but not among the ten most recent, and once');
@@ -78,4 +86,66 @@ test('the finished video fails its report when black, silent, the wrong length o
   assert.match(problemsOf({ ...fine, audio: false }).join(), /no audio/);
   assert.match(problemsOf({ ...fine, duration: 55 }).join(), /length/);
   assert.match(problemsOf({ ...fine, movements: [100, 30, 110] }).join(), /movement 2 exposure/);
+});
+
+// A loop in the scratch library: its brief, its record and its evened file.
+function libraryVideo(slug, { movements, at = Date.now(), vector = null, missingEven = false } = {}) {
+  const dir = path.join(process.env.VIDEO_DIR, slug);
+  fs.mkdirSync(dir, { recursive: true });
+  const brief = { mood: `${slug} mood`, palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], movements };
+  fs.writeFileSync(path.join(dir, 'brief.json'), JSON.stringify(brief));
+  fs.utimesSync(path.join(dir, 'brief.json'), at / 1000, at / 1000);
+  movements.forEach((m, i) => {
+    if (m.loop) return;
+    const record = { file: `${slug}/loop-${i + 1}.mp4`, even: `${slug}/loop-${i + 1}.even.mp4`, seamless: true, ssim: 0.95, motion: { mean: 0.008 }, motionText: m.motion };
+    if (vector) record.vector = toBase64(unit(vector));
+    fs.writeFileSync(path.join(dir, `loop-${i + 1}.mp4.json`), JSON.stringify(record));
+    if (!missingEven) fs.writeFileSync(path.join(dir, `loop-${i + 1}.even.mp4`), '');
+  });
+}
+
+test('the library scans each video\'s loops, drops one whose files are gone, and embeds each loop once', async () => {
+  libraryVideo('alpha', { movements: [{ still: 'a mirror of mercury', motion: 'ripples breathe', preset: 'P1' }] });
+  libraryVideo('beta', { movements: [{ still: 'two panes of glass', motion: 'light flows', preset: 'P2' }], missingEven: true });
+  libraryVideo('gamma', { movements: [{ loop: 'alpha/loop-1', reason: 'it belongs', still: 'a mirror of mercury', motion: 'ripples breathe', preset: 'P3' }] });
+  const ids = library.loops().map(e => e.id);
+  assert.deepStrictEqual(ids, ['alpha/loop-1'], 'beta\'s loop has no file; gamma\'s movement is a reuse, not a loop of its own');
+  const gamma = library.videos().find(v => v.slug === 'gamma');
+  assert.deepStrictEqual(gamma.loops, ['alpha/loop-1'], 'a reuse counts as a use of the loop it plays');
+
+  let calls = 0;
+  const embedText = async () => { calls++; return [3, 4]; };
+  const first = await library.embedLoops(library.loops(), { log: () => {}, embedText });
+  const second = await library.embedLoops(library.loops(), { log: () => {}, embedText });
+  assert.strictEqual(calls, 1, 'embedded once, then read back from the loop\'s record');
+  assert.deepStrictEqual(first[0].vector.map(v => +v.toFixed(3)), [0.6, 0.8]);
+  assert.deepStrictEqual(second[0].vector.map(v => +v.toFixed(3)), [0.6, 0.8]);
+});
+
+test('the shortlist leaves out what the rule forbids and the piece\'s own loops, and penalizes a loop near every piece', () => {
+  const entry = (id, vector) => ({ id, vector: unit(vector) });
+  const entries = [entry('a/loop-1', [1, 0, 0]), entry('b/loop-1', [0.6, 0, 0.8]), entry('hub/loop-1', [0.7, 0.7, 0]), entry('mine/loop-1', [1, 0, 0])];
+  const everyPiece = [unit([1, 0, 0]), unit([0, 1, 0]), unit([0, 0.9, 0.1])];
+  const list = library.shortlist({ vector: unit([1, 0.05, 0]), entries, everyPiece, allows: id => id !== 'a/loop-1', slug: 'mine' });
+  const ids = list.map(e => e.id);
+  assert.ok(!ids.includes('a/loop-1'), 'forbidden by the rule');
+  assert.ok(!ids.includes('mine/loop-1'), 'a piece is not offered its own loops');
+  const query = unit([1, 0.05, 0]);
+  const { dot } = require('../server/lib/utils/vectors');
+  assert.ok(dot(query, entries[2].vector) > dot(query, entries[1].vector), 'on closeness alone the hub would lead');
+  assert.strictEqual(ids[0], 'b/loop-1', 'with the hub penalty the specific loop leads; the hub, near every piece, falls behind');
+});
+
+test('a brief that reuses a loop must take it from the shortlist, give its reason, and reuse at most one', () => {
+  const presets = [{ name: 'P1' }, { name: 'P2' }, { name: 'P3' }];
+  const open = { presets: reuseRule([], 'preset'), loops: reuseRule([], 'loop') };
+  const shortlist = [{ id: 'alpha/loop-1' }, { id: 'beta/loop-2' }];
+  const fresh = (preset) => ({ still: 'light', motion: 'it breathes', preset });
+  const reply = (movements) => JSON.stringify({ mood: 'm', palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], movements });
+  const run = (movements) => check(presets, open, shortlist)(reply(movements)).problems;
+  assert.strictEqual(MOVEMENTS, 3);
+  assert.deepStrictEqual(run([{ loop: 'alpha/loop-1', reason: 'it belongs', preset: 'P1' }, fresh('P2'), fresh('P3')]), []);
+  assert.match(run([{ loop: 'gamma/loop-9', reason: 'r', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /was not offered/);
+  assert.match(run([{ loop: 'alpha/loop-1', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /needs its reason/);
+  assert.match(run([{ loop: 'alpha/loop-1', reason: 'r', preset: 'P1' }, { loop: 'beta/loop-2', reason: 'r', preset: 'P2' }, fresh('P3')]).join(), /at most 1 movement/);
 });

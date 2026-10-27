@@ -13,12 +13,13 @@ const assert = require('node:assert');
 const fs = require('fs');
 
 const companions = require('../server/lib/music/companions');
+const { unit } = require('../server/lib/utils/vectors');
 const discover = require('../server/lib/docs/discover');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
 const { loadCatalog, loadCompanions } = require('../server/lib/utils/data');
 
 const {
-  buildShortlists, nearestPieces, parseHours, inHours, normalize,
+  buildShortlists, nearestPieces, parseHours, inHours,
   REUSE_CAP, PER_CATEGORY, NEAR_MARGIN,
 } = companions;
 
@@ -31,7 +32,7 @@ function vec(axis, common = 0) {
   const v = new Array(DIMS).fill(0);
   v[axis] = 1;
   v[COMMON] = common;
-  return normalize(v);
+  return unit(v);
 }
 function onlyCommon() {
   const v = new Array(DIMS).fill(0);

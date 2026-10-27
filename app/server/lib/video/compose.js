@@ -21,6 +21,7 @@ const { Resvg } = require('@resvg/resvg-js');
 const { ffmpeg, seconds: lengthOf } = require('../audio/assemble');
 const { RESVG_FONTS, escapeXml } = require('../og-cards');
 const { lumaAt } = require('./checks');
+const { onDisk } = require('./library');
 
 const FPS = 30;
 const SIZE = '1920:1080';
@@ -54,10 +55,11 @@ function titleCard(title, file) {
 // The loop as it plays: its motion evened (checks.js evenLoop), and played
 // forward then backward when it does not close.
 async function loopSource(clip) {
-  if (clip.seamless) return clip.even;
-  const source = clip.even.replace(/\.mp4$/, '.pingpong.mp4');
+  const loop = onDisk(clip.even);
+  if (clip.seamless) return loop;
+  const source = loop.replace(/\.mp4$/, '.pingpong.mp4');
   if (!fs.existsSync(source)) {
-    await ffmpeg(['-i', clip.even, '-filter_complex', `[0:v]scale=${SIZE},fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[v]`, '-map', '[v]', ...WORK, source]);
+    await ffmpeg(['-i', loop, '-filter_complex', `[0:v]scale=${SIZE},fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[v]`, '-map', '[v]', ...WORK, source]);
   }
   return source;
 }
