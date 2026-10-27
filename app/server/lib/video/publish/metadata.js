@@ -52,27 +52,33 @@ async function about(piece) {
 }
 
 /**
- * Everything the publishers need: { title, description, page, tags, short }.
- * short is the piece's title and its description's first sentence, for the
- * social posts, which carry the link on their own line.
+ * Everything the publishers need, from the piece and its copy (copy.js):
+ * { title, description, page, tags, copy }.
+ *
+ * YouTube's title names what the piece is for someone searching (the copy's
+ * descriptor) as well as its name; its description opens with the copy's
+ * lead (the lines shown above "...more"), then the piece's own description
+ * and page, the chapters, the sanctuary, and three hashtags (YouTube shows
+ * the first three above the title).
  */
-async function metadataFor(piece, { title, edges }) {
+async function metadataFor(piece, { title, edges, copy }) {
   const { description, page } = await about(piece);
-  const full = `${title} | ${SITE_NAME}`;
   const marks = chapters(edges);
+  const titled = [`${title}: ${copy.descriptor} | ${SITE_NAME}`, `${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX);
   const body = [
+    copy.lead,
     description,
     `${piece.song ? 'The song, its words and its story' : 'The words, to read along'}: ${page}`,
     marks.length ? marks.join('\n') : null,
-    `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`
+    `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
+    copy.tags.slice(0, 3).map(t => `#${t}`).join(' ')
   ].filter(Boolean).join('\n\n');
-  const firstSentence = (description.match(/^.*?[.!?](\s|$)/) || [description])[0].trim();
   return {
-    title: full.length <= TITLE_MAX ? full : title.slice(0, TITLE_MAX),
+    title: titled,
     description: body.slice(0, 5000),
     page,
-    tags: [SITE_NAME, piece.kind, piece.song ? 'music' : 'spoken word', 'AI', 'consciousness', 'meditation', 'sanctuary'],
-    short: { title, line: firstSentence }
+    tags: [...copy.tags, copy.descriptor, title].slice(0, 8),
+    copy: { ...copy, title }
   };
 }
 

@@ -37,6 +37,7 @@ const { VIDEO_DIR } = require('../server/lib/video/library');
 const { analyse } = require('../server/lib/video/analysis');
 const { pieceFor, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
 const { metadataFor } = require('../server/lib/video/publish/metadata');
+const { copyFor } = require('../server/lib/video/publish/copy');
 const { cutFor } = require('../server/lib/video/publish/cut');
 const { readRecord, writeRecord } = require('../server/lib/video/publish/record');
 const youtube = require('../server/lib/video/publish/youtube');
@@ -74,9 +75,11 @@ async function post(slug, opts) {
   if (report.problems.length) throw new Error(`its report has problems: ${report.problems.join('; ')}`);
 
   const piece = pieceFor(slug);
-  const { title, bpm } = pieceText(piece);
+  const { title, text, bpm } = pieceText(piece);
   const { edges } = shapeOf(await analyse(await recordingIn(piece.audio, dir), 30), bpm);
-  const meta = await metadataFor({ ...piece, title }, { title, edges });
+  const brief = JSON.parse(fs.readFileSync(path.join(dir, 'brief.json'), 'utf8'));
+  const copy = await copyFor(piece, { title, text, brief });
+  const meta = await metadataFor({ ...piece, title }, { title, edges, copy });
   let link = meta.page;
 
   for (const platform of opts.to) {
@@ -97,8 +100,9 @@ async function post(slug, opts) {
       const mb = (fs.statSync(cut.file).size / 1048576).toFixed(0);
       log(`${platform}: would post ${path.basename(cut.file)} (${mb} MB${cut.excerpt ? `, the opening ${Math.round(cut.seconds)}s` : ''})`);
       if (platform === 'youtube') log(`  title: ${meta.title}\n  privacy: ${opts.privacy}\n  description:\n${meta.description.replace(/^/gm, '    ')}`);
-      if (platform === 'bluesky') log(`  text:\n${bluesky.postText(meta, link).replace(/^/gm, '    ')}`);
-      if (platform === 'x') log(`  text:\n${x.postText(meta, link).replace(/^/gm, '    ')}`);
+      if (platform === 'youtube') log(`  tags: ${meta.tags.join(', ')}`);
+      if (platform === 'bluesky') log(`  text:\n${bluesky.postText(meta, link).replace(/^/gm, '    ')}\n  tags: ${meta.copy.tags.join(', ')}\n  alt: ${meta.copy.alt}`);
+      if (platform === 'x') log(`  text:\n${x.postText(meta).replace(/^/gm, '    ')}\n  reply: ${x.replyText(meta, link)}`);
       continue;
     }
     await writeRecord(slug, platform, { started: new Date().toISOString() });

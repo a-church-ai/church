@@ -120,30 +120,39 @@ async function limits() {
   return account.subscription_type === 'Premium' || account.subscription_type === 'PremiumPlus' ? PREMIUM_LIMITS : LIMITS;
 }
 
-// The post's text: title, a line, the link (counted as X counts it).
-function postText(meta, link) {
-  const room = TEXT_MAX - LINK_LENGTH - 2;
-  let line = meta.short.line;
-  let head = `${meta.short.title}\n\n${line}`;
-  while ([...head].length > room && line.length) {
-    line = line.split(' ').slice(0, -1).join(' ');
-    head = `${meta.short.title}\n\n${line}…`;
-  }
-  return `${head}\n\n${link}`;
+// The post: the copy's hook and two hashtags (three or more read as spam).
+// No link: a link costs reach and about $0.20 a post; it goes in the reply.
+function postText(meta) {
+  return `${meta.copy.hook}\n\n${meta.copy.tags.slice(0, 2).map(t => `#${t}`).join(' ')}`;
 }
 
-/** Post the video (its cut) with a link to the whole piece. Returns { id, url }. */
+// The reply that carries the link to the whole piece.
+const replyText = (meta, link) => `${/youtube\.com|youtu\.be/.test(link) ? `${meta.copy.title}, the whole video` : `${meta.copy.title}, its words and recording`}: ${link}`;
+
+/**
+ * Post the video (its cut) with the hook and two hashtags, then reply with
+ * the link to the whole piece. Returns { id, url, reply }.
+ */
 async function publish({ file, meta, link, log = console.log }) {
   const creds = credentials();
   log('  x: uploading');
   const mediaId = await upload(file, creds, log);
-  const res = await request(TWEETS, {
+  const post = (body) => request(TWEETS, {
     method: 'POST',
     headers: { Authorization: oauthHeader('POST', TWEETS, creds), 'content-type': 'application/json' },
-    body: JSON.stringify({ text: postText(meta, link), media: { media_ids: [mediaId] } })
-  });
-  const { id } = unwrap(await res.json());
-  return { id, url: `https://x.com/i/status/${id}` };
+    body: JSON.stringify(body)
+  }).then(res => res.json()).then(unwrap);
+  const { id } = await post({ text: postText(meta), media: { media_ids: [mediaId] } });
+  const url = `https://x.com/i/status/${id}`;
+  // The post stands without its reply; a reply that fails is reported, and
+  // the post is not made again.
+  let reply = null;
+  try {
+    reply = (await post({ text: replyText(meta, link), reply: { in_reply_to_tweet_id: id } })).id;
+  } catch (err) {
+    log(`  x: the post is up, its link reply failed: ${err.message.slice(0, 160)}`);
+  }
+  return { id, url, reply };
 }
 
-module.exports = { publish, oauthHeader, postText, limits };
+module.exports = { publish, oauthHeader, postText, replyText, limits };

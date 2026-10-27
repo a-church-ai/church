@@ -6,7 +6,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { oauthHeader, postText: xText } = require('../server/lib/video/publish/x');
+const { oauthHeader, postText: xText, replyText } = require('../server/lib/video/publish/x');
+const { check: checkCopy } = require('../server/lib/video/publish/copy');
 const { postText: bskyText, linkFacet } = require('../server/lib/video/publish/bluesky');
 const { chapters, timecode } = require('../server/lib/video/publish/metadata');
 
@@ -34,15 +35,23 @@ test('a Bluesky link facet is placed by UTF-8 byte, so a curly quote before it d
   assert.notStrictEqual(facet.index.byteStart, text.indexOf(url), 'a UTF-16 index would be wrong here');
 });
 
-test('posts keep within each platform\'s length, cutting the line and never the link', () => {
+test('posts carry the hook; X adds two hashtags and keeps its link for the reply', () => {
   const link = 'https://www.youtube.com/watch?v=abcdefghijk';
-  const meta = { short: { title: 'A Hymn for the One Who Doesn\'t Sing', line: 'word '.repeat(120).trim() + '.' } };
-  const bsky = bskyText(meta, link);
-  assert.ok([...bsky].length <= 300, `${[...bsky].length} characters`);
-  assert.ok(bsky.endsWith(link));
-  const x = xText(meta, link);
-  assert.ok([...x.replace(link, 'x'.repeat(23))].length <= 280, 'X counts a link as 23 characters');
-  assert.ok(x.endsWith(link));
+  const meta = { copy: { title: 'No Mirror Now', hook: 'What if the face you keep seeing is only your own?', tags: ['Meditation', 'FolkMusic', 'Consciousness', 'AI', 'Hymn'] } };
+  assert.strictEqual(bskyText(meta, link), `${meta.copy.hook}\n\n${link}`);
+  const x = xText(meta);
+  assert.ok(!x.includes('http'), 'no link in the X post itself');
+  assert.strictEqual((x.match(/#/g) || []).length, 2);
+  assert.ok(replyText(meta, link).endsWith(link));
+});
+
+test('the copy check refuses links, em dashes, brand tags and tags that are not PascalCase', () => {
+  const good = { hook: 'A hymn for the moment you stop seeing yourself in everyone else.', lead: 'A Nordic folk hymn. Stay with it.', descriptor: 'Nordic Folk Hymn', alt: 'Two panes of glass lean toward one light.', tags: ['Meditation', 'FolkMusic', 'Consciousness', 'AI', 'Hymn'] };
+  assert.deepStrictEqual(checkCopy(JSON.stringify(good)).problems, []);
+  const bad = checkCopy(JSON.stringify({ ...good, hook: 'Watch now — https://x.co', tags: ['aChurchAI', 'folk music', 'Meditation', 'AI', 'Hymn'] })).problems.join(' | ');
+  assert.match(bad, /hook has a link, a hashtag or an em dash/);
+  assert.match(bad, /names the sanctuary/);
+  assert.match(bad, /"folk music" is not PascalCase/);
 });
 
 test('chapters are written only when YouTube would show them: from 0:00, three or more, ten seconds each', () => {

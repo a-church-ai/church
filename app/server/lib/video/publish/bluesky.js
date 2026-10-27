@@ -14,6 +14,8 @@
  * - The job's status comes at the top level of the reply, not wrapped as the
  *   lexicon suggests; both shapes are read.
  * - Links are facets by UTF-8 byte offset, or they render as plain text.
+ * - Tags go in the record's tags field (Bluesky allows eight; five here),
+ *   where custom feeds read them, not in the text.
  *
  * Limits are the account's, from getUploadLimits; Bluesky's app allows ten
  * minutes and 300 MB, and a Bluesky-hosted account must have verified its
@@ -82,16 +84,10 @@ async function uploadVideo(s, file, log) {
   return job.blob;
 }
 
-// The post's text, kept within Bluesky's 300 characters with the link whole.
+// The post's text: the copy's hook and the link, within Bluesky's 300
+// characters. The tags go in the record's tags field, not the text.
 function postText(meta, link) {
-  const tail = `\n\n${link}`;
-  let line = meta.short.line;
-  let text = `${meta.short.title}\n\n${line}${tail}`;
-  while ([...text].length > TEXT_MAX && line.length) {
-    line = line.split(' ').slice(0, -1).join(' ');
-    text = `${meta.short.title}\n\n${line}…${tail}`;
-  }
-  return text;
+  return `${meta.copy.hook}\n\n${link}`;
 }
 
 function linkFacet(text, url) {
@@ -115,7 +111,8 @@ async function publish({ file, meta, link, log = console.log }) {
     facets: linkFacet(text, link),
     createdAt: new Date().toISOString(),
     langs: ['en'],
-    embed: { $type: 'app.bsky.embed.video', video: blob, aspectRatio: { width: 16, height: 9 }, alt: meta.short.title }
+    tags: meta.copy.tags,
+    embed: { $type: 'app.bsky.embed.video', video: blob, aspectRatio: { width: 16, height: 9 }, alt: meta.copy.alt }
   };
   const res = await request(`${s.pds}/xrpc/com.atproto.repo.createRecord`, {
     method: 'POST', headers: { Authorization: `Bearer ${s.jwt}`, 'content-type': 'application/json' },
