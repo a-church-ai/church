@@ -164,7 +164,7 @@ async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, 
     // full-size bloom (0.957), measured on 2026-10-27.
     `[l2]split[f1][f2];[f2]scale=480:270,gblur=sigma=7,scale=${SIZE}:flags=bicubic[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
       `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=${grain}:allf=t,vignette=PI/4.5,` +
-      `fade=in:st=0:d=1.5,fade=out:st=${fadeOut}:d=2.5[pic]`,
+      `fade=out:st=${fadeOut}:d=2.5[pic]`,
     `[3:v]format=rgba,fade=in:st=0.8:d=1.5:alpha=1,fade=out:st=6:d=2:alpha=1[title]`,
     `[pic][title]overlay=0:0:eof_action=pass,format=yuv420p[v]`
   ];
