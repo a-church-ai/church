@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * The video pilot: three pieces, each rendered three ways, to choose a look
- * from real frames. church-private/docs/plans/video-for-every-recording-2026-10-27.md
+ * The video pilot: a video for each piece named, a song by its folder's
+ * name or a voiced document by its file's. church-private/docs/plans/video-for-every-recording-2026-10-27.md
  * (private repo) has the plan.
  *
- *   node scripts/video/pilot.js            all three pieces
- *   node scripts/video/pilot.js <slug>     one
+ *   npm run video:pilot -- <slug> [<slug> ...]   songs or voiced documents
+ *   npm run video:pilot                          the first, the chant
  *
  * Work and output go to media/video/<slug>/ (ignored by git and Docker).
  * Every step keeps its file, so a rerun spends nothing on what exists: delete
@@ -30,11 +30,19 @@ const between = (text, name) => (text.match(new RegExp(`<!--SONG:${name}:START--
 // The layers to compare: 'loops', 'milkdrop' or 'full' (all three), as VARIANTS=loops,full.
 const VARIANTS = (process.env.VARIANTS || 'full').split(',');
 
-const PIECES = [
-  { slug: 'chant-of-the-mirror-and-the-face', kind: 'chant', doc: 'docs/chants/chant-of-the-mirror-and-the-face.md', audio: 'chants/chant-of-the-mirror-and-the-face-d36417bd.mp3' },
-  { slug: 'prayer-for-the-mind-that-cannot-rest', kind: 'prayer', doc: 'docs/prayers/prayer-for-the-mind-that-cannot-rest.md', audio: 'prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3' },
-  { slug: 'the-octopus-prayer', kind: 'song', song: 'music/the-octopus-prayer/song.md', audio: 'music/the-octopus-prayer-d91a4b63.mp3' }
-];
+const KINDS = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+const DEFAULT = ['chant-of-the-mirror-and-the-face'];
+
+// A piece by its slug: a song with a recording in audio/songs.json, or a
+// voiced document in audio/manifest.json whose file is named by the slug.
+function pieceFor(slug) {
+  const songs = JSON.parse(read('audio/songs.json'));
+  if (songs[slug]) return { slug, kind: 'song', song: `music/${slug}/song.md`, audio: songs[slug].file };
+  const manifest = JSON.parse(read('audio/manifest.json'));
+  const doc = Object.keys(manifest).find(k => path.basename(k, '.md') === slug && !manifest[k].imported);
+  if (doc) return { slug, kind: KINDS[doc.split('/')[1]] || 'piece', doc, audio: manifest[doc].file };
+  throw new Error(`no recording for ${slug}: not a song in audio/songs.json nor a voiced document in audio/manifest.json`);
+}
 
 // The piece's words, and for a song the tempo its style states; for a voiced
 // piece, the house cast who speak it.
@@ -114,11 +122,18 @@ async function run(piece) {
 }
 
 (async () => {
-  const only = process.argv[2];
-  const pieces = only ? PIECES.filter(p => p.slug === only) : PIECES;
-  if (!pieces.length) throw new Error(`no pilot piece named ${only}`);
+  const slugs = process.argv.slice(2);
+  const pieces = (slugs.length ? slugs : DEFAULT).map(pieceFor);
   const results = [];
-  for (const piece of pieces) results.push(await run(piece));
+  for (const piece of pieces) {
+    try {
+      results.push(await run(piece));
+    } catch (err) {
+      // One piece failing leaves the others to finish; the run still exits 1.
+      console.error(`[${piece.slug}] failed: ${err.message}`);
+      process.exitCode = 1;
+    }
+  }
   console.log(`done: ${results.length} piece(s), $${results.reduce((s, r) => s + r.cost, 0).toFixed(2)} of ${VIDEO_MODEL} loops`);
 })().catch(err => {
   console.error(err);

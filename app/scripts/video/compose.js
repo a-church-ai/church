@@ -170,14 +170,14 @@ function compose({ variant, base, milkdrop, mandala, audio, title, brief, second
   }
   // The finish: bloom, chromatic split, hue drift, grain, vignette.
   parts.push(`${layer}split[f1][f2];[f2]gblur=sigma=28[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
-    `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=5:allf=t,vignette=PI/4.5,` +
+    `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=4:allf=t,vignette=PI/4.5,` +
     `fade=in:st=0:d=1.5,fade=out:st=${fadeOut}:d=2.5[pic]`);
   const t = add(['-loop', '1', '-t', '9', '-i', title]);
   parts.push(`[${t}:v]format=rgba,fade=in:st=0.8:d=1.5:alpha=1,fade=out:st=6:d=2:alpha=1[title]`);
   parts.push(`[pic][title]overlay=0:0:eof_action=pass,format=yuv420p[v]`);
   const a = add(['-i', audio]);
   ffmpeg([...inputs, '-filter_complex', parts.join(';'), '-map', '[v]', '-map', `${a}:a`, '-t', seconds.toFixed(3),
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', out], variant);
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', out], variant);
   return out;
 }
 
