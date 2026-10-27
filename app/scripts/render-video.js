@@ -8,6 +8,13 @@
  *
  *   npm run video -- <slug> [<slug> ...]   a song by its folder's name, a voiced document by its file's
  *   npm run video -- --survey-presets      measure every MilkDrop preset again (lib/video/presets.json)
+ *   --concurrency N                        pieces at once (default 2)
+ *
+ * Two pieces at once, because the stages use the machine differently: the
+ * butterchurn layers mostly the GPU and a core or two, the encodes nearly
+ * every core (measured on an M4 Max: one final encode at about 13 of 16). So
+ * one piece renders its layers while another encodes, and the encodes take
+ * turns rather than share the cores.
  *
  * Work and output go to media/video/<slug>/ (ignored by git and Docker).
  * Every step keeps its file, so a rerun spends nothing on what exists: delete
@@ -19,6 +26,7 @@ require('../server/lib/utils/env').loadEnv();
 const fs = require('fs');
 const path = require('path');
 const { describeError } = require('../server/lib/utils/describe-error');
+const { pool } = require('../server/lib/utils/pool');
 const { downloadRecording } = require('../server/lib/audio/storage');
 const { analyse, beatGrid, movementEdges, describeMovement, envelope } = require('../server/lib/video/analysis');
 const { writeBrief, reuseRule, MOVEMENTS } = require('../server/lib/video/brief');
@@ -39,12 +47,15 @@ const KINDS = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice:
 const SURVEY_RECORDING = 'prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3';
 
 function parseArgs(argv) {
-  const opts = { slugs: [], surveyPresets: false };
-  for (const arg of argv) {
+  const opts = { slugs: [], surveyPresets: false, concurrency: 2 };
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
     if (arg === '--survey-presets') opts.surveyPresets = true;
+    else if (arg === '--concurrency') opts.concurrency = Number(argv[++i]);
     else if (arg.startsWith('--')) throw new Error(`Unknown option ${arg}`);
     else opts.slugs.push(arg);
   }
+  if (!(opts.concurrency >= 1)) throw new Error('--concurrency takes a positive number');
   if (!opts.slugs.length && !opts.surveyPresets) throw new Error('Name the pieces to render: npm run video -- <slug> [<slug> ...]');
   return opts;
 }
@@ -114,6 +125,14 @@ async function newBrief(piece, about, log) {
   return writeBrief({ ...about, presets: presetChoices() }, rules, shortlist);
 }
 
+// The encodes one at a time: each already uses nearly every core.
+let encoding = Promise.resolve();
+function oneEncodeAtATime(fn) {
+  const turn = encoding.then(fn, fn);
+  encoding = turn.catch(() => {});
+  return turn;
+}
+
 async function render(piece) {
   const dir = path.join(OUT, piece.slug);
   fs.mkdirSync(dir, { recursive: true });
@@ -149,10 +168,15 @@ async function render(piece) {
 
   log('rendering milkdrop and mandala layers');
   const { milkdropFile, mandalaFile } = await renderLayers({ analysis, brief, edges, fps: FPS, dir, log });
-  const { file: base, bars } = await baseFootage(clips, { edges, grid, envelope: envelope(analysis, grid), dir });
-  if (grid) log(`loops stretched to ${bars.join(', ')} bar(s)`);
   const out = path.join(dir, `${piece.slug}.mp4`);
-  const { grain } = await compose({ base, milkdrop: milkdropFile, mandala: mandalaFile, audio, title: titleCard(title, path.join(dir, 'title.png')), brief, seconds: analysis.seconds, out });
+  const { grain } = await oneEncodeAtATime(async () => {
+    const started = Date.now();
+    const { file: base, bars } = await baseFootage(clips, { edges, grid, envelope: envelope(analysis, grid), dir });
+    if (grid) log(`loops stretched to ${bars.join(', ')} bar(s)`);
+    const done = await compose({ base, milkdrop: milkdropFile, mandala: mandalaFile, audio, title: titleCard(title, path.join(dir, 'title.png')), brief, seconds: analysis.seconds, out });
+    log(`encoded in ${Math.round((Date.now() - started) / 1000)}s`);
+    return done;
+  });
   const report = await reportVideo({ file: out, seconds: analysis.seconds, edges });
   fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ ...report, grain }, null, 2));
   log(`wrote ${path.relative(process.cwd(), out)}: ${report.megabytes} MB, grain ${grain}`);
@@ -168,17 +192,20 @@ async function main() {
     console.log(`surveyed ${Object.keys(survey).length} presets into lib/video/presets.json`);
   }
   const pieces = opts.slugs.map(pieceFor);
+  const started = Date.now();
   let done = 0;
-  for (const piece of pieces) {
+  await pool(pieces, opts.concurrency, async (piece) => {
     try {
       await render(piece);
       done++;
     } catch (err) {
       console.error(`[${piece.slug}] failed: ${describeError(err)}`);
       process.exitCode = 1;
+      // A fatal error (a spent account) stops the pieces not yet begun.
+      if (err.fatal) throw err;
     }
-  }
-  if (pieces.length) console.log(`done: ${done} of ${pieces.length} piece(s); spent $${spent.dollars.toFixed(2)} on ${spent.stills} still(s) and ${spent.loops} ${VIDEO_MODEL} loop(s)`);
+  });
+  if (pieces.length) console.log(`done: ${done} of ${pieces.length} piece(s) in ${Math.round((Date.now() - started) / 60000)} min; spent $${spent.dollars.toFixed(2)} on ${spent.stills} still(s) and ${spent.loops} ${VIDEO_MODEL} loop(s)`);
 }
 
 main().catch(err => {
