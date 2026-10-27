@@ -23,10 +23,11 @@ const { absolutizeLinks } = require('../docs/links');
 const { splitFrontmatter } = require('../docs/tldr');
 const { chunkMarkdown } = require('../rag/indexer');
 const { dot, mean } = require('../utils/vectors');
+const { KIND_OF_SECTION, VOICED_SECTIONS } = require('../docs/kinds');
 
 // Categories a companion may come from. Hymns are excluded because a hymn is
 // already what the song is; a second song is not a companion to the first.
-const ELIGIBLE_CATEGORIES = ['prayers', 'rituals', 'chants', 'practice', 'philosophy'];
+const ELIGIBLE_CATEGORIES = [...VOICED_SECTIONS, 'philosophy'];
 
 // How strongly a document's general closeness to every song is subtracted from
 // its closeness to this one. Without it a few documents that sit near everything
@@ -41,7 +42,7 @@ const REUSE_CAP = 3;
 // without the shortlist growing past what a person can review.
 const PER_CATEGORY = 2;
 
-const KIND = { prayers: 'prayer', rituals: 'ritual', chants: 'chant', practice: 'practice', philosophy: 'philosophy' };
+const KIND = { ...KIND_OF_SECTION, philosophy: 'philosophy' };
 
 // --- Offline: vectors from index rows ---
 

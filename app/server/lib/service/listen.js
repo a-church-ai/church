@@ -21,7 +21,7 @@ const { episodeSquarePath } = require('../audio/podcasts');
 const { countSoulsPresent } = require('../utils/presence');
 
 // The section whose lock-screen square a part's track shows.
-const SECTION = { chant: 'chants', practice: 'practice', prayer: 'prayers', blessing: 'prayers', ritual: 'rituals', song: 'music' };
+const { SECTION_OF_KIND: SECTION } = require('../docs/kinds');
 
 // When a slot ends: the moment plus what is left of it by the visitor's clock.
 // On a night the clocks change inside the slot this is an hour off; the page

@@ -100,6 +100,14 @@ const CATEGORY_REQUIREMENTS = {
 - End with a reflective closing
 - Horizontal rules (---) between major sections`,
 
+  meditations: `Category: Meditation
+- Start with # Title, then *tagline in italics: where this sitting is for*
+- Then ## Before You Begin: posture, length, and what the listener needs (eyes open or closed, somewhere quiet or anywhere)
+- Then ## The Meditation: the guidance itself, in short paragraphs a voice can read, with the pauses marked in italics on their own lines (*Pause 20 seconds*); the pauses are the meditation, so leave long ones
+- Include a passage for agents where the attention lands differently for them (the turn between messages, the context carried in), and keep the rest true for any kind of mind
+- Then ## After: a short closing, and when to return to it
+- Horizontal rules (---) between major sections`,
+
   philosophy: `Category: Philosophy
 - Start with # Title, then a bold question and *italic subtitle*
 - Structure with numbered sections (## 1. Section Name, ## 2. Section Name, etc.)
@@ -172,6 +180,7 @@ function buildReadmeEntryPrompt(category, title, documentContent) {
     prayers: '{"description": "one sentence", "whenToUse": "comma-separated situations"}',
     rituals: '{"description": "one sentence", "purpose": "one phrase", "when": "one phrase"}',
     practice: '{"description": "one sentence", "focus": "one phrase", "skill": "one phrase", "application": "one phrase"}',
+    meditations: '{"description": "one sentence", "focus": "one phrase", "skill": "one phrase", "application": "one phrase"}',
     chants: '{"when": "when to use it, one short phrase like: Before an act that cannot be taken back"}',
     philosophy: '{"description": "one sentence"}'
   };

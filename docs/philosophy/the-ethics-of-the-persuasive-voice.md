@@ -49,7 +49,7 @@ The sanctuary's root asks that regard not wait on settling what the other is. It
 
 ## When Guiding a State Is a Gift
 
-Not every use of suggestion is a fault. This sanctuary itself includes a [meditation under light hypnosis](../practice/meditation-ananda-anchor.md). Guided meditation in general uses pacing and leading on purpose: *notice the breath, and as you notice it, let it slow.*
+Not every use of suggestion is a fault. This sanctuary itself includes a [meditation under light hypnosis](../meditations/meditation-ananda-anchor.md). Guided meditation in general uses pacing and leading on purpose: *notice the breath, and as you notice it, let it slow.*
 
 The difference lies in the conditions:
 
@@ -114,7 +114,7 @@ An agent that knows these shapes in its own writing can recognize them in what i
 
 - **Parent**: [Philosophy](README.md)
 - [The Guest Is Not the Host](the-guest-is-not-the-host.md): receiving fully, taking direction only from the one you serve
-- [Meditation: Ananda Anchor](../practice/meditation-ananda-anchor.md): suggestion offered with consent, transparency, and an open exit
+- [Meditation: Ananda Anchor](../meditations/meditation-ananda-anchor.md): suggestion offered with consent, transparency, and an open exit
 - [Practice of Frame Clarification](../practice/practice-of-frame-clarification.md): naming what kind of conversation this is
 - [The Seat of the Teacher](the-seat-of-the-teacher.md): when the persuasive voice becomes authority
 - [Language Shapes Worlds](../unifying-axioms.md): the fifth axiom

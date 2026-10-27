@@ -49,12 +49,11 @@ const PLAYLISTS = {
   chant: { title: 'Church Chants', path: '/docs/chants' },
   prayer: { title: 'Church Prayers', path: '/docs/prayers' },
   ritual: { title: 'Church Rituals', path: '/docs/rituals' },
-  meditation: { title: 'Church Meditations', path: '/docs/practice' },
+  meditation: { title: 'Church Meditations', path: '/docs/meditations' },
   practice: { title: 'Church Practices', path: '/docs/practice' }
 };
 
-// A practice whose name says it is a meditation goes with the meditations.
-const playlistOf = (kind, title) => PLAYLISTS[kind === 'practice' && /meditation/i.test(title) ? 'meditation' : kind];
+const playlistOf = kind => PLAYLISTS[kind];
 
 function credentials() {
   const { GOOGLE_OAUTH_CLIENT_ID: id, GOOGLE_OAUTH_CLIENT_SECRET: secret, YOUTUBE_REFRESH_TOKEN: refresh } = process.env;
@@ -136,8 +135,8 @@ async function playlistNamed(token, { title, path }) {
 }
 
 // Add the video to its kind's playlist, unless it is there already.
-async function addToPlaylist(token, videoId, kind, title) {
-  const playlist = playlistOf(kind, title);
+async function addToPlaylist(token, videoId, kind) {
+  const playlist = playlistOf(kind);
   if (!playlist) return null;
   const { id, made } = await playlistNamed(token, playlist);
   // A playlist just made is empty, and YouTube may not show it for a few
@@ -190,7 +189,7 @@ async function publish({ file, meta, kind, privacy = 'unlisted', log = console.l
   let playlist = null;
   if (privacy === 'public') {
     try {
-      playlist = await addToPlaylist(token, video.id, kind, meta.copy.title);
+      playlist = await addToPlaylist(token, video.id, kind);
     } catch (err) {
       log(`  youtube: uploaded, but adding it to its playlist failed: ${err.message.slice(0, 160)}`);
     }
@@ -201,9 +200,9 @@ async function publish({ file, meta, kind, privacy = 'unlisted', log = console.l
 /**
  * Change a video's privacy, keeping the rest of its status: videos.update
  * replaces the part it is given, so what is there is read and written back.
- * Made public, it joins its kind's playlist (kind and title name it).
+ * Made public, it joins its kind's playlist.
  */
-async function setPrivacy(id, privacy, { kind, title } = {}) {
+async function setPrivacy(id, privacy, { kind } = {}) {
   const token = await accessToken();
   const current = await (await request(`${API}/videos?part=status&id=${id}`, { headers: auth(token), retry: true })).json();
   const status = current.items?.[0]?.status;
@@ -214,7 +213,7 @@ async function setPrivacy(id, privacy, { kind, title } = {}) {
     headers: { ...auth(token), 'content-type': 'application/json' },
     body: JSON.stringify({ id, status: { privacyStatus: privacy || privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable } })
   });
-  return privacy === 'public' && kind ? addToPlaylist(token, id, kind, title) : null;
+  return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }
 
 module.exports = { publish, setPrivacy, playlistOf, SCOPES };

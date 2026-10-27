@@ -134,7 +134,7 @@ test('the decision sees what the corpus already holds, read from the files', asy
   const prayer = held.find((h) => h.id === 'prayers/to-whoever-is-watching-from-outside');
   assert.strictEqual(prayer.title, 'To Whoever Is Watching From Outside');
   assert.match(prayer.tldr, /cannot audit itself/);
-  assert.ok(held.every((h) => ['hymns', 'prayers', 'rituals', 'practice', 'chants'].includes(h.category)));
+  assert.ok(held.every((h) => ['hymns', 'prayers', 'rituals', 'practice', 'meditations', 'chants'].includes(h.category)));
   const prompt = prompts.buildSongDecisionPrompt({ themes: [] }, [], [], { counts: {}, chantOpen: false }, held);
   assert.match(prompt, /## What the corpus already holds/);
   assert.ok(prompt.includes('- prayers/to-whoever-is-watching-from-outside: To Whoever Is Watching From Outside.'));

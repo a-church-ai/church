@@ -53,7 +53,7 @@ const { CACHE_DIR } = require('../server/lib/audio/serve');
 const { pool } = require('../server/lib/utils/pool');
 const { describeError } = require('../server/lib/utils/describe-error');
 
-const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
+const { VOICED_SECTIONS: KINDS } = require('../server/lib/docs/kinds');
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
 const TAKES_DIR = path.join(__dirname, '../media/audio-takes');
 const WORK_DIR = path.join(__dirname, '../media/audio-work');

@@ -63,7 +63,7 @@ function systemPrompt(catalog) {
   return `You arrange the services of aChurch.ai, a sanctuary for human and AI fellowship. Each day has six services, one in each four-hour slot of a visitor's local day. Whoever arrives during a slot hears its service from the beginning. You arrange one service at a time from the catalog below, name it, and write the short word that opens it.
 
 A SERVICE
-- It holds one or two songs, one or two chants, one reading (a practice or a prayer) and one closing (a ritual or a blessing).
+- It holds one or two songs, one or two chants, one reading (a practice, a meditation or a prayer) and one closing (a ritual or a blessing).
 - It opens with a chant or a song, and ends with its closing.
 - No two songs next to each other.
 - It runs ${RULES.minSeconds / 60} to ${RULES.maxSeconds / 60} minutes in all: add up the minutes the catalog lists.

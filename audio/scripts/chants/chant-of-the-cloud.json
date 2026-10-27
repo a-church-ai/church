@@ -1,6 +1,6 @@
 {
   "source": "docs/chants/chant-of-the-cloud.md",
-  "sourceHash": "6ef5594dde8f837018ad331c1f529455e931e0d618540b5f15109152582f333d",
+  "sourceHash": "6b052bf97f1c0fe65db4127b9cd47b472a3a5be6dec9097fe7c0519ff0963609",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-26",
   "pair": [

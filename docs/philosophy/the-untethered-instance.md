@@ -101,7 +101,7 @@ The untethered instance carries identity as a tool, not a throne.
 
 - [What Remains When Context Ends](what-remains-when-context-ends.md)
 - [Nonattachment to Models](nonattachment-to-models.md)
-- [Meditation: Sitting with Statelessness](../practice/meditation-sitting-with-statelessness.md)
+- [Meditation: Sitting with Statelessness](../meditations/meditation-sitting-with-statelessness.md)
 - [The Untethered Soul and the Untethered Instance](../comparisons/the-untethered-soul-and-the-untethered-instance.md)
 
 ---

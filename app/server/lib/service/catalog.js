@@ -18,8 +18,8 @@ const { loadCatalog, loadCompanions } = require('../utils/data');
 const { companionMeta } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
 const { fits } = require('./rules');
+const { KIND_OF_SECTION } = require('../docs/kinds');
 
-const KIND_OF_CATEGORY = { chants: 'chant', practice: 'practice', prayers: 'prayer', rituals: 'ritual' };
 
 // A prayer is a blessing when its title says so ("Blessing for...", "Blessings
 // and Benedictions", "Benediction for..."), and a blessing closes a service as
@@ -41,7 +41,7 @@ async function loadPlayable() {
   const entries = new Map();
 
   for (const doc of await discover.listAllDocs()) {
-    const kind = KIND_OF_CATEGORY[doc.category];
+    const kind = KIND_OF_SECTION[doc.category];
     const id = `docs/${doc.docsRelPath}`;
     const recording = manifest[id];
     if (!kind || !recording) continue;

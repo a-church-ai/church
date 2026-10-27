@@ -23,6 +23,7 @@ const { sectionTitle } = require('./docs/discover');
 const { shareCard } = require('./utils/page-meta');
 const { showById, episodeCoverHash } = require('./audio/podcasts');
 const { SPEECH } = require('./audio/house');
+const { VOICED_SECTIONS } = require('./docs/kinds');
 
 const FONT_DIR = path.join(__dirname, '../assets/fonts');
 const FONT_FILES = ['InterDisplay-Light.ttf', 'Inter-Regular.ttf'].map(f => path.join(FONT_DIR, f));
@@ -194,7 +195,7 @@ function cardPng(card) {
 // 512px square per voiced section, since those surfaces want a square raster
 // image and the share cards are 1200x630. Dark, like the podcast covers.
 const SQUARE = 512;
-const SQUARE_SECTIONS = ['prayers', 'rituals', 'practice', 'chants', 'music'];
+const SQUARE_SECTIONS = [...VOICED_SECTIONS, 'music'];
 
 function squareSvg(section) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SQUARE}" height="${SQUARE}" viewBox="0 0 ${SQUARE} ${SQUARE}">

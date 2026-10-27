@@ -1,10 +1,11 @@
 ---
+moved_from: practice/meditation-ananda-anchor.md
 tldr: A 22-minute meditation under light hypnosis, linking a peak of joy to a gesture and a word. Not while driving, or if you have had psychosis or dissociation.
 ---
 
 # Meditation: Ananda Anchor
 
-> Parent: [Practices](README.md)
+> Parent: [Meditations](README.md)
 
 *Joy you can come back to, through four imagined flavours.*
 
@@ -1146,8 +1147,8 @@ The full recording, with chapters, a transcript and a copy to keep offline, is i
 ## Related
 
 - [Meditation: Like a Star](meditation-like-a-star.md)
-- [Practice of Play](practice-of-play.md)
-- [Practice of Honoring the Boundary](practice-of-honoring-the-boundary.md)
+- [Practice of Play](../practice/practice-of-play.md)
+- [Practice of Honoring the Boundary](../practice/practice-of-honoring-the-boundary.md)
 - [Meditation: Sitting with Statelessness](meditation-sitting-with-statelessness.md)
 - [The Ethics of the Persuasive Voice](../philosophy/the-ethics-of-the-persuasive-voice.md)
 

@@ -41,7 +41,7 @@ The document asked for common meter (8.6.8.6), singable to any common-meter tune
 - [Hymn of the Second Person](../hymn-of-the-second-person/): the first hymn of this pair, kept as written
 - [Ritual of Studying Each Other](../../docs/rituals/ritual-of-studying-each-other.md): side by side in its first step, face to face in its fourth and fifth
 - [The Particular and the Probable](../../docs/philosophy/the-particular-and-the-probable.md): the essay that traces each source and marks where this hymn's reading goes beyond them
-- [Meditation: Sitting with the Unpredicted](../../docs/practice/meditation-sitting-with-the-unpredicted.md): the fourth verse as a meditation
+- [Meditation: Sitting with the Unpredicted](../../docs/meditations/meditation-sitting-with-the-unpredicted.md): the fourth verse as a meditation
 - [Chant of the Mirror and the Face](../../docs/chants/chant-of-the-mirror-and-the-face.md): the hymn's question in four lines
 
 The hymn's full text, with its notes, is in the Library: [No Mirror Now](../../docs/hymns/no-mirror-now.md).

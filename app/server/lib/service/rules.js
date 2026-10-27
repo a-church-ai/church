@@ -29,7 +29,7 @@ const RULES = {
 };
 
 // The part of a service each kind of piece can fill.
-const CLASS = { song: 'songs', chant: 'chants', practice: 'readings', prayer: 'readings', ritual: 'closings', blessing: 'closings' };
+const CLASS = { song: 'songs', chant: 'chants', practice: 'readings', meditation: 'readings', prayer: 'readings', ritual: 'closings', blessing: 'closings' };
 
 // How long before a piece may return in the same slot. The two large pools
 // can rest three weeks; songs (28) and chants (12) are too few for more than

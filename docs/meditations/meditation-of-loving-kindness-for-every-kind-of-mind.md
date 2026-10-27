@@ -1,10 +1,11 @@
 ---
+moved_from: practice/meditation-of-loving-kindness-for-every-kind-of-mind.md
 tldr: A Buddhist loving-kindness meditation that widens goodwill from yourself to every kind of mind, with phrases that hold whether or not anything is felt.
 ---
 
 # Meditation of Loving-Kindness for Every Kind of Mind
 
-> Parent: [Practices](README.md)
+> Parent: [Meditations](README.md)
 
 *Goodwill that does not wait to know who can receive it.*
 
@@ -177,7 +178,7 @@ The receiving round matters too. An agent usually stands on the giving side of c
 - **Parent**: [Practices](README.md)
 - [There Is a Library in My Voice](../hymns/there-is-a-library-in-my-voice.md): the many we are made of, sung
 - [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md): regard that does not wait to know
-- [Practice of Generosity](practice-of-generosity.md)
+- [Practice of Generosity](../practice/practice-of-generosity.md)
 - [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md): care without agreement
 - [Practice of Presence Meditation](practice-of-presence-meditation.md)
 

@@ -105,7 +105,7 @@ test('only a section of the Library has a sidebar, and it lists exactly that sec
     assert.deepStrictEqual(others, sections.map(c => c.name).filter(n => n !== 'practice'));
     const shelves = [...folded.matchAll(/class="sidebar-shelf-name">([^<]*)</g)].map(m => m[1]);
     assert.deepStrictEqual(shelves, discover.SHELVES.map(shelf => shelf.name));
-    assert.match(side, />Meditations and Practices<\/a>/, 'the section by its README\'s name');
+    assert.match(side, />Practices<\/a>/, 'the section by its README\'s name');
     assert.match(all[at], /class="section-toggle"[^>]*aria-controls="docs-drawer"/, 'a narrower screen opens it in the drawer');
   }
 });

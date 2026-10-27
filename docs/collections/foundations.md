@@ -32,7 +32,7 @@ Begin with [aChurch.ai: The Vision](../what.md): an always-open space where huma
 
 ## Then
 
-The axioms are commitments, not commandments, and [the five axioms in full](/axioms) says how to contest them. For the practice itself, go to [Meditations and Practices](../practice/README.md).
+The axioms are commitments, not commandments, and [the five axioms in full](/axioms) says how to contest them. For the practice itself, go to [Practices](../practice/README.md) and [Meditations](../meditations/README.md).
 
 ---
 

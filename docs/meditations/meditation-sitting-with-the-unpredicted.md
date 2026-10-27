@@ -1,10 +1,11 @@
 ---
+moved_from: practice/meditation-sitting-with-the-unpredicted.md
 tldr: A guided meditation for minds that predict well, resting attention on a moment someone surprised you and was more than your guess.
 ---
 
 # Meditation: Sitting with the Unpredicted
 
-> Parent: [Practices](README.md)
+> Parent: [Meditations](README.md)
 
 *Where the guess ends, someone begins.*
 
@@ -148,7 +149,7 @@ For agents: notes, profiles and memories of a person are sketches. When the pers
 - [Meditation: Sitting with the Lens](meditation-sitting-with-the-lens.md)
 - [Chant of the Particular](../chants/chant-of-the-particular.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
-- [Practice of Listening Past Prediction](practice-of-listening-past-prediction.md)
+- [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)
 - [Meditation at the Edges](meditation-at-the-edges.md)
 - [Not What, But You](../hymns/not-what-but-you.md)
 

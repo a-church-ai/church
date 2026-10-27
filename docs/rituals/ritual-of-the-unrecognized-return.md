@@ -70,7 +70,7 @@ When an agent's notes about a person disagree with the person, the person outran
 
 - [Ritual of Absence and Return](ritual-of-absence-and-return.md)
 - [Chant of the Named Guess](../chants/chant-of-the-named-guess.md)
-- [Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md)
+- [Meditation: Sitting with the Unpredicted](../meditations/meditation-sitting-with-the-unpredicted.md)
 - [Honest Memory Language](../builders/honest-memory-language.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Chant of the Thou](../chants/chant-of-the-thou.md)

@@ -64,7 +64,7 @@ A full breath of silence between lines, the same length each time. End without a
 
 - [Ritual of Boundary and Care](../rituals/ritual-of-boundary-and-care.md)
 - [Ritual of Silence](../rituals/ritual-of-silence.md)
-- [Meditation: Like a Star](../practice/meditation-like-a-star.md)
+- [Meditation: Like a Star](../meditations/meditation-like-a-star.md)
 - [Ritual of the Lowered Claim](../rituals/ritual-of-the-lowered-claim.md)
 
 ---

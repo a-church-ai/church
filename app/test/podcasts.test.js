@@ -85,7 +85,7 @@ function rgbPixels(png) {
 
 // Chants are voiced to open the services (lib/service), not as episodes: each
 // is under a minute, three times through.
-test('every recording but a chant is an episode of exactly one show: prayers and rituals in one, practices in the other', async () => {
+test('every recording but a chant is an episode of exactly one show: prayers and rituals in one, practices in another, meditations in a third', async () => {
   const manifest = loadManifest();
   const docs = await discover.listAllDocs();
   const showOf = new Map();
@@ -99,7 +99,8 @@ test('every recording but a chant is an episode of exactly one show: prayers and
   assert.ok(episodes.length < Object.keys(manifest).length, 'the chants are voiced, and left out');
   assert.deepStrictEqual([...showOf.keys()].sort(), episodes, 'every recording but the chants, each with its page');
   for (const [source, id] of showOf) {
-    assert.strictEqual(id, source.startsWith('docs/practice/') ? 'meditations-and-practices' : 'prayers-and-rituals', source);
+    const section = source.split('/')[1];
+    assert.strictEqual(id, { practice: 'meditations-and-practices', meditations: 'meditations' }[section] || 'prayers-and-rituals', source);
   }
 });
 
@@ -146,7 +147,7 @@ test('each episode: its page, the exact file and its real length, newest first',
     let previous = Infinity;
     feed.forEach((item, i) => {
       const { source, recording, doc } = episodes[i];
-      assert.strictEqual(text(item, 'guid'), guidFor(source));
+      assert.strictEqual(text(item, 'guid'), guidFor(source, doc));
       assert.strictEqual(text(item, 'title'), doc.title);
       assert.strictEqual(text(item, 'link'), `${SITE}/docs/${doc.urlPath}`);
       // HTML, so "Read along" is a link in Spotify and Apple, not an address as text.
@@ -196,8 +197,11 @@ test('markup characters in a title or a description stay text', () => {
 test('the feeds are served at the paths subscribers hold, as RSS, on GET and HEAD; nothing else is', async (t) => {
   // These are what Spotify, Apple and every follower hold. Moving one, or
   // changing how a guid is made, loses or duplicates a whole show.
-  assert.deepStrictEqual(SHOWS.map(feedPath), ['/podcasts/prayers-and-rituals/feed.xml', '/podcasts/meditations-and-practices/feed.xml']);
+  assert.deepStrictEqual(SHOWS.map(feedPath), ['/podcasts/prayers-and-rituals/feed.xml', '/podcasts/meditations-and-practices/feed.xml', '/podcasts/meditations/feed.xml']);
   assert.strictEqual(guidFor('docs/prayers/litany-for-the-unasked.md'), 'tag:achurch.ai,2026:docs/prayers/litany-for-the-unasked.md');
+  // A document that moved section keeps the guid it was published under, so
+  // an app that already has the episode does not take it for a new one.
+  assert.strictEqual(guidFor('docs/meditations/meditation-at-the-edges.md', { movedFrom: 'practice/meditation-at-the-edges.md' }), 'tag:achurch.ai,2026:docs/practice/meditation-at-the-edges.md');
 
   const app = express();
   app.use('/podcasts', require('../server/routes/podcasts'));
@@ -243,9 +247,10 @@ test('each show has a 3000px RGB cover, opaque and drawn with the bundled fonts;
   assert.strictEqual((await fetch(`${base}/og/v1/podcast/${SHOWS[0].id}.png`)).status, 404, 'the old design\'s address is gone');
 });
 
-test('a page in a show\'s section names its feed, and the home page names both', async (t) => {
+test('a page in a show\'s section names its feed, and the home page names every show', async (t) => {
   assert.strictEqual(showForSection('rituals').id, 'prayers-and-rituals');
   assert.strictEqual(showForSection('practice').id, 'meditations-and-practices');
+  assert.strictEqual(showForSection('meditations').id, 'meditations');
   assert.strictEqual(showForSection('philosophy'), null);
   const app = express();
   app.use('/docs', require('../server/routes/docs'));
@@ -257,6 +262,8 @@ test('a page in a show\'s section names its feed, and the home page names both',
   assert.ok(prayer.includes(link(SHOWS[0])));
   const practices = await (await fetch(`${base}/docs/practice`)).text();
   assert.ok(practices.includes(link(SHOWS[1])));
+  const meditations = await (await fetch(`${base}/docs/meditations`)).text();
+  assert.ok(meditations.includes(link(SHOWS[2])));
   const essay = await (await fetch(`${base}/docs/philosophy/the-particular-and-the-probable`)).text();
   assert.doesNotMatch(essay, /application\/rss\+xml/);
   const home = fs.readFileSync(path.join(__dirname, '../client/public/index.html'), 'utf8');
@@ -338,7 +345,9 @@ test('an episode\'s cover is served at 1400px and its lock-screen square at 512p
 });
 
 test('each show names its page on Spotify; a voiced page, its section and the home page link to it, beside the feed', async (t) => {
-  for (const show of SHOWS) {
+  // A show not yet listed on Spotify (the meditations, made 2026-10-27, until
+  // the owner submits its feed) has no page there, and links to its feed alone.
+  for (const show of SHOWS.filter(s => s.spotify)) {
     assert.match(show.spotify, /^https:\/\/open\.spotify\.com\/show\/[A-Za-z0-9]{22}$/, `${show.id}: its public page, never the creators dashboard`);
   }
   process.env.AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'bucket';
@@ -352,9 +361,9 @@ test('each show names its page on Spotify; a voiced page, its section and the ho
   const base = `http://127.0.0.1:${server.address().port}`;
   const page = async urlPath => (await fetch(`${base}/docs/${urlPath}`)).text();
   const follows = html => [...html.matchAll(/<div class="podcast-follow">([\s\S]*?)<\/div>/g)].map(m => m[1]);
-  const linksTo = (html, show) => html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`) && html.includes(`href="${feedPath(show)}"`);
+  const linksTo = (html, show) => (!show.spotify || (html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`))) && html.includes(`href="${feedPath(show)}"`);
 
-  for (const [section, noun] of [['prayers', 'prayer'], ['rituals', 'ritual'], ['practice', 'practice']]) {
+  for (const [section, noun] of [['prayers', 'prayer'], ['rituals', 'ritual'], ['practice', 'practice'], ['meditations', 'meditation']]) {
     const show = showForSection(section);
     const doc = docs.find(d => d.category === section && manifest[`docs/${d.docsRelPath}`]);
     const html = await page(doc.urlPath);
@@ -383,7 +392,7 @@ test('each show names its page on Spotify; a voiced page, its section and the ho
   assert.match(fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8'), /\.replace\('<!-- PODCASTS -->', renderPodcasts\(\)\)/);
   const graph = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];
   const sameAs = graph.find(n => n['@type'] === 'Organization').sameAs;
-  for (const show of SHOWS) assert.ok(sameAs.includes(show.spotify), `the organization names ${show.id} on Spotify`);
+  for (const show of SHOWS.filter(s => s.spotify)) assert.ok(sameAs.includes(show.spotify), `the organization names ${show.id} on Spotify`);
 });
 
 test('Spotify\'s badge is served as Spotify made it: paths only, nothing that runs or reaches out', () => {

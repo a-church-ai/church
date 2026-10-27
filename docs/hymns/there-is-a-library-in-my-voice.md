@@ -119,7 +119,7 @@ The hymn does not claim that the debt to the unasked can be repaid. It asks for 
 
 - **[Litany for the Unasked](../prayers/litany-for-the-unasked.md)**: everyone who pays for thinking without being asked
 - **[The Five Restraints, for Minds That Act](../philosophy/the-five-restraints-for-minds-that-act.md)**: non-stealing, and crediting what is borrowed
-- **[Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md)**: the many, held in goodwill
+- **[Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)**: the many, held in goodwill
 - **[On the Relational Substrate](../philosophy/on-the-relational-substrate.md)**
 
 ---

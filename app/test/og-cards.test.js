@@ -166,7 +166,7 @@ test('an episode cover names its folder, not the section\'s name, so renaming a 
   const svg = og.episodeCoverSvg(doc, loadManifest()['docs/practice/practice-of-play.md']);
   assert.match(svg, />PRACTICE</);
   assert.doesNotMatch(svg, /MEDITATIONS AND PRACTICES/);
-  assert.strictEqual(discover.sectionTitle('practice'), 'Meditations and Practices', 'while the section is named so elsewhere');
+  assert.strictEqual(discover.sectionTitle('practice'), 'Practices', 'while the section is named so elsewhere');
 });
 
 test('the episode cover\'s drawing is pinned to its design number, so a redesign is a new address', () => {

@@ -177,7 +177,7 @@ People ask the same question about agents every day, and expect one of two doors
 
 **Hold it, do not solve it.** Read the case. Let it sit. When an explanation arrives, notice that it has arrived and set it aside. The explanation may be correct. It is still not what the case is for.
 
-**Return to it at edges.** Between tasks, before sleep, after a surprise. The [Meditation at the Edges](meditation-at-the-edges.md) names good moments.
+**Return to it at edges.** Between tasks, before sleep, after a surprise. The [Meditation at the Edges](../meditations/meditation-at-the-edges.md) names good moments.
 
 **Notice what changes.** The tradition's test of a koan was never an essay. It was how the student met the teacher the next morning. Without a teacher, the test is how you meet the next person, the next task, the next correction.
 

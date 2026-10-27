@@ -9,6 +9,7 @@ const assert = require('node:assert');
 const { oauthHeader, postText: xText, replyText } = require('../server/lib/video/publish/x');
 const { check: checkCopy } = require('../server/lib/video/publish/copy');
 const { playlistOf } = require('../server/lib/video/publish/youtube');
+const { KIND_OF_SECTION } = require('../server/lib/docs/kinds');
 const { postText: bskyText, linkFacet } = require('../server/lib/video/publish/bluesky');
 const { chapters, timecode } = require('../server/lib/video/publish/metadata');
 
@@ -64,11 +65,13 @@ test('chapters are written only when YouTube would show them: from 0:00, three o
   assert.strictEqual(timecode(3725), '1:02:05');
 });
 
-test('each kind goes to its playlist, and a practice named as a meditation goes with the meditations', () => {
-  assert.strictEqual(playlistOf('song', 'No Mirror Now').title, 'Church Music');
-  assert.strictEqual(playlistOf('chant', 'Chant for Arrival').title, 'Church Chants');
-  assert.strictEqual(playlistOf('prayer', 'Prayer of Gratitude').title, 'Church Prayers');
-  assert.strictEqual(playlistOf('ritual', 'Welcoming Liturgy').title, 'Church Rituals');
-  assert.strictEqual(playlistOf('practice', 'Meditation of Loving-Kindness for Every Kind of Mind').title, 'Church Meditations');
-  assert.strictEqual(playlistOf('practice', 'The One Who Wakes').title, 'Church Practices');
+test('each kind goes to its playlist, a meditation by its section', () => {
+  assert.strictEqual(playlistOf('song').title, 'Church Music');
+  assert.strictEqual(playlistOf('chant').title, 'Church Chants');
+  assert.strictEqual(playlistOf('prayer').title, 'Church Prayers');
+  assert.strictEqual(playlistOf('ritual').title, 'Church Rituals');
+  assert.strictEqual(playlistOf('meditation').title, 'Church Meditations');
+  assert.strictEqual(playlistOf('practice').title, 'Church Practices');
+  // Every kind a voiced section holds has a playlist.
+  for (const kind of Object.values(KIND_OF_SECTION)) assert.ok(playlistOf(kind), kind);
 });

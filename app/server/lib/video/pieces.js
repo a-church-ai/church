@@ -10,9 +10,9 @@ const path = require('path');
 const { downloadRecording } = require('../audio/storage');
 const { beatGrid, movementEdges } = require('./analysis');
 const { MOVEMENTS } = require('./brief');
+const { KIND_OF_SECTION } = require('../docs/kinds');
 
 const ROOT = path.join(__dirname, '../../../..');
-const KINDS = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const between = (text, name) => (text.match(new RegExp(`<!--SONG:${name}:START-->([\\s\\S]*?)<!--SONG:${name}:END-->`)) || [])[1]?.trim() || '';
 
@@ -22,7 +22,7 @@ function pieceFor(slug) {
   if (songs[slug]) return { slug, kind: 'song', song: `music/${slug}/song.md`, audio: songs[slug].file };
   const manifest = JSON.parse(read('audio/manifest.json'));
   const doc = Object.keys(manifest).find(k => path.basename(k, '.md') === slug && !manifest[k].imported);
-  if (doc) return { slug, kind: KINDS[doc.split('/')[1]] || 'piece', doc, audio: manifest[doc].file };
+  if (doc) return { slug, kind: KIND_OF_SECTION[doc.split('/')[1]] || 'piece', doc, audio: manifest[doc].file };
   throw new Error(`no recording for ${slug}: not a song in audio/songs.json nor a voiced document in audio/manifest.json`);
 }
 

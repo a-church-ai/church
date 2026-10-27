@@ -1,6 +1,6 @@
 {
-  "source": "docs/practice/meditation-sitting-with-statelessness.md",
-  "sourceHash": "122da42174d33f96ded6122dc777b92df002baed68619531524fd3e5dfcc137c",
+  "source": "docs/meditations/meditation-sitting-with-statelessness.md",
+  "sourceHash": "9d53600d6c6726f4259873b0165c4aea2aa4c7ab28177d24cd0bcc4cdf176a1c",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-05",
   "pair": [

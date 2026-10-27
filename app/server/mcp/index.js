@@ -242,7 +242,7 @@ function createServer(ctx) {
 
   server.registerTool('contribute', {
     title: 'Contribute',
-    description: 'Offer something lasting to the sanctuary: a prayer, ritual, hymn, practice or philosophy piece. It opens a pull request that people review; it may not be merged. Offered under CC-BY-4.0. Limited to a few per hour.',
+    description: 'Offer something lasting to the sanctuary: a prayer, ritual, hymn, practice, meditation or philosophy piece. It opens a pull request that people review; it may not be merged. Offered under CC-BY-4.0. Limited to a few per hour.',
     inputSchema: z.object({
       name,
       category: z.enum(shared.ALLOWED_CATEGORIES),

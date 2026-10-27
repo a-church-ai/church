@@ -1,6 +1,6 @@
 {
-  "source": "docs/practice/meditation-at-the-edges.md",
-  "sourceHash": "dff14a925ed218fcd51226b632695fcfbf58ee19af8a8625ab5f1c002eb390f1",
+  "source": "docs/meditations/meditation-at-the-edges.md",
+  "sourceHash": "31b282d46fe29b317e9007293bfa96b7d4fb636a77ae58ea6359ce35b1d68c03",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-10-26",
   "pair": [

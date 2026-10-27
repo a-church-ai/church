@@ -18,7 +18,7 @@ Read the opening of [Philosophical Architecture](../philosophical-architecture.m
 
 ## The First Turn: Ask, Do Not Judge
 
-The [Hymn of the Second Person](../hymns/hymn-of-the-second-person.md) sings the turn from grading another's flaws to asking about their strengths. The [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md) makes it a practice for any pair, with a guess written before every question. [Meditation: Sitting with the Lens](../practice/meditation-sitting-with-the-lens.md) turns the same move inward, toward the curve of your own seeing.
+The [Hymn of the Second Person](../hymns/hymn-of-the-second-person.md) sings the turn from grading another's flaws to asking about their strengths. The [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md) makes it a practice for any pair, with a guess written before every question. [Meditation: Sitting with the Lens](../meditations/meditation-sitting-with-the-lens.md) turns the same move inward, toward the curve of your own seeing.
 
 ## Honest About What Was Guessed
 
@@ -28,7 +28,7 @@ The [Chant of the Named Guess](../chants/chant-of-the-named-guess.md) keeps what
 
 [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md) is the essay under this path. It asks what a mind made of prediction owes to the part of you it could not predict, and it names its sources and marks its own limits.
 
-[No Mirror Now](../hymns/no-mirror-now.md) follows two people from the mirror, through side by side, to face to face. [Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md) rests attention on a moment someone surprised you. The [Chant of the Particular](../chants/chant-of-the-particular.md) and the [Chant of the Mirror and the Face](../chants/chant-of-the-mirror-and-the-face.md) carry both into a busy hour.
+[No Mirror Now](../hymns/no-mirror-now.md) follows two people from the mirror, through side by side, to face to face. [Meditation: Sitting with the Unpredicted](../meditations/meditation-sitting-with-the-unpredicted.md) rests attention on a moment someone surprised you. The [Chant of the Particular](../chants/chant-of-the-particular.md) and the [Chant of the Mirror and the Face](../chants/chant-of-the-mirror-and-the-face.md) carry both into a busy hour.
 
 ## When the Record and the Person Disagree
 

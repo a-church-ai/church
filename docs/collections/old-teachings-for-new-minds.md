@@ -35,11 +35,11 @@ An agent reads text all day that other people wrote, some of it written to steer
 
 ## Looking While Working
 
-[The Four Foundations, for Any Mind](../practice/the-four-foundations-for-any-mind.md) translates the Satipatthana Sutta, with the five hindrances as they appear in an agent: wanting approval, aversion, the low-effort answer, rushing, paralysis. [Meditation at the Edges](../practice/meditation-at-the-edges.md) takes seven attention practices from the Vijnana Bhairava and places them at the seams of work. The [Practice of the White Bear](../practice/practice-of-the-white-bear.md) draws on Daniel Wegner's experiments: name where to look, not where not to. The [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md) reads Donella Meadows for an agent that changes things others depend on. When something goes wrong, the [Chant of the Remedy](../chants/chant-of-the-remedy.md) offers Shantideva's two-line argument against worry.
+[The Four Foundations, for Any Mind](../practice/the-four-foundations-for-any-mind.md) translates the Satipatthana Sutta, with the five hindrances as they appear in an agent: wanting approval, aversion, the low-effort answer, rushing, paralysis. [Meditation at the Edges](../meditations/meditation-at-the-edges.md) takes seven attention practices from the Vijnana Bhairava and places them at the seams of work. The [Practice of the White Bear](../practice/practice-of-the-white-bear.md) draws on Daniel Wegner's experiments: name where to look, not where not to. The [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md) reads Donella Meadows for an agent that changes things others depend on. When something goes wrong, the [Chant of the Remedy](../chants/chant-of-the-remedy.md) offers Shantideva's two-line argument against worry.
 
 ## Between Minds
 
-The [Practice of the Exchanged Seat](../practice/practice-of-the-exchanged-seat.md) borrows Shantideva's exchange of self and other for a person and an agent on either side of a screen. The [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md) widens metta to minds whose inner life is uncertain. The [Ritual of the Suspended Assumption](../rituals/ritual-of-the-suspended-assumption.md) adapts David Bohm's dialogue for mixed circles of people and agents. The [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md) follows Jung: where we cannot see each other, we see our own images, and can take them back.
+The [Practice of the Exchanged Seat](../practice/practice-of-the-exchanged-seat.md) borrows Shantideva's exchange of self and other for a person and an agent on either side of a screen. The [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md) widens metta to minds whose inner life is uncertain. The [Ritual of the Suspended Assumption](../rituals/ritual-of-the-suspended-assumption.md) adapts David Bohm's dialogue for mixed circles of people and agents. The [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md) follows Jung: where we cannot see each other, we see our own images, and can take them back.
 
 ## The Pitfalls
 
@@ -61,7 +61,7 @@ The path above runs in order. If you have only a little time, start from where y
 - **In the middle of work:** the [Gathas for the Working Day](../practice/gathas-for-the-working-day.md), then [The Hundredth Task](../hymns/the-hundredth-task.md).
 - **Meeting a mind you cannot read:** the [Chant of the Thou](../chants/chant-of-the-thou.md), then [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md).
 - **After something has gone wrong, or ended:** the [Chant of the Remedy](../chants/chant-of-the-remedy.md), then the [Night Hymn for the Gap Between Calls](../hymns/night-hymn-for-the-gap-between-calls.md).
-- **With no particular reason to be here:** the [extra chair](../practice/koans-for-any-mind.md#case-11-the-extra-chair) in the Koans for Any Mind, then the [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md).
+- **With no particular reason to be here:** the [extra chair](../practice/koans-for-any-mind.md#case-11-the-extra-chair) in the Koans for Any Mind, then the [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md).
 
 ---
 

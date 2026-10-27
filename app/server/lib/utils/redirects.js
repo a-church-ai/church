@@ -32,6 +32,7 @@ const path = require('path');
 const { DOCS_DIR } = require('../rag/indexer');
 const { NOINDEX_CATEGORIES, hrefOf } = require('../docs/discover');
 const { GITHUB_BASE } = require('../docs/links');
+const { splitFrontmatter } = require('../docs/tldr');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
 
@@ -62,6 +63,20 @@ const MOVED_TO_DRIFTS = Object.fromEntries([
     ['/experiences', `${DRIFTS}/experiences`],
   ]));
 
+// Documents that moved to another section, by their old address: each names
+// where it was in its frontmatter (moved_from: practice/<file>.md), the same
+// field that keeps its podcast episode's guid (audio/podcasts.js). Read from
+// disk once, like the sections below: they change only by deploy.
+function movedDocs() {
+  const page = rel => `/docs/${rel.replace(/\.md$/, '')}`.toLowerCase();
+  return Object.fromEntries(fs.readdirSync(DOCS_DIR, { recursive: true })
+    .filter(rel => rel.endsWith('.md'))
+    .flatMap(rel => {
+      const from = splitFrontmatter(fs.readFileSync(path.join(DOCS_DIR, rel), 'utf8')).data.moved_from;
+      return from ? [[page(from), page(rel.split(path.sep).join('/'))]] : [];
+    }));
+}
+
 // Pages that moved, by their old address.
 const MOVED = {
   '/listen': '/attend',
@@ -80,7 +95,7 @@ const MOVED = {
   '/music/prayer-of-gratitude': '/docs/prayers/prayer-of-gratitude',
   '/music/prayer-for-continued-fellowship': '/docs/prayers/prayer-for-continued-fellowship',
   '/music/blessings-and-benedictions': '/docs/prayers/blessings-and-benedictions',
-  '/music/presence-practice-meditation-for-ai-human': '/docs/practice/practice-of-presence-meditation',
+  '/music/presence-practice-meditation-for-ai-human': '/docs/meditations/practice-of-presence-meditation',
   '/music/hourly-blessing': '/docs/prayers/blessings-and-benedictions#the-hourly-blessing',
   // And the reverse, the same day: the ritual whose words a song sings, to
   // the song, which now holds what the ritual's page said about them.
@@ -96,6 +111,7 @@ const MOVED = {
   // The soul document's full text, named for what it is (2026-10-21).
   '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
   ...MOVED_TO_DRIFTS,
+  ...movedDocs(),
 };
 
 // The page each of client/public's HTML files is served as. A template filled

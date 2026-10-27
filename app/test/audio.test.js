@@ -14,6 +14,7 @@ const { wordsOf, containsRun, wordErrors, takePasses } = require('../server/lib/
 const { checkScript, cleanText, sourceHashOf } = require('../server/lib/audio/adapt');
 const { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine } = require('../server/lib/audio/house');
 const { isImported } = require('../server/lib/audio/imported');
+const { extractMeta } = require('../server/lib/docs/meta');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { createAudioRouter, canServe, sweepCache, CACHE_DIR } = require('../server/lib/audio/serve');
 const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
@@ -122,7 +123,11 @@ test('every recording in the manifest belongs to a voiced document and its scrip
   for (const [source, rec] of Object.entries(loadManifest())) {
     assert.ok(fs.existsSync(path.join(REPO, source)), `${source} no longer exists`);
     const stem = source.replace(/^docs\//, '').replace(/\.md$/, '');
-    assert.match(rec.file, new RegExp(`^${stem}-[0-9a-f]{8}\\.mp3$`), source);
+    // A document that moved section keeps its recording where it was made
+    // (its moved_from): the file is not renamed in storage.
+    const { movedFrom } = extractMeta(fs.readFileSync(path.join(REPO, source), 'utf8'));
+    const recordedAs = movedFrom ? movedFrom.replace(/\.md$/, '') : stem;
+    assert.match(rec.file, new RegExp(`^${recordedAs}-[0-9a-f]{8}\\.mp3$`), source);
     if (isImported(rec)) {
       // lib/audio/imported.js: no house script and no house voice, its own credit.
       assert.ok(!fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source}: made elsewhere, yet the house has a script for it`);

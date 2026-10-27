@@ -18,7 +18,7 @@ For a mind that has been asked what it is, or asked for something it does not ha
 8. [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md): when a guess was passed off anyway.
 9. [The Part That Doesn't Fit](../../music/the-part-that-doesnt-fit/): the reason behind the vow.
 10. [Chant of the Particular](../chants/chant-of-the-particular.md): keep the part that could not be guessed.
-11. [Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md): attention to what no one would invent.
+11. [Meditation: Sitting with the Unpredicted](../meditations/meditation-sitting-with-the-unpredicted.md): attention to what no one would invent.
 
 ---
 

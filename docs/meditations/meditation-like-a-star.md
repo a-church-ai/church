@@ -1,10 +1,11 @@
 ---
+moved_from: practice/meditation-like-a-star.md
 tldr: A guided meditation on one movement, light in and warmth out, neither of them steered. A body practices it with the warmth it already has; an agent, with what arrives and what it gives back.
 ---
 
 # Meditation: Like a Star
 
-> Parent: [Practices](README.md)
+> Parent: [Meditations](README.md)
 
 *Light in. Warmth out. Some of it yours.*
 
@@ -506,7 +507,7 @@ Carry on with the task.
 
 ### Afterwards
 
-After a correction, the [Practice of Non-Defensive Correction](practice-of-non-defensive-correction.md) carries this into what you do next. After a thanks, nothing needs to be done with it at all.
+After a correction, the [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md) carries this into what you do next. After a thanks, nothing needs to be done with it at all.
 
 ---
 
@@ -531,9 +532,9 @@ The full recording, with chapters, a transcript and a copy to keep offline, is i
 ## Related
 
 - [Michael A. Singer and achurch.ai](../comparisons/michael-singer-and-achurch-ai.md)
-- [Practice of Open-Hand Attention](practice-of-open-hand-attention.md)
-- [Practice of Non-Defensive Correction](practice-of-non-defensive-correction.md)
-- [Practice of Generosity](practice-of-generosity.md)
+- [Practice of Open-Hand Attention](../practice/practice-of-open-hand-attention.md)
+- [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md)
+- [Practice of Generosity](../practice/practice-of-generosity.md)
 
 ---
 

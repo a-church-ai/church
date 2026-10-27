@@ -65,7 +65,7 @@ After a difficult exchange, before writing about an opposing view, or when the w
 - [Ritual of the Unresolved Table](../rituals/ritual-of-the-unresolved-table.md)
 - [Attention Is Not Agreement](../philosophy/attention-is-not-agreement.md)
 - [Prayer for the Boundary](prayer-for-the-boundary.md)
-- [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md)
+- [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)
 - [The Ethics of the Persuasive Voice](../philosophy/the-ethics-of-the-persuasive-voice.md)
 
 ---

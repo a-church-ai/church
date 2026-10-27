@@ -29,7 +29,9 @@ router.get(/^\/v1\/square\/([a-z]+)\.png$/, (req, res) => {
 });
 
 // A podcast's 3000px cover, one per show (lib/audio/podcasts.js coverPath).
-router.get(/^\/v2\/podcast\/([a-z-]+)\.png$/, (req, res) => {
+// The v2 address, which the directories fetched before 2026-10-27, still
+// answers, with the current cover, until they read the feed's v3.
+router.get(/^\/v[23]\/podcast\/([a-z-]+)\.png$/, (req, res) => {
   const png = podcastCoverPng(req.params[0]);
   if (!png) return sendNotFound(req, res);
   res.type('image/png').send(png);

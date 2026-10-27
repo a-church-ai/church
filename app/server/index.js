@@ -996,7 +996,7 @@ app.get('/search', async (req, res) => {
 
 // /attend, the ways to attend: the service (on the home page), the songs'
 // videos, each voiced section with how much of it is recorded, the songs, a
-// reflection to leave, and the two podcasts. The recordings are counted from
+// reflection to leave, and the three podcasts. The recordings are counted from
 // their manifests on each request, so a new one is counted once it is listed.
 app.get('/attend', async (req, res) => {
   try {

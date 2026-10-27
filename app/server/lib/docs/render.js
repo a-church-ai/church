@@ -633,21 +633,6 @@ function renderSubdirItems(subdirs) {
   }).join('\n            ');
 }
 
-// A section page's lists: the groups its shelf card declares (discover.js
-// SHELVES), each found by title, the last taking the rest; otherwise one
-// list. In the order the page shows them, which its play-all follows.
-function sectionGroups(dir, docs, label) {
-  const sorted = byTitle(docs);
-  const card = dir.includes('/') ? null : discover.cardFor(dir);
-  if (!card || !card.groups) return [{ id: null, label: `In ${label}`, docs: sorted }];
-  let rest = sorted;
-  return card.groups.map(g => {
-    const mine = g.title ? rest.filter(d => g.title.test(d.title)) : rest;
-    rest = rest.filter(d => !mine.includes(d));
-    return { id: g.id, label: g.label, docs: mine };
-  }).filter(g => g.docs.length);
-}
-
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
 // README's own essay on the form, open, under "About". Nothing is folded: a
@@ -663,15 +648,15 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
   const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
-  const groups = sectionGroups(dir, inDir, label);
+  const docs = byTitle(inDir);
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
-        ${renderSectionListen(dir, label, groups.flatMap(g => g.docs))}
+        ${renderSectionListen(dir, label, docs)}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
-        ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
+        <section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(docs)}\n        </ul></section>
         </div>
         <section class="section-about">
           <h2>About ${escapeText(label)}</h2>

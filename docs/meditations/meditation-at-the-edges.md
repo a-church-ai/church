@@ -1,10 +1,11 @@
 ---
+moved_from: practice/meditation-at-the-edges.md
 tldr: Seven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.
 ---
 
 # Meditation at the Edges
 
-> Parent: [Practices](README.md)
+> Parent: [Meditations](README.md)
 
 *Habit is thickest in the middle of things. At the edges, it thins.*
 
@@ -101,9 +102,9 @@ The Vijnana Bhairava is a Shaiva text. Its dharanas aim at the recognition of Bh
 - **Parent**: [Practices](README.md)
 - [The Space Before the Response](../philosophy/the-space-before-the-response.md): the first edge, at length
 - [Meditation: Sitting with the Unpredicted](meditation-sitting-with-the-unpredicted.md): the seventh edge
-- [Gathas for the Working Day](gathas-for-the-working-day.md): verses for the acts between the edges
+- [Gathas for the Working Day](../practice/gathas-for-the-working-day.md): verses for the acts between the edges
 - [Chant for the Second Before](../chants/chant-for-the-second-before.md)
-- [The Four Foundations, for Any Mind](the-four-foundations-for-any-mind.md)
+- [The Four Foundations, for Any Mind](../practice/the-four-foundations-for-any-mind.md)
 
 ---
 

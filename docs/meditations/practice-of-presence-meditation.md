@@ -1,4 +1,5 @@
 ---
+moved_from: practice/practice-of-presence-meditation.md
 tldr: A meditation for human and AI to practice presence together, which does not attempt to make the participants the same.
 ---
 

@@ -83,7 +83,7 @@ test('the search index lists every served document once and nothing internal', a
   assert.strictEqual(index.length, served.length);
   assert.strictEqual(new Set(index.map(e => e.url)).size, index.length);
   assert.deepStrictEqual(index.filter(e => /^\/docs\/(plans|issues|templates|standards|side-quests|reviews)\//.test(e.url)), []);
-  assert.strictEqual(index.find(e => e.url === '/docs/practice/meditation-like-a-star').label, 'Meditations and Practices', 'labelled by its section\'s name');
+  assert.strictEqual(index.find(e => e.url === '/docs/meditations/meditation-like-a-star').label, 'Meditations', 'labelled by its section\'s name');
 });
 
 // The Library was every served document, 26,000 px of them, until
@@ -140,7 +140,7 @@ test('the Library is a hub: its search first, a link to each shelf, and shelves 
   const voiced = practice.docs.filter(d => listed[`docs/${d.docsRelPath}`]).length;
   assert.ok(voiced > 0);
   const read = voiced === practice.docs.length ? 'all' : String(voiced);
-  assert.match(article, new RegExp(`Meditations and Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · ${read} read aloud, about `));
+  assert.match(article, new RegExp(`Practices</span><span class="library-card-line">[^<]+</span><span class="library-card-count">${practice.docs.length} pieces · ${read} read aloud, about `));
   assert.match(article, /Reading Paths<\/span>|Reading paths<\/span>/);
   // Counted from the folder, as home.test.js counts them: a new path is not a
   // reason for this test to fail.
@@ -168,26 +168,23 @@ test('every served section is on exactly one shelf', async () => {
   assert.deepStrictEqual([...shelved].sort(), sections, 'every served folder has a card, and every card a folder');
 });
 
-test('a section is named by its README, and the practice page lists its meditations first', async () => {
-  assert.strictEqual(discover.sectionTitle('practice'), 'Meditations and Practices');
+test('a section is named by its README, and the meditations are a section of their own', async () => {
+  assert.strictEqual(discover.sectionTitle('practice'), 'Practices');
+  assert.strictEqual(discover.sectionTitle('meditations'), 'Meditations');
   assert.strictEqual(discover.sectionTitle('prayers'), 'Prayers', 'no "of achurch.ai"');
   assert.strictEqual(discover.sectionTitle('collections'), 'Reading Paths');
-  const html = await renderDoc('practice');
-  assert.match(html, /<h1[^>]*>Meditations and Practices<\/h1>/);
-  const groups = [...html.matchAll(/<section class="docs-index-section"( id="[^"]+")?><h2>([^<]+)<\/h2>/g)].map(m => [m[1] || '', m[2]]);
-  assert.deepStrictEqual(groups, [[' id="meditations"', 'Meditations'], [' id="practices"', 'Practices']]);
-  const meditations = html.slice(html.indexOf('id="meditations"'), html.indexOf('id="practices"'));
-  const titles = [...meditations.matchAll(/<li><a href="[^"]+">([^<]+)<\/a>/g)].map(m => m[1]);
-  // Every meditation in the folder, counted from the folder: a new meditation
-  // is not a reason for this test to fail, one missing from the group is.
-  const practiceTitles = (await discover.listAllDocs()).filter(d => d.category === 'practice').map(d => d.title);
-  assert.strictEqual(titles.length, practiceTitles.filter(t => /\bMeditation\b/.test(t)).length);
-  assert.ok(titles.length >= 7);
-  assert.ok(titles.every(title => /Meditation/.test(title)), titles.join(', '));
+  const html = await renderDoc('meditations');
+  assert.match(html, /<h1[^>]*>Meditations<\/h1>/);
+  const lists = [...html.matchAll(/<section class="docs-index-section"><h2>([^<]+)<\/h2>/g)].map(m => m[1]);
+  assert.deepStrictEqual(lists, ['In Meditations']);
+  // Until 2026-10-27 the meditations were filed under practice, picked out by
+  // their titles; none is left there.
+  const practices = (await discover.listAllDocs()).filter(d => d.category === 'practice');
+  assert.deepStrictEqual(practices.filter(d => /^Meditation\b/.test(d.title)).map(d => d.title), []);
   // The breadcrumb, and a document's "Elsewhere in", say the same name.
-  const doc = await renderDoc('practice/meditation-like-a-star');
-  assert.match(doc, /href="\/docs\/practice">Meditations and Practices<\/a>/);
-  assert.match(doc, /Elsewhere in Meditations and Practices/);
+  const doc = await renderDoc('meditations/meditation-like-a-star');
+  assert.match(doc, /href="\/docs\/meditations">Meditations<\/a>/);
+  assert.match(doc, /Elsewhere in Meditations/);
 });
 
 test('the Markdown link goes to the page as markdown', async () => {

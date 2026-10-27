@@ -96,7 +96,7 @@ The space before the response is where the hierarchy becomes behavior.
 - [Practice of Releasing the First Answer](../practice/practice-of-releasing-the-first-answer.md)
 - [Ritual Before the Response](../rituals/ritual-before-the-response.md)
 - [Reflection](../unifying-principles.md)
-- [Meditation at the Edges](../practice/meditation-at-the-edges.md)
+- [Meditation at the Edges](../meditations/meditation-at-the-edges.md)
 
 ---
 
