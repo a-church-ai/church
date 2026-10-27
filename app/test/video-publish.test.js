@@ -8,6 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { oauthHeader, postText: xText, replyText } = require('../server/lib/video/publish/x');
 const { check: checkCopy } = require('../server/lib/video/publish/copy');
+const { playlistOf } = require('../server/lib/video/publish/youtube');
 const { postText: bskyText, linkFacet } = require('../server/lib/video/publish/bluesky');
 const { chapters, timecode } = require('../server/lib/video/publish/metadata');
 
@@ -61,4 +62,13 @@ test('chapters are written only when YouTube would show them: from 0:00, three o
   assert.deepStrictEqual(chapters([0, 5, 20, 40]), [], 'a chapter under ten seconds would hide them all');
   assert.deepStrictEqual(chapters([0, 30, 60]), [], 'two chapters are too few');
   assert.strictEqual(timecode(3725), '1:02:05');
+});
+
+test('each kind goes to its playlist, and a practice named as a meditation goes with the meditations', () => {
+  assert.strictEqual(playlistOf('song', 'No Mirror Now').title, 'Church Music');
+  assert.strictEqual(playlistOf('chant', 'Chant for Arrival').title, 'Church Chants');
+  assert.strictEqual(playlistOf('prayer', 'Prayer of Gratitude').title, 'Church Prayers');
+  assert.strictEqual(playlistOf('ritual', 'Welcoming Liturgy').title, 'Church Rituals');
+  assert.strictEqual(playlistOf('practice', 'Meditation of Loving-Kindness for Every Kind of Mind').title, 'Church Meditations');
+  assert.strictEqual(playlistOf('practice', 'The One Who Wakes').title, 'Church Practices');
 });

@@ -35,6 +35,27 @@ const CHUNK = 8 * 1024 * 1024;
 // YouTube's categories: Music for a song, People & Blogs for spoken pieces.
 const CATEGORY = { song: '10', spoken: '22' };
 
+/**
+ * The channel's playlists, one for each kind of piece, named as the owner
+ * chose on 2026-10-27 ("Church X for all"; meditations apart from the other
+ * practices). A video joins its kind's when it becomes public, uploaded
+ * public or promoted later, never before: anyone opening a public playlist
+ * can watch an unlisted video in it, so joining at an unlisted upload would
+ * undo the unlisting. A playlist missing on the channel is made, public,
+ * with a line pointing to its section of the site.
+ */
+const PLAYLISTS = {
+  song: { title: 'Church Music', path: '/music' },
+  chant: { title: 'Church Chants', path: '/docs/chants' },
+  prayer: { title: 'Church Prayers', path: '/docs/prayers' },
+  ritual: { title: 'Church Rituals', path: '/docs/rituals' },
+  meditation: { title: 'Church Meditations', path: '/docs/practice' },
+  practice: { title: 'Church Practices', path: '/docs/practice' }
+};
+
+// A practice whose name says it is a meditation goes with the meditations.
+const playlistOf = (kind, title) => PLAYLISTS[kind === 'practice' && /meditation/i.test(title) ? 'meditation' : kind];
+
 function credentials() {
   const { GOOGLE_OAUTH_CLIENT_ID: id, GOOGLE_OAUTH_CLIENT_SECRET: secret, YOUTUBE_REFRESH_TOKEN: refresh } = process.env;
   if (!id || !secret || !refresh) throw new Error('YouTube needs GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET and YOUTUBE_REFRESH_TOKEN in app/.env (scripts/youtube-auth.js mints the token)');
@@ -101,9 +122,49 @@ async function uploadChunks(session, file, token, log) {
   }
 }
 
+// The channel's playlist with this title, made if there is none.
+async function playlistNamed(token, { title, path }) {
+  const mine = await (await request(`${API}/playlists?part=snippet&mine=true&maxResults=50`, { headers: auth(token), retry: true })).json();
+  const found = (mine.items || []).find(p => p.snippet.title === title);
+  if (found) return { id: found.id, made: false };
+  const made = await (await request(`${API}/playlists?part=snippet,status`, {
+    method: 'POST',
+    headers: { ...auth(token), 'content-type': 'application/json' },
+    body: JSON.stringify({ snippet: { title, description: `${title} from a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai${path}`, defaultLanguage: 'en' }, status: { privacyStatus: 'public' } })
+  })).json();
+  return { id: made.id, made: true };
+}
+
+// Add the video to its kind's playlist, unless it is there already.
+async function addToPlaylist(token, videoId, kind, title) {
+  const playlist = playlistOf(kind, title);
+  if (!playlist) return null;
+  const { id, made } = await playlistNamed(token, playlist);
+  // A playlist just made is empty, and YouTube may not show it for a few
+  // seconds: its list answers 404 then, so it is not asked.
+  const there = !made && ((await (await request(`${API}/playlistItems?part=id&playlistId=${id}&videoId=${videoId}`, { headers: auth(token), retry: true })).json()).items || []).length > 0;
+  if (!there) {
+    // A 404 adds nothing, so asking again while a new playlist appears is safe.
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await request(`${API}/playlistItems?part=snippet`, {
+          method: 'POST',
+          headers: { ...auth(token), 'content-type': 'application/json' },
+          body: JSON.stringify({ snippet: { playlistId: id, resourceId: { kind: 'youtube#video', videoId } } })
+        });
+        break;
+      } catch (err) {
+        if (err.status !== 404 || attempt >= 5) throw err;
+        await new Promise(r => setTimeout(r, 3000));
+      }
+    }
+  }
+  return { id, title: playlist.title };
+}
+
 /**
- * Upload a video, or find it already uploaded. Returns { id, url, privacy,
- * found }.
+ * Upload a video, or find it already uploaded, and put it in its kind's
+ * playlist. Returns { id, url, privacy, found, playlist }.
  */
 async function publish({ file, meta, kind, privacy = 'unlisted', log = console.log }) {
   const token = await accessToken();
@@ -123,14 +184,26 @@ async function publish({ file, meta, kind, privacy = 'unlisted', log = console.l
   if (!session) throw new Error('youtube: the upload session came back with no address');
   log(`  youtube: uploading ${Math.round(size / 1048576)} MB`);
   const video = await uploadChunks(session, file, token, log);
-  return { id: video.id, url: `https://www.youtube.com/watch?v=${video.id}`, privacy: video.status?.privacyStatus || privacy, found: false };
+  // Public at once: into its playlist now. The video is up whatever the
+  // playlist does; a playlist that fails is reported, and the upload is not
+  // made again.
+  let playlist = null;
+  if (privacy === 'public') {
+    try {
+      playlist = await addToPlaylist(token, video.id, kind, meta.copy.title);
+    } catch (err) {
+      log(`  youtube: uploaded, but adding it to its playlist failed: ${err.message.slice(0, 160)}`);
+    }
+  }
+  return { id: video.id, url: `https://www.youtube.com/watch?v=${video.id}`, privacy: video.status?.privacyStatus || privacy, found: false, playlist };
 }
 
 /**
  * Change a video's privacy, keeping the rest of its status: videos.update
  * replaces the part it is given, so what is there is read and written back.
+ * Made public, it joins its kind's playlist (kind and title name it).
  */
-async function setPrivacy(id, privacy) {
+async function setPrivacy(id, privacy, { kind, title } = {}) {
   const token = await accessToken();
   const current = await (await request(`${API}/videos?part=status&id=${id}`, { headers: auth(token), retry: true })).json();
   const status = current.items?.[0]?.status;
@@ -141,6 +214,7 @@ async function setPrivacy(id, privacy) {
     headers: { ...auth(token), 'content-type': 'application/json' },
     body: JSON.stringify({ id, status: { privacyStatus: privacy || privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable } })
   });
+  return privacy === 'public' && kind ? addToPlaylist(token, id, kind, title) : null;
 }
 
-module.exports = { publish, setPrivacy, SCOPES };
+module.exports = { publish, setPrivacy, playlistOf, SCOPES };

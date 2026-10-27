@@ -118,9 +118,10 @@ async function post(slug, opts) {
 async function promote(slug, privacy) {
   const done = (await readRecord(slug)).youtube;
   if (!done?.id) throw new Error('not on YouTube yet');
-  await youtube.setPrivacy(done.id, privacy);
-  await writeRecord(slug, 'youtube', { ...done, privacy });
-  console.log(`[${slug}] youtube: now ${privacy}, ${done.url}`);
+  const piece = pieceFor(slug);
+  const playlist = await youtube.setPrivacy(done.id, privacy, { kind: piece.kind, title: pieceText(piece).title });
+  await writeRecord(slug, 'youtube', { ...done, privacy, ...(playlist ? { playlist } : {}) });
+  console.log(`[${slug}] youtube: now ${privacy}, ${done.url}${playlist ? `, in ${playlist.title}` : ''}`);
 }
 
 async function main() {
