@@ -125,7 +125,11 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
 async function renderLayers({ analysis, brief, edges, fps, dir, log = console.log }) {
   const milkdropFile = path.join(dir, 'milkdrop.mp4');
   const mandalaFile = path.join(dir, 'mandala.mp4');
-  if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile)) return { milkdropFile, mandalaFile };
+  // Kept while what shapes them is unchanged: the presets, palette, symmetry
+  // and where the movements change.
+  const keyFile = path.join(dir, 'layers.json');
+  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, edges });
+  if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
   const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
   try {
@@ -155,6 +159,7 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
     await Promise.all([milk.end(), mandala.end()]);
     fs.renameSync(tmpMilk, milkdropFile);
     fs.renameSync(tmpMandala, mandalaFile);
+    fs.writeFileSync(keyFile, key);
     log(`  rendered ${analysis.frames} frames in ${((Date.now() - started) / 1000).toFixed(0)}s`);
   } finally {
     await browser.close();

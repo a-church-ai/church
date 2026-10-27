@@ -76,7 +76,37 @@ MilkDrop presets you may choose from, each with how bright it looks under a voic
 ${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightness ${p.brightness} | motion ${p.motion}`)).join('\n')}`;
 }
 
-function check(presets) {
+/**
+ * The presets a brief may use, given what other videos used. Asking for
+ * variety in a prompt does not hold (both sibling projects learned it; here
+ * Airhandler was in 7 of the first 10 briefs), so the rule is enforced on the
+ * answer: no preset twice in one brief, none used by the ten most recent
+ * videos, none used three times in all.
+ *
+ * used: [{ presets: [...], at: time }] for every other video's brief.
+ */
+const RECENT = 10;
+const CAP = 3;
+function presetRule(used) {
+  const counts = new Map();
+  for (const b of used) for (const p of b.presets) counts.set(p, (counts.get(p) || 0) + 1);
+  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, RECENT).flatMap(b => b.presets));
+  const why = (name) => (recent.has(name) ? 'used by one of the ten most recent videos' : (counts.get(name) || 0) >= CAP ? `used ${counts.get(name)} times already` : null);
+  return {
+    allows: (name) => !why(name),
+    problems(names) {
+      const out = [];
+      names.forEach((name, i) => {
+        if (names.indexOf(name) !== i) out.push(`movement ${i + 1}'s preset "${name}" is already used by an earlier movement; each movement needs its own`);
+        const reason = why(name);
+        if (reason) out.push(`movement ${i + 1}'s preset "${name}" is ${reason}; choose another`);
+      });
+      return out;
+    }
+  };
+}
+
+function check(presets, rule) {
   const names = new Set(presets.map(p => p.name));
   return (raw) => {
     const problems = [];
@@ -91,17 +121,21 @@ function check(presets) {
       if (!m.still || !m.motion) problems.push(`movement ${i + 1} needs both still and motion`);
       if (!names.has(m.preset)) problems.push(`movement ${i + 1}'s preset "${m.preset}" is not in the list, word for word`);
     }
+    if (rule) problems.push(...rule.problems((brief.movements || []).map(m => m.preset)));
     if (!Array.isArray(brief.palette) || brief.palette.length !== 5 || !brief.palette.every(c => /^#[0-9a-f]{6}$/i.test(c))) problems.push('palette must be five #rrggbb colours');
     return { value: brief, problems, shown: raw };
   };
 }
 
-async function writeBrief(piece) {
+// The presets offered: those the rule allows. Each is checked again on the
+// answer, since a model can name one it was not offered.
+async function writeBrief(piece, rule = presetRule([])) {
+  piece = { ...piece, presets: piece.presets.filter(p => rule.allows(p.name)) };
   return askChecked({
     label: 'brief',
     tries: 3,
     attempt: (feedback) => message(SYSTEM, userMessage(piece) + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 4000 }),
-    check: check(piece.presets)
+    check: check(piece.presets, rule)
   });
 }
 
@@ -127,4 +161,42 @@ Return only JSON: { "motions": ["...", "...", "..."] }`;
   });
 }
 
-module.exports = { writeBrief, writeMotions, barsPerLoop, MOVEMENTS };
+/**
+ * A brief written before the rule, chosen again where it breaks it: only the
+ * presets that do, each from the allowed presets, for its movement's still and
+ * motion. The stills and loops are kept.
+ */
+async function repickPresets(brief, presets, rule) {
+  const names = () => brief.movements.map(m => m.preset);
+  if (!rule.problems(names()).length) return false;
+  const allowed = presets.filter(p => rule.allows(p.name));
+  for (const [i, m] of brief.movements.entries()) {
+    const taken = names().filter((_, j) => j !== i);
+    if (rule.allows(m.preset) && !taken.includes(m.preset)) continue;
+    const offer = allowed.filter(p => !taken.includes(p.name));
+    const request = `Choose one MilkDrop preset for this movement of an abstract, psychedelic, metaphysical video.
+
+Mood of the piece: ${brief.mood}
+Still: ${m.still}
+Motion: ${m.motionText || m.motion}
+
+Presets, each with how bright it looks under a voice (0 to 1) and how much it moves:
+${offer.map(p => `${p.name} | brightness ${p.brightness} | motion ${p.motion}`).join('\n')}
+
+Return only JSON: { "preset": "exact name" }`;
+    m.preset = await askChecked({
+      label: 'preset',
+      tries: 3,
+      attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 300 }),
+      check: (raw) => {
+        let reply;
+        try { reply = parseJSON(raw); } catch (err) { return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw }; }
+        const ok = offer.some(p => p.name === reply.preset);
+        return { value: reply.preset, problems: ok ? [] : [`"${reply.preset}" is not in the list, word for word`], shown: raw };
+      }
+    });
+  }
+  return true;
+}
+
+module.exports = { writeBrief, writeMotions, repickPresets, presetRule, barsPerLoop, MOVEMENTS };

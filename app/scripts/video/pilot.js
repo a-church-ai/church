@@ -17,8 +17,9 @@ require('../../server/lib/utils/env').loadEnv();
 const fs = require('fs');
 const path = require('path');
 const { analyse, beatGrid, movementEdges, describeMovement, envelope } = require('./audio');
-const { writeBrief, writeMotions, MOVEMENTS } = require('./brief');
-const { makeStill, makeClip, VIDEO_MODEL } = require('./loops');
+const { writeBrief, writeMotions, repickPresets, presetRule, MOVEMENTS } = require('./brief');
+const { makeStill, makeClip, spent, VIDEO_MODEL } = require('./loops');
+const { reportVideo } = require('./checks');
 const { renderLayers, presetChoices } = require('./visual');
 const { compose, baseFootage, titleCard, FPS } = require('./compose');
 
@@ -35,6 +36,18 @@ const DEFAULT = ['chant-of-the-mirror-and-the-face'];
 
 // A piece by its slug: a song with a recording in audio/songs.json, or a
 // voiced document in audio/manifest.json whose file is named by the slug.
+// Every other video's presets, and when its brief was written, for the
+// reuse rule (brief.js presetRule).
+function otherBriefs(slug) {
+  if (!fs.existsSync(OUT)) return [];
+  return fs.readdirSync(OUT)
+    .filter(d => d !== slug && fs.existsSync(path.join(OUT, d, 'brief.json')))
+    .map(d => {
+      const file = path.join(OUT, d, 'brief.json');
+      return { presets: JSON.parse(fs.readFileSync(file, 'utf8')).movements.map(m => m.preset), at: fs.statSync(file).mtimeMs };
+    });
+}
+
 function pieceFor(slug) {
   const songs = JSON.parse(read('audio/songs.json'));
   if (songs[slug]) return { slug, kind: 'song', song: `music/${slug}/song.md`, audio: songs[slug].file };
@@ -85,6 +98,7 @@ async function run(piece) {
   // and has its motion written again; its loops are then made again.
   const briefFile = path.join(dir, 'brief.json');
   const about = { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid };
+  const rule = presetRule(otherBriefs(piece.slug));
   let brief;
   if (fs.existsSync(briefFile)) {
     brief = JSON.parse(fs.readFileSync(briefFile, 'utf8'));
@@ -95,16 +109,20 @@ async function run(piece) {
       fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
       log('motions written again from the sound');
     }
+    if (await repickPresets(brief, presetChoices(), rule)) {
+      fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
+      log('presets chosen again under the reuse rule');
+    }
   } else {
-    brief = { ...(await writeBrief({ ...about, presets: presetChoices() })), heard: true };
+    brief = { ...(await writeBrief({ ...about, presets: presetChoices() }, rule)), heard: true };
     fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
   }
   log(`brief: ${brief.mood} | presets: ${brief.movements.map(m => m.preset).join(' / ')}`);
 
   const clips = await Promise.all(brief.movements.map(async (m, i) => {
-    const still = await makeStill(m.still, path.join(dir, `still-${i + 1}.png`));
-    const clip = await makeClip(still, m.motion, path.join(dir, `loop-${i + 1}.mp4`));
-    log(`loop ${i + 1}: ${clip.seamless ? 'closes on its first frame' : 'played forward and back'} (SSIM ${clip.ssim?.toFixed(3)}, $${clip.cost})`);
+    const still = await makeStill(m.still, path.join(dir, `still-${i + 1}.png`), { log });
+    const clip = await makeClip(still, m.motion, path.join(dir, `loop-${i + 1}.mp4`), { log });
+    log(`loop ${i + 1}: ${clip.seamless ? 'closes on its first frame' : 'played forward and back'} (SSIM ${clip.ssim?.toFixed(3)}), motion floor ${clip.motion?.before} evened to ${clip.motion?.after}${clip.motion?.stalls ? ', still freezes' : ''}`);
     return clip;
   }));
 
@@ -115,10 +133,13 @@ async function run(piece) {
   const title_ = titleCard(title, path.join(dir, 'title.png'));
   for (const variant of VARIANTS) {
     const out = path.join(dir, `${piece.slug}.${variant}.mp4`);
-    compose({ variant, base, milkdrop: milkdropFile, mandala: mandalaFile, audio, title: title_, brief, seconds: analysis.seconds, out });
-    log(`wrote ${path.relative(process.cwd(), out)}`);
+    const { grain } = compose({ variant, base, milkdrop: milkdropFile, mandala: mandalaFile, audio, title: title_, brief, seconds: analysis.seconds, out });
+    const report = reportVideo({ file: out, seconds: analysis.seconds, edges });
+    fs.writeFileSync(out.replace(/\.mp4$/, '.report.json'), JSON.stringify({ ...report, grain }, null, 2));
+    log(`wrote ${path.relative(process.cwd(), out)}: ${report.megabytes} MB, grain ${grain}`);
+    if (report.problems.length) throw new Error(`the finished video fails its report: ${report.problems.join('; ')}`);
   }
-  return { slug: piece.slug, cost: clips.reduce((s, c) => s + (c.cost || 0), 0) };
+  return { slug: piece.slug };
 }
 
 (async () => {
@@ -134,7 +155,7 @@ async function run(piece) {
       process.exitCode = 1;
     }
   }
-  console.log(`done: ${results.length} piece(s), $${results.reduce((s, r) => s + r.cost, 0).toFixed(2)} of ${VIDEO_MODEL} loops`);
+  console.log(`done: ${results.length} of ${pieces.length} piece(s); spent $${spent.dollars.toFixed(2)} on ${spent.stills} still(s) and ${spent.loops} ${VIDEO_MODEL} loop(s)`);
 })().catch(err => {
   console.error(err);
   process.exit(1);

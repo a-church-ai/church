@@ -19,6 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { Resvg } = require('@resvg/resvg-js');
+const { lumaAt } = require('./checks');
 
 const FPS = 30;
 const SIZE = '1920:1080';
@@ -60,11 +61,14 @@ function titleCard(title, file) {
 const probeSeconds = (file) => Number(spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file], { encoding: 'utf8' }).stdout);
 
 // A clip that does not end where it began is played forward then backward.
+// The loop as it plays: its motion evened (checks.js evenLoop) when it has
+// been, and played forward then backward when it does not close.
 function loopSource(clip) {
-  if (clip.seamless) return clip.file;
-  const source = clip.file.replace(/\.mp4$/, '.pingpong.mp4');
+  const loop = clip.even || clip.file;
+  if (clip.seamless) return loop;
+  const source = loop.replace(/\.mp4$/, '.pingpong.mp4');
   if (!fs.existsSync(source)) {
-    ffmpeg(['-i', clip.file, '-filter_complex', `[0:v]scale=${SIZE},fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[v]`, '-map', '[v]', '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', source], 'pingpong');
+    ffmpeg(['-i', loop, '-filter_complex', `[0:v]scale=${SIZE},fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[v]`, '-map', '[v]', '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', source], 'pingpong');
   }
   return source;
 }
@@ -143,7 +147,20 @@ function baseFootage(clips, { edges, grid, envelope, dir }) {
 /**
  * @param {'loops'|'milkdrop'|'full'} variant
  */
+/**
+ * Grain for a picture this bright: 2 for a bright one, 5 for a dark one.
+ * Grain is noise, and noise is what an encoder spends bits on; mvplanner
+ * found bright shots need almost none.
+ */
+function grainFor(file, seconds) {
+  const samples = [0.15, 0.4, 0.65, 0.9].map(f => lumaAt(file, f * seconds)).filter(v => v !== null);
+  if (!samples.length) return 3;
+  const brightness = Math.min(1, Math.max(0, (samples.reduce((s, v) => s + v, 0) / samples.length - 16) / 219));
+  return Math.round(1 + 2 * (1 - brightness));
+}
+
 function compose({ variant, base, milkdrop, mandala, audio, title, brief, seconds, out }) {
+  const grain = grainFor(base || milkdrop, seconds);
   const fadeOut = Math.max(0, seconds - 2.5).toFixed(3);
   const inputs = [];
   const add = (args) => { inputs.push(...args); return inputs.filter(a => a === '-i').length - 1; };
@@ -170,15 +187,21 @@ function compose({ variant, base, milkdrop, mandala, audio, title, brief, second
   }
   // The finish: bloom, chromatic split, hue drift, grain, vignette.
   parts.push(`${layer}split[f1][f2];[f2]gblur=sigma=28[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
-    `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=4:allf=t,vignette=PI/4.5,` +
+    `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=${grain}:allf=t,vignette=PI/4.5,` +
     `fade=in:st=0:d=1.5,fade=out:st=${fadeOut}:d=2.5[pic]`);
   const t = add(['-loop', '1', '-t', '9', '-i', title]);
   parts.push(`[${t}:v]format=rgba,fade=in:st=0.8:d=1.5:alpha=1,fade=out:st=6:d=2:alpha=1[title]`);
   parts.push(`[pic][title]overlay=0:0:eof_action=pass,format=yuv420p[v]`);
   const a = add(['-i', audio]);
   ffmpeg([...inputs, '-filter_complex', parts.join(';'), '-map', '[v]', '-map', `${a}:a`, '-t', seconds.toFixed(3),
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', out], variant);
-  return out;
+    // news-community's settings: CRF 23 capped at 3.5 Mbps, a keyframe every
+    // two seconds. Every platform encodes again on upload, and side by side
+    // 7.3 and 2.5 Mbps looked the same. Written under a temporary name and
+    // renamed when whole, so nothing reads a half-written video.
+    '-c:v', 'libx264', '-preset', 'medium', '-profile:v', 'high', '-crf', '23', '-maxrate', '8000k', '-bufsize', '16000k',
+    '-force_key_frames', 'expr:gte(t,n_forced*2)', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', '-f', 'mp4', `${out}.part`], variant);
+  fs.renameSync(`${out}.part`, out);
+  return { file: out, grain };
 }
 
 module.exports = { compose, baseFootage, titleCard, FPS };
