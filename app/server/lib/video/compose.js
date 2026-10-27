@@ -9,8 +9,9 @@
  *   mandala  the house's layer, screen-blended over that
  *   finish   a soft bloom, a slight chromatic split, a slow hue drift, grain
  *            and a vignette
- *   title    the piece's name, faded in over the opening and out again, drawn
- *            as the share cards are (og-cards.js), with their fonts
+ *   title    the piece's name and the site's (page-meta.js SITE_NAME), faded
+ *            in over the opening and out again, drawn as the share cards are
+ *            (og-cards.js), with their fonts
  *
  * with the recording, at its house level, as the sound.
  */
@@ -20,6 +21,7 @@ const path = require('path');
 const { Resvg } = require('@resvg/resvg-js');
 const { ffmpeg, seconds: lengthOf } = require('../audio/assemble');
 const { RESVG_FONTS, escapeXml } = require('../og-cards');
+const { SITE_NAME } = require('../utils/page-meta');
 const { lumaAt } = require('./checks');
 const { onDisk } = require('./library');
 
@@ -46,7 +48,7 @@ function titleCard(title, file) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
   <defs><filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
   ${text}
-  <text x="960" y="${top + (lines.length - 1) * lineHeight + 96}" text-anchor="middle" font-family="Inter" font-weight="400" font-size="26" letter-spacing="10" fill="#ffffff" fill-opacity="0.75">ACHURCH.AI</text>
+  <text x="960" y="${top + (lines.length - 1) * lineHeight + 100}" text-anchor="middle" font-family="Inter" font-weight="400" font-size="34" letter-spacing="3" fill="#ffffff" fill-opacity="0.8">${escapeXml(SITE_NAME)}</text>
 </svg>`;
   fs.writeFileSync(file, new Resvg(svg, { font: RESVG_FONTS }).render().asPng());
   return file;
