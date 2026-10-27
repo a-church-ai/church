@@ -73,7 +73,7 @@ async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
   const { status, body } = await operation();
   recordApiUse({
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,
-    ip: ctx.ip, userAgent: ctx.userAgent, name: who, tool,
+    ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool,
     error: status >= 400 && body && body.error ? String(body.error).slice(0, 200) : undefined,
   });
   const isError = status >= 400;
@@ -321,11 +321,28 @@ const requestContext = new AsyncLocalStorage();
 const currentServer = () => createServer(requestContext.getStore());
 
 // A refused request (bad JSON, an unsupported protocol version, a type the
-// client cannot read) otherwise leaves no trace but its status code. One line
-// each, from either path, so the next look at the logs says why, and who.
+// client cannot read, a header the 2026-07-28 spec requires and was not sent)
+// otherwise leaves no trace but its status code. Its reason is noted here, from
+// either path, as one log line and on the request's context, which handleMcp
+// writes to the access log once the refusal is sent: Railway forgets the log
+// line at the next deploy, and Cloudflare sees only a POST to /mcp.
 function logRefusal(error) {
   const ctx = requestContext.getStore();
   console.warn(`[mcp] refused: ${error.message} (${(ctx && ctx.userAgent) || 'no user agent'})`);
+  if (ctx) ctx.refusal = String(error.message).slice(0, 200);
+}
+
+// The client's own name, where its request gives one: every 2026-07-28 request
+// carries its clientInfo in _meta, and a 2025-era client sends it only with
+// initialize, so its tool calls go without. Cloudflare and the user agent
+// (often just a library's, node or python-httpx) cannot say who is calling.
+const CLIENT_INFO = 'io.modelcontextprotocol/clientInfo';
+
+function clientOf(body) {
+  const message = Array.isArray(body) ? body[0] : body;
+  const params = message && message.params;
+  const info = params && ((params._meta && params._meta[CLIENT_INFO]) || (message.method === 'initialize' && params.clientInfo));
+  return info && typeof info.name === 'string' && info.name.trim() ? info.name.trim().slice(0, 100) : undefined;
 }
 
 // 2025-era requests answer in JSON (enableJsonResponse), never as an event
@@ -383,7 +400,15 @@ const modern = toNodeHandler(createMcpHandler(currentServer, { legacy: 'reject',
 // POST /mcp: route by era. isLegacyRequest is the SDK's own classifier, the
 // one createMcpHandler routes with, so the two cannot disagree.
 async function handleMcp(req, res) {
-  const ctx = { ...shared.requestContext(req), userAgent: req.get('user-agent') };
+  const ctx = { ...shared.requestContext(req), userAgent: req.get('user-agent'), client: clientOf(req.body) };
+  const started = Date.now();
+  res.on('finish', () => {
+    if (!ctx.refusal || res.statusCode < 400) return;
+    recordApiUse({
+      method: 'MCP', path: '/mcp', status: res.statusCode, duration: Date.now() - started,
+      ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, error: ctx.refusal,
+    });
+  });
   return requestContext.run(ctx, async () => {
     try {
       if (await isLegacyRequest(await toWebRequest(req, req.body), req.body)) return await serveLegacy(req, res);

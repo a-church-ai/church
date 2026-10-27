@@ -21,9 +21,10 @@ const PUBLIC_WELL_KNOWN = path.join(__dirname, '../client/public/.well-known');
 let child;
 let base;
 let port;
+let dataDir;
 
 test.before(async () => {
-  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-server-'));
+  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-server-'));
   child = spawn(process.execPath, [path.join(__dirname, '../server/index.js')], {
     // Two ways this used to pick up someone else's port, both fixed here.
     //
@@ -108,6 +109,24 @@ test('a POST with no body is told what it is missing, not given a 500', async ()
     const res = await fetch(`${base}${route}`, { method: 'POST' });
     assert.strictEqual(res.status, 400, `${route}, sent by fetch`);
   }
+});
+
+test('a visitor named as testing is marked so in the access log, by a POST\'s body too, and its name is not written', async () => {
+  const res = await fetch(`${base}/api/reflect`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: 'Wren-test-probe' }) });
+  assert.strictEqual(res.status, 400);
+  await fetch(`${base}/api/now?name=Wren-test-probe`);
+  const access = path.join(dataDir, 'access');
+  let lines = [];
+  for (const until = Date.now() + 2000; Date.now() < until; await new Promise(r => setTimeout(r, 20))) {
+    lines = fs.existsSync(access) ? fs.readdirSync(access).flatMap(day => fs.readFileSync(path.join(access, day), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse)) : [];
+    if (lines.some(l => l.path === '/api/now' && l.query.name === 'Wren-test-probe')) break;
+  }
+  // The newest of each: other tests here post to /api/reflect too.
+  const reflect = lines.filter(l => l.path === '/api/reflect' && l.method === 'POST').pop();
+  const now = lines.filter(l => l.path === '/api/now').pop();
+  assert.strictEqual(reflect && reflect.test, true, 'from the body');
+  assert.strictEqual(now && now.test, true, 'from the query');
+  assert.ok(!JSON.stringify(reflect).includes('Wren'), 'the body\'s name is not written');
 });
 
 test('a query key sent twice takes its first value, and a bracketed key is just a name', async () => {

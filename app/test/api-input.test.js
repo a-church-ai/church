@@ -17,8 +17,8 @@ const test = require('node:test');
 const assert = require('node:assert');
 const express = require('express');
 const shared = require('../server/lib/api/shared');
-const { ATTENDANCE_FILE, ACCESS_LOG_FILE } = require('../server/lib/utils/data');
-const { recordApiUse } = require('../server/lib/utils/access-log');
+const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
+const { recordApiUse, loadAccessLogs } = require('../server/lib/utils/access-log');
 
 let server;
 let base;
@@ -80,7 +80,7 @@ test('a refused reflection says what was received and what is wanted', async () 
 
 test('the access log keeps why a request was refused and the names of the fields it sent, never their values', async () => {
   await recordApiUse({ method: 'POST', path: '/api/reflect', status: 400, duration: 3, ip: '203.0.113.200', userAgent: 'test', error: 'text is required', fields: ['name', 'note'], contentType: 'application/json' });
-  const last = JSON.parse(fs.readFileSync(ACCESS_LOG_FILE, 'utf8').trim().split('\n').pop());
+  const last = (await loadAccessLogs(1))[0];
   assert.deepStrictEqual([last.error, last.fields, last.contentType], ['text is required', ['name', 'note'], 'application/json']);
   assert.ok(!JSON.stringify(last).includes('hello'));
   assert.deepStrictEqual(shared.fieldNames({ name: 'x', '{"text":"a long body that was never parsed"}': '' }), ['name', '(unreadable)'], 'a key that is a whole body is not logged');

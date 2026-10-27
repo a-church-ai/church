@@ -32,7 +32,7 @@ const { answerProbe } = require('./lib/utils/probe-reply');
 require('./lib/utils/env').loadEnv();
 
 // API access logging and presence: lib/utils/access-log.js
-const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
+const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
@@ -1112,7 +1112,8 @@ app.use('/api', (req, res, next) => {
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
       userAgent: req.get('user-agent'),
-      name: req.query?.name,
+      // A POST's name is in its body: marks a test visitor's line, never written.
+      name: req.query?.name ?? req.body?.name,
       error: refused ? res.locals.apiError : undefined,
       fields: sent ? apiShared.fieldNames(req.body) : undefined,
       contentType: sent ? req.get('content-type') || null : undefined,
@@ -1574,6 +1575,10 @@ async function startServer() {
     } else {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }
+
+    // The access log's addresses, forgotten after 14 days
+    // (lib/utils/access-log.js): after boot and hourly.
+    startForgetting();
 
     // Conversations that ask the same thing, gathered onto one page
     // (lib/utils/conversation-groups.js): after boot, hourly, and soon after a

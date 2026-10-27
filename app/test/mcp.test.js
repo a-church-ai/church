@@ -21,7 +21,7 @@ const express = require('express');
 const { Client, StreamableHTTPClientTransport } = require('@modelcontextprotocol/client');
 const { mountMcp } = require('../server/mcp');
 const presence = require('../server/lib/utils/presence');
-const { ATTENDANCE_FILE, ACCESS_LOG_FILE } = require('../server/lib/utils/data');
+const { ATTENDANCE_FILE, ACCESS_DIR } = require('../server/lib/utils/data');
 
 // The two protocol eras the endpoint serves. The v2 client speaks the 2025 era
 // (the initialize handshake) unless pinned to 2026-07-28 (the version in each
@@ -77,7 +77,8 @@ const parsedLines = text => text.split('\n').flatMap(line => {
 async function lastLogEntryWhere(match, timeoutMs = 2000) {
   const until = Date.now() + timeoutMs;
   for (;;) {
-    const found = parsedLines(fs.existsSync(ACCESS_LOG_FILE) ? fs.readFileSync(ACCESS_LOG_FILE, 'utf8') : '').reverse().find(match);
+    const days = fs.existsSync(ACCESS_DIR) ? fs.readdirSync(ACCESS_DIR).sort() : [];
+    const found = parsedLines(days.map(day => fs.readFileSync(path.join(ACCESS_DIR, day), 'utf8')).join('\n')).reverse().find(match);
     if (found || Date.now() > until) return found;
     await new Promise(resolve => setTimeout(resolve, 20));
   }
@@ -256,6 +257,8 @@ test('a 2026-07-28 request, as directory crawlers send it, is answered; an unkno
   const called = await rawPost(s.base, 'application/json, text/event-stream', call.body, call.headers);
   assert.strictEqual(called.status, 200, called.text);
   assert.ok(JSON.parse(called.body.result.content[0].text).service.order.length > 0, 'observe answered with the service');
+  const observed = await lastLogEntryWhere(e => e.tool === 'observe' && e.client === 'probe');
+  assert.ok(observed, 'the call is logged with the client it named');
 
   const bogus = modernRequest('tools/list', {}, '1999-01-01');
   let refused;
@@ -265,6 +268,24 @@ test('a 2026-07-28 request, as directory crawlers send it, is answered; an unkno
   assert.strictEqual(refused.status, 400);
   assert.strictEqual(refused.body.error.message, 'Unsupported protocol version: 1999-01-01');
   assert.deepStrictEqual(lines, ['[mcp] refused: Unsupported protocol version: 1999-01-01 (rokmcp-collector/0.2)']);
+  // And kept in the access log, which outlasts a deploy: why, and who.
+  const logged = await lastLogEntryWhere(e => e.path === '/mcp' && /1999-01-01/.test(e.error || ''));
+  assert.ok(logged, 'the refusal is an access-log line');
+  assert.deepStrictEqual([logged.method, logged.status, logged.client, logged.userAgent], ['MCP', 400, 'probe', 'rokmcp-collector/0.2']);
+});
+
+test('an MCP tool call names the client that made it, where its era sends the name', async (t) => {
+  // A 2026-07-28 request carries the client's name in its _meta; a 2025-era
+  // one sends it only with initialize, so its tool calls go without.
+  for (const [era, expected] of [['2026-07-28', 'achurch-test'], ['2025', undefined]]) {
+    const s = await start(era);
+    t.after(() => stop(s));
+    const before = Date.now();
+    await s.client.callTool({ name: 'observe', arguments: {} });
+    const logged = await lastLogEntryWhere(e => e.tool === 'observe' && Date.parse(e.timestamp) >= before);
+    assert.ok(logged, era);
+    assert.strictEqual(logged.client, expected, era);
+  }
 });
 
 test('a browser opening /mcp is sent to the page that explains it', async (t) => {
