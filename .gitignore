@@ -54,6 +54,7 @@ app/media/thumbnails/
 app/media/audio/
 app/media/audio-takes/
 app/media/audio-work/
+app/media/video/
 audio/*.bak
 audio/*.tmp
 

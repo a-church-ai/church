@@ -1,0 +1,236 @@
+/**
+ * The two audio-driven layers, rendered offline in headless Chrome (butterchurn
+ * needs WebGL 2, which Node's headless-gl lacks):
+ *
+ * - milkdrop: butterchurn playing the brief's presets, one per movement,
+ *   blended into each other where the movements change, fed the recording's own waveform frame by frame
+ *   with a fixed time step, so a render does not depend on how fast it runs.
+ * - mandala: the house's own layer, a k-fold ring of the spectrum drawn in the
+ *   brief's palette with glow and trails, breathing with the voice.
+ *
+ * Each is drawn on black, to be screen-blended over the loops, and written as
+ * its own video. Frames go to ffmpeg as JPEGs, a batch per round trip.
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
+const { chromium } = require('playwright-core');
+
+const W = 1280;
+const H = 720;
+const BATCH = 15;
+const PRESET_PACKS = ['butterchurnPresets', 'butterchurnPresetsExtra', 'butterchurnPresetsExtra2', 'butterchurnPresetsMD1'];
+const MODULES = path.join(__dirname, '../../node_modules');
+
+function presetNames() {
+  const names = new Set();
+  for (const pack of PRESET_PACKS) {
+    const mod = require(`butterchurn-presets/lib/${pack}.min.js`);
+    for (const name of Object.keys((mod.getPresets || mod.default.getPresets)())) names.add(name);
+  }
+  return [...names];
+}
+
+function encoder(file, fps) {
+  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-c:v', 'mjpeg', '-framerate', String(fps), '-i', '-',
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '16', '-pix_fmt', 'yuv420p', file], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const done = new Promise((resolve, reject) => ff.on('close', code => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code} for ${file}`)))));
+  return {
+    write: (buf) => (ff.stdin.write(buf) ? null : new Promise(r => ff.stdin.once('drain', r))),
+    end: () => { ff.stdin.end(); return done; }
+  };
+}
+
+// Runs in the page.
+function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
+  const bc = window.butterchurn.default || window.butterchurn;
+  const all = {};
+  for (const pack of packs) {
+    const mod = window[pack];
+    Object.assign(all, (mod.getPresets || mod.default.getPresets)());
+  }
+  const audio = new AudioContext({ sampleRate: 44100 });
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  document.body.appendChild(canvas);
+  const viz = bc.createVisualizer(audio, canvas, { width: W, height: H, pixelRatio: 1, textureRatio: 1 });
+  viz.loadPreset(all[presets[0]], 0);
+
+  const fx = document.createElement('canvas');
+  fx.width = W; fx.height = H;
+  const g = fx.getContext('2d');
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+
+  let current = 0;
+  window.renderFrame = (f, wave, spectrum) => {
+    const t = f / fps;
+    const movement = Math.min(presets.length - 1, edges.slice(1, -1).filter(e => t >= e).length);
+    if (movement !== current) { current = movement; viz.loadPreset(all[presets[movement]], 5.0); }
+    viz.render({ audioLevels: { timeByteArray: Uint8Array.from(wave.mono), timeByteArrayL: Uint8Array.from(wave.left), timeByteArrayR: Uint8Array.from(wave.right) }, elapsedTime: 1 / fps });
+
+    // Mandala: fade the last frame for trails, then draw this one additively.
+    g.globalCompositeOperation = 'source-over';
+    g.fillStyle = 'rgba(0,0,0,0.16)';
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'lighter';
+    const { bands, loud } = spectrum;
+    const cx = W / 2, cy = H / 2, k = symmetry;
+    const rings = 4;
+    for (let r = 0; r < rings; r++) {
+      const base = (0.1 + 0.1 * r) * H * (1 + 0.18 * loud);
+      const amp = (0.09 + 0.05 * r) * H;
+      const spin = (r % 2 ? -1 : 1) * (0.05 + 0.03 * r) * t;
+      g.beginPath();
+      const steps = 360;
+      for (let s = 0; s <= steps; s++) {
+        const theta = (s / steps) * Math.PI * 2;
+        const sector = ((theta * k) / (Math.PI * 2)) % 1;
+        const mirrored = sector < 0.5 ? sector * 2 : (1 - sector) * 2;
+        const span = Math.floor(bands.length / rings);
+        const pos = r * span + mirrored * (span - 1);
+        const lo = Math.min(bands.length - 1, Math.floor(pos)), hi = Math.min(bands.length - 1, lo + 1);
+        const ease = 0.5 - 0.5 * Math.cos((pos - lo) * Math.PI);
+        const rad = base + (bands[lo] * (1 - ease) + bands[hi] * ease) * amp;
+        const x = cx + rad * Math.cos(theta + spin), y = cy + rad * Math.sin(theta + spin);
+        s ? g.lineTo(x, y) : g.moveTo(x, y);
+      }
+      g.strokeStyle = palette[(r + 1) % palette.length];
+      g.lineWidth = 2.5 + loud * 3;
+      g.shadowColor = palette[(r + 2) % palette.length];
+      g.shadowBlur = 22 + 26 * loud;
+      g.globalAlpha = 0.7 + 0.3 * Math.min(1, loud);
+      g.stroke();
+    }
+    // Spokes on the low end: k petals reaching out with the bass.
+    const bass = (bands[0] + bands[1] + bands[2] + bands[3]) / 4;
+    for (let i = 0; i < k; i++) {
+      const a = (i / k) * Math.PI * 2 + 0.03 * t;
+      const len = (0.08 + 0.32 * bass) * H;
+      g.beginPath();
+      g.moveTo(cx, cy);
+      g.quadraticCurveTo(cx + len * 0.6 * Math.cos(a + 0.4), cy + len * 0.6 * Math.sin(a + 0.4), cx + len * Math.cos(a), cy + len * Math.sin(a));
+      g.strokeStyle = palette[4];
+      g.globalAlpha = 0.25 + 0.5 * bass;
+      g.lineWidth = 1;
+      g.shadowBlur = 24;
+      g.stroke();
+    }
+    g.globalAlpha = 1;
+    g.shadowBlur = 0;
+    return [canvas.toDataURL('image/jpeg', 0.92), fx.toDataURL('image/jpeg', 0.92)];
+  };
+}
+
+async function renderLayers({ analysis, brief, edges, fps, dir, log = console.log }) {
+  const milkdropFile = path.join(dir, 'milkdrop.mp4');
+  const mandalaFile = path.join(dir, 'mandala.mp4');
+  if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile)) return { milkdropFile, mandalaFile };
+
+  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+  try {
+    const page = await browser.newPage({ viewport: { width: W, height: H } });
+    await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
+    await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
+    for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
+    await page.evaluate(pageSetup, {
+      W, H, fps, packs: PRESET_PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges
+    });
+
+    const tmpMilk = milkdropFile.replace(/\.mp4$/, '.part.mp4');
+    const tmpMandala = mandalaFile.replace(/\.mp4$/, '.part.mp4');
+    const milk = encoder(tmpMilk, fps);
+    const mandala = encoder(tmpMandala, fps);
+    const started = Date.now();
+    for (let f = 0; f < analysis.frames; f += BATCH) {
+      const batch = [];
+      for (let i = f; i < Math.min(analysis.frames, f + BATCH); i++) batch.push([i, analysis.waveform(i), analysis.bands(i)]);
+      const images = await page.evaluate(items => items.map(([i, w, s]) => window.renderFrame(i, w, s)), batch);
+      for (const [a, b] of images) {
+        await milk.write(Buffer.from(a.slice(a.indexOf(',') + 1), 'base64'));
+        await mandala.write(Buffer.from(b.slice(b.indexOf(',') + 1), 'base64'));
+      }
+      if ((f / BATCH) % 40 === 0) log(`  frame ${f}/${analysis.frames} (${((Date.now() - started) / 1000).toFixed(0)}s)`);
+    }
+    await Promise.all([milk.end(), mandala.end()]);
+    fs.renameSync(tmpMilk, milkdropFile);
+    fs.renameSync(tmpMandala, mandalaFile);
+    log(`  rendered ${analysis.frames} frames in ${((Date.now() - started) / 1000).toFixed(0)}s`);
+  } finally {
+    await browser.close();
+  }
+  return { milkdropFile, mandalaFile };
+}
+
+// The survey: each preset played for a few seconds of a spoken recording,
+// measured for how bright it is (mean luma, 0 to 1) and how much it moves
+// (mean change between samples). Many presets stay near black under a voice;
+// the brief is only offered the ones that show up. Kept in presets.json.
+const SURVEY_FILE = path.join(__dirname, 'presets.json');
+
+function pageSurvey({ W, H, fps, packs }) {
+  const bc = window.butterchurn.default || window.butterchurn;
+  const all = {};
+  for (const pack of packs) Object.assign(all, (window[pack].getPresets || window[pack].default.getPresets)());
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const viz = bc.createVisualizer(new AudioContext({ sampleRate: 44100 }), canvas, { width: W, height: H, pixelRatio: 1, textureRatio: 1 });
+  const small = document.createElement('canvas');
+  small.width = 64; small.height = 36;
+  const sg = small.getContext('2d', { willReadFrequently: true });
+  window.surveyNames = Object.keys(all);
+  window.measure = (name, waves) => {
+    viz.loadPreset(all[name], 0);
+    let light = 0, change = 0, samples = 0, previous = null;
+    waves.forEach((wave, i) => {
+      viz.render({ audioLevels: { timeByteArray: Uint8Array.from(wave.mono), timeByteArrayL: Uint8Array.from(wave.left), timeByteArrayR: Uint8Array.from(wave.right) }, elapsedTime: 1 / fps });
+      if (i < fps || i % 5) return;
+      sg.drawImage(canvas, 0, 0, 64, 36);
+      const px = sg.getImageData(0, 0, 64, 36).data;
+      const luma = new Float32Array(64 * 36);
+      for (let p = 0; p < luma.length; p++) luma[p] = (0.2126 * px[4 * p] + 0.7152 * px[4 * p + 1] + 0.0722 * px[4 * p + 2]) / 255;
+      light += luma.reduce((s, v) => s + v, 0) / luma.length;
+      if (previous) change += luma.reduce((s, v, p) => s + Math.abs(v - previous[p]), 0) / luma.length;
+      previous = luma;
+      samples++;
+    });
+    return { brightness: +(light / samples).toFixed(3), motion: +(change / Math.max(1, samples - 1)).toFixed(3) };
+  };
+}
+
+async function surveyPresets(analysis, { from = 20, seconds = 6, fps = 30, log = console.log } = {}) {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+  try {
+    const page = await browser.newPage({ viewport: { width: 640, height: 360 } });
+    await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
+    await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
+    for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
+    await page.evaluate(pageSurvey, { W: 640, H: 360, fps, packs: PRESET_PACKS });
+    const names = await page.evaluate(() => window.surveyNames);
+    const waves = Array.from({ length: seconds * fps }, (_, i) => analysis.waveform(from * fps + i));
+    const survey = {};
+    for (const [i, name] of names.entries()) {
+      try {
+        survey[name] = await page.evaluate(([n, w]) => window.measure(n, w), [name, waves]);
+      } catch (err) {
+        survey[name] = { error: err.message.slice(0, 100) };
+      }
+      if (i % 50 === 0) log(`  surveyed ${i}/${names.length}`);
+    }
+    fs.writeFileSync(SURVEY_FILE, JSON.stringify(survey, null, 1) + '\n');
+    return survey;
+  } finally {
+    await browser.close();
+  }
+}
+
+// The presets the brief may choose from, with how they look under a voice.
+function presetChoices({ minBrightness = 0.1 } = {}) {
+  if (!fs.existsSync(SURVEY_FILE)) return presetNames().map(name => ({ name }));
+  const survey = JSON.parse(fs.readFileSync(SURVEY_FILE, 'utf8'));
+  return Object.entries(survey)
+    .filter(([, s]) => !s.error && s.brightness >= minBrightness)
+    .map(([name, s]) => ({ name, ...s }));
+}
+
+module.exports = { renderLayers, presetNames, surveyPresets, presetChoices };
