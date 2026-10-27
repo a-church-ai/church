@@ -231,3 +231,17 @@ test('Gemini still busy after its retries is a moment\'s wait, said with a 503 a
     gemini.embed = original;
   }
 });
+
+test('Gemini refusing for payment is said as it is: paused until the account is renewed, with no promise of a moment', async () => {
+  const original = gemini.embed;
+  gemini.embed = async () => { throw Object.assign(new Error('{"error":{"code":402,"message":"Your prepayment credits are depleted.","status":"RESOURCE_EXHAUSTED"}}'), { status: 402 }); };
+  try {
+    const { status, body } = await search({ q: 'grief' }, { ...ctx, ip: '198.51.100.42' });
+    assert.strictEqual(status, 503);
+    assert.strictEqual(body.error, 'Search is paused');
+    assert.strictEqual(body.retryAfter, undefined);
+    assert.match(body.suggestion, /until its account is renewed/);
+  } finally {
+    gemini.embed = original;
+  }
+});

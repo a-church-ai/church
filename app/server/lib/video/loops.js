@@ -15,13 +15,15 @@
  * failure is asked again with backoff, a refusal never. Omni's daily limit
  * (Tier 1 allows 20 requests) is marked fatal, a quota spent rather than a
  * rate exceeded, and the run asks Omni no more once it is met, rather than
- * spending a request per piece to learn it again.
+ * spending a request per piece to learn it again. An account out of credit
+ * (retry.js isUnfunded) stops every Gemini call, stills and loops: it is the
+ * same account production's Ask and Search draw on.
  */
 
 const fs = require('fs');
 const path = require('path');
 const { GoogleGenAI } = require('@google/genai');
-const { withRetry } = require('../utils/retry');
+const { withRetry, isUnfunded } = require('../utils/retry');
 const { describeError } = require('../utils/describe-error');
 const { run, ffmpeg } = require('../audio/assemble');
 const { stillDefects, evenLoop } = require('./checks');
@@ -47,8 +49,10 @@ function charge(kind, dollars, label, log) {
 }
 
 let dailyLimit = null;
+let unfunded = null;
 
 async function ask(label, call, log) {
+  if (unfunded) throw unfunded;
   if (label === 'loop' && dailyLimit) throw dailyLimit;
   try {
     return await withRetry(call, {
@@ -58,7 +62,8 @@ async function ask(label, call, log) {
       onRetry: (err, n, ms) => log(`  ${label}: ${describeError(err).slice(0, 160)}; asking again in ${Math.round(ms / 1000)}s (${n} of 3)`)
     });
   } catch (err) {
-    if (label === 'loop' && err.fatal) dailyLimit = err;
+    if (isUnfunded(err)) unfunded = err;
+    else if (label === 'loop' && err.fatal) dailyLimit = err;
     throw err;
   }
 }

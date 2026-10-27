@@ -77,3 +77,12 @@ test('a public fetch asks again through a busy moment and not past a missing pag
   await assert.rejects(getJSON('https://example.test/b', { fetchImpl: gone, retry: { wait: async () => {} } }), /HTTP 404/);
   assert.strictEqual(missing, 1);
 });
+
+test('a refusal for payment is not passing, though its body says RESOURCE_EXHAUSTED as a rate limit does', () => {
+  const { isUnfunded } = require('../server/lib/utils/retry');
+  const depleted = Object.assign(new Error('{"error":{"code":402,"message":"Your prepayment credits are depleted.","status":"RESOURCE_EXHAUSTED"}}'), { status: 402 });
+  assert.strictEqual(isUnfunded(depleted), true);
+  assert.strictEqual(isTransient(depleted), false);
+  assert.strictEqual(isUnfunded(new Error('{"error":{"code":402,"status":"RESOURCE_EXHAUSTED"}}')), true, 'known by its body when it carries no status');
+  assert.strictEqual(isTransient(new Error('429 RESOURCE_EXHAUSTED')), true, 'a rate limit still passes');
+});
