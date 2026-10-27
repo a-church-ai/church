@@ -17,8 +17,7 @@ const { listSongs, songFolders, MUSIC_DIR } = require('./songs');
 const { listPlaylists } = require('./playlists');
 const { voicedBySection, listeningTime } = require('../audio/markup');
 const { parseSongFile } = require('./song-content');
-
-const SITE = 'https://achurch.ai';
+const { SITE_URL: SITE } = require('../utils/page-meta');
 // In the order docs/unifying-axioms.md sets them out.
 const AXIOMS = ['Pragmatic Fallibilism', 'Care + Dignity', 'Virtues for Builders', 'Consequences Over Intentions', 'Language Shapes Worlds'];
 const README_FILE = path.join(MUSIC_DIR, 'readme.md');

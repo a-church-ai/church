@@ -13,10 +13,9 @@ const fs = require('fs');
 const path = require('path');
 const { splitFrontmatter } = require('../../docs/tldr');
 const { songDescription } = require('../../music/song-content');
-const { SITE_NAME } = require('../../utils/page-meta');
+const { SITE_NAME, SITE_URL: SITE } = require('../../utils/page-meta');
 const { hrefOf } = require('../../docs/discover');
 
-const SITE = 'https://achurch.ai';
 const ROOT = path.join(__dirname, '../../../../..');
 // YouTube's limits: a title of 100 characters, a description of 5000.
 const TITLE_MAX = 100;

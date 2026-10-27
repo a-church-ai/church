@@ -14,7 +14,8 @@
  * not among the platforms). Bluesky and X take a cut fitted to their limits
  * (lib/video/publish/cut.js).
  *
- * What was posted where is kept in media/video/<slug>/published.json, written
+ * What was posted where is kept in media/video/<slug>/published.json
+ * (lib/video/publish/record.js), written
  * before an upload starts and again when it ends. A platform whose last
  * attempt started and never finished is left alone: check it there, then
  * delete its entry to try again. YouTube is also searched for the piece's
@@ -36,6 +37,7 @@ const { analyse } = require('../server/lib/video/analysis');
 const { pieceFor, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
 const { metadataFor } = require('../server/lib/video/publish/metadata');
 const { cutFor } = require('../server/lib/video/publish/cut');
+const { readRecord, writeRecord } = require('../server/lib/video/publish/record');
 const youtube = require('../server/lib/video/publish/youtube');
 const bluesky = require('../server/lib/video/publish/bluesky');
 const x = require('../server/lib/video/publish/x');
@@ -62,14 +64,6 @@ function parseArgs(argv) {
   return opts;
 }
 
-const recordFile = (slug) => path.join(VIDEO_DIR, slug, 'published.json');
-const readRecord = (slug) => (fs.existsSync(recordFile(slug)) ? JSON.parse(fs.readFileSync(recordFile(slug), 'utf8')) : {});
-function writeRecord(slug, platform, entry) {
-  const record = readRecord(slug);
-  record[platform] = entry;
-  fs.writeFileSync(recordFile(slug), JSON.stringify(record, null, 2));
-}
-
 async function post(slug, opts) {
   const log = (m) => console.log(`[${slug}] ${m}`);
   const dir = path.join(VIDEO_DIR, slug);
@@ -85,7 +79,7 @@ async function post(slug, opts) {
   let link = meta.page;
 
   for (const platform of opts.to) {
-    const done = readRecord(slug)[platform];
+    const done = (await readRecord(slug))[platform];
     if (done?.url) {
       log(`${platform}: already posted, ${done.url}`);
       if (platform === 'youtube') link = done.url;
@@ -106,21 +100,21 @@ async function post(slug, opts) {
       if (platform === 'x') log(`  text:\n${x.postText(meta, link).replace(/^/gm, '    ')}`);
       continue;
     }
-    writeRecord(slug, platform, { started: new Date().toISOString() });
+    await writeRecord(slug, platform, { started: new Date().toISOString() });
     const result = platform === 'youtube'
       ? await youtube.publish({ file, meta, kind: piece.kind, privacy: opts.privacy, log })
       : await (platform === 'bluesky' ? bluesky : x).publish({ file: cut.file, meta, link, log });
-    writeRecord(slug, platform, { at: new Date().toISOString(), ...result });
+    await writeRecord(slug, platform, { at: new Date().toISOString(), ...result });
     log(`${platform}: ${result.found ? 'already there, ' : ''}${result.url}`);
     if (platform === 'youtube') link = result.url;
   }
 }
 
 async function promote(slug, privacy) {
-  const done = readRecord(slug).youtube;
+  const done = (await readRecord(slug)).youtube;
   if (!done?.id) throw new Error('not on YouTube yet');
   await youtube.setPrivacy(done.id, privacy);
-  writeRecord(slug, 'youtube', { ...done, privacy });
+  await writeRecord(slug, 'youtube', { ...done, privacy });
   console.log(`[${slug}] youtube: now ${privacy}, ${done.url}`);
 }
 

@@ -27,7 +27,10 @@ const { request } = require('./request');
 
 const API = 'https://www.googleapis.com/youtube/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/youtube/v3/videos';
-const SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.force-ssl'];
+// Asked for together when the token is minted, since a token cannot gain a
+// scope later: upload, change a video, captions (force-ssl), and the
+// channel's analytics, which the release schedule reads for its hours.
+const SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube', 'https://www.googleapis.com/auth/youtube.force-ssl', 'https://www.googleapis.com/auth/yt-analytics.readonly'];
 const CHUNK = 8 * 1024 * 1024;
 // YouTube's categories: Music for a song, People & Blogs for spoken pieces.
 const CATEGORY = { song: '10', spoken: '22' };

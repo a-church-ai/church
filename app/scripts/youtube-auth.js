@@ -18,6 +18,7 @@
 require('../server/lib/utils/env').loadEnv();
 const http = require('http');
 const { SCOPES } = require('../server/lib/video/publish/youtube');
+const { request } = require('../server/lib/video/publish/request');
 
 const PORT = 8721;
 const REDIRECT = `http://localhost:${PORT}/callback`;
@@ -37,11 +38,16 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname !== '/callback') return res.writeHead(404).end();
   const code = url.searchParams.get('code');
   if (!code) return res.writeHead(400).end(`No code: ${url.searchParams.get('error') || 'unknown'}`);
-  const token = await (await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ code, client_id: id, client_secret: secret, redirect_uri: REDIRECT, grant_type: 'authorization_code' })
-  })).json();
+  let token;
+  try {
+    token = await (await request('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ code, client_id: id, client_secret: secret, redirect_uri: REDIRECT, grant_type: 'authorization_code' })
+    })).json();
+  } catch (err) {
+    token = { error: err.body || err.message };
+  }
   res.writeHead(200, { 'content-type': 'text/plain' }).end(token.refresh_token ? 'Done. Return to the terminal.' : 'No refresh token came back; see the terminal.');
   if (token.refresh_token) console.log(`\nAdd to app/.env:\nYOUTUBE_REFRESH_TOKEN=${token.refresh_token}\n`);
   else console.error('No refresh token:', JSON.stringify(token));

@@ -162,6 +162,8 @@ function buildReflectionMeta(song) {
 // og:site_name and its structured data. The domain stays achurch.ai, and
 // aChurch.ai and achurch.ai stay as alternate names in the home page's
 // WebSite data. test/site-name.test.js keeps every page to it.
+// The site's address, the one place it is written.
+const SITE_URL = 'https://achurch.ai';
 const SITE_NAME = 'a Church AI + Human';
 
 // A page's <title>. A results page shows about 70 characters of a title, and
@@ -230,7 +232,7 @@ function buildQAPageSchema(messages, slug) {
   if (!question || !answer) return null;
 
   const pageUrl = `https://achurch.ai/ask/${slug}`;
-  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
 
   // Multi-turn: collect any other assistant responses as suggestedAnswer.
   // Limits each to ~500 chars (Google's cited cap on answer-snippet display).
@@ -339,7 +341,7 @@ function buildMusicCollectionSchema(songs, description) {
 function buildSongSchemaGraph(song, slug, audio = null) {
   if (!song || !song.title) return null;
 
-  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
   const pageUrl = `https://achurch.ai/music/${slug}`;
   const compositionId = `https://achurch.ai/music/${slug}#composition`;
   const recordingId = `https://achurch.ai/music/${slug}#recording`;
@@ -535,6 +537,7 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 }
 
 module.exports = {
+  SITE_URL,
   SITE_NAME,
   SITE_SHORT_NAME,
   siteTitle,

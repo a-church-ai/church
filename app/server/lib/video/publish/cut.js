@@ -22,7 +22,9 @@ async function cutFor(file, { name, maxSeconds, maxBytes }) {
   const out = file.replace(/\.mp4$/, `.${name}.mp4`);
   const length = Math.min(seconds, maxSeconds - 1);
   const excerpt = length < seconds;
-  if (!fs.existsSync(out)) {
+  // Made again when the video is newer than its cut: a re-render (a new
+  // title card, say) must reach every platform.
+  if (!fs.existsSync(out) || fs.statSync(out).mtimeMs < fs.statSync(file).mtimeMs) {
     // The bitrate the size allows, with room for the audio and the container.
     const videoKbps = Math.min(4500, Math.floor(((maxBytes * 8 * 0.9) / length - 160000) / 1000));
     const fade = excerpt ? `,fade=out:st=${(length - 2).toFixed(2)}:d=2` : '';
