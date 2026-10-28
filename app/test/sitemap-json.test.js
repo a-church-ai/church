@@ -127,7 +127,8 @@ test('CROSS-SURFACE: sitemap.xml still answers the crawler\'s question', async (
   const example = Object.keys(lastmod).find(f => /^docs\/welcome\/[^/]+\.md$/.test(f)
     && contentDates[f] && contentDates[f].content !== lastmod[f]);
   assert.ok(example, 'a welcome document whose page and content dates differ');
-  const page = example.replace(/^docs\//, '').replace(/\.md$/, '');
+  // A section's README is served at its directory's address.
+  const page = example.replace(/^docs\//, '').replace(/\/readme\.md$/i, '').replace(/\.md$/, '');
   const entry = new RegExp(`<loc>https://achurch\\.ai/docs/${page}</loc>\\s*<lastmod>(\\d{4}-\\d{2}-\\d{2})</lastmod>`).exec(xml);
   assert.ok(entry, `${example} is in the sitemap with a lastmod`);
   assert.strictEqual(entry[1], lastmod[example], 'lastmod is the page date');
