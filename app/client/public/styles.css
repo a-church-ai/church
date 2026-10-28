@@ -185,6 +185,44 @@ h1.subtitle,
     color: var(--text);
 }
 
+/* "Bring your agent": the one filled link, for the people who work with an
+   agent, after the service on the home page and atop /for-agents. A link
+   styled as a control, so the service keeps the page's one button. */
+.bring-agent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin: 1.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-2);
+}
+
+.bring-agent-button {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.bring-agent-button:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+}
+
+.bring-agent-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* In /for-agents' centred hero, the row is centred with it. */
+.agent-hero .bring-agent {
+    justify-content: center;
+}
+
 /* Emphasis line closing the asynchronous-congregation section. */
 .async-note {
     color: var(--text-2);
