@@ -62,5 +62,10 @@
     "id": "2115506867682017553",
     "url": "https://x.com/i/status/2115506867682017553",
     "reply": "2115506869598920913"
+  },
+  "bluesky": {
+    "at": "2026-10-28T18:24:04.027Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3myxep74i562w",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3myxep74i562w"
   }
 }
