@@ -50,16 +50,17 @@ const LAYERS = { width: 720, height: 1280 };
 const PHRASE_GAP = 0.6;
 const PHRASE_WORDS = 14;
 
-// A spoken piece's audio script: its lines, and who says each.
-const scriptOf = (piece) => JSON.parse(fs.readFileSync(path.join(ROOT, 'audio/scripts', piece.doc.replace(/^docs\//, '').replace(/\.md$/, '.json')), 'utf8'));
+// A spoken piece's spoken lines, and who says each: its audio script's lines
+// with text, without its timed silences ({ hold }), which have no cue.
+const spokenOf = (piece) => JSON.parse(fs.readFileSync(path.join(ROOT, 'audio/scripts', piece.doc.replace(/^docs\//, '').replace(/\.md$/, '.json')), 'utf8')).lines.filter(l => l.text);
 
 // A spoken piece's lines with when each is spoken: [{ text, start, end, voice }].
 function spokenLines(piece) {
   const recording = JSON.parse(fs.readFileSync(path.join(ROOT, 'audio/manifest.json'), 'utf8'))[piece.doc];
-  const script = scriptOf(piece);
+  const lines = spokenOf(piece);
   const cues = recording?.cues || [];
-  if (cues.length !== script.lines.length) throw new Error(`${piece.slug}: ${cues.length} cues for ${script.lines.length} lines; run npm run audio to measure its cues again`);
-  return script.lines.map((line, i) => ({ text: line.text, start: cues[i][0], end: cues[i][1], voice: line.role }));
+  if (cues.length !== lines.length) throw new Error(`${piece.slug}: ${cues.length} cues for ${lines.length} spoken lines; run npm run audio to measure its cues again`);
+  return lines.map((line, i) => ({ text: line.text, start: cues[i][0], end: cues[i][1], voice: line.role }));
 }
 
 // The recording heard once, each word with its time, and kept.
@@ -72,7 +73,7 @@ async function heardWords(audio, dir) {
 // The words the captions show: the script's lines, or the song's lyrics
 // without their section marks.
 function writtenWords(piece, text) {
-  if (!piece.song) return scriptOf(piece).lines.map(l => l.text).join('\n');
+  if (!piece.song) return spokenOf(piece).map(l => l.text).join('\n');
   return text.slice(text.indexOf('Lyrics:') + 7).replace(/\[[^\]]*\]/g, ' ');
 }
 

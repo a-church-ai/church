@@ -239,4 +239,7 @@ test('a caption is shown from its first word until the next begins, timed from t
   assert.deepStrictEqual(caps.map(c => c.text), ['The door.', 'Is open.']);
   assert.ok(Math.abs(caps[0].start) < 1e-9 && Math.abs(caps[0].end - 1) < 1e-9);
   assert.ok(Math.abs(caps[1].end - 2.4) < 1e-9, 'the last lingers a moment past its last word');
+  // Through an instrumental the screen clears two seconds after the last word.
+  const sparse = captionsFor([{ text: 'and', start: 10, end: 10.3 }, { text: 'yet.', start: 10.4, end: 11 }, { text: 'Living.', start: 28, end: 29 }], 10, 30);
+  assert.ok(Math.abs(sparse[0].end - 3) < 1e-9, `held until ${sparse[0].end}`);
 });

@@ -46,8 +46,11 @@ const MAX_WORDS = 6;
 const FINISH_WORDS = 2;
 const CLAUSE_WORDS = 4;
 const FLASH = 0.35;
-// How long the last caption stays after its last word.
+// How long the last caption stays after its last word, and the longest any
+// stays after its last word before the next: through an instrumental, the
+// screen clears.
 const LINGER = 0.6;
+const HOLD = 2;
 
 const key = (word) => wordsOf(word).join('');
 
@@ -149,8 +152,9 @@ function groupCaptions(words) {
 
 /**
  * The captions of a passage [from, to) of the piece, timed from the
- * passage's start: each shown from its first word until the next begins, the
- * last a moment past its last word.
+ * passage's start: each shown from its first word until the next begins, or
+ * two seconds past its last word if that comes first; the last a moment past
+ * its last word.
  */
 function captionsFor(words, from, to) {
   const inside = words.filter(w => w.start >= from - 0.05 && w.end <= to + 0.05);
@@ -159,7 +163,7 @@ function captionsFor(words, from, to) {
   return cues.map((cue, k) => ({
     text: cue.words.join(' '),
     start: Math.max(0, cue.start - from),
-    end: Math.min(length, k + 1 < cues.length ? cues[k + 1].start - from : cue.end - from + LINGER)
+    end: Math.min(length, k + 1 < cues.length ? Math.min(cues[k + 1].start, cue.end + HOLD) - from : cue.end - from + LINGER)
   })).filter(c => c.end - c.start > 0.05);
 }
 
