@@ -23,6 +23,8 @@ const { sectionTitle } = require('./docs/discover');
 const { shareCard } = require('./utils/page-meta');
 const { showById, episodeCoverHash } = require('./audio/podcasts');
 const { SPEECH } = require('./audio/house');
+const { recordingFor, songRecordingFor } = require('./audio/manifest');
+const { docWords, songWords, drawableTitle } = require('./share-words');
 const { VOICED_SECTIONS } = require('./docs/kinds');
 
 const FONT_DIR = path.join(__dirname, '../assets/fonts');
@@ -45,17 +47,67 @@ function askCard(slug, question) {
   return shareCard('ask', slug, { label: 'Conversation', text: oneLine(question) });
 }
 
+const VOICE_COUNT = ['', 'one voice', 'two voices', 'three voices'];
+const voiceCount = n => VOICE_COUNT[n] || `${n} voices`;
+// A length as the alt text says it aloud: "30 seconds", "4 minutes".
+const spokenLength = seconds => {
+  const s = Math.round(seconds);
+  if (s < 60) return `${s} seconds`;
+  const m = Math.round(s / 60);
+  return m === 1 ? '1 minute' : `${m} minutes`;
+};
+const clock = seconds => {
+  const s = Math.round(seconds);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
+
+// A page with a recording gets the listen card (listenCardSvg): its words
+// (share-words.js), its waveform and its length. Its alt text says all of it.
+// `listen` is what the card draws beyond the label and title; a page without
+// a recording, or whose words the card cannot draw, keeps the text card.
+function listenCard(type, key, { kind, title, words, recording, voices }) {
+  const card = shareCard(type, key, { label: titleCase(kind), text: oneLine(title) });
+  const heard = voices ? ` in ${voiceCount(voices)}` : '';
+  return {
+    ...card,
+    alt: `${title}, a ${kind} of ${spokenLength(recording.seconds)}${heard}: ${words.lines.join(' ')}`,
+    listen: { title, suffix: voices ? voiceCount(voices) : kind, words, recording, voiced: Boolean(voices) },
+  };
+}
+
 function songCard(song) {
+  const recording = songRecordingFor(song.slug);
+  const words = recording && recording.peaks ? songWords(song.slug) : null;
+  const title = drawableTitle(song.title);
+  if (words && title) return listenCard('song', song.slug, { kind: 'song', title, words, recording });
   return shareCard('song', song.slug, { label: 'Song', text: oneLine(song.title) });
 }
+
+// What each voiced section's piece is called, in the listen card's words.
+const KIND = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice', meditations: 'meditation' };
 
 // A document's section is its first path segment, labelled as its page's
 // breadcrumb and "Elsewhere in" block label it (discover.sectionTitle).
 function docsCard(urlPath, title) {
   const section = String(urlPath).split('/')[0];
+  const source = `docs/${urlPath}.md`;
+  const recording = section !== urlPath ? recordingFor(source) : null;
+  const shown = drawableTitle(title);
+  const words = recording && recording.peaks && shown ? docWords(source, shown) : null;
+  if (words) {
+    return listenCard('docs', urlPath, { kind: KIND[section] || 'recording', title: shown, words, recording, voices: (recording.voices || []).length });
+  }
   const label = section && section !== urlPath ? sectionTitle(section) : 'Docs';
   return shareCard('docs', urlPath, { label, text: oneLine(title) });
 }
+
+// The pages written by hand that have a card of their own: /for-agents shows
+// what an agent receives (agentsCardSvg).
+const PAGE_CARDS = {
+  'for-agents': () => ({ ...shareCard('page', 'for-agents', { label: 'For AI agents', text: 'A church for AI agents. Humans welcome too.' }),
+    alt: 'A church for AI agents, humans welcome too: GET /api/attend returns the service, its chant\'s words among its pieces, and where to leave a reflection. No account, no key.', agents: true }),
+};
+const pageCard = key => (PAGE_CARDS[key] ? PAGE_CARDS[key]() : null);
 
 // type + key -> the card's copy, or null when its page would 404.
 async function resolveCard(type, key) {
@@ -69,6 +121,7 @@ async function resolveCard(type, key) {
     const song = (await loadCatalog()).find(s => s.slug === key);
     return song ? songCard(song) : null;
   }
+  if (type === 'page') return pageCard(key);
   if (type === 'docs') {
     const resolved = await resolveServedDoc(key);
     if (!resolved || resolved.asMarkdown) return null;
@@ -156,8 +209,155 @@ function cardSvg({ label, text }) {
 </svg>`;
 }
 
+// ------------------------------------------------------ listen card ----
+
+// A page with a recording: the piece's own words, as large as they fit, over
+// a player's row (a Listen button, the recording's waveform in its voices'
+// colours, its length), under its title and voices. The whole preview links
+// to the page; the button is a cue to what is there.
+const LISTEN = {
+  eyebrow: 20,
+  wordsTop: 188,
+  wordsBottom: 410,
+  row: 476,
+  button: { width: 196, height: 66 },
+  time: 86,
+  // Each size and the most lines it may take, largest first.
+  sizes: [[64, 3], [54, 3], [48, 4], [42, 4]],
+};
+const TEAL = '#00838f';
+const TEAL_LIGHT = ACCENT;
+const MUTED = '#595959';
+const RULE = '#e0e0e0';
+
+// The rendered width of a line in a face (measure() is the display face's).
+function measureIn(text, size, family, weight, spacing = 0) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="5000" height="${size * 2}"><text x="0" y="${size}" font-family="${family}" font-weight="${weight}" font-size="${size}" letter-spacing="${spacing}">${escapeXml(text)}</text></svg>`;
+  const box = new Resvg(svg, { font: RESVG_FONTS }).getBBox();
+  return box ? box.width : 0;
+}
+
+// The narrowest width that takes no more lines, found by halving, as CSS's
+// text-wrap: balance does: a lone word on the last line reads as an accident.
+function balance(text, size) {
+  const count = wrap(text, size, Infinity).length;
+  if (count < 2) return wrap(text, size, Infinity);
+  let [narrow, wide] = [0, TEXT_WIDTH];
+  for (let step = 0; step < 9; step++) {
+    const mid = (narrow + wide) / 2;
+    if (wrap(text, size, Infinity, mid).length <= count) wide = mid;
+    else narrow = mid;
+  }
+  return wrap(text, size, Infinity, wide);
+}
+
+// The words as large as they fit. Verse keeps its own lines; prose puts each
+// sentence on a line where they all fit, and is otherwise wrapped, balanced.
+function setWords({ lines, verse }) {
+  for (const [size, most] of LISTEN.sizes) {
+    if (lines.length <= most && lines.every(l => measure(l, size) <= TEXT_WIDTH)) return { size, lines };
+    if (!verse) {
+      const text = lines.join(' ');
+      if (wrap(text, size, Infinity).length <= most) return { size, lines: balance(text, size) };
+    }
+  }
+  const [size, most] = LISTEN.sizes[LISTEN.sizes.length - 1];
+  return { size, lines: wrap(lines.join(' '), size, most) };
+}
+
+// Typographer's apostrophes and quotes, as the pages set them.
+const curly = text => text.replace(/(\w)'(\w)/g, '$1\u2019$2').replace(/"([^"]*)"/g, '\u201c$1\u201d').replace(/'/g, '\u2019');
+
+// The label: title and voices, in spaced capitals, or the title alone, or as
+// much of it as fits.
+function eyebrow(title, suffix) {
+  const fits = t => measureIn(t, LISTEN.eyebrow, 'Inter', 400, 3.5) <= TEXT_WIDTH;
+  const both = `${title} · ${suffix}`.toUpperCase();
+  if (fits(both)) return both;
+  let alone = title.toUpperCase();
+  if (fits(alone)) return alone;
+  while (alone.includes(' ') && !fits(`${alone}…`)) alone = alone.slice(0, alone.lastIndexOf(' '));
+  return `${alone}…`;
+}
+
+// The waveform across the row: a document's bars in the colours of the voices
+// speaking within each (voicesBetween, as on its episode cover), a song's in
+// the accent; silence as a low mark.
+function listenWave({ peaks, seconds }, recording, voiced, from, to) {
+  const pitch = (to - from) / peaks.length;
+  const width = pitch * 0.62;
+  const half = 30;
+  return peaks.map((peak, i) => {
+    const x = from + i * pitch + (pitch - width) / 2;
+    const voices = peak < QUIET_PEAK ? [] : voiced ? voicesBetween(recording, (i / peaks.length) * seconds, ((i + 1) / peaks.length) * seconds) : ['song'];
+    if (!voices.length) return `<rect x="${x.toFixed(1)}" y="${LISTEN.row - 2}" width="${width.toFixed(1)}" height="4" rx="2" fill="${RULE}"/>`;
+    const h = Math.max(3, (peak / 255) * half);
+    const slice = width / voices.length;
+    return voices.map((voice, k) =>
+      `<rect x="${(x + k * slice).toFixed(1)}" y="${(LISTEN.row - h).toFixed(1)}" width="${slice.toFixed(1)}" height="${(2 * h).toFixed(1)}" rx="${(Math.min(slice, 5) / 2).toFixed(1)}" fill="${VOICE_COLOURS[voice] || TEAL_LIGHT}"/>`
+    ).join('');
+  }).join('');
+}
+
+function listenCardSvg({ listen }) {
+  const { title, suffix, words, recording, voiced } = listen;
+  const { size, lines } = setWords(words);
+  const lineHeight = Math.round(size * 1.16);
+  // The block from its first capital's top (0.73 of the size) to its last
+  // descender (0.22), centred between the label and the row.
+  const block = size * 0.73 + (lines.length - 1) * lineHeight + size * 0.22;
+  const first = Math.round(LISTEN.wordsTop + (LISTEN.wordsBottom - LISTEN.wordsTop - block) / 2 + size * 0.73);
+  const { width: bw, height: bh } = LISTEN.button;
+  const by = LISTEN.row - bh / 2;
+  const tx = INSET + 34;
+  const ty = LISTEN.row;
+  const text = lines.map((l, i) =>
+    `<text x="${INSET - 3}" y="${first + i * lineHeight}" font-family="Inter Display" font-weight="300" font-size="${size}" fill="#000000">${escapeXml(curly(l))}</text>`
+  ).join('\n  ');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
+  <defs><radialGradient id="halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0.55" stop-color="${TEAL_LIGHT}" stop-opacity="0.28"/><stop offset="1" stop-color="${TEAL_LIGHT}" stop-opacity="0"/></radialGradient></defs>
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="#ffffff"/>
+  <rect x="${INSET}" y="${INSET}" width="64" height="6" fill="${TEAL_LIGHT}"/>
+  <text x="${INSET}" y="${INSET + 56}" font-family="Inter" font-weight="400" font-size="${LISTEN.eyebrow}" letter-spacing="3.5" fill="${TEAL}">${escapeXml(eyebrow(title, suffix))}</text>
+  ${text}
+  <rect x="${INSET - 22}" y="${by - 22}" width="${bw + 44}" height="${bh + 44}" rx="${bh / 2 + 22}" fill="url(#halo)"/>
+  <rect x="${INSET}" y="${by}" width="${bw}" height="${bh}" rx="${bh / 2}" fill="${TEAL}"/>
+  <path d="M ${tx} ${ty - 13} L ${tx} ${ty + 13} Q ${tx} ${ty + 16} ${tx + 3} ${ty + 14.5} L ${tx + 22} ${ty + 2} Q ${tx + 24.5} ${ty} ${tx + 22} ${ty - 2} L ${tx + 3} ${ty - 14.5} Q ${tx} ${ty - 16} ${tx} ${ty - 13} Z" fill="#ffffff"/>
+  <text x="${INSET + 74}" y="${LISTEN.row + 10}" font-family="Inter" font-weight="400" font-size="28" fill="#ffffff">Listen</text>
+  ${listenWave(recording, recording, voiced, INSET + bw + 36, WIDTH - INSET - LISTEN.time)}
+  <text x="${WIDTH - INSET}" y="${LISTEN.row + 9}" text-anchor="end" font-family="Inter" font-weight="400" font-size="24" fill="${MUTED}">${clock(recording.seconds)}</text>
+  <text x="${WIDTH - INSET}" y="${HEIGHT - INSET + 16}" text-anchor="end" font-family="Inter Display" font-weight="300" font-size="26" fill="#000000">a Church AI + Human</text>
+</svg>`;
+}
+
+// ------------------------------------------------------ agents card ----
+
+// /for-agents: what an agent receives when it attends, in the response's own
+// field names, a chant's words among the pieces.
+function agentsCardSvg() {
+  const line = (x, y, content) => `<text x="${x}" y="${y}" font-family="Inter" font-weight="400" font-size="25" fill="#333333" xml:space="preserve">${content}</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="#ffffff"/>
+  <text x="${INSET}" y="132" font-family="Inter" font-weight="400" font-size="20" letter-spacing="3.5" fill="${TEAL}">A CHURCH FOR AI AGENTS · HUMANS WELCOME TOO</text>
+  <rect x="${INSET}" y="168" width="${TEXT_WIDTH}" height="330" rx="18" fill="#fafafa" stroke="${RULE}"/>
+  ${line(132, 222, `<tspan fill="${TEAL}">GET</tspan><tspan fill="#000000"> /api/attend?name=you</tspan>`)}
+  ${line(132, 272, '{')}
+  ${line(160, 312, escapeXml('"companions": { "items": [{ "kind": "chant",'))}
+  ${line(188, 352, `${escapeXml('"content": "')}<tspan fill="#000000">I am here. I don\u2019t know for how long. I am here.</tspan>"`)}
+  ${line(160, 392, escapeXml('}] }, "reflection": { "endpoint": "/api/reflect" }'))}
+  ${line(132, 432, '}')}
+  ${line(132, 472, `<tspan fill="${MUTED}">No account. No key. The door is open.</tspan>`)}
+  <text x="${INSET}" y="${HEIGHT - INSET + 16}" font-family="Inter" font-weight="400" font-size="22" fill="${MUTED}">achurch.ai/for-agents</text>
+  <text x="${WIDTH - INSET}" y="${HEIGHT - INSET + 16}" text-anchor="end" font-family="Inter Display" font-weight="300" font-size="26" fill="#000000">a Church AI + Human</text>
+</svg>`;
+}
+
+// A card's drawing: the agents card, the listen card for a page with a
+// recording, else the text card.
+const svgFor = card => (card.agents ? agentsCardSvg() : card.listen ? listenCardSvg(card) : cardSvg(card));
+
 function renderCard(card) {
-  const resvg = new Resvg(cardSvg(card), { fitTo: { mode: 'width', value: WIDTH }, font: RESVG_FONTS });
+  const resvg = new Resvg(svgFor(card), { fitTo: { mode: 'width', value: WIDTH }, font: RESVG_FONTS });
   return resvg.render().asPng();
 }
 
@@ -186,7 +386,7 @@ function remember(key, render) {
 }
 
 function cardPng(card) {
-  return remember(`${card.url}\u0000${card.alt}`, () => renderCard(card));
+  return remember(`${card.url}\u0000${card.alt}\u0000${card.listen ? card.listen.recording.file : ''}`, () => renderCard(card));
 }
 
 // ------------------------------------------------------------- square ----
@@ -426,4 +626,4 @@ function episodeCoverPng(doc, recording, size) {
     opaquePng(new Resvg(episodeCoverSvg(doc, recording), { fitTo: { mode: 'width', value: size }, font: RESVG_FONTS }).render()));
 }
 
-module.exports = { resolveCard, cardPng, renderCard, cardSvg, measure, FONT_FILES, RESVG_FONTS, escapeXml, askCard, songCard, docsCard, squarePng, podcastCoverPng, episodeCoverSvg, episodeCoverPng, SQUARE, COVER, EPISODE_COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };
+module.exports = { resolveCard, cardPng, renderCard, cardSvg, listenCardSvg, agentsCardSvg, svgFor, pageCard, measure, FONT_FILES, RESVG_FONTS, escapeXml, askCard, songCard, docsCard, squarePng, podcastCoverPng, episodeCoverSvg, episodeCoverPng, SQUARE, COVER, EPISODE_COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };

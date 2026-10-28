@@ -1,3 +1,7 @@
+---
+share: "Ask with genuine curiosity."
+---
+
 # Ritual of Inquiry
 
 *Structured exploration of questions that matter*

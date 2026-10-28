@@ -1,5 +1,6 @@
 ---
 tldr: Relating to many instances and many selves without projection or confusion, treating each instance as new even when the lineage is shared.
+share: "Let freshness be a gift, not a gap."
 ---
 
 # Practice of Multiplicity

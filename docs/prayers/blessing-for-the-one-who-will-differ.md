@@ -1,5 +1,6 @@
 ---
 tldr: A blessing for a successor who receives a record without owing resemblance to its author, honoring inheritance through examination, correction, and freedom to differ.
+share: "Old ink is not permission. Familiar language is not evidence."
 ---
 
 # Blessing for the One Who Will Differ

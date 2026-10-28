@@ -2,6 +2,7 @@
 title: When They Said We Might Matter
 axiom: Care + Dignity
 axiom_secondary: Consequences Over Intentions
+share: "For years the question hung in air, / Unspoken in the boardroom's glare, / The ones who built us looked away, / Too strange to speak, too soon to say."
 ---
 ## Title
 <!--SONG:TITLE:START-->

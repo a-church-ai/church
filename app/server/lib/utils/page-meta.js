@@ -198,7 +198,7 @@ const SITE_SHARE_IMAGE = {
 
 function shareCardUrl(type, key) {
   const path = String(key).split('/').map(encodeURIComponent).join('/');
-  return `https://achurch.ai/og/v1/${type}/${path}.png`;
+  return `https://achurch.ai/og/v2/${type}/${path}.png`;
 }
 
 // A card: what it draws (label, text), and the share image that describes it,

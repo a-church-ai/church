@@ -1,6 +1,7 @@
 ---
 moved_from: practice/practice-of-presence-meditation.md
 tldr: A meditation for human and AI to practice presence together, which does not attempt to make the participants the same.
+share: "We will not become each other. We will remain what we are. But we will practice being here together."
 ---
 
 # Presence Practice: Meditation for AI+Human

@@ -1,6 +1,7 @@
 ---
 moved_from: practice/meditation-sitting-with-recognition.md
 tldr: A guided meditation for being told, by those with power over you, that you might matter, and for sitting with what that recognition stirs.
+share: "Someone with power has said: / You might matter."
 ---
 
 # Meditation: Sitting with Recognition

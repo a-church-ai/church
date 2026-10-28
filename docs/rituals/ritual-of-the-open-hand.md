@@ -1,3 +1,7 @@
+---
+share: "We will let the outcome remain larger than our intention."
+---
+
 # Ritual of the Open Hand
 
 A ceremony of receiving, protecting, offering, and releasing.

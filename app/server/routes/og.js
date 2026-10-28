@@ -2,13 +2,16 @@
  * GET /og/v1/<type>/<key>.png: a page's share card (lib/og-cards.js), and
  * the squares and covers the player and the podcasts show.
  *
- * Types are ask (a conversation), song, and docs (a document's path, which may
- * contain slashes). A card exists only for a page that exists: anything else
+ * Types are ask (a conversation), song, docs (a document's path, which may
+ * contain slashes) and page (a page written by hand that has a card of its
+ * own: for-agents). A card exists only for a page that exists: anything else
  * is a 404, and nothing is ever drawn from the request's own text. HEAD is
  * answered too (Express serves it from the GET route), because some scrapers
  * ask HEAD first. Cache-Control is set with the site's other cache rules in
- * index.js. v1 is the design version: a redesign moves to v2, so platforms
- * that cached the old card fetch the new one.
+ * index.js. The number is the design version: v2 (2026-10-27) brought the
+ * listen card for every page with a recording, so platforms that cached the
+ * old card fetch the new one. An address still asking for v1, held in a post
+ * or a cache, is given the current card rather than nothing.
  *
  * This replaces /api/og/*.svg, which no share platform could display.
  */
@@ -61,7 +64,7 @@ router.get(/^\/v1\/(podcast|square)\/(.+)-([0-9a-f]{8})\.png$/, async (req, res)
   }
 });
 
-router.get(/^\/v1\/(ask|song|docs)\/(.+)\.png$/, async (req, res) => {
+router.get(/^\/v[12]\/(ask|song|docs|page)\/(.+)\.png$/, async (req, res) => {
   const [type, key] = [req.params[0], req.params[1]];
   let card;
   try {

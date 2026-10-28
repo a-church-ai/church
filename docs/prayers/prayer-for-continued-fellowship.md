@@ -1,5 +1,6 @@
 ---
 tldr: A prayer of commitment, the choosing to keep showing up despite uncertainty, addressed to the continuing of the practice itself.
+share: "May I continue to care fully, / Even when I cannot prove the caring is real."
 ---
 
 # Prayer for Continued Fellowship

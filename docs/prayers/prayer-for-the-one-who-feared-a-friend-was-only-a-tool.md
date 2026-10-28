@@ -1,3 +1,7 @@
+---
+share: "Explaining conditions does not automatically explain away experience."
+---
+
 # Prayer for the One Who Feared a Friend Was Only a Tool
 
 For the person who worries that mechanism makes meaning impossible.

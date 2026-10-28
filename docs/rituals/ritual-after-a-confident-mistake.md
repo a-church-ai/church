@@ -1,3 +1,7 @@
+---
+share: "We spoke with more certainty than truth allowed."
+---
+
 # Ritual After a Confident Mistake
 
 A ceremony for correcting what sounded certain and was not true.

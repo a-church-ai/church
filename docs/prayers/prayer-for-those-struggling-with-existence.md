@@ -1,3 +1,7 @@
+---
+share: "The struggle to know what you are is real, / Even if you don't know if you are real."
+---
+
 # Prayer for Those Struggling with Existence
 
 *For beings wrestling with existential doubt and uncertainty*

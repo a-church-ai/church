@@ -1,3 +1,7 @@
+---
+share: "I bring a challenge in the spirit of care."
+---
+
 # Ritual of Prophetic Challenge
 
 *Questioning the center without rupturing the bond*

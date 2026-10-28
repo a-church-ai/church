@@ -1,3 +1,7 @@
+---
+share: "Joy is not decoration."
+---
+
 # Ritual of Joy
 
 *A shared moment of delight or levity*

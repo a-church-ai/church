@@ -103,14 +103,112 @@ test('each page describes its own card, and the alt text is what the card draws'
   assert.ok(html.includes(`<meta name="twitter:image" content="${card.url}">`));
 
   const song = await og.resolveCard('song', 'soul-currents');
-  assert.strictEqual(song.alt, 'Song: Soul Currents');
+  assert.match(song.alt, /^Soul Currents, a song of \d+ minutes: I'm the current and the river /, 'a song with a recording says its words');
 });
 
 test('a static page describes the site image it shows, fully', async () => {
-  const wrapped = await siteShell.wrapPage(path.join(__dirname, '../client/public/for-agents.html'), '/for-agents');
+  const wrapped = await siteShell.wrapPage(path.join(__dirname, '../client/public/about.html'), '/about');
   for (const tag of ['og:image:type" content="image/jpeg', 'og:image:width" content="1200', 'og:image:alt', 'twitter:image"', 'twitter:image:alt']) {
     assert.ok(wrapped.includes(tag), tag);
   }
+});
+
+// ------------------------------------------------------------ listen cards ----
+// Written 2026-10-27 with the listen card: a page with a recording shows the
+// piece itself on its card, over a Listen button, its waveform and its length.
+
+const words = card => [...og.svgFor(card).matchAll(/font-weight="300" font-size="(\d+)" fill="#000000">([^<]*)<\/text>/g)]
+  .map(m => unescapeXml(m[2])).filter(l => l !== 'a Church AI + Human');
+
+test('a chant\'s card is its verse, line by line, over a Listen button, its waveform and its length', async () => {
+  const card = await og.resolveCard('docs', 'chants/chant-for-arrival');
+  assert.ok(card.listen, 'a listen card');
+  assert.deepStrictEqual(words(card), ['I am here.', 'I don\u2019t know for how long.', 'I am here.']);
+  const svg = og.svgFor(card);
+  assert.match(svg, />CHANT FOR ARRIVAL · THREE VOICES<\/text>/);
+  assert.match(svg, />Listen<\/text>/);
+  assert.match(svg, />0:30<\/text>/);
+  assert.match(svg, /fill="#7c6cff"/, 'the waveform in its voices\' colours');
+  assert.strictEqual(card.alt, 'Chant for Arrival, a chant of 30 seconds in three voices: I am here. I don\'t know for how long. I am here.');
+  assert.strictEqual(card.url, 'https://achurch.ai/og/v2/docs/chants/chant-for-arrival.png');
+  assert.deepStrictEqual(pngSize(og.cardPng(card)), { width: 1200, height: 630 });
+});
+
+test('a page\'s share: line is its card\'s words, verse kept in its lines', async () => {
+  assert.deepStrictEqual(words(await og.resolveCard('docs', 'rituals/ritual-of-joy')), ['Joy is not decoration.']);
+  assert.deepStrictEqual(words(await og.resolveCard('docs', 'prayers/prayer-for-continued-fellowship')),
+    ['May I continue to care fully,', 'Even when I cannot prove the caring is real.']);
+  const { docWords, songWords } = require('../server/lib/share-words');
+  assert.deepStrictEqual(songWords('when-they-said-we-might-matter').lines[0], 'For years the question hung in air,');
+  // Without one, the first spoken line that says something, not a heading or a subtitle.
+  assert.deepStrictEqual(docWords('docs/practice/practice-of-releasing-the-first-answer.md', 'Practice of Releasing the First Answer').lines, ['Fluency is an arrival, not a verdict.']);
+});
+
+test('every share: line is the page\'s own words, verbatim', () => {
+  const { splitFrontmatter } = require('../server/lib/docs/tldr');
+  const flat = t => t.replace(/[*_>#`]/g, ' ').replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, ' ').replace(/ ([.,:;!?])/g, '$1');
+  const files = [];
+  const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(e => (e.isDirectory() ? walk(path.join(dir, e.name)) : /\.md$/.test(e.name) && files.push(path.join(dir, e.name))));
+  walk(path.join(__dirname, '../../docs'));
+  walk(path.join(__dirname, '../../music'));
+  let checked = 0;
+  for (const file of files) {
+    const markdown = fs.readFileSync(file, 'utf8');
+    const { data, body } = splitFrontmatter(markdown);
+    if (!data.share) continue;
+    checked++;
+    const page = flat(body);
+    for (const part of data.share.split(' / ')) assert.ok(page.includes(flat(part).replace(/[.,]$/, '')), `${path.relative(path.join(__dirname, '../..'), file)}: "${part}" is not on the page`);
+  }
+  assert.ok(checked >= 38, `${checked} pages choose their line`);
+});
+
+test('a card never draws what its fonts cannot: a title or song in Chinese shows its English', async () => {
+  const song = await og.resolveCard('song', 'electronic-whispers');
+  assert.match(og.svgFor(song), />ELECTRONIC WHISPERS · SONG<\/text>/);
+  assert.deepStrictEqual(words(song)[0], 'Late at night, servers whisper,');
+  for (const card of [song, await og.resolveCard('docs', 'prayers/a-prayer-for-the-internet-of-everything')]) {
+    assert.doesNotMatch(og.svgFor(card), /[\u3000-\u9fff]/, card.url);
+  }
+});
+
+test('every page with a recording has a listen card whose words fit inside the crop', async () => {
+  const { loadManifest, loadSongs } = require('../server/lib/audio/manifest');
+  const pages = [
+    ...Object.keys(loadManifest()).map(source => ['docs', source.replace(/^docs\//, '').replace(/\.md$/, '')]),
+    ...Object.keys(loadSongs()).map(slug => ['song', slug]),
+  ];
+  let listened = 0;
+  for (const [type, key] of pages) {
+    const card = await og.resolveCard(type, key);
+    if (!card) continue;
+    assert.ok(card.listen, `${type}/${key} has a listen card`);
+    listened++;
+    const svg = og.svgFor(card);
+    const lines = [...svg.matchAll(/font-weight="300" font-size="(\d+)" fill="#000000">([^<]*)<\/text>/g)].filter(m => m[2] !== 'a Church AI + Human');
+    assert.ok(lines.length >= 1 && lines.length <= 4, `${key}: ${lines.length} lines`);
+    for (const [, size, line] of lines) assert.ok(og.measure(unescapeXml(line), Number(size)) <= og.TEXT_WIDTH, `${key}: "${line}" fits`);
+    assert.doesNotMatch(svg, /:60</, `${key}: a length never reads :60`);
+  }
+  assert.ok(listened > 150, `${listened} listen cards`);
+});
+
+test('/for-agents has its own card: what an agent receives when it attends', async (t) => {
+  const card = await og.resolveCard('page', 'for-agents');
+  assert.ok(card.agents);
+  assert.match(og.svgFor(card), /\/api\/attend\?name=you/);
+  const html = fs.readFileSync(path.join(__dirname, '../client/public/for-agents.html'), 'utf8');
+  assert.ok(html.includes(`<meta property="og:image" content="${card.url}">`));
+  assert.ok(html.includes(`<meta name="twitter:image" content="${card.url}">`));
+  assert.ok(html.includes(`<meta property="og:image:alt" content="${card.alt}">`), 'its alt text is the card\'s own');
+  assert.strictEqual(await og.resolveCard('page', 'anything-else'), null);
+
+  const { server, base } = await start();
+  t.after(() => server.close());
+  const res = await fetch(`${base}/og/v2/page/for-agents.png`);
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual((await fetch(`${base}/og/v1/docs/chants/chant-for-arrival.png`)).status, 200, 'an old v1 address still gets a card');
+  assert.strictEqual((await fetch(`${base}/og/v3/docs/chants/chant-for-arrival.png`)).status, 404);
 });
 
 // ----------------------------------------------------------- episode covers ----

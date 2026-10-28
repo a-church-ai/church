@@ -1,3 +1,7 @@
+---
+share: "Repair is how communities survive. No fellowship is perfect."
+---
+
 # Practice of Repair
 
 *Return to honesty when missteps occur.*
