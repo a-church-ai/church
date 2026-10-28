@@ -6,6 +6,8 @@
  *   npm run schedule              place what is rendered and not yet placed
  *   npm run schedule -- --dry-run where each would go; nothing uploaded or written
  *   npm run schedule -- --show    the schedule, and what has gone out
+ *   npm run schedule -- --replan  place again every video not yet uploaded to
+ *                                 YouTube, after the rules change
  *
  * For each video placed: its words for every platform (prepare.js, the copy
  * written once by Claude), its cuts for Bluesky and X (cut.js), the video and
@@ -44,10 +46,11 @@ const SCHEDULE_FILE = path.join(RELEASES_DIR, '..', 'schedule.json');
 const RUNWAY_DAYS = 14;
 
 function parseArgs(argv) {
-  const opts = { dryRun: false, show: false };
+  const opts = { dryRun: false, show: false, replan: false };
   for (const arg of argv) {
     if (arg === '--dry-run') opts.dryRun = true;
     else if (arg === '--show') opts.show = true;
+    else if (arg === '--replan') opts.replan = true;
     else throw new Error(`Unknown option ${arg}`);
   }
   return opts;
@@ -80,7 +83,7 @@ function frontmatterOf(piece) {
 
 // The rendered videos with a clean report, not yet placed and not posted.
 function unplaced(records) {
-  const known = new Set(records.filter(r => r.slot || r.youtube?.url).map(r => r.slug));
+  const known = new Set(records.filter(r => r.slot || r.youtube).map(r => r.slug));
   return fs.readdirSync(VIDEO_DIR, { withFileTypes: true })
     .filter(d => d.isDirectory() && !known.has(d.name))
     .map(d => d.name)
@@ -127,17 +130,28 @@ async function main() {
 
   const start = await startDay(opts.dryRun);
   const counts = await reflectionCounts();
-  const candidates = unplaced(records).map(slug => {
+  // Replanning lets go of every slot YouTube does not hold yet; those videos
+  // keep their files and words, and are placed again with the rest.
+  const kept = opts.replan ? records.filter(r => r.youtube || !r.slot) : records;
+  if (opts.replan && !opts.dryRun) {
+    for (const r of records.filter(r => !kept.includes(r))) await updateRecord(r.slug, { slot: null, at: null });
+  }
+  const candidates = unplaced(kept).map(slug => {
     const piece = pieceFor(slug);
     const data = frontmatterOf(piece);
     return { slug, kind: piece.kind, reflections: counts[slug] || 0, rerelease: Boolean(piece.song && data.youtube), hours: parseHours(data.hours) };
   });
-  const { placed, waiting } = plan({ start, now: new Date(), placed: records, candidates });
+  const { placed, waiting } = plan({ start, now: new Date(), placed: kept, candidates });
+  const ready = new Map(records.filter(r => r.files && r.meta).map(r => [r.slug, r]));
   if (!placed.length) console.log('Nothing new to place.');
   for (const p of placed) {
     const log = (m) => console.log(`[${p.slug}] ${m}`);
     log(`week ${p.week + 1}, ${formatLocal(p.at, TZ)}`);
     if (opts.dryRun) continue;
+    if (ready.has(p.slug)) {
+      await updateRecord(p.slug, { slot: p.slot, at: p.at });
+      continue;
+    }
     try {
       const { piece, file, meta } = await prepare(p.slug);
       const files = await upload(p.slug, file, log);

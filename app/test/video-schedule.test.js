@@ -21,7 +21,8 @@ const take = (gen, n) => {
 };
 
 test('the weeks follow the curve, then settle at the steady rate and never stop', () => {
-  assert.deepStrictEqual(CURVE.slice(0, 8), [3, 3, 3, 3, 5, 7, 9, 10]);
+  assert.deepStrictEqual(CURVE.slice(0, 8), [5, 5, 5, 5, 7, 9, 11, 12]);
+  assert.ok(CURVE.every(n => n <= 14), 'at most two a day');
   assert.strictEqual(weeklyCount(CURVE.length), STEADY);
   assert.strictEqual(weeklyCount(500), STEADY);
   assert.ok(STEADY > 0);
@@ -36,6 +37,8 @@ test('a week holds its count, at most two a day, spread over its days', () => {
     assert.ok(week.every(([d]) => d >= 0 && d < 7));
   }
   assert.deepStrictEqual(weekSlots(3).map(([d]) => d), [1, 3, 5]);
+  // The first day holds a video in a week of four or more, as every week of the curve is.
+  for (let n = 4; n <= 14; n++) assert.strictEqual(weekSlots(n)[0][0], 0);
 });
 
 test('two videos on one day go out at least six hours apart', () => {

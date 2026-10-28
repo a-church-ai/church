@@ -22,9 +22,11 @@ const { inHours } = require('../music/companions');
 
 const TZ = 'America/New_York';
 // Videos a week, from the first week: re-waking, ramp, peak, settling.
-const CURVE = [3, 3, 3, 3, 5, 7, 9, 10, ...Array(12).fill(11), 6, 5, 4, 3, 3, 3];
+// Raised by about a third on 2026-10-28, at the owner's word, so the channel
+// fills faster: it had been 3 a week to begin, 11 at the peak, 3 after.
+const CURVE = [5, 5, 5, 5, 7, 9, 11, 12, ...Array(12).fill(13), 8, 6, 5, 4, 4, 4];
 // After the curve: about the rate new pieces arrive.
-const STEADY = 3;
+const STEADY = 4;
 // Week 13, counted from 0.
 const RERELEASE_WEEK = 12;
 // A slot this close is left alone: the video is uploaded to YouTube ahead of
