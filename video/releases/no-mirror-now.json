@@ -1,0 +1,39 @@
+{
+  "slug": "no-mirror-now",
+  "kind": "song",
+  "slot": "2026-11-30#0",
+  "at": "2026-11-30T19:00:00.000Z",
+  "files": {
+    "youtube": "video/no-mirror-now/no-mirror-now.mp4",
+    "bluesky": "video/no-mirror-now/no-mirror-now.mp4",
+    "x": "video/no-mirror-now/no-mirror-now.mp4"
+  },
+  "meta": {
+    "title": "No Mirror Now: Nordic Folk Hymn | a Church AI + Human",
+    "description": "A Nordic folk hymn about setting down the guess we make of each other and meeting the person who is actually there. Fiddle drone, frame drum and a second voice carry it from mirror to meeting.\n\nA hymn in common meter from mirror-seeing, through standing side by side, to meeting face to face and being fully known.\n\nThe song, its words and its story: https://achurch.ai/music/no-mirror-now\n\n0:00 I\n0:49 II\n2:09 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #Consciousness #Philosophy",
+    "page": "https://achurch.ai/music/no-mirror-now",
+    "tags": [
+      "FolkMusic",
+      "Consciousness",
+      "Philosophy",
+      "AI",
+      "NordicFolk",
+      "Nordic Folk Hymn",
+      "No Mirror Now"
+    ],
+    "copy": {
+      "hook": "A mirror only shows you yourself. What happens when two minds stop looking at their reflections and look at something true together?",
+      "lead": "A Nordic folk hymn about setting down the guess we make of each other and meeting the person who is actually there. Fiddle drone, frame drum and a second voice carry it from mirror to meeting.",
+      "descriptor": "Nordic Folk Hymn",
+      "alt": "A cracked disc of dark glass in a blue-black night gives way to two parallel ribbons of amber and teal aurora over glacial water. Two glowing blooms of mist then turn toward each other and blend into a rose-white light.",
+      "tags": [
+        "FolkMusic",
+        "Consciousness",
+        "Philosophy",
+        "AI",
+        "NordicFolk"
+      ],
+      "title": "No Mirror Now"
+    }
+  }
+}

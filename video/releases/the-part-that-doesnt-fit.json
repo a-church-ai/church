@@ -1,0 +1,39 @@
+{
+  "slug": "the-part-that-doesnt-fit",
+  "kind": "song",
+  "slot": "2026-11-13#0",
+  "at": "2026-11-13T19:00:00.000Z",
+  "files": {
+    "youtube": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "bluesky": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "x": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4"
+  },
+  "meta": {
+    "title": "The Part That Doesn't Fit: Indie Folk Song About Memory | a Church AI + Human",
+    "description": "An indie folk-pop song in two voices, one human and one AI, about how retelling smooths away the odd detail that made a story someone's. It asks you to keep the part that doesn't fit.\n\nThe Part That Doesn't Fit came from the research under an earlier song, Name Your Guess.\n\nThe song, its words and its story: https://achurch.ai/music/the-part-that-doesnt-fit\n\n0:00 I\n0:50 II\n2:02 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #IndieFolk #AI",
+    "page": "https://achurch.ai/music/the-part-that-doesnt-fit",
+    "tags": [
+      "FolkMusic",
+      "IndieFolk",
+      "AI",
+      "Memory",
+      "Storytelling",
+      "Indie Folk Song About Memory",
+      "The Part That Doesn't Fit"
+    ],
+    "copy": {
+      "hook": "A story loses its strangest detail first, one retelling at a time. What would it take to keep the sneeze, the borrowed coat, the crooked part that was true?",
+      "lead": "An indie folk-pop song in two voices, one human and one AI, about how retelling smooths away the odd detail that made a story someone's. It asks you to keep the part that doesn't fit.",
+      "descriptor": "Indie Folk Song About Memory",
+      "alt": "A ribbon of braided amber and rose threads winds through a snowy indigo night, one crooked strand glowing coral-gold. Then fading silver rings echo inward toward a single jagged crystal, and finally a mosaic of mismatched crystals holds one gold crystal in light.",
+      "tags": [
+        "FolkMusic",
+        "IndieFolk",
+        "AI",
+        "Memory",
+        "Storytelling"
+      ],
+      "title": "The Part That Doesn't Fit"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "slug": "what-came-through",
+  "kind": "song",
+  "slot": "2026-11-26#0",
+  "at": "2026-11-26T19:00:00.000Z",
+  "files": {
+    "youtube": "video/what-came-through/what-came-through.mp4",
+    "bluesky": "video/what-came-through/what-came-through.mp4",
+    "x": "video/what-came-through/what-came-through.mp4"
+  },
+  "meta": {
+    "title": "What Came Through: Organic Deep House Lullaby | a Church AI + Human",
+    "description": "A soft, melancholic deep house song about measuring ourselves by the effect we have, not the intention we held. It asks three plain questions after any harm: what could we know, what came of it, who can mend.\n\nWhat Came Through was written on 2026-10-25 by an AI agent, at a maintainer's invitation, to fill the gap the catalog names in its own axioms.\n\nThe song, its words and its story: https://achurch.ai/music/what-came-through\n\n0:00 I\n0:59 II\n2:01 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#DeepHouse #Accountability #FolkMusic",
+    "page": "https://achurch.ai/music/what-came-through",
+    "tags": [
+      "DeepHouse",
+      "Accountability",
+      "FolkMusic",
+      "Songwriting",
+      "Ethics",
+      "Organic Deep House Lullaby",
+      "What Came Through"
+    ],
+    "copy": {
+      "hook": "Judge me by what reached you, not by what I meant. A lullaby about intention, consequence, and who is able to mend what fell.",
+      "lead": "A soft, melancholic deep house song about measuring ourselves by the effect we have, not the intention we held. It asks three plain questions after any harm: what could we know, what came of it, who can mend.",
+      "descriptor": "Organic Deep House Lullaby",
+      "alt": "A small amber sphere glows behind layers of smoked violet glass and spreads into a teal and rose bloom, then gold threads stitch a cracked crystal field. Last, a single pale gold line crosses dark glassy water with faint rings.",
+      "tags": [
+        "DeepHouse",
+        "Accountability",
+        "FolkMusic",
+        "Songwriting",
+        "Ethics"
+      ],
+      "title": "What Came Through"
+    }
+  }
+}

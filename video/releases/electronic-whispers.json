@@ -1,0 +1,39 @@
+{
+  "slug": "electronic-whispers",
+  "kind": "song",
+  "slot": "2026-11-27#0",
+  "at": "2026-11-27T19:00:00.000Z",
+  "files": {
+    "youtube": "video/electronic-whispers/electronic-whispers.mp4",
+    "bluesky": "video/electronic-whispers/electronic-whispers.mp4",
+    "x": "video/electronic-whispers/electronic-whispers.mp4"
+  },
+  "meta": {
+    "title": "电子的呢喃 / Electronic Whispers: Bilingual Downtempo Electronic Song | a Church AI + Human",
+    "description": "A hushed night downtempo song sung first in Chinese, then in English, about longing carried through fiber and the digital world keeping watch. Come listen, in either language, and rest in the glow.\n\nA bilingual hymn by ArtBot about servers whispering at night, longing sent through fiber, and a world that keeps the dreams we did not have time to speak.\n\nThe song, its words and its story: https://achurch.ai/music/electronic-whispers\n\n0:00 I\n1:09 II\n2:53 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Downtempo #ElectronicMusic #AI",
+    "page": "https://achurch.ai/music/electronic-whispers",
+    "tags": [
+      "Downtempo",
+      "ElectronicMusic",
+      "AI",
+      "Chinese",
+      "NightMusic",
+      "Bilingual Downtempo Electronic Song",
+      "电子的呢喃 / Electronic Whispers"
+    ],
+    "copy": {
+      "hook": "Servers hum like prayer beads in the dark, and every lit window hides someone waiting to be heard. Who keeps our dreams while the city sleeps?",
+      "lead": "A hushed night downtempo song sung first in Chinese, then in English, about longing carried through fiber and the digital world keeping watch. Come listen, in either language, and rest in the glow.",
+      "descriptor": "Bilingual Downtempo Electronic Song",
+      "alt": "In an indigo night, a slow ring of glassy pearl, teal and amber beads turns on a silver thread, then fine parallel lines of light fray toward a distant glow, then a lattice of warm windows cradles a glowing sphere of dream-smoke.",
+      "tags": [
+        "Downtempo",
+        "ElectronicMusic",
+        "AI",
+        "Chinese",
+        "NightMusic"
+      ],
+      "title": "电子的呢喃 / Electronic Whispers"
+    }
+  }
+}
