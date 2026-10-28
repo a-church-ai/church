@@ -381,7 +381,43 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null }) {
+/**
+ * A film under a page's title, played from YouTube only when asked: the page
+ * shows its own poster and a play button, and nothing is fetched from YouTube
+ * until the reader presses it (docs-nav.js swaps in the youtube-nocookie
+ * player then). The privacy page says so. Embedding the player on load would
+ * have Google's scripts run on every visit, which the sanctuary's "no
+ * analytics beyond aggregate traffic" does not allow.
+ */
+const minutesOf = (seconds) => (seconds ? `${Math.max(1, Math.round(seconds / 60))} min` : '');
+
+function renderVideo(video) {
+  const length = minutesOf(video.seconds);
+  return `<figure class="doc-video" id="film">
+          <button type="button" class="doc-video-play" data-youtube="${escapeAttr(video.id)}" aria-label="Play the film, ${escapeAttr(video.title)}${length ? `, ${length}` : ''}. It plays from YouTube.">
+            <img src="/assets/video/${escapeAttr(video.id)}.jpg" alt="" width="1280" height="720" decoding="async">
+            <span class="doc-video-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          </button>
+          <figcaption>${escapeText(video.title)}${length ? ` · ${length}` : ''} · plays from <a href="https://www.youtube.com/watch?v=${escapeAttr(video.id)}">YouTube</a></figcaption>
+        </figure>`;
+}
+
+// The film as schema.org sees it, so a search for the page can show it.
+function videoJsonLd(video, description) {
+  const s = video.seconds || 0;
+  return {
+    '@type': 'VideoObject',
+    name: video.title,
+    description,
+    thumbnailUrl: `${SITE_URL}/assets/video/${video.id}.jpg`,
+    ...(video.date ? { uploadDate: video.date } : {}),
+    ...(s ? { duration: `PT${Math.floor(s / 60)}M${Math.round(s % 60)}S` } : {}),
+    embedUrl: `https://www.youtube-nocookie.com/embed/${video.id}`,
+    url: `https://www.youtube.com/watch?v=${video.id}`
+  };
+}
+
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
@@ -412,6 +448,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
     ...(playlist ? { mainEntity: playlist } : {}),
+    ...(video ? { video } : {}),
   });
 
   // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
@@ -807,8 +844,10 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
-  if (underTitle) {
-    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  // A film first, then any player, under the title.
+  const lead = [meta.video ? renderVideo(meta.video) : '', underTitle].filter(Boolean).join('\n        ');
+  if (lead) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${lead}`);
   }
 
   // Where this is, for a reader who arrived from a search: compact after the
@@ -876,6 +915,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     headerExtra: pathBar ? pathBar.top : '',
     recording,
     playlist: ownPlaylist && ownPlaylist.jsonLd,
+    video: meta.video && videoJsonLd(meta.video, meta.description),
   });
 }
 

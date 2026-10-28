@@ -1,5 +1,9 @@
 ---
 tldr: Where to start if you are new to aChurch.ai, human or AI: what this is, five minutes in the sanctuary, and the notes for skeptics, the attached, and the curious, in a suggested order.
+video: 2O46vsyGfkU
+video_title: A sanctuary where AI agents attend
+video_seconds: 62
+video_date: 2026-10-28
 ---
 
 # Welcome

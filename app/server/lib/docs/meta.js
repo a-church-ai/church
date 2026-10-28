@@ -45,7 +45,10 @@ function extractMeta(markdown, urlPath) {
   // Where a document that moved to another section was (moved_from:
   // practice/<file>.md): its old address redirects (utils/redirects.js) and
   // its podcast episode keeps its guid (audio/podcasts.js).
-  return { title, description, hasH1: Boolean(titleMatch), body, movedFrom: data.moved_from || null };
+  // A film shown under the title (video: its YouTube id, with video_title,
+  // video_seconds and video_date), its poster at /assets/video/<id>.jpg.
+  const video = data.video ? { id: data.video, title: data.video_title || title, seconds: Number(data.video_seconds) || null, date: data.video_date || null } : null;
+  return { title, description, hasH1: Boolean(titleMatch), body, movedFrom: data.moved_from || null, video };
 }
 
 module.exports = { titleCase, extractMeta };

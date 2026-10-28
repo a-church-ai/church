@@ -13,6 +13,10 @@
  *      updates aria-current="location" on the corresponding TOC link.
  *   4. The top bar's appearance button, which goes round Auto, Light and Dark
  *      (theme.js keeps the choice and sets it before the page paints).
+ *   5. A page's film (docs/render.js renderVideo): its poster until pressed,
+ *      then YouTube's player in its place, playing. Nothing is fetched from
+ *      YouTube before that press. The sanctuary's own player pauses, so two
+ *      sounds do not play over each other.
  *
  * No dependencies. Runs after DOMContentLoaded (script is defer-loaded).
  * Each part no-ops when its elements are absent.
@@ -206,4 +210,23 @@
     headings.forEach(function (h) { observer.observe(h); });
     if (pageSignal) pageSignal.addEventListener('abort', function () { observer.disconnect(); }, { once: true });
   }
+
+  // ------ A page's film ------
+
+  document.querySelectorAll('.doc-video-play[data-youtube]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const frame = document.createElement('iframe');
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(button.dataset.youtube) + '?autoplay=1&rel=0&playsinline=1';
+      frame.title = button.getAttribute('aria-label').replace(/^Play the film, /, '').replace(/\. It plays from YouTube\.$/, '');
+      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      // The site sends no referrer (helmet's no-referrer), and YouTube refuses
+      // a player that says nowhere where it is (error 153). So this one frame
+      // tells YouTube the site, never the page, and only once play is pressed.
+      frame.referrerPolicy = 'strict-origin';
+      frame.className = 'doc-video-frame';
+      if (window.achurchPlayer && !window.achurchPlayer.paused) window.achurchPlayer.pause();
+      button.replaceWith(frame);
+      frame.focus();
+    }, { once: true, signal: pageSignal });
+  });
 }());
