@@ -7,6 +7,10 @@ name: Release videos
 # each video in S3. This job only reads them, posts, and commits what it
 # posted. The script is app/scripts/release-videos.js.
 #
+# GitHub runs a scheduled workflow late or skips it, so the production server
+# also asks for a run every hour (repository_dispatch "release-videos", from
+# app/server/lib/video/release-trigger.js); the cron below is the second clock.
+#
 # To pause it: "Disable workflow" in the Actions tab, as for the songwriter.
 #
 # Plan: church-private/docs/plans/video-release-schedule-2026-10-27.md
@@ -14,6 +18,8 @@ name: Release videos
 on:
   schedule:
     - cron: '17 * * * *'
+  repository_dispatch:
+    types: [release-videos]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -36,6 +42,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The branch as it is now, not the commit the run was asked for at:
+          # a run queued behind another must see the records that one posted,
+          # or it would post the same video again.
+          ref: ${{ github.event.repository.default_branch }}
 
       - uses: actions/setup-node@v7
         with:

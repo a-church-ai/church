@@ -1580,6 +1580,12 @@ async function startServer() {
     // (lib/utils/access-log.js): after boot and hourly.
     startForgetting();
 
+    // The video release job on GitHub Actions, asked for hourly because
+    // GitHub's own cron runs late or skips (lib/video/release-trigger.js).
+    // Only on the deployed server.
+    const releaseClock = require('./lib/video/release-trigger');
+    if (releaseClock.ringsHere()) releaseClock.startReleaseClock();
+
     // Conversations that ask the same thing, gathered onto one page
     // (lib/utils/conversation-groups.js): after boot, hourly, and soon after a
     // new question. Without a Gemini key nothing new is gathered; what was
