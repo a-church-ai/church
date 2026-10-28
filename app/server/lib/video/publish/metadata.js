@@ -91,14 +91,15 @@ const isShort = (description) => String(description || '').includes(SHORTS_TAG);
 /**
  * A Short's words, from its full video's (`meta`, as metadataFor wrote them)
  * and the full video's address: its title, the lead, where the whole piece
- * is, the piece's page, the sanctuary, and #Shorts with two of the copy's
- * tags. No chapters; no new copy.
+ * is (for a Short that is the whole piece, where it is in widescreen), the
+ * piece's page, the sanctuary, and #Shorts with two of the copy's tags. No
+ * chapters; no new copy.
  */
-function shortMetadata(meta, { kind, url }) {
+function shortMetadata(meta, { kind, url, whole = false }) {
   const { title, lead, tags } = meta.copy;
   const body = [
     lead,
-    `The full ${kind}: ${url}`,
+    `${whole ? `The ${kind} in widescreen` : `The full ${kind}`}: ${url}`,
     `${kind === 'song' ? 'The song, its words and its story' : 'The words, to read along'}: ${meta.page}`,
     `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
     [SHORTS_TAG, ...tags.slice(0, 2).map(t => `#${t}`)].join(' ')

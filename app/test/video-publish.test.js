@@ -94,6 +94,10 @@ test('a Short\'s words come from its full video\'s: the lead, the full video, th
   assert.ok(!/\d:\d\d [IV]/.test(short.description), 'no chapters');
   assert.strictEqual(isShort(short.description), true);
   assert.strictEqual(isShort(fullMeta.description), false);
+  // A Short that is the whole piece points to it in widescreen, not "in full".
+  const whole = shortMetadata(fullMeta, { kind: 'chant', url: 'https://www.youtube.com/watch?v=full', whole: true });
+  assert.match(whole.description, /The chant in widescreen: https:/);
+  assert.ok(!/The full chant/.test(whole.description));
 });
 
 test('a Short and its full video are found apart on the channel, though both name the page', () => {

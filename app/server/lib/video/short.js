@@ -80,7 +80,7 @@ async function passageFor(piece, { title, seconds, dir, log = console.log }) {
   const file = path.join(dir, 'short.json');
   if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
   let passage;
-  if (seconds <= MAX_SECONDS + 1) passage = { start: 0, end: seconds, why: 'the whole piece is under a minute' };
+  if (seconds <= MAX_SECONDS + 1) passage = { start: 0, end: seconds, whole: true, why: 'the whole piece is under a minute' };
   else {
     const lines = timedLines(piece);
     const request = `Kind: ${piece.kind}\nTitle: ${title}\n\nThe lines, numbered, with when each is spoken (seconds):\n${lines.map((l, i) => `${i}. [${l.start.toFixed(1)} to ${l.end.toFixed(1)}] ${l.text}`).join('\n')}`;
@@ -122,7 +122,8 @@ async function renderShort(piece, { title, analysis, brief, edges, grid, clips, 
     await compose({
       base, milkdrop: milkdropFile, mandala: mandalaFile, audio, brief, seconds, out, size: PORTRAIT, from: passage.start,
       title: titleCard(title, path.join(dir, 'short.title.png'), { size: PORTRAIT }),
-      end: titleCard(title, path.join(dir, 'short.end.png'), { size: PORTRAIT, under: `Hear the full ${piece.kind}` })
+      // A Short that is the whole piece has nothing further to point to.
+      end: passage.whole ? null : titleCard(title, path.join(dir, 'short.end.png'), { size: PORTRAIT, under: `Hear the full ${piece.kind}` })
     });
   });
   const report = await reportVideo({ file: out, seconds, edges: [0, seconds] });

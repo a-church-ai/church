@@ -200,9 +200,9 @@ async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = nul
   const video = await uploadChunks(session, file, token, log);
   // Public at once: into its playlist now. The video is up whatever the
   // playlist does; a playlist that fails is reported, and the upload is not
-  // made again.
+  // made again. A Short joins none: it is a passage, not the piece.
   let playlist = null;
-  if (privacy === 'public') {
+  if (privacy === 'public' && !isShort(meta.description)) {
     try {
       playlist = await addToPlaylist(token, video.id, kind);
     } catch (err) {
