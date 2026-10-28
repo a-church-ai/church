@@ -41,5 +41,14 @@
     "start": 113.38,
     "end": 148.36,
     "whole": false
+  },
+  "youtube": {
+    "at": "2026-10-28T23:02:02.101Z",
+    "id": "cUKJYOVl1OE",
+    "url": "https://www.youtube.com/watch?v=cUKJYOVl1OE",
+    "privacy": "private",
+    "publishAt": "2026-10-30T11:00:00.000Z",
+    "found": false,
+    "playlist": null
   }
 }
