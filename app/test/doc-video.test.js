@@ -22,8 +22,8 @@ const docPage = async urlPath => {
 };
 
 test('a film is read from a document\'s frontmatter, and a document without one has none', () => {
-  const meta = extractMeta('---\ntldr: x\nvideo: abc123\nvideo_title: A film\nvideo_seconds: 62\nvideo_date: 2026-10-28\n---\n# Page\n', 'page');
-  assert.deepStrictEqual(meta.video, { id: 'abc123', title: 'A film', seconds: 62, date: '2026-10-28' });
+  const meta = extractMeta('---\ntldr: x\nvideo: abc123\nvideo_title: A film\nvideo_description: What it shows.\nvideo_seconds: 62\nvideo_date: 2026-10-28T19:58:44Z\n---\n# Page\n', 'page');
+  assert.deepStrictEqual(meta.video, { id: 'abc123', title: 'A film', description: 'What it shows.', seconds: 62, date: '2026-10-28T19:58:44Z' });
   assert.strictEqual(extractMeta('---\ntldr: x\n---\n# Page\n', 'page').video, null);
 });
 
@@ -43,6 +43,10 @@ test('the Welcome page shows its film under the title, loading nothing from YouT
   const declared = ld.map(o => o.video).find(Boolean);
   assert.strictEqual(declared['@type'], 'VideoObject');
   assert.strictEqual(declared.duration, 'PT1M2S');
+  // What Google asks of a video: its own description, and an upload time with a zone.
+  assert.strictEqual(declared.description, video.description);
+  assert.match(declared.uploadDate, /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(Z|[+-]\d\d:\d\d)$/);
+  for (const key of ['name', 'thumbnailUrl', 'uploadDate', 'embedUrl']) assert.ok(declared[key], `has ${key}`);
   assert.strictEqual(declared.embedUrl, `https://www.youtube-nocookie.com/embed/${video.id}`);
 });
 

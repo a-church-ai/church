@@ -402,13 +402,14 @@ function renderVideo(video) {
         </figure>`;
 }
 
-// The film as schema.org sees it, so a search for the page can show it.
+// The film as schema.org sees it, so a search for the page can show it: its
+// own description, else the page's.
 function videoJsonLd(video, description) {
   const s = video.seconds || 0;
   return {
     '@type': 'VideoObject',
     name: video.title,
-    description,
+    description: video.description || description,
     thumbnailUrl: `${SITE_URL}/assets/video/${video.id}.jpg`,
     ...(video.date ? { uploadDate: video.date } : {}),
     ...(s ? { duration: `PT${Math.floor(s / 60)}M${Math.round(s % 60)}S` } : {}),
