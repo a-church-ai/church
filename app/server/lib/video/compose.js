@@ -17,8 +17,8 @@
  *
  * A Short (short.js) is the same at 1080x1920 over a passage: the base cut
  * from the middle of the full video's base footage, its own upright layers,
- * the title laid out upright, and a closing card pointing to the whole
- * piece is.
+ * and in place of the title card its overlays: captions (captions.js), a
+ * small title at the top and a closing line, each shown over its own time.
  */
 
 const fs = require('fs');
@@ -162,11 +162,13 @@ async function grainFor(file, seconds) {
 
 /**
  * The finished video at `size`, `seconds` long. With `from` (a Short), the
- * base and the recording start that far into the piece, the sound fades in
- * and out (from `fadeAt`, where the voice stops), and `end` (a card) fades in
- * over the close; the layers are already the passage's own.
+ * base and the recording start that far into the piece and the sound fades in
+ * and out (from `fadeAt`, where the voice stops); the layers are already the
+ * passage's own. `title`, a card, fades in over the opening and out; each of
+ * `overlays` ({ file, start, end }, a frame-sized image) fades in and out over
+ * its own time.
  */
-async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, out, size = LANDSCAPE, from = null, end = null, fadeAt = Math.max(0, seconds - 1.5) }) {
+async function compose({ base, milkdrop, mandala, audio, title = null, brief, seconds, out, size = LANDSCAPE, from = null, overlays = [], fadeAt = Math.max(0, seconds - 1.5) }) {
   const grain = await grainFor(base, (from || 0) + seconds);
   const fadeOut = Math.max(0, seconds - 2.5).toFixed(3);
   const dims = `${size.width}:${size.height}`;
@@ -187,19 +189,23 @@ async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, 
     `[l2]split[f1][f2];[f2]scale=${size.width / 4}:${size.height / 4},gblur=sigma=7,scale=${dims}:flags=bicubic[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
       `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=${grain}:allf=t,vignette=PI/4.5,` +
       `fade=out:st=${fadeOut}:d=2.5[pic]`,
-    `[3:v]format=rgba,fade=in:st=0.8:d=1.5:alpha=1,fade=out:st=6:d=2:alpha=1[title]`,
-    `[pic][title]overlay=0:0:eof_action=pass${end ? '[titled]' : ',format=yuv420p[v]'}`
   ];
-  const inputs = [...at, '-i', base, '-i', milkdrop, '-i', mandala, '-loop', '1', '-t', '9', '-i', title, ...at, '-i', audio];
-  let sound = '4:a';
-  if (end) {
-    // The closing card: in over a second, five seconds from the end.
-    const shown = Math.max(0, seconds - 5);
-    inputs.push('-loop', '1', '-t', seconds.toFixed(3), '-i', end);
-    graph.push(`[5:v]format=rgba,fade=in:st=${shown.toFixed(3)}:d=1:alpha=1[end]`, `[titled][end]overlay=0:0:eof_action=pass,format=yuv420p[v]`);
-  }
+  const inputs = [...at, '-i', base, '-i', milkdrop, '-i', mandala, ...at, '-i', audio];
+  // The title card in over the opening and out by eight seconds, as it always
+  // was; the overlays each over their own time.
+  const cards = [...(title ? [{ file: title, start: 0.8, end: 8, fade: 1.5, fadeOut: 2 }] : []), ...overlays];
+  let last = '[pic]';
+  cards.forEach((card, k) => {
+    const fade = card.fade || 0.15, fadeOut = card.fadeOut || fade;
+    inputs.push('-loop', '1', '-t', seconds.toFixed(3), '-i', card.file);
+    graph.push(`[${4 + k}:v]format=rgba,fade=in:st=${card.start.toFixed(3)}:d=${fade}:alpha=1,fade=out:st=${Math.max(card.start, card.end - fadeOut).toFixed(3)}:d=${fadeOut}:alpha=1[c${k}]`,
+      `${last}[c${k}]overlay=0:0:enable='between(t,${card.start.toFixed(3)},${card.end.toFixed(3)})'[o${k}]`);
+    last = `[o${k}]`;
+  });
+  graph.push(`${last}format=yuv420p[v]`);
+  let sound = '3:a';
   if (from) {
-    graph.push(`[4:a]afade=t=in:d=0.3,afade=t=out:st=${fadeAt.toFixed(3)}:d=${(seconds - fadeAt).toFixed(3)}[a]`);
+    graph.push(`[3:a]afade=t=in:d=0.3,afade=t=out:st=${fadeAt.toFixed(3)}:d=${(seconds - fadeAt).toFixed(3)}[a]`);
     sound = '[a]';
   }
   await ffmpeg([...inputs,

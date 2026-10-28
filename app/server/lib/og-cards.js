@@ -626,4 +626,4 @@ function episodeCoverPng(doc, recording, size) {
     opaquePng(new Resvg(episodeCoverSvg(doc, recording), { fitTo: { mode: 'width', value: size }, font: RESVG_FONTS }).render()));
 }
 
-module.exports = { resolveCard, cardPng, renderCard, cardSvg, listenCardSvg, agentsCardSvg, svgFor, pageCard, measure, FONT_FILES, RESVG_FONTS, escapeXml, askCard, songCard, docsCard, squarePng, podcastCoverPng, episodeCoverSvg, episodeCoverPng, SQUARE, COVER, EPISODE_COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };
+module.exports = { resolveCard, cardPng, renderCard, cardSvg, listenCardSvg, agentsCardSvg, svgFor, pageCard, measure, measureIn, FONT_FILES, RESVG_FONTS, escapeXml, askCard, songCard, docsCard, squarePng, podcastCoverPng, episodeCoverSvg, episodeCoverPng, SQUARE, COVER, EPISODE_COVER, INSET, WIDTH, HEIGHT, TEXT_WIDTH };

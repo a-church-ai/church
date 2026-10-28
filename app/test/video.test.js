@@ -160,19 +160,20 @@ test('a brief that reuses a loop must take it from the shortlist, give its reaso
   assert.match(run([{ loop: 'alpha/loop-1', reason: 'r', preset: 'P1' }, { loop: 'beta/loop-2', reason: 'r', preset: 'P2' }, fresh('P3')]).join(), /at most 1 movement/);
 });
 
-test('a Short\'s passage is whole lines, 30 to 59 seconds with its lead and tail, and says why', () => {
+test('a Short\'s passage is whole lines, 20 to 45 seconds with its lead and tail, and says why it hooks', () => {
   // Ten lines of eight seconds, a second apart.
   const lines = Array.from({ length: 10 }, (_, i) => ({ text: `line ${i}`, start: i * 9, end: i * 9 + 8 }));
-  const ok = checkPassage({ first: 2, last: 5, why: 'its turn' }, lines, 90);
+  const ok = checkPassage({ first: 2, last: 5, why: 'its turn', hook: 'a question' }, lines, 90);
   assert.deepStrictEqual(ok.problems, []);
   assert.strictEqual(ok.value.start, 17.85);
   // The fade would reach the next line at 54, so the passage stops just before it, and fades from where its last line ends.
   assert.strictEqual(ok.value.end, 53.9);
   assert.strictEqual(ok.value.quiet, 53);
   assert.ok(ok.value.end - ok.value.start >= MIN_SECONDS && ok.value.end - ok.value.start <= MAX_SECONDS);
-  assert.match(checkPassage({ first: 2, last: 3, why: 'x' }, lines, 90).problems.join(), /at least 30/);
-  assert.match(checkPassage({ first: 0, last: 9, why: 'x' }, lines, 90).problems.join(), /under 59/);
-  assert.match(checkPassage({ first: 2, last: 5 }, lines, 90).problems.join(), /why/);
+  assert.match(checkPassage({ first: 2, last: 3, why: 'x', hook: 'y' }, lines, 90).problems.join(), /at least 20/);
+  assert.match(checkPassage({ first: 0, last: 9, why: 'x', hook: 'y' }, lines, 90).problems.join(), /under 45/);
+  assert.match(checkPassage({ first: 2, last: 5, hook: 'y' }, lines, 90).problems.join(), /why/);
+  assert.match(checkPassage({ first: 2, last: 5, why: 'x' }, lines, 90).problems.join(), /hook/);
   assert.match(checkPassage({ first: 5, last: 2, why: 'x' }, lines, 90).problems.join(), /line numbers/);
   assert.match(checkPassage({ first: 0, last: 10, why: 'x' }, lines, 90).problems.join(), /line numbers/);
   // The tail never runs past the recording's end.
@@ -197,4 +198,45 @@ test('a song\'s passage reaches out to its bar lines, but never into the phrase 
   // With no grid, a breath before and a fade after.
   const plain = spanOf(lines, 1, 2, 300);
   assert.ok(Math.abs(plain.start - 131.05) < 1e-9 && Math.abs(plain.end - 161.5) < 1e-9);
+});
+
+test('captions show the piece\'s own words at the heard times: a misheard word as written, a missed one kept', () => {
+  const { alignWords } = require('../server/lib/video/captions');
+  const heard = [
+    { word: 'We', start: 1, end: 1.2 }, { word: 'bring', start: 1.2, end: 1.5 }, { word: 'are', start: 1.5, end: 1.7 },
+    { word: 'questions', start: 1.7, end: 2.2 }, { word: 'stay', start: 2.4, end: 2.6 }, { word: 'stray', start: 2.9, end: 3.3 }
+  ];
+  const words = alignWords(heard, 'The door is open\nWe bring our questions,\nstay or stray,\nNot certain what we are');
+  assert.deepStrictEqual(words.map(w => w.text), ['We', 'bring', 'our', 'questions,', 'stay', 'or', 'stray,']);
+  assert.strictEqual(words[2].start, 1.5, 'the misheard "are" shows as "our", at its time');
+  assert.strictEqual(words[5].start, 2.6, 'the missed "or" takes the time its neighbour ends');
+  assert.deepStrictEqual(words.filter(w => w.lineEnd).map(w => w.text), ['questions,', 'stray,']);
+});
+
+test('captions end at pauses, lines and sentences, and split a long phrase evenly rather than orphan a word', () => {
+  const { groupCaptions } = require('../server/lib/video/captions');
+  const timed = (text, from = 0) => text.split(' ').map((t, i) => ({ text: t, start: from + i * 0.3, end: from + i * 0.3 + 0.25, lineEnd: false }));
+  // Seven words, one sentence: one caption, not six and one.
+  assert.deepStrictEqual(groupCaptions(timed('May they find the door still open.')).map(c => c.words.length), [7]);
+  // Twelve words with no break: two of six.
+  assert.deepStrictEqual(groupCaptions(timed('one two three four five six seven eight nine ten eleven twelve')).map(c => c.words.length), [6, 6]);
+  // A line's end ends a caption, though it has no punctuation.
+  const lines = timed('stay or stray not certain what');
+  lines[2].lineEnd = true;
+  assert.deepStrictEqual(groupCaptions(lines).map(c => c.words.join(' ')), ['stay or stray', 'not certain what']);
+  // A pause ends one too.
+  assert.strictEqual(groupCaptions([...timed('here we are'), ...timed('again', 5)]).length, 2);
+});
+
+test('a caption is shown from its first word until the next begins, timed from the passage', () => {
+  const { captionsFor } = require('../server/lib/video/captions');
+  const words = [
+    { text: 'Before.', start: 9, end: 9.5 },
+    { text: 'The', start: 10, end: 10.2 }, { text: 'door.', start: 10.2, end: 10.6 },
+    { text: 'Is', start: 11, end: 11.2 }, { text: 'open.', start: 11.2, end: 11.8 }
+  ];
+  const caps = captionsFor(words, 10, 14);
+  assert.deepStrictEqual(caps.map(c => c.text), ['The door.', 'Is open.']);
+  assert.ok(Math.abs(caps[0].start) < 1e-9 && Math.abs(caps[0].end - 1) < 1e-9);
+  assert.ok(Math.abs(caps[1].end - 2.4) < 1e-9, 'the last lingers a moment past its last word');
 });
