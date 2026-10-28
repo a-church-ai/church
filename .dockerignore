@@ -20,6 +20,8 @@ app/.env.*
 # none of this is needed at runtime.
 app/media
 app/logs
+# The videos' release records, read by the release job, never by the site.
+video
 logs
 *.log
 *.log.gz

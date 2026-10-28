@@ -163,15 +163,18 @@ async function addToPlaylist(token, videoId, kind) {
 
 /**
  * Upload a video, or find it already uploaded, and put it in its kind's
- * playlist. Returns { id, url, privacy, found, playlist }.
+ * playlist. With `publishAt` (an ISO time) it is uploaded private and YouTube
+ * makes it public then, on its own; it joins its playlist after that
+ * (joinPlaylist). Returns { id, url, privacy, publishAt, found, playlist }.
  */
-async function publish({ file, meta, kind, privacy = 'unlisted', log = console.log }) {
+async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = null, log = console.log }) {
   const token = await accessToken();
   const existing = await findUpload(token, meta.page);
   if (existing) return { id: existing, url: `https://www.youtube.com/watch?v=${existing}`, found: true };
+  if (publishAt) privacy = 'private';
   const body = {
     snippet: { title: meta.title, description: meta.description, tags: meta.tags, categoryId: kind === 'song' ? CATEGORY.song : CATEGORY.spoken, defaultLanguage: 'en', defaultAudioLanguage: 'en' },
-    status: { privacyStatus: privacy, selfDeclaredMadeForKids: false }
+    status: { privacyStatus: privacy, selfDeclaredMadeForKids: false, ...(publishAt ? { publishAt } : {}) }
   };
   const size = fs.statSync(file).size;
   const start = await request(`${UPLOAD}?uploadType=resumable&part=snippet,status`, {
@@ -194,7 +197,22 @@ async function publish({ file, meta, kind, privacy = 'unlisted', log = console.l
       log(`  youtube: uploaded, but adding it to its playlist failed: ${err.message.slice(0, 160)}`);
     }
   }
-  return { id: video.id, url: `https://www.youtube.com/watch?v=${video.id}`, privacy: video.status?.privacyStatus || privacy, found: false, playlist };
+  return { id: video.id, url: `https://www.youtube.com/watch?v=${video.id}`, privacy: video.status?.privacyStatus || privacy, ...(publishAt ? { publishAt } : {}), found: false, playlist };
+}
+
+// A video's privacy and how far YouTube has processed it:
+// { privacy, publishAt, processed } or null when it is not on the channel.
+async function statusOf(id) {
+  const token = await accessToken();
+  const found = await (await request(`${API}/videos?part=status,processingDetails&id=${id}`, { headers: auth(token), retry: true })).json();
+  const video = found.items?.[0];
+  if (!video) return null;
+  return { privacy: video.status.privacyStatus, publishAt: video.status.publishAt || null, processed: video.processingDetails?.processingStatus || null, rejected: video.status.rejectionReason || video.status.failureReason || null };
+}
+
+// A video now public, into its kind's playlist.
+async function joinPlaylist(id, kind) {
+  return addToPlaylist(await accessToken(), id, kind);
 }
 
 /**
@@ -216,4 +234,4 @@ async function setPrivacy(id, privacy, { kind } = {}) {
   return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }
 
-module.exports = { publish, setPrivacy, playlistOf, SCOPES };
+module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, SCOPES };

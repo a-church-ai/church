@@ -1,23 +1,42 @@
 /**
- * What was posted where, per video: media/video/<slug>/published.json,
- * { youtube: { at, id, url, privacy } | { started }, bluesky: ..., x: ... }.
+ * Each video's release, committed in video/releases/<slug>.json so the hourly
+ * release job (scripts/release-videos.js, on GitHub Actions) and a person at
+ * the machine that rendered it read the same record:
  *
- * Read, changed and written through utils/safe-json.js readModifyWriteJSON,
- * the house rule for a shared JSON file (CLAUDE.md): the manual
- * publish-video.js and the scheduled release both write it, and a plain
- * read-then-write would lose whichever wrote second.
+ *   { slug, kind, slot, at,            when it goes out (lib/video/schedule.js)
+ *     files: { youtube, bluesky, x },  its files in S3 (audio/storage.js)
+ *     meta,                            the words each platform posts (metadata.js)
+ *     youtube, bluesky, x }            what was posted: { at, id, url, ... } | { started }
+ *
+ * One file per video, not one manifest, because two writers commit them: the
+ * schedule adds videos and the release job marks them posted, and separate
+ * files never meet in a merge. Written through utils/safe-json.js
+ * readModifyWriteJSON, the house rule for a shared JSON file (CLAUDE.md).
  */
 
+const fs = require('fs');
 const path = require('path');
 const { readModifyWriteJSON, safeReadJSON } = require('../../utils/safe-json');
-const { VIDEO_DIR } = require('../library');
 
-const fileOf = (slug) => path.join(VIDEO_DIR, slug, 'published.json');
+const RELEASES_DIR = path.join(__dirname, '../../../../../video/releases');
+
+const fileOf = (slug) => path.join(RELEASES_DIR, `${slug}.json`);
 
 const readRecord = (slug) => safeReadJSON(fileOf(slug), {});
 
-function writeRecord(slug, platform, entry) {
-  return readModifyWriteJSON(fileOf(slug), {}, (record) => ({ ...record, [platform]: entry }));
+function updateRecord(slug, change) {
+  fs.mkdirSync(RELEASES_DIR, { recursive: true });
+  return readModifyWriteJSON(fileOf(slug), {}, (record) => ({ ...record, ...change }));
 }
 
-module.exports = { readRecord, writeRecord };
+const writeRecord = (slug, platform, entry) => updateRecord(slug, { [platform]: entry });
+
+// Every release, in the order they go out.
+async function allRecords() {
+  if (!fs.existsSync(RELEASES_DIR)) return [];
+  const slugs = fs.readdirSync(RELEASES_DIR).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5));
+  const records = await Promise.all(slugs.map(async slug => ({ slug, ...(await readRecord(slug)) })));
+  return records.sort((a, b) => String(a.at || '').localeCompare(String(b.at || '')));
+}
+
+module.exports = { readRecord, writeRecord, updateRecord, allRecords, RELEASES_DIR };

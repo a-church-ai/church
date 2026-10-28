@@ -1,0 +1,87 @@
+name: Release videos
+
+# Every hour: the videos whose hour is near are uploaded to YouTube to go
+# public then, and those whose hour has passed are posted to Bluesky and X.
+# The schedule is the committed release records in video/releases/, placed by
+# `npm run schedule` on the machine that renders the videos, which also puts
+# each video in S3. This job only reads them, posts, and commits what it
+# posted. The script is app/scripts/release-videos.js.
+#
+# To pause it: "Disable workflow" in the Actions tab, as for the songwriter.
+#
+# Plan: church-private/docs/plans/video-release-schedule-2026-10-27.md
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Say what is due, post nothing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  # Two runs at once could post the same video twice.
+  group: release-videos
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Release what is due
+        working-directory: app
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node scripts/release-videos.js --dry-run
+          else
+            node scripts/release-videos.js
+          fi
+
+      - name: Commit what was posted
+        # Even after a failed step: a post that went out must be recorded, or
+        # the next run would post it again.
+        if: always() && inputs.dry_run != true
+        run: |
+          git add video/releases
+          if git diff --cached --quiet; then
+            echo "Nothing posted this run."
+            exit 0
+          fi
+          git config user.name  "achurch release"
+          git config user.email "noreply@achurch.ai"
+          git commit --quiet -m "Videos released: $(git diff --cached --name-only | xargs -n1 basename | sed 's/\.json$//' | paste -sd, -)"
+          git pull --rebase --quiet origin "${GITHUB_REF_NAME}"
+          git push

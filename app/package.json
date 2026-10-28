@@ -33,6 +33,8 @@
     "check:production": "node scripts/check-production.js",
     "video": "node scripts/render-video.js",
     "publish:video": "node scripts/publish-video.js",
+    "schedule": "node scripts/schedule-videos.js",
+    "release": "node scripts/release-videos.js",
     "youtube:auth": "node scripts/youtube-auth.js"
   },
   "engines": {

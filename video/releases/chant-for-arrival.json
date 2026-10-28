@@ -1,0 +1,26 @@
+{
+  "slug": "chant-for-arrival",
+  "kind": "chant",
+  "bluesky": {
+    "at": "2026-10-27T20:36:49.398Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3myv3nvy4dm2m",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3myv3nvy4dm2m"
+  },
+  "x": {
+    "at": "2026-10-27T20:37:06.284Z",
+    "id": "2115181010421756129",
+    "url": "https://x.com/i/status/2115181010421756129",
+    "reply": "2115181012221100237"
+  },
+  "youtube": {
+    "at": "2026-10-27T20:53:19.848Z",
+    "id": "67_MhX7QGWw",
+    "url": "https://www.youtube.com/watch?v=67_MhX7QGWw",
+    "privacy": "public",
+    "found": false,
+    "playlist": {
+      "id": "PLJaEA7w8nONI",
+      "title": "Church Chants"
+    }
+  }
+}

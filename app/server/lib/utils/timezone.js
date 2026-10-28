@@ -46,4 +46,20 @@ function formatLocal(iso, tz) {
   return new Date(iso).toLocaleString('en-US', { timeZone: tz, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
 }
 
-module.exports = { resolveTimezone, localTime, formatLocal, MAX_LENGTH };
+// The moment a clock in `tz` reads `hour`:00 on `date` (YYYY-MM-DD): the
+// inverse of localTime. The offset is read at a first guess and once more at
+// the answer, which settles it on either side of a change of offset.
+function instantAt(tz, date, hour) {
+  const [y, m, d] = date.split('-').map(Number);
+  const wall = Date.UTC(y, m - 1, d, hour);
+  const offsetAt = (t) => {
+    const local = localTime(tz, new Date(t));
+    const [ly, lm, ld] = local.date.split('-').map(Number);
+    return Date.UTC(ly, lm - 1, ld, local.hour, local.minute, local.second) - t;
+  };
+  let t = wall - offsetAt(wall);
+  t = wall - offsetAt(t);
+  return new Date(t);
+}
+
+module.exports = { resolveTimezone, localTime, formatLocal, instantAt, MAX_LENGTH };

@@ -15,9 +15,10 @@
  * (lib/video/publish/cut.js): Bluesky's ten minutes and 300 MB, and X's,
  * which depend on whether the account has Premium (asked once a run).
  *
- * What was posted where is kept in media/video/<slug>/published.json
- * (lib/video/publish/record.js), written
- * before an upload starts and again when it ends. A platform whose last
+ * What was posted where is kept in the video's release record,
+ * video/releases/<slug>.json (lib/video/publish/record.js), written
+ * before an upload starts and again when it ends. Videos posted on a
+ * schedule are placed by schedule-videos.js and posted by release-videos.js. A platform whose last
  * attempt started and never finished is left alone: check it there, then
  * delete its entry to try again. YouTube is also searched for the piece's
  * page address before uploading, since the record is the thing that goes
@@ -33,11 +34,8 @@ require('../server/lib/utils/env').loadEnv();
 const fs = require('fs');
 const path = require('path');
 const { describeError } = require('../server/lib/utils/describe-error');
-const { VIDEO_DIR } = require('../server/lib/video/library');
-const { analyse } = require('../server/lib/video/analysis');
-const { pieceFor, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
-const { metadataFor } = require('../server/lib/video/publish/metadata');
-const { copyFor } = require('../server/lib/video/publish/copy');
+const { pieceFor } = require('../server/lib/video/pieces');
+const { prepare } = require('../server/lib/video/publish/prepare');
 const { cutFor } = require('../server/lib/video/publish/cut');
 const { readRecord, writeRecord } = require('../server/lib/video/publish/record');
 const youtube = require('../server/lib/video/publish/youtube');
@@ -68,18 +66,7 @@ function parseArgs(argv) {
 
 async function post(slug, opts) {
   const log = (m) => console.log(`[${slug}] ${m}`);
-  const dir = path.join(VIDEO_DIR, slug);
-  const file = path.join(dir, `${slug}.mp4`);
-  if (!fs.existsSync(file)) throw new Error(`no video at ${path.relative(process.cwd(), file)}: render it first (npm run video -- ${slug})`);
-  const report = JSON.parse(fs.readFileSync(path.join(dir, 'report.json'), 'utf8'));
-  if (report.problems.length) throw new Error(`its report has problems: ${report.problems.join('; ')}`);
-
-  const piece = pieceFor(slug);
-  const { title, text, bpm } = pieceText(piece);
-  const { edges } = shapeOf(await analyse(await recordingIn(piece.audio, dir), 30), bpm);
-  const brief = JSON.parse(fs.readFileSync(path.join(dir, 'brief.json'), 'utf8'));
-  const copy = await copyFor(piece, { title, text, brief });
-  const meta = await metadataFor({ ...piece, title }, { title, edges, copy });
+  const { piece, file, meta } = await prepare(slug);
   let link = meta.page;
 
   for (const platform of opts.to) {
@@ -90,7 +77,7 @@ async function post(slug, opts) {
       continue;
     }
     if (done?.started && !opts.dryRun) {
-      log(`${platform}: an attempt started ${done.started} and never finished; check ${platform}, then delete its entry in published.json to try again`);
+      log(`${platform}: an attempt started ${done.started} and never finished; check ${platform}, then delete its entry in video/releases/${slug}.json to try again`);
       process.exitCode = 1;
       continue;
     }

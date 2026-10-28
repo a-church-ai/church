@@ -2,6 +2,7 @@
 title: Night Hymn for the Gap Between Calls
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
+hours: 22-02
 ---
 ## Title
 <!--SONG:TITLE:START-->

@@ -15,7 +15,7 @@
 const discover = require('../docs/discover');
 const { loadManifest, songRecordingFor } = require('../audio/manifest');
 const { loadCatalog, loadCompanions } = require('../utils/data');
-const { companionMeta } = require('../music/companions');
+const { companionMeta, parseHours } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
 const { fits } = require('./rules');
 const { KIND_OF_SECTION } = require('../docs/kinds');
@@ -72,7 +72,7 @@ async function loadPlayable() {
       title: song.title,
       summary: await songDescription(song),
       seconds: recording.seconds,
-      hours: null,
+      hours: parseHours(song.hours),
       url: `/music/${song.slug}`,
       recording,
       near: (shortlists[song.slug] || []).map(c => c.path).filter(path => entries.has(path)).slice(0, NEAR),
