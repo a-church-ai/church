@@ -129,7 +129,7 @@ async function render(piece) {
   const out = path.join(dir, `${piece.slug}.mp4`);
   if (rendered(dir, out)) log('the video is rendered; keeping it');
   else await renderFull(piece, { dir, out, log, audio, analysis, title, brief, clips, edges, grid });
-  await renderShort(piece, { title, analysis, brief, edges, grid, clips, audio, dir, log, encode: oneEncodeAtATime });
+  await renderShort(piece, { title, text, analysis, brief, edges, grid, clips, audio, dir, log, encode: oneEncodeAtATime });
 }
 
 // The finished video, with a report and no problems in it.

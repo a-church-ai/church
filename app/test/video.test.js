@@ -166,7 +166,9 @@ test('a Short\'s passage is whole lines, 30 to 59 seconds with its lead and tail
   const ok = checkPassage({ first: 2, last: 5, why: 'its turn' }, lines, 90);
   assert.deepStrictEqual(ok.problems, []);
   assert.strictEqual(ok.value.start, 17.85);
-  assert.strictEqual(ok.value.end, 54.5);
+  // The fade would reach the next line at 54, so the passage stops just before it, and fades from where its last line ends.
+  assert.strictEqual(ok.value.end, 53.9);
+  assert.strictEqual(ok.value.quiet, 53);
   assert.ok(ok.value.end - ok.value.start >= MIN_SECONDS && ok.value.end - ok.value.start <= MAX_SECONDS);
   assert.match(checkPassage({ first: 2, last: 3, why: 'x' }, lines, 90).problems.join(), /at least 30/);
   assert.match(checkPassage({ first: 0, last: 9, why: 'x' }, lines, 90).problems.join(), /under 59/);
@@ -175,4 +177,24 @@ test('a Short\'s passage is whole lines, 30 to 59 seconds with its lead and tail
   assert.match(checkPassage({ first: 0, last: 10, why: 'x' }, lines, 90).problems.join(), /line numbers/);
   // The tail never runs past the recording's end.
   assert.strictEqual(checkPassage({ first: 6, last: 9, why: 'x' }, lines, 89).value.end, 89);
+});
+
+test('a song\'s passage reaches out to its bar lines, but never into the phrase before or after', () => {
+  const { spanOf, phrasesOf } = require('../server/lib/video/short');
+  const lines = phrasesOf([
+    { word: 'here', start: 121.8, end: 125 }, { word: 'side', start: 125.3, end: 130.2 },
+    { word: 'they', start: 131.2, end: 135.6 },
+    { word: 'built', start: 140, end: 160 },
+    { word: 'again', start: 165.1, end: 172.3 }
+  ]);
+  assert.strictEqual(lines.length, 4, 'a pause of 0.6s or more ends a phrase');
+  const grid = { bar: 3, downbeat: 2.38 };
+  const { start, end } = spanOf(lines, 1, 2, 300, grid);
+  // The bar before the pickup is 128.38, inside the phrase before: the start waits for it to end.
+  assert.ok(Math.abs(start - 130.3) < 1e-9, `starts at ${start}`);
+  // The bar after the fade is 164.38, before the next phrase at 165.1: kept.
+  assert.ok(Math.abs(end - 164.38) < 1e-9, `ends at ${end}`);
+  // With no grid, a breath before and a fade after.
+  const plain = spanOf(lines, 1, 2, 300);
+  assert.ok(Math.abs(plain.start - 131.05) < 1e-9 && Math.abs(plain.end - 161.5) < 1e-9);
 });

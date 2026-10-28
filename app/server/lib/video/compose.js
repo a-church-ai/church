@@ -163,10 +163,10 @@ async function grainFor(file, seconds) {
 /**
  * The finished video at `size`, `seconds` long. With `from` (a Short), the
  * base and the recording start that far into the piece, the sound fades in
- * and out, and `end` (a card) fades in over the close; the layers are already
- * the passage's own.
+ * and out (from `fadeAt`, where the voice stops), and `end` (a card) fades in
+ * over the close; the layers are already the passage's own.
  */
-async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, out, size = LANDSCAPE, from = null, end = null }) {
+async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, out, size = LANDSCAPE, from = null, end = null, fadeAt = Math.max(0, seconds - 1.5) }) {
   const grain = await grainFor(base, (from || 0) + seconds);
   const fadeOut = Math.max(0, seconds - 2.5).toFixed(3);
   const dims = `${size.width}:${size.height}`;
@@ -199,7 +199,7 @@ async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, 
     graph.push(`[5:v]format=rgba,fade=in:st=${shown.toFixed(3)}:d=1:alpha=1[end]`, `[titled][end]overlay=0:0:eof_action=pass,format=yuv420p[v]`);
   }
   if (from) {
-    graph.push(`[4:a]afade=t=in:d=0.3,afade=t=out:st=${Math.max(0, seconds - 1.5).toFixed(3)}:d=1.5[a]`);
+    graph.push(`[4:a]afade=t=in:d=0.3,afade=t=out:st=${fadeAt.toFixed(3)}:d=${(seconds - fadeAt).toFixed(3)}[a]`);
     sound = '[a]';
   }
   await ffmpeg([...inputs,

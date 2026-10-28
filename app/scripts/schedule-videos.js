@@ -10,12 +10,15 @@
  *                                 YouTube, after the rules change
  *
  * For each video placed: its words for every platform (prepare.js, the copy
- * written once by Claude), its cuts for Bluesky and X (cut.js), the video and
- * the cuts uploaded to S3 under video/<slug>/, and its release record written
- * in video/releases/<slug>.json with its hour. Commit and push video/ after:
- * the hourly job (release-videos.js, .github/workflows/release-videos.yml)
- * reads the records from the repository, uploads each video to YouTube a day
- * ahead to go public at its hour, and posts it to Bluesky and X then.
+ * written once by Claude), its cuts for Bluesky and X (cut.js), the video,
+ * the cuts and its Short (lib/video/short.js) uploaded to S3 under
+ * video/<slug>/, and its release record written in
+ * video/releases/<slug>.json with its hour and the Short's passage. A placed
+ * video without its Short gets just that. Commit and push video/ after: the
+ * hourly job (release-videos.js, .github/workflows/release-videos.yml) reads
+ * the records from the repository, uploads each video to YouTube a day ahead
+ * to go public at its hour and its Short an hour after, and posts the video
+ * to Bluesky and X then.
  *
  * The rules are lib/video/schedule.js. Placed videos keep their hours;
  * rendering more and running this again fills the slots after them. It warns
@@ -97,11 +100,14 @@ function unplaced(records) {
     });
 }
 
-// The video and its cuts in S3, by name; a cut that is the video itself is
-// the same object.
-async function upload(slug, file, log) {
-  const files = { youtube: file, bluesky: (await cutFor(file, bluesky.LIMITS)).file, x: (await cutFor(file, await x.limits())).file };
-  const keys = {};
+// The video, its cuts and its Short in S3, by name; a cut that is the video
+// itself is the same object. Those already there (`have`) are kept.
+async function upload(slug, { file, short }, log, have = {}) {
+  const files = { youtube: file, short };
+  if (!have.bluesky) files.bluesky = (await cutFor(file, bluesky.LIMITS)).file;
+  if (!have.x) files.x = (await cutFor(file, await x.limits())).file;
+  for (const platform of Object.keys(have)) delete files[platform];
+  const keys = { ...have };
   for (const local of new Set(Object.values(files))) {
     const key = `video/${slug}/${path.basename(local)}`;
     log(`uploading ${path.basename(local)} (${Math.round(fs.statSync(local).size / 1048576)} MB)`);
@@ -114,7 +120,7 @@ async function upload(slug, file, log) {
 function show(records) {
   const now = Date.now();
   for (const r of records.filter(r => r.at)) {
-    const state = ['youtube', 'bluesky', 'x'].map(p => `${p} ${r[p]?.url ? 'posted' : r[p]?.started ? 'STARTED' : r[p]?.id ? 'uploaded' : '-'}`).join(', ');
+    const state = ['youtube', 'short', 'bluesky', 'x'].map(p => `${p} ${r[p]?.url ? 'posted' : r[p]?.started ? 'STARTED' : r[p]?.id ? 'uploaded' : '-'}`).join(', ');
     console.log(`${Date.parse(r.at) < now ? ' ' : '>'} ${formatLocal(r.at, TZ).padEnd(28)} ${r.slug.padEnd(48)} ${state}`);
   }
   const last = records.filter(r => r.at).map(r => Date.parse(r.at)).sort().pop();
@@ -144,6 +150,20 @@ async function main() {
   const { placed, waiting } = plan({ start, now: new Date(), placed: kept, candidates });
   const ready = new Map(records.filter(r => r.files && r.meta).map(r => [r.slug, r]));
   if (!placed.length) console.log('Nothing new to place.');
+  // Videos placed before they had Shorts: just the Short, into S3. One put on
+  // YouTube by hand (its record holds "short") needs none.
+  for (const r of records.filter(r => r.slot && r.files && !r.files.short && !r.short)) {
+    const log = (m) => console.log(`[${r.slug}] ${m}`);
+    try {
+      const { file, short, passage } = renderedVideo(r.slug);
+      log(`its Short, ${passage.start.toFixed(1)}s to ${passage.end.toFixed(1)}s`);
+      if (opts.dryRun) continue;
+      await updateRecord(r.slug, { files: await upload(r.slug, { file, short }, log, r.files), passage });
+    } catch (err) {
+      log(`its Short: ${describeError(err)}`);
+      process.exitCode = 1;
+    }
+  }
   for (const p of placed) {
     const log = (m) => console.log(`[${p.slug}] ${m}`);
     log(`week ${p.week + 1}, ${formatLocal(p.at, TZ)}`);
@@ -153,9 +173,9 @@ async function main() {
       continue;
     }
     try {
-      const { piece, file, meta } = await prepare(p.slug);
-      const files = await upload(p.slug, file, log);
-      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, files, meta });
+      const { piece, file, short, passage, meta } = await prepare(p.slug);
+      const files = await upload(p.slug, { file, short }, log);
+      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, files, passage, meta });
     } catch (err) {
       log(`failed: ${describeError(err)}`);
       process.exitCode = 1;

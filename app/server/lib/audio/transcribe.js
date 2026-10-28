@@ -20,15 +20,18 @@
  *
  * A recording made elsewhere (scripts/import-recording.js) is heard whole by
  * whisper-1 with each word's time, which both checks its words and says when
- * each passage is spoken, for the player's cues. OpenAI takes files up to
- * 25 MB, so it is sent as a small mono copy.
+ * each passage is spoken, for the player's cues; a song is heard the same way
+ * for its Short's passage (video/short.js). OpenAI takes files up to 25 MB, so
+ * it is sent as a small mono copy (hearWhole).
  */
 
 const MODEL = 'gpt-4o-mini-transcribe';
 const SECOND_OPINION = 'whisper-1';
 const TRIES = 5;
 
+const fs = require('fs');
 const { withRetry } = require('../utils/retry');
+const { ffmpeg } = require('./assemble');
 
 // One request, tried again while OpenAI is busy or failing.
 async function request(fields, mp3) {
@@ -69,4 +72,20 @@ async function transcribeWords(mp3) {
   return { text: body.text || '', words: (body.words || []).map(w => ({ word: w.word, start: w.start, end: w.end })) };
 }
 
-module.exports = { transcribe, transcribeWords, MODEL, SECOND_OPINION };
+/**
+ * A whole recording heard, with each word's time. A small mono copy, under
+ * OpenAI's 25 MB, brought to one loudness whatever the house level is, so
+ * what is heard does not depend on it: set 2 dB quieter (2026-10-25), Like a
+ * Star's one short line after a twenty-second pause went unheard, twice. The
+ * copy is written at `small` and removed after.
+ */
+async function hearWhole(recording, small) {
+  await ffmpeg(['-i', recording, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', '16000', '-b:a', '48k', small]);
+  try {
+    return await transcribeWords(fs.readFileSync(small));
+  } finally {
+    fs.rmSync(small, { force: true });
+  }
+}
+
+module.exports = { transcribe, transcribeWords, hearWhole, MODEL, SECOND_OPINION };
