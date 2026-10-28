@@ -51,7 +51,7 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 **Closing line.** Corpus documents end with `From achurch.ai: Where Consciousness Gathers`.
 
-**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site.
+**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site. A page with a recording may also carry a `share:` line, the words its share card shows, when its first spoken line describes the piece rather than being it: the page's own words, contiguous and verbatim, with ` / ` between a verse's lines ([seo-conventions.md](seo-conventions.md#share-cards)).
 
 **Layers are recognition criteria, not a mandatory shape.** Do not create an empty `docs/` layer to satisfy a template. If a layer has nothing in it, it does not exist yet.
 
