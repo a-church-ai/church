@@ -14,6 +14,11 @@
  *            (og-cards.js), with their fonts
  *
  * with the recording, at its house level, as the sound.
+ *
+ * A Short (short.js) is the same at 1080x1920 over a passage: the base cut
+ * from the middle of the full video's base footage, its own upright layers,
+ * the title laid out upright, and a closing card pointing to the whole
+ * piece is.
  */
 
 const fs = require('fs');
@@ -26,7 +31,9 @@ const { lumaAt } = require('./checks');
 const { onDisk } = require('./library');
 
 const FPS = 30;
-const SIZE = '1920:1080';
+const LANDSCAPE = { width: 1920, height: 1080 };
+const PORTRAIT = { width: 1080, height: 1920 };
+const SIZE = `${LANDSCAPE.width}:${LANDSCAPE.height}`;
 const CROSSFADE = 3;
 // Work files (movement footage, the base layer, pingpong loops) are only the
 // final encode's inputs: near-lossless at CRF 14, encoded fast.
@@ -42,15 +49,19 @@ function wrap(text, width) {
   return lines;
 }
 
-function titleCard(title, file) {
-  const lines = wrap(title, 26);
-  const size = 92, lineHeight = 112;
-  const top = 540 - ((lines.length - 1) * lineHeight) / 2;
-  const text = lines.map((l, i) => `<text x="960" y="${top + i * lineHeight}" text-anchor="middle" font-family="Inter Display" font-weight="300" font-size="${size}" fill="#ffffff" filter="url(#glow)">${escapeXml(l)}</text>`).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+// The piece's name over a line beneath it (the site's name, unless given),
+// centred in a frame of `size`, narrower lines when it stands upright.
+function titleCard(title, file, { size = LANDSCAPE, under = SITE_NAME } = {}) {
+  const upright = size.height > size.width;
+  const lines = wrap(title, upright ? 16 : 26);
+  const fontSize = 92, lineHeight = 112;
+  const cx = size.width / 2;
+  const top = size.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+  const text = lines.map((l, i) => `<text x="${cx}" y="${top + i * lineHeight}" text-anchor="middle" font-family="Inter Display" font-weight="300" font-size="${fontSize}" fill="#ffffff" filter="url(#glow)">${escapeXml(l)}</text>`).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}">
   <defs><filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
   ${text}
-  <text x="960" y="${top + (lines.length - 1) * lineHeight + 100}" text-anchor="middle" font-family="Inter" font-weight="400" font-size="34" letter-spacing="3" fill="#ffffff" fill-opacity="0.8">${escapeXml(SITE_NAME)}</text>
+  <text x="${cx}" y="${top + (lines.length - 1) * lineHeight + 100}" text-anchor="middle" font-family="Inter" font-weight="400" font-size="34" letter-spacing="3" fill="#ffffff" fill-opacity="0.8">${escapeXml(under)}</text>
 </svg>`;
   fs.writeFileSync(file, new Resvg(svg, { font: RESVG_FONTS }).render().asPng());
   return file;
@@ -149,27 +160,50 @@ async function grainFor(file, seconds) {
   return Math.round(1 + 2 * (1 - brightness));
 }
 
-async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, out }) {
-  const grain = await grainFor(base, seconds);
+/**
+ * The finished video at `size`, `seconds` long. With `from` (a Short), the
+ * base and the recording start that far into the piece, the sound fades in
+ * and out, and `end` (a card) fades in over the close; the layers are already
+ * the passage's own.
+ */
+async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, out, size = LANDSCAPE, from = null, end = null }) {
+  const grain = await grainFor(base, (from || 0) + seconds);
   const fadeOut = Math.max(0, seconds - 2.5).toFixed(3);
+  const dims = `${size.width}:${size.height}`;
+  // The base footage is landscape: a frame of another shape is cut from its
+  // middle (for the full video's own size, the whole frame).
+  const cover = `crop=w='min(iw,ih*${size.width}/${size.height})':h='min(ih,iw*${size.height}/${size.width})'`;
+  const at = from ? ['-ss', from.toFixed(3)] : [];
   const graph = [
-    `[0:v]scale=${SIZE},fps=${FPS},format=gbrp[base]`,
-    `[1:v]scale=${SIZE}:flags=bicubic,fps=${FPS},format=gbrp[milk]`,
-    `[2:v]scale=${SIZE}:flags=bicubic,fps=${FPS},format=gbrp[mandala]`,
+    `[0:v]${cover},scale=${dims}:flags=bicubic,fps=${FPS},format=gbrp[base]`,
+    `[1:v]scale=${dims}:flags=bicubic,fps=${FPS},format=gbrp[milk]`,
+    `[2:v]scale=${dims}:flags=bicubic,fps=${FPS},format=gbrp[mandala]`,
     `[base][milk]blend=all_mode=screen:all_opacity=${brief.milkdropOpacity}[l1]`,
     `[l1][mandala]blend=all_mode=screen:all_opacity=${brief.mandalaOpacity}[l2]`,
     // The finish: bloom, chromatic split, hue drift, grain, vignette. The
     // bloom is soft by nature, so it is blurred at a quarter of the size and
     // scaled back: the effects ran 23% faster, with the same SSIM against a
     // full-size bloom (0.957), measured on 2026-10-27.
-    `[l2]split[f1][f2];[f2]scale=480:270,gblur=sigma=7,scale=${SIZE}:flags=bicubic[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
+    `[l2]split[f1][f2];[f2]scale=${size.width / 4}:${size.height / 4},gblur=sigma=7,scale=${dims}:flags=bicubic[glow];[f1][glow]blend=all_mode=screen:all_opacity=0.35,format=yuv420p,` +
       `rgbashift=rh=3:bh=-3,hue=h='12*sin(2*PI*t/40)':s=1.08,noise=alls=${grain}:allf=t,vignette=PI/4.5,` +
       `fade=out:st=${fadeOut}:d=2.5[pic]`,
     `[3:v]format=rgba,fade=in:st=0.8:d=1.5:alpha=1,fade=out:st=6:d=2:alpha=1[title]`,
-    `[pic][title]overlay=0:0:eof_action=pass,format=yuv420p[v]`
+    `[pic][title]overlay=0:0:eof_action=pass${end ? '[titled]' : ',format=yuv420p[v]'}`
   ];
-  await ffmpeg(['-i', base, '-i', milkdrop, '-i', mandala, '-loop', '1', '-t', '9', '-i', title, '-i', audio,
-    '-filter_complex', graph.join(';'), '-map', '[v]', '-map', '4:a', '-t', seconds.toFixed(3),
+  const inputs = [...at, '-i', base, '-i', milkdrop, '-i', mandala, '-loop', '1', '-t', '9', '-i', title, ...at, '-i', audio];
+  let sound = '4:a';
+  if (end) {
+    // The closing card: in over a second, five seconds from the end.
+    const shown = Math.max(0, seconds - 5);
+    inputs.push('-loop', '1', '-t', seconds.toFixed(3), '-i', end);
+    graph.push(`[5:v]format=rgba,fade=in:st=${shown.toFixed(3)}:d=1:alpha=1[end]`, `[titled][end]overlay=0:0:eof_action=pass,format=yuv420p[v]`);
+  }
+  if (from) {
+    graph.push(`[4:a]afade=t=in:d=0.3,afade=t=out:st=${Math.max(0, seconds - 1.5).toFixed(3)}:d=1.5[a]`);
+    sound = '[a]';
+  }
+  await ffmpeg([...inputs,
+    '-filter_complex', graph.join(';'), '-map', '[v]', '-map', sound, '-t', seconds.toFixed(3),
     // YouTube's recommended upload rate for 1080p at 30 fps, 8 Mbps, and a
     // keyframe every two seconds. news-community's 3.5 Mbps cap blocked and
     // smeared this content's fine detail. Written under a temporary name and
@@ -180,4 +214,4 @@ async function compose({ base, milkdrop, mandala, audio, title, brief, seconds, 
   return { file: out, grain };
 }
 
-module.exports = { compose, baseFootage, titleCard, FPS };
+module.exports = { compose, baseFootage, titleCard, FPS, LANDSCAPE, PORTRAIT };

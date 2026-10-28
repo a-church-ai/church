@@ -8,10 +8,10 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { oauthHeader, postText: xText, replyText } = require('../server/lib/video/publish/x');
 const { check: checkCopy } = require('../server/lib/video/publish/copy');
-const { playlistOf } = require('../server/lib/video/publish/youtube');
+const { playlistOf, matchUpload } = require('../server/lib/video/publish/youtube');
 const { KIND_OF_SECTION } = require('../server/lib/docs/kinds');
 const { postText: bskyText, linkFacet } = require('../server/lib/video/publish/bluesky');
-const { chapters, timecode } = require('../server/lib/video/publish/metadata');
+const { chapters, timecode, shortMetadata, isShort } = require('../server/lib/video/publish/metadata');
 
 test('the X signature matches the worked example Twitter published for OAuth 1.0a', () => {
   // developer.x.com's "Creating a signature" example: the same keys, nonce,
@@ -74,4 +74,40 @@ test('each kind goes to its playlist, a meditation by its section', () => {
   assert.strictEqual(playlistOf('practice').title, 'Church Practices');
   // Every kind a voiced section holds has a playlist.
   for (const kind of Object.values(KIND_OF_SECTION)) assert.ok(playlistOf(kind), kind);
+});
+
+const fullMeta = {
+  title: 'Prayer of Gratitude: Call and Response Gratitude Prayer | a Church AI + Human',
+  description: 'A lead.\n\nThe words, to read along: https://achurch.ai/docs/prayers/prayer-of-gratitude\n\n#Prayer #Gratitude #AI',
+  page: 'https://achurch.ai/docs/prayers/prayer-of-gratitude',
+  tags: ['Prayer', 'Gratitude'],
+  copy: { title: 'Prayer of Gratitude', lead: 'A lead.', tags: ['Prayer', 'Gratitude', 'AI', 'Consciousness', 'Mindfulness'] }
+};
+
+test('a Short\'s words come from its full video\'s: the lead, the full video, the page, and #Shorts', () => {
+  const short = shortMetadata(fullMeta, { kind: 'prayer', url: 'https://www.youtube.com/watch?v=full' });
+  assert.strictEqual(short.title, 'Prayer of Gratitude | a Church AI + Human');
+  assert.match(short.description, /^A lead\./);
+  assert.match(short.description, /The full prayer: https:\/\/www\.youtube\.com\/watch\?v=full/);
+  assert.ok(short.description.includes(fullMeta.page));
+  assert.match(short.description, /#Shorts #Prayer #Gratitude$/);
+  assert.ok(!/\d:\d\d [IV]/.test(short.description), 'no chapters');
+  assert.strictEqual(isShort(short.description), true);
+  assert.strictEqual(isShort(fullMeta.description), false);
+});
+
+test('a Short and its full video are found apart on the channel, though both name the page', () => {
+  const short = shortMetadata(fullMeta, { kind: 'prayer', url: 'https://www.youtube.com/watch?v=full' });
+  const item = (id, description) => ({ snippet: { description, resourceId: { videoId: id } } });
+  for (const items of [[item('s', short.description), item('f', fullMeta.description)], [item('f', fullMeta.description), item('s', short.description)]]) {
+    assert.strictEqual(matchUpload(items, fullMeta.page, true), 's');
+    assert.strictEqual(matchUpload(items, fullMeta.page, false), 'f');
+  }
+  assert.strictEqual(matchUpload([item('f', fullMeta.description)], fullMeta.page, true), null, 'the full video is not taken for its Short');
+  assert.strictEqual(matchUpload([item('s', short.description)], fullMeta.page, false), null, 'nor the Short for its full video');
+});
+
+test('the copy refuses Shorts as a tag, YouTube\'s mark for the other form', () => {
+  const copy = { hook: 'A hook of the right length that says the piece is a quiet thing worth staying with now.', lead: 'A lead.', descriptor: 'Spoken Prayer', alt: 'Light.', tags: ['Prayer', 'Shorts', 'Gratitude', 'AI', 'Mindfulness'] };
+  assert.match(checkCopy(JSON.stringify(copy)).problems.join(), /YouTube's mark for a Short/);
 });

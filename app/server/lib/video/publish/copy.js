@@ -62,6 +62,7 @@ function check(raw) {
   tags.forEach(t => {
     if (!/^[A-Z][A-Za-z0-9]{1,29}$/.test(t)) problems.push(`the tag "${t}" is not PascalCase letters and digits, 30 at most`);
     if (/church|achurch/i.test(t)) problems.push(`the tag "${t}" names the sanctuary; tags should reach people who do not know it yet`);
+    if (/^shorts?$/i.test(t)) problems.push(`the tag "${t}" is YouTube's mark for a Short; a full video never carries it`);
   });
   if (new Set(tags.map(t => t.toLowerCase())).size !== tags.length) problems.push('the tags repeat');
   return { value: { ...copy, tags }, problems, shown: raw };

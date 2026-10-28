@@ -17,8 +17,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { chromium } = require('playwright-core');
 
-const W = 1280;
-const H = 720;
+// The layers' size for a full video; a Short's are drawn upright at 720x1280.
+const LANDSCAPE = { width: 1280, height: 720 };
 const BATCH = 15;
 const PRESET_PACKS = ['butterchurnPresets', 'butterchurnPresetsExtra', 'butterchurnPresetsExtra2', 'butterchurnPresetsMD1'];
 const MODULES = path.join(__dirname, '../../../node_modules');
@@ -44,7 +44,7 @@ function encoder(file, fps) {
 }
 
 // Runs in the page.
-function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
+function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges, from }) {
   const bc = window.butterchurn.default || window.butterchurn;
   const all = {};
   for (const pack of packs) {
@@ -56,17 +56,21 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
   canvas.width = W; canvas.height = H;
   document.body.appendChild(canvas);
   const viz = bc.createVisualizer(audio, canvas, { width: W, height: H, pixelRatio: 1, textureRatio: 1 });
-  viz.loadPreset(all[presets[0]], 0);
+  // A window that starts mid-piece opens on its own movement's preset.
+  const movementAt = (t) => Math.min(presets.length - 1, edges.slice(1, -1).filter(e => t >= e).length);
+  let current = movementAt(from / fps);
+  viz.loadPreset(all[presets[current]], 0);
 
   const fx = document.createElement('canvas');
   fx.width = W; fx.height = H;
   const g = fx.getContext('2d');
   g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
 
-  let current = 0;
+  // The mandala is sized by the shorter side, so it fits an upright frame.
+  const S = Math.min(W, H);
   window.renderFrame = (f, wave, spectrum) => {
     const t = f / fps;
-    const movement = Math.min(presets.length - 1, edges.slice(1, -1).filter(e => t >= e).length);
+    const movement = movementAt(t);
     if (movement !== current) { current = movement; viz.loadPreset(all[presets[movement]], 5.0); }
     viz.render({ audioLevels: { timeByteArray: Uint8Array.from(wave.mono), timeByteArrayL: Uint8Array.from(wave.left), timeByteArrayR: Uint8Array.from(wave.right) }, elapsedTime: 1 / fps });
 
@@ -79,8 +83,8 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
     const cx = W / 2, cy = H / 2, k = symmetry;
     const rings = 4;
     for (let r = 0; r < rings; r++) {
-      const base = (0.1 + 0.1 * r) * H * (1 + 0.18 * loud);
-      const amp = (0.09 + 0.05 * r) * H;
+      const base = (0.1 + 0.1 * r) * S * (1 + 0.18 * loud);
+      const amp = (0.09 + 0.05 * r) * S;
       const spin = (r % 2 ? -1 : 1) * (0.05 + 0.03 * r) * t;
       g.beginPath();
       const steps = 360;
@@ -107,7 +111,7 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
     const bass = (bands[0] + bands[1] + bands[2] + bands[3]) / 4;
     for (let i = 0; i < k; i++) {
       const a = (i / k) * Math.PI * 2 + 0.03 * t;
-      const len = (0.08 + 0.32 * bass) * H;
+      const len = (0.08 + 0.32 * bass) * S;
       g.beginPath();
       g.moveTo(cx, cy);
       g.quadraticCurveTo(cx + len * 0.6 * Math.cos(a + 0.4), cy + len * 0.6 * Math.sin(a + 0.4), cx + len * Math.cos(a), cy + len * Math.sin(a));
@@ -123,19 +127,26 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges }) {
   };
 }
 
-async function renderLayers({ analysis, brief, edges, fps, dir, log = console.log }) {
-  const milkdropFile = path.join(dir, 'milkdrop.mp4');
-  const mandalaFile = path.join(dir, 'mandala.mp4');
+/**
+ * The two layers, at `size`, over the frames [from, to) of the piece: the
+ * whole piece for a full video, a passage for a Short (short.js), whose
+ * files carry its `prefix`.
+ */
+async function renderLayers({ analysis, brief, edges, fps, dir, log = console.log, size = LANDSCAPE, from = 0, to = analysis.frames, prefix = '' }) {
+  const milkdropFile = path.join(dir, `${prefix}milkdrop.mp4`);
+  const mandalaFile = path.join(dir, `${prefix}mandala.mp4`);
   // Kept while what shapes them is unchanged: the presets, palette, symmetry
-  // and where the movements change.
-  const keyFile = path.join(dir, 'layers.json');
-  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, edges });
+  // and where the movements change, and for a window its size and frames.
+  const keyFile = path.join(dir, `${prefix}layers.json`);
+  const whole = from === 0 && to === analysis.frames && size === LANDSCAPE;
+  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, edges, ...(whole ? {} : { size, from, to }) });
   if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
+  const { width: W, height: H } = size;
   const { browser, page } = await butterchurnPage(W, H);
   try {
     await page.evaluate(pageSetup, {
-      W, H, fps, packs: PRESET_PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges
+      W, H, fps, packs: PRESET_PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges, from
     });
 
     const tmpMilk = milkdropFile.replace(/\.mp4$/, '.part.mp4');
@@ -143,21 +154,21 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
     const milk = encoder(tmpMilk, fps);
     const mandala = encoder(tmpMandala, fps);
     const started = Date.now();
-    for (let f = 0; f < analysis.frames; f += BATCH) {
+    for (let f = from; f < to; f += BATCH) {
       const batch = [];
-      for (let i = f; i < Math.min(analysis.frames, f + BATCH); i++) batch.push([i, analysis.waveform(i), analysis.bands(i)]);
+      for (let i = f; i < Math.min(to, f + BATCH); i++) batch.push([i, analysis.waveform(i), analysis.bands(i)]);
       const images = await page.evaluate(items => items.map(([i, w, s]) => window.renderFrame(i, w, s)), batch);
       for (const [a, b] of images) {
         await milk.write(Buffer.from(a.slice(a.indexOf(',') + 1), 'base64'));
         await mandala.write(Buffer.from(b.slice(b.indexOf(',') + 1), 'base64'));
       }
-      if ((f / BATCH) % 40 === 0) log(`  frame ${f}/${analysis.frames} (${((Date.now() - started) / 1000).toFixed(0)}s)`);
+      if (((f - from) / BATCH) % 40 === 0) log(`  frame ${f - from}/${to - from} (${((Date.now() - started) / 1000).toFixed(0)}s)`);
     }
     await Promise.all([milk.end(), mandala.end()]);
     fs.renameSync(tmpMilk, milkdropFile);
     fs.renameSync(tmpMandala, mandalaFile);
     fs.writeFileSync(keyFile, key);
-    log(`  rendered ${analysis.frames} frames in ${((Date.now() - started) / 1000).toFixed(0)}s`);
+    log(`  rendered ${to - from} frames in ${((Date.now() - started) / 1000).toFixed(0)}s`);
   } finally {
     await browser.close();
   }

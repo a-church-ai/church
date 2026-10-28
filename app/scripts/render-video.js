@@ -16,9 +16,14 @@
  * one piece renders its layers while another encodes, and the encodes take
  * turns rather than share the cores.
  *
+ * Each video also gets its Short (lib/video/short.js): a passage, upright,
+ * from the same loops. Rerunning a rendered piece makes only what it lacks,
+ * which is how a video rendered before Shorts gets one.
+ *
  * Work and output go to media/video/<slug>/ (ignored by git and Docker).
  * Every step keeps its file, so a rerun spends nothing on what exists: delete
- * a file to make it again. One piece's failure leaves the rest to finish; the
+ * a file to make it again. The finished video is kept while its report is
+ * clean. One piece's failure leaves the rest to finish; the
  * run then exits 1.
  */
 
@@ -36,6 +41,7 @@ const { makeStill, makeClip, spent, VIDEO_MODEL } = require('../server/lib/video
 const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
 const { compose, baseFootage, titleCard, FPS } = require('../server/lib/video/compose');
+const { renderShort } = require('../server/lib/video/short');
 
 const OUT = library.VIDEO_DIR;
 // The recording the preset survey plays each preset against: a spoken
@@ -120,9 +126,21 @@ async function render(piece) {
     return clip;
   }));
 
+  const out = path.join(dir, `${piece.slug}.mp4`);
+  if (rendered(dir, out)) log('the video is rendered; keeping it');
+  else await renderFull(piece, { dir, out, log, audio, analysis, title, brief, clips, edges, grid });
+  await renderShort(piece, { title, analysis, brief, edges, grid, clips, audio, dir, log, encode: oneEncodeAtATime });
+}
+
+// The finished video, with a report and no problems in it.
+function rendered(dir, out) {
+  const report = path.join(dir, 'report.json');
+  return fs.existsSync(out) && fs.existsSync(report) && !JSON.parse(fs.readFileSync(report, 'utf8')).problems.length;
+}
+
+async function renderFull(piece, { dir, out, log, audio, analysis, title, brief, clips, edges, grid }) {
   log('rendering milkdrop and mandala layers');
   const { milkdropFile, mandalaFile } = await renderLayers({ analysis, brief, edges, fps: FPS, dir, log });
-  const out = path.join(dir, `${piece.slug}.mp4`);
   const { grain } = await oneEncodeAtATime(async () => {
     const started = Date.now();
     const { file: base, bars } = await baseFootage(clips, { edges, grid, envelope: envelope(analysis, grid), dir });

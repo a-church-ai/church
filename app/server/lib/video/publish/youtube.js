@@ -24,6 +24,7 @@
 
 const fs = require('fs');
 const { request } = require('./request');
+const { isShort } = require('./metadata');
 
 const API = 'https://www.googleapis.com/youtube/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/youtube/v3/videos';
@@ -74,14 +75,25 @@ async function accessToken() {
 
 const auth = (token) => ({ Authorization: `Bearer ${token}` });
 
-// The channel's most recent uploads (up to 50) whose descriptions name `page`.
-async function findUpload(token, page) {
+// The upload of this form among the channel's: one whose description names
+// the piece's page, a Short when `short` and its full video when not, since
+// both name the same page.
+function matchUpload(items, page, short) {
+  const hit = items.find(i => {
+    const description = i.snippet?.description || '';
+    return description.includes(page) && isShort(description) === short;
+  });
+  return hit ? hit.snippet.resourceId.videoId : null;
+}
+
+// The channel's most recent uploads (up to 50) whose descriptions name `page`,
+// of the form `short` says.
+async function findUpload(token, page, short) {
   const channel = await (await request(`${API}/channels?part=contentDetails&mine=true`, { headers: auth(token), retry: true })).json();
   const uploads = channel.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
   if (!uploads) return null;
   const items = await (await request(`${API}/playlistItems?part=snippet&maxResults=50&playlistId=${uploads}`, { headers: auth(token), retry: true })).json();
-  const hit = (items.items || []).find(i => (i.snippet?.description || '').includes(page));
-  return hit ? hit.snippet.resourceId.videoId : null;
+  return matchUpload(items.items || [], page, short);
 }
 
 async function uploadChunks(session, file, token, log) {
@@ -169,7 +181,7 @@ async function addToPlaylist(token, videoId, kind) {
  */
 async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = null, log = console.log }) {
   const token = await accessToken();
-  const existing = await findUpload(token, meta.page);
+  const existing = await findUpload(token, meta.page, isShort(meta.description));
   if (existing) return { id: existing, url: `https://www.youtube.com/watch?v=${existing}`, found: true };
   if (publishAt) privacy = 'private';
   const body = {
@@ -234,4 +246,4 @@ async function setPrivacy(id, privacy, { kind } = {}) {
   return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }
 
-module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, SCOPES };
+module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, matchUpload, SCOPES };

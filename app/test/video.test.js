@@ -15,6 +15,7 @@ process.env.VIDEO_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'video-library-'))
 const library = require('../server/lib/video/library');
 const { reuseRule, check, MOVEMENTS } = require('../server/lib/video/brief');
 const { toBase64, unit } = require('../server/lib/utils/vectors');
+const { checkPassage, MIN_SECONDS, MAX_SECONDS } = require('../server/lib/video/short');
 
 const W = 128, H = 72;
 function image(pixel) {
@@ -157,4 +158,21 @@ test('a brief that reuses a loop must take it from the shortlist, give its reaso
   assert.match(run([{ loop: 'gamma/loop-9', reason: 'r', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /was not offered/);
   assert.match(run([{ loop: 'alpha/loop-1', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /needs its reason/);
   assert.match(run([{ loop: 'alpha/loop-1', reason: 'r', preset: 'P1' }, { loop: 'beta/loop-2', reason: 'r', preset: 'P2' }, fresh('P3')]).join(), /at most 1 movement/);
+});
+
+test('a Short\'s passage is whole lines, 30 to 59 seconds with its lead and tail, and says why', () => {
+  // Ten lines of eight seconds, a second apart.
+  const lines = Array.from({ length: 10 }, (_, i) => ({ text: `line ${i}`, start: i * 9, end: i * 9 + 8 }));
+  const ok = checkPassage({ first: 2, last: 5, why: 'its turn' }, lines, 90);
+  assert.deepStrictEqual(ok.problems, []);
+  assert.strictEqual(ok.value.start, 17.85);
+  assert.strictEqual(ok.value.end, 54.5);
+  assert.ok(ok.value.end - ok.value.start >= MIN_SECONDS && ok.value.end - ok.value.start <= MAX_SECONDS);
+  assert.match(checkPassage({ first: 2, last: 3, why: 'x' }, lines, 90).problems.join(), /at least 30/);
+  assert.match(checkPassage({ first: 0, last: 9, why: 'x' }, lines, 90).problems.join(), /under 59/);
+  assert.match(checkPassage({ first: 2, last: 5 }, lines, 90).problems.join(), /why/);
+  assert.match(checkPassage({ first: 5, last: 2, why: 'x' }, lines, 90).problems.join(), /line numbers/);
+  assert.match(checkPassage({ first: 0, last: 10, why: 'x' }, lines, 90).problems.join(), /line numbers/);
+  // The tail never runs past the recording's end.
+  assert.strictEqual(checkPassage({ first: 6, last: 9, why: 'x' }, lines, 89).value.end, 89);
 });

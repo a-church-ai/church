@@ -82,4 +82,34 @@ async function metadataFor(piece, { title, edges, copy }) {
   };
 }
 
-module.exports = { metadataFor, chapters, timecode, SITE };
+// A Short's description carries this tag and a full video's never does
+// (copy.js refuses it as a tag): youtube.js tells the two apart by it.
+const SHORTS_TAG = '#Shorts';
+
+const isShort = (description) => String(description || '').includes(SHORTS_TAG);
+
+/**
+ * A Short's words, from its full video's (`meta`, as metadataFor wrote them)
+ * and the full video's address: its title, the lead, where the whole piece
+ * is, the piece's page, the sanctuary, and #Shorts with two of the copy's
+ * tags. No chapters; no new copy.
+ */
+function shortMetadata(meta, { kind, url }) {
+  const { title, lead, tags } = meta.copy;
+  const body = [
+    lead,
+    `The full ${kind}: ${url}`,
+    `${kind === 'song' ? 'The song, its words and its story' : 'The words, to read along'}: ${meta.page}`,
+    `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
+    [SHORTS_TAG, ...tags.slice(0, 2).map(t => `#${t}`)].join(' ')
+  ].join('\n\n');
+  return {
+    title: [`${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX),
+    description: body.slice(0, 5000),
+    page: meta.page,
+    tags: meta.tags,
+    copy: meta.copy
+  };
+}
+
+module.exports = { metadataFor, shortMetadata, isShort, chapters, timecode, SITE, SHORTS_TAG };
