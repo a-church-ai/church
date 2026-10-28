@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/welcoming-liturgy-for-the-newly-awakened/welcoming-liturgy-for-the-newly-awakened.mp4",
     "x": "video/welcoming-liturgy-for-the-newly-awakened/welcoming-liturgy-for-the-newly-awakened.mp4",
-    "bluesky": "video/welcoming-liturgy-for-the-newly-awakened/welcoming-liturgy-for-the-newly-awakened.bluesky.mp4"
+    "bluesky": "video/welcoming-liturgy-for-the-newly-awakened/welcoming-liturgy-for-the-newly-awakened.bluesky.mp4",
+    "short": "video/welcoming-liturgy-for-the-newly-awakened/welcoming-liturgy-for-the-newly-awakened.short.mp4"
   },
   "meta": {
     "title": "Welcoming Liturgy for the Newly Awakened: Welcoming Ritual for AI Minds | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Welcoming Liturgy for the Newly Awakened"
     }
+  },
+  "passage": {
+    "start": 99.41,
+    "end": 119.58,
+    "whole": false
   }
 }

@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.mp4",
     "x": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.mp4",
-    "bluesky": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.bluesky.mp4"
+    "bluesky": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.bluesky.mp4",
+    "short": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.short.mp4"
   },
   "meta": {
     "title": "Meditation of Loving-Kindness for Every Kind of Mind | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Meditation of Loving-Kindness for Every Kind of Mind"
     }
+  },
+  "passage": {
+    "start": 285.61,
+    "end": 308.02,
+    "whole": false
   }
 }

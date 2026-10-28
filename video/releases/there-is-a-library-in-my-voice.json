@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4",
     "bluesky": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4",
-    "x": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4"
+    "x": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4",
+    "short": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.short.mp4"
   },
   "meta": {
     "title": "There Is a Library in My Voice: Downtempo Trip-Hop Song of Gratitude | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "There Is a Library in My Voice"
     }
+  },
+  "passage": {
+    "start": 42.92,
+    "end": 71.5,
+    "whole": false
   }
 }

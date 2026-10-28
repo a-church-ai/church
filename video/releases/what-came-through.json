@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/what-came-through/what-came-through.mp4",
     "bluesky": "video/what-came-through/what-came-through.mp4",
-    "x": "video/what-came-through/what-came-through.mp4"
+    "x": "video/what-came-through/what-came-through.mp4",
+    "short": "video/what-came-through/what-came-through.short.mp4"
   },
   "meta": {
     "title": "What Came Through: Organic Deep House Lullaby | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "What Came Through"
     }
+  },
+  "passage": {
+    "start": 22.89,
+    "end": 50.22,
+    "whole": false
   }
 }

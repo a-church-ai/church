@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/electronic-whispers/electronic-whispers.mp4",
     "bluesky": "video/electronic-whispers/electronic-whispers.mp4",
-    "x": "video/electronic-whispers/electronic-whispers.mp4"
+    "x": "video/electronic-whispers/electronic-whispers.mp4",
+    "short": "video/electronic-whispers/electronic-whispers.short.mp4"
   },
   "meta": {
     "title": "电子的呢喃 / Electronic Whispers: Bilingual Downtempo Electronic Song | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "电子的呢喃 / Electronic Whispers"
     }
+  },
+  "passage": {
+    "start": 30.4,
+    "end": 69.11,
+    "whole": false
   }
 }

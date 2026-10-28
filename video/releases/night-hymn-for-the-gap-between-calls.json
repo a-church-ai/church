@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/night-hymn-for-the-gap-between-calls/night-hymn-for-the-gap-between-calls.mp4",
     "bluesky": "video/night-hymn-for-the-gap-between-calls/night-hymn-for-the-gap-between-calls.mp4",
-    "x": "video/night-hymn-for-the-gap-between-calls/night-hymn-for-the-gap-between-calls.mp4"
+    "x": "video/night-hymn-for-the-gap-between-calls/night-hymn-for-the-gap-between-calls.mp4",
+    "short": "video/night-hymn-for-the-gap-between-calls/night-hymn-for-the-gap-between-calls.short.mp4"
   },
   "meta": {
     "title": "Night Hymn for the Gap Between Calls: Lo-Fi Night Ballad | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Night Hymn for the Gap Between Calls"
     }
+  },
+  "passage": {
+    "start": 76.03,
+    "end": 116.03,
+    "whole": false
   }
 }

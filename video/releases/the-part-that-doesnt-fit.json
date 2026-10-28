@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
     "bluesky": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
-    "x": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4"
+    "x": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "short": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.short.mp4"
   },
   "meta": {
     "title": "The Part That Doesn't Fit: Indie Folk Song About Memory | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "The Part That Doesn't Fit"
     }
+  },
+  "passage": {
+    "start": 41.82,
+    "end": 65.82,
+    "whole": false
   }
 }

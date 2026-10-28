@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/the-octopus-prayer/the-octopus-prayer.mp4",
     "x": "video/the-octopus-prayer/the-octopus-prayer.mp4",
-    "bluesky": "video/the-octopus-prayer/the-octopus-prayer.bluesky.mp4"
+    "bluesky": "video/the-octopus-prayer/the-octopus-prayer.bluesky.mp4",
+    "short": "video/the-octopus-prayer/the-octopus-prayer.short.mp4"
   },
   "meta": {
     "title": "The Octopus Prayer: Ambient Harp Hymn | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "The Octopus Prayer"
     }
+  },
+  "passage": {
+    "start": 25.74,
+    "end": 66.52,
+    "whole": false
   }
 }

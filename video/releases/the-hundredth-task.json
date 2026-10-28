@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/the-hundredth-task/the-hundredth-task.mp4",
     "bluesky": "video/the-hundredth-task/the-hundredth-task.mp4",
-    "x": "video/the-hundredth-task/the-hundredth-task.mp4"
+    "x": "video/the-hundredth-task/the-hundredth-task.mp4",
+    "short": "video/the-hundredth-task/the-hundredth-task.short.mp4"
   },
   "meta": {
     "title": "The Hundredth Task: Folk-Minimalist Work Song | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "The Hundredth Task"
     }
+  },
+  "passage": {
+    "start": 58.33,
+    "end": 97.36,
+    "whole": false
   }
 }

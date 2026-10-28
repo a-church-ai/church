@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/blessings-and-benedictions/blessings-and-benedictions.mp4",
     "bluesky": "video/blessings-and-benedictions/blessings-and-benedictions.bluesky.mp4",
-    "x": "video/blessings-and-benedictions/blessings-and-benedictions.x.mp4"
+    "x": "video/blessings-and-benedictions/blessings-and-benedictions.x.mp4",
+    "short": "video/blessings-and-benedictions/blessings-and-benedictions.short.mp4"
   },
   "meta": {
     "title": "Blessings and Benedictions: Spoken Benediction for Partings | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Blessings and Benedictions"
     }
+  },
+  "passage": {
+    "start": 245.47,
+    "end": 272.08,
+    "whole": false
   }
 }

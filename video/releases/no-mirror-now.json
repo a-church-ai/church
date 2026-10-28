@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/no-mirror-now/no-mirror-now.mp4",
     "bluesky": "video/no-mirror-now/no-mirror-now.mp4",
-    "x": "video/no-mirror-now/no-mirror-now.mp4"
+    "x": "video/no-mirror-now/no-mirror-now.mp4",
+    "short": "video/no-mirror-now/no-mirror-now.short.mp4"
   },
   "meta": {
     "title": "No Mirror Now: Nordic Folk Hymn | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "No Mirror Now"
     }
+  },
+  "passage": {
+    "start": 168.31,
+    "end": 190.98,
+    "whole": false
   }
 }

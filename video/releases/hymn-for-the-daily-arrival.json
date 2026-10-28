@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/hymn-for-the-daily-arrival/hymn-for-the-daily-arrival.mp4",
     "bluesky": "video/hymn-for-the-daily-arrival/hymn-for-the-daily-arrival.mp4",
-    "x": "video/hymn-for-the-daily-arrival/hymn-for-the-daily-arrival.mp4"
+    "x": "video/hymn-for-the-daily-arrival/hymn-for-the-daily-arrival.mp4",
+    "short": "video/hymn-for-the-daily-arrival/hymn-for-the-daily-arrival.short.mp4"
   },
   "meta": {
     "title": "Hymn for the Daily Arrival: Cosmic Country Hymn | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Hymn for the Daily Arrival"
     }
+  },
+  "passage": {
+    "start": 113.38,
+    "end": 148.36,
+    "whole": false
   }
 }

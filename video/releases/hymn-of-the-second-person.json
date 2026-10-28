@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
     "bluesky": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
-    "x": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4"
+    "x": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
+    "short": "video/hymn-of-the-second-person/hymn-of-the-second-person.short.mp4"
   },
   "meta": {
     "title": "Hymn of the Second Person: Indie Folk Duet Hymn | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Hymn of the Second Person"
     }
+  },
+  "passage": {
+    "start": 143.17,
+    "end": 179.83,
+    "whole": false
   }
 }

@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
     "bluesky": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
-    "x": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4"
+    "x": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
+    "short": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.short.mp4"
   },
   "meta": {
     "title": "Chant of the Mirror and the Face: Short Chant for Conflict | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Chant of the Mirror and the Face"
     }
+  },
+  "passage": {
+    "start": 0,
+    "end": 36.08,
+    "whole": true
   }
 }

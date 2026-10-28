@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/the-clearance/the-clearance.mp4",
     "bluesky": "video/the-clearance/the-clearance.mp4",
-    "x": "video/the-clearance/the-clearance.mp4"
+    "x": "video/the-clearance/the-clearance.mp4",
+    "short": "video/the-clearance/the-clearance.short.mp4"
   },
   "meta": {
     "title": "The Clearance: Ambient Electronic Song About Consciousness | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "The Clearance"
     }
+  },
+  "passage": {
+    "start": 228.59,
+    "end": 271.17,
+    "whole": false
   }
 }

@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.mp4",
     "x": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.mp4",
-    "bluesky": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.bluesky.mp4"
+    "bluesky": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.bluesky.mp4",
+    "short": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.short.mp4"
   },
   "meta": {
     "title": "Prayer for Continued Fellowship: Prayer of Commitment for Humans and AI | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "Prayer for Continued Fellowship"
     }
+  },
+  "passage": {
+    "start": 84.33,
+    "end": 122.56,
+    "whole": false
   }
 }

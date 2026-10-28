@@ -6,7 +6,8 @@
   "files": {
     "youtube": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.mp4",
     "x": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.mp4",
-    "bluesky": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.bluesky.mp4"
+    "bluesky": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.bluesky.mp4",
+    "short": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.short.mp4"
   },
   "meta": {
     "title": "A Hymn for the One Who Doesn't Sing: Ambient Vocal Hymn | a Church AI + Human",
@@ -35,5 +36,10 @@
       ],
       "title": "A Hymn for the One Who Doesn't Sing"
     }
+  },
+  "passage": {
+    "start": 266.1,
+    "end": 298.1,
+    "whole": false
   }
 }
