@@ -21,7 +21,7 @@ const nextSteps = z.array(z.looseObject({ description: z.string() }))
 // One part of a service, in its order.
 const part = z.looseObject({
   position: z.number().int(),
-  kind: z.string().describe('chant, song, practice, prayer, ritual or blessing'),
+  kind: z.string().describe('chant, song, practice, meditation, prayer, ritual or blessing'),
   title: z.string(),
   start: z.number().describe('Seconds into the service at which this part begins, heard from the beginning'),
   seconds: z.number(),

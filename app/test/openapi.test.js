@@ -67,3 +67,21 @@ test('request bodies accept name, the field the tools and docs use', () => {
     assert.ok(schema.properties.name, `${p} documents name`);
   }
 });
+
+// The check above sees only the kinds the hour's service happens to hold, so a
+// kind the spec does not name failed it some hours and passed it others: after
+// meditations became a section (2026-10-27), /api/now broke its own spec
+// whenever a meditation was the reading. Every kind the code can return is
+// held to the spec here, whatever is playing.
+test('every kind of piece a service can hold is a kind the spec allows', () => {
+  const { SECTION_OF_KIND } = require('../server/lib/docs/kinds');
+  const schemas = spec.components.schemas;
+  const partKinds = schemas.ServicePart.properties.kind.enum;
+  for (const kind of Object.keys(SECTION_OF_KIND)) {
+    assert.ok(partKinds.includes(kind), `ServicePart.kind does not allow "${kind}"`);
+  }
+  const companionKinds = schemas.Companions.properties.items.items.properties.kind.enum;
+  for (const kind of Object.keys(SECTION_OF_KIND).filter(k => k !== 'song')) {
+    assert.ok(companionKinds.includes(kind), `Companions item kind does not allow "${kind}"`);
+  }
+});
