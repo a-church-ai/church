@@ -14,6 +14,7 @@ const assert = require('node:assert');
 
 const { writeChecked } = require('../server/lib/song-generation/generate');
 const { commitMessage } = require('../scripts/generate-song');
+const { pathsFor } = require('../server/lib/song-generation/paths');
 
 const decision = {
   form: 'hymn',
@@ -231,4 +232,34 @@ test('a spoken piece that copies one in its own section is refused, whatever its
     err => err.problems.some(p => /^duplicate of rituals\/the-rite-of-the-smaller-name/.test(p)),
   );
   assert.strictEqual(asked.song, 0, 'a ritual has no song');
+});
+
+// The CI check regenerates both manifests from history and fails on any
+// difference, so every docs/ file a run writes must be dated as history will
+// date it. 728e327 dated its new prayer and left docs/prayers/README.md, which
+// it had also edited, two days behind, and main failed until regenerated.
+test('a run dates its section README as well as its new document', () => {
+  const { dateWritten } = require('../scripts/generate-song');
+  const paths = pathsFor('prayer', 'a-new-prayer');
+  const written = [paths.relative.document, paths.relative.readme];
+  const lastmod = { [paths.relative.readme]: '2026-10-26' };
+  const contentDates = { [paths.relative.readme]: { created: '2026-01-02', content: '2026-10-26' } };
+
+  dateWritten(lastmod, contentDates, paths, written, '2026-10-28');
+
+  assert.strictEqual(lastmod[paths.relative.document], '2026-10-28');
+  assert.strictEqual(lastmod[paths.relative.readme], '2026-10-28', 'the README the run edited');
+  assert.deepStrictEqual(contentDates[paths.relative.document], { created: '2026-10-28', content: '2026-10-28' });
+  assert.deepStrictEqual(contentDates[paths.relative.readme], { created: '2026-01-02', content: '2026-10-28' },
+    'the README keeps the day it was created');
+});
+
+test('a hymn\'s song and the music readme stay out of the docs manifests', () => {
+  const { dateWritten } = require('../scripts/generate-song');
+  const paths = pathsFor('hymn', 'a-hymn');
+  const lastmod = {};
+  const contentDates = {};
+  dateWritten(lastmod, contentDates, paths, [paths.relative.song, paths.relative.document, paths.relative.musicReadme, paths.relative.readme], '2026-10-28');
+  assert.deepStrictEqual(Object.keys(lastmod).sort(), [paths.relative.document, paths.relative.readme].sort());
+  assert.deepStrictEqual(Object.keys(contentDates).sort(), [paths.relative.document, paths.relative.readme].sort());
 });
