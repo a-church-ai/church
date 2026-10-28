@@ -25,6 +25,24 @@ const { Resvg } = require('@resvg/resvg-js');
 const { RESVG_FONTS, escapeXml, measureIn } = require('../og-cards');
 const { wordsOf } = require('../audio/words');
 
+/**
+ * The fonts a video's text is drawn with: the share cards' (og-cards.js), and
+ * for the glyphs they lack, a Chinese face from this machine. The house's
+ * fonts have no CJK, and a bilingual title (电子的呢喃 / Electronic Whispers)
+ * drew boxes; videos are rendered offline on a Mac, which has these. Inter
+ * still draws every glyph it has (measured: Latin text renders identically).
+ */
+const CJK_FONTS = ['/System/Library/Fonts/STHeiti Light.ttc', '/System/Library/Fonts/Hiragino Sans GB.ttc'].filter(f => fs.existsSync(f));
+const VIDEO_FONTS = { ...RESVG_FONTS, fontFiles: [...RESVG_FONTS.fontFiles, ...CJK_FONTS] };
+
+// SVG drawn to a PNG with the video's fonts; text needing a face this
+// machine lacks is an error, not boxes in a published video.
+function renderSvg(svg, text, file) {
+  if (/[\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff]/.test(text) && !CJK_FONTS.length) throw new Error(`"${text}" needs a CJK font, and none of ${['STHeiti Light', 'Hiragino Sans GB'].join(', ')} is on this machine`);
+  fs.writeFileSync(file, new Resvg(svg, { font: VIDEO_FONTS }).render().asPng());
+  return file;
+}
+
 // YouTube Shorts' clear box on a 9:16 frame (news-community video-layers.ts
 // PLATFORM_SAFE_AREA.youtube_short), as fractions of the frame.
 const SAFE = { top: 0.198, bottom: 0.198, left: 0.056, right: 0.111 };
@@ -204,7 +222,7 @@ function captionPng(text, file, size) {
   <defs><filter id="shade" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="${(fontSize * 0.18).toFixed(1)}" flood-color="#000000" flood-opacity="0.75"/></filter></defs>
   ${text$}
 </svg>`;
-  fs.writeFileSync(file, new Resvg(svg, { font: RESVG_FONTS }).render().asPng());
+  renderSvg(svg, text, file);
   return { file, lines: lines.length, fontSize };
 }
 
@@ -231,7 +249,7 @@ function labelPng(lines, { y, size, file }) {
   <defs><filter id="shade" x="-20%" y="-80%" width="140%" height="260%"><feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#000000" flood-opacity="0.7"/></filter></defs>
   ${text}
 </svg>`;
-  fs.writeFileSync(file, new Resvg(svg, { font: RESVG_FONTS }).render().asPng());
+  renderSvg(svg, lines.map(l => l.text).join(' '), file);
   return { file };
 }
 
@@ -248,4 +266,4 @@ function captionOverlays(words, { from, to, size, dir }) {
   }));
 }
 
-module.exports = { alignWords, groupCaptions, captionsFor, captionPng, captionOverlays, labelPng, SAFE };
+module.exports = { alignWords, groupCaptions, captionsFor, captionPng, captionOverlays, labelPng, renderSvg, SAFE };

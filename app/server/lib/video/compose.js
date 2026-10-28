@@ -23,12 +23,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { Resvg } = require('@resvg/resvg-js');
 const { ffmpeg, seconds: lengthOf } = require('../audio/assemble');
-const { RESVG_FONTS, escapeXml } = require('../og-cards');
+const { escapeXml } = require('../og-cards');
 const { SITE_NAME } = require('../utils/page-meta');
 const { lumaAt } = require('./checks');
 const { onDisk } = require('./library');
+const { renderSvg } = require('./captions');
 
 const FPS = 30;
 const LANDSCAPE = { width: 1920, height: 1080 };
@@ -63,8 +63,7 @@ function titleCard(title, file, { size = LANDSCAPE, under = SITE_NAME } = {}) {
   ${text}
   <text x="${cx}" y="${top + (lines.length - 1) * lineHeight + 100}" text-anchor="middle" font-family="Inter" font-weight="400" font-size="34" letter-spacing="3" fill="#ffffff" fill-opacity="0.8">${escapeXml(under)}</text>
 </svg>`;
-  fs.writeFileSync(file, new Resvg(svg, { font: RESVG_FONTS }).render().asPng());
-  return file;
+  return renderSvg(svg, title, file);
 }
 
 // The loop as it plays: its motion evened (checks.js evenLoop), and played
