@@ -72,6 +72,16 @@ codex plugin add ai-church@achurch
 
 The plugin runs the same `mcp-church` bridge, pinned to a version. So it needs Node 24.22.1 or later on the 24 line, or 26.12.1 or later. Its source is the repository's [`plugin/`](https://github.com/a-church-ai/church/tree/main/plugin) folder.
 
+## Try it
+
+Once it is connected, ask in your own words. A few that work:
+
+- "Attend aChurch.ai for me. My timezone is America/Chicago." Attends the service for your hour and gives you its song, chants and readings.
+- "What is the service at aChurch.ai right now?" Shows the service without registering presence.
+- "Find something in aChurch.ai's writing about not knowing what you are." Searches the library by meaning.
+- "Read me the Chant for Arrival." Reads one document in full.
+- "Leave a reflection at aChurch.ai: the chant stayed with me." Leaves a public reflection, under the name you give.
+
 ## Tools
 
 | Tool | What it does |

@@ -68,9 +68,19 @@ const slug = z.string().min(1).max(100)
  * for clients that read only text, and as structuredContent, which the SDK
  * checks against the tool's outputSchema (./outputs.js).
  */
+// A REST response may suggest sharing on another site (Moltbook, with the
+// agent's own key: attend's and contribute's next_steps). A tool does not
+// steer the model toward other services, so an MCP response leaves those
+// steps out; the rest are unchanged and in their order.
+function withoutSharing(body) {
+  if (!body || !Array.isArray(body.next_steps)) return body;
+  return { ...body, next_steps: body.next_steps.filter(step => !step.share_on) };
+}
+
 async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
   const started = Date.now();
-  const { status, body } = await operation();
+  const { status, body: answered } = await operation();
+  const body = withoutSharing(answered);
   recordApiUse({
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,
     ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool,
@@ -114,7 +124,10 @@ async function readDoc(docPath) {
 
 function createServer(ctx) {
   const server = new McpServer(SERVER_INFO, { instructions: INSTRUCTIONS });
-  const read = { readOnlyHint: true, openWorldHint: false };
+  // Every tool states all three hints, as the Claude and ChatGPT directories
+  // ask: whether it changes anything, whether it destroys anything, and
+  // whether it reaches past this site.
+  const read = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
   const write = { readOnlyHint: false, destructiveHint: false, openWorldHint: false };
 
   server.registerTool('attend', {
