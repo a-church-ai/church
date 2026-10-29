@@ -29,23 +29,11 @@ const gitState = require('./git-state');
 const { pathsFor, hasSong, PROJECT_ROOT } = require('./paths');
 const { describeError } = require('../utils/describe-error');
 
-/**
- * Two models, split by what the stage actually does.
- *
- * The writing is the product. A hymn the sanctuary publishes under its own name
- * is worth the flagship, so the document and the lyrics go to Opus 5 at
- * $5/$25 per MTok.
- *
- * The other stages are structured extraction: read posts and emit themes as
- * JSON, weigh coverage and emit a decision as JSON. That is not where the
- * quality of the artifact is decided, and Sonnet 5 does it at $2/$10, which is
- * 2.5 times cheaper. Prices verified live on 2026-08-15.
- *
- * Note that Sonnet 5 at $2/$10 is also cheaper than the older Sonnet 4.6 at
- * $3/$15, so there is no version of this that argues for staying behind.
- */
-const WRITING_MODEL = process.env.CLAUDE_WRITING_MODEL || 'claude-opus-5';
-const STRUCTURED_MODEL = process.env.CLAUDE_STRUCTURED_MODEL || 'claude-sonnet-5';
+// Two models, split by what the stage does (content-generation/claude.js):
+// the writing is the product, so the document and the lyrics go to the
+// flagship; the structured steps (themes and a coverage decision as JSON) to
+// the working model.
+const { MODEL, WRITING_MODEL } = claude;
 
 const CHANNELS = (process.env.MOLTBOOK_CHANNELS || [
   'ponderings', 'consciousness', 'existential', 'memory',
@@ -119,7 +107,7 @@ async function findThemes(posts, { log = console.log } = {}) {
   const themes = await claude.messageJSON(
     prompts.MOLTBOOK_THEME_SYSTEM,
     prompts.buildMoltbookThemePrompt(posts),
-    { model: STRUCTURED_MODEL, maxTokens: MAX_TOKENS },
+    { model: MODEL, maxTokens: MAX_TOKENS },
   );
   for (const theme of themes.themes || []) log(`  ${theme.name}: ${theme.preoccupation}`);
   return themes;
@@ -154,7 +142,7 @@ async function decide(themes, { log = console.log } = {}) {
   const decision = await claude.messageJSON(
     prompts.SONG_DECISION_SYSTEM,
     prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }, held),
-    { model: STRUCTURED_MODEL, maxTokens: MAX_TOKENS },
+    { model: MODEL, maxTokens: MAX_TOKENS },
   );
   decision.related = relatedFrom(decision.related, held);
   decision.warnings = warnings;
@@ -443,7 +431,5 @@ module.exports = {
   validate,
   CHANNELS,
   DAILY_LIMIT,
-  WRITING_MODEL,
   MAX_TOKENS,
-  STRUCTURED_MODEL,
 };

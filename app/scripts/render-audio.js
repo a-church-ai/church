@@ -39,7 +39,8 @@ const crypto = require('crypto');
 const fs = require('fs');
 const discover = require('../server/lib/docs/discover');
 const { SPEECH, SPEECH_VALUES, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
-const { adapt, sourceHashOf, ADAPT_MODEL } = require('../server/lib/audio/adapt');
+const { adapt, sourceHashOf } = require('../server/lib/audio/adapt');
+const { WRITING_MODEL } = require('../server/lib/content-generation/claude');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
@@ -336,7 +337,7 @@ async function main() {
   const stale = pieces.filter(p => !p.script || p.script.sourceHash !== p.sourceHash);
   const failures = [];
   if (stale.length) {
-    console.log(`${stale.length} of ${pieces.length} documents need a script (${ADAPT_MODEL}).`);
+    console.log(`${stale.length} of ${pieces.length} documents need a script (${WRITING_MODEL}).`);
     if (opts.dryRun) {
       stale.forEach(p => console.log(`  ${p.source}`));
     } else {
@@ -351,7 +352,7 @@ async function main() {
           piece.script = {
             source: piece.source,
             sourceHash: piece.sourceHash,
-            adaptedWith: ADAPT_MODEL,
+            adaptedWith: WRITING_MODEL,
             adapted: new Date().toISOString().slice(0, 10),
             pair,
             omitted,

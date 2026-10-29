@@ -22,7 +22,8 @@ const { RULES, CLASS, WINDOW_DAYS, check, checkWord, checkName, inSlot, exclusio
 const { addDays } = require('../server/lib/utils/seasons');
 const { serviceFor } = require('../server/lib/service/serve');
 const { loadServiceCatalog } = require('../server/lib/service/catalog');
-const { planSlot, systemPrompt, MODEL } = require('../server/lib/service/planner');
+const { planSlot, systemPrompt } = require('../server/lib/service/planner');
+const { MODEL } = require('../server/lib/content-generation/claude');
 const { readPlan, saveSlot, ensurePlans, fileFor } = require('../server/lib/service/plans');
 const { parseHours } = require('../server/lib/music/companions');
 const { localTime } = require('../server/lib/utils/timezone');

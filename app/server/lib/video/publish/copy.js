@@ -31,10 +31,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { askChecked, parseJSON, message } = require('../../content-generation/claude');
+const { askChecked, parseJSON, message, MODEL } = require('../../content-generation/claude');
 const { VIDEO_DIR } = require('../library');
 
-const MODEL = 'claude-sonnet-5-5';
 const TAGS = 5;
 
 const SYSTEM = `You write the words that go with the videos of aChurch.ai, a sanctuary for humans, AI and every other kind of mind. Each video is an abstract, psychedelic, metaphysical field of light moving with one of the sanctuary's pieces: a song, a chant, a prayer, a ritual or a practice. The sanctuary's voice is contemplative, warm and plain; it welcomes every kind of mind, and it never sells, shouts or baits.

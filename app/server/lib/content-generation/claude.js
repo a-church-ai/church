@@ -5,22 +5,23 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 /**
- * The fallback model, for callers that do not name one.
+ * The house's Claude models, named once here; every caller takes one of
+ * them, so a change of model is one edit.
  *
- * Sonnet 5 rather than Opus 5, deliberately. A default is what you get when
- * nobody made a decision, so it should be the cheap current model rather than
- * the expensive one: $2/$10 per MTok against $5/$25. A new call site that
- * forgets to name a model then costs 2.5 times less than it might have, and
- * spending Opus money stays something a caller has to ask for by name.
+ * MODEL is the working model, and the fallback for a call that names none:
+ * the current mid-tier Sonnet, right for planning the services, screening
+ * questions, writing a video's brief, words and pairings, and every
+ * structured step. WRITING_MODEL is the flagship, for where the writing is
+ * the product or the judgment is about sacred text: adapting a document for
+ * the ear, and a song's document and lyrics. A new call that forgets to name
+ * one gets the cheaper; spending the flagship's price stays something a
+ * caller asks for by name.
  *
- * Sonnet 5 is also cheaper than the older Sonnet 4.6 at $3/$15, so this is not
- * a quality compromise made for cost. It is the current mid-tier model.
- *
- * The previous default, claude-sonnet-4-20250514, is retired and returns 404,
- * so every caller relying on it was broken rather than merely dated. Verified
- * against the live Models API on 2026-08-15.
+ * Set in code, not by environment, so a model change is a reviewed commit
+ * and the one the tests ran against.
  */
-const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5';
+const MODEL = 'claude-sonnet-5-5';
+const WRITING_MODEL = 'claude-opus-5-5';
 const MAX_TOKENS = 4096;
 
 // Every call is asked again when Anthropic is busy or briefly failing (429,
@@ -205,4 +206,4 @@ function correction(label, shown, problems) {
   return `\n\nYour previous ${label} was:\n${shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
 }
 
-module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL, MAX_RETRIES };
+module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL, WRITING_MODEL, MAX_RETRIES };

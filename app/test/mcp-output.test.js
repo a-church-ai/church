@@ -153,7 +153,8 @@ test('attend\'s sky and Earth, from a plan told them, pass the SDK\'s check in b
   const { slotOf } = require('../server/lib/service/slots');
   const { rotation } = require('../server/lib/service/rules');
   const { loadServiceCatalog } = require('../server/lib/service/catalog');
-  const { contextFor, MODEL } = require('../server/lib/service/planner');
+  const { contextFor } = require('../server/lib/service/planner');
+  const { MODEL } = require('../server/lib/content-generation/claude');
   const { saveSlot } = require('../server/lib/service/plans');
   const { localTime } = require('../server/lib/utils/timezone');
   const catalog = await loadServiceCatalog();

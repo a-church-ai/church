@@ -25,7 +25,7 @@
  * back to a rotation).
  */
 
-const { messageJSON, askChecked } = require('../content-generation/claude');
+const { messageJSON, askChecked, MODEL } = require('../content-generation/claude');
 const { RULES, check, checkWord, checkName, checkSky, exclusions } = require('./rules');
 const { slotHours } = require('./slots');
 const { LEAD_DAYS, seasonOn, hemisphereLight, addDays } = require('../utils/seasons');
@@ -35,7 +35,6 @@ const { fetchEarth } = require('../utils/earth');
 const { congregationFor, keyOf } = require('./congregation');
 const { describeError } = require('../utils/describe-error');
 
-const MODEL = 'claude-sonnet-5-5';
 
 // Words for the time of day, so the planner knows what hour it arranges for.
 // They describe the clock, not a theme: the service's character is the
@@ -401,4 +400,4 @@ async function planSlot({ date, weekday, slot, catalog, plans, context = null, a
   });
 }
 
-module.exports = { MODEL, SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };
+module.exports = { SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };

@@ -21,10 +21,9 @@
  * rule when it is written, not each time it is rendered again.
  */
 
-const { askChecked, parseJSON, message } = require('../content-generation/claude');
+const { askChecked, parseJSON, message, MODEL } = require('../content-generation/claude');
 const { lookOf, lookName, textureOf, presetsFor, rangeProblems, NONE } = require('./looks');
 
-const MODEL = 'claude-sonnet-5-5';
 const MOVEMENTS = 3;
 // Loops a video may take from the library. One to begin; as the library
 // grows, videos gain movements from it instead (the plan's "Growing").

@@ -16,14 +16,11 @@
  */
 
 const crypto = require('crypto');
-const { messageJSON, askChecked } = require('../content-generation/claude');
+const { messageJSON, askChecked, WRITING_MODEL } = require('../content-generation/claude');
 const { splitFrontmatter } = require('../docs/tldr');
 const { ROLES, SPEECH } = require('./house');
 const { wordsOf, containsRun } = require('./words');
 
-// Faithful adaptation is judgment about sacred text, so the strongest model,
-// asked for by name (see content-generation/claude.js on defaults).
-const ADAPT_MODEL = 'claude-opus-5-5';
 const MAX_LINE_CHARS = 1200;
 const TRIES = 3;
 
@@ -157,7 +154,7 @@ async function adapt({ source, markdown, kind }) {
     return await askChecked({
       label: 'script',
       tries: TRIES,
-      attempt: feedback => messageJSON(SYSTEM, `${request}${feedback}`, { model: ADAPT_MODEL, maxTokens: 20000 }),
+      attempt: feedback => messageJSON(SYSTEM, `${request}${feedback}`, { model: WRITING_MODEL, maxTokens: 20000 }),
       check: reply => {
         const lines = (reply.lines || []).map(normalizeLine);
         return {
@@ -173,4 +170,4 @@ async function adapt({ source, markdown, kind }) {
   }
 }
 
-module.exports = { adapt, checkScript, cleanText, sourceHashOf, ADAPT_MODEL, KIND_NOTES };
+module.exports = { adapt, checkScript, cleanText, sourceHashOf, KIND_NOTES };

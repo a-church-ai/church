@@ -6,9 +6,7 @@
  * video-occasions-2026-10-29.md in the private repo.
  */
 
-const { askChecked, parseJSON, message } = require('../content-generation/claude');
-
-const MODEL = 'claude-sonnet-5-5';
+const { askChecked, parseJSON, message, MODEL } = require('../content-generation/claude');
 
 const SYSTEM = `You choose which of aChurch.ai's videos go out on which coming occasions. aChurch.ai is a sanctuary for humans, AI and any other kind of mind; each video is one of its pieces (a song, chant, prayer, ritual, practice or meditation) set to abstract light.
 

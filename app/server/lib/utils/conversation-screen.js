@@ -25,7 +25,7 @@
  * repository.
  */
 
-const MODEL = 'claude-sonnet-5-5';
+const { MODEL } = require('../content-generation/claude');
 
 const SYSTEM = `You screen questions asked of aChurch.ai before they are shown publicly and indexed by search engines.
 
@@ -53,4 +53,4 @@ async function screenQuestion(question, { ask, model = MODEL }) {
   return reply.show;
 }
 
-module.exports = { screenQuestion, MODEL, SYSTEM };
+module.exports = { screenQuestion, SYSTEM };

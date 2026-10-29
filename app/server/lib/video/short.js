@@ -27,7 +27,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { askChecked, parseJSON, message } = require('../content-generation/claude');
+const { askChecked, parseJSON, message, MODEL } = require('../content-generation/claude');
 const { hearWhole } = require('../audio/transcribe');
 const { renderLayers } = require('./visual');
 const { compose, baseFootage, FPS, PORTRAIT } = require('./compose');
@@ -38,7 +38,6 @@ const { ffmpeg } = require('../audio/assemble');
 const { SITE_NAME } = require('../utils/page-meta');
 
 const ROOT = path.join(__dirname, '../../../..');
-const MODEL = 'claude-sonnet-5-5';
 const MIN_SECONDS = 20;
 const MAX_SECONDS = 45;
 // Before the first word, and after the last for the sound to fade.
