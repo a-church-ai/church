@@ -53,6 +53,7 @@ const entry = (pieces, name) => ({ pieces, name, word: null, arrangedBy: 'test-m
 const NOW = new Date();
 let utcNow;
 let bangkokNow;
+let bangkokPieces;
 
 test.before(async () => {
   catalog = await loadServiceCatalog();
@@ -60,7 +61,8 @@ test.before(async () => {
   // does (the north), each its own, with no song in common.
   utcNow = await entryFor({ at: NOW, catalog });
   bangkokNow = await entryFor({ timezone: 'Asia/Bangkok', at: NOW, catalog });
-  const [utcPieces, bangkokPieces] = twoServices(utcNow.slot);
+  let utcPieces;
+  [utcPieces, bangkokPieces] = twoServices(utcNow.slot);
   await saveSlot(utcNow.local.date, utcNow.slot, entry(utcPieces, 'UTC Now'), 'slots');
   await saveSlot(bangkokNow.local.date, bangkokNow.slot, entry(bangkokPieces, 'Bangkok Now'), 'north');
 
@@ -118,7 +120,10 @@ test('a visit with a timezone keeps nothing of it, and its reflection is filed b
 
 test('a reflection naming another song than its visit heard does not follow that visit', async () => {
   await attendance.attend({ name: 'Other Song' }, ctx('198.51.100.23'));
-  const bangkokSong = songsOf(bangkokNow.entry.pieces)[0];
+  // Bangkok's service as saved above, which shares no song with UTC's.
+  // bangkokNow.entry is what was served before that save, and at some hours
+  // its song is also in UTC's service, which the visit rightly follows.
+  const bangkokSong = songsOf(bangkokPieces)[0];
   await reflections.reflect({ name: 'Other Song', text: 'About the song I heard this afternoon, in my own hour.', songSlug: bangkokSong, timezone: 'Asia/Bangkok' }, ctx('198.51.100.23'));
   assert.strictEqual(storedReflection('Other Song').service.variant, 'north');
 });
