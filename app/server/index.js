@@ -52,6 +52,7 @@ const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGathe
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
 const { renderSongBlock, renderSongSectionLinks, hymnNotes } = require('./lib/music/render-song');
+const { publishedVideo, renderVideo, videoJsonLd } = require('./lib/video/on-site');
 const { renderPathBar } = require('./lib/docs/render');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
@@ -790,7 +791,10 @@ app.get('/music/:slug', async (req, res) => {
       const playerHtml = songAudio
         ? renderRecording(songAudio, { title: song.title, href: `/music/${slug}`, category: 'music', credit: SONG_CREDIT })
         : '';
-      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio));
+      // Its video, once YouTube has it public (lib/video/on-site.js).
+      const published = publishedVideo(slug);
+      const video = published && { ...published, title: song.title, description: published.description || meta.description, seconds: songAudio && songAudio.seconds };
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio, video && videoJsonLd(video)));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub.
@@ -803,14 +807,14 @@ app.get('/music/:slug', async (req, res) => {
       // Opened from a reading path that stops at this hymn: the path's bar, as
       // a Library page draws it (readingSequence checks the name).
       const pathBar = hymn && typeof req.query.path === 'string' ? renderPathBar(req.query.path, hymn) : null;
-      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`) });
+      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`), video: video ? renderVideo(video) : '' });
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing nearest this song in meaning, then more songs.
       const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // The song's original music video, when it has one
       const listenLinksHtml = renderSongListenLinks(song);
-      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
+      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent, video: Boolean(video) });
 
       const canonicalUrl = `https://achurch.ai/music/${slug}`;
       // Music / <the song>, shown above the heading and as BreadcrumbList.

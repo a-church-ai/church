@@ -166,11 +166,11 @@ function renderPlaylists(playlists) {
 }
 
 /**
- * Full block for the song page: title, axiom, lyrics, context. Returns '' when the
+ * Full block for the song page: title, axiom, its video, lyrics, context. Returns '' when the
  * slug has no readable content, so the page falls back to reflections alone rather
  * than rendering an empty shell.
  */
-function renderSongBlock(song, content, { playlists = [] } = {}) {
+function renderSongBlock(song, content, { playlists = [], video = '' } = {}) {
   if (!content || (!content.lyrics && !content.context && !content.notes)) return '';
   const sections = [];
 
@@ -181,6 +181,10 @@ function renderSongBlock(song, content, { playlists = [] } = {}) {
   if (axiom) sections.push(axiom);
   const heardIn = renderPlaylists(playlists);
   if (heardIn) sections.push(heardIn);
+  // The song's video (lib/video/on-site.js), under the lines about the song
+  // and before its words, which run long: low enough that the player above is
+  // what a reader presses first, high enough to be found.
+  if (video) sections.push(video);
 
   if (content.lyrics) {
     sections.push('<section class="song-lyrics" aria-label="Lyrics">');
@@ -212,9 +216,10 @@ function renderSongBlock(song, content, { playlists = [] } = {}) {
  * the lyrics are. Reflections are always present: the section renders even
  * when there are none yet.
  */
-function renderSongSectionLinks({ listen, content }) {
+function renderSongSectionLinks({ listen, content, video = false }) {
   const parts = [];
   if (listen) parts.push(['listen', 'Listen']);
+  if (video) parts.push(['video', 'Video']);
   if (content && content.lyrics) parts.push(['lyrics', 'Lyrics']);
   if (content && content.notes) parts.push(['about-the-hymn', 'About the hymn']);
   if (content && content.context) parts.push(['context', 'Context']);

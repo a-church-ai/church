@@ -3483,8 +3483,9 @@ body.docs-drawer-open {
 /* A voiced document's recording, under its title. Without a script: the
    waveform and the native controls. With one (.is-enhanced): a play button,
    the waveform as the progress bar, the time, and the visual above. */
-/* A page's film (docs/render.js renderVideo): its own poster and a play
-   button until pressed, then YouTube's player in the same 16:9 box. */
+/* A page's film or video (lib/video/on-site.js renderVideo): its own poster
+   and a play button until pressed, then YouTube's player in the same 16:9
+   box. */
 .doc-video {
     margin: 0.75rem 0 1.5rem;
 }
@@ -3540,6 +3541,27 @@ body.docs-drawer-open {
     margin-top: 0.5rem;
     font-size: 0.875rem;
     color: var(--muted);
+}
+/* A piece's own video, lower on its page: a smaller, quieter button, so the
+   recording's player above stays the one that calls to be pressed. */
+.doc-video-aside {
+    margin: 1.75rem 0 2rem;
+}
+.doc-video-aside .doc-video-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: -1.625rem 0 0 -1.625rem;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    box-shadow: none;
+    border: 1px solid var(--rule);
+}
+.doc-video-aside .doc-video-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--text);
+}
+.doc-video-aside .doc-video-play:hover .doc-video-icon {
+    background: var(--surface);
 }
 
 .doc-audio {

@@ -20,8 +20,12 @@ app/.env.*
 # none of this is needed at runtime.
 app/media
 app/logs
-# The videos' release records, read by the release job, never by the site.
+# The videos' schedule stays out; their release records come in, since a page
+# shows its piece's video once its record says YouTube has it public
+# (lib/video/on-site.js).
 video
+!video/releases
+video/releases/*.bak
 logs
 *.log
 *.log.gz

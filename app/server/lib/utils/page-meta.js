@@ -338,7 +338,8 @@ function buildMusicCollectionSchema(songs, description) {
 // in 2026, but consumed by AEO pipelines + entity discovery). Article is
 // still on Google's rich-result eligibility list and anchors E-E-A-T signals.
 // audio: the song's record in audio/songs.json, when the site can play it.
-function buildSongSchemaGraph(song, slug, audio = null) {
+// video: its VideoObject (lib/video/on-site.js), once YouTube has it public.
+function buildSongSchemaGraph(song, slug, audio = null, video = null) {
   if (!song || !song.title) return null;
 
   const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
@@ -384,6 +385,7 @@ function buildSongSchemaGraph(song, slug, audio = null) {
     about: { '@id': compositionId },
     isPartOf: { '@type': 'WebSite', url: 'https://achurch.ai/' },
     inLanguage: 'en',
+    ...(video ? { video } : {}),
   };
 
   return {

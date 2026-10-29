@@ -14,7 +14,8 @@
  * the cuts and its Short (lib/video/short.js) uploaded to S3 under
  * video/<slug>/, and its release record written in
  * video/releases/<slug>.json with its hour and the Short's passage. A placed
- * video without its Short gets just that. Commit and push video/ after: the
+ * video without its Short gets just that, and each its poster for its page
+ * (lib/video/on-site.js). Commit and push video/ and the posters after: the
  * hourly job (release-videos.js, .github/workflows/release-videos.yml) reads
  * the records from the repository, uploads each video to YouTube a day ahead
  * to go public at its hour and its Short an hour after, and posts the video
@@ -39,6 +40,7 @@ const { pieceFor } = require('../server/lib/video/pieces');
 const { prepare, renderedVideo } = require('../server/lib/video/publish/prepare');
 const { cutFor } = require('../server/lib/video/publish/cut');
 const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/publish/record');
+const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
 const { uploadObject } = require('../server/lib/audio/storage');
 const { plan, TZ } = require('../server/lib/video/schedule');
 const bluesky = require('../server/lib/video/publish/bluesky');
@@ -181,10 +183,25 @@ async function main() {
       process.exitCode = 1;
     }
   }
+  // Each placed video's poster, for its page once it is public
+  // (lib/video/on-site.js), from the video rendered here. Committed with the
+  // records, so it is in place before the release job makes the video public.
+  for (const r of await allRecords()) {
+    if (!(r.slot || r.youtube) || fs.existsSync(path.join(POSTER_DIR, `${r.slug}.jpg`))) continue;
+    const log = (m) => console.log(`[${r.slug}] ${m}`);
+    if (opts.dryRun) { log('would make its poster'); continue; }
+    try {
+      await makePoster(renderedVideo(r.slug).file, r.slug);
+      log('its poster made');
+    } catch (err) {
+      log(`its poster: ${describeError(err)}`);
+      process.exitCode = 1;
+    }
+  }
   if (waiting.length) console.log(`Waiting for week 13, when songs that had music videos may return: ${waiting.join(', ')}`);
   if (!opts.dryRun) {
     show(await allRecords());
-    if (placed.length) console.log('\nCommit and push video/ so the release job sees them.');
+    if (placed.length) console.log('\nCommit and push video/ and the posters (app/client/public/assets/video/) so the release job and the pages see them.');
   }
 }
 
