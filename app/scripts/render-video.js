@@ -23,7 +23,7 @@
  * Work and output go to media/video/<slug>/ (ignored by git and Docker).
  * Every step keeps its file, so a rerun spends nothing on what exists: delete
  * a file to make it again. The finished video is kept while its report is
- * clean. One piece's failure leaves the rest to finish; the
+ * clean and it is newer than its brief. One piece's failure leaves the rest to finish; the
  * run then exits 1.
  */
 
@@ -35,6 +35,7 @@ const { pool } = require('../server/lib/utils/pool');
 const { analyse, describeMovement, envelope } = require('../server/lib/video/analysis');
 const { pieceFor, allPieces, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
 const { writeBrief, reuseRule } = require('../server/lib/video/brief');
+const { lookOf, lookName } = require('../server/lib/video/looks');
 const library = require('../server/lib/video/library');
 const lancedb = require('../server/lib/rag/lancedb');
 const { makeStill, makeClip, spent, VIDEO_MODEL } = require('../server/lib/video/loops');
@@ -70,8 +71,13 @@ function parseArgs(argv) {
  */
 async function newBrief(piece, about, log) {
   const others = library.videos().filter(v => v.slug !== piece.slug);
+  // A kind with its own list of presets is held only against its own kind.
+  const look = lookName(about);
+  const own = lookOf(look).presets;
   const rules = {
-    presets: reuseRule(others.map(v => ({ items: v.presets, at: v.at })), 'preset'),
+    presets: own
+      ? reuseRule(others.filter(v => v.kind === look).map(v => ({ items: v.presets, at: v.at })), 'preset', { recent: 2, cap: Infinity })
+      : reuseRule(others.map(v => ({ items: v.presets, at: v.at })), 'preset'),
     loops: reuseRule(others.map(v => ({ items: v.loops, at: v.at })), 'loop')
   };
   const rows = await lancedb.listAll();
@@ -132,10 +138,13 @@ async function render(piece) {
   await renderShort(piece, { title, text, analysis, brief, edges, grid, clips, audio, dir, log, encode: oneEncodeAtATime });
 }
 
-// The finished video, with a report and no problems in it.
+// The finished video, with a report and no problems in it, made since its
+// brief last changed (a preset swapped by hand is drawn again, at no cost).
 function rendered(dir, out) {
   const report = path.join(dir, 'report.json');
-  return fs.existsSync(out) && fs.existsSync(report) && !JSON.parse(fs.readFileSync(report, 'utf8')).problems.length;
+  const brief = path.join(dir, 'brief.json');
+  return fs.existsSync(out) && fs.existsSync(report) && !JSON.parse(fs.readFileSync(report, 'utf8')).problems.length
+    && fs.statSync(out).mtimeMs >= fs.statSync(brief).mtimeMs;
 }
 
 async function renderFull(piece, { dir, out, log, audio, analysis, title, brief, clips, edges, grid }) {

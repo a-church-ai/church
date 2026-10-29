@@ -164,14 +164,20 @@ test('each kind is offered the presets in its band of motion, and its mandala is
   const { presetsFor, lookOf, LOOKS, DEFAULT_STYLE } = require('../server/lib/video/looks');
   const presets = [{ name: 'still', motion: 0.01 }, { name: 'typical', motion: 0.09 }, { name: 'restless', motion: 0.25 }, { name: 'unmeasured' }];
   const names = (kind) => presetsFor(kind, presets).map(p => p.name);
-  assert.deepStrictEqual(names('meditation'), ['still', 'unmeasured']);
   assert.deepStrictEqual(names('prayer'), ['still', 'typical', 'unmeasured']);
   assert.deepStrictEqual(names('song'), ['typical', 'restless', 'unmeasured']);
   assert.deepStrictEqual(names('anything else'), ['still', 'typical', 'restless', 'unmeasured']);
-  // Slow but harsh: a meditation is offered only soft presets.
-  const harsh = [{ name: 'garish', motion: 0.02, chroma: 0.7, edges: 0.01 }, { name: 'blocky', motion: 0.02, chroma: 0.2, edges: 0.06 }, { name: 'soft', motion: 0.02, chroma: 0.2, edges: 0.01 }];
-  assert.deepStrictEqual(presetsFor('meditation', harsh).map(p => p.name), ['soft']);
-  assert.strictEqual(presetsFor('prayer', harsh).length, 3);
+  // A meditation plays only its elemental list, by title with its look, and
+  // every one of them is a preset the layer can load.
+  const { ELEMENTAL, treatmentOf } = require('../server/lib/video/looks');
+  const elemental = presetsFor('meditation', presets);
+  assert.deepStrictEqual(elemental.map(p => p.name), Object.values(ELEMENTAL).map(p => p.title));
+  assert.ok(elemental.every(p => p.look && ['light', 'lines'].includes(p.treatment)));
+  const survey = require('../server/lib/video/presets.json');
+  const cream = require('../server/lib/video/presets-cream.json');
+  for (const p of elemental) assert.ok(p.name in survey || p.name in cream, `${p.name} is in no pack`);
+  assert.strictEqual(treatmentOf('meditation', 'Serge circles006'), 'lines');
+  assert.strictEqual(treatmentOf('prayer', 'Serge circles006'), null);
 
   // Every kind keeps the mandala, in a style of its own; the briefs written
   // before kinds had looks are drawn as they were.
@@ -184,14 +190,30 @@ test('each kind is offered the presets in its band of motion, and its mandala is
   assert.strictEqual(lookName({ kind: 'prayer', title: 'A Hymn-like Prayer' }), 'prayer');
 
   const open = { presets: reuseRule([], 'preset'), loops: reuseRule([], 'loop') };
-  const movements = ['still', 'typical', 'unmeasured'].map(preset => ({ still: 'light', motion: 'it breathes', preset }));
+  const movements = ['still', 'typical', 'unmeasured'].map(preset => ({ still: 'light', motion: 'it breathes', preset, tint: '#333333' }));
   const reply = (numbers) => JSON.stringify({ mood: 'm', palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], movements, ...numbers });
   const run = (kind, numbers) => check(presets, open, [], kind)(reply(numbers)).problems.join();
-  assert.strictEqual(run('meditation', { symmetry: 6, milkdropOpacity: 0.4, mandalaOpacity: 0.45 }), '');
-  assert.match(run('meditation', { symmetry: 11, milkdropOpacity: 0.4, mandalaOpacity: 0.45 }), /symmetry must be a number from 5 to 7 for a meditation/);
+  assert.strictEqual(run('meditation', { symmetry: 6, milkdropOpacity: 0.7, mandalaOpacity: 0.45 }), '');
+  assert.match(run('meditation', { symmetry: 11, milkdropOpacity: 0.7, mandalaOpacity: 0.45 }), /symmetry must be a number from 5 to 7 for a meditation/);
   assert.match(run('prayer', { symmetry: 6, milkdropOpacity: 0.4, mandalaOpacity: 0.6 }), /symmetry .* 8 to 12/);
-  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.8, mandalaOpacity: 0.45 }), /milkdropOpacity/);
-  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.4 }), /mandalaOpacity/);
+  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.3, mandalaOpacity: 0.45 }), /milkdropOpacity/);
+  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.7 }), /mandalaOpacity/);
+});
+
+test('a meditation\'s brief tints each movement from its palette, and may leave one without a preset', () => {
+  const { presetsFor } = require('../server/lib/video/looks');
+  const presets = presetsFor('meditation', []);
+  const open = { presets: reuseRule([], 'preset'), loops: reuseRule([], 'loop') };
+  const palette = ['#000000', '#111111', '#222222', '#333333', '#444444'];
+  const movement = (preset, tint) => ({ still: 'light', motion: 'it breathes', preset, tint });
+  const run = (movements) => check(presets, open, [], 'meditation')(JSON.stringify({ mood: 'm', palette, symmetry: 6, milkdropOpacity: 0.7, mandalaOpacity: 0.45, movements })).problems.join();
+  assert.strictEqual(run([movement('martin - castle in the air', '#333333'), movement('none', '#444444'), movement('none', '#222222')]), '', 'none twice is no reuse');
+  assert.match(run([movement('martin - castle in the air', '#abcdef'), movement('none', '#444444'), movement('none', '#222222')]), /movement 1's tint/);
+  assert.match(run([movement('Flexi + Martin - cascading decay swing', '#333333'), movement('none', '#444444'), movement('none', '#222222')]), /not in the list/);
+  // Held only against other meditations: two back, with no cap.
+  const used = [{ items: ['martin - castle in the air'], at: 1 }, { items: ['Geiss - Planet 1'], at: 2 }, { items: ['Geiss - Desert Rose 4'], at: 3 }];
+  const rule = reuseRule(used, 'preset', { recent: 2, cap: Infinity });
+  assert.ok(rule.allows('martin - castle in the air') && !rule.allows('Geiss - Planet 1') && rule.allows('none'));
 });
 
 test('a Short\'s passage is whole lines, 20 to 45 seconds with its lead and tail, and says why it hooks', () => {

@@ -46,6 +46,7 @@ function videos() {
       return {
         slug,
         at: fs.statSync(file).mtimeMs,
+        kind: brief.kind || null,
         presets: brief.movements.map(m => m.preset),
         loops: brief.movements.map((m, i) => m.loop || `${slug}/loop-${i + 1}`)
       };

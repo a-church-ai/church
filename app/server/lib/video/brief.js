@@ -22,7 +22,7 @@
  */
 
 const { askChecked, parseJSON, message } = require('../content-generation/claude');
-const { lookOf, lookName, textureOf, presetsFor, rangeProblems } = require('./looks');
+const { lookOf, lookName, textureOf, presetsFor, rangeProblems, NONE } = require('./looks');
 
 const MODEL = 'claude-sonnet-5-5';
 const MOVEMENTS = 3;
@@ -46,7 +46,7 @@ Rules for the motion:
 - Fit the motion to how the movement sounds, which you are told. Sparse speech with long pauses wants near-stillness that breathes; dense speech or several voices together want a fuller unfolding; a rising trend wants an opening. Use timecodes inside the eight seconds ("[0-3s] ... [3-6s] ... [6-8s] ...") to place a swell or a stillness.
 - For a song you are told how many bars one loop will span (the loop is stretched to whole bars and started on a downbeat). Give it exactly that many swells or pulses, evenly spaced, one per bar, so the motion moves in time.
 
-Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. The list already suits the piece's kind.
+Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. The list already suits the piece's kind. For some kinds the list gives what each preset looks like and it is drawn in one colour of your palette, never its own: then give each movement a "tint", one of your five palette colours, and a preset may be "none" where the loop should be left alone.
 
 Loops from the library: you may be offered loops made for earlier videos. Prefer one of them to writing a new movement whenever it already shows what a movement needs, the same image or a close variation of it, with a pace that suits how the movement sounds and a palette that sits with the others. A new loop costs $1.22 and one of twenty requests a day; a reused one costs nothing, and the video around it (its presets, palette, mandala and pulse) makes it new. Give a library loop to at most ${MAX_REUSED} movement. That movement is { "loop": "its id", "reason": "one sentence on why it belongs", "preset": "..." }, with no still or motion of its own. Write every movement new only when no offered loop shows what any movement needs.
 
@@ -58,7 +58,7 @@ Return only JSON:
   "milkdropOpacity": in the range given for the kind,
   "mandalaOpacity": in the range given for the kind,
   "movements": [
-    { "still": "...", "motion": "...", "preset": "exact preset name" } or { "loop": "id", "reason": "...", "preset": "exact preset name" }
+    { "still": "...", "motion": "...", "preset": "exact preset name" } or { "loop": "id", "reason": "...", "preset": "exact preset name" }, each with "tint": "#rrggbb" when the kind's presets are tinted
   ]
 }`;
 
@@ -99,8 +99,11 @@ The piece:
 ${text}
 """
 
-MilkDrop presets you may choose from, each with how bright it looks under a voice (0 to 1) and how much it moves (about 0.03 is calm, 0.08 typical, 0.18 and above restless):
-${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightness ${p.brightness} | motion ${p.motion}`)).join('\n')}${loopsOffered(shortlist)}`;
+${look.presets
+    ? `MilkDrop presets you may choose from, each with what it looks like, drawn in the one palette colour you give its movement as "tint" (or "none" for no preset):
+${presets.map(p => `${p.name} | ${p.look}`).join('\n')}`
+    : `MilkDrop presets you may choose from, each with how bright it looks under a voice (0 to 1) and how much it moves (about 0.03 is calm, 0.08 typical, 0.18 and above restless):
+${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightness ${p.brightness} | motion ${p.motion}`)).join('\n')}`}${loopsOffered(shortlist)}`;
 }
 
 /**
@@ -117,24 +120,29 @@ ${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightnes
  * every loop the library had, and the cap of three uses still keeps any one
  * loop from wearing thin.
  *
+ * A kind with its own short list of presets (a meditation's, looks.js) is
+ * held only against the other videos of its kind, in a window of two and
+ * with no cap: its list is the choice, and its tint makes a preset reused
+ * look new. "none" is never a reuse.
+ *
  * used: [{ items: [...], at: time }] for every other video, its presets or
  * the loops its movements play; noun names them in the problems.
  */
 const RECENT = { preset: 10, loop: 3 };
 const CAP = 3;
-function reuseRule(used, noun) {
-  const window = RECENT[noun];
+function reuseRule(used, noun, { recent = RECENT[noun], cap = CAP } = {}) {
+  const window = recent;
   const counts = new Map();
   for (const v of used) for (const item of v.items) counts.set(item, (counts.get(item) || 0) + 1);
-  const recent = new Set([...used].sort((a, b) => b.at - a.at).slice(0, window).flatMap(v => v.items));
-  const why = (item) => (recent.has(item) ? `used by one of the ${window} most recent videos` : (counts.get(item) || 0) >= CAP ? `used ${counts.get(item)} times already` : null);
+  const recentItems = new Set([...used].sort((a, b) => b.at - a.at).slice(0, window).flatMap(v => v.items));
+  const why = (item) => (item === NONE ? null : recentItems.has(item) ? `used by one of the ${window} most recent videos` : (counts.get(item) || 0) >= cap ? `used ${counts.get(item)} times already` : null);
   return {
     allows: (item) => !why(item),
     problems(items) {
       const out = [];
       items.forEach((item, i) => {
         if (item === undefined) return;
-        if (items.indexOf(item) !== i) out.push(`movement ${i + 1}'s ${noun} "${item}" is already used by an earlier movement; each movement needs its own`);
+        if (item !== NONE && items.indexOf(item) !== i) out.push(`movement ${i + 1}'s ${noun} "${item}" is already used by an earlier movement; each movement needs its own`);
         const reason = why(item);
         if (reason) out.push(`movement ${i + 1}'s ${noun} "${item}" is ${reason}; choose another`);
       });
@@ -144,7 +152,8 @@ function reuseRule(used, noun) {
 }
 
 function check(presets, rules, shortlist, kind) {
-  const names = new Set(presets.map(p => p.name));
+  const tinted = Boolean(lookOf(kind).presets);
+  const names = new Set([...presets.map(p => p.name), ...(tinted ? [NONE] : [])]);
   const offered = new Map(shortlist.map(e => [e.id, e]));
   return (raw) => {
     const problems = [];
@@ -167,6 +176,12 @@ function check(presets, rules, shortlist, kind) {
     problems.push(...rules.presets.problems(movements.map(m => m.preset)));
     problems.push(...rules.loops.problems(movements.map(m => m.loop)));
     problems.push(...rangeProblems(kind, brief));
+    if (tinted) {
+      const palette = (brief.palette || []).map(c => String(c).toLowerCase());
+      movements.forEach((m, i) => {
+        if (!palette.includes(String(m.tint).toLowerCase())) problems.push(`movement ${i + 1}'s tint must be one of the palette's five colours`);
+      });
+    }
     if (!Array.isArray(brief.palette) || brief.palette.length !== 5 || !brief.palette.every(c => /^#[0-9a-f]{6}$/i.test(c))) problems.push('palette must be five #rrggbb colours');
     return { value: brief, problems, shown: raw };
   };

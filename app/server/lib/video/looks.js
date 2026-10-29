@@ -23,6 +23,47 @@
  * nested polygons) is drawn within it.
  */
 
+/**
+ * A meditation's presets: a short list chosen by eye over real meditations by
+ * satchitananda's video pipeline, which this follows, named for what each
+ * looks like once tinted. A survey's numbers could not find them (starlight
+ * and motes are too dim to pass its bar, the fine geometry has hard edges),
+ * and could not keep out the busy and garish, so for a meditation the list
+ * is the choice. Each is drawn by its treatment (visual.js) and tinted one
+ * colour of the brief's palette, so a preset brings its light and its shapes,
+ * never its own colours: `light` keeps its brightness, levelled and softened,
+ * for mist, glow and water; `lines` keeps only its edges, so thin geometry
+ * shows over the stills. A movement may also have none.
+ */
+const ELEMENTAL = {
+  mist: { title: 'martin - castle in the air', treatment: 'light', look: 'slow cloud drifting through the light' },
+  smoke: { title: 'Geiss - Desert Rose 4', treatment: 'light', look: 'smoke with fine threads of light in it' },
+  nebula: { title: 'Geiss - Planet 1', treatment: 'light', look: 'a soft glowing cloud that swells and settles' },
+  motes: { title: 'Flexi - reality tunnel', treatment: 'light', look: 'drifting specks of light' },
+  bokeh: { title: 'flexi + stahlregen - jelly strike', treatment: 'light', look: 'soft out-of-focus orbs, a little busier' },
+  starlight: { title: 'fiShbRaiN - a quiet death', treatment: 'light', look: 'a faint field of stars around a glow' },
+  'moonlit water': { title: 'Martin - cool morning', treatment: 'light', look: 'light glinting on a moving water surface' },
+  ocean: { title: 'martin - stormy sea (2010 update)', treatment: 'light', look: 'a rolling sea surface along the bottom' },
+  ripples: { title: 'Rovastar + Telek - Altars of Madness (Rolling Oceans Mix)', treatment: 'light', look: 'a wavering water texture' },
+  lotus: { title: 'phat + EoS - single cel angel birth', treatment: 'light', look: 'a glowing lotus opening from the centre' },
+  'jewel ring': { title: 'LuxXx - Heavy Vortex Tech i', treatment: 'light', look: 'a ring of soft lights around nested circles' },
+  'flower knot': { title: 'Geiss - Bipolar 3', treatment: 'light', look: 'a knot of looping light, like a flower' },
+  lattice: { title: 'Stahlregen & Aderrasi + EoS + fiShBRaiN + Geiss + Krash - Altars of Eckshak', treatment: 'light', look: 'a lattice of light lines around a bright centre' },
+  'twin spirals': { title: 'va ultramix2 - 358_1', treatment: 'light', look: 'two glowing spirals' },
+  galaxy: { title: 'Tripgnosis - Big Bang nz+', treatment: 'light', look: 'a soft galaxy of light, slowly turning' },
+  'overlapping circles': { title: 'Serge circles006', treatment: 'lines', look: 'large circles drifting through one another' },
+  torus: { title: 'amandio c - circles intersection 6', treatment: 'lines', look: 'a turning torus of fine circles strung with points of light' },
+  'flower web': { title: 'amandio c - circles intersection 2', treatment: 'lines', look: 'a web of interlaced circles, like a flower of life' },
+  'wire sphere': { title: 'Tripgnosis - Depth', treatment: 'lines', look: 'a sphere of fine concentric rings' },
+  'circle sphere': { title: 'suksma - bolpthpestrian irrefutable demonstration unit', treatment: 'lines', look: 'a large sphere outlined in circles' },
+  hexagons: { title: 'EoS + Phat - chasers 14 sentinel 617 Flowering', treatment: 'lines', look: 'glassy nested hexagons, turning' },
+  'golden ring': { title: 'suksma - schlockhausen distribution slaveries nz+', treatment: 'lines', look: 'a bright ring in a fine woven mesh' },
+  nautilus: { title: 'suksma - Hedgehog dreams69', treatment: 'lines', look: 'a nautilus spiral of fine scales' }
+};
+
+// A movement with no preset over its loop.
+const NONE = 'none';
+
 // The mandala as it was drawn before kinds had looks, kept for the videos
 // whose briefs name no kind.
 const DEFAULT_STYLE = { spin: 1, fade: 0.16, line: 1, glow: 1, spokes: 1, pulse: 1, geometry: 0 };
@@ -39,13 +80,12 @@ const PRAYER = {
 const LOOKS = {
   meditation: {
     direction: 'Stillness. Soft and gentle. Natural and cosmic elements made abstract: mist, still water, nebulae, aurora, horizon light, slow tides of particles, the curve of a planet against the dark. Calm colours: dusk blues, sea greens, soft violet, pale gold kept low. Nothing sharp, nothing hurried, nothing saturated. Luminous and quiet rather than psychedelic; the motion is a near stillness that breathes. Across the three movements, a settling: from a gentle drift toward one suspended form resting in vast quiet space.',
-    motion: [0, 0.06],
-    // Slow is not gentle: a preset that barely moves can still lay flat,
-    // garish blocks over the stills ("cascading decay swing", edges 0.06), so
-    // a meditation is offered only soft ones.
-    soft: { chroma: 0.35, edges: 0.03 },
+    // Slow is not gentle: the soft presets a survey found still laid busy
+    // shapes and their own colours over the stills, so a meditation plays
+    // only the elemental list, tinted.
+    presets: ELEMENTAL,
     symmetry: [5, 7],
-    milkdropOpacity: [0.25, 0.5],
+    milkdropOpacity: [0.5, 0.9],
     mandalaOpacity: [0.35, 0.55],
     style: { spin: 0.4, fade: 0.08, line: 0.6, glow: 1.5, spokes: 0.3, pulse: 0.6, geometry: 0 }
   },
@@ -108,13 +148,23 @@ const lookName = ({ kind, title = '' }) => (kind === 'song' && /\bhymn\b/i.test(
 // recordings made elsewhere (with music under them) get no videos.
 const textureOf = (kind) => (kind === 'song' || kind === 'hymn' ? 'sung, with music' : 'spoken, a voice alone with no music under it');
 
-// The presets a kind is offered: those in its band of motion and, for a kind
-// that wants softness, under its limits of colour strength and hard edges. A
-// preset the survey did not measure is kept, as presetChoices keeps it.
+// The presets a kind is offered: its own list, by title with its look and
+// treatment, or those of the survey in its band of motion. A preset the
+// survey did not measure is kept, as presetChoices keeps it.
 function presetsFor(kind, presets) {
-  const { motion: [lo, hi], soft } = lookOf(kind);
-  return presets.filter(p => (p.motion === undefined || (p.motion >= lo && p.motion <= hi))
-    && (!soft || ((p.chroma === undefined || p.chroma <= soft.chroma) && (p.edges === undefined || p.edges <= soft.edges))));
+  const look = lookOf(kind);
+  if (look.presets) return Object.values(look.presets).map(p => ({ name: p.title, look: p.look, treatment: p.treatment }));
+  const [lo, hi] = look.motion;
+  return presets.filter(p => p.motion === undefined || (p.motion >= lo && p.motion <= hi));
+}
+
+// How a tinted kind draws a preset, by its title; null for a kind whose
+// presets play in their own colours.
+function treatmentOf(kind, title) {
+  const list = lookOf(kind).presets;
+  if (!list) return null;
+  const found = Object.values(list).find(p => p.title === title);
+  return found ? found.treatment : null;
 }
 
 // What a brief's numbers break of its kind's ranges.
@@ -127,4 +177,4 @@ function rangeProblems(kind, brief) {
   });
 }
 
-module.exports = { LOOKS, DEFAULT_STYLE, lookOf, lookName, textureOf, presetsFor, rangeProblems };
+module.exports = { LOOKS, ELEMENTAL, NONE, DEFAULT_STYLE, lookOf, lookName, treatmentOf, textureOf, presetsFor, rangeProblems };

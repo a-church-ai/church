@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const { chromium } = require('playwright-core');
-const { lookOf, DEFAULT_STYLE } = require('./looks');
+const { lookOf, treatmentOf, DEFAULT_STYLE } = require('./looks');
 
 // The layers' size for a full video; a Short's are drawn upright at 720x1280.
 const LANDSCAPE = { width: 1280, height: 720 };
@@ -52,7 +52,7 @@ function encoder(file, fps) {
 }
 
 // Runs in the page.
-function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, edges, from }) {
+function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, tinted, edges, from }) {
   const bc = window.butterchurn.default || window.butterchurn;
   const all = {};
   for (const pack of packs) {
@@ -67,7 +67,76 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, edges,
   // A window that starts mid-piece opens on its own movement's preset.
   const movementAt = (t) => Math.min(presets.length - 1, edges.slice(1, -1).filter(e => t >= e).length);
   let current = movementAt(from / fps);
-  viz.loadPreset(all[presets[current]], 0);
+  // A tinted movement may have no preset: the one before keeps playing,
+  // faded out. One that opens on none loads the next it will play.
+  const playable = (m) => presets.slice(m).concat(presets.slice(0, m).reverse()).find(p => p !== 'none');
+  viz.loadPreset(all[presets[current] === 'none' ? playable(current) : presets[current]], 0);
+
+  // A tinted kind's preset, drawn by its treatment and in one colour
+  // (looks.js, after satchitananda's butterchurn layer): light levelled to
+  // LEVEL, greyed and softened; lines the frame less its blurred self, edges
+  // kept and background gone; then multiplied by the movement's tint, which
+  // keeps black black. Strength, tint and treatment ease over the five
+  // seconds the presets blend at a change.
+  const LEVEL = 0.45, BLEND = 5;
+  const STRENGTH = { light: 0.5, lines: 1 };
+  const hex = (c) => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  const mix = (a, b, k) => `rgb(${hex(a).map((v, i) => Math.round(v + (hex(b)[i] - v) * k)).join(',')})`;
+  const target = (m) => (presets[m] === 'none' ? { strength: 0, tint: tinted[m].tint, lines: 0 } : { strength: STRENGTH[tinted[m].treatment], tint: tinted[m].tint, lines: tinted[m].treatment === 'lines' ? 1 : 0 });
+  const lookAt = (t) => {
+    const m = movementAt(t);
+    const now = target(m);
+    const k = m > 0 ? Math.min(1, (t - edges[m]) / BLEND) : 1;
+    if (k >= 1) return now;
+    const before = target(m - 1);
+    const ease = 0.5 - 0.5 * Math.cos(k * Math.PI);
+    // Fading to none keeps the treatment it had; from none, takes the new one.
+    const lines = presets[m] === 'none' ? before.lines : presets[m - 1] === 'none' ? now.lines : before.lines + (now.lines - before.lines) * ease;
+    return { strength: before.strength + (now.strength - before.strength) * ease, tint: mix(before.tint, now.tint, ease), lines };
+  };
+  const make = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
+  const out = make(W, H), o = out.getContext('2d');
+  const edgeCanvas = make(W, H), e = edgeCanvas.getContext('2d');
+  const probe = make(32, 18).getContext('2d', { willReadFrequently: true });
+  let level = LEVEL;
+  const tint = (look) => {
+    probe.drawImage(canvas, 0, 0, 32, 18);
+    const px = probe.getImageData(0, 0, 32, 18).data;
+    let sum = 0;
+    for (let p = 0; p < px.length; p += 4) sum += (0.2126 * px[p] + 0.7152 * px[p + 1] + 0.0722 * px[p + 2]) / 255;
+    level += (sum / (px.length / 4) - level) * Math.min(1, 1 / fps / 1.5);
+    const gain = Math.min(8, Math.max(0.5, LEVEL / Math.max(0.005, level)));
+    o.globalCompositeOperation = 'source-over';
+    o.globalAlpha = 1;
+    o.filter = 'none';
+    o.fillStyle = '#000';
+    o.fillRect(0, 0, W, H);
+    if (look.strength > 0) {
+      o.globalCompositeOperation = 'lighter';
+      if (look.lines < 1) {
+        o.filter = `grayscale(1) brightness(${gain}) blur(2px)`;
+        o.globalAlpha = look.strength * (1 - look.lines);
+        o.drawImage(canvas, 0, 0);
+      }
+      if (look.lines > 0) {
+        e.globalCompositeOperation = 'source-over';
+        e.filter = 'grayscale(1)';
+        e.drawImage(canvas, 0, 0);
+        e.globalCompositeOperation = 'difference';
+        e.filter = 'grayscale(1) blur(18px)';
+        e.drawImage(canvas, 0, 0);
+        o.filter = 'contrast(1.6) brightness(2) blur(0.7px)';
+        o.globalAlpha = look.strength * look.lines;
+        o.drawImage(edgeCanvas, 0, 0);
+      }
+      o.filter = 'none';
+      o.globalAlpha = 1;
+      o.globalCompositeOperation = 'multiply';
+      o.fillStyle = look.tint;
+      o.fillRect(0, 0, W, H);
+    }
+    return out;
+  };
 
   const fx = document.createElement('canvas');
   fx.width = W; fx.height = H;
@@ -79,7 +148,10 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, edges,
   window.renderFrame = (f, wave, spectrum) => {
     const t = f / fps;
     const movement = movementAt(t);
-    if (movement !== current) { current = movement; viz.loadPreset(all[presets[movement]], 5.0); }
+    if (movement !== current) {
+      current = movement;
+      if (presets[movement] !== 'none') viz.loadPreset(all[presets[movement]], 5.0);
+    }
     viz.render({ audioLevels: { timeByteArray: Uint8Array.from(wave.mono), timeByteArrayL: Uint8Array.from(wave.left), timeByteArrayR: Uint8Array.from(wave.right) }, elapsedTime: 1 / fps });
 
     // Mandala: fade the last frame for trails, then draw this one additively.
@@ -163,7 +235,7 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, edges,
     }
     g.globalAlpha = 1;
     g.shadowBlur = 0;
-    return [canvas.toDataURL('image/jpeg', 0.92), fx.toDataURL('image/jpeg', 0.92)];
+    return [(tinted ? tint(lookAt(t)) : canvas).toDataURL('image/jpeg', 0.92), fx.toDataURL('image/jpeg', 0.92)];
   };
 }
 
@@ -180,15 +252,18 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
   // and where the movements change, and for a window its size and frames.
   const keyFile = path.join(dir, `${prefix}layers.json`);
   const whole = from === 0 && to === analysis.frames && size === LANDSCAPE;
-  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, ...(brief.kind ? { kind: brief.kind } : {}), edges, ...(whole ? {} : { size, from, to }) });
+  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, ...(brief.kind ? { kind: brief.kind } : {}), ...(brief.kind && lookOf(brief.kind).presets ? { tints: brief.movements.map(m => m.tint || null), treated: 1 } : {}), edges, ...(whole ? {} : { size, from, to }) });
   if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
   const { width: W, height: H } = size;
   const look = brief.kind ? lookOf(brief.kind).style : DEFAULT_STYLE;
+  const tinted = brief.kind && lookOf(brief.kind).presets
+    ? brief.movements.map(m => ({ treatment: treatmentOf(brief.kind, m.preset) || 'light', tint: m.tint || brief.palette[3] }))
+    : null;
   const { browser, page } = await butterchurnPage(W, H);
   try {
     await page.evaluate(pageSetup, {
-      W, H, fps, packs: PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, style: look, edges, from
+      W, H, fps, packs: PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, style: look, tinted, edges, from
     });
 
     const tmpMilk = milkdropFile.replace(/\.mp4$/, '.part.mp4');
