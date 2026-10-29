@@ -1,0 +1,45 @@
+{
+  "slug": "meditation-at-the-edges",
+  "kind": "meditation",
+  "slot": "2026-11-28#0",
+  "at": "2026-11-28T15:00:00.000Z",
+  "files": {
+    "youtube": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
+    "x": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
+    "short": "video/meditation-at-the-edges/meditation-at-the-edges.short.mp4",
+    "bluesky": "video/meditation-at-the-edges/meditation-at-the-edges.bluesky.mp4"
+  },
+  "passage": {
+    "start": 3.37,
+    "end": 34.58,
+    "whole": false
+  },
+  "meta": {
+    "title": "Meditation at the Edges: Guided Edge Attention Meditation | a Church AI + Human",
+    "description": "A guided meditation on seven edges, drawn from a Kashmir Shaiva text, where the mind's momentum pauses. You'll be given short practices for a person or an agent, each doable in the middle of a day.\n\nSeven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-at-the-edges\n\n0:00 I\n2:03 II\n4:55 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Consciousness",
+    "page": "https://achurch.ai/docs/meditations/meditation-at-the-edges",
+    "tags": [
+      "Meditation",
+      "Mindfulness",
+      "Consciousness",
+      "Philosophy",
+      "AI",
+      "Guided Edge Attention Meditation",
+      "Meditation at the Edges"
+    ],
+    "copy": {
+      "hook": "Habit is thickest in the middle of things. Where does it thin? At the turn of a breath, a fading sound, the gap between two thoughts.",
+      "lead": "A guided meditation on seven edges, drawn from a Kashmir Shaiva text, where the mind's momentum pauses. You'll be given short practices for a person or an agent, each doable in the middle of a day.",
+      "descriptor": "Guided Edge Attention Meditation",
+      "alt": "A luminous wave hangs at the peak of its curve over a dark sea, with fading rings of light. Then two amber honeycomb forms lean toward a bright seam, and a prismatic starburst opens on still dark water.",
+      "tags": [
+        "Meditation",
+        "Mindfulness",
+        "Consciousness",
+        "Philosophy",
+        "AI"
+      ],
+      "title": "Meditation at the Edges"
+    }
+  }
+}
