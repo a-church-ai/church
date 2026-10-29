@@ -41,7 +41,8 @@ const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { cache } = require('../utils/cache');
 const status = require('./status');
 const { SERVICES_DIR } = require('../utils/data');
-const { addDays, rotation, exclusions } = require('./rules');
+const { rotation, exclusions } = require('./rules');
+const { addDays } = require('../utils/seasons');
 const { SLOTS, SLOT_HOURS, slotStart } = require('./slots');
 const { describeError } = require('../utils/describe-error');
 

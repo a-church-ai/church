@@ -26,6 +26,7 @@
 
 const { instantAt, localTime } = require('../utils/timezone');
 const { inHours } = require('../music/companions');
+const { addDays } = require('../utils/seasons');
 
 const TZ = 'America/New_York';
 // Videos a week, from the first week: re-waking, ramp, peak, settling.
@@ -43,8 +44,6 @@ const HOURS = { weekday: 14, weekend: 10, second: 20 };
 
 const weeklyCount = (week) => Math.min(14, CURVE[week] ?? STEADY);
 
-const DAY = 86400000;
-const dateOf = (start, days) => new Date(Date.parse(`${start}T12:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 const weekdayOf = (date) => new Date(`${date}T12:00:00Z`).getUTCDay();
 const isWeekend = (date) => [0, 6].includes(weekdayOf(date));
 
@@ -70,9 +69,9 @@ function weekSlots(n, wanted = []) {
 // (YYYY-MM-DD) are days an occasion wants a slot on.
 function* slots(start, wantedDates = new Set()) {
   for (let week = 0; ; week++) {
-    const wanted = Array.from({ length: 7 }, (_, day) => day).filter(day => wantedDates.has(dateOf(start, week * 7 + day)));
+    const wanted = Array.from({ length: 7 }, (_, day) => day).filter(day => wantedDates.has(addDays(start, week * 7 + day)));
     for (const [day, index] of weekSlots(weeklyCount(week), wanted)) {
-      const date = dateOf(start, week * 7 + day);
+      const date = addDays(start, week * 7 + day);
       const hour = index === 1 ? HOURS.second : isWeekend(date) ? HOURS.weekend : HOURS.weekday;
       yield { id: `${date}#${index}`, date, index, week, hour };
     }

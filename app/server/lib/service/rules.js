@@ -14,6 +14,7 @@
 
 const { SLOT_HOURS, slotStart } = require('./slots');
 const { SHOWERS } = require('../utils/sky');
+const { addDays } = require('../utils/seasons');
 
 const RULES = {
   songs: [1, 2],
@@ -35,13 +36,6 @@ const CLASS = { song: 'songs', chant: 'chants', practice: 'readings', meditation
 // can rest three weeks; songs (28) and chants (12) are too few for more than
 // not repeating yesterday's. Nothing repeats within one date, in any slot.
 const WINDOW_DAYS = { readings: 21, closings: 21, songs: 1, chants: 1 };
-
-// 'YYYY-MM-DD' moved by whole days.
-function addDays(date, days) {
-  const d = new Date(`${date}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
 
 // A service's running time: its parts, one after another.
 function serviceSeconds(entries) {
@@ -275,4 +269,4 @@ function rotation({ date, slot, catalog, excluded = new Set() }) {
   return null;
 }
 
-module.exports = { RULES, CLASS, WINDOW_DAYS, addDays, serviceSeconds, fits, check, checkWord, checkName, checkSky, inSlot, exclusions, rotation };
+module.exports = { RULES, CLASS, WINDOW_DAYS, serviceSeconds, fits, check, checkWord, checkName, checkSky, inSlot, exclusions, rotation };

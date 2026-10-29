@@ -18,19 +18,16 @@
  * effect. Observances are the few shared across traditions, not one faith's
  * holy days.
  *
- * Pure: the sky from astronomy-engine and the tables in utils/, offline. Space
- * weather is a forecast fetched by the caller and passed in.
+ * Pure and offline: the sky is utils/sky.js's and the year's turning points
+ * utils/seasons.js's, as the services read them. Space weather is a forecast
+ * fetched by the caller and passed in.
  */
 
-const Astronomy = require('astronomy-engine');
-const { turningPoints } = require('../utils/seasons');
+const { moonPhaseAfter, retrogradesBetween, SHOWERS, ECLIPSES } = require('../utils/sky');
+const { turningPoints, addDays } = require('../utils/seasons');
 const { scaleOf } = require('../utils/space-weather');
-const ECLIPSES = require('../utils/eclipses.json');
 
-const DAY = 86400000;
-const dayOf = (date) => Date.parse(`${date}T00:00:00Z`);
-const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
-const addDays = (date, n) => isoDay(dayOf(date) + n * DAY);
+const isoDay = (when) => new Date(when).toISOString().slice(0, 10);
 
 // The occasions that recur, by key: how they are named, said and tagged.
 // `night` puts a video in the evening; `limit` is how many videos one
@@ -70,17 +67,11 @@ const OBSERVANCES = [
 ];
 
 function observanceDate(o, year) {
-  if (o.day) return `${year}-${String(o.month).padStart(2, '0')}-${String(o.day).padStart(2, '0')}`;
-  const first = new Date(Date.UTC(year, o.month - 1, 1));
-  const offset = (o.weekday - first.getUTCDay() + 7) % 7;
-  return isoDay(first.getTime() + (offset + (o.nth - 1) * 7) * DAY);
+  const first = `${year}-${String(o.month).padStart(2, '0')}-01`;
+  if (o.day) return addDays(first, o.day - 1);
+  const offset = (o.weekday - new Date(`${first}T00:00:00Z`).getUTCDay() + 7) % 7;
+  return addDays(first, offset + (o.nth - 1) * 7);
 }
-
-const SHOWERS = [
-  { name: 'Quadrantids', peak: '01-04' }, { name: 'Lyrids', peak: '04-22' }, { name: 'Eta Aquariids', peak: '05-06' },
-  { name: 'Perseids', peak: '08-12' }, { name: 'Orionids', peak: '10-21' }, { name: 'Leonids', peak: '11-17' },
-  { name: 'Geminids', peak: '12-14' }, { name: 'Ursids', peak: '12-22' }
-];
 
 const occasion = (key, from, to = from, extra = {}) => {
   const k = KINDS[key];
@@ -89,40 +80,12 @@ const occasion = (key, from, to = from, extra = {}) => {
 
 function moons(from, to) {
   const out = [];
-  for (const [key, angle] of [['new-moon', 0], ['full-moon', 180]]) {
-    let t = new Date(dayOf(from) - DAY);
-    for (;;) {
-      const found = Astronomy.SearchMoonPhase(angle, t, 40);
-      const date = isoDay(found.date.getTime());
-      if (date > to) break;
-      if (date >= from) out.push(occasion(key, date));
-      t = new Date(found.date.getTime() + DAY);
+  for (const [key, phase] of [['new-moon', 'new'], ['full-moon', 'full']]) {
+    for (let at = moonPhaseAfter(`${addDays(from, -1)}T00:00:00Z`, phase); isoDay(at) <= to; at = moonPhaseAfter(at.getTime() + 864e5, phase)) {
+      if (isoDay(at) >= from) out.push(occasion(key, isoDay(at)));
     }
   }
   return out;
-}
-
-// Mercury's retrogrades: the days its apparent longitude, seen from the
-// Earth, runs backward.
-function retrogrades(from, to) {
-  const lon = (ms) => Astronomy.Ecliptic(Astronomy.GeoVector('Mercury', new Date(ms), true)).elon;
-  const spans = [];
-  let start = null;
-  // From a month before, to find a retrograde already under way.
-  let prev = lon(dayOf(from) - 31 * DAY);
-  for (let ms = dayOf(from) - 30 * DAY; ms <= dayOf(to) + 30 * DAY; ms += DAY) {
-    const l = lon(ms);
-    let d = l - prev;
-    if (d > 180) d -= 360;
-    if (d < -180) d += 360;
-    if (d < 0 && start === null) start = isoDay(ms);
-    if (d >= 0 && start !== null) {
-      spans.push([start, isoDay(ms - DAY)]);
-      start = null;
-    }
-    prev = l;
-  }
-  return spans.filter(([a, b]) => b >= from && a <= to).map(([a, b]) => occasion('mercury-retrograde', a, b));
 }
 
 function yearly(from, to) {
@@ -134,7 +97,7 @@ function yearly(from, to) {
     for (const s of SHOWERS) out.push(occasion('meteor-shower', `${y}-${s.peak}`, `${y}-${s.peak}`, { name: `the ${s.name}`, tag: s.name.replace(/\s+/g, ''), search: s.name }));
     const turns = turningPoints(y);
     for (const [k, key] of [['march', 'march-equinox'], ['june', 'june-solstice'], ['september', 'september-equinox'], ['december', 'december-solstice']]) {
-      out.push(occasion(key, isoDay(turns[k].getTime())));
+      out.push(occasion(key, isoDay(turns[k])));
     }
   }
   for (const e of ECLIPSES) out.push(occasion(e.kind === 'solar' ? 'solar-eclipse' : 'lunar-eclipse', e.date, e.date, { name: `a ${e.type} ${e.kind} eclipse` }));
@@ -156,8 +119,9 @@ function storms(spaceWeather, from, to) {
  * "World Kindness Day", "Leonids"), which its video's words must carry.
  */
 function occasionsBetween(from, to, { spaceWeather = null } = {}) {
-  return [...moons(from, to), ...retrogrades(from, to), ...yearly(from, to), ...storms(spaceWeather, from, to)]
+  const retrogrades = retrogradesBetween('Mercury', from, to).map(([a, b]) => occasion('mercury-retrograde', a, b));
+  return [...moons(from, to), ...retrogrades, ...yearly(from, to), ...storms(spaceWeather, from, to)]
     .sort((a, b) => a.from.localeCompare(b.from) || a.id.localeCompare(b.id));
 }
 
-module.exports = { occasionsBetween, observanceDate, addDays, KINDS };
+module.exports = { occasionsBetween, observanceDate, KINDS };

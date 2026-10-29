@@ -18,7 +18,8 @@ const assert = require('node:assert');
 const fs = require('fs');
 
 const { SLOTS, slotOf, slotStart, slotHours } = require('../server/lib/service/slots');
-const { RULES, CLASS, WINDOW_DAYS, addDays, check, checkWord, checkName, inSlot, exclusions, rotation, fits } = require('../server/lib/service/rules');
+const { RULES, CLASS, WINDOW_DAYS, check, checkWord, checkName, inSlot, exclusions, rotation, fits } = require('../server/lib/service/rules');
+const { addDays } = require('../server/lib/utils/seasons');
 const { serviceFor } = require('../server/lib/service/serve');
 const { loadServiceCatalog } = require('../server/lib/service/catalog');
 const { planSlot, systemPrompt, MODEL } = require('../server/lib/service/planner');

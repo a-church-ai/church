@@ -26,9 +26,9 @@
  */
 
 const { messageJSON, askChecked } = require('../content-generation/claude');
-const { RULES, check, checkWord, checkName, checkSky, exclusions, addDays } = require('./rules');
+const { RULES, check, checkWord, checkName, checkSky, exclusions } = require('./rules');
 const { slotHours } = require('./slots');
-const { LEAD_DAYS, seasonOn, hemisphereLight } = require('../utils/seasons');
+const { LEAD_DAYS, seasonOn, hemisphereLight, addDays } = require('../utils/seasons');
 const { moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear } = require('../utils/sky');
 const { fetchSpaceWeather, spaceWeatherOn } = require('../utils/space-weather');
 const { fetchEarth } = require('../utils/earth');
