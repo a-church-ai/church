@@ -15,7 +15,11 @@
  * video/<slug>/, and its release record written in
  * video/releases/<slug>.json with its hour and the Short's passage. A placed
  * video without its Short gets just that, and each its poster for its page
- * (lib/video/on-site.js). Commit and push video/ and the posters after: the
+ * (lib/video/on-site.js). A placed video rendered again since its upload (a
+ * new brief, or `npm run video -- --restyle`) and not yet on YouTube is
+ * uploaded anew, with its words written again where its brief is new and
+ * its poster made again; the record keeps the render's time (renderedAt) to
+ * tell. Commit and push video/ and the posters after: the
  * hourly job (release-videos.js, .github/workflows/release-videos.yml) reads
  * the records from the repository, uploads each video to YouTube a day ahead
  * to go public at its hour and its Short an hour after, and posts the video
@@ -51,7 +55,7 @@ const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/
 const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
 const { uploadObject } = require('../server/lib/audio/storage');
 const { plan, TZ } = require('../server/lib/video/schedule');
-const { occasionsBetween } = require('../server/lib/video/occasions');
+const { occasionsBetween, occasionById } = require('../server/lib/video/occasions');
 const { addDays } = require('../server/lib/utils/seasons');
 const { matchOccasions } = require('../server/lib/video/occasion-match');
 const { fetchSpaceWeather } = require('../server/lib/utils/space-weather');
@@ -189,6 +193,28 @@ async function main() {
       process.exitCode = 1;
     }
   }
+  // Placed videos rendered again since their upload, not yet on YouTube.
+  for (const r of records.filter(r => r.slot && r.files && !r.youtube)) {
+    const log = (m) => console.log(`[${r.slug}] ${m}`);
+    let renderedAt;
+    try {
+      renderedAt = fs.statSync(renderedVideo(r.slug).file).mtimeMs;
+    } catch {
+      continue;
+    }
+    if (r.renderedAt && renderedAt <= r.renderedAt) continue;
+    log('rendered again since its upload: uploading it anew');
+    if (opts.dryRun) continue;
+    try {
+      const { file, short, passage, meta } = await prepare(r.slug, { occasion: r.occasion ? occasionById(r.occasion.id) : null });
+      const files = await upload(r.slug, { file, short }, log);
+      await makePoster(file, r.slug);
+      await updateRecord(r.slug, { files, passage, meta, renderedAt });
+    } catch (err) {
+      log(`uploading it anew: ${describeError(err)}`);
+      process.exitCode = 1;
+    }
+  }
   for (const p of placed) {
     const log = (m) => console.log(`[${p.slug}] ${m}`);
     const occasion = p.occasion ? occasionOf.get(p.occasion) : null;
@@ -211,7 +237,7 @@ async function main() {
     try {
       const { piece, file, short, passage, meta } = await prepare(p.slug, { occasion });
       const files = await upload(p.slug, { file, short }, log);
-      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, occasion: kept, files, passage, meta });
+      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, occasion: kept, files, passage, meta, renderedAt: fs.statSync(file).mtimeMs });
     } catch (err) {
       log(`failed: ${describeError(err)}`);
       process.exitCode = 1;

@@ -208,4 +208,54 @@ async function writeBrief(piece, rules, shortlist = []) {
   return brief;
 }
 
-module.exports = { writeBrief, reuseRule, check, barsPerLoop, MOVEMENTS, MAX_REUSED };
+/**
+ * A brief written before its kind had a look, restyled: its stills, motion,
+ * loops, mood and palette stay, so no image or loop is made again, and only
+ * what is drawn over them is chosen anew for its kind (looks.js): each
+ * movement's preset (and tint, for a tinted kind), the mandala's symmetry and
+ * the layers' opacities, under the same rules and checks as a new brief.
+ */
+async function restyleBrief(piece, brief, rules) {
+  piece = { ...piece, kind: lookName(piece) };
+  piece = { ...piece, presets: presetsFor(piece.kind, piece.presets).filter(p => rules.presets.allows(p.name)), shortlist: [] };
+  const made = brief.movements.map((m, i) => `${i + 1}. ${m.still}\n   motion: ${m.motion}`).join('\n');
+  const request = `${userMessage(piece)}
+
+This video is already made: its stills and their motion stay as they are, and so does its palette (${brief.palette.join(' ')}). Choose only what is drawn over them, for its kind: each movement's preset${lookOf(piece.kind).presets ? ' and tint' : ''}, the symmetry and the two opacities. Return the whole brief as JSON with these movements, in this order:
+${made}`;
+  // Only the choices are taken from the answer; what is made is kept.
+  const merge = (raw) => {
+    const answer = parseJSON(raw);
+    return {
+      ...brief,
+      kind: piece.kind,
+      symmetry: answer.symmetry,
+      milkdropOpacity: answer.milkdropOpacity,
+      mandalaOpacity: answer.mandalaOpacity,
+      movements: brief.movements.map((m, i) => {
+        const chosen = (answer.movements || [])[i] || {};
+        const { tint, ...kept } = m;
+        return { ...kept, preset: chosen.preset, ...(chosen.tint ? { tint: chosen.tint } : {}) };
+      })
+    };
+  };
+  const own = brief.movements.filter(m => m.loop).map(m => ({ id: m.loop }));
+  const checkMerged = check(piece.presets, rules, own, piece.kind);
+  return askChecked({
+    label: 'restyle',
+    tries: 3,
+    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 4000 }),
+    check: (raw) => {
+      let merged;
+      try {
+        merged = merge(raw);
+      } catch (err) {
+        return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw };
+      }
+      const checked = checkMerged(JSON.stringify(merged));
+      return { ...checked, value: checked.value && merged };
+    }
+  });
+}
+
+module.exports = { writeBrief, restyleBrief, reuseRule, check, barsPerLoop, MOVEMENTS, MAX_REUSED };

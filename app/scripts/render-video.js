@@ -8,6 +8,10 @@
  *
  *   npm run video -- <slug> [<slug> ...]   a song by its folder's name, a voiced document by its file's
  *   npm run video -- --survey-presets      measure every MilkDrop preset again (lib/video/presets.json)
+ *   npm run video -- --restyle <slug> ...  give a video briefed before its kind had a look that look:
+ *                                          its stills and loops kept, its presets, tints and mandala
+ *                                          chosen anew (brief.js restyleBrief), then drawn again at no
+ *                                          Omni cost
  *   --concurrency N                        pieces at once (default 2)
  *
  * Two pieces at once, because the stages use the machine differently: the
@@ -34,7 +38,7 @@ const { describeError } = require('../server/lib/utils/describe-error');
 const { pool } = require('../server/lib/utils/pool');
 const { analyse, describeMovement, envelope } = require('../server/lib/video/analysis');
 const { pieceFor, allPieces, pieceText, recordingIn, shapeOf } = require('../server/lib/video/pieces');
-const { writeBrief, reuseRule } = require('../server/lib/video/brief');
+const { writeBrief, restyleBrief, reuseRule } = require('../server/lib/video/brief');
 const { lookOf, lookName } = require('../server/lib/video/looks');
 const library = require('../server/lib/video/library');
 const lancedb = require('../server/lib/rag/lancedb');
@@ -50,10 +54,11 @@ const OUT = library.VIDEO_DIR;
 const SURVEY_RECORDING = 'prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3';
 
 function parseArgs(argv) {
-  const opts = { slugs: [], surveyPresets: false, concurrency: 2 };
+  const opts = { slugs: [], surveyPresets: false, restyle: false, concurrency: 2 };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--survey-presets') opts.surveyPresets = true;
+    else if (arg === '--restyle') opts.restyle = true;
     else if (arg === '--concurrency') opts.concurrency = Number(argv[++i]);
     else if (arg.startsWith('--')) throw new Error(`Unknown option ${arg}`);
     else opts.slugs.push(arg);
@@ -69,15 +74,20 @@ function parseArgs(argv) {
  * search index does not hold (not yet indexed) is offered no loops, and says
  * so.
  */
+// The preset rule for a piece, from every other video: a kind with its own
+// list of presets is held only against its own kind.
+function presetRule(piece, about) {
+  const others = library.videos().filter(v => v.slug !== piece.slug);
+  const look = lookName(about);
+  return lookOf(look).presets
+    ? reuseRule(others.filter(v => v.kind === look).map(v => ({ items: v.presets, at: v.at })), 'preset', { recent: 2, cap: Infinity })
+    : reuseRule(others.map(v => ({ items: v.presets, at: v.at })), 'preset');
+}
+
 async function newBrief(piece, about, log) {
   const others = library.videos().filter(v => v.slug !== piece.slug);
-  // A kind with its own list of presets is held only against its own kind.
-  const look = lookName(about);
-  const own = lookOf(look).presets;
   const rules = {
-    presets: own
-      ? reuseRule(others.filter(v => v.kind === look).map(v => ({ items: v.presets, at: v.at })), 'preset', { recent: 2, cap: Infinity })
-      : reuseRule(others.map(v => ({ items: v.presets, at: v.at })), 'preset'),
+    presets: presetRule(piece, about),
     loops: reuseRule(others.map(v => ({ items: v.loops, at: v.at })), 'loop')
   };
   const rows = await lancedb.listAll();
@@ -100,7 +110,7 @@ function oneEncodeAtATime(fn) {
   return turn;
 }
 
-async function render(piece) {
+async function render(piece, { restyle = false } = {}) {
   const dir = path.join(OUT, piece.slug);
   fs.mkdirSync(dir, { recursive: true });
   const log = (m) => console.log(`[${piece.slug}] ${m}`);
@@ -117,6 +127,24 @@ async function render(piece) {
   if (!fs.existsSync(briefFile)) {
     const brief = await newBrief(piece, { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid }, log);
     fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
+    // The words describe the stills (copy.js), so a new brief has them
+    // written again when the video is next placed or uploaded.
+    const copyFile = path.join(dir, 'copy.json');
+    if (fs.existsSync(copyFile)) {
+      fs.unlinkSync(copyFile);
+      log('a new brief: its words will be written again');
+    }
+  }
+  if (restyle) {
+    const old = JSON.parse(fs.readFileSync(briefFile, 'utf8'));
+    if (old.kind) log(`already has its kind's look (${old.kind}); nothing to restyle`);
+    else {
+      const about = { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid, presets: presetChoices() };
+      // Its loops are its own, so they are not held to the loop rule again.
+      const styled = await restyleBrief(about, old, { presets: presetRule(piece, about), loops: reuseRule([], 'loop') });
+      fs.writeFileSync(briefFile, JSON.stringify(styled, null, 2));
+      log(`restyled as a ${styled.kind}: ${old.movements.map(m => m.preset).join(' / ')} became ${styled.movements.map(m => m.preset + (m.tint ? ` (${m.tint})` : '')).join(' / ')}`);
+    }
   }
   const brief = JSON.parse(fs.readFileSync(briefFile, 'utf8'));
   log(`brief: ${brief.mood} | presets: ${brief.movements.map(m => m.preset).join(' / ')}`);
@@ -177,7 +205,7 @@ async function main() {
   let done = 0;
   await pool(pieces, opts.concurrency, async (piece) => {
     try {
-      await render(piece);
+      await render(piece, { restyle: opts.restyle });
       done++;
     } catch (err) {
       console.error(`[${piece.slug}] failed: ${describeError(err)}`);

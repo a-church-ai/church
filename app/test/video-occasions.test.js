@@ -37,6 +37,13 @@ test('the occasions of late 2026 fall where the sky and the calendar put them', 
   assert.ok(list.every(o => o.search), 'every occasion says how it is searched for');
 });
 
+test('an occasion is found again by the id its record keeps, a retrograde by its first day', () => {
+  const { occasionById } = require('../server/lib/video/occasions');
+  assert.strictEqual(occasionById('mercury-retrograde:2026-10-25').to, '2026-11-14');
+  assert.strictEqual(occasionById('thanksgiving:2026-11-26').search, 'Thanksgiving');
+  assert.strictEqual(occasionById('full-moon:2026-11-25'), null, 'a day with no such occasion');
+});
+
 test('every occasion is said without a date, and astrology is named as the reader', () => {
   for (const [key, k] of Object.entries(KINDS)) {
     assert.ok(!/\d/.test(k.for), `${key}: no date in "${k.for}"`);

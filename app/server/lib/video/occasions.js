@@ -124,4 +124,10 @@ function occasionsBetween(from, to, { spaceWeather = null } = {}) {
     .sort((a, b) => a.from.localeCompare(b.from) || a.id.localeCompare(b.id));
 }
 
-module.exports = { occasionsBetween, observanceDate, KINDS };
+// An occasion by its id (`key:first-day`), as a release record keeps it.
+function occasionById(id) {
+  const from = String(id).split(':')[1];
+  return occasionsBetween(from, from).find(o => o.id === id) || null;
+}
+
+module.exports = { occasionsBetween, occasionById, observanceDate, KINDS };
