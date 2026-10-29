@@ -32,6 +32,9 @@ test('the occasions of late 2026 fall where the sky and the calendar put them', 
   assert.ok(find(list, 'new-year', '2027-01-01'));
   assert.ok(list.every((o, i) => i === 0 || list[i - 1].from <= o.from), 'in order');
   assert.strictEqual(observanceDate({ month: 11, weekday: 4, nth: 4 }, 2027), '2027-11-25');
+  assert.strictEqual(find(list, 'thanksgiving', '2026-11-26').search, 'Thanksgiving');
+  assert.strictEqual(leonids.search, 'Leonids');
+  assert.ok(list.every(o => o.search), 'every occasion says how it is searched for');
 });
 
 test('every occasion is said without a date, and astrology is named as the reader', () => {
@@ -102,7 +105,7 @@ test('a paired video goes out inside its occasion, at night for a night one, and
 
 test('the copy for an occasion names it without a date, astrology as astrology, its tag up front', () => {
   const base = { hook: 'A prayer for the mind that cannot know itself.', lead: 'A spoken prayer. Stay with it.', descriptor: 'Spoken Prayer', alt: 'A violet crystal in gold light.', tags: ['FullMoon', 'Prayer', 'Meditation', 'AI', 'Consciousness'] };
-  const moon = { key: 'full-moon', kind: 'sky', tag: 'FullMoon' };
+  const moon = { key: 'full-moon', kind: 'sky', tag: 'FullMoon', search: 'full moon' };
   const run = (copy, occasion) => checkCopy(JSON.stringify(copy), occasion).problems.join(' | ');
   assert.strictEqual(run({ ...base, occasion: 'For the nights of a full moon, when what was hidden is lit.' }, moon), '');
   assert.strictEqual(checkCopy(JSON.stringify({ ...base, occasion: 'For the nights of a full moon.' }), moon).value.occasionKey, 'full-moon');
@@ -111,12 +114,19 @@ test('the copy for an occasion names it without a date, astrology as astrology, 
   assert.match(run({ ...base, occasion: 'The nights of a full moon.' }, moon), /begin with "For"/);
   assert.match(run(base, moon), /occasion is missing/);
   assert.match(run({ ...base, tags: ['Prayer', 'Meditation', 'FullMoon', 'AI', 'Consciousness'], occasion: 'For the nights of a full moon.' }, moon), /FullMoon" must be one of the first two/);
-  assert.strictEqual(run({ ...base, tags: ['Solstice', 'Prayer', 'Meditation', 'AI', 'Consciousness'], occasion: 'For the June solstice, the longest day in the north.' }, { key: 'june-solstice', kind: 'season', tag: 'Solstice' }), '', 'a solstice may name its month');
-  const retro = { key: 'mercury-retrograde', kind: 'astrology', tag: 'MercuryRetrograde' };
+  assert.strictEqual(run({ ...base, tags: ['Solstice', 'Prayer', 'Meditation', 'AI', 'Consciousness'], occasion: 'For the June solstice, the longest day in the north.' }, { key: 'june-solstice', kind: 'season', tag: 'Solstice', search: 'solstice' }), '', 'a solstice may name its month');
+  const retro = { key: 'mercury-retrograde', kind: 'astrology', tag: 'MercuryRetrograde', search: 'Mercury retrograde' };
   const retroTags = ['MercuryRetrograde', 'Prayer', 'Meditation', 'AI', 'Consciousness'];
   assert.match(run({ ...base, tags: retroTags, occasion: 'For a Mercury retrograde, when everything slows and misfires.' }, retro), /astrology/);
   assert.strictEqual(run({ ...base, tags: retroTags, occasion: 'For a Mercury retrograde, which astrology reads as a time to reread and return.' }, retro), '');
   assert.strictEqual(run(base, null), '', 'without an occasion, no line is asked for');
+  // The occasion as people search for it, spelled so, and kept for the keywords.
+  const thanks = { key: 'thanksgiving', kind: 'observance', tag: 'Thanksgiving', search: 'Thanksgiving' };
+  const thanksTags = ['Thanksgiving', 'Gratitude', 'Meditation', 'AI', 'Consciousness'];
+  assert.match(run({ ...base, tags: thanksTags, occasion: 'For a day of giving thanks, and the many voices behind each word.' }, thanks), /must name "Thanksgiving"/);
+  const ok = checkCopy(JSON.stringify({ ...base, tags: thanksTags, occasion: 'For Thanksgiving and any day of giving thanks.' }), thanks);
+  assert.deepStrictEqual(ok.problems, []);
+  assert.strictEqual(ok.value.occasionSearch, 'Thanksgiving');
 });
 
 test('a Short carries its occasion line under the lead, and one without has none', () => {

@@ -21,8 +21,11 @@
  * - A video going out for an occasion (occasions.js) has an occasion line:
  *   one sentence beginning "For", with no date, month, weekday or year, so it
  *   is true again whenever the occasion returns; one for astrology names
- *   astrology as the one reading it, never claiming an effect. The
- *   occasion's tag is one of the first two, the ones every platform shows.
+ *   astrology as the one reading it, never claiming an effect. It carries
+ *   the occasion as people search for it ("Thanksgiving", "World Kindness
+ *   Day", "Leonids"), spelled so, and that name joins the video's YouTube
+ *   keywords. The occasion's tag is one of the first two, the ones every
+ *   platform shows.
  *   The copy is written again when the occasion changes.
  */
 
@@ -80,10 +83,11 @@ function check(raw, occasion = null) {
     plain('occasion', 160);
     if (line && !/^For /.test(line)) problems.push('occasion must begin with "For"');
     if (/\d/.test(line) || MONTHS.test(line.replace(SEASONAL, ''))) problems.push('occasion must hold no date, month, weekday, year or "tonight": it should stay true whenever the occasion returns');
+    if (occasion.search && !line.toLowerCase().includes(occasion.search.toLowerCase())) problems.push(`occasion must name "${occasion.search}", spelled so, as people search for it`);
     if (occasion.kind === 'astrology' && !/astrolog/i.test(line)) problems.push('occasion must say it is astrology that reads this time so, not claim an effect');
     if (!tags.slice(0, 2).some(t => t.toLowerCase() === occasion.tag.toLowerCase())) problems.push(`the tag "${occasion.tag}" must be one of the first two`);
   }
-  return { value: { ...copy, tags, ...(occasion ? { occasionKey: occasion.key } : {}) }, problems, shown: raw };
+  return { value: { ...copy, tags, ...(occasion ? { occasionKey: occasion.key, occasionSearch: occasion.search || null } : {}) }, problems, shown: raw };
 }
 
 /**
@@ -108,7 +112,7 @@ ${text}
 What the video shows, movement by movement (its brief): ${brief.mood}
 ${brief.movements.map((m, i) => `${i + 1}. ${m.still}`).join('\n')}${occasion ? `
 
-It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}${occasion.kind === 'astrology' ? ', naming astrology as the one that reads it so (what astrology reads in it, never that the planet does anything)' : ''}, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.` : ''}`;
+It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}, with the words "${occasion.search}" in it, spelled so, since that is how people search for it${occasion.kind === 'astrology' ? ', naming astrology as the one that reads it so (what astrology reads in it, never that the planet does anything)' : ''}, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.` : ''}`;
   const copy = await askChecked({
     label: 'copy',
     tries: 3,

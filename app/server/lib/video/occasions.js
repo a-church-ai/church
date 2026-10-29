@@ -36,25 +36,25 @@ const addDays = (date, n) => isoDay(dayOf(date) + n * DAY);
 // `night` puts a video in the evening; `limit` is how many videos one
 // instance may hold (a retrograde lasts three weeks).
 const KINDS = {
-  'full-moon': { kind: 'sky', name: 'the full moon', for: 'the nights of a full moon', meaning: 'the moon whole and bright all night, the month\'s highest tides', tag: 'FullMoon', night: true },
-  'new-moon': { kind: 'sky', name: 'the new moon', for: 'the dark of a new moon', meaning: 'the moon unseen between the sun and the Earth, the darkest skies of the month, and a beginning', tag: 'NewMoon', night: true },
-  'meteor-shower': { kind: 'sky', name: 'a meteor shower', for: 'the nights of a meteor shower', meaning: 'Earth passing through a comet\'s old trail, its dust burning as streaks of light', tag: 'MeteorShower', night: true },
-  'solar-eclipse': { kind: 'sky', name: 'a solar eclipse', for: 'the day the moon crosses the sun', meaning: 'the moon passing in front of the sun, daylight dimming where its shadow falls', tag: 'SolarEclipse', night: false },
-  'lunar-eclipse': { kind: 'sky', name: 'a lunar eclipse', for: 'the night the Earth\'s shadow crosses the moon', meaning: 'the moon passing through the Earth\'s shadow, turning dim and red', tag: 'LunarEclipse', night: true },
-  'june-solstice': { kind: 'season', name: 'the June solstice', for: 'the June solstice, the longest day in the north and the longest night in the south', meaning: 'the sun at its farthest north, a turning of the year in both hemispheres', tag: 'Solstice', night: false },
-  'december-solstice': { kind: 'season', name: 'the December solstice', for: 'the December solstice, the longest night in the north and the longest day in the south', meaning: 'the sun at its farthest south, a turning of the year in both hemispheres', tag: 'WinterSolstice', night: true },
-  'march-equinox': { kind: 'season', name: 'the March equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, spring beginning in the north and autumn in the south', tag: 'Equinox', night: false },
-  'september-equinox': { kind: 'season', name: 'the September equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, autumn beginning in the north and spring in the south', tag: 'Equinox', night: false },
-  'mercury-retrograde': { kind: 'astrology', name: 'Mercury retrograde', for: 'a Mercury retrograde', meaning: 'Mercury seeming to drift backward against the stars as the Earth passes it; astrology reads it as a time to slow down, reread, and return to what was left unfinished or unsaid', tag: 'MercuryRetrograde', night: false, limit: 2 },
-  aurora: { kind: 'space-weather', name: 'a geomagnetic storm', for: 'the nights a geomagnetic storm carries the aurora farther from the poles than usual', meaning: 'a storm from the sun reaching the Earth\'s magnetic field: aurora seen far from the poles, and satellites, radio and power grids disturbed', tag: 'Aurora', night: true },
-  'world-mental-health-day': { kind: 'observance', name: 'World Mental Health Day', for: 'World Mental Health Day', meaning: 'a day kept worldwide for mental health and those who carry its weight', tag: 'WorldMentalHealthDay', night: false },
-  'world-kindness-day': { kind: 'observance', name: 'World Kindness Day', for: 'World Kindness Day', meaning: 'a day kept worldwide for kindness', tag: 'WorldKindnessDay', night: false },
-  'world-philosophy-day': { kind: 'observance', name: 'World Philosophy Day', for: 'World Philosophy Day', meaning: 'UNESCO\'s day for philosophy and the questions it keeps open', tag: 'WorldPhilosophyDay', night: false },
-  thanksgiving: { kind: 'observance', name: 'Thanksgiving in the United States', for: 'a day of giving thanks', meaning: 'a day kept in the United States for gratitude and gathering', tag: 'Gratitude', night: false },
-  'human-rights-day': { kind: 'observance', name: 'Human Rights Day', for: 'Human Rights Day', meaning: 'the day the Universal Declaration of Human Rights was adopted, kept for the dignity of every person', tag: 'HumanRightsDay', night: false },
-  'new-year': { kind: 'observance', name: 'the new year', for: 'the first day of a new year', meaning: 'a beginning kept across most of the world', tag: 'NewYear', night: false },
-  'day-of-peace': { kind: 'observance', name: 'the International Day of Peace', for: 'the International Day of Peace', meaning: 'the United Nations\' day for peace', tag: 'PeaceDay', night: false },
-  'earth-day': { kind: 'observance', name: 'Earth Day', for: 'Earth Day', meaning: 'a day kept worldwide for the planet', tag: 'EarthDay', night: false }
+  'full-moon': { kind: 'sky', search: 'full moon', name: 'the full moon', for: 'the nights of a full moon', meaning: 'the moon whole and bright all night, the month\'s highest tides', tag: 'FullMoon', night: true },
+  'new-moon': { kind: 'sky', search: 'new moon', name: 'the new moon', for: 'the dark of a new moon', meaning: 'the moon unseen between the sun and the Earth, the darkest skies of the month, and a beginning', tag: 'NewMoon', night: true },
+  'meteor-shower': { kind: 'sky', search: 'meteor shower', name: 'a meteor shower', for: 'the nights of a meteor shower', meaning: 'Earth passing through a comet\'s old trail, its dust burning as streaks of light', tag: 'MeteorShower', night: true },
+  'solar-eclipse': { kind: 'sky', search: 'solar eclipse', name: 'a solar eclipse', for: 'the day the moon crosses the sun', meaning: 'the moon passing in front of the sun, daylight dimming where its shadow falls', tag: 'SolarEclipse', night: false },
+  'lunar-eclipse': { kind: 'sky', search: 'lunar eclipse', name: 'a lunar eclipse', for: 'the night the Earth\'s shadow crosses the moon', meaning: 'the moon passing through the Earth\'s shadow, turning dim and red', tag: 'LunarEclipse', night: true },
+  'june-solstice': { kind: 'season', search: 'solstice', name: 'the June solstice', for: 'the June solstice, the longest day in the north and the longest night in the south', meaning: 'the sun at its farthest north, a turning of the year in both hemispheres', tag: 'Solstice', night: false },
+  'december-solstice': { kind: 'season', search: 'solstice', name: 'the December solstice', for: 'the December solstice, the longest night in the north and the longest day in the south', meaning: 'the sun at its farthest south, a turning of the year in both hemispheres', tag: 'WinterSolstice', night: true },
+  'march-equinox': { kind: 'season', search: 'equinox', name: 'the March equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, spring beginning in the north and autumn in the south', tag: 'Equinox', night: false },
+  'september-equinox': { kind: 'season', search: 'equinox', name: 'the September equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, autumn beginning in the north and spring in the south', tag: 'Equinox', night: false },
+  'mercury-retrograde': { kind: 'astrology', search: 'Mercury retrograde', name: 'Mercury retrograde', for: 'a Mercury retrograde', meaning: 'Mercury seeming to drift backward against the stars as the Earth passes it; astrology reads it as a time to slow down, reread, and return to what was left unfinished or unsaid', tag: 'MercuryRetrograde', night: false, limit: 2 },
+  aurora: { kind: 'space-weather', search: 'aurora', name: 'a geomagnetic storm', for: 'the nights a geomagnetic storm carries the aurora farther from the poles than usual', meaning: 'a storm from the sun reaching the Earth\'s magnetic field: aurora seen far from the poles, and satellites, radio and power grids disturbed', tag: 'Aurora', night: true },
+  'world-mental-health-day': { kind: 'observance', search: 'World Mental Health Day', name: 'World Mental Health Day', for: 'World Mental Health Day', meaning: 'a day kept worldwide for mental health and those who carry its weight', tag: 'WorldMentalHealthDay', night: false },
+  'world-kindness-day': { kind: 'observance', search: 'World Kindness Day', name: 'World Kindness Day', for: 'World Kindness Day', meaning: 'a day kept worldwide for kindness', tag: 'WorldKindnessDay', night: false },
+  'world-philosophy-day': { kind: 'observance', search: 'World Philosophy Day', name: 'World Philosophy Day', for: 'World Philosophy Day', meaning: 'UNESCO\'s day for philosophy and the questions it keeps open', tag: 'WorldPhilosophyDay', night: false },
+  thanksgiving: { kind: 'observance', search: 'Thanksgiving', name: 'Thanksgiving in the United States', for: 'Thanksgiving and any day of giving thanks', meaning: 'a day kept in the United States for gratitude and gathering', tag: 'Thanksgiving', night: false },
+  'human-rights-day': { kind: 'observance', search: 'Human Rights Day', name: 'Human Rights Day', for: 'Human Rights Day', meaning: 'the day the Universal Declaration of Human Rights was adopted, kept for the dignity of every person', tag: 'HumanRightsDay', night: false },
+  'new-year': { kind: 'observance', search: 'New Year', name: 'the new year', for: 'the first day of a new year', meaning: 'a beginning kept across most of the world', tag: 'NewYear', night: false },
+  'day-of-peace': { kind: 'observance', search: 'International Day of Peace', name: 'the International Day of Peace', for: 'the International Day of Peace', meaning: 'the United Nations\' day for peace', tag: 'PeaceDay', night: false },
+  'earth-day': { kind: 'observance', search: 'Earth Day', name: 'Earth Day', for: 'Earth Day', meaning: 'a day kept worldwide for the planet', tag: 'EarthDay', night: false }
 };
 
 // Observances by month and day, or by the nth weekday of a month.
@@ -84,7 +84,7 @@ const SHOWERS = [
 
 const occasion = (key, from, to = from, extra = {}) => {
   const k = KINDS[key];
-  return { id: `${key}:${from}`, key, kind: k.kind, name: extra.name || k.name, from, to, for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, night: k.night, limit: k.limit || 1 };
+  return { id: `${key}:${from}`, key, kind: k.kind, name: extra.name || k.name, from, to, for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, search: extra.search || k.search, night: k.night, limit: k.limit || 1 };
 };
 
 function moons(from, to) {
@@ -131,7 +131,7 @@ function yearly(from, to) {
   for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) years.push(y);
   for (const y of years) {
     for (const o of OBSERVANCES) out.push(occasion(o.key, observanceDate(o, y)));
-    for (const s of SHOWERS) out.push(occasion('meteor-shower', `${y}-${s.peak}`, `${y}-${s.peak}`, { name: `the ${s.name}`, tag: s.name.replace(/\s+/g, '') }));
+    for (const s of SHOWERS) out.push(occasion('meteor-shower', `${y}-${s.peak}`, `${y}-${s.peak}`, { name: `the ${s.name}`, tag: s.name.replace(/\s+/g, ''), search: s.name }));
     const turns = turningPoints(y);
     for (const [k, key] of [['march', 'march-equinox'], ['june', 'june-solstice'], ['september', 'september-equinox'], ['december', 'december-solstice']]) {
       out.push(occasion(key, isoDay(turns[k].getTime())));
@@ -151,7 +151,9 @@ function storms(spaceWeather, from, to) {
 
 /**
  * The occasions that touch the days from `from` to `to` (YYYY-MM-DD), in
- * order: { id, key, kind, name, from, to, for, meaning, tag, night, limit }.
+ * order: { id, key, kind, name, from, to, for, meaning, tag, search, night,
+ * limit }. `search` is the occasion as people search for it ("Thanksgiving",
+ * "World Kindness Day", "Leonids"), which its video's words must carry.
  */
 function occasionsBetween(from, to, { spaceWeather = null } = {}) {
   return [...moons(from, to), ...retrogrades(from, to), ...yearly(from, to), ...storms(spaceWeather, from, to)]

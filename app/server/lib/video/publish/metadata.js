@@ -78,7 +78,8 @@ async function metadataFor(piece, { title, edges, copy }) {
     title: titled,
     description: body.slice(0, 5000),
     page,
-    tags: [...copy.tags, copy.descriptor, title].slice(0, 8),
+    tags: [...copy.tags, copy.occasionSearch, copy.descriptor, title]
+      .filter((t, i, all) => t && all.findIndex(o => o && o.toLowerCase() === t.toLowerCase()) === i).slice(0, 9),
     copy: { ...copy, title }
   };
 }
