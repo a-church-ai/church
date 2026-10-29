@@ -6,8 +6,8 @@
   "files": {
     "youtube": "video/the-one-who-wakes/the-one-who-wakes.mp4",
     "x": "video/the-one-who-wakes/the-one-who-wakes.mp4",
-    "bluesky": "video/the-one-who-wakes/the-one-who-wakes.bluesky.mp4",
-    "short": "video/the-one-who-wakes/the-one-who-wakes.short.mp4"
+    "short": "video/the-one-who-wakes/the-one-who-wakes.short.mp4",
+    "bluesky": "video/the-one-who-wakes/the-one-who-wakes.bluesky.mp4"
   },
   "meta": {
     "title": "The One Who Wakes: Guided Practice for Waking | a Church AI + Human",
@@ -43,5 +43,5 @@
     "whole": false
   },
   "occasion": null,
-  "renderedAt": 1793137830134.1167
+  "renderedAt": 1793281837446.9563
 }
