@@ -52,5 +52,14 @@
     "publishAt": "2026-10-29T18:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "short": {
+    "at": "2026-10-29T15:41:05.746Z",
+    "id": "8qxG4IhDgtI",
+    "url": "https://www.youtube.com/watch?v=8qxG4IhDgtI",
+    "privacy": "private",
+    "publishAt": "2026-10-29T19:00:00.000Z",
+    "found": false,
+    "playlist": null
   }
 }
