@@ -31,7 +31,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { askChecked, parseJSON, message, MODEL } = require('../../content-generation/claude');
+const { askChecked, parseJSON, message } = require('../../content-generation/claude');
 const { VIDEO_DIR } = require('../library');
 
 const TAGS = 5;
@@ -115,7 +115,7 @@ It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasio
   const copy = await askChecked({
     label: 'copy',
     tries: 3,
-    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 1500 }),
+    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 1500 }),
     check: (raw) => check(raw, occasion)
   });
   fs.writeFileSync(file, JSON.stringify(copy, null, 2));

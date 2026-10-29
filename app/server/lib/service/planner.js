@@ -164,7 +164,7 @@ async function fetchFeeds(due = []) {
   const [spaceWeather, earth, congregation] = await Promise.all([
     fetchSpaceWeather(),
     fetchEarth(),
-    congregationFor(due, { model: MODEL }).catch(err => {
+    congregationFor(due).catch(err => {
       console.warn(`[congregation] skipped: ${describeError(err)}`);
       return new Map();
     }),

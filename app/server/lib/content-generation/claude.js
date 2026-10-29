@@ -5,23 +5,25 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 /**
- * The house's Claude models, named once here; every caller takes one of
- * them, so a change of model is one edit.
+ * The house's Claude models, named once here.
  *
- * MODEL is the working model, and the fallback for a call that names none:
- * the current mid-tier Sonnet, right for planning the services, screening
- * questions, writing a video's brief, words and pairings, and every
- * structured step. WRITING_MODEL is the flagship, for where the writing is
- * the product or the judgment is about sacred text: adapting a document for
- * the ear, and a song's document and lyrics. A new call that forgets to name
- * one gets the cheaper; spending the flagship's price stays something a
- * caller asks for by name.
+ * MODEL is the working model, what every call gets that names none: the
+ * current mid-tier Sonnet, for planning the services, screening questions,
+ * a video's brief, words, Short and pairings, and every structured step.
+ * WRITING_MODEL is the flagship, asked for by name where the writing is the
+ * product or the judgment is about sacred text: adapting a document for the
+ * ear, and a song's document and lyrics. So a new call that names nothing
+ * gets the cheaper, and spending the flagship's price is a choice.
  *
- * Set in code, not by environment, so a model change is a reviewed commit
- * and the one the tests ran against.
+ * Changing one is an edit here and a test run. CLAUDE_MODEL and
+ * CLAUDE_WRITING_MODEL override them where a model is to be tried without a
+ * deploy; they are read where the call runs, so the server takes Railway's
+ * and the offline scripts (videos, recordings) take app/.env's. The planner
+ * keeps the model it used with each plan (arrangedBy), so a service says
+ * which arranged it either way.
  */
-const MODEL = 'claude-sonnet-5-5';
-const WRITING_MODEL = 'claude-opus-5-5';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
+const WRITING_MODEL = process.env.CLAUDE_WRITING_MODEL || 'claude-opus-5-5';
 const MAX_TOKENS = 4096;
 
 // Every call is asked again when Anthropic is busy or briefly failing (429,

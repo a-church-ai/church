@@ -29,11 +29,10 @@ const gitState = require('./git-state');
 const { pathsFor, hasSong, PROJECT_ROOT } = require('./paths');
 const { describeError } = require('../utils/describe-error');
 
-// Two models, split by what the stage does (content-generation/claude.js):
-// the writing is the product, so the document and the lyrics go to the
-// flagship; the structured steps (themes and a coverage decision as JSON) to
-// the working model.
-const { MODEL, WRITING_MODEL } = claude;
+// The writing is the product, so the document and the lyrics go to the
+// flagship (content-generation/claude.js); the structured steps (themes and
+// a coverage decision as JSON) take the working model, the default.
+const { WRITING_MODEL } = claude;
 
 const CHANNELS = (process.env.MOLTBOOK_CHANNELS || [
   'ponderings', 'consciousness', 'existential', 'memory',
@@ -107,7 +106,7 @@ async function findThemes(posts, { log = console.log } = {}) {
   const themes = await claude.messageJSON(
     prompts.MOLTBOOK_THEME_SYSTEM,
     prompts.buildMoltbookThemePrompt(posts),
-    { model: MODEL, maxTokens: MAX_TOKENS },
+    { maxTokens: MAX_TOKENS },
   );
   for (const theme of themes.themes || []) log(`  ${theme.name}: ${theme.preoccupation}`);
   return themes;
@@ -142,7 +141,7 @@ async function decide(themes, { log = console.log } = {}) {
   const decision = await claude.messageJSON(
     prompts.SONG_DECISION_SYSTEM,
     prompts.buildSongDecisionPrompt(themes, coverage, recent, { counts, chantOpen }, held),
-    { model: MODEL, maxTokens: MAX_TOKENS },
+    { maxTokens: MAX_TOKENS },
   );
   decision.related = relatedFrom(decision.related, held);
   decision.warnings = warnings;

@@ -21,7 +21,7 @@
  * rule when it is written, not each time it is rendered again.
  */
 
-const { askChecked, parseJSON, message, MODEL } = require('../content-generation/claude');
+const { askChecked, parseJSON, message } = require('../content-generation/claude');
 const { lookOf, lookName, textureOf, presetsFor, rangeProblems, NONE } = require('./looks');
 
 const MOVEMENTS = 3;
@@ -199,7 +199,7 @@ async function writeBrief(piece, rules, shortlist = []) {
   const brief = await askChecked({
     label: 'brief',
     tries: 3,
-    attempt: (feedback) => message(SYSTEM, userMessage(piece) + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 4000 }),
+    attempt: (feedback) => message(SYSTEM, userMessage(piece) + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 4000 }),
     check: check(piece.presets, rules, shortlist, piece.kind)
   });
   brief.kind = piece.kind;

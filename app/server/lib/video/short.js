@@ -27,7 +27,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { askChecked, parseJSON, message, MODEL } = require('../content-generation/claude');
+const { askChecked, parseJSON, message } = require('../content-generation/claude');
 const { hearWhole } = require('../audio/transcribe');
 const { renderLayers } = require('./visual');
 const { compose, baseFootage, FPS, PORTRAIT } = require('./compose');
@@ -172,7 +172,7 @@ async function passageFor(piece, { title, text, analysis, seconds, grid, audio, 
     passage = await askChecked({
       label: 'passage',
       tries: 3,
-      attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 2000 }),
+      attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 2000 }),
       check: (raw) => {
         let choice;
         try {

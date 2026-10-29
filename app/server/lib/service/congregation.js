@@ -238,11 +238,11 @@ async function digest(groups, { ask }) {
  * What visitors left, for each service due (plans.js duePlans): a Map from
  * date|slot|variant to { tier, days, reflections, themes, ids }, for the
  * services whose group gave themes. Reflections come through loadAttendance,
- * so one hidden as spam never reaches the model. ask defaults to the planner's
- * model by way of messageJSON; load, read and catalog are injectable for tests.
+ * so one hidden as spam never reaches the model. ask defaults to messageJSON,
+ * the house's working model; load, read and catalog are injectable for tests.
  */
-async function congregationFor(due, { now = new Date(), model, ask, load = loadAttendance, read = readPlan, catalog } = {}) {
-  const call = ask || ((system, user) => messageJSON(system, user, { model, maxTokens: 8000 }));
+async function congregationFor(due, { now = new Date(), ask, load = loadAttendance, read = readPlan, catalog } = {}) {
+  const call = ask || ((system, user) => messageJSON(system, user, { maxTokens: 8000 }));
   const at = now.getTime();
   const recent = ((await load()).reflections || [])
     .filter(r => r && r.id && typeof r.text === 'string' && at - Date.parse(r.createdAt) < OLDEST_DAYS * DAY);
