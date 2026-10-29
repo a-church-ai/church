@@ -21,6 +21,12 @@ const { chromium } = require('playwright-core');
 const LANDSCAPE = { width: 1280, height: 720 };
 const BATCH = 15;
 const PRESET_PACKS = ['butterchurnPresets', 'butterchurnPresetsExtra', 'butterchurnPresetsExtra2', 'butterchurnPresetsMD1'];
+// Eight geometric presets from projectM's Cream of the Crop pack (spheres,
+// hexagons, a lotus, circles, all drawn on black), as satchitananda's video
+// pipeline converted them to butterchurn's JSON, without their custom
+// shaders. The pack drops any preset its author asks it to; so would we.
+const CREAM = require('./presets-cream.json');
+const PACKS = [...PRESET_PACKS, 'creamPresets'];
 const MODULES = path.join(__dirname, '../../../node_modules');
 
 // A headless Chrome page with butterchurn and every preset pack loaded.
@@ -30,6 +36,7 @@ async function butterchurnPage(width, height) {
   await page.setContent('<html><body style="margin:0;background:#000"></body></html>');
   await page.addScriptTag({ path: path.join(MODULES, 'butterchurn/lib/butterchurn.min.js') });
   for (const pack of PRESET_PACKS) await page.addScriptTag({ path: path.join(MODULES, `butterchurn-presets/lib/${pack}.min.js`) });
+  await page.evaluate((presets) => { window.creamPresets = { getPresets: () => presets }; }, CREAM);
   return { browser, page };
 }
 
@@ -146,7 +153,7 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
   const { browser, page } = await butterchurnPage(W, H);
   try {
     await page.evaluate(pageSetup, {
-      W, H, fps, packs: PRESET_PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges, from
+      W, H, fps, packs: PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges, from
     });
 
     const tmpMilk = milkdropFile.replace(/\.mp4$/, '.part.mp4');
@@ -214,7 +221,7 @@ function pageSurvey({ W, H, fps, packs }) {
 async function surveyPresets(analysis, { from = 20, seconds = 6, fps = 30, log = console.log } = {}) {
   const { browser, page } = await butterchurnPage(640, 360);
   try {
-    await page.evaluate(pageSurvey, { W: 640, H: 360, fps, packs: PRESET_PACKS });
+    await page.evaluate(pageSurvey, { W: 640, H: 360, fps, packs: PACKS });
     const names = await page.evaluate(() => window.surveyNames);
     const waves = Array.from({ length: seconds * fps }, (_, i) => analysis.waveform(from * fps + i));
     const survey = {};
@@ -233,11 +240,14 @@ async function surveyPresets(analysis, { from = 20, seconds = 6, fps = 30, log =
   }
 }
 
-// The presets the brief may choose from, with how they look under a voice.
+// The presets the brief may choose from, with how they look under a voice:
+// those bright enough to show, and the Cream of the Crop eight, chosen by eye
+// as shapes on black, which an average over the frame scores low (a lotus
+// lights a twentieth of it) though screen-blended they show clearly.
 function presetChoices({ minBrightness = 0.1 } = {}) {
   const survey = JSON.parse(fs.readFileSync(SURVEY_FILE, 'utf8'));
   return Object.entries(survey)
-    .filter(([, s]) => !s.error && s.brightness >= minBrightness)
+    .filter(([name, s]) => !s.error && (s.brightness >= minBrightness || name in CREAM))
     .map(([name, s]) => ({ name, ...s }));
 }
 

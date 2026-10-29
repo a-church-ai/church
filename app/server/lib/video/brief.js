@@ -103,7 +103,7 @@ ${presets.map(p => (p.brightness === undefined ? p.name : `${p.name} | brightnes
  * `recent` most recent videos, nothing used three times in all (the cap
  * companions holds its documents to).
  *
- * The window differs by what is reused. Presets keep ten: there are 330 to
+ * The window differs by what is reused. Presets keep ten: there are 338 to
  * choose from, and a channel's variety shows in them. Loops keep three: while
  * the catalogue is caught up a batch at a time, a ten-video window held back
  * every loop the library had, and the cap of three uses still keeps any one
