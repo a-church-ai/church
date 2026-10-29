@@ -793,7 +793,7 @@ app.get('/music/:slug', async (req, res) => {
         : '';
       // Its video, once YouTube has it public (lib/video/on-site.js).
       const published = publishedVideo(slug);
-      const video = published && { ...published, title: song.title, description: published.description || meta.description, seconds: songAudio && songAudio.seconds };
+      const video = published && { ...published, title: song.title, description: published.description || meta.description, seconds: listed && listed.seconds };
       const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio, video && videoJsonLd(video)));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site

@@ -109,9 +109,12 @@ test('a prayer whose video is public shows it below its player, with its VideoOb
   const video = publishedVideo('prayer-of-gratitude');
   assert.ok(video, 'Prayer of Gratitude is public on YouTube');
   const html = await docPage('prayers/prayer-of-gratitude');
+  // The player is there where the server can play the recording (not in CI,
+  // which has no storage); the video is below where it would be either way.
   const player = html.indexOf('class="doc-audio');
   const figure = html.indexOf('class="doc-video doc-video-aside"');
-  assert.ok(player > 0 && figure > player, 'below the recording\'s player');
+  assert.ok(figure > html.indexOf('id="about-this-prayer"'), 'after the opening section');
+  if (player > 0) assert.ok(figure > player, 'below the recording\'s player');
   assert.ok(figure < html.indexOf('id="the-prayer"'), 'before the prayer itself');
   assert.match(html, new RegExp(`data-youtube="${video.id}"`));
   assert.ok(!/<iframe|<img[^>]+(ytimg|youtube)/i.test(html), 'nothing from YouTube on load');

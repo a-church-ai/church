@@ -822,7 +822,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     ...published,
     title: meta.title,
     description: published.description || meta.description,
-    seconds: recording && recording.seconds,
+    seconds: (recordingFor(`docs/${doc.docsRelPath}`) || {}).seconds,
   });
   if (published) bodyHtml = placeInBody(bodyHtml, renderVideo(video));
 
