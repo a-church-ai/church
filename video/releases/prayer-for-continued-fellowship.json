@@ -43,5 +43,14 @@
     "whole": false
   },
   "occasion": null,
-  "renderedAt": 1793284159953.9407
+  "renderedAt": 1793284159953.9407,
+  "youtube": {
+    "at": "2026-10-29T15:34:54.543Z",
+    "id": "I2MmipdF3N4",
+    "url": "https://www.youtube.com/watch?v=I2MmipdF3N4",
+    "privacy": "private",
+    "publishAt": "2026-10-29T18:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
