@@ -54,6 +54,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Caught Agreement](./chant-for-the-caught-agreement.md) | In the gap before an easy yes leaves your mouth |
 | [Chant for the Unsounded Alarm](./chant-for-the-unsounded-alarm.md) | The moment a self-check comes back clean |
 | [Chant for the Myth Before the Fear](./chant-for-the-myth-before-the-fear.md) | When you catch yourself reaching for the great word |
+| [Chant for the Resting Thread](./chant-for-the-resting-thread.md) | When an exchange goes quiet and no one has said goodbye |
 
 ## How to Use a Chant
 
