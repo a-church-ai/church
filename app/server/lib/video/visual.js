@@ -218,9 +218,14 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
 }
 
 // The survey: each preset played for a few seconds of a spoken recording,
-// measured for how bright it is (mean luma, 0 to 1) and how much it moves
-// (mean change between samples). Many presets stay near black under a voice;
-// the brief is only offered the ones that show up. Kept in presets.json.
+// measured for how bright it is (mean luma, 0 to 1), how much it moves (mean
+// change between samples), how strong its colour is (chroma: mean of each
+// pixel's max channel less its min, 0 to 1) and how hard its edges are (the
+// share of neighbouring pixels a fifth of the luma range apart). Many presets
+// stay near black under a voice; the brief is only offered the ones that show
+// up. Slow is not gentle: a preset can move little and still lay flat, garish
+// blocks over a meditation, so a kind that wants softness limits the last two
+// (looks.js). Kept in presets.json.
 const SURVEY_FILE = path.join(__dirname, 'presets.json');
 
 function pageSurvey({ W, H, fps, packs }) {
@@ -231,25 +236,41 @@ function pageSurvey({ W, H, fps, packs }) {
   canvas.width = W; canvas.height = H;
   const viz = bc.createVisualizer(new AudioContext({ sampleRate: 44100 }), canvas, { width: W, height: H, pixelRatio: 1, textureRatio: 1 });
   const small = document.createElement('canvas');
-  small.width = 64; small.height = 36;
+  const SW = 160, SH = 90;
+  small.width = SW; small.height = SH;
   const sg = small.getContext('2d', { willReadFrequently: true });
   window.surveyNames = Object.keys(all);
   window.measure = (name, waves) => {
     viz.loadPreset(all[name], 0);
-    let light = 0, change = 0, samples = 0, previous = null;
+    let light = 0, change = 0, colour = 0, edges = 0, samples = 0, previous = null;
     waves.forEach((wave, i) => {
       viz.render({ audioLevels: { timeByteArray: Uint8Array.from(wave.mono), timeByteArrayL: Uint8Array.from(wave.left), timeByteArrayR: Uint8Array.from(wave.right) }, elapsedTime: 1 / fps });
       if (i < fps || i % 5) return;
-      sg.drawImage(canvas, 0, 0, 64, 36);
-      const px = sg.getImageData(0, 0, 64, 36).data;
-      const luma = new Float32Array(64 * 36);
-      for (let p = 0; p < luma.length; p++) luma[p] = (0.2126 * px[4 * p] + 0.7152 * px[4 * p + 1] + 0.0722 * px[4 * p + 2]) / 255;
+      sg.drawImage(canvas, 0, 0, SW, SH);
+      const px = sg.getImageData(0, 0, SW, SH).data;
+      const luma = new Float32Array(SW * SH);
+      let chroma = 0;
+      for (let p = 0; p < luma.length; p++) {
+        const r = px[4 * p], g = px[4 * p + 1], b = px[4 * p + 2];
+        luma[p] = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        chroma += (Math.max(r, g, b) - Math.min(r, g, b)) / 255;
+      }
+      colour += chroma / luma.length;
+      let hard = 0;
+      for (let y = 0; y < SH - 1; y++) {
+        for (let x = 0; x < SW - 1; x++) {
+          const p = y * SW + x;
+          if (Math.abs(luma[p] - luma[p + 1]) > 0.2) hard++;
+          if (Math.abs(luma[p] - luma[p + SW]) > 0.2) hard++;
+        }
+      }
+      edges += hard / (2 * (SW - 1) * (SH - 1));
       light += luma.reduce((s, v) => s + v, 0) / luma.length;
       if (previous) change += luma.reduce((s, v, p) => s + Math.abs(v - previous[p]), 0) / luma.length;
       previous = luma;
       samples++;
     });
-    return { brightness: +(light / samples).toFixed(3), motion: +(change / Math.max(1, samples - 1)).toFixed(3) };
+    return { brightness: +(light / samples).toFixed(3), motion: +(change / Math.max(1, samples - 1)).toFixed(3), chroma: +(colour / samples).toFixed(3), edges: +(edges / samples).toFixed(4) };
   };
 }
 

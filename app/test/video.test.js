@@ -168,6 +168,10 @@ test('each kind is offered the presets in its band of motion, and its mandala is
   assert.deepStrictEqual(names('prayer'), ['still', 'typical', 'unmeasured']);
   assert.deepStrictEqual(names('song'), ['typical', 'restless', 'unmeasured']);
   assert.deepStrictEqual(names('anything else'), ['still', 'typical', 'restless', 'unmeasured']);
+  // Slow but harsh: a meditation is offered only soft presets.
+  const harsh = [{ name: 'garish', motion: 0.02, chroma: 0.7, edges: 0.01 }, { name: 'blocky', motion: 0.02, chroma: 0.2, edges: 0.06 }, { name: 'soft', motion: 0.02, chroma: 0.2, edges: 0.01 }];
+  assert.deepStrictEqual(presetsFor('meditation', harsh).map(p => p.name), ['soft']);
+  assert.strictEqual(presetsFor('prayer', harsh).length, 3);
 
   // Every kind keeps the mandala, in a style of its own; the briefs written
   // before kinds had looks are drawn as they were.

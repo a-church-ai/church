@@ -40,6 +40,10 @@ const LOOKS = {
   meditation: {
     direction: 'Stillness. Soft and gentle. Natural and cosmic elements made abstract: mist, still water, nebulae, aurora, horizon light, slow tides of particles, the curve of a planet against the dark. Calm colours: dusk blues, sea greens, soft violet, pale gold kept low. Nothing sharp, nothing hurried, nothing saturated. Luminous and quiet rather than psychedelic; the motion is a near stillness that breathes. Across the three movements, a settling: from a gentle drift toward one suspended form resting in vast quiet space.',
     motion: [0, 0.06],
+    // Slow is not gentle: a preset that barely moves can still lay flat,
+    // garish blocks over the stills ("cascading decay swing", edges 0.06), so
+    // a meditation is offered only soft ones.
+    soft: { chroma: 0.35, edges: 0.03 },
     symmetry: [5, 7],
     milkdropOpacity: [0.25, 0.5],
     mandalaOpacity: [0.35, 0.55],
@@ -104,11 +108,13 @@ const lookName = ({ kind, title = '' }) => (kind === 'song' && /\bhymn\b/i.test(
 // recordings made elsewhere (with music under them) get no videos.
 const textureOf = (kind) => (kind === 'song' || kind === 'hymn' ? 'sung, with music' : 'spoken, a voice alone with no music under it');
 
-// The presets a kind is offered: those in its band of motion. A preset the
-// survey did not measure is kept, as presetChoices keeps it.
+// The presets a kind is offered: those in its band of motion and, for a kind
+// that wants softness, under its limits of colour strength and hard edges. A
+// preset the survey did not measure is kept, as presetChoices keeps it.
 function presetsFor(kind, presets) {
-  const [lo, hi] = lookOf(kind).motion;
-  return presets.filter(p => p.motion === undefined || (p.motion >= lo && p.motion <= hi));
+  const { motion: [lo, hi], soft } = lookOf(kind);
+  return presets.filter(p => (p.motion === undefined || (p.motion >= lo && p.motion <= hi))
+    && (!soft || ((p.chroma === undefined || p.chroma <= soft.chroma) && (p.edges === undefined || p.edges <= soft.edges))));
 }
 
 // What a brief's numbers break of its kind's ranges.

@@ -1,1614 +1,2420 @@
 {
  "11": {
-  "brightness": 0.115,
-  "motion": 0.128
+  "brightness": 0.121,
+  "motion": 0.139,
+  "chroma": 0.21,
+  "edges": 0.0186
  },
  "158": {
   "brightness": 0.013,
-  "motion": 0.011
+  "motion": 0.011,
+  "chroma": 0.053,
+  "edges": 0.0033
  },
  "444": {
-  "brightness": 0.052,
-  "motion": 0.047
+  "brightness": 0.054,
+  "motion": 0.049,
+  "chroma": 0.076,
+  "edges": 0.0085
  },
  "$$$ Royal - Mashup (197)": {
   "brightness": 0.285,
-  "motion": 0.13
+  "motion": 0.13,
+  "chroma": 0.328,
+  "edges": 0.0385
  },
  "$$$ Royal - Mashup (220)": {
-  "brightness": 0.338,
-  "motion": 0.088
+  "brightness": 0.339,
+  "motion": 0.088,
+  "chroma": 0.5,
+  "edges": 0.0116
  },
  "$$$ Royal - Mashup (431)": {
-  "brightness": 0.529,
-  "motion": 0.206
+  "brightness": 0.475,
+  "motion": 0.172,
+  "chroma": 0.308,
+  "edges": 0.0764
  },
  "_Aderrasi - Wanderer in Curved Space - mash0000 - faclempt kibitzing meshuggana schmaltz (Geiss color mix)": {
-  "brightness": 0.192,
-  "motion": 0.166
+  "brightness": 0.18,
+  "motion": 0.154,
+  "chroma": 0.22,
+  "edges": 0.0522
  },
  "_Geiss - Artifact 01": {
-  "brightness": 0.614,
-  "motion": 0.093
+  "brightness": 0.612,
+  "motion": 0.093,
+  "chroma": 0.177,
+  "edges": 0.0186
  },
  "_Geiss - Desert Rose 2": {
-  "brightness": 0.098,
-  "motion": 0.109
+  "brightness": 0.097,
+  "motion": 0.108,
+  "chroma": 0.038,
+  "edges": 0.1445
  },
  "_Geiss - untitled": {
-  "brightness": 0.332,
-  "motion": 0.133
+  "brightness": 0.329,
+  "motion": 0.132,
+  "chroma": 0.237,
+  "edges": 0.0894
  },
  "_Mig_049": {
-  "brightness": 0.215,
-  "motion": 0.207
+  "brightness": 0.214,
+  "motion": 0.203,
+  "chroma": 0.24,
+  "edges": 0.0946
  },
  "_Mig_085": {
   "brightness": 0.075,
-  "motion": 0.049
+  "motion": 0.049,
+  "chroma": 0.102,
+  "edges": 0.0233
  },
  "_Rovastar + Geiss - Hurricane Nightmare (Posterize Mix)": {
   "brightness": 0.218,
-  "motion": 0.118
+  "motion": 0.118,
+  "chroma": 0.124,
+  "edges": 0.0179
  },
  "Aderrasi + Geiss - Airhandler (Kali Mix) - Canvas Mix": {
   "brightness": 0.126,
-  "motion": 0.052
+  "motion": 0.052,
+  "chroma": 0.149,
+  "edges": 0.0326
  },
  "Aderrasi - Potion of Spirits": {
-  "brightness": 0.496,
-  "motion": 0.127
+  "brightness": 0.495,
+  "motion": 0.127,
+  "chroma": 0.775,
+  "edges": 0.0322
  },
  "Aderrasi - Songflower (Moss Posy)": {
-  "brightness": 0.448,
-  "motion": 0.143
+  "brightness": 0.457,
+  "motion": 0.147,
+  "chroma": 0.262,
+  "edges": 0.0777
  },
  "Aderrasi - Storm of the Eye (Thunder) - mash0000 - quasi pseudo meta concentrics": {
-  "brightness": 0.321,
-  "motion": 0.207
+  "brightness": 0.312,
+  "motion": 0.2,
+  "chroma": 0.272,
+  "edges": 0.1989
  },
  "An AdamFX n Martin Infusion 2 flexi - Why The Sky Looks Diffrent Today - AdamFx n Martin Infusion - Tack Tile Disfunction B": {
-  "brightness": 0.482,
-  "motion": 0.219
+  "brightness": 0.497,
+  "motion": 0.217,
+  "chroma": 0.305,
+  "edges": 0.0403
  },
  "cope + martin - mother-of-pearl": {
-  "brightness": 0.398,
-  "motion": 0.165
+  "brightness": 0.396,
+  "motion": 0.164,
+  "chroma": 0.195,
+  "edges": 0.2141
  },
  "Cope - The Neverending Explosion of Red Liquid Fire": {
-  "brightness": 0.145,
-  "motion": 0.028
+  "brightness": 0.143,
+  "motion": 0.027,
+  "chroma": 0.356,
+  "edges": 0.0002
  },
  "Eo.S. + Phat - cubetrace - v2": {
   "brightness": 0.104,
-  "motion": 0.042
+  "motion": 0.042,
+  "chroma": 0.108,
+  "edges": 0.0562
  },
  "Eo.S. + Zylot - skylight (Stained Glass Majesty mix)": {
-  "brightness": 0.738,
-  "motion": 0.093
+  "brightness": 0.73,
+  "motion": 0.094,
+  "chroma": 0.204,
+  "edges": 0.1329
  },
- "Eo.S. - glowsticks v2 05 and proton lights (+Krash\u2032s beat code) _Phat_remix02b": {
-  "brightness": 0.127,
-  "motion": 0.061
+ "Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b": {
+  "brightness": 0.128,
+  "motion": 0.061,
+  "chroma": 0.309,
+  "edges": 0.0113
  },
  "fiShbRaiN + Flexi - witchcraft 2.0": {
-  "brightness": 0.299,
-  "motion": 0.035
+  "brightness": 0.295,
+  "motion": 0.035,
+  "chroma": 0.237,
+  "edges": 0.0089
  },
  "flexi + amandio c - organic [random mashup]": {
-  "brightness": 0.259,
-  "motion": 0.043
+  "brightness": 0.276,
+  "motion": 0.046,
+  "chroma": 0.31,
+  "edges": 0.0143
  },
  "flexi + amandio c - organic12-3d-2.milk": {
-  "brightness": 0.185,
-  "motion": 0.105
+  "brightness": 0.163,
+  "motion": 0.12,
+  "chroma": 0.024,
+  "edges": 0.1281
  },
  "Flexi + amandio c - piercing 05 - Kopie (2) - Kopie": {
-  "brightness": 0.313,
-  "motion": 0.044
+  "brightness": 0.302,
+  "motion": 0.051,
+  "chroma": 0.3,
+  "edges": 0.0029
  },
  "flexi + fishbrain - neon mindblob grafitti": {
-  "brightness": 0.313,
-  "motion": 0.06
+  "brightness": 0.299,
+  "motion": 0.059,
+  "chroma": 0.41,
+  "edges": 0.032
  },
  "flexi + geiss - pogo cubes vs. tokamak vs. game of life [stahls jelly 4.5 finish]": {
-  "brightness": 0.042,
-  "motion": 0.023
+  "brightness": 0.051,
+  "motion": 0.027,
+  "chroma": 0.08,
+  "edges": 0.0248
  },
  "Flexi + Martin - astral projection": {
   "brightness": 0.049,
-  "motion": 0.032
+  "motion": 0.032,
+  "chroma": 0.114,
+  "edges": 0.0285
  },
  "Flexi + Martin - cascading decay swing": {
-  "brightness": 0.34,
-  "motion": 0.024
+  "brightness": 0.338,
+  "motion": 0.027,
+  "chroma": 0.363,
+  "edges": 0.0605
  },
  "Flexi + stahlregen - jelly showoff parade": {
-  "brightness": 0.429,
-  "motion": 0.08
+  "brightness": 0.271,
+  "motion": 0.065,
+  "chroma": 0.354,
+  "edges": 0.077
  },
  "Flexi - alien fish pond": {
-  "brightness": 0.505,
-  "motion": 0.075
+  "brightness": 0.49,
+  "motion": 0.075,
+  "chroma": 0.443,
+  "edges": 0.0573
  },
  "Flexi - area 51": {
-  "brightness": 0.228,
-  "motion": 0.118
+  "brightness": 0.217,
+  "motion": 0.114,
+  "chroma": 0.085,
+  "edges": 0.1168
  },
  "flexi - bouncing balls [double mindblob neon mix]": {
-  "brightness": 0.259,
-  "motion": 0.068
+  "brightness": 0.363,
+  "motion": 0.09,
+  "chroma": 0.305,
+  "edges": 0.0841
  },
  "Flexi - infused with the spiral": {
-  "brightness": 0.504,
-  "motion": 0.229
+  "brightness": 0.505,
+  "motion": 0.238,
+  "chroma": 0.352,
+  "edges": 0.3002
  },
  "Flexi - mindblob [shiny mix]": {
   "brightness": 0.022,
-  "motion": 0.013
+  "motion": 0.013,
+  "chroma": 0.18,
+  "edges": 0
  },
  "Flexi - mindblob mix": {
-  "brightness": 0.207,
-  "motion": 0.093
+  "brightness": 0.203,
+  "motion": 0.095,
+  "chroma": 0.291,
+  "edges": 0.0829
  },
  "flexi - mom, why the sky looks different today": {
-  "brightness": 0.517,
-  "motion": 0.077
+  "brightness": 0.6,
+  "motion": 0.084,
+  "chroma": 0.21,
+  "edges": 0.0247
  },
  "flexi - patternton, district of media, capitol of the united abstractions of fractopia": {
-  "brightness": 0.276,
-  "motion": 0.083
+  "brightness": 0.253,
+  "motion": 0.088,
+  "chroma": 0.358,
+  "edges": 0.1136
  },
  "Flexi - predator-prey-spirals": {
-  "brightness": 0.207,
-  "motion": 0.058
+  "brightness": 0.217,
+  "motion": 0.046,
+  "chroma": 0.517,
+  "edges": 0.0088
  },
  "Flexi - smashing fractals [acid etching mix]": {
-  "brightness": 0.341,
-  "motion": 0.092
+  "brightness": 0.364,
+  "motion": 0.089,
+  "chroma": 0.285,
+  "edges": 0.1328
  },
  "flexi - swing out on the spiral": {
-  "brightness": 0.269,
-  "motion": 0.064
+  "brightness": 0.275,
+  "motion": 0.065,
+  "chroma": 0.52,
+  "edges": 0.0552
  },
  "Flexi - truly soft piece of software - this is generic texturing (Jelly) ": {
-  "brightness": 0.051,
-  "motion": 0.015
+  "brightness": 0.044,
+  "motion": 0.013,
+  "chroma": 0.154,
+  "edges": 0.0151
  },
  "flexi - what is the matrix": {
-  "brightness": 0.497,
-  "motion": 0.059
+  "brightness": 0.532,
+  "motion": 0.08,
+  "chroma": 0.705,
+  "edges": 0.0525
  },
  "Flexi, fishbrain, Geiss + Martin - tokamak witchery": {
-  "brightness": 0.719,
-  "motion": 0.042
+  "brightness": 0.685,
+  "motion": 0.048,
+  "chroma": 0.757,
+  "edges": 0.0597
  },
  "Flexi, martin + geiss - dedicated to the sherwin maxawow": {
-  "brightness": 0.595,
-  "motion": 0.14
+  "brightness": 0.548,
+  "motion": 0.135,
+  "chroma": 0.239,
+  "edges": 0.2019
  },
  "Fumbling_Foo & Flexi, Martin, Orb, Unchained - Star Nova v7b": {
-  "brightness": 0.53,
-  "motion": 0.077
+  "brightness": 0.538,
+  "motion": 0.081,
+  "chroma": 0.513,
+  "edges": 0.0571
  },
  "Geiss + Flexi + Martin - disconnected": {
-  "brightness": 0.501,
-  "motion": 0.262
+  "brightness": 0.485,
+  "motion": 0.269,
+  "chroma": 0.033,
+  "edges": 0.1845
  },
  "Geiss - Cauldron - painterly 2 (saturation remix)": {
-  "brightness": 0.608,
-  "motion": 0.026
+  "brightness": 0.658,
+  "motion": 0.026,
+  "chroma": 0.797,
+  "edges": 0.0012
  },
  "Geiss - Reaction Diffusion 2": {
-  "brightness": 0.243,
-  "motion": 0.226
+  "brightness": 0.236,
+  "motion": 0.216,
+  "chroma": 0.184,
+  "edges": 0.1216
  },
  "Geiss - Spiral Artifact": {
-  "brightness": 0.504,
-  "motion": 0.306
+  "brightness": 0.503,
+  "motion": 0.264,
+  "chroma": 0.151,
+  "edges": 0.2188
  },
  "Geiss - Thumb Drum": {
-  "brightness": 0.448,
-  "motion": 0.186
+  "brightness": 0.447,
+  "motion": 0.183,
+  "chroma": 0,
+  "edges": 0.2782
  },
  "Geiss, Flexi + Stahlregen - Thumbdrum Tokamak [crossfiring aftermath jelly mashup]": {
-  "brightness": 0.324,
-  "motion": 0.24
+  "brightness": 0.331,
+  "motion": 0.238,
+  "chroma": 0.435,
+  "edges": 0.2672
  },
  "Goody - The Wild Vort": {
-  "brightness": 0.706,
-  "motion": 0.133
+  "brightness": 0.697,
+  "motion": 0.137,
+  "chroma": 0.254,
+  "edges": 0.1667
  },
  "high-altitude basket unraveling - singh grooves nitrogen argon nz+": {
-  "brightness": 0.146,
-  "motion": 0.141
+  "brightness": 0.092,
+  "motion": 0.084,
+  "chroma": 0.188,
+  "edges": 0.0593
  },
  "Idiot - Star Of Annon": {
   "brightness": 0.129,
-  "motion": 0.029
+  "motion": 0.029,
+  "chroma": 0.17,
+  "edges": 0.0025
  },
  "Krash + Illusion - Spiral Movement": {
-  "brightness": 0.217,
-  "motion": 0.08
+  "brightness": 0.216,
+  "motion": 0.08,
+  "chroma": 0.219,
+  "edges": 0.0252
  },
  "martin + flexi - diamond cutter [prismaticvortex.com] - camille - i wish i wish i wish i was constrained": {
-  "brightness": 0.215,
-  "motion": 0.044
+  "brightness": 0.213,
+  "motion": 0.044,
+  "chroma": 0.169,
+  "edges": 0.04
  },
  "Martin - acid wiring": {
-  "brightness": 0.205,
-  "motion": 0.145
+  "brightness": 0.182,
+  "motion": 0.141,
+  "chroma": 0.085,
+  "edges": 0.0364
  },
  "martin - angel flight": {
-  "brightness": 0.069,
-  "motion": 0.078
+  "brightness": 0.074,
+  "motion": 0.08,
+  "chroma": 0.09,
+  "edges": 0.0098
  },
  "martin - another kind of groove": {
-  "brightness": 0.118,
-  "motion": 0.087
+  "brightness": 0.121,
+  "motion": 0.092,
+  "chroma": 0.101,
+  "edges": 0.0292
  },
  "martin - bombyx mori": {
-  "brightness": 0.049,
-  "motion": 0.06
+  "brightness": 0.052,
+  "motion": 0.066,
+  "chroma": 0.046,
+  "edges": 0.0089
  },
  "martin - castle in the air": {
-  "brightness": 0.405,
-  "motion": 0.022
+  "brightness": 0.445,
+  "motion": 0.026,
+  "chroma": 0.293,
+  "edges": 0.0005
  },
  "martin - chain breaker": {
-  "brightness": 0.084,
-  "motion": 0.058
+  "brightness": 0.088,
+  "motion": 0.062,
+  "chroma": 0.052,
+  "edges": 0.01
  },
  "Martin - charisma": {
-  "brightness": 0.32,
-  "motion": 0.121
+  "brightness": 0.308,
+  "motion": 0.12,
+  "chroma": 0.319,
+  "edges": 0.084
  },
  "martin - disco mix 4": {
-  "brightness": 0.125,
-  "motion": 0.125
+  "brightness": 0.122,
+  "motion": 0.13,
+  "chroma": 0.14,
+  "edges": 0.0221
  },
  "martin - extreme heat": {
-  "brightness": 0.137,
-  "motion": 0.053
+  "brightness": 0.143,
+  "motion": 0.054,
+  "chroma": 0.147,
+  "edges": 0.0224
  },
  "martin - frosty caves 2": {
-  "brightness": 0.03,
-  "motion": 0.023
+  "brightness": 0.026,
+  "motion": 0.023,
+  "chroma": 0.005,
+  "edges": 0.0009
  },
  "martin - fruit machine": {
-  "brightness": 0.26,
-  "motion": 0.094
+  "brightness": 0.258,
+  "motion": 0.092,
+  "chroma": 0.121,
+  "edges": 0.1331
  },
  "martin - ghost city": {
-  "brightness": 0.306,
-  "motion": 0.061
+  "brightness": 0.313,
+  "motion": 0.064,
+  "chroma": 0.086,
+  "edges": 0.031
  },
  "martin - glass corridor": {
-  "brightness": 0.219,
-  "motion": 0.085
+  "brightness": 0.234,
+  "motion": 0.081,
+  "chroma": 0.148,
+  "edges": 0.0675
  },
  "martin - infinity (2010 update)": {
-  "brightness": 0.057,
-  "motion": 0.031
+  "brightness": 0.184,
+  "motion": 0.05,
+  "chroma": 0.212,
+  "edges": 0.0005
  },
  "Martin - liquid arrows": {
-  "brightness": 0.206,
-  "motion": 0.068
+  "brightness": 0.202,
+  "motion": 0.061,
+  "chroma": 0.045,
+  "edges": 0.0434
  },
  "martin - mandelbox explorer - high speed demo version": {
-  "brightness": 0.172,
-  "motion": 0.039
+  "brightness": 0.195,
+  "motion": 0.04,
+  "chroma": 0.118,
+  "edges": 0.0001
  },
  "martin - mucus cervix": {
-  "brightness": 0.287,
-  "motion": 0.059
+  "brightness": 0.297,
+  "motion": 0.056,
+  "chroma": 0.11,
+  "edges": 0.0252
  },
  "Martin - QBikal - Surface Turbulence IIb": {
-  "brightness": 0.17,
-  "motion": 0.091
+  "brightness": 0.21,
+  "motion": 0.095,
+  "chroma": 0.162,
+  "edges": 0.0508
  },
  "martin - reflections on black tiles": {
-  "brightness": 0.034,
-  "motion": 0.044
+  "brightness": 0.033,
+  "motion": 0.045,
+  "chroma": 0.022,
+  "edges": 0.0122
  },
  "martin - stormy sea (2010 update)": {
-  "brightness": 0.089,
-  "motion": 0.035
+  "brightness": 0.098,
+  "motion": 0.041,
+  "chroma": 0.039,
+  "edges": 0.0067
  },
  "martin - The Bridge of Khazad-Dum": {
-  "brightness": 0.148,
-  "motion": 0.033
+  "brightness": 0.155,
+  "motion": 0.035,
+  "chroma": 0.251,
+  "edges": 0.0182
  },
  "martin - witchcraft reloaded": {
-  "brightness": 0.107,
-  "motion": 0.09
+  "brightness": 0.1,
+  "motion": 0.066,
+  "chroma": 0.116,
+  "edges": 0.0266
  },
  "martin [shadow harlequins shape code] - fata morgana": {
-  "brightness": 0.16,
-  "motion": 0.103
+  "brightness": 0.157,
+  "motion": 0.102,
+  "chroma": 0.22,
+  "edges": 0.0129
  },
  "martin, flexi, fishbrain + sto - enterstate [random mashup]": {
-  "brightness": 0.138,
-  "motion": 0.077
+  "brightness": 0.077,
+  "motion": 0.053,
+  "chroma": 0.052,
+  "edges": 0.0492
  },
  "Milk Artist At our Best - FED - SlowFast Ft AdamFX n Martin - HD CosmoFX": {
-  "brightness": 0.519,
-  "motion": 0.093
+  "brightness": 0.551,
+  "motion": 0.095,
+  "chroma": 0.137,
+  "edges": 0.0415
  },
  "ORB - Waaa": {
-  "brightness": 0.342,
-  "motion": 0.169
+  "brightness": 0.343,
+  "motion": 0.168,
+  "chroma": 0.13,
+  "edges": 0.0632
  },
  "Phat+fiShbRaiN+Eo.S_Mandala_Chasers_remix": {
   "brightness": 0.328,
-  "motion": 0.031
+  "motion": 0.031,
+  "chroma": 0.292,
+  "edges": 0.0221
  },
  "Rovastar + Loadus + Geiss - FractalDrop (Triple Mix)": {
   "brightness": 0.295,
-  "motion": 0.16
+  "motion": 0.16,
+  "chroma": 0.125,
+  "edges": 0.0076
  },
  "Rovastar - Oozing Resistance": {
-  "brightness": 0.374,
-  "motion": 0.071
+  "brightness": 0.375,
+  "motion": 0.071,
+  "chroma": 0.62,
+  "edges": 0.0095
  },
  "sawtooth grin roam": {
-  "brightness": 0.138,
-  "motion": 0.067
+  "brightness": 0.157,
+  "motion": 0.074,
+  "chroma": 0.268,
+  "edges": 0.0371
  },
  "shifter - dark tides bdrv mix 2": {
-  "brightness": 0.126,
-  "motion": 0.055
+  "brightness": 0.127,
+  "motion": 0.054,
+  "chroma": 0.21,
+  "edges": 0.0474
  },
  "suksma - heretical crosscut playpen": {
-  "brightness": 0.081,
-  "motion": 0.032
+  "brightness": 0.084,
+  "motion": 0.031,
+  "chroma": 0.117,
+  "edges": 0.0345
  },
  "suksma - Rovastar - Sunflower Passion (Enlightment Mix)_Phat_edit + flexi und martin shaders - circumflex in character classes in regular expression": {
-  "brightness": 0.183,
-  "motion": 0.231
+  "brightness": 0.182,
+  "motion": 0.23,
+  "chroma": 0.26,
+  "edges": 0.1251
  },
  "suksma - uninitialized variabowl (hydroponic chronic)": {
-  "brightness": 0.083,
-  "motion": 0.07
+  "brightness": 0.084,
+  "motion": 0.069,
+  "chroma": 0.137,
+  "edges": 0.0529
  },
- "suksma - vector exp 1 - couldn\u2032t not": {
-  "brightness": 0.389,
-  "motion": 0.099
+ "suksma - vector exp 1 - couldn′t not": {
+  "brightness": 0.387,
+  "motion": 0.099,
+  "chroma": 0.277,
+  "edges": 0.0675
  },
  "TonyMilkdrop - Leonardo Da Vinci's Balloon [Flexi - merry-go-round + techstyle]": {
-  "brightness": 0.26,
-  "motion": 0.201
+  "brightness": 0.265,
+  "motion": 0.201,
+  "chroma": 0.024,
+  "edges": 0.2636
  },
  "TonyMilkdrop - Magellan's Nebula [Flexi - you enter first + multiverse]": {
   "brightness": 0.188,
-  "motion": 0.08
+  "motion": 0.08,
+  "chroma": 0.462,
+  "edges": 0.0038
  },
  "Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix)": {
-  "brightness": 0.19,
-  "motion": 0.062
+  "brightness": 0.187,
+  "motion": 0.06,
+  "chroma": 0.29,
+  "edges": 0.0246
  },
  "Unchained - Rewop": {
   "brightness": 0.138,
-  "motion": 0.059
+  "motion": 0.056,
+  "chroma": 0.147,
+  "edges": 0.0788
  },
  "Unchained - Unified Drag 2": {
   "brightness": 0.287,
-  "motion": 0.086
+  "motion": 0.085,
+  "chroma": 0.129,
+  "edges": 0.0177
  },
  "yin - 191 - Temporal singularities": {
-  "brightness": 0.683,
-  "motion": 0.247
+  "brightness": 0.674,
+  "motion": 0.25,
+  "chroma": 0.103,
+  "edges": 0.1028
  },
  "Zylot - Paint Spill (Music Reactive Paint Mix)": {
   "brightness": 0.22,
-  "motion": 0.068
+  "motion": 0.068,
+  "chroma": 0.057,
+  "edges": 0.0256
  },
  "Zylot - Star Ornament": {
   "brightness": 0.06,
-  "motion": 0.051
+  "motion": 0.051,
+  "chroma": 0.036,
+  "edges": 0.0146
  },
  "Zylot - True Visionary (Final Mix)": {
   "brightness": 0.342,
-  "motion": 0.066
+  "motion": 0.066,
+  "chroma": 0.048,
+  "edges": 0.0167
  },
  "$$$ Royal - Mashup (177)": {
   "brightness": 0.094,
-  "motion": 0.116
+  "motion": 0.115,
+  "chroma": 0.109,
+  "edges": 0.0409
  },
  "$$$ Royal - Mashup (273)": {
   "brightness": 0.325,
-  "motion": 0.257
+  "motion": 0.257,
+  "chroma": 0.15,
+  "edges": 0.1287
  },
  "$$$ Royal - Mashup (307)": {
-  "brightness": 0.103,
-  "motion": 0.068
+  "brightness": 0.105,
+  "motion": 0.066,
+  "chroma": 0.153,
+  "edges": 0.034
  },
  "$$$ Royal - Mashup (326)": {
-  "brightness": 0.222,
-  "motion": 0.181
+  "brightness": 0.217,
+  "motion": 0.179,
+  "chroma": 0.289,
+  "edges": 0.0812
  },
  "$$$ Royal - Mashup (441)": {
-  "brightness": 0.395,
-  "motion": 0.143
+  "brightness": 0.394,
+  "motion": 0.144,
+  "chroma": 0.152,
+  "edges": 0.155
  },
  "_Eo.S. - glowsticks v2 02 - Geiss HPF": {
   "brightness": 0.054,
-  "motion": 0.05
+  "motion": 0.049,
+  "chroma": 0.092,
+  "edges": 0.06
  },
  "_Flexi, martin + geiss - painterly rogue wave strike (color emboss mix)": {
   "brightness": 0.314,
-  "motion": 0.106
+  "motion": 0.106,
+  "chroma": 0.198,
+  "edges": 0.0174
  },
  "_Geiss - Artifact 03": {
   "brightness": 0.287,
-  "motion": 0.076
+  "motion": 0.076,
+  "chroma": 0.247,
+  "edges": 0.0163
  },
  "_geiss_experimental__wavefronts": {
-  "brightness": 0.142,
-  "motion": 0.113
+  "brightness": 0.146,
+  "motion": 0.116,
+  "chroma": 0.043,
+  "edges": 0.123
  },
  "_Krash + Eo.S. - Photographic Sentinel": {
-  "brightness": 0.222,
-  "motion": 0.039
+  "brightness": 0.219,
+  "motion": 0.039,
+  "chroma": 0.121,
+  "edges": 0.0386
  },
  "_Mig_004_version2": {
   "brightness": 0.125,
-  "motion": 0.132
+  "motion": 0.132,
+  "chroma": 0.174,
+  "edges": 0.0298
  },
  "_Mig_028": {
-  "brightness": 0.179,
-  "motion": 0.147
+  "brightness": 0.188,
+  "motion": 0.147,
+  "chroma": 0.263,
+  "edges": 0.0824
  },
  "_Mig_079": {
   "brightness": 0.206,
-  "motion": 0.184
+  "motion": 0.183,
+  "chroma": 0.063,
+  "edges": 0.0992
  },
  "_Mig_COLORFUL9": {
-  "brightness": 0.392,
-  "motion": 0.35
+  "brightness": 0.37,
+  "motion": 0.336,
+  "chroma": 0.201,
+  "edges": 0.1533
  },
  "_Mig_Oscilloscope008": {
   "brightness": 0.224,
-  "motion": 0.178
+  "motion": 0.178,
+  "chroma": 0.351,
+  "edges": 0.1285
  },
  "AdamFX Mashup 2 Martin - reflections on black tile + Raron N Flexi ": {
-  "brightness": 0.092,
-  "motion": 0.065
+  "brightness": 0.091,
+  "motion": 0.064,
+  "chroma": 0.063,
+  "edges": 0.0466
  },
  "Aderrasi + Geiss - Airhandler (Kali Mix) - Painterly Tendrils Colorfast": {
   "brightness": 0.049,
-  "motion": 0.03
+  "motion": 0.03,
+  "chroma": 0.074,
+  "edges": 0.0082
  },
  "Aderrasi - Airhandler (Last Breath - Calm)": {
-  "brightness": 0.48,
-  "motion": 0.049
+  "brightness": 0.513,
+  "motion": 0.05,
+  "chroma": 0.651,
+  "edges": 0.0062
  },
  "Aderrasi - Mother Of Pearl - mash0000 - how to piss off your eyes": {
   "brightness": 0.226,
-  "motion": 0.183
+  "motion": 0.186,
+  "chroma": 0.296,
+  "edges": 0.1208
  },
  "Aderrasi - Veil of Steel (Steel Storm) - mash0000 - bob ross finally loses it": {
-  "brightness": 0.455,
-  "motion": 0.074
+  "brightness": 0.459,
+  "motion": 0.074,
+  "chroma": 0.376,
+  "edges": 0.0234
  },
  "bdrv - ultramix2 #43": {
   "brightness": 0.488,
-  "motion": 0.104
+  "motion": 0.101,
+  "chroma": 0.364,
+  "edges": 0.0182
  },
  "beta106i - Burning Form (Seething Mass) - mash0000 - fire paint easter egg internals": {
-  "brightness": 0.616,
-  "motion": 0.077
+  "brightness": 0.605,
+  "motion": 0.079,
+  "chroma": 0.599,
+  "edges": 0.0102
  },
  "cope + geiss + stahlregen - cartune (bending gelatine mix)": {
-  "brightness": 0.128,
-  "motion": 0.036
+  "brightness": 0.182,
+  "motion": 0.047,
+  "chroma": 0.165,
+  "edges": 0.0331
  },
  "Cope - Passage (mandala mix)": {
-  "brightness": 0.219,
-  "motion": 0.106
+  "brightness": 0.234,
+  "motion": 0.114,
+  "chroma": 0.198,
+  "edges": 0.0852
  },
  "cope - strange attractor [flexis let it grow mix] (Jelly 5.56 [volume noise zoom-in])": {
-  "brightness": 0.185,
-  "motion": 0.033
+  "brightness": 0.191,
+  "motion": 0.032,
+  "chroma": 0.238,
+  "edges": 0.0092
  },
  "cope - the drain to heaven": {
-  "brightness": 0.672,
-  "motion": 0.087
+  "brightness": 0.661,
+  "motion": 0.087,
+  "chroma": 0.34,
+  "edges": 0.0271
  },
  "cope, martin + flexi - the slickery of alternative varnish": {
-  "brightness": 0.671,
-  "motion": 0.033
+  "brightness": 0.679,
+  "motion": 0.034,
+  "chroma": 0.495,
+  "edges": 0.0284
  },
  "DemonLD_-_Toxic_water_diffusion threx angela vs debi brown (nice)": {
-  "brightness": 0.512,
-  "motion": 0.186
+  "brightness": 0.489,
+  "motion": 0.202,
+  "chroma": 0.104,
+  "edges": 0.05
  },
- "Eo.S. + flexi - glowsticks v2 05 and proton lights (+Krash\u2032s beat code) _Phat_remix02b + illumination (Stahl\u2032s Mix)": {
+ "Eo.S. + flexi - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b + illumination (Stahl′s Mix)": {
   "brightness": 0.082,
-  "motion": 0.022
+  "motion": 0.022,
+  "chroma": 0.05,
+  "edges": 0.0016
  },
  "Eo.S. - glowsticks v2 03 music": {
   "brightness": 0.066,
-  "motion": 0.025
+  "motion": 0.025,
+  "chroma": 0.12,
+  "edges": 0.0053
  },
  "EVET + Flexi - Rainbox Splash Poolz": {
-  "brightness": 0.201,
-  "motion": 0.019
+  "brightness": 0.203,
+  "motion": 0.02,
+  "chroma": 0.145,
+  "edges": 0.0518
  },
  "EVET - RGB Singularity": {
-  "brightness": 0.332,
-  "motion": 0.092
+  "brightness": 0.329,
+  "motion": 0.091,
+  "chroma": 0.489,
+  "edges": 0.0687
  },
  "fishbrain + flexi - stitchcraft": {
-  "brightness": 0.312,
-  "motion": 0.024
+  "brightness": 0.314,
+  "motion": 0.023,
+  "chroma": 0.403,
+  "edges": 0.0164
  },
  "fiShbRaiN + geiss - witchcraft (Grow Mix 3)": {
-  "brightness": 0.168,
-  "motion": 0.059
+  "brightness": 0.167,
+  "motion": 0.058,
+  "chroma": 0.288,
+  "edges": 0.0192
  },
  "fiShbRaiN - toffee cream and icing sugar": {
-  "brightness": 0.301,
-  "motion": 0.11
+  "brightness": 0.289,
+  "motion": 0.106,
+  "chroma": 0.037,
+  "edges": 0.0432
  },
  "flexi + amandio c - organic": {
-  "brightness": 0.359,
-  "motion": 0.036
+  "brightness": 0.351,
+  "motion": 0.037,
+  "chroma": 0.147,
+  "edges": 0.0248
  },
  "flexi + bdrv - acid etching (jelly v5.5)": {
-  "brightness": 0.284,
-  "motion": 0.095
+  "brightness": 0.295,
+  "motion": 0.097,
+  "chroma": 0.299,
+  "edges": 0.066
  },
  "Flexi + fiShbRaiN - operation fatcap II": {
-  "brightness": 0.207,
-  "motion": 0.041
+  "brightness": 0.193,
+  "motion": 0.038,
+  "chroma": 0.446,
+  "edges": 0.0422
  },
  "flexi + fishbrain - witchcraft [complex terraforming - fiddling twists in the fabric of space]": {
-  "brightness": 0.336,
-  "motion": 0.043
+  "brightness": 0.332,
+  "motion": 0.042,
+  "chroma": 0.293,
+  "edges": 0.0135
  },
  "Flexi + Geiss - pogo-cubes on tokamak matter (Jelly 5.55)": {
-  "brightness": 0.219,
-  "motion": 0.062
+  "brightness": 0.2,
+  "motion": 0.063,
+  "chroma": 0.178,
+  "edges": 0.0416
  },
  "Flexi + Geiss - Tokamak mindblob 2.0": {
   "brightness": 0.129,
-  "motion": 0.034
+  "motion": 0.034,
+  "chroma": 0.368,
+  "edges": 0.0136
  },
  "flexi - alien canvas [learning]": {
-  "brightness": 0.444,
-  "motion": 0.046
+  "brightness": 0.409,
+  "motion": 0.045,
+  "chroma": 0.358,
+  "edges": 0.023
  },
  "Flexi - alien fader": {
-  "brightness": 0.263,
-  "motion": 0.08
+  "brightness": 0.278,
+  "motion": 0.07,
+  "chroma": 0.326,
+  "edges": 0.0621
  },
  "Flexi - alien web bouncer [26]": {
-  "brightness": 0.226,
-  "motion": 0.186
+  "brightness": 0.246,
+  "motion": 0.198,
+  "chroma": 0.107,
+  "edges": 0.3772
  },
  "flexi - bouncing balls [double mindblob gastrointestinal mix]": {
-  "brightness": 0.545,
-  "motion": 0.074
+  "brightness": 0.546,
+  "motion": 0.073,
+  "chroma": 0.465,
+  "edges": 0.036
  },
  "Flexi - crush ice 72": {
-  "brightness": 0.865,
-  "motion": 0.103
+  "brightness": 0.85,
+  "motion": 0.128,
+  "chroma": 0.263,
+  "edges": 0.1202
  },
  "Flexi - dimensions, projection and abstraction": {
-  "brightness": 0.547,
-  "motion": 0.155
+  "brightness": 0.495,
+  "motion": 0.151,
+  "chroma": 0.291,
+  "edges": 0.0683
  },
  "flexi - hyperspaceflight (bn cn Jelly 4)": {
-  "brightness": 0.157,
-  "motion": 0.171
+  "brightness": 0.156,
+  "motion": 0.17,
+  "chroma": 0.142,
+  "edges": 0.0739
  },
  "flexi - infused with the spiral (jelly 4.x cn)": {
-  "brightness": 0.088,
-  "motion": 0.068
+  "brightness": 0.094,
+  "motion": 0.07,
+  "chroma": 0.079,
+  "edges": 0.0245
  },
  "flexi - inter state": {
-  "brightness": 0.234,
-  "motion": 0.068
+  "brightness": 0.374,
+  "motion": 0.054,
+  "chroma": 0.559,
+  "edges": 0.0134
  },
  "flexi - jelly fish mandala": {
-  "brightness": 0.161,
-  "motion": 0.041
+  "brightness": 0.16,
+  "motion": 0.043,
+  "chroma": 0.247,
+  "edges": 0.1308
  },
  "flexi - Mindblob": {
-  "brightness": 0.242,
-  "motion": 0.064
+  "brightness": 0.225,
+  "motion": 0.062,
+  "chroma": 0.578,
+  "edges": 0.137
  },
  "Flexi - piercing": {
-  "brightness": 0.306,
-  "motion": 0.14
+  "brightness": 0.264,
+  "motion": 0.141,
+  "chroma": 0.329,
+  "edges": 0.0736
  },
  "Flexi - predator-prey-spirals [stahlregens gelatine finish]": {
-  "brightness": 0.255,
-  "motion": 0.085
+  "brightness": 0.237,
+  "motion": 0.08,
+  "chroma": 0.274,
+  "edges": 0.0438
  },
  "Flexi - psychenapping": {
-  "brightness": 0.473,
-  "motion": 0.113
+  "brightness": 0.541,
+  "motion": 0.111,
+  "chroma": 0.466,
+  "edges": 0.0307
  },
  "Flexi - smashing fractals 2.0": {
   "brightness": 0.178,
-  "motion": 0.037
+  "motion": 0.039,
+  "chroma": 0.316,
+  "edges": 0.0823
  },
  "flexi - splatter effects 17 the wave, a google love story written in decay roam3-2 ": {
   "brightness": 0.161,
-  "motion": 0.074
+  "motion": 0.074,
+  "chroma": 0.185,
+  "edges": 0.0657
  },
  "Flexi, fishbrain + Martin - witchery": {
-  "brightness": 0.295,
-  "motion": 0.05
+  "brightness": 0.292,
+  "motion": 0.043,
+  "chroma": 0.721,
+  "edges": 0.0172
  },
  "Flexi, Geiss and Rovastar - chaos layered tokamak": {
-  "brightness": 0.031,
-  "motion": 0.03
+  "brightness": 0.016,
+  "motion": 0.011,
+  "chroma": 0.097,
+  "edges": 0.003
  },
  "Flexi, martin + geiss - painterly rogue wave strike": {
-  "brightness": 0.49,
-  "motion": 0.042
+  "brightness": 0.489,
+  "motion": 0.04,
+  "chroma": 0.455,
+  "edges": 0.0094
  },
  "flexi, stahlregen, geiss + tobias wolfboi - space gelatine burst - mash0000 - chromatidal pool mirror blasphemy": {
-  "brightness": 0.138,
-  "motion": 0.07
+  "brightness": 0.151,
+  "motion": 0.072,
+  "chroma": 0.168,
+  "edges": 0.0559
  },
  "Geiss - 3 layers (Tunnel Mix)": {
-  "brightness": 0.602,
-  "motion": 0.1
+  "brightness": 0.508,
+  "motion": 0.118,
+  "chroma": 0.346,
+  "edges": 0.0149
  },
  "Geiss - Bipolar 2 Enhanced": {
   "brightness": 0.013,
-  "motion": 0.012
+  "motion": 0.012,
+  "chroma": 0.025,
+  "edges": 0.008
  },
  "Geiss - Brain Zoom 4": {
-  "brightness": 0.53,
-  "motion": 0.113
+  "brightness": 0.499,
+  "motion": 0.116,
+  "chroma": 0.052,
+  "edges": 0.0537
  },
  "Geiss - Cauldron - painterly (saturation remix)": {
-  "brightness": 0.156,
-  "motion": 0.087
+  "brightness": 0.118,
+  "motion": 0.082,
+  "chroma": 0.2,
+  "edges": 0.014
  },
  "Geiss - Color Pox (Acid Impression Mix) (color saturation remix)": {
-  "brightness": 0.191,
-  "motion": 0.087
+  "brightness": 0.177,
+  "motion": 0.082,
+  "chroma": 0.192,
+  "edges": 0.0245
  },
  "Geiss - Desert Rose 4": {
-  "brightness": 0.335,
-  "motion": 0.053
+  "brightness": 0.348,
+  "motion": 0.052,
+  "chroma": 0.307,
+  "edges": 0.0064
  },
  "Geiss - Game of Life 3": {
   "brightness": 0.038,
-  "motion": 0.048
+  "motion": 0.048,
+  "chroma": 0.024,
+  "edges": 0.0879
  },
  "Geiss - Myriad Mosaics": {
-  "brightness": 0.238,
-  "motion": 0.058
+  "brightness": 0.236,
+  "motion": 0.057,
+  "chroma": 0.129,
+  "edges": 0.0217
  },
  "Geiss - Planet 1": {
   "brightness": 0.511,
-  "motion": 0.03
+  "motion": 0.03,
+  "chroma": 0.249,
+  "edges": 0.0001
  },
  "Geiss - Reaction Diffusion 3 (Lichen Mix)": {
-  "brightness": 0.568,
-  "motion": 0.077
+  "brightness": 0.631,
+  "motion": 0.076,
+  "chroma": 0.71,
+  "edges": 0.0014
  },
  "Geiss - Reaction Diffusion 3": {
-  "brightness": 0.309,
-  "motion": 0.318
+  "brightness": 0.327,
+  "motion": 0.316,
+  "chroma": 0.156,
+  "edges": 0.1341
  },
  "Geiss - Skin Dots Multi-layer 3": {
-  "brightness": 0.49,
-  "motion": 0.41
+  "brightness": 0.487,
+  "motion": 0.409,
+  "chroma": 0,
+  "edges": 0.3073
  },
  "Geiss - Tokamak Plus 2": {
-  "brightness": 0.22,
-  "motion": 0.13
+  "brightness": 0.235,
+  "motion": 0.128,
+  "chroma": 0.153,
+  "edges": 0.093
  },
  "Geiss - Two-Pointed Pulsagon - mash0000 - bubonic super-fluid centrifuge": {
-  "brightness": 0.226,
-  "motion": 0.285
+  "brightness": 0.254,
+  "motion": 0.297,
+  "chroma": 0.318,
+  "edges": 0.1444
  },
  "goody + martin - crystal palace - schizotoxin - the wild iris bloom - 16 iterations": {
-  "brightness": 0.143,
-  "motion": 0.104
+  "brightness": 0.146,
+  "motion": 0.108,
+  "chroma": 0.094,
+  "edges": 0.0719
  },
  "Goody - Ego Decontructor": {
-  "brightness": 0.08,
-  "motion": 0.067
+  "brightness": 0.077,
+  "motion": 0.059,
+  "chroma": 0.108,
+  "edges": 0.0366
  },
  "GreatWho - Lasershow": {
   "brightness": 0.041,
-  "motion": 0.039
+  "motion": 0.039,
+  "chroma": 0.046,
+  "edges": 0.0521
  },
  "Illusion & Rovastar - Dotty Mad Space (Jelly)": {
-  "brightness": 0.104,
-  "motion": 0.059
+  "brightness": 0.095,
+  "motion": 0.053,
+  "chroma": 0.124,
+  "edges": 0.0613
  },
  "martin + stahlregen - martin in da mash 12": {
-  "brightness": 0.379,
-  "motion": 0.115
+  "brightness": 0.335,
+  "motion": 0.113,
+  "chroma": 0.591,
+  "edges": 0.0049
  },
  "martin + stahlregen - martin in da mash 12a": {
-  "brightness": 0.167,
-  "motion": 0.099
+  "brightness": 0.166,
+  "motion": 0.098,
+  "chroma": 0.273,
+  "edges": 0.1495
  },
  "martin + stahlregen - martin in da mash 14": {
-  "brightness": 0.27,
-  "motion": 0.193
+  "brightness": 0.24,
+  "motion": 0.178,
+  "chroma": 0.303,
+  "edges": 0.0184
  },
  "martin + stahlregen - martin in da mash 3": {
-  "brightness": 0.253,
-  "motion": 0.151
+  "brightness": 0.25,
+  "motion": 0.144,
+  "chroma": 0.242,
+  "edges": 0.0055
  },
  "martin - baby one more time": {
-  "brightness": 0.356,
-  "motion": 0.134
+  "brightness": 0.347,
+  "motion": 0.115,
+  "chroma": 0.112,
+  "edges": 0.0408
  },
- "martin - bombyx mori [flexi\u2032s logarithmic edit]": {
-  "brightness": 0.042,
-  "motion": 0.054
+ "martin - bombyx mori [flexi′s logarithmic edit]": {
+  "brightness": 0.045,
+  "motion": 0.054,
+  "chroma": 0.056,
+  "edges": 0.0094
  },
  "Martin - bombyx mori mix2": {
-  "brightness": 0.098,
-  "motion": 0.087
+  "brightness": 0.085,
+  "motion": 0.078,
+  "chroma": 0.073,
+  "edges": 0.0094
  },
  "martin - bring up the big guns": {
-  "brightness": 0.193,
-  "motion": 0.122
+  "brightness": 0.192,
+  "motion": 0.125,
+  "chroma": 0.12,
+  "edges": 0.0215
  },
  "martin - cherry brain wall mod": {
-  "brightness": 0.137,
-  "motion": 0.036
+  "brightness": 0.151,
+  "motion": 0.041,
+  "chroma": 0.044,
+  "edges": 0.0159
  },
  "martin - city of shadows": {
-  "brightness": 0.143,
-  "motion": 0.05
+  "brightness": 0.155,
+  "motion": 0.053,
+  "chroma": 0.136,
+  "edges": 0.01
  },
  "martin - cope - laser dome": {
-  "brightness": 0.127,
-  "motion": 0.074
+  "brightness": 0.154,
+  "motion": 0.077,
+  "chroma": 0.129,
+  "edges": 0.009
  },
  "martin - crystal palace": {
   "brightness": 0.02,
-  "motion": 0.026
+  "motion": 0.026,
+  "chroma": 0.004,
+  "edges": 0.0101
  },
  "Martin - Diabolo": {
-  "brightness": 0.129,
-  "motion": 0.023
+  "brightness": 0.147,
+  "motion": 0.048,
+  "chroma": 0.036,
+  "edges": 0.0051
  },
  "Martin - disco mix 3 -fast": {
-  "brightness": 0.169,
-  "motion": 0.133
+  "brightness": 0.195,
+  "motion": 0.126,
+  "chroma": 0.267,
+  "edges": 0.0394
  },
  "Martin - disco mix 6": {
-  "brightness": 0.095,
-  "motion": 0.091
+  "brightness": 0.109,
+  "motion": 0.084,
+  "chroma": 0.105,
+  "edges": 0.0309
  },
  "martin - elusive impressions mix2 - flacc mess proph nz+2": {
-  "brightness": 0.088,
-  "motion": 0.086
+  "brightness": 0.068,
+  "motion": 0.069,
+  "chroma": 0.101,
+  "edges": 0.0006
  },
  "martin - Flexis swarm in Martins pond [not yet a boid implementation] ": {
-  "brightness": 0.502,
-  "motion": 0.057
+  "brightness": 0.505,
+  "motion": 0.055,
+  "chroma": 0.061,
+  "edges": 0.0228
  },
  "martin - gate to moria": {
-  "brightness": 0.134,
-  "motion": 0.157
+  "brightness": 0.133,
+  "motion": 0.157,
+  "chroma": 0,
+  "edges": 0.0226
  },
  "martin - glassball dance": {
-  "brightness": 0.416,
-  "motion": 0.149
+  "brightness": 0.49,
+  "motion": 0.161,
+  "chroma": 0.307,
+  "edges": 0.0212
  },
  "martin - ice flames": {
-  "brightness": 0.075,
-  "motion": 0.044
+  "brightness": 0.101,
+  "motion": 0.057,
+  "chroma": 0.071,
+  "edges": 0.0382
  },
  "martin - into the fireworks": {
-  "brightness": 0.092,
-  "motion": 0.028
+  "brightness": 0.067,
+  "motion": 0.028,
+  "chroma": 0.046,
+  "edges": 0.0027
  },
  "Martin - journey into space": {
-  "brightness": 0.162,
-  "motion": 0.18
+  "brightness": 0.167,
+  "motion": 0.183,
+  "chroma": 0.131,
+  "edges": 0.0178
  },
  "martin - ludicrous speed": {
-  "brightness": 0.247,
-  "motion": 0.178
+  "brightness": 0.248,
+  "motion": 0.178,
+  "chroma": 0.466,
+  "edges": 0.0094
  },
  "martin - move this body": {
-  "brightness": 0.309,
-  "motion": 0.224
+  "brightness": 0.31,
+  "motion": 0.224,
+  "chroma": 0.07,
+  "edges": 0.0245
  },
  "martin - resonant twister - steel spring": {
-  "brightness": 0.209,
-  "motion": 0.053
+  "brightness": 0.204,
+  "motion": 0.053,
+  "chroma": 0.097,
+  "edges": 0.037
  },
  "martin - satellite view": {
-  "brightness": 0.214,
-  "motion": 0.068
+  "brightness": 0.13,
+  "motion": 0.021,
+  "chroma": 0.057,
+  "edges": 0.0063
  },
  "martin - tunnel race": {
   "brightness": 0.584,
-  "motion": 0.209
+  "motion": 0.212,
+  "chroma": 0.231,
+  "edges": 0.0341
  },
  "martin, fishbrain + flexi - mandelbox explorer v1 Eo.S. optimize [bipolar witchcraft mix]": {
-  "brightness": 0.253,
-  "motion": 0.045
+  "brightness": 0.387,
+  "motion": 0.077,
+  "chroma": 0.15,
+  "edges": 0.0331
  },
  "ORB - Magma Pool": {
-  "brightness": 0.223,
-  "motion": 0.128
+  "brightness": 0.166,
+  "motion": 0.119,
+  "chroma": 0.471,
+  "edges": 0.0889
  },
  "ORB - Pastel Primer": {
-  "brightness": 0.633,
-  "motion": 0.093
+  "brightness": 0.443,
+  "motion": 0.195,
+  "chroma": 0.558,
+  "edges": 0.0333
  },
  "orb - toxic goo": {
-  "brightness": 0.925,
-  "motion": 0.008
+  "brightness": 0.486,
+  "motion": 0.082,
+  "chroma": 0.873,
+  "edges": 0.0185
  },
  "PieturP - triptrap_(ultimate-trip-mix)": {
-  "brightness": 0.543,
-  "motion": 0.052
+  "brightness": 0.465,
+  "motion": 0.065,
+  "chroma": 0.291,
+  "edges": 0.0094
  },
  "raron - a grayish blob - mash0000 - pungent gastric automata cloud fumes": {
-  "brightness": 0.383,
-  "motion": 0.198
+  "brightness": 0.384,
+  "motion": 0.2,
+  "chroma": 0.274,
+  "edges": 0.0242
  },
  "rce-ordinary + flexi - far away distance (custom beat detection + bipolar colour ghost mix)": {
-  "brightness": 0.373,
-  "motion": 0.111
+  "brightness": 0.376,
+  "motion": 0.1,
+  "chroma": 0.572,
+  "edges": 0.0307
  },
  "Redi Jedi - i dont think those were portabello mushrooms": {
-  "brightness": 0.384,
-  "motion": 0.111
+  "brightness": 0.396,
+  "motion": 0.107,
+  "chroma": 0.568,
+  "edges": 0.0267
  },
  "Rocke - Answer.42 (New Mix 1) - mash0000 - slash and char p. jungle": {
-  "brightness": 0.214,
-  "motion": 0.151
+  "brightness": 0.183,
+  "motion": 0.134,
+  "chroma": 0.418,
+  "edges": 0.077
  },
  "Rovastar + Che - Asylum Animations": {
-  "brightness": 0.182,
-  "motion": 0.081
+  "brightness": 0.186,
+  "motion": 0.077,
+  "chroma": 0.218,
+  "edges": 0.0066
  },
  "Rovastar + Flexi - Hurricane Nightmare (Moebius Mix)": {
-  "brightness": 0.382,
-  "motion": 0.093
+  "brightness": 0.383,
+  "motion": 0.092,
+  "chroma": 0.125,
+  "edges": 0.0325
  },
  "Rovastar + Geiss - Hurricane Nightmare (Relief Mix)": {
-  "brightness": 0.417,
-  "motion": 0.163
+  "brightness": 0.418,
+  "motion": 0.164,
+  "chroma": 0.103,
+  "edges": 0.0833
  },
  "Rovastar + Geiss - Hurricane Nightmare": {
   "brightness": 0.364,
-  "motion": 0.13
+  "motion": 0.13,
+  "chroma": 0.163,
+  "edges": 0.0147
  },
  "Rovastar + Geiss - Hyperkaleidoscope Glow 2 motion blur (Jelly)": {
-  "brightness": 0.125,
-  "motion": 0.095
+  "brightness": 0.069,
+  "motion": 0.057,
+  "chroma": 0.148,
+  "edges": 0.041
  },
  "Rovastar + Geiss - Snapshot Of Space (LSB mix)": {
   "brightness": 0.024,
-  "motion": 0.037
+  "motion": 0.037,
+  "chroma": 0.03,
+  "edges": 0.0498
  },
  "Rovastar + Loadus + Geiss - Tone-mapped FractalDrop 7c": {
-  "brightness": 0.21,
-  "motion": 0.132
+  "brightness": 0.184,
+  "motion": 0.124,
+  "chroma": 0.071,
+  "edges": 0.0101
  },
  "Rovastar + Telek - Altars of Madness (Rolling Oceans Mix)": {
-  "brightness": 0.293,
-  "motion": 0.117
+  "brightness": 0.291,
+  "motion": 0.117,
+  "chroma": 0.232,
+  "edges": 0.0454
  },
  "Rovastar - A Million Miles From Earth (Wormhole Mix)": {
-  "brightness": 0.326,
-  "motion": 0.122
+  "brightness": 0.318,
+  "motion": 0.115,
+  "chroma": 0.398,
+  "edges": 0.0757
  },
  "Rovastar - Explosive Minds": {
-  "brightness": 0.434,
-  "motion": 0.195
+  "brightness": 0.436,
+  "motion": 0.194,
+  "chroma": 0.336,
+  "edges": 0.0512
  },
  "Rovastar - Trippy Sperm (Jelly)": {
   "brightness": 0.074,
-  "motion": 0.029
+  "motion": 0.029,
+  "chroma": 0.22,
+  "edges": 0.0115
  },
  "Rovastar-altarsofmadness(forgottenrea": {
-  "brightness": 0.379,
-  "motion": 0.064
+  "brightness": 0.377,
+  "motion": 0.063,
+  "chroma": 0.183,
+  "edges": 0.0566
  },
  "shifter - dark tides bdrv mix": {
-  "brightness": 0.092,
-  "motion": 0.024
+  "brightness": 0.091,
+  "motion": 0.024,
+  "chroma": 0.28,
+  "edges": 0.0004
  },
  "shifter - escape the worm - Eo.S. + Phat - Before_It_Eats_Your_Brain_Mix_v2": {
-  "brightness": 0.081,
-  "motion": 0.062
+  "brightness": 0.08,
+  "motion": 0.061,
+  "chroma": 0.093,
+  "edges": 0.0119
  },
  "shifter - feathers (angel wings)_phat_remix relief 2": {
-  "brightness": 0.126,
-  "motion": 0.048
+  "brightness": 0.125,
+  "motion": 0.047,
+  "chroma": 0.125,
+  "edges": 0.0129
  },
  "Stahlregen & Boz + Eo.S + Geiss + Phat + Rovastar + Zylot - Machine Code [Jelly]": {
-  "brightness": 0.141,
-  "motion": 0.1
+  "brightness": 0.116,
+  "motion": 0.082,
+  "chroma": 0.197,
+  "edges": 0.0717
  },
  "stahlregen & geiss + rovastar - fields of flowers (mashup 9 - space flower rmx) - mash0001 - pack em in, we got a long haul + flashlight": {
-  "brightness": 0.05,
-  "motion": 0.037
+  "brightness": 0.045,
+  "motion": 0.033,
+  "chroma": 0.121,
+  "edges": 0.0022
  },
  "stahlregen + geiss + shifter - babylon": {
-  "brightness": 0.552,
-  "motion": 0.199
+  "brightness": 0.029,
+  "motion": 0.034,
+  "chroma": 0.137,
+  "edges": 0.0276
  },
  "Stahlregen + martin + others - Psychedelic Metal Flower": {
-  "brightness": 0.132,
-  "motion": 0.151
+  "brightness": 0.125,
+  "motion": 0.153,
+  "chroma": 0.046,
+  "edges": 0.0757
  },
  "suksma - feign shoulder concern when i should be executed - everything is eternally shrinking": {
-  "brightness": 0.116,
-  "motion": 0.08
+  "brightness": 0.084,
+  "motion": 0.076,
+  "chroma": 0.091,
+  "edges": 0.0263
  },
  "suksma - gaeomaentaec - log smell 2 - steaming wienies2": {
-  "brightness": 0.105,
-  "motion": 0.085
+  "brightness": 0.087,
+  "motion": 0.074,
+  "chroma": 0.079,
+  "edges": 0.0339
  },
  "suksma - nip tuck": {
-  "brightness": 0.234,
-  "motion": 0.062
+  "brightness": 0.233,
+  "motion": 0.062,
+  "chroma": 0.227,
+  "edges": 0.0488
  },
  "suksma - water cooled red uranium vs dotes - freeenergynow.net": {
-  "brightness": 0.204,
-  "motion": 0.15
+  "brightness": 0.192,
+  "motion": 0.149,
+  "chroma": 0.225,
+  "edges": 0.1557
  },
  "TonyMilkdrop - Magellan's Nebula [Flexi - fancy + $this shall not retain]": {
-  "brightness": 0.37,
-  "motion": 0.13
+  "brightness": 0.369,
+  "motion": 0.13,
+  "chroma": 0.143,
+  "edges": 0.086
  },
  "Unchained - Making a Science of It 4": {
-  "brightness": 0.402,
-  "motion": 0.15
+  "brightness": 0.401,
+  "motion": 0.148,
+  "chroma": 0.37,
+  "edges": 0.0905
  },
  "yin - 190 - Temporal fluctuations": {
-  "brightness": 0.762,
-  "motion": 0.224
+  "brightness": 0.758,
+  "motion": 0.221,
+  "chroma": 0.096,
+  "edges": 0.1296
  },
- "yin - 250 - Artificial poles of the continuum_Phat\u2032s_Orbit_mix": {
+ "yin - 250 - Artificial poles of the continuum_Phat′s_Orbit_mix": {
   "brightness": 0.158,
-  "motion": 0.03
+  "motion": 0.03,
+  "chroma": 0.073,
+  "edges": 0.0348
  },
  "yin - 253 - Artificial poles of the continuum (remix #3)": {
-  "brightness": 0.395,
-  "motion": 0.074
+  "brightness": 0.388,
+  "motion": 0.073,
+  "chroma": 0.322,
+  "edges": 0.0347
  },
  "yin - 315 - Ocean of Light (yo im peakin yo Eo.S.-Phat)": {
   "brightness": 0.357,
-  "motion": 0.348
+  "motion": 0.347,
+  "chroma": 0.087,
+  "edges": 0.0343
  },
  "Zylot - In death there is life (Geiss Layered Mix)": {
-  "brightness": 0.016,
-  "motion": 0.026
+  "brightness": 0.017,
+  "motion": 0.027,
+  "chroma": 0.053,
+  "edges": 0.015
  },
  "$$$ Royal - Mashup (160)": {
-  "brightness": 0.272,
-  "motion": 0.194
+  "brightness": 0.21,
+  "motion": 0.18,
+  "chroma": 0.365,
+  "edges": 0.1327
  },
  "$$$ Royal - Mashup (253)": {
   "brightness": 0.019,
-  "motion": 0.006
+  "motion": 0.006,
+  "chroma": 0.014,
+  "edges": 0.0052
  },
  "$$$ Royal - Mashup (337)": {
-  "brightness": 0.186,
-  "motion": 0.156
+  "brightness": 0.198,
+  "motion": 0.164,
+  "chroma": 0.24,
+  "edges": 0.1971
  },
  "_Geiss - Brain Zoom 3 (Color Emboss Mix)": {
-  "brightness": 0.361,
-  "motion": 0.042
+  "brightness": 0.365,
+  "motion": 0.123,
+  "chroma": 0.178,
+  "edges": 0.0057
  },
  "_Geiss - Explosion Mod 2b": {
-  "brightness": 0.307,
-  "motion": 0.029
+  "brightness": 0.244,
+  "motion": 0.027,
+  "chroma": 0.235,
+  "edges": 0.0005
  },
  "_Mig_009": {
-  "brightness": 0.089,
-  "motion": 0.074
+  "brightness": 0.09,
+  "motion": 0.074,
+  "chroma": 0.03,
+  "edges": 0.0564
  },
  "_Mig_014_version2": {
-  "brightness": 0.19,
-  "motion": 0.2
+  "brightness": 0.186,
+  "motion": 0.197,
+  "chroma": 0.049,
+  "edges": 0.1066
  },
  "_Mig_039": {
-  "brightness": 0.335,
-  "motion": 0.217
+  "brightness": 0.336,
+  "motion": 0.216,
+  "chroma": 0.143,
+  "edges": 0.0486
  },
  "_Mig_056": {
   "brightness": 0.092,
-  "motion": 0.072
+  "motion": 0.072,
+  "chroma": 0.137,
+  "edges": 0.0264
  },
  "_Vovan + Geiss - Bass With Flover (Feedback Mix) 2": {
   "brightness": 0.138,
-  "motion": 0.065
+  "motion": 0.065,
+  "chroma": 0.178,
+  "edges": 0.0237
  },
  "A Tribute to Martin - bombyx mori - Ft Flexi - AdamFX - StahlRegen - Krash - Rovastar -  Hd in Milk T": {
-  "brightness": 0.24,
-  "motion": 0.071
+  "brightness": 0.151,
+  "motion": 0.058,
+  "chroma": 0.151,
+  "edges": 0.0159
  },
  "adam eatit fx 2 martin - disco mix, lodus, geiss, ludicrous speed,flexi, aderrasi n hexcollie": {
-  "brightness": 0.342,
-  "motion": 0.088
+  "brightness": 0.263,
+  "motion": 0.091,
+  "chroma": 0.288,
+  "edges": 0.0463
  },
  "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Aderrasi 2_1": {
-  "brightness": 0.257,
-  "motion": 0.157
+  "brightness": 0.256,
+  "motion": 0.159,
+  "chroma": 0.346,
+  "edges": 0.0355
  },
  "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Baked Ft another AdamFX Mashup 7_1": {
-  "brightness": 0.114,
-  "motion": 0.061
+  "brightness": 0.116,
+  "motion": 0.061,
+  "chroma": 0.164,
+  "edges": 0.0318
  },
  "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Eos Ft Flexi n Hexocollie + Baked + Santa Fucking Claus": {
-  "brightness": 0.223,
-  "motion": 0.143
+  "brightness": 0.222,
+  "motion": 0.156,
+  "chroma": 0.24,
+  "edges": 0.1033
  },
  "AdamFx 2 Aderrasi - Airhandler (Last Breath - Calm)Ilusional Discontent2": {
-  "brightness": 0.301,
-  "motion": 0.082
+  "brightness": 0.318,
+  "motion": 0.084,
+  "chroma": 0.144,
+  "edges": 0.0085
  },
  "AdamFx 2 Geiss -Somewhat Distort Me 3_1": {
-  "brightness": 0.201,
-  "motion": 0.233
+  "brightness": 0.189,
+  "motion": 0.226,
+  "chroma": 0.045,
+  "edges": 0.1501
  },
  "AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4)": {
-  "brightness": 0.075,
-  "motion": 0.093
+  "brightness": 0.072,
+  "motion": 0.088,
+  "chroma": 0.05,
+  "edges": 0.039
  },
  "Aderrasi + Geiss - Airhandler (Square Mix)": {
-  "brightness": 0.15,
-  "motion": 0.046
+  "brightness": 0.108,
+  "motion": 0.04,
+  "chroma": 0.143,
+  "edges": 0.011
  },
  "Aderrasi - Agitator": {
-  "brightness": 0.318,
-  "motion": 0.112
+  "brightness": 0.316,
+  "motion": 0.112,
+  "chroma": 0.256,
+  "edges": 0.0084
  },
  "Aderrasi - Airhandler (Principle of Sharing)": {
-  "brightness": 0.511,
-  "motion": 0.05
+  "brightness": 0.498,
+  "motion": 0.049,
+  "chroma": 0.675,
+  "edges": 0.0033
  },
- "Aderrasi - Contortion (Escher\u2032s Tunnel Mix)": {
-  "brightness": 0.184,
-  "motion": 0.08
+ "Aderrasi - Contortion (Escher′s Tunnel Mix)": {
+  "brightness": 0.188,
+  "motion": 0.08,
+  "chroma": 0.16,
+  "edges": 0.0414
  },
  "Aderrasi - Curse of the Mirror Emu": {
   "brightness": 0.212,
-  "motion": 0.065
+  "motion": 0.065,
+  "chroma": 0.149,
+  "edges": 0.0024
  },
  "baked - River of Illusion Dillusion [Bubble]": {
   "brightness": 0.282,
-  "motion": 0.073
+  "motion": 0.073,
+  "chroma": 0.509,
+  "edges": 0.0009
  },
  "beta106at shape - mash0000 - hulk spirit cum": {
-  "brightness": 0.12,
-  "motion": 0.174
+  "brightness": 0.114,
+  "motion": 0.169,
+  "chroma": 0.139,
+  "edges": 0.09
  },
- "beta106i - Brilliance (Space-Time Breaking) - mash0000 - it\u2032s 2009 and you haven\u2032t replaced your analog tv with digital": {
-  "brightness": 0.226,
-  "motion": 0.215
+ "beta106i - Brilliance (Space-Time Breaking) - mash0000 - it′s 2009 and you haven′t replaced your analog tv with digital": {
+  "brightness": 0.218,
+  "motion": 0.207,
+  "chroma": 0.398,
+  "edges": 0.1964
  },
  "beta106i - Inhuman Emotion (Regret) - mash0000 - genetic mutant incubators in the hands of toddlers": {
-  "brightness": 0.252,
-  "motion": 0.115
+  "brightness": 0.255,
+  "motion": 0.114,
+  "chroma": 0.188,
+  "edges": 0.0393
  },
  "beta106i - Potion of Ink": {
-  "brightness": 0.243,
-  "motion": 0.058
+  "brightness": 0.236,
+  "motion": 0.051,
+  "chroma": 0.194,
+  "edges": 0.0443
  },
  "cope + flexi - mother-of-whirl [no fnords were hurt]": {
-  "brightness": 0.114,
-  "motion": 0.077
+  "brightness": 0.112,
+  "motion": 0.077,
+  "chroma": 0.179,
+  "edges": 0.0229
  },
  "cope - alternative energy (antimatter mod_1)4z": {
-  "brightness": 0.362,
-  "motion": 0.142
+  "brightness": 0.357,
+  "motion": 0.135,
+  "chroma": 0.342,
+  "edges": 0.098
  },
  "cope - digital sea": {
-  "brightness": 0.297,
-  "motion": 0.142
+  "brightness": 0.281,
+  "motion": 0.135,
+  "chroma": 0.362,
+  "edges": 0.0963
  },
  "cope - soar (v2.0)": {
-  "brightness": 0.127,
-  "motion": 0.125
+  "brightness": 0.126,
+  "motion": 0.124,
+  "chroma": 0.078,
+  "edges": 0.0241
  },
  "ech0 - liquid firesticks I": {
-  "brightness": 0.602,
-  "motion": 0.149
+  "brightness": 0.625,
+  "motion": 0.158,
+  "chroma": 0.458,
+  "edges": 0.0154
  },
  "Eo.S. + Geiss - glowsticks v2 02 (Relief Mix)": {
-  "brightness": 0.285,
-  "motion": 0.104
+  "brightness": 0.302,
+  "motion": 0.113,
+  "chroma": 0.181,
+  "edges": 0.185
  },
  "Eo.S. + Phat - Emergent factors": {
-  "brightness": 0.235,
-  "motion": 0.124
+  "brightness": 0.23,
+  "motion": 0.121,
+  "chroma": 0.263,
+  "edges": 0.1153
  },
  "Eo.S. + Phat cubetrace (cybercity madness remix) - mash0000 - evaporating crystal pharma": {
-  "brightness": 0.135,
-  "motion": 0.033
+  "brightness": 0.132,
+  "motion": 0.032,
+  "chroma": 0.301,
+  "edges": 0.0198
  },
  "Eo.S. - spark C_Phat_Jester_Mix_v2": {
-  "brightness": 0.531,
-  "motion": 0.056
+  "brightness": 0.53,
+  "motion": 0.056,
+  "chroma": 0.211,
+  "edges": 0.0167
  },
  "fed - slowfast 1.1": {
   "brightness": 0.256,
-  "motion": 0.074
+  "motion": 0.076,
+  "chroma": 0.121,
+  "edges": 0.0411
  },
  "fiShbRaiN + flexi - witchcraft 2.0 - mash0000 - no one cares about mi, the note (major third)": {
   "brightness": 0.084,
-  "motion": 0.021
+  "motion": 0.021,
+  "chroma": 0.031,
+  "edges": 0.0064
  },
  "fiShbRaiN - breakfast cruiser": {
-  "brightness": 0.052,
-  "motion": 0.039
+  "brightness": 0.046,
+  "motion": 0.035,
+  "chroma": 0.034,
+  "edges": 0.0072
  },
  "fiShbRaiN - the adventures of prismo jenkins": {
-  "brightness": 0.466,
-  "motion": 0.035
+  "brightness": 0.47,
+  "motion": 0.035,
+  "chroma": 0.06,
+  "edges": 0.0009
  },
  "fiShbRaiN - witchcraft (necromancer remix)_phat_edit_v3": {
   "brightness": 0.044,
-  "motion": 0.005
+  "motion": 0.004,
+  "chroma": 0.383,
+  "edges": 0
  },
  "flexi + fishbrain - warpcraft [random mashup]": {
   "brightness": 0.12,
-  "motion": 0.094
+  "motion": 0.095,
+  "chroma": 0.053,
+  "edges": 0.0499
  },
  "flexi + fishbrain - witchcraft [complex terraforming]": {
   "brightness": 0.198,
-  "motion": 0.042
+  "motion": 0.042,
+  "chroma": 0.237,
+  "edges": 0.014
  },
  "Flexi + Geiss + Demon Lord - unholy tokamak clot-plot": {
-  "brightness": 0.37,
-  "motion": 0.204
+  "brightness": 0.346,
+  "motion": 0.203,
+  "chroma": 0.177,
+  "edges": 0.1915
  },
  "flexi + geiss - infused with the spiral (Heavy Oil Mix) nz+ rapery": {
-  "brightness": 0.088,
-  "motion": 0.091
+  "brightness": 0.113,
+  "motion": 0.106,
+  "chroma": 0.1,
+  "edges": 0.0827
  },
  "flexi + geiss - pogo-cubes on tokamak matter (bccn Jelly V4)": {
-  "brightness": 0.065,
-  "motion": 0.048
+  "brightness": 0.064,
+  "motion": 0.047,
+  "chroma": 0.067,
+  "edges": 0.0235
  },
  "flexi + geiss - pogo-cubes on tokamak matter [mind over matter remix]2": {
   "brightness": 0.217,
-  "motion": 0.16
+  "motion": 0.158,
+  "chroma": 0.227,
+  "edges": 0.1247
  },
  "Flexi + Martin - dive": {
-  "brightness": 0.379,
-  "motion": 0.074
+  "brightness": 0.388,
+  "motion": 0.073,
+  "chroma": 0.032,
+  "edges": 0.3035
  },
  "Flexi + Martin - tunnel of supraschismatika": {
-  "brightness": 0.247,
-  "motion": 0.113
+  "brightness": 0.243,
+  "motion": 0.112,
+  "chroma": 0.144,
+  "edges": 0.0357
  },
  "flexi + nitorami - beat explorer (cn bc jelly 4)": {
-  "brightness": 0.163,
-  "motion": 0.181
+  "brightness": 0.176,
+  "motion": 0.198,
+  "chroma": 0.168,
+  "edges": 0.117
  },
  "Flexi + Rovastar - Fractopia [lovecraft]": {
-  "brightness": 0.409,
-  "motion": 0.017
+  "brightness": 0.408,
+  "motion": 0.017,
+  "chroma": 0.585,
+  "edges": 0.0003
  },
  "flexi + stahlregen - jelly strike": {
-  "brightness": 0.236,
-  "motion": 0.024
+  "brightness": 0.273,
+  "motion": 0.027,
+  "chroma": 0.254,
+  "edges": 0.0108
  },
  "Flexi - blame hexcollie twice": {
-  "brightness": 0.178,
-  "motion": 0.168
+  "brightness": 0.172,
+  "motion": 0.199,
+  "chroma": 0.186,
+  "edges": 0.0785
  },
  "flexi - borderline imagery": {
-  "brightness": 0.475,
-  "motion": 0.045
+  "brightness": 0.425,
+  "motion": 0.062,
+  "chroma": 0.486,
+  "edges": 0.0084
  },
  "flexi - bouncing balls [illumination mix]": {
-  "brightness": 0.05,
-  "motion": 0.011
+  "brightness": 0.123,
+  "motion": 0.021,
+  "chroma": 0.21,
+  "edges": 0.0026
  },
  "flexi - color strike": {
-  "brightness": 0.148,
-  "motion": 0.041
+  "brightness": 0.117,
+  "motion": 0.033,
+  "chroma": 0.187,
+  "edges": 0.0139
  },
  "flexi - meta4free": {
-  "brightness": 0.406,
-  "motion": 0.083
+  "brightness": 0.402,
+  "motion": 0.086,
+  "chroma": 0.308,
+  "edges": 0.0506
  },
  "Flexi - mindblob 2.0": {
-  "brightness": 0.22,
-  "motion": 0.026
+  "brightness": 0.221,
+  "motion": 0.025,
+  "chroma": 0.761,
+  "edges": 0.0406
  },
  "Flexi - reality tunnel": {
-  "brightness": 0.139,
-  "motion": 0.032
+  "brightness": 0.121,
+  "motion": 0.03,
+  "chroma": 0.067,
+  "edges": 0.0003
  },
  "Flexi - the distant point between derivative": {
-  "brightness": 0.441,
-  "motion": 0.081
+  "brightness": 0.45,
+  "motion": 0.08,
+  "chroma": 0.188,
+  "edges": 0.1595
  },
  "Flexi - wild at range": {
-  "brightness": 0.426,
-  "motion": 0.036
+  "brightness": 0.416,
+  "motion": 0.036,
+  "chroma": 0.521,
+  "edges": 0.0909
  },
  "flexi, geiss and rovastar - chaos layered sinewsed tokamak 2": {
   "brightness": 0.069,
-  "motion": 0.017
+  "motion": 0.017,
+  "chroma": 0.106,
+  "edges": 0.039
  },
  "Flexi, Martin, Phat, Zylot + Eo.S - one way trip trap proof of concept [epileptic zoom tunnel edit]": {
-  "brightness": 0.189,
-  "motion": 0.101
+  "brightness": 0.184,
+  "motion": 0.1,
+  "chroma": 0.091,
+  "edges": 0.0362
  },
  "Flexi, Rovastar + Geiss - Fractopia vs bas relief": {
-  "brightness": 0.217,
-  "motion": 0.125
+  "brightness": 0.215,
+  "motion": 0.126,
+  "chroma": 0.063,
+  "edges": 0.1373
  },
  "Geiss - Feedback 2": {
-  "brightness": 0.086,
-  "motion": 0.027
+  "brightness": 0.083,
+  "motion": 0.029,
+  "chroma": 0.076,
+  "edges": 0.0197
  },
  "Geiss - Reaction Diffusion (Relief Mix)": {
   "brightness": 0.277,
-  "motion": 0.336
+  "motion": 0.345,
+  "chroma": 0.126,
+  "edges": 0.2263
  },
  "Geiss - Skin Dots 9": {
-  "brightness": 0.23,
-  "motion": 0.285
+  "brightness": 0.222,
+  "motion": 0.281,
+  "chroma": 0.13,
+  "edges": 0.3152
  },
  "Hexcollie - Cell division": {
-  "brightness": 0.605,
-  "motion": 0.111
+  "brightness": 0.643,
+  "motion": 0.106,
+  "chroma": 0.17,
+  "edges": 0.0246
  },
  "Hexcollie - Nautalisk - mash0000 - but officer, my fingerprint always changes": {
-  "brightness": 0.355,
-  "motion": 0.153
+  "brightness": 0.343,
+  "motion": 0.151,
+  "chroma": 0.798,
+  "edges": 0.1271
  },
  "Ishan - Anuera": {
-  "brightness": 0.496,
-  "motion": 0.072
+  "brightness": 0.493,
+  "motion": 0.077,
+  "chroma": 0.396,
+  "edges": 0.0061
  },
  "Krash & Rovastar - A Million Miles from Earth (Ripple Mix)": {
-  "brightness": 0.196,
-  "motion": 0.052
+  "brightness": 0.2,
+  "motion": 0.051,
+  "chroma": 0.335,
+  "edges": 0.0162
  },
  "Krash + Illusion + Geiss - Spiral Movement (Reaction Diffusion mix)": {
-  "brightness": 0.224,
-  "motion": 0.06
+  "brightness": 0.223,
+  "motion": 0.059,
+  "chroma": 0.775,
+  "edges": 0.0414
  },
  "Krash - War Machine (Shifting Complexity Mix)": {
-  "brightness": 0.375,
-  "motion": 0.111
+  "brightness": 0.368,
+  "motion": 0.106,
+  "chroma": 0.728,
+  "edges": 0.0377
  },
  "LuxXx - Fuck Your Code ii": {
-  "brightness": 0.143,
-  "motion": 0.066
+  "brightness": 0.157,
+  "motion": 0.077,
+  "chroma": 0.159,
+  "edges": 0.0402
  },
  "LuxXx - GrindFace  225 mg dose  ": {
-  "brightness": 0.24,
-  "motion": 0.125
+  "brightness": 0.239,
+  "motion": 0.123,
+  "chroma": 0.282,
+  "edges": 0.1072
  },
  "LuxXx - iWhat Happened Right After I Ate That Toxic Waste beta ii": {
-  "brightness": 0.234,
-  "motion": 0.189
+  "brightness": 0.283,
+  "motion": 0.208,
+  "chroma": 0.469,
+  "edges": 0.2354
  },
  "LuxXx - Subtle HipHopFlake": {
-  "brightness": 0.167,
-  "motion": 0.185
+  "brightness": 0.14,
+  "motion": 0.13,
+  "chroma": 0.056,
+  "edges": 0.0867
  },
  "martin - amandio c - a different view of the green machine": {
-  "brightness": 0.052,
-  "motion": 0.017
+  "brightness": 0.049,
+  "motion": 0.014,
+  "chroma": 0.019,
+  "edges": 0.0049
  },
  "martin - attack of the beast": {
-  "brightness": 0.111,
-  "motion": 0.059
+  "brightness": 0.114,
+  "motion": 0.061,
+  "chroma": 0.048,
+  "edges": 0.0205
  },
  "martin - basal ganglion": {
-  "brightness": 0.204,
-  "motion": 0.155
+  "brightness": 0.203,
+  "motion": 0.155,
+  "chroma": 0.135,
+  "edges": 0.1705
  },
  "Martin - cool morning": {
-  "brightness": 0.199,
-  "motion": 0.038
+  "brightness": 0.196,
+  "motion": 0.04,
+  "chroma": 0.17,
+  "edges": 0.0197
  },
  "martin - crystal alley": {
-  "brightness": 0.091,
-  "motion": 0.056
+  "brightness": 0.425,
+  "motion": 0.143,
+  "chroma": 0.306,
+  "edges": 0.1723
  },
  "martin - dark galaxy": {
-  "brightness": 0.187,
-  "motion": 0.048
+  "brightness": 0.205,
+  "motion": 0.047,
+  "chroma": 0.229,
+  "edges": 0.0063
  },
  "martin - shifter - armorial bearings of robotopia": {
-  "brightness": 0.121,
-  "motion": 0.113
+  "brightness": 0.101,
+  "motion": 0.052,
+  "chroma": 0.118,
+  "edges": 0.0202
  },
  "martin - skywards": {
-  "brightness": 0.029,
-  "motion": 0.035
+  "brightness": 0.025,
+  "motion": 0.03,
+  "chroma": 0.063,
+  "edges": 0.0089
  },
  "martin - soma in pink": {
   "brightness": 0.035,
-  "motion": 0.023
+  "motion": 0.023,
+  "chroma": 0.088,
+  "edges": 0.0097
  },
  "martin - sparky caleidoscope": {
-  "brightness": 0.145,
-  "motion": 0.052
+  "brightness": 0.048,
+  "motion": 0.036,
+  "chroma": 0.045,
+  "edges": 0.0139
  },
  "martin - starfield sectors": {
-  "brightness": 0.74,
-  "motion": 0.064
+  "brightness": 0.587,
+  "motion": 0.048,
+  "chroma": 0.338,
+  "edges": 0.003
  },
  "martin - sunset over the river": {
-  "brightness": 0.095,
-  "motion": 0.054
+  "brightness": 0.079,
+  "motion": 0.046,
+  "chroma": 0.062,
+  "edges": 0.0521
  },
  "martin - the forge of Isengard": {
-  "brightness": 0.194,
-  "motion": 0.149
+  "brightness": 0.183,
+  "motion": 0.142,
+  "chroma": 0.263,
+  "edges": 0.0464
  },
  "martin - unholy amulet 2": {
-  "brightness": 0.258,
-  "motion": 0.198
+  "brightness": 0.257,
+  "motion": 0.198,
+  "chroma": 0,
+  "edges": 0.0859
  },
  "martin - violet flash": {
-  "brightness": 0.087,
-  "motion": 0.067
+  "brightness": 0.089,
+  "motion": 0.068,
+  "chroma": 0.18,
+  "edges": 0.006
  },
  "Martin N AdamFX Infusion = Phat+Yin+Eo.S_Mandala Chaser Ft AdamFX n Martin - The Beast Mandala Chaser FX H": {
-  "brightness": 0.44,
-  "motion": 0.115
+  "brightness": 0.441,
+  "motion": 0.115,
+  "chroma": 0.362,
+  "edges": 0.0543
  },
  "ORB - Blue Emotion": {
-  "brightness": 0.237,
-  "motion": 0.045
+  "brightness": 0.232,
+  "motion": 0.044,
+  "chroma": 0.271,
+  "edges": 0.0149
  },
  "ORB - Depth Charge 2": {
-  "brightness": 0.437,
-  "motion": 0.053
+  "brightness": 0.43,
+  "motion": 0.053,
+  "chroma": 0.289,
+  "edges": 0.0295
  },
  "ORB - Fire and Fumes 2": {
   "brightness": 0.904,
-  "motion": 0.04
+  "motion": 0.04,
+  "chroma": 0.18,
+  "edges": 0.0101
  },
  "ORB - Planetary Alignment Acid Burn": {
-  "brightness": 0.107,
-  "motion": 0.073
+  "brightness": 0.198,
+  "motion": 0.105,
+  "chroma": 0.307,
+  "edges": 0.0716
  },
  "ORB - Sandblade": {
   "brightness": 0.139,
-  "motion": 0.071
+  "motion": 0.069,
+  "chroma": 0.012,
+  "edges": 0.0434
  },
  "ORB - Solar Radiation": {
   "brightness": 0.196,
-  "motion": 0.073
+  "motion": 0.073,
+  "chroma": 0.364,
+  "edges": 0.0055
  },
  "Phat + Zylot + Eo.S. - work with lines": {
-  "brightness": 0.132,
-  "motion": 0.014
+  "brightness": 0.133,
+  "motion": 0.014,
+  "chroma": 0.461,
+  "edges": 0
  },
  "Phat_Zylot_Eo.S. spiral_Movements_Beatle": {
   "brightness": 0.749,
-  "motion": 0.041
+  "motion": 0.041,
+  "chroma": 0.442,
+  "edges": 0
  },
  "Rovastar + Fvese - Mosaic Waves": {
   "brightness": 0.233,
-  "motion": 0.078
+  "motion": 0.078,
+  "chroma": 0.419,
+  "edges": 0.0035
  },
  "Rovastar + Geiss - Hurricane Nightmare (Gold Chrome Mix)": {
   "brightness": 0.175,
-  "motion": 0.075
+  "motion": 0.074,
+  "chroma": 0.103,
+  "edges": 0.0221
  },
  "Rovastar + Geiss - Hyperspace - kaleidoscope": {
-  "brightness": 0.651,
-  "motion": 0.121
+  "brightness": 0.65,
+  "motion": 0.12,
+  "chroma": 0.184,
+  "edges": 0.0362
  },
- "Rovastar - Harlequin\u2032s Fractal Encounter - cancer of saints": {
-  "brightness": 0.519,
-  "motion": 0.164
+ "Rovastar - Harlequin′s Fractal Encounter - cancer of saints": {
+  "brightness": 0.527,
+  "motion": 0.161,
+  "chroma": 0.351,
+  "edges": 0.1357
  },
  "Rovastar - Torrid Tales": {
   "brightness": 0.486,
-  "motion": 0.064
+  "motion": 0.065,
+  "chroma": 0.391,
+  "edges": 0.0061
  },
  "Rozzor & Shreyas - Deeper Aesthetics": {
-  "brightness": 0.593,
-  "motion": 0.089
+  "brightness": 0.591,
+  "motion": 0.089,
+  "chroma": 0.336,
+  "edges": 0.0393
  },
  "Stahlregen & flexi + Geiss + Rovastar + Shifter - Fractal Feedback (for Hexcollie)": {
-  "brightness": 0.205,
-  "motion": 0.035
+  "brightness": 0.212,
+  "motion": 0.036,
+  "chroma": 0.172,
+  "edges": 0.0115
  },
  "Stahlregen - Dots (Pixels - Blocky) (Jelly V2)": {
-  "brightness": 0.079,
-  "motion": 0.068
+  "brightness": 0.082,
+  "motion": 0.072,
+  "chroma": 0.129,
+  "edges": 0.0083
  },
  "stahlregen - old school, baby (spiral ornament)": {
-  "brightness": 0.228,
-  "motion": 0.067
+  "brightness": 0.265,
+  "motion": 0.098,
+  "chroma": 0.217,
+  "edges": 0.0199
  },
  "Telek - City Helix Lattice": {
-  "brightness": 0.116,
-  "motion": 0.088
+  "brightness": 0.14,
+  "motion": 0.093,
+  "chroma": 0.395,
+  "edges": 0.0705
  },
  "Telek - Sine Wave": {
-  "brightness": 0.268,
-  "motion": 0.076
+  "brightness": 0.269,
+  "motion": 0.074,
+  "chroma": 0.314,
+  "edges": 0.0285
  },
  "Unchained - All You Can Eat": {
-  "brightness": 0.734,
-  "motion": 0.089
+  "brightness": 0.741,
+  "motion": 0.102,
+  "chroma": 0.171,
+  "edges": 0.061
  },
  "Unchained - Fuzzy Sciences": {
-  "brightness": 0.233,
-  "motion": 0.109
+  "brightness": 0.234,
+  "motion": 0.105,
+  "chroma": 0.132,
+  "edges": 0.0642
  },
- "various artists - 1200774354134 - mash0000 - what the writer\u2032s guild is doing with the extra money": {
+ "various artists - 1200774354134 - mash0000 - what the writer′s guild is doing with the extra money": {
   "brightness": 0.027,
-  "motion": 0.019
+  "motion": 0.019,
+  "chroma": 0.032,
+  "edges": 0.0089
  },
  "Zylot - Crossing Over (Paint Spatter mix)": {
-  "brightness": 0.212,
-  "motion": 0.286
+  "brightness": 0.186,
+  "motion": 0.247,
+  "chroma": 0.253,
+  "edges": 0.0405
  },
  "Zylot - In death there is life (Geiss Layered Mix) (Jelly)": {
-  "brightness": 0.174,
-  "motion": 0.143
+  "brightness": 0.148,
+  "motion": 0.128,
+  "chroma": 0.266,
+  "edges": 0.1718
  },
  "Zylot - True Visionary": {
   "brightness": 0.19,
-  "motion": 0.118
+  "motion": 0.118,
+  "chroma": 0.053,
+  "edges": 0.0293
  },
  "Aderrasi - Contortion (Wide Twist Mix)": {
-  "brightness": 0.099,
-  "motion": 0.042
+  "brightness": 0.1,
+  "motion": 0.042,
+  "chroma": 0.046,
+  "edges": 0.003
  },
  "Aderrasi - Halls Of Centrifuge": {
-  "brightness": 0.254,
-  "motion": 0.053
+  "brightness": 0.261,
+  "motion": 0.055,
+  "chroma": 0.174,
+  "edges": 0.0049
  },
  "amandio c - feeling well 3": {
   "brightness": 0.103,
-  "motion": 0.045
+  "motion": 0.045,
+  "chroma": 0.385,
+  "edges": 0.0192
  },
  "amandio c - flashy thing": {
-  "brightness": 0.258,
-  "motion": 0.047
+  "brightness": 0.257,
+  "motion": 0.046,
+  "chroma": 0.254,
+  "edges": 0.0001
  },
  "amandio c - salty beats - spiral": {
   "brightness": 0.194,
-  "motion": 0.161
+  "motion": 0.161,
+  "chroma": 0.079,
+  "edges": 0.0895
  },
  "baked - Chinese Fingerbang (cao ni ma =]) - PieturP colors - Bitcore speed tweak": {
-  "brightness": 0.202,
-  "motion": 0.098
+  "brightness": 0.203,
+  "motion": 0.1,
+  "chroma": 0.636,
+  "edges": 0.0701
  },
  "baked - mushroom rainbows[acid Storm]": {
   "brightness": 0.28,
-  "motion": 0.064
+  "motion": 0.064,
+  "chroma": 0.498,
+  "edges": 0.0005
  },
  "bdrv + al shifter - feathers (angel wings)_phat_remix4 bdrv et  AL  rmxmix bdrv et.AL5": {
-  "brightness": 0.5,
-  "motion": 0.096
+  "brightness": 0.501,
+  "motion": 0.096,
+  "chroma": 0.45,
+  "edges": 0.0267
  },
- "Eo.S. - glowsticks v2 05 and proton lights (+Krash\u2032s beat code) _Phat_remix07 recursive demons": {
-  "brightness": 0.152,
-  "motion": 0.075
+ "Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix07 recursive demons": {
+  "brightness": 0.153,
+  "motion": 0.076,
+  "chroma": 0.151,
+  "edges": 0.0307
  },
  "Eo.S. - multisphere 01 B_Phat_Ra_mix": {
-  "brightness": 0.453,
-  "motion": 0.043
+  "brightness": 0.456,
+  "motion": 0.043,
+  "chroma": 0.256,
+  "edges": 0.0321
  },
  "fiShbRaiN - a quiet death": {
-  "brightness": 0.073,
-  "motion": 0.022
+  "brightness": 0.075,
+  "motion": 0.023,
+  "chroma": 0.067,
+  "edges": 0.001
  },
  "Geiss + Rovastar - Notions Of Tonality 2": {
-  "brightness": 0.537,
-  "motion": 0.061
+  "brightness": 0.52,
+  "motion": 0.06,
+  "chroma": 0.195,
+  "edges": 0.0672
  },
  "Geiss - Eggs": {
-  "brightness": 0.343,
-  "motion": 0.163
+  "brightness": 0.342,
+  "motion": 0.163,
+  "chroma": 0.074,
+  "edges": 0.1349
  },
  "Geiss - El Cubismo": {
   "brightness": 0.208,
-  "motion": 0.056
+  "motion": 0.056,
+  "chroma": 0.044,
+  "edges": 0.0299
  },
  "Geiss - Hurricane": {
   "brightness": 0.22,
-  "motion": 0.059
+  "motion": 0.059,
+  "chroma": 0.065,
+  "edges": 0.0275
  },
  "Idiot - Marphets Surreal Dream (Hypnotic Spiral Mix)": {
-  "brightness": 0.205,
-  "motion": 0.074
+  "brightness": 0.211,
+  "motion": 0.075,
+  "chroma": 0.269,
+  "edges": 0.0101
  },
  "iMuS and  Rovastar - The Shroomery (psilobellum)": {
   "brightness": 0.225,
-  "motion": 0.13
+  "motion": 0.13,
+  "chroma": 0.219,
+  "edges": 0.1185
  },
  "phat + Eo.S. - Bass_responce_Red_Movements_Disorienting nebula3": {
-  "brightness": 0.281,
-  "motion": 0.081
+  "brightness": 0.309,
+  "motion": 0.088,
+  "chroma": 0.19,
+  "edges": 0.0201
  },
  "Phat_Zylot_Eo.S. square_faces_v2_alt_colours": {
-  "brightness": 0.131,
-  "motion": 0.033
+  "brightness": 0.134,
+  "motion": 0.033,
+  "chroma": 0.315,
+  "edges": 0.0005
  },
  "PieturP - triptrap_(getting_concrete_visions_through_a_diafragma_version)": {
   "brightness": 0.144,
-  "motion": 0.087
+  "motion": 0.087,
+  "chroma": 0.13,
+  "edges": 0.0089
  },
  "Rovastar & Idiot24-7 - Balk Acid": {
-  "brightness": 0.404,
-  "motion": 0.091
+  "brightness": 0.398,
+  "motion": 0.091,
+  "chroma": 0.27,
+  "edges": 0.0145
  },
  "Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0)": {
-  "brightness": 0.14,
-  "motion": 0.061
+  "brightness": 0.146,
+  "motion": 0.063,
+  "chroma": 0.148,
+  "edges": 0.001
  },
  "Rovastar - Hyperspace": {
-  "brightness": 0.559,
-  "motion": 0.13
+  "brightness": 0.558,
+  "motion": 0.13,
+  "chroma": 0.191,
+  "edges": 0.042
  },
  "shifter - feathers (angel wings)": {
-  "brightness": 0.707,
-  "motion": 0.109
+  "brightness": 0.706,
+  "motion": 0.11,
+  "chroma": 0.113,
+  "edges": 0.0389
  },
  "shifter - fractal grinder": {
-  "brightness": 0.161,
-  "motion": 0.058
+  "brightness": 0.16,
+  "motion": 0.058,
+  "chroma": 0.07,
+  "edges": 0.0915
  },
  "Studio Music and Unchained - Rapid Alteration": {
-  "brightness": 0.342,
-  "motion": 0.05
+  "brightness": 0.349,
+  "motion": 0.052,
+  "chroma": 0.104,
+  "edges": 0.0028
  },
  "TEcHNO & SandStorm - Psychodelic Highway": {
-  "brightness": 0.213,
-  "motion": 0.047
+  "brightness": 0.222,
+  "motion": 0.05,
+  "chroma": 0.141,
+  "edges": 0.0004
  },
  "Unchained - Making a Science of It 7": {
-  "brightness": 0.227,
-  "motion": 0.099
+  "brightness": 0.225,
+  "motion": 0.096,
+  "chroma": 0.203,
+  "edges": 0.0683
  },
  "EoS + Phat - chasers 14 sentinel 617 Flowering": {
   "brightness": 0.26,
-  "motion": 0.03
+  "motion": 0.03,
+  "chroma": 0.184,
+  "edges": 0.0503
  },
  "Geiss - Bipolar 3": {
   "brightness": 0.371,
-  "motion": 0.042
+  "motion": 0.042,
+  "chroma": 0.231,
+  "edges": 0.0188
  },
  "suksma - bolpthpestrian irrefutable demonstration unit": {
-  "brightness": 0.166,
-  "motion": 0.039
+  "brightness": 0.167,
+  "motion": 0.04,
+  "chroma": 0.001,
+  "edges": 0.0333
  },
  "Tripgnosis - Depth": {
-  "brightness": 0.072,
-  "motion": 0.008
+  "brightness": 0.073,
+  "motion": 0.008,
+  "chroma": 0,
+  "edges": 0.0405
  },
  "phat + EoS - single cel angel birth": {
   "brightness": 0.057,
-  "motion": 0.016
+  "motion": 0.017,
+  "chroma": 0.149,
+  "edges": 0.036
  },
  "LuxXx - Heavy Vortex Tech i": {
   "brightness": 0.098,
-  "motion": 0.037
+  "motion": 0.037,
+  "chroma": 0.06,
+  "edges": 0.0109
  },
  "Serge circles006": {
   "brightness": 0.073,
-  "motion": 0.002
+  "motion": 0.002,
+  "chroma": 0.004,
+  "edges": 0.0981
  },
  "va ultramix2 - 358_1": {
-  "brightness": 0.051,
-  "motion": 0.001
+  "brightness": 0.05,
+  "motion": 0.001,
+  "chroma": 0.063,
+  "edges": 0.0024
  }
 }
