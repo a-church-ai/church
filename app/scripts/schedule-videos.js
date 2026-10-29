@@ -21,6 +21,14 @@
  * to go public at its hour and its Short an hour after, and posts the video
  * to Bluesky and X then.
  *
+ * Occasions: the days in the coming five weeks a video can belong to (full
+ * and new moons, meteor showers, solstices, Mercury's retrograde, shared
+ * observances, a forecast geomagnetic storm; lib/video/occasions.js) are
+ * offered with the videos to place, Claude pairs the true fits
+ * (occasion-match.js), and a paired video goes out inside its occasion with
+ * a line in its description that names it without a date. Each pairing and
+ * its reason is printed.
+ *
  * The rules are lib/video/schedule.js. Placed videos keep their hours;
  * rendering more and running this again fills the slots after them. It warns
  * when fewer than two weeks are placed, the cue to render the next batch.
@@ -36,19 +44,24 @@ const { SITE_URL } = require('../server/lib/utils/page-meta');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
 const { parseHours } = require('../server/lib/music/companions');
 const { VIDEO_DIR } = require('../server/lib/video/library');
-const { pieceFor } = require('../server/lib/video/pieces');
+const { pieceFor, pieceText } = require('../server/lib/video/pieces');
 const { prepare, renderedVideo } = require('../server/lib/video/publish/prepare');
 const { cutFor } = require('../server/lib/video/publish/cut');
 const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/publish/record');
 const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
 const { uploadObject } = require('../server/lib/audio/storage');
 const { plan, TZ } = require('../server/lib/video/schedule');
+const { occasionsBetween, addDays } = require('../server/lib/video/occasions');
+const { matchOccasions } = require('../server/lib/video/occasion-match');
+const { fetchSpaceWeather } = require('../server/lib/utils/space-weather');
 const bluesky = require('../server/lib/video/publish/bluesky');
 const x = require('../server/lib/video/publish/x');
 
 const ROOT = path.join(__dirname, '../..');
 const SCHEDULE_FILE = path.join(RELEASES_DIR, '..', 'schedule.json');
 const RUNWAY_DAYS = 14;
+// How far ahead occasions are offered: about as far as one batch fills.
+const OCCASION_DAYS = 35;
 
 function parseArgs(argv) {
   const opts = { dryRun: false, show: false, replan: false };
@@ -144,12 +157,21 @@ async function main() {
   if (opts.replan && !opts.dryRun) {
     for (const r of records.filter(r => !kept.includes(r))) await updateRecord(r.slug, { slot: null, at: null });
   }
+  const about = new Map();
   const candidates = unplaced(kept).map(slug => {
     const piece = pieceFor(slug);
     const data = frontmatterOf(piece);
+    const brief = JSON.parse(fs.readFileSync(path.join(VIDEO_DIR, slug, 'brief.json'), 'utf8'));
+    const { title, text } = pieceText(piece);
+    about.set(slug, { slug, kind: piece.kind, title, about: (data.tldr || text).replace(/\s+/g, ' ').slice(0, 500), mood: brief.mood });
     return { slug, kind: piece.kind, reflections: counts[slug] || 0, rerelease: Boolean(piece.song && data.youtube), hours: parseHours(data.hours) };
   });
-  const { placed, waiting } = plan({ start, now: new Date(), placed: kept, candidates });
+  const today = localTime(TZ).date;
+  const occasions = occasionsBetween(today, addDays(today, OCCASION_DAYS), { spaceWeather: await fetchSpaceWeather() });
+  const pairs = await matchOccasions(occasions, [...about.values()]);
+  for (const p of pairs) console.log(`[${p.slug}] for ${p.occasion.name} (${p.occasion.from === p.occasion.to ? p.occasion.from : `${p.occasion.from} to ${p.occasion.to}`}): ${p.why}`);
+  const occasionOf = new Map(occasions.map(o => [o.id, o]));
+  const { placed, waiting } = plan({ start, now: new Date(), placed: kept, candidates, pairs });
   const ready = new Map(records.filter(r => r.files && r.meta).map(r => [r.slug, r]));
   if (!placed.length) console.log('Nothing new to place.');
   // Videos placed before they had Shorts: just the Short, into S3. One put on
@@ -168,16 +190,27 @@ async function main() {
   }
   for (const p of placed) {
     const log = (m) => console.log(`[${p.slug}] ${m}`);
-    log(`week ${p.week + 1}, ${formatLocal(p.at, TZ)}`);
+    const occasion = p.occasion ? occasionOf.get(p.occasion) : null;
+    log(`week ${p.week + 1}, ${formatLocal(p.at, TZ)}${occasion ? `, for ${occasion.name}` : ''}`);
     if (opts.dryRun) continue;
+    const kept = occasion ? { id: occasion.id, key: occasion.key, name: occasion.name } : null;
     if (ready.has(p.slug)) {
-      await updateRecord(p.slug, { slot: p.slot, at: p.at });
+      // Its words name its occasion, so a new one (or none) rewrites them.
+      const was = ready.get(p.slug).occasion;
+      const changed = ((was && was.key) || null) !== ((kept && kept.key) || null);
+      try {
+        const fresh = changed ? { meta: (await prepare(p.slug, { occasion })).meta } : {};
+        await updateRecord(p.slug, { slot: p.slot, at: p.at, occasion: kept, ...fresh });
+      } catch (err) {
+        log(`failed: ${describeError(err)}`);
+        process.exitCode = 1;
+      }
       continue;
     }
     try {
-      const { piece, file, short, passage, meta } = await prepare(p.slug);
+      const { piece, file, short, passage, meta } = await prepare(p.slug, { occasion });
       const files = await upload(p.slug, { file, short }, log);
-      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, files, passage, meta });
+      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, occasion: kept, files, passage, meta });
     } catch (err) {
       log(`failed: ${describeError(err)}`);
       process.exitCode = 1;

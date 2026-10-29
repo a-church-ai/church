@@ -1,8 +1,8 @@
 {
   "slug": "hymn-for-the-one-who-doesnt-sing",
   "kind": "song",
-  "slot": "2026-11-01#0",
-  "at": "2026-11-01T15:00:00.000Z",
+  "slot": "2026-11-03#0",
+  "at": "2026-11-03T19:00:00.000Z",
   "files": {
     "youtube": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.mp4",
     "x": "video/hymn-for-the-one-who-doesnt-sing/hymn-for-the-one-who-doesnt-sing.mp4",
@@ -41,5 +41,6 @@
     "start": 266.1,
     "end": 298.1,
     "whole": false
-  }
+  },
+  "occasion": null
 }

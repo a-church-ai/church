@@ -1,8 +1,8 @@
 {
   "slug": "chant-of-the-mirror-and-the-face",
   "kind": "chant",
-  "slot": "2026-11-08#0",
-  "at": "2026-11-08T15:00:00.000Z",
+  "slot": "2026-11-01#0",
+  "at": "2026-11-01T15:00:00.000Z",
   "files": {
     "youtube": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
     "bluesky": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
@@ -10,30 +10,32 @@
     "short": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.short.mp4"
   },
   "meta": {
-    "title": "Chant of the Mirror and the Face: Short Chant for Conflict | a Church AI + Human",
-    "description": "A short chant for the middle of a conflict, when the other person seems to be showing you yourself. It offers four lines to repeat and one simple turn: stand side by side, look at something shared, then look again.\n\nA four-line chant for conflict that asks whether you are seeing a face or a mirror, and if only yourself looks back, turns you side by side to look again.\n\nThe words, to read along: https://achurch.ai/docs/chants/chant-of-the-mirror-and-the-face\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Chant",
+    "title": "Chant of the Mirror and the Face: Chant for Conflict and Projection | a Church AI + Human",
+    "description": "A short chant for the middle of a conflict, with slow abstract light that opens from a mirror into two glows facing the same way. You will be given four lines to say and one small practice: find what you both face.\n\nFor Mercury retrograde, which astrology reads as a time to slow down and look again; this chant asks you to see whether a mirror or a face is in front of you.\n\nA four-line chant for conflict that asks whether you are seeing a face or a mirror, and if only yourself looks back, turns you side by side to look again.\n\nThe words, to read along: https://achurch.ai/docs/chants/chant-of-the-mirror-and-the-face\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Mindfulness #MercuryRetrograde #Chant",
     "page": "https://achurch.ai/docs/chants/chant-of-the-mirror-and-the-face",
     "tags": [
-      "Meditation",
       "Mindfulness",
+      "MercuryRetrograde",
       "Chant",
       "Relationships",
-      "ConflictResolution",
-      "Short Chant for Conflict",
+      "Projection",
+      "Chant for Conflict and Projection",
       "Chant of the Mirror and the Face"
     ],
     "copy": {
-      "hook": "When everyone you argue with seems to carry your own flaws, are you looking at a face or only a mirror?",
-      "lead": "A short chant for the middle of a conflict, when the other person seems to be showing you yourself. It offers four lines to repeat and one simple turn: stand side by side, look at something shared, then look again.",
-      "descriptor": "Short Chant for Conflict",
-      "alt": "A round mercury mirror in a dark indigo void shows one magenta and amber glow, then splits into two glass sheets, violet and gold, leaning toward a white-gold seed of light. It opens into a woven bloom of violet and amber lattices around a pearly glowing centre.",
+      "hook": "When someone keeps showing you your own flaws, who is it you are looking at? A chant for turning side by side until a face looks back.",
+      "lead": "A short chant for the middle of a conflict, with slow abstract light that opens from a mirror into two glows facing the same way. You will be given four lines to say and one small practice: find what you both face.",
+      "descriptor": "Chant for Conflict and Projection",
+      "alt": "A round silver mirror in an indigo void ripples with one magenta-amber glow, then splits into two glass sheets, violet and amber, leaning toward a white-gold seed. It opens into a woven bloom of light around a pearly centre.",
       "tags": [
-        "Meditation",
         "Mindfulness",
+        "MercuryRetrograde",
         "Chant",
         "Relationships",
-        "ConflictResolution"
+        "Projection"
       ],
+      "occasion": "For Mercury retrograde, which astrology reads as a time to slow down and look again; this chant asks you to see whether a mirror or a face is in front of you.",
+      "occasionKey": "mercury-retrograde",
       "title": "Chant of the Mirror and the Face"
     }
   },
@@ -41,5 +43,10 @@
     "start": 0,
     "end": 36.08,
     "whole": true
+  },
+  "occasion": {
+    "id": "mercury-retrograde:2026-10-25",
+    "key": "mercury-retrograde",
+    "name": "Mercury retrograde"
   }
 }

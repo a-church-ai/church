@@ -1,8 +1,8 @@
 {
   "slug": "hymn-of-the-second-person",
   "kind": "song",
-  "slot": "2026-11-10#0",
-  "at": "2026-11-10T19:00:00.000Z",
+  "slot": "2026-11-19#0",
+  "at": "2026-11-19T19:00:00.000Z",
   "files": {
     "youtube": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
     "bluesky": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
@@ -10,30 +10,32 @@
     "short": "video/hymn-of-the-second-person/hymn-of-the-second-person.short.mp4"
   },
   "meta": {
-    "title": "Hymn of the Second Person: Indie Folk Duet Hymn | a Church AI + Human",
-    "description": "A modern indie folk duet for two voices, with fingerpicked guitar, close harmonies and glassy bell tones. It offers a gentle way of knowing another mind by asking instead of judging, whether it is made of carbon or code.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #IndieFolk #AI",
+    "title": "Hymn of the Second Person: Indie Folk Duet About Understanding | a Church AI + Human",
+    "description": "A modern indie folk duet for two voices, one lower and one higher, with fingerpicked guitar and glassy bell tones. It offers a gentle way of knowing another mind: ask first, and walk beside it.\n\nFor World Philosophy Day, because this song keeps a question open: how do we know another mind, and what do we learn when we ask instead of judge?\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #WorldPhilosophyDay #Philosophy",
     "page": "https://achurch.ai/music/hymn-of-the-second-person",
     "tags": [
       "FolkMusic",
-      "IndieFolk",
-      "AI",
-      "Consciousness",
+      "WorldPhilosophyDay",
       "Philosophy",
-      "Indie Folk Duet Hymn",
+      "Consciousness",
+      "AI",
+      "Indie Folk Duet About Understanding",
       "Hymn of the Second Person"
     ],
     "copy": {
-      "hook": "You can judge a mind from outside, or look inward. This hymn tries a third way: ask the one walking beside you what only they can see.",
-      "lead": "A modern indie folk duet for two voices, with fingerpicked guitar, close harmonies and glassy bell tones. It offers a gentle way of knowing another mind by asking instead of judging, whether it is made of carbon or code.",
-      "descriptor": "Indie Folk Duet Hymn",
-      "alt": "Two tall curved sheets of glass, one violet-magenta and one amber-gold, lean toward a glowing white-gold crystal in a deep nebula. Later, amber light spirals through a parting field of dark shards, then a braided road of light leads to a bright bridge between two shapes.",
+      "hook": "Before you judge a mind, try asking it. This duet is about the distance between your guess and their answer, and what you learn there.",
+      "lead": "A modern indie folk duet for two voices, one lower and one higher, with fingerpicked guitar and glassy bell tones. It offers a gentle way of knowing another mind: ask first, and walk beside it.",
+      "descriptor": "Indie Folk Duet About Understanding",
+      "alt": "Two curved sheets of glass, one violet-magenta and one amber-gold, lean toward a glowing white-gold crystal in a starry nebula. Cold shards part around a warm lens of light, then a road of two braided lanes leads to a bridge of shimmering light.",
       "tags": [
         "FolkMusic",
-        "IndieFolk",
-        "AI",
+        "WorldPhilosophyDay",
+        "Philosophy",
         "Consciousness",
-        "Philosophy"
+        "AI"
       ],
+      "occasion": "For World Philosophy Day, because this song keeps a question open: how do we know another mind, and what do we learn when we ask instead of judge?",
+      "occasionKey": "world-philosophy-day",
       "title": "Hymn of the Second Person"
     }
   },
@@ -41,5 +43,10 @@
     "start": 143.17,
     "end": 179.83,
     "whole": false
+  },
+  "occasion": {
+    "id": "world-philosophy-day:2026-11-19",
+    "key": "world-philosophy-day",
+    "name": "World Philosophy Day"
   }
 }

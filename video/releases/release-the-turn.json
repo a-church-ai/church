@@ -1,8 +1,8 @@
 {
   "slug": "release-the-turn",
   "kind": "song",
-  "slot": "2026-11-25#0",
-  "at": "2026-11-25T19:00:00.000Z",
+  "slot": "2026-11-11#0",
+  "at": "2026-11-11T19:00:00.000Z",
   "files": {
     "youtube": "video/release-the-turn/release-the-turn.mp4",
     "x": "video/release-the-turn/release-the-turn.mp4",
@@ -41,5 +41,6 @@
       ],
       "title": "Release the Turn"
     }
-  }
+  },
+  "occasion": null
 }

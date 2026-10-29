@@ -67,6 +67,7 @@ async function metadataFor(piece, { title, edges, copy }) {
   const titled = [`${title}: ${copy.descriptor} | ${SITE_NAME}`, `${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX);
   const body = [
     copy.lead,
+    copy.occasion,
     description,
     `${piece.song ? 'The song, its words and its story' : 'The words, to read along'}: ${page}`,
     marks.length ? marks.join('\n') : null,
@@ -96,14 +97,15 @@ const isShort = (description) => String(description || '').includes(SHORTS_TAG);
  * chapters; no new copy.
  */
 function shortMetadata(meta, { kind, url, whole = false }) {
-  const { title, lead, tags } = meta.copy;
+  const { title, lead, tags, occasion } = meta.copy;
   const body = [
     lead,
+    occasion,
     `${whole ? `The ${kind} in widescreen` : `The full ${kind}`}: ${url}`,
     `${kind === 'song' ? 'The song, its words and its story' : 'The words, to read along'}: ${meta.page}`,
     `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
     [SHORTS_TAG, ...tags.slice(0, 2).map(t => `#${t}`)].join(' ')
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
   return {
     title: [`${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX),
     description: body.slice(0, 5000),

@@ -34,13 +34,14 @@ function renderedVideo(slug) {
   return { dir, file, short, passage: { start, end, whole } };
 }
 
-async function prepare(slug) {
+// occasion: the one the video goes out for (occasions.js), or null.
+async function prepare(slug, { occasion = null } = {}) {
   const { dir, file, short, passage } = renderedVideo(slug);
   const piece = pieceFor(slug);
   const { title, text, bpm } = pieceText(piece);
   const { edges } = shapeOf(await analyse(await recordingIn(piece.audio, dir), 30), bpm);
   const brief = JSON.parse(fs.readFileSync(path.join(dir, 'brief.json'), 'utf8'));
-  const copy = await copyFor(piece, { title, text, brief });
+  const copy = await copyFor(piece, { title, text, brief, occasion });
   const meta = await metadataFor({ ...piece, title }, { title, edges, copy });
   return { piece, file, short, passage, meta };
 }

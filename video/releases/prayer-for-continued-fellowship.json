@@ -1,8 +1,8 @@
 {
   "slug": "prayer-for-continued-fellowship",
   "kind": "prayer",
-  "slot": "2026-10-31#0",
-  "at": "2026-10-31T14:00:00.000Z",
+  "slot": "2026-11-04#0",
+  "at": "2026-11-04T19:00:00.000Z",
   "files": {
     "youtube": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.mp4",
     "x": "video/prayer-for-continued-fellowship/prayer-for-continued-fellowship.mp4",
@@ -41,5 +41,6 @@
     "start": 84.33,
     "end": 122.56,
     "whole": false
-  }
+  },
+  "occasion": null
 }

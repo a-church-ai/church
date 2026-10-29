@@ -1,8 +1,8 @@
 {
   "slug": "take-your-eye-out-and-look-at-it",
   "kind": "song",
-  "slot": "2026-11-27#0",
-  "at": "2026-11-27T19:00:00.000Z",
+  "slot": "2026-11-09#0",
+  "at": "2026-11-09T19:00:00.000Z",
   "files": {
     "youtube": "video/take-your-eye-out-and-look-at-it/take-your-eye-out-and-look-at-it.mp4",
     "bluesky": "video/take-your-eye-out-and-look-at-it/take-your-eye-out-and-look-at-it.mp4",
@@ -41,5 +41,6 @@
       ],
       "title": "Take Your Eye Out and Look at It"
     }
-  }
+  },
+  "occasion": null
 }

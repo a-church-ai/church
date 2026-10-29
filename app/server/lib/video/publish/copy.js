@@ -18,6 +18,12 @@
  *   (three or more read as spam), Bluesky keeps all five in the post's tags
  *   field, YouTube shows three above the title.
  * - Alt text describes what is seen, not what the piece is about.
+ * - A video going out for an occasion (occasions.js) has an occasion line:
+ *   one sentence beginning "For", with no date, month, weekday or year, so it
+ *   is true again whenever the occasion returns; one for astrology names
+ *   astrology as the one reading it, never claiming an effect. The
+ *   occasion's tag is one of the first two, the ones every platform shows.
+ *   The copy is written again when the occasion changes.
  */
 
 const fs = require('fs');
@@ -39,7 +45,11 @@ Return only JSON:
   "tags": ["five hashtags without the #, in PascalCase, best first: lead with broad categories a stranger browses (Meditation, AmbientMusic, SpokenWord, Consciousness, Mindfulness, Prayer, AI, Philosophy, Downtempo, FolkMusic), then what is specific to this piece. Never the sanctuary's name or a brand. Each must truly describe this piece."]
 }`;
 
-function check(raw) {
+const MONTHS = /\b(january|february|march|april|may|june|july|august|september|october|november|december|monday|tuesday|wednesday|thursday|friday|saturday|sunday|tonight|today|tomorrow|this (week|year|month))\b/i;
+// Months that also name a solstice or equinox ("the June solstice") are kept.
+const SEASONAL = /\b(march|june|september|december) (solstice|equinox)\b/gi;
+
+function check(raw, occasion = null) {
   let copy;
   try {
     copy = parseJSON(raw);
@@ -65,7 +75,15 @@ function check(raw) {
     if (/^shorts?$/i.test(t)) problems.push(`the tag "${t}" is YouTube's mark for a Short; a full video never carries it`);
   });
   if (new Set(tags.map(t => t.toLowerCase())).size !== tags.length) problems.push('the tags repeat');
-  return { value: { ...copy, tags }, problems, shown: raw };
+  if (occasion) {
+    const line = String(copy.occasion || '');
+    plain('occasion', 160);
+    if (line && !/^For /.test(line)) problems.push('occasion must begin with "For"');
+    if (/\d/.test(line) || MONTHS.test(line.replace(SEASONAL, ''))) problems.push('occasion must hold no date, month, weekday, year or "tonight": it should stay true whenever the occasion returns');
+    if (occasion.kind === 'astrology' && !/astrolog/i.test(line)) problems.push('occasion must say it is astrology that reads this time so, not claim an effect');
+    if (!tags.slice(0, 2).some(t => t.toLowerCase() === occasion.tag.toLowerCase())) problems.push(`the tag "${occasion.tag}" must be one of the first two`);
+  }
+  return { value: { ...copy, tags, ...(occasion ? { occasionKey: occasion.key } : {}) }, problems, shown: raw };
 }
 
 /**
@@ -73,9 +91,12 @@ function check(raw) {
  * alt, tags }. brief is the video's brief (its mood and stills describe
  * what is seen).
  */
-async function copyFor(piece, { title, text, brief }) {
+async function copyFor(piece, { title, text, brief, occasion = null }) {
   const file = path.join(VIDEO_DIR, piece.slug, 'copy.json');
-  if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (fs.existsSync(file)) {
+    const kept = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if ((kept.occasionKey || null) === (occasion ? occasion.key : null)) return kept;
+  }
   const request = `Kind: ${piece.kind}
 Title: ${title}
 
@@ -85,12 +106,14 @@ ${text}
 """
 
 What the video shows, movement by movement (its brief): ${brief.mood}
-${brief.movements.map((m, i) => `${i + 1}. ${m.still}`).join('\n')}`;
+${brief.movements.map((m, i) => `${i + 1}. ${m.still}`).join('\n')}${occasion ? `
+
+It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}${occasion.kind === 'astrology' ? ', naming astrology as the one that reads it so (what astrology reads in it, never that the planet does anything)' : ''}, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.` : ''}`;
   const copy = await askChecked({
     label: 'copy',
     tries: 3,
     attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 1500 }),
-    check
+    check: (raw) => check(raw, occasion)
   });
   fs.writeFileSync(file, JSON.stringify(copy, null, 2));
   return copy;

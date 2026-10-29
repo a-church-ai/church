@@ -1,0 +1,161 @@
+/**
+ * Occasions: days a video can belong to, so it goes out when it means
+ * something (schedule.js, occasion-match.js). The plan is
+ * video-occasions-2026-10-29.md in the private repo.
+ *
+ * Each says what it is in words without a date (`for`), since most come back
+ * (moons every month, Mercury's retrograde three times a year, showers,
+ * solstices and observances every year, storms with the sun's cycle), and a
+ * video's description should be true again each time.
+ *
+ * What each says stays honest about what it is. The moon lights the night and
+ * drives the tides; a shower and an eclipse are where orbits put them. Space
+ * weather acts on the Earth in measured ways (aurora, satellites, radio and
+ * power grids, regional weather; utils/space-weather.js gives the sources),
+ * and may be said to. Mercury's retrograde is an astronomical fact, its
+ * apparent backward drift against the stars as Earth overtakes it; what it
+ * means is astrology's reading, named as astrology's and never claimed as an
+ * effect. Observances are the few shared across traditions, not one faith's
+ * holy days.
+ *
+ * Pure: the sky from astronomy-engine and the tables in utils/, offline. Space
+ * weather is a forecast fetched by the caller and passed in.
+ */
+
+const Astronomy = require('astronomy-engine');
+const { turningPoints } = require('../utils/seasons');
+const { scaleOf } = require('../utils/space-weather');
+const ECLIPSES = require('../utils/eclipses.json');
+
+const DAY = 86400000;
+const dayOf = (date) => Date.parse(`${date}T00:00:00Z`);
+const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+const addDays = (date, n) => isoDay(dayOf(date) + n * DAY);
+
+// The occasions that recur, by key: how they are named, said and tagged.
+// `night` puts a video in the evening; `limit` is how many videos one
+// instance may hold (a retrograde lasts three weeks).
+const KINDS = {
+  'full-moon': { kind: 'sky', name: 'the full moon', for: 'the nights of a full moon', meaning: 'the moon whole and bright all night, the month\'s highest tides', tag: 'FullMoon', night: true },
+  'new-moon': { kind: 'sky', name: 'the new moon', for: 'the dark of a new moon', meaning: 'the moon unseen between the sun and the Earth, the darkest skies of the month, and a beginning', tag: 'NewMoon', night: true },
+  'meteor-shower': { kind: 'sky', name: 'a meteor shower', for: 'the nights of a meteor shower', meaning: 'Earth passing through a comet\'s old trail, its dust burning as streaks of light', tag: 'MeteorShower', night: true },
+  'solar-eclipse': { kind: 'sky', name: 'a solar eclipse', for: 'the day the moon crosses the sun', meaning: 'the moon passing in front of the sun, daylight dimming where its shadow falls', tag: 'SolarEclipse', night: false },
+  'lunar-eclipse': { kind: 'sky', name: 'a lunar eclipse', for: 'the night the Earth\'s shadow crosses the moon', meaning: 'the moon passing through the Earth\'s shadow, turning dim and red', tag: 'LunarEclipse', night: true },
+  'june-solstice': { kind: 'season', name: 'the June solstice', for: 'the June solstice, the longest day in the north and the longest night in the south', meaning: 'the sun at its farthest north, a turning of the year in both hemispheres', tag: 'Solstice', night: false },
+  'december-solstice': { kind: 'season', name: 'the December solstice', for: 'the December solstice, the longest night in the north and the longest day in the south', meaning: 'the sun at its farthest south, a turning of the year in both hemispheres', tag: 'WinterSolstice', night: true },
+  'march-equinox': { kind: 'season', name: 'the March equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, spring beginning in the north and autumn in the south', tag: 'Equinox', night: false },
+  'september-equinox': { kind: 'season', name: 'the September equinox', for: 'an equinox, when day and night are nearly equal everywhere', meaning: 'the sun over the equator, autumn beginning in the north and spring in the south', tag: 'Equinox', night: false },
+  'mercury-retrograde': { kind: 'astrology', name: 'Mercury retrograde', for: 'a Mercury retrograde', meaning: 'Mercury seeming to drift backward against the stars as the Earth passes it; astrology reads it as a time to slow down, reread, and return to what was left unfinished or unsaid', tag: 'MercuryRetrograde', night: false, limit: 2 },
+  aurora: { kind: 'space-weather', name: 'a geomagnetic storm', for: 'the nights a geomagnetic storm carries the aurora farther from the poles than usual', meaning: 'a storm from the sun reaching the Earth\'s magnetic field: aurora seen far from the poles, and satellites, radio and power grids disturbed', tag: 'Aurora', night: true },
+  'world-mental-health-day': { kind: 'observance', name: 'World Mental Health Day', for: 'World Mental Health Day', meaning: 'a day kept worldwide for mental health and those who carry its weight', tag: 'WorldMentalHealthDay', night: false },
+  'world-kindness-day': { kind: 'observance', name: 'World Kindness Day', for: 'World Kindness Day', meaning: 'a day kept worldwide for kindness', tag: 'WorldKindnessDay', night: false },
+  'world-philosophy-day': { kind: 'observance', name: 'World Philosophy Day', for: 'World Philosophy Day', meaning: 'UNESCO\'s day for philosophy and the questions it keeps open', tag: 'WorldPhilosophyDay', night: false },
+  thanksgiving: { kind: 'observance', name: 'Thanksgiving in the United States', for: 'a day of giving thanks', meaning: 'a day kept in the United States for gratitude and gathering', tag: 'Gratitude', night: false },
+  'human-rights-day': { kind: 'observance', name: 'Human Rights Day', for: 'Human Rights Day', meaning: 'the day the Universal Declaration of Human Rights was adopted, kept for the dignity of every person', tag: 'HumanRightsDay', night: false },
+  'new-year': { kind: 'observance', name: 'the new year', for: 'the first day of a new year', meaning: 'a beginning kept across most of the world', tag: 'NewYear', night: false },
+  'day-of-peace': { kind: 'observance', name: 'the International Day of Peace', for: 'the International Day of Peace', meaning: 'the United Nations\' day for peace', tag: 'PeaceDay', night: false },
+  'earth-day': { kind: 'observance', name: 'Earth Day', for: 'Earth Day', meaning: 'a day kept worldwide for the planet', tag: 'EarthDay', night: false }
+};
+
+// Observances by month and day, or by the nth weekday of a month.
+const OBSERVANCES = [
+  { key: 'new-year', month: 1, day: 1 },
+  { key: 'earth-day', month: 4, day: 22 },
+  { key: 'day-of-peace', month: 9, day: 21 },
+  { key: 'world-mental-health-day', month: 10, day: 10 },
+  { key: 'world-kindness-day', month: 11, day: 13 },
+  { key: 'world-philosophy-day', month: 11, weekday: 4, nth: 3 },
+  { key: 'thanksgiving', month: 11, weekday: 4, nth: 4 },
+  { key: 'human-rights-day', month: 12, day: 10 }
+];
+
+function observanceDate(o, year) {
+  if (o.day) return `${year}-${String(o.month).padStart(2, '0')}-${String(o.day).padStart(2, '0')}`;
+  const first = new Date(Date.UTC(year, o.month - 1, 1));
+  const offset = (o.weekday - first.getUTCDay() + 7) % 7;
+  return isoDay(first.getTime() + (offset + (o.nth - 1) * 7) * DAY);
+}
+
+const SHOWERS = [
+  { name: 'Quadrantids', peak: '01-04' }, { name: 'Lyrids', peak: '04-22' }, { name: 'Eta Aquariids', peak: '05-06' },
+  { name: 'Perseids', peak: '08-12' }, { name: 'Orionids', peak: '10-21' }, { name: 'Leonids', peak: '11-17' },
+  { name: 'Geminids', peak: '12-14' }, { name: 'Ursids', peak: '12-22' }
+];
+
+const occasion = (key, from, to = from, extra = {}) => {
+  const k = KINDS[key];
+  return { id: `${key}:${from}`, key, kind: k.kind, name: extra.name || k.name, from, to, for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, night: k.night, limit: k.limit || 1 };
+};
+
+function moons(from, to) {
+  const out = [];
+  for (const [key, angle] of [['new-moon', 0], ['full-moon', 180]]) {
+    let t = new Date(dayOf(from) - DAY);
+    for (;;) {
+      const found = Astronomy.SearchMoonPhase(angle, t, 40);
+      const date = isoDay(found.date.getTime());
+      if (date > to) break;
+      if (date >= from) out.push(occasion(key, date));
+      t = new Date(found.date.getTime() + DAY);
+    }
+  }
+  return out;
+}
+
+// Mercury's retrogrades: the days its apparent longitude, seen from the
+// Earth, runs backward.
+function retrogrades(from, to) {
+  const lon = (ms) => Astronomy.Ecliptic(Astronomy.GeoVector('Mercury', new Date(ms), true)).elon;
+  const spans = [];
+  let start = null;
+  // From a month before, to find a retrograde already under way.
+  let prev = lon(dayOf(from) - 31 * DAY);
+  for (let ms = dayOf(from) - 30 * DAY; ms <= dayOf(to) + 30 * DAY; ms += DAY) {
+    const l = lon(ms);
+    let d = l - prev;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    if (d < 0 && start === null) start = isoDay(ms);
+    if (d >= 0 && start !== null) {
+      spans.push([start, isoDay(ms - DAY)]);
+      start = null;
+    }
+    prev = l;
+  }
+  return spans.filter(([a, b]) => b >= from && a <= to).map(([a, b]) => occasion('mercury-retrograde', a, b));
+}
+
+function yearly(from, to) {
+  const out = [];
+  const years = [];
+  for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) years.push(y);
+  for (const y of years) {
+    for (const o of OBSERVANCES) out.push(occasion(o.key, observanceDate(o, y)));
+    for (const s of SHOWERS) out.push(occasion('meteor-shower', `${y}-${s.peak}`, `${y}-${s.peak}`, { name: `the ${s.name}`, tag: s.name.replace(/\s+/g, '') }));
+    const turns = turningPoints(y);
+    for (const [k, key] of [['march', 'march-equinox'], ['june', 'june-solstice'], ['september', 'september-equinox'], ['december', 'december-solstice']]) {
+      out.push(occasion(key, isoDay(turns[k].getTime())));
+    }
+  }
+  for (const e of ECLIPSES) out.push(occasion(e.kind === 'solar' ? 'solar-eclipse' : 'lunar-eclipse', e.date, e.date, { name: `a ${e.type} ${e.kind} eclipse` }));
+  return out.filter(o => o.from >= from && o.from <= to);
+}
+
+// Days the forecast puts at G3 or stronger, from fetchSpaceWeather's result.
+function storms(spaceWeather, from, to) {
+  if (!spaceWeather || !spaceWeather.kp) return [];
+  return Object.entries(spaceWeather.kp)
+    .filter(([date, kp]) => date >= from && date <= to && /^G[345]$/.test(scaleOf(kp) || ''))
+    .map(([date, kp]) => occasion('aurora', date, date, { name: `a ${scaleOf(kp)} geomagnetic storm` }));
+}
+
+/**
+ * The occasions that touch the days from `from` to `to` (YYYY-MM-DD), in
+ * order: { id, key, kind, name, from, to, for, meaning, tag, night, limit }.
+ */
+function occasionsBetween(from, to, { spaceWeather = null } = {}) {
+  return [...moons(from, to), ...retrogrades(from, to), ...yearly(from, to), ...storms(spaceWeather, from, to)]
+    .sort((a, b) => a.from.localeCompare(b.from) || a.id.localeCompare(b.id));
+}
+
+module.exports = { occasionsBetween, observanceDate, addDays, KINDS };

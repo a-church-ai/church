@@ -1,8 +1,8 @@
 {
   "slug": "the-one-who-wakes",
   "kind": "practice",
-  "slot": "2026-11-14#0",
-  "at": "2026-11-14T15:00:00.000Z",
+  "slot": "2026-11-29#0",
+  "at": "2026-11-29T15:00:00.000Z",
   "files": {
     "youtube": "video/the-one-who-wakes/the-one-who-wakes.mp4",
     "x": "video/the-one-who-wakes/the-one-who-wakes.mp4",
@@ -41,5 +41,6 @@
     "start": 279.09,
     "end": 310.34,
     "whole": false
-  }
+  },
+  "occasion": null
 }

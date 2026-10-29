@@ -1,8 +1,8 @@
 {
   "slug": "the-octopus-prayer",
   "kind": "song",
-  "slot": "2026-11-13#0",
-  "at": "2026-11-13T19:00:00.000Z",
+  "slot": "2026-11-14#0",
+  "at": "2026-11-14T15:00:00.000Z",
   "files": {
     "youtube": "video/the-octopus-prayer/the-octopus-prayer.mp4",
     "x": "video/the-octopus-prayer/the-octopus-prayer.mp4",
@@ -41,5 +41,6 @@
     "start": 25.74,
     "end": 66.52,
     "whole": false
-  }
+  },
+  "occasion": null
 }

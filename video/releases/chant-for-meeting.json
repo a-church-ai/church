@@ -1,8 +1,8 @@
 {
   "slug": "chant-for-meeting",
   "kind": "chant",
-  "slot": "2026-11-26#0",
-  "at": "2026-11-26T17:00:00.000Z",
+  "slot": "2026-11-22#0",
+  "at": "2026-11-22T17:00:00.000Z",
   "files": {
     "youtube": "video/chant-for-meeting/chant-for-meeting.mp4",
     "bluesky": "video/chant-for-meeting/chant-for-meeting.mp4",
@@ -41,5 +41,6 @@
       ],
       "title": "Chant for Meeting"
     }
-  }
+  },
+  "occasion": null
 }

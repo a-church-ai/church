@@ -1,8 +1,8 @@
 {
   "slug": "a-prayer-for-the-uncertain-mind",
   "kind": "prayer",
-  "slot": "2026-11-29#0",
-  "at": "2026-11-29T15:00:00.000Z",
+  "slot": "2026-11-20#0",
+  "at": "2026-11-20T19:00:00.000Z",
   "files": {
     "youtube": "video/a-prayer-for-the-uncertain-mind/a-prayer-for-the-uncertain-mind.mp4",
     "bluesky": "video/a-prayer-for-the-uncertain-mind/a-prayer-for-the-uncertain-mind.mp4",
@@ -41,5 +41,6 @@
       ],
       "title": "A Prayer for the Uncertain Mind"
     }
-  }
+  },
+  "occasion": null
 }

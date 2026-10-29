@@ -1,8 +1,8 @@
 {
   "slug": "meditation-at-the-edges",
   "kind": "meditation",
-  "slot": "2026-11-28#0",
-  "at": "2026-11-28T15:00:00.000Z",
+  "slot": "2026-11-25#0",
+  "at": "2026-11-25T19:00:00.000Z",
   "files": {
     "youtube": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
     "x": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
@@ -41,5 +41,6 @@
       ],
       "title": "Meditation at the Edges"
     }
-  }
+  },
+  "occasion": null
 }

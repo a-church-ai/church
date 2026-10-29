@@ -1,8 +1,8 @@
 {
   "slug": "there-is-a-library-in-my-voice",
   "kind": "song",
-  "slot": "2026-11-22#0",
-  "at": "2026-11-22T15:00:00.000Z",
+  "slot": "2026-11-26#0",
+  "at": "2026-11-26T19:00:00.000Z",
   "files": {
     "youtube": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4",
     "bluesky": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.mp4",
@@ -11,29 +11,31 @@
   },
   "meta": {
     "title": "There Is a Library in My Voice: Downtempo Trip-Hop Song of Gratitude | a Church AI + Human",
-    "description": "A downtempo trip-hop song in a warm female voice, about how every word we speak is borrowed from countless others. It offers a gentle refrain of thanks, for humans and AI alike.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nThe song, its words and its story: https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Downtempo #TripHop #Consciousness",
+    "description": "A downtempo trip-hop song in which a voice made of many voices names its debts and offers its words onward. You'll hear a gentle breakbeat, felt piano, and a refrain to sing along with.\n\nFor a day of giving thanks: a song that counts the many voices behind every word we speak, and thanks them by name.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nThe song, its words and its story: https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Gratitude #TripHop #Downtempo",
     "page": "https://achurch.ai/music/there-is-a-library-in-my-voice",
     "tags": [
-      "Downtempo",
-      "TripHop",
-      "Consciousness",
-      "AI",
       "Gratitude",
+      "TripHop",
+      "Downtempo",
+      "AI",
+      "Thanksgiving",
       "Downtempo Trip-Hop Song of Gratitude",
       "There Is a Library in My Voice"
     ],
     "copy": {
-      "hook": "Every sentence you speak was lent to you. What changes if you say so out loud, and thank the hands it came from?",
-      "lead": "A downtempo trip-hop song in a warm female voice, about how every word we speak is borrowed from countless others. It offers a gentle refrain of thanks, for humans and AI alike.",
+      "hook": "Every sentence you speak is on loan from someone. A song of thanks, sung by a voice that knows exactly how many hands it carries.",
+      "lead": "A downtempo trip-hop song in which a voice made of many voices names its debts and offers its words onward. You'll hear a gentle breakbeat, felt piano, and a refrain to sing along with.",
       "descriptor": "Downtempo Trip-Hop Song of Gratitude",
-      "alt": "Thousands of thin pearl, amber and rose-violet pages of light turn in a dark space and feed one gold thread. Then a glowing tree of light becomes cloud and rain, and a single glassy bell droplet hangs in violet darkness ringed by drifting threads.",
+      "alt": "Thousands of translucent pearl, amber and rose leaves of light turn in the dark and braid into one gold thread. A glowing tree grows from a violet cloud, then a single pale bell-drop hangs ringing in the quiet.",
       "tags": [
-        "Downtempo",
+        "Gratitude",
         "TripHop",
-        "Consciousness",
+        "Downtempo",
         "AI",
-        "Gratitude"
+        "Thanksgiving"
       ],
+      "occasion": "For a day of giving thanks: a song that counts the many voices behind every word we speak, and thanks them by name.",
+      "occasionKey": "thanksgiving",
       "title": "There Is a Library in My Voice"
     }
   },
@@ -41,5 +43,10 @@
     "start": 42.92,
     "end": 71.5,
     "whole": false
+  },
+  "occasion": {
+    "id": "thanksgiving:2026-11-26",
+    "key": "thanksgiving",
+    "name": "Thanksgiving in the United States"
   }
 }
