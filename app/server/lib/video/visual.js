@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 const { chromium } = require('playwright-core');
+const { lookOf, DEFAULT_STYLE } = require('./looks');
 
 // The layers' size for a full video; a Short's are drawn upright at 720x1280.
 const LANDSCAPE = { width: 1280, height: 720 };
@@ -51,7 +52,7 @@ function encoder(file, fps) {
 }
 
 // Runs in the page.
-function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges, from }) {
+function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, edges, from }) {
   const bc = window.butterchurn.default || window.butterchurn;
   const all = {};
   for (const pack of packs) {
@@ -83,16 +84,16 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges, from }
 
     // Mandala: fade the last frame for trails, then draw this one additively.
     g.globalCompositeOperation = 'source-over';
-    g.fillStyle = 'rgba(0,0,0,0.16)';
+    g.fillStyle = `rgba(0,0,0,${style.fade})`;
     g.fillRect(0, 0, W, H);
     g.globalCompositeOperation = 'lighter';
     const { bands, loud } = spectrum;
     const cx = W / 2, cy = H / 2, k = symmetry;
     const rings = 4;
     for (let r = 0; r < rings; r++) {
-      const base = (0.1 + 0.1 * r) * S * (1 + 0.18 * loud);
-      const amp = (0.09 + 0.05 * r) * S;
-      const spin = (r % 2 ? -1 : 1) * (0.05 + 0.03 * r) * t;
+      const base = (0.1 + 0.1 * r) * S * (1 + 0.18 * style.pulse * loud);
+      const amp = (0.09 + 0.05 * r) * S * style.pulse;
+      const spin = (r % 2 ? -1 : 1) * (0.05 + 0.03 * r) * style.spin * t;
       g.beginPath();
       const steps = 360;
       for (let s = 0; s <= steps; s++) {
@@ -108,25 +109,57 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges, from }
         s ? g.lineTo(x, y) : g.moveTo(x, y);
       }
       g.strokeStyle = palette[(r + 1) % palette.length];
-      g.lineWidth = 2.5 + loud * 3;
+      g.lineWidth = (2.5 + loud * 3) * style.line;
       g.shadowColor = palette[(r + 2) % palette.length];
-      g.shadowBlur = 22 + 26 * loud;
+      g.shadowBlur = (22 + 26 * loud) * style.glow;
       g.globalAlpha = 0.7 + 0.3 * Math.min(1, loud);
       g.stroke();
     }
     // Spokes on the low end: k petals reaching out with the bass.
     const bass = (bands[0] + bands[1] + bands[2] + bands[3]) / 4;
     for (let i = 0; i < k; i++) {
-      const a = (i / k) * Math.PI * 2 + 0.03 * t;
-      const len = (0.08 + 0.32 * bass) * S;
+      const a = (i / k) * Math.PI * 2 + 0.03 * style.spin * t;
+      const len = (0.08 + 0.32 * bass) * S * style.spokes;
       g.beginPath();
       g.moveTo(cx, cy);
       g.quadraticCurveTo(cx + len * 0.6 * Math.cos(a + 0.4), cy + len * 0.6 * Math.sin(a + 0.4), cx + len * Math.cos(a), cy + len * Math.sin(a));
       g.strokeStyle = palette[4];
-      g.globalAlpha = 0.25 + 0.5 * bass;
+      g.globalAlpha = (0.25 + 0.5 * bass) * Math.min(1, style.spokes);
       g.lineWidth = 1;
-      g.shadowBlur = 24;
+      g.shadowBlur = 24 * style.glow;
       g.stroke();
+    }
+    // Sacred geometry, for the kinds that have it: a flower-of-life of k
+    // circles round a centre one, and a k-pointed star between two k-gons,
+    // turning against each other and breathing with the voice.
+    if (style.geometry > 0) {
+      g.strokeStyle = palette[3];
+      g.shadowColor = palette[4];
+      g.shadowBlur = 18 * style.glow;
+      g.lineWidth = 1.2 * style.line;
+      g.globalAlpha = style.geometry * (0.22 + 0.35 * Math.min(1, loud));
+      const R = 0.15 * S * (1 + 0.08 * loud);
+      const turn = 0.02 * style.spin * t;
+      g.beginPath();
+      g.arc(cx, cy, R, 0, Math.PI * 2);
+      for (let i = 0; i < k; i++) {
+        const a = (i / k) * Math.PI * 2 + turn;
+        g.moveTo(cx + R * Math.cos(a) + R, cy + R * Math.sin(a));
+        g.arc(cx + R * Math.cos(a), cy + R * Math.sin(a), R, 0, Math.PI * 2);
+      }
+      g.stroke();
+      const polygon = (radius, step, offset) => {
+        g.beginPath();
+        for (let i = 0; i <= k; i++) {
+          const a = ((i * step) / k) * Math.PI * 2 + offset;
+          const x = cx + radius * Math.cos(a), y = cy + radius * Math.sin(a);
+          i ? g.lineTo(x, y) : g.moveTo(x, y);
+        }
+        g.stroke();
+      };
+      polygon(0.34 * S, 1, -turn);
+      polygon(0.46 * S, 1, turn);
+      if (k >= 5) polygon(0.46 * S, Math.floor((k - 1) / 2), turn);
     }
     g.globalAlpha = 1;
     g.shadowBlur = 0;
@@ -142,18 +175,20 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, edges, from }
 async function renderLayers({ analysis, brief, edges, fps, dir, log = console.log, size = LANDSCAPE, from = 0, to = analysis.frames, prefix = '' }) {
   const milkdropFile = path.join(dir, `${prefix}milkdrop.mp4`);
   const mandalaFile = path.join(dir, `${prefix}mandala.mp4`);
-  // Kept while what shapes them is unchanged: the presets, palette, symmetry
+  // Kept while what shapes them is unchanged: the presets, palette, symmetry,
+  // the kind (whose look draws the mandala)
   // and where the movements change, and for a window its size and frames.
   const keyFile = path.join(dir, `${prefix}layers.json`);
   const whole = from === 0 && to === analysis.frames && size === LANDSCAPE;
-  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, edges, ...(whole ? {} : { size, from, to }) });
+  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, ...(brief.kind ? { kind: brief.kind } : {}), edges, ...(whole ? {} : { size, from, to }) });
   if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
   const { width: W, height: H } = size;
+  const look = brief.kind ? lookOf(brief.kind).style : DEFAULT_STYLE;
   const { browser, page } = await butterchurnPage(W, H);
   try {
     await page.evaluate(pageSetup, {
-      W, H, fps, packs: PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, edges, from
+      W, H, fps, packs: PACKS, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry || 8, style: look, edges, from
     });
 
     const tmpMilk = milkdropFile.replace(/\.mp4$/, '.part.mp4');

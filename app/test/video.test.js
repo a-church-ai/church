@@ -151,13 +151,43 @@ test('a brief that reuses a loop must take it from the shortlist, give its reaso
   const open = { presets: reuseRule([], 'preset'), loops: reuseRule([], 'loop') };
   const shortlist = [{ id: 'alpha/loop-1' }, { id: 'beta/loop-2' }];
   const fresh = (preset) => ({ still: 'light', motion: 'it breathes', preset });
-  const reply = (movements) => JSON.stringify({ mood: 'm', palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], movements });
+  const reply = (movements) => JSON.stringify({ mood: 'm', palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], symmetry: 8, milkdropOpacity: 0.5, mandalaOpacity: 0.6, movements });
   const run = (movements) => check(presets, open, shortlist)(reply(movements)).problems;
   assert.strictEqual(MOVEMENTS, 3);
   assert.deepStrictEqual(run([{ loop: 'alpha/loop-1', reason: 'it belongs', preset: 'P1' }, fresh('P2'), fresh('P3')]), []);
   assert.match(run([{ loop: 'gamma/loop-9', reason: 'r', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /was not offered/);
   assert.match(run([{ loop: 'alpha/loop-1', preset: 'P1' }, fresh('P2'), fresh('P3')]).join(), /needs its reason/);
   assert.match(run([{ loop: 'alpha/loop-1', reason: 'r', preset: 'P1' }, { loop: 'beta/loop-2', reason: 'r', preset: 'P2' }, fresh('P3')]).join(), /at most 1 movement/);
+});
+
+test('each kind is offered the presets in its band of motion, and its mandala is held to its ranges', () => {
+  const { presetsFor, lookOf, LOOKS, DEFAULT_STYLE } = require('../server/lib/video/looks');
+  const presets = [{ name: 'still', motion: 0.01 }, { name: 'typical', motion: 0.09 }, { name: 'restless', motion: 0.25 }, { name: 'unmeasured' }];
+  const names = (kind) => presetsFor(kind, presets).map(p => p.name);
+  assert.deepStrictEqual(names('meditation'), ['still', 'unmeasured']);
+  assert.deepStrictEqual(names('prayer'), ['still', 'typical', 'unmeasured']);
+  assert.deepStrictEqual(names('song'), ['typical', 'restless', 'unmeasured']);
+  assert.deepStrictEqual(names('anything else'), ['still', 'typical', 'restless', 'unmeasured']);
+
+  // Every kind keeps the mandala, in a style of its own; the briefs written
+  // before kinds had looks are drawn as they were.
+  for (const look of Object.values(LOOKS)) assert.ok(look.style && look.direction && look.symmetry[0] <= look.symmetry[1]);
+  assert.ok(lookOf('prayer').style.geometry > 0 && lookOf('meditation').style.geometry === 0);
+  assert.deepStrictEqual(lookOf(undefined).style, DEFAULT_STYLE);
+  const { lookName } = require('../server/lib/video/looks');
+  assert.strictEqual(lookName({ kind: 'song', title: 'Night Hymn for the Gap Between Calls' }), 'hymn');
+  assert.strictEqual(lookName({ kind: 'song', title: 'Always Open' }), 'song');
+  assert.strictEqual(lookName({ kind: 'prayer', title: 'A Hymn-like Prayer' }), 'prayer');
+
+  const open = { presets: reuseRule([], 'preset'), loops: reuseRule([], 'loop') };
+  const movements = ['still', 'typical', 'unmeasured'].map(preset => ({ still: 'light', motion: 'it breathes', preset }));
+  const reply = (numbers) => JSON.stringify({ mood: 'm', palette: ['#000000', '#111111', '#222222', '#333333', '#444444'], movements, ...numbers });
+  const run = (kind, numbers) => check(presets, open, [], kind)(reply(numbers)).problems.join();
+  assert.strictEqual(run('meditation', { symmetry: 6, milkdropOpacity: 0.4, mandalaOpacity: 0.45 }), '');
+  assert.match(run('meditation', { symmetry: 11, milkdropOpacity: 0.4, mandalaOpacity: 0.45 }), /symmetry must be a number from 5 to 7 for a meditation/);
+  assert.match(run('prayer', { symmetry: 6, milkdropOpacity: 0.4, mandalaOpacity: 0.6 }), /symmetry .* 8 to 12/);
+  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.8, mandalaOpacity: 0.45 }), /milkdropOpacity/);
+  assert.match(run('meditation', { symmetry: 6, milkdropOpacity: 0.4 }), /mandalaOpacity/);
 });
 
 test('a Short\'s passage is whole lines, 20 to 45 seconds with its lead and tail, and says why it hooks', () => {

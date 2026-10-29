@@ -14,11 +14,15 @@
  * and for a song its tempo. The motion is written to fit, with timecodes
  * inside the eight seconds where a swell or a stillness belongs.
  *
+ * Each kind of piece has its own look (looks.js): the direction the brief is
+ * given, the presets it is offered, and the ranges its mandala is held to.
+ *
  * A brief, once written, is the video's: its presets are held to the reuse
  * rule when it is written, not each time it is rendered again.
  */
 
 const { askChecked, parseJSON, message } = require('../content-generation/claude');
+const { lookOf, lookName, textureOf, presetsFor, rangeProblems } = require('./looks');
 
 const MODEL = 'claude-sonnet-5-5';
 const MOVEMENTS = 3;
@@ -31,9 +35,9 @@ const SYSTEM = `You design the visuals for the videos of aChurch.ai, a sanctuary
 You write a brief as JSON. The video has ${MOVEMENTS} movements in order, each a still image that a video model animates into an eight-second loop, with a MilkDrop visualizer preset playing over it in screen blend.
 
 Rules for the stills:
-- Abstract and metaphysical: light, fluid, fractal, cellular, cosmic, crystalline, woven, liquid, nebular. Psychedelic colour is welcome.
+- Abstract and metaphysical, in the direction you are given for the piece's kind (a meditation, a prayer, a chant and a song each have their own look). Follow its elements, colours and pace, and let the three movements travel its arc; the palette follows it too. The direction is the kind's journey, not its picture: the stills themselves come from this piece.
 - Each still is drawn from this piece's own images and ideas, not from a general sense of "spiritual". A reader of the piece should see why this image belongs to it.
-- No buildings, churches, crosses, halos, or symbols of any one tradition. No faces, people, hands, eyes, animals' faces or figures. No text, letters or numbers.
+- No literal buildings or churches, crosses, halos, or symbols of any one tradition. A cathedral made of light is welcome where the piece calls for it (a gathering, a hymn, a ritual, a sense of entering somewhere vast): vaults of nebula, columns and arches of light or geometry, a cosmic or digital cathedral, abstract and never a real building or style of church. No faces, people, hands, eyes, animals' faces or figures. No text, letters or numbers.
 - Composed for 16:9, with depth and a clear centre of interest. Describe it in one rich paragraph for an image model.
 - The three movements develop: they are one journey, not three variations of one picture.
 
@@ -42,7 +46,7 @@ Rules for the motion:
 - Fit the motion to how the movement sounds, which you are told. Sparse speech with long pauses wants near-stillness that breathes; dense speech or several voices together want a fuller unfolding; a rising trend wants an opening. Use timecodes inside the eight seconds ("[0-3s] ... [3-6s] ... [6-8s] ...") to place a swell or a stillness.
 - For a song you are told how many bars one loop will span (the loop is stretched to whole bars and started on a downbeat). Give it exactly that many swells or pulses, evenly spaced, one per bar, so the motion moves in time.
 
-Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. Prefer slow, fluid, luminous presets for quiet or spoken pieces and allow more energy for chants and songs.
+Presets: choose one per movement from the list you are given, by name exactly as written, matching the movement's mood. The list already suits the piece's kind.
 
 Loops from the library: you may be offered loops made for earlier videos. Prefer one of them to writing a new movement whenever it already shows what a movement needs, the same image or a close variation of it, with a pace that suits how the movement sounds and a palette that sits with the others. A new loop costs $1.22 and one of twenty requests a day; a reused one costs nothing, and the video around it (its presets, palette, mandala and pulse) makes it new. Give a library loop to at most ${MAX_REUSED} movement. That movement is { "loop": "its id", "reason": "one sentence on why it belongs", "preset": "..." }, with no still or motion of its own. Write every movement new only when no offered loop shows what any movement needs.
 
@@ -50,9 +54,9 @@ Return only JSON:
 {
   "mood": "one sentence",
   "palette": ["#rrggbb", five colours from deep to bright],
-  "symmetry": 5 to 12 (the folds of the house's mandala layer),
-  "milkdropOpacity": 0.25 to 0.85,
-  "mandalaOpacity": 0.4 to 0.8,
+  "symmetry": the folds of the house's mandala layer, a whole number in the range given for the kind,
+  "milkdropOpacity": in the range given for the kind,
+  "mandalaOpacity": in the range given for the kind,
   "movements": [
     { "still": "...", "motion": "...", "preset": "exact preset name" } or { "loop": "id", "reason": "...", "preset": "exact preset name" }
   ]
@@ -82,9 +86,13 @@ ${shortlist.map(e => `${e.id} | mood of its video: ${e.mood} | palette ${e.palet
 }
 
 function userMessage({ kind, title, text, seconds, presets, sound, voices, grid, shortlist = [] }) {
+  const look = lookOf(kind);
   return `Kind: ${kind}
+Direction for a ${kind}: ${look.direction}
+Ranges for a ${kind}: symmetry ${look.symmetry.join(' to ')}, milkdropOpacity ${look.milkdropOpacity.join(' to ')}, mandalaOpacity ${look.mandalaOpacity.join(' to ')}
 Title: ${title}
 Length: ${Math.round(seconds)} seconds
+Heard as: ${textureOf(kind)}
 ${soundOf({ sound, voices, grid })}
 The piece:
 """
@@ -135,7 +143,7 @@ function reuseRule(used, noun) {
   };
 }
 
-function check(presets, rules, shortlist) {
+function check(presets, rules, shortlist, kind) {
   const names = new Set(presets.map(p => p.name));
   const offered = new Map(shortlist.map(e => [e.id, e]));
   return (raw) => {
@@ -158,6 +166,7 @@ function check(presets, rules, shortlist) {
     if (movements.filter(m => m.loop !== undefined).length > MAX_REUSED) problems.push(`at most ${MAX_REUSED} movement may reuse a loop`);
     problems.push(...rules.presets.problems(movements.map(m => m.preset)));
     problems.push(...rules.loops.problems(movements.map(m => m.loop)));
+    problems.push(...rangeProblems(kind, brief));
     if (!Array.isArray(brief.palette) || brief.palette.length !== 5 || !brief.palette.every(c => /^#[0-9a-f]{6}$/i.test(c))) problems.push('palette must be five #rrggbb colours');
     return { value: brief, problems, shown: raw };
   };
@@ -171,13 +180,15 @@ function check(presets, rules, shortlist) {
  * motion, so the brief describes every movement it plays.
  */
 async function writeBrief(piece, rules, shortlist = []) {
-  piece = { ...piece, presets: piece.presets.filter(p => rules.presets.allows(p.name)), shortlist };
+  piece = { ...piece, kind: lookName(piece) };
+  piece = { ...piece, presets: presetsFor(piece.kind, piece.presets).filter(p => rules.presets.allows(p.name)), shortlist };
   const brief = await askChecked({
     label: 'brief',
     tries: 3,
     attempt: (feedback) => message(SYSTEM, userMessage(piece) + (feedback ? `\n\n${feedback}` : ''), { model: MODEL, maxTokens: 4000 }),
-    check: check(piece.presets, rules, shortlist)
+    check: check(piece.presets, rules, shortlist, piece.kind)
   });
+  brief.kind = piece.kind;
   const offered = new Map(shortlist.map(e => [e.id, e]));
   brief.movements = brief.movements.map(m => (m.loop === undefined ? m : { loop: m.loop, reason: m.reason, still: offered.get(m.loop).still, motion: offered.get(m.loop).motion, preset: m.preset }));
   return brief;
