@@ -83,7 +83,7 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 ## After changing a doc
 
-`app/server/lib/docs/lastmod.json` is a hand-maintained manifest of per-document modification dates, consumed by the sitemap. Bump the entry for any doc you meaningfully change. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
+Nothing to do for its dates. `app/server/lib/docs/lastmod.json` and `content-dates.json` are generated from git history, and after each push to main `.github/workflows/page-dates.yml` regenerates them and commits what changed. Running `npm run gen:lastmod` and `npm run gen:content-dates` after staging puts the dates in the same commit, which is tidier but not required. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
 
 ## The app runs as one process
 

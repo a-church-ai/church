@@ -4,16 +4,17 @@
  * Both generators derive dates from committed history, and a commit cannot
  * hold a manifest generated from history that includes itself. So a session
  * that edited a document, regenerated and committed both together committed
- * that document at its previous date, and CI's "date manifests are current"
- * step, which regenerates once the commit exists, failed on main: e1ab5aa
- * did exactly this with docs/reference/railway-deploy.md on 2026-10-28.
+ * that document at its previous date, and CI's then "date manifests are
+ * current" step, which regenerated once the commit existed, failed on main:
+ * e1ab5aa did exactly this with docs/reference/railway-deploy.md on
+ * 2026-10-28. CI now regenerates and commits instead (page-dates.yml).
  *
  * What is staged is what the next commit will hold, so the generators read it
  * as one more commit, the newest, dated as git will date it. Staged rather
  * than every change in the working tree, because the checkout is shared by
  * parallel sessions: another session's unstaged edit is not this commit's,
- * and dating it here would fail CI the other way. In CI nothing is staged,
- * so the check still reads history alone.
+ * and dating it here would date it wrongly. In CI nothing is staged, so
+ * page-dates.yml reads history alone.
  *
  * So: edit, `git add` the documents, `npm run gen:lastmod && npm run
  * gen:content-dates`, `git add` the manifests, commit. A commit made on a

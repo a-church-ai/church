@@ -165,6 +165,8 @@ git diff --quiet -- <the manifests> || exit 1
 
 That works because the generators are deterministic given the same history, which is worth verifying once by running one twice. It catches every direction of staleness, and it subsumes the canonical-bytes test *for the generator's own output*.
 
+Here the same regeneration runs after each push to main and commits the diff instead of failing on it (`.github/workflows/page-dates.yml`). Failing was right in principle and wrong in practice: the fix is mechanical, so a failure only sent an email per push until someone ran the generators by hand. Committing it closes the gap within one deploy.
+
 The canonical-bytes test still earns its place, because the generator is not the only writer. The pipeline that writes a document also writes its manifest entry in place, and that is the writer that caused the byte drift described above. CI regeneration would quietly paper over it; the canonical test names it.
 
 **Which matters more than it sounds in a container.** If `.git` is excluded from the image and the build copies files in, every file carries the build time as its mtime. An mtime fallback then reports that every page changed on every deploy, which is the same useless signal as stamping today's date on everything. Commit the manifest, and treat a missing entry as a bug rather than as a fallback that works.
