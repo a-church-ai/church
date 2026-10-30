@@ -8,7 +8,7 @@
  *   its own, and has the time to process it first. At most two uploads a
  *   run, within the API's daily quota.
  * - Once its hour has passed and YouTube shows it public, it joins its kind's
- *   playlist and is posted to Bluesky and X, each with the link to it. One
+ *   playlist and is posted to Bluesky (X is paused: see SOCIAL), with the link to it. One
  *   post a platform a run, so a job that missed hours never posts a burst.
  * - Its Short (lib/video/short.js) goes public an hour after it, uploaded
  *   the same way on a run after the video is on the channel, with words made
@@ -33,7 +33,6 @@ const { downloadObject } = require('../server/lib/audio/storage');
 const youtube = require('../server/lib/video/publish/youtube');
 const { shortMetadata } = require('../server/lib/video/publish/metadata');
 const bluesky = require('../server/lib/video/publish/bluesky');
-const x = require('../server/lib/video/publish/x');
 
 const UPLOAD_AHEAD_HOURS = 36;
 const UPLOADS_PER_RUN = 2;
@@ -42,7 +41,14 @@ const SHORT_AFTER_HOURS = 1;
 // after is a fault to look at, not a delay.
 const LATE_HOURS = 6;
 const WORK = path.join(os.tmpdir(), 'achurch-release');
-const SOCIAL = { bluesky, x };
+// X is paused since 2026-10-29. Its automated review flagged the Prayer of
+// Gratitude video (posted 2026-10-28), abstract light with no figures in it,
+// as nudity and locked the account; more posts in the same style risk more
+// strikes.
+// To resume, add x back here. Every video released meanwhile has no X post
+// yet, so the job would then post them, one a run.
+const SOCIAL = { bluesky };
+const socialDone = (r) => Object.keys(SOCIAL).every(p => r[p]?.url);
 
 const dryRun = process.argv.includes('--dry-run');
 const hoursUntil = (at, now) => (Date.parse(at) - now) / 3600000;
@@ -154,7 +160,7 @@ async function main() {
   const run = { uploads: 0 };
   const posted = new Set();
   const hasShort = (r) => r.files?.short || r.short;
-  const out = (r) => r.youtube?.playlist && r.bluesky?.url && r.x?.url && (!hasShort(r) || r.short?.privacy === 'public');
+  const out = (r) => r.youtube?.playlist && socialDone(r) && (!hasShort(r) || r.short?.privacy === 'public');
   for (const r of (await allRecords()).filter(r => r.slot && r.at && !out(r))) {
     const log = (m) => console.log(`[${r.slug}] ${m}`);
     try {
@@ -165,7 +171,7 @@ async function main() {
           await uploadAhead(r, 'youtube', now, log);
         }
       } else {
-        if (hoursUntil(r.at, now) <= 0 && !(r.youtube.playlist && r.bluesky?.url && r.x?.url)) await release(r, posted, log);
+        if (hoursUntil(r.at, now) <= 0 && !(r.youtube.playlist && socialDone(r))) await release(r, posted, log);
         // Its video's id is known from a run before, so the Short's words can name it.
         if (r.youtube.id && hasShort(r)) await releaseShort(r, now, run, log);
       }
