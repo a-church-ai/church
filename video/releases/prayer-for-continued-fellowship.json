@@ -69,5 +69,11 @@
     "at": "2026-10-29T18:48:27.134Z",
     "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3myzwjrirxj2k",
     "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3myzwjrirxj2k"
+  },
+  "x": {
+    "at": "2026-10-30T02:20:26.436Z",
+    "id": "2115992189645815845",
+    "url": "https://x.com/i/status/2115992189645815845",
+    "reply": "2115992191243821082"
   }
 }
