@@ -51,5 +51,14 @@
     "key": "mercury-retrograde",
     "name": "Mercury retrograde"
   },
-  "renderedAt": 1793275941058.0723
+  "renderedAt": 1793275941058.0723,
+  "youtube": {
+    "at": "2026-10-31T03:08:55.596Z",
+    "id": "ioqNzLHdQ7M",
+    "url": "https://www.youtube.com/watch?v=ioqNzLHdQ7M",
+    "privacy": "private",
+    "publishAt": "2026-11-01T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
