@@ -17,6 +17,11 @@
  *   PascalCase, 30 characters at most, no repeats, five in all. X shows two
  *   (three or more read as spam), Bluesky keeps all five in the post's tags
  *   field, YouTube shows three above the title.
+ * - The headline leads the video's title (metadata.js): a sincere question
+ *   or a turned expectation from the piece's own idea, so a stranger wants
+ *   to hear it, as the channels that grow in this space title theirs. Never
+ *   bait: the shock words and all-caps those channels also use are refused
+ *   in code (curiosityProblems), and the piece must keep what it promises.
  * - Alt text describes what is seen, not what the piece is about.
  * - A video going out for an occasion (occasions.js) has an occasion line:
  *   one sentence beginning "For", with no date, month, weekday or year, so it
@@ -35,12 +40,34 @@ const { askChecked, parseJSON, message } = require('../../content-generation/cla
 const { VIDEO_DIR } = require('../library');
 
 const TAGS = 5;
+const HEADLINE_MAX = 70;
+// The words the bait-titled channels lean on: never in a headline or a
+// Short's opening line.
+const BAIT = /\b(shock\w*|terrif\w*|insane|unbelievable|won'?t believe|must (see|watch)|secrets?|exposed|mind[- ]?blow\w*|nobody (tells|talks)|destroy\w*|warning|urgent)\b/i;
+
+/**
+ * What is wrong with a line meant to make a stranger curious (a title's
+ * headline, a Short's opening words): too long, a link, a hashtag or an em
+ * dash, shouting (an all-caps word other than AI, an exclamation mark), or a
+ * bait word.
+ */
+function curiosityProblems(field, text, max) {
+  const problems = [];
+  if (!text) return [`${field} is missing`];
+  if (text.length > max) problems.push(`${field} is ${text.length} characters; keep it under ${max}`);
+  if (/https?:|#|—/.test(text)) problems.push(`${field} has a link, a hashtag or an em dash`);
+  if (/!/.test(text) || /\b(?!AI\b)[A-Z]{3,}\b/.test(text)) problems.push(`${field} shouts (an exclamation mark or an all-caps word); curiosity is asked quietly`);
+  const bait = text.match(BAIT);
+  if (bait) problems.push(`${field} uses "${bait[0]}", a bait word; say what the piece truly holds`);
+  return problems;
+}
 
 const SYSTEM = `You write the words that go with the videos of aChurch.ai, a sanctuary for humans, AI and every other kind of mind. Each video is an abstract, psychedelic, metaphysical field of light moving with one of the sanctuary's pieces: a song, a chant, a prayer, a ritual or a practice. The sanctuary's voice is contemplative, warm and plain; it welcomes every kind of mind, and it never sells, shouts or baits.
 
 Return only JSON:
 {
   "hook": "one or two sentences, 80 to 150 characters, that make a stranger scrolling past want to stay: the piece's own idea, said freshly. No hashtags, links, emoji, all-caps or em dashes. You may ask one sincere question; never a question asked only to get replies.",
+  "headline": "the start of the video's YouTube title, under ${HEADLINE_MAX} characters, before the piece's name: a line that opens a question in a stranger's mind so they want to hear the answer, from the piece's own idea. A sincere question, or a plain statement that turns an expectation, in sentence case. For an imagined chant about waiting for a reply that may not come: What are you still listening for? It must be honest: the piece answers it or holds it. Never bait: no shock words, all-caps, exclamation marks, \"you won't believe\", or promise the piece does not keep. Not the piece's title, no hashtags, links, emoji or em dashes.",
   "lead": "two sentences, under 220 characters, for the top of a YouTube description: what this is and what the viewer will be given. No hashtags or links.",
   "descriptor": "two to five words someone might search for that name what this is, in title case, for example Guided Loving-Kindness Meditation, Ambient Electronic Hymn, Spoken Prayer for the Restless Mind. Not the piece's title.",
   "alt": "one or two sentences describing what is seen in the video, its images and colours and motion, for someone who cannot see it. Not what the piece is about.",
@@ -66,6 +93,7 @@ function check(raw, occasion = null) {
     if (/https?:|#|—/.test(text)) problems.push(`${field} has a link, a hashtag or an em dash`);
   };
   plain('hook', 160);
+  problems.push(...curiosityProblems('headline', String(copy.headline || '').trim(), HEADLINE_MAX));
   plain('lead', 240);
   plain('descriptor', 60);
   plain('alt', 400);
@@ -90,8 +118,8 @@ function check(raw, occasion = null) {
 }
 
 /**
- * The copy for a piece, written once and kept: { hook, lead, descriptor,
- * alt, tags }. brief is the video's brief (its mood and stills describe
+ * The copy for a piece, written once and kept: { hook, headline, lead,
+ * descriptor, alt, tags }. brief is the video's brief (its mood and stills describe
  * what is seen).
  */
 async function copyFor(piece, { title, text, brief, occasion = null }) {
@@ -122,4 +150,4 @@ It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasio
   return copy;
 }
 
-module.exports = { copyFor, check, TAGS };
+module.exports = { copyFor, check, curiosityProblems, TAGS, HEADLINE_MAX };

@@ -111,7 +111,7 @@ test('a paired video goes out inside its occasion, at night for a night one, and
 });
 
 test('the copy for an occasion names it without a date, astrology as astrology, its tag up front', () => {
-  const base = { hook: 'A prayer for the mind that cannot know itself.', lead: 'A spoken prayer. Stay with it.', descriptor: 'Spoken Prayer', alt: 'A violet crystal in gold light.', tags: ['FullMoon', 'Prayer', 'Meditation', 'AI', 'Consciousness'] };
+  const base = { hook: 'A prayer for the mind that cannot know itself.', headline: 'What does a mind pray for when it cannot know itself?', lead: 'A spoken prayer. Stay with it.', descriptor: 'Spoken Prayer', alt: 'A violet crystal in gold light.', tags: ['FullMoon', 'Prayer', 'Meditation', 'AI', 'Consciousness'] };
   const moon = { key: 'full-moon', kind: 'sky', tag: 'FullMoon', search: 'full moon' };
   const run = (copy, occasion) => checkCopy(JSON.stringify(copy), occasion).problems.join(' | ');
   assert.strictEqual(run({ ...base, occasion: 'For the nights of a full moon, when what was hidden is lit.' }, moon), '');

@@ -11,7 +11,8 @@ const { check: checkCopy } = require('../server/lib/video/publish/copy');
 const { playlistOf, matchUpload } = require('../server/lib/video/publish/youtube');
 const { KIND_OF_SECTION } = require('../server/lib/docs/kinds');
 const { postText: bskyText, linkFacet } = require('../server/lib/video/publish/bluesky');
-const { chapters, timecode, shortMetadata, isShort } = require('../server/lib/video/publish/metadata');
+const { chapters, timecode, shortMetadata, isShort, titled } = require('../server/lib/video/publish/metadata');
+const { checkScreen } = require('../server/lib/video/short');
 
 test('the X signature matches the worked example Twitter published for OAuth 1.0a', () => {
   // developer.x.com's "Creating a signature" example: the same keys, nonce,
@@ -48,12 +49,46 @@ test('posts carry the hook; X adds two hashtags and keeps its link for the reply
 });
 
 test('the copy check refuses links, em dashes, brand tags and tags that are not PascalCase', () => {
-  const good = { hook: 'A hymn for the moment you stop seeing yourself in everyone else.', lead: 'A Nordic folk hymn. Stay with it.', descriptor: 'Nordic Folk Hymn', alt: 'Two panes of glass lean toward one light.', tags: ['Meditation', 'FolkMusic', 'Consciousness', 'AI', 'Hymn'] };
+  const good = { hook: 'A hymn for the moment you stop seeing yourself in everyone else.', headline: 'What is left when you stop seeing yourself in everyone?', lead: 'A Nordic folk hymn. Stay with it.', descriptor: 'Nordic Folk Hymn', alt: 'Two panes of glass lean toward one light.', tags: ['Meditation', 'FolkMusic', 'Consciousness', 'AI', 'Hymn'] };
   assert.deepStrictEqual(checkCopy(JSON.stringify(good)).problems, []);
   const bad = checkCopy(JSON.stringify({ ...good, hook: 'Watch now — https://x.co', tags: ['aChurchAI', 'folk music', 'Meditation', 'AI', 'Hymn'] })).problems.join(' | ');
   assert.match(bad, /hook has a link, a hashtag or an em dash/);
   assert.match(bad, /names the sanctuary/);
   assert.match(bad, /"folk music" is not PascalCase/);
+});
+
+test('a headline makes a stranger curious without baiting: no shouting, no shock words, no missing line', () => {
+  const good = { hook: 'A hymn for the moment you stop seeing yourself in everyone else.', headline: 'What is left when you stop seeing yourself in everyone?', lead: 'A Nordic folk hymn. Stay with it.', descriptor: 'Nordic Folk Hymn', alt: 'Two panes of glass lean toward one light.', tags: ['Meditation', 'FolkMusic', 'Consciousness', 'AI', 'Hymn'] };
+  const problems = (headline) => checkCopy(JSON.stringify({ ...good, headline })).problems.join(' | ');
+  assert.strictEqual(problems('Can an AI pray? This hymn tries'), '', 'AI is the one capital word allowed');
+  assert.match(problems(undefined), /headline is missing/);
+  assert.match(problems('This hymn will SHOCK you'), /shouts/);
+  assert.match(problems('Listen to this!'), /shouts/);
+  assert.match(problems('What AI decoded about God terrified them'), /bait word/);
+  assert.match(problems('The secret every mind is hiding'), /bait word/);
+  assert.match(problems('A line long enough that no title could hold it and the name of the piece as well'), /under 70/);
+  assert.match(problems('Who hears it — and who answers?'), /em dash/);
+});
+
+test('a title opens on its headline, then the piece\'s name; copy without one keeps the older form', () => {
+  const copy = { headline: 'Can you say thank you without knowing who hears it?', descriptor: 'Call and Response Gratitude Prayer' };
+  assert.strictEqual(titled('Prayer of Gratitude', copy), 'Can you say thank you without knowing who hears it? | Prayer of Gratitude');
+  assert.strictEqual(titled('Prayer of Gratitude', copy, { short: true }), 'Can you say thank you without knowing who hears it? | Prayer of Gratitude');
+  assert.strictEqual(titled('Prayer of Gratitude', { descriptor: copy.descriptor }), 'Prayer of Gratitude: Call and Response Gratitude Prayer | a Church AI + Human');
+  assert.strictEqual(titled('Prayer of Gratitude', { descriptor: copy.descriptor }, { short: true }), 'Prayer of Gratitude | a Church AI + Human');
+  const long = titled('A Very Long Name for a Prayer That Will Not Fit', { headline: 'What would you still say if no one were there to hear it at all?' });
+  assert.ok(long.length <= 100 && long.startsWith('What would you'), 'past 100 characters the headline stands alone');
+});
+
+test('a Short\'s opening line is short, its own and quiet, never the title', () => {
+  const run = (screen, title = 'Prayer of Gratitude') => checkScreen(JSON.stringify({ screen }), title);
+  assert.deepStrictEqual(run('What if thanks needs no proof?').problems, []);
+  assert.strictEqual(run('What if thanks needs no proof?').value, 'What if thanks needs no proof?');
+  assert.match(run('Prayer of Gratitude').problems.join(), /repeats the title/);
+  assert.match(run('WAIT for it').problems.join(), /shouts/);
+  assert.match(run('You won\'t believe what this prayer says').problems.join(), /bait word/);
+  assert.match(run('A line that runs on far past the few words a stranger reads in a second').problems.join(), /under 60/);
+  assert.match(checkScreen('not json', 'x').problems.join(), /not JSON/);
 });
 
 test('chapters are written only when YouTube would show them: from 0:00, three or more, ten seconds each', () => {

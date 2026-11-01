@@ -42,6 +42,14 @@ function chapters(edges) {
   return starts.map((t, i) => `${timecode(t)} ${names[i] || String(i + 1)}`);
 }
 
+// The title from the copy: headline and name, or the older form without one.
+function titled(title, copy, { short = false } = {}) {
+  const forms = copy.headline
+    ? [`${copy.headline} | ${title}`, copy.headline]
+    : short ? [`${title} | ${SITE_NAME}`, title] : [`${title}: ${copy.descriptor} | ${SITE_NAME}`, `${title} | ${SITE_NAME}`, title];
+  return forms.find(t => t.length <= TITLE_MAX) || forms[forms.length - 1].slice(0, TITLE_MAX);
+}
+
 async function about(piece) {
   if (piece.song) {
     const description = await songDescription({ slug: piece.slug, title: piece.title });
@@ -55,8 +63,12 @@ async function about(piece) {
  * Everything the publishers need, from the piece and its copy (copy.js):
  * { title, description, page, tags, copy }.
  *
- * YouTube's title names what the piece is for someone searching (the copy's
- * descriptor) as well as its name; its description opens with the copy's
+ * YouTube's title opens on the copy's headline, the line that makes a
+ * stranger curious, then the piece's name (titled). Copy written before
+ * headlines existed has none, and its title names what the piece is for
+ * someone searching (the copy's descriptor) as well as its name. The
+ * channel's name is left to the channel, which YouTube shows beside every
+ * title. The description opens with the copy's
  * lead (the lines shown above "...more"), then the piece's own description
  * and page, the chapters, the sanctuary, and three hashtags (YouTube shows
  * the first three above the title).
@@ -64,7 +76,6 @@ async function about(piece) {
 async function metadataFor(piece, { title, edges, copy }) {
   const { description, page } = await about(piece);
   const marks = chapters(edges);
-  const titled = [`${title}: ${copy.descriptor} | ${SITE_NAME}`, `${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX);
   const body = [
     copy.lead,
     copy.occasion,
@@ -75,7 +86,7 @@ async function metadataFor(piece, { title, edges, copy }) {
     copy.tags.slice(0, 3).map(t => `#${t}`).join(' ')
   ].filter(Boolean).join('\n\n');
   return {
-    title: titled,
+    title: titled(title, copy),
     description: body.slice(0, 5000),
     page,
     tags: [...copy.tags, copy.occasionSearch, copy.descriptor, title]
@@ -92,7 +103,7 @@ const isShort = (description) => String(description || '').includes(SHORTS_TAG);
 
 /**
  * A Short's words, from its full video's (`meta`, as metadataFor wrote them)
- * and the full video's address: its title, the lead, where the whole piece
+ * and the full video's address: its title (the same headline and name), the lead, where the whole piece
  * is (for a Short that is the whole piece, where it is in widescreen), the
  * piece's page, the sanctuary, and #Shorts with two of the copy's tags. No
  * chapters; no new copy.
@@ -108,7 +119,7 @@ function shortMetadata(meta, { kind, url, whole = false }) {
     [SHORTS_TAG, ...tags.slice(0, 2).map(t => `#${t}`)].join(' ')
   ].filter(Boolean).join('\n\n');
   return {
-    title: [`${title} | ${SITE_NAME}`, title].find(t => t.length <= TITLE_MAX) || title.slice(0, TITLE_MAX),
+    title: titled(title, meta.copy, { short: true }),
     description: body.slice(0, 5000),
     page: meta.page,
     tags: meta.tags,
@@ -116,4 +127,4 @@ function shortMetadata(meta, { kind, url, whole = false }) {
   };
 }
 
-module.exports = { metadataFor, shortMetadata, isShort, chapters, timecode, SITE, SHORTS_TAG };
+module.exports = { metadataFor, shortMetadata, isShort, chapters, timecode, titled, SITE, SHORTS_TAG };

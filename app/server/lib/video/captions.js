@@ -185,12 +185,12 @@ function captionsFor(words, from, to) {
   })).filter(c => c.end - c.start > 0.05);
 }
 
-// Greedy wrap to `width` at `size`.
-function wrapLines(text, size, width) {
+// Greedy wrap to `width` at `size`, in the captions' face or another.
+function wrapLines(text, size, width, { family, weight } = FONT) {
   const lines = [];
   for (const word of text.split(' ')) {
     const last = lines[lines.length - 1];
-    if (last && measureIn(`${last} ${word}`, size, FONT.family, FONT.weight) <= width) lines[lines.length - 1] = `${last} ${word}`;
+    if (last && measureIn(`${last} ${word}`, size, family, weight) <= width) lines[lines.length - 1] = `${last} ${word}`;
     else lines.push(word);
   }
   return lines;
@@ -230,13 +230,15 @@ function captionPng(text, file, size) {
  * A few centred lines on a clear frame of `size`, the first centred at `y` (a
  * fraction of the height), each { text, size, family, weight, opacity }:
  * a Short's title at the top, or its closing line. White with the captions'
- * soft shadow, kept inside the Shorts box's width.
+ * soft shadow, kept inside the Shorts box's width. A line marked `wrap`
+ * (a Short's opening hook) breaks onto as many lines as it needs instead.
  */
 function labelPng(lines, { y, size, file }) {
   const { width: W, height: H } = size;
   const cx = (SAFE.left + (1 - SAFE.right)) / 2 * W;
   const width = (1 - SAFE.left - SAFE.right) * W;
   let at = y * H;
+  lines = lines.flatMap(l => (l.wrap ? wrapLines(l.text, l.size, width, l).map(text => ({ ...l, text })) : [l]));
   const text = lines.map(l => {
     // Smaller, rather than off the edge, when a name is long.
     let fontSize = l.size;

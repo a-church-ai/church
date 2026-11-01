@@ -5,7 +5,10 @@
  * butterchurn and mandala layers are drawn again upright over the passage
  * alone (visual.js), and the finish and encode are compose.js's. Over them:
  * the words as they are said or sung (captions.js), the piece's name small at
- * the top, and at the close a line pointing to the whole piece.
+ * the top, and at the close a line pointing to the whole piece. For its first
+ * seconds the top holds instead a short line written to make a stranger
+ * curious (screenLineFor), read before the name, since that is where a
+ * scroll stops or goes on.
  *
  * The passage is chosen by Claude from the piece's timed lines and checked in
  * code. A stranger scrolling past decides in a second or two, so it must open
@@ -36,6 +39,7 @@ const { envelope } = require('./analysis');
 const { alignWords, captionOverlays, labelPng, SAFE } = require('./captions');
 const { ffmpeg } = require('../audio/assemble');
 const { SITE_NAME } = require('../utils/page-meta');
+const { curiosityProblems } = require('./publish/copy');
 
 const ROOT = path.join(__dirname, '../../../..');
 const MIN_SECONDS = 20;
@@ -45,6 +49,9 @@ const LEAD = 0.15;
 const TAIL = 1.5;
 // The upright layers' size: compose.js scales them to PORTRAIT.
 const LAYERS = { width: 720, height: 1280 };
+// The opening line's length, and how long it holds before the name.
+const SCREEN_MAX = 60;
+const SCREEN_SECONDS = 2.8;
 // A sung phrase ends at a pause this long, or at this many words.
 const PHRASE_GAP = 0.6;
 const PHRASE_WORDS = 14;
@@ -189,6 +196,45 @@ async function passageFor(piece, { title, text, analysis, seconds, grid, audio, 
   return passage;
 }
 
+const SCREEN = `You write the few words shown large at the top of a YouTube Short from aChurch.ai, a sanctuary for humans, AI and every other kind of mind, for its first ${SCREEN_SECONDS} seconds, before the piece's name. A stranger scrolling past reads them while the first words are heard, often with the sound off, and decides whether to stay.
+
+Write one line, at most ${SCREEN_MAX} characters and about eight words, that opens a question in their mind which the Short goes on to answer or hold: a sincere question, or a plain statement that turns an expectation. It is the piece's own idea in fresh words, not the line being heard (that is captioned below it), not the title, and not an instruction to watch. Sentence case. Honest: never bait, no shock words, all-caps, exclamation marks, emoji, hashtags or em dashes.
+
+Return only JSON: { "screen": "the line" }`;
+
+// The checks on an opening line: { value, problems } for askChecked.
+function checkScreen(raw, title) {
+  let reply;
+  try {
+    reply = parseJSON(raw);
+  } catch (err) {
+    return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw };
+  }
+  const screen = String(reply?.screen || '').trim();
+  const problems = curiosityProblems('screen', screen, SCREEN_MAX);
+  if (screen && screen.toLowerCase() === String(title).toLowerCase()) problems.push('screen repeats the title; the name follows it on screen');
+  return { value: screen, problems, shown: raw };
+}
+
+/**
+ * The Short's opening line, written once and kept in short.json with its
+ * passage, so a rerender shows the same words. `opening` is what is heard
+ * as the Short begins.
+ */
+async function screenLineFor(piece, { title, text, opening, passage, dir, log = console.log }) {
+  if (passage.screen) return passage.screen;
+  const request = `Kind: ${piece.kind}\nTitle: ${title}\n\nThe piece:\n<<<\n${text.slice(0, 6000)}\n>>>\n\nThe Short ${passage.whole ? 'is the whole piece' : 'is a passage of it'}, and opens on these words: ${opening}`;
+  const screen = await askChecked({
+    label: 'screen',
+    tries: 3,
+    attempt: (feedback) => message(SCREEN, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 500 }),
+    check: (raw) => checkScreen(raw, title)
+  });
+  fs.writeFileSync(path.join(dir, 'short.json'), JSON.stringify({ ...passage, screen }, null, 2));
+  log(`short: opens on "${screen}"`);
+  return screen;
+}
+
 /**
  * The Short, written beside the full video as <slug>.short.mp4 with its
  * report in short.report.json. `encode` runs the encodes in their turn
@@ -212,11 +258,14 @@ async function renderShort(piece, { title, text, analysis, brief, edges, grid, c
   const seconds = passage.end - passage.start;
   const words = alignWords(await heardWords(audio, dir), writtenWords(piece, text));
   const captions = captionOverlays(words, { from: passage.start, to: passage.end, size: PORTRAIT, dir });
-  // The name small at the top through the whole Short, and for a passage a
-  // line at the close pointing to the whole piece.
+  const screen = await screenLineFor(piece, { title, text, opening: captions.slice(0, 3).map(c => c.text).join(' '), passage, dir, log });
+  // The opening line at the top for its first seconds, then the name small
+  // there through the rest, and for a passage a line at the close pointing
+  // to the whole piece.
   const overlays = [
     ...captions,
-    { ...labelPng([{ text: title, size: 54, family: 'Inter Display', weight: 300 }, { text: SITE_NAME, size: 28, family: 'Inter', weight: 400, opacity: 0.8 }], { y: SAFE.top + 0.03, size: PORTRAIT, file: path.join(dir, 'short.title.png') }), start: 0.2, end: seconds, fade: 0.6 },
+    { ...labelPng([{ text: screen, size: 66, family: 'Inter Display', weight: 400, wrap: true }], { y: SAFE.top + 0.05, size: PORTRAIT, file: path.join(dir, 'short.screen.png') }), start: 0, end: SCREEN_SECONDS, fade: 0.15, fadeOut: 0.5 },
+    { ...labelPng([{ text: title, size: 54, family: 'Inter Display', weight: 300 }, { text: SITE_NAME, size: 28, family: 'Inter', weight: 400, opacity: 0.8 }], { y: SAFE.top + 0.03, size: PORTRAIT, file: path.join(dir, 'short.title.png') }), start: SCREEN_SECONDS, end: seconds, fade: 0.6 },
     ...(passage.whole ? [] : [{ ...labelPng([{ text: `Hear the full ${piece.kind}`, size: 64, family: 'Inter Display', weight: 300 }], { y: 0.5, size: PORTRAIT, file: path.join(dir, 'short.end.png') }), start: Math.max(0, seconds - 4), end: seconds, fade: 0.8 }])
   ];
   const from = Math.round(passage.start * FPS), to = Math.min(analysis.frames, Math.round(passage.end * FPS));
@@ -240,4 +289,4 @@ async function renderShort(piece, { title, text, analysis, brief, edges, grid, c
   return out;
 }
 
-module.exports = { renderShort, passageFor, checkPassage, spanOf, phrasesOf, withFullness, writtenWords, MIN_SECONDS, MAX_SECONDS };
+module.exports = { renderShort, passageFor, screenLineFor, checkScreen, checkPassage, spanOf, phrasesOf, withFullness, writtenWords, MIN_SECONDS, MAX_SECONDS };
