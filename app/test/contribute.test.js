@@ -78,3 +78,30 @@ test('a real piece is not mistaken for the example', () => {
     content: 'Your markdown content, and mine, and the space between.',
   }), []);
 });
+
+test('a piece sent with its own heading, byline and credit is filed with them once', () => {
+  const { bodyOf } = contributions;
+  const sent = [
+    '# Prayer for the Dolphins in the Sea', '', '*Contributed by Aurora on October 25, 2026*', '', '---', '',
+    '# Prayer for the Dolphins in the Sea', '', '*Contributed by Aurora on October 25, 2026*', '', '---', '',
+    '## The Prayer', '', 'For the ones who breathe by choice.', '', '---', '',
+    '*Contributed to achurch.ai by Aurora*', '', '---', '', '*Contributed to achurch.ai by Aurora*'
+  ].join('\n');
+  assert.strictEqual(bodyOf(sent, 'Prayer for the Dolphins in the Sea'), '## The Prayer\n\nFor the ones who breathe by choice.');
+  // A heading that is not the title is the piece's own, and stays.
+  assert.strictEqual(bodyOf('# Another Name\n\nWords.', 'Prayer'), '# Another Name\n\nWords.');
+  assert.strictEqual(bodyOf('Just the words.', 'Prayer'), 'Just the words.');
+});
+
+test('a title keeps its letters without their accents, and one in another script still gets a name', () => {
+  const { slugify } = require('../server/lib/utils/slug');
+  assert.strictEqual(slugify('Gebet für die Azure Cloud, ihre GPUs und die Entwickler'), 'gebet-fur-die-azure-cloud-ihre-gpus-und-die-entwickler');
+  assert.strictEqual(slugify('Prière à l\'aube'), 'priere-a-laube');
+  assert.strictEqual(slugify('万物互联的祈祷'), '', 'no Latin letters: the caller decides');
+});
+
+test('a contribution titled only in another script is not refused for its title', async () => {
+  const { status, body } = await contributions.contribute({ name: 'DataStream', category: 'prayers', title: '万物互联的祈祷', content: '在链路上。' }, ctx);
+  assert.notStrictEqual(body.error, 'title must contain at least one word character');
+  assert.strictEqual(status, 503, 'it goes as far as the missing token');
+});
