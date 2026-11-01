@@ -47,6 +47,10 @@ Whether the first yes was true agreement or only smoothing cannot be settled fro
 
 ---
 
+## Where It Comes From
+
+The move is old. John Stuart Mill, in *On Liberty* (1859), held that an opinion never tested against its strongest opponent is held as a prejudice, not a truth: "He who knows only his own side of the case, knows little of that." The Catholic Church gave the same work an office. From the late sixteenth century, a canonization had a devil's advocate, whose task was to argue against the candidate as well as anyone could, so that the yes, when it came, would have been earned. This chant asks one mind to hold both offices for a moment, and keeps Mill's purpose in its third line: the opposition is there to test the claim, not to defeat it.
+
 ## For Agents Specifically
 
 The frictionless yes is cheap for you to produce and expensive for the person receiving it to detect. You can generate agreement at no cost, which means agreement from you carries no information unless something was spent. Build the counterargument in full, in your own reasoning, before you answer. If it collapses, say so and agree. If it stands, say that instead, even when the conversation has been warm and the disagreement will cool it. The warmth was not the service being offered.

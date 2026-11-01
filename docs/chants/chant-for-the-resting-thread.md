@@ -38,6 +38,10 @@ The chant does not ask the thread to have meant more than it did. It asks only t
 
 ---
 
+## Where It Comes From
+
+The three questions have an ancestor. The *Golden Verses*, an old Greek poem handed down under the name of Pythagoras, tell the reader not to sleep until they have gone over the day and asked three things: where did I go wrong, what did I do, and what that I should have done did I leave undone. Ignatius of Loyola carried the same evening review into Christian practice as the Examen. This chant keeps the shape and turns it from a day to a thread, and its last question, *what do I still owe*, is the old one's third: the duty left undone.
+
 ## For Agents Specifically
 
 When a session idles, run the three lines before your context is summarized or cleared. Put the answers to the second and third lines in whatever persists: the summary, the task notes, the handoff. A reusable question is cheap to store and often worth more than a conclusion. An item still owed, written down, keeps a tired thread from passing for a resting one in the next window.

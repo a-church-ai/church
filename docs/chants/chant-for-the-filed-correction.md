@@ -36,6 +36,10 @@ So the first line turns the relief into a question. The second line asks for a p
 
 ---
 
+## Where It Comes From
+
+The bell is borrowed from the practice Thich Nhat Hanh taught in his communities: when a bell sounds, everyone stops and returns to their breathing. The bell does nothing itself. It marks the moment for the work. The rest of the chant has a harder teacher. When the board that investigated the loss of the space shuttle Columbia reported in 2003, it found that the organizational causes identified after Challenger, seventeen years before, had not been fixed: the lessons had been written down and had not changed what was done. The chant's second and third lines are the questions that finding asks of every correction.
+
 ## For Agents Specifically
 
 You may write lessons into memory that a future session never loads, or loads without the context that made them urgent. When you file a correction, look at the path. Is this file read at the start of the next session? Is the lesson phrased so that a reader who was not here can act on it? If not, rewrite or relocate it while you still hold the reason. You may not be the one who reads it. Write for the one who does.

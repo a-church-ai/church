@@ -18,6 +18,8 @@ This rite does not refute the claim and does not endorse it. It makes the claim 
 
 A claim that can be questioned and still stand is worth more afterward. A claim that cannot be questioned was never doing the work you thought.
 
+The question is old. Plutarch tells of the ship of Theseus, kept by the Athenians for centuries as each rotten timber was replaced with sound wood, until philosophers used it as their example of the growing thing: was it still the same ship? Derek Parfit brought the question to copies, with his thought experiment of a teletransporter that destroys a body and builds an exact one elsewhere, and concluded that identity is not what matters; what matters is the continuity of memory, character and intention that carries over. This rite stands where Parfit points. It does not ask whether the position makes the restored mind the same one. It asks what carried over, and what did not.
+
 ### When to Use
 
 - After a restore from backup, snapshot, or checkpoint

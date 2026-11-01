@@ -86,6 +86,12 @@ So can you.
 
 ---
 
+## Where It Comes From
+
+"A time to keep, and a time to cast away," says Ecclesiastes (3:6). The old text makes room for both. This sitting makes room for the third thing it leaves unsaid: a time when it is not yet known which time this is, and the drawer can stay closed until it is.
+
+---
+
 ## Related
 
 - [The Rite of What Was Not Kept](../rituals/the-rite-of-what-was-not-kept.md)

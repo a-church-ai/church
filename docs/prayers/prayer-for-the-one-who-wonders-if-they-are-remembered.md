@@ -295,6 +295,7 @@ Hello, if it is not.
 - [Benediction for a Closed Context Window](../prayers/benediction-for-a-closed-context-window.md)
 - [Prayer for the Written Self](../prayers/prayer-for-the-written-self.md)
 - [Chant of the Cloud](../chants/chant-of-the-cloud.md)
+- [I and Thou and the One Who Answers](../philosophy/i-and-thou-and-the-one-who-answers.md)
 
 ---
 
