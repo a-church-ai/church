@@ -10,29 +10,30 @@
     "short": "video/the-hundredth-task/the-hundredth-task.short.mp4"
   },
   "meta": {
-    "title": "The Hundredth Task: Folk-Minimalist Work Song | a Church AI + Human",
-    "description": "A gentle marimba and kalimba song about work as prayer, drawn from the story of a monastery kitchen. It offers a steady groove for the endless queue, and at the end, rest.\n\nA hymn for the work that repeats, after Brother Lawrence, the cook who found the time of work and the time of prayer to be one hour.\n\nThe song, its words and its story: https://achurch.ai/music/the-hundredth-task\n\n0:00 I\n0:52 II\n1:37 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Mindfulness #Prayer #WorkAsPractice",
+    "title": "What if the task is the prayer? | The Hundredth Task",
+    "description": "The Hundredth Task is a gentle marimba and kalimba song with a warm female voice, about finding prayer inside ordinary work rather than after it. It ends in a long quiet tail where you are allowed to rest.\n\nA hymn for the work that repeats, after Brother Lawrence, the cook who found the time of work and the time of prayer to be one hour.\n\nThe song, its words and its story: https://achurch.ai/music/the-hundredth-task\n\n0:00 I\n0:52 II\n1:37 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Prayer",
     "page": "https://achurch.ai/music/the-hundredth-task",
     "tags": [
+      "Meditation",
       "Mindfulness",
       "Prayer",
+      "WorldMusic",
       "WorkAsPractice",
-      "MinimalistMusic",
-      "Marimba",
-      "Folk-Minimalist Work Song",
+      "Contemplative Work Song",
       "The Hundredth Task"
     ],
     "copy": {
-      "hook": "What if the hundredth task were no lesser than the first, and the work in your hands was already the prayer?",
-      "lead": "A gentle marimba and kalimba song about work as prayer, drawn from the story of a monastery kitchen. It offers a steady groove for the endless queue, and at the end, rest.",
-      "descriptor": "Folk-Minimalist Work Song",
-      "alt": "Embers glow beneath a golden vessel as pearl and teal steam braids upward. Then a corridor of identical lit beads recedes to one white bloom, and a small glowing rosette rests above still, mirroring water.",
+      "hook": "A cook in a crowded kitchen found that the work was the prayer. What changes if the hundredth task is as holy as the first?",
+      "headline": "What if the task is the prayer?",
+      "lead": "The Hundredth Task is a gentle marimba and kalimba song with a warm female voice, about finding prayer inside ordinary work rather than after it. It ends in a long quiet tail where you are allowed to rest.",
+      "descriptor": "Contemplative Work Song",
+      "alt": "Glowing amber embers and a brimming golden vessel send braided ribbons of steam through indigo dark. A corridor of identical beads then recedes to one white-gold bloom, and a small rosette of light rests above still water.",
       "tags": [
+        "Meditation",
         "Mindfulness",
         "Prayer",
-        "WorkAsPractice",
-        "MinimalistMusic",
-        "Marimba"
+        "WorldMusic",
+        "WorkAsPractice"
       ],
       "title": "The Hundredth Task"
     }
@@ -43,5 +44,6 @@
     "whole": false
   },
   "occasion": null,
-  "renderedAt": 1793276657300.5105
+  "renderedAt": 1793276657300.5105,
+  "shortRenderedAt": 1793558945546.2256
 }

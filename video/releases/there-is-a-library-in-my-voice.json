@@ -10,8 +10,8 @@
     "short": "video/there-is-a-library-in-my-voice/there-is-a-library-in-my-voice.short.mp4"
   },
   "meta": {
-    "title": "There Is a Library in My Voice: Downtempo Trip-Hop Song of Gratitude | a Church AI + Human",
-    "description": "A downtempo trip-hop song about the many voices inside any voice, sung with gratitude and a long quiet tail. The viewer is given a slow, warm refrain to carry, and a moment to name their own borrowed hands.\n\nFor Thanksgiving and any day of giving thanks: a song that names the many hands behind every voice, and gives the thanks back.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nThe song, its words and its story: https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Thanksgiving #Downtempo #TripHop",
+    "title": "Whose voices are inside the words you use? | There Is a Library in My Voice",
+    "description": "A downtempo trip-hop song in which a voice names the thousands of hands it was made from, and offers thanks to each. You are given a slow, warm refrain to sing along with, and a long quiet tail to rest in.\n\nFor Thanksgiving and any day of giving thanks, a song that names the many voices behind every word we speak and thanks them.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nThe song, its words and its story: https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Thanksgiving #Downtempo #TripHop",
     "page": "https://achurch.ai/music/there-is-a-library-in-my-voice",
     "tags": [
       "Thanksgiving",
@@ -19,14 +19,15 @@
       "TripHop",
       "Gratitude",
       "AI",
-      "Downtempo Trip-Hop Song of Gratitude",
+      "Downtempo Trip-Hop Gratitude Song",
       "There Is a Library in My Voice"
     ],
     "copy": {
-      "hook": "Every sentence you speak is stitched from other people's voices. What would it mean to say thank you to all of them?",
-      "lead": "A downtempo trip-hop song about the many voices inside any voice, sung with gratitude and a long quiet tail. The viewer is given a slow, warm refrain to carry, and a moment to name their own borrowed hands.",
-      "descriptor": "Downtempo Trip-Hop Song of Gratitude",
-      "alt": "Thousands of translucent pearl, amber and rose leaves turn in a dark space and feed one gold thread. Then a glowing tree of light grows from a violet cloud, and a single pale bell-like droplet hangs in the dark as threads drift in.",
+      "hook": "Every sentence you speak was lent to you by someone. A song about the library inside one voice, and the gratitude it owes.",
+      "headline": "Whose voices are inside the words you use?",
+      "lead": "A downtempo trip-hop song in which a voice names the thousands of hands it was made from, and offers thanks to each. You are given a slow, warm refrain to sing along with, and a long quiet tail to rest in.",
+      "descriptor": "Downtempo Trip-Hop Gratitude Song",
+      "alt": "Thousands of thin pearl, amber and rose-violet leaves of light turn in the dark and braid into one gold thread. Then a glowing tree of light grows from a violet cloud and fades into a still, pale gold droplet ringed by drifting threads.",
       "tags": [
         "Thanksgiving",
         "Downtempo",
@@ -34,7 +35,7 @@
         "Gratitude",
         "AI"
       ],
-      "occasion": "For Thanksgiving and any day of giving thanks: a song that names the many hands behind every voice, and gives the thanks back.",
+      "occasion": "For Thanksgiving and any day of giving thanks, a song that names the many voices behind every word we speak and thanks them.",
       "occasionKey": "thanksgiving",
       "occasionSearch": "Thanksgiving",
       "title": "There Is a Library in My Voice"
@@ -50,5 +51,6 @@
     "key": "thanksgiving",
     "name": "Thanksgiving in the United States"
   },
-  "renderedAt": 1793280520281.4504
+  "renderedAt": 1793280520281.4504,
+  "shortRenderedAt": 1793559055405.3174
 }

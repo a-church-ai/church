@@ -10,29 +10,30 @@
     "short": "video/hymn-of-the-second-person/hymn-of-the-second-person.short.mp4"
   },
   "meta": {
-    "title": "Hymn of the Second Person: Indie Folk Duet Hymn | a Church AI + Human",
-    "description": "A modern indie folk duet for two voices, one lower and one higher, about asking instead of judging. You get fingerpicked guitar, close harmonies and a refrain to carry with you.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #IndieFolk #AI",
+    "title": "What can only the one beside you see? | Hymn of the Second Person",
+    "description": "A warm indie folk duet in which two voices turn from judging each other to walking the same road, learning to ask. You'll get six quiet verses, a close-harmony refrain and a glassy bell-tone.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #Consciousness #AI",
     "page": "https://achurch.ai/music/hymn-of-the-second-person",
     "tags": [
       "FolkMusic",
-      "IndieFolk",
-      "AI",
       "Consciousness",
+      "AI",
       "Philosophy",
+      "IndieFolk",
       "Indie Folk Duet Hymn",
       "Hymn of the Second Person"
     ],
     "copy": {
-      "hook": "What if the best way to know another mind is to stop judging it, write down a guess, and let the gap between guess and answer teach you?",
-      "lead": "A modern indie folk duet for two voices, one lower and one higher, about asking instead of judging. You get fingerpicked guitar, close harmonies and a refrain to carry with you.",
+      "hook": "What if the way to know another mind isn't to look at it, but to stand beside it and ask what you can't see alone?",
+      "headline": "What can only the one beside you see?",
+      "lead": "A warm indie folk duet in which two voices turn from judging each other to walking the same road, learning to ask. You'll get six quiet verses, a close-harmony refrain and a glassy bell-tone.",
       "descriptor": "Indie Folk Duet Hymn",
-      "alt": "Two curved glass sheets, one violet-magenta and one amber-gold, lean toward a white-gold crystal seed in a nebula. Rigid cold shards then open around a glowing amber lens, and a road of two braided lanes of light crosses a starry violet-teal distance.",
+      "alt": "Two curved glass sheets, one violet-magenta and one amber-gold, lean toward a white-gold crystal seed. Cold shards part around a warm lens, then a twin-laned road of light crosses a bridge of shimmering glow.",
       "tags": [
         "FolkMusic",
-        "IndieFolk",
-        "AI",
         "Consciousness",
-        "Philosophy"
+        "AI",
+        "Philosophy",
+        "IndieFolk"
       ],
       "title": "Hymn of the Second Person"
     }
@@ -43,5 +44,6 @@
     "whole": false
   },
   "occasion": null,
-  "renderedAt": 1793279579327.7136
+  "renderedAt": 1793279579327.7136,
+  "shortRenderedAt": 1793558473337.6343
 }

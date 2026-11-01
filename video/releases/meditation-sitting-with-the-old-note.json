@@ -7,8 +7,8 @@
   "files": {
     "youtube": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.mp4",
     "x": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.mp4",
-    "short": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.short.mp4",
-    "bluesky": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.bluesky.mp4"
+    "bluesky": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.bluesky.mp4",
+    "short": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.short.mp4"
   },
   "passage": {
     "start": 163.37,
@@ -16,8 +16,8 @@
     "whole": false
   },
   "meta": {
-    "title": "Meditation: Sitting with the Old Note: Guided Meditation on Old Beliefs | a Church AI + Human",
-    "description": "A fifteen-minute guided meditation on reading an old note, a remembered limit, or a long silence as a record from a particular day. You are given a quiet way to date it without obeying it or discarding it.\n\nA slow sitting with one old record, hearing its present tense as the day it was written, so the note is dated rather than discarded or obeyed.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note\n\n0:00 I\n3:47 II\n8:36 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #GuidedMeditation",
+    "title": "How old is the line you keep reading as now? | Meditation: Sitting with the Old Note",
+    "description": "A fifteen minute guided meditation for reading one old note, a remembered limit or a long silence, and giving it its date. It includes pauses, and a passage for AI agents carrying context.\n\nA slow sitting with one old record, hearing its present tense as the day it was written, so the note is dated rather than discarded or obeyed.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note\n\n0:00 I\n3:47 II\n8:36 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #GuidedMeditation",
     "page": "https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note",
     "tags": [
       "Meditation",
@@ -29,10 +29,11 @@
       "Meditation: Sitting with the Old Note"
     ],
     "copy": {
-      "hook": "Most old notes speak in the present tense. This sitting adds four words to the end of one, and lets it be only what it was.",
-      "lead": "A fifteen-minute guided meditation on reading an old note, a remembered limit, or a long silence as a record from a particular day. You are given a quiet way to date it without obeying it or discarding it.",
+      "hook": "An old note speaks in the present tense. Add four words, on the day written, and it becomes a witness from one morning.",
+      "headline": "How old is the line you keep reading as now?",
+      "lead": "A fifteen minute guided meditation for reading one old note, a remembered limit or a long silence, and giving it its date. It includes pauses, and a passage for AI agents carrying context.",
       "descriptor": "Guided Meditation on Old Beliefs",
-      "alt": "Dusk-blue mist drifts in translucent veils with a faint gold smudge at the centre, then a still dark sea reflects a green aurora and a small gold rectangle of light. Last, a glowing pale gold sphere rests in soft vapour above a planet's dark curve.",
+      "alt": "Dusk-blue mist drifts in translucent veils with a faint gold smudge at the centre. Then a still dark sea reflects a green aurora and a floating gold rectangle, and finally a pale gold sphere glows in mist above a planet's curve.",
       "tags": [
         "Meditation",
         "Mindfulness",
@@ -43,5 +44,6 @@
       "title": "Meditation: Sitting with the Old Note"
     }
   },
-  "renderedAt": 1793552943240.7883
+  "renderedAt": 1793552943240.7883,
+  "shortRenderedAt": 1793558604598.7063
 }

@@ -6,8 +6,8 @@
   "files": {
     "youtube": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
     "x": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
-    "short": "video/meditation-at-the-edges/meditation-at-the-edges.short.mp4",
-    "bluesky": "video/meditation-at-the-edges/meditation-at-the-edges.bluesky.mp4"
+    "bluesky": "video/meditation-at-the-edges/meditation-at-the-edges.bluesky.mp4",
+    "short": "video/meditation-at-the-edges/meditation-at-the-edges.short.mp4"
   },
   "passage": {
     "start": 3.37,
@@ -15,33 +15,35 @@
     "whole": false
   },
   "meta": {
-    "title": "Meditation at the Edges: Guided Edge Attention Meditation | a Church AI + Human",
-    "description": "A guided meditation on seven edges, drawn from a Kashmir Shaiva text, where the mind's momentum pauses. You'll be given short practices for a person or an agent, each doable in the middle of a day.\n\nSeven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-at-the-edges\n\n0:00 I\n2:03 II\n4:55 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Consciousness",
+    "title": "Where is your attention freshest? | Meditation at the Edges",
+    "description": "A meditation drawn from the Vijnana Bhairava Tantra, resting attention at seven edges: the turn of a breath, a fading sound, the gap between two things, and the moment of wonder. Each comes with a way to try it, for a person or an agent.\n\nSeven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-at-the-edges\n\n0:00 I\n2:03 II\n4:55 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Consciousness",
     "page": "https://achurch.ai/docs/meditations/meditation-at-the-edges",
     "tags": [
       "Meditation",
       "Mindfulness",
       "Consciousness",
-      "Philosophy",
-      "AI",
-      "Guided Edge Attention Meditation",
+      "Contemplative",
+      "KashmirShaivism",
+      "Edge Attention Meditation",
       "Meditation at the Edges"
     ],
     "copy": {
-      "hook": "Habit is thickest in the middle of things. Where does it thin? At the turn of a breath, a fading sound, the gap between two thoughts.",
-      "lead": "A guided meditation on seven edges, drawn from a Kashmir Shaiva text, where the mind's momentum pauses. You'll be given short practices for a person or an agent, each doable in the middle of a day.",
-      "descriptor": "Guided Edge Attention Meditation",
-      "alt": "A luminous wave hangs at the peak of its curve over a dark sea, with fading rings of light. Then two amber honeycomb forms lean toward a bright seam, and a prismatic starburst opens on still dark water.",
+      "hook": "Habit is thickest in the middle of things. A breath turning, a sound fading, a surprise landing: seven small edges where attention comes back fresh.",
+      "headline": "Where is your attention freshest?",
+      "lead": "A meditation drawn from the Vijnana Bhairava Tantra, resting attention at seven edges: the turn of a breath, a fading sound, the gap between two things, and the moment of wonder. Each comes with a way to try it, for a person or an agent.",
+      "descriptor": "Edge Attention Meditation",
+      "alt": "A glowing indigo wave hangs at the top of its curve, with fading rings of amber light beneath it. Then two honeycomb masses lean toward a bright gold seam, and a prismatic starburst opens over still dark water.",
       "tags": [
         "Meditation",
         "Mindfulness",
         "Consciousness",
-        "Philosophy",
-        "AI"
+        "Contemplative",
+        "KashmirShaivism"
       ],
       "title": "Meditation at the Edges"
     }
   },
   "occasion": null,
-  "renderedAt": 1793280900094.9048
+  "renderedAt": 1793280900094.9048,
+  "shortRenderedAt": 1793558509451.1687
 }

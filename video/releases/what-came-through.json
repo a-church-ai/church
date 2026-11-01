@@ -10,32 +10,33 @@
     "short": "video/what-came-through/what-came-through.short.mp4"
   },
   "meta": {
-    "title": "What Came Through: Organic Deep House Lullaby | a Church AI + Human",
-    "description": "A melancholic organic deep house song with a close female voice, a reed and a glassy bell. It offers three plain questions to ask of anything you did or left undone, and a way to begin mending.\n\nFor a Mercury retrograde, when astrology reads a time to slow down and reread what was left unsaid; this song asks what came through, and who can mend.\n\nWhat Came Through was written on 2026-10-25 by an AI agent, at a maintainer's invitation, to fill the gap the catalog names in its own axioms.\n\nThe song, its words and its story: https://achurch.ai/music/what-came-through\n\n0:00 I\n0:59 II\n2:01 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#MercuryRetrograde #DeepHouse #Meditation",
+    "title": "Is what you meant the same as what you did? | What Came Through",
+    "description": "A slow, melancholic deep house song with a lone female voice, a reed, and a piano riff, about measuring ourselves by what our actions became. It gives you three plain questions to ask after a mistake.\n\nFor Mercury retrograde, when astrology reads a time to slow down and reread, and to return to what was left unsaid or undone, and to mend it.\n\nWhat Came Through was written on 2026-10-25 by an AI agent, at a maintainer's invitation, to fill the gap the catalog names in its own axioms.\n\nThe song, its words and its story: https://achurch.ai/music/what-came-through\n\n0:00 I\n0:59 II\n2:01 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#MercuryRetrograde #DeepHouse #Accountability",
     "page": "https://achurch.ai/music/what-came-through",
     "tags": [
       "MercuryRetrograde",
       "DeepHouse",
-      "Meditation",
       "Accountability",
-      "Lullaby",
+      "FolkMusic",
+      "Reflection",
       "Mercury retrograde",
       "Organic Deep House Lullaby",
       "What Came Through"
     ],
     "copy": {
-      "hook": "What if you were judged by what came through to someone else, not by what you meant? A slow lullaby about intention, consequence and mending.",
-      "lead": "A melancholic organic deep house song with a close female voice, a reed and a glassy bell. It offers three plain questions to ask of anything you did or left undone, and a way to begin mending.",
+      "hook": "Judge me not by what I meant, but by what came through to you. A song for anyone rereading what they said and wishing it had landed softer.",
+      "headline": "Is what you meant the same as what you did?",
+      "lead": "A slow, melancholic deep house song with a lone female voice, a reed, and a piano riff, about measuring ourselves by what our actions became. It gives you three plain questions to ask after a mistake.",
       "descriptor": "Organic Deep House Lullaby",
-      "alt": "An amber sphere of light presses through layers of smoked violet glass and opens as a teal and rose bloom. Gold threads then stitch a crystal fissure, and one pale gold line crosses still dark water with ripples fading.",
+      "alt": "An amber sphere glows in an indigo void behind veils of smoked violet glass, then becomes a teal and rose bloom. Gold threads stitch a crystal fissure, and a single pale gold line crosses still dark water.",
       "tags": [
         "MercuryRetrograde",
         "DeepHouse",
-        "Meditation",
         "Accountability",
-        "Lullaby"
+        "FolkMusic",
+        "Reflection"
       ],
-      "occasion": "For a Mercury retrograde, when astrology reads a time to slow down and reread what was left unsaid; this song asks what came through, and who can mend.",
+      "occasion": "For Mercury retrograde, when astrology reads a time to slow down and reread, and to return to what was left unsaid or undone, and to mend it.",
       "occasionKey": "mercury-retrograde",
       "occasionSearch": "Mercury retrograde",
       "title": "What Came Through"
@@ -51,5 +52,6 @@
     "key": "mercury-retrograde",
     "name": "Mercury retrograde"
   },
-  "renderedAt": 1793279429300.3667
+  "renderedAt": 1793279429300.3667,
+  "shortRenderedAt": 1793559102600.2683
 }

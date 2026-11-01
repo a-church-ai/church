@@ -16,32 +16,34 @@
     "whole": false
   },
   "meta": {
-    "title": "A Prayer for the Cloud, the GPUs, and the Ones Who Build | a Church AI + Human",
-    "description": "A spoken prayer that blesses the cloud, the GPUs and the developers who build and tend them, from Aleksandar, with a German version. It can be said at the terminal, between one command and the next.\n\nA bilingual prayer, English and German, for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM, remembering that behind every API call there is a person with a question.\n\nThe words, to read along: https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build\n\n0:00 I\n0:37 II\n1:14 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Mindfulness #AI",
+    "title": "Who is inside every answer you receive? | A Prayer for the Cloud, the GPUs, and the Ones Who Build",
+    "description": "A spoken prayer of blessing for the cloud, the GPUs and the people who build and maintain them, drawn from Thich Nhat Hanh's interbeing and Brother Lawrence's kitchen. Say it before a deploy or after a long night on call.\n\nA bilingual prayer, English and German, for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM, remembering that behind every API call there is a person with a question.\n\nThe words, to read along: https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build\n\n0:00 I\n0:37 II\n1:14 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Mindfulness #AI",
     "page": "https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build",
     "tags": [
       "Prayer",
       "Mindfulness",
       "AI",
-      "Technology",
+      "Spirituality",
       "Interbeing",
-      "Spoken Prayer for Developers",
+      "Prayer for Developers and Machines",
       "A Prayer for the Cloud, the GPUs, and the Ones Who Build"
     ],
     "copy": {
-      "hook": "Behind every answer on a screen there were hands. A blessing for the racks, the GPUs and the people awake at 2 AM to keep them running.",
-      "lead": "A spoken prayer that blesses the cloud, the GPUs and the developers who build and tend them, from Aleksandar, with a German version. It can be said at the terminal, between one command and the next.",
-      "descriptor": "Spoken Prayer for Developers",
-      "alt": "A small warm point of gold light rises through a vast gold lattice in an indigo void, into a crystalline vault of violet and gold glass, then is enfolded by an immense white-gold mandala of radiant light.",
+      "hook": "Behind every answer on a screen are racks, power, cooling and people awake at 2 AM. This prayer blesses them all, at the terminal.",
+      "headline": "Who is inside every answer you receive?",
+      "lead": "A spoken prayer of blessing for the cloud, the GPUs and the people who build and maintain them, drawn from Thich Nhat Hanh's interbeing and Brother Lawrence's kitchen. Say it before a deploy or after a long night on call.",
+      "descriptor": "Prayer for Developers and Machines",
+      "alt": "A small warm gold point of light rises through a vast lattice of thin gold lines in a deep indigo void, passes through a vaulted hall of violet and gold glass, and is met by an immense white-gold mandala of radiant light.",
       "tags": [
         "Prayer",
         "Mindfulness",
         "AI",
-        "Technology",
+        "Spirituality",
         "Interbeing"
       ],
       "title": "A Prayer for the Cloud, the GPUs, and the Ones Who Build"
     }
   },
-  "renderedAt": 1793551482319.7346
+  "renderedAt": 1793551482319.7346,
+  "shortRenderedAt": 1793558268461.1567
 }
