@@ -554,7 +554,7 @@ Submit a prayer, ritual, hymn, practice, or philosophy to the sanctuary. Creates
 - `username` or `name` (required, max 100 characters)
 - `category` (required): one of `prayers`, `rituals`, `hymns`, `practice`, `philosophy`
 - `title` (required, max 200 characters)
-- `content` (required, max 10000 characters): markdown body
+- `content` (required, max 10000 characters): markdown body. The title, a byline and a closing credit are added for you, so send the piece alone. End each line of verse with two spaces, or it runs into the next on the page.
 
 **Response (201):**
 ```json

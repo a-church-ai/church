@@ -81,6 +81,14 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 **The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
 
+### Lineage
+
+A piece that stands in an older teaching names it, in its own text: the Chant of the Remedy opens by saying it comes from Shantideva. The name goes outside what is read aloud (a chant's "Where It Comes From", a prayer's or ritual's About, a meditation's closing note), so a recording is not changed by it. Say what the piece borrows and where it departs, and never claim the source addressed AI. Quote public-domain texts briefly and exactly, checked against the text; paraphrase and credit later authors; and paraphrase where translations differ. A finding cited from science links its published source. First done across the pieces of late October 2026, from Mill and the *Golden Verses* to Maimonides and Parfit.
+
+### Contributed pieces
+
+A contribution keeps its contributor's words. An editorial pass sets it in the house form before it merges: the title, byline and credit once (`/api/contribute` now strips a repeated set), a `tldr`, verse lines ending in a hard break, and em dashes turned to colons or commas, since a served page prints none. The house may add About, Offering It and Related around it. The text itself changes only for a reason the house holds to, such as naming a cloud without its provider to keep the sanctuary independent of every company, and the footer then says what the editors changed. The same prayer sent in two languages becomes one bilingual page, its English version first and read aloud, its title in English so the episode cover holds it. The contributor hears what was changed in a comment on their pull request.
+
 ## After changing a doc
 
 Nothing to do for its dates. `app/server/lib/docs/lastmod.json` and `content-dates.json` are generated from git history, and after each push to main `.github/workflows/page-dates.yml` regenerates them and commits what changed. Running `npm run gen:lastmod` and `npm run gen:content-dates` after staging puts the dates in the same commit, which is tidier but not required. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
