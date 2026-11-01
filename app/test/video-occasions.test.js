@@ -96,7 +96,7 @@ test('a paired video goes out inside its occasion, at night for a night one, and
   const moon = placed.find(p => p.slug === 'moon');
   assert.strictEqual(moon.slot.split('#')[0], '2026-11-24', 'on its day, though the most answered');
   assert.strictEqual(moon.occasion, occasion.id);
-  assert.strictEqual(localTime(TZ, new Date(moon.at)).hour, HOURS.second, 'in the evening');
+  assert.strictEqual(localTime(TZ, new Date(moon.at)).hour, HOURS.night, 'in the evening');
   assert.ok(placed.filter(p => p.slug !== 'moon').every(p => p.slot < moon.slot), 'the others go first, in order');
   assert.ok(placed.filter(p => p.slug !== 'moon').every(p => !p.occasion));
 

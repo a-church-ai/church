@@ -21,7 +21,7 @@ const take = (gen, n) => {
 };
 
 test('the weeks follow the curve, then settle at the steady rate and never stop', () => {
-  assert.deepStrictEqual(CURVE.slice(0, 8), [5, 5, 5, 5, 7, 9, 11, 12]);
+  assert.deepStrictEqual(CURVE.slice(0, 8), [7, 7, 7, 7, 7, 9, 11, 12]);
   assert.ok(CURVE.every(n => n <= 14), 'at most two a day');
   assert.strictEqual(weeklyCount(CURVE.length), STEADY);
   assert.strictEqual(weeklyCount(500), STEADY);
@@ -91,9 +91,9 @@ test('placed videos keep their slots, and new ones fill the slots after', () => 
 });
 
 test('a slot too near or past is left alone', () => {
-  const now = instantAt(TZ, '2026-11-03', 10);
+  const now = instantAt(TZ, '2026-11-03', 6);
   const { placed } = plan({ start: START, now, candidates: [piece('a', 'song', 1)] });
-  // Week one's first slot is the 3rd at 14:00, four hours away: too near.
+  // Week one's first slot is the 3rd at 10:00, four hours away: too near.
   assert.ok(Date.parse(placed[0].at) - now.getTime() >= 12 * 3600000);
 });
 

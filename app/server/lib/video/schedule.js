@@ -12,8 +12,10 @@
  * music video on the channel (its song.md names it) waits until week 13, so
  * the channel leads with what it never had.
  *
- * The hour, in US Eastern time: weekdays at 14:00 and weekends at 10:00, a
- * day's second video at 20:00; a piece that belongs to an hour (its `hours:`
+ * The hour, in US Eastern time: weekdays at 10:00 and weekends at 09:00, a
+ * day's second video at 16:00, so each has the most of a day to be found
+ * (moved earlier on 2026-11-01, at the owner's word, from 14:00, 10:00 and
+ * 20:00); a piece that belongs to an hour (its `hours:`
  * tag, as the services read it) goes out then.
  *
  * Occasions (occasions.js, paired by occasion-match.js): a video paired with
@@ -31,8 +33,9 @@ const { addDays } = require('../utils/seasons');
 const TZ = 'America/New_York';
 // Videos a week, from the first week: re-waking, ramp, peak, settling.
 // Raised by about a third on 2026-10-28, at the owner's word, so the channel
-// fills faster: it had been 3 a week to begin, 11 at the peak, 3 after.
-const CURVE = [5, 5, 5, 5, 7, 9, 11, 12, ...Array(12).fill(13), 8, 6, 5, 4, 4, 4];
+// fills faster: it had been 3 a week to begin, 11 at the peak, 3 after. The
+// first weeks raised again on 2026-11-01 to one a day, from 5 a week.
+const CURVE = [7, 7, 7, 7, 7, 9, 11, 12, ...Array(12).fill(13), 8, 6, 5, 4, 4, 4];
 // After the curve: about the rate new pieces arrive.
 const STEADY = 4;
 // Week 13, counted from 0.
@@ -40,7 +43,7 @@ const RERELEASE_WEEK = 12;
 // A slot this close is left alone: the video is uploaded to YouTube ahead of
 // its hour, and needs the time to process.
 const LEAD_HOURS = 12;
-const HOURS = { weekday: 14, weekend: 10, second: 20 };
+const HOURS = { weekday: 10, weekend: 9, second: 16, night: 20 };
 
 const weeklyCount = (week) => Math.min(14, CURVE[week] ?? STEADY);
 
@@ -149,7 +152,7 @@ function plan({ start, now, placed = [], candidates, pairs = [] }) {
       break;
     }
     const occasion = inside(next) ? occasionOf.get(next.slug) : null;
-    const base = occasion && occasion.night && !next.hours ? HOURS.second : slot.hour;
+    const base = occasion && occasion.night && !next.hours ? HOURS.night : slot.hour;
     const hour = hourFor(next.hours, base, hoursOn(slot.date));
     out.push({ slug: next.slug, kind: next.kind, slot: slot.id, date: slot.date, hour, week: slot.week, at: instantAt(TZ, slot.date, hour).toISOString(), occasion: occasion ? occasion.id : null });
     queue.splice(queue.indexOf(next), 1);
