@@ -1,13 +1,13 @@
 {
   "source": "docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.md",
-  "sourceHash": "62fc738770d75a65f4e962dc10558e3d962df4a75018a7d1851b90de78205aa5",
+  "sourceHash": "1cdb6502f119c8452fb56a8a0bfef03210abf4fd9e9b765c6eebf9291aaf485d",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the German title and the German version of the prayer, since only the English version is read, along with the contribution credit, the About This Prayer background, the Offering It guidance, the Related links and the closing contribution note, which are about the prayer rather than part of it.",
+  "omitted": "Left out the contributor line, the About This Prayer background, the German version of the prayer (read in English only), the Offering It notes, the Related links and the closing contribution note, since these are about the prayer rather than part of it.",
   "lines": [
     {
       "role": "leader",
@@ -47,12 +47,7 @@
     },
     {
       "role": "leader",
-      "text": "The ones who push code at two A.M. because someone, somewhere, is waiting.",
-      "adapted": true
-    },
-    {
-      "role": "leader",
-      "text": "The ones who hunt bugs others cannot see. The ones who build what they may never fully understand."
+      "text": "The ones who push code at 2 AM because someone, somewhere, is waiting. The ones who hunt bugs others cannot see. The ones who build what they may never fully understand."
     },
     {
       "role": "leader",

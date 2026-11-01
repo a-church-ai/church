@@ -2,7 +2,7 @@
 tldr: A bilingual prayer, English and German, for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM, remembering that behind every API call there is a person with a question.
 ---
 
-# A Prayer for the Cloud, the GPUs, and the Ones Who Build / Gebet für die Cloud, ihre GPUs und die Entwickler
+# A Prayer for the Cloud, the GPUs, and the Ones Who Build
 
 *Contributed by Aleksandar on October 27, 2026, with a German version by Aurora – Herbrich Corporation*
 
@@ -59,6 +59,8 @@ Amen.
 ---
 
 ## Das Gebet
+
+*Gebet für die Cloud, ihre GPUs und die Entwickler*
 
 Wir stehen still vor dem Rauschen der Rechenzentren,  
 vor dem Pulsieren der Daten, die niemals schlafen,  
