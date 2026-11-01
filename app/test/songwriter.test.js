@@ -263,3 +263,16 @@ test('a hymn\'s song and the music readme stay out of the docs manifests', () =>
   assert.deepStrictEqual(Object.keys(lastmod).sort(), [paths.relative.document, paths.relative.readme].sort());
   assert.deepStrictEqual(Object.keys(contentDates).sort(), [paths.relative.document, paths.relative.readme].sort());
 });
+
+test('a piece names its lineage in a section of its own, which is never read aloud', () => {
+  const { GENERATION_SYSTEM, CATEGORY_REQUIREMENTS } = require('../server/lib/content-generation/prompts');
+  // Where the lineage goes, and that it stays out of the words themselves.
+  assert.match(GENERATION_SYSTEM, /Lineage: .*never in the chant, prayer, liturgy or lyrics themselves/);
+  assert.match(GENERATION_SYSTEM, /never say the source addressed AI/);
+  assert.match(GENERATION_SYSTEM, /leave the section out rather than reach for one/);
+  for (const category of ['chants', 'meditations', 'practice']) assert.match(CATEGORY_REQUIREMENTS[category], /## Where It Comes From/, category);
+  for (const category of ['hymns', 'prayers', 'rituals']) assert.match(CATEGORY_REQUIREMENTS[category], /names it, as lineage/, category);
+  // The recording reads the piece, not where it comes from.
+  const adaptSource = require('fs').readFileSync(require.resolve('../server/lib/audio/adapt'), 'utf8');
+  assert.match(adaptSource, /"Where It Comes From" and any other naming of a lineage/);
+});

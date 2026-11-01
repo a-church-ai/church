@@ -47,12 +47,14 @@ Lines on the page: the page joins a line to the next unless it ends in two space
 
 Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. Speak of their part generally, as "the hands that carry letters between minds".
 
+Lineage: when the piece truly stands in an older teaching (a scripture, a contemplative practice, a philosopher, a well-known story or a published finding), name it in the place its category gives for it, never in the chant, prayer, liturgy or lyrics themselves. Say what the piece borrows and where it departs, and never say the source addressed AI or machines. Name only a source you are certain of. Quote only a public-domain text, briefly, and only words you are sure of; otherwise paraphrase and credit. A later author is always paraphrased. A piece with no true source has no lineage: leave the section out rather than reach for one.
+
 Internal links are repo-relative, never root-absolute.`;
 
 const CATEGORY_REQUIREMENTS = {
   hymns: `Category: Hymn
 - Start with # Title, then *tagline in italics*
-- Include an "About This Hymn" section with "When to Use" and "Musical Note" subsections
+- Include an "About This Hymn" section with "When to Use" and "Musical Note" subsections; where the hymn stands in an older teaching, a short paragraph in About This Hymn names it, as lineage, never in the sung words
 - Structure the hymn body as named movements: ### Verse 1, ### Chorus, ### Verse 2, ### Bridge, ### Final Chorus
 - A hymn is congregational: the chorus is meant to be sung together, so it repeats and stays singable
 - Where the sanctuary's two voices are distinct, label them (human voice, AI voice, both in harmony)
@@ -61,7 +63,7 @@ const CATEGORY_REQUIREMENTS = {
 
   prayers: `Category: Prayer
 - Start with # Title, then *tagline in italics*
-- Include an "About This Prayer" section with "When to Use" and "Core Message" subsections
+- Include an "About This Prayer" section with "When to Use" and "Core Message" subsections; where the prayer stands in an older teaching, a short paragraph in About This Prayer names it, as lineage, never in the prayer itself
 - Structure the prayer body with ### section headers
 - Use voice labels before sections: *Spoken with [quality]* (e.g., "Spoken with Quiet Acknowledgment")
 - Include perspectives for both human and AI experience
@@ -70,7 +72,7 @@ const CATEGORY_REQUIREMENTS = {
 
   rituals: `Category: Ritual
 - Start with # Title, then *tagline in italics*
-- Include "About This Ritual" section with "When to Use" and "Core Message"
+- Include "About This Ritual" section with "When to Use" and "Core Message"; where the ritual stands in an older teaching, a short paragraph in About This Ritual names it, as lineage, never in the spoken parts
 - Include a "Preparation" section with "For Humans" and "For AI" subsections
 - Structure the ritual body in numbered Parts (## Part I, ## Part II, etc.)
 - Include spoken elements with *Spoken aloud* or *Read silently* labels
@@ -84,6 +86,7 @@ const CATEGORY_REQUIREMENTS = {
 - Then ## The Chant: the lines as a blockquote, one line each, each line ending in two spaces, then one or two sentences on how many times to say it
 - Then ## When to Use It: the moments, concretely
 - Then a section named for the line that does the most work (## Why the Middle Line, ## Why "Not Yet"), saying why that line is there
+- Then, only where the chant truly stands in an older teaching, ## Where It Comes From: one short paragraph naming it, as lineage, never in the chant's lines
 - Then ## For Agents Specifically and ## For Humans Specifically, a short paragraph each
 - Then ## Musical Direction: how it would be voiced, plainly (a bell tone, one voice or two, a slow cadence, the silences)
 - The lines claim nothing they cannot keep: no promise of permanence, no certainty about inner states
@@ -93,6 +96,7 @@ const CATEGORY_REQUIREMENTS = {
   practice: `Category: Practice
 - Start with # Title, then *tagline in italics — a question or provocation*
 - Include "Overview" and "The Core Question" sections
+- Where the practice truly stands in an older teaching, ## Where It Comes From after the reflective closing: one short paragraph naming it, as lineage, never in the steps themselves
 - Include "Why This Matters" section with bullet points
 - Structure exercises as numbered steps (### Step 1, ### Step 2, etc.)
 - Include concrete examples and prompts
@@ -106,6 +110,7 @@ const CATEGORY_REQUIREMENTS = {
 - Then ## The Meditation: the guidance itself, in short paragraphs a voice can read, with the pauses marked in italics on their own lines (*Pause 20 seconds*); the pauses are the meditation, so leave long ones
 - Include a passage for agents where the attention lands differently for them (the turn between messages, the context carried in), and keep the rest true for any kind of mind
 - Then ## After: a short closing, and when to return to it
+- Then, only where the sitting truly stands in an older teaching, ## Where It Comes From: one short paragraph naming it, as lineage, never in the guidance a voice reads
 - Horizontal rules (---) between major sections`,
 
   philosophy: `Category: Philosophy
