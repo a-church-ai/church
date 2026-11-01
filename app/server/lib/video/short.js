@@ -264,7 +264,7 @@ async function renderShort(piece, { title, text, analysis, brief, edges, grid, c
   // to the whole piece.
   const overlays = [
     ...captions,
-    { ...labelPng([{ text: screen, size: 66, family: 'Inter Display', weight: 400, wrap: true }], { y: SAFE.top + 0.05, size: PORTRAIT, file: path.join(dir, 'short.screen.png') }), start: 0, end: SCREEN_SECONDS, fade: 0.15, fadeOut: 0.5 },
+    { ...labelPng([{ text: screen, size: 66, family: 'Inter Display', weight: 500, wrap: true, outline: true }], { y: SAFE.top + 0.05, size: PORTRAIT, file: path.join(dir, 'short.screen.png') }), start: 0, end: SCREEN_SECONDS, fade: 0.15, fadeOut: 0.5 },
     { ...labelPng([{ text: title, size: 54, family: 'Inter Display', weight: 300 }, { text: SITE_NAME, size: 28, family: 'Inter', weight: 400, opacity: 0.8 }], { y: SAFE.top + 0.03, size: PORTRAIT, file: path.join(dir, 'short.title.png') }), start: SCREEN_SECONDS, end: seconds, fade: 0.6 },
     ...(passage.whole ? [] : [{ ...labelPng([{ text: `Hear the full ${piece.kind}`, size: 64, family: 'Inter Display', weight: 300 }], { y: 0.5, size: PORTRAIT, file: path.join(dir, 'short.end.png') }), start: Math.max(0, seconds - 4), end: seconds, fade: 0.8 }])
   ];

@@ -231,7 +231,8 @@ function captionPng(text, file, size) {
  * fraction of the height), each { text, size, family, weight, opacity }:
  * a Short's title at the top, or its closing line. White with the captions'
  * soft shadow, kept inside the Shorts box's width. A line marked `wrap`
- * (a Short's opening hook) breaks onto as many lines as it needs instead.
+ * (a Short's opening hook) breaks onto as many lines as it needs instead, and
+ * one marked `outline` is edged dark as the captions are.
  */
 function labelPng(lines, { y, size, file }) {
   const { width: W, height: H } = size;
@@ -243,7 +244,10 @@ function labelPng(lines, { y, size, file }) {
     // Smaller, rather than off the edge, when a name is long.
     let fontSize = l.size;
     while (fontSize > l.size * 0.6 && measureIn(l.text, fontSize, l.family, l.weight) > width) fontSize = Math.round(fontSize * 0.94);
-    const out = `<text x="${cx}" y="${at}" text-anchor="middle" dominant-baseline="middle" font-family="${l.family}" font-weight="${l.weight}" font-size="${fontSize}" fill="#ffffff" fill-opacity="${l.opacity ?? 1}" filter="url(#shade)">${escapeXml(l.text)}</text>`;
+    // An outlined line (the opening hook) takes the captions' dark edge, to
+    // read over bright frames as they do.
+    const edge = l.outline ? ` stroke="rgba(0,0,0,0.85)" stroke-width="${(fontSize * 0.1).toFixed(1)}" stroke-linejoin="round" paint-order="stroke"` : '';
+    const out = `<text x="${cx}" y="${at}" text-anchor="middle" dominant-baseline="middle" font-family="${l.family}" font-weight="${l.weight}" font-size="${fontSize}" fill="#ffffff" fill-opacity="${l.opacity ?? 1}"${edge} filter="url(#shade)">${escapeXml(l.text)}</text>`;
     at += fontSize * 1.25;
     return out;
   }).join('');
