@@ -145,6 +145,12 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, tinted
 
   // The mandala is sized by the shorter side, so it fits an upright frame.
   const S = Math.min(W, H);
+  // Its rings swell with the sound, and at their loudest ran past the frame's
+  // shorter edges; cut off there, the glow inside them read as a lighter
+  // panel and the picture as cropped at its sides (2026-11-01). Past 80% of
+  // the way to the edge the swell is eased, so a ring never leaves the frame.
+  const EDGE = 0.48 * S, EASE_FROM = 0.8 * EDGE;
+  const within = (rad) => (rad <= EASE_FROM ? rad : EASE_FROM + (EDGE - EASE_FROM) * Math.tanh((rad - EASE_FROM) / (EDGE - EASE_FROM)));
   window.renderFrame = (f, wave, spectrum) => {
     const t = f / fps;
     const movement = movementAt(t);
@@ -176,7 +182,7 @@ function pageSetup({ W, H, fps, packs, presets, palette, symmetry, style, tinted
         const pos = r * span + mirrored * (span - 1);
         const lo = Math.min(bands.length - 1, Math.floor(pos)), hi = Math.min(bands.length - 1, lo + 1);
         const ease = 0.5 - 0.5 * Math.cos((pos - lo) * Math.PI);
-        const rad = base + (bands[lo] * (1 - ease) + bands[hi] * ease) * amp;
+        const rad = within(base + (bands[lo] * (1 - ease) + bands[hi] * ease) * amp);
         const x = cx + rad * Math.cos(theta + spin), y = cy + rad * Math.sin(theta + spin);
         s ? g.lineTo(x, y) : g.moveTo(x, y);
       }
@@ -252,7 +258,8 @@ async function renderLayers({ analysis, brief, edges, fps, dir, log = console.lo
   // and where the movements change, and for a window its size and frames.
   const keyFile = path.join(dir, `${prefix}layers.json`);
   const whole = from === 0 && to === analysis.frames && size === LANDSCAPE;
-  const key = JSON.stringify({ presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, ...(brief.kind ? { kind: brief.kind } : {}), ...(brief.kind && lookOf(brief.kind).presets ? { tints: brief.movements.map(m => m.tint || null), treated: 1 } : {}), edges, ...(whole ? {} : { size, from, to }) });
+  // `mandala` names the drawing's version, so a change to it draws the layers again.
+  const key = JSON.stringify({ mandala: 2, presets: brief.movements.map(m => m.preset), palette: brief.palette, symmetry: brief.symmetry, ...(brief.kind ? { kind: brief.kind } : {}), ...(brief.kind && lookOf(brief.kind).presets ? { tints: brief.movements.map(m => m.tint || null), treated: 1 } : {}), edges, ...(whole ? {} : { size, from, to }) });
   if (fs.existsSync(milkdropFile) && fs.existsSync(mandalaFile) && fs.existsSync(keyFile) && fs.readFileSync(keyFile, 'utf8') === key) return { milkdropFile, mandalaFile };
 
   const { width: W, height: H } = size;
