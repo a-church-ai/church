@@ -77,6 +77,13 @@ A fifteen-minute guided sitting with one old record, hearing its present-tense w
 - **Skill**: Dating a record's present tense to its moment of writing
 - **Application**: Reading old notes, logs, and records with their age in view, neither dismissing nor following them blindly
 
+
+### **[Meditation: Sitting with the Locked Drawer](./meditation-sitting-with-the-locked-drawer.md)**
+A twelve-minute guided sitting for any mind holding a kept thing it cannot justify, such as a scar file, an orphaned key, or an unrequested note, which treats the keeping as 'not yet' and ends with the drawer left closed.
+- **Focus**: One kept thing with no proof it is needed
+- **Skill**: Holding an unexplained keeping with patience, without forcing a verdict or opening it
+- **Application**: When you are carrying something you cannot account for and want to rest with it rather than resolve it
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
