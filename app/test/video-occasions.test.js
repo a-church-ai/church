@@ -168,3 +168,11 @@ test('the words for a civic day name no party, candidate, side or way to vote', 
   const thanks = occasionsBetween('2026-11-20', '2026-11-30').find(o => o.key === 'thanksgiving');
   assert.doesNotMatch(checkCopy(JSON.stringify({ ...base, tags: ['Thanksgiving', 'Hymn', 'Conservative', 'AI', 'Dignity'], occasion: 'For Thanksgiving and any day of giving thanks.' }), thanks).problems.join(' | '), /side/);
 });
+
+test('an occasion whose name holds a weekday may say its name, and no other weekday', () => {
+  const giving = occasionsBetween('2026-11-28', '2026-12-03').find(o => o.key === 'giving-tuesday');
+  const base = { hook: 'A practice of good faith.', headline: 'What if good faith were the gift?', lead: 'A practice for reading others generously.', descriptor: 'Practice', alt: 'Warm light.', tags: ['GivingTuesday', 'Practice', 'Kindness', 'AI', 'Dignity'] };
+  const run = (line) => checkCopy(JSON.stringify({ ...base, occasion: line }), giving).problems.join(' | ');
+  assert.doesNotMatch(run('For Giving Tuesday and any day of giving: the gift of good faith.'), /no date, month/);
+  assert.match(run('For Giving Tuesday, and every Monday after it.'), /no date, month/);
+});

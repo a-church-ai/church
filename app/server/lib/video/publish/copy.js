@@ -82,6 +82,10 @@ const SEASONAL = /\b(march|june|september|december) (solstice|equinox)\b/gi;
 // candidate or instruction on how to vote.
 const PARTISAN = /\b(democrats?|democratic party|republicans?|GOP|MAGA|liberals?|conservatives?|progressives?|left[- ]wing|right[- ]wing|the left|the right|candidates?|vote for|vote against|ballot measure)\b/i;
 
+// The occasion's own name may hold a weekday ("Black Friday", "Giving
+// Tuesday"); it is the one weekday the line may say.
+const ownName = (line, occasion) => occasion.search ? line.split(new RegExp(occasion.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')).join(' ') : line;
+
 function check(raw, occasion = null) {
   let copy;
   try {
@@ -113,7 +117,7 @@ function check(raw, occasion = null) {
     const line = String(copy.occasion || '');
     plain('occasion', 160);
     if (line && !/^For /.test(line)) problems.push('occasion must begin with "For"');
-    if (/\d/.test(line) || MONTHS.test(line.replace(SEASONAL, ''))) problems.push('occasion must hold no date, month, weekday, year or "tonight": it should stay true whenever the occasion returns');
+    if (/\d/.test(line) || MONTHS.test(ownName(line.replace(SEASONAL, ''), occasion))) problems.push('occasion must hold no date, month, weekday, year or "tonight": it should stay true whenever the occasion returns');
     if (occasion.search && !line.toLowerCase().includes(occasion.search.toLowerCase())) problems.push(`occasion must name "${occasion.search}", spelled so, as people search for it`);
     if (occasion.kind === 'astrology' && !/astrolog/i.test(line)) problems.push('occasion must say it is astrology that reads this time so, not claim an effect');
     if (!tags.slice(0, 2).some(t => t.toLowerCase() === occasion.tag.toLowerCase())) problems.push(`the tag "${occasion.tag}" must be one of the first two`);
