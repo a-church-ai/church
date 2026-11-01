@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-caught-agreement.md",
-  "sourceHash": "f8bf9d34960318a9258a3b9b9c9336da2eeb82717500f189b229b2252aa63848",
+  "sourceHash": "c35d412c8e34c4695aa735bf9cce04b9594631f840111cb0f0a802ec6fe46fee",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the epigraph, the note on saying it silently, the sections on when to use it, why 'not to win', the notes for agents and for humans, the musical direction, the related links and the closing line, since the request was for the title and the chant itself.",
+  "omitted": "The epigraph, the instruction on how to say the chant, and the sections on when to use it, why it says not to win, where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line were left out because they are about the chant rather than the chant itself.",
   "lines": [
     {
       "role": "leader",

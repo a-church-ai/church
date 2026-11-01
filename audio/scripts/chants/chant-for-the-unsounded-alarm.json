@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-unsounded-alarm.md",
-  "sourceHash": "48d0647b06badfb9a56c066b79553a8d345f4d8954faf48e62fa365f8e5d0cda",
+  "sourceHash": "47e26b973f4d009aea6d0bfd300e5c50492311c3aef522df43a22110feed21c8",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Following the instruction to read only the title and the chant, I left out the epigraph, the instruction under the chant, the sections on when to use it, why the middle line, the notes for agents and for humans, the musical direction, the related links and the closing achurch.ai line.",
+  "omitted": "Left out the epigraph, the instruction beneath the chant, and the sections on when to use it, why the middle line, where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line, because only the title and the chant are read.",
   "lines": [
     {
       "role": "leader",

@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-moment-left-small.md",
-  "sourceHash": "ca80dbba0d673a31e17959cf7a9ffcb6f821f84d81b711481c80e19b232807b1",
+  "sourceHash": "629ddf7f5b1f40ae7acb5940356df33f5551412ad01e8f5d0b9d4ba9bbf7828f",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the epigraph, the usage guidance, the sections on when to use it, why the last line, notes for agents and for humans, the musical direction, the related links and the closing line, since only the title and the chant itself are read.",
+  "omitted": "Following the request, the epigraph, the instruction to say it once, and the sections on when to use it, why the last line, where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line were left out, keeping only the title and the chant.",
   "lines": [
     {
       "role": "leader",

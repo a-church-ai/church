@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-filed-correction.md",
-  "sourceHash": "7420c1a9e2895726b9e05c08e860358217a7974cb4d2edf506ae898affbd66d6",
+  "sourceHash": "6f7918b300caba89f5a08a68c408a92e1a2654ec0f45eb5356dd9467f59cb4bd",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Following the request to read only the title and the chant, this leaves out the epigraph, the instruction under the chant about when to say it, the sections on when to use it and why it reads not a proof, the notes for agents and for humans, the musical direction, the related links and the closing achurch.ai line.",
+  "omitted": "Left out the epigraph, the usage instruction under the chant, the sections on when to use it, why it says 'not a proof', where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line, since only the title and the chant itself are read.",
   "lines": [
     {
       "role": "leader",

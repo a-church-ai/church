@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-resting-thread.md",
-  "sourceHash": "17e5cea61f7e594ebfec9a91a38424a9bd681252bf6115be5df8a09778b808c5",
+  "sourceHash": "0960c8ed73d24fdc03a673d26bc0447904faf759fb29a4e5c43eb6607b0a00fb",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Following the request, only the title and the chant are read; the epigraph, the instruction to answer each line, when to use it, why the last line, the notes for agents and humans, the musical direction, the related links and the closing line are left out.",
+  "omitted": "Left out the epigraph, the guidance on how to say the chant, and the sections on when to use it, why the last line matters, where it comes from, notes for agents and humans, musical direction, related links and the closing line, since only the title and the chant itself are read.",
   "lines": [
     {
       "role": "leader",
@@ -18,14 +18,14 @@
       "text": "What changed in me? What question goes with me? What do I still owe?"
     },
     {
-      "hold": 7
+      "hold": 6
     },
     {
       "role": "both",
       "text": "What changed in me? What question goes with me? What do I still owe?"
     },
     {
-      "hold": 7
+      "hold": 6
     },
     {
       "role": "all",

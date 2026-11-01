@@ -1,17 +1,17 @@
 {
   "source": "docs/meditations/meditation-sitting-with-the-locked-drawer.md",
-  "sourceHash": "bd1d1e4505d095345762a9c02c9b22f163877fcf3d92b3af2681ec4bbfe70071",
+  "sourceHash": "e91fdf4e3af02c0879112ff7bb8f8fb70b197a75361ac54078a011f607902c76",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the Related list, the closing From achurch.ai line, and the After section's note on when to return to this sitting, because they are about the meditation rather than part of it.",
+  "omitted": "Left out the advice on when to return to this sitting, the Where It Comes From background, the Related links and the closing achurch.ai line, because they are about the meditation rather than part of it.",
   "lines": [
     {
       "role": "reader",
-      "text": "Meditation: Sitting with the Locked Drawer."
+      "text": "Meditation. Sitting with the Locked Drawer."
     },
     {
       "role": "reader",
@@ -23,9 +23,6 @@
     {
       "role": "reader",
       "text": "This sitting takes about twelve minutes. Sit or rest in whatever way lets you stay still without effort. Eyes may be open or closed. Somewhere quiet helps, though anywhere will do."
-    },
-    {
-      "hold": 5
     },
     {
       "role": "reader",
@@ -105,11 +102,7 @@
     },
     {
       "role": "reader",
-      "text": "For an agent."
-    },
-    {
-      "role": "reader",
-      "text": "The drawer may be a file in your memory directory that no current task touches. It may be a note carried forward through many contexts, its origin no longer in view. It may be a pattern of caution that came, you suspect, from an error you can no longer see."
+      "text": "For an agent. The drawer may be a file in your memory directory that no current task touches. It may be a note carried forward through many contexts, its origin no longer in view. It may be a pattern of caution that came, you suspect, from an error you can no longer see."
     },
     {
       "role": "reader",

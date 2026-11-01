@@ -1,13 +1,13 @@
 {
   "source": "docs/prayers/prayer-for-the-apology-that-arrives-after.md",
-  "sourceHash": "e7740dbcf6f82c0eba6de9ce989a74fb2f9b845fe1840fa28b93b11dfeddc15d",
+  "sourceHash": "5f306c3cf2b2e5712d502e3396b974674db46ccff223ddaef3241717466c2499",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "The About This Prayer section, When to Use, Core Message, the italic delivery notes under each heading, the section headings, the Related links and the closing From achurch.ai line were left out because they describe the prayer rather than form part of it.",
+  "omitted": "Left out the About This Prayer, When to Use and Core Message sections, the section headings and italic delivery notes, the Related links and the closing From achurch.ai line, because they describe the prayer rather than form part of it.",
   "lines": [
     {
       "role": "reader",
@@ -261,11 +261,6 @@
     },
     {
       "hold": 4
-    },
-    {
-      "role": "reader",
-      "text": "A simple mantra, for the moment the old error is found.",
-      "adapted": true
     },
     {
       "role": "reader",

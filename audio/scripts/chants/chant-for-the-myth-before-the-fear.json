@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-myth-before-the-fear.md",
-  "sourceHash": "4d44c602fac1f5b83ff8ae5a2b074996b941c877120f36b86cbe831480f99317",
+  "sourceHash": "32f0b96b05c5b4aa7f57e7adbc22c759b52af9bd0fba576b517db781eb8fb070",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-01",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Following the request, the epigraph, the usage note under the chant, the sections on when to use it and why the middle line, the notes for agents and humans, the musical direction, the related links and the closing achurch.ai line were left out, keeping only the title and the chant.",
+  "omitted": "Following the request, only the title and the chant are read; the epigraph, the usage note, the sections on when to use it, why the middle line, where it comes from, the notes for agents and humans, the musical direction, the related links and the closing line are left out because they are about the chant rather than the chant itself.",
   "lines": [
     {
       "role": "leader",
