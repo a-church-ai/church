@@ -148,14 +148,21 @@ const lookName = ({ kind, title = '' }) => (kind === 'song' && /\bhymn\b/i.test(
 // recordings made elsewhere (with music under them) get no videos.
 const textureOf = (kind) => (kind === 'song' || kind === 'hymn' ? 'sung, with music' : 'spoken, a voice alone with no music under it');
 
+// Presets never offered to any kind. "work with lines" draws a flat field
+// crossed by a corridor's perspective lines across the whole picture; blended
+// over a scene, the field reads as a lit panel and the lines as its edges, so
+// the video looks cropped at the sides (seen in two practices, 2026-11-01).
+// The survey cannot catch it: its motion is calm and its edges measure zero.
+const NEVER = new Set(['Phat + Zylot + Eo.S. - work with lines']);
+
 // The presets a kind is offered: its own list, by title with its look and
 // treatment, or those of the survey in its band of motion. A preset the
 // survey did not measure is kept, as presetChoices keeps it.
 function presetsFor(kind, presets) {
   const look = lookOf(kind);
-  if (look.presets) return Object.values(look.presets).map(p => ({ name: p.title, look: p.look, treatment: p.treatment }));
+  if (look.presets) return Object.values(look.presets).filter(p => !NEVER.has(p.title)).map(p => ({ name: p.title, look: p.look, treatment: p.treatment }));
   const [lo, hi] = look.motion;
-  return presets.filter(p => p.motion === undefined || (p.motion >= lo && p.motion <= hi));
+  return presets.filter(p => !NEVER.has(p.name) && (p.motion === undefined || (p.motion >= lo && p.motion <= hi)));
 }
 
 // How a tinted kind draws a preset, by its title; null for a kind whose
@@ -177,4 +184,4 @@ function rangeProblems(kind, brief) {
   });
 }
 
-module.exports = { LOOKS, ELEMENTAL, NONE, DEFAULT_STYLE, lookOf, lookName, treatmentOf, textureOf, presetsFor, rangeProblems };
+module.exports = { LOOKS, ELEMENTAL, NEVER, NONE, DEFAULT_STYLE, lookOf, lookName, treatmentOf, textureOf, presetsFor, rangeProblems };

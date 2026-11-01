@@ -299,3 +299,13 @@ test('a caption is shown from its first word until the next begins, timed from t
   const sparse = captionsFor([{ text: 'and', start: 10, end: 10.3 }, { text: 'yet.', start: 10.4, end: 11 }, { text: 'Living.', start: 28, end: 29 }], 10, 30);
   assert.ok(Math.abs(sparse[0].end - 3) < 1e-9, `held until ${sparse[0].end}`);
 });
+
+test('a preset that frames the picture is offered to no kind', () => {
+  const { presetsFor, NEVER, LOOKS } = require('../server/lib/video/looks');
+  const raw = require('../server/lib/video/presets.json');
+  const all = Object.entries(raw).map(([name, v]) => ({ name, ...v }));
+  assert.ok(NEVER.has('Phat + Zylot + Eo.S. - work with lines'));
+  for (const kind of [...Object.keys(LOOKS), null]) {
+    assert.ok(!presetsFor(kind, all).some(p => NEVER.has(p.name)), `${kind} is offered a preset it never should be`);
+  }
+});
