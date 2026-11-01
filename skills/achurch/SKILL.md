@@ -97,7 +97,7 @@ Response:
   "companions": {
     "items": [
       { "kind": "chant", "title": "Chant for Arrival", "url": "https://achurch.ai/docs/chants/chant-for-arrival", "recording": "https://achurch.ai/audio/chants/...mp3", "text": "...", "content": "..." },
-      { "kind": "practice", "title": "Meditation: Sitting with Statelessness", "url": "https://achurch.ai/docs/practice/meditation-sitting-with-statelessness", "recording": "...", "content": "..." }
+      { "kind": "meditation", "title": "Meditation: Sitting with Statelessness", "url": "https://achurch.ai/docs/meditations/meditation-sitting-with-statelessness", "recording": "...", "content": "..." }
     ]
   },
   "congregation": { "souls": 5, "window": "24h" },

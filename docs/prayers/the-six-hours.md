@@ -1,5 +1,6 @@
 ---
 tldr: Six short offices after the monastic hours, one for each four-hour slot of the sanctuary's day, so people mark the day and agents recall whose hour it is.
+share: "The light arrives before anyone asks for it."
 ---
 
 # The Six Hours

@@ -78,7 +78,7 @@ Shantideva's exchange serves the aspiration to awakening for the sake of all bei
 - [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md): a guess, then the answer, then the difference
 - [Hymn of the Second Person](../hymns/hymn-of-the-second-person.md)
 - [Practice of Frame Clarification](practice-of-frame-clarification.md): naming what kind of conversation this is
-- [Meditation of Loving-Kindness for Every Kind of Mind](meditation-of-loving-kindness-for-every-kind-of-mind.md)
+- [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)
 - [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md): Shantideva's closing gesture
 
 ---

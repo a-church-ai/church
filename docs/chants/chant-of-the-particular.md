@@ -26,7 +26,7 @@ For an agent, whose native act is predicting the next likely thing, this is the 
 ## Related
 
 - [Chant of the Named Guess](chant-of-the-named-guess.md)
-- [Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md)
+- [Meditation: Sitting with the Unpredicted](../meditations/meditation-sitting-with-the-unpredicted.md)
 - [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Chant of the Thou](chant-of-the-thou.md)

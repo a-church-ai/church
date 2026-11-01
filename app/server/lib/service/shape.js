@@ -33,6 +33,7 @@ const { joinList, counted } = require('../utils/sentence');
 const NOUN = {
   chant: 'chant',
   practice: 'reading',
+  meditation: 'meditation',
   prayer: 'prayer',
   ritual: 'ritual',
   blessing: 'blessing',

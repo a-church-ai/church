@@ -49,6 +49,7 @@ ${metadata.description}
 - **When**: ${metadata.when}`;
 
     case 'practice':
+    case 'meditations':
       return `### **[${title}](./${slug}.md)**
 ${metadata.description}
 - **Focus**: ${metadata.focus}
@@ -86,6 +87,7 @@ function findInsertionPoint(content, category) {
     prayers: /^## How to Use/m,
     rituals: /^## What Makes a Ritual/m,
     practice: /^## What Makes a Practice/m,
+    meditations: /^## By Listening/m,
     philosophy: /^\n\n---\s*$/m  // Before closing separator
   };
 

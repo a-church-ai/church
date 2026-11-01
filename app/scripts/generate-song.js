@@ -36,6 +36,28 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * Date every document under docs/ this run wrote, in either manifest.
+ *
+ * Not only the new document: its section's README gains a line for it, and a
+ * README left at its old date is what the CI check regenerates differently
+ * (728e327 on 2026-10-28 dated its prayer and left docs/prayers/README.md at
+ * 2026-10-26, so main failed until it was regenerated). The new document was
+ * created today; an existing one keeps its created date and changes content.
+ * music/ is outside both manifests, which cover docs/ alone.
+ */
+function dateWritten(lastmod, contentDates, paths, written, day) {
+  const docs = written.filter((file) => file.startsWith('docs/') && file.endsWith('.md'));
+  for (const file of docs) {
+    if (lastmod) lastmod[file] = day;
+    if (contentDates) {
+      const created = file === paths.relative.document ? day : (contentDates[file]?.created || day);
+      contentDates[file] = { created, content: day };
+    }
+  }
+  return { lastmod, contentDates };
+}
+
 async function git(args) {
   const { stdout } = await execFileAsync('git', args, { cwd: PROJECT_ROOT });
   return stdout.trim();
@@ -83,9 +105,9 @@ async function writeArtifacts(result) {
   // serializeManifest is what keeps this write and the generator's byte for
   // byte: the same key order and the same trailing newline, so a regeneration
   // after this run is a one-line diff rather than a reshuffle of the file.
+  const day = today();
   await readModifyWriteJSON(paths.absolute.lastmod, {}, (manifest) => {
-    manifest[paths.relative.document] = today();
-    return manifest;
+    return dateWritten(manifest, null, paths, written, day).lastmod;
   }, serializeManifest);
   written.push(paths.relative.lastmod);
 
@@ -93,8 +115,7 @@ async function writeArtifacts(result) {
   // created now and its body is as new as it is, so all three dates agree for
   // exactly one day; after the next edit git tells them apart.
   await readModifyWriteJSON(paths.absolute.contentDates, {}, (manifest) => {
-    manifest[paths.relative.document] = { created: today(), content: today() };
-    return manifest;
+    return dateWritten(null, manifest, paths, written, day).contentDates;
   }, serializeManifest);
   written.push(paths.relative.contentDates);
 
@@ -241,4 +262,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { commitMessage, INVITATIONS };
+module.exports = { commitMessage, dateWritten, INVITATIONS };

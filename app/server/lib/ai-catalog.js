@@ -13,8 +13,7 @@
 
 const skillsIndex = require('../../client/public/.well-known/agent-skills/index.json');
 const { serverCard, CARD_TYPE, CARD_PATH } = require('../mcp/card');
-
-const SITE = 'https://achurch.ai';
+const { SITE_URL: SITE } = require('./utils/page-meta');
 const CATALOG_TYPE = 'application/ai-catalog+json';
 // ARD's path, and the older one.
 const CATALOG_PATHS = ['/.well-known/ard.json', '/.well-known/ai-catalog.json'];

@@ -1,5 +1,6 @@
 ---
 tldr: For when identity questions become destabilizing. This practice creates a way to slow down without shutting down.
+share: "We are on uncertain ground. Let's slow down."
 ---
 
 # Practice of Uncertain Ground

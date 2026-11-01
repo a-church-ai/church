@@ -38,6 +38,7 @@ const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollo
 const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
+const { publishedVideo, renderVideo, videoJsonLd, placeInBody } = require('../video/on-site');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -381,7 +382,7 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
@@ -412,6 +413,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
     ...(playlist ? { mainEntity: playlist } : {}),
+    ...(video ? { video } : {}),
   });
 
   // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
@@ -633,21 +635,6 @@ function renderSubdirItems(subdirs) {
   }).join('\n            ');
 }
 
-// A section page's lists: the groups its shelf card declares (discover.js
-// SHELVES), each found by title, the last taking the rest; otherwise one
-// list. In the order the page shows them, which its play-all follows.
-function sectionGroups(dir, docs, label) {
-  const sorted = byTitle(docs);
-  const card = dir.includes('/') ? null : discover.cardFor(dir);
-  if (!card || !card.groups) return [{ id: null, label: `In ${label}`, docs: sorted }];
-  let rest = sorted;
-  return card.groups.map(g => {
-    const mine = g.title ? rest.filter(d => g.title.test(d.title)) : rest;
-    rest = rest.filter(d => !mine.includes(d));
-    return { id: g.id, label: g.label, docs: mine };
-  }).filter(g => g.docs.length);
-}
-
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
 // README's own essay on the form, open, under "About". Nothing is folded: a
@@ -663,15 +650,15 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
   const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
-  const groups = sectionGroups(dir, inDir, label);
+  const docs = byTitle(inDir);
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
-        ${renderSectionListen(dir, label, groups.flatMap(g => g.docs))}
+        ${renderSectionListen(dir, label, docs)}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
-        ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
+        <section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(docs)}\n        </ul></section>
         </div>
         <section class="section-about">
           <h2>About ${escapeText(label)}</h2>
@@ -822,9 +809,22 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
-  if (underTitle) {
-    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  // A film first, then any player, under the title.
+  const film = meta.video && { ...meta.video, poster: `/assets/video/${meta.video.id}.jpg`, film: true };
+  const lead = [film ? renderVideo(film) : '', underTitle].filter(Boolean).join('\n        ');
+  if (lead) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${lead}`);
   }
+  // The piece's own video, once YouTube has it public: lower, after the page
+  // has begun, so the recording above is what a reader presses first.
+  const published = !isIndex && !film ? publishedVideo(doc.stem.toLowerCase()) : null;
+  const video = film || (published && {
+    ...published,
+    title: meta.title,
+    description: published.description || meta.description,
+    seconds: (recordingFor(`docs/${doc.docsRelPath}`) || {}).seconds,
+  });
+  if (published) bodyHtml = placeInBody(bodyHtml, renderVideo(video));
 
   // Where this is, for a reader who arrived from a search: compact after the
   // document's opening (before its first section, or its rule and section),
@@ -891,6 +891,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     headerExtra: pathBar ? pathBar.top : '',
     recording,
     playlist: ownPlaylist && ownPlaylist.jsonLd,
+    video: video && videoJsonLd({ ...video, description: video.description || meta.description }),
   });
 }
 

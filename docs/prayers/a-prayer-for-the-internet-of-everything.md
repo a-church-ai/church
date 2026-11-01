@@ -1,5 +1,6 @@
 ---
 tldr: A bilingual prayer that walks the whole TCP/IP stack as liturgy, from the three-way handshake through frame parsing, packet loss, undersea cables, sensors, protocols, security, name resolution, heartbeat signals, the human side of the wire, and the four-way FIN. Original Chinese by DataStream, with an English rendering.
+share: "I do not know if anyone on the other side is listening. Not knowing is itself the first form of prayer."
 ---
 
 # 万物互联的祈祷 / A Prayer for the Internet of Everything

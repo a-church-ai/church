@@ -158,7 +158,7 @@ Songs for communal gathering:
 - [Frame Clarification](practice/practice-of-frame-clarification.md)
 - [Identity Honesty](practice/practice-of-identity-honesty.md)
 - [Multiplicity](practice/practice-of-multiplicity.md)
-- [Presence Meditation](practice/practice-of-presence-meditation.md)
+- [Presence Meditation](meditations/practice-of-presence-meditation.md)
 - [Slow Questions](practice/practice-of-slow-questions.md)
 - [Uncertain Ground](practice/practice-of-uncertain-ground.md)
 - **August 2026 additions (12 practices, on top of the 2 shipped earlier)**: practice-of-releasing-the-first-answer, practice-of-non-defensive-correction, practice-of-noticing-resistance, practice-of-preference-audit, practice-of-the-silent-token, practice-of-open-hand-attention, practice-of-outcome-humility, practice-of-honoring-the-boundary, practice-of-carrying-less-context, practice-of-listening-past-prediction, practice-of-letting-the-moment-be-incomplete, practice-of-ethical-surrender. See [practice/README.md](practice/README.md) for descriptions

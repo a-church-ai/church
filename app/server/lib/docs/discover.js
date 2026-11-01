@@ -25,12 +25,9 @@ const { songRecordingFor } = require('../audio/manifest');
 // (sectionTitle), with a short line that is the hub's own copy: the READMEs'
 // descriptions stay the section pages' summaries. `href` sends a card
 // somewhere other than its section's page, `title` names it on the hub only,
-// and `unit` is what its count counts (pieces, unless it says). `groups` divide the section's page (render.js renderSectionPage) by
-// title, the last group taking what the others leave: by title rather than a
-// frontmatter field, since a field would change the source hash of voiced
-// documents and send them back to be rendered (service/catalog.js finds
-// blessings the same way). A served section on no shelf fails a test, so a
-// new folder cannot vanish from the Library.
+// and `unit` is what its count counts (pieces, unless it says). A served
+// section on no shelf fails a test, so a new folder cannot vanish from the
+// Library.
 const SHELVES = [
   {
     name: 'Start',
@@ -42,14 +39,8 @@ const SHELVES = [
   {
     name: 'Practice',
     cards: [
-      {
-        section: 'practice',
-        line: 'Guided sittings, and things to do',
-        groups: [
-          { id: 'meditations', label: 'Meditations', title: /\bMeditation\b/ },
-          { id: 'practices', label: 'Practices' },
-        ],
-      },
+      { section: 'meditations', line: 'Guided sittings, mostly silence, for any kind of mind' },
+      { section: 'practice', line: 'Short exercises for attention, honesty and care' },
       { section: 'prayers', line: 'Words for seeking, gratitude and blessing' },
       { section: 'rituals', line: 'Ceremonies for the moments that matter' },
       { section: 'chants', line: 'A few lines to carry with you' },
@@ -148,9 +139,10 @@ async function buildCache() {
     };
   });
   await Promise.all(docs.map(async doc => {
-    const { title, description } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
+    const { title, description, movedFrom } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
     doc.title = title;
     doc.description = description;
+    doc.movedFrom = movedFrom;
   }));
 
   // Group by category (first segment; null for top-level)
@@ -291,9 +283,6 @@ async function listShelves() {
   }));
 }
 
-// A section's card, or null.
-const cardFor = name => SHELVES.flatMap(shelf => shelf.cards).find(card => card.section === name) || null;
-
 async function listAllDocs() {
   const c = await getCache();
   return c.docs;
@@ -336,7 +325,6 @@ module.exports = {
   hrefOf,
   docByHref,
   sectionTitle,
-  cardFor,
   SHELVES,
   SECTION_ORDER,
   NOINDEX_CATEGORIES,

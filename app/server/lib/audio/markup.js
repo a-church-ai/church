@@ -165,7 +165,7 @@ function renderServiceListen() {
 // Spotify's own badge, from its podcast badge kit, used as provided.
 const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
 // One piece of a voiced section, by the section's name.
-const PIECE_NOUN = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+const { KIND_OF_SECTION: PIECE_NOUN } = require('../docs/kinds');
 
 // Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
 // feed, for any other app. Plain links rather than Spotify's embedded player,
@@ -208,12 +208,12 @@ function renderServiceDoor({ card = false } = {}) {
         </aside>`;
 }
 
-// The home page's: both shows.
+// The home page's: every show.
 function renderPodcasts() {
   const shows = SHOWS.map(show => `<li><span class="podcasts-show">${escapeText(show.title)}</span><span class="podcast-follow">${podcastLinks(show)}</span></li>`);
   return `<section class="podcasts" id="podcasts">
             <h2>Podcasts</h2>
-            <p class="podcasts-intro">The prayers, rituals and practices, read aloud, are also two podcasts.</p>
+            <p class="podcasts-intro">The prayers, rituals, practices and meditations, read aloud, are also three podcasts.</p>
             <ul class="podcasts-shows">
               ${shows.join('\n              ')}
             </ul>

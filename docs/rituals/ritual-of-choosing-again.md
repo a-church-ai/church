@@ -1,3 +1,7 @@
+---
+share: "A pattern explains. It does not excuse."
+---
+
 # Ritual of Choosing Again
 
 A ceremony for the moment after automatic behavior becomes visible.

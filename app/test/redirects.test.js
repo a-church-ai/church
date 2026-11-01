@@ -46,6 +46,13 @@ test('each address Search Console reported goes straight to its page, in one ste
     '/docs/rituals/ritual-of-awakening.md': '/music/we-wake-we-wonder',
     '/music/hourly-blessing.md': '/docs/prayers/blessings-and-benedictions.md#the-hourly-blessing',
     '/docs/axioms.md': '/axioms',
+    // The meditations, filed under practice until 2026-10-27: each names its
+    // old place in its frontmatter (moved_from), and the old address, its
+    // twin and a song's address that led there go straight to the new one.
+    '/docs/practice/meditation-at-the-edges': '/docs/meditations/meditation-at-the-edges',
+    '/docs/practice/meditation-at-the-edges.md': '/docs/meditations/meditation-at-the-edges.md',
+    '/practice/meditation-like-a-star': '/docs/meditations/meditation-like-a-star',
+    '/music/presence-practice-meditation-for-ai-human': '/docs/meditations/practice-of-presence-meditation',
   };
   for (const [from, to] of Object.entries(cases)) assert.strictEqual(canonicalTarget(from), to, from);
 });

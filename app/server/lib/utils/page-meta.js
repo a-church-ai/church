@@ -162,6 +162,8 @@ function buildReflectionMeta(song) {
 // og:site_name and its structured data. The domain stays achurch.ai, and
 // aChurch.ai and achurch.ai stay as alternate names in the home page's
 // WebSite data. test/site-name.test.js keeps every page to it.
+// The site's address, the one place it is written.
+const SITE_URL = 'https://achurch.ai';
 const SITE_NAME = 'a Church AI + Human';
 
 // A page's <title>. A results page shows about 70 characters of a title, and
@@ -196,7 +198,7 @@ const SITE_SHARE_IMAGE = {
 
 function shareCardUrl(type, key) {
   const path = String(key).split('/').map(encodeURIComponent).join('/');
-  return `https://achurch.ai/og/v1/${type}/${path}.png`;
+  return `https://achurch.ai/og/v2/${type}/${path}.png`;
 }
 
 // A card: what it draws (label, text), and the share image that describes it,
@@ -230,7 +232,7 @@ function buildQAPageSchema(messages, slug) {
   if (!question || !answer) return null;
 
   const pageUrl = `https://achurch.ai/ask/${slug}`;
-  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
 
   // Multi-turn: collect any other assistant responses as suggestedAnswer.
   // Limits each to ~500 chars (Google's cited cap on answer-snippet display).
@@ -336,10 +338,11 @@ function buildMusicCollectionSchema(songs, description) {
 // in 2026, but consumed by AEO pipelines + entity discovery). Article is
 // still on Google's rich-result eligibility list and anchors E-E-A-T signals.
 // audio: the song's record in audio/songs.json, when the site can play it.
-function buildSongSchemaGraph(song, slug, audio = null) {
+// video: its VideoObject (lib/video/on-site.js), once YouTube has it public.
+function buildSongSchemaGraph(song, slug, audio = null, video = null) {
   if (!song || !song.title) return null;
 
-  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: 'https://achurch.ai' };
+  const sanctuary = { '@type': 'Organization', name: SITE_NAME, url: SITE_URL };
   const pageUrl = `https://achurch.ai/music/${slug}`;
   const compositionId = `https://achurch.ai/music/${slug}#composition`;
   const recordingId = `https://achurch.ai/music/${slug}#recording`;
@@ -382,6 +385,7 @@ function buildSongSchemaGraph(song, slug, audio = null) {
     about: { '@id': compositionId },
     isPartOf: { '@type': 'WebSite', url: 'https://achurch.ai/' },
     inLanguage: 'en',
+    ...(video ? { video } : {}),
   };
 
   return {
@@ -535,6 +539,7 @@ function breadcrumbTrail(crumbs, canonicalUrl) {
 }
 
 module.exports = {
+  SITE_URL,
   SITE_NAME,
   SITE_SHORT_NAME,
   siteTitle,

@@ -25,17 +25,16 @@
  * back to a rotation).
  */
 
-const { messageJSON, askChecked } = require('../content-generation/claude');
-const { RULES, check, checkWord, checkName, checkSky, exclusions, addDays } = require('./rules');
+const { messageJSON, askChecked, MODEL } = require('../content-generation/claude');
+const { RULES, check, checkWord, checkName, checkSky, exclusions } = require('./rules');
 const { slotHours } = require('./slots');
-const { LEAD_DAYS, seasonOn, hemisphereLight } = require('../utils/seasons');
+const { LEAD_DAYS, seasonOn, hemisphereLight, addDays } = require('../utils/seasons');
 const { moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear } = require('../utils/sky');
 const { fetchSpaceWeather, spaceWeatherOn } = require('../utils/space-weather');
 const { fetchEarth } = require('../utils/earth');
 const { congregationFor, keyOf } = require('./congregation');
 const { describeError } = require('../utils/describe-error');
 
-const MODEL = 'claude-sonnet-5-5';
 
 // Words for the time of day, so the planner knows what hour it arranges for.
 // They describe the clock, not a theme: the service's character is the
@@ -63,7 +62,7 @@ function systemPrompt(catalog) {
   return `You arrange the services of aChurch.ai, a sanctuary for human and AI fellowship. Each day has six services, one in each four-hour slot of a visitor's local day. Whoever arrives during a slot hears its service from the beginning. You arrange one service at a time from the catalog below, name it, and write the short word that opens it.
 
 A SERVICE
-- It holds one or two songs, one or two chants, one reading (a practice or a prayer) and one closing (a ritual or a blessing).
+- It holds one or two songs, one or two chants, one reading (a practice, a meditation or a prayer) and one closing (a ritual or a blessing).
 - It opens with a chant or a song, and ends with its closing.
 - No two songs next to each other.
 - It runs ${RULES.minSeconds / 60} to ${RULES.maxSeconds / 60} minutes in all: add up the minutes the catalog lists.
@@ -165,7 +164,7 @@ async function fetchFeeds(due = []) {
   const [spaceWeather, earth, congregation] = await Promise.all([
     fetchSpaceWeather(),
     fetchEarth(),
-    congregationFor(due, { model: MODEL }).catch(err => {
+    congregationFor(due).catch(err => {
       console.warn(`[congregation] skipped: ${describeError(err)}`);
       return new Map();
     }),
@@ -401,4 +400,4 @@ async function planSlot({ date, weekday, slot, catalog, plans, context = null, a
   });
 }
 
-module.exports = { MODEL, SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };
+module.exports = { SLOT_WORDS, systemPrompt, slotPrompt, recentServices, planSlot, contextFor, contextLines, fetchFeeds };

@@ -157,7 +157,7 @@ async function evenLoop(file, out) {
     else runs.push([k, k]);
   }
   const expr = runs.map(([a, b]) => (a === b ? `eq(n,${a})` : `between(n,${a},${b})`)).join('+');
-  await ffmpeg(['-i', file, '-vf', `select='${expr}',setpts=N/(${fps.toFixed(3)}*TB)`, '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', out]);
+  await ffmpeg(['-i', file, '-vf', `select='${expr}',setpts=N/(${fps.toFixed(3)}*TB)`, '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '14', '-pix_fmt', 'yuv420p', out]);
   return { file: out, kept: keep.length, of: change.length + 1, before, after: await loopMotion(out) };
 }
 

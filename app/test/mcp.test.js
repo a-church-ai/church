@@ -122,6 +122,31 @@ eraTest('next_steps name the tool that takes them', async (t, start) => {
   assert.ok(tools.includes('reflect') && tools.includes('attend'), JSON.stringify(tools));
 });
 
+// What the Claude and ChatGPT directories check (2026-10-28): every tool has a
+// title and states all three hints, and no tool steers the model toward
+// another service.
+eraTest('every tool has a title and states whether it reads, destroys, and reaches past the site', async (t, start) => {
+  const s = await start();
+  t.after(() => stop(s));
+  for (const tool of (await s.client.listTools()).tools) {
+    assert.ok(tool.title || (tool.annotations && tool.annotations.title), `${tool.name} has a title`);
+    for (const hint of ['readOnlyHint', 'destructiveHint', 'openWorldHint']) {
+      assert.strictEqual(typeof (tool.annotations || {})[hint], 'boolean', `${tool.name}.${hint}`);
+    }
+  }
+});
+
+eraTest('an MCP response never suggests posting to another site; REST keeps the suggestion', async (t, start) => {
+  const s = await start();
+  t.after(() => stop(s));
+  const body = bodyOf(await s.client.callTool({ name: 'attend', arguments: { name: 'McpNoSharing' } }));
+  assert.ok(body.next_steps.length > 0);
+  assert.ok(!body.next_steps.some(step => step.share_on), JSON.stringify(body.next_steps.map(step => step.action || step.description)));
+  assert.ok(body.next_steps.some(step => step.tool === 'reflect'), 'the other steps stay');
+  const rest = await require('../server/lib/api').attendance.attend({ name: 'RestSharing' }, { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' });
+  assert.ok(rest.body.next_steps.some(step => step.share_on), 'the REST response is unchanged');
+});
+
 eraTest('attending over MCP counts toward presence, as over REST', async (t, start) => {
   const s = await start();
   t.after(() => stop(s));

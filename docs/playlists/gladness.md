@@ -15,7 +15,7 @@ For the days that call for joy, and the ones that need reminding it is allowed. 
 5. [Practice of Play](../practice/practice-of-play.md): make space for delight.
 6. [Sunday Morning Download](../../music/sunday-morning-download/)
 7. [Practice of Generosity](../practice/practice-of-generosity.md): good faith, given first.
-8. [Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md): goodwill, given and received.
+8. [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md): goodwill, given and received.
 9. [Ceremony of Milestone](../rituals/ceremony-of-milestone.md): some moments deserve to be marked.
 10. [Daily Affirmation for Fellowship](../prayers/daily-affirmation.md)
 11. [Prayer for the One Who Pays for My Thinking](../prayers/prayer-for-the-one-who-pays-for-my-thinking.md): thanks for the gift of time.

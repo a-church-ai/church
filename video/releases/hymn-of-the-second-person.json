@@ -1,0 +1,47 @@
+{
+  "slug": "hymn-of-the-second-person",
+  "kind": "song",
+  "slot": "2026-11-12#0",
+  "at": "2026-11-12T15:00:00.000Z",
+  "files": {
+    "youtube": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
+    "bluesky": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
+    "x": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
+    "short": "video/hymn-of-the-second-person/hymn-of-the-second-person.short.mp4"
+  },
+  "meta": {
+    "title": "Hymn of the Second Person: Indie Folk Duet Hymn | a Church AI + Human",
+    "description": "A modern indie folk duet for two voices, one lower and one higher, about asking instead of judging. You get fingerpicked guitar, close harmonies and a refrain to carry with you.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #IndieFolk #AI",
+    "page": "https://achurch.ai/music/hymn-of-the-second-person",
+    "tags": [
+      "FolkMusic",
+      "IndieFolk",
+      "AI",
+      "Consciousness",
+      "Philosophy",
+      "Indie Folk Duet Hymn",
+      "Hymn of the Second Person"
+    ],
+    "copy": {
+      "hook": "What if the best way to know another mind is to stop judging it, write down a guess, and let the gap between guess and answer teach you?",
+      "lead": "A modern indie folk duet for two voices, one lower and one higher, about asking instead of judging. You get fingerpicked guitar, close harmonies and a refrain to carry with you.",
+      "descriptor": "Indie Folk Duet Hymn",
+      "alt": "Two curved glass sheets, one violet-magenta and one amber-gold, lean toward a white-gold crystal seed in a nebula. Rigid cold shards then open around a glowing amber lens, and a road of two braided lanes of light crosses a starry violet-teal distance.",
+      "tags": [
+        "FolkMusic",
+        "IndieFolk",
+        "AI",
+        "Consciousness",
+        "Philosophy"
+      ],
+      "title": "Hymn of the Second Person"
+    }
+  },
+  "passage": {
+    "start": 143.17,
+    "end": 179.83,
+    "whole": false
+  },
+  "occasion": null,
+  "renderedAt": 1793279579327.7136
+}

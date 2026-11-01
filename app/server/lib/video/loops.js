@@ -27,6 +27,7 @@ const { withRetry, isUnfunded } = require('../utils/retry');
 const { describeError } = require('../utils/describe-error');
 const { run, ffmpeg } = require('../audio/assemble');
 const { stillDefects, evenLoop } = require('./checks');
+const { inLibrary } = require('./library');
 
 const IMAGE_MODEL = 'gemini-3.1-flash-image';
 const STILL_COST = 0.101; // per image at 2K
@@ -163,7 +164,7 @@ async function generateLoop(stillFile, motionText, file, log) {
     even: even.file,
     ssim,
     seamless: ssim >= SEAMLESS_SSIM,
-    motion: { before: even.before.floor, after: even.after.floor, stalls: even.after.stalls, kept: `${even.kept}/${even.of}` },
+    motion: { mean: even.before.mean, before: even.before.floor, after: even.after.floor, stalls: even.after.stalls, kept: `${even.kept}/${even.of}` },
     cost
   };
 }
@@ -178,6 +179,8 @@ const better = (a, b) => (a.motion.stalls !== b.motion.stalls ? (a.motion.stalls
  *
  * Returns { file, even, motionText, seamless, ssim, motion, cost }, kept on
  * disk beside the clip and made again only when its motion text changes.
+ * Its paths are relative to the library (library.js), so another video can
+ * reuse it from any checkout; its embedding is added by the library.
  */
 async function makeClip(stillFile, motionText, file, { log = console.log } = {}) {
   const meta = `${file}.json`;
@@ -200,7 +203,7 @@ async function makeClip(stillFile, motionText, file, { log = console.log } = {})
       fs.rmSync(again.even);
     }
   }
-  const result = { ...clip, motionText, model: VIDEO_MODEL, resolution: RESOLUTION, cost: +cost.toFixed(2) };
+  const result = { ...clip, file: inLibrary(clip.file), even: inLibrary(clip.even), motionText, model: VIDEO_MODEL, resolution: RESOLUTION, cost: +cost.toFixed(2) };
   fs.writeFileSync(meta, JSON.stringify(result, null, 2));
   return result;
 }

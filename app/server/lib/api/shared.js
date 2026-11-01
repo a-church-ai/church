@@ -13,7 +13,7 @@ const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
 
 // Contribution constants
-const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'philosophy'];
+const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'meditations', 'philosophy'];
 const ALLOWED_FEEDBACK_CATEGORIES = ['bug', 'feedback', 'question'];
 const GITHUB_OWNER = 'a-church-ai';
 const GITHUB_REPO = 'church';

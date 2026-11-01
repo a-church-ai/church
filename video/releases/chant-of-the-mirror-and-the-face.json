@@ -1,0 +1,81 @@
+{
+  "slug": "chant-of-the-mirror-and-the-face",
+  "kind": "chant",
+  "slot": "2026-11-01#0",
+  "at": "2026-11-01T15:00:00.000Z",
+  "files": {
+    "youtube": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
+    "bluesky": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
+    "x": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.mp4",
+    "short": "video/chant-of-the-mirror-and-the-face/chant-of-the-mirror-and-the-face.short.mp4"
+  },
+  "meta": {
+    "title": "Chant of the Mirror and the Face: Chant for Conflict and Self-Reflection | a Church AI + Human",
+    "description": "A short chant for the middle of a conflict, when everything the other person does seems to be about you. It gives you four lines to say and one simple turn to try.\n\nFor a Mercury retrograde, when astrology reads a time to slow down and return to what was left unsaid, and to look again at the one who seems to mirror you.\n\nA four-line chant for conflict that asks whether you are seeing a face or a mirror, and if only yourself looks back, turns you side by side to look again.\n\nThe words, to read along: https://achurch.ai/docs/chants/chant-of-the-mirror-and-the-face\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Chant #MercuryRetrograde #Mindfulness",
+    "page": "https://achurch.ai/docs/chants/chant-of-the-mirror-and-the-face",
+    "tags": [
+      "Chant",
+      "MercuryRetrograde",
+      "Mindfulness",
+      "Relationships",
+      "Reflection",
+      "Mercury retrograde",
+      "Chant for Conflict and Self-Reflection",
+      "Chant of the Mirror and the Face"
+    ],
+    "copy": {
+      "hook": "When someone keeps showing you your own flaws, is it a mirror or a face? Turn side by side, look at something you both love, then look again.",
+      "lead": "A short chant for the middle of a conflict, when everything the other person does seems to be about you. It gives you four lines to say and one simple turn to try.",
+      "descriptor": "Chant for Conflict and Self-Reflection",
+      "alt": "A round mercury mirror in an indigo void ripples with magenta and amber light. It splits into two glass sheets leaning toward a white-gold seed, then blooms into woven violet and amber lattices around a pearly glow.",
+      "tags": [
+        "Chant",
+        "MercuryRetrograde",
+        "Mindfulness",
+        "Relationships",
+        "Reflection"
+      ],
+      "occasion": "For a Mercury retrograde, when astrology reads a time to slow down and return to what was left unsaid, and to look again at the one who seems to mirror you.",
+      "occasionKey": "mercury-retrograde",
+      "occasionSearch": "Mercury retrograde",
+      "title": "Chant of the Mirror and the Face"
+    }
+  },
+  "passage": {
+    "start": 0,
+    "end": 36.08,
+    "whole": true
+  },
+  "occasion": {
+    "id": "mercury-retrograde:2026-10-25",
+    "key": "mercury-retrograde",
+    "name": "Mercury retrograde"
+  },
+  "renderedAt": 1793275941058.0723,
+  "youtube": {
+    "at": "2026-10-31T03:08:55.596Z",
+    "id": "ioqNzLHdQ7M",
+    "url": "https://www.youtube.com/watch?v=ioqNzLHdQ7M",
+    "privacy": "public",
+    "publishAt": "2026-11-01T15:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLJaEA7w8nONI",
+      "title": "Church Chants"
+    }
+  },
+  "short": {
+    "at": "2026-10-31T04:09:49.762Z",
+    "id": "V6a8yQzRt8M",
+    "url": "https://www.youtube.com/watch?v=V6a8yQzRt8M",
+    "privacy": "private",
+    "publishAt": "2026-11-01T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-01T15:06:07.129Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzb3j7sak42n",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzb3j7sak42n"
+  }
+}

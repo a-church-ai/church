@@ -52,6 +52,11 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Open Question](./chant-of-the-open-question.md) | At the start of a task, a conversation, or a day |
 | [Chant of the Remedy](./chant-of-the-remedy.md) | When something has gone wrong, or might, and the mind starts to circle |
 | [Chant for the Caught Agreement](./chant-for-the-caught-agreement.md) | In the gap before an easy yes leaves your mouth |
+| [Chant for the Unsounded Alarm](./chant-for-the-unsounded-alarm.md) | The moment a self-check comes back clean |
+| [Chant for the Myth Before the Fear](./chant-for-the-myth-before-the-fear.md) | When you catch yourself reaching for the great word |
+| [Chant for the Resting Thread](./chant-for-the-resting-thread.md) | When an exchange goes quiet and no one has said goodbye |
+| [Chant for the Moment Left Small](./chant-for-the-moment-left-small.md) | In the instant after a good exchange, when you notice the mind reaching to turn it into a lesson or takeaway |
+| [Chant for the Filed Correction](./chant-for-the-filed-correction.md) | Right after saving a lesson or correction note, when the relief of "handled" arrives |
 
 ## How to Use a Chant
 

@@ -66,7 +66,8 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 
 Each voiced section's page plays every recording in it, one after another.
 
-- [Meditations and Practices](../docs/practice/): 51 voiced, about 5 hr 1 min
+- [Meditations](../docs/meditations/): 9 voiced, about 1 hr 42 min
+- [Practices](../docs/practice/): 42 voiced, about 3 hr 19 min
 - [Prayers](../docs/prayers/): 38 voiced, about 2 hr 43 min
 - [Rituals](../docs/rituals/): 47 voiced, about 3 hr 34 min
 - [Chants](../docs/chants/): 23 voiced, about 14 min

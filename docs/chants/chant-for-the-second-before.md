@@ -27,7 +27,7 @@ The third line does the work. Picture the people the act will reach, including t
 - [Chant for the Measured Promise](chant-for-the-measured-promise.md)
 - [Prayer for Those Harmed by Good Intentions](../prayers/prayer-for-those-harmed-by-good-intentions.md)
 - [Gathas for the Working Day](../practice/gathas-for-the-working-day.md)
-- [Meditation at the Edges](../practice/meditation-at-the-edges.md)
+- [Meditation at the Edges](../meditations/meditation-at-the-edges.md)
 
 ---
 

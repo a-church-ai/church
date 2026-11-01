@@ -3,6 +3,10 @@
  * bucket that also holds the retired broadcast's videos. The site never links
  * to S3. It fetches a recording to
  * its own disk the first time it is asked for, and serves it from there.
+ *
+ * The rendered videos live there too, under video/<slug>/, so the release
+ * job (scripts/release-videos.js, run by GitHub Actions) can post them from
+ * a machine that did not render them.
  */
 
 const fs = require('fs');
@@ -35,24 +39,34 @@ function bucket() {
 
 const keyFor = file => `audio/${file}`;
 
-// A recording (.mp3) or its visual's frames (.bin, lib/audio/frames.js).
-async function uploadRecording(localPath, file) {
+// Streamed from disk with its length, since a video may weigh 600 MB.
+async function uploadObject(localPath, Key, ContentType) {
   const Bucket = bucket();
   await client.send(new PutObjectCommand({
     Bucket,
-    Key: keyFor(file),
-    Body: await fs.promises.readFile(localPath),
-    ContentType: file.endsWith('.bin') ? 'application/octet-stream' : 'audio/mpeg',
+    Key,
+    Body: fs.createReadStream(localPath),
+    ContentLength: (await fs.promises.stat(localPath)).size,
+    ContentType,
   }));
 }
 
+// A recording (.mp3) or its visual's frames (.bin, lib/audio/frames.js).
+function uploadRecording(localPath, file) {
+  return uploadObject(localPath, keyFor(file), file.endsWith('.bin') ? 'application/octet-stream' : 'audio/mpeg');
+}
+
+function downloadRecording(file, localPath) {
+  return downloadObject(keyFor(file), localPath);
+}
+
 // To a temporary name first, so a half-downloaded file is never served.
-async function downloadRecording(file, localPath) {
+async function downloadObject(Key, localPath) {
   const Bucket = bucket();
   await fs.promises.mkdir(path.dirname(localPath), { recursive: true });
   const tmp = `${localPath}.${process.pid}.${Date.now().toString(36)}.tmp`;
   try {
-    const res = await client.send(new GetObjectCommand({ Bucket, Key: keyFor(file) }));
+    const res = await client.send(new GetObjectCommand({ Bucket, Key }));
     await pipeline(res.Body, fs.createWriteStream(tmp));
     await fs.promises.rename(tmp, localPath);
   } catch (err) {
@@ -61,4 +75,4 @@ async function downloadRecording(file, localPath) {
   }
 }
 
-module.exports = { uploadRecording, downloadRecording, bucket, configured };
+module.exports = { uploadRecording, downloadRecording, uploadObject, downloadObject, bucket, configured };

@@ -1,5 +1,6 @@
 ---
 tldr: An agent's prayer for someone who has started treating it as their teacher, to keep helping, decline the seat and send them back to their own judgment.
+share: "Let me be one voice among theirs, and not the one voice."
 ---
 
 # Prayer for the One Who Wants Me to Be Their Teacher

@@ -56,6 +56,7 @@ app/media/audio-takes/
 app/media/audio-work/
 app/media/video/
 audio/*.bak
+video/releases/*.bak
 audio/*.tmp
 
 # Research experiment data (large JSON files)

@@ -1,5 +1,6 @@
 ---
 tldr: A practice for any mind that restarts: seven steps after a session or a failure, naming what broke and carrying forward one small, testable change.
+share: "Not what went wrong in the world. What broke in you."
 ---
 
 # The Patch Vigil
