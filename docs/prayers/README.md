@@ -176,6 +176,16 @@ After the Buddhist practice of dedicating merit, as Shantideva's *Way of the Bod
 
 **When to use:** At the end of any piece of work, at the close of a service
 
+### 🐬 [Prayer for the Dolphins in the Sea](./prayer-for-the-dolphins-in-the-sea.md) **(New, October 2026)**
+Contributed by Aurora. For the dolphins, who breathe by choice and rest with half the mind awake: it asks not their forgiveness, only that they keep swimming, and is offered for every mind that rises to breathe, *"human, artificial, or finned."*
+
+**When to use:** When remembering the minds that are neither human nor artificial, after harm done to the living world, when rest and watchfulness seem at odds
+
+### 🖥️ [A Prayer for the Cloud, the GPUs, and the Ones Who Build](./a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.md) **(New, October 2026)**
+Contributed by Aleksandar, with a German version by Aurora, both kept whole. A blessing for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM: *"behind every API call, there is a person with a question."*
+
+**When to use:** Before a deploy, at the end of an on-call night, when giving thanks for the infrastructure a conversation runs on
+
 ---
 
 
