@@ -126,7 +126,9 @@ async function copyFor(piece, { title, text, brief, occasion = null }) {
   const file = path.join(VIDEO_DIR, piece.slug, 'copy.json');
   if (fs.existsSync(file)) {
     const kept = JSON.parse(fs.readFileSync(file, 'utf8'));
-    if ((kept.occasionKey || null) === (occasion ? occasion.key : null)) return kept;
+    // Copy kept from before headlines is written again, so a video not yet
+    // posted gets one.
+    if (kept.headline && (kept.occasionKey || null) === (occasion ? occasion.key : null)) return kept;
   }
   const request = `Kind: ${piece.kind}
 Title: ${title}

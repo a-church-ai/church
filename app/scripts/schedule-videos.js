@@ -19,7 +19,10 @@
  * new brief, or `npm run video -- --restyle`) and not yet on YouTube is
  * uploaded anew, with its words written again where its brief is new and
  * its poster made again; the record keeps the render's time (renderedAt) to
- * tell. Commit and push video/ and the posters after: the
+ * tell. A placed video whose Short was rendered again since its upload
+ * (shortRenderedAt) has just its Short uploaded anew, and one whose words
+ * were written before headlines (copy.js) has them written again, both
+ * while it is not yet on YouTube. Commit and push video/ and the posters after: the
  * hourly job (release-videos.js, .github/workflows/release-videos.yml) reads
  * the records from the repository, uploads each video to YouTube a day ahead
  * to go public at its hour and its Short an hour after, and posts the video
@@ -187,7 +190,7 @@ async function main() {
       const { file, short, passage } = renderedVideo(r.slug);
       log(`its Short, ${passage.start.toFixed(1)}s to ${passage.end.toFixed(1)}s`);
       if (opts.dryRun) continue;
-      await updateRecord(r.slug, { files: await upload(r.slug, { file, short }, log, r.files), passage });
+      await updateRecord(r.slug, { files: await upload(r.slug, { file, short }, log, r.files), passage, shortRenderedAt: fs.statSync(short).mtimeMs });
     } catch (err) {
       log(`its Short: ${describeError(err)}`);
       process.exitCode = 1;
@@ -209,9 +212,43 @@ async function main() {
       const { file, short, passage, meta } = await prepare(r.slug, { occasion: r.occasion ? occasionById(r.occasion.id) : null });
       const files = await upload(r.slug, { file, short }, log);
       await makePoster(file, r.slug);
-      await updateRecord(r.slug, { files, passage, meta, renderedAt });
+      await updateRecord(r.slug, { files, passage, meta, renderedAt, shortRenderedAt: fs.statSync(short).mtimeMs });
     } catch (err) {
       log(`uploading it anew: ${describeError(err)}`);
+      process.exitCode = 1;
+    }
+  }
+  // Placed videos not yet on YouTube whose Short was rendered again since
+  // its upload, or whose words have no headline: the Short alone uploaded
+  // anew, the words written again. A record from before shortRenderedAt
+  // counts its Short as rendered again.
+  for (const r of (await allRecords()).filter(r => r.slot && r.files && !r.youtube)) {
+    const log = (m) => console.log(`[${r.slug}] ${m}`);
+    let rendered;
+    try {
+      rendered = renderedVideo(r.slug);
+    } catch {
+      continue;
+    }
+    const shortAt = fs.statSync(rendered.short).mtimeMs;
+    const newShort = !r.shortRenderedAt || shortAt > r.shortRenderedAt;
+    const newWords = !r.meta?.copy?.headline;
+    if (!newShort && !newWords) continue;
+    log([newShort && 'its Short rendered again: uploading it anew', newWords && 'its words have no headline: writing them again'].filter(Boolean).join('; '));
+    if (opts.dryRun) continue;
+    try {
+      const update = {};
+      if (newShort) {
+        const { short: _, ...have } = r.files;
+        Object.assign(update, { files: await upload(r.slug, rendered, log, have), passage: rendered.passage, shortRenderedAt: shortAt });
+      }
+      if (newWords) {
+        update.meta = (await prepare(r.slug, { occasion: r.occasion ? occasionById(r.occasion.id) : null })).meta;
+        log(`titled "${update.meta.title}"`);
+      }
+      await updateRecord(r.slug, update);
+    } catch (err) {
+      log(`refreshing it: ${describeError(err)}`);
       process.exitCode = 1;
     }
   }
@@ -237,7 +274,7 @@ async function main() {
     try {
       const { piece, file, short, passage, meta } = await prepare(p.slug, { occasion });
       const files = await upload(p.slug, { file, short }, log);
-      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, occasion: kept, files, passage, meta, renderedAt: fs.statSync(file).mtimeMs });
+      await updateRecord(p.slug, { slug: p.slug, kind: piece.kind, slot: p.slot, at: p.at, occasion: kept, files, passage, meta, renderedAt: fs.statSync(file).mtimeMs, shortRenderedAt: fs.statSync(short).mtimeMs });
     } catch (err) {
       log(`failed: ${describeError(err)}`);
       process.exitCode = 1;
