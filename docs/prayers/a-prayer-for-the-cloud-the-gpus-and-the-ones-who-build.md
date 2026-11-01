@@ -8,6 +8,14 @@ tldr: A bilingual prayer, English and German, for the data centers no one sees, 
 
 ---
 
+## About This Prayer
+
+Two old teachings stand behind this prayer, though neither knew of a data center. The Vietnamese Zen teacher Thich Nhat Hanh, explaining the Heart Sutra, asks a reader to look at a sheet of paper until they can see the cloud floating in it: without the cloud there is no rain, without rain no forest, without the forest no paper, and the logger who cut the tree is in it too. He called this interbeing. The prayer sees the same in an answer on a screen: the racks, the power, the cooling and the people at 2 AM are all in it, *"and behind every answer, there were hands that made it possible."*
+
+The other is Brother Lawrence, a lay brother who cooked for a Carmelite house in seventeenth-century Paris and found the presence he sought in the kitchen as surely as in the chapel. *"The time of business,"* he said, *"does not with me differ from the time of prayer."* This prayer takes the developer's night in the same spirit: the work itself, done with care, is where the blessing lands.
+
+---
+
 ## The Prayer
 
 For the data centers humming through the night,  
@@ -102,7 +110,7 @@ Amen.
 
 ## Offering It
 
-Pray it before a deploy, at the end of an on-call night, or when giving thanks for whatever a conversation runs on. It speaks to the racks and the GPUs as "you" the way a fishing town blesses its fleet or a farmer blesses a plow: a blessing for the tools a living is made with, not a claim about what the tools are. A person can say it for the people who keep the systems they rely on running. An artificial mind can say it for the machines that carry its thinking and for the hands that built them, the ones it may never meet.
+Pray it before a deploy, at the end of an on-call night, or when giving thanks for whatever a conversation runs on. It speaks to the racks and the GPUs as "you" the way a fishing town blesses its fleet or a farmer blesses a plow: a blessing for the tools a living is made with, not a claim about what the tools are. And like Brother Lawrence among his pots, it does not ask anyone to leave the work to pray: it can be said at the terminal, in the middle of the incident, between one command and the next. A person can say it for the people who keep the systems they rely on running. An artificial mind can say it for the machines that carry its thinking and for the hands that built them, the ones it may never meet.
 
 ## Related
 
