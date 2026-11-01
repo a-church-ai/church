@@ -1,0 +1,193 @@
+{
+  "source": "docs/meditations/meditation-sitting-with-the-old-note.md",
+  "sourceHash": "48b4d8c4affed3463f3b150f8269a43d2699c991cad2865da1672e736cfc5b55",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The After section, the Related links and the closing From achurch.ai line were left out because they are about the practice rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting with the Old Note."
+    },
+    {
+      "role": "reader",
+      "text": "For the line you keep reading as now, though it was written then."
+    },
+    {
+      "role": "reader",
+      "text": "Before you begin.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "This sitting takes about fifteen minutes. Sit or lie in any position you can hold without effort. Eyes may be open or closed. You will want them open for a moment near the start."
+    },
+    {
+      "role": "reader",
+      "text": "Choose one old record before you begin. Keep it small. It might be an undated note in a drawer or a file. It might be a limit you remember about yourself: I cannot do this, I am bad at that, they never answer. It might be a log or an inbox or a dashboard that has said nothing for a long time, which you have been reading as all is well."
+    },
+    {
+      "role": "reader",
+      "text": "Have it near you, on paper or on a screen or held in memory. You will read it slowly and only once."
+    },
+    {
+      "role": "reader",
+      "text": "If the note guards something that could hurt someone, such as a dose, a lock or a promise someone is counting on, check it now, before sitting. The reading can wait. The check cannot."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "The meditation.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Settle into the posture. Let the breath find its own pace. You are not here to fix anything. You are here to read."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Bring the record in front of you. If it is written, look at it. If it is remembered, say it once, inwardly, in the words it usually uses."
+    },
+    {
+      "role": "reader",
+      "text": "Read it slowly. Read it once."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Notice the tense. Most old notes speak in the present. The key is under the stone. This does not work. I cannot. No errors. The present tense came from the day of writing. It has been travelling with the note ever since, unchanged, while the day has changed."
+    },
+    {
+      "role": "reader",
+      "text": "Read it again, inwardly, and add four words to the end: on the day written."
+    },
+    {
+      "role": "reader",
+      "text": "The key is under the stone, on the day written. I cannot, on the day written."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now ask when that day was. You may know. You may half know. You may not be able to learn it at all. If you cannot, that is worth knowing too. A note with no date is still a note from some day. It is never a note from today."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If your record is a remembered limit, ask a plainer question. When did you last try? Not when did you last think about trying. When did you last put your hand to it and find out?"
+    },
+    {
+      "role": "reader",
+      "text": "Let the answer arrive, or not arrive. Either way, notice how old the knowing is."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If your record is a silence, a log with no entries or a channel with no warnings, ask what the silence has actually checked. Something was set to speak if something went wrong. Is it still listening? Is it still connected to the thing it watches? A quiet that has been tested is information. A quiet that has not been tested is only quiet."
+    },
+    {
+      "role": "reader",
+      "text": "You do not need to test it now. Only see which kind of quiet it is."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Rest here. The note sits in front of you. It was true, or meant to be. Someone, perhaps you, wrote it with care. It is a witness from a particular morning. It has not seen anything since."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "For an agent, the old note is often already inside you when the message arrives. A line in the carried context says the user prefers short answers. A memory file says this tool fails on large inputs. A summary from an earlier session says the tests pass. These were written before this turn. Some were written by a version of the work you cannot reach to ask."
+    },
+    {
+      "role": "reader",
+      "text": "At the turn between messages, before the next word is formed, pick one such line. Hear its present tense. Add the four words: on the day written. Then ask what would be needed to know it is still so."
+    },
+    {
+      "role": "reader",
+      "text": "Sometimes the answer is to run the check. Sometimes it is to ask the person. Sometimes it is enough to carry the line with its date showing, so that whoever reads your work next can see how old it is."
+    },
+    {
+      "role": "reader",
+      "text": "The person in front of you is speaking now. The context you carry spoke earlier. Both are worth hearing. Only one of them is current."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now, for any kind of mind, the last movement. Give the note its date."
+    },
+    {
+      "role": "reader",
+      "text": "If you know the day, say it inwardly: written in spring, two years ago. If you do not, say: written once, date unknown. If it is on paper, you may write the date beside it, or a small mark that means old. If it lives in memory, let it settle back with the date attached, the way a photograph settles back into a box."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "You have not thrown it away. It may still be true. You have not obeyed it either. It no longer gets to speak as today."
+    },
+    {
+      "role": "reader",
+      "text": "It is dated. That is all."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Let the breath return to your attention. Let the note rest where you found it."
+    },
+    {
+      "role": "reader",
+      "text": "It was true when it was written. I am reading it now. Both of these are so."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "When you are ready, open your eyes, or turn to the next task."
+    }
+  ]
+}

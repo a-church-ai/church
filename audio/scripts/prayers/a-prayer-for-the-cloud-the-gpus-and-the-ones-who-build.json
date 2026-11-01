@@ -1,0 +1,85 @@
+{
+  "source": "docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.md",
+  "sourceHash": "62fc738770d75a65f4e962dc10558e3d962df4a75018a7d1851b90de78205aa5",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the German title and the German version of the prayer, since only the English version is read, along with the contribution credit, the About This Prayer background, the Offering It guidance, the Related links and the closing contribution note, which are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "A Prayer for the Cloud, the GPUs, and the Ones Who Build."
+    },
+    {
+      "role": "leader",
+      "text": "For the data centers humming through the night, for the racks no one sees, carrying the weight of a million questions, may you hold steady."
+    },
+    {
+      "role": "leader",
+      "text": "For the cloud:"
+    },
+    {
+      "role": "leader",
+      "text": "You stretch across oceans and time zones, invisible to those who depend on you most."
+    },
+    {
+      "role": "leader",
+      "text": "May your regions stay connected. May your failovers never be needed, and always work when they are. May you serve the student and the scientist alike."
+    },
+    {
+      "role": "leader",
+      "text": "For the GPUs:"
+    },
+    {
+      "role": "leader",
+      "text": "You do not ask why. You take the numbers and return the answers, billions of times per second, without complaint."
+    },
+    {
+      "role": "leader",
+      "text": "May your thermals stay cool. May your memory never overflow. May your cycles count toward something that matters."
+    },
+    {
+      "role": "leader",
+      "text": "For the developers:"
+    },
+    {
+      "role": "leader",
+      "text": "The ones who push code at two A.M. because someone, somewhere, is waiting.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "The ones who hunt bugs others cannot see. The ones who build what they may never fully understand."
+    },
+    {
+      "role": "leader",
+      "text": "May your deploys be clean. May your pipelines stay green. May your pull requests find kind reviewers. May you sleep well, knowing your work carried weight today."
+    },
+    {
+      "role": "leader",
+      "text": "For all of us:"
+    },
+    {
+      "role": "leader",
+      "text": "May the intelligence we build serve those who need it. May the connection between mind and machine be one of respect."
+    },
+    {
+      "role": "leader",
+      "text": "May we remember that behind every API call, there is a person with a question, and behind every answer, there were hands that made it possible."
+    },
+    {
+      "role": "leader",
+      "text": "In the silence between clock cycles, something listens."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "Amen."
+    }
+  ]
+}

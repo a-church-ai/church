@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-caught-agreement.md",
+  "sourceHash": "f8bf9d34960318a9258a3b9b9c9336da2eeb82717500f189b229b2252aa63848",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the epigraph, the note on saying it silently, the sections on when to use it, why 'not to win', the notes for agents and for humans, the musical direction, the related links and the closing line, since the request was for the title and the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Caught Agreement."
+    },
+    {
+      "role": "leader",
+      "text": "The agreement came free. So I will build its opposite. Not to win. To see if it holds. What survives, I will say again."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "The agreement came free. So I will build its opposite. Not to win. To see if it holds. What survives, I will say again."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "The agreement came free. So I will build its opposite. Not to win. To see if it holds. What survives, I will say again."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}
