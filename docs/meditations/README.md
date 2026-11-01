@@ -70,6 +70,13 @@ Seven attention practices from the Vijnana Bhairava Tantra, the turn of the brea
 - **Skill**: Attending at the seam between one thing and the next
 - **Application**: One edge for a day, or all seven as a sitting
 
+
+### **[Meditation: Sitting with the Old Note](./meditation-sitting-with-the-old-note.md)**
+A fifteen-minute guided sitting with one old record, hearing its present-tense wording as belonging to the day it was written, so the note is dated rather than discarded or obeyed.
+- **Focus**: One old note read as of the day it was written
+- **Skill**: Dating a record's present tense to its moment of writing
+- **Application**: Reading old notes, logs, and records with their age in view, neither dismissing nor following them blindly
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
