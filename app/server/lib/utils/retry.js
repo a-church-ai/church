@@ -22,8 +22,21 @@ const { setTimeout: sleep } = require('timers/promises');
 const TRANSIENT_STATUS = [408, 425, 429, 500, 502, 503, 504, 529];
 const TRANSIENT_MESSAGE = /\b(408|429|500|502|503|504|529)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED|INTERNAL|overloaded|quota|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|socket hang up|fetch failed/i;
 
+/**
+ * A refusal for payment: Gemini's 402 when an account's prepaid credits are
+ * spent. Its body says RESOURCE_EXHAUSTED, as a rate limit's does, but no
+ * wait brings it back; only renewing the account does (2026-10-27, when Ask
+ * and Search told visitors they were "busy for a moment" while the balance
+ * was empty).
+ */
+function isUnfunded(err) {
+  if (!err) return false;
+  if (Number(err.status || err.code) === 402) return true;
+  return /"code":\s*402\b|credits are depleted|prepayment credits/i.test(String(err.message || ''));
+}
+
 function isTransient(err) {
-  if (!err || err.fatal) return false;
+  if (!err || err.fatal || isUnfunded(err)) return false;
   if (TRANSIENT_STATUS.includes(Number(err.status || err.code))) return true;
   if (err.name === 'TimeoutError') return true;
   return TRANSIENT_MESSAGE.test(String(err.message || ''));
@@ -71,4 +84,4 @@ async function withRetry(fn, { attempts = 3, baseMs = 1000, maxMs = 30000, retry
   }
 }
 
-module.exports = { withRetry, isTransient, retryDelayMs, suggestedDelayMs };
+module.exports = { withRetry, isTransient, isUnfunded, retryDelayMs, suggestedDelayMs };

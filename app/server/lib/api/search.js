@@ -11,7 +11,7 @@
  * as score (1 is identical). Plan: church-private/docs/plans/search-api-2026-09-30.md.
  */
 
-const { isTransient } = require('../utils/retry');
+const { isTransient, isUnfunded } = require('../utils/retry');
 const rag = require('../rag');
 const discover = require('../docs/discover');
 const { pageUrlForFile } = require('../docs/links');
@@ -148,6 +148,15 @@ async function search(input, ctx) {
       } };
     }
     console.error('Error in /api/search:', describeError(error));
+    // The account that pays for Gemini is spent (retry.js isUnfunded): said
+    // as it is, since no wait brings it back.
+    if (isUnfunded(error)) {
+      return { status: 503, body: {
+        error: 'Search is paused',
+        suggestion: ns.suggestion('The service that matches words to the writing is paused until its account is renewed, which a person must do. Attend or reflect while it is.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
+      } };
+    }
     // Gemini still busy after its retries (rag/gemini.js): Google's shared
     // capacity, briefly spent. A moment's wait, said as one, not a fault.
     if (isTransient(error)) {

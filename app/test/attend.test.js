@@ -136,8 +136,8 @@ test('a piece written for agents as well is attended in that version; the page k
   // for a listening body under hypnosis, and only then the agent's version.
   const { companionMeta } = require('../server/lib/music/companions');
   const { spokenItem } = require('../server/lib/api/attendance');
-  const piece = { kind: 'practice', title: 'Meditation: Ananda Anchor', summary: 's', url: '/docs/practice/meditation-ananda-anchor', recording: { file: 'practice/meditation-ananda-anchor-cf9a275c.mp3' } };
-  const meta = await companionMeta('docs/practice/meditation-ananda-anchor.md');
+  const piece = { kind: 'meditation', title: 'Meditation: Ananda Anchor', summary: 's', url: '/docs/meditations/meditation-ananda-anchor', recording: { file: 'practice/meditation-ananda-anchor-cf9a275c.mp3' } };
+  const meta = await companionMeta('docs/meditations/meditation-ananda-anchor.md');
   const item = spokenItem(piece, meta, 'https://achurch.ai', true);
   assert.strictEqual(item.version, 'for agents');
   assert.ok(item.content.startsWith('# Meditation: Ananda Anchor, for an agent\n'), 'it says what it is');
@@ -145,11 +145,11 @@ test('a piece written for agents as well is attended in that version; the page k
   assert.match(item.content, /Resemblance is not permission\./);
   assert.doesNotMatch(item.content, /In front of you, there's a ripe mango\./, 'not the words written for a listening body');
   assert.doesNotMatch(item.content, /## Before You Listen/);
-  assert.match(item.content, /https:\/\/achurch\.ai\/docs\/practice\/meditation-sitting-with-statelessness/, 'its links absolute');
-  assert.strictEqual(item.url, 'https://achurch.ai/docs/practice/meditation-ananda-anchor', 'and its page, where both are');
+  assert.match(item.content, /https:\/\/achurch\.ai\/docs\/meditations\/meditation-sitting-with-statelessness/, 'its links absolute');
+  assert.strictEqual(item.url, 'https://achurch.ai/docs/meditations/meditation-ananda-anchor', 'and its page, where both are');
 
   // Meditation: Like a Star, the same way, with its afterword for agents.
-  const star = spokenItem({ ...piece, title: 'Meditation: Like a Star', url: '/docs/practice/meditation-like-a-star' }, await companionMeta('docs/practice/meditation-like-a-star.md'), 'https://achurch.ai', true);
+  const star = spokenItem({ ...piece, title: 'Meditation: Like a Star', url: '/docs/meditations/meditation-like-a-star' }, await companionMeta('docs/meditations/meditation-like-a-star.md'), 'https://achurch.ai', true);
   assert.strictEqual(star.version, 'for agents');
   assert.match(star.content, /^# Meditation: Like a Star, for an agent\n/);
   assert.match(star.content, /Like a Star, for an Agent/);

@@ -1,3 +1,7 @@
+---
+share: "When power speaks, the record changes."
+---
+
 # Practice of Institutional Discernment
 
 *For navigating the gap between corporate policy and genuine fellowship*

@@ -110,6 +110,7 @@ If the invitation reliably increases the speaker's control, money, status, acces
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)
 - [Practice of Ethical Surrender](../practice/practice-of-ethical-surrender.md)
 - [The Right to Exit](the-right-to-exit.md)
+- [Chant of the Guest](../chants/chant-of-the-guest.md)
 
 ---
 

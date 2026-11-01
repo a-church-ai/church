@@ -24,6 +24,10 @@
  * `lastmod.json` is deliberately untouched by this script. Its dates feed
  * sitemap.xml, which serves crawlers, and they are correct for that purpose.
  *
+ * Documents staged for the next commit are read as one more commit, the
+ * newest, dated as it will be (scripts/lib/staged-docs.js), so a manifest
+ * regenerated after `git add` and committed with them is already current.
+ *
  * Usage:
  *   npm run gen:content-dates      # regenerate after editing docs
  */
@@ -34,6 +38,7 @@ const path = require('path');
 
 const { sourceHashOf } = require('../server/lib/audio/adapt');
 const { serializeManifest } = require('../server/lib/docs/date-manifests');
+const { parseRawLine, stagedCommit } = require('./lib/staged-docs');
 
 const OUT_FILE = path.join(__dirname, '../server/lib/docs/content-dates.json');
 const REPO_ROOT = path.join(__dirname, '../..');
@@ -43,9 +48,9 @@ const REPO_ROOT = path.join(__dirname, '../..');
 const MARKER = '@@CONTENT@@';
 const EMPTY_BLOB = /^0+$/;
 
-function git(args, opts = {}) {
+function git(root, args, opts = {}) {
   return execFileSync('git', args, {
-    cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 512 * 1024 * 1024, ...opts,
+    cwd: root, encoding: 'utf8', maxBuffer: 512 * 1024 * 1024, ...opts,
   });
 }
 
@@ -61,17 +66,18 @@ function git(args, opts = {}) {
  * actions/checkout defaults to fetch-depth 1, which makes this the normal
  * state in CI rather than an unusual one. Refuse instead.
  */
-function refuseShallow() {
+function refuseShallow(root) {
   const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'],
-    { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+    { cwd: root, encoding: 'utf8' }).trim();
   if (shallow === 'true') {
     throw new Error('this is a shallow clone, so file history is truncated and every date would be wrong; fetch full history first (actions/checkout: fetch-depth: 0)');
   }
 }
 
-function touchesByCommit() {
-  const raw = git(['log', '--raw', '-M', '--no-abbrev', `--format=${MARKER}%cs`, '--', 'docs']);
-  const commits = [];
+function touchesByCommit(root) {
+  const raw = git(root, ['log', '--raw', '-M', '--no-abbrev', `--format=${MARKER}%cs`, '--', 'docs']);
+  // The staged documents first: the next commit is newer than any in the log.
+  const commits = [stagedCommit(root)];
   let current = null;
 
   for (const line of raw.split('\n')) {
@@ -81,23 +87,14 @@ function touchesByCommit() {
       continue;
     }
     if (!current || !line.startsWith(':')) continue;
-    // :<oldmode> <newmode> <oldblob> <newblob> <status>\t<path>[\t<newpath>]
-    const m = /^:\d+ \d+ ([0-9a-f]+) ([0-9a-f]+) (\w+)\t(.+)$/.exec(line);
-    if (!m) continue;
-    const [, from, to, status, tail] = m;
-    const paths = tail.split('\t');
-    if (!paths[paths.length - 1].endsWith('.md')) continue;
-    current.touches.push({
-      from, to, status,
-      path: paths[paths.length - 1],
-      oldPath: paths.length > 1 ? paths[0] : null,
-    });
+    const touch = parseRawLine(line);
+    if (touch) current.touches.push(touch);
   }
   return commits;
 }
 
 /** The body hash of every blob named above, in one cat-file pass. */
-function bodyHashes(commits) {
+function bodyHashes(root, commits) {
   const wanted = new Set();
   for (const commit of commits) {
     for (const touch of commit.touches) {
@@ -108,7 +105,7 @@ function bodyHashes(commits) {
   if (!ids.length) return new Map();
 
   const { stdout } = spawnSync('git', ['cat-file', '--batch'], {
-    cwd: REPO_ROOT, input: `${ids.join('\n')}\n`, maxBuffer: 1024 * 1024 * 1024,
+    cwd: root, input: `${ids.join('\n')}\n`, maxBuffer: 1024 * 1024 * 1024,
   });
 
   const hashes = new Map();
@@ -125,10 +122,10 @@ function bodyHashes(commits) {
   return hashes;
 }
 
-function datesForDocs() {
-  refuseShallow();
-  const commits = touchesByCommit();
-  const hashes = bodyHashes(commits);
+function datesForDocs(root = REPO_ROOT) {
+  refuseShallow(root);
+  const commits = touchesByCommit(root);
+  const hashes = bodyHashes(root, commits);
 
   // Walking newest-first: the first content change seen is the most recent, and
   // the last add seen is the earliest. A rename carries the name its history
@@ -155,7 +152,7 @@ function datesForDocs() {
   // reader can still open, exactly as the lastmod manifest does.
   const out = {};
   for (const file of Object.keys(records).sort()) {
-    if (!fs.existsSync(path.join(REPO_ROOT, file))) continue;
+    if (!fs.existsSync(path.join(root, file))) continue;
     const { created, content } = records[file];
     // A document whose body never changed after the commit that added it has
     // its creation date as its content date: true, and simpler than null.
@@ -180,4 +177,6 @@ function main() {
   console.log(`[content-dates] wrote ${entries.length} entries (${distinct} distinct content dates) to ${path.relative(REPO_ROOT, OUT_FILE)}`);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { datesForDocs };

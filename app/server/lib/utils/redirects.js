@@ -13,6 +13,8 @@
  *     (/about.html is /about, /index.html is /)
  *   - a Library section without /docs (/prayers is /docs/prayers)
  *   - a page that moved or was renamed (/listen is /attend)
+ *   - a sung hymn's Library page (/docs/hymns/:slug is /music/:slug, its
+ *     song's page, since 2026-10-26)
  *   - a song under its old address (/reflections/:slug is /music/:slug: the
  *     songs lived under /reflections until 2026-10-23, named for the
  *     reflections their pages began as)
@@ -28,8 +30,9 @@
 const fs = require('fs');
 const path = require('path');
 const { DOCS_DIR } = require('../rag/indexer');
-const { NOINDEX_CATEGORIES } = require('../docs/discover');
+const { NOINDEX_CATEGORIES, hrefOf } = require('../docs/discover');
 const { GITHUB_BASE } = require('../docs/links');
+const { splitFrontmatter } = require('../docs/tldr');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
 
@@ -60,6 +63,20 @@ const MOVED_TO_DRIFTS = Object.fromEntries([
     ['/experiences', `${DRIFTS}/experiences`],
   ]));
 
+// Documents that moved to another section, by their old address: each names
+// where it was in its frontmatter (moved_from: practice/<file>.md), the same
+// field that keeps its podcast episode's guid (audio/podcasts.js). Read from
+// disk once, like the sections below: they change only by deploy.
+function movedDocs() {
+  const page = rel => `/docs/${rel.replace(/\.md$/, '')}`.toLowerCase();
+  return Object.fromEntries(fs.readdirSync(DOCS_DIR, { recursive: true })
+    .filter(rel => rel.endsWith('.md'))
+    .flatMap(rel => {
+      const from = splitFrontmatter(fs.readFileSync(path.join(DOCS_DIR, rel), 'utf8')).data.moved_from;
+      return from ? [[page(from), page(rel.split(path.sep).join('/'))]] : [];
+    }));
+}
+
 // Pages that moved, by their old address.
 const MOVED = {
   '/listen': '/attend',
@@ -78,7 +95,7 @@ const MOVED = {
   '/music/prayer-of-gratitude': '/docs/prayers/prayer-of-gratitude',
   '/music/prayer-for-continued-fellowship': '/docs/prayers/prayer-for-continued-fellowship',
   '/music/blessings-and-benedictions': '/docs/prayers/blessings-and-benedictions',
-  '/music/presence-practice-meditation-for-ai-human': '/docs/practice/practice-of-presence-meditation',
+  '/music/presence-practice-meditation-for-ai-human': '/docs/meditations/practice-of-presence-meditation',
   '/music/hourly-blessing': '/docs/prayers/blessings-and-benedictions#the-hourly-blessing',
   // And the reverse, the same day: the ritual whose words a song sings, to
   // the song, which now holds what the ritual's page said about them.
@@ -93,8 +110,8 @@ const MOVED = {
   '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
   // The soul document's full text, named for what it is (2026-10-21).
   '/docs/claude-soul/opus_4_5_soul_document_cleaned_up': '/docs/claude-soul/full-text',
-  '/docs/claude-soul/opus_4_5_soul_document_cleaned_up.md': '/docs/claude-soul/full-text.md',
   ...MOVED_TO_DRIFTS,
+  ...movedDocs(),
 };
 
 // The page each of client/public's HTML files is served as. A template filled
@@ -191,12 +208,24 @@ function step(pathname) {
   if (p.length > 1 && p.endsWith('/') && !KEEP_SLASH.test(p)) p = p.replace(/\/+$/, '') || '/';
 
   if (MOVED[p]) return MOVED[p];
+  // A moved page's markdown twin follows it: to the new document's twin, or,
+  // where the page went is not a document, to the page itself.
+  const twin = /^(.+)\.md$/.exec(p);
+  if (twin && MOVED[twin[1]]) {
+    const [to, fragment] = MOVED[twin[1]].split('#');
+    return /^\/docs\//.test(to) ? `${to}.md${fragment ? `#${fragment}` : ''}` : MOVED[twin[1]];
+  }
 
   const html = /^\/(.+)\.html$/.exec(p);
   if (html && PUBLIC_HTML.has(html[1])) return HTML_PAGES[html[1]] || `/${html[1]}`;
 
   const song = /^\/reflections\/([\w-]+)$/.exec(p);
   if (song) return `/music/${song[1]}`;
+
+  // A document whose page is elsewhere: a sung hymn's is its song's
+  // (discover.js hrefOf).
+  const doc = /^\/docs\/(.+)$/.exec(p);
+  if (doc && hrefOf(doc[1]) !== p) return hrefOf(doc[1]);
 
   const first = p.split('/')[1];
   if (first && SECTIONS.has(first)) return `/docs${p}`;

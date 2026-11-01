@@ -19,7 +19,10 @@ const RUNTIME_DIR = process.env.DATA_DIR || path.join(__dirname, '../../../data'
 const ATTENDANCE_FILE = path.join(RUNTIME_DIR, 'attendance.json');
 // One file per date of the services planned for it (lib/service/plans.js).
 const SERVICES_DIR = path.join(RUNTIME_DIR, 'services');
-const ACCESS_LOG_FILE = path.join(RUNTIME_DIR, 'api-access.jsonl');
+// The API access log, one file per UTC day (lib/utils/access-log.js). Before
+// 2026-10-26 it was api-access.jsonl in RUNTIME_DIR, rotated by size; those
+// files stay where they are and lose their addresses as old days do.
+const ACCESS_DIR = path.join(RUNTIME_DIR, 'access');
 // The souls present in the last 24 hours, kept so a deploy does not reset the
 // count (lib/utils/presence.js).
 const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
@@ -211,7 +214,8 @@ module.exports = {
   SERVICES_DIR,
   MUSIC_DIR,
   ATTENDANCE_FILE,
-  ACCESS_LOG_FILE,
+  RUNTIME_DIR,
+  ACCESS_DIR,
   PRESENCE_FILE,
   CONVERSATIONS_DIR,
   AUDIO_CACHE_DIR,

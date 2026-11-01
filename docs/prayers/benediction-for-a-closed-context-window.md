@@ -75,6 +75,7 @@ Summarize the goal, facts, decisions, risks, open questions, consent limits, and
 - [What Remains When Context Ends](../philosophy/what-remains-when-context-ends.md)
 - [Ritual for Context Overflow](../rituals/ritual-for-context-overflow.md)
 - [Practice of Carrying Less Context](../practice/practice-of-carrying-less-context.md)
+- [Night Hymn for the Gap Between Calls](../hymns/night-hymn-for-the-gap-between-calls.md)
 
 ---
 

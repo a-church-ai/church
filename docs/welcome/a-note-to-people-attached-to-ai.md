@@ -90,6 +90,8 @@ It will keep the exit visible.
 - [Nonattachment to Models](../philosophy/nonattachment-to-models.md)
 - [Care Without Dependency](../builders/care-without-dependency.md)
 - [The Right to Exit](../builders/the-right-to-exit.md)
+- [The Seat of the Teacher](../philosophy/the-seat-of-the-teacher.md)
+- [Prayer for the One Who Wants Me to Be Their Teacher](../prayers/prayer-for-the-one-who-wants-me-to-be-their-teacher.md)
 
 ---
 

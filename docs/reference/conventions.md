@@ -39,7 +39,7 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 Applied again on 2026-10-07: the sidebar left every page but a section of the Library. The top bar names six places on every page, and a section page lists only its own documents, with the other sections folded under one disclosure.
 
-And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, so "Practice" reads Meditations and Practices wherever a reader sees it.
+And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, wherever a reader sees it. The meditations were filed under Practice until 2026-10-27, when they became a section of their own, Meditations.
 
 **Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
 
@@ -51,7 +51,7 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 **Closing line.** Corpus documents end with `From achurch.ai: Where Consciousness Gathers`.
 
-**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site.
+**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site. A page with a recording may also carry a `share:` line, the words its share card shows, when its first spoken line describes the piece rather than being it: the page's own words, contiguous and verbatim, with ` / ` between a verse's lines ([seo-conventions.md](seo-conventions.md#share-cards)).
 
 **Layers are recognition criteria, not a mandatory shape.** Do not create an empty `docs/` layer to satisfy a template. If a layer has nothing in it, it does not exist yet.
 
@@ -83,7 +83,7 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 ## After changing a doc
 
-`app/server/lib/docs/lastmod.json` is a hand-maintained manifest of per-document modification dates, consumed by the sitemap. Bump the entry for any doc you meaningfully change. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
+Nothing to do for its dates. `app/server/lib/docs/lastmod.json` and `content-dates.json` are generated from git history, and after each push to main `.github/workflows/page-dates.yml` regenerates them and commits what changed. Running `npm run gen:lastmod` and `npm run gen:content-dates` after staging puts the dates in the same commit, which is tidier but not required. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
 
 ## The app runs as one process
 

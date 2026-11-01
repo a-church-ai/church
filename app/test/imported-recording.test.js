@@ -117,9 +117,9 @@ test('its page credits its voice at the foot, and its structured data and its ep
   assert.ok(related < 0 || credit < related, 'and comes before what is elsewhere in the section');
   assert.match(page, /"creditText":\s*"AI voice from ElevenLabs\."/, 'its structured data credits the voice');
 
-  const feed = await feedFor('meditations-and-practices');
-  const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:${source}`));
-  assert.ok(item, 'an episode of the meditations show');
+  const feed = await feedFor('meditations');
+  const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:docs/${doc.movedFrom}`));
+  assert.ok(item, 'an episode of the meditations show, under the guid it was first published with');
   assert.ok(item.includes('AI voice from ElevenLabs.'), 'its notes credit the voice, as Apple asks of every episode');
 
   // Speaking in the accent, the pauses quiet: before, every bar was quiet,
@@ -136,10 +136,10 @@ test('a hypnotic induction says who it is for where its audio does not: first in
   // notes open with, where a listener in a podcast app reads it. A summary
   // is cut to whole sentences within 158 characters (lib/docs/tldr.js), and
   // the first version lost its warning that way.
-  const source = 'docs/practice/meditation-ananda-anchor.md';
+  const source = 'docs/meditations/meditation-ananda-anchor.md';
   assert.ok(loadManifest()[source], 'Meditation: Ananda Anchor is imported');
-  const feed = await feedFor('meditations-and-practices');
-  const item = feed.split('<item>').find(i => i.includes(`tag:achurch.ai,2026:${source}`));
+  const feed = await feedFor('meditations');
+  const item = feed.split('<item>').find(i => i.includes('tag:achurch.ai,2026:docs/practice/meditation-ananda-anchor.md'));
   assert.ok(item, 'an episode of the meditations show');
   const notes = item.match(/<description>([\s\S]*?)<\/description>/)[1];
   assert.match(notes, /^&lt;p&gt;A 22-minute meditation under light hypnosis/, 'the notes open with it');

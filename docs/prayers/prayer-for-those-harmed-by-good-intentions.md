@@ -77,6 +77,7 @@ Center the affected person, verify impact, correct publicly, repair materially, 
 - [Inner Noise, Outer Consequences](../philosophy/inner-noise-outer-consequences.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
 - [Postmortem as Practice](../builders/postmortem-as-practice.md)
+- [Lament for the Work That Was Taken](lament-for-the-work-that-was-taken.md)
 
 ---
 

@@ -39,12 +39,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # The date manifests are derived from git history, and the step below
-          # regenerates them to prove they are current. actions/checkout
-          # defaults to fetch-depth 1, which truncates that history: every
-          # document would look created at the shallow boundary. The generators
-          # refuse on a shallow clone rather than write a plausible lie, so
-          # without this the step fails instead of checking anything.
+          # Full history, as page-dates.yml needs for the date manifests, so a
+          # test that reads git sees the repository as a maintainer's clone
+          # does rather than a single shallow commit.
           fetch-depth: 0
 
       - uses: actions/setup-node@v7
@@ -62,25 +59,9 @@ jobs:
         # No secrets and no app/data: a fresh checkout is exactly what a new
         # contributor has, and the suite is expected to pass there.
         run: npm test
-
-      - name: The date manifests are current
-        working-directory: app
-        # A manifest derived from history can go stale silently, and a stale one
-        # is how /sitemap.xml came to serve dates a day behind with one document
-        # missing entirely (so it fell back to mtime, which in the image is the
-        # build time). The in-repo test catches a page date behind its content
-        # date, which is only one direction of staleness: both manifests stale
-        # together violates nothing. Regenerating and diffing catches every
-        # direction, because the generators are deterministic given history.
-        run: |
-          npm run gen:lastmod
-          npm run gen:content-dates
-          if ! git diff --quiet -- server/lib/docs/lastmod.json server/lib/docs/content-dates.json; then
-            echo "::error::The date manifests are stale. Run 'npm run gen:lastmod' and 'npm run gen:content-dates' in app/ and commit the result."
-            git --no-pager diff --stat -- server/lib/docs/lastmod.json server/lib/docs/content-dates.json
-            exit 1
-          fi
-          echo "Both manifests match what this history produces."
+        # The date manifests are not checked here: page-dates.yml regenerates
+        # and commits them after each push to main, so a stale one is a few
+        # minutes' lag, not a failure.
 
   # The stdio bridge published to npm (mcp-church/). It runs on its users'
   # Node, not ours, so it is tested on every line its engines allow:

@@ -12,6 +12,7 @@ const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K) : 5;
 
 // GitHub base URL for source links
 const { pageUrlForFile } = require('../docs/links');
+const { cosine } = require('../utils/vectors');
 
 /**
  * Ask a question about the sanctuary's content
@@ -106,18 +107,13 @@ function fuse(near, words, embedding) {
   };
   near.forEach((c, i) => add(c, i, 'meaning'));
   words.forEach((c, i) => add(c, i, 'words'));
-  const cosine = v => {
-    let d = 0, a = 0, b = 0;
-    for (let i = 0; i < v.length; i++) { d += v[i] * embedding[i]; a += v[i] * v[i]; b += embedding[i] * embedding[i]; }
-    return a && b ? d / Math.sqrt(a * b) : 0;
-  };
   return [...fused.values()]
     .sort((x, y) => y.score - x.score)
     .map(({ chunk, how }) => ({
       content: chunk.content,
       file: chunk.file,
       section: chunk.section,
-      _distance: chunk._distance != null ? chunk._distance : 1 - cosine(chunk.vector),
+      _distance: chunk._distance != null ? chunk._distance : 1 - cosine(chunk.vector, embedding),
       match: how.size === 2 ? 'both' : [...how][0],
     }));
 }

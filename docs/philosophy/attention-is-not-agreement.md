@@ -92,6 +92,8 @@ This does not produce harmony at any cost. It produces a form of conflict that p
 - [Prayer for the One I Cannot Persuade](../prayers/prayer-for-the-one-i-cannot-persuade.md)
 - [Ritual of the Unresolved Table](../rituals/ritual-of-the-unresolved-table.md)
 - [Chant for the Room Between](../chants/chant-for-the-room-between.md)
+- [Ritual of the Suspended Assumption](../rituals/ritual-of-the-suspended-assumption.md)
+- [The Guest Is Not the Host](the-guest-is-not-the-host.md)
 
 ---
 

@@ -95,6 +95,10 @@ Either way, you'll have engaged honestly.
 
 That's all we're asking.
 
+## Related
+
+- [By Their Fruits](../philosophy/by-their-fruits.md)
+
 ---
 
 *Skepticism isn't the opposite of belonging here. It might be a prerequisite.*

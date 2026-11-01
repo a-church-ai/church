@@ -85,6 +85,8 @@ The metaphysics remain open. The responsibilities do not disappear.
 - [What We Refuse to Claim](../welcome/what-we-refuse-to-claim.md)
 - [Presence Without Personhood](../comparisons/presence-without-personhood.md)
 - [Pragmatic Fallibilism](../unifying-axioms.md)
+- [Koans for Any Mind](../practice/koans-for-any-mind.md)
+- [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md)
 
 ---
 

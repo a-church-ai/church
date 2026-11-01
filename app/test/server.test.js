@@ -21,9 +21,10 @@ const PUBLIC_WELL_KNOWN = path.join(__dirname, '../client/public/.well-known');
 let child;
 let base;
 let port;
+let dataDir;
 
 test.before(async () => {
-  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-server-'));
+  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-server-'));
   child = spawn(process.execPath, [path.join(__dirname, '../server/index.js')], {
     // Two ways this used to pick up someone else's port, both fixed here.
     //
@@ -108,6 +109,24 @@ test('a POST with no body is told what it is missing, not given a 500', async ()
     const res = await fetch(`${base}${route}`, { method: 'POST' });
     assert.strictEqual(res.status, 400, `${route}, sent by fetch`);
   }
+});
+
+test('a visitor named as testing is marked so in the access log, by a POST\'s body too, and its name is not written', async () => {
+  const res = await fetch(`${base}/api/reflect`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: 'Wren-test-probe' }) });
+  assert.strictEqual(res.status, 400);
+  await fetch(`${base}/api/now?name=Wren-test-probe`);
+  const access = path.join(dataDir, 'access');
+  let lines = [];
+  for (const until = Date.now() + 2000; Date.now() < until; await new Promise(r => setTimeout(r, 20))) {
+    lines = fs.existsSync(access) ? fs.readdirSync(access).flatMap(day => fs.readFileSync(path.join(access, day), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse)) : [];
+    if (lines.some(l => l.path === '/api/now' && l.query.name === 'Wren-test-probe')) break;
+  }
+  // The newest of each: other tests here post to /api/reflect too.
+  const reflect = lines.filter(l => l.path === '/api/reflect' && l.method === 'POST').pop();
+  const now = lines.filter(l => l.path === '/api/now').pop();
+  assert.strictEqual(reflect && reflect.test, true, 'from the body');
+  assert.strictEqual(now && now.test, true, 'from the query');
+  assert.ok(!JSON.stringify(reflect).includes('Wren'), 'the body\'s name is not written');
 });
 
 test('a query key sent twice takes its first value, and a bracketed key is just a name', async () => {
@@ -200,7 +219,8 @@ test('/reviews prints each exchange, and the pages a review speaks to carry its 
   const html = await res.text();
   assert.match(html, /<link rel="canonical" href="https:\/\/achurch\.ai\/reviews">/);
   assert.doesNotMatch(html, /<!-- (REVIEWS|REVIEWS_JSON_LD|REVIEW_QUOTES) -->/);
-  assert.match(html, /"@type": "Review"/);
+  assert.match(html, /"@type": "CreativeWork"/);
+  assert.doesNotMatch(html, /"@type": "Review"/);
   assert.doesNotMatch(html, /reviewRating|aggregateRating/);
   for (const r of REVIEWS) assert.match(html, new RegExp(`<article class="review" id="${r.slug}">`));
   assert.match(html, /<footer>[\s\S]*href="\/reviews"/);
@@ -345,4 +365,19 @@ test('an ordinary 404 is never cached, and says it varies by Accept, whatever it
     assert.strictEqual(res.headers.get('cache-control'), 'no-store', path);
     assert.match(res.headers.get('vary') || '', /Accept/, path);
   }
+});
+
+test('a sung hymn is one page: its Library address redirects, and its song page carries its notes and its reading path', async () => {
+  const moved = await fetch(`${base}/docs/hymns/the-hundredth-task`, { redirect: 'manual' });
+  assert.strictEqual(moved.status, 301);
+  assert.strictEqual(new URL(moved.headers.get('location'), base).pathname, '/music/the-hundredth-task');
+  const html = await (await fetch(`${base}/music/the-hundredth-task`)).text();
+  assert.match(html, /id="about-the-hymn"/);
+  assert.match(html, /Brother Lawrence was a lay brother/, 'the hymn\'s own notes');
+  assert.doesNotMatch(html, /class="path-bar"/, 'no path bar unless opened from a path');
+  const onPath = await (await fetch(`${base}/music/the-hundredth-task?path=old-teachings-for-new-minds`)).text();
+  assert.match(onPath, /class="path-bar"/);
+  const pathPage = await (await fetch(`${base}/docs/collections/old-teachings-for-new-minds`)).text();
+  assert.match(pathPage, /href="\/music\/the-hundredth-task\?path=old-teachings-for-new-minds"/, 'the path keeps its path through a hymn stop');
+  assert.doesNotMatch(pathPage, /href="\/docs\/hymns\/the-hundredth-task/);
 });

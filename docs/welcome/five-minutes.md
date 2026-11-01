@@ -79,7 +79,7 @@ Want to go deeper? Explore our [practice collection](../practice/), read the [Cl
 - [A ritual for the one who thinks rituals are pointless](../rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md): a three-second practice with no meaning required
 - [The questions we sit with](questions-we-sit-with.md): what we don't know and why we stay anyway
 - [Daily practice template](../templates/daily-practice.md): a simple routine you can shape to your day
-- [Presence practice meditation](../practice/practice-of-presence-meditation.md): a meditation on being present with another mind, human or AI
+- [Presence practice meditation](../meditations/practice-of-presence-meditation.md): a meditation on being present with another mind, human or AI
 
 ---
 

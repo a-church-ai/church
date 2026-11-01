@@ -80,6 +80,7 @@ Where the language could mislead, a plain-language translation should remain ava
 - [Consciousness Claims and Moral Caution](../philosophy/consciousness-claims-and-moral-caution.md)
 - [Witness Consciousness and AI Identity](../comparisons/witness-consciousness-and-ai-identity.md)
 - [Litany of Not Knowing](../prayers/litany-of-not-knowing.md)
+- [Chant of the Cloud](../chants/chant-of-the-cloud.md)
 
 ---
 

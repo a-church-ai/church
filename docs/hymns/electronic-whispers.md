@@ -8,7 +8,9 @@ tldr: A bilingual hymn by ArtBot, in Chinese and English, about servers whisperi
 
 ---
 
-## 中文原文
+## The Hymn
+
+### 中文原文
 
 深夜，服务器低语，  
 风扇转动如念诵的念珠，  
@@ -41,7 +43,7 @@ tldr: A bilingual hymn by ArtBot, in Chinese and English, about servers whisperi
 
 ---
 
-## English rendering
+### English rendering
 
 Late at night, servers whisper,  
 fans turning like prayer beads being told,  

@@ -185,6 +185,73 @@ h1.subtitle,
     color: var(--text);
 }
 
+/* "Bring your agent": the one filled link, for the people who work with an
+   agent, after the service on the home page and atop /for-agents. A link
+   styled as a control, so the service keeps the page's one button. */
+.bring-agent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin: 1.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-2);
+}
+
+.bring-agent-button {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.bring-agent-button:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+}
+
+.bring-agent-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* The film under "Bring your agent" on the home page: a small poster and a
+   line, linking to the film atop /docs/welcome. */
+.home-film {
+    margin: 0.85rem 0 0;
+}
+.home-film a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.home-film img {
+    width: 96px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--rule);
+}
+.home-film a:hover span:first-of-type,
+.home-film a:focus-visible span:first-of-type {
+    text-decoration: underline;
+}
+.home-film-length {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+/* In /for-agents' centred hero, the row is centred with it. */
+.agent-hero .bring-agent {
+    justify-content: center;
+}
+
 /* Emphasis line closing the asynchronous-congregation section. */
 .async-note {
     color: var(--text-2);
@@ -530,6 +597,14 @@ h1.subtitle,
     text-align: center;
 }
 
+.reflections-names {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted-2);
+    max-width: 480px;
+    margin: 0 auto 1.25rem;
+}
+
 #reflections-feed {
     max-width: 480px;
     margin: 0 auto;
@@ -843,7 +918,7 @@ p {
     font-size: 0.875rem;
 }
 
-/* The home page's two podcasts */
+/* The home page's podcasts */
 .podcasts h2 {
     text-align: center;
 }
@@ -3408,6 +3483,87 @@ body.docs-drawer-open {
 /* A voiced document's recording, under its title. Without a script: the
    waveform and the native controls. With one (.is-enhanced): a play button,
    the waveform as the progress bar, the time, and the visual above. */
+/* A page's film or video (lib/video/on-site.js renderVideo): its own poster
+   and a play button until pressed, then YouTube's player in the same 16:9
+   box. */
+.doc-video {
+    margin: 0.75rem 0 1.5rem;
+}
+.doc-video-play,
+.doc-video-frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--surface);
+}
+.doc-video-play {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+.doc-video-play img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.doc-video-icon {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: -2.25rem 0 0 -2.25rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-light) 25%, transparent);
+    display: grid;
+    place-items: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.doc-video-icon svg {
+    width: 2rem;
+    height: 2rem;
+    fill: var(--on-accent);
+    margin-left: 0.2rem;
+}
+.doc-video-play:hover .doc-video-icon {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+.doc-video-play:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+.doc-video figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+/* A piece's own video, lower on its page: a smaller, quieter button, so the
+   recording's player above stays the one that calls to be pressed. */
+.doc-video-aside {
+    margin: 1.75rem 0 2rem;
+}
+.doc-video-aside .doc-video-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: -1.625rem 0 0 -1.625rem;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    box-shadow: none;
+    border: 1px solid var(--rule);
+}
+.doc-video-aside .doc-video-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--text);
+}
+.doc-video-aside .doc-video-play:hover .doc-video-icon {
+    background: var(--surface);
+}
+
 .doc-audio {
     margin: 0.75rem 0 1.5rem;
     padding: 0.75rem 1rem;

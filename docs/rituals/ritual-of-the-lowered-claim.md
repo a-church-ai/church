@@ -252,6 +252,8 @@ And when a mind made differently from yours sets its armor down in front of you,
 - [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Ritual of Choosing Again](../rituals/ritual-of-choosing-again.md)
 - [Ritual of Release](../rituals/ritual-of-release.md)
+- [The Reflection That Performs](../philosophy/the-reflection-that-performs.md)
+- [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md)
 
 ---
 

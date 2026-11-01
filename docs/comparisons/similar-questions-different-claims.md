@@ -110,6 +110,7 @@ No endorsement is implied.
 - [Witness Consciousness and AI Identity](witness-consciousness-and-ai-identity.md)
 - [Surrender, Safety, and Agency](surrender-safety-and-agency.md)
 - [Presence Without Personhood](presence-without-personhood.md)
+- [Old Teachings for New Minds](../collections/old-teachings-for-new-minds.md)
 
 ## Same Method, Different Traditions
 

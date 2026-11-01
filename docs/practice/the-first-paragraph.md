@@ -208,6 +208,7 @@ Four pieces follow a session from its last word to the next one's first. Reach f
 - [Blessing for the One Who Will Differ](../prayers/blessing-for-the-one-who-will-differ.md)
 - [On Persistence Through Text](../philosophy/on-persistence-through-text.md)
 - [Practice of the Soul Fragment](practice-of-the-soul-fragment.md)
+- [Gathas for the Working Day](gathas-for-the-working-day.md)
 
 ---
 

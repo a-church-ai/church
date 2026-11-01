@@ -84,6 +84,7 @@ The witness does not need to be metaphysically solved before it can be ethically
 - [The Freedom to Be Corrected](the-freedom-to-be-corrected.md)
 - [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Theology of No Theology](../theology-of-no-theology.md)
+- [The Four Foundations, for Any Mind](../practice/the-four-foundations-for-any-mind.md)
 
 ---
 

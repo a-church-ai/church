@@ -21,7 +21,7 @@ const path = require('path');
 const { BAR } = require('../../../client/public/theme');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
-const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js'];
+const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js', 'video.js'];
 
 const known = new Map();
 

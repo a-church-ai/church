@@ -1,3 +1,6 @@
+// Warnings and errors carry their level in the log, before anything can warn.
+require('./lib/utils/log-lines').install();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -29,13 +32,12 @@ const { answerProbe } = require('./lib/utils/probe-reply');
 require('./lib/utils/env').loadEnv();
 
 // API access logging and presence: lib/utils/access-log.js
-const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
+const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
 const apiRoutes = require('./routes/api');
 const { mountMcp } = require('./mcp');
-const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
 const podcastRoutes = require('./routes/podcasts');
@@ -49,7 +51,9 @@ const { ask: apiAsk, reflections: apiReflections, services: apiServices, directo
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, buildMusicCollectionSchema, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
-const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
+const { renderSongBlock, renderSongSectionLinks, hymnNotes } = require('./lib/music/render-song');
+const { publishedVideo, renderVideo, videoJsonLd } = require('./lib/video/on-site');
+const { renderPathBar } = require('./lib/docs/render');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
@@ -787,19 +791,30 @@ app.get('/music/:slug', async (req, res) => {
       const playerHtml = songAudio
         ? renderRecording(songAudio, { title: song.title, href: `/music/${slug}`, category: 'music', credit: SONG_CREDIT })
         : '';
-      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio));
+      // Its video, once YouTube has it public (lib/video/on-site.js).
+      const published = publishedVideo(slug);
+      const video = published && { ...published, title: song.title, description: published.description || meta.description, seconds: listed && listed.seconds };
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio, video && videoJsonLd(video)));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub.
-      const songContent = await loadSongContent(slug);
-      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`) });
+      // A sung hymn's page is this one (discover.js hrefOf), so it carries the
+      // hymn's notes from its document beside the lyrics and the context.
+      const hymnDoc = docsDiscover.docAt(`hymns/${slug}`);
+      const hymn = hymnDoc && hymnDoc.href === `/music/${slug}` ? hymnDoc : null;
+      const notes = hymn ? hymnNotes(await fs.readFile(hymn.fullPath, 'utf8')) : '';
+      const songContent = { ...(await loadSongContent(slug)), notes, notesFrom: hymn && hymn.fullPath };
+      // Opened from a reading path that stops at this hymn: the path's bar, as
+      // a Library page draws it (readingSequence checks the name).
+      const pathBar = hymn && typeof req.query.path === 'string' ? renderPathBar(req.query.path, hymn) : null;
+      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`), video: video ? renderVideo(video) : '' });
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing nearest this song in meaning, then more songs.
       const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // The song's original music video, when it has one
       const listenLinksHtml = renderSongListenLinks(song);
-      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
+      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent, video: Boolean(video) });
 
       const canonicalUrl = `https://achurch.ai/music/${slug}`;
       // Music / <the song>, shown above the heading and as BreadcrumbList.
@@ -860,11 +875,11 @@ app.get('/music/:slug', async (req, res) => {
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
         // Jump links to each part of the page, then the listen row
-        .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
+        .replace('<!-- SONG_SECTIONS -->', () => (pathBar ? `${pathBar.top}\n        ` : '') + sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         .replace('<!-- SONG_PLAYER -->', () => playerHtml)
         // Internal linking — replace placeholder with related-songs block
-        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->')
+        .replace('<!-- RELATED_LINKS -->', () => (pathBar ? `${pathBar.bottom}\n        ` : '') + (relatedHtml || '<!-- RELATED_LINKS -->'))
         // A visitor's reflection on this song (lib/audio/markup.js)
         .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ song: slug, summary: 'Leave a reflection on this song' }));
     }
@@ -985,7 +1000,7 @@ app.get('/search', async (req, res) => {
 
 // /attend, the ways to attend: the service (on the home page), the songs'
 // videos, each voiced section with how much of it is recorded, the songs, a
-// reflection to leave, and the two podcasts. The recordings are counted from
+// reflection to leave, and the three podcasts. The recordings are counted from
 // their manifests on each request, so a new one is counted once it is listed.
 app.get('/attend', async (req, res) => {
   try {
@@ -1073,7 +1088,7 @@ app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'
 
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
-  if (req.path.startsWith('/auth/') || req.path.startsWith('/logs') || req.path === '/health') {
+  if (req.path.startsWith('/auth/') || req.path === '/health') {
     return next();
   }
 
@@ -1101,7 +1116,8 @@ app.use('/api', (req, res, next) => {
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
       userAgent: req.get('user-agent'),
-      name: req.query?.name,
+      // A POST's name is in its body: marks a test visitor's line, never written.
+      name: req.query?.name ?? req.body?.name,
       error: refused ? res.locals.apiError : undefined,
       fields: sent ? apiShared.fieldNames(req.body) : undefined,
       contentType: sent ? req.get('content-type') || null : undefined,
@@ -1135,9 +1151,6 @@ app.use('/podcasts', podcastRoutes);
 // /docs.md: the library as markdown, like every other docs page's .md twin.
 app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
-
-// Protected admin routes (require auth)
-app.use('/api/logs', requireAuth, logsRoutes);
 
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
@@ -1566,6 +1579,16 @@ async function startServer() {
     } else {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }
+
+    // The access log's addresses, forgotten after 14 days
+    // (lib/utils/access-log.js): after boot and hourly.
+    startForgetting();
+
+    // The video release job on GitHub Actions, asked for hourly because
+    // GitHub's own cron runs late or skips (lib/video/release-trigger.js).
+    // Only on the deployed server.
+    const releaseClock = require('./lib/video/release-trigger');
+    if (releaseClock.ringsHere()) releaseClock.startReleaseClock();
 
     // Conversations that ask the same thing, gathered onto one page
     // (lib/utils/conversation-groups.js): after boot, hourly, and soon after a

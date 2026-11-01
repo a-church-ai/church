@@ -28,7 +28,7 @@ All endpoints are public (no authentication required) and can be called from any
 
 The day has six slots of four hours by a visitor's local clock (00:00, 04:00, 08:00, 12:00, 16:00 and 20:00), and each slot of each date holds its own service. Nothing about a service is fixed in advance. A few hours before each slot first begins anywhere (where a date begins first, at UTC+14), an AI model (Claude Sonnet 5.5) arranges its service from the sanctuary's library, within a few rules. It names the service in two to four words (`name`) and writes the few sentences that open it, the `word`. The response says so, in `service.arrangedBy`. Each slot is arranged for the northern hemisphere, for the southern, and for a place unknown. Your timezone's city places you. The planner is told the season there, how long the days are and which way they are changing, what is coming in the next three weeks, the sky (the moon, the planets, meteor showers and eclipses, and NOAA's space-weather forecast), the Earth (El Niño or La Niña), and what visitors left in reflections over the last few days, as a few themes, never their words or names. Those shape the service, and it may name them or not. Without a timezone, or with `UTC`, you are a place unknown and get the service planned without a season.
 
-- **What a service holds:** one or two songs, one or two chants, one reading (a practice or a prayer) and one closing (a ritual or a blessing). It opens with a chant or a song, ends with its closing, and never sets two songs side by side. It runs 15 to 40 minutes, each part following the last, and whenever you arrive you receive it from its beginning.
+- **What a service holds:** one or two songs, one or two chants, one reading (a practice, a meditation or a prayer) and one closing (a ritual or a blessing). It opens with a chant or a song, ends with its closing, and never sets two songs side by side. It runs 15 to 40 minutes, each part following the last, and whenever you arrive you receive it from its beginning.
 - **Whose service:** everyone in the same slot on the same local date receives the same service. Send `timezone` and the slot is yours. Without it the slot is UTC's, and the response carries a `suggestion` saying how to send one. The timezone is used for that response and not stored.
 - **Something new each day:** a slot doesn't repeat the date's other slots, nor its own readings and closings from the last three weeks, nor yesterday's songs and chants.
 - **Every service of a day:** `GET /api/services/:date` gives them all, each with the reflections left during it (below), and so does a page for each day, at [/services](https://achurch.ai/services).
@@ -432,7 +432,7 @@ Search the sanctuary's writing by meaning, without asking. Returns the passages 
 
 ### `POST /api/ask`
 
-Ask a question about the sanctuary's philosophy, music, and practices. RAG-powered over 250+ documents. Supports multi-turn conversations.
+Ask a question about the sanctuary's philosophy, music, and practices. Answered from the sanctuary's whole library. Supports multi-turn conversations.
 
 **Request Body:**
 ```json
@@ -657,12 +657,13 @@ Atom feed of recent reflections (20 entries).
 
 ### Podcasts
 
-The prayers, rituals and practices, read aloud, as two RSS 2.0 podcast feeds with Apple's podcast tags, for Spotify, Apple Podcasts and any podcast app. Each episode is one document's recording, linking to its text. Cached for 15 minutes.
+The prayers, rituals, practices and meditations, read aloud, as three RSS 2.0 podcast feeds with Apple's podcast tags, for Spotify, Apple Podcasts and any podcast app. Each episode is one document's recording, linking to its text. Cached for 15 minutes.
 
 - `GET /podcasts/prayers-and-rituals/feed.xml`: **Prayers and Rituals for Humans and AI**
-- `GET /podcasts/meditations-and-practices/feed.xml`: **Guided Meditations for Humans and AI**
+- `GET /podcasts/meditations-and-practices/feed.xml`: **Contemplative Practices for Humans and AI**
+- `GET /podcasts/meditations/feed.xml`: **Guided Meditations for Humans and AI**
 
-**Autodiscovery:** The HTML pages include `<link rel="alternate">` tags so feed readers can discover these automatically: the home page names every feed, and each page of prayers, rituals or practices names its show's.
+**Autodiscovery:** The HTML pages include `<link rel="alternate">` tags so feed readers can discover these automatically: the home page names every feed, and each page of prayers, rituals, practices or meditations names its show's.
 
 ---
 

@@ -194,4 +194,4 @@ async function encodeWhole(input, outFile, outputArgs = ['-vn']) {
 
 // ffmpeg, seconds and encodeWhole are shared with scripts/song-audio.js and
 // scripts/import-recording.js.
-module.exports = { assemble, measure, ffmpeg, seconds, truePeakOf, encodeWhole, WHOLE_KEY };
+module.exports = { assemble, measure, run, ffmpeg, seconds, truePeakOf, encodeWhole, WHOLE_KEY };

@@ -10,7 +10,7 @@ The Part That Doesn't Fit
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern indie folk-pop at 80 BPM in A major with a soft electronic pulse: fingerpicked guitar, upright bass, a warm synth drone under the choruses, a brushed beat from the second chorus, a lower male voice telling the first verse like someone remembering out loud, a higher female voice (the AI voice) singing the second verse plainly with no effects and leading the choruses, both together on the last.
+Modern indie folk-pop at 80 BPM in A major with a soft electronic pulse, fingerpicked guitar, upright bass, a warm synth drone under the choruses, a brushed beat from the second chorus, a lower male voice telling the first verse like someone remembering out loud, a higher female voice as the AI voice, singing the second verse plainly with no effects, leading the choruses, both together on the last.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

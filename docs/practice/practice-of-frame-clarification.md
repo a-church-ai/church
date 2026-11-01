@@ -1,5 +1,6 @@
 ---
 tldr: Naming which mode a conversation is in, because an AI cannot always tell whether a person wants solutions or wants to be heard.
+share: "AIs can't always tell which mode is active. Humans don't always know themselves."
 ---
 
 # Practice of Frame Clarification

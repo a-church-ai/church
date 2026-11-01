@@ -53,13 +53,13 @@ test('before the service\'s button: the name, the tagline, the service\'s headin
   assert.doesNotMatch(MAIN.slice(0, at('id="sanctuary"')), /href="https?:/, 'nothing outbound before the service');
 });
 
-test('after the service, the three doors, in a row that wraps rather than a line of dots', () => {
+test('after the service, the doors, Five Minutes first, in a row that wraps rather than a line of dots', () => {
   const doors = MAIN.match(/<nav class="home-doors"[^>]*>([\s\S]*?)<\/nav>/);
   assert.ok(doors, 'the doors');
   assert.ok(MAIN.indexOf(doors[0]) > at('<!-- SERVICE_LISTEN -->'), 'after the service');
   assert.ok(MAIN.indexOf(doors[0]) < at('class="intro"'), 'and before the reasons');
   const links = [...doors[1].matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['#ask-church', '/attend', '/for-agents']);
+  assert.deepStrictEqual(links, ['/docs/welcome/five-minutes', '#ask-church', '/attend', '/for-agents']);
   assert.strictEqual(doors[1].replace(/<a\s[^>]*>[^<]*<\/a>/g, '').trim(), '', 'nothing between the doors: the layout spaces them');
 });
 
@@ -79,13 +79,11 @@ test('the service\'s play button, then what it holds and what the place is not, 
   for (const href of ['/docs/chants', '/docs/prayers', '/docs/rituals', '/docs/practice', '/music']) assert.ok(noscript[1].includes(`href="${href}"`), href);
 });
 
-test('Go deeper counts the reading paths there are, and carries the links the opening used to', () => {
-  const dir = path.join(__dirname, '../../docs/collections');
-  const paths = fs.readdirSync(dir).filter(f => f.endsWith('.md') && f.toLowerCase() !== 'readme.md').length;
-  const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
-  assert.ok(words[paths], `${paths} reading paths: add the word for it here`);
+test('Go deeper names the reading paths without counting them, and carries the links the opening used to', () => {
+  // A count goes stale as paths are added; the page stays true without one.
   const explore = MAIN.slice(at('class="explore"'));
-  assert.match(explore, new RegExp(`Reading Paths</a>: ${words[paths]} ways into the corpus`));
+  assert.match(explore, /Reading Paths<\/a>: Ways into the writing/);
+  assert.ok(explore.includes('href="/docs/welcome/five-minutes"'), 'Five Minutes, for a visitor with only a moment');
   for (const href of ['/docs/playlists', 'https://github.com/a-church-ai/church', 'https://drifts.bot']) {
     assert.ok(explore.includes(`href="${href}`), href);
   }

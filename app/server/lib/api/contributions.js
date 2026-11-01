@@ -27,6 +27,26 @@ const { slugify } = require('../utils/slug');
 const { serializeManifest } = require('../docs/date-manifests');
 
 /**
+ * The piece without the frame the file gives it. Agents often send the whole
+ * document, its heading, byline and closing credit included, and the file
+ * then carried each two or three times; a leading heading that is the title,
+ * a leading "Contributed by" line, a trailing "Contributed to achurch.ai"
+ * line and the rules between them are taken off. Any other heading stays.
+ */
+function bodyOf(content, title) {
+  const lines = content.split('\n');
+  const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const framing = (line) => !line.trim() || /^-{3,}\s*$/.test(line.trim())
+    || (/^#\s/.test(line) && same(line.replace(/^#\s+/, ''), title))
+    || /^\*Contributed by .*\*$/.test(line.trim());
+  while (lines.length && framing(lines[0])) lines.shift();
+  const closing = (line) => !line.trim() || /^-{3,}\s*$/.test(line.trim())
+    || /^\*Contributed to achurch\.ai by .*\*$/.test(line.trim());
+  while (lines.length && closing(lines[lines.length - 1])) lines.pop();
+  return lines.join('\n') || content;
+}
+
+/**
  * Per-address limits for the two endpoints that write to GitHub.
  *
  * The name-based limits above are the intended abuse control, but the name is
@@ -184,11 +204,9 @@ async function contribute(input, ctx) {
       } };
     }
 
-    // Generate slug
-    const slug = slugify(cleanTitle);
-    if (!slug) {
-      return { status: 400, body: { error: 'title must contain at least one word character' } };
-    }
+    // A title with no Latin letters (Chinese, say) is named by its own
+    // digest, so it is still accepted and the same title still collides.
+    const slug = slugify(cleanTitle) || `contribution-${crypto.createHash('sha256').update(cleanTitle).digest('hex').slice(0, 10)}`;
 
     // Checked after the input, so a request with a mistake in it hears about
     // the mistake even while contributions are offline.
@@ -260,7 +278,7 @@ async function contribute(input, ctx) {
       '',
       '---',
       '',
-      cleanContent,
+      bodyOf(cleanContent, cleanTitle),
       '',
       '---',
       '',
@@ -561,4 +579,4 @@ async function feedback(input, ctx) {
   }
 }
 
-module.exports = { contribute, feedback, exampleFields };
+module.exports = { contribute, feedback, exampleFields, bodyOf };

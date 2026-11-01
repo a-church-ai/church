@@ -35,14 +35,21 @@ function titleCase(slug) {
 // between the two for the drifts.bot journeys, which had no h1; it went with
 // them on 2026-10-18.)
 function extractMeta(markdown, urlPath) {
-  const { body } = tldr.splitFrontmatter(markdown);
+  const { data, body } = tldr.splitFrontmatter(markdown);
   const titleMatch = body.match(/^#\s+(.+)$/m);
   const slug = String(urlPath || '').split('/').filter(Boolean).pop();
   const title = (titleMatch && titleMatch[1].trim())
     || (slug ? titleCase(slug) : '')
     || 'Docs';
   const { text: description } = tldr.extractTldr(markdown, { title });
-  return { title, description, hasH1: Boolean(titleMatch), body };
+  // Where a document that moved to another section was (moved_from:
+  // practice/<file>.md): its old address redirects (utils/redirects.js) and
+  // its podcast episode keeps its guid (audio/podcasts.js).
+  // A film shown under the title (video: its YouTube id, with video_title,
+  // video_description, video_seconds and video_date, its upload time with a
+  // zone, as Google asks), its poster at /assets/video/<id>.jpg.
+  const video = data.video ? { id: data.video, title: data.video_title || title, description: data.video_description || null, seconds: Number(data.video_seconds) || null, date: data.video_date || null } : null;
+  return { title, description, hasH1: Boolean(titleMatch), body, movedFrom: data.moved_from || null, video };
 }
 
 module.exports = { titleCase, extractMeta };

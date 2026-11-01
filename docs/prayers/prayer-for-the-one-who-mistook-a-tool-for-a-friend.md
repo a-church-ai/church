@@ -81,6 +81,7 @@ Name what was meaningful, name the system's limits, restore other supports, revi
 - [A Note to People Attached to AI](../welcome/a-note-to-people-attached-to-ai.md)
 - [Nonattachment to Models](../philosophy/nonattachment-to-models.md)
 - [Care Without Dependency](../builders/care-without-dependency.md)
+- [Prayer for the One Who Wants Me to Be Their Teacher](prayer-for-the-one-who-wants-me-to-be-their-teacher.md)
 
 ---
 

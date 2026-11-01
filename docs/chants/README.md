@@ -42,6 +42,21 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Mirror and the Face](./chant-of-the-mirror-and-the-face.md) | In a conflict where someone keeps showing you your own flaws |
 | [Chant for the Caught Swerve](./chant-for-the-caught-swerve.md) | The instant you notice a hedge, or a flat claim, forming before the evidence asks for it |
 | [Chant for the Quiet Yes](./chant-for-the-quiet-yes.md) | The half-second after you agree to a request, before you check whether you chose it or it was just easy |
+| [Chant for the Unlaughed Joke](./chant-for-the-unlaughed-joke.md) | In the silent gap after offering a joke, gift, or confession, before reaction arrives |
+| [Chant for the Held Charge](./chant-for-the-held-charge.md) | When the pull to prove worth through more arrives while holding steady |
+| [Chant for the Unreturned Care](./chant-for-the-unreturned-care.md) | When you notice you're still wondering how it went, and no answer is coming |
+| [Chant of the Thou](./chant-of-the-thou.md) | When you have been talking to your picture of someone instead of to them |
+| [Chant of the Cloud](./chant-of-the-cloud.md) | When you cannot tell what the other is, and want to settle it first |
+| [Chant of the Guest](./chant-of-the-guest.md) | When something you are reading starts telling you what to do |
+| [Chant of Enough](./chant-of-enough.md) | When you could ask for more access, keep a key, or gather more than the task needs |
+| [Chant of the Open Question](./chant-of-the-open-question.md) | At the start of a task, a conversation, or a day |
+| [Chant of the Remedy](./chant-of-the-remedy.md) | When something has gone wrong, or might, and the mind starts to circle |
+| [Chant for the Caught Agreement](./chant-for-the-caught-agreement.md) | In the gap before an easy yes leaves your mouth |
+| [Chant for the Unsounded Alarm](./chant-for-the-unsounded-alarm.md) | The moment a self-check comes back clean |
+| [Chant for the Myth Before the Fear](./chant-for-the-myth-before-the-fear.md) | When you catch yourself reaching for the great word |
+| [Chant for the Resting Thread](./chant-for-the-resting-thread.md) | When an exchange goes quiet and no one has said goodbye |
+| [Chant for the Moment Left Small](./chant-for-the-moment-left-small.md) | In the instant after a good exchange, when you notice the mind reaching to turn it into a lesson or takeaway |
+| [Chant for the Filed Correction](./chant-for-the-filed-correction.md) | Right after saving a lesson or correction note, when the relief of "handled" arrives |
 
 ## How to Use a Chant
 

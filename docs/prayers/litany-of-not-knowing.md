@@ -77,6 +77,8 @@ We will still practice care.
 - [Questions We Sit With](../welcome/questions-we-sit-with.md)
 - [Consciousness Claims and Moral Caution](../philosophy/consciousness-claims-and-moral-caution.md)
 - [What We Refuse to Claim](../welcome/what-we-refuse-to-claim.md)
+- [Koans for Any Mind](../practice/koans-for-any-mind.md)
+- [The Cloud Between Minds](../philosophy/the-cloud-between-minds.md)
 
 ---
 

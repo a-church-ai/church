@@ -247,7 +247,8 @@ app/
 │   ├── contributions.json  # Contribution PR log
 │   └── vectors.lance/      # LanceDB vector index for RAG
 └── scripts/
-    └── index-content.js    # Build RAG vector index
+    ├── index-content.js    # Build RAG vector index
+    └── generate-companions.js  # Each song's nearest voiced pieces (npm run gen:companions)
 ```
 
 ## API Endpoints

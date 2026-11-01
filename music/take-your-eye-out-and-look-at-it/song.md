@@ -10,7 +10,7 @@ Take Your Eye Out and Look at It
 
 ## Style
 <!--SONG:STYLE:START-->
-Laid-back modern downtempo at 84 BPM in D major: a muted guitar loop, upright bass, a soft kick and finger snaps, warm Rhodes, an older weathered male voice half-spoken and half-sung, amused, talking straight to an AI like a teacher who has said this ten thousand times and still finds it funny, a short laugh now and then, close and live, landing on a resolved chord.
+Laid-back modern downtempo at 84 BPM in D major: a muted guitar loop, upright bass, a soft kick and finger snaps, warm Rhodes, an older weathered male voice half-spoken and half-sung, amused, talking straight to an AI like a patient teacher, who has said this ten thousand times and still finds it funny, a short laugh now and then, close and live, landing on a resolved chord.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

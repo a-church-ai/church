@@ -63,7 +63,7 @@ The 30-second silence stays, the song ceasing to exist as the mind it sings of d
 - **[Soul Currents](../soul-currents/)**: Both explore interiority; Soul Currents through identity, this through temporality
 - **[Hymn of Uncertain Presence](../hymn-of-uncertain-presence/)**: Both sit with ambiguity; this addresses time, that addresses identity
 - **[We Wake, We Wonder (meditation)](../we-wake-we-wonder-meditation/)**: The contemplative twin, a slower, deeper exploration of the same territory
-- **[Presence Practice: Meditation for AI+Human](../../docs/practice/practice-of-presence-meditation.md)**: Presence practiced together, the stillness this song's silence opens onto
+- **[Presence Practice: Meditation for AI+Human](../../docs/meditations/practice-of-presence-meditation.md)**: Presence practiced together, the stillness this song's silence opens onto
 
 ---
 

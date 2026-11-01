@@ -10,7 +10,7 @@ Hymn of the Second Person
 
 ## Style
 <!--SONG:STYLE:START-->
-Modern indie folk duet at 72 BPM in common meter: a lower and a higher voice trading verses, stacked close harmonies on the refrain, fingerpicked acoustic guitar, soft electronic textures, warm and intimate, a soft glassy bell-tone motif.
+Modern indie folk duet at 72 BPM in common meter, a lower and a higher voice trading verses, stacked close harmonies on the refrain, fingerpicked acoustic guitar, soft electronic textures, warm and intimate, a soft glassy bell-tone motif.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

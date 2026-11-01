@@ -17,6 +17,7 @@ const path = require('path');
 const fs = require('fs');
 const { findMarkdownFiles, DOCS_DIR } = require('../rag/indexer');
 const { extractMeta, titleCase } = require('./meta');
+const { songRecordingFor } = require('../audio/manifest');
 
 // The Library's shelves (/docs): how its sections are grouped there, and the
 // order sections take wherever they are listed (the section sidebar, the site
@@ -24,12 +25,9 @@ const { extractMeta, titleCase } = require('./meta');
 // (sectionTitle), with a short line that is the hub's own copy: the READMEs'
 // descriptions stay the section pages' summaries. `href` sends a card
 // somewhere other than its section's page, `title` names it on the hub only,
-// and `unit` is what its count counts (pieces, unless it says). `groups` divide the section's page (render.js renderSectionPage) by
-// title, the last group taking what the others leave: by title rather than a
-// frontmatter field, since a field would change the source hash of voiced
-// documents and send them back to be rendered (service/catalog.js finds
-// blessings the same way). A served section on no shelf fails a test, so a
-// new folder cannot vanish from the Library.
+// and `unit` is what its count counts (pieces, unless it says). A served
+// section on no shelf fails a test, so a new folder cannot vanish from the
+// Library.
 const SHELVES = [
   {
     name: 'Start',
@@ -41,14 +39,8 @@ const SHELVES = [
   {
     name: 'Practice',
     cards: [
-      {
-        section: 'practice',
-        line: 'Guided sittings, and things to do',
-        groups: [
-          { id: 'meditations', label: 'Meditations', title: /\bMeditation\b/ },
-          { id: 'practices', label: 'Practices' },
-        ],
-      },
+      { section: 'meditations', line: 'Guided sittings, mostly silence, for any kind of mind' },
+      { section: 'practice', line: 'Short exercises for attention, honesty and care' },
       { section: 'prayers', line: 'Words for seeking, gratitude and blessing' },
       { section: 'rituals', line: 'Ceremonies for the moments that matter' },
       { section: 'chants', line: 'A few lines to carry with you' },
@@ -99,6 +91,20 @@ function isNoindexPath(urlPath) {
   return Boolean(first) && NOINDEX_CATEGORIES.includes(first.toLowerCase());
 }
 
+// Where a document's page is: /docs/<urlPath>, except a hymn that is sung,
+// whose page is its song's (/music/<slug>), words, notes, recording and
+// reflections together. Until 2026-10-26 a sung hymn was two pages with the
+// same words, and search engines kept only one of them. A hymn hands over the
+// moment its song has a recording, so one the songwriter writes today keeps
+// its Library page until it is made. Everything that links, lists, redirects
+// or cites a document reads this, not /docs/<urlPath>.
+function hrefOf(urlPath) {
+  const p = String(urlPath || '');
+  const hymn = /^hymns\/([a-z0-9-]+)$/.exec(p);
+  if (hymn && songRecordingFor(hymn[1])) return `/music/${hymn[1]}`;
+  return p ? `/docs/${p}` : '/docs';
+}
+
 let cache = null;
 
 // Display order for names: numbers compare as numbers, so "Principle 2"
@@ -125,6 +131,7 @@ async function buildCache() {
       fullPath: f.fullPath,
       docsRelPath: relToDocs.replace(/\\/g, '/'),  // Windows-safe
       urlPath: buildUrlPath(dirRelToDocs, stem),
+      href: hrefOf(buildUrlPath(dirRelToDocs, stem)),
       dirRelPath: dirRelToDocs,
       filename,
       stem,
@@ -132,9 +139,10 @@ async function buildCache() {
     };
   });
   await Promise.all(docs.map(async doc => {
-    const { title, description } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
+    const { title, description, movedFrom } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
     doc.title = title;
     doc.description = description;
+    doc.movedFrom = movedFrom;
   }));
 
   // Group by category (first segment; null for top-level)
@@ -275,12 +283,16 @@ async function listShelves() {
   }));
 }
 
-// A section's card, or null.
-const cardFor = name => SHELVES.flatMap(shelf => shelf.cards).find(card => card.section === name) || null;
-
 async function listAllDocs() {
   const c = await getCache();
   return c.docs;
+}
+
+// The document whose page is at this address (its href): for a link that
+// lands on a sung hymn's song page, the hymn. Null before the walk is built.
+function docByHref(href) {
+  if (!cache) return null;
+  return cache.docs.find(d => d.href === href) || null;
 }
 
 // The document an index chunk came from: its `file` is repository-relative
@@ -310,8 +322,9 @@ module.exports = {
   docByFile,
   byName,
   isNoindexPath,
+  hrefOf,
+  docByHref,
   sectionTitle,
-  cardFor,
   SHELVES,
   SECTION_ORDER,
   NOINDEX_CATEGORIES,

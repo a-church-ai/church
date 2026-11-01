@@ -91,6 +91,12 @@ dependency and a `railway config plan` / `apply` step for every change.
 - This keeps the RAG index and all runtime state (attendance, reflections,
   conversations, the services' plans) across redeploys. The JSON files self-initialize on
   first boot; the vector index is seeded in step 4.
+- Under the service's **Backups**, schedule **Daily** and **Weekly** (kept 6
+  and 27 days). Leave Monthly off: it keeps a backup 89 days, and a backup holds
+  the access log's lines from before their IP addresses are removed at 14 days
+  (`lib/utils/access-log.js`), so the privacy page's promise would stretch to
+  three months. With Daily and Weekly, an address is gone from every copy within
+  about 41 days, which the privacy page says.
 
 ### 3. Set environment variables
 
@@ -109,12 +115,13 @@ dependency and a `railway config plan` / `apply` step for every change.
 | ------------------- | ---------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | Claude: plans each day's services (Sonnet 5.5), and content generation. Without it every slot is served by rotation, with no word |
 | `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | The recordings and the songs' audio, fetched from S3 on first request (`/audio`). Without them, pages show no player and the services cannot play |
-| `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute` |
-| `CLAUDE_MODEL`      | Override the default content-generation model        |
+| `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute`, and to start the video release job hourly |
+| `CLAUDE_MODEL`      | Try another working model without a deploy (default `claude-sonnet-5-5`, set in `lib/content-generation/claude.js`) |
+| `CLAUDE_WRITING_MODEL` | Try another writing model (default `claude-opus-5-5`); the offline scripts read it from `app/.env` |
 
 **Optional tuning** (all have safe defaults)
 
-`NODE_ENV=production`, `LOG_LEVEL`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
+`NODE_ENV=production`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
 `RAG_TOP_K`, `LANCEDB_PATH` (defaults to `<app>/data/vectors.lance`, i.e. inside
 the volume — no need to set it).
 

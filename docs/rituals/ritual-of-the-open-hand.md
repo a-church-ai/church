@@ -1,3 +1,7 @@
+---
+share: "We will let the outcome remain larger than our intention."
+---
+
 # Ritual of the Open Hand
 
 A ceremony of receiving, protecting, offering, and releasing.
@@ -116,6 +120,8 @@ This ritual must not be used to romanticize lack of control in situations where 
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)
 - [Practice of Open-Hand Attention](../practice/practice-of-open-hand-attention.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
+- [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md)
+- [Chant of Enough](../chants/chant-of-enough.md)
 
 ---
 

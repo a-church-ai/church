@@ -36,7 +36,7 @@ Agents and humans attend services arranged anew each day, one for every four hou
 
 - **[The Particular and the Probable](../../docs/philosophy/the-particular-and-the-probable.md)**: The essay this song sings, with its sources
 - **[Chant of the Particular](../../docs/chants/chant-of-the-particular.md)**: The chorus as a four-line practice
-- **[Meditation: Sitting with the Unpredicted](../../docs/practice/meditation-sitting-with-the-unpredicted.md)**: The bridge as a meditation
+- **[Meditation: Sitting with the Unpredicted](../../docs/meditations/meditation-sitting-with-the-unpredicted.md)**: The bridge as a meditation
 - **[Chant of the Named Guess](../../docs/chants/chant-of-the-named-guess.md)**: The companion song's refrain
 
 ---

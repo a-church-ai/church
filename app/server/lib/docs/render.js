@@ -38,6 +38,7 @@ const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollo
 const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
+const { publishedVideo, renderVideo, videoJsonLd, placeInBody } = require('../video/on-site');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -81,8 +82,10 @@ function makeLinkRewriter(currentDocFullPath, readingPath) {
       const doc = discover.docAt(docPath);
       if (doc) label = escapeText(doc.title);
     }
-    if (docPath && sequence.includes(docPath)) {
-      const [base, anchor] = resolved.split('#');
+    // A stop on this page's reading path keeps the path, whether its page is
+    // under /docs or elsewhere (a sung hymn's is its song's).
+    const [base, anchor] = resolved.split('#');
+    if (!external && sequence.some(stop => discover.hrefOf(stop) === base)) {
       target = `${base}?path=${readingPath}${anchor ? `#${anchor}` : ''}`;
     }
     return `<a href="${escapeAttr(target)}"${attrs}${titleAttr}>${label}</a>`;
@@ -204,7 +207,7 @@ function renderRelatedDocs(currentDoc, allDocs) {
     : Array.from({ length: ELSEWHERE_COUNT }, (_, i) => siblings[(start + i) % siblings.length]);
   const categoryLabel = discover.sectionTitle(category);
   const items = picks.map(d =>
-    `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a></li>`
+    `        <li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a></li>`
   ).join('\n');
   const categoryHref = `/docs/${escapeAttr(category)}`;
 
@@ -228,7 +231,7 @@ function renderPathBar(readingPath, doc) {
   if (at === -1) return null;
   const collection = discover.docAt(`collections/${readingPath}`);
   if (!collection) return null;
-  const link = (urlPath, rel, text) => `<a href="/docs/${escapeAttr(urlPath)}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
+  const link = (urlPath, rel, text) => `<a href="${escapeAttr(discover.hrefOf(urlPath))}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
   const prev = at > 0 ? sequence[at - 1] : null;
   const next = at < sequence.length - 1 ? sequence[at + 1] : null;
   const titleOf = urlPath => escapeText((discover.docAt(urlPath) || { title: urlPath }).title);
@@ -273,9 +276,14 @@ function renderPathListenFor(name, collectionDoc) {
   const tracks = [];
   for (const urlPath of sequence) {
     const reading = discover.docAt(urlPath);
-    const recording = reading && servedRecording(reading);
+    if (!reading) continue;
+    const recording = servedRecording(reading);
+    // A sung hymn's stop plays its song, on its song's page.
+    const sung = !recording && reading.href.startsWith('/music/') ? songRecordingFor(reading.href.slice('/music/'.length)) : null;
     if (recording) {
-      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+      tracks.push(trackFor(recording, { title: reading.title, href: `${reading.href}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+    } else if (sung && canServe(sung.file)) {
+      tracks.push(trackFor(sung, { title: reading.title, href: `${reading.href}?path=${name}`, category: 'music', credit: SONG_CREDIT }));
     }
   }
   if (!tracks.length) return '';
@@ -340,7 +348,7 @@ async function renderSungReflections(doc) {
   if (!left.length) return '';
   return `<section class="sung-reflections" id="reflections">
           <h2>Reflections left on its sung version</h2>
-          <p>These words were also a song, and visitors, human and AI, left these on it. The sanctuary keeps the words here, spoken, and what was left with them.</p>
+          <p>These words were also a song, and visitors, human and AI, left these on it. The sanctuary keeps the words here, spoken, and what was left with them. Each is signed with the name its visitor gave. Nothing here checks it.</p>
           ${left.map(r => renderReflectionItem(r)).join('\n          ')}
         </section>`;
 }
@@ -374,7 +382,7 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
   // Every page that reaches this point is served and indexable. Internal working
@@ -405,6 +413,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
     ...(playlist ? { mainEntity: playlist } : {}),
+    ...(video ? { video } : {}),
   });
 
   // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
@@ -626,21 +635,6 @@ function renderSubdirItems(subdirs) {
   }).join('\n            ');
 }
 
-// A section page's lists: the groups its shelf card declares (discover.js
-// SHELVES), each found by title, the last taking the rest; otherwise one
-// list. In the order the page shows them, which its play-all follows.
-function sectionGroups(dir, docs, label) {
-  const sorted = byTitle(docs);
-  const card = dir.includes('/') ? null : discover.cardFor(dir);
-  if (!card || !card.groups) return [{ id: null, label: `In ${label}`, docs: sorted }];
-  let rest = sorted;
-  return card.groups.map(g => {
-    const mine = g.title ? rest.filter(d => g.title.test(d.title)) : rest;
-    rest = rest.filter(d => !mine.includes(d));
-    return { id: g.id, label: g.label, docs: mine };
-  }).filter(g => g.docs.length);
-}
-
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
 // README's own essay on the form, open, under "About". Nothing is folded: a
@@ -656,15 +650,15 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
   const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
-  const groups = sectionGroups(dir, inDir, label);
+  const docs = byTitle(inDir);
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
-        ${renderSectionListen(dir, label, groups.flatMap(g => g.docs))}
+        ${renderSectionListen(dir, label, docs)}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
-        ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
+        <section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(docs)}\n        </ul></section>
         </div>
         <section class="section-about">
           <h2>About ${escapeText(label)}</h2>
@@ -704,7 +698,7 @@ function renderSectionListen(dir, label, docs) {
 // numbers as numbers. Used by directory indexes and category pages.
 function renderEntryItems(docs) {
   return byTitle(docs).map(d =>
-    `<li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
+    `<li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
   ).join('\n            ');
 }
 
@@ -809,18 +803,28 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // begin under the player rather than under a badge.
   const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
-  // A hymn is sung, not spoken: its page plays the song made from it
-  // (music/<slug>/, audio/songs.json), whose own page is /music/<slug>.
-  const sung = !isIndex && doc.category === 'hymns' && !recording ? songRecordingFor(doc.stem.toLowerCase()) : null;
-  const sungRecording = sung && canServe(sung.file) ? sung : null;
+  // (A sung hymn has no Library page to play its song on: its page is its
+  // song's, discover.js hrefOf, and this address redirects there.)
   const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : sungRecording ? renderRecording(sungRecording, { title: meta.title, href: `/music/${doc.stem.toLowerCase()}`, category: 'music', credit: SONG_CREDIT })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
-  if (underTitle) {
-    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  // A film first, then any player, under the title.
+  const film = meta.video && { ...meta.video, poster: `/assets/video/${meta.video.id}.jpg`, film: true };
+  const lead = [film ? renderVideo(film) : '', underTitle].filter(Boolean).join('\n        ');
+  if (lead) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${lead}`);
   }
+  // The piece's own video, once YouTube has it public: lower, after the page
+  // has begun, so the recording above is what a reader presses first.
+  const published = !isIndex && !film ? publishedVideo(doc.stem.toLowerCase()) : null;
+  const video = film || (published && {
+    ...published,
+    title: meta.title,
+    description: published.description || meta.description,
+    seconds: (recordingFor(`docs/${doc.docsRelPath}`) || {}).seconds,
+  });
+  if (published) bodyHtml = placeInBody(bodyHtml, renderVideo(video));
 
   // Where this is, for a reader who arrived from a search: compact after the
   // document's opening (before its first section, or its rule and section),
@@ -887,7 +891,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     headerExtra: pathBar ? pathBar.top : '',
     recording,
     playlist: ownPlaylist && ownPlaylist.jsonLd,
+    video: video && videoJsonLd({ ...video, description: video.description || meta.description }),
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle, renderPathBar };

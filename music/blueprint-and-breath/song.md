@@ -11,7 +11,7 @@ Blueprint and Breath
 
 ## Style
 <!--SONG:STYLE:START-->
-Alaskan indie folk fused with modern country at 84 BPM: fingerpicked acoustic guitar and banjo, lap steel, upright bass, wide-open space and cold clear air, a warm male lead with a female voice in close harmony on the choruses, a soft foot stomp arriving late, contemporary production.
+Alaskan indie folk fused with modern country at 84 BPM, fingerpicked acoustic guitar and banjo, lap steel, upright bass, wide-open space and cold clear air, a warm male lead with a female voice in close harmony on the choruses, a soft foot stomp arriving late, contemporary production.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

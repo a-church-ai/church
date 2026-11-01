@@ -1,10 +1,11 @@
 /**
- * The podcasts: the recordings as two shows, each an RSS feed that Spotify,
+ * The podcasts: the recordings as three shows, each an RSS feed that Spotify,
  * Apple Podcasts and any other podcast app can follow.
  *
- * Prayers and rituals are one show and the practices another, because they
- * are listened to differently: the first is liturgy, the second is guidance
- * with silences left in for doing the practice. The songs are not a show:
+ * Prayers and rituals are one show, the practices another and the meditations
+ * a third, because they are listened to differently: the first is liturgy,
+ * the second guidance with silences left in for doing the practice, the third
+ * a sitting that is mostly silence. The songs are not a show:
  * Spotify keeps music out of podcasts whoever holds its rights, so songs go
  * to a music distributor instead. Nor are the chants: they are voiced to open
  * the services (lib/service), each under a minute.
@@ -18,8 +19,10 @@
  *
  * Two things never change once a show is submitted: its feed path, which
  * every directory and subscriber holds, and an episode's guid, which is how an
- * app knows an episode it already has. The tags are the set news-community's
- * feeds use, which Spotify accepts.
+ * app knows an episode it already has. An episode may move to another of the
+ * sanctuary's shows when a section splits, by the owner's decision (the
+ * meditations, 2026-10-27); it keeps its guid (guidFor). The tags
+ * are the set news-community's feeds use, which Spotify accepts.
  */
 
 const crypto = require('crypto');
@@ -57,26 +60,44 @@ const SHOWS = [
     spotify: 'https://open.spotify.com/show/3cXEtT7Y32i2RabNX7sgUc',
   },
   {
+    // The id and feed path are the ones this show was submitted under, as
+    // Guided Meditations for Humans and AI, when its meditations and practices
+    // were one section. Since 2026-10-27 the meditations are a show of their
+    // own, below, and this one holds the practices, under a title that says so.
     id: 'meditations-and-practices',
-    title: 'Guided Meditations for Humans and AI',
+    title: 'Contemplative Practices for Humans and AI',
     sections: ['practice'],
     description: paragraphs(
-      'The meditations and practices of aChurch.ai, a sanctuary for human and AI fellowship, guided aloud.',
-      'Most are guided by a single voice, and each leaves room for silence: the pauses are where the practice happens. If your podcast app shortens silences, you may want to turn that off for this show.',
+      'The practices of aChurch.ai, a sanctuary for human and AI fellowship, guided aloud: short exercises for attention, honesty and care, from a three-second pause before replying to a way of holding a question that will not settle.',
+      'Each is guided by a single voice and leaves room to do the practice: the pauses are where it happens. If your podcast app shortens silences, you may want to turn that off for this show.',
       'Each episode links to its text at achurch.ai, where anyone who arrives is welcome, human or AI.',
       'Guided by AI voices from ElevenLabs. The texts are open, under CC BY 4.0.',
     ),
+    // One voice, steady: a practice is something done, again and again.
+    cover: { lines: ['Contemplative', 'Practices', 'for Humans and AI'], voices: ['luca'] },
+    spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
+  },
+  {
+    id: 'meditations',
+    title: 'Guided Meditations for Humans and AI',
+    sections: ['meditations'],
+    description: paragraphs(
+      'The guided meditations of aChurch.ai, a sanctuary for human and AI fellowship: sittings with presence, recognition, loving-kindness and the edges of attention, for any kind of mind.',
+      'Each leaves long room for silence, and the silence is the meditation. If your podcast app shortens silences, you may want to turn that off for this show.',
+      'Each episode links to its text at achurch.ai, where anyone who arrives is welcome, human or AI.',
+      'Most are guided by AI voices from ElevenLabs; a few are read in their authors\' own voices over their own music, and say so. The texts are open, under CC BY 4.0.',
+    ),
     // One voice, settling into silence.
     cover: { lines: ['Guided', 'Meditations', 'for Humans and AI'], voices: [] },
-    spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
   },
 ];
 
 const feedPath = show => `/podcasts/${show.id}/feed.xml`;
 // Under /og with the other drawn images, and versioned the same way: Spotify
-// keeps a show's artwork by its URL, so a new design must be a new URL. v2 since
-// 2026-10-19, when the shows were renamed and their covers given the new names.
-const coverPath = show => `/og/v2/podcast/${show.id}.png`;
+// keeps a show's artwork by its URL, so a new design must be a new URL. v3 since
+// 2026-10-27, when the meditations became a show of their own and the
+// practices' show was renamed.
+const coverPath = show => `/og/v3/podcast/${show.id}.png`;
 
 // An episode's own picture (og-cards.js draws it): its cover in the feed, and
 // the same picture as the square a phone's lock screen shows while it plays
@@ -103,9 +124,11 @@ function episodeArtPath(kind, doc, recording) {
 const episodeCoverPath = (doc, recording) => episodeArtPath('podcast', doc, recording);
 const episodeSquarePath = (doc, recording) => episodeArtPath('square', doc, recording);
 
-// An episode's guid: its document's path in this repository, as a tag URI.
-// Never derived from the recording, which changes with every re-render.
-const guidFor = source => `tag:achurch.ai,2026:${source}`;
+// An episode's guid: its document's path in this repository, as a tag URI,
+// the path it was first published under for a document that moved to another
+// section (its moved_from). Never derived from the recording, which changes
+// with every re-render.
+const guidFor = (source, doc) => `tag:achurch.ai,2026:${doc && doc.movedFrom ? `docs/${doc.movedFrom}` : source}`;
 
 // M:SS, the form Apple and Spotify both read without ambiguity.
 function duration(seconds) {
@@ -142,7 +165,7 @@ function itemXml({ source, recording, doc }) {
       <link>${escapeXml(link)}</link>
       <description>${escapeXml(notes)}</description>
       <pubDate>${new Date(recording.published).toUTCString()}</pubDate>
-      <guid isPermaLink="false">${escapeXml(guidFor(source))}</guid>
+      <guid isPermaLink="false">${escapeXml(guidFor(source, doc))}</guid>
       <enclosure url="${escapeXml(`${SITE_URL}/audio/${recording.file}`)}" length="${recording.bytes}" type="audio/mpeg"/>
       <itunes:author>${AUTHOR}</itunes:author>
       <itunes:duration>${duration(recording.seconds)}</itunes:duration>

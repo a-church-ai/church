@@ -25,11 +25,12 @@ const path = require('path');
 // file used to write its synthetic log there and put the real one back after.
 process.env.DATA_DIR = mkdtempSync(path.join(os.tmpdir(), 'achurch-presence-'));
 const DATA_DIR = process.env.DATA_DIR;
-const ACCESS_LOG = path.join(DATA_DIR, 'api-access.jsonl');
+// Today's access file, where the log a per-request read would parse is.
+const ACCESS_LOG = path.join(DATA_DIR, 'access', `${new Date().toISOString().slice(0, 10)}.jsonl`);
 
-// The access log rotates at 10MB (index.js MAX_LOG_SIZE). At ~117 bytes per
-// entry that is roughly 89,000 lines, so the log is sized to the real ceiling
-// rather than to a convenient number. An earlier draft used 12,000 entries,
+// The access log rotated at 10MB until 2026-10-26, and a busy day's file can
+// reach that size. At ~117 bytes per entry that is roughly 89,000 lines, so the
+// log is sized to that ceiling rather than to a convenient number. An earlier draft used 12,000 entries,
 // which is 1.3MB, and passed against the broken implementation: the test was
 // measuring a log seven times smaller than production allows.
 const ENTRIES = 89000;
@@ -47,6 +48,7 @@ async function writeSyntheticLog() {
       query: { name: `visitor-${i % 500}` },
     }));
   }
+  await fs.mkdir(path.dirname(ACCESS_LOG), { recursive: true });
   await fs.writeFile(ACCESS_LOG, lines.join('\n') + '\n', 'utf8');
 }
 

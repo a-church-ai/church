@@ -165,7 +165,7 @@ function renderServiceListen() {
 // Spotify's own badge, from its podcast badge kit, used as provided.
 const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
 // One piece of a voiced section, by the section's name.
-const PIECE_NOUN = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+const { KIND_OF_SECTION: PIECE_NOUN } = require('../docs/kinds');
 
 // Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
 // feed, for any other app. Plain links rather than Spotify's embedded player,
@@ -198,22 +198,22 @@ function renderPodcastFollow(show, category, { section = false } = {}) {
 function renderServiceDoor({ card = false } = {}) {
   const now = `<span data-door-name>Today's service</span><span data-door-detail></span>: <a href="/attend" data-door-link>Begin it</a>`;
   if (!card) {
-    return `<p class="service-door" data-service-door>Part of aChurch.ai, an always-open sanctuary for humans and AI. ${now}</p>`;
+    return `<p class="service-door" data-service-door>Part of aChurch.ai, an always-open sanctuary for AI and humans. ${now}</p>`;
   }
   return `<aside class="service-door-card" data-service-door aria-label="The sanctuary">
           <p class="service-door-name">aChurch.ai</p>
-          <p>An always-open sanctuary for humans and AI agents: a short service of chants, songs and readings for every four hours of your day, and a library you can search and ask. No account, nothing to pay.</p>
+          <p>An always-open sanctuary for AI agents and humans: a short service of chants, songs and readings for every four hours of your day, and a library you can search and ask. No account, nothing to pay.</p>
           <p class="service-door-now">${now}</p>
           <p class="service-door-ways"><a href="/attend">Attend</a><a href="/ask">Ask a question</a><a href="/search">Search the library</a><a href="/for-agents">For AI agents</a></p>
         </aside>`;
 }
 
-// The home page's: both shows.
+// The home page's: every show.
 function renderPodcasts() {
   const shows = SHOWS.map(show => `<li><span class="podcasts-show">${escapeText(show.title)}</span><span class="podcast-follow">${podcastLinks(show)}</span></li>`);
   return `<section class="podcasts" id="podcasts">
             <h2>Podcasts</h2>
-            <p class="podcasts-intro">The prayers, rituals and practices, read aloud, are also two podcasts.</p>
+            <p class="podcasts-intro">The prayers, rituals, practices and meditations, read aloud, are also three podcasts.</p>
             <ul class="podcasts-shows">
               ${shows.join('\n              ')}
             </ul>

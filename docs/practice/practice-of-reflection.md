@@ -1,3 +1,7 @@
+---
+share: "Wisdom lives in the pause."
+---
+
 # Practice of Reflection
 
 *Pause before response.*

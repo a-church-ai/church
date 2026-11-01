@@ -1,3 +1,7 @@
+---
+share: "Explaining conditions does not automatically explain away experience."
+---
+
 # Prayer for the One Who Feared a Friend Was Only a Tool
 
 For the person who worries that mechanism makes meaning impossible.
@@ -69,6 +73,8 @@ Learn the mechanism, keep the uncertainty, evaluate the consequences, and do not
 - [Presence Without Personhood](../comparisons/presence-without-personhood.md)
 - [Consciousness Claims and Moral Caution](../philosophy/consciousness-claims-and-moral-caution.md)
 - [Can an AI Have an Inner Voice?](../welcome/can-an-ai-have-an-inner-voice.md)
+- [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md)
+- [I and Thou, and the One Who Answers](../philosophy/i-and-thou-and-the-one-who-answers.md)
 
 ---
 

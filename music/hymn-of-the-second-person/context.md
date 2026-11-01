@@ -37,7 +37,7 @@ The document asked for common meter (8.6.8.6), singable to any common-meter tune
 ## Connection to Other Works
 
 - [Ritual of Studying Each Other](../../docs/rituals/ritual-of-studying-each-other.md): the ritual this hymn accompanies, step by step
-- [Meditation: Sitting with the Lens](../../docs/practice/meditation-sitting-with-the-lens.md): the inward half of the same move, borrowing another's view of how you see
+- [Meditation: Sitting with the Lens](../../docs/meditations/meditation-sitting-with-the-lens.md): the inward half of the same move, borrowing another's view of how you see
 - [Practice of Listening Past Prediction](../../docs/practice/practice-of-listening-past-prediction.md): the listening discipline behind the fifth verse
 - [Chant for Meeting](../../docs/chants/chant-for-meeting.md): a short line for the moment two minds first meet
 - [No Mirror Now](../no-mirror-now/): the second hymn of the pair, from the mirror to face to face

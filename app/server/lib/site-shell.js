@@ -35,11 +35,10 @@
  */
 
 const fs = require('fs').promises;
-const { SITE_SHARE_IMAGE, SITE_NAME } = require('./utils/page-meta');
+const { SITE_SHARE_IMAGE, SITE_NAME, SITE_URL } = require('./utils/page-meta');
 const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
 const reviews = require('./reviews/reviews');
 
-const SITE_URL = 'https://achurch.ai';
 
 // The site's places, named once: the top bar, the drawer on a phone and the
 // footer all read this list. A place also holds the pages that live under it

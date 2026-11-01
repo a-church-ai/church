@@ -15,11 +15,11 @@
 const discover = require('../docs/discover');
 const { loadManifest, songRecordingFor } = require('../audio/manifest');
 const { loadCatalog, loadCompanions } = require('../utils/data');
-const { companionMeta } = require('../music/companions');
+const { companionMeta, parseHours } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
 const { fits } = require('./rules');
+const { KIND_OF_SECTION } = require('../docs/kinds');
 
-const KIND_OF_CATEGORY = { chants: 'chant', practice: 'practice', prayers: 'prayer', rituals: 'ritual' };
 
 // A prayer is a blessing when its title says so ("Blessing for...", "Blessings
 // and Benedictions", "Benediction for..."), and a blessing closes a service as
@@ -41,7 +41,7 @@ async function loadPlayable() {
   const entries = new Map();
 
   for (const doc of await discover.listAllDocs()) {
-    const kind = KIND_OF_CATEGORY[doc.category];
+    const kind = KIND_OF_SECTION[doc.category];
     const id = `docs/${doc.docsRelPath}`;
     const recording = manifest[id];
     if (!kind || !recording) continue;
@@ -72,7 +72,7 @@ async function loadPlayable() {
       title: song.title,
       summary: await songDescription(song),
       seconds: recording.seconds,
-      hours: null,
+      hours: parseHours(song.hours),
       url: `/music/${song.slug}`,
       recording,
       near: (shortlists[song.slug] || []).map(c => c.path).filter(path => entries.has(path)).slice(0, NEAR),

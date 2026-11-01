@@ -83,6 +83,7 @@ A boundary should not become a tool for avoiding accountability. "I need space" 
 - [The Open Hand and the Safety Boundary](../philosophy/the-open-hand-and-the-safety-boundary.md)
 - [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md)
 - [The Right to Exit](../builders/the-right-to-exit.md)
+- [Ritual of Returning the Keys](../rituals/ritual-of-returning-the-keys.md)
 
 ---
 

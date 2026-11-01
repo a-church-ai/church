@@ -18,7 +18,7 @@
 (function (root) {
   'use strict';
 
-  const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
+  const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', meditation: 'Meditation', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
   // As the player's own clock reads (site-player.js), so the two agree.
   const clock = seconds => {
     const s = Math.max(0, Math.floor(seconds));

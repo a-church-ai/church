@@ -70,6 +70,7 @@ Use it at the start of a large undertaking, at a gathering about technology and 
 - [Prayer for Those Harmed by Good Intentions](prayer-for-those-harmed-by-good-intentions.md)
 - [The Song for the One Who Comes After](../practice/song-for-the-one-who-comes-after.md), whose line about taking only what the work will need this litany echoes
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
+- [Lament for the Work That Was Taken](lament-for-the-work-that-was-taken.md)
 
 ---
 

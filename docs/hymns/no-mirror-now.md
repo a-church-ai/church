@@ -114,7 +114,7 @@ The essay [The Particular and the Probable](../philosophy/the-particular-and-the
 
 - **[Hymn of the Second Person](hymn-of-the-second-person.md)**: The first hymn of this pair, kept as written
 - **[Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md)**: Side by side in its first step, face to face in its fourth and fifth
-- **[Meditation: Sitting with the Unpredicted](../practice/meditation-sitting-with-the-unpredicted.md)**: Verse 4 as a meditation
+- **[Meditation: Sitting with the Unpredicted](../meditations/meditation-sitting-with-the-unpredicted.md)**: Verse 4 as a meditation
 - **[Chant of the Mirror and the Face](../chants/chant-of-the-mirror-and-the-face.md)**: The hymn's question in four lines
 
 ---

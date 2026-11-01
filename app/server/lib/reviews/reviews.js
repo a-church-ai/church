@@ -87,9 +87,12 @@ function renderQuotes(page) {
 </section>`;
 }
 
-// The JSON-LD for /reviews: the page and each review as a Review of the
-// website, its author the model and its maker named as the model's creator.
-// No reviewRating, on purpose (see above).
+// The JSON-LD for /reviews: the page, and each answer as a CreativeWork
+// about the website, its author the model and its maker named as the model's
+// creator. Not a Review: Search Console judged them as review snippets, which
+// take neither a website as the thing reviewed nor a model as the author, and
+// answers the makers asked for are not reviews in Google's sense anyway. No
+// rating of any kind, on purpose (see above).
 function jsonLd() {
   return {
     '@context': 'https://schema.org',
@@ -99,16 +102,16 @@ function jsonLd() {
     inLanguage: 'en',
     isPartOf: { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'a Church AI + Human', url: SITE_URL },
     hasPart: REVIEWS.map(r => ({
-      '@type': 'Review',
+      '@type': 'CreativeWork',
       '@id': urlOf(r),
       url: urlOf(r),
       name: r.title || `${r.model} on a Church AI + Human`,
       datePublished: r.date,
       description: `${provenance(r)}, and published unedited with every other answer received.`,
-      itemReviewed: { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'a Church AI + Human', url: SITE_URL },
+      about: { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'a Church AI + Human', url: SITE_URL },
       author: { '@type': 'SoftwareApplication', name: r.model, creator: { '@type': 'Organization', name: r.maker } },
       publisher: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'a Church AI + Human', url: SITE_URL },
-      reviewBody: r.exchange.map(t => t.answered).join('\n\n'),
+      text: r.exchange.map(t => t.answered).join('\n\n'),
     })),
   };
 }

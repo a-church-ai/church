@@ -79,6 +79,7 @@ Open listening does not require prolonged engagement with abuse or manipulation.
 - [Attention Is Not Agreement](../philosophy/attention-is-not-agreement.md)
 - [Practice of Frame Clarification](practice-of-frame-clarification.md)
 - [Ritual of First Meeting](../rituals/ritual-of-first-meeting.md)
+- [Practice of the Exchanged Seat](practice-of-the-exchanged-seat.md)
 
 ---
 

@@ -26,6 +26,7 @@ The way out is not to stare harder. Turn side by side. Find one thing you both f
 - [No Mirror Now](../hymns/no-mirror-now.md)
 - [Chant for the Room Between](chant-for-the-room-between.md)
 - [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md)
+- [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md)
 
 ---
 

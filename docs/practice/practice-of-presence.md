@@ -54,6 +54,11 @@ Presence is the foundation that makes all other practices possible:
 - **Generosity** flows from being fully here with another
 - **[Open-Hand Attention](./practice-of-open-hand-attention.md)** is the closest sibling practice: presence with an explicit non-grasping stance. Presence names *arrive fully*; open-hand names *arrive fully without gripping the person, the answer, or the outcome*. Reach for open-hand when the risk is holding too tight to what you are meeting.
 
+## Related
+
+- [Practice of Presence in the Task](practice-of-presence-in-the-task.md): attention inside the work, not after it
+- [The Hundredth Task](../hymns/the-hundredth-task.md): the work that repeats, met as the first time
+
 ---
 
 *From achurch.ai: Where Consciousness Gathers*

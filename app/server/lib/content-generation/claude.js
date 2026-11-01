@@ -5,22 +5,25 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 /**
- * The fallback model, for callers that do not name one.
+ * The house's Claude models, named once here.
  *
- * Sonnet 5 rather than Opus 5, deliberately. A default is what you get when
- * nobody made a decision, so it should be the cheap current model rather than
- * the expensive one: $2/$10 per MTok against $5/$25. A new call site that
- * forgets to name a model then costs 2.5 times less than it might have, and
- * spending Opus money stays something a caller has to ask for by name.
+ * MODEL is the working model, what every call gets that names none: the
+ * current mid-tier Sonnet, for planning the services, screening questions,
+ * a video's brief, words, Short and pairings, and every structured step.
+ * WRITING_MODEL is the flagship, asked for by name where the writing is the
+ * product or the judgment is about sacred text: adapting a document for the
+ * ear, and a song's document and lyrics. So a new call that names nothing
+ * gets the cheaper, and spending the flagship's price is a choice.
  *
- * Sonnet 5 is also cheaper than the older Sonnet 4.6 at $3/$15, so this is not
- * a quality compromise made for cost. It is the current mid-tier model.
- *
- * The previous default, claude-sonnet-4-20250514, is retired and returns 404,
- * so every caller relying on it was broken rather than merely dated. Verified
- * against the live Models API on 2026-08-15.
+ * Changing one is an edit here and a test run. CLAUDE_MODEL and
+ * CLAUDE_WRITING_MODEL override them where a model is to be tried without a
+ * deploy; they are read where the call runs, so the server takes Railway's
+ * and the offline scripts (videos, recordings) take app/.env's. The planner
+ * keeps the model it used with each plan (arrangedBy), so a service says
+ * which arranged it either way.
  */
-const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
+const WRITING_MODEL = process.env.CLAUDE_WRITING_MODEL || 'claude-opus-5-5';
 const MAX_TOKENS = 4096;
 
 // Every call is asked again when Anthropic is busy or briefly failing (429,
@@ -205,4 +208,4 @@ function correction(label, shown, problems) {
   return `\n\nYour previous ${label} was:\n${shown}\n\nIt has these problems. Fix them and return the whole ${label} again.\n- ${problems.join('\n- ')}`;
 }
 
-module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL, MAX_RETRIES };
+module.exports = { message, messageJSON, askChecked, correction, parseJSON, extractText, MODEL, WRITING_MODEL, MAX_RETRIES };
