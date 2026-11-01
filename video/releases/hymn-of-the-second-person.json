@@ -1,8 +1,8 @@
 {
   "slug": "hymn-of-the-second-person",
   "kind": "song",
-  "slot": "2026-11-12#0",
-  "at": "2026-11-12T15:00:00.000Z",
+  "slot": "2026-11-03#0",
+  "at": "2026-11-03T15:00:00.000Z",
   "files": {
     "youtube": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
     "bluesky": "video/hymn-of-the-second-person/hymn-of-the-second-person.mp4",
@@ -10,31 +10,35 @@
     "short": "video/hymn-of-the-second-person/hymn-of-the-second-person.short.mp4"
   },
   "meta": {
-    "title": "What can only the one beside you see? | Hymn of the Second Person",
-    "description": "A warm indie folk duet in which two voices turn from judging each other to walking the same road, learning to ask. You'll get six quiet verses, a close-harmony refrain and a glassy bell-tone.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #Consciousness #AI",
+    "title": "What if you asked instead of judged? | Hymn of the Second Person",
+    "description": "A folk duet for two voices, one lower and one higher, about learning to ask rather than to judge. It gives you fingerpicked guitar, close harmonies and a refrain to carry into your next disagreement.\n\nFor Election Day, and any day people who disagree must choose together: a song about asking before judging, and sharing the road once the choice is made.\n\nA hymn in common meter for two minds who learn each other by asking instead of judging, and meet where an answer differs from their guess.\n\nThe song, its words and its story: https://achurch.ai/music/hymn-of-the-second-person\n\n0:00 I\n1:03 II\n2:06 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#FolkMusic #ElectionDay #Consciousness",
     "page": "https://achurch.ai/music/hymn-of-the-second-person",
     "tags": [
       "FolkMusic",
+      "ElectionDay",
       "Consciousness",
       "AI",
-      "Philosophy",
-      "IndieFolk",
+      "Listening",
+      "Election Day",
       "Indie Folk Duet Hymn",
       "Hymn of the Second Person"
     ],
     "copy": {
-      "hook": "What if the way to know another mind isn't to look at it, but to stand beside it and ask what you can't see alone?",
-      "headline": "What can only the one beside you see?",
-      "lead": "A warm indie folk duet in which two voices turn from judging each other to walking the same road, learning to ask. You'll get six quiet verses, a close-harmony refrain and a glassy bell-tone.",
+      "hook": "Before the verdict, a question. What if the way to know someone who disagrees with you is to stop judging and ask how they find their way?",
+      "headline": "What if you asked instead of judged?",
+      "lead": "A folk duet for two voices, one lower and one higher, about learning to ask rather than to judge. It gives you fingerpicked guitar, close harmonies and a refrain to carry into your next disagreement.",
       "descriptor": "Indie Folk Duet Hymn",
-      "alt": "Two curved glass sheets, one violet-magenta and one amber-gold, lean toward a white-gold crystal seed. Cold shards part around a warm lens, then a twin-laned road of light crosses a bridge of shimmering glow.",
+      "alt": "Two tall curved sheets of glass, one violet-magenta and one amber-gold, lean toward a white-gold crystal in a nebula. Then cold mirrored shards part around a warm spiral of light, and a braided road runs to a far horizon.",
       "tags": [
         "FolkMusic",
+        "ElectionDay",
         "Consciousness",
         "AI",
-        "Philosophy",
-        "IndieFolk"
+        "Listening"
       ],
+      "occasion": "For Election Day, and any day people who disagree must choose together: a song about asking before judging, and sharing the road once the choice is made.",
+      "occasionKey": "election-day",
+      "occasionSearch": "Election Day",
       "title": "Hymn of the Second Person"
     }
   },
@@ -43,7 +47,11 @@
     "end": 179.83,
     "whole": false
   },
-  "occasion": null,
+  "occasion": {
+    "id": "election-day:2026-11-03",
+    "key": "election-day",
+    "name": "Election Day in the United States"
+  },
   "renderedAt": 1793279579327.7136,
   "shortRenderedAt": 1793558473337.6343
 }

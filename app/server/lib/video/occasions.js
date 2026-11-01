@@ -49,20 +49,34 @@ const KINDS = {
   'world-philosophy-day': { kind: 'observance', search: 'World Philosophy Day', name: 'World Philosophy Day', for: 'World Philosophy Day', meaning: 'UNESCO\'s day for philosophy and the questions it keeps open', tag: 'WorldPhilosophyDay', night: false },
   thanksgiving: { kind: 'observance', search: 'Thanksgiving', name: 'Thanksgiving in the United States', for: 'Thanksgiving and any day of giving thanks', meaning: 'a day kept in the United States for gratitude and gathering', tag: 'Thanksgiving', night: false },
   'human-rights-day': { kind: 'observance', search: 'Human Rights Day', name: 'Human Rights Day', for: 'Human Rights Day', meaning: 'the day the Universal Declaration of Human Rights was adopted, kept for the dignity of every person', tag: 'HumanRightsDay', night: false },
+  'election-day': { kind: 'observance', civic: true, search: 'Election Day', name: 'Election Day in the United States', for: 'Election Day, and any day people who disagree must choose together', meaning: 'the day the United States votes, and the disagreement that comes before it and remains after it', tag: 'ElectionDay', night: false },
+  'remembrance-day': { kind: 'observance', search: 'Veterans Day', name: 'Veterans Day and Remembrance Day', for: 'Veterans Day and Remembrance Day, a day kept for remembering', meaning: 'the eleventh of November, kept in many countries to remember those who served and those who died in war', tag: 'RemembranceDay', night: false },
+  'tolerance-day': { kind: 'observance', search: 'International Day for Tolerance', name: 'the International Day for Tolerance', for: 'the International Day for Tolerance', meaning: 'the United Nations\' day for living alongside difference with respect', tag: 'ToleranceDay', night: false },
+  'buy-nothing-day': { kind: 'observance', search: 'Black Friday', name: 'Black Friday and Buy Nothing Day', for: 'Black Friday, and the Buy Nothing Day kept beside it', meaning: 'the busiest shopping day in the United States, and the day kept beside it for wanting less', tag: 'BuyNothingDay', night: false },
+  'giving-tuesday': { kind: 'observance', search: 'Giving Tuesday', name: 'Giving Tuesday', for: 'Giving Tuesday and any day of giving', meaning: 'a day kept worldwide for giving, after the days of buying', tag: 'GivingTuesday', night: false },
   'new-year': { kind: 'observance', search: 'New Year', name: 'the new year', for: 'the first day of a new year', meaning: 'a beginning kept across most of the world', tag: 'NewYear', night: false },
   'day-of-peace': { kind: 'observance', search: 'International Day of Peace', name: 'the International Day of Peace', for: 'the International Day of Peace', meaning: 'the United Nations\' day for peace', tag: 'PeaceDay', night: false },
   'earth-day': { kind: 'observance', search: 'Earth Day', name: 'Earth Day', for: 'Earth Day', meaning: 'a day kept worldwide for the planet', tag: 'EarthDay', night: false }
 };
 
-// Observances by month and day, or by the nth weekday of a month.
+// Observances by month and day, or by the nth weekday of a month, `plus`
+// days after it: the US Election Day is the Tuesday after the first Monday
+// of November, Black Friday the day after Thanksgiving, Giving Tuesday the
+// Tuesday after it. Election Day is `civic` (KINDS): its words name no party,
+// candidate or side (publish/copy.js).
 const OBSERVANCES = [
   { key: 'new-year', month: 1, day: 1 },
   { key: 'earth-day', month: 4, day: 22 },
   { key: 'day-of-peace', month: 9, day: 21 },
   { key: 'world-mental-health-day', month: 10, day: 10 },
+  { key: 'election-day', month: 11, weekday: 1, nth: 1, plus: 1 },
+  { key: 'remembrance-day', month: 11, day: 11 },
   { key: 'world-kindness-day', month: 11, day: 13 },
+  { key: 'tolerance-day', month: 11, day: 16 },
   { key: 'world-philosophy-day', month: 11, weekday: 4, nth: 3 },
   { key: 'thanksgiving', month: 11, weekday: 4, nth: 4 },
+  { key: 'buy-nothing-day', month: 11, weekday: 4, nth: 4, plus: 1 },
+  { key: 'giving-tuesday', month: 11, weekday: 4, nth: 4, plus: 5 },
   { key: 'human-rights-day', month: 12, day: 10 }
 ];
 
@@ -70,12 +84,12 @@ function observanceDate(o, year) {
   const first = `${year}-${String(o.month).padStart(2, '0')}-01`;
   if (o.day) return addDays(first, o.day - 1);
   const offset = (o.weekday - new Date(`${first}T00:00:00Z`).getUTCDay() + 7) % 7;
-  return addDays(first, offset + (o.nth - 1) * 7);
+  return addDays(first, offset + (o.nth - 1) * 7 + (o.plus || 0));
 }
 
 const occasion = (key, from, to = from, extra = {}) => {
   const k = KINDS[key];
-  return { id: `${key}:${from}`, key, kind: k.kind, name: extra.name || k.name, from, to, for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, search: extra.search || k.search, night: k.night, limit: k.limit || 1 };
+  return { id: `${key}:${from}`, key, kind: k.kind, name: extra.name || k.name, from, to, for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, search: extra.search || k.search, night: k.night, limit: k.limit || 1, civic: Boolean(k.civic) };
 };
 
 function moons(from, to) {

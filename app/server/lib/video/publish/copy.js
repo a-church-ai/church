@@ -78,6 +78,10 @@ const MONTHS = /\b(january|february|march|april|may|june|july|august|september|o
 // Months that also name a solstice or equinox ("the June solstice") are kept.
 const SEASONAL = /\b(march|june|september|december) (solstice|equinox)\b/gi;
 
+// A civic occasion's words stay with what every side shares: no party, side,
+// candidate or instruction on how to vote.
+const PARTISAN = /\b(democrats?|democratic party|republicans?|GOP|MAGA|liberals?|conservatives?|progressives?|left[- ]wing|right[- ]wing|the left|the right|candidates?|vote for|vote against|ballot measure)\b/i;
+
 function check(raw, occasion = null) {
   let copy;
   try {
@@ -113,6 +117,11 @@ function check(raw, occasion = null) {
     if (occasion.search && !line.toLowerCase().includes(occasion.search.toLowerCase())) problems.push(`occasion must name "${occasion.search}", spelled so, as people search for it`);
     if (occasion.kind === 'astrology' && !/astrolog/i.test(line)) problems.push('occasion must say it is astrology that reads this time so, not claim an effect');
     if (!tags.slice(0, 2).some(t => t.toLowerCase() === occasion.tag.toLowerCase())) problems.push(`the tag "${occasion.tag}" must be one of the first two`);
+    if (occasion.civic) {
+      const words = [copy.hook, copy.headline, copy.lead, copy.descriptor, line, ...tags].join(' ');
+      const side = words.match(PARTISAN);
+      if (side) problems.push(`"${side[0]}" takes or names a side; the words for ${occasion.search} name no party, candidate, side or way to vote`);
+    }
   }
   return { value: { ...copy, tags, ...(occasion ? { occasionKey: occasion.key, occasionSearch: occasion.search || null } : {}) }, problems, shown: raw };
 }
@@ -141,7 +150,7 @@ ${text}
 What the video shows, movement by movement (its brief): ${brief.mood}
 ${brief.movements.map((m, i) => `${i + 1}. ${m.still}`).join('\n')}${occasion ? `
 
-It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}, with the words "${occasion.search}" in it, spelled so, since that is how people search for it${occasion.kind === 'astrology' ? ', naming astrology as the one that reads it so (what astrology reads in it, never that the planet does anything)' : ''}, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.` : ''}`;
+It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}, with the words "${occasion.search}" in it, spelled so, since that is how people search for it${occasion.kind === 'astrology' ? ', naming astrology as the one that reads it so (what astrology reads in it, never that the planet does anything)' : ''}, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.${occasion.civic ? ' This is a civic day people disagree about: speak to what every side shares, such as listening, dignity and living together after the choice, and name no party, candidate, side or way to vote, anywhere in the words or tags.' : ''}` : ''}`;
   const copy = await askChecked({
     label: 'copy',
     tries: 3,

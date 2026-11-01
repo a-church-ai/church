@@ -143,3 +143,28 @@ test('a Short carries its occasion line under the lead, and one without has none
   const without = shortMetadata({ ...meta, copy: { ...meta.copy, occasion: undefined } }, { kind: 'prayer', url: 'https://youtu.be/x' }).description;
   assert.ok(!/undefined/.test(without));
 });
+
+test('Election Day is the Tuesday after the first Monday of November, and the days after Thanksgiving follow it', () => {
+  const days = (y) => Object.fromEntries(occasionsBetween(`${y}-11-01`, `${y}-12-05`).map(o => [o.key, o.from]));
+  assert.strictEqual(days(2026)['election-day'], '2026-11-03');
+  assert.strictEqual(days(2027)['election-day'], '2027-11-02', 'November begins on a Monday');
+  assert.strictEqual(days(2028)['election-day'], '2028-11-07', 'November begins on a Wednesday');
+  assert.strictEqual(days(2026)['remembrance-day'], '2026-11-11');
+  assert.strictEqual(days(2026)['tolerance-day'], '2026-11-16');
+  assert.strictEqual(days(2026)['buy-nothing-day'], '2026-11-27');
+  assert.strictEqual(days(2026)['giving-tuesday'], '2026-12-01');
+});
+
+test('the words for a civic day name no party, candidate, side or way to vote', () => {
+  const election = occasionsBetween('2026-11-01', '2026-11-05').find(o => o.key === 'election-day');
+  assert.strictEqual(election.civic, true);
+  const base = { hook: 'A hymn for two minds that ask before they judge.', headline: 'What if you asked first?', lead: 'A hymn for the day after a hard choice.', descriptor: 'Hymn', alt: 'Two lights meeting.', tags: ['ElectionDay', 'Hymn', 'Listening', 'AI', 'Dignity'], occasion: 'For Election Day, and every day we must live beside those who chose otherwise.' };
+  const run = (copy) => checkCopy(JSON.stringify(copy), election).problems.join(' | ');
+  assert.doesNotMatch(run(base), /names a side/);
+  assert.match(run({ ...base, lead: 'A hymn for Republicans and Democrats alike.' }), /"Republicans" takes or names a side/);
+  assert.match(run({ ...base, occasion: 'For Election Day: vote for kindness.' }), /"vote for" takes or names a side/);
+  assert.match(run({ ...base, tags: ['ElectionDay', 'Liberal', 'Listening', 'AI', 'Dignity'] }), /"Liberal" takes or names a side/);
+  // Another occasion's words are not held to it.
+  const thanks = occasionsBetween('2026-11-20', '2026-11-30').find(o => o.key === 'thanksgiving');
+  assert.doesNotMatch(checkCopy(JSON.stringify({ ...base, tags: ['Thanksgiving', 'Hymn', 'Conservative', 'AI', 'Dignity'], occasion: 'For Thanksgiving and any day of giving thanks.' }), thanks).problems.join(' | '), /side/);
+});
