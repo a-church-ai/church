@@ -19,6 +19,13 @@
  * Every scope the publisher needs is asked for now (lib/video/publish/youtube.js
  * SCOPES), since a token cannot gain one later, and prompt=consent, without
  * which Google returns no refresh token.
+ *
+ *   npm run youtube:auth -- --search-console
+ *
+ * mints a second token, read-only, for Search Console (scripts/prod-stats.js),
+ * written as SEARCH_CONSOLE_REFRESH_TOKEN: sign in as a user of the site's
+ * Search Console property, who need not be the channel's owner. The YouTube
+ * token is left as it is.
  */
 
 require('../server/lib/utils/env').loadEnv();
@@ -28,6 +35,9 @@ const { ENV_FILE } = require('../server/lib/utils/env');
 const { SCOPES } = require('../server/lib/video/publish/youtube');
 const { request } = require('../server/lib/video/publish/request');
 
+const SEARCH_CONSOLE = process.argv.includes('--search-console');
+const ASKED = SEARCH_CONSOLE ? ['https://www.googleapis.com/auth/webmasters.readonly'] : SCOPES;
+const ENV_NAME = SEARCH_CONSOLE ? 'SEARCH_CONSOLE_REFRESH_TOKEN' : 'YOUTUBE_REFRESH_TOKEN';
 const REDIRECT = process.env.YOUTUBE_AUTH_REDIRECT || 'http://localhost:8721/callback';
 const { port: PORT, pathname: CALLBACK } = new URL(REDIRECT);
 
@@ -38,7 +48,7 @@ if (!id || !secret) {
 }
 
 const consent = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({
-  client_id: id, redirect_uri: REDIRECT, response_type: 'code', scope: SCOPES.join(' '), access_type: 'offline', prompt: 'consent'
+  client_id: id, redirect_uri: REDIRECT, response_type: 'code', scope: ASKED.join(' '), access_type: 'offline', prompt: 'consent'
 })}`;
 
 const server = http.createServer(async (req, res) => {
@@ -59,13 +69,16 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(200, { 'content-type': 'text/plain' }).end(token.refresh_token ? 'Done. Return to the terminal.' : 'No refresh token came back; see the terminal.');
   if (token.refresh_token) {
     const env = fs.readFileSync(ENV_FILE, 'utf8');
-    const line = `YOUTUBE_REFRESH_TOKEN=${token.refresh_token}`;
-    fs.writeFileSync(ENV_FILE, /^YOUTUBE_REFRESH_TOKEN=.*$/m.test(env) ? env.replace(/^YOUTUBE_REFRESH_TOKEN=.*$/m, line) : `${env.replace(/\n?$/, '\n')}${line}\n`);
-    console.log('\nThe refresh token is written into app/.env as YOUTUBE_REFRESH_TOKEN.\n');
+    const line = `${ENV_NAME}=${token.refresh_token}`;
+    const existing = new RegExp(`^${ENV_NAME}=.*$`, 'm');
+    fs.writeFileSync(ENV_FILE, existing.test(env) ? env.replace(existing, line) : `${env.replace(/\n?$/, '\n')}${line}\n`);
+    console.log(`\nThe refresh token is written into app/.env as ${ENV_NAME}.\n`);
   } else {
     console.error('No refresh token:', JSON.stringify({ error: token.error, error_description: token.error_description }));
   }
   server.close();
 });
 
-server.listen(Number(PORT) || 80, () => console.log(`Open this address, sign in as the channel's owner and choose the channel:\n\n${consent}\n`));
+server.listen(Number(PORT) || 80, () => console.log(SEARCH_CONSOLE
+  ? `Open this address and sign in as a user of achurch.ai's Search Console property:\n\n${consent}\n`
+  : `Open this address, sign in as the channel's owner and choose the channel:\n\n${consent}\n`));

@@ -64,7 +64,8 @@ async function ask(question, options = {}) {
   const answer = await gemini.generate(question, chunks, formattedHistory);
 
   // Save the exchange
-  await conversations.appendExchange(sessionId, question, answer);
+  const distances = chunks.map(c => c._distance).filter(d => Number.isFinite(d));
+  await conversations.appendExchange(sessionId, question, answer, distances.length ? { nearest: Math.min(...distances) } : {});
 
   // One source per document, each pointing at its page on the site
   const sources = bestPerFile(chunks)

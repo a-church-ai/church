@@ -133,8 +133,12 @@ async function getHistory(sessionId, limit = MAX_HISTORY_EXCHANGES) {
  * @param {string} sessionId - Session identifier
  * @param {string} question - User's question
  * @param {string} answer - Assistant's answer
+ * @param {{ nearest?: number }} [found] - the closest passage's distance from
+ *   the question, kept on the answer's line so the production report can list
+ *   the questions the corpus answered worst (lib/insights/server-stats.js);
+ *   never shown publicly (lib/api/ask.js leaves it out)
  */
-async function appendExchange(sessionId, question, answer) {
+async function appendExchange(sessionId, question, answer, { nearest } = {}) {
   await ensureDir();
 
   const filepath = getFilepath(sessionId);
@@ -149,7 +153,8 @@ async function appendExchange(sessionId, question, answer) {
   const assistantLine = JSON.stringify({
     role: 'assistant',
     content: answer,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    ...(typeof nearest === 'number' ? { nearest } : {})
   });
 
   await fs.appendFile(filepath, `${userLine}\n${assistantLine}\n`);

@@ -246,4 +246,4 @@ async function setPrivacy(id, privacy, { kind } = {}) {
   return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }
 
-module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, matchUpload, SCOPES };
+module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, matchUpload, accessToken, SCOPES };

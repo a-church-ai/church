@@ -309,8 +309,9 @@ async function conversation(input, ctx) {
     // of a file no longer there left out: as the page shows them, so the API,
     // MCP and the page agree.
     await discover.listAllDocs();
+    // `nearest` is the report's (rag/conversations.js), not the visitor's.
     const messages = parsed.filter(m => !m._meta)
-      .map(m => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
+      .map(({ nearest, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';

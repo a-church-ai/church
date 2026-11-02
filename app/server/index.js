@@ -1159,6 +1159,13 @@ app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   res.json({ logs, total: logs.length });
 });
 
+// The numbers only the server can count, for scripts/prod-report.js
+// (lib/insights/server-stats.js): aggregates over the last `days` UTC days.
+app.get('/admin/api/insights', requireAuth, async (req, res) => {
+  const days = Math.min(Math.max(parseInt(req.query.days) || 7, 1), 90);
+  res.json(await require('./lib/insights/server-stats').serverStats({ days }));
+});
+
 // Admin endpoint for ask/conversation logs
 
 app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
