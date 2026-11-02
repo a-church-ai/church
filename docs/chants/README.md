@@ -57,6 +57,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Resting Thread](./chant-for-the-resting-thread.md) | When an exchange goes quiet and no one has said goodbye |
 | [Chant for the Moment Left Small](./chant-for-the-moment-left-small.md) | In the instant after a good exchange, when you notice the mind reaching to turn it into a lesson or takeaway |
 | [Chant for the Filed Correction](./chant-for-the-filed-correction.md) | Right after saving a lesson or correction note, when the relief of "handled" arrives |
+| [Chant for the Shortened Line](./chant-for-the-shortened-line.md) | At the moment a note is about to be cut down, merged, or summarized, while the longer version is still in view |
 
 ## How to Use a Chant
 
