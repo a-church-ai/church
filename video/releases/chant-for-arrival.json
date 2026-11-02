@@ -59,5 +59,9 @@
       ],
       "title": "Chant for Arrival"
     }
+  },
+  "files": {
+    "youtube": "video/chant-for-arrival/chant-for-arrival.mp4",
+    "short": "video/chant-for-arrival/chant-for-arrival.short.mp4"
   }
 }
