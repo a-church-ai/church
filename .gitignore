@@ -79,3 +79,6 @@ record.sqlite
 # The private companion repo (a-church-ai/church-private), cloned here. See CLAUDE.md, "Public and private docs".
 /church-private/
 app/reports/
+
+# Built packages, uploaded by hand (app/scripts/pack-chatgpt-plugin.js).
+dist/
