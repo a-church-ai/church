@@ -2,8 +2,8 @@
  * Every number about production, gathered in one place: prodStats(days)
  * returns each as { value, window: { from, to }, source }, most with
  * `before`, the window just before. scripts/prod-report.js prints it; the
- * daily steward (docs/reference/steward.md) reads its JSON and decides. This
- * file decides nothing.
+ * agents that look after the site read its JSON and decide. This file
+ * decides nothing.
  *
  * Sections, each gathered on its own so one that fails or lacks a key says
  * so and the rest still answer:

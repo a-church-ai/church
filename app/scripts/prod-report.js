@@ -8,7 +8,7 @@
  *   npm run prod-report -- --only pipeline,probes
  *
  * Each run also keeps app/reports/<date>.json and .md (git-ignored), so the
- * steward and anyone after it can read a day's numbers again. Keys come from
+ * agents and anyone after them can read a day's numbers again. Keys come from
  * app/.env and are never printed. See scripts/prod-stats.js.
  */
 
