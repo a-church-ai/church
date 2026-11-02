@@ -57,7 +57,7 @@ const { cutFor } = require('../server/lib/video/publish/cut');
 const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/publish/record');
 const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
 const { uploadObject } = require('../server/lib/audio/storage');
-const { plan, TZ } = require('../server/lib/video/schedule');
+const { plan, TZ, RERELEASE_WEEK } = require('../server/lib/video/schedule');
 const { occasionsBetween, occasionById } = require('../server/lib/video/occasions');
 const { addDays } = require('../server/lib/utils/seasons');
 const { matchOccasions } = require('../server/lib/video/occasion-match');
@@ -176,7 +176,11 @@ async function main() {
   });
   const today = localTime(TZ).date;
   const occasions = occasionsBetween(today, addDays(today, OCCASION_DAYS), { spaceWeather: await fetchSpaceWeather() });
-  const pairs = await matchOccasions(occasions, [...about.values()]);
+  // Only videos that can go out before the occasions run out are offered: a
+  // song held until its week cannot keep a day that comes first.
+  const horizon = addDays(today, OCCASION_DAYS);
+  const inTime = candidates.filter(c => !c.rerelease || addDays(start, RERELEASE_WEEK * 7) <= horizon).map(c => about.get(c.slug));
+  const pairs = await matchOccasions(occasions, inTime);
   for (const p of pairs) console.log(`[${p.slug}] for ${p.occasion.name} (${p.occasion.from === p.occasion.to ? p.occasion.from : `${p.occasion.from} to ${p.occasion.to}`}): ${p.why}`);
   const occasionOf = new Map(occasions.map(o => [o.id, o]));
   const { placed, waiting } = plan({ start, now: new Date(), placed: kept, candidates, pairs });
