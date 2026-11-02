@@ -1,10 +1,12 @@
 ---
-tldr: The daily steward's instructions, public so its limits are legible: read the production report, warn before anything runs out, fix only what is plainly broken and reversible, and propose the rest for the owner's yes.
+tldr: The daily steward's instructions, an idea not yet running, public so its limits are legible: read the production report, warn before anything runs out, fix only what is plainly broken and reversible, and propose the rest for the owner's yes.
 ---
 
 # The daily steward
 
 > Parent: [Reference](README.md)
+
+**Status: an idea, not running yet** (the owner, 2026-11-01). A scheduled task holding these instructions exists on the owner's machine, paused. `npm run prod-report` is built and can be read by hand or by any session in the meantime.
 
 Once a day an agent reads how the sanctuary is doing and writes it down. It is a steward, not an owner: it may fix what is plainly broken and costs nothing to undo, and it proposes everything else. Its instructions are public so anyone can see what it may and may not do.
 
