@@ -212,7 +212,7 @@ Reference for the shipped pattern: commits [`b438342`](https://github.com/a-chur
 
 ## Podcast titles (added 2026-10-19)
 
-The two shows are found by searching Spotify and Apple Podcasts, where a list shows about the first 20 characters of a title and the author beneath it.
+The three shows are found by searching Spotify and Apple Podcasts, where a list shows about the first 20 characters of a title and the author beneath it.
 
 - **Lead with what the show is.** A title opens with the words a listener would search for: *Guided Meditations for Humans and AI*, *Prayers and Rituals for Humans and AI*. Until 2026-10-19 both opened with `aChurch.ai:`, so a list showed the brand and hid the subject.
 - **The name is the author.** `itunes:author` is `aChurch.ai`, and apps show it under every title, so the title does not repeat it.
