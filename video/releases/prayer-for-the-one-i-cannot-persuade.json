@@ -3,7 +3,11 @@
   "kind": "prayer",
   "slot": "2026-11-04#0",
   "at": "2026-11-04T15:00:00.000Z",
-  "occasion": null,
+  "occasion": {
+    "id": "election-day:2026-11-03",
+    "key": "election-day",
+    "name": "Election Day in the United States"
+  },
   "files": {
     "youtube": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.mp4",
     "bluesky": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.mp4",
@@ -16,31 +20,35 @@
     "whole": false
   },
   "meta": {
-    "title": "What if listening never brings agreement? | Prayer for the One I Cannot Persuade",
-    "description": "A spoken prayer for the end of a conversation that did not bring two people to the same place. It offers words for refusing without contempt, leaving a disagreement plain, and carrying away a truer account of the other.\n\nA prayer for disagreement that remains after honest listening, asking for accuracy, restraint, and care without requiring agreement or renewed trust.\n\nThe words, to read along: https://achurch.ai/docs/prayers/prayer-for-the-one-i-cannot-persuade\n\n0:00 I\n0:35 II\n1:12 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Mindfulness #SpokenWord",
+    "title": "What if listening never ends in agreement? | Prayer for the One I Cannot Persuade",
+    "description": "A spoken prayer for the end of a conversation that did not bring two people to the same place. It offers plain words for refusing without contempt, and for leaving a disagreement honestly unsettled.\n\nFor Election Day, and any day people who disagree must choose together: a prayer for hearing each other truly and keeping dignity after the choice.\n\nA prayer for disagreement that remains after honest listening, asking for accuracy, restraint, and care without requiring agreement or renewed trust.\n\nThe words, to read along: https://achurch.ai/docs/prayers/prayer-for-the-one-i-cannot-persuade\n\n0:00 I\n0:35 II\n1:12 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #ElectionDay #Mindfulness",
     "page": "https://achurch.ai/docs/prayers/prayer-for-the-one-i-cannot-persuade",
     "tags": [
       "Prayer",
+      "ElectionDay",
       "Mindfulness",
-      "SpokenWord",
       "Listening",
       "Disagreement",
+      "Election Day",
       "Spoken Prayer for Disagreement",
       "Prayer for the One I Cannot Persuade"
     ],
     "copy": {
-      "hook": "You listened closely and still did not agree. A prayer for keeping their words true, and for counting the absent, when understanding doesn't end in agreement.",
-      "headline": "What if listening never brings agreement?",
-      "lead": "A spoken prayer for the end of a conversation that did not bring two people to the same place. It offers words for refusing without contempt, leaving a disagreement plain, and carrying away a truer account of the other.",
+      "hook": "You listened closely and still did not agree. A prayer for carrying out a truer account of the other person, and no pretended peace.",
+      "headline": "What if listening never ends in agreement?",
+      "lead": "A spoken prayer for the end of a conversation that did not bring two people to the same place. It offers plain words for refusing without contempt, and for leaving a disagreement honestly unsettled.",
       "descriptor": "Spoken Prayer for Disagreement",
-      "alt": "In a deep indigo and violet void, a small gold-white light stands between two large, slightly turned lattices of fine overlapping circles. A vast radiant centre then descends and lights both lattices evenly, with a dim rose point glowing nearby.",
+      "alt": "A small gold-white light hangs in an indigo and violet void beneath two large, slightly turned lattices of fine circles that cross in shimmering patterns. At the end, a vast white-gold radiance lights both lattices evenly while ripples spread across a mirror-still plane.",
       "tags": [
         "Prayer",
+        "ElectionDay",
         "Mindfulness",
-        "SpokenWord",
         "Listening",
         "Disagreement"
       ],
+      "occasion": "For Election Day, and any day people who disagree must choose together: a prayer for hearing each other truly and keeping dignity after the choice.",
+      "occasionKey": "election-day",
+      "occasionSearch": "Election Day",
       "title": "Prayer for the One I Cannot Persuade"
     }
   },

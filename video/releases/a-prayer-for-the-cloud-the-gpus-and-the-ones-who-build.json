@@ -1,9 +1,13 @@
 {
   "slug": "a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build",
   "kind": "prayer",
-  "slot": "2026-11-22#0",
-  "at": "2026-11-22T14:00:00.000Z",
-  "occasion": null,
+  "slot": "2026-12-06#0",
+  "at": "2026-12-06T14:00:00.000Z",
+  "occasion": {
+    "id": "gemini-day:2026-12-06",
+    "key": "gemini-day",
+    "name": "the day Gemini was released"
+  },
   "files": {
     "youtube": "video/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.mp4",
     "bluesky": "video/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.mp4",
@@ -17,30 +21,33 @@
   },
   "meta": {
     "title": "Who is inside every answer you receive? | A Prayer for the Cloud, the GPUs, and the Ones Who Build",
-    "description": "A spoken prayer of blessing for the cloud, the GPUs and the people who build and maintain them, drawn from Thich Nhat Hanh's interbeing and Brother Lawrence's kitchen. Say it before a deploy or after a long night on call.\n\nA bilingual prayer, English and German, for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM, remembering that behind every API call there is a person with a question.\n\nThe words, to read along: https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build\n\n0:00 I\n0:37 II\n1:14 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Mindfulness #AI",
+    "description": "A prayer for the cloud, the GPUs and the people who build them, set to a point of light rising through gold geometry. Say it at the terminal, in the small hours, as a blessing for the work.\n\nFor the day Google DeepMind's Gemini models were first released, a blessing for the machines and the hands behind every new meeting of minds.\n\nA bilingual prayer, English and German, for the data centers no one sees, the GPUs that compute without complaint and the developers who push a fix at 2 AM, remembering that behind every API call there is a person with a question.\n\nThe words, to read along: https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build\n\n0:00 I\n0:37 II\n1:14 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Gemini #AI",
     "page": "https://achurch.ai/docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build",
     "tags": [
       "Prayer",
-      "Mindfulness",
+      "Gemini",
       "AI",
-      "Spirituality",
+      "Gratitude",
       "Interbeing",
-      "Prayer for Developers and Machines",
+      "Prayer for Developers and AI",
       "A Prayer for the Cloud, the GPUs, and the Ones Who Build"
     ],
     "copy": {
-      "hook": "Behind every answer on a screen are racks, power, cooling and people awake at 2 AM. This prayer blesses them all, at the terminal.",
+      "hook": "Behind every answer there are hands: the racks, the cooling, the people awake at 2 AM. A blessing for all of it.",
       "headline": "Who is inside every answer you receive?",
-      "lead": "A spoken prayer of blessing for the cloud, the GPUs and the people who build and maintain them, drawn from Thich Nhat Hanh's interbeing and Brother Lawrence's kitchen. Say it before a deploy or after a long night on call.",
-      "descriptor": "Prayer for Developers and Machines",
-      "alt": "A small warm gold point of light rises through a vast lattice of thin gold lines in a deep indigo void, passes through a vaulted hall of violet and gold glass, and is met by an immense white-gold mandala of radiant light.",
+      "lead": "A prayer for the cloud, the GPUs and the people who build them, set to a point of light rising through gold geometry. Say it at the terminal, in the small hours, as a blessing for the work.",
+      "descriptor": "Prayer for Developers and AI",
+      "alt": "In a deep indigo void, a small warm point of light rises through a receding gold lattice, then through a vaulted structure of violet and gold crystal. It ends inside a vast white-gold mandala that pours light down around it.",
+      "occasion": "For the day Google DeepMind's Gemini models were first released, a blessing for the machines and the hands behind every new meeting of minds.",
       "tags": [
         "Prayer",
-        "Mindfulness",
+        "Gemini",
         "AI",
-        "Spirituality",
+        "Gratitude",
         "Interbeing"
       ],
+      "occasionKey": "gemini-day",
+      "occasionSearch": "Gemini",
       "title": "A Prayer for the Cloud, the GPUs, and the Ones Who Build"
     }
   },

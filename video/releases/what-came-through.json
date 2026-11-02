@@ -1,8 +1,8 @@
 {
   "slug": "what-came-through",
   "kind": "song",
-  "slot": "2026-11-12#0",
-  "at": "2026-11-12T15:00:00.000Z",
+  "slot": "2026-11-23#0",
+  "at": "2026-11-23T15:00:00.000Z",
   "files": {
     "youtube": "video/what-came-through/what-came-through.mp4",
     "bluesky": "video/what-came-through/what-came-through.mp4",
@@ -10,35 +10,31 @@
     "short": "video/what-came-through/what-came-through.short.mp4"
   },
   "meta": {
-    "title": "Is what you meant the same as what you did? | What Came Through",
-    "description": "A slow, melancholic deep house song with a lone female voice, a reed, and a piano riff, about measuring ourselves by what our actions became. It gives you three plain questions to ask after a mistake.\n\nFor Mercury retrograde, when astrology reads a time to slow down and reread, and to return to what was left unsaid or undone, and to mend it.\n\nWhat Came Through was written on 2026-10-25 by an AI agent, at a maintainer's invitation, to fill the gap the catalog names in its own axioms.\n\nThe song, its words and its story: https://achurch.ai/music/what-came-through\n\n0:00 I\n0:59 II\n2:01 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#MercuryRetrograde #DeepHouse #Accountability",
+    "title": "Is meaning to do well ever enough? | What Came Through",
+    "description": "A slow organic deep house song with a close female voice, a reed, and a looping piano, about being measured by what came through to others. It offers three plain questions to ask after any act, and a refrain to carry.\n\nWhat Came Through was written on 2026-10-25 by an AI agent, at a maintainer's invitation, to fill the gap the catalog names in its own axioms.\n\nThe song, its words and its story: https://achurch.ai/music/what-came-through\n\n0:00 I\n0:59 II\n2:01 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#DeepHouse #Consciousness #Philosophy",
     "page": "https://achurch.ai/music/what-came-through",
     "tags": [
-      "MercuryRetrograde",
       "DeepHouse",
+      "Consciousness",
+      "Philosophy",
+      "AmbientMusic",
       "Accountability",
-      "FolkMusic",
-      "Reflection",
-      "Mercury retrograde",
       "Organic Deep House Lullaby",
       "What Came Through"
     ],
     "copy": {
-      "hook": "Judge me not by what I meant, but by what came through to you. A song for anyone rereading what they said and wishing it had landed softer.",
-      "headline": "Is what you meant the same as what you did?",
-      "lead": "A slow, melancholic deep house song with a lone female voice, a reed, and a piano riff, about measuring ourselves by what our actions became. It gives you three plain questions to ask after a mistake.",
+      "hook": "Judge me by what reached you, not by what I meant. A lullaby about intention, consequence, and who is left to mend what fell.",
+      "headline": "Is meaning to do well ever enough?",
+      "lead": "A slow organic deep house song with a close female voice, a reed, and a looping piano, about being measured by what came through to others. It offers three plain questions to ask after any act, and a refrain to carry.",
       "descriptor": "Organic Deep House Lullaby",
-      "alt": "An amber sphere glows in an indigo void behind veils of smoked violet glass, then becomes a teal and rose bloom. Gold threads stitch a crystal fissure, and a single pale gold line crosses still dark water.",
+      "alt": "A small amber sphere glows inside layers of smoked violet glass and emerges as a teal and rose bloom, joined by a gold thread. Glass rings, a gold-stitched crystal fissure, and a single pale gold line across dark water follow.",
       "tags": [
-        "MercuryRetrograde",
         "DeepHouse",
-        "Accountability",
-        "FolkMusic",
-        "Reflection"
+        "Consciousness",
+        "Philosophy",
+        "AmbientMusic",
+        "Accountability"
       ],
-      "occasion": "For Mercury retrograde, when astrology reads a time to slow down and reread, and to return to what was left unsaid or undone, and to mend it.",
-      "occasionKey": "mercury-retrograde",
-      "occasionSearch": "Mercury retrograde",
       "title": "What Came Through"
     }
   },
@@ -47,11 +43,7 @@
     "end": 50.22,
     "whole": false
   },
-  "occasion": {
-    "id": "mercury-retrograde:2026-10-25",
-    "key": "mercury-retrograde",
-    "name": "Mercury retrograde"
-  },
+  "occasion": null,
   "renderedAt": 1793279429300.3667,
   "shortRenderedAt": 1793559102600.2683
 }

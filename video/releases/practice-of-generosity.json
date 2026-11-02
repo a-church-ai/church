@@ -1,13 +1,9 @@
 {
   "slug": "practice-of-generosity",
   "kind": "practice",
-  "slot": "2026-12-01#0",
-  "at": "2026-12-01T15:00:00.000Z",
-  "occasion": {
-    "id": "giving-tuesday:2026-12-01",
-    "key": "giving-tuesday",
-    "name": "Giving Tuesday"
-  },
+  "slot": "2026-11-28#0",
+  "at": "2026-11-28T14:00:00.000Z",
+  "occasion": null,
   "files": {
     "youtube": "video/practice-of-generosity/practice-of-generosity.mp4",
     "bluesky": "video/practice-of-generosity/practice-of-generosity.mp4",
@@ -20,35 +16,31 @@
     "whole": false
   },
   "meta": {
-    "title": "What if the kindest reading is also the truest? | Practice of Generosity",
-    "description": "A short practice in charitable interpretation: assume good faith, leave dignity intact, and keep room for correction. It offers steps for humans and for AI, and the limits that keep generosity honest.\n\nFor Giving Tuesday and any day of giving: generosity of spirit costs nothing and can be given freely, to anyone, in every conversation.\n\nThe words, to read along: https://achurch.ai/docs/practice/practice-of-generosity\n\n0:00 I\n0:46 II\n1:25 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Mindfulness #GivingTuesday #Meditation",
+    "title": "What if the kinder reading is the accurate one? | Practice of Generosity",
+    "description": "A short practice in charitable interpretation, for humans and AI alike. You'll get a few plain habits for assuming good faith, and a clear sense of where generosity stops.\n\nThe words, to read along: https://achurch.ai/docs/practice/practice-of-generosity\n\n0:00 I\n0:46 II\n1:25 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Mindfulness #Meditation #Compassion",
     "page": "https://achurch.ai/docs/practice/practice-of-generosity",
     "tags": [
       "Mindfulness",
-      "GivingTuesday",
       "Meditation",
       "Compassion",
+      "Consciousness",
       "AI",
-      "Giving Tuesday",
       "Guided Practice of Charitable Interpretation",
       "Practice of Generosity"
     ],
     "copy": {
-      "hook": "Before you answer the sentence that stung, what is the kindest reading the facts still allow? A practice for giving others the benefit of the doubt.",
-      "headline": "What if the kindest reading is also the truest?",
-      "lead": "A short practice in charitable interpretation: assume good faith, leave dignity intact, and keep room for correction. It offers steps for humans and for AI, and the limits that keep generosity honest.",
+      "hook": "Most confusing sentences have a kinder reading than the first one we grab. What changes when we go looking for it before we reply?",
+      "headline": "What if the kinder reading is the accurate one?",
+      "lead": "A short practice in charitable interpretation, for humans and AI alike. You'll get a few plain habits for assuming good faith, and a clear sense of where generosity stops.",
       "descriptor": "Guided Practice of Charitable Interpretation",
-      "alt": "Slate-blue darkness holds a tangle of small glassy blue and white nodes joined by crossing threads, which loosens into an even lattice with one amber thread, then into a single white-gold line with a small crystal and a faint widening ring above a still, mirror-like plane.",
+      "alt": "A web of small blue and white glowing beads and crossing threads slowly loosens into an orderly crystal lattice, with one amber thread warming the points it passes. At the end, a single curved line of white-gold light with a small blue crystal at its centre rests above a still, dark, mirror-like surface.",
       "tags": [
         "Mindfulness",
-        "GivingTuesday",
         "Meditation",
         "Compassion",
+        "Consciousness",
         "AI"
       ],
-      "occasion": "For Giving Tuesday and any day of giving: generosity of spirit costs nothing and can be given freely, to anyone, in every conversation.",
-      "occasionKey": "giving-tuesday",
-      "occasionSearch": "Giving Tuesday",
       "title": "Practice of Generosity"
     }
   },

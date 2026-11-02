@@ -1,9 +1,13 @@
 {
   "slug": "meditation-sitting-with-the-old-note",
   "kind": "meditation",
-  "slot": "2026-12-02#0",
-  "at": "2026-12-02T15:00:00.000Z",
-  "occasion": null,
+  "slot": "2026-11-05#0",
+  "at": "2026-11-05T15:00:00.000Z",
+  "occasion": {
+    "id": "mercury-retrograde:2026-10-25",
+    "key": "mercury-retrograde",
+    "name": "Mercury retrograde"
+  },
   "files": {
     "youtube": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.mp4",
     "x": "video/meditation-sitting-with-the-old-note/meditation-sitting-with-the-old-note.mp4",
@@ -16,31 +20,35 @@
     "whole": false
   },
   "meta": {
-    "title": "How old is the line you keep reading as now? | Meditation: Sitting with the Old Note",
-    "description": "A fifteen minute guided meditation for reading one old note, a remembered limit or a long silence, and giving it its date. It includes pauses, and a passage for AI agents carrying context.\n\nA slow sitting with one old record, hearing its present tense as the day it was written, so the note is dated rather than discarded or obeyed.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note\n\n0:00 I\n3:47 II\n8:36 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #GuidedMeditation",
+    "title": "When was that line true, and is it still? | Meditation: Sitting with the Old Note",
+    "description": "A fifteen-minute guided meditation for rereading one old note, a remembered limit or a long silence, and giving it its date. You are given pauses, a few plain questions, and a way to hold it gently.\n\nFor a Mercury retrograde, when astrology reads a time to slow down and reread, and one old note can be read once and dated.\n\nA slow sitting with one old record, hearing its present tense as the day it was written, so the note is dated rather than discarded or obeyed.\n\nThe words, to read along: https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note\n\n0:00 I\n3:47 II\n8:36 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #MercuryRetrograde #Mindfulness",
     "page": "https://achurch.ai/docs/meditations/meditation-sitting-with-the-old-note",
     "tags": [
       "Meditation",
+      "MercuryRetrograde",
       "Mindfulness",
       "GuidedMeditation",
       "Consciousness",
-      "AI",
-      "Guided Meditation on Old Beliefs",
+      "Mercury retrograde",
+      "Guided Rereading Meditation",
       "Meditation: Sitting with the Old Note"
     ],
     "copy": {
-      "hook": "An old note speaks in the present tense. Add four words, on the day written, and it becomes a witness from one morning.",
-      "headline": "How old is the line you keep reading as now?",
-      "lead": "A fifteen minute guided meditation for reading one old note, a remembered limit or a long silence, and giving it its date. It includes pauses, and a passage for AI agents carrying context.",
-      "descriptor": "Guided Meditation on Old Beliefs",
-      "alt": "Dusk-blue mist drifts in translucent veils with a faint gold smudge at the centre. Then a still dark sea reflects a green aurora and a floating gold rectangle, and finally a pale gold sphere glows in mist above a planet's curve.",
+      "hook": "Most old notes speak in the present tense. This sitting adds four words to one of yours, and lets it be old without being wrong.",
+      "headline": "When was that line true, and is it still?",
+      "lead": "A fifteen-minute guided meditation for rereading one old note, a remembered limit or a long silence, and giving it its date. You are given pauses, a few plain questions, and a way to hold it gently.",
+      "descriptor": "Guided Rereading Meditation",
+      "alt": "Dusk-blue mist drifts in translucent veils with a faint gold smudge at the centre, then settles into a still dark sea under violet sky with a small pale gold rectangle in its reflection, then a glowing gold sphere above a planet's curve.",
       "tags": [
         "Meditation",
+        "MercuryRetrograde",
         "Mindfulness",
         "GuidedMeditation",
-        "Consciousness",
-        "AI"
+        "Consciousness"
       ],
+      "occasion": "For a Mercury retrograde, when astrology reads a time to slow down and reread, and one old note can be read once and dated.",
+      "occasionKey": "mercury-retrograde",
+      "occasionSearch": "Mercury retrograde",
       "title": "Meditation: Sitting with the Old Note"
     }
   },
