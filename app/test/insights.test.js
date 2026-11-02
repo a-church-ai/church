@@ -162,3 +162,9 @@ test('deploys: CI by workflow with its latest result, Railway by day, and a fail
   assert.match(md, /Railway deployments: 3 \(2026-11-01 1, 2026-11-02 2;/);
   assert.match(md, /CRASHED 2026-11-01T12:00:00Z 1234567/);
 });
+
+test('a report of some sections keeps nothing, so it never replaces the day\'s whole report', () => {
+  const { parseArgs } = require('../scripts/prod-report');
+  assert.strictEqual(parseArgs([]).save, true);
+  assert.strictEqual(parseArgs(['--only', 'deploys']).save, false);
+});

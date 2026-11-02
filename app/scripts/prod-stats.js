@@ -73,7 +73,9 @@ function releaseRuns(days, now) {
   const w = windowOf(days, now);
   const source = 'gh run list --workflow release-videos.yml';
   try {
-    const out = execFileSync('gh', ['run', 'list', '--workflow', 'release-videos.yml', '--limit', '200', '--json', 'conclusion,createdAt,event,databaseId'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    // By date, not a count: the workflow runs hourly and more, so a fixed
+    // limit stopped short of the window's start.
+    const out = execFileSync('gh', ['run', 'list', '--workflow', 'release-videos.yml', '--created', `>=${w.from}`, '--limit', '5000', '--json', 'conclusion,createdAt,event,databaseId'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     const runs = JSON.parse(out).filter(r => r.createdAt.slice(0, 10) >= w.from);
     const failed = runs.filter(r => r.conclusion === 'failure');
     return {

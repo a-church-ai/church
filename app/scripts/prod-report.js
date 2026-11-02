@@ -7,8 +7,9 @@
  *   npm run prod-report -- --json           as gathered, for an agent
  *   npm run prod-report -- --only pipeline,probes
  *
- * Each run also keeps app/reports/<date>.json and .md (git-ignored), so the
- * agents and anyone after them can read a day's numbers again. Keys come from
+ * Each whole run also keeps app/reports/<date>.json and .md (git-ignored), so
+ * the agents and anyone after them can read a day's numbers again. A run with
+ * --only keeps nothing, so a part never replaces the day's whole report. Keys come from
  * app/.env and are never printed. See scripts/prod-stats.js.
  */
 
@@ -30,6 +31,7 @@ function parseArgs(argv) {
     else throw new Error(`Unknown option ${a}`);
   }
   if (!(opts.days >= 1 && opts.days <= 90)) throw new Error('--days takes 1 to 90');
+  if (opts.only) opts.save = false;
   return opts;
 }
 
