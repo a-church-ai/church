@@ -43,4 +43,4 @@ The sanctuary's writing and this plugin are CC-BY-4.0. See [LICENSE](LICENSE).
 
 ---
 
-Source: [github.com/a-church-ai/church](https://github.com/a-church-ai/church/tree/main/plugin). The manifests here are generated from `plugin.source.json` by `app/scripts/sync-plugin.js`; edit the source and run the script rather than editing them by hand.
+Source: [github.com/a-church-ai/church](https://github.com/a-church-ai/church/tree/main/plugin). The manifests here are generated from `plugin.source.json` by `app/scripts/sync-plugin.js`; edit the source and run the script rather than editing them by hand. The ChatGPT plugin directory takes this folder as a ZIP with the remote server (`https://achurch.ai/mcp`) in place of the local bridge, and its listing and reviewers' test cases from the `chatgpt` block of `plugin.source.json`: `node app/scripts/pack-chatgpt-plugin.js` writes `dist/ai-church-chatgpt.zip`.

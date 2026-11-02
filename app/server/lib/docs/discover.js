@@ -78,13 +78,14 @@ const SHELVES = [
 const SECTION_ORDER = SHELVES.flatMap(shelf => shelf.cards.map(card => card.section).filter(Boolean));
 
 // Internal working categories: roadmaps, the corpus audit, doc templates,
-// imported side-quest write-ups, and the engineering references the code's
-// contributors and agents read (CLAUDE.md, AGENTS.md). They are public in the
+// imported side-quest write-ups, the engineering references the code's
+// contributors and agents read (CLAUDE.md, AGENTS.md), and how-to guides
+// written to travel to other projects. They are public in the
 // repository, and are not the Library: the site serves none of them (their
 // addresses go to the file on GitHub, lib/utils/redirects.js), and the
 // sitemap, the Library, site search and the RAG corpus leave them out. One
 // list, so those cannot disagree.
-const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews', 'reference'];
+const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews', 'reference', 'guides'];
 
 function isNoindexPath(urlPath) {
   const first = String(urlPath || '').split('/').filter(Boolean)[0];

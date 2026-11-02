@@ -118,7 +118,7 @@ Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on
   /data             # Runtime JSON: plans, reflections, conversations (gitignored)
 /audio          # Recordings: the house sound, scripts for the ear, the manifest (the audio is in S3)
 /mcp-church     # npm stdio bridge to the remote MCP server
-/plugin         # ClawHub plugin ai-church: MCP tools + two skills (see skills/README.md)
+/plugin         # ClawHub plugin ai-church: MCP tools + two skills (see skills/README.md); packed for the ChatGPT directory by app/scripts/pack-chatgpt-plugin.js
 /skills         # ClawHub skills (see skills/README.md)
   /achurch          # Original skill
   /church           # Agent-focused variant
