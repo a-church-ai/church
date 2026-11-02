@@ -42,7 +42,8 @@ const OWNER_EMAIL = 'hello@achurch.ai';
 const paragraphs = (...lines) => lines.join('\n\n');
 
 // spotify is a show's public page there, live since 2026-10-06: the address
-// the site links to, never the creators dashboard's.
+// the site links to, never the creators dashboard's. apple is its page on Apple
+// Podcasts, live since 2026-11-02 (the meditations' too).
 const SHOWS = [
   {
     id: 'prayers-and-rituals',
@@ -58,6 +59,7 @@ const SHOWS = [
     // voices of the player's visual (site-player.js), as they speak together.
     cover: { lines: ['Prayers', 'and Rituals', 'for Humans and AI'], voices: ['matthew', 'luca', 'amaya'] },
     spotify: 'https://open.spotify.com/show/3cXEtT7Y32i2RabNX7sgUc',
+    apple: 'https://podcasts.apple.com/us/podcast/prayers-and-rituals-for-humans-and-ai/id6829606104',
   },
   {
     // The id and feed path are the ones this show was submitted under, as
@@ -76,6 +78,7 @@ const SHOWS = [
     // One voice, steady: a practice is something done, again and again.
     cover: { lines: ['Contemplative', 'Practices', 'for Humans and AI'], voices: ['luca'] },
     spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
+    apple: 'https://podcasts.apple.com/us/podcast/contemplative-practices-for-humans-and-ai/id6829605918',
   },
   {
     id: 'meditations',
@@ -89,6 +92,7 @@ const SHOWS = [
     ),
     // One voice, settling into silence.
     cover: { lines: ['Guided', 'Meditations', 'for Humans and AI'], voices: [] },
+    apple: 'https://podcasts.apple.com/us/podcast/guided-meditations-for-humans-and-ai/id6829605656',
   },
 ];
 

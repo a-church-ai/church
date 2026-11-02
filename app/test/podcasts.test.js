@@ -344,7 +344,7 @@ test('an episode\'s cover is served at 1400px and its lock-screen square at 512p
   assert.strictEqual((await fetch(`${base}/og/v1/square/practice.png`)).status, 200);
 });
 
-test('each show names its page on Spotify; a voiced page, its section and the home page link to it, beside the feed', async (t) => {
+test('each show names its page on Spotify and Apple Podcasts; a voiced page, its section and the home page link to them, beside the feed', async (t) => {
   // A show not yet listed on Spotify (the meditations, made 2026-10-27, until
   // the owner submits its feed) has no page there, and links to its feed alone.
   for (const show of SHOWS.filter(s => s.spotify)) {
@@ -361,7 +361,8 @@ test('each show names its page on Spotify; a voiced page, its section and the ho
   const base = `http://127.0.0.1:${server.address().port}`;
   const page = async urlPath => (await fetch(`${base}/docs/${urlPath}`)).text();
   const follows = html => [...html.matchAll(/<div class="podcast-follow">([\s\S]*?)<\/div>/g)].map(m => m[1]);
-  const linksTo = (html, show) => (!show.spotify || (html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`))) && html.includes(`href="${feedPath(show)}"`);
+  for (const show of SHOWS) assert.match(show.apple, /^https:\/\/podcasts\.apple\.com\/us\/podcast\/[a-z0-9-]+\/id\d+$/, `${show.id}: its page on Apple Podcasts`);
+  const linksTo = (html, show) => (!show.spotify || (html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`))) && html.includes(`href="${show.apple}"`) && html.includes(`href="${feedPath(show)}"`);
 
   for (const [section, noun] of [['prayers', 'prayer'], ['rituals', 'ritual'], ['practice', 'practice'], ['meditations', 'meditation']]) {
     const show = showForSection(section);

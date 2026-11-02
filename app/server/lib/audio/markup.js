@@ -167,14 +167,15 @@ const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
 // One piece of a voiced section, by the section's name.
 const { KIND_OF_SECTION: PIECE_NOUN } = require('../docs/kinds');
 
-// Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
-// feed, for any other app. Plain links rather than Spotify's embedded player,
+// Where to follow a show (lib/audio/podcasts.js): its page on Spotify, its page
+// on Apple Podcasts, and its feed, for any other app. Plain links rather than Spotify's embedded player,
 // which would load Spotify's scripts and tracking on these pages.
 function podcastLinks(show) {
   const spotify = show.spotify
     ? `<a class="podcast-follow-spotify" href="${escapeAttr(show.spotify)}"><img src="${SPOTIFY_BADGE}" width="165" height="40" alt="Listen to ${escapeAttr(show.title)} on Spotify"></a>`
     : '';
-  return `${spotify}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
+  const apple = show.apple ? `<a class="podcast-follow-feed podcast-follow-apple" href="${escapeAttr(show.apple)}">Apple Podcasts</a>` : '';
+  return `${spotify}${apple}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
 }
 
 // Under a voiced prayer's, ritual's or practice's player, and on its
