@@ -117,7 +117,7 @@ Before deploying a new page, score the local build with the readiness scorecard,
 
 ```bash
 cd app && npm run dev   # start dev server on :3000
-npx readiness-audit@1 achurch.ai --base http://localhost:3000
+npx readiness-audit@2 achurch.ai --base http://localhost:3000
 ```
 
 For schema validity, paste the rendered source into [Google's Rich Results Test](https://search.google.com/test/rich-results) and confirm it parses without errors. Note: it will report most types as "not eligible for rich result" — that's expected in 2026; we ship schema for AEO, not rich snippets.

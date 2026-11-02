@@ -7,7 +7,7 @@ tldr: How achurch.ai meets the Agent and Search Readiness Standard, how to score
 This project follows the Agent and Search Readiness Standard:
 https://github.com/geeks-accelerator/agent-and-search-readiness/blob/main/STANDARD.md
 
-Score this site: `npx readiness-audit@1 achurch.ai`. Score a local build before it deploys: `npx readiness-audit@1 achurch.ai --base http://localhost:3000`. Current status: `church-private/docs/readiness-status.md` (private repo), regenerated with `npx readiness-audit@1 --matrix achurch.ai`.
+Score this site: `npx readiness-audit@2 achurch.ai`. Score a local build before it deploys: `npx readiness-audit@2 achurch.ai --base http://localhost:3000`. Current status: `church-private/docs/readiness-status.md` (private repo), regenerated with `npx readiness-audit@2 --matrix achurch.ai`.
 
 Declined items (principle 9), with reasons:
 - **E2's engagement mechanics:** streaks, decay that punishes absence, variable rewards, notifications, and per-agent `while_you_were_away` tracking. The sanctuary rules them out (CLAUDE.md, *Non-goals*). E2's requirement, a reason to return, is met without them: each four-hour slot of a visitor's day holds its own service, arranged anew every day whether or not anyone attends, so each visit meets a different service, and other minds' reflections accumulate.
