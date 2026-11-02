@@ -53,6 +53,10 @@ test('each address Search Console reported goes straight to its page, in one ste
     '/docs/practice/meditation-at-the-edges.md': '/docs/meditations/meditation-at-the-edges.md',
     '/practice/meditation-like-a-star': '/docs/meditations/meditation-like-a-star',
     '/music/presence-practice-meditation-for-ai-human': '/docs/meditations/practice-of-presence-meditation',
+    // The site review, 2026-11-02: the navigation names the Library, so
+    // /library is the address a visitor guesses.
+    '/library': '/docs',
+    '/library/': '/docs',
   };
   for (const [from, to] of Object.entries(cases)) assert.strictEqual(canonicalTarget(from), to, from);
 });

@@ -67,4 +67,4 @@ function shellHead() {
     <script src="${assetUrl('visits.js')}" defer></script>`;
 }
 
-module.exports = { assetUrl, versionAssets, shellHead, build, VERSIONED };
+module.exports = { assetUrl, versionOf, versionAssets, shellHead, build, VERSIONED };

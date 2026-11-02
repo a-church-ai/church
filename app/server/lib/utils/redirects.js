@@ -81,6 +81,8 @@ function movedDocs() {
 const MOVED = {
   '/listen': '/attend',
   '/livestream': '/attend',
+  // The navigation names the Library, which is /docs.
+  '/library': '/docs',
   '/parish': '/',
   '/join': '/',
   '/reflections': '/music',

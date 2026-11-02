@@ -23,6 +23,7 @@ const ragIndexState = require('./lib/rag/index-state');
 const ragLancedb = require('./lib/rag/lancedb');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
+const assets = require('./lib/utils/assets');
 const churchMusic = require('./lib/music/church-music');
 const { listPlaylists, playlistsWith, renderPlaylistList } = require('./lib/music/playlists');
 const reviews = require('./lib/reviews/reviews');
@@ -122,9 +123,14 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=604800');
   }
   // The site's own scripts and stylesheet, asked for by version
-  // (lib/utils/assets.js): a new version is a new URL, so a year is safe
+  // (lib/utils/assets.js): a new version is a new URL, so a year is safe.
+  // Only for this deploy's version: a page cached across a deploy asks for
+  // the last one's, which is answered with this deploy's file, and that
+  // answer must not be kept a year under the old version's URL.
   else if (req.query.v && /^\/[\w-]+\.(?:js|css)$/.test(p)) {
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    const name = p.slice(1);
+    const current = assets.VERSIONED.includes(name) && req.query.v === assets.versionOf(name);
+    res.set('Cache-Control', current ? 'public, max-age=31536000, immutable' : 'no-store');
   }
   // Podcast feeds (routes/podcasts.js): they change only with a deploy, but
   // the apps that poll them keep their own copy for as long as this allows,
@@ -145,8 +151,9 @@ app.use((req, res, next) => {
   else if (p.startsWith('/.well-known/')) {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
-  else if (!p.startsWith('/api/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
+  // HTML pages — no browser cache, short edge cache, SWR for graceful deploys.
+  // Not /mcp, whose answer to a GET varies by Accept (mcp/index.js).
+  else if (!p.startsWith('/api/') && !p.startsWith('/admin') && p !== '/mcp' && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
   }
   // Note: /api/ endpoints have their own caching handled in their route handlers

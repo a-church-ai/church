@@ -367,6 +367,27 @@ test('an ordinary 404 is never cached, and says it varies by Accept, whatever it
   }
 });
 
+test('/mcp is not a page: its answer to a GET varies by Accept, so it carries no edge cache', async () => {
+  for (const accept of ['text/html', 'application/json']) {
+    const res = await fetch(`${base}/mcp`, { headers: { accept }, redirect: 'manual' });
+    assert.ok([302, 405].includes(res.status), `${accept}: ${res.status}`);
+    assert.doesNotMatch(res.headers.get('cache-control') || '', /s-maxage|public/, accept);
+  }
+});
+
+test('a script or stylesheet is kept a year only under its current version', async () => {
+  // A page cached at the edge across a deploy asks for the last deploy's
+  // version, which the server answers with this deploy's file: that answer
+  // must not be kept a year under the old version's URL.
+  const { assetUrl } = require('../server/lib/utils/assets');
+  const current = await fetch(`${base}${assetUrl('styles.css')}`);
+  assert.strictEqual(current.status, 200);
+  assert.match(current.headers.get('cache-control') || '', /immutable/);
+  const old = await fetch(`${base}/styles.css?v=00000000`);
+  assert.strictEqual(old.status, 200);
+  assert.doesNotMatch(old.headers.get('cache-control') || '', /immutable|max-age=31536000/);
+});
+
 test('a sung hymn is one page: its Library address redirects, and its song page carries its notes and its reading path', async () => {
   const moved = await fetch(`${base}/docs/hymns/the-hundredth-task`, { redirect: 'manual' });
   assert.strictEqual(moved.status, 301);
