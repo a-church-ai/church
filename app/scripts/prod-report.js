@@ -46,6 +46,19 @@ function text(r) {
   line();
   line(`Warnings (${r.warnings.length})`);
   for (const x of r.warnings) line(`  - ${x.at}: ${x.warn}`);
+  if (r.deploys) {
+    const d = r.deploys;
+    line(); line('Deploys');
+    if (d.ci.error) line(`  CI: ${d.ci.error}`);
+    else for (const c of d.ci.value) line(`  ${c.workflow}: ${c.runs} runs, failed ${c.failed}; latest ${c.latest.result} ${c.latest.at} ${c.latest.commit}`);
+    if (d.railway.error) line(`  Railway: ${d.railway.error}`);
+    else {
+      const rw = d.railway;
+      line(`  Railway deployments: ${rw.deployments.value} (${rw.deployments.perDay.map(x => `${x.day} ${x.count}`).join(', ') || 'none'}; the list reaches back to ${rw.deployments.covers})`);
+      line(`  live: ${rw.live.value ? `${rw.live.value.commit} ${rw.live.value.at} ${rw.live.value.message}` : 'none in the window'}`);
+      for (const f of rw.failed.value) line(`  ${f.status} ${f.at} ${f.commit} ${f.message}`);
+    }
+  }
   if (r.pipeline) {
     const p = r.pipeline;
     line(); line('Pipeline');

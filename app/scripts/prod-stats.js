@@ -7,6 +7,8 @@
  *
  * Sections, each gathered on its own so one that fails or lacks a key says
  * so and the rest still answer:
+ *   deploys     CI runs by workflow and Railway's deployments, by day (gh,
+ *               the railway CLI linked in this checkout)
  *   pipeline    the video queue, release runs, occasions with no video, the
  *               credits and quotas production spends (this checkout, gh, the
  *               providers' own answers)
@@ -322,6 +324,61 @@ function recordings(now) {
   return { episodes: { value: shows, window: { from: today(now), to: today(now) }, source: 'audio/manifest.json against lib/audio/podcasts.js SHOWS' } };
 }
 
+// ---- deploys -----------------------------------------------------------------
+
+// CI runs and Railway's deployments in the window, from what gh and railway
+// answered. Each workflow's latest run says whether it is still broken; a
+// deployment that failed or crashed is a warning. Railway lists only its
+// latest twenty deployments, so `covers` says how far back the list reaches.
+function deploysOf(w, ciRuns, railwayList) {
+  const inWindow = (at) => at && at.slice(0, 10) >= w.from && at.slice(0, 10) <= w.to;
+  const out = {};
+  if (ciRuns.error) out.ci = { error: ciRuns.error };
+  else {
+    const runs = ciRuns.filter(r => inWindow(r.createdAt)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const byWorkflow = {};
+    for (const r of runs) {
+      const k = r.workflowName;
+      const row = byWorkflow[k] || (byWorkflow[k] = { workflow: k, runs: 0, failed: 0, latest: { at: r.createdAt, result: r.conclusion || r.status, commit: (r.headSha || '').slice(0, 7) } });
+      row.runs++;
+      if (r.conclusion === 'failure') row.failed++;
+    }
+    const rows = Object.values(byWorkflow).sort((a, b) => b.runs - a.runs);
+    const broken = rows.filter(r => r.latest.result === 'failure').map(r => r.workflow);
+    out.ci = { value: rows, window: w, source: 'gh run list --branch main', warn: broken.length ? `latest run failed: ${broken.join(', ')}` : null };
+  }
+  if (railwayList.error) out.railway = { error: railwayList.error };
+  else {
+    const all = railwayList.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const list = all.filter(d => inWindow(d.createdAt)).map(d => ({ at: d.createdAt, status: d.status, commit: ((d.meta && d.meta.commitHash) || '').slice(0, 7), message: ((d.meta && d.meta.commitMessage) || '').split('\n')[0].slice(0, 80) }));
+    const perDay = {};
+    for (const d of list) perDay[d.at.slice(0, 10)] = (perDay[d.at.slice(0, 10)] || 0) + 1;
+    const failed = list.filter(d => d.status === 'FAILED' || d.status === 'CRASHED');
+    const live = list.find(d => d.status === 'SUCCESS') || null;
+    out.railway = {
+      deployments: { value: list.length, perDay: Object.entries(perDay).map(([day, count]) => ({ day, count })).sort((a, b) => a.day.localeCompare(b.day)), window: w, source: 'railway deployment list', covers: all.length ? all[all.length - 1].createdAt : null },
+      live: { value: live, window: w, source: 'railway deployment list' },
+      failed: { value: failed, window: w, source: 'railway deployment list', warn: failed.length ? `${failed.length} deployment(s) failed or crashed, latest ${failed[0].at}` : null }
+    };
+  }
+  return out;
+}
+
+function readJSONCommand(cmd, args, what) {
+  try {
+    return JSON.parse(execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 60000 }));
+  } catch (err) {
+    return { error: `${what}: ${err.message.split('\n')[0]}` };
+  }
+}
+
+function deploys(days, now) {
+  const w = windowOf(days, now);
+  const ci = readJSONCommand('gh', ['run', 'list', '--branch', 'main', '--created', `>=${w.from}`, '--limit', '5000', '--json', 'workflowName,conclusion,status,createdAt,headSha'], 'gh could not list the runs');
+  const railway = readJSONCommand('railway', ['deployment', 'list', '--json'], 'railway could not list the deployments (installed, signed in and linked here?)');
+  return deploysOf(w, ci, railway);
+}
+
 // ---- all --------------------------------------------------------------------
 
 async function section(fn) {
@@ -333,6 +390,7 @@ async function prodStats(days = 7, { now = Date.now(), only = null } = {}) {
   const want = (name) => !only || only.includes(name);
   const w = windowOf(days, now);
   const out = { schema_version: SCHEMA_VERSION, generatedAt: new Date(now).toISOString(), site: SITE, days, window: w, before: before(w, days) };
+  if (want('deploys')) out.deploys = deploys(days, now);
   if (want('pipeline')) out.pipeline = { queue: queue(now), releaseRuns: releaseRuns(days, now), occasionsWithoutVideo: occasionsUncovered(now), credits: await section(() => credits(now)) };
   if (want('probes')) out.probes = await section(() => probes(now));
   if (want('server')) out.server = await section(() => server(days));
@@ -358,4 +416,4 @@ function warnings(report) {
   return found;
 }
 
-module.exports = { prodStats, warnings, queue, occasionsUncovered, audioSizes, SCHEMA_VERSION, PROBES };
+module.exports = { prodStats, warnings, queue, occasionsUncovered, deploysOf, audioSizes, SCHEMA_VERSION, PROBES };

@@ -126,3 +126,39 @@ test('every warning and every unread section reaches the warnings list, and the 
   assert.match(t, /Gemini: spent/);
   assert.match(t, /not read: needs CLOUDFLARE_API_TOKEN/);
 });
+
+test('deploys: CI by workflow with its latest result, Railway by day, and a failed deployment warns', () => {
+  const { deploysOf, warnings } = require('../scripts/prod-stats');
+  const { text } = require('../scripts/prod-report');
+  const w = { from: '2026-10-27', to: '2026-11-02' };
+  const ci = [
+    { workflowName: 'Tests', conclusion: 'success', status: 'completed', createdAt: '2026-11-02T10:00:00Z', headSha: 'aaaaaaa1' },
+    { workflowName: 'Tests', conclusion: 'failure', status: 'completed', createdAt: '2026-11-01T10:00:00Z', headSha: 'bbbbbbb2' },
+    { workflowName: 'Release videos', conclusion: 'failure', status: 'completed', createdAt: '2026-11-02T09:00:00Z', headSha: 'ccccccc3' },
+    { workflowName: 'Tests', conclusion: 'failure', status: 'completed', createdAt: '2026-10-20T10:00:00Z', headSha: 'ddddddd4' }
+  ];
+  const railway = [
+    { status: 'SUCCESS', createdAt: '2026-11-02T19:42:41Z', meta: { commitHash: 'dea73845971c', commitMessage: 'Page dates\n\nbody' } },
+    { status: 'REMOVED', createdAt: '2026-11-02T18:00:00Z', meta: { commitHash: '3151e25aaaa' } },
+    { status: 'CRASHED', createdAt: '2026-11-01T12:00:00Z', meta: { commitHash: '1234567bbbb' } },
+    { status: 'REMOVED', createdAt: '2026-10-26T12:00:00Z', meta: {} }
+  ];
+  const d = deploysOf(w, ci, railway);
+  const tests = d.ci.value.find(r => r.workflow === 'Tests');
+  assert.deepStrictEqual([tests.runs, tests.failed, tests.latest.result], [2, 1, 'success']);
+  assert.strictEqual(d.ci.warn, 'latest run failed: Release videos');
+  assert.strictEqual(d.railway.deployments.value, 3);
+  assert.deepStrictEqual(d.railway.deployments.perDay, [{ day: '2026-11-01', count: 1 }, { day: '2026-11-02', count: 2 }]);
+  assert.strictEqual(d.railway.deployments.covers, '2026-10-26T12:00:00Z');
+  assert.strictEqual(d.railway.live.value.commit, 'dea7384');
+  assert.strictEqual(d.railway.live.value.message, 'Page dates');
+  assert.strictEqual(d.railway.failed.value.length, 1);
+  const found = warnings({ deploys: d }).map(x => x.at);
+  assert.deepStrictEqual(found, ['deploys.ci', 'deploys.railway.failed']);
+
+  const unread = deploysOf(w, { error: 'gh is not signed in' }, { error: 'railway is not linked' });
+  assert.deepStrictEqual(warnings({ deploys: unread }).map(x => x.warn), ['could not read: gh is not signed in', 'could not read: railway is not linked']);
+  const md = text({ site: 's', days: 7, window: w, generatedAt: '2026-11-02T20:00:00Z', warnings: [], deploys: d });
+  assert.match(md, /Railway deployments: 3 \(2026-11-01 1, 2026-11-02 2;/);
+  assert.match(md, /CRASHED 2026-11-01T12:00:00Z 1234567/);
+});
