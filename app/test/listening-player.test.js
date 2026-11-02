@@ -419,11 +419,26 @@ test('the home page has a service player to fill: a button, the waveform and its
   const { renderServiceListen } = require('../server/lib/audio/markup');
   const html = renderServiceListen();
   assert.match(html, /<div class="service-player" data-path-listen hidden>/);
-  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
+  assert.match(html, /class="path-listen-play service-play" disabled><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
   for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));
   assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /fetch\('\/service\.json' \+ zone\)/);
+});
+
+test('the service\'s button is on the first screen before the service arrives: shown by mount, enabled once drawn', () => {
+  const source = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
+  const mount = source.slice(source.indexOf('function mount()'));
+  // Shown before the fetch, so it does not wait on it.
+  assert.ok(mount.indexOf('box.hidden = false') >= 0 && mount.indexOf('box.hidden = false') < mount.indexOf('load('), 'shown before load');
+  // Hidden again when there is no service to draw.
+  assert.match(mount, /else boxes\.forEach\(box => \{ box\.hidden = true; \}\)/);
+  // The copy drawPanel puts on the page has its button enabled.
+  const draw = source.slice(source.indexOf('function drawPanel('), source.indexOf('box.replaceWith(fresh)'));
+  assert.match(draw, /fresh\.querySelector\('\.service-play'\)\.disabled = false/);
+  // Its space is kept while it is empty, so the first screen does not move.
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
+  for (const rule of ['.service-parts:empty', '.service-forms:empty']) assert.match(css, new RegExp(rule.replace('.', '\\.') + ' \\{\\s*min-height'), rule);
 });
 
 test('site-player: a queue is this page\'s only with the same name and the same tracks in order', () => {

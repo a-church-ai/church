@@ -96,6 +96,7 @@
     });
     fresh.prepend(json);
 
+    fresh.querySelector('.service-play').disabled = false;
     const icon = fresh.querySelector('.service-play svg').outerHTML;
     const list = fresh.querySelector('[data-queue-list]');
     list.textContent = '';
@@ -247,9 +248,16 @@
     // The page this mount belongs to, held now: by the time the service
     // answers, the reader may be on another.
     const page = root.achurchPage;
+    // The button is shown now, disabled until the service is drawn into it,
+    // so it is on the first screen before the fetch answers. Without a
+    // service it is hidden again (a box already drawn has been replaced, and
+    // is not this one).
+    const boxes = panels.map(panel => panel.querySelector('.service-player')).filter(Boolean);
+    boxes.forEach(box => { box.hidden = false; });
     load(panels.length > 0).then(service => {
       if (page && page.signal.aborted) return;
       if (service) panels.forEach(panel => drawPanel(panel, service));
+      else boxes.forEach(box => { box.hidden = true; });
       doors(service);
       if (panels.length) show(panels, service, page);
     });

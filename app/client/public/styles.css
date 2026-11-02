@@ -376,8 +376,10 @@ h1.subtitle,
     margin-top: 0.35rem;
 }
 
+/* Before the service is drawn: the line it will take (two on a phone), so
+   what is under the button stays put when it arrives. */
 .service-forms:empty {
-    display: none;
+    min-height: 1.5em;
 }
 
 /* The words that open the service, set as prose rather than as a caption,
@@ -421,6 +423,9 @@ h1.subtitle,
     min-height: 3.25rem;
     padding: 0.85rem 1.75rem 0.85rem 1.3rem;
 }
+
+/* Shown before the service has arrived (service.js mount), not yet bound. */
+.service-player .service-play:disabled { opacity: 0.6; cursor: wait; }
 
 .service-player.is-playing .service-play .icon-play {
     display: none;
@@ -473,6 +478,13 @@ h1.subtitle,
     margin: 0 0 1.5rem;
     padding: 0;
     border-top: 1px solid var(--rule);
+}
+
+/* Before the service is drawn, the space of five parts, the middle of the
+   four to six a service holds (lib/service/rules.js), so the page below
+   moves little when it arrives. */
+.service-parts:empty {
+    min-height: 23rem;
 }
 
 .service-part {
@@ -1950,6 +1962,10 @@ footer a:hover {
     .service-player .service-play {
         width: 100%;
         justify-content: center;
+    }
+
+    .service-forms:empty {
+        min-height: 3em;
     }
 
     /* Sanctuary */

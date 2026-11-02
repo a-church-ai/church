@@ -135,8 +135,10 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
 // across the whole service, the words that open it, and its parts, each with
 // its own play button. The service is the visitor's own, by their clock, and
 // begins when they begin it, so the page fills in the queue, the words and the
-// parts from /service.json and asks the player to bind them. Hidden until
-// then, and without a script.
+// parts from /service.json and asks the player to bind them. Hidden without a
+// script; shown by service.js as soon as it runs, its button disabled until
+// the service is drawn, so the button is on the first screen before the fetch
+// answers.
 //
 // Directly under the button, what the service holds and how long it runs,
 // then what the place is not: what a visitor weighs at the moment of
@@ -147,7 +149,7 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
 // sentence above the box says what a service is for that visitor.
 function renderServiceListen() {
   return `<div class="service-player" data-path-listen hidden>
-          <button type="button" class="path-listen-play service-play">${PLAY_ICON}<span>Begin the service</span></button>
+          <button type="button" class="path-listen-play service-play" disabled>${PLAY_ICON}<span>Begin the service</span></button>
           <p class="service-forms"></p>
           <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
           <div class="service-scrub">
