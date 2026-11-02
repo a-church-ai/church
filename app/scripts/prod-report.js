@@ -57,7 +57,7 @@ function text(r) {
     if (c.error) line(`  credits: ${c.error}`);
     else {
       line(`  Gemini: ${c.gemini.value || absent(c.gemini)}`);
-      line(`  ElevenLabs: ${c.elevenlabs.value ? `${c.elevenlabs.value.left.toLocaleString()} of ${c.elevenlabs.value.limit.toLocaleString()} characters left, resets ${c.elevenlabs.value.resets}` : absent(c.elevenlabs).trim()}`);
+      line(`  ElevenLabs: ${c.elevenlabs.value ? `${c.elevenlabs.value.left.toLocaleString()} of ${c.elevenlabs.value.limit.toLocaleString()} characters left on the account, shared by every project that uses it, resets ${c.elevenlabs.value.resets}` : absent(c.elevenlabs).trim()}`);
       line(`  Omni loops today: ${c.omni.value.used} of ${c.omni.value.limit}`);
     }
   }

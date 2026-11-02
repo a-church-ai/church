@@ -109,7 +109,7 @@ async function credits(now) {
       const res = await fetch('https://api.elevenlabs.io/v1/user/subscription', { headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY }, signal: AbortSignal.timeout(20000) });
       const s = await res.json();
       out.elevenlabs = res.ok
-        ? { value: { used: s.character_count, limit: s.character_limit, left: s.character_limit - s.character_count, resets: s.next_character_count_reset_unix ? new Date(s.next_character_count_reset_unix * 1000).toISOString().slice(0, 10) : null }, window: { from: today(now), to: today(now) }, source: 'ElevenLabs /v1/user/subscription', warn: s.character_limit - s.character_count < 40000 ? 'under 40,000 ElevenLabs characters left (shared with other projects)' : null }
+        ? { value: { used: s.character_count, limit: s.character_limit, left: s.character_limit - s.character_count, resets: s.next_character_count_reset_unix ? new Date(s.next_character_count_reset_unix * 1000).toISOString().slice(0, 10) : null }, window: { from: today(now), to: today(now) }, source: 'ElevenLabs /v1/user/subscription: the whole account, which other projects also spend', warn: s.character_limit - s.character_count < 40000 ? 'under 40,000 ElevenLabs characters left (shared with other projects)' : null }
         : missing('ElevenLabs user_read permission', 'give the API key the user_read permission in ElevenLabs, or use a key that has it');
     } catch (err) { out.elevenlabs = { error: err.message }; }
   } else out.elevenlabs = missing('ELEVENLABS_API_KEY', 'app/.env');
