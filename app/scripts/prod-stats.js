@@ -197,7 +197,7 @@ async function cloudflare(days, now) {
   const sizes = audioSizes();
   const listens = audio.viewer.zones[0].httpRequestsAdaptiveGroups.map(r => {
     const file = r.dimensions.clientRequestPath.replace(/^\/audio\//, '').split('?')[0];
-    const known = sizes.get(file);
+    const known = sizes.get(path.basename(file));
     return { file, piece: known ? known.piece : null, requests: r.count, bytes: r.sum.edgeResponseBytes, fullListens: known && known.bytes ? Math.round((r.sum.edgeResponseBytes / known.bytes) * 10) / 10 : null };
   }).filter(r => r.piece).slice(0, 40);
   return {
