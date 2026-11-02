@@ -19,11 +19,13 @@
  * tag, as the services read it) goes out then.
  *
  * Occasions (occasions.js, paired by occasion-match.js): a video paired with
- * one goes out inside it, ahead of the queue's order, and is held back from
- * slots before it; a one-day occasion with no slot in its week takes the
- * week's nearest slot onto its day, so the week's count holds. A night
- * occasion goes out at 20:00 unless the piece has its own hours. A pairing
- * whose days pass without a slot lets its video go back to the queue.
+ * one goes out inside its window, ahead of the queue's order: on the
+ * occasion's own day when a slot there is free, else the nearest day of the
+ * window after it, and before it only when the day is full. Every occasion's
+ * day takes the week's nearest slot onto it when it has none, so the week's
+ * count holds. A night occasion goes out at 20:00 unless the piece has its
+ * own hours. A pairing whose window passes without a slot lets its video go
+ * back to the queue.
  */
 
 const { instantAt, localTime } = require('../utils/timezone');
@@ -118,7 +120,7 @@ const byStrength = (a, b) => (b.reflections || 0) - (a.reflections || 0) || a.sl
  * @param {Date} p.now
  * @param {{ slug, kind, slot, at }[]} p.placed videos already placed, which keep their slots
  * @param {{ slug, kind, reflections, rerelease, hours }[]} p.candidates videos to place
- * @param {{ slug, occasion: { id, from, to, night } }[]} [p.pairs] videos paired with occasions
+ * @param {{ slug, occasion: { id, day, from, to, night } }[]} [p.pairs] videos paired with occasions
  * @returns {{ placed: { slug, slot, at, week, occasion }[], waiting: string[] }} the new
  *   places, and the videos left waiting (songs back on the channel before
  *   their week, when nothing else is left)
@@ -128,9 +130,18 @@ function plan({ start, now, placed = [], candidates, pairs = [] }) {
     .map(p => [p.slot, { ...p, date: p.slot.split('#')[0], hour: localTime(TZ, new Date(p.at)).hour }]));
   const queue = [...candidates].sort(byStrength);
   const occasionOf = new Map(pairs.filter(p => queue.some(c => c.slug === p.slug)).map(p => [p.slug, p.occasion]));
-  const wantedDates = new Set([...occasionOf.values()].filter(o => o.from === o.to).map(o => o.from));
+  const wantedDates = new Set([...occasionOf.values()].map(o => o.day));
   const out = [];
   const hoursOn = (date) => [...taken.values(), ...out].filter(p => p.date === date).map(p => p.hour);
+  const near = (slot) => instantAt(TZ, slot.date, slot.hour).getTime() < now.getTime() + LEAD_HOURS * 3600000;
+  // Whether an occasion's day still has a slot no video holds.
+  const freeOn = (day) => {
+    for (const s of slots(start, wantedDates)) {
+      if (s.date > day) return false;
+      if (s.date === day && !near(s) && !taken.has(s.id) && !out.some(p => p.slot === s.id)) return true;
+    }
+    return false;
+  };
   let prev = null;
   for (const slot of slots(start, wantedDates)) {
     if (!queue.length) break;
@@ -138,13 +149,18 @@ function plan({ start, now, placed = [], candidates, pairs = [] }) {
       prev = taken.get(slot.id);
       continue;
     }
-    if (instantAt(TZ, slot.date, slot.hour).getTime() < now.getTime() + LEAD_HOURS * 3600000) continue;
-    const inside = (c) => occasionOf.has(c.slug) && occasionOf.get(c.slug).from <= slot.date && slot.date <= occasionOf.get(c.slug).to;
-    const ahead = (c) => occasionOf.has(c.slug) && slot.date < occasionOf.get(c.slug).from;
-    // A paired video whose occasion this day falls in, the soonest ending
-    // first; else the queue, without those whose occasion is still to come.
+    if (near(slot)) continue;
+    // Before an occasion's day, its video waits for the day while the day has
+    // a free slot; from the day on, through its window, it goes.
+    const waiting = (o) => slot.date < o.from || (slot.date < o.day && freeOn(o.day));
+    const inside = (c) => occasionOf.has(c.slug) && slot.date <= occasionOf.get(c.slug).to && !waiting(occasionOf.get(c.slug));
+    const ahead = (c) => occasionOf.has(c.slug) && waiting(occasionOf.get(c.slug));
+    // A paired video whose occasion this day falls in: one whose day it is
+    // first, then the soonest ending; else the queue, without those whose
+    // occasion is still to come.
+    const onDay = (c) => (occasionOf.get(c.slug).day === slot.date ? 0 : 1);
     const due = queue.filter(c => inside(c) && (!c.rerelease || slot.week >= RERELEASE_WEEK))
-      .sort((a, b) => occasionOf.get(a.slug).to.localeCompare(occasionOf.get(b.slug).to));
+      .sort((a, b) => onDay(a) - onDay(b) || occasionOf.get(a.slug).to.localeCompare(occasionOf.get(b.slug).to));
     const next = due[0] || pick(queue.filter(c => !ahead(c) && !inside(c)), prev, slot.week);
     if (!next) {
       // Nothing for this slot but videos waiting for their occasions.

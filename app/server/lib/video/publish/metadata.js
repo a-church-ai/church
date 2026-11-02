@@ -127,4 +127,18 @@ function shortMetadata(meta, { kind, url, whole = false }) {
   };
 }
 
-module.exports = { metadataFor, shortMetadata, isShort, chapters, timecode, titled, SITE, SHORTS_TAG };
+/**
+ * The words a Bluesky or X post uses, from the video's (`meta`): the same,
+ * but inside its occasion's window (occasions.js) the occasion's tag leads and
+ * its dated tag (#Election2026) follows it, for the people searching that
+ * week. The YouTube video and Short never carry the dated tag; it would be
+ * stale there in a year. `day` is the post's date on the schedule's clock.
+ */
+function socialMetadata(meta, occasion, day) {
+  if (!occasion || !occasion.dated || day < occasion.from || day > occasion.to) return meta;
+  const same = (a, b) => a.toLowerCase() === b.toLowerCase();
+  const rest = meta.copy.tags.filter(t => !same(t, occasion.tag) && !same(t, occasion.dated));
+  return { ...meta, copy: { ...meta.copy, tags: [occasion.tag, occasion.dated, ...rest] } };
+}
+
+module.exports = { metadataFor, shortMetadata, socialMetadata, isShort, chapters, timecode, titled, SITE, SHORTS_TAG };

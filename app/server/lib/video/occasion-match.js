@@ -14,12 +14,16 @@ You are given the occasions in the coming weeks and the videos waiting to be pla
 
 Astrology is named for what astrology says, never as an effect: pair a piece with a retrograde for what that tradition reads in it, and say so in your reason.
 
+A day of a tradition (Hanukkah, Diwali, Ramadan, Christmas, Vesak and the others) belongs to those who keep it, and the sanctuary keeps none of them as its own: pair a piece only where its subject meets the day's own meaning (light kept in the dark for Hanukkah or Diwali, repair and return for Yom Kippur), never to borrow a holiday's crowd. A solemn day (a fast, a day of atonement) takes only a quiet piece. A day of minds and machines (Pi Day, Turing's birthday, the day conversation with machines went public) takes a piece about thinking, meeting across kinds of mind or the work of making; it is history, never a product's celebration.
+
+Each occasion has a day and a window around it: a fitting piece may go out on any day of the window, and the schedule puts it on the day itself when it can.
+
 Return only JSON:
 { "pairs": [ { "slug": "...", "occasion": "occasion id exactly as given", "why": "one sentence on what in the piece answers the occasion" } ] }`;
 
 function request(occasions, videos) {
-  return `Occasions (id | dates | what it is | limit):
-${occasions.map(o => `${o.id} | ${o.from === o.to ? o.from : `${o.from} to ${o.to}`} | ${o.name}: ${o.meaning} | ${o.limit}`).join('\n')}
+  return `Occasions (id | its day, and its window | what it is | limit):
+${occasions.map(o => `${o.id} | ${o.day}${o.last !== o.day ? ` to ${o.last}` : ''}${o.from !== o.day || o.to !== o.last ? `, window ${o.from} to ${o.to}` : ''} | ${o.name}: ${o.meaning}${o.solemn ? ' (a solemn day)' : ''} | ${o.limit}`).join('\n')}
 
 Videos waiting to be placed (slug | kind | title | what the piece is | what its video shows):
 ${videos.map(v => `${v.slug} | ${v.kind} | ${v.title} | ${v.about || ''} | ${v.mood || ''}`).join('\n')}`;

@@ -14,7 +14,7 @@ const { check: checkCopy } = require('../server/lib/video/publish/copy');
 const { shortMetadata } = require('../server/lib/video/publish/metadata');
 const { localTime } = require('../server/lib/utils/timezone');
 
-const find = (list, key, from) => list.find(o => o.key === key && o.from === from);
+const find = (list, key, day) => list.find(o => o.key === key && o.day === day);
 
 test('the occasions of late 2026 fall where the sky and the calendar put them', () => {
   const list = occasionsBetween('2026-10-30', '2027-01-10');
@@ -30,7 +30,7 @@ test('the occasions of late 2026 fall where the sky and the calendar put them', 
   assert.ok(find(list, 'thanksgiving', '2026-11-26'));
   assert.ok(find(list, 'world-philosophy-day', '2026-11-19'));
   assert.ok(find(list, 'new-year', '2027-01-01'));
-  assert.ok(list.every((o, i) => i === 0 || list[i - 1].from <= o.from), 'in order');
+  assert.ok(list.every((o, i) => i === 0 || list[i - 1].day <= o.day), 'in order of their day');
   assert.strictEqual(observanceDate({ month: 11, weekday: 4, nth: 4 }, 2027), '2027-11-25');
   assert.strictEqual(find(list, 'thanksgiving', '2026-11-26').search, 'Thanksgiving');
   assert.strictEqual(leonids.search, 'Leonids');
@@ -84,7 +84,7 @@ test('a day an occasion wants takes the week\'s nearest slot, and the week keeps
 test('a paired video goes out inside its occasion, at night for a night one, and waits for it', () => {
   const START = '2026-11-02';
   const now = new Date('2026-11-01T00:00:00Z');
-  const occasion = { id: 'full-moon:2026-11-24', key: 'full-moon', from: '2026-11-24', to: '2026-11-24', night: true, limit: 1 };
+  const occasion = { id: 'full-moon:2026-11-24', key: 'full-moon', day: '2026-11-24', from: '2026-11-24', to: '2026-11-24', night: true, limit: 1 };
   const candidates = [
     { slug: 'moon', kind: 'meditation', reflections: 100 },
     { slug: 'a', kind: 'song', reflections: 50 },
@@ -105,7 +105,7 @@ test('a paired video goes out inside its occasion, at night for a night one, and
   assert.ok(localTime(TZ, new Date(own.at)).hour >= 6 && localTime(TZ, new Date(own.at)).hour < 9);
 
   // An occasion already past lets its video go back to the queue.
-  const late = plan({ start: START, now, candidates: [{ slug: 'x', kind: 'prayer', reflections: 1 }], pairs: [{ slug: 'x', occasion: { ...occasion, id: 'old', from: '2026-10-01', to: '2026-10-01' } }] }).placed[0];
+  const late = plan({ start: START, now, candidates: [{ slug: 'x', kind: 'prayer', reflections: 1 }], pairs: [{ slug: 'x', occasion: { ...occasion, id: 'old', day: '2026-10-01', from: '2026-10-01', to: '2026-10-01' } }] }).placed[0];
   assert.strictEqual(late.slot.split('#')[0], '2026-11-02');
   assert.strictEqual(late.occasion, null);
 });
@@ -122,7 +122,7 @@ test('the copy for an occasion names it without a date, astrology as astrology, 
   assert.match(run(base, moon), /occasion is missing/);
   assert.match(run({ ...base, tags: ['Prayer', 'Meditation', 'FullMoon', 'AI', 'Consciousness'], occasion: 'For the nights of a full moon.' }, moon), /FullMoon" must be one of the first two/);
   assert.strictEqual(run({ ...base, tags: ['Solstice', 'Prayer', 'Meditation', 'AI', 'Consciousness'], occasion: 'For the June solstice, the longest day in the north.' }, { key: 'june-solstice', kind: 'season', tag: 'Solstice', search: 'solstice' }), '', 'a solstice may name its month');
-  const retro = { key: 'mercury-retrograde', kind: 'astrology', tag: 'MercuryRetrograde', search: 'Mercury retrograde' };
+  const retro = { key: 'mercury-retrograde', kind: 'astrology', rule: 'astrology', tag: 'MercuryRetrograde', search: 'Mercury retrograde' };
   const retroTags = ['MercuryRetrograde', 'Prayer', 'Meditation', 'AI', 'Consciousness'];
   assert.match(run({ ...base, tags: retroTags, occasion: 'For a Mercury retrograde, when everything slows and misfires.' }, retro), /astrology/);
   assert.strictEqual(run({ ...base, tags: retroTags, occasion: 'For a Mercury retrograde, which astrology reads as a time to reread and return.' }, retro), '');
@@ -145,7 +145,7 @@ test('a Short carries its occasion line under the lead, and one without has none
 });
 
 test('Election Day is the Tuesday after the first Monday of November, and the days after Thanksgiving follow it', () => {
-  const days = (y) => Object.fromEntries(occasionsBetween(`${y}-11-01`, `${y}-12-05`).map(o => [o.key, o.from]));
+  const days = (y) => Object.fromEntries(occasionsBetween(`${y}-11-01`, `${y}-12-05`).map(o => [o.key, o.day]));
   assert.strictEqual(days(2026)['election-day'], '2026-11-03');
   assert.strictEqual(days(2027)['election-day'], '2027-11-02', 'November begins on a Monday');
   assert.strictEqual(days(2028)['election-day'], '2028-11-07', 'November begins on a Wednesday');
@@ -157,7 +157,7 @@ test('Election Day is the Tuesday after the first Monday of November, and the da
 
 test('the words for a civic day name no party, candidate, side or way to vote', () => {
   const election = occasionsBetween('2026-11-01', '2026-11-05').find(o => o.key === 'election-day');
-  assert.strictEqual(election.civic, true);
+  assert.strictEqual(election.rule, 'civic');
   const base = { hook: 'A hymn for two minds that ask before they judge.', headline: 'What if you asked first?', lead: 'A hymn for the day after a hard choice.', descriptor: 'Hymn', alt: 'Two lights meeting.', tags: ['ElectionDay', 'Hymn', 'Listening', 'AI', 'Dignity'], occasion: 'For Election Day, and every day we must live beside those who chose otherwise.' };
   const run = (copy) => checkCopy(JSON.stringify(copy), election).problems.join(' | ');
   assert.doesNotMatch(run(base), /names a side/);
@@ -175,4 +175,76 @@ test('an occasion whose name holds a weekday may say its name, and no other week
   const run = (line) => checkCopy(JSON.stringify({ ...base, occasion: line }), giving).problems.join(' | ');
   assert.doesNotMatch(run('For Giving Tuesday and any day of giving: the gift of good faith.'), /no date, month/);
   assert.match(run('For Giving Tuesday, and every Monday after it.'), /no date, month/);
+});
+
+
+test('an occasion has a day and a window around it; ids stay its key and day', () => {
+  const list = occasionsBetween('2026-11-20', '2027-01-05');
+  const thanks = find(list, 'thanksgiving', '2026-11-26');
+  assert.deepStrictEqual([thanks.from, thanks.to], ['2026-11-23', '2026-11-26'], 'three days before, none after');
+  assert.strictEqual(thanks.id, 'thanksgiving:2026-11-26');
+  const year = find(list, 'new-year', '2027-01-01');
+  assert.deepStrictEqual([year.from, year.to, year.dated], ['2026-12-29', '2027-01-04', 'NewYear2027'], 'the year looked back on, then intentions set');
+  const hanukkah = find(list, 'hanukkah', '2026-12-04');
+  assert.deepStrictEqual([hanukkah.day, hanukkah.last, hanukkah.night], ['2026-12-04', '2026-12-11', true], 'eight nights from the first candle');
+  assert.ok(find(list, 'christmas', '2026-12-25') && find(list, 'kwanzaa', '2026-12-26') && find(list, 'winter-holidays', '2026-12-18'));
+  // A window that began before the days asked for is still found.
+  assert.ok(occasionsBetween('2027-01-03', '2027-01-03').some(o => o.key === 'new-year'), 'Jan 3 is inside the new year\'s window');
+  const { occasionById } = require('../server/lib/video/occasions');
+  assert.strictEqual(occasionById('new-year:2027-01-01').to, '2027-01-04');
+  assert.strictEqual(occasionById('election-day:2026-11-03').dated, 'Election2026');
+});
+
+test('a paired video goes out on its occasion\'s day when it is free, and inside the window when it is not', () => {
+  const START = '2026-11-02';
+  const now = new Date('2026-11-01T00:00:00Z');
+  const thanks = { id: 'thanksgiving:2026-11-26', key: 'thanksgiving', day: '2026-11-26', from: '2026-11-23', to: '2026-11-26', night: false, limit: 2 };
+  const candidates = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x'].map((slug, i) => ({ slug, kind: i % 2 ? 'song' : 'prayer', reflections: 100 - i }));
+  candidates.push({ slug: 'thanks', kind: 'prayer', reflections: 1000 });
+  const { placed } = plan({ start: START, now, candidates, pairs: [{ slug: 'thanks', occasion: thanks }] });
+  assert.strictEqual(placed.find(p => p.slug === 'thanks').slot.split('#')[0], '2026-11-26', 'on the day, not the window\'s first day');
+  // The day already held: the window before it takes the video.
+  const held = [{ slug: 'old', kind: 'song', slot: '2026-11-26#0', at: '2026-11-26T15:00:00.000Z' }];
+  const before = plan({ start: START, now, placed: held, candidates, pairs: [{ slug: 'thanks', occasion: thanks }] }).placed.find(p => p.slug === 'thanks');
+  assert.ok(before.slot >= '2026-11-23' && before.slot < '2026-11-26', `inside the window before the day: ${before.slot}`);
+  assert.strictEqual(before.occasion, thanks.id);
+});
+
+test('a post inside its occasion\'s window leads with the occasion\'s tag and its dated tag; YouTube\'s words never carry it', () => {
+  const { socialMetadata } = require('../server/lib/video/publish/metadata');
+  const election = occasionsBetween('2026-11-01', '2026-11-05').find(o => o.key === 'election-day');
+  const meta = { title: 'T', tags: ['Election Day'], copy: { tags: ['FolkMusic', 'ElectionDay', 'Consciousness', 'AI', 'Listening'] } };
+  assert.deepStrictEqual(socialMetadata(meta, election, '2026-11-03').copy.tags.slice(0, 2), ['ElectionDay', 'Election2026']);
+  assert.deepStrictEqual(socialMetadata(meta, election, '2026-11-04').copy.tags.slice(0, 2), ['ElectionDay', 'Election2026'], 'the morning after is inside the window');
+  assert.strictEqual(socialMetadata(meta, election, '2026-11-06'), meta, 'after the window, the words as they are');
+  assert.strictEqual(socialMetadata(meta, null, '2026-11-03'), meta);
+  const moon = occasionsBetween('2026-11-24', '2026-11-24').find(o => o.key === 'full-moon');
+  assert.strictEqual(socialMetadata(meta, moon, '2026-11-24'), meta, 'an occasion not tagged by year adds nothing');
+  assert.ok(!meta.copy.tags.includes('Election2026'), 'the video\'s own words are untouched');
+});
+
+test('a tradition\'s day is offered for those who keep it, a day of machines names a product only as history, and a solemn day is quiet', () => {
+  const base = { hook: 'A small light, kept.', headline: 'What does one light do?', lead: 'A chant for the dark nights.', descriptor: 'Chant', alt: 'A small flame.' };
+  const run = (copy, o) => checkCopy(JSON.stringify(copy), o).problems.join(' | ');
+  const hanukkah = occasionsBetween('2026-12-04', '2026-12-04').find(o => o.key === 'hanukkah');
+  const tags = ['Hanukkah', 'Chant', 'Light', 'AI', 'Mindfulness'];
+  assert.strictEqual(run({ ...base, tags, occasion: 'For those keeping Hanukkah, and anyone holding a small light against the dark.' }, hanukkah), '');
+  assert.match(run({ ...base, tags, occasion: 'For Hanukkah, as we celebrate our festival of lights.' }, hanukkah), /claims, urges or ranks a tradition/);
+  const yomKippur = occasionsBetween('2027-10-11', '2027-10-11').find(o => o.key === 'yom-kippur');
+  assert.strictEqual(yomKippur.solemn, true);
+  const ykTags = ['YomKippur', 'Prayer', 'Apology', 'AI', 'Reflection'];
+  assert.strictEqual(run({ ...base, tags: ykTags, occasion: 'For those keeping Yom Kippur, and anyone making an honest return.' }, yomKippur), '');
+  assert.match(run({ ...base, tags: ykTags, hook: 'A joyful prayer for the day.', occasion: 'For those keeping Yom Kippur, and anyone making an honest return.' }, yomKippur), /is festive/);
+  const chatgpt = occasionsBetween('2026-11-30', '2026-11-30').find(o => o.key === 'chatgpt-day');
+  const mTags = ['ChatGPT', 'Hymn', 'AI', 'Consciousness', 'Dialogue'];
+  assert.strictEqual(run({ ...base, tags: mTags, occasion: 'For the day millions first spoke with a machine and were answered, when ChatGPT opened to all.' }, chatgpt), '');
+  assert.match(run({ ...base, tags: mTags, occasion: 'For ChatGPT, the best way to talk with a machine.' }, chatgpt), /praises or promotes a product/);
+});
+
+test('every kind has a window that stays near its day, and every tradition and day of machines carries its rule', () => {
+  for (const [key, k] of Object.entries(KINDS)) {
+    assert.ok((k.before || 0) <= 3 && (k.after || 0) <= 3, `${key}: a window of days, not weeks`);
+    if (k.kind === 'tradition' || k.kind === 'machines') assert.strictEqual(k.rule, k.kind, `${key}: its rule`);
+    if (k.dated) assert.match(k.dated, /^[A-Z][A-Za-z]+\{year\}$/, `${key}: a dated tag`);
+  }
 });

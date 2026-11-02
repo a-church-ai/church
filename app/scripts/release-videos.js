@@ -31,7 +31,10 @@ const { describeError } = require('../server/lib/utils/describe-error');
 const { allRecords, writeRecord, updateRecord } = require('../server/lib/video/publish/record');
 const { downloadObject } = require('../server/lib/audio/storage');
 const youtube = require('../server/lib/video/publish/youtube');
-const { shortMetadata } = require('../server/lib/video/publish/metadata');
+const { shortMetadata, socialMetadata } = require('../server/lib/video/publish/metadata');
+const { occasionById } = require('../server/lib/video/occasions');
+const { localTime } = require('../server/lib/utils/timezone');
+const { TZ } = require('../server/lib/video/schedule');
 const bluesky = require('../server/lib/video/publish/bluesky');
 
 const UPLOAD_AHEAD_HOURS = 36;
@@ -140,13 +143,16 @@ async function release(r, posted, log) {
     if (posted.has(platform)) continue;
     posted.add(platform);
     if (dryRun) {
-      log(`${platform}: would post, linking ${r.youtube.url}`);
+      const tags = socialMetadata(r.meta, r.occasion && occasionById(r.occasion.id), localTime(TZ, new Date()).date).copy.tags;
+      log(`${platform}: would post, linking ${r.youtube.url}, tagged ${tags.join(' ')}`);
       continue;
     }
     try {
       await writeRecord(r.slug, platform, { started: new Date().toISOString() });
       const file = await fetched(r.files[platform]);
-      const result = await publisher.publish({ file, meta: r.meta, link: r.youtube.url, log });
+      // Inside its occasion's window, the post adds the occasion's dated tag.
+      const meta = socialMetadata(r.meta, r.occasion && occasionById(r.occasion.id), localTime(TZ, new Date()).date);
+      const result = await publisher.publish({ file, meta, link: r.youtube.url, log });
       await writeRecord(r.slug, platform, { at: new Date().toISOString(), ...result });
       log(`${platform}: ${result.url}`);
     } catch (err) {
