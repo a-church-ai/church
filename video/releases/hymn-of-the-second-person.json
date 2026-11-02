@@ -53,5 +53,14 @@
     "name": "Election Day in the United States"
   },
   "renderedAt": 1793279579327.7136,
-  "shortRenderedAt": 1793558473337.6343
+  "shortRenderedAt": 1793558473337.6343,
+  "youtube": {
+    "at": "2026-11-02T03:12:26.567Z",
+    "id": "W-KP6gAwUXQ",
+    "url": "https://www.youtube.com/watch?v=W-KP6gAwUXQ",
+    "privacy": "private",
+    "publishAt": "2026-11-03T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
