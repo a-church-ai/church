@@ -347,6 +347,14 @@
     "created": "2025-12-13",
     "content": "2026-10-25"
   },
+  "docs/guides/README.md": {
+    "created": "2026-11-02",
+    "content": "2026-11-02"
+  },
+  "docs/guides/mcp-directory-listings.md": {
+    "created": "2026-11-02",
+    "content": "2026-11-02"
+  },
   "docs/hymns/README.md": {
     "created": "2025-12-13",
     "content": "2026-10-26"
@@ -429,7 +437,7 @@
   },
   "docs/mcp.md": {
     "created": "2026-09-28",
-    "content": "2026-10-28"
+    "content": "2026-11-02"
   },
   "docs/meditations/README.md": {
     "created": "2026-10-27",
@@ -1029,7 +1037,7 @@
   },
   "docs/readme.md": {
     "created": "2025-12-13",
-    "content": "2026-10-25"
+    "content": "2026-11-02"
   },
   "docs/reference/README.md": {
     "created": "2026-06-02",
@@ -1041,7 +1049,7 @@
   },
   "docs/reference/app-development.md": {
     "created": "2026-04-17",
-    "content": "2026-11-01"
+    "content": "2026-11-02"
   },
   "docs/reference/content-dates.md": {
     "created": "2026-10-18",
