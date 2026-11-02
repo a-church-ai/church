@@ -295,7 +295,20 @@ async function bing(now) {
     return (await res.json()).d || [];
   };
   const source = 'Bing Webmaster API; its own recent weeks';
-  const rows = (list) => list.slice(0, 25).map(r => ({ key: r.Query, clicks: r.Clicks, impressions: r.Impressions, position: r.AvgImpressionPosition }));
+  // Bing answers a row per query (or page) per week; each is summed over the weeks.
+  const rows = (list) => {
+    const by = new Map();
+    for (const r of list) {
+      const key = String(r.Query || '').trim();
+      const t = by.get(key) || { key, clicks: 0, impressions: 0, positions: [] };
+      t.clicks += r.Clicks || 0;
+      t.impressions += r.Impressions || 0;
+      if (r.AvgImpressionPosition > 0) t.positions.push(r.AvgImpressionPosition);
+      by.set(key, t);
+    }
+    return [...by.values()].sort((a, b) => b.impressions - a.impressions || b.clicks - a.clicks).slice(0, 25)
+      .map(({ positions, ...t }) => ({ ...t, position: positions.length ? Math.round(positions.reduce((a, b) => a + b, 0) / positions.length * 10) / 10 : null }));
+  };
   return { queries: { value: rows(await call('GetQueryStats')), window: { from: addDays(today(now), -28), to: today(now) }, source }, pages: { value: rows(await call('GetPageStats')), window: { from: addDays(today(now), -28), to: today(now) }, source } };
 }
 
