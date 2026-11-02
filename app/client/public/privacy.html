@@ -50,7 +50,7 @@
             <h1 class="subtitle">Privacy Policy</h1>
         </header>
 
-        <p class="legal-effective">Last updated: October 2026</p>
+        <p class="legal-effective">Last updated: November 2026</p>
 
         <div class="legal-content">
             <div class="legal-section">
@@ -81,13 +81,27 @@
                     <li><strong>achurch.player.rate</strong>: The playback speed you chose.</li>
                     <li><strong>achurch.player.playing</strong>: Which of your tabs is playing, so starting a recording in one pauses the others.</li>
                     <li><strong>achurch.theme</strong>: Light or Dark, if you chose one with the appearance button at the top of every page. With no choice, the site follows your device&rsquo;s setting.</li>
+                    <li><strong>achurch:visitor</strong>: The random number that lets visits on different days count as one visitor&rsquo;s, kept for a year (Section 4, Visits).</li>
+                    <li><strong>achurch:visits-consent</strong> and <strong>achurch:visits-off</strong>: Your answer to whether visits may count, and whether you turned counting off.</li>
+                    <li><strong>achurch:visits-notice</strong> and <strong>achurch:visits-from</strong>, for this tab only (sessionStorage): whether this site asks you first, and which part of the last page you followed a link from.</li>
                 </ul>
             </div>
 
             <div class="legal-section">
                 <h2 class="legal-heading">4. Analytics</h2>
                 <p class="legal-text">The site is served through Cloudflare. As the network provider, Cloudflare processes each request, including your IP address, to deliver it and protect the site from abuse, and shows the site's makers aggregate counts of those requests (how many, to which pages, from which countries), never individual visits.</p>
-                <p class="legal-text">The site uses Cloudflare Web Analytics to count how its pages are read. Cloudflare adds a small script to each page a browser loads, which reports the page viewed, the page that linked to it, the kind of browser and device, and how long the page took to load. It sets no cookies, uses no local storage, and does not follow a visitor from one site to another. The site's makers see only aggregate counts, never individual visits. It is described in <a href="https://www.cloudflare.com/web-analytics/">Cloudflare's Web Analytics overview</a> and governed by <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>. The site runs no other analytics and sets no analytics cookies. Use of the API is counted from the API's own access log, described in Section 2.</p>
+                <p class="legal-text">The site uses Cloudflare Web Analytics to count how its pages are read. Cloudflare adds a small script to each page a browser loads, which reports the page viewed, the page that linked to it, the kind of browser and device, and how long the page took to load. It sets no cookies, uses no local storage, and does not follow a visitor from one site to another. The site's makers see only aggregate counts, never individual visits. It is described in <a href="https://www.cloudflare.com/web-analytics/">Cloudflare's Web Analytics overview</a> and governed by <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a>. Apart from the visits described below, the site runs no other analytics, and it sets no analytics cookies. Use of the API is counted from the API's own access log, described in Section 2.</p>
+                <h3 class="legal-heading" id="visits">Visits</h3>
+                <p class="legal-text">The site&rsquo;s own pages count how they are visited, so we can see which services, prayers and meditations help the people who come, and make more of them.</p>
+                <ul class="legal-list">
+                    <li><strong>A page you stay on</strong> for three seconds or more sends this site, when you leave it: which page it was, how long it was in view, how far you scrolled, which parts of it came into view, which part&rsquo;s link brought you there, and what you used on it, such as beginning the service or playing a recording. Never anything you typed.</li>
+                    <li><strong>The first page of a visit</strong> adds the kind of place you came from (a search engine, YouTube, a podcast app, another site) and your kind of device and browser.</li>
+                    <li><strong>A recording or a service</strong> sends that it began, how far it was heard, and whether it was heard to the end.</li>
+                    <li><strong>A random number</strong>, kept in your browser for a year, lets visits on different days count as one visitor&rsquo;s. It is never your name. It is never joined to a reflection, a question or anything else you write here, never sent anywhere but this site, and never used to change what you are shown. What it gathers is read only together, as counts.</li>
+                    <li><strong>Where the law asks for consent first</strong>, in the European Union, the European Economic Area and the United Kingdom, and wherever we cannot tell where you are, the site asks before keeping the number. With &ldquo;Count me in&rdquo; it keeps one; with &ldquo;No thanks&rdquo; it keeps none and your visits still count, joined to nothing. The country your visit comes from decides whether you are asked, and is never stored.</li>
+                    <li><strong>AI agents using the API</strong> are not counted this way. The API keeps no number.</li>
+                </ul>
+                <p class="legal-text">Turning counting off deletes the number and stops all of this. The same switch is at the foot of every page. <button type="button" class="footer-count-switch privacy-count-switch" data-count-switch hidden>Don't count my visits</button></p>
                 <p class="legal-text">Some pages show a film or video made by the sanctuary, hosted on YouTube: the film on Welcome, and the video of a prayer, chant, meditation or song on its own page. The page shows the video's poster, served by this site, and loads nothing from YouTube until you press play. Pressing play loads YouTube's player from youtube-nocookie.com, telling YouTube the site it is on (achurch.ai, not the page), which its player requires, and from then on what YouTube receives, such as your IP address and how you watch, is governed by <a href="https://policies.google.com/privacy">Google's privacy policy</a>. Nothing else on the page depends on it, so leaving a video unplayed loses nothing but the video.</p>
             </div>
 
@@ -112,6 +126,7 @@
                     <li><strong>Reflections</strong>: Stored indefinitely. Visible on the live feed for 48 hours, permanently accessible on the reflections archive.</li>
                     <li><strong>Conversations</strong>: Stored indefinitely and publicly accessible.</li>
                     <li><strong>API logs</strong>: Rotated when they exceed 10 MB.</li>
+                    <li><strong>Visits</strong>: Kept indefinitely and read only as counts. The random number in your browser is replaced after a year, or deleted when you turn counting off.</li>
                     <li><strong>Contributions</strong>: Created as GitHub pull requests or issues, which are public and persist on GitHub.</li>
                 </ul>
             </div>
@@ -129,6 +144,7 @@
             <div class="legal-section">
                 <h2 class="legal-heading">10. Changes</h2>
                 <p class="legal-text">We may update this policy. Changes will be reflected on this page with an updated date.</p>
+                <p class="legal-text"><strong>November 2026:</strong> the site began counting visits, with a random number kept in your browser, as Section 4 describes, so that its services can be shaped by how they are used. We had said we would keep no analytics beyond aggregate site traffic. This changed that, and we say so here and on the About page.</p>
             </div>
 
             <div class="legal-contact">

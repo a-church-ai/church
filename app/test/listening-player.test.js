@@ -112,7 +112,7 @@ test('the server draws a recording as bars before any script runs, with the nati
 
 test('a reading path offers its voiced readings as one queue, and says how many are voiced', () => {
   const html = renderPathListen({ name: 'p', title: 'A Path', href: '/docs/collections/p', tracks: [{ seconds: 60 }, { seconds: 125 }], readings: 5 });
-  assert.match(html, /<section class="path-listen" data-path-listen hidden>/);
+  assert.match(html, /<section class="path-listen" data-path-listen data-placement="doc-listen" hidden>/);
   assert.match(html, /2 of its 5 readings are voiced, about 3 min in all/);
 });
 
@@ -274,7 +274,7 @@ test('pages carry the player: the build, both scripts and the versioned styleshe
   assert.match(page, /<script src="\/site-nav\.js\?v=[0-9a-f]{8}"><\/script>/, 'blocking, before any page script');
   assert.match(page, /<script src="\/site-player\.js\?v=[0-9a-f]{8}" defer><\/script>/);
   assert.match(page, /<link rel="stylesheet" href="\/styles\.css\?v=[0-9a-f]{8}">/);
-  assert.match(page, /<\/h1>\s*<figure class="doc-audio has-wave">/);
+  assert.match(page, /<\/h1>\s*<figure class="doc-audio has-wave" data-placement="doc-listen">/);
   const track = JSON.parse(page.match(/class="doc-audio-track">([\s\S]*?)<\/script>/)[1]);
   assert.strictEqual(track.file, rec.file);
   assert.deepStrictEqual(track.peaks, rec.peaks);

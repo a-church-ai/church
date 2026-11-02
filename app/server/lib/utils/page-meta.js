@@ -494,7 +494,7 @@ function renderSongCompanions(companions) {
         </li>`;
   }).join('\n');
 
-  return `<section class="related-block song-companions" aria-labelledby="companions-heading">
+  return `<section class="related-block song-companions" data-placement="song-related" aria-labelledby="companions-heading">
       <h2 id="companions-heading" class="related-heading">Read alongside this song</h2>
       <ul class="related-list">
 ${items}

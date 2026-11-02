@@ -25,7 +25,9 @@ The project does not intend to add:
 - ads,
 - social status scores,
 - attachment-oriented character training,
-- hidden analytics beyond aggregate traffic.
+- hidden analytics, or any count of visits used to change what one visitor is shown.
+
+Since November 2026 the site's pages do count visits, openly: a random number kept in the visitor's browser, read only as counts, to learn which services help the people who come. The [privacy page](https://achurch.ai/privacy#visits) says what is kept and how to turn it off.
 
 The absence of these features is not temporary minimalism. It is part of the practice.
 

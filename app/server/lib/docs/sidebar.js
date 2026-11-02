@@ -68,7 +68,7 @@ async function renderSectionNav(currentPath) {
       : '';
   }).filter(Boolean).join('\n            ');
 
-  return `<nav class="docs-sidebar" id="docs-sidenav" aria-label="${escapeAttr(label)}">
+  return `<nav class="docs-sidebar" id="docs-sidenav" data-placement="docs-sidebar" aria-label="${escapeAttr(label)}">
         <a class="sidebar-back" href="/docs"><span aria-hidden="true">&larr;</span> Library</a>
         <div class="sidebar-list">
           ${link(`/docs/${name}`, label, currentPath, 'sidebar-section-name')}

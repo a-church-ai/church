@@ -23,6 +23,9 @@ const SERVICES_DIR = path.join(RUNTIME_DIR, 'services');
 // 2026-10-26 it was api-access.jsonl in RUNTIME_DIR, rotated by size; those
 // files stay where they are and lose their addresses as old days do.
 const ACCESS_DIR = path.join(RUNTIME_DIR, 'access');
+// What the website's own pages report of their visits, one file per UTC day
+// (lib/insights/visits.js).
+const VISITS_DIR = path.join(RUNTIME_DIR, 'visits');
 // The souls present in the last 24 hours, kept so a deploy does not reset the
 // count (lib/utils/presence.js).
 const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
@@ -199,6 +202,7 @@ async function readConversationList() {
 }
 
 module.exports = {
+  VISITS_DIR,
   isHiddenReflection,
   isQuietlyHidden,
   loadCatalog,

@@ -11,8 +11,8 @@
  * poster and a play button, and nothing is fetched from YouTube until the
  * reader presses it (video.js swaps in the youtube-nocookie player then). The
  * privacy page says so. Embedding the player on load would have Google's
- * scripts run on every visit, which the sanctuary's "no analytics beyond
- * aggregate traffic" does not allow.
+ * scripts run on every visit, which the sanctuary's rule of no third-party
+ * analytics scripts does not allow.
  *
  * A piece's poster is a frame of its video (makePoster, run by
  * scripts/schedule-videos.js where the videos are rendered), committed under

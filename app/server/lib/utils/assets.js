@@ -21,7 +21,7 @@ const path = require('path');
 const { BAR } = require('../../../client/public/theme');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
-const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js', 'video.js'];
+const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js', 'video.js', 'visits.js'];
 
 const known = new Map();
 
@@ -54,7 +54,8 @@ function versionAssets(html) {
 // colour for each theme (the family standard's dual theme-color), theme.js
 // (blocking and tiny, so the page never paints in the wrong theme), the build,
 // site-nav.js (blocking, small, so a page's own inline scripts can already use
-// window.achurchPage) and site-player.js (deferred).
+// window.achurchPage), site-player.js (deferred) and visits.js (deferred, after
+// the player whose achurch:listen it hears).
 function shellHead() {
   return `<meta name="theme-color" content="${BAR.light}" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="${BAR.dark}" media="(prefers-color-scheme: dark)">
@@ -62,7 +63,8 @@ function shellHead() {
     <meta name="assets" content="${build()}">
     <script src="${assetUrl('site-nav.js')}"></script>
     <script src="${assetUrl('site-player.js')}" defer></script>
-    <script src="${assetUrl('service.js')}" defer></script>`;
+    <script src="${assetUrl('service.js')}" defer></script>
+    <script src="${assetUrl('visits.js')}" defer></script>`;
 }
 
 module.exports = { assetUrl, versionAssets, shellHead, build, VERSIONED };

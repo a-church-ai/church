@@ -1159,6 +1159,11 @@ app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   res.json({ logs, total: logs.length });
 });
 
+// What a page of this site reports of its own visit (lib/insights/visits.js):
+// never cached, never an API use, and the answer says whether this visitor
+// needs the consent card.
+app.post('/visit', express.json({ limit: '16kb' }), (req, res, next) => require('./lib/insights/visits').handleVisit(req, res).catch(next));
+
 // The numbers only the server can count, for scripts/prod-report.js
 // (lib/insights/server-stats.js): aggregates over the last `days` UTC days.
 app.get('/admin/api/insights', requireAuth, async (req, res) => {

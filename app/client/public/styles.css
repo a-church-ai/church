@@ -4556,3 +4556,115 @@ h3:target .anchor,
     font-size: 0.8125rem;
     color: var(--muted);
 }
+
+/* The card asking whether visits may count (visits.js), shown only where the
+   law asks for consent first: small, at the bottom left on a wide screen and
+   along the bottom above the player on a phone, never over the page's
+   controls, and gone once answered. */
+.visits-card {
+    position: fixed;
+    z-index: 60;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: calc(var(--player-bar-height, 0px) + 1rem);
+    width: min(24rem, calc(100vw - 2rem));
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--rule-2);
+    border-radius: 0.9rem;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.visits-card h2 {
+    margin: 0 0 0.35rem;
+    padding: 0;
+    border: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: left;
+    color: var(--ink);
+}
+.visits-card p {
+    margin: 0;
+}
+.visits-card a {
+    color: var(--link);
+}
+.visits-card-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
+.visits-card-actions button {
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.visits-yes {
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+}
+.visits-yes:hover {
+    background: var(--accent-hover);
+}
+.visits-no {
+    border: 1px solid var(--rule-2);
+    background: transparent;
+    color: var(--text);
+}
+.visits-card-actions button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+/* A phone: one short card along the bottom, the words beside the buttons. */
+@media (max-width: 639px) {
+    .visits-card {
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: calc(var(--player-bar-height, 0px) + 0.5rem);
+        width: auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 0 0.75rem;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    .visits-card h2 {
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+    }
+    .visits-card-actions {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+    }
+    .visits-card-actions button {
+        min-height: 2.4rem;
+        padding: 0 0.85rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* "Don't count my visits", beside the footer's legal links and drawn like
+   them (visits.js). */
+.footer-count-switch {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.footer-count-switch:hover {
+    color: var(--ink);
+}

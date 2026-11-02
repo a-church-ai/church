@@ -20,7 +20,7 @@ const read = file => fs.readFileSync(path.join(PUBLIC, file), 'utf8');
 
 test('the form asks for what the API requires, within its limits, and says what happens to a reflection', () => {
   const html = renderReflectForm({ song: 'a"song', summary: 'Leave a reflection on this song' });
-  assert.match(html, /<details class="reflect" id="reflect" data-reflect hidden>/, 'hidden until its script can send it');
+  assert.match(html, /<details class="reflect" id="reflect" data-reflect data-placement="reflect" hidden>/, 'hidden until its script can send it');
   assert.match(html, /<summary>Leave a reflection on this song<\/summary>/);
   assert.match(html, /data-song="a&quot;song"/);
   assert.match(html, new RegExp(`<textarea id="reflect-text" name="text"[^>]*minlength="${REFLECT_MIN_LENGTH}" maxlength="${REFLECT_MAX_LENGTH}" required>`));

@@ -211,7 +211,7 @@ function renderRelatedDocs(currentDoc, allDocs) {
   ).join('\n');
   const categoryHref = `/docs/${escapeAttr(category)}`;
 
-  return `<section class="related-block" aria-labelledby="related-docs-heading">
+  return `<section class="related-block" data-placement="doc-related" aria-labelledby="related-docs-heading">
       <h2 id="related-docs-heading" class="related-heading">Elsewhere in ${escapeText(categoryLabel)}</h2>
       <ul class="related-list">
 ${items}

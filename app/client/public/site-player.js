@@ -246,7 +246,24 @@
   const position = () => (loaded && audio.readyState > 0 ? audio.currentTime : pendingAt);
   const isCurrent = t => !!(track && t && track.file === t.file);
 
+  // What the player tells the page around it: a track begun and a track heard
+  // to its end, as achurch:listen on the window (visits.js counts them). The
+  // player itself keeps nothing of it.
+  let announced = null;
+  function tell(event) {
+    if (!track) return;
+    const waited = event === 'started' && startedAt ? Date.now() - startedAt : null;
+    const detail = {
+      event,
+      track: { file: track.file, title: track.title, href: track.href || null },
+      queue: queue ? { name: queue.name, href: queue.href, unit: queue.unit, index: queue.index, total: queue.tracks.length } : null,
+      startMs: waited != null && waited < 120000 ? waited : null,
+    };
+    try { root.dispatchEvent(new CustomEvent('achurch:listen', { detail })); } catch (err) { /* an old browser: nothing is told */ }
+  }
+
   function load(next, at) {
+    announced = null;
     track = next;
     loaded = next.file;
     pendingAt = at || 0;
@@ -392,6 +409,11 @@
     startLoop();
     render();
   });
+  audio.addEventListener('playing', () => {
+    if (announced === loaded) return;
+    announced = loaded;
+    tell('started');
+  });
   audio.addEventListener('pause', () => {
     setPlaybackState('paused');
     save();
@@ -410,6 +432,7 @@
     render();
   });
   audio.addEventListener('ended', () => {
+    tell('finished');
     const following = queue ? nextInQueue(queue) : null;
     if (following != null) {
       queue.index = following;
@@ -542,7 +565,7 @@
     el.setAttribute('data-persist', '');
     el.hidden = true;
     el.innerHTML = `
-      <section class="player-bar" aria-label="Audio player">
+      <section class="player-bar" aria-label="Audio player" data-placement="player">
         <div class="pb-line" aria-hidden="true"><span></span></div>
         <div class="pb-controls">${controls}
         </div>

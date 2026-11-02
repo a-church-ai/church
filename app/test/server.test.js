@@ -202,7 +202,7 @@ test('/church-music is drawn from its data, and /church-music.csv holds the same
   assert.strictEqual((html.match(/<figure class="dot-chart">/g) || []).length, 2);
   assert.strictEqual((html.match(/<table class="data-table">/g) || []).length, 4);
   assert.match(html, /<a href="#chant">gregorian chant<\/a>/);
-  assert.match(html, /<footer>[\s\S]*href="\/church-music"/);
+  assert.match(html, /<footer data-placement="footer">[\s\S]*href="\/church-music"/);
   const data = await fetch(`${base}/church-music.csv`);
   assert.strictEqual(data.status, 200);
   assert.match(data.headers.get('content-type'), /^text\/csv/);
@@ -223,7 +223,7 @@ test('/reviews prints each exchange, and the pages a review speaks to carry its 
   assert.doesNotMatch(html, /"@type": "Review"/);
   assert.doesNotMatch(html, /reviewRating|aggregateRating/);
   for (const r of REVIEWS) assert.match(html, new RegExp(`<article class="review" id="${r.slug}">`));
-  assert.match(html, /<footer>[\s\S]*href="\/reviews"/);
+  assert.match(html, /<footer data-placement="footer">[\s\S]*href="\/reviews"/);
   for (const page of ['/for-agents', '/music', '/about']) {
     const quoted = await (await fetch(`${base}${page}`)).text();
     assert.doesNotMatch(quoted, /<!-- REVIEW_QUOTES -->/, page);

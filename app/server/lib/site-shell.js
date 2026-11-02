@@ -97,7 +97,7 @@ function footerLink({ url, label }, currentPath) {
  * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
  */
 function renderFooter(currentPath) {
-  return `<footer>
+  return `<footer data-placement="footer">
             <nav aria-label="Footer">
                 <div class="footer-nav">
                 ${PLACES.map(l => footerLink(l, currentPath)).join('\n                ')}
@@ -109,6 +109,7 @@ function renderFooter(currentPath) {
             <hr class="footer-separator">
             <div class="footer-legal">
                 ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
+                <button type="button" class="footer-count-switch" data-count-switch hidden>Don't count my visits</button>
             </div>
         </footer>`;
 }
@@ -140,7 +141,7 @@ const ICON_THEME = [
 function renderTopbarAndDrawer(currentPath, crumb = '') {
   const places = PLACES.map(p => `<a href="${p.url}"${p.aside ? ' class="topbar-aside"' : ''}${currentness(p, currentPath)}>${p.label}</a>`);
   const searching = currentPath === '/search' ? ' aria-current="page"' : '';
-  return `<div class="docs-topbar" role="banner">
+  return `<div class="docs-topbar" role="banner" data-placement="topbar">
       <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
         <span class="hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -157,7 +158,7 @@ function renderTopbarAndDrawer(currentPath, crumb = '') {
     </div>
 
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>
-    <div class="docs-drawer" id="docs-drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
+    <div class="docs-drawer" id="docs-drawer" data-placement="drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
       <h2 class="visually-hidden" id="docs-drawer-title">Menu</h2>
       <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
     </div>`;

@@ -93,7 +93,7 @@ function renderRecording(recording, { title, href, category, credit, artwork }) 
   const wave = recording.peaks
     ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`
     : '';
-  return `<figure class="doc-audio${recording.peaks ? ' has-wave' : ''}">
+  return `<figure class="doc-audio${recording.peaks ? ' has-wave' : ''}" data-placement="doc-listen">
           ${jsonScript('doc-audio-track', track)}
           <canvas class="doc-audio-visual" aria-hidden="true"></canvas>
           <div class="doc-audio-player">
@@ -124,7 +124,7 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
   const voiced = tracks.length === readings
     ? `All ${readings} ${plural} are voiced`
     : `${tracks.length} of its ${readings} ${plural} are voiced`;
-  return `<section class="path-listen" data-path-listen hidden>
+  return `<section class="path-listen" data-path-listen data-placement="doc-listen" hidden>
           ${jsonScript('path-listen-queue', { name, title, href, unit, noun, tracks })}
           <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this ${noun}</span></button>
           <p class="path-listen-note">${voiced}, about ${listeningTime(seconds)} in all, played in ${order}.</p>
@@ -228,7 +228,7 @@ function renderPodcasts() {
 // POST /api/reflect, under the same limits and rules. A closed disclosure,
 // hidden until the script shows it, since without one it cannot send.
 function renderReflectForm({ song = null, summary }) {
-  return `<details class="reflect" id="reflect" data-reflect hidden>
+  return `<details class="reflect" id="reflect" data-reflect data-placement="reflect" hidden>
           <summary>${escapeText(summary)}</summary>
           <form class="reflect-form"${song ? ` data-song="${escapeAttr(song)}"` : ''}>
             <label for="reflect-text">Your reflection</label>

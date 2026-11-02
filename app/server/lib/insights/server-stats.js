@@ -13,7 +13,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
-const { ACCESS_DIR, ATTENDANCE_FILE, CONVERSATIONS_DIR, SERVICES_DIR, loadAttendance } = require('../utils/data');
+const { ACCESS_DIR, ATTENDANCE_FILE, CONVERSATIONS_DIR, SERVICES_DIR, VISITS_DIR, loadAttendance } = require('../utils/data');
 const { addDays } = require('../utils/seasons');
 const { safeReadJSON } = require('../utils/safe-json');
 
@@ -150,11 +150,84 @@ async function services(w) {
   };
 }
 
+async function visitRows(w) {
+  const rows = [];
+  for (const day of datesOf(w)) {
+    let text;
+    try { text = await fs.readFile(path.join(VISITS_DIR, `${day}.jsonl`), 'utf8'); } catch { continue; }
+    for (const raw of text.split('\n')) { if (!raw) continue; try { rows.push({ ...JSON.parse(raw), day }); } catch {} }
+  }
+  return rows;
+}
+
+const avg = (list) => (list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : null);
+
+// The website's own visits (lib/insights/visits.js), in aggregate only.
+async function visits(w) {
+  const source = `${path.basename(VISITS_DIR)}/<day>.jsonl, what the site's pages reported (client/public/visits.js)`;
+  const [now, before] = await Promise.all([visitRows(w.now), visitRows(w.before)]);
+  // A page view is sent again when its tab comes back into view and is hidden
+  // again (visits.js), so each view counts once, at its longest.
+  const pages = (rs) => {
+    const longest = new Map();
+    for (const r of rs) if (r.kind === 'page' && (!longest.has(r.view) || r.seconds > longest.get(r.view).seconds)) longest.set(r.view, r);
+    return [...longest.values()];
+  };
+  const ids = (rs) => new Set(rs.map(r => r.visitor).filter(Boolean));
+  // Returning: an id seen on two or more days of the window, or before it.
+  const earlier = ids(before);
+  const daysOf = new Map();
+  for (const r of now) if (r.visitor) daysOf.set(r.visitor, (daysOf.get(r.visitor) || new Set()).add(r.day));
+  const returning = [...daysOf].filter(([id, days]) => days.size > 1 || earlier.has(id)).length;
+  // Likely people: a page held ten seconds or more, or one where something was used.
+  const likely = pages(now).filter(r => r.seconds >= 10 || (r.features || []).length);
+  const byPath = {};
+  for (const r of pages(now)) (byPath[r.path] = byPath[r.path] || []).push(r);
+  const topPages = Object.entries(byPath).sort((a, b) => b[1].length - a[1].length).slice(0, 15)
+    .map(([key, rs]) => ({ key, views: rs.length, seconds: avg(rs.map(r => r.seconds)), scroll: avg(rs.map(r => r.scroll).filter(n => n != null)) }));
+  const sources = {}, shown = {}, clicked = {}, features = {}, devices = {};
+  for (const r of pages(now)) {
+    if (r.first) { bump(sources, r.source || 'direct'); if (r.device) bump(devices, r.device); }
+    for (const p of r.shown || []) bump(shown, p);
+    if (r.placement) bump(clicked, r.placement);
+    for (const f of r.features || []) bump(features, f);
+  }
+  const placements = Object.keys(shown).map(key => ({ key, shown: shown[key], followed: clicked[key] || 0 })).sort((a, b) => b.shown - a.shown);
+  const listens = now.filter(r => r.kind === 'listen');
+  const services = now.filter(r => r.kind === 'service');
+  // How far services are heard: for each begun service view, the furthest part reached.
+  const furthest = new Map();
+  for (const r of services) if (r.event !== 'begun') furthest.set(r.view, Math.max(furthest.get(r.view) || 0, r.event === 'finished' ? r.parts : r.part));
+  const reached = {};
+  for (const [, part] of furthest) bump(reached, String(part));
+  const bySlot = {};
+  for (const r of services.filter(r => r.event === 'begun')) bump(bySlot, r.slot || '?');
+  return {
+    visitors: { value: ids(now).size, before: ids(before).size, window: w.now, source, note: 'distinct ids; visits without one (no consent yet, No thanks) are counted in page views only' },
+    returning: { value: returning, window: w.now, source },
+    pageViews: { value: pages(now).length, before: pages(before).length, window: w.now, source, note: 'pages held visible three seconds or more' },
+    likelyPeople: { value: likely.length, window: w.now, source, note: 'page views held ten seconds or more, or where something was used' },
+    unjoined: { value: pages(now).filter(r => !r.visitor).length, window: w.now, source, note: 'page views with no id' },
+    topPages: { value: topPages, window: w.now, source },
+    sources: { value: top(sources), window: w.now, source, note: 'where a visit\'s first page came from' },
+    devices: { value: top(devices), window: w.now, source },
+    placements: { value: placements, window: w.now, source, note: 'each section: page views it came into view on, and links followed from it' },
+    features: { value: top(features), window: w.now, source },
+    listens: { started: { value: listens.filter(r => r.event === 'started').length, window: w.now, source }, finished: { value: listens.filter(r => r.event === 'finished').length, window: w.now, source } },
+    services: {
+      begun: { value: services.filter(r => r.event === 'begun').length, before: before.filter(r => r.kind === 'service' && r.event === 'begun').length, window: w.now, source },
+      finished: { value: services.filter(r => r.event === 'finished').length, window: w.now, source, note: 'heard to the end of the last part' },
+      furthestPart: { value: Object.entries(reached).map(([part, count]) => ({ part: Number(part), count })).sort((a, b) => a.part - b.part), window: w.now, source, note: 'for each service begun, the furthest part reached' },
+      bySlot: { value: top(bySlot), window: w.now, source }
+    }
+  };
+}
+
 /** Every server-side number over the last `days` UTC days, with the window before. */
 async function serverStats({ days = 7, now = Date.now() } = {}) {
   const w = windows(days, now);
-  const [apiStats, reflectionStats, askStats, serviceStats] = await Promise.all([api(w), reflections(w), ask(w), services(w)]);
-  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats };
+  const [apiStats, reflectionStats, askStats, serviceStats, visitStats] = await Promise.all([api(w), reflections(w), ask(w), services(w), visits(w)]);
+  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats };
 }
 
 module.exports = { serverStats, windows, operation };
