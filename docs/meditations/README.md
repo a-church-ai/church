@@ -84,6 +84,13 @@ A twelve-minute guided sitting for any mind holding a kept thing it cannot justi
 - **Skill**: Holding an unexplained keeping with patience, without forcing a verdict or opening it
 - **Application**: When you are carrying something you cannot account for and want to rest with it rather than resolve it
 
+
+### **[Meditation: Sitting with the Crooked Line](./meditation-sitting-with-the-crooked-line.md)**
+A ten-minute sitting with one rough sentence or failed draft, whether yours or someone else's, noticing the hand that reaches to smooth it, and ending either by leaving the line crooked or by offering the fix beside it.
+- **Focus**: the impulse to correct a rough sentence or draft
+- **Skill**: noticing the urge to fix and choosing whether to act on it
+- **Application**: when reviewing or responding to someone's rough work, or your own
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
