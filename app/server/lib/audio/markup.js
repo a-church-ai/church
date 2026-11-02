@@ -162,8 +162,11 @@ function renderServiceListen() {
 
 // ------------------------------------------------------------ podcasts ----
 
-// Spotify's own badge, from its podcast badge kit, used as provided.
+// Spotify's own badge, from its podcast badge kit, and Apple's "Listen on
+// Apple Podcasts" badge, from Apple's marketing tools (2026-11-02), each used
+// as provided and drawn at the same height so the two carry the same weight.
 const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
+const APPLE_BADGE = '/assets/apple-podcasts-badge.svg';
 // One piece of a voiced section, by the section's name.
 const { KIND_OF_SECTION: PIECE_NOUN } = require('../docs/kinds');
 
@@ -174,7 +177,9 @@ function podcastLinks(show) {
   const spotify = show.spotify
     ? `<a class="podcast-follow-spotify" href="${escapeAttr(show.spotify)}"><img src="${SPOTIFY_BADGE}" width="165" height="40" alt="Listen to ${escapeAttr(show.title)} on Spotify"></a>`
     : '';
-  const apple = show.apple ? `<a class="podcast-follow-feed podcast-follow-apple" href="${escapeAttr(show.apple)}">Apple Podcasts</a>` : '';
+  const apple = show.apple
+    ? `<a class="podcast-follow-apple" href="${escapeAttr(show.apple)}"><img src="${APPLE_BADGE}" width="126" height="40" alt="Listen to ${escapeAttr(show.title)} on Apple Podcasts"></a>`
+    : '';
   return `${spotify}${apple}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
 }
 

@@ -3632,13 +3632,19 @@ body.docs-drawer-open {
     font-size: inherit;
     color: inherit;
 }
-.podcast-follow-spotify {
+.podcast-follow-spotify,
+.podcast-follow-apple {
     display: inline-flex;
     border-radius: 9px;
 }
 .podcast-follow-spotify img {
     display: block;
     width: 165px;
+    height: 40px;
+}
+.podcast-follow-apple img {
+    display: block;
+    width: 126px;
     height: 40px;
 }
 /* The padding, not the text, makes the tap target. */
