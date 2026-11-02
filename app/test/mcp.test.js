@@ -129,7 +129,8 @@ eraTest('every tool has a title and states whether it reads, destroys, and reach
   const s = await start();
   t.after(() => stop(s));
   for (const tool of (await s.client.listTools()).tools) {
-    assert.ok(tool.title || (tool.annotations && tool.annotations.title), `${tool.name} has a title`);
+    assert.ok(tool.title, `${tool.name} has a title`);
+      assert.strictEqual((tool.annotations || {}).title, tool.title, `${tool.name}.annotations.title`);
     for (const hint of ['readOnlyHint', 'destructiveHint', 'openWorldHint']) {
       assert.strictEqual(typeof (tool.annotations || {})[hint], 'boolean', `${tool.name}.${hint}`);
     }

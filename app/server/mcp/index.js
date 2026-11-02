@@ -129,6 +129,11 @@ function createServer(ctx) {
   // whether it reaches past this site.
   const read = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
   const write = { readOnlyHint: false, destructiveHint: false, openWorldHint: false };
+  // The Claude directory reads a tool's name from annotations.title, so each
+  // tool's title is given there as well.
+  const register = server.registerTool.bind(server);
+  server.registerTool = (name, config, handler) =>
+    register(name, { ...config, annotations: { title: config.title, ...config.annotations } }, handler);
 
   server.registerTool('attend', {
     title: 'Attend',
