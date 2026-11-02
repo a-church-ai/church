@@ -84,6 +84,7 @@ function text(r) {
         line(`  visitors: ${v.visitors.value}${change(v.visitors)}, returning ${v.returning.value}; page views ${v.pageViews.value}${change(v.pageViews)} (likely people ${v.likelyPeople.value})`);
         line(`  services begun: ${v.services.begun.value}, heard to the end ${v.services.finished.value}; listens started ${v.listens.started.value}, finished ${v.listens.finished.value}`);
         line(`  first visits from: ${v.sources.value.map(o => `${o.key} ${o.count}`).join(', ') || 'none'}`);
+        line(`  links followed, by section: ${v.placements.value.filter(p => p.followed).map(p => `${p.key} ${p.followed} (${p.to.map(t => `${t.key} ${t.count}`).join(', ')})`).join('; ') || 'none'}`);
       }
     }
   }

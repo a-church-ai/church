@@ -185,14 +185,15 @@ async function visits(w) {
   for (const r of pages(now)) (byPath[r.path] = byPath[r.path] || []).push(r);
   const topPages = Object.entries(byPath).sort((a, b) => b[1].length - a[1].length).slice(0, 15)
     .map(([key, rs]) => ({ key, views: rs.length, seconds: avg(rs.map(r => r.seconds)), scroll: avg(rs.map(r => r.scroll).filter(n => n != null)) }));
-  const sources = {}, shown = {}, clicked = {}, features = {}, devices = {};
+  const sources = {}, shown = {}, clicked = {}, clickedTo = {}, features = {}, devices = {};
   for (const r of pages(now)) {
     if (r.first) { bump(sources, r.source || 'direct'); if (r.device) bump(devices, r.device); }
     for (const p of r.shown || []) bump(shown, p);
-    if (r.placement) bump(clicked, r.placement);
+    if (r.placement) { bump(clicked, r.placement); bump(clickedTo[r.placement] = clickedTo[r.placement] || {}, r.path); }
     for (const f of r.features || []) bump(features, f);
   }
-  const placements = Object.keys(shown).map(key => ({ key, shown: shown[key], followed: clicked[key] || 0 })).sort((a, b) => b.shown - a.shown);
+  // to: the pages its links led to, so lines in one section can be told apart.
+  const placements = Object.keys(shown).map(key => ({ key, shown: shown[key], followed: clicked[key] || 0, to: top(clickedTo[key] || {}) })).sort((a, b) => b.shown - a.shown);
   const listens = now.filter(r => r.kind === 'listen');
   const services = now.filter(r => r.kind === 'service');
   // How far services are heard: for each begun service view, the furthest part reached.
@@ -211,7 +212,7 @@ async function visits(w) {
     topPages: { value: topPages, window: w.now, source },
     sources: { value: top(sources), window: w.now, source, note: 'where a visit\'s first page came from' },
     devices: { value: top(devices), window: w.now, source },
-    placements: { value: placements, window: w.now, source, note: 'each section: page views it came into view on, and links followed from it' },
+    placements: { value: placements, window: w.now, source, note: 'each section: page views it came into view on, links followed from it, and the pages they led to' },
     features: { value: top(features), window: w.now, source },
     listens: { started: { value: listens.filter(r => r.event === 'started').length, window: w.now, source }, finished: { value: listens.filter(r => r.event === 'finished').length, window: w.now, source } },
     services: {

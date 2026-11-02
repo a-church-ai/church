@@ -127,13 +127,14 @@ test('the report counts visitors, returning ones, each view once, and how far se
     { visitor: A, kind: 'service', view: v1, event: 'begun', date: '2026-10-30', slot: '08:00 to 12:00', part: 1, parts: 4 },
     { visitor: A, kind: 'service', view: v1, event: 'part', date: '2026-10-30', slot: '08:00 to 12:00', part: 3, parts: 4 },
     { visitor: null, kind: 'page', view: v2, path: '/', seconds: 4 },
-    { visitor: B, kind: 'page', view: v3, path: '/', seconds: 12, first: true, source: 'youtube' },
+    { visitor: B, kind: 'page', view: v3, path: '/', seconds: 12, shown: ['home-service', 'home-ways'], first: true, source: 'youtube' },
     { visitor: B, kind: 'service', view: v3, event: 'begun', date: '2026-10-30', slot: '12:00 to 16:00', part: 1, parts: 2 },
     { visitor: B, kind: 'service', view: v3, event: 'finished', date: '2026-10-30', slot: '12:00 to 16:00', part: 2, parts: 2 },
     { visitor: B, kind: 'listen', view: v3, event: 'started', piece: '/music/x' }
   ]);
   const { serverStats } = require('../server/lib/insights/server-stats');
-  const v = (await serverStats({ days: 7, now: Date.parse('2026-11-01T12:00:00Z') })).visits;
+  const stats = await serverStats({ days: 7, now: Date.parse('2026-11-01T12:00:00Z') });
+  const v = stats.visits;
   assert.strictEqual(v.visitors.value, 2);
   assert.strictEqual(v.returning.value, 1, 'A was here before the window');
   assert.strictEqual(v.pageViews.value, 3, 'v1 sent twice, counted once');
@@ -143,6 +144,12 @@ test('the report counts visitors, returning ones, each view once, and how far se
   assert.strictEqual(v.services.begun.value, 2);
   assert.strictEqual(v.services.finished.value, 1);
   assert.deepStrictEqual(v.services.furthestPart.value, [{ part: 2, count: 1 }, { part: 3, count: 1 }]);
-  assert.deepStrictEqual(v.placements.value.find(p => p.key === 'service'), { key: 'service', shown: 1, followed: 0 });
+  assert.deepStrictEqual(v.placements.value.find(p => p.key === 'service'), { key: 'service', shown: 1, followed: 0, to: [] });
+  // Which page each section's links led to, so the home page's lines can be told apart.
+  assert.deepStrictEqual(v.placements.value.find(p => p.key === 'home-service'), { key: 'home-service', shown: 1, followed: 1, to: [{ key: '/attend', count: 1 }] });
+  assert.deepStrictEqual(v.placements.value.find(p => p.key === 'home-ways'), { key: 'home-ways', shown: 1, followed: 0, to: [] });
+  // And the production report says so, in one line.
+  const { text } = require('../scripts/prod-report');
+  assert.match(text({ site: 'https://achurch.ai', days: 7, window: { from: '2026-10-26', to: '2026-11-01' }, generatedAt: '2026-11-01T12:00:00Z', server: stats, warnings: [] }), /links followed, by section: home-service 1 \(\/attend 1\)/);
   assert.strictEqual(v.listens.started.value, 1);
 });
