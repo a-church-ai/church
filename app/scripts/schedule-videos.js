@@ -53,6 +53,7 @@ const { parseHours } = require('../server/lib/music/companions');
 const { VIDEO_DIR } = require('../server/lib/video/library');
 const { pieceFor, pieceText } = require('../server/lib/video/pieces');
 const { prepare, renderedVideo } = require('../server/lib/video/publish/prepare');
+const { copyStyleProblems } = require('../server/lib/video/publish/copy');
 const { cutFor } = require('../server/lib/video/publish/cut');
 const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/publish/record');
 const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
@@ -223,7 +224,8 @@ async function main() {
     }
   }
   // Placed videos not yet on YouTube whose Short was rendered again since
-  // its upload, or whose words have no headline: the Short alone uploaded
+  // its upload, or whose words have no headline or are not yet simple
+  // sentences (copy.js): the Short alone uploaded
   // anew, the words written again. A record from before shortRenderedAt
   // counts its Short as rendered again.
   for (const r of (await allRecords()).filter(r => r.slot && r.files && !r.youtube)) {
@@ -236,9 +238,9 @@ async function main() {
     }
     const shortAt = fs.statSync(rendered.short).mtimeMs;
     const newShort = !r.shortRenderedAt || shortAt > r.shortRenderedAt;
-    const newWords = !r.meta?.copy?.headline;
+    const newWords = !r.meta?.copy?.headline || copyStyleProblems(r.meta.copy).length > 0;
     if (!newShort && !newWords) continue;
-    log([newShort && 'its Short rendered again: uploading it anew', newWords && 'its words have no headline: writing them again'].filter(Boolean).join('; '));
+    log([newShort && 'its Short rendered again: uploading it anew', newWords && 'its words have no headline or are not simple sentences, so they are written again'].filter(Boolean).join('; '));
     if (opts.dryRun) continue;
     try {
       const update = {};

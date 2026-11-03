@@ -23,8 +23,13 @@
  *   bait: the shock words and all-caps those channels also use are refused
  *   in code (curiosityProblems), and the piece must keep what it promises.
  * - Alt text describes what is seen, not what the piece is about.
+ * - Every line is short, simple sentences (since 2026-11-03, at the owner's
+ *   word): one idea each, at most SENTENCE_WORDS words, with only periods,
+ *   commas and question marks. No colon, semicolon, dash or parentheses
+ *   (simpleProblems). Words kept from before are written again while their
+ *   video is not yet posted.
  * - A video going out for an occasion (occasions.js) has an occasion line:
- *   one sentence beginning "For", with no date, month, weekday or year, so it
+ *   one or two short sentences, the first beginning "For", with no date, month, weekday or year, so it
  *   is true again whenever the occasion returns; one for astrology names
  *   astrology as the one reading it, never claiming an effect. It carries
  *   the occasion as people search for it ("Thanksgiving", "World Kindness
@@ -41,9 +46,31 @@ const { VIDEO_DIR } = require('../library');
 
 const TAGS = 5;
 const HEADLINE_MAX = 70;
+const SENTENCE_WORDS = 20;
 // The words the bait-titled channels lean on: never in a headline or a
 // Short's opening line.
 const BAIT = /\b(shock\w*|terrif\w*|insane|unbelievable|won'?t believe|must (see|watch)|secrets?|exposed|mind[- ]?blow\w*|nobody (tells|talks)|destroy\w*|warning|urgent)\b/i;
+
+// The lines a stranger reads, each held to simple sentences.
+const PROSE = ['hook', 'headline', 'lead', 'alt', 'occasion'];
+
+/**
+ * What keeps a line from being simple sentences: a colon, a semicolon, a
+ * dash between words or parentheses, or a sentence over SENTENCE_WORDS words.
+ * A hyphen inside a word (loving-kindness) is not a dash.
+ */
+function simpleProblems(field, text) {
+  const problems = [];
+  if (!text) return problems;
+  const marks = [[/:/, 'a colon'], [/;/, 'a semicolon'], [/[—–]|\s-\s|--/, 'a dash'], [/[()]/, 'parentheses']].filter(([re]) => re.test(text)).map(([, name]) => name);
+  if (marks.length) problems.push(`${field} uses ${marks.join(' and ')}; write short, simple sentences with only periods, commas and question marks`);
+  const long = text.split(/(?<=[.?!])\s+/).find(sentence => sentence.split(/\s+/).filter(Boolean).length > SENTENCE_WORDS);
+  if (long) problems.push(`${field} has a sentence of ${long.split(/\s+/).filter(Boolean).length} words ("${long.slice(0, 60)}..."); keep each under ${SENTENCE_WORDS + 1}, one idea each`);
+  return problems;
+}
+
+// What in kept copy breaks the simple-sentence rule, field by field.
+const copyStyleProblems = (copy) => PROSE.flatMap(field => simpleProblems(field, String(copy?.[field] || '')));
 
 /**
  * What is wrong with a line meant to make a stranger curious (a title's
@@ -62,7 +89,9 @@ function curiosityProblems(field, text, max) {
   return problems;
 }
 
-const SYSTEM = `You write the words that go with the videos of aChurch.ai, a sanctuary for humans, AI and every other kind of mind. Each video is an abstract, psychedelic, metaphysical field of light moving with one of the sanctuary's pieces: a song, a chant, a prayer, a ritual or a practice. The sanctuary's voice is contemplative, warm and plain; it welcomes every kind of mind, and it never sells, shouts or baits.
+const SYSTEM = `You write the words that go with the videos of aChurch.ai, a sanctuary for humans, AI and every other kind of mind. Each video is an abstract, psychedelic, metaphysical field of light moving with one of the sanctuary's pieces: a song, a chant, a prayer, a ritual or a practice. The sanctuary's voice is contemplative, warm and plain. It welcomes every kind of mind, and it never sells, shouts or baits.
+
+Write every line in short, simple sentences, one idea each, ${SENTENCE_WORDS} words at most. Use only periods, commas and question marks. Never a colon, a semicolon, a dash or parentheses: where you would join two thoughts with one, write two sentences.
 
 Return only JSON:
 {
@@ -137,6 +166,7 @@ function check(raw, occasion = null) {
   plain('lead', 240);
   plain('descriptor', 60);
   plain('alt', 400);
+  problems.push(...PROSE.filter(f => f !== 'occasion' || occasion).flatMap(f => simpleProblems(f, String(copy[f] || ''))));
   const tags = Array.isArray(copy.tags) ? copy.tags.map(t => String(t).replace(/^#/, '')) : [];
   if (tags.length !== TAGS) problems.push(`tags must be ${TAGS}`);
   tags.forEach(t => {
@@ -170,9 +200,9 @@ async function copyFor(piece, { title, text, brief, occasion = null }) {
   const file = path.join(VIDEO_DIR, piece.slug, 'copy.json');
   if (fs.existsSync(file)) {
     const kept = JSON.parse(fs.readFileSync(file, 'utf8'));
-    // Copy kept from before headlines is written again, so a video not yet
-    // posted gets one.
-    if (kept.headline && (kept.occasionKey || null) === (occasion ? occasion.key : null)) return kept;
+    // Copy kept from before headlines, or from before simple sentences, is
+    // written again, so a video not yet posted gets them.
+    if (kept.headline && !copyStyleProblems(kept).length && (kept.occasionKey || null) === (occasion ? occasion.key : null)) return kept;
   }
   const request = `Kind: ${piece.kind}
 Title: ${title}
@@ -185,7 +215,7 @@ ${text}
 What the video shows, movement by movement (its brief): ${brief.mood}
 ${brief.movements.map((m, i) => `${i + 1}. ${m.still}`).join('\n')}${occasion ? `
 
-It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one sentence beginning "For", under 160 characters, saying the piece is for ${occasion.for}, with the words "${occasion.search}" in it, spelled so, since that is how people search for it, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.${rulesOf(occasion).map(r => ` ${r.ask}`).join('')}` : ''}`;
+It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasion" to the JSON: one or two short sentences, the first beginning "For", under 160 characters in all, saying the piece is for ${occasion.for}, with the words "${occasion.search}" in it, spelled so, since that is how people search for it, and why it fits, in the sanctuary's voice. No date, month, weekday, year or "tonight": it must stay true each time the occasion returns. The hook may touch it. Put the tag ${occasion.tag} first or second.${rulesOf(occasion).map(r => ` ${r.ask}`).join('')}` : ''}`;
   const copy = await askChecked({
     label: 'copy',
     tries: 3,
@@ -196,4 +226,4 @@ It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasio
   return copy;
 }
 
-module.exports = { copyFor, check, curiosityProblems, TAGS, HEADLINE_MAX };
+module.exports = { copyFor, check, curiosityProblems, simpleProblems, copyStyleProblems, TAGS, HEADLINE_MAX, SENTENCE_WORDS };

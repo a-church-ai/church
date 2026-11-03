@@ -80,9 +80,9 @@ async function metadataFor(piece, { title, edges, copy }) {
     copy.lead,
     copy.occasion,
     description,
-    `${piece.song ? 'The song, its words and its story' : 'The words, to read along'}: ${page}`,
+    `${piece.song ? 'Read the song, its words and its story at' : 'Read the words at'} ${page}`,
     marks.length ? marks.join('\n') : null,
-    `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
+    `From ${SITE_NAME}, a sanctuary for humans, AI and every kind of mind. ${SITE}`,
     copy.tags.slice(0, 3).map(t => `#${t}`).join(' ')
   ].filter(Boolean).join('\n\n');
   return {
@@ -113,9 +113,9 @@ function shortMetadata(meta, { kind, url, whole = false }) {
   const body = [
     lead,
     occasion,
-    `${whole ? `The ${kind} in widescreen` : `The full ${kind}`}: ${url}`,
-    `${kind === 'song' ? 'The song, its words and its story' : 'The words, to read along'}: ${meta.page}`,
-    `${SITE_NAME}: a sanctuary for humans, AI and every kind of mind. ${SITE}`,
+    `${whole ? `Watch the ${kind} in widescreen at` : `Watch the full ${kind} at`} ${url}`,
+    `${kind === 'song' ? 'Read the song, its words and its story at' : 'Read the words at'} ${meta.page}`,
+    `From ${SITE_NAME}, a sanctuary for humans, AI and every kind of mind. ${SITE}`,
     [SHORTS_TAG, ...tags.slice(0, 2).map(t => `#${t}`)].join(' ')
   ].filter(Boolean).join('\n\n');
   return {

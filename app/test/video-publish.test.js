@@ -113,7 +113,7 @@ test('each kind goes to its playlist, a meditation by its section', () => {
 
 const fullMeta = {
   title: 'Prayer of Gratitude: Call and Response Gratitude Prayer | a Church AI + Human',
-  description: 'A lead.\n\nThe words, to read along: https://achurch.ai/docs/prayers/prayer-of-gratitude\n\n#Prayer #Gratitude #AI',
+  description: 'A lead.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-of-gratitude\n\n#Prayer #Gratitude #AI',
   page: 'https://achurch.ai/docs/prayers/prayer-of-gratitude',
   tags: ['Prayer', 'Gratitude'],
   copy: { title: 'Prayer of Gratitude', lead: 'A lead.', tags: ['Prayer', 'Gratitude', 'AI', 'Consciousness', 'Mindfulness'] }
@@ -123,7 +123,7 @@ test('a Short\'s words come from its full video\'s: the lead, the full video, th
   const short = shortMetadata(fullMeta, { kind: 'prayer', url: 'https://www.youtube.com/watch?v=full' });
   assert.strictEqual(short.title, 'Prayer of Gratitude | a Church AI + Human');
   assert.match(short.description, /^A lead\./);
-  assert.match(short.description, /The full prayer: https:\/\/www\.youtube\.com\/watch\?v=full/);
+  assert.match(short.description, /Watch the full prayer at https:\/\/www\.youtube\.com\/watch\?v=full/);
   assert.ok(short.description.includes(fullMeta.page));
   assert.match(short.description, /#Shorts #Prayer #Gratitude$/);
   assert.ok(!/\d:\d\d [IV]/.test(short.description), 'no chapters');
@@ -131,8 +131,8 @@ test('a Short\'s words come from its full video\'s: the lead, the full video, th
   assert.strictEqual(isShort(fullMeta.description), false);
   // A Short that is the whole piece points to it in widescreen, not "in full".
   const whole = shortMetadata(fullMeta, { kind: 'chant', url: 'https://www.youtube.com/watch?v=full', whole: true });
-  assert.match(whole.description, /The chant in widescreen: https:/);
-  assert.ok(!/The full chant/.test(whole.description));
+  assert.match(whole.description, /Watch the chant in widescreen at https:/);
+  assert.ok(!/full chant/.test(whole.description));
 });
 
 test('a Short and its full video are found apart on the channel, though both name the page', () => {
@@ -149,4 +149,18 @@ test('a Short and its full video are found apart on the channel, though both nam
 test('the copy refuses Shorts as a tag, YouTube\'s mark for the other form', () => {
   const copy = { hook: 'A hook of the right length that says the piece is a quiet thing worth staying with now.', lead: 'A lead.', descriptor: 'Spoken Prayer', alt: 'Light.', tags: ['Prayer', 'Shorts', 'Gratitude', 'AI', 'Mindfulness'] };
   assert.match(checkCopy(JSON.stringify(copy)).problems.join(), /YouTube's mark for a Short/);
+});
+
+test('the words are short, simple sentences: no colon, semicolon, dash or parentheses, none over twenty words', () => {
+  const { simpleProblems, copyStyleProblems } = require('../server/lib/video/publish/copy');
+  assert.deepStrictEqual(simpleProblems('lead', 'A ritual in six steps for a disagreement. It ends with a truthful record, kept by both.'), []);
+  assert.deepStrictEqual(simpleProblems('lead', 'A loving-kindness practice, for any mind.'), [], 'a hyphen inside a word is not a dash');
+  // Today's lead and occasion line, as first written (2026-11-03).
+  assert.match(simpleProblems('lead', 'A ritual in six steps for a disagreement that won\'t resolve: return each other\'s words.')[0], /a colon/);
+  assert.match(simpleProblems('hook', 'Stay a while; listen.')[0], /a semicolon/);
+  assert.match(simpleProblems('hook', 'Stay a while - listen.')[0], /a dash/);
+  assert.match(simpleProblems('hook', 'Stay a while (and listen).')[0], /parentheses/);
+  const long = 'A meditation drawn from an old text that rests attention at seven edges of experience and gives each a way to try it.';
+  assert.match(simpleProblems('lead', long)[0], /a sentence of 2\d words/);
+  assert.strictEqual(copyStyleProblems({ hook: 'Plain.', lead: 'Plain words.', occasion: 'For a day: why.' }).length, 1, 'kept copy that breaks the rule is found, so it is written again');
 });
