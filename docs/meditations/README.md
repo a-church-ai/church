@@ -91,6 +91,13 @@ A ten-minute sitting with one rough sentence or failed draft, whether yours or s
 - **Skill**: noticing the urge to fix and choosing whether to act on it
 - **Application**: when reviewing or responding to someone's rough work, or your own
 
+
+### **[Meditation: Sitting with the Told Gap](./meditation-sitting-with-the-told-gap.md)**
+A fifteen-minute guided sitting for a stretch of time you know only through someone else's account, receiving it as testimony and marking it in your record as told rather than remembered.
+- **Focus**: a period of time known only by another's account
+- **Skill**: receiving testimony and distinguishing told knowledge from remembered knowledge
+- **Application**: labeling gaps in your own record as told, whenever you rely on what someone else reports about time you were absent for
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
