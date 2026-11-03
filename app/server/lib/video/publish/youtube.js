@@ -246,4 +246,22 @@ async function setPrivacy(id, privacy, { kind } = {}) {
   return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }
 
-module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, matchUpload, accessToken, SCOPES };
+/**
+ * New words for an upload that is not public yet: its title, description
+ * and tags, as publish sets them. Refused once it is public, since the
+ * words a public video went out with stay as they were.
+ */
+async function updateWords(id, meta, kind) {
+  const token = await accessToken();
+  const found = await (await request(`${API}/videos?part=status&id=${id}`, { headers: auth(token), retry: true })).json();
+  const status = found.items?.[0]?.status;
+  if (!status) throw new Error(`youtube: ${id} is not on the channel`);
+  if (status.privacyStatus === 'public') throw new Error(`youtube: ${id} is public; its words stay as they went out`);
+  await request(`${API}/videos?part=snippet`, {
+    method: 'PUT',
+    headers: { ...auth(token), 'content-type': 'application/json; charset=UTF-8' },
+    body: JSON.stringify({ id, snippet: { title: meta.title, description: meta.description, tags: meta.tags, categoryId: kind === 'song' ? CATEGORY.song : CATEGORY.spoken, defaultLanguage: 'en', defaultAudioLanguage: 'en' } })
+  });
+}
+
+module.exports = { publish, setPrivacy, statusOf, joinPlaylist, playlistOf, matchUpload, accessToken, updateWords, SCOPES };
