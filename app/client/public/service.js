@@ -213,7 +213,11 @@
   // ------------------------------------------------------------------
   // A door: the service of the hour, named, leading to its page.
 
+  // The service it last named, for a redraw when something else starts.
+  let doorService = null;
   function doors(service) {
+    if (service) doorService = service;
+    else service = doorService;
     const player = root.achurchPlayer;
     const playing = player && !player.paused && player.queue;
     document.querySelectorAll('[data-service-door]').forEach(door => {
@@ -263,6 +267,15 @@
     });
     // The page's own refresh, ended when the page is left (site-nav.js).
     if (panels.length && page) page.whileSeen(600000, () => refresh(panels, page));
+    // A door drawn while a service played said "Now playing" and kept saying
+    // it after a page's own recording started in its place (2026-11-03).
+    // Whatever starts, the door is drawn again.
+    if (hasDoor) {
+      const opts = page ? { signal: page.signal } : undefined;
+      root.addEventListener('achurch:listen', event => {
+        if (event.detail && event.detail.event === 'started') doors(null);
+      }, opts);
+    }
   }
 
   root.achurchService = { load, mount, doors };
