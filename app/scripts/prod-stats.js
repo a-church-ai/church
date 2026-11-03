@@ -267,6 +267,21 @@ async function youtube(days, now) {
   const videos = (await report({ dimensions: 'video', metrics: 'views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,subscribersGained', sort: '-views', maxResults: '50' }))
     .map(v => ({ ...v, ...(byId.get(v.video) || { slug: null, form: null }) }));
   const out = { videos: { value: videos, window: w, source } };
+  // A video that isn't a release (the channel's intro, the old live stream,
+  // the first music videos) is named by its YouTube title, one read of
+  // videos.list for all of them (1 unit of quota), rather than shown as "?".
+  const unknown = videos.filter(v => !v.slug);
+  if (unknown.length) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${new URLSearchParams({ part: 'snippet', id: unknown.map(v => v.video).join(','), maxResults: '50' })}`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30000) });
+      const body = await res.json();
+      if (!res.ok) throw new Error((body.error && body.error.message) || `answered ${res.status}`);
+      for (const item of body.items || []) {
+        const v = unknown.find(x => x.video === item.id);
+        if (v) Object.assign(v, { title: item.snippet.title, form: 'other' });
+      }
+    } catch (err) { out.videos.titles = { error: `could not name the videos that are not releases: ${err.message}` }; }
+  }
   try { out.searchTerms = { value: await report({ dimensions: 'insightTrafficSourceDetail', filters: 'insightTrafficSourceType==YT_SEARCH', metrics: 'views', sort: '-views', maxResults: '25' }), window: w, source: `${source}: views from YouTube search, by the words searched` }; } catch (err) { out.searchTerms = { error: err.message }; }
   try { out.trafficSources = { value: await report({ dimensions: 'insightTrafficSourceType', metrics: 'views,estimatedMinutesWatched', sort: '-views' }), window: w, source }; } catch (err) { out.trafficSources = { error: err.message }; }
   return out;

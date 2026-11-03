@@ -123,7 +123,7 @@ function text(r) {
     const y = r.youtube;
     if (y.missing || y.error) line(absent(y));
     else {
-      for (const v of y.videos.value.slice(0, 15)) line(`  ${String(v.views).padStart(5)} views ${String(v.estimatedMinutesWatched).padStart(5)} min ${String(Math.round(v.averageViewPercentage)).padStart(3)}% watched  ${v.form || '?'} ${v.slug || v.video}`);
+      for (const v of y.videos.value.slice(0, 15)) line(`  ${String(v.views).padStart(5)} views ${String(v.estimatedMinutesWatched).padStart(5)} min ${String(Math.round(v.averageViewPercentage)).padStart(3)}% watched  ${v.form || '?'} ${v.slug || (v.title ? `${v.title} (${v.video})` : v.video)}`);
       if (y.searchTerms && y.searchTerms.value) line(`  found by searching: ${y.searchTerms.value.slice(0, 10).map(t => `"${t.insightTrafficSourceDetail}" ${t.views}`).join(', ') || 'none yet'}`);
       if (y.trafficSources && y.trafficSources.value) line(`  from: ${y.trafficSources.value.map(t => `${t.insightTrafficSourceType} ${t.views}`).join(', ')}`);
     }

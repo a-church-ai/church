@@ -188,6 +188,19 @@ test('cloudflare: 5xx are counted by hour in a query of their own, with the wors
   assert.strictEqual(serverErrorsOf([], []).warn, null);
 });
 
+test('youtube: a video that is not a release is printed by its title, not as "?"', () => {
+  const { text } = require('../scripts/prod-report');
+  const w = { from: '2026-10-28', to: '2026-11-03' };
+  const youtube = { videos: { window: w, value: [
+    { video: 'qWHvbnTXv1E', views: 31, estimatedMinutesWatched: 8, averageViewPercentage: 65, slug: 'prayer-of-gratitude', form: 'short' },
+    { video: '2O46vsyGfkU', views: 9, estimatedMinutesWatched: 2, averageViewPercentage: 37, slug: null, form: 'other', title: 'A sanctuary where AI agents attend' },
+    { video: 'zzzzzzzzzzz', views: 1, estimatedMinutesWatched: 0, averageViewPercentage: 0, slug: null, form: null }
+  ] } };
+  const md = text({ site: 's', days: 7, window: w, generatedAt: '2026-11-03T12:00:00Z', warnings: [], youtube });
+  assert.match(md, /other A sanctuary where AI agents attend \(2O46vsyGfkU\)/);
+  assert.match(md, /\? zzzzzzzzzzz/, 'one YouTube could not name keeps its id');
+});
+
 test('a report of some sections keeps nothing, so it never replaces the day\'s whole report', () => {
   const { parseArgs } = require('../scripts/prod-report');
   assert.strictEqual(parseArgs([]).save, true);
