@@ -90,6 +90,16 @@ test('an internal category\'s document goes to its file on GitHub, and one that 
   assert.strictEqual(canonicalTarget('/docs/contributing'), null, 'the guide to contributing writing is a Library page');
 });
 
+test('an address read with the Markdown after it goes to the address', () => {
+  assert.strictEqual(canonicalTarget('/api/music):'), '/api/music');
+  assert.strictEqual(canonicalTarget('/church-music):'), '/church-music');
+  assert.strictEqual(canonicalTarget('/podcasts/meditations/feed.xml)'), '/podcasts/meditations/feed.xml');
+  assert.strictEqual(canonicalTarget('/listen).'), '/attend', 'and on to where the page moved, in one step');
+  assert.strictEqual(canonicalTarget('/api/music'), null);
+  assert.strictEqual(canonicalTarget('/6).map(function(r'), null, 'a ")" inside a path is left alone');
+  assert.strictEqual(canonicalTarget('//evil.example):'), null);
+});
+
 test('never a redirect to another host built from the path', () => {
   for (const p of ['//evil.example/', '/\\evil.example/', '/app/client/public//evil.example']) {
     assert.strictEqual(canonicalTarget(p), null, p);

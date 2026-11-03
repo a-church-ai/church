@@ -18,6 +18,8 @@
  *   - a song under its old address (/reflections/:slug is /music/:slug: the
  *     songs lived under /reflections until 2026-10-23, named for the
  *     reflections their pages began as)
+ *   - an address read with the Markdown or prose after it (/api/music): is
+ *     /api/music, 2026-11-03)
  *   - a repository file, linked from the repository and resolved against the
  *     site (/CONTRIBUTING.md is on GitHub, /app/client/public/robots.txt is
  *     /robots.txt when the site serves that file)
@@ -207,6 +209,12 @@ function step(pathname) {
   // Never a target that starts //, which a browser reads as another host.
   if (/^\/[\/\\]/.test(pathname)) return null;
   let p = pathname;
+  // An address read with the Markdown around it: llms.txt's
+  // "[Music Catalog](https://achurch.ai/api/music): ..." fetched as
+  // /api/music): (Cloudflare, 2026-10-28 to 11-03: /api/music): 9,
+  // /church-music): 3, a podcast feed 1). No page here ends in ")".
+  const copied = /^(\/.*?)\)[:.,;]?$/.exec(p);
+  if (copied) p = copied[1];
   if (p.length > 1 && p.endsWith('/') && !KEEP_SLASH.test(p)) p = p.replace(/\/+$/, '') || '/';
 
   if (MOVED[p]) return MOVED[p];
