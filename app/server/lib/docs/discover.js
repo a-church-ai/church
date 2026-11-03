@@ -261,6 +261,12 @@ function sectionTitle(name) {
   return sectionTitles.get(name);
 }
 
+// What a folder is called on its page ("In Prayers", "About Prayers") and in
+// its markdown: a section by its README's title, a subfolder by its name.
+function sectionLabel(dir) {
+  return dir.includes('/') ? titleCase(dir.split('/').pop()) : sectionTitle(dir);
+}
+
 // The served sections, in shelf order, each with every document in it
 // (subfolders and READMEs included; callers choose what they list).
 async function listSections() {
@@ -326,6 +332,7 @@ module.exports = {
   hrefOf,
   docByHref,
   sectionTitle,
+  sectionLabel,
   SHELVES,
   SECTION_ORDER,
   NOINDEX_CATEGORIES,

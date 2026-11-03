@@ -48,14 +48,20 @@ ${ns.waysIn(SITE_URL).map(s => `- [${s.action}](${s.url}) (${s.method}${s.body ?
 
 // A document's markdown with absolute links, and where it is. A section's
 // README also lists every document in that section, so nothing is reachable
-// only by guessing.
+// only by guessing, under the headings its page gives them: the README under
+// "About <section>" and the list under "In <section>" (render.js
+// renderSectionPage). The readiness audit compares a page's headings with its
+// markdown's, and the copy of /docs/playlists lacked those two (2026-11-03).
 async function servedMarkdown(resolved) {
-  const markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath).trimEnd();
+  let markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath).trimEnd();
   const { doc } = resolved;
-  const inSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath
+  const isSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath;
+  const inSection = isSection
     ? (await servedDocs(d => d.dirRelPath === doc.dirRelPath)).sort((a, b) => byName(a.title, b.title))
     : [];
-  const list = inSection.length ? `\n\n## Every document in this section\n\n${inSection.map(listLine).join('\n')}` : '';
+  const label = isSection ? discover.sectionLabel(doc.dirRelPath) : '';
+  if (isSection) markdown = markdown.replace(/^(# .+\n)/m, `$1\n## About ${label}\n`);
+  const list = inSection.length ? `\n\n## In ${label}\n\n${inSection.map(listLine).join('\n')}` : '';
   return `${markdown}${list}\n\n---\n\n${WHERE_THIS_IS}`;
 }
 

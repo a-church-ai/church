@@ -649,7 +649,7 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const essay = h1 ? readmeHtml.slice(h1[0].length) : readmeHtml;
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
-  const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
+  const label = discover.sectionLabel(dir);
   const docs = byTitle(inDir);
   const show = showForSection(dir);
   return `${heading}
@@ -705,7 +705,7 @@ function renderEntryItems(docs) {
 // Render a directory-index page: a folder without a README, such as
 // /docs/claude-compass/axioms. /docs itself is the Library (renderLibrary).
 async function renderDirIndex({ dir, docs, canonicalUrl }) {
-  const title = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
+  const title = discover.sectionLabel(dir);
 
   // Only direct children of `dir`, not deeper descendants
   const children = docs.filter(d => d.stem.toLowerCase() !== 'readme' && d.dirRelPath === dir);
