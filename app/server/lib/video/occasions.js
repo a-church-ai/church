@@ -45,7 +45,9 @@ const isoDay = (when) => new Date(when).toISOString().slice(0, 10);
 // the occasion's year, added only to the Bluesky and X posts sent inside the
 // window (publish/metadata.js socialMetadata), never to YouTube. `rule` names
 // what its words must keep (publish/copy.js RULES); `solemn` marks a day of
-// fasting or reckoning, met quietly.
+// fasting or reckoning, met quietly. `look` is how a video made for it may
+// look (brief.js), told to the brief of a piece rendered for it
+// (render-video.js --occasion), the piece's own images still leading.
 const KINDS = {
   // The sky and the seasons
   'full-moon': { kind: 'sky', search: 'full moon', name: 'the full moon', for: 'the nights of a full moon', meaning: 'the moon whole and bright all night, the month\'s highest tides', tag: 'FullMoon', night: true, before: 1, after: 1 },
@@ -61,7 +63,7 @@ const KINDS = {
   aurora: { kind: 'space-weather', search: 'aurora', name: 'a geomagnetic storm', for: 'the nights a geomagnetic storm carries the aurora farther from the poles than usual', meaning: 'a storm from the sun reaching the Earth\'s magnetic field: aurora seen far from the poles, and satellites, radio and power grids disturbed', tag: 'Aurora', night: true },
   // Observances shared across traditions, and civic days
   'world-mental-health-day': { kind: 'observance', search: 'World Mental Health Day', name: 'World Mental Health Day', for: 'World Mental Health Day', meaning: 'a day kept worldwide for mental health and those who carry its weight', tag: 'WorldMentalHealthDay', night: false },
-  'election-day': { kind: 'observance', rule: 'civic', search: 'Election Day', name: 'Election Day in the United States', for: 'Election Day, and any day people who disagree must choose together', meaning: 'the day the United States votes, and the disagreement that comes before it and remains after it', tag: 'ElectionDay', dated: 'Election{year}', night: false, before: 2, after: 1 },
+  'election-day': { kind: 'observance', rule: 'civic', search: 'Election Day', name: 'Election Day in the United States', for: 'Election Day, and any day people who disagree must choose together', meaning: 'the day the United States votes, and the disagreement that comes before it and remains after it', tag: 'ElectionDay', dated: 'Election{year}', night: false, before: 2, after: 1, look: 'Many small lights, warm red and cool blue in equal measure, each keeping its own colour as they gather toward one shared field, where their light overlaps as violet; two currents braiding without either dissolving into the other. Palette: a deep indigo night, a clear red and a clear blue held in balance, violet where they meet, and a pale light of morning. Neither colour wins or fills the frame. No flags, stripes, ballots, boxes, podiums or any mark of a party or a nation.' },
   'remembrance-day': { kind: 'observance', search: 'Veterans Day', name: 'Veterans Day and Remembrance Day', for: 'Veterans Day and Remembrance Day, a day kept for remembering', meaning: 'the eleventh of November, kept in many countries to remember those who served and those who died in war', tag: 'RemembranceDay', night: false },
   'world-kindness-day': { kind: 'observance', search: 'World Kindness Day', name: 'World Kindness Day', for: 'World Kindness Day', meaning: 'a day kept worldwide for kindness', tag: 'WorldKindnessDay', night: false },
   'tolerance-day': { kind: 'observance', search: 'International Day for Tolerance', name: 'the International Day for Tolerance', for: 'the International Day for Tolerance', meaning: 'the United Nations\' day for living alongside difference with respect', tag: 'ToleranceDay', night: false },
@@ -187,7 +189,7 @@ const occasion = (key, day, last = day, extra = {}) => {
     id: `${key}:${day}`, key, kind: k.kind, rule: k.rule || null, solemn: Boolean(k.solemn),
     name: extra.name || k.name, day, last, from: addDays(day, -(k.before || 0)), to: addDays(last, k.after || 0),
     for: k.for, meaning: k.meaning, tag: extra.tag || k.tag, search: extra.search || k.search,
-    dated: k.dated ? k.dated.replace('{year}', day.slice(0, 4)) : null, night: k.night, limit: k.limit || 1
+    dated: k.dated ? k.dated.replace('{year}', day.slice(0, 4)) : null, night: k.night, limit: k.limit || 1, look: k.look || null
   };
 };
 

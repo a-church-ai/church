@@ -248,3 +248,20 @@ test('every kind has a window that stays near its day, and every tradition and d
     if (k.dated) assert.match(k.dated, /^[A-Z][A-Za-z]+\{year\}$/, `${key}: a dated tag`);
   }
 });
+
+test('a video rendered for an occasion is briefed with its look, the piece still leading; one without has none', () => {
+  const { occasionById } = require('../server/lib/video/occasions');
+  const { userMessage } = require('../server/lib/video/brief');
+  const election = occasionById('election-day:2026-11-03');
+  assert.ok(election.look, 'Election Day has a look');
+  // A civic day's look, like its words, favours no side.
+  assert.doesNotMatch(election.look, /\b(democrats?|republicans?|party's|candidates?|vote for)\b/i);
+  assert.match(election.look, /red/);
+  assert.match(election.look, /blue/);
+  const piece = { kind: 'ritual', title: 'T', text: 'words', seconds: 60, presets: [{ name: 'p', brightness: 0.5, motion: 0.05 }] };
+  const briefed = userMessage({ ...piece, occasion: election });
+  assert.ok(briefed.includes(election.look), 'the look is told to the brief');
+  assert.match(briefed, /Every still is still drawn from this piece/);
+  assert.doesNotMatch(userMessage(piece), /Occasion:/, 'no occasion, no occasion in the brief');
+  assert.strictEqual(occasionById('full-moon:2026-11-24') && occasionById('full-moon:2026-11-24').look, null, 'an occasion without a look says so');
+});

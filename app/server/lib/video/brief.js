@@ -84,7 +84,18 @@ ${shortlist.map(e => `${e.id} | mood of its video: ${e.mood} | palette ${e.palet
   motion: ${e.motion}`).join('\n')}`;
 }
 
-function userMessage({ kind, title, text, seconds, presets, sound, voices, grid, shortlist = [] }) {
+// The occasion a video is made for, as the brief reads it: the day's colours
+// and images join the kind's direction, and the piece still leads.
+function occasionOffered(occasion) {
+  if (!occasion) return '';
+  return `
+Occasion: this video goes out for ${occasion.for} (${occasion.meaning}).${occasion.look ? `
+Its look: ${occasion.look}` : ''}
+Let the occasion set the palette and colour the light of every movement, and let its images meet the piece's own where they truly do. Every still is still drawn from this piece, and the occasion's name, its symbols and any text never appear.
+`;
+}
+
+function userMessage({ kind, title, text, seconds, presets, sound, voices, grid, shortlist = [], occasion = null }) {
   const look = lookOf(kind);
   return `Kind: ${kind}
 Direction for a ${kind}: ${look.direction}
@@ -92,7 +103,7 @@ Ranges for a ${kind}: symmetry ${look.symmetry.join(' to ')}, milkdropOpacity ${
 Title: ${title}
 Length: ${Math.round(seconds)} seconds
 Heard as: ${textureOf(kind)}
-${soundOf({ sound, voices, grid })}
+${soundOf({ sound, voices, grid })}${occasionOffered(occasion)}
 The piece:
 """
 ${text}
@@ -203,6 +214,7 @@ async function writeBrief(piece, rules, shortlist = []) {
     check: check(piece.presets, rules, shortlist, piece.kind)
   });
   brief.kind = piece.kind;
+  if (piece.occasion) brief.occasion = piece.occasion.id;
   const offered = new Map(shortlist.map(e => [e.id, e]));
   brief.movements = brief.movements.map(m => (m.loop === undefined ? m : { loop: m.loop, reason: m.reason, still: offered.get(m.loop).still, motion: offered.get(m.loop).motion, preset: m.preset }));
   return brief;
@@ -258,4 +270,4 @@ ${made}`;
   });
 }
 
-module.exports = { writeBrief, restyleBrief, reuseRule, check, barsPerLoop, MOVEMENTS, MAX_REUSED };
+module.exports = { writeBrief, restyleBrief, reuseRule, check, barsPerLoop, userMessage, MOVEMENTS, MAX_REUSED };

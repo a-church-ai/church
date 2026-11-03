@@ -12,6 +12,9 @@
  *                                          its stills and loops kept, its presets, tints and mandala
  *                                          chosen anew (brief.js restyleBrief), then drawn again at no
  *                                          Omni cost
+ *   --occasion <id>                        brief each new video for an occasion (lib/video/occasions.js,
+ *                                          as key:day, e.g. election-day:2026-11-03): its colours and
+ *                                          images join the piece's own; a brief already written is kept
  *   --concurrency N                        pieces at once (default 2)
  *
  * Two pieces at once, because the stages use the machine differently: the
@@ -47,6 +50,7 @@ const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
 const { compose, baseFootage, titleCard, FPS } = require('../server/lib/video/compose');
 const { renderShort } = require('../server/lib/video/short');
+const { occasionById } = require('../server/lib/video/occasions');
 
 const OUT = library.VIDEO_DIR;
 // The recording the preset survey plays each preset against: a spoken
@@ -54,13 +58,17 @@ const OUT = library.VIDEO_DIR;
 const SURVEY_RECORDING = 'prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3';
 
 function parseArgs(argv) {
-  const opts = { slugs: [], surveyPresets: false, restyle: false, concurrency: 2 };
+  const opts = { slugs: [], surveyPresets: false, restyle: false, concurrency: 2, occasion: null };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--survey-presets') opts.surveyPresets = true;
     else if (arg === '--restyle') opts.restyle = true;
     else if (arg === '--concurrency') opts.concurrency = Number(argv[++i]);
-    else if (arg.startsWith('--')) throw new Error(`Unknown option ${arg}`);
+    else if (arg === '--occasion') {
+      const id = argv[++i];
+      opts.occasion = occasionById(id);
+      if (!opts.occasion) throw new Error(`--occasion: no occasion ${id}; give its key and day, e.g. election-day:2026-11-03`);
+    } else if (arg.startsWith('--')) throw new Error(`Unknown option ${arg}`);
     else opts.slugs.push(arg);
   }
   if (!(opts.concurrency >= 1)) throw new Error('--concurrency takes a positive number');
@@ -110,7 +118,7 @@ function oneEncodeAtATime(fn) {
   return turn;
 }
 
-async function render(piece, { restyle = false } = {}) {
+async function render(piece, { restyle = false, occasion = null } = {}) {
   const dir = path.join(OUT, piece.slug);
   fs.mkdirSync(dir, { recursive: true });
   const log = (m) => console.log(`[${piece.slug}] ${m}`);
@@ -124,8 +132,10 @@ async function render(piece, { restyle = false } = {}) {
   // A brief, once written, is the video's: the reuse rule holds when it is
   // written, not each time the video is rendered again.
   const briefFile = path.join(dir, 'brief.json');
+  if (fs.existsSync(briefFile) && occasion) log(`its brief is already written, so ${occasion.name} does not change its look; delete brief.json to brief it anew`);
   if (!fs.existsSync(briefFile)) {
-    const brief = await newBrief(piece, { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid }, log);
+    if (occasion) log(`briefed for ${occasion.name}`);
+    const brief = await newBrief(piece, { kind: piece.kind, title, text, seconds: analysis.seconds, sound, voices, grid, occasion }, log);
     fs.writeFileSync(briefFile, JSON.stringify(brief, null, 2));
     // The words describe the stills (copy.js), so a new brief has them
     // written again when the video is next placed or uploaded.
@@ -205,7 +215,7 @@ async function main() {
   let done = 0;
   await pool(pieces, opts.concurrency, async (piece) => {
     try {
-      await render(piece, { restyle: opts.restyle });
+      await render(piece, { restyle: opts.restyle, occasion: opts.occasion });
       done++;
     } catch (err) {
       console.error(`[${piece.slug}] failed: ${describeError(err)}`);
