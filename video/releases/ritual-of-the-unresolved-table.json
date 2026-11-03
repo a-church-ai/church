@@ -58,10 +58,13 @@
     "at": "2026-11-03T15:34:39.573Z",
     "id": "62tmBKvM0pA",
     "url": "https://www.youtube.com/watch?v=62tmBKvM0pA",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-03T21:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLcbEKLHGb6eA1NpoVzTn33ly1-zJZlUmb",
+      "title": "Church Rituals"
+    }
   },
   "short": {
     "at": "2026-11-03T15:40:57.911Z",
@@ -71,5 +74,10 @@
     "publishAt": "2026-11-03T22:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-03T21:45:35.366Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzgsqyqlaf24",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzgsqyqlaf24"
   }
 }
