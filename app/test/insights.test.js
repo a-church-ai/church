@@ -163,6 +163,31 @@ test('deploys: CI by workflow with its latest result, Railway by day, and a fail
   assert.match(md, /CRASHED 2026-11-01T12:00:00Z 1234567/);
 });
 
+test('cloudflare: 5xx are counted by hour in a query of their own, with the worst hour in the warning', () => {
+  const { serverErrorsOf, warnings } = require('../scripts/prod-stats');
+  const { text } = require('../scripts/prod-report');
+  const hour = (h, count, interval = 1) => ({ count, avg: { sampleInterval: interval }, dimensions: { datetimeHour: h } });
+  const byHour = [hour('2026-10-28T17:00:00Z', 60), hour('2026-10-28T18:00:00Z', 55), hour('2026-11-02T17:00:00Z', 2)];
+  const byPath = [
+    { count: 100, dimensions: { edgeResponseStatus: 502, clientRequestPath: '/' } },
+    { count: 3, dimensions: { edgeResponseStatus: 500, clientRequestPath: '/wp-login.php' } },
+    { count: 14, dimensions: { edgeResponseStatus: 503, clientRequestPath: '/api/search' } }
+  ];
+  const e = serverErrorsOf(byHour, byPath);
+  assert.strictEqual(e.value, 117);
+  assert.deepStrictEqual(e.peakHour, { hour: '2026-10-28T17:00:00Z', count: 60 });
+  assert.strictEqual(e.sampled, false);
+  assert.deepStrictEqual(e.top.map(p => p.path), ['/', '/api/search']);
+  const w = { from: '2026-10-27', to: '2026-11-02' };
+  const cloudflare = { notFound: { value: 0, probes: 0, top: [], window: w }, serverErrors: { ...e, window: w }, audioServed: { value: [] } };
+  assert.deepStrictEqual(warnings({ cloudflare }).map(x => x.warn), ['117 server errors in the window; the worst hour, 2026-10-28T17:00:00Z, had 60']);
+  const md = text({ site: 's', days: 7, window: w, generatedAt: '2026-11-03T07:00:00Z', warnings: [], cloudflare });
+  assert.match(md, /5xx by hour \(UTC, worst first\): 10-28 17h 60, 10-28 18h 55, 11-02 17h 2/);
+
+  assert.strictEqual(serverErrorsOf([hour('2026-11-01T00:00:00Z', 4, 10)], []).sampled, true);
+  assert.strictEqual(serverErrorsOf([], []).warn, null);
+});
+
 test('a report of some sections keeps nothing, so it never replaces the day\'s whole report', () => {
   const { parseArgs } = require('../scripts/prod-report');
   assert.strictEqual(parseArgs([]).save, true);

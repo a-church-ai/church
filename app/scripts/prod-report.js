@@ -111,6 +111,10 @@ function text(r) {
       line(`  404s: ${c.notFound.value} (${c.notFound.probes} of them probes); 5xx: ${c.serverErrors.value}, ${w(c.notFound)}`);
       for (const p of c.notFound.top.slice(0, 8)) line(`    404 ${p.count}  ${p.path}`);
       for (const p of c.serverErrors.top.slice(0, 8)) line(`    ${p.status} ${p.count}  ${p.path}`);
+      if (c.serverErrors.byHour) {
+        const busiest = [...c.serverErrors.byHour].sort((a, b) => b.count - a.count).slice(0, 5);
+        line(`  5xx by hour (UTC, worst first${c.serverErrors.sampled ? ', sampled' : ''}): ${busiest.map(h => `${h.hour.slice(5, 13).replace('T', ' ')}h ${h.count}`).join(', ') || 'none'}`);
+      }
       line(`  full listens' worth: ${c.audioServed.value.slice(0, 10).map(a => `${a.piece} ${a.fullListens}`).join(', ') || 'none'}`);
     }
   }

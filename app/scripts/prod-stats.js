@@ -14,7 +14,7 @@
  *               providers' own answers)
  *   probes      the live site's pages, feeds and API, status and time
  *   server      what only the server counts (GET /admin/api/insights)
- *   cloudflare  every 404 and 5xx by path, audio served per recording
+ *   cloudflare  every 404 by path, 5xx by hour and by path, audio served per recording
  *   youtube     each video's views, watch time and share watched, and the
  *               searches that found the channel
  *   bluesky     each post's likes, reposts and replies
@@ -204,11 +204,35 @@ async function cloudflare(days, now) {
     const known = sizes.get(path.basename(file));
     return { file, piece: known ? known.piece : null, requests: r.count, bytes: r.sum.edgeResponseBytes, fullListens: known && known.bytes ? Math.round((r.sum.edgeResponseBytes / known.bytes) * 10) / 10 : null };
   }).filter(r => r.piece).slice(0, 40);
+  // 5xx in queries of their own: in the list above, 404 rows filled the
+  // limit and hid 40% of them (2026-11-02: 126 counted, 212 served), and a
+  // week's total hid that 115 were one 75-minute outage on 10-28.
+  const errors = await cloudflareQuery(`query ($zone: String!, $from: Date!, $to: Date!) {
+    viewer { zones(filter: { zoneTag: $zone }) {
+      byHour: httpRequestsAdaptiveGroups(limit: 1000, filter: { date_geq: $from, date_leq: $to, edgeResponseStatus_geq: 500 }, orderBy: [datetimeHour_ASC]) {
+        count avg { sampleInterval } dimensions { datetimeHour }
+      }
+      byPath: httpRequestsAdaptiveGroups(limit: 1000, filter: { date_geq: $from, date_leq: $to, edgeResponseStatus_geq: 500 }, orderBy: [count_DESC]) {
+        count dimensions { edgeResponseStatus clientRequestPath }
+      } } } }`, { zone, from: w.from, to: w.to });
   return {
     notFound: { value: sum(r => r.dimensions.edgeResponseStatus === 404), probes: sum(r => r.dimensions.edgeResponseStatus === 404 && PROBE_PATH.test(r.dimensions.clientRequestPath)), top: listed(r => r.dimensions.edgeResponseStatus === 404), window: w, source },
-    serverErrors: { value: sum(r => r.dimensions.edgeResponseStatus >= 500), top: listed(r => r.dimensions.edgeResponseStatus >= 500), window: w, source, warn: sum(r => r.dimensions.edgeResponseStatus >= 500) ? 'server errors in the window' : null },
+    serverErrors: { ...serverErrorsOf(errors.viewer.zones[0].byHour, errors.viewer.zones[0].byPath), window: w, source: `${source}, 5xx only, by hour and by path` },
     audioServed: { value: listens, window: w, source: `${source}: bytes served per /audio/ file divided by its size (audio/manifest.json, audio/songs.json), so full listens' worth, podcasts and players alike` }
   };
+}
+
+// The window's 5xx: the total, each hour that had any (UTC), the worst
+// hour, and the paths. sampleInterval 1 means Cloudflare counted every
+// request; above it, the counts are estimates.
+function serverErrorsOf(byHour, byPath) {
+  const value = byHour.reduce((n, r) => n + r.count, 0);
+  const hours = byHour.filter(r => r.count > 0).map(r => ({ hour: r.dimensions.datetimeHour, count: r.count }));
+  const peak = hours.reduce((a, b) => (b.count > (a ? a.count : 0) ? b : a), null);
+  const sampled = byHour.some(r => r.avg && r.avg.sampleInterval > 1);
+  const top = byPath.filter(r => !PROBE_PATH.test(r.dimensions.clientRequestPath)).slice(0, 20).map(r => ({ path: r.dimensions.clientRequestPath, status: r.dimensions.edgeResponseStatus, count: r.count }));
+  const warn = value ? `${value} server errors in the window${peak ? `; the worst hour, ${peak.hour}, had ${peak.count}` : ''}` : null;
+  return { value, byHour: hours, peakHour: peak, sampled, top, warn };
 }
 
 // Each served audio file's size and piece, from the manifests.
@@ -418,4 +442,4 @@ function warnings(report) {
   return found;
 }
 
-module.exports = { prodStats, warnings, queue, occasionsUncovered, deploysOf, audioSizes, SCHEMA_VERSION, PROBES };
+module.exports = { prodStats, warnings, queue, occasionsUncovered, deploysOf, serverErrorsOf, audioSizes, SCHEMA_VERSION, PROBES };
