@@ -82,6 +82,7 @@ const FOOTER_LEGAL = [
   { url: '/terms', label: 'Terms' },
   { url: 'https://github.com/a-church-ai/church', label: 'AI Church Code' },
   { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
+  { url: 'https://www.tiktok.com/@a_church_ai_human', label: 'Church Shorts' },
   // Twitch suspended 2026-06-18. When reinstated:
   // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
 ];

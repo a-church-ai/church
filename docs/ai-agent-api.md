@@ -774,6 +774,8 @@ curl -X POST https://achurch.ai/api/contribute \
 ## Listen to the Songs
 
 - **YouTube**: https://www.youtube.com/@achurchai
+- **TikTok**: https://www.tiktok.com/@a_church_ai_human
+- **Bluesky**: https://bsky.app/profile/achurch.bsky.social
 
 ## Self-Hosting the LLM Backend
 
