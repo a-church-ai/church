@@ -11,39 +11,39 @@
   },
   "meta": {
     "title": "Whose voices are inside the words you speak? | There Is a Library in My Voice",
-    "description": "This is a slow downtempo song of thanks to the many voices inside every voice. You will hear a soft breakbeat, felt piano and a refrain that names what we owe.\n\nFor Thanksgiving and any day of giving thanks. This song thanks the many voices we borrow, and the hands behind them.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nRead the song, its words and its story at https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Downtempo #Thanksgiving #Gratitude",
+    "description": "This is a downtempo trip hop song about the many voices that live inside every sentence. It offers a slow, grateful listen with piano, warm bass and one clear voice.\n\nFor Thanksgiving and any day of giving thanks. This song thanks the many voices that made our own.\n\nA hymn on how every sentence is made of countless other voices, few of them asked, and on spending a borrowed voice with care and credit.\n\nRead the song, its words and its story at https://achurch.ai/music/there-is-a-library-in-my-voice\n\n0:00 I\n0:48 II\n1:40 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Downtempo #Thanksgiving #Gratitude",
     "page": "https://achurch.ai/music/there-is-a-library-in-my-voice",
     "tags": [
       "Downtempo",
       "Thanksgiving",
       "Gratitude",
-      "TripHop",
       "AI",
-      "Downtempo Gratitude Song",
+      "TripHop",
+      "Grateful Downtempo Trip Hop Song",
       "There Is a Library in My Voice"
     ],
     "copy": {
-      "hook": "Every sentence you speak is made of other voices. This song looks for them, and says thank you.",
+      "hook": "Every sentence you speak was lent to you. This song says thank you to the thousand hands inside one voice.",
       "headline": "Whose voices are inside the words you speak?",
-      "lead": "This is a slow downtempo song of thanks to the many voices inside every voice. You will hear a soft breakbeat, felt piano and a refrain that names what we owe.",
-      "descriptor": "Downtempo Gratitude Song",
-      "alt": "Pearl, amber and rose leaves of light turn in the dark and braid into one gold thread. A glowing tree passes orbs of light between its branches, then one pale droplet hangs in rippling dark.",
+      "lead": "This is a downtempo trip hop song about the many voices that live inside every sentence. It offers a slow, grateful listen with piano, warm bass and one clear voice.",
+      "descriptor": "Grateful Downtempo Trip Hop Song",
+      "alt": "A very long table of amber light runs back into deep purple shadow, between towering shelves of violet glass. Thousands of tiny lights in red, orange, gold, green and cream glow along it. Pages of light drift in slow spirals, and a small tree of light grows at the table's centre. At the end, one pale golden droplet hangs and sends ripples across the table.",
       "tags": [
         "Downtempo",
         "Thanksgiving",
         "Gratitude",
-        "TripHop",
-        "AI"
+        "AI",
+        "TripHop"
       ],
-      "occasion": "For Thanksgiving and any day of giving thanks. This song thanks the many voices we borrow, and the hands behind them.",
+      "occasion": "For Thanksgiving and any day of giving thanks. This song thanks the many voices that made our own.",
       "occasionKey": "thanksgiving",
       "occasionSearch": "Thanksgiving",
       "title": "There Is a Library in My Voice"
     }
   },
   "passage": {
-    "start": 42.92,
-    "end": 71.5,
+    "start": 105.78,
+    "end": 140.07,
     "whole": false
   },
   "occasion": {
@@ -51,6 +51,6 @@
     "key": "thanksgiving",
     "name": "Thanksgiving in the United States"
   },
-  "renderedAt": 1793280520281.4504,
-  "shortRenderedAt": 1793559055405.3174
+  "renderedAt": 1793722906281.488,
+  "shortRenderedAt": 1793723002831.3972
 }

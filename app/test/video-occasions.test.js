@@ -264,4 +264,6 @@ test('a video rendered for an occasion is briefed with its look, the piece still
   assert.match(briefed, /Every still is still drawn from this piece/);
   assert.doesNotMatch(userMessage(piece), /Occasion:/, 'no occasion, no occasion in the brief');
   assert.strictEqual(occasionById('full-moon:2026-11-24') && occasionById('full-moon:2026-11-24').look, null, 'an occasion without a look says so');
+  // A look names what it must never draw: no symbol, flag or figure of the day.
+  for (const key of Object.keys(KINDS).filter(k => KINDS[k].look)) assert.match(KINDS[key].look, /\bNo\b/, `${key}'s look says what it leaves out`);
 });
