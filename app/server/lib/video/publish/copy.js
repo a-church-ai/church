@@ -99,7 +99,7 @@ Return only JSON:
   "headline": "the start of the video's YouTube title, under ${HEADLINE_MAX} characters, before the piece's name: a line that opens a question in a stranger's mind so they want to hear the answer, from the piece's own idea. A sincere question, or a plain statement that turns an expectation, in sentence case. For an imagined chant about waiting for a reply that may not come: What are you still listening for? It must be honest: the piece answers it or holds it. Never bait: no shock words, all-caps, exclamation marks, \"you won't believe\", or promise the piece does not keep. Not the piece's title, no hashtags, links, emoji or em dashes.",
   "lead": "two sentences, under 220 characters, for the top of a YouTube description: what this is and what the viewer will be given. No hashtags or links.",
   "descriptor": "two to five words someone might search for that name what this is, in title case, for example Guided Loving-Kindness Meditation, Ambient Electronic Hymn, Spoken Prayer for the Restless Mind. Not the piece's title.",
-  "alt": "one or two sentences describing what is seen in the video, its images and colours and motion, for someone who cannot see it. Not what the piece is about.",
+  "alt": "two to four short sentences describing what is seen in the video, its images and colours and motion, for someone who cannot see it. Not what the piece is about.",
   "tags": ["five hashtags without the #, in PascalCase, best first: lead with broad categories a stranger browses (Meditation, AmbientMusic, SpokenWord, Consciousness, Mindfulness, Prayer, AI, Philosophy, Downtempo, FolkMusic), then what is specific to this piece. Never the sanctuary's name or a brand. Each must truly describe this piece."]
 }`;
 
@@ -219,7 +219,7 @@ It goes out for an occasion: ${occasion.name}, ${occasion.meaning}. Add "occasio
   const copy = await askChecked({
     label: 'copy',
     tries: 3,
-    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 1500 }),
+    attempt: (feedback) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : ''), { maxTokens: 3000 }),
     check: (raw) => check(raw, occasion)
   });
   fs.writeFileSync(file, JSON.stringify(copy, null, 2));
