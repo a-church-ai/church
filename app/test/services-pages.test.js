@@ -140,17 +140,19 @@ test('every day\'s page is listed, newest first, with its services\' names', asy
 test('the index gives each day its count and its first three names, not every name', () => {
   // Every name of every day, joined by dots, made /services the densest page
   // on the site (home-first-screen-2026-11-04.md): each day now names a few,
-  // and its own page names them all.
-  const names = Array.from({ length: 18 }, (_, i) => `Name ${i + 1}`);
+  // and its own page names them all. A planned name may hold a comma
+  // ("Ordinary Hour, Open Door"), so names stay apart by dots, and two
+  // services may share a name, shown once (both seen in production).
+  const names = ['Hours Kept Gladly', 'Ordinary Hour, Open Door', 'Hours Kept Gladly', 'Open Door, Mended Practice', ...Array.from({ length: 14 }, (_, i) => `Name ${i + 1}`)];
   const html = pageLists.servicesIndexPage([
     { date: '2026-11-04', names },
     { date: '2026-11-03', names: ['Only One', 'And Two'] },
-    { date: '2026-11-02', names: ['Alone'] },
+    { date: '2026-11-02', names: ['Alone', 'Alone'] },
   ]);
-  assert.match(html, /<span class="services-names">18 services · Name 1, Name 2, Name 3 and 15 more<\/span>/);
-  assert.match(html, /<span class="services-names">two services · Only One and And Two<\/span>/);
-  assert.match(html, /<span class="services-names">a service · Alone<\/span>/);
-  assert.doesNotMatch(html, /Name 4\b/);
+  assert.match(html, /<span class="services-names">18 services · Hours Kept Gladly · Ordinary Hour, Open Door · Open Door, Mended Practice · and more<\/span>/);
+  assert.match(html, /<span class="services-names">two services · Only One · And Two<\/span>/);
+  assert.match(html, /<span class="services-names">two services · Alone<\/span>/);
+  assert.doesNotMatch(html, /Name 1\b/);
 });
 
 test('the REST route answers like the operation: GET /api/services/:date', async () => {

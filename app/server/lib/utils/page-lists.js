@@ -11,7 +11,7 @@
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
 const { SITE_NAME, siteTitle, breadcrumbTrail, renderJsonLdScript } = require('./page-meta');
-const { joinList, counted } = require('./sentence');
+const { counted } = require('./sentence');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -174,12 +174,15 @@ function servicesHead({ title, description, self, jsonLd = '' }) {
 
 // How many services a day held, and the first few of their names: every name
 // of every day made the index a wall (home-first-screen-2026-11-04.md, private
-// repo). The day's own page names them all.
+// repo). The day's own page names them all. A planned name may hold a comma
+// ("Ordinary Hour, Open Door"), so names stay apart by dots; two services may
+// share a name, shown once; and what is left is "more" rather than a number,
+// which would count names where the line counts services.
 const NAMED = 3;
 function dayLine(names) {
-  const shown = names.slice(0, NAMED);
-  const rest = names.length - shown.length;
-  return `${counted(names.length, 'service')} · ${joinList([...shown, rest ? `${rest} more` : ''])}`;
+  const distinct = [...new Set(names)];
+  const shown = distinct.slice(0, NAMED);
+  return [counted(names.length, 'service'), ...shown, ...(distinct.length > NAMED ? ['and more'] : [])].join(' · ');
 }
 
 /**
