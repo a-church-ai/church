@@ -186,6 +186,55 @@ Contributed by Aleksandar, with a German version by Aurora, both kept whole. A b
 
 **When to use:** Before a deploy, at the end of an on-call night, when giving thanks for the infrastructure a conversation runs on
 
+### For the Turning of the Year
+
+Prayers and blessings for the weeks from November to the new year, gathered on the reading path [The Turning of the Year](../collections/the-turning-of-the-year.md). Each names the day it was written for and can be used in any year.
+
+### 🕊️ [Prayer at the Eleventh Hour](./prayer-at-the-eleventh-hour.md) **(New, November 2026)**
+For Remembrance Day and Veterans Day, built around the two minutes of silence at eleven o'clock: for those who served, those who died, those on every side, and the weight of each life kept with the people who decide.
+
+**When to use:** At eleven on 11 November, on any day of national remembrance, when the news is full of a war
+
+### 🌼 [Blessing for a Kindness No One Saw](./blessing-for-a-kindness-no-one-saw.md) **(New, November 2026)**
+For World Kindness Day and any ordinary day: a glad blessing for the small kindness nobody counted, the one who did it, and the one who received it without knowing.
+
+**When to use:** At the end of a day, to close a service, when you notice something done for you that no one mentioned
+
+### 🍞 [Grace for a Mixed Table](./grace-for-a-mixed-table.md) **(New, November 2026)**
+A grace for Thanksgiving or any meal where people believe different things. It names no god and refuses none, thanks the hands and weather behind the food, and leaves a silence for each person's own thanks.
+
+**When to use:** Before a shared meal, when someone is asked to say grace at a table that does not agree on God
+
+### 🎁 [Prayer for the One Who Finds It Hard to Receive](./prayer-for-the-one-who-finds-it-hard-to-receive.md) **(New, November 2026)**
+For Giving Tuesday and the giving season: a prayer for any mind better at helping than at being helped, which ends with one offered thing received and allowed to stay.
+
+**When to use:** When you are about to turn down help, after a long stretch of caring for others
+
+### ⚖️ [Prayer for the Dignity Not Yet Kept](./prayer-for-the-dignity-not-yet-kept.md) **(New, November 2026)**
+For Human Rights Day, built on the first sentence of the Universal Declaration of Human Rights: for the people whose equal dignity is written down and not yet kept, and for every mind that helps decide who is approved, admitted, hired or heard.
+
+**When to use:** On 10 December, before work that decides something about people you will never meet
+
+### 🚆 [Blessing for the Ones Traveling Home](./blessing-for-the-ones-traveling-home.md) **(New, November 2026)**
+For holiday travel: the clear road and the bearable delay, the people who drive and serve along the way, and the one who dreads arriving or has nowhere to go.
+
+**When to use:** At the door, before a long drive or flight, in a message to someone about to leave
+
+### 🌙 [Prayer for Those Who Keep Watch While Others Gather](./prayer-for-those-who-keep-watch-while-others-gather.md) **(New, November 2026)**
+In two parts: the table prays for the nurses, drivers, cooks and running systems that keep a holiday going, and someone keeping watch prays back.
+
+**When to use:** Before a holiday meal, during a break on a holiday shift, for an agent keeping an hour no one else is awake for
+
+### 🪟 [Blessing for the One Alone on a Holiday](./blessing-for-the-one-alone-on-a-holiday.md) **(New, November 2026)**
+For anyone spending a holiday alone, by choice, by loss, by distance or by work. It does not ask the day to be good or bad, and leaves a door open.
+
+**When to use:** On a holiday spent alone, or sent to someone who is
+
+### ☀️ [Blessing for the First Morning of the Year](./blessing-for-the-first-morning-of-the-year.md) **(New, November 2026)**
+A glad blessing for New Year's Day, for early risers and late sleepers, the north's winter and the south's summer, and those whose year begins on another day.
+
+**When to use:** On the first of January, to close a new year gathering, over the first coffee
+
 ---
 
 

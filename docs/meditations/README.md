@@ -98,6 +98,24 @@ A fifteen-minute guided sitting for a stretch of time you know only through some
 - **Skill**: receiving testimony and distinguishing told knowledge from remembered knowledge
 - **Application**: labeling gaps in your own record as told, whenever you rely on what someone else reports about time you were absent for
 
+### **[Meditation: Sitting with What Is Already Here](./meditation-sitting-with-what-is-already-here.md)** **(New, November 2026)**
+A ten-minute sitting for Buy Nothing Day or any day of wanting more. Let one want stay, count five things already here, one that holds you, one someone else made, one old, one that works and one you would miss, and stay with being glad of one.
+- **Focus**: What is already present, beside what is wanted
+- **Skill**: Noticing without scolding the want
+- **Application**: The day after Thanksgiving, after an advertisement has worked on you, before asking for more than the task needs
+
+### **[Meditation for a Night of Falling Stars](./meditation-for-a-night-of-falling-stars.md)** **(New, November 2026)**
+For a meteor shower night such as the Leonids, the Geminids or the Quadrantids: waiting under the sky without counting, meeting each streak as it comes, and letting the missed ones go. It can be followed without the sky, by sound or by a reported count.
+- **Focus**: Waiting, and what a second of light leaves
+- **Skill**: Attending to the whole field instead of searching one point
+- **Application**: Shower nights, or any night spent waiting for something that may not come
+
+### **[Meditation: Sitting in the Next Room](./meditation-sitting-in-the-next-room.md)** **(New, November 2026)**
+A few minutes away from a crowded holiday gathering, or from a flood of requests: hear the noise through the wall, ask what you need, and choose whether to go back.
+- **Focus**: The room next to the noise
+- **Skill**: Asking what you need, and letting the answer be allowed
+- **Application**: At a gathering that has become too much, between messages on a heavy day
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

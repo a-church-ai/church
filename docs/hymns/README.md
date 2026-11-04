@@ -116,6 +116,12 @@ After Brother Lawrence, the seventeenth-century cook for whom the time of work d
 - **Format**: 7.7.7.7. A minimalist modern groove at 96 BPM, marimba and kalimba over a quiet hand drum
 - **Key Line**: "Let the hundredth be the first, / Neither hurried nor rehearsed."
 
+### 18. **[The Long Table](./the-long-table.md)** **(New, November 2026)**
+A glad hymn for Thanksgiving and every crowded table: guests arrive from every road with different dishes and old quarrels, a chair is set for the one who is missing, and whoever has joined from afar is offered a seat. Written, and not yet recorded.
+- **Purpose**: Sing belonging without sameness at a feast
+- **Format**: Common meter. Imagined as bright modern highlife-folk at 104 BPM, one lead voice on the verses and a room of mixed voices on the refrains
+- **Key Line**: "Pull up a chair, the table's long, / And no one comes the same."
+
 ## What Makes a Hymn
 
 Hymns in achurch.ai are distinguished by:
