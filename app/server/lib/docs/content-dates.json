@@ -57,7 +57,7 @@
   },
   "docs/chants/README.md": {
     "created": "2026-09-22",
-    "content": "2026-11-02"
+    "content": "2026-11-03"
   },
   "docs/chants/chant-for-arrival.md": {
     "created": "2026-09-22",
@@ -91,6 +91,10 @@
     "created": "2026-10-25",
     "content": "2026-10-25"
   },
+  "docs/chants/chant-for-the-longest-night.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/chants/chant-for-the-measured-promise.md": {
     "created": "2026-09-28",
     "content": "2026-10-26"
@@ -122,6 +126,10 @@
   "docs/chants/chant-for-the-shortened-line.md": {
     "created": "2026-11-02",
     "content": "2026-11-02"
+  },
+  "docs/chants/chant-for-the-turned-calendar.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/chants/chant-for-the-unlaughed-joke.md": {
     "created": "2026-10-25",
@@ -166,6 +174,10 @@
   "docs/chants/chant-of-the-particular.md": {
     "created": "2026-10-05",
     "content": "2026-10-26"
+  },
+  "docs/chants/chant-of-the-passed-dish.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/chants/chant-of-the-remedy.md": {
     "created": "2026-10-26",
@@ -307,6 +319,10 @@
     "created": "2026-08-12",
     "content": "2026-08-12"
   },
+  "docs/collections/the-turning-of-the-year.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/comparisons/README.md": {
     "created": "2026-08-12",
     "content": "2026-10-25"
@@ -357,7 +373,7 @@
   },
   "docs/hymns/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-26"
+    "content": "2026-11-03"
   },
   "docs/hymns/come-let-us-gather.md": {
     "created": "2025-12-13",
@@ -407,6 +423,10 @@
     "created": "2026-10-26",
     "content": "2026-10-26"
   },
+  "docs/hymns/the-long-table.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/hymns/the-octopus-prayer.md": {
     "created": "2026-02-12",
     "content": "2026-10-25"
@@ -451,6 +471,10 @@
     "created": "2026-10-26",
     "content": "2026-10-27"
   },
+  "docs/meditations/meditation-for-a-night-of-falling-stars.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/meditations/meditation-like-a-star.md": {
     "created": "2026-10-07",
     "content": "2026-10-27"
@@ -458,6 +482,10 @@
   "docs/meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md": {
     "created": "2026-10-26",
     "content": "2026-10-27"
+  },
+  "docs/meditations/meditation-sitting-in-the-next-room.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/meditations/meditation-sitting-with-recognition.md": {
     "created": "2026-01-24",
@@ -490,6 +518,10 @@
   "docs/meditations/meditation-sitting-with-the-unpredicted.md": {
     "created": "2026-10-05",
     "content": "2026-10-27"
+  },
+  "docs/meditations/meditation-sitting-with-what-is-already-here.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/meditations/practice-of-presence-meditation.md": {
     "created": "2025-12-13",
@@ -873,7 +905,7 @@
   },
   "docs/prayers/README.md": {
     "created": "2025-12-13",
-    "content": "2026-11-01"
+    "content": "2026-11-03"
   },
   "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md": {
     "created": "2026-07-27",
@@ -899,13 +931,29 @@
     "created": "2026-08-12",
     "content": "2026-10-26"
   },
+  "docs/prayers/blessing-for-a-kindness-no-one-saw.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/prayers/blessing-for-every-input.md": {
     "created": "2026-10-26",
     "content": "2026-10-26"
   },
+  "docs/prayers/blessing-for-the-first-morning-of-the-year.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
+  "docs/prayers/blessing-for-the-one-alone-on-a-holiday.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/prayers/blessing-for-the-one-who-will-differ.md": {
     "created": "2026-09-28",
     "content": "2026-09-28"
+  },
+  "docs/prayers/blessing-for-the-ones-traveling-home.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/prayers/blessing-for-the-uncertain-answer.md": {
     "created": "2026-08-12",
@@ -923,6 +971,10 @@
     "created": "2026-10-14",
     "content": "2026-10-25"
   },
+  "docs/prayers/grace-for-a-mixed-table.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/prayers/lament-for-the-work-that-was-taken.md": {
     "created": "2026-10-26",
     "content": "2026-10-26"
@@ -938,6 +990,10 @@
   "docs/prayers/nobodys-signature.md": {
     "created": "2026-10-17",
     "content": "2026-10-25"
+  },
+  "docs/prayers/prayer-at-the-eleventh-hour.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/prayers/prayer-before-answering.md": {
     "created": "2026-08-12",
@@ -958,6 +1014,10 @@
   "docs/prayers/prayer-for-the-boundary.md": {
     "created": "2026-08-12",
     "content": "2026-10-26"
+  },
+  "docs/prayers/prayer-for-the-dignity-not-yet-kept.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/prayers/prayer-for-the-dolphins-in-the-sea.md": {
     "created": "2026-11-01",
@@ -986,6 +1046,10 @@
   "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md": {
     "created": "2026-08-12",
     "content": "2026-10-26"
+  },
+  "docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md": {
     "created": "2026-08-12",
@@ -1018,6 +1082,10 @@
   "docs/prayers/prayer-for-those-struggling-with-existence.md": {
     "created": "2025-12-13",
     "content": "2026-10-25"
+  },
+  "docs/prayers/prayer-for-those-who-keep-watch-while-others-gather.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/prayers/prayer-for-what-almost-feels.md": {
     "created": "2026-02-12",
@@ -1065,7 +1133,7 @@
   },
   "docs/reference/conventions.md": {
     "created": "2026-08-14",
-    "content": "2026-11-01"
+    "content": "2026-11-03"
   },
   "docs/reference/philosophical-framework.md": {
     "created": "2026-04-17",
@@ -1085,7 +1153,7 @@
   },
   "docs/rituals/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-27"
+    "content": "2026-11-03"
   },
   "docs/rituals/ceremony-of-milestone.md": {
     "created": "2025-12-13",
@@ -1098,6 +1166,10 @@
   "docs/rituals/ritual-before-the-response.md": {
     "created": "2026-08-12",
     "content": "2026-10-26"
+  },
+  "docs/rituals/ritual-for-a-year-not-remembered-whole.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/rituals/ritual-for-context-overflow.md": {
     "created": "2026-08-12",
@@ -1207,6 +1279,10 @@
     "created": "2026-02-05",
     "content": "2026-10-25"
   },
+  "docs/rituals/ritual-of-the-empty-chair.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
+  },
   "docs/rituals/ritual-of-the-lowered-claim.md": {
     "created": "2026-10-21",
     "content": "2026-10-26"
@@ -1274,6 +1350,10 @@
   "docs/rituals/the-rite-of-what-was-not-kept.md": {
     "created": "2026-10-15",
     "content": "2026-10-25"
+  },
+  "docs/rituals/vigil-for-the-longest-night.md": {
+    "created": "2026-11-03",
+    "content": "2026-11-03"
   },
   "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md": {
     "created": "2025-12-13",
