@@ -295,7 +295,7 @@ test('GET /api lists every endpoint, from openapi.json', async (t) => {
 
   const res = await get(port, '/api');
   assert.strictEqual(res.status, 200);
-  const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
+  const spec = require('../server/lib/api/openapi').spec();
   const listed = new Set(res.json.endpoints.map(e => `${e.method} ${e.path}`));
   for (const [route, ops] of Object.entries(spec.paths)) {
     for (const method of Object.keys(ops).filter(m => ['get', 'post', 'put', 'delete'].includes(m))) {

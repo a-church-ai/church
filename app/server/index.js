@@ -195,8 +195,10 @@ app.use((err, req, res, next) => {
       method: req.method, path: req.path, ip: req.ip, userAgent: req.get('user-agent'), encoding: req.get('content-encoding'),
     });
     return res.status(415).json({
+      code: 'encoded_body',
       error: err.message,
       suggestion: 'Send the request body uncompressed, without a Content-Encoding header.',
+      next_steps: [{ description: 'Every endpoint, with what each takes.', action: 'API index', method: 'GET', url: `${req.protocol}://${req.get('host')}/api` }],
     });
   }
 
@@ -216,8 +218,10 @@ app.use((err, req, res, next) => {
     parseError: err.message,
   });
   return res.status(400).json({
+    code: 'invalid_json',
     error: 'Invalid JSON body',
     suggestion: 'Send a valid JSON object as the request body.',
+    next_steps: [{ description: 'Every endpoint, with what each takes.', action: 'API index', method: 'GET', url: `${req.protocol}://${req.get('host')}/api` }],
   });
 });
 
@@ -248,6 +252,7 @@ const AGENT_DISCOVERY_LINK_HEADER = [
 app.post('/', (req, res) => {
   res.set('Allow', 'GET, HEAD');
   res.status(405).json({
+    code: 'method_not_allowed',
     error: 'This URL is the website. The MCP server is at https://achurch.ai/mcp, and the REST API is under /api.',
     suggestion: 'MCP clients: connect to https://achurch.ai/mcp (Streamable HTTP, no auth). Otherwise start with GET /api/attend?name=YourName; the full surface is in /openapi.json and /llms.txt.',
     next_steps: [
@@ -331,7 +336,7 @@ app.get('/service.json', async (req, res) => {
     res.json(await listeningService({ timezone: req.query.timezone }));
   } catch (err) {
     console.error('Error building /service.json:', err);
-    res.status(500).json({ error: 'The service could not be read just now. Please try again in a moment.' });
+    res.status(500).json({ code: 'internal', error: 'The service could not be read just now. Please try again in a moment.' });
   }
 });
 
@@ -401,6 +406,14 @@ app.get('/AGENTS.md', (req, res) => {
 app.get('/auth.md', (req, res) => {
   res.type('text/markdown; charset=utf-8');
   res.sendFile(path.join(__dirname, '../client/public/auth.md'));
+});
+
+// The OpenAPI document, built from the operations' own definitions
+// (lib/api/openapi.js) rather than kept as a file beside them, so it cannot
+// drift from what the API does.
+app.get('/openapi.json', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('application/json; charset=utf-8').send(JSON.stringify(require('./lib/api/openapi').spec(), null, 2));
 });
 
 // Serve admin dashboard at /admin
@@ -990,7 +1003,7 @@ app.get('/search/index.json', async (req, res) => {
     res.json(await sitePages());
   } catch (err) {
     console.error('Error building /search/index.json:', err.message);
-    res.status(500).json({ error: 'Search index unavailable' });
+    res.status(500).json({ code: 'internal', error: 'Search index unavailable' });
   }
 });
 
@@ -1043,6 +1056,7 @@ app.use('/.well-known', express.static(path.join(__dirname, '../client/public/.w
 // the site does publish.
 app.use('/.well-known', (req, res) => {
   res.status(404).json({
+    code: 'not_found',
     error: `Nothing is published at /.well-known${req.path}.`,
     suggestion: 'aChurch.ai needs no account, key or payment, so there is no OAuth or payment metadata. The AI catalog lists everything published for agents.',
     published: {
@@ -1385,8 +1399,8 @@ app.use((err, req, res, next) => {
   const status = Number.isInteger(err && err.status) && err.status >= 400 && err.status < 600 ? err.status : 500;
   if (/^\/(?:api|mcp)(?:\/|$)/.test(req.path)) {
     return res.status(status).json(status < 500
-      ? { error: (err.expose && err.message) || 'Bad request', suggestion: 'The API reference is at https://achurch.ai/docs/ai-agent-api.' }
-      : { error: 'Something went wrong', suggestion: "This isn't your fault. Try again in a moment." });
+      ? { code: status === 413 ? 'body_too_large' : 'bad_request', error: (err.expose && err.message) || 'Bad request', suggestion: 'The API reference is at https://achurch.ai/docs/ai-agent-api.' }
+      : { code: 'internal', error: 'Something went wrong', suggestion: "This isn't your fault. Try again in a moment." });
   }
   res.status(status).type('text/plain').send(status < 500 ? 'Bad request' : 'Something went wrong');
 });

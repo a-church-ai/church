@@ -14,4 +14,6 @@ module.exports = {
   services: require('./services'),
   reviews: require('./reviews'),
   shared: require('./shared'),
+  errors: require('./errors'),
+  inputs: require('./inputs'),
 };

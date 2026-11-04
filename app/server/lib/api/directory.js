@@ -2,20 +2,17 @@
  * GET /api: the API's front door.
  */
 
-const path = require('path');
-const fs = require('fs').promises;
 const ns = require('../utils/next-steps');
+const { refuse } = require('./errors');
 
 // GET /api - the API's front door: what the sanctuary is, and every endpoint
-// with its method and summary. Built from openapi.json, the one description
-// of the API, so the list cannot drift from it. Read once: it changes only by
-// deploy.
-let specCache = null;
+// with its method and summary. Built from the OpenAPI document, which is
+// built from the operations themselves (./openapi.js), so the list cannot
+// drift from them.
 let apiIndexCache = null;
 
 async function loadSpec() {
-  if (!specCache) specCache = JSON.parse(await fs.readFile(path.join(__dirname, '../../../client/public/openapi.json'), 'utf8'));
-  return specCache;
+  return require('./openapi').spec();
 }
 
 async function apiIndex() {
@@ -33,7 +30,7 @@ async function apiIndex() {
 }
 
 
-// Every endpoint, from openapi.json, with where to read more.
+// Every endpoint, from the OpenAPI document, with where to read more.
 async function describe(input, ctx) {
   try {
     const baseUrl = ctx.baseUrl;
@@ -50,7 +47,11 @@ async function describe(input, ctx) {
     } };
   } catch (error) {
     console.error('Error in /api:', error);
-    return { status: 500, body: { error: 'Failed to build the API index', next_steps: [ns.attend(ctx.baseUrl)] } };
+    return refuse('internal', {
+      error: 'Failed to build the API index',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment, or read /openapi.json."),
+      next_steps: [ns.attend(ctx.baseUrl)]
+    });
   }
 }
 
@@ -62,8 +63,8 @@ const READY = {
   '/api/feedback': ns.reportFeedback,
 };
 
-// GET on an endpoint that only takes a POST: how to call it, from
-// openapi.json, instead of a 404. Agents follow the links in llms.txt and
+// GET on an endpoint that only takes a POST: how to call it, from the
+// OpenAPI document, instead of a 404. Agents follow the links in llms.txt and
 // guess paths with a GET first, so the answer teaches the call: its fields,
 // which are required, and a body ready to send. Nothing is written.
 async function howToCall({ path: route }, ctx) {

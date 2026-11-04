@@ -185,7 +185,7 @@ data/conversations/        (RAG chat memory)
 `npm run check:production` (in `app/`, or with `--base <url>` for another
 server) checks what can be checked from outside, and runs once a day on its
 own (`.github/workflows/check-production.yml`): `/api/health` and the services
-it reports, `/api/now` against every field `openapi.json` requires, that
+it reports, `/api/now` against every field the built OpenAPI document requires, that
 yesterday's 18 services and today's so far were planned and none fell to the
 rotation, that MCP lists the tools this checkout registers, both podcast
 feeds, a range request for each recording in the service, and search.

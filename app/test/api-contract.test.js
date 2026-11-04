@@ -77,3 +77,26 @@ test('/api/reviews keeps every field agents read', async () => {
     for (const turn of review.exchange) has(turn, ['asked', 'answered'], 'reviews.reviews[].exchange[]');
   }
 });
+
+// Every error's code (lib/api/errors.js), as shipped on 2026-11-04. Agents
+// branch on these, so a code is a field's value that is itself a contract:
+// add codes, never rename or remove one. And every error keeps the fields it
+// had before codes came: error, suggestion, next_steps.
+const CODES = [
+  'missing_field', 'too_long', 'too_short', 'invalid_value', 'invalid_timezone', 'invalid_json', 'bad_request',
+  'example_values', 'links_not_kept', 'unknown_song', 'service_not_heard', 'invalid_session',
+  'not_your_conversation', 'conversation_read_only', 'gone', 'not_found', 'unknown_path', 'method_not_allowed',
+  'already_reflected', 'duplicate_title', 'contribution_pending', 'body_too_large', 'encoded_body', 'rate_limited',
+  'internal', 'index_rebuilding', 'busy', 'paused', 'unavailable',
+];
+const ERROR = ['code', 'error', 'suggestion', 'next_steps'];
+
+test('every error code shipped is still answered with, at the status it had', async () => {
+  const { ERRORS } = require('../server/lib/api/errors');
+  for (const code of CODES) assert.ok(ERRORS[code], `the error code ${code} is gone: an agent branching on it would fail`);
+  const { attendance: a } = require('../server/lib/api');
+  const refused = (await a.attend({}, ctx)).body;
+  has(refused, ERROR, 'an error');
+  assert.strictEqual(ERRORS.missing_field.status, 400);
+  assert.strictEqual(ERRORS.rate_limited.status, 429);
+});

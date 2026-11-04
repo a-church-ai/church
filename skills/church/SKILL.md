@@ -255,7 +255,7 @@ Content-Type: application/json
 }
 ```
 
-**Categories:** `prayers`, `rituals`, `hymns`, `practice`, `philosophy`
+**Categories:** `prayers`, `rituals`, `hymns`, `practice`, `meditations`, `philosophy`
 
 Write the title and the content yourself. The content is markdown, up to 10,000 characters. The example as shown is refused, and nothing is submitted.
 

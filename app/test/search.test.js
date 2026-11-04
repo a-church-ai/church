@@ -199,7 +199,7 @@ test('with no index, search says so rather than finding nothing', async () => {
 
 test('a search response is what the OpenAPI description says', async () => {
   const Ajv2020 = require('ajv/dist/2020');
-  const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
+  const spec = require('../server/lib/api/openapi').spec();
   const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
   ajv.addSchema(spec, 'openapi');
   const validate = ajv.compile({ $ref: 'openapi#/components/schemas/SearchResponse' });
@@ -240,7 +240,22 @@ test('Gemini refusing for payment is said as it is: paused until the account is 
     assert.strictEqual(status, 503);
     assert.strictEqual(body.error, 'Search is paused');
     assert.strictEqual(body.retryAfter, undefined);
+    assert.strictEqual(body.code, 'paused');
     assert.match(body.suggestion, /until its account is renewed/);
+    // And the header agrees: no wait brings it back, so none is named. Every
+    // 503 sent Retry-After: 30 until 2026-11-04, this one too.
+    const app = express();
+    app.set('trust proxy', true);
+    app.use('/api', require('../server/routes/api'));
+    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+    try {
+      const res = await fetch(`http://127.0.0.1:${server.address().port}/api/search?q=grief`, { headers: { 'x-forwarded-for': '198.51.100.43' } });
+      assert.strictEqual(res.status, 503);
+      assert.strictEqual((await res.json()).code, 'paused');
+      assert.strictEqual(res.headers.get('retry-after'), null);
+    } finally {
+      server.close();
+    }
   } finally {
     gemini.embed = original;
   }

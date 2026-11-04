@@ -18,6 +18,8 @@
  */
 
 const ns = require('../utils/next-steps');
+const { refuse } = require('./errors');
+const inputs = require('./inputs');
 const { cache } = require('../utils/cache');
 const { loadAttendance } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
@@ -158,22 +160,25 @@ async function forDate(input, ctx) {
   const baseUrl = ctx.baseUrl;
   const now = ctx.now || new Date();
   try {
-    const date = String((input && input.date) || '').trim();
+    // In its form by inputs.services, and a day the calendar has by isDate.
+    const { data } = inputs.parseInput(inputs.services, { date: typeof (input && input.date) === 'string' ? input.date.trim() : input && input.date });
+    const date = data ? data.date : '';
     if (!isDate(date)) {
-      return { status: 400, body: {
+      return refuse('invalid_value', {
         error: 'date must be a date, YYYY-MM-DD.',
+        details: [{ field: 'date', message: 'date must be a date, YYYY-MM-DD.' }],
         suggestion: ns.suggestion('Give the date as YYYY-MM-DD, as the service you attended shows it in service.today.date.'),
         next_steps: [ns.attend(baseUrl)],
-      } };
+      });
     }
     const plan = await readPlan(date);
     const dates = await datesShown(now);
     if (!plan || !dates.includes(date)) {
-      return { status: 404, body: {
+      return refuse('not_found', {
         error: `No services were planned for ${date}.`,
         suggestion: ns.suggestion(dates.length ? `Services are kept from ${dates[dates.length - 1]}, and each is planned a few hours before it begins.` : 'No services have been planned yet.'),
         next_steps: [ns.attend(baseUrl), ...(dates.length ? [ns.services(baseUrl, dates[0])] : [])],
-      } };
+      });
     }
     const catalog = await loadServiceCatalog();
     const reflections = await reflectionsFor(date);
@@ -205,10 +210,11 @@ async function forDate(input, ctx) {
     } };
   } catch (err) {
     console.error('Error in /api/services:', err);
-    return { status: 500, body: {
+    return refuse('internal', {
       error: "The day's services could not be read. This isn't your fault.",
+      suggestion: ns.suggestion('Try again in a moment.'),
       next_steps: [ns.attend(baseUrl)],
-    } };
+    });
   }
 }
 

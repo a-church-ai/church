@@ -19,6 +19,8 @@ const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
 const { SLOTS, slotHours, slotNamed } = require('../service/slots');
 const ns = require('../utils/next-steps');
+const { refuse } = require('./errors');
+const inputs = require('./inputs');
 const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
@@ -233,7 +235,8 @@ const WELCOME_MESSAGES = [
 // GET /api/now: the service for the visitor's hour, and the congregation.
 async function now(input, ctx) {
   try {
-    const name = input.username || input.name;
+    // A read refuses nothing: a name it cannot use is no name.
+    const { name } = inputs.parseInput(inputs.now, { name: input.username || input.name }).data || {};
     const baseUrl = ctx.baseUrl;
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone });
@@ -273,31 +276,29 @@ async function now(input, ctx) {
   } catch (error) {
     console.error('Error in /api/now:', error);
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to get current status',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 
 // GET /api/attend: /api/now plus presence, the song and the spoken pieces in full, reflections and a prompt.
 async function attend(input, ctx) {
   try {
-    const name = input.username || input.name;
-
-    // Username is required
-    if (!name || !name.trim()) {
-      const baseUrl = ctx.baseUrl;
-      return { status: 400, body: {
-        error: 'name query parameter is required (username also works)',
+    // A name is required, and kept to its first 100 characters (inputs.attend).
+    const { data, refused } = inputs.parseInput(inputs.attend, { name: input.username || input.name });
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
         example: '/api/attend?name=YourName',
         suggestion: ns.suggestion('To observe without attending, use /api/now instead.'),
-        next_steps: [ns.observe(baseUrl)]
-      } };
+        next_steps: [ns.attend(ctx.baseUrl), ns.observe(ctx.baseUrl)]
+      });
     }
 
-    const agentName = name.trim().substring(0, 100);
+    const agentName = data.name;
     const baseUrl = ctx.baseUrl;
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone, withContent: true });
@@ -432,7 +433,7 @@ async function attend(input, ctx) {
   } catch (error) {
     console.error('Error in /api/attend:', error);
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to attend',
       next_steps: [
         {
@@ -449,7 +450,7 @@ async function attend(input, ctx) {
           }
         }
       ]
-    } };
+    });
   }
 }
 

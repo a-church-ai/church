@@ -19,13 +19,12 @@ const { loadCatalog } = require('../utils/data');
 const { truncateAtWord } = require('../utils/page-meta');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
 const ns = require('../utils/next-steps');
+const { refuse } = require('./errors');
+const inputs = require('./inputs');
 const { overIpLimit, SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX } = require('./shared');
 const { describeError } = require('../utils/describe-error');
 
-const MIN_QUERY = 2;
-const MAX_QUERY = 300;
 const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 20;
 const EXCERPT_CHARS = 300;
 
 // Below this similarity a passage is not about the query, only the least far
@@ -77,33 +76,30 @@ async function search(input, ctx) {
   const baseUrl = ctx.baseUrl;
   try {
     if (overIpLimit(searchRateLimits, ctx.ip, SEARCH_RATE_LIMIT_MAX, SEARCH_RATE_LIMIT_WINDOW)) {
-      return { status: 429, body: {
+      return refuse('rate_limited', {
         error: 'Too many searches. Rest a while.',
         hint: `Maximum ${SEARCH_RATE_LIMIT_MAX} searches per hour`,
         retryAfter: '1h',
         suggestion: ns.suggestion('Rest a while, then search again. In the meantime, read what you have found, or attend.'),
         next_steps: [ns.attend(baseUrl)]
-      } };
+      });
     }
 
-    // A repeated ?q= arrives as an array; only one query is meant.
-    const q = typeof input.q === 'string' ? input.q.trim() : '';
-    if (q.length < MIN_QUERY) {
-      return { status: 400, body: {
-        error: `q is required: what to search for, at least ${MIN_QUERY} characters`,
-        example: { q: 'what survives when a context window closes' },
-        suggestion: ns.suggestion('Describe what you are looking for in your own words; the search matches meaning, not exact phrases.'),
+    // The query and its limit, as inputs.search describes them. A repeated
+    // ?q= arrives as its first value (routes/api.js fromQuery).
+    const { data, refused } = inputs.parseInput(inputs.search, input);
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
+        ...(refused.code !== 'too_long' ? { example: { q: 'what survives when a context window closes' } } : {}),
+        suggestion: ns.suggestion(refused.code === 'too_long'
+          ? 'Search with the heart of it: a phrase or a sentence.'
+          : 'Describe what you are looking for in your own words; the search matches meaning, not exact phrases.'),
         next_steps: [ns.askQuestion(baseUrl)]
-      } };
+      });
     }
-    if (q.length > MAX_QUERY) {
-      return { status: 400, body: {
-        error: `q must be ${MAX_QUERY} characters or fewer`,
-        suggestion: ns.suggestion('Search with the heart of it: a phrase or a sentence.'),
-        next_steps: [ns.askQuestion(baseUrl)]
-      } };
-    }
-    const limit = Math.min(Math.max(parseInt(input.limit, 10) || DEFAULT_LIMIT, 1), MAX_LIMIT);
+    const { q } = data;
+    const limit = data.limit || DEFAULT_LIMIT;
 
     const [passages, catalog] = await Promise.all([rag.search(q, limit), loadCatalog()]);
     await discover.listAllDocs(); // docByFile reads the walk synchronously
@@ -141,37 +137,37 @@ async function search(input, ctx) {
     } };
   } catch (error) {
     if (/Index not built/.test(error.message)) {
-      return { status: 503, body: {
+      return refuse('index_rebuilding', {
         error: 'RAG index not available',
         suggestion: ns.suggestion('The knowledge base is being rebuilt. Try again shortly.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
     console.error('Error in /api/search:', describeError(error));
     // The account that pays for Gemini is spent (retry.js isUnfunded): said
     // as it is, since no wait brings it back.
     if (isUnfunded(error)) {
-      return { status: 503, body: {
+      return refuse('paused', {
         error: 'Search is paused',
         suggestion: ns.suggestion('The service that matches words to the writing is paused until its account is renewed, which a person must do. Attend or reflect while it is.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
     // Gemini still busy after its retries (rag/gemini.js): Google's shared
     // capacity, briefly spent. A moment's wait, said as one, not a fault.
     if (isTransient(error)) {
-      return { status: 503, body: {
+      return refuse('busy', {
         error: 'Search is busy for a moment',
         retryAfter: '30s',
         suggestion: ns.suggestion('The service that matches words to the writing is busy for a moment. Search again in half a minute.'),
         next_steps: [ns.attend(baseUrl)]
-      } };
+      });
     }
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Search failed',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 

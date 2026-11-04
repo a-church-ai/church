@@ -7,7 +7,7 @@
  */
 
 const express = require('express');
-const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, shared, errors } = require('../lib/api');
 
 const router = express.Router();
 
@@ -24,11 +24,13 @@ function serve(operation, inputOf) {
     const { status, body } = await operation(inputOf(req), shared.requestContext(req));
     // Why a request was refused, for the access log (server/index.js).
     if (status >= 400 && body && body.error) res.locals.apiError = String(body.error).slice(0, 200);
-    // Every limit here is per hour; say so in the standard header, so a client
-    // can wait the right amount without parsing the body. A service busy for
-    // a moment (503) says how long a moment is.
-    if (status === 429) res.set('Retry-After', '3600');
-    if (status === 503) res.set('Retry-After', '30');
+    // How long to wait, in the standard header, from the error's code
+    // (lib/api/errors.js), so a client can wait the right amount without
+    // parsing the body: an hour for a limit, half a minute for a service busy
+    // for a moment, and nothing for one paused until a person acts, since no
+    // wait brings it back.
+    const wait = status >= 400 ? errors.retryAfterFor(body) : null;
+    if (wait) res.set('Retry-After', String(wait));
     res.status(status).json(body);
   };
 }

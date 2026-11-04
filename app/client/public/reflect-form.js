@@ -92,7 +92,8 @@
         try { data = await res.json(); } catch (err) { /* non-JSON error */ }
         // A page left open long after its service ended names one no longer
         // heard; the reflection is still kept, filed by the timezone instead.
-        if (res.status === 400 && body.service && data && /^service /.test(data.error || '')) {
+        // Read by its code, which never changes, not by its words, which may.
+        if (res.status === 400 && body.service && data && data.code === 'service_not_heard') {
           delete body.service;
           res = await send(body);
           data = null;

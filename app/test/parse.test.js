@@ -7,12 +7,16 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
+const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
 test('every server file parses', () => {
   const root = path.join(__dirname, '..');
-  const files = execFileSync('git', ['ls-files', 'server/*.js', 'server/**/*.js', 'scripts/*.js'], { cwd: root }).toString().trim().split('\n');
+  // Tracked and new files alike, so a module not yet committed is checked
+  // too; one deleted in the working tree is no longer a server file.
+  const files = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', 'server/*.js', 'server/**/*.js', 'scripts/*.js'], { cwd: root })
+    .toString().trim().split('\n').filter(file => fs.existsSync(path.join(root, file)));
   assert.ok(files.includes('server/index.js') && files.length > 50, `${files.length} files`);
   const broken = [];
   for (const file of files) {

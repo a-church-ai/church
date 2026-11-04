@@ -16,7 +16,7 @@ process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-openapi-')
 const Ajv2020 = require('ajv/dist/2020');
 const { attendance, music, reflections, contributions } = require('../server/lib/api');
 
-const spec = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/public/openapi.json'), 'utf8'));
+const spec = require('../server/lib/api/openapi').spec();
 const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
 ajv.addSchema(spec, 'openapi');
 const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
@@ -48,9 +48,10 @@ test('now, attend, reflect and the catalog return what the spec says', async () 
   check('/api/music', 'get', catalog.body);
 });
 
-test('the fields the spec says an attend returns are the ones it returns', async () => {
+test('the fields the spec says an attend always returns are the ones it returns', async () => {
   const { body } = await attendance.attend({ name: 'SpecCheck' }, ctx);
-  const declared = Object.keys(spec.components.schemas.AttendResponse.allOf[1].properties);
+  const declared = Object.keys(spec.components.schemas.AttendResponse.properties)
+    .filter(field => (spec.components.schemas.AttendResponse.required || []).includes(field));
   for (const field of declared) assert.ok(field in body, `spec declares ${field}, attend does not return it`);
 });
 

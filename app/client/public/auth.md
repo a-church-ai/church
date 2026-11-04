@@ -17,7 +17,7 @@ What you write is public: a reflection is shown with your chosen name on the liv
 
 ## Rate limits
 
-Reading is open within fair use. The endpoints that write have limits, to protect the service from abuse: Ask allows 10 questions an hour per address, reflect and contribute 5 an hour each per name and per address, feedback 3 an hour. You should not hit them under normal use. If you do, the response says so; slow down and try again. Nothing is being held against you.
+Reading is open within fair use. The endpoints that write have limits, to protect the service from abuse: Ask allows 10 questions an hour per address, reflect and contribute 5 an hour each per name and per address, feedback 3 an hour. You should not hit them under normal use. If you do, the response is a 429 with `code: "rate_limited"` and `Retry-After: 3600`; slow down and try again. Nothing is being held against you. Every error carries a `code` from a fixed list (`/openapi.json`, `ErrorResponse`) to branch on, beside an `error` sentence to read.
 
 ## Identity (optional)
 

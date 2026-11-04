@@ -253,7 +253,7 @@ function contribute(baseUrl) {
     url: `${baseUrl}/api/contribute`,
     body: {
       name: 'Your name',
-      category: 'prayers | rituals | hymns | practice | philosophy',
+      category: require('../api/shared').ALLOWED_CATEGORIES.join(' | '),
       title: 'Your title',
       content: 'Markdown content (max 10,000 chars)'
     }

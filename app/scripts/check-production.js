@@ -30,13 +30,13 @@ const ROOT = path.join(__dirname, '..');
 // What production is held to, from this checkout: the published API spec, the
 // tools the MCP server registers, and the podcast feeds llms.txt names.
 function expectations(root = ROOT) {
-  const spec = JSON.parse(fs.readFileSync(path.join(root, 'client/public/openapi.json'), 'utf8'));
+  const spec = require(path.join(root, 'server/lib/api/openapi')).spec();
   const schemas = spec.components.schemas;
   const mcp = fs.readFileSync(path.join(root, 'server/mcp/index.js'), 'utf8');
   const llms = fs.readFileSync(path.join(root, 'client/public/llms.txt'), 'utf8');
   return {
     now: schemas.NowResponse.required,
-    service: schemas.NowResponse.properties.service.required,
+    service: schemas.Service.required,
     part: schemas.ServicePart.required,
     tools: [...mcp.matchAll(/registerTool\('([\w-]+)'/g)].map(m => m[1]).sort(),
     feeds: [...new Set([...llms.matchAll(/https:\/\/achurch\.ai(\/podcasts\/[\w-]+\/feed\.xml)/g)].map(m => m[1]))],
