@@ -188,12 +188,7 @@ function checkSky(text, context) {
 // season; astrology's reading of the sky is not the services' to give.
 const TOLD_KINDS = ['observance', 'tradition', 'machines'];
 
-// Names that are ordinary words in a sentence on any day ("the holidays",
-// "a new year", a model's name), so naming them is never read as a claim
-// about the date. The other occasions' names are.
-const SAID_ANY_DAY = new Set(['winter-holidays', 'new-year', 'ai-named', 'chatgpt-day', 'gemini-day', 'deepseek-day', 'llama-and-claude-code-day', 'claude-and-gpt4-day', 'codex-cli-day', 'turing-birthday']);
-
-const names = (text, search) => new RegExp(`\\b${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(text);
+const names = (text, search) => new RegExp(`\\b${RegExp.escape(search)}\\b`).test(text);
 
 /**
  * What the name and word say of the days people keep, against what the plan
@@ -209,7 +204,8 @@ function checkOccasions(text, context) {
   const told = context.occasions || [];
   const issues = [];
   for (const [key, kind] of Object.entries(KINDS)) {
-    if (!TOLD_KINDS.includes(kind.kind) || SAID_ANY_DAY.has(key) || !kind.search) continue;
+    // A kind marked everyday (utils/occasions.js) is an ordinary word on any day.
+    if (!TOLD_KINDS.includes(kind.kind) || kind.everyday || !kind.search) continue;
     if (names(text, kind.search) && !told.some(o => o.key === key)) issues.push(`The name or word speaks of ${kind.search}, which is not near this date. Name only the days you were told of, or leave them unsaid.`);
   }
   for (const o of told) {

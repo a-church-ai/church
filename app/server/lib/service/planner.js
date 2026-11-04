@@ -32,7 +32,7 @@ const { messageJSON, askChecked, MODEL } = require('../content-generation/claude
 const { RULES, TOLD_KINDS, check, checkWord, checkName, checkSky, checkOccasions, exclusions } = require('./rules');
 const { occasionsBetween } = require('../utils/occasions');
 const { slotHours } = require('./slots');
-const { LEAD_DAYS, seasonOn, hemisphereLight, addDays } = require('../utils/seasons');
+const { LEAD_DAYS, seasonOn, hemisphereLight, addDays, daysBetween } = require('../utils/seasons');
 const { moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear } = require('../utils/sky');
 const { fetchSpaceWeather, spaceWeatherOn } = require('../utils/space-weather');
 const { fetchEarth } = require('../utils/earth');
@@ -168,12 +168,11 @@ function contextFor({ date, slot = null, hemisphere = null, feeds = null }) {
 // `days` is how far off: 0 on the day or within its span, more before it,
 // less after it.
 function occasionsOn(date) {
-  const between = (a, b) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 864e5);
   return occasionsBetween(date, date)
     .filter(o => TOLD_KINDS.includes(o.kind))
     .map(o => ({
       id: o.id, key: o.key, kind: o.kind, name: o.name, search: o.search, day: o.day, last: o.last,
-      days: date < o.day ? between(date, o.day) : date > o.last ? -between(o.last, date) : 0,
+      days: date < o.day ? daysBetween(date, o.day) : date > o.last ? -daysBetween(o.last, date) : 0,
       for: o.for, meaning: o.meaning, rule: o.rule, solemn: o.solemn,
     }));
 }

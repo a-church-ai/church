@@ -110,7 +110,7 @@ const SEASONAL = /\b(march|june|september|december) (solstice|equinox)\b/gi;
 
 // The occasion's own name may hold a weekday ("Black Friday", "Giving
 // Tuesday"); it is the one weekday the line may say.
-const ownName = (line, occasion) => occasion.search ? line.split(new RegExp(occasion.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')).join(' ') : line;
+const ownName = (line, occasion) => occasion.search ? line.split(new RegExp(RegExp.escape(occasion.search), 'gi')).join(' ') : line;
 
 
 function check(raw, occasion = null) {

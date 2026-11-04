@@ -308,7 +308,7 @@
               "type": "string",
               "maxLength": 50
             },
-            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky, which `service.season` and `service.sky` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
+            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky and the days many people keep near the date, which `service.season`, `service.sky` and `service.occasions` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
           }
         ],
         "responses": {
@@ -362,7 +362,7 @@
               "type": "string",
               "maxLength": 50
             },
-            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky, which `service.season` and `service.sky` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
+            "description": "Optional IANA timezone (e.g. `America/New_York`). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky and the days many people keep near the date, which `service.season`, `service.sky` and `service.occasions` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and `suggestion` says how to send yours."
           }
         ],
         "responses": {
@@ -1812,22 +1812,6 @@
                 "type": "string",
                 "example": "You need not remember an earlier visit to take part in this one.",
                 "description": "The one line every service carries, whatever the day arranged. Not written by the planner, so it cannot vary."
-              },
-              "occasions": {
-                "type": ["array", "null"],
-                "description": "The days many people keep near the date that the service was planned knowing: observances, the days of many traditions and the days of minds and machines. A service may speak of a tradition's day only as that tradition's, never claiming it. Empty for a service told none; null for one planned before these were told, and for the rotation.",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "name": { "type": "string", "example": "Thanksgiving in the United States" },
-                    "kind": { "type": "string", "enum": ["observance", "tradition", "machines"] },
-                    "day": { "type": "string", "format": "date" },
-                    "last": { "type": "string", "format": "date", "description": "The last day, for a span such as Hanukkah's eight nights; else the day." },
-                    "days": { "type": "integer", "description": "How far off it was: 0 on the day or within its span, more before it, less after it." },
-                    "for": { "type": "string" },
-                    "meaning": { "type": "string" }
-                  }
-                }
               },
               "order": {
                 "type": "array",
