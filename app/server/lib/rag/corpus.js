@@ -22,7 +22,8 @@
  */
 
 const { findMarkdownFiles, DOCS_DIR, MUSIC_DIR } = require('./indexer');
-const { NOINDEX_CATEGORIES, isNoindexPath } = require('../docs/discover');
+const discover = require('../docs/discover');
+const { NOINDEX_CATEGORIES, isNoindexPath } = discover;
 const { SONG_SLUGS } = require('../docs/links');
 
 const SONG_FILE = /^music\/([^/]+)\/(context|song)\.md$/;
@@ -57,8 +58,12 @@ function servedCorpusFilter() {
   const slugs = [...SONG_SLUGS];
   const contexts = slugs.map(s => quote(`music/${s}/context.md`)).join(', ');
   const songs = slugs.map(s => quote(`music/${s}/song.md`)).join(', ');
+  // A document whose publication date is still to come is indexed with the
+  // rest, so it is found the moment it goes public, and left out until then.
+  const unpublished = discover.unpublishedFiles().map(f => quote(`docs/${f}`));
   return [
     ...NOINDEX_CATEGORIES.map(c => `file NOT LIKE ${quote(`docs/${c}/%`)}`),
+    ...(unpublished.length ? [`file NOT IN (${unpublished.join(', ')})`] : []),
     `lower(file) <> 'docs/readme.md'`,
     `(file NOT LIKE 'music/%' OR file IN (${contexts}) OR (file IN (${songs}) AND section = 'Lyrics'))`,
   ].join(' AND ');

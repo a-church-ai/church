@@ -12,6 +12,7 @@
 const fs = require('fs').promises;
 const discover = require('./discover');
 const { absolutizeLinks, SITE_URL } = require('./links');
+const { withoutUnpublished } = require('./unpublished');
 const ns = require('../utils/next-steps');
 
 const { byName } = discover;
@@ -53,7 +54,8 @@ ${ns.waysIn(SITE_URL).map(s => `- [${s.action}](${s.url}) (${s.method}${s.body ?
 // renderSectionPage). The readiness audit compares a page's headings with its
 // markdown's, and the copy of /docs/playlists lacked those two (2026-11-03).
 async function servedMarkdown(resolved) {
-  let markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath).trimEnd();
+  const source = withoutUnpublished(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath);
+  let markdown = absolutizeLinks(source, resolved.fullPath).trimEnd();
   const { doc } = resolved;
   const isSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath;
   const inSection = isSection
@@ -65,12 +67,16 @@ async function servedMarkdown(resolved) {
   return `${markdown}${list}\n\n---\n\n${WHERE_THIS_IS}`;
 }
 
-// Built once: the walk it reads is built once too (docs change only by deploy).
+// Built once for each set of public documents: the walk is built once, and
+// grows only when a dated document goes public (discover.js publicationKey).
 let indexCache = null;
+let indexKey = null;
 
 // Every served document, grouped by section: /docs/index.md.
 async function corpusIndex() {
-  if (indexCache) return indexCache;
+  await discover.listAllDocs();
+  if (indexCache && indexKey === discover.publicationKey()) return indexCache;
+  indexKey = discover.publicationKey();
   const all = await servedDocs();
   const sections = new Map();
   for (const d of all) {

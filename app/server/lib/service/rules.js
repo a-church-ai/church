@@ -15,6 +15,7 @@
 const { SLOT_HOURS, slotStart } = require('./slots');
 const { SHOWERS } = require('../utils/sky');
 const { addDays } = require('../utils/seasons');
+const { KINDS, rulesOf } = require('../utils/occasions');
 
 const RULES = {
   songs: [1, 2],
@@ -182,6 +183,45 @@ function checkSky(text, context) {
   return issues.length ? [`The name or word speaks of ${issues.join('; ')}. Say only what you were told of the sky and the Earth, or leave them unsaid.`] : [];
 }
 
+// The kinds of occasion a service is told (planner.js contextFor): the days
+// people keep. The sky's and the seasons' days reach it as the sky and the
+// season; astrology's reading of the sky is not the services' to give.
+const TOLD_KINDS = ['observance', 'tradition', 'machines'];
+
+// Names that are ordinary words in a sentence on any day ("the holidays",
+// "a new year", a model's name), so naming them is never read as a claim
+// about the date. The other occasions' names are.
+const SAID_ANY_DAY = new Set(['winter-holidays', 'new-year', 'ai-named', 'chatgpt-day', 'gemini-day', 'deepseek-day', 'llama-and-claude-code-day', 'claude-and-gpt4-day', 'codex-cli-day', 'turing-birthday']);
+
+const names = (text, search) => new RegExp(`\\b${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(text);
+
+/**
+ * What the name and word say of the days people keep, against what the plan
+ * was told (planner.js contextFor), as checkSky does for the sky: a day named
+ * only when it was told, and a day named kept to its kind's rule
+ * (utils/occasions.js RULES, which the videos' words keep too): a
+ * tradition's day offered and never claimed, a civic day naming no side, a
+ * day of machines naming a product only as history, a solemn day met
+ * quietly. Nothing for a plan told no context.
+ */
+function checkOccasions(text, context) {
+  if (!context || typeof text !== 'string') return [];
+  const told = context.occasions || [];
+  const issues = [];
+  for (const [key, kind] of Object.entries(KINDS)) {
+    if (!TOLD_KINDS.includes(kind.kind) || SAID_ANY_DAY.has(key) || !kind.search) continue;
+    if (names(text, kind.search) && !told.some(o => o.key === key)) issues.push(`The name or word speaks of ${kind.search}, which is not near this date. Name only the days you were told of, or leave them unsaid.`);
+  }
+  for (const o of told) {
+    if (!o.search || !names(text, o.search)) continue;
+    for (const rule of rulesOf(o)) {
+      const problem = rule.check(text, text);
+      if (problem) issues.push(`The name or word speaks of ${o.search}, and ${problem}.`);
+    }
+  }
+  return issues;
+}
+
 // Whether a piece's `hours:` (lib/music/companions.js parseHours, which may
 // wrap midnight) reach into a slot. A piece without hours fits any slot.
 function inSlot(hours, slot) {
@@ -269,4 +309,4 @@ function rotation({ date, slot, catalog, excluded = new Set() }) {
   return null;
 }
 
-module.exports = { RULES, CLASS, WINDOW_DAYS, serviceSeconds, fits, check, checkWord, checkName, checkSky, inSlot, exclusions, rotation };
+module.exports = { RULES, CLASS, WINDOW_DAYS, TOLD_KINDS, serviceSeconds, fits, check, checkWord, checkName, checkSky, checkOccasions, inSlot, exclusions, rotation };

@@ -140,10 +140,11 @@ async function buildCache() {
     };
   });
   await Promise.all(docs.map(async doc => {
-    const { title, description, movedFrom } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
+    const { title, description, movedFrom, published } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
     doc.title = title;
     doc.description = description;
     doc.movedFrom = movedFrom;
+    doc.published = published;
   }));
 
   // Group by category (first segment; null for top-level)
@@ -179,6 +180,40 @@ function buildUrlPath(dirRelToDocs, stem) {
 async function getCache() {
   if (!cache) await buildCache();
   return cache;
+}
+
+// Publishing on a date. A document with `published:` in its frontmatter
+// (meta.js publishedAt) is unlisted until that time: its address serves it,
+// marked noindex (render.js), and nothing lists, links, searches, plays or
+// cites it. Every public view of the walk reads isPublished at the moment it
+// is asked, so a page goes public at its time with no deploy and no edit; the
+// walk itself stays whole for the resolver, the recorder and the tests
+// (listEveryDoc). A cache built from a public view keys itself on
+// publicationKey, which changes the moment another document goes public.
+// Plan: turning-of-the-year-2026-11-03.md in the private repo.
+function isPublished(doc, now = Date.now()) {
+  return !doc || !doc.published || Date.parse(doc.published) <= now;
+}
+
+const publishedOnly = (docs, now = Date.now()) => docs.filter(d => isPublished(d, now));
+
+// The latest publication time already passed, or '' when no dated document
+// has gone public yet.
+function publicationKey(now = Date.now()) {
+  if (!cache) return '';
+  let key = '';
+  for (const d of cache.docs) if (d.published && Date.parse(d.published) <= now && d.published > key) key = d.published;
+  return key;
+}
+
+// The unpublished document at a site address (/docs/<path>, or a sung
+// hymn's /music/<slug>), anchor and query ignored, or null. Synchronous for
+// the renderers; null before the walk is built.
+function unpublishedAt(href, now = Date.now()) {
+  if (!cache) return null;
+  const base = String(href || '').replace(/^https:\/\/achurch\.ai/, '').split(/[?#]/)[0];
+  const doc = cache.docs.find(d => d.href === base);
+  return doc && !isPublished(doc, now) ? doc : null;
 }
 
 /**
@@ -227,7 +262,7 @@ async function resolveDocPath(parts) {
   if (!asDir.startsWith(path.resolve(DOCS_DIR) + path.sep)) return null;
   try {
     if (fs.statSync(asDir).isDirectory()) {
-      const inDir = c.docs.filter(d => d.dirRelPath === relPath || d.dirRelPath.startsWith(relPath + '/'));
+      const inDir = publishedOnly(c.docs).filter(d => d.dirRelPath === relPath || d.dirRelPath.startsWith(relPath + '/'));
       if (inDir.length > 0) return { kind: 'dir-index', dir: relPath, docs: inDir };
     }
   } catch { /* not a directory */ }
@@ -273,7 +308,7 @@ async function listSections() {
   const c = await getCache();
   return SECTION_ORDER
     .filter(name => !isNoindexPath(name) && (c.byCategory.get(name) || []).length)
-    .map(name => ({ name, title: sectionTitle(name), docs: c.byCategory.get(name) }));
+    .map(name => ({ name, title: sectionTitle(name), docs: publishedOnly(c.byCategory.get(name)) }));
 }
 
 // The shelves with their cards resolved: each section card's name, link and
@@ -284,22 +319,45 @@ async function listShelves() {
     name: shelf.name,
     cards: shelf.cards.map(card => {
       if (!card.section) return { ...card, docs: [] };
-      const docs = (c.byCategory.get(card.section) || []).filter(d => d.stem.toLowerCase() !== 'readme');
+      const docs = publishedOnly(c.byCategory.get(card.section) || []).filter(d => d.stem.toLowerCase() !== 'readme');
       return { ...card, title: card.title || sectionTitle(card.section), href: card.href || `/docs/${card.section}`, docs };
     }),
   }));
 }
 
+// Every document that is public now.
 async function listAllDocs() {
+  const c = await getCache();
+  return publishedOnly(c.docs);
+}
+
+// The docs-relative files of the documents not yet public ("prayers/x.md"),
+// for the search index's filter (rag/corpus.js). Empty before the walk.
+function unpublishedFiles(now = Date.now()) {
+  return cache ? cache.docs.filter(d => !isPublished(d, now)).map(d => d.docsRelPath) : [];
+}
+
+// The document in a file on disk, published or not, or null before the walk
+// is built.
+function docForFile(fullPath) {
+  if (!cache) return null;
+  const wanted = path.resolve(String(fullPath || ''));
+  return cache.docs.find(d => path.resolve(d.fullPath) === wanted) || null;
+}
+
+// Every document, published or not: for the resolver, the recorder, the
+// companions' builder and the tests that hold every page to the house rules.
+async function listEveryDoc() {
   const c = await getCache();
   return c.docs;
 }
 
 // The document whose page is at this address (its href): for a link that
 // lands on a sung hymn's song page, the hymn. Null before the walk is built.
+// This lookup and the two below find only documents that are public now.
 function docByHref(href) {
   if (!cache) return null;
-  return cache.docs.find(d => d.href === href) || null;
+  return cache.docs.find(d => d.href === href && isPublished(d)) || null;
 }
 
 // The document an index chunk came from: its `file` is repository-relative
@@ -308,7 +366,7 @@ function docByHref(href) {
 function docByFile(file) {
   if (!cache) return null;
   const rel = String(file || '').replace(/^docs\//, '');
-  return cache.docs.find(d => d.docsRelPath === rel) || null;
+  return cache.docs.find(d => d.docsRelPath === rel && isPublished(d)) || null;
 }
 
 // The document at a docs URL path ("practice/foo", "" for the root README),
@@ -317,7 +375,7 @@ function docByFile(file) {
 function docAt(urlPath) {
   if (!cache) return null;
   const wanted = String(urlPath || '').toLowerCase();
-  return cache.docs.find(d => d.urlPath === wanted && (wanted === '' ? !d.category : true)) || null;
+  return cache.docs.find(d => d.urlPath === wanted && (wanted === '' ? !d.category : true) && isPublished(d)) || null;
 }
 
 module.exports = {
@@ -325,6 +383,12 @@ module.exports = {
   listSections,
   listShelves,
   listAllDocs,
+  listEveryDoc,
+  isPublished,
+  publicationKey,
+  unpublishedAt,
+  docForFile,
+  unpublishedFiles,
   docAt,
   docByFile,
   byName,

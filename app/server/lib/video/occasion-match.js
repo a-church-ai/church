@@ -1,5 +1,5 @@
 /**
- * Which videos belong to which coming occasions (occasions.js): Claude reads
+ * Which videos belong to which coming occasions (utils/occasions.js): Claude reads
  * the occasions in the schedule's window and the videos to place, and pairs
  * only the true fits, each with its reason; the pairs are checked in code.
  * schedule.js then places a paired video inside its occasion. The plan is

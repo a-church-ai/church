@@ -12,7 +12,7 @@
  *                                          its stills and loops kept, its presets, tints and mandala
  *                                          chosen anew (brief.js restyleBrief), then drawn again at no
  *                                          Omni cost
- *   --occasion <id>                        brief each new video for an occasion (lib/video/occasions.js,
+ *   --occasion <id>                        brief each new video for an occasion (lib/utils/occasions.js,
  *                                          as key:day, e.g. election-day:2026-11-03): its colours and
  *                                          images join the piece's own; a brief already written is kept
  *   --concurrency N                        pieces at once (default 2)
@@ -50,7 +50,7 @@ const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
 const { compose, baseFootage, titleCard, FPS } = require('../server/lib/video/compose');
 const { renderShort } = require('../server/lib/video/short');
-const { occasionById } = require('../server/lib/video/occasions');
+const { occasionById } = require('../server/lib/utils/occasions');
 
 const OUT = library.VIDEO_DIR;
 // The recording the preset survey plays each preset against: a spoken

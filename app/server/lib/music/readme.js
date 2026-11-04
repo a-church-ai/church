@@ -30,7 +30,9 @@ async function musicReadme() {
     .sort((a, b) => discover.byName(a.title, b.title));
   const playlists = await listPlaylists();
   const voiced = voicedBySection();
-  const docs = await discover.listAllDocs();
+  // Every hymn, dated or not: this is the repository's index, read on
+  // GitHub, and it must not go stale by the clock (discover.js isPublished).
+  const docs = await discover.listEveryDoc();
   const hymns = docs.filter(d => d.category === 'hymns' && d.stem.toLowerCase() !== 'readme')
     .sort((a, b) => discover.byName(a.title, b.title));
   const sections = [...voiced.entries()]

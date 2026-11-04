@@ -208,6 +208,9 @@ async function buildSitemap() {
           lastmod = stat.mtime.toISOString().split('T')[0];
         } catch { /* unreadable: omit lastmod rather than invent one */ }
       }
+      // A document published on a date is new to readers on that date.
+      const publishedDay = doc.published && doc.published.slice(0, 10);
+      if (publishedDay && (!lastmod || lastmod < publishedDay)) lastmod = publishedDay;
 
       urls += `\n  <url>
     <loc>https://achurch.ai${url}</loc>${lastmod ? `
@@ -249,12 +252,15 @@ async function buildSitemapJson() {
 
     const key = `docs/${doc.docsRelPath}`;
     const dates = datesOf(key);
+    // A document published on a date was created, for a reader, then.
+    const publishedDay = doc.published && doc.published.slice(0, 10);
+    const later = (date, floor) => (floor && (!date || date < floor) ? floor : date);
     documents.push({
       url: `https://achurch.ai${url}`,
       title: doc.title || null,
-      created: dates.created || null,
-      contentUpdated: dates.content || null,
-      pageUpdated: dates.pageUpdated,
+      created: later(dates.created, publishedDay) || null,
+      contentUpdated: later(dates.content, publishedDay) || null,
+      pageUpdated: later(dates.pageUpdated, publishedDay),
     });
   }
 

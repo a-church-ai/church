@@ -6,6 +6,7 @@
 const lancedb = require('@lancedb/lancedb');
 const path = require('path');
 const { servedCorpusFilter } = require('./corpus');
+const discover = require('../docs/discover');
 
 const DB_PATH = process.env.LANCEDB_PATH || path.join(__dirname, '../../../data/vectors.lance');
 const TABLE_NAME = 'documents';
@@ -53,6 +54,18 @@ async function getTable() {
 }
 
 let servedFilter = null;
+let servedFor = null;
+
+// The served corpus as a filter, rebuilt when a dated document goes public
+// (corpus.js leaves out what is not public yet).
+async function served() {
+  await discover.listAllDocs();
+  if (!servedFilter || servedFor !== discover.publicationKey()) {
+    servedFor = discover.publicationKey();
+    servedFilter = servedCorpusFilter();
+  }
+  return servedFilter;
+}
 
 // The served corpus (corpus.js), applied to every search: the index holds only
 // served files once rebuilt, and this keeps an index built under an older rule
@@ -72,11 +85,10 @@ async function search(embedding, limit = 5) {
     return [];
   }
 
-  if (!servedFilter) servedFilter = servedCorpusFilter();
   const results = await tbl
     .vectorSearch(embedding)
     .distanceType('cosine')
-    .where(servedFilter)
+    .where(await served())
     .limit(limit)
     .toArray();
 
@@ -210,10 +222,9 @@ async function textSearch(query, limit = 5) {
   const tbl = await getTable();
   if (!tbl) return [];
   await ensureTextIndex(tbl);
-  if (!servedFilter) servedFilter = servedCorpusFilter();
   const results = await tbl.query()
     .fullTextSearch(query)
-    .where(servedFilter)
+    .where(await served())
     .limit(limit)
     .toArray()
     // A table rebuilt since its index was checked: check again next time.

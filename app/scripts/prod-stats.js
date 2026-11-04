@@ -29,7 +29,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { addDays } = require('../server/lib/utils/seasons');
-const { occasionsBetween } = require('../server/lib/video/occasions');
+const { occasionsBetween } = require('../server/lib/utils/occasions');
 const { localTime } = require('../server/lib/utils/timezone');
 const { TZ } = require('../server/lib/video/schedule');
 
@@ -91,7 +91,7 @@ function occasionsUncovered(now, records = releases()) {
   const w = { from: addDays(today(now), 1), to: addDays(today(now), 35) };
   const covered = new Set(records.map(r => r.occasion && r.occasion.id).filter(Boolean));
   const open = occasionsBetween(w.from, w.to).filter(o => !covered.has(o.id)).map(o => ({ id: o.id, name: o.name, from: o.from, to: o.to }));
-  return { value: open, window: w, source: 'lib/video/occasions.js against video/releases/*.json' };
+  return { value: open, window: w, source: 'lib/utils/occasions.js against video/releases/*.json' };
 }
 
 async function credits(now) {

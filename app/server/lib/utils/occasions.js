@@ -1,8 +1,11 @@
 /**
- * Occasions: days a video can belong to, so it goes out when it means
- * something (schedule.js, occasion-match.js). The plans are
- * video-occasions-2026-10-29.md and
- * occasion-windows-and-traditions-2026-11-02.md in the private repo.
+ * Occasions: the days many people keep, one calendar for the two things that
+ * meet them. A video goes out on a day it fits (video/schedule.js,
+ * video/occasion-match.js), and a service is told the days near its date
+ * (service/planner.js), each kept to its kind's rule (RULES, below). The plans
+ * are video-occasions-2026-10-29.md,
+ * occasion-windows-and-traditions-2026-11-02.md and
+ * turning-of-the-year-2026-11-03.md in the private repo.
  *
  * Each has its day and a window around it, the days people speak of it
  * before and after, when a fitting video may still go out for it.
@@ -31,10 +34,10 @@
  * fetched by the caller and passed in.
  */
 
-const { moonPhaseAfter, retrogradesBetween, SHOWERS, ECLIPSES } = require('../utils/sky');
-const { turningPoints, addDays } = require('../utils/seasons');
-const { scaleOf } = require('../utils/space-weather');
-const calendars = require('../utils/calendars');
+const { moonPhaseAfter, retrogradesBetween, SHOWERS, ECLIPSES } = require('./sky');
+const { turningPoints, addDays } = require('./seasons');
+const { scaleOf } = require('./space-weather');
+const calendars = require('./calendars');
 
 const isoDay = (when) => new Date(when).toISOString().slice(0, 10);
 
@@ -44,7 +47,7 @@ const isoDay = (when) => new Date(when).toISOString().slice(0, 10);
 // fitting video may still go out for it (its window); `dated` is a tag with
 // the occasion's year, added only to the Bluesky and X posts sent inside the
 // window (publish/metadata.js socialMetadata), never to YouTube. `rule` names
-// what its words must keep (publish/copy.js RULES); `solemn` marks a day of
+// what its words must keep (RULES, below); `solemn` marks a day of
 // fasting or reckoning, met quietly. `look` is how a video made for it may
 // look (brief.js), told to the brief of a piece rendered for it
 // (render-video.js --occasion), the piece's own images still leading.
@@ -180,6 +183,43 @@ function observanceDate(o, year) {
   return addDays(first, offset + (o.nth - 1) * 7 + (o.plus || 0));
 }
 
+// What words for an occasion must keep, by its kind's rule: a video's copy
+// (video/publish/copy.js) and a service's name and word (service/planner.js).
+// `ask`, what the writer is told; `check(words, line)`, a problem or null.
+// `words` is everything the copy says (hook, headline, lead, descriptor, the
+// occasion line and the tags); `line` is the occasion line alone.
+const refuse = (pattern, why) => (words) => { const m = words.match(pattern); return m ? `"${m[0]}" ${why}` : null; };
+const RULES = {
+  // Astrology is named as the reader, never claimed as an effect.
+  astrology: {
+    ask: 'Name astrology as the one that reads it so: what astrology reads in it, never that the planet does anything.',
+    check: (words, line) => (/astrolog/i.test(line) ? null : 'occasion must say it is astrology that reads this time so, not claim an effect')
+  },
+  // A civic day's words stay with what every side shares.
+  civic: {
+    ask: 'This is a civic day people disagree about: speak to what every side shares, such as listening, dignity and living together after the choice, and name no party, candidate, side or way to vote, anywhere in the words or tags.',
+    check: refuse(/\b(democrats?|democratic party|republicans?|GOP|MAGA|liberals?|conservatives?|progressives?|left[- ]wing|right[- ]wing|the left|the right|candidates?|vote for|vote against|ballot measure)\b/i, 'takes or names a side; a civic day\'s words name no party, candidate, side or way to vote')
+  },
+  // A tradition's day is named as its own: offered for those who keep it,
+  // never claimed, taught, urged or ranked.
+  tradition: {
+    ask: 'This day belongs to a tradition the sanctuary welcomes but does not speak for. Offer the piece for those who keep it ("for those keeping ..."), name the day as that tradition\'s, state no doctrine, borrow no rite, never say "our" or "we celebrate" or "join us", and never compare or rank traditions.',
+    check: refuse(/\b(our|we celebrate|celebrate with us|join us|convert|the true faith|the only way|unbelievers?|heathens?|pagans?)\b/i, 'claims, urges or ranks a tradition; the words offer the piece for those who keep the day, and claim nothing of it')
+  },
+  // A day of minds and machines names a product only as history.
+  machines: {
+    ask: 'This marks a moment in how minds and machines came to meet. A product may be named as a fact of history; never praise, recommend or compare it, and never present a company as a friend or sponsor of the sanctuary.',
+    check: refuse(/\b(best|greatest|favou?rite|try it|try (chatgpt|claude|gemini|llama|codex)|sign up|download|thanks to|powered by|sponsored|partner(ed)?)\b/i, 'praises or promotes a product; a launch is named as history only')
+  }
+};
+// A solemn day is met quietly.
+const SOLEMN = {
+  ask: 'It is a solemn day of fasting and reckoning: the words are quiet and serious, never festive.',
+  check: refuse(/\b(celebrat\w*|festive|party|fun|happy|joyful)\b/i, 'is festive; a solemn day is met quietly')
+};
+
+const rulesOf = (occasion) => [RULES[occasion.rule], occasion.solemn ? SOLEMN : null].filter(Boolean);
+
 // An occasion: its `day` (the first, for a span to `last`) and its window,
 // from `before` days ahead to `after` days past its last day. Its id is its
 // key and day, as a release record keeps it.
@@ -252,4 +292,4 @@ function occasionById(id) {
   return occasionsBetween(day, day).find(o => o.id === id) || null;
 }
 
-module.exports = { occasionsBetween, occasionById, observanceDate, KINDS };
+module.exports = { occasionsBetween, occasionById, observanceDate, KINDS, RULES, SOLEMN, rulesOf };

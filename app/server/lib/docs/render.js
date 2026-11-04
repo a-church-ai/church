@@ -23,6 +23,7 @@ const tldr = require('./tldr');
 const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
 const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence, playlistSequence } = require('./links');
+const { withoutUnpublished } = require('./unpublished');
 const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
@@ -382,14 +383,15 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null, published = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
-  // Every page that reaches this point is served and indexable. Internal working
-  // categories never get here: routes/docs.js 404s them before rendering, so the
-  // old conditional noindex branch could not fire and only suggested that those
-  // pages were served-but-hidden, which they are not.
-  const robots = 'index, follow';
+  // Every page that reaches this point is served, and indexable unless it is a
+  // document whose publication date is still to come (discover.js
+  // isPublished): unlisted until then, so noindex. Internal working categories
+  // never get here: routes/docs.js 404s them before rendering.
+  const unlisted = Boolean(published) && Date.parse(published) > Date.now();
+  const robots = unlisted ? 'noindex, follow' : 'index, follow';
   // Every docs page but the root has its own share card (lib/og-cards.js),
   // drawn from this page's title and section; the root uses the site image.
   const shareImage = urlPath ? docsCard(urlPath, title) : SITE_SHARE_IMAGE;
@@ -399,7 +401,11 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
   // A section's index lists documents, so it is a CollectionPage, not an
   // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
-  const modified = urlPath && (datesOf(`docs/${urlPath}.md`).pageUpdated || datesOf(`docs/${urlPath}/README.md`).pageUpdated);
+  // A document published on a date was published then, and has not changed
+  // since as far as a reader can know, whatever its commits say.
+  const committed = urlPath && (datesOf(`docs/${urlPath}.md`).pageUpdated || datesOf(`docs/${urlPath}/README.md`).pageUpdated);
+  const publishedDay = published && published.slice(0, 10);
+  const modified = publishedDay && (!committed || committed < publishedDay) ? publishedDay : committed;
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
     '@type': isIndex ? 'CollectionPage' : 'Article',
@@ -409,6 +415,7 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
+    ...(publishedDay ? { datePublished: publishedDay } : {}),
     ...(modified ? { dateModified: modified } : {}),
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
@@ -772,7 +779,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // the YAML block as an <hr> followed by one enormous heading holding every
   // key as visible page text, and puts the same blob in the table of contents.
   // Nearly every document carries a `tldr:` block, so this is not optional.
-  const rendered = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
+  // Ways into documents not yet public are left out (unpublished.js).
+  const rendered = renderMarkdownBody(withoutUnpublished(meta.body, doc.fullPath), doc.fullPath, ownPath);
   let bodyHtml = rendered.html;
 
   // A document with no h1 would leave the page's heading outline without its
@@ -892,6 +900,7 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     recording,
     playlist: ownPlaylist && ownPlaylist.jsonLd,
     video: video && videoJsonLd({ ...video, description: video.description || meta.description }),
+    published: doc.published,
   });
 }
 

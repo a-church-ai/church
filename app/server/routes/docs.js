@@ -69,6 +69,9 @@ async function handle(req, res, rest) {
     // so a cache that saw HTML first could serve it to an agent asking for
     // Markdown, and the reverse. Set before the branch so both paths carry it.
     res.vary('Accept');
+    // A document whose publication date is still to come is served at its
+    // address and unlisted everywhere else, so neither form is indexed.
+    if (!discover.isPublished(resolved.doc)) res.set('X-Robots-Tag', 'noindex');
     if (asMarkdown || acceptsMarkdown(req)) {
       if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.href}>; rel="canonical"`);
       try {

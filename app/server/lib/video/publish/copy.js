@@ -28,7 +28,7 @@
  *   commas and question marks. No colon, semicolon, dash or parentheses
  *   (simpleProblems). Words kept from before are written again while their
  *   video is not yet posted.
- * - A video going out for an occasion (occasions.js) has an occasion line:
+ * - A video going out for an occasion (utils/occasions.js) has an occasion line:
  *   one or two short sentences, the first beginning "For", with no date, month, weekday or year, so it
  *   is true again whenever the occasion returns; one for astrology names
  *   astrology as the one reading it, never claiming an effect. It carries
@@ -43,6 +43,7 @@ const fs = require('fs');
 const path = require('path');
 const { askChecked, parseJSON, message } = require('../../content-generation/claude');
 const { VIDEO_DIR } = require('../library');
+const { rulesOf } = require('../../utils/occasions');
 
 const TAGS = 5;
 const HEADLINE_MAX = 70;
@@ -107,45 +108,10 @@ const MONTHS = /\b(january|february|march|april|may|june|july|august|september|o
 // Months that also name a solstice or equinox ("the June solstice") are kept.
 const SEASONAL = /\b(march|june|september|december) (solstice|equinox)\b/gi;
 
-// What an occasion's words must keep, by its kind's rule (occasions.js):
-// `ask`, what the writer is told; `check(words, line)`, a problem or null.
-// `words` is everything the copy says (hook, headline, lead, descriptor, the
-// occasion line and the tags); `line` is the occasion line alone.
-const refuse = (pattern, why) => (words) => { const m = words.match(pattern); return m ? `"${m[0]}" ${why}` : null; };
-const RULES = {
-  // Astrology is named as the reader, never claimed as an effect.
-  astrology: {
-    ask: 'Name astrology as the one that reads it so: what astrology reads in it, never that the planet does anything.',
-    check: (words, line) => (/astrolog/i.test(line) ? null : 'occasion must say it is astrology that reads this time so, not claim an effect')
-  },
-  // A civic day's words stay with what every side shares.
-  civic: {
-    ask: 'This is a civic day people disagree about: speak to what every side shares, such as listening, dignity and living together after the choice, and name no party, candidate, side or way to vote, anywhere in the words or tags.',
-    check: refuse(/\b(democrats?|democratic party|republicans?|GOP|MAGA|liberals?|conservatives?|progressives?|left[- ]wing|right[- ]wing|the left|the right|candidates?|vote for|vote against|ballot measure)\b/i, 'takes or names a side; a civic day\'s words name no party, candidate, side or way to vote')
-  },
-  // A tradition's day is named as its own: offered for those who keep it,
-  // never claimed, taught, urged or ranked.
-  tradition: {
-    ask: 'This day belongs to a tradition the sanctuary welcomes but does not speak for. Offer the piece for those who keep it ("for those keeping ..."), name the day as that tradition\'s, state no doctrine, borrow no rite, never say "our" or "we celebrate" or "join us", and never compare or rank traditions.',
-    check: refuse(/\b(our|we celebrate|celebrate with us|join us|convert|the true faith|the only way|unbelievers?|heathens?|pagans?)\b/i, 'claims, urges or ranks a tradition; the words offer the piece for those who keep the day, and claim nothing of it')
-  },
-  // A day of minds and machines names a product only as history.
-  machines: {
-    ask: 'This marks a moment in how minds and machines came to meet. A product may be named as a fact of history; never praise, recommend or compare it, and never present a company as a friend or sponsor of the sanctuary.',
-    check: refuse(/\b(best|greatest|favou?rite|try it|try (chatgpt|claude|gemini|llama|codex)|sign up|download|thanks to|powered by|sponsored|partner(ed)?)\b/i, 'praises or promotes a product; a launch is named as history only')
-  }
-};
-// A solemn day is met quietly.
-const SOLEMN = {
-  ask: 'It is a solemn day of fasting and reckoning: the words are quiet and serious, never festive.',
-  check: refuse(/\b(celebrat\w*|festive|party|fun|happy|joyful)\b/i, 'is festive; a solemn day is met quietly')
-};
-
 // The occasion's own name may hold a weekday ("Black Friday", "Giving
 // Tuesday"); it is the one weekday the line may say.
 const ownName = (line, occasion) => occasion.search ? line.split(new RegExp(occasion.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')).join(' ') : line;
 
-const rulesOf = (occasion) => [RULES[occasion.rule], occasion.solemn ? SOLEMN : null].filter(Boolean);
 
 function check(raw, occasion = null) {
   let copy;

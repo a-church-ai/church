@@ -4,7 +4,7 @@
  * need nothing installed), the Chinese New Year and Vesak (from the sky, as
  * utils/sky.js reads it), Easter (the computus), and the days kept by hand in
  * festivals.json, which no calendar here can compute. Offline and pure but
- * for the table. Used by lib/video/occasions.js; plan:
+ * for the table. Used by lib/utils/occasions.js; plan:
  * occasion-windows-and-traditions-2026-11-02.md in the private repo.
  *
  * Every date is held against published calendars in test/calendars.test.js.

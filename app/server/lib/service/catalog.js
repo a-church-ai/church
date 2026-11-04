@@ -33,10 +33,17 @@ const NEAR = 4;
 
 let playable = null;
 let cached = null;
+// The public documents the two caches were built from (discover.js
+// publicationKey): a dated piece joins the services when it goes public.
+let builtFor = null;
+const stale = () => builtFor !== discover.publicationKey();
 
 // Every piece that plays, the playlists' catalog (docs/playlists/), by id.
 async function loadPlayable() {
-  if (playable) return playable;
+  await discover.listAllDocs();
+  if (playable && !stale()) return playable;
+  builtFor = discover.publicationKey();
+  cached = null;
   const manifest = loadManifest();
   const entries = new Map();
 
@@ -86,8 +93,9 @@ async function loadPlayable() {
 // What a service can hold: what plays, less what can never fit a service (a
 // 37-minute prayer), which a playlist can still hold.
 async function loadServiceCatalog() {
+  const pieces = await loadPlayable();
   if (cached) return cached;
-  const entries = new Map(await loadPlayable());
+  const entries = new Map(pieces);
   const all = [...entries.values()];
   for (const entry of all) if (!fits(entry, all)) entries.delete(entry.id);
   cached = entries;

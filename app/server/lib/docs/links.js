@@ -186,7 +186,14 @@ function documentLinks(markdown, docFullPath) {
  */
 const sequences = new Map();
 
+// Only the readings public now: a reading with a publication date still to
+// come joins its path at that time (discover.js isPublished).
 function readingSequence(collection) {
+  const sequence = writtenSequence(collection);
+  return sequence && sequence.filter(urlPath => !discover.unpublishedAt(discover.hrefOf(urlPath)));
+}
+
+function writtenSequence(collection) {
   const name = String(collection || '');
   if (!/^[a-z0-9-]+$/.test(name)) return null;
   if (sequences.has(name)) return sequences.get(name);

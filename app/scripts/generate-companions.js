@@ -45,7 +45,7 @@ async function main() {
   const catalog = await loadCatalog();
   const slugs = catalog.map(song => song.slug);
 
-  const allDocs = await discover.listAllDocs();
+  const allDocs = await discover.listEveryDoc();
   const eligible = allDocs
     .filter(d => companions.ELIGIBLE_CATEGORIES.includes(d.category))
     .filter(d => d.stem.toLowerCase() !== 'readme')

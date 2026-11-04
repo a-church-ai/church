@@ -129,7 +129,7 @@ function shortMetadata(meta, { kind, url, whole = false }) {
 
 /**
  * The words a Bluesky or X post uses, from the video's (`meta`): the same,
- * but inside its occasion's window (occasions.js) the occasion's tag leads and
+ * but inside its occasion's window (utils/occasions.js) the occasion's tag leads and
  * its dated tag (#Election2026) follows it, for the people searching that
  * week. The YouTube video and Short never carry the dated tag; it would be
  * stale there in a year. `day` is the post's date on the schedule's clock.

@@ -323,7 +323,7 @@ async function recordPiece(piece, stats) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const docs = selectDocs(await discover.listAllDocs(), opts.paths, loadManifest());
+  const docs = selectDocs(await discover.listEveryDoc(), opts.paths, loadManifest());
   const elsewhere = Object.keys(loadManifest()).filter(source => isImported(loadManifest()[source]));
   if (elsewhere.length) console.log(`Made elsewhere, left as they are: ${elsewhere.join(', ')}.`);
   const led = countLeads();

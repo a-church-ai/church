@@ -18,7 +18,7 @@
  * 20:00); a piece that belongs to an hour (its `hours:`
  * tag, as the services read it) goes out then.
  *
- * Occasions (occasions.js, paired by occasion-match.js): a video paired with
+ * Occasions (utils/occasions.js, paired by occasion-match.js): a video paired with
  * one goes out inside its window, ahead of the queue's order: on the
  * occasion's own day when a slot there is free, else the nearest day of the
  * window after it, and before it only when the day is full. Every occasion's

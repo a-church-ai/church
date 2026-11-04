@@ -30,7 +30,7 @@
  *
  * Occasions: the days in the coming five weeks a video can belong to (full
  * and new moons, meteor showers, solstices, Mercury's retrograde, shared
- * observances, a forecast geomagnetic storm; lib/video/occasions.js) are
+ * observances, a forecast geomagnetic storm; lib/utils/occasions.js) are
  * offered with the videos to place, Claude pairs the true fits
  * (occasion-match.js), and a paired video goes out inside its occasion with
  * a line in its description that names it without a date. Each pairing and
@@ -59,7 +59,7 @@ const { allRecords, updateRecord, RELEASES_DIR } = require('../server/lib/video/
 const { makePoster, POSTER_DIR } = require('../server/lib/video/on-site');
 const { uploadObject } = require('../server/lib/audio/storage');
 const { plan, TZ, RERELEASE_WEEK } = require('../server/lib/video/schedule');
-const { occasionsBetween, occasionById } = require('../server/lib/video/occasions');
+const { occasionsBetween, occasionById } = require('../server/lib/utils/occasions');
 const { addDays } = require('../server/lib/utils/seasons');
 const { matchOccasions } = require('../server/lib/video/occasion-match');
 const { fetchSpaceWeather } = require('../server/lib/utils/space-weather');

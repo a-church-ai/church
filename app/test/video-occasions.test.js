@@ -1,13 +1,13 @@
 /**
  * Videos released on days that mean something: the occasions
- * (lib/video/occasions.js), the pairing's check (occasion-match.js), how a
+ * (lib/utils/occasions.js), the pairing's check (occasion-match.js), how a
  * paired video is placed (schedule.js) and the words that name its occasion
  * (publish/copy.js, metadata.js). No network.
  */
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { occasionsBetween, observanceDate, KINDS } = require('../server/lib/video/occasions');
+const { occasionsBetween, observanceDate, KINDS } = require('../server/lib/utils/occasions');
 const { check: checkPairs } = require('../server/lib/video/occasion-match');
 const { plan, weekSlots, HOURS, TZ } = require('../server/lib/video/schedule');
 const { check: checkCopy } = require('../server/lib/video/publish/copy');
@@ -38,7 +38,7 @@ test('the occasions of late 2026 fall where the sky and the calendar put them', 
 });
 
 test('an occasion is found again by the id its record keeps, a retrograde by its first day', () => {
-  const { occasionById } = require('../server/lib/video/occasions');
+  const { occasionById } = require('../server/lib/utils/occasions');
   assert.strictEqual(occasionById('mercury-retrograde:2026-10-25').to, '2026-11-14');
   assert.strictEqual(occasionById('thanksgiving:2026-11-26').search, 'Thanksgiving');
   assert.strictEqual(occasionById('full-moon:2026-11-25'), null, 'a day with no such occasion');
@@ -190,7 +190,7 @@ test('an occasion has a day and a window around it; ids stay its key and day', (
   assert.ok(find(list, 'christmas', '2026-12-25') && find(list, 'kwanzaa', '2026-12-26') && find(list, 'winter-holidays', '2026-12-18'));
   // A window that began before the days asked for is still found.
   assert.ok(occasionsBetween('2027-01-03', '2027-01-03').some(o => o.key === 'new-year'), 'Jan 3 is inside the new year\'s window');
-  const { occasionById } = require('../server/lib/video/occasions');
+  const { occasionById } = require('../server/lib/utils/occasions');
   assert.strictEqual(occasionById('new-year:2027-01-01').to, '2027-01-04');
   assert.strictEqual(occasionById('election-day:2026-11-03').dated, 'Election2026');
 });
@@ -250,7 +250,7 @@ test('every kind has a window that stays near its day, and every tradition and d
 });
 
 test('a video rendered for an occasion is briefed with its look, the piece still leading; one without has none', () => {
-  const { occasionById } = require('../server/lib/video/occasions');
+  const { occasionById } = require('../server/lib/utils/occasions');
   const { userMessage } = require('../server/lib/video/brief');
   const election = occasionById('election-day:2026-11-03');
   assert.ok(election.look, 'Election Day has a look');

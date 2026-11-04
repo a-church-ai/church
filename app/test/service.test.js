@@ -781,12 +781,51 @@ test('a plan is told what visitors left, as themes, right after what is coming; 
   const lines = contextLines(north);
   assert.match(lines[1], /^Coming:/);
   assert.strictEqual(lines[2], 'What visitors left recently (9 reflections over two days, from this hemisphere at this hour): tired of being asked to be certain; grateful for small continuities.');
-  assert.match(lines[3], /^The season:/);
+  assert.match(lines[3], /^Days kept near this date: Hanukkah/, 'then the days kept near the date');
+  assert.match(lines[4], /^The season:/);
   assert.deepStrictEqual(north.congregation.ids, ['r1'], 'the context keeps which reflections shaped it');
   const unknown = contextLines(contextFor({ date: '2026-12-04', slot: 4, hemisphere: null, feeds: visitors(4) }));
   assert.ok(unknown.includes('What visitors left recently (6 reflections over two days, from everywhere): quiet after a long week.'));
   assert.ok(!contextLines(contextFor({ date: '2026-12-04', slot: 3, hemisphere: 'north', feeds: visitors(4) })).some(l => /^What visitors left/.test(l)), 'another slot, none');
   assert.strictEqual(contextFor({ date: '2026-12-04', hemisphere: 'north' }).congregation, null);
+});
+
+test('a plan is told the days people keep whose window holds its date, from the videos\' calendar, and none of the sky\'s or astrology\'s', () => {
+  const told = date => contextFor({ date, hemisphere: 'north' }).occasions;
+  const thanksgiving = told('2026-11-24').find(o => o.key === 'thanksgiving');
+  assert.ok(thanksgiving, 'Thanksgiving inside its window, three days before');
+  assert.strictEqual(thanksgiving.days, 2);
+  assert.ok(!told('2026-11-20').some(o => o.key === 'thanksgiving'), 'not before its window');
+  assert.strictEqual(told('2026-12-06').find(o => o.key === 'hanukkah').days, 0, 'a span under way is today');
+  assert.strictEqual(told('2026-11-04').find(o => o.key === 'election-day').days, -1, 'the morning after');
+  assert.ok(told('2026-11-04').every(o => ['observance', 'tradition', 'machines'].includes(o.kind)), 'no moons, showers, seasons or retrogrades: the sky tells those');
+  assert.deepStrictEqual(contextFor({ date: '2026-11-26', hemisphere: null }).occasions.map(o => o.key), ['thanksgiving'], 'a place unknown is told them too');
+  const line = contextLines(contextFor({ date: '2026-12-25', hemisphere: 'south' })).find(l => l.startsWith('Days kept'));
+  assert.match(line, /Christmas, today: .*\(for those who keep it, claimed by none here\)/);
+  assert.match(contextLines(contextFor({ date: '2026-11-03', hemisphere: 'north' })).find(l => l.startsWith('Days kept')), /Election Day in the United States, today: .*\(a civic day, naming no side\)/);
+  assert.ok(!contextLines(contextFor({ date: '2026-07-07', hemisphere: 'north' })).some(l => l.startsWith('Days kept')), 'a date with none is told nothing of them');
+});
+
+test('a name or word may speak of a day kept only when told of it, and only as its kind allows', () => {
+  const { checkOccasions } = require('../server/lib/service/rules');
+  const on = date => contextFor({ date, hemisphere: 'north' });
+  assert.deepStrictEqual(checkOccasions('A table for Thanksgiving, long and glad.', on('2026-11-26')), []);
+  assert.match(checkOccasions('A table for Thanksgiving, long and glad.', on('2026-11-10')).join(), /Thanksgiving, which is not near this date/);
+  assert.match(checkOccasions('Our Hanukkah lights.', on('2026-12-06')).join(), /"Our" claims, urges or ranks a tradition/);
+  assert.deepStrictEqual(checkOccasions('For those keeping Hanukkah, one small light.', on('2026-12-06')), []);
+  assert.match(checkOccasions('A day to vote for the candidates you trust after Election Day.', on('2026-11-03')).join(), /names a side|takes or names a side/);
+  assert.deepStrictEqual(checkOccasions('the holidays, a new year, and a thanksgiving of the heart', on('2026-07-07')), [], 'ordinary words on any day');
+  assert.deepStrictEqual(checkOccasions('Diwali', null), [], 'nothing for a plan told no context');
+});
+
+test('a plan that names a day it was not told of is retried with that named', async () => {
+  const naming = catalog => ({ ...validReply(catalog), word: `Diwali lights every window. ${sixtyWords}` });
+  const { calls, args } = await plannerCase([naming, validReply]);
+  const entry = await planSlot({ ...args, context: contextFor({ date: args.date, hemisphere: 'north' }) });
+  assert.strictEqual(calls.length, 2);
+  assert.match(calls[1].user, /Diwali, which is not near this date/);
+  assert.strictEqual(entry.word, sixtyWords);
+  assert.match(calls[0].system, /THE CALENDAR/, 'the rules for the days people keep are in the shared prompt');
 });
 
 test('the response says what visitors left that shaped the service, as service.visitors, and offers the day\'s services', async () => {

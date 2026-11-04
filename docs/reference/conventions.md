@@ -53,6 +53,8 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 **Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site. A page with a recording may also carry a `share:` line, the words its share card shows, when its first spoken line describes the piece rather than being it: the page's own words, contiguous and verbatim, with ` / ` between a verse's lines ([seo-conventions.md](seo-conventions.md#share-cards)).
 
+**Publishing on a date.** New writing may carry `published: 2026-11-20T14:00:00Z` (or a day). Until then it is unlisted: served at its address with `noindex`, and left out of every list, link, search and service, then public everywhere at its time with no edit ([app-development.md](app-development.md#architecture)). Write the indexes, Related lists and reading paths as you would for a published piece; each entry appears on the piece's day. Put a dated piece's links in a list item, a table row or under its own heading, so the whole entry waits for it; a link inside a sentence loses only its link. Space a batch of new pieces out, a few days apart and ahead of the days they are for, rather than publishing a collection overnight.
+
 **Layers are recognition criteria, not a mandatory shape.** Do not create an empty `docs/` layer to satisfy a template. If a layer has nothing in it, it does not exist yet.
 
 ## Voice

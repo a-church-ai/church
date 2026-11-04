@@ -34,7 +34,7 @@ function renderedVideo(slug) {
   return { dir, file, short, passage: { start, end, whole } };
 }
 
-// occasion: the one the video goes out for (occasions.js), or null.
+// occasion: the one the video goes out for (utils/occasions.js), or null.
 async function prepare(slug, { occasion = null } = {}) {
   const { dir, file, short, passage } = renderedVideo(slug);
   const piece = pieceFor(slug);

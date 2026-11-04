@@ -20,6 +20,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const discover = require('../docs/discover');
 const { absolutizeLinks } = require('../docs/links');
+const { withoutUnpublished } = require('../docs/unpublished');
 const { splitFrontmatter } = require('../docs/tldr');
 const { chunkMarkdown } = require('../rag/indexer');
 const { dot, mean } = require('../utils/vectors');
@@ -194,8 +195,10 @@ function inHours(range, hour) {
 // --- Request time: document metadata ---
 
 // Documents change only by deploy, which restarts the process, the same
-// assumption lib/docs/discover.js makes for its own cache.
+// assumption lib/docs/discover.js makes for its own cache; it is emptied when
+// a dated document goes public, since a piece's links to it then appear.
 const metaCache = new Map();
+let metaFor = null;
 
 // A piece written for agents as well as for a listening body carries its
 // version for agents in a "## For an Agent" section (Meditation: Like a Star,
@@ -218,13 +221,17 @@ function forAgents(body, title) {
  * resolves, so a stale shortlist entry is skipped rather than served as a 404.
  */
 async function companionMeta(relPath) {
+  await discover.listAllDocs();
+  if (metaFor !== discover.publicationKey()) {
+    metaCache.clear();
+    metaFor = discover.publicationKey();
+  }
   if (metaCache.has(relPath)) return metaCache.get(relPath);
 
-  await discover.listAllDocs();
   const doc = discover.docByFile(relPath);
   if (!doc) return null;
 
-  const markdown = await fs.readFile(doc.fullPath, 'utf8');
+  const markdown = withoutUnpublished(await fs.readFile(doc.fullPath, 'utf8'), doc.fullPath);
   const { data, body } = splitFrontmatter(markdown);
   const meta = {
     title: doc.title,

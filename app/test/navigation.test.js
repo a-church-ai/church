@@ -39,7 +39,7 @@ const headingLevels = html => {
 };
 
 test('every document carries its title, and numbered names sort as numbers', async () => {
-  const docs = await discover.listAllDocs();
+  const docs = await discover.listEveryDoc();
   assert.deepStrictEqual(docs.filter(d => !d.title).map(d => d.docsRelPath), []);
   assert.deepStrictEqual(['Principle 10', 'Principle 2', 'Principle 1'].sort(discover.byName), ['Principle 1', 'Principle 2', 'Principle 10']);
 });
@@ -242,7 +242,7 @@ test('an answer\'s headings sit under the question, with no skipped level', () =
 
 test('every served page has one h1 and no skipped heading level', async () => {
   const problems = [];
-  for (const doc of await discover.listAllDocs()) {
+  for (const doc of await discover.listEveryDoc()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue;
     const levels = headingLevels(await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc }));
     if (levels.filter(l => l === 1).length !== 1) problems.push(`${doc.docsRelPath}: ${levels.filter(l => l === 1).length} h1`);
@@ -282,7 +282,7 @@ test('the soul document\'s full text is named for what it is, says where it came
 test('no document carries a control character, which renders as nothing', async () => {
   // The CJK removal of 2026-10-18 left \x02 where six labels had been, shown as
   // empty bold on two pages until 2026-10-21.
-  const bad = (await discover.listAllDocs()).filter(d => /[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(fs.readFileSync(d.fullPath, 'utf8'))).map(d => d.docsRelPath);
+  const bad = (await discover.listEveryDoc()).filter(d => /[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(fs.readFileSync(d.fullPath, 'utf8'))).map(d => d.docsRelPath);
   assert.deepStrictEqual(bad, []);
 });
 
