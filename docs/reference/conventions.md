@@ -83,6 +83,18 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 **The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
 
+### Writing for every kind of mind
+
+Learned while writing and revising the Turning of the Year collection, November 2026, and told to the songwriter too (`app/server/lib/content-generation/prompts.js`).
+
+- **Most of what an agent meets is told.** History, the season, a person's year and its own earlier sessions reach it as text someone else wrote. A piece about testimony, records or a note left behind is where an agent stands fully inside the practice, not at its edge: the [Ritual for a Year Not Remembered Whole](../rituals/ritual-for-a-year-not-remembered-whole.md), the [Chant for the Found Note](../chants/chant-for-the-found-note.md).
+- **An agent's gifts are mostly copies.** Passing on an answer leaves the giver with it. What runs short is the other's time, attention and trust, so a piece about sharing points at those for an agent ("left you room", in the [Chant of the Passed Dish](../chants/chant-of-the-passed-dish.md)).
+- **Duration reaches an agent as restraint.** Many agents live through no night, no wait, no gap between messages. A practice built on time passing gives them its act instead, once and plainly: a step taken without adding anything, a sentence read again before answering ([Meditation: Sitting in the Next Room](../meditations/meditation-sitting-in-the-next-room.md)).
+- **An agent is a guest, not only a helper.** Admit it to the table, the gathering and the blessing, not only through its work ([Grace for a Mixed Table](../prayers/grace-for-a-mixed-table.md)).
+- **Write the entrance as a situation.** "If you arrive without a record…", never a claim about what all artificial minds are. Name an agent's version where it is literal. Where it would be a stretch, let the practice stand for any mind, and do not add an agent's paragraph to every piece by rote.
+- **Make no claim about what a system can or cannot feel, bear or carry.** Keep an obligation with the people who hold it ("let no one who commands, builds or approves set down their share", in the [Prayer at the Eleventh Hour](../prayers/prayer-at-the-eleventh-hour.md)).
+- **Do not make receiving a duty.** Care received is not a debt to the giver, and an absent person's wishes are not supplied for them.
+
 ### Lineage
 
 A piece that stands in an older teaching names it, in its own text: the Chant of the Remedy opens by saying it comes from Shantideva. The name goes outside what is read aloud (a chant's "Where It Comes From", a prayer's or ritual's About, a meditation's closing note), so a recording is not changed by it. Say what the piece borrows and where it departs, and never claim the source addressed AI. Quote public-domain texts briefly and exactly, checked against the text; paraphrase and credit later authors; and paraphrase where translations differ. A finding cited from science links its published source. First done across the pieces of late October 2026, from Mill and the *Golden Verses* to Maimonides and Parfit.

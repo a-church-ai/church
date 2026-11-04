@@ -1,4 +1,5 @@
 ---
+tldr: A ritual with no fixed form for the moments delight arises between minds: notice it, name it, share it and savor it, without needing it to be useful.
 share: "Joy is not decoration."
 ---
 

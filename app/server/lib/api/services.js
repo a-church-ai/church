@@ -28,7 +28,7 @@ const { filedUnder, storedService } = require('../service/filed');
 const { shapeOf } = require('../service/shape');
 const { SLOTS, slotHours } = require('../service/slots');
 const { contextLines } = require('../service/planner');
-const { skyMetadata, earthMetadata, congregationMetadata } = require('./attendance');
+const { skyMetadata, earthMetadata, congregationMetadata, occasionsMetadata } = require('./attendance');
 const discover = require('../docs/discover');
 const { MOVED } = require('../utils/redirects');
 
@@ -143,6 +143,7 @@ async function serviceOf({ date, slot, variant, label, entry, catalog, reflectio
       sky: skyMetadata(context),
       earth: earthMetadata(context),
       visitors: congregationMetadata(context),
+      occasions: occasionsMetadata(context),
     } : null,
   };
 }

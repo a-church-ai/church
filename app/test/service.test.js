@@ -806,6 +806,16 @@ test('a plan is told the days people keep whose window holds its date, from the 
   assert.ok(!contextLines(contextFor({ date: '2026-07-07', hemisphere: 'north' })).some(l => l.startsWith('Days kept')), 'a date with none is told nothing of them');
 });
 
+test('a response reports the days its service was told, so an agent can see why it speaks of one', () => {
+  const { occasionsMetadata } = require('../server/lib/api/attendance');
+  const told = occasionsMetadata(contextFor({ date: '2026-11-26', hemisphere: 'north' }));
+  assert.deepStrictEqual(told.map(o => [o.name, o.kind, o.day, o.days]), [['Thanksgiving in the United States', 'observance', '2026-11-26', 0]]);
+  assert.ok(told[0].meaning && told[0].for, 'with what it is');
+  assert.deepStrictEqual(occasionsMetadata(contextFor({ date: '2026-07-07', hemisphere: 'north' })), [], 'a plan told none says so');
+  assert.strictEqual(occasionsMetadata(null), null, 'the rotation, and a plan made before the days were told');
+  assert.strictEqual(occasionsMetadata({ moon: {} }), null);
+});
+
 test('a name or word may speak of a day kept only when told of it, and only as its kind allows', () => {
   const { checkOccasions } = require('../server/lib/service/rules');
   const on = date => contextFor({ date, hemisphere: 'north' });

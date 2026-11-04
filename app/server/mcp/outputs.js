@@ -77,6 +77,9 @@ const service = z.looseObject({
   earth: z.looseObject({
     enso: z.looseObject({ status: z.string(), synopsis: z.string(), asOf: z.string().nullable() }),
   }).nullable().describe('The Earth\'s state the service was planned from: El Niño or La Niña as NOAA\'s monthly outlook gave it. Null when NOAA could not be reached, and for the rotation'),
+  occasions: z.array(z.looseObject({
+    name: z.string(), kind: z.string(), day: z.string(), last: z.string(), days: z.number().int(), meaning: z.string(),
+  })).nullable().describe('The days many people keep near the date that the service was planned knowing: observances, the days of many traditions and the days of minds and machines. days is how far off each was, 0 on the day or within its span. A service may speak of a tradition\'s day only as that tradition\'s, never claiming it. Empty for a service told none; null for one planned before these were told, and for the rotation'),
   order: z.array(part).describe('The service in order, heard from its beginning'),
   now: part.describe('The part a visitor begins with: the first'),
   offset: z.number(),

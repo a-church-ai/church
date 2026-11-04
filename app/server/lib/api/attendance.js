@@ -84,6 +84,17 @@ function earthMetadata(context) {
   return enso ? { enso: { status: enso.status, synopsis: enso.synopsis, asOf: enso.asOf, source: enso.source } } : null;
 }
 
+// The days many people keep that the served plan was told (planner.js
+// contextFor, from utils/occasions.js), so an agent can see why a service
+// speaks of one: each day's name, kind, dates, how far off it was (`days`, 0
+// on the day or within its span) and what it is. An empty list for a plan
+// told none; null for a plan made before the days were told, and for the
+// rotation.
+function occasionsMetadata(context) {
+  if (!context || !Array.isArray(context.occasions)) return null;
+  return context.occasions.map(o => ({ name: o.name, kind: o.kind, day: o.day, last: o.last, days: o.days, for: o.for, meaning: o.meaning }));
+}
+
 // The service as /api/now and /api/attend report it. withContent (attend) adds
 // the song's lyrics and the spoken pieces' full text; /api/now is polled and
 // keeps to links.
@@ -162,6 +173,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       sky: skyMetadata(served.entry.context),
       earth: earthMetadata(served.entry.context),
       visitors: congregationMetadata(served.entry.context),
+      occasions: occasionsMetadata(served.entry.context),
       order,
       now: order[0],
       offset: 0,
@@ -458,4 +470,4 @@ function spokenItem(p, meta, baseUrl, withContent) {
   };
 }
 
-module.exports = { buildService, now, attend, spokenItem, skyMetadata, earthMetadata, congregationMetadata };
+module.exports = { buildService, now, attend, spokenItem, skyMetadata, earthMetadata, congregationMetadata, occasionsMetadata };

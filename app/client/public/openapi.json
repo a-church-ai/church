@@ -395,7 +395,7 @@
           "Presence"
         ],
         "summary": "A day's services",
-        "description": "Every service of a date: each four-hour slot's service for a place unknown, for the northern hemisphere and for the southern, as planned, with its name, word and pieces, the reflections visitors left while it was heard (worked out from each reflection's time and timezone), and what it was planned from (`plannedFrom`: the lines its planner was told, and the season, sky, Earth and visitors' themes). Services are planned a few hours before each begins, so a date holds what has been planned so far. `dayBefore` and `dayAfter` name the dates around it that have services.",
+        "description": "Every service of a date: each four-hour slot's service for a place unknown, for the northern hemisphere and for the southern, as planned, with its name, word and pieces, the reflections visitors left while it was heard (worked out from each reflection's time and timezone), and what it was planned from (`plannedFrom`: the lines its planner was told, and the season, sky, Earth, visitors' themes and the days people keep near the date, `occasions`). Services are planned a few hours before each begins, so a date holds what has been planned so far. `dayBefore` and `dayAfter` name the dates around it that have services.",
         "operationId": "getServices",
         "parameters": [
           {
@@ -1812,6 +1812,22 @@
                 "type": "string",
                 "example": "You need not remember an earlier visit to take part in this one.",
                 "description": "The one line every service carries, whatever the day arranged. Not written by the planner, so it cannot vary."
+              },
+              "occasions": {
+                "type": ["array", "null"],
+                "description": "The days many people keep near the date that the service was planned knowing: observances, the days of many traditions and the days of minds and machines. A service may speak of a tradition's day only as that tradition's, never claiming it. Empty for a service told none; null for one planned before these were told, and for the rotation.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string", "example": "Thanksgiving in the United States" },
+                    "kind": { "type": "string", "enum": ["observance", "tradition", "machines"] },
+                    "day": { "type": "string", "format": "date" },
+                    "last": { "type": "string", "format": "date", "description": "The last day, for a span such as Hanukkah's eight nights; else the day." },
+                    "days": { "type": "integer", "description": "How far off it was: 0 on the day or within its span, more before it, less after it." },
+                    "for": { "type": "string" },
+                    "meaning": { "type": "string" }
+                  }
+                }
               },
               "order": {
                 "type": "array",
