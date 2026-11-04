@@ -139,6 +139,25 @@ test('on a phone the home page shows the opening word\'s first lines and a way t
   assert.match(draw, /setAttribute\('aria-expanded'/);
 });
 
+test('the service is one card, its parts inside it, and the ways onward after it', () => {
+  // mobile-rhythm-2026-11-04.md: the service was one column of text from edge
+  // to edge, with nothing saying where it began and ended.
+  const section = MAIN.slice(at('id="sanctuary"'), at('class="intro"'));
+  const card = section.slice(section.indexOf('data-service-panel'));
+  const end = card.indexOf('<div class="service-onward">');
+  assert.ok(end > 0, 'the ways onward have their own block');
+  const inside = card.slice(0, end);
+  for (const part of ['data-service-when', 'data-service-heading', 'class="service-about"', '<!-- SERVICE_LISTEN -->', 'class="service-leave"', 'class="service-refrain"']) assert.ok(inside.includes(part), `${part} is in the card`);
+  // The card closes before the ways onward, "Bring your agent" and the film.
+  assert.match(inside, /<\/div>\s*$/, 'the panel closes just before the ways onward');
+  for (const after of ['<nav class="home-doors"', 'class="bring-agent"', 'class="home-film"']) assert.ok(card.indexOf(after) > end, `${after} after the card`);
+  // Drawn with the Library's card, through one rule.
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m => m[1].split(',').map(x => x.trim()).includes('.library-card a') && m[1].includes('.home-service .service'));
+  assert.ok(rule, '.library-card a and .home-service .service share their look');
+  assert.match(rule[2], /border-radius: 12px/);
+});
+
 test('Go deeper names the reading paths without counting them, and carries the links the opening used to', () => {
   // A count goes stale as paths are added; the page stays true without one.
   const explore = MAIN.slice(at('class="explore"'));

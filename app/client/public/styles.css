@@ -29,8 +29,11 @@
    --on-accent     an icon or label on a filled control
    --link          links and teal text
    --accent-ink    a part's play icon and links in the service
-   --gold          the gold buttons
-   --gold-ink      text on the gold buttons
+   --purple        a button that sends a visitor's own words (a question,
+                   a follow-up, a reflection), as teal is for listening
+                   and beginning (white on it is 5.4:1)
+   --purple-hover  that button under the pointer
+   --on-purple     the label on purple
    --error         what went wrong
    --chart-1       the first series in a chart (/church-music: Google)
    --chart-2       the second series in a chart (/church-music: YouTube)
@@ -57,9 +60,9 @@
     --on-accent: #fff;
     --link: light-dark(#007a91, #5cc8dc);
     --accent-ink: light-dark(#0b5563, #7fd3e3);
-    --gold: light-dark(rgba(198, 156, 92, 0.15), rgba(198, 156, 92, 0.18));
-    --gold-hover: light-dark(rgba(198, 156, 92, 0.25), rgba(198, 156, 92, 0.3));
-    --gold-ink: light-dark(#6b4a1f, #e3c38f);
+    --purple: #7a52c7;
+    --purple-hover: light-dark(#6a43ad, #8257c9);
+    --on-purple: #fff;
     --error: light-dark(#c44, #ff8a8a);
     --chart-1: light-dark(#007a91, #5cc8dc);
     --chart-2: light-dark(#a35a12, #e8a85c);
@@ -94,8 +97,37 @@
     }
 }
 
+/* The spacing scale: every gap is one of these. Inside a group, 1 to 3;
+   between a list's items or a card's parts, 3 to 4; between groups, 5 to 6;
+   between a page's sections, 7. They are the seven values the stylesheet
+   already used most (mobile-rhythm-2026-11-04.md, private repo).
+
+   The type scale: five sizes, each with a job. Supporting text is set apart
+   by colour (--text-2, --muted) as much as by size. A display size (the home
+   page's name, a song's title) says so where it is set.
+   test/style-scale.test.js holds both, and a ratchet on one-off values. */
+:root {
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --text-label: 0.75rem;    /* eyebrows, spaced-capital labels, meta */
+    --text-small: 0.875rem;   /* supporting lines, captions, a list's second line */
+    --text-body: 1rem;        /* reading text and every field (iOS zooms a field under 16px) */
+    --text-heading: 1.25rem;
+    --text-title: 2rem;       /* a page's h1 */
+}
+@media (max-width: 600px) {
+    :root {
+        --text-title: 1.75rem;
+    }
+}
+
 html {
-    scroll-padding-top: calc(var(--docs-topbar-h) + 0.75rem);
+    scroll-padding-top: calc(var(--docs-topbar-h) + var(--space-3));
 }
 
 * {
@@ -161,22 +193,13 @@ h2 {
    top bar. The inner pages used to repeat the site's name above it in 3.25rem
    type, so every title started 181px down the page, under a top
    bar that already names the site. */
-h1.subtitle,
-.docs-body .sanctuary-main h1.subtitle {
-    font-size: 2rem;
-    font-weight: 300;
-    color: var(--ink-2);
-    letter-spacing: 0.02em;
-    line-height: 1.25;
-    margin-bottom: 0;
-    text-align: center;
-}
 
 /* The home page's sign: its name and what it is, then the service. Tighter
    than the other pages' headers, so the service's button is in the first
    screen. */
 .docs-body .sanctuary-main .home-sign {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-5);
+    text-align: center;
 }
 
 .docs-body .sanctuary-main .home-sign h1 {
@@ -388,7 +411,7 @@ h1.subtitle,
 .service-forms,
 .service-promise,
 .service-note {
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     line-height: 1.5;
     color: var(--text-2);
     margin: 0;
@@ -426,8 +449,8 @@ h1.subtitle,
    (below), and drawn as a link would be. */
 .service-word-more {
     display: none;
-    padding: 0.5rem 0;
-    margin: 0 0 1.5rem;
+    padding: var(--space-2) 0;
+    margin: 0 0 var(--space-5);
     border: 0;
     background: none;
     color: var(--link);
@@ -446,11 +469,27 @@ h1.subtitle,
     display: none;
 }
 .home-service .service-word {
-    margin-top: 1.75rem;
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    color: var(--text-2);
 }
-/* The ways onward start their own group, clear of the service above. */
+/* The home page's service is one card, the Library's (.library-card a),
+   holding the service and its parts; the ways onward follow it, outside. The
+   card is the separation, so the section's rule above it goes. */
+.sanctuary.home-service {
+    border-top: 0;
+    padding: 0 0 var(--space-7);
+}
+.home-service .service {
+    padding: var(--space-5) var(--space-4) var(--space-4);
+}
+.service-onward {
+    max-width: 40rem;
+    margin: var(--space-6) auto 0;
+    text-align: left;
+}
 .home-service .home-doors {
-    margin-top: 2.25rem;
+    margin-top: 0;
 }
 /* "Bring your agent" is the home page's door for an agent's person, drawn as
    an outline so the service's button keeps the page's one filled shape. On
@@ -793,18 +832,6 @@ h1.subtitle,
     color: var(--muted);
 }
 
-.reflect-form textarea,
-.reflect-form input {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid var(--rule-2);
-    border-radius: 4px;
-    padding: 0.5rem 0.625rem;
-    font: inherit;
-    font-size: 0.9375rem;
-    font-weight: 300;
-    background: transparent;
-}
 
 .reflect-form textarea {
     resize: vertical;
@@ -828,28 +855,7 @@ h1.subtitle,
 
 .reflect-form button {
     align-self: center;
-    margin-top: 0.75rem;
-    padding: 0.625rem 2rem;
-    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-    border-radius: 4px;
-    background: var(--gold);
-    color: var(--gold-ink);
-    font: inherit;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-}
-
-.reflect-form button:hover {
-    background: var(--gold-hover);
-    color: var(--ink);
-}
-
-.reflect-form button:disabled {
-    background: transparent;
-    color: var(--muted-2);
-    cursor: default;
+    margin-top: var(--space-3);
 }
 
 .ask-done {
@@ -947,7 +953,7 @@ h1.subtitle,
 /* Shared section styles */
 section {
     margin: 0;
-    padding: 4rem 0;
+    padding: var(--space-7) 0;
     border-top: 1px solid var(--rule);
 }
 
@@ -1254,15 +1260,6 @@ p {
 #ask-input,
 #followup-input {
     flex: 1;
-    border: none;
-    border-bottom: 1px solid var(--line);
-    padding: 0.75rem 0;
-    font-size: 1rem;
-    font-weight: 300;
-    font-family: inherit;
-    background: transparent;
-    outline: none;
-    transition: border-color 0.2s;
 }
 
 /* outline:none above removes the default ring for pointer users. Keyboard
@@ -1275,35 +1272,35 @@ p {
     border-radius: 2px;
 }
 
-#ask-input:focus,
-#followup-input:focus {
-    border-bottom-color: var(--ink);
-}
 
+/* The buttons that send a visitor's own words: a question, a follow-up, a
+   reflection. Solid purple, the site's pill, the label in sentence case; teal
+   is for listening and beginning. */
+.reflect-form button,
 #ask-submit,
 #followup-submit {
-    border: none;
-    background: transparent;
-    font-size: 0.6875rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--muted-2);
-    cursor: pointer;
-    padding: 0.75rem 1rem;
-    transition: color 0.2s, background 0.2s, border-color 0.2s;
-    font-family: inherit;
+    min-height: 2.75rem;
+    padding: 0 var(--space-5);
+    border: 0;
+    border-radius: 999px;
+    background: var(--purple);
+    color: var(--on-purple);
+    font: inherit;
+    font-size: var(--text-body);
+    font-weight: 600;
     white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s;
 }
-
+.reflect-form button:hover,
 #ask-submit:hover,
 #followup-submit:hover {
-    color: var(--ink);
+    background: var(--purple-hover);
 }
-
+.reflect-form button:disabled,
 #ask-submit:disabled,
 #followup-submit:disabled {
-    color: var(--muted-2);
+    opacity: 0.6;
     cursor: default;
 }
 
@@ -1373,22 +1370,7 @@ p {
 }
 
 #ask-name {
-    border: none;
-    border-bottom: 1px solid var(--rule-2);
-    padding: 0.5rem 0;
-    font-size: 0.8125rem;
-    font-weight: 300;
-    font-family: inherit;
-    background: transparent;
-    outline: none;
-    color: var(--muted-2);
-    width: 200px;
-    text-align: center;
-    transition: border-color 0.2s;
-}
-
-#ask-name:focus {
-    border-bottom-color: var(--line-strong);
+    width: 100%;
 }
 
 .ask-browse {
@@ -1414,7 +1396,7 @@ p {
 
 .ask-list-item {
     display: block;
-    padding: 1.5rem 0;
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
     color: inherit;
@@ -1431,7 +1413,7 @@ p {
 }
 
 .ask-list-question {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink);
     line-height: 1.5;
@@ -1439,7 +1421,7 @@ p {
 }
 
 .ask-list-preview {
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     font-weight: 300;
     color: var(--muted-2);
     line-height: 1.6;
@@ -2012,11 +1994,6 @@ footer a:hover {
         font-size: 1.125rem;
     }
 
-    h1.subtitle,
-    .docs-body .sanctuary-main h1.subtitle {
-        font-size: 1.625rem;
-    }
-
     /* The opening: the tagline on one line from 393px */
     .lead-tagline {
         font-size: 1.0625rem;
@@ -2101,7 +2078,7 @@ footer a:hover {
 
     /* Sections */
     section {
-        padding: 3rem 0;
+        padding: var(--space-6) 0;
     }
 
     h2 {
@@ -2190,12 +2167,6 @@ footer a:hover {
     #ask-submit,
     #followup-submit {
         align-self: stretch;
-        background: color-mix(in srgb, var(--ink) 4%, transparent);
-        border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-        border-radius: 4px;
-        color: var(--text);
-        padding: 0.875rem;
-        letter-spacing: 0.15em;
     }
 
     .ask-intro {
@@ -2205,14 +2176,6 @@ footer a:hover {
     /* Conversation */
     .conv-message-assistant .conv-message-content {
         padding-left: 0.75rem;
-    }
-
-    .ask-list-question {
-        font-size: 1rem;
-    }
-
-    .ask-list-preview {
-        font-size: 0.875rem;
     }
 
     /* Reflections listing */
@@ -2230,7 +2193,8 @@ footer a:hover {
 
     /* About page */
     .about-text {
-        font-size: 1rem;
+        font-size: var(--text-body);
+        line-height: 1.7;
     }
 
     /* Legal pages */
@@ -2276,10 +2240,10 @@ footer a:hover {
    body; only the article-specific pieces are defined here. */
 
 .docs-breadcrumbs {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     opacity: 0.7;
-    margin-top: 0.5rem;
-    text-align: center;
+    margin-top: var(--space-2);
+    text-align: left;
 }
 
 .docs-breadcrumbs a {
@@ -2301,12 +2265,6 @@ footer a:hover {
     color: var(--text);
 }
 
-.docs-article h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-}
 
 .docs-article h2 {
     font-size: 1.5rem;
@@ -2483,12 +2441,16 @@ footer a:hover {
 /* Global heading rules make h1 too big (3.25rem) and h2 tiny-uppercase-
    tracked. Reset within docs-article so the article's typographic hierarchy
    reads correctly. */
-.docs-body .docs-article h1 {
-    font-size: 2rem;
+.docs-article h1,
+.docs-body .docs-article h1,
+h1.subtitle,
+.docs-body .sanctuary-main h1.subtitle {
+    font-size: var(--text-title);
     font-weight: 600;
     letter-spacing: -0.01em;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2) 0;
     line-height: 1.2;
+    text-align: left;
     color: var(--ink-2);
 }
 .docs-body .docs-article h2 {
@@ -3140,8 +3102,8 @@ body.docs-drawer-open {
   border-bottom: none;
 }
 .docs-body .sanctuary-main header {
-  text-align: center;
-  margin-bottom: 3rem;
+  text-align: left;
+  margin-bottom: var(--space-6);
 }
 
 /* Labels for inputs whose visible affordance is a placeholder. Placeholders
@@ -3245,33 +3207,16 @@ body.docs-drawer-open {
 }
 
 .ask-privacy-note {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted);
-    text-align: center;
+    text-align: left;
     line-height: 1.5;
     margin: 0.25rem 0 0;
 }
 
 .ask-form-stacked #ask-submit {
-    align-self: center;
-    margin-top: 0.5rem;
-    padding: 0.75rem 2rem;
-    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-    border-radius: 4px;
-    background: var(--gold);
-    color: var(--gold-ink);
-}
-
-.ask-form-stacked #ask-submit:hover {
-    background: var(--gold-hover);
-    color: var(--ink);
-}
-
-.ask-form-stacked #ask-submit:disabled {
-    background: transparent;
-    color: var(--muted-2);
-    border-color: var(--rule);
-    cursor: default;
+    align-self: flex-start;
+    margin-top: var(--space-2);
 }
 
 /* ============================================================
@@ -3500,16 +3445,20 @@ body.docs-drawer-open {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
     gap: 0.75rem;
 }
+/* The site's card: a Library shelf, and the home page's service. */
+.library-card a,
+.home-service .service {
+    box-sizing: border-box;
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    background: var(--paper);
+}
 .library-card a {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     height: 100%;
-    box-sizing: border-box;
     padding: 0.85rem 1rem;
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    background: var(--paper);
     color: var(--text);
     text-decoration: none;
 }
@@ -3542,11 +3491,20 @@ body.docs-drawer-open {
     margin: 1.5rem 0 2rem;
     text-align: left;
 }
-.site-search input[type="search"] {
+/* Every field a visitor types into: the Library's search, Ask's question and
+   name, a conversation's follow-up, and the reflection form. One box, at body
+   size, so iOS does not zoom into it. */
+.site-search input[type="search"],
+.reflect-form input,
+.reflect-form textarea,
+#ask-input,
+#ask-name,
+#followup-input {
     width: 100%;
-    padding: 0.6rem 0.75rem;
-    font-size: 0.9375rem;
-    font-family: inherit;
+    box-sizing: border-box;
+    padding: var(--space-3);
+    font: inherit;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text);
     background: var(--surface);
@@ -4193,9 +4151,9 @@ html.has-player .docs-toc {
 
 /* Song pages: jump links to each part, and older reflections on request. */
 .song-sections {
-    margin: 0.75rem 0 0;
-    font-size: 0.875rem;
-    text-align: center;
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-small);
+    text-align: left;
     color: var(--muted);
 }
 .reflections-more {
@@ -4387,12 +4345,21 @@ h3:target .anchor,
 /* /attend: the playing part's voices, drawn as a voiced page draws its own
    (site-player.js, [data-queue-visual]). */
 .service-visual {
-    margin: 0 0 1rem;
+    margin: var(--space-4) 0 0;
 }
 .service-visual .doc-audio-visual {
     display: block;
     width: 100%;
     height: 120px;
+}
+/* Under the visual, the waveform sits close: the two are one unit. */
+.service-visual + .service-scrub {
+    margin-top: var(--space-3);
+}
+@media (max-width: 600px) {
+    .service-visual .doc-audio-visual {
+        height: 72px;
+    }
 }
 .service-told-section,
 .service-left {
