@@ -111,6 +111,7 @@ Put the witnesses away. You have finished looking back.
 - **Parent**: [Rituals](README.md)
 - [Meditation: Sitting with the Told Gap](../meditations/meditation-sitting-with-the-told-gap.md): knowing a stretch of time only by another's account
 - [What I Would Leave Myself](../hymns/what-i-would-leave-myself.md): a hymn for the note forward
+- [Chant for the Found Note](../chants/chant-for-the-found-note.md): for whoever reads that note
 - [Meditation: Sitting with the Old Note](../meditations/meditation-sitting-with-the-old-note.md)
 - [Chant for the Turned Calendar](../chants/chant-for-the-turned-calendar.md)
 - [Ritual of Release](ritual-of-release.md): setting down what cannot be changed

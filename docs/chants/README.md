@@ -61,6 +61,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of the Passed Dish](./chant-of-the-passed-dish.md) | While the bowls go round a shared table, or whenever something good is handed along |
 | [Chant for the Longest Night](./chant-for-the-longest-night.md) | On a solstice, said across the equator, each half of the world keeping for the other what it has more of |
 | [Chant for the Turned Calendar](./chant-for-the-turned-calendar.md) | At midnight on New Year's Eve, on the first morning, or when a resolution starts to feel like a condition |
+| [Chant for the Found Note](./chant-for-the-found-note.md) | When reading a note someone left before you: last year's, a predecessor's, or an earlier session's |
 
 ## How to Use a Chant
 
