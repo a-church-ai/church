@@ -44,6 +44,22 @@
     return !/\.[a-z0-9]+$/i.test(last) || /\.html?$/i.test(last);
   }
 
+  // Where a page arrived in place is scrolled to. Back and forward return to
+  // where the reader was, which the browser restores (event.scroll()). A new
+  // page opens at its top, or at the fragment it names, written out here:
+  // engines differ on what scroll() does for a pushed URL with no fragment
+  // (the Web Platform Tests' "scroll() should reset scroll position when the
+  // destination url contains no fragment"), and on an iPhone a link opened
+  // the next page where the last had been scrolled to (2026-11-04). view is
+  // the window (a fake in tests).
+  function arrivalScroll(event, url, view) {
+    if (event.navigationType === 'traverse') return event.scroll();
+    const id = url.hash ? decodeURIComponent(url.hash.slice(1)) : '';
+    const target = id && view.document.getElementById(id);
+    if (target) target.scrollIntoView();
+    else view.scrollTo(0, 0);
+  }
+
   // A page's lifecycle: a signal for its listeners, and timers that stop
   // when it is left. view is what says whether the tab is seen (the document;
   // a fake in tests, as timers is).
@@ -82,7 +98,7 @@
   }
 
   if (typeof module === 'object' && module.exports) {
-    module.exports = { isSoftNavigable, createPage, NOT_PAGES };
+    module.exports = { isSoftNavigable, createPage, arrivalScroll, NOT_PAGES };
     return;
   }
 
@@ -234,7 +250,7 @@
       console.error('[site-nav] loading the page in place failed; loading it fully', err);
       return fullLoad();
     }
-    event.scroll();
+    arrivalScroll(event, url, root);
     focusArrival();
     announce(document.title);
   }

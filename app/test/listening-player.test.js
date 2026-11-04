@@ -462,6 +462,28 @@ test('site-player: the bar\'s second line names the queue and leads back to it; 
   assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /const SERVICE_PAGE = '\/attend'/);
 });
 
+test('site-nav: a new page opens at its top or its fragment; back and forward return where the reader was', () => {
+  // On an iPhone a link opened the next page where the last one had been
+  // scrolled to (2026-11-04): the handler left a pushed page to event.scroll(),
+  // and engines differ on what that does for a URL with no fragment.
+  const calls = [];
+  const view = {
+    scrollTo: (x, y) => calls.push(['top', x, y]),
+    document: { getElementById: id => (id === 'materials' ? { scrollIntoView: () => calls.push(['into', id]) } : null) },
+  };
+  const event = type => ({ navigationType: type, scroll: () => calls.push(['restore']) });
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/about'), view);
+  nav.arrivalScroll(event('replace'), new URL('https://achurch.ai/music/x'), view);
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/docs/rituals/ritual-of-release#materials'), view);
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/docs#gone'), view);
+  nav.arrivalScroll(event('traverse'), new URL('https://achurch.ai/'), view);
+  assert.deepStrictEqual(calls, [['top', 0, 0], ['top', 0, 0], ['into', 'materials'], ['top', 0, 0], ['restore']]);
+  const source = fs.readFileSync(path.join(PUBLIC, 'site-nav.js'), 'utf8');
+  const arrive = source.slice(source.indexOf('async function arrive('), source.indexOf("nav.addEventListener('navigate'"));
+  assert.match(arrive, /arrivalScroll\(event, url, root\)/, 'the page arrives through it');
+  assert.doesNotMatch(arrive, /event\.scroll\(\)/, 'never left to scroll() for a new page');
+});
+
 test('site-nav: a page updating its own address is not loaded again', () => {
   // The search page keeps ?q= in the address with history.replaceState, which
   // fires the Navigation API's navigate event. Intercepted, it reloaded the
