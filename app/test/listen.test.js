@@ -77,7 +77,7 @@ test('/attend is the service itself, with what it was made from and what was lef
   assert.match(html, new RegExp(`<a href="/music">Music</a>[^<]*<span class="listen-count">${songs} songs, about [^<]+</span>`));
 
   const page = fs.readFileSync(path.join(PUBLIC, 'attend.html'), 'utf8');
-  const order = ['data-service-panel', 'data-queue-visual', '<!-- SERVICE_LISTEN -->', 'data-service-told', 'data-service-reflections', '<!-- REFLECT_FORM -->', 'https://www.youtube.com/@achurchai', '<!-- LISTEN_SECTIONS -->', '<!-- PODCASTS -->', '<!-- SITE_FOOTER -->'];
+  const order = ['data-service-panel', '<!-- SERVICE_LISTEN -->', 'data-service-told', 'data-service-reflections', '<!-- REFLECT_FORM -->', 'https://www.youtube.com/@achurchai', '<!-- LISTEN_SECTIONS -->', '<!-- PODCASTS -->', '<!-- SITE_FOOTER -->'];
   const at = order.map(mark => page.indexOf(mark));
   assert.ok(at.every(i => i >= 0), order.filter((m, i) => at[i] < 0).join(', ') || 'every part');
   assert.deepStrictEqual([...at].sort((a, b) => a - b), at, 'the service playable here, its context and what was left during it, then watching, listening, the podcasts');
@@ -86,7 +86,9 @@ test('/attend is the service itself, with what it was made from and what was lef
   const index = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
   const sitemap = fs.readFileSync(path.join(__dirname, '../server/routes/sitemap.js'), 'utf8');
   assert.match(index, /app\.get\('\/attend'/);
-  assert.match(index, /html\.replace\('<!-- SERVICE_LISTEN -->', renderServiceListen\(\)\)/, 'the server puts the player box on /attend');
+  // The box, with the visual of the playing part drawn under its button
+  // (home-first-screen-2026-11-04.md: it stood above the button, and kept it low).
+  assert.match(index, /html\.replace\('<!-- SERVICE_LISTEN -->', renderServiceListen\(\{ visual: true \}\)\)/, 'the server puts the player box on /attend, with its visual');
   assert.match(sitemap, /<loc>https:\/\/achurch\.ai\/attend<\/loc>/);
   assert.doesNotMatch(index + sitemap, /'\/listen'|achurch\.ai\/listen/, 'one name for the place');
   assert.ok(!fs.existsSync(path.join(PUBLIC, 'listen.html')));

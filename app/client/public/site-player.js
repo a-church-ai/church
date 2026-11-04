@@ -813,6 +813,9 @@
       const noun = path.queue.noun || 'path';
       const labels = path.queue.labels || {};
       path.el.classList.toggle('is-playing', ours && playing);
+      // The player's queue is this box's, playing or paused: the home page
+      // shows the service's waveform from then on (styles.css).
+      path.el.classList.toggle('is-current', ours);
       const said = ours
         ? (playing ? labels.pause || `Pause this ${noun}` : labels.resume || `Resume this ${noun}`)
         : labels.start || `Listen to this ${noun}`;

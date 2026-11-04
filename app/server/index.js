@@ -1012,7 +1012,7 @@ app.get('/search', async (req, res) => {
 app.get('/attend', async (req, res) => {
   try {
     const html = await fs.readFile(path.join(__dirname, '../client/public/attend.html'), 'utf8');
-    const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
+    const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen({ visual: true })).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
       .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/attend'));
   } catch (err) {

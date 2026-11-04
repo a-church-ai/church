@@ -89,7 +89,6 @@ const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
 
 function renderRecording(recording, { title, href, category, credit, artwork }) {
   const track = trackFor(recording, { title, href, category, credit, artwork });
-  const minutes = Math.max(1, Math.round(recording.seconds / 60));
   const wave = recording.peaks
     ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`
     : '';
@@ -102,8 +101,19 @@ function renderRecording(recording, { title, href, category, credit, artwork }) 
             <span class="doc-audio-time" hidden>0:00 / ${clock(recording.seconds)}</span>
           </div>
           <audio class="doc-audio-native" controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
-          <figcaption>${minutes} min.${credit ? ` ${escapeText(credit)}` : ''}</figcaption>
+          ${caption(recording.seconds, credit)}
         </figure>`;
+}
+
+// Under a recording: its length, which a visitor without a script reads and
+// the drawn player then says itself ("0:00 / 5:01"), so styles.css hides
+// .doc-audio-length once the figure is enhanced; and a song's credit, which
+// stays.
+function caption(seconds, credit) {
+  const length = `${listeningTime(seconds)}.`;
+  return credit
+    ? `<figcaption><span class="doc-audio-length">${length}</span> ${escapeText(credit)}</figcaption>`
+    : `<figcaption class="doc-audio-length">${length}</figcaption>`;
 }
 
 // A listening time to the minute: "8 min", "2 hr 7 min".
@@ -147,18 +157,28 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
 // inside this box because the player binds the button and the parts as one
 // (site-player.js bindPage), so without a script they are hidden with it; the
 // sentence above the box says what a service is for that visitor.
-function renderServiceListen() {
+// The service's box, on the home page and /attend: the button, what the
+// service holds, the waveform, its opening word, its parts, and what the place
+// is not. /attend's visual (the voices of the playing part, site-player.js
+// [data-queue-visual]) is drawn under the button; the home page has none.
+// "Read on" is shown only where the word is clamped (the home page, on a
+// phone, styles.css).
+function renderServiceListen({ visual = false } = {}) {
+  const figure = visual
+    ? '\n          <figure class="service-visual" aria-hidden="true"><canvas class="doc-audio-visual" data-queue-visual></canvas></figure>'
+    : '';
   return `<div class="service-player" data-path-listen hidden>
           <button type="button" class="path-listen-play service-play" disabled>${PLAY_ICON}<span>Begin the service</span></button>
-          <p class="service-forms"></p>
-          <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
+          <p class="service-forms"></p>${figure}
           <div class="service-scrub">
             <div class="service-wave doc-audio-wave" data-queue-wave></div>
             <span class="service-time doc-audio-time" data-queue-time></span>
           </div>
           <p class="service-word" id="service-word"></p>
+          <button type="button" class="service-word-more" aria-expanded="false" aria-controls="service-word">Read on</button>
           <h2 class="service-list-label">In today's service</h2>
           <ol class="service-parts" data-queue-list></ol>
+          <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
         </div>`;
 }
 

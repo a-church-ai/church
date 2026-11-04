@@ -110,7 +110,8 @@ test('its page credits its voice at the foot, and its structured data and its ep
 
   const page = await (await docsServer(t))(doc.urlPath);
   assert.match(page, new RegExp(`src="/audio/${rec.file}"`));
-  assert.ok(page.includes(`<figcaption>${Math.round(rec.seconds / 60)} min.</figcaption>`), 'under the player, its length alone');
+  const { listeningTime } = require('../server/lib/audio/markup');
+  assert.ok(page.includes(`<figcaption class="doc-audio-length">${listeningTime(rec.seconds)}.</figcaption>`), 'under the player, its length alone, hidden once the player shows its time');
   const credit = page.indexOf('<p class="doc-audio-credit">Recording: AI voice from ElevenLabs.</p>');
   assert.ok(credit > page.indexOf('## About the Recording') && credit > page.indexOf('About the Recording'), 'the credit follows the document, at its foot');
   const related = page.indexOf('related-heading');

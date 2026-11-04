@@ -137,6 +137,22 @@ test('every day\'s page is listed, newest first, with its services\' names', asy
   assert.ok(html.match(/<meta name="description" content="([^"]*)"/)[1].length <= 158);
 });
 
+test('the index gives each day its count and its first three names, not every name', () => {
+  // Every name of every day, joined by dots, made /services the densest page
+  // on the site (home-first-screen-2026-11-04.md): each day now names a few,
+  // and its own page names them all.
+  const names = Array.from({ length: 18 }, (_, i) => `Name ${i + 1}`);
+  const html = pageLists.servicesIndexPage([
+    { date: '2026-11-04', names },
+    { date: '2026-11-03', names: ['Only One', 'And Two'] },
+    { date: '2026-11-02', names: ['Alone'] },
+  ]);
+  assert.match(html, /<span class="services-names">18 services · Name 1, Name 2, Name 3 and 15 more<\/span>/);
+  assert.match(html, /<span class="services-names">two services · Only One and And Two<\/span>/);
+  assert.match(html, /<span class="services-names">a service · Alone<\/span>/);
+  assert.doesNotMatch(html, /Name 4\b/);
+});
+
 test('the REST route answers like the operation: GET /api/services/:date', async () => {
   const app = express();
   app.use('/api', require('../server/routes/api'));

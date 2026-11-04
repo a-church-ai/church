@@ -153,3 +153,16 @@ test('the report counts visitors, returning ones, each view once, and how far se
   assert.match(text({ site: 'https://achurch.ai', days: 7, window: { from: '2026-10-26', to: '2026-11-01' }, generatedAt: '2026-11-01T12:00:00Z', server: stats, warnings: [] }), /links followed, by section: home-service 1 \(\/attend 1\)/);
   assert.strictEqual(v.listens.started.value, 1);
 });
+
+test('the card asks without leaning: both answers look the same, and each is a full tap target', () => {
+  // "Count me in" was filled and "No thanks" an outline, so accepting was the
+  // stronger-looking choice (home-first-screen-2026-11-04.md). Both now take
+  // their look from the rule they share; their classes are the script's hooks.
+  const css = fs.readFileSync(path.join(__dirname, '../client/public/styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.doesNotMatch(css, /\.visits-(yes|no)\b[^{}]*\{/, 'no styles of their own');
+  const heights = [...css.matchAll(/\.visits-card-actions button\s*\{[^}]*min-height: ([\d.]+)rem/g)].map(m => Number(m[1]));
+  assert.ok(heights.length >= 2, 'the card and its phone layout');
+  for (const h of heights) assert.ok(h * 16 >= 44, `${h}rem is under 44px`);
+  const script = fs.readFileSync(path.join(__dirname, '../client/public/visits.js'), 'utf8');
+  assert.match(script, /class="visits-yes">Count me in<\/button><button type="button" class="visits-no">No thanks<\/button>/);
+});

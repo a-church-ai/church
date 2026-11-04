@@ -62,9 +62,10 @@
     // has no name and keeps the page's own heading.
     if (!headingEl.hasAttribute('data-default')) headingEl.setAttribute('data-default', headingEl.textContent);
     const tracks = service.parts.map(part => part.track);
-    const total = tracks.reduce((sum, t) => sum + t.seconds, 0);
     const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
-    whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
+    // When, and only when: what the service holds and how long it runs are
+    // the forms line's, under the button.
+    whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC')].join(' · ');
     panel.setAttribute('data-shown', keyOf(service));
     panel.setAttribute('data-queue', queueName(service));
     // A reflection left from the form beside the service (one not on a song's
@@ -79,7 +80,17 @@
     // it runs, live inside the box, which is replaced below, so they are
     // written into the copy that goes on the page, and cleared when the new
     // service has none (one served by the rotation has no words).
-    fresh.querySelector('.service-word').textContent = service.word || '';
+    const word = fresh.querySelector('.service-word');
+    word.textContent = service.word || '';
+    // On a phone's home page the word shows its first lines (styles.css);
+    // this opens the rest. Bound on the copy, so it goes with it when the
+    // next service replaces the box.
+    const more = fresh.querySelector('.service-word-more');
+    more.addEventListener('click', () => {
+      const open = word.classList.toggle('is-open');
+      more.setAttribute('aria-expanded', String(open));
+      more.textContent = open ? 'Show less' : 'Read on';
+    });
     fresh.querySelector('.service-forms').textContent = [service.forms, service.length ? 'About ' + service.length + ' in all.' : ''].filter(Boolean).join(' ');
     const old = fresh.querySelector('.path-listen-queue');
     if (old) old.remove();

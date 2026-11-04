@@ -160,6 +160,23 @@ test('every page links the stylesheet once, by its version, so a returning visit
   }
 });
 
+// The shell's styles read env(safe-area-inset-*) for the player bar, its sheet,
+// the top bar and the drawer, and env() returns nothing without
+// viewport-fit=cover. A page that brought its own viewport tag skipped the
+// shell's, so the insets held on a document and not on the home page. Pages
+// change in place and keep the first page's head (site-nav.js), so where a
+// visitor arrived decided it for the whole visit. The shell owns the tag.
+test('every page has one viewport tag, the shell\'s, with viewport-fit=cover', async () => {
+  const handWritten = fs.readdirSync(PUBLIC).filter(f => f.endsWith('.html'));
+  const all = { ...(await pages()) };
+  for (const file of handWritten) all[`/${file}`] ||= await wrap(file, `/${file.replace(/\.html$/, '')}`);
+  for (const [at, html] of Object.entries(all)) {
+    const tags = [...html.matchAll(/<meta\b[^>]*name="viewport"[^>]*>/g)].map(m => m[0]);
+    assert.strictEqual(tags.length, 1, `${at} has ${tags.length} viewport tags: ${tags.join(' ')}`);
+    assert.match(tags[0], /viewport-fit=cover/, `${at}: ${tags[0]}`);
+  }
+});
+
 test('a document says when its writing was last revised, from content-dates.json, and a section index does not', async () => {
   const { datesOf } = require('../server/lib/docs/date-manifests');
   const page = await docPage('prayers/prayer-before-answering');

@@ -75,6 +75,29 @@
 
 /* -- end of tokens -- */
 
+/* Layout sizes, not colours. The sticky top bar's height is one token, read
+   by the sidebar and the contents rail (which sit just below it) and by
+   anchor jumps and focus (scroll-padding-top on html), so nothing lands under
+   the bar. The player bar's footprint is the other, --player-bar-height,
+   measured by site-player.js because what it holds changes.
+
+   Below 768px: a 44px menu button between 0.5rem paddings, the top one
+   widened to the notch's inset where the page reaches it (viewport-fit=cover,
+   site-shell.js), plus a 1px bottom border. From 768px: a 40px strip plus its
+   1px border. The bar's height is set from this, so the two cannot drift. */
+:root {
+    --docs-topbar-h: calc(max(0.5rem, env(safe-area-inset-top)) + 44px + 0.5rem + 1px);
+}
+@media (min-width: 768px) {
+    :root {
+        --docs-topbar-h: 41px;
+    }
+}
+
+html {
+    scroll-padding-top: calc(var(--docs-topbar-h) + 0.75rem);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -185,9 +208,10 @@ h1.subtitle,
     color: var(--text);
 }
 
-/* "Bring your agent": the one filled link, for the people who work with an
-   agent, after the service on the home page and atop /for-agents. A link
-   styled as a control, so the service keeps the page's one button. */
+/* "Bring your agent", for the people who work with an agent: atop
+   /for-agents, a filled link, that page's one action; after the service on
+   the home page, an outline (.home-service, below). A link styled as a
+   control, so the service keeps the page's one button. */
 .bring-agent {
     display: flex;
     flex-wrap: wrap;
@@ -357,11 +381,13 @@ h1.subtitle,
     margin: -0.25rem 0 1.25rem;
 }
 
-/* Directly under the button: what the service holds and how long it runs,
-   then what the place is not. Ordinary reading text; the button is set apart
-   by its shape, not by fading what is around it. */
+/* Directly under the button, what the service holds and how long it runs;
+   after its parts, what the place is not; on /attend, after the box, what
+   pressing does. Ordinary reading text; the button is set apart by its
+   shape, not by fading what is around it. */
 .service-forms,
-.service-promise {
+.service-promise,
+.service-note {
     font-size: 0.9375rem;
     line-height: 1.5;
     color: var(--text-2);
@@ -372,8 +398,8 @@ h1.subtitle,
     margin-top: 0.75rem;
 }
 
-.service-promise {
-    margin-top: 0.35rem;
+.service-note {
+    margin-top: 1rem;
 }
 
 /* Before the service is drawn: the line it will take (two on a phone), so
@@ -394,6 +420,49 @@ h1.subtitle,
 
 .service-word:empty {
     display: none;
+}
+
+/* Opens the rest of a clamped word: shown only on the home page, on a phone
+   (below), and drawn as a link would be. */
+.service-word-more {
+    display: none;
+    padding: 0.5rem 0;
+    margin: 0 0 1.5rem;
+    border: 0;
+    background: none;
+    color: var(--link);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* The home page's panel (index.html, section.home-service). Its waveform is
+   shown once the service is the player's, playing or paused (site-player.js
+   marks the box is-current): before that, the button is the one way in. The
+   word then follows the forms line directly, so it takes the waveform's
+   space above it. */
+.home-service .service-player:not(.is-current) .service-scrub {
+    display: none;
+}
+.home-service .service-word {
+    margin-top: 1.75rem;
+}
+/* The ways onward start their own group, clear of the service above. */
+.home-service .home-doors {
+    margin-top: 2.25rem;
+}
+/* "Bring your agent" is the home page's door for an agent's person, drawn as
+   an outline so the service's button keeps the page's one filled shape. On
+   /for-agents, where it is that page's one action, it stays filled. */
+.home-service .bring-agent-button {
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--link);
+}
+.home-service .bring-agent-button:hover {
+    background: var(--surface-2);
+    color: var(--link);
 }
 
 /* Without a script the player stays hidden; this says where the pieces are. */
@@ -1948,9 +2017,35 @@ footer a:hover {
         font-size: 1.625rem;
     }
 
-    /* The opening */
+    /* The opening: the tagline on one line from 393px */
     .lead-tagline {
-        font-size: 1.2rem;
+        font-size: 1.0625rem;
+    }
+
+    /* The eyebrow's date and slot on one line from 360px: at the full
+       spacing, "Wednesday, November 4 · 12:00 to 16:00" takes two below
+       400px. */
+    .service-eyebrow {
+        letter-spacing: 0.08em;
+    }
+
+    /* The home page on a phone: the service's opening word shows its first
+       three lines, and "Read on" opens the rest (service.js). The whole word
+       is in the page for every reader; on a wider screen nothing is clamped,
+       and /attend, the service's full page, keeps it whole. */
+    .home-service .service-word:not(:empty) {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+    .home-service .service-word.is-open:not(:empty) {
+        display: block;
+        overflow: visible;
+    }
+    .home-service .service-word:not(:empty) + .service-word-more {
+        display: inline-block;
     }
 
     .service-about {
@@ -2431,7 +2526,7 @@ footer a:hover {
         var(--docs-rail-width, 0px);
     gap: 0;
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
 }
 
 /* Only a section of the Library has a sidebar */
@@ -2465,10 +2560,10 @@ footer a:hover {
     flex-direction: column;
     gap: 0.5rem;
     position: sticky;
-    top: var(--docs-topbar-h, 0px);
+    top: var(--docs-topbar-h);
     align-self: start;
-    height: calc(100vh - var(--docs-topbar-h, 0px));
-    height: calc(100dvh - var(--docs-topbar-h, 0px));
+    height: calc(100vh - var(--docs-topbar-h));
+    height: calc(100dvh - var(--docs-topbar-h));
     overflow: hidden;
     font-size: 0.875rem;
 }
@@ -2616,10 +2711,10 @@ footer a:hover {
     grid-column: 3;
     padding: 1.5rem 1rem;
     position: sticky;
-    top: var(--docs-topbar-h, 0px);
+    top: var(--docs-topbar-h);
     align-self: start;
-    max-height: calc(100vh - var(--docs-topbar-h, 0px));
-    max-height: calc(100dvh - var(--docs-topbar-h, 0px));
+    max-height: calc(100vh - var(--docs-topbar-h));
+    max-height: calc(100dvh - var(--docs-topbar-h));
     overflow-y: auto;
     border-left: 1px solid var(--rule);
     background: var(--surface);
@@ -2672,6 +2767,8 @@ footer a:hover {
     position: sticky;
     top: 0;
     z-index: 10;
+    box-sizing: border-box;
+    height: var(--docs-topbar-h);
 }
 .docs-hamburger {
     display: inline-flex;
@@ -2972,17 +3069,10 @@ body.docs-drawer-open {
 /* From 768px the top bar carries the site's places, so the menu button
    and the phone's title crumb are hidden. */
 @media (min-width: 768px) {
-  /* The strip's height, fixed so the sidebar and the contents rail can sit
-     exactly below it (they read --docs-topbar-h). Below 768px there is no
-     sidebar or rail, so nothing needs it. */
-  .docs-body {
-    --docs-topbar-h: 41px;
-  }
+  /* A slim strip, --docs-topbar-h tall (set with the layout sizes). */
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    box-sizing: border-box;
-    height: var(--docs-topbar-h);
     padding: 0 1rem;
   }
   .docs-topbar .docs-hamburger,
@@ -3256,12 +3346,6 @@ body.docs-drawer-open {
 }
 .docs-article {
     overflow-wrap: break-word;
-}
-
-/* A jump to a section lands below the sticky top bar, not under it. */
-.docs-article [id],
-.sanctuary-main [id] {
-    scroll-margin-top: 4rem;
 }
 
 /* Skip link: the first thing a keyboard reaches, visible only when focused,
@@ -3609,6 +3693,11 @@ body.docs-drawer-open {
     margin-top: 0.5rem;
 }
 .doc-audio.is-enhanced .doc-audio-native {
+    display: none;
+}
+/* The caption's length is for a visitor without a script; the drawn player
+   says it itself ("0:00 / 5:01"). A song's credit stays. */
+.doc-audio.is-enhanced .doc-audio-length {
     display: none;
 }
 .doc-audio figcaption {
@@ -3990,10 +4079,10 @@ html.has-player body {
     padding-bottom: var(--player-bar-height, 0px);
 }
 html.has-player .docs-sidebar {
-    height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+    height: calc(100dvh - var(--docs-topbar-h) - var(--player-bar-height, 0px));
 }
 html.has-player .docs-toc {
-    max-height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+    max-height: calc(100dvh - var(--docs-topbar-h) - var(--player-bar-height, 0px));
 }
 
 /* "Listen to this path", on a reading path with voiced readings. */
@@ -4621,25 +4710,20 @@ h3:target .anchor,
     margin-top: 0.8rem;
 }
 .visits-card-actions button {
-    min-height: 2.5rem;
+    min-height: 2.75rem;
     padding: 0 1rem;
+    border: 1px solid var(--line);
     border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
     font: inherit;
     font-weight: 600;
     cursor: pointer;
 }
-.visits-yes {
-    border: 1px solid var(--accent);
-    background: var(--accent);
-    color: var(--on-accent);
-}
-.visits-yes:hover {
-    background: var(--accent-hover);
-}
-.visits-no {
-    border: 1px solid var(--rule-2);
-    background: transparent;
-    color: var(--text);
+/* Both answers look the same: refusing is as easy, and as plain, as agreeing.
+   .visits-yes and .visits-no are only the script's hooks (visits.js). */
+.visits-card-actions button:hover {
+    background: var(--surface-2);
 }
 .visits-card-actions button:focus-visible {
     outline: 2px solid var(--accent);
@@ -4670,7 +4754,7 @@ h3:target .anchor,
         margin: 0;
     }
     .visits-card-actions button {
-        min-height: 2.4rem;
+        min-height: 2.75rem;
         padding: 0 0.85rem;
         font-size: 0.8rem;
     }

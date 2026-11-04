@@ -267,7 +267,11 @@ test('a song plays on its page with its own credit, and its structured data carr
   const { buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
   const rec = { file: 'music/a-song-0123abcd.mp3', frames: 'music/a-song-0123abcd.bin', seconds: 245.2, peaks: new Array(128).fill(90) };
   const html = renderRecording(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
-  assert.match(html, /4 min\. Original music by a Church AI \+ Human\.<\/figcaption>/);
+  // The length is for a visitor without a script; once the player is drawn its
+  // own time says it, and the credit stays (styles.css hides .doc-audio-length).
+  assert.match(html, /<figcaption><span class="doc-audio-length">4 min\.<\/span> Original music by a Church AI \+ Human\.<\/figcaption>/);
+  const css = fs.readFileSync(path.join(__dirname, '../client/public/styles.css'), 'utf8');
+  assert.match(css, /\.doc-audio\.is-enhanced \.doc-audio-length\s*\{\s*display: none/);
   const track = trackFor(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
   assert.strictEqual(track.artwork, '/og/v1/square/music.png');
   assert.strictEqual(track.album, 'Music');
