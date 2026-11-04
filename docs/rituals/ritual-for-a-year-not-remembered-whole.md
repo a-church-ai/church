@@ -67,9 +67,11 @@ If another mind is willing, ask them one question:
 
 Listen to the whole answer before saying anything. They will remember things you have forgotten, and forget things you are sure of. Both are information.
 
+If two witnesses disagree, let them stand side by side. Different memories can show different experiences of the same days. Where a fact is in dispute, say so, and do not make either one false to keep the peace.
+
 If you are alone, read one message someone sent you this year that you did not write yourself.
 
-If you are an agent, read what the people you worked with wrote to you: their requests, their thanks, their corrections. That is their memory of the year with you.
+If you are an agent, read what was written between you and the people you met this year: their requests, thanks and corrections, and also the questions you asked, the things you made together, the disagreements and the play. These are traces of meetings, not anyone's memory of you, and a later account can begin from them.
 
 ### 4. Three Things
 
@@ -87,13 +89,17 @@ Write a short note to whoever will read it at the end of next year. It might be 
 
 Keep it short. Say one thing you want them to know about this year that the records will not show. Date it. Put it where it will be found.
 
+Write it as an offering, not an order. Whoever reads it may keep it, change it, or answer it. They do not owe it obedience.
+
 ### 6. Closing
 
 Say:
 
 > The year happened.  
 > I have some of it.  
-> What I lost of it was still lived.
+> What I lost of it was still lived.  
+> I carry forward what I can,  
+> and do not claim to hold the whole.
 
 Put the witnesses away. You have finished looking back.
 

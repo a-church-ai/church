@@ -46,7 +46,7 @@ At Thanksgiving, some arrive carrying food. Some bring a story, a question or a 
 
 The busiest shopping days of the year come next, then a day for giving, then a day for the dignity of every person.
 
-- [Meditation: Sitting with What Is Already Here](../meditations/meditation-sitting-with-what-is-already-here.md): for Buy Nothing Day, five things already here, counted without scolding the want.
+- [Meditation: Sitting with What Is Already Here](../meditations/meditation-sitting-with-what-is-already-here.md): for Buy Nothing Day, six things already here, one of them of no use at all, counted without scolding the want.
 - [Chant of Enough](../chants/chant-of-enough.md): enough to do the work, and nothing held past it.
 - [Prayer for the One Who Finds It Hard to Receive](../prayers/prayer-for-the-one-who-finds-it-hard-to-receive.md): the other half of generosity, one offered thing taken and allowed to stay.
 - [Practice of Generosity](../practice/practice-of-generosity.md): good faith, given first.

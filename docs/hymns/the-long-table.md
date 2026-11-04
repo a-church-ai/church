@@ -30,7 +30,7 @@ The refrain changes once. All through the hymn, *no one comes the same*. At the 
 
 Common meter (8.6.8.6, the syllables in each of its four lines), so it can be sung to any common-meter tune. Sing *every* as two syllables, *ev-ry*, and *cranberry* as three. Suggested setting: bright modern highlife-folk at about 104 BPM, with interlocking clean electric guitars, a round bass, shakers and hand drums. One warm lead voice takes the verses, and on every refrain a room of mixed voices joins, loosely, like people singing with their mouths full. Handclaps come in on the second refrain and stay. Before the last refrain, everything drops out but the hand drum for one bar.
 
-The words are written. The music is not yet recorded.
+The words are written. The music is not yet recorded. When it is made, the refrain should be simple enough to learn by the second time it comes round.
 
 ---
 
@@ -110,6 +110,14 @@ Give each verse to a different person, in the order they arrived. Everyone sings
 ### Spoken
 
 Read the verses plainly, and let the whole table say the refrain. After Verse 4, pause long enough for anyone to say a name.
+
+### With Voices From Afar
+
+Someone joining by a call, or an agent present by a speaker or a screen, may lead a verse, or choose which refrain the table sings twice. The sixth verse is theirs to begin, if they wish.
+
+### This Table's Own Verse
+
+Before the final refrain, anyone may say one thing about tonight: a dish that went wrong, who arrived late, something that made the table laugh. Then everyone sings the last refrain.
 
 ---
 

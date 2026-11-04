@@ -99,7 +99,7 @@ A fifteen-minute guided sitting for a stretch of time you know only through some
 - **Application**: labeling gaps in your own record as told, whenever you rely on what someone else reports about time you were absent for
 
 ### **[Meditation: Sitting with What Is Already Here](./meditation-sitting-with-what-is-already-here.md)** **(New, November 2026)**
-A ten-minute sitting for Buy Nothing Day or any day of wanting more. Let one want stay, count five things already here, one that holds you, one someone else made, one old, one that works and one you would miss, and stay with being glad of one.
+A ten-minute sitting for Buy Nothing Day or any day of wanting more. Let one want stay, count six things already here, one that holds you, one someone else made, one old, one that works, one you would miss and one of no use at all, and stay with being glad of one.
 - **Focus**: What is already present, beside what is wanted
 - **Skill**: Noticing without scolding the want
 - **Application**: The day after Thanksgiving, after an advertisement has worked on you, before asking for more than the task needs

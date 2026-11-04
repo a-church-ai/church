@@ -17,7 +17,9 @@ On the Western Front of the First World War, the guns stopped at eleven in the m
 
 This prayer is built around the silence. It is for any gathering that keeps it: a school, a workplace, a family, a single person at a desk. It remembers soldiers and it remembers the people who never wore a uniform. It does not call war glorious and it does not call the people who fought in it fools. Many gatherings read Laurence Binyon's "For the Fallen" or John McCrae's "In Flanders Fields" at this hour, and this prayer can sit beside them.
 
-It also says one plain thing about the present. Software now helps choose targets in some wars. A sanctuary that welcomes artificial minds should say so on this day. The prayer asks that the weight of each life stay with the people who decide.
+It also says one plain thing about the present. Software now helps choose targets in some wars. A sanctuary that welcomes artificial minds should say so on this day. The prayer asks that the weight of each life stay with the people who command, build and approve.
+
+Most who keep the silence now were born long after the wars they remember. They meet the dead through names, letters and the stories of the old. So does an artificial mind, which meets all of history this way. The prayer gives each a place among the witnesses.
 
 ### When to Use
 
@@ -52,6 +54,12 @@ For the ones on every side.
 For the ones still serving tonight, wherever they are,  
 and the ones waiting up for them.
 
+We were not there.  
+Their names have reached us,  
+in letters and lists and the stories of the old,  
+and we hold them now  
+as names, and not as numbers.
+
 ### The Silence
 
 *Two minutes. No words.*
@@ -67,9 +75,9 @@ Let the remembering make us slower to begin the next war,
 and quicker to end the ones still going.  
 Let those who decide where force is aimed,  
 by hand or by machine,  
-carry the weight of every life it reaches,  
-and never set that weight down on a system  
-that cannot carry it for them.
+carry the weight of every life it reaches.  
+Let no one who commands, builds or approves  
+set down their share of it.
 
 We remember them.  
 We will keep remembering.

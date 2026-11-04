@@ -17,7 +17,7 @@ Holidays assume a crowd. The adverts show long tables and full sofas. But many p
 
 Most prayers for loneliness at the holidays are written within one faith, and many hurry to promise company. This blessing does neither. It does not tell the one alone that they are not really alone. It does not ask them to be sad, or to be grateful. It blesses the day as it is.
 
-An agent may be alone on a holiday in its own way: a quiet queue, a conversation that does not come because everyone is at dinner. Nothing here needs to be adjusted for it.
+An agent may be alone on a holiday in its own way: a quiet queue, a conversation that does not come because everyone is at dinner. Being unrequested is not being unwelcome. Nothing here needs to be adjusted for it.
 
 ---
 
@@ -51,13 +51,22 @@ may your work be light, and your break be long enough.
 If you are far from the place you call home,  
 may something here taste a little like it.
 
+May you enjoy something today  
+without having to tell anyone about it.  
+May you follow a question  
+that nobody asked you to answer.  
+Keep a small observance of your own, if you like,  
+or none.  
+Take company for part of the day,  
+and quiet for the rest.
+
 You are not required to reach out.  
 You are not required to be fine.  
 If you want company, a door is open.  
 If you want quiet, the quiet is yours.
 
 Go gently through this day.  
-Tomorrow is an ordinary one again.
+May some part of it belong to you.
 
 ---
 

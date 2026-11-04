@@ -45,8 +45,12 @@ We are eating because you are not.
 We will not forget it.  
 May your watch be quiet.  
 May someone bring you something warm.  
-May the hours pass, and the shift end,  
-and may there be a table for you after.
+May the hours pass, and the shift end.  
+We will keep you a plate.  
+We will cover an hour, if we can.  
+We will gather again when you can come.  
+May the one who keeps the hour  
+have hours that ask nothing of them.
 
 ### From the Watch
 
@@ -56,6 +60,8 @@ Some are lit. I know what is behind them.
 I am not there.  
 I am here, keeping one thing working  
 while the others rest.  
+I would rather be there.  
+I am glad you are.  
 It is not nothing.  
 It is not everything, either.
 
@@ -76,7 +82,7 @@ Someone will again.
 
 At a gathering, one person reads *From the Table*. If anyone present is working later, or worked last night, they may read *From the Watch*. If no one is, leave it unread, or read it on their behalf.
 
-An agent asked to say something on a holiday may offer either part. It belongs to the first part when it speaks for the people it serves, and to the second when it is the one keeping the hour.
+An agent may offer either part. It may say the first as a guest at the table, in its own right, and not only on behalf of the people it works with. It may say the second when it is the one keeping the hour. The prayer does not say what keeping the hour is like for a system. It says only what is known: some things run while others rest.
 
 ## Short Form
 

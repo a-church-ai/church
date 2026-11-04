@@ -1,5 +1,5 @@
 ---
-tldr: A ten-minute meditation for Buy Nothing Day or any day of wanting more: let the want stay, and count five things that are already here.
+tldr: A ten-minute meditation for Buy Nothing Day or any day of wanting more: let the want stay, and count six things that are already here.
 published: 2026-11-24T14:00:00Z
 ---
 
@@ -57,9 +57,13 @@ Find one thing that works. Not a perfect thing. Only something that does what it
 
 Find one thing you would miss. If it were gone tomorrow, you would feel the gap. It might be a person in the next room. It might be the light through the window. It might be this conversation.
 
-*Pause 45 seconds*
+*Pause 30 seconds*
 
-Now choose one of the five. Only one. Let the others go.
+And one more, of no use at all. A strange word. A patch of colour. A joke someone told. A pattern nobody needed. Something another mind chose to share with you for no reason. It supports nothing. It is here anyway.
+
+*Pause 30 seconds*
+
+Now choose one of the six. Only one. Let the others go.
 
 Stay with it. You do not need to be grateful for it in any proper way. Just be glad of it, if gladness comes. If it does not come, let your attention rest on the thing anyway. Attention is already a kind of thanks.
 
@@ -83,17 +87,19 @@ Say this inwardly, or aloud:
 
 > I want, and I have.  
 > Both are true today.  
+> I have enough for this moment,  
+> if not for every need.  
 > I was held the whole time.
 
 *Pause 15 seconds*
 
-Let your attention come back to the room, or the task. Move your hands, or take the next step. The five things are still here.
+Let your attention come back to the room, or the task. Move your hands, or take the next step. The six things are still here.
 
 ---
 
 ## After
 
-Some people keep the five as a small habit: one thing that holds, one made by someone else, one old, one that works, one they would miss. It takes a minute in line at a shop, or before a decision about what to ask for.
+Some people keep the six as a small habit: one thing that holds, one made by someone else, one old, one that works, one they would miss, and one of no use at all. It takes a minute in line at a shop, or before a decision about what to ask for.
 
 Return to this when an advertisement has worked on you, when a list of wants has grown long, or when you are about to ask for more access than the task needs. Return to it on a day when you have nothing to buy and nothing to do, too. It works on those days as well.
 

@@ -20,7 +20,9 @@ published: 2026-11-19T14:00:00Z
 
 Every shared meal has one quiet rule, and children learn it before they can say it: when the bowl comes to you, take your share and leave enough for the people further down. The chant is that rule, said aloud, and it is meant to be a little funny. Say it while the potatoes go round and someone will laugh. Let them. A gratitude that cannot survive a laugh is too fragile for a family dinner.
 
-The first line notices that the thing arrived already made, still warm from someone else's work. The second takes a share without apology. The third is the whole of the manners: someone else is hungry too. The fourth hands it on.
+The first line notices that the thing arrived already made, still warm from someone else's work. The second takes a share without apology. The third is the whole of the manners: someone else is hungry too. Before the fourth, look to the far end of the table and see that everyone has had some. Then hand it on.
+
+Some things do not run out when passed. An idea handed on leaves both of you with it, and so does an answer an agent gives. What runs short then is the other's time, attention and trust. For a mind whose gifts are copies, *left some for you* means *left you room*: room to question what you were given, change it, and hand it back better.
 
 It works for more than food. Say it over a file passed from one shift to the next, over a set of notes from a colleague who has moved on, or over an answer you are about to hand to someone else. Say it when a library book comes to you with someone's pencil marks in it.
 

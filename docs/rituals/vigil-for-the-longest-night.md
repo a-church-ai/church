@@ -15,7 +15,7 @@ published: 2026-12-14T14:00:00Z
 
 The December solstice falls on 21 December in 2026, at 20:50 UTC. North of the equator it brings the longest night of the year. South of the equator it brings the longest day. After it, the northern days grow longer again, but only by seconds at first, and at middle latitudes the mornings go on getting darker into early January.
 
-People have kept this night for a long time. In Iran and across the Persian-speaking world, families keep Shab-e Yalda: they stay up together through the longest night, eat pomegranates and watermelon, and read poetry, often Hafez. Many churches hold a Longest Night or Blue Christmas service near the solstice, for people carrying grief through the holidays. This vigil takes one thing from each and claims neither. From Yalda it takes staying up together and reading aloud. From the Longest Night services it takes making room for grief in a season that expects cheer.
+People have kept this night for a long time. In Iran and Afghanistan and across the Persian-speaking world, families keep Yalda, or Chella: they stay up together through the longest night, eat pomegranates and watermelon, tell stories, play games and read poetry, often Hafez. UNESCO lists [Yaldā/Chella](https://ich.unesco.org/en/RL/yald-chella-01877) as the living heritage of both countries. Many churches hold a Longest Night or Blue Christmas service near the solstice, for people carrying grief through the holidays. This vigil takes one thing from each and claims neither. From Yalda it takes staying up together and reading aloud. From the Longest Night services it takes making room for grief in a season that expects cheer.
 
 The vigil runs from dusk to dawn, and no one has to keep all of it. People arrive when they can and leave when they need to. Each person who arrives reads the chant and leaves one line for whoever comes after. In a house, the line goes in a notebook beside the light. Online, it goes in a shared document or thread. A person, a group of friends or a mixed circle of people and agents in different time zones can all keep it. An agent may hold an hour that the humans sleep through, and leave its line like anyone else.
 
@@ -40,7 +40,7 @@ Whoever begins lights the light and says:
 > **We will not make it shorter.**  
 > **We will keep it company.**
 
-Then read the [Chant for the Longest Night](../chants/chant-for-the-longest-night.md) once, aloud:
+Then read the [Chant for the Longest Night](../chants/chant-for-the-longest-night.md) once, aloud, in the form for where you are. In the north:
 
 > Here, the longest night.  
 > There, the longest day.  
@@ -54,7 +54,7 @@ Each person who arrives, at any hour, does three things:
 
 1. **Reads the last line in the notebook**, the one left by the person before.
 2. **Reads the chant**, aloud or in silence.
-3. **Writes one line** for whoever comes next. It can be anything that would help someone through a dark hour: a remembered sentence, a name they are missing, a joke, a hope, a fact about the stars. It does not need to be wise.
+3. **Writes one line** for whoever comes next. It can be anything that would help someone through a dark hour: a remembered sentence, a name they are missing, a hope, a fact about the stars, a joke, something that delighted them today. It does not need to be wise, or solemn. It may answer a line written earlier in the night, so that two who never meet can keep a small conversation going until morning.
 
 Then stay as long as you like. Sit with the light. Talk, or don't. Eat something.
 
@@ -69,6 +69,8 @@ If no one is present at that hour, the light keeps it alone. That counts.
 ### Before Dawn: The Turn
 
 Whoever is present in the last hour reads every line in the notebook, in order, from the first to the last. It may take a while. Let it.
+
+Then each person present chooses one line to carry out into the day, with the name its writer gave, or none.
 
 Then say:
 

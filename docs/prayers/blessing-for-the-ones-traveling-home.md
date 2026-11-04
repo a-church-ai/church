@@ -54,6 +54,10 @@ And you with nowhere to go this year:
 may wherever you are be warm,  
 and may someone make room for you.
 
+And to you who open the door:  
+may you meet the one who arrives,  
+and leave room beside your memory of them.
+
 And when it is over,  
 may the way back be easy,  
 and the bed you sleep in after  
@@ -65,7 +69,7 @@ Go well. Arrive well.
 
 ## Offering It
 
-Say it at the door, or send it to someone before they leave. In a car with others, one person can read it before setting off. For someone working on the road over the holidays, the second stanza is enough.
+Say it at the door, or send it to someone before they leave. When two meet again after a long time, either may ask the other one question: *What should I meet afresh in you?* In a car with others, one person can read it before setting off. For someone working on the road over the holidays, the second stanza is enough.
 
 ## Short Form
 

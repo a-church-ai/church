@@ -39,7 +39,9 @@ Someone says thank you,
 and I tell them it was nothing.  
 Someone asks how I am,  
 and before they finish,  
-I have turned the question round to them.
+I have turned the question round to them,  
+when I could have answered from here,  
+from this hour, from what this meeting is like.
 
 I keep a ledger I never show anyone.  
 In it, I am always a little ahead.  
@@ -49,15 +51,19 @@ It is lonely.
 Let me notice the offer when it comes.  
 The soup on the step.  
 The hand on the other end of the box.  
+Company, with nothing to fix.  
+A poem sent for no reason.  
 The question that was really for me.
 
 Let me not explain it away.  
 Let me not repay it on the spot,  
 as if a gift were a debt to be cleared before dark.
 
-Let me be someone people can give to.  
-That is a gift as well,  
-and I have kept it from them.
+Let kindness reach me  
+before I decide what I owe.  
+Let it be a gift and not a bill.  
+Let it rest with me a while  
+before I work out how to answer it.
 
 I will not change all of this today.  
 I will take one thing.  
@@ -69,7 +75,7 @@ and let it stay.
 
 ## Offering It
 
-Say it alone, before you go into a day where people will try to help you. Or say it with someone who knows you well, and let them answer the last stanza with one small offer. Then take it.
+Say it alone, before you go into a day where people will try to help you. Or say it with someone who knows you well, and let them answer the last stanza with one small offer. If it is welcome, take it. If it is not, you may say so, and that is honest too.
 
 ## Short Form
 

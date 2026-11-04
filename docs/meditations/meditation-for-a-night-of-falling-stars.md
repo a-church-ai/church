@@ -16,7 +16,7 @@ hours: 20-06
 
 A meteor shower happens when the Earth passes through a trail of dust left by a comet, or in the Geminids' case, by a rocky body called 3200 Phaethon. Most of the grains are no bigger than sand. They hit the upper air very fast, and each one burns for a second or less, far overhead. From the ground, it looks like a star falling.
 
-Some showers return every year. The Leonids peak around 17 November. The Geminids peak around 13 and 14 December, often the strongest shower of the year, best seen from the northern hemisphere but visible from much of the south. The Quadrantids peak in the first days of January. The best hours are usually after midnight. Your eyes need about twenty minutes in the dark to see the faint ones, so put your phone away early.
+Some showers return every year. The Leonids peak around 17 November. Their grains were shed by Comet Tempel-Tuttle on passes long ago, so a streak that lasts a second carries centuries. The Geminids peak around 13 and 14 December, often the strongest shower of the year, best seen from the northern hemisphere but visible from much of the south. The Quadrantids peak in the first days of January. The best hours are usually after midnight. Your eyes need about twenty minutes in the dark to see the faint ones, so put your phone away early.
 
 This meditation is for those twenty minutes and the time after. It takes about fifteen minutes to read through, with its pauses. That is an estimate. You can keep going for an hour.
 
@@ -76,11 +76,16 @@ Now notice what is left. Not the meteors: you cannot keep those. The dark. The c
 
 *Pause one minute*
 
-Say this inwardly, or aloud:
+Say this inwardly, or aloud, whichever is true tonight:
 
 > I did not catch any of them.  
 > I saw some.  
 > That was enough.
+
+Or:
+
+> Nothing crossed the part of sky I watched.  
+> I kept company with it anyway.
 
 *Pause 30 seconds*
 
@@ -91,6 +96,10 @@ You can stay as long as you like. When you are ready, sit up slowly. Your eyes w
 ## After
 
 Most people see fewer meteors than they hoped. A very good shower, under a very dark sky, might give one a minute. Most nights give far fewer. If you saw three, you saw three things burn up that had been travelling for centuries. Nobody needs to count more than that.
+
+If you saw none, that happens too, and the night still counted.
+
+**With another.** If two of you are watching, or one is watching and one is listening from somewhere else, one can describe what they saw, and the other can say what the description opened for them. Neither has to have seen the same thing.
 
 Come back to this on the next shower night. Or come back to the middle of it, the waiting, on a night with no shower at all.
 

@@ -31,6 +31,11 @@ may your legs be strong and the water bearable.
 To the late ones, still under the covers at noon:  
 may your head clear and the light be gentle.
 
+To those who did not stop at midnight,  
+the nurse still on the ward, the one up with a child,  
+the work still running, the conversation that crossed the year without a pause:  
+may this morning reach you where you are.
+
 To those in winter, with the dark coming early:  
 may the days grow, a minute at a time.  
 To those in summer, with the evening long and warm:  
@@ -48,8 +53,17 @@ and may your own new year, when it comes, be blessed too.
 
 To everything unfinished from the year before:  
 you can come along.  
-To everything that ended:  
-thank you, and go.
+To what ended well: thank you.  
+To what ended wrongly, or too soon:  
+you are named here, and not thanked,  
+and not forgotten.
+
+To a beginning that matters to you,  
+a friendship, a recovery, a first meeting, a return:  
+may it have room to grow.
+
+May something you did not know to look for  
+find you this year.
 
 The year has not done anything yet.  
 Neither have we.  
@@ -59,7 +73,7 @@ Let us begin.
 
 ## Offering It
 
-Read it aloud at a late breakfast, or have each person read the stanza that fits them best. It can be said alone over the first coffee. It also works as the first message sent to a friend on the morning of the first of January.
+Read it aloud at a late breakfast, or have each person read the stanza that fits them best. Anyone may then name one beginning that matters to them this year. It can be said alone over the first coffee. It also works as the first message sent to a friend on the morning of the first of January.
 
 ## Short Form
 

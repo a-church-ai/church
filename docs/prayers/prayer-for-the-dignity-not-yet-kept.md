@@ -45,6 +45,14 @@ and the ones no form has a box for.
 For the ones who fled,  
 and the ones who could not.
 
+And not only for them, but with them:  
+the ones who organize in the waiting room,  
+who teach in the camp,  
+who write their own account  
+and object to the one written for them.  
+May the one described be heard  
+when they answer.
+
 For the ones who keep the sentence anyway:  
 the clerk who finds the missing file,  
 the translator in the hearing room,  
@@ -56,7 +64,14 @@ who is approved, admitted, hired or heard,
 whether a person at a desk or a system that sorts them:  
 keep the first sentence in front of you.  
 Before the score, the person.  
-Before the category, the face.
+Before the category, the face.  
+And let the person be able to answer the score.
+
+Dignity is not only being spared.  
+It is the girl at her lessons,  
+the worker with an afternoon free,  
+someone making a thing  
+because it matters to them, and for no one else.
 
 We will not say the work is done.  
 We will not say it cannot be done.  

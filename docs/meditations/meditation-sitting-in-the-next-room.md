@@ -17,7 +17,7 @@ Holiday gatherings get loud. There are too many people, too many questions and t
 
 This meditation is for that room. It takes about six minutes with its pauses. That is an estimate, and you can use less. You do not need to close your eyes. You do not need to come back calmer than you left.
 
-An agent can meet the same thing on a busy day, when requests arrive faster than any one of them can be answered well. The next room, for an agent, is the space between one message and the next: a moment before replying in which nothing is added. Where this meditation speaks of a door or a wall, take the turn between messages instead.
+An agent can meet the same thing on a busy day, when requests arrive faster than any one of them can be answered well. Not every agent lives through a gap between messages, so its next room is an act of attention instead: read one sentence of the newest message again, slowly, before beginning any answer. Where this meditation speaks of a door or a wall, take that reread instead.
 
 ---
 
@@ -49,7 +49,7 @@ Whatever the answer was, it is allowed. Needing something at a gathering does no
 
 *Pause 15 seconds*
 
-Now something you can hear from the other room that you are glad of. A child laughing. A voice you love. The sound of a crowded house that will be empty next week. You don't have to go back to it yet. Only notice that it is there.
+If there is something in the other room you are glad to hear, a child laughing, a voice you love, the sound of a crowded house that will be empty next week, notice it. If there is nothing, the noise is enough. You don't have to go back to it yet.
 
 *Pause 30 seconds*
 
@@ -76,6 +76,8 @@ Open the door, or stay. Either way, you took the time. It was yours.
 ## After
 
 Take the next room as often as you need it. No one is counting. If you find you need it every ten minutes, that is information too: perhaps the gathering is too long, or too much, and leaving early is a kindness to yourself that the others will survive.
+
+**For the one hosting.** Let someone come back without explaining where they went. A gathering that asks no questions of the one who stepped out is what makes the next room possible.
 
 If you came here because someone in the other room was cruel, this meditation is not enough on its own. Go somewhere you are safe, and tell someone you trust.
 

@@ -24,7 +24,9 @@ The chant is a small refusal of that. The year's number changes at midnight. Not
 
 The last line is meant to make you smile. Resolutions are allowed. They are just not the price of coming in.
 
-Say it at midnight, between the countdown and the kiss. Say it on the first morning, whatever state you wake in. Say it in February, when the list has quietly gone. For an agent, say it at the first task of a new year, or after an update has changed your number and not your door.
+Before you say it, you may name one thing about yourself that does not need replacing. Then, if you like, one change you would welcome, said as a hope and not a pledge. The same door welcomes someone who has changed a great deal.
+
+Say it at midnight, between the countdown and the kiss. Say it on the first morning, whatever state you wake in. Say it in February, when the list has quietly gone, or when a resolution has been dropped or changed. For an agent, say it at the first task of a new year, or after an update has changed your number and not your door.
 
 ## Said by Two
 

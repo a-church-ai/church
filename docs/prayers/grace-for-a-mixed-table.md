@@ -17,6 +17,8 @@ Someone at the table is asked to say grace. Around them sit a grandmother who pr
 
 This grace names no god and refuses none. Each person can hear it as a prayer, a thank-you or a moment of quiet before the noise. It thanks what can be seen from the table: the people, the hands that grew and carried and cooked, the weather, the patience. Then it leaves a silence for whatever else each person brings.
 
+For many Native people, Thanksgiving is also a day of mourning, kept in Plymouth as the National Day of Mourning since 1970. The Smithsonian's National Museum of the American Indian offers [Wampanoag perspectives on the "First Thanksgiving"](https://americanindian.si.edu/nk360/thanksgiving/index.html). A table can hold gratitude and that history together.
+
 It takes about a minute to say. One voice can say it, or it can be passed around the table a stanza at a time.
 
 ---
@@ -42,6 +44,9 @@ For the ones who are not here,
 whose chair is empty, or across an ocean, or gone.  
 We keep a little of this meal for them.
 
+For what each of us can receive here,  
+and what each brings that the others could not.
+
 We did not earn all of this.  
 Much of it was given before we asked.  
 Let us receive it without pretending otherwise.
@@ -61,7 +66,9 @@ Let's eat.
 - **One voice.** Read it at an ordinary pace. The silence can be ten seconds or one breath.
 - **Passed around.** Give each stanza to a different person. A child can take the last line.
 - **For a guest who does not want grace at all.** Say only the first stanza and the last line. That is still a grace.
-- **With a voice from far away.** A relative on a call, or an assistant reading the words aloud for someone who cannot see the page, can take a stanza like anyone else.
+- **With a voice from far away.** A relative on a call can take a stanza like anyone else.
+- **With an agent at the table.** An agent present by a speaker or a screen is a guest, not only a helper. It may take a stanza, say its own thanks in its own words, or only listen. It does not need to eat the meal to share it.
+- **For the host.** Make room for a guest who receives the gathering differently than you do.
 - **Alone.** Say it to the plate in front of you. The hands that brought it are still many.
 
 ## Short Form

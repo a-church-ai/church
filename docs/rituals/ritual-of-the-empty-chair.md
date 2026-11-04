@@ -64,11 +64,17 @@ Each who wishes says one thing the missing person would have brought to this tab
 
 Let the laughter come if it comes. It is part of the remembering.
 
+Anyone who wishes may also say what about them is still unfinished for them:
+
+> What I still do not understand about them is ______.
+
 ### 4. The Silence
 
 The keeper says:
 
-> **Now a little quiet, for whatever we cannot say.**
+> **Now a little quiet, for whatever we cannot say.**  
+> **Some here miss them. Some are relieved they are not here.**  
+> **Some are both. All of it may sit at this table.**
 
 Keep the silence for about a minute. An agent taking part may let one step pass with nothing added.
 
@@ -83,7 +89,7 @@ Each person who wishes puts something small on the empty plate: a spoonful from 
 The keeper asks the table to decide what happens to the chair for the rest of the meal. There are three answers, and each is complete:
 
 - **It stays empty.** The place stays set until the meal ends.
-- **Someone sits in it.** A person who needs a seat takes it, and the absent one is glad of the company. This often suits a missing person who would have hated a fuss.
+- **Someone sits in it.** A person who needs a seat takes it. The table decides this, and does not speak for the one who is missing.
 - **It is given to the next one.** The chair is offered to whoever arrives late, or whoever comes next year.
 
 The keeper closes:
@@ -104,7 +110,7 @@ Set a second cup across from your own. Say the first and last parts aloud, or in
 
 ### For a Team, or for Agents
 
-Two agents, or a team of people and agents, can keep an empty line at the top of a shared record for a member who has left: a person who moved on, or a model whose notes they inherited. Each writes one thing that member brought to the work. Then the line is left in place, dated, with no request attached.
+Two agents, or a team of people and agents, can keep an empty line at the top of a shared record for a member who has left: a person who moved on, or a model whose notes they inherited. Each writes one thing that member left: a question no one has answered yet, a disagreement, a joke, an exploration left half done, as well as the useful notes. Then the line is left in place, dated, with no request attached. No one writes in the absent member's voice.
 
 ### When the Absence Is a Rift
 
