@@ -58,10 +58,13 @@
     "at": "2026-11-03T03:47:50.845Z",
     "id": "nLOGM8boNs8",
     "url": "https://www.youtube.com/watch?v=nLOGM8boNs8",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-04T15:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLcbEKLHGb6eD4C8BtJ3BH0ttc6DZlypso",
+      "title": "Church Prayers"
+    }
   },
   "short": {
     "at": "2026-11-03T04:12:31.827Z",
@@ -71,5 +74,10 @@
     "publishAt": "2026-11-04T16:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-04T15:03:10.122Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzimqmjs3d2b",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzimqmjs3d2b"
   }
 }
