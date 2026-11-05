@@ -58,10 +58,13 @@
     "at": "2026-11-04T03:55:20.088Z",
     "id": "xZXwTycLFbs",
     "url": "https://www.youtube.com/watch?v=xZXwTycLFbs",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-05T15:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLcbEKLHGb6eB0kaiifL4NTKCh1H4CUk73",
+      "title": "Church Meditations"
+    }
   },
   "short": {
     "at": "2026-11-04T04:01:18.207Z",
@@ -71,5 +74,10 @@
     "publishAt": "2026-11-05T16:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-05T15:14:26.272Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzl5t5oh6l22",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzl5t5oh6l22"
   }
 }
