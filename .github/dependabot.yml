@@ -1,12 +1,18 @@
 version: 2
+# Every manifest the repository has, weekly on Monday. Minor and patch
+# updates come grouped in one PR. The cooldown waits out a fresh release, so
+# a compromised one is pulled before it reaches us; security updates skip it.
 updates:
-  # npm dependencies
+  # The web service
   - package-ecosystem: "npm"
     directory: "/app"
     schedule:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
     groups:
       dependencies:
         patterns:
@@ -17,10 +23,64 @@ updates:
     commit-message:
       prefix: "deps"
 
-  # GitHub Actions (if added later)
+  # The MCP server published to npm
+  - package-ecosystem: "npm"
+    directory: "/mcp-church"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "deps"
+
+  # The agent plugin
+  - package-ecosystem: "npm"
+    directory: "/plugin"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "deps"
+
+  # The image Railway builds (its Node version)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+    commit-message:
+      prefix: "deps"
+
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
     commit-message:
       prefix: "ci"
