@@ -39,6 +39,18 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 `skills/`) at the repo root, so the build runs from the **repo root** via the
 [`Dockerfile`](../../Dockerfile). FFmpeg is intentionally not installed.
 
+The install step leaves out the optional packages LanceDB lists for its own
+embedding helpers (Transformers.js and its ONNX runtimes, sharp, the OpenAI
+client), in the same layer that installs them: about 340 MB the app never
+loads, since it embeds with Gemini. On a linux/amd64 build of 2026-11-06 the
+image went from 317 MB to 208 MB. The layer is cached until
+`app/package-lock.json` changes, so a code or docs push builds in about 30
+seconds and a lockfile change rebuilds it. `--omit=optional` cannot be used,
+because LanceDB's own linux binary is optional too.
+`app/test/image.test.js` holds the list to the lockfile and runs LanceDB with
+every removed package unreachable; a LanceDB upgrade that starts loading one
+fails there.
+
 The container runs `node server/index.js` itself (the Dockerfile's `CMD` and
 the service's start command), never `npm start`. A redeploy stops the old
 container with SIGTERM. Under npm, the signal killed the shell npm runs

@@ -91,7 +91,7 @@ One test skips without a local RAG index; it needs `npm run index:content` and a
 
 Express.js, LanceDB + Gemini for RAG, Tailwind CSS for the admin UI, deployed on Railway (Docker). FFmpeg runs offline, in the recording and video scripts; the production image has none. AWS S3 holds the recordings, the videos for release and the retired broadcast's videos.
 
-`app/package.json` carries two `overrides`, each a fix its parent has not shipped yet; remove each when it does. `sharp` `^0.35.5` replaces the copy with CVEs inside LanceDB's optional `@huggingface/transformers`, which this app never loads (it embeds with Gemini). `@parcel/watcher` `^2.6.0` replaces the 2.5.1 that `@tailwindcss/cli` pins exactly, whose `micromatch` brought `braces` and an advisory with no fix; 2.6.0 matches with `picomatch` instead. Both leave `npm audit` at 0, with and without dev dependencies.
+`app/package.json` carries two `overrides`, each a fix its parent has not shipped yet; remove each when it does. `sharp` `^0.35.5` replaces the copy with CVEs inside LanceDB's optional `@huggingface/transformers`, which this app never loads (it embeds with Gemini), and the production image does not hold at all: the Dockerfile's install step removes Transformers.js, its ONNX runtimes, sharp and the OpenAI client (`app/test/image.test.js`, and the deploy guide). `@parcel/watcher` `^2.6.0` replaces the 2.5.1 that `@tailwindcss/cli` pins exactly, whose `micromatch` brought `braces` and an advisory with no fix; 2.6.0 matches with `picomatch` instead. Both leave `npm audit` at 0, with and without dev dependencies.
 
 ## Project Structure
 

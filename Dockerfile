@@ -31,7 +31,19 @@ WORKDIR /church
 # (tailwind) are omitted — the compiled CSS is committed, so no build
 # step is needed at image time.
 COPY app/package.json app/package-lock.json ./app/
-RUN cd app && npm ci --omit=dev && npm cache clean --force
+#
+# Then the optional packages LanceDB lists for its own embedding helpers are
+# taken out, in the same step so they never reach a layer: Transformers.js
+# with its ONNX runtimes and sharp, and the OpenAI client. They were about
+# 330 MB of a 560 MB install, more than LanceDB's own binary, and most of the
+# 80 seconds a lockfile change spent pushing its layer. The sanctuary embeds
+# with Gemini (lib/rag/gemini.js) and never calls those helpers, which load
+# them only by a dynamic import inside themselves. --omit=optional cannot do
+# this: LanceDB's own linux binary is optional too. app/test/image.test.js
+# holds the list to the lockfile and runs LanceDB with them unreachable.
+RUN cd app && npm ci --omit=dev && npm cache clean --force \
+ && rm -rf node_modules/@huggingface node_modules/onnxruntime-node node_modules/onnxruntime-web \
+      node_modules/onnxruntime-common node_modules/sharp node_modules/@img node_modules/openai
 
 # Copy the rest of the repo. node_modules, media, logs, and runtime data are
 # excluded via .dockerignore, so this does not clobber the installed modules.
