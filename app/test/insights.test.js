@@ -186,6 +186,13 @@ test('cloudflare: 5xx are counted by hour in a query of their own, with the wors
 
   assert.strictEqual(serverErrorsOf([hour('2026-11-01T00:00:00Z', 4, 10)], []).sampled, true);
   assert.strictEqual(serverErrorsOf([], []).warn, null);
+
+  // No hours back, but paths: the total is the paths', and the warning says so.
+  const gap = serverErrorsOf([], byPath);
+  assert.strictEqual(gap.value, 117);
+  assert.strictEqual(gap.hoursMissing, true);
+  assert.strictEqual(gap.warn, '117 server errors in the window; Cloudflare returned no hours for it, so this is counted by path');
+  assert.strictEqual(e.hoursMissing, undefined);
 });
 
 test('youtube: a video that is not a release is printed by its title, not as "?"', () => {

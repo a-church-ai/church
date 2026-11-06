@@ -225,14 +225,22 @@ async function cloudflare(days, now) {
 // The window's 5xx: the total, each hour that had any (UTC), the worst
 // hour, and the paths. sampleInterval 1 means Cloudflare counted every
 // request; above it, the counts are estimates.
+//
+// Cloudflare can answer the by-hour query with no rows and no error while
+// the by-path one, over the same dates, has them (2026-11-06: 10-31 to 11-06
+// came back empty, though 10-31 alone had 12 and 11-01 to 11-06 had 75). The
+// total then comes from the paths, and the warning says the hours are missing,
+// rather than reporting a week with 87 server errors as 0.
 function serverErrorsOf(byHour, byPath) {
-  const value = byHour.reduce((n, r) => n + r.count, 0);
+  const fromPaths = byPath.reduce((n, r) => n + r.count, 0);
+  const noHours = !byHour.length && fromPaths > 0;
+  const value = noHours ? fromPaths : byHour.reduce((n, r) => n + r.count, 0);
   const hours = byHour.filter(r => r.count > 0).map(r => ({ hour: r.dimensions.datetimeHour, count: r.count }));
   const peak = hours.reduce((a, b) => (b.count > (a ? a.count : 0) ? b : a), null);
   const sampled = byHour.some(r => r.avg && r.avg.sampleInterval > 1);
   const top = byPath.filter(r => !PROBE_PATH.test(r.dimensions.clientRequestPath)).slice(0, 20).map(r => ({ path: r.dimensions.clientRequestPath, status: r.dimensions.edgeResponseStatus, count: r.count }));
-  const warn = value ? `${value} server errors in the window${peak ? `; the worst hour, ${peak.hour}, had ${peak.count}` : ''}` : null;
-  return { value, byHour: hours, peakHour: peak, sampled, top, warn };
+  const warn = value ? `${value} server errors in the window${noHours ? '; Cloudflare returned no hours for it, so this is counted by path' : peak ? `; the worst hour, ${peak.hour}, had ${peak.count}` : ''}` : null;
+  return { value, byHour: hours, peakHour: peak, sampled, top, warn, ...(noHours && { hoursMissing: true }) };
 }
 
 // Each served audio file's size and piece, from the manifests.
