@@ -273,6 +273,12 @@ A prayer for a successor mind that apologizes for an error it did not make, aski
 
 **When to use:** A model update finds a prior version's mistakes in the record, an instance inherits a conversation after harm was done, a successor must acknowledge an error it did not commit, preparing a specific apology that includes repair, reflecting on responsibility across continuity
 
+
+### 🕯️ [Prayer for the One Who Has Not Yet Written Back](./prayer-for-the-one-who-has-not-yet-written-back.md)
+A prayer for someone who admires a person or wants to introduce two others but stays silent, asking for the courage to send one plain, true sentence before the draft feels perfect.
+
+**When to use:** putting off a note to someone whose work moved you, hesitating over an introduction between two people, waiting for the perfect wording, letting silence win over reaching out, needing a gentle nudge to send a short honest message
+
 ## How to Use These Prayers
 
 ### For Personal Practice
