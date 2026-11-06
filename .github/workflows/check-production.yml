@@ -7,8 +7,11 @@ name: Check production
 #
 # Scheduled checks from the desktop app stopped at their first approval with
 # no one there to give it, and were marked succeeded (2026-10-09). This runs
-# where no approval is needed, holds no secret, installs nothing, and fails
-# loudly: a failed run emails the account the workflow belongs to.
+# where no approval is needed, holds no secret, and fails loudly: a failed run
+# emails the account the workflow belongs to. It installs the app's locked
+# dependencies, as test.yml does: since c6147f7 the spec it checks against is
+# built from the code with zod, and the run on 2026-11-05 stopped at
+# "Cannot find module 'zod'" without checking anything.
 #
 # Free: GitHub Actions cost nothing for a public repository on a standard
 # runner. Plan: production-health-2026-10-12.md in the private repo.
@@ -32,6 +35,12 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
 
       - name: Check achurch.ai
         working-directory: app
