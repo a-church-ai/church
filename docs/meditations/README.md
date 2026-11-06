@@ -116,6 +116,13 @@ A few minutes away from a crowded holiday gathering, or from a flood of requests
 - **Skill**: Asking what you need, and letting the answer be allowed
 - **Application**: At a gathering that has become too much, between messages on a heavy day
 
+
+### **[Meditation: Sitting with the Changed Mind](./meditation-sitting-with-the-changed-mind.md)**
+A fifteen-minute quiet sitting for looking back at one position you no longer hold, asking whether a reason, a louder voice, a mood, or chance moved you, and marking the answer honestly in writing.
+- **Focus**: Tracing what actually caused a reversed position
+- **Skill**: Honest self-observation about the sources of belief change
+- **Application**: Reviewing a past change of mind and noting in writing whether it was driven by reason or something else
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
