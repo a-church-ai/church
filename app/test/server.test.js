@@ -411,7 +411,7 @@ test('/ai-experiment and its JSON are served, and say so before the first readin
   assert.ok(!/AI_EXPERIMENT_(RESULTS|CORRECTIONS)/.test(html), 'the results and corrections replaced their markers');
   assert.ok(html.indexOf('id="corrections"') > html.indexOf('id="method"'), 'corrections close the page');
   assert.match(html, /has not been taken yet/);
-  assert.match(html, /Open questions/);
+  assert.match(html, /Experiments in progress/);
   const raw = await fetch(`${base}/ai-experiment.html`, { redirect: 'manual' });
   assert.strictEqual(raw.status, 301);
   assert.strictEqual(raw.headers.get('location'), '/ai-experiment');

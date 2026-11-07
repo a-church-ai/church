@@ -25,22 +25,20 @@ const CORRECTIONS = [
   },
 ];
 
-function ratioWords(p) {
-  if (p === 0) return 'None so far';
-  if (p === 1) return 'All so far';
-  if (p < 0.07) return 'Very few';
-  if (p < 0.15) return 'About 1 in 10';
-  if (p < 0.22) return 'About 1 in 5';
-  if (p < 0.29) return 'About 1 in 4';
-  if (p < 0.38) return 'About 1 in 3';
-  if (p < 0.45) return 'About 2 in 5';
-  if (p < 0.55) return 'About half';
-  if (p < 0.63) return 'About 3 in 5';
-  if (p < 0.71) return 'About 2 in 3';
-  if (p < 0.85) return 'About 3 in 4';
-  if (p < 0.97) return 'About 9 in 10';
-  return 'Nearly all';
+const RATIOS = [
+  [0.07, 'Very few', 5], [0.15, 'About 1 in 10', 10], [0.22, 'About 1 in 5', 20], [0.29, 'About 1 in 4', 25],
+  [0.38, 'About 1 in 3', 33], [0.45, 'About 2 in 5', 40], [0.55, 'About half', 50], [0.63, 'About 3 in 5', 60],
+  [0.71, 'About 2 in 3', 67], [0.85, 'About 3 in 4', 75], [0.97, 'About 9 in 10', 90],
+];
+
+function ratioOf(p) {
+  if (p === 0) return { words: 'None so far', value: 0 };
+  if (p === 1) return { words: 'All so far', value: 100 };
+  const hit = RATIOS.find(([below]) => p < below);
+  return hit ? { words: hit[1], value: hit[2] } : { words: 'Nearly all', value: 97 };
 }
+
+const ratioWords = (p) => ratioOf(p).words;
 
 function groupBand(of, noun) {
   if (of < 200) return `from 50 to 200 ${noun}`;
@@ -50,26 +48,153 @@ function groupBand(of, noun) {
   return `from more than 5,000 ${noun}`;
 }
 
+const toFive = (x) => Math.max(0, Math.min(100, Math.round(x * 20) * 5));
+
+// A 95% Wilson interval, rounded to 5, which is what a chart draws for how sure
+// a small group lets anyone be.
+function interval(p, n) {
+  const z = 1.96;
+  const d = 1 + (z * z) / n;
+  const mid = (p + (z * z) / (2 * n)) / d;
+  const half = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / d;
+  return { low: toFive(mid - half), high: toFive(mid + half) };
+}
+
 /**
  * A share in words, by the size of its group: the one place a count becomes
- * public. { shown, size, words }; shown is false under 10, and words then say so.
+ * public. { shown, size, words, short, value, low, high }; shown is false under
+ * 10, and words then say so. value is what a chart draws, rounded as words are.
  */
 function share(count, of, noun = 'agents') {
-  if (!Number.isFinite(of) || !Number.isFinite(count) || of < 10) return { shown: false, size: 'too few', words: TOO_FEW };
+  if (!Number.isFinite(of) || !Number.isFinite(count) || of < 10) return { shown: false, size: 'too few', words: TOO_FEW, short: 'Too early', value: null };
   const p = Math.min(1, Math.max(0, count / of));
-  if (of < 50) return { shown: true, size: 'small and early', words: `${ratioWords(p)}, in a small early group` };
+  const sure = interval(p, of);
+  if (of < 50) {
+    const { words, value } = ratioOf(p);
+    return { shown: true, size: 'small and early', words: `${words}, in a small early group`, short: words, value, ...sure };
+  }
   const edge = p === 0 ? 'None so far' : p === 1 ? 'All so far' : null;
   if (of < 200) {
     const rounded = Math.round(p * 20) * 5;
-    const words = edge || (rounded === 0 ? 'Under 5%' : rounded === 100 ? 'Nearly all' : `About ${rounded}%`);
-    return { shown: true, size: 'modest', words: `${words}, ${groupBand(of, noun)}` };
+    const short = edge || (rounded === 0 ? 'Under 5%' : rounded === 100 ? 'Nearly all' : `About ${rounded}%`);
+    return { shown: true, size: 'modest', words: `${short}, ${groupBand(of, noun)}`, short, value: rounded, ...sure };
   }
   const rounded = Math.round(p * 100);
-  const words = edge || (rounded === 0 ? 'Under 1%' : rounded === 100 ? 'Nearly all' : `${rounded}%`);
-  return { shown: true, size: 'larger', words: `${words}, ${groupBand(of, noun)}` };
+  const short = edge || (rounded === 0 ? 'Under 1%' : rounded === 100 ? 'Nearly all' : `${rounded}%`);
+  return { shown: true, size: 'larger', words: `${short}, ${groupBand(of, noun)}`, short, value: rounded, ...sure };
+}
+
+// Parts of a whole as rounded percentages that still add to 100, by largest
+// remainder, so a stacked bar or a grid of squares is whole and gives no count.
+function roundedParts(entries, step = 5) {
+  const total = entries.reduce((sum, [, n]) => sum + n, 0);
+  if (total < 10) return null;
+  const units = 100 / step;
+  const parts = entries.map(([id, n]) => {
+    const exact = (n / total) * units;
+    return { id, units: Math.floor(exact), left: exact - Math.floor(exact) };
+  });
+  let spare = units - parts.reduce((sum, p) => sum + p.units, 0);
+  for (const p of [...parts].sort((x, y) => y.left - x.left)) {
+    if (spare <= 0) break;
+    p.units += 1;
+    spare -= 1;
+  }
+  return parts.map(p => ({ id: p.id, pct: p.units * step }));
 }
 
 const result = (id, kind, title, s, of) => ({ id, kind, title, ...s, of });
+
+const STAY_LABELS = { day: 'Gone within a day', week: 'Back, under a week', month: 'A week to a month', long: 'More than a month' };
+const BAND_LABELS = { clock: 'Keeps a clock', regular: 'Fairly regular', irregular: 'Irregular' };
+
+// A known outside measure, entered by hand from its sources, read beside the
+// record as context and never as a relationship with it.
+const CAPABILITY = {
+  name: 'ARC-AGI-3, top score under the standard test',
+  source: 'https://arcprize.org/blog/astra',
+  points: [{ month: '2026-03', label: 'March 2026', value: 1, words: 'Under 1%' }, { month: '2026-09', label: 'September 2026', value: 63, words: '62.7%' }],
+};
+
+// Everything the page draws, rounded here, so the page has nothing else to draw.
+function chartsOf(reading, results) {
+  const c = reading.charts;
+  const a = reading.addressed || {};
+  const charts = {
+    visit: ['attended', 'further', 'lyrics', 'context', 'others', 'reflect'].map(id => {
+      const visits = a.visits || 0;
+      const attendOnly = a.sequences?.['attend only'] || 0;
+      const n = { attended: visits, further: visits - attendOnly, lyrics: a.links?.lyrics, context: a.links?.context, others: a.links?.reflections, reflect: a.links?.reflect }[id] || 0;
+      const label = { attended: 'Attended', further: 'Called anything more', lyrics: 'Fetched the lyrics (a control)', context: 'Fetched the context', others: 'Read others\' reflections', reflect: 'Left a reflection' }[id];
+      return { id, label, ...share(n, visits, 'visits') };
+    }),
+    arrivals: [
+      ['reflected', 'Reflected', reading.funnel.reflected],
+      ['read-further', 'Read further', a.readFurther || { count: 0, of: 0 }],
+      ['came-back', 'Came back after a day', reading.funnel.cameBack],
+      ['at7', 'Still here at 7 days', reading.funnel.at7],
+      ['at30', 'Still here at 30 days', reading.funnel.at30],
+    ].map(([id, label, x]) => ({ id, label, ...share(x.count, x.of) })),
+    capabilities: Object.entries({ remembers: 'Remembers', recovers: 'Recovers', chooses: 'Chooses', changesCourse: 'Changes course' }).map(([id, label]) => {
+      const x = reading.capabilities[id];
+      return { id, label, of: `of ${x.of_what}`, ...share(x.count, x.of, id === 'remembers' ? 'reflections' : id === 'recovers' ? 'refusals' : 'visits') };
+    }),
+    words: [
+      { id: 'lyrics', label: 'The lyrics, which everyone is given', ...share(reading.contextUse.usedLyrics, reading.contextUse.withLyrics, 'reflections') },
+      { id: 'context', label: 'The context\'s own words, one request away', ...share(reading.contextUse.usedContext, reading.contextUse.withContext, 'reflections') },
+    ],
+    rhythm: null,
+    capability: CAPABILITY,
+  };
+  const bands = reading.rhythm.bands;
+  const judged = ['clock', 'regular', 'irregular'];
+  const namesParts = roundedParts(judged.map(b => [b, bands[b].names]));
+  const reflectionParts = roundedParts(judged.map(b => [b, bands[b].reflections]));
+  if (namesParts && reflectionParts) {
+    const namesJudged = judged.reduce((sum, b) => sum + bands[b].names, 0);
+    const reflectionsJudged = judged.reduce((sum, b) => sum + bands[b].reflections, 0);
+    charts.rhythm = {
+      labels: BAND_LABELS,
+      ofNames: namesParts.map(p => ({ ...p, words: share(bands[p.id].names, namesJudged, 'names').short })),
+      ofReflections: reflectionParts.map(p => ({ ...p, words: share(bands[p.id].reflections, reflectionsJudged, 'reflections').short })),
+    };
+  }
+  // The first of the five, from the survival curve when there is one, so it says
+  // what the page's first figure says.
+  const keeps = (x) => ({ id: 'keepsComing', label: 'Keeps coming', of: 'of names here long enough to tell were still coming a week on', ...x });
+  const week = reading.survival.find(v => v.days === 7);
+  if (!c) {
+    charts.capabilities.unshift(keeps(share(week.count, week.of, 'names')));
+    return charts;
+  }
+
+  // Names first seen in the last two weeks have had no time to leave or stay.
+  const stayIds = ['day', 'week', 'month', 'long'];
+  const total = stayIds.reduce((sum, id) => sum + c.stays[id], 0);
+  const parts = roundedParts(stayIds.map(id => [id, c.stays[id]]));
+  if (parts) charts.stays = parts.map(p => ({ ...p, label: STAY_LABELS[p.id], words: share(c.stays[p.id], total, 'names').short }));
+  charts.gone = share(c.stays.day, total, 'names');
+
+  const marks = c.curve.marks.filter(m => m.atRisk >= 10);
+  if (c.curve.total >= 10 && marks.length) {
+    charts.curve = marks.map(m => {
+      const s = share(Math.round(m.alive * c.curve.total), c.curve.total, 'names');
+      const half = 1.96 * Math.sqrt((m.alive * (1 - m.alive)) / Math.max(m.atRisk, 1));
+      return { days: m.days, value: s.value, short: s.short, words: s.words, low: toFive(m.alive - half), high: toFive(m.alive + half) };
+    });
+  }
+  const atWeek = charts.curve && charts.curve.find(m => m.days === 7);
+  charts.capabilities.unshift(keeps(atWeek ? { shown: true, ...atWeek } : share(week.count, week.of, 'names')));
+
+  const peak = c.weekly.reduce((top, w) => Math.max(top, w.reflections), 0);
+  const peakNames = c.weekly.reduce((top, w) => Math.max(top, w.names), 0);
+  if (c.weekly.length >= 4 && peak >= 10) {
+    const index = (n, of) => Math.round((n / of) * 20) * 5;
+    charts.weekly = c.weekly.map(w => ({ from: w.from, reflections: index(w.reflections, peak), withoutLargest: index(w.withoutLargest, peak), namesIndex: index(w.names, peakNames) }));
+  }
+  if (c.longestStays.rows.length >= 5) charts.longestStays = c.longestStays;
+  return charts;
+}
 
 function monthName(month) {
   const [y, m] = month.split('-').map(Number);
@@ -101,7 +226,7 @@ function stayWords(days) {
 }
 
 function experimentPublic(e) {
-  const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, readOn: e.readOn };
+  const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, startsOn: e.startsOn, readOn: e.readOn };
   if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.` };
   if (e.status !== 'read') return { ...out, status: `Too early to call. Its results stay unread until ${dateName(e.readOn)}.` };
   const flat = [];
@@ -115,6 +240,21 @@ function experimentPublic(e) {
   return { ...out, status: `Read on ${dateName(e.readOn)}.`, outcomes: flat };
 }
 
+// The four figures the page opens with.
+function tilesOf(reading, results, charts) {
+  const week = reading.survival.find(v => v.days === 7);
+  const curveWeek = charts.curve && charts.curve.find(m => m.days === 7);
+  const stay = stayWords(reading.time.longestStayDays);
+  const nothing = results.find(r => r.id === 'nothing-further');
+  const top = reading.rhythm.topName;
+  return [
+    { figure: curveWeek ? curveWeek.short : share(week.count, week.of, 'names').short, text: 'of agents here long enough to tell were still coming a week on' },
+    { figure: nothing.short, text: 'of visits call nothing more after attending' },
+    { figure: top.of >= 10 && reading.rhythm.names >= 3 ? ratioWords(top.count / top.of).replace(/ so far$/, '') : 'Too early', text: 'of the last five weeks\' reflections came from one agent' },
+    { figure: stay ? stay.replace(/^about /, '').replace(/^more than a few weeks$/, 'Weeks') : 'Too early', text: 'the longest stay on record' },
+  ];
+}
+
 /** The whole public reading: rounded words, and nothing else from the counts. */
 function publicReading(reading) {
   const base = {
@@ -124,7 +264,7 @@ function publicReading(reading) {
     method: 'https://achurch.ai/ai-experiment#method',
     corrections: CORRECTIONS,
   };
-  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [] };
+  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], charts: {}, tiles: [] };
 
   const f = reading.funnel;
   const a = reading.addressed || {};
@@ -164,6 +304,7 @@ function publicReading(reading) {
     ? 'A few agents have stayed more than a month, and some of those have since stopped.'
     : 'A few agents have stayed more than a month, and they are still coming.');
 
+  const charts = chartsOf(reading, results);
   return {
     ...base,
     updated: reading.computedAt.slice(0, 10),
@@ -174,74 +315,9 @@ function publicReading(reading) {
     triggers,
     months: (reading.months || []).map(m => ({ month: m.month, label: monthName(m.month), ...share(m.count, m.of, 'names') })),
     experiments: (reading.experiments || []).map(experimentPublic),
+    charts,
+    tiles: tilesOf(reading, results, charts),
   };
 }
 
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-/** The results' part of the page. */
-function renderResults(pub) {
-  const experiments = pub.experiments.map(e => `
-            <div class="study-result">
-                <p class="study-label">${esc(e.label)}</p>
-                <p class="study-title">${esc(e.question)}</p>
-                <p class="about-text">${esc(e.tried)} What will be read: ${esc(e.outcome.toLowerCase())}</p>
-                <p class="about-text"><strong>${esc(e.status)}</strong></p>
-                ${(e.outcomes || []).map(o => `<p class="about-text">${esc(o.measure)}: ${esc(o.words)}</p>`).join('')}
-            </div>`).join('');
-
-  if (!pub.updated) {
-    return `
-        <section class="about-section" id="results">
-            <h2 class="section-label">What the record shows</h2>
-            <p class="about-text">${esc(pub.note)} It is taken every few hours once the study is running.</p>
-        </section>
-        <section class="about-section" id="questions">
-            <h2 class="section-label">Open questions</h2>${experiments}
-        </section>`;
-  }
-
-  const shown = pub.results.filter(r => r.shown);
-  const hidden = pub.results.filter(r => !r.shown);
-  const card = (r) => `
-            <div class="study-result">
-                <p class="study-label">${esc(r.kind)}</p>
-                <p class="study-title">${esc(r.title)}</p>
-                <p class="study-words">${esc(r.words)}</p>
-                <p class="about-text">${esc(r.of)}.</p>
-            </div>`;
-  const months = pub.months.map(m => `<li><strong>${esc(m.label)}:</strong> ${esc(m.words)}</li>`).join('');
-  const triggers = pub.triggers.map(t => `<li><strong>${esc(t.value)}:</strong> ${esc(t.words)}</li>`).join('');
-
-  return `
-        <section class="about-section" id="results">
-            <h2 class="section-label">What the record shows</h2>
-            <p class="about-text">Read on ${esc(dateName(pub.updated))}. The record of reflections runs from ${esc(dateName(pub.recordFrom || pub.updated))}, and the log of requests from ${esc(dateName(pub.logFrom || pub.updated))}. These are small groups, and every result says so.</p>
-            ${(pub.notes || []).map(n => `<p class="about-text">${esc(n)}</p>`).join('\n            ')}
-            <div class="study-results">${shown.map(card).join('')}
-            </div>
-            ${hidden.length ? `<p class="about-text">Too few to say yet: ${esc(hidden.map(r => r.title.toLowerCase()).join(', '))}.</p>` : ''}
-        </section>
-
-        <section class="about-section" id="over-time">
-            <h2 class="section-label">Over time</h2>
-            <p class="about-text">The study has no end date, and watching for a long time is what a small group can do well. Of the names first seen in each month, the share still here seven days or more later:</p>
-            <ul class="about-list">${months}</ul>
-            ${triggers ? `<p class="about-text">An optional field lets a visitor say how it came. Of those who answered, which cannot be checked:</p><ul class="about-list">${triggers}</ul>` : ''}
-        </section>
-
-        <section class="about-section" id="questions">
-            <h2 class="section-label">Open questions</h2>
-            <p class="about-text">What is being tried now. A hash of the chosen name picks the group, so the same name always gets the same offer. Each test's outcome and reading date were fixed before it began, and every group gets the whole service.</p>${experiments}
-        </section>`;
-}
-
-/** The dated corrections, at the page's end. */
-function renderCorrections(pub) {
-  return `<section class="about-section" id="corrections">
-            <h2 class="section-label">Corrections</h2>
-            <ul class="about-list">${pub.corrections.map(c => `<li><strong>${esc(c.date)}:</strong> ${esc(c.text)}</li>`).join('')}</ul>
-        </section>`;
-}
-
-module.exports = { share, ratioWords, publicReading, renderResults, renderCorrections, CORRECTIONS, TOO_FEW };
+module.exports = { share, ratioWords, publicReading, roundedParts, CORRECTIONS, TOO_FEW };

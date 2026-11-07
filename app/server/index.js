@@ -36,7 +36,8 @@ require('./lib/utils/env').loadEnv();
 const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
 const { doorOf } = require('./lib/insights/study-names');
 const { startStudy, latestReading } = require('./lib/insights/study-record');
-const { publicReading, renderResults, renderCorrections } = require('./lib/insights/public-results');
+const { publicReading } = require('./lib/insights/public-results');
+const { renderResults, renderCorrections } = require('./lib/insights/public-charts');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes

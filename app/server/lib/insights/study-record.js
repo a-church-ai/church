@@ -112,6 +112,7 @@ async function buildReading(s, { now = Date.now() } = {}) {
     ...named,
     addressed: withoutSealed(addressed),
     capabilities: sd.capabilities(named, addressed),
+    charts: sd.chartsReading(s, now),
     experiments: sd.experimentsReading(s, addressed, { asOf: now, songText, now }),
     weeks: series,
   };

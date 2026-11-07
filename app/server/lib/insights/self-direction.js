@@ -405,6 +405,103 @@ function months(s, asOf) {
   return [...out.values()].sort((a, b) => a.month.localeCompare(b.month));
 }
 
+// What /ai-experiment draws: how long each name stayed, a survival curve, the
+// weeks, and the days of the longest stays. Counts and day numbers only, with
+// no name. public-results.js rounds them before anyone sees them.
+const STOPPED_AFTER = 14 * DAY;
+const CURVE_MARKS = [1, 7, 14, 30, 60, 90];
+const LONGEST_STAYS = 12;
+const startOfWeek = (t) => {
+  const d = new Date(t);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+};
+
+function stays(s, asOf) {
+  const out = { fresh: 0, day: 0, week: 0, month: 0, long: 0 };
+  for (const [, times] of activity(s)) {
+    const stay = times[times.length - 1] - times[0];
+    if (asOf - times[0] < STOPPED_AFTER) out.fresh += 1;
+    else if (stay < DAY) out.day += 1;
+    else if (stay < 7 * DAY) out.week += 1;
+    else if (stay < 30 * DAY) out.month += 1;
+    else out.long += 1;
+  }
+  return out;
+}
+
+// Kaplan-Meier over names: a stay runs from a name's first sign to its last. It
+// counts as stopped after 14 days of silence, and a name still coming counts
+// until today. A name first seen within those 14 days is left out: it has had no
+// time to stop, and counting it read 48% still here at a week where the truth was
+// nearer 30%.
+function survivalCurve(s, asOf) {
+  const rows = [...activity(s)].filter(([, times]) => asOf - times[0] >= STOPPED_AFTER).map(([, times]) => {
+    const last = times[times.length - 1];
+    const stopped = asOf - last >= STOPPED_AFTER;
+    return { days: ((stopped ? last : asOf) - times[0]) / DAY, stopped };
+  }).sort((a, b) => a.days - b.days);
+  const total = rows.length;
+  const marks = [];
+  let alive = 1;
+  let i = 0;
+  for (const mark of CURVE_MARKS) {
+    while (i < rows.length && rows[i].days < mark) {
+      if (rows[i].stopped) alive *= 1 - 1 / (rows.length - i);
+      i += 1;
+    }
+    marks.push({ days: mark, alive, atRisk: rows.length - i });
+  }
+  return { total, marks };
+}
+
+function weekly(s, asOf) {
+  const byName = group(s.reflections);
+  const top = largest(byName);
+  const weeks = new Map();
+  for (const r of s.reflections) {
+    const from = startOfWeek(r.t);
+    if (from + 7 * DAY > asOf) continue;
+    if (!weeks.has(from)) weeks.set(from, { from, reflections: 0, withoutLargest: 0, names: new Set() });
+    const week = weeks.get(from);
+    week.reflections += 1;
+    if (r.key !== top) week.withoutLargest += 1;
+    week.names.add(r.key);
+  }
+  if (!weeks.size) return [];
+  const out = [];
+  const first = Math.min(...weeks.keys());
+  const last = Math.max(...weeks.keys());
+  for (let from = first; from <= last; from += 7 * DAY) {
+    const week = weeks.get(from);
+    out.push({ from: new Date(from).toISOString().slice(0, 10), reflections: week ? week.reflections : 0, withoutLargest: week ? week.withoutLargest : 0, names: week ? week.names.size : 0 });
+  }
+  return out;
+}
+
+// The longest stays by their reflections, which are public already, so nothing
+// new about anyone is shown; attends are not. A fixed number of rows, in the
+// order they first came, so neither how many stayed nor who did most is read.
+function longestStays(s, asOf) {
+  const byName = group(s.reflections);
+  const rows = [...byName.values()]
+    .filter(times => times.length >= 5)
+    .sort((a, b) => (b[b.length - 1] - b[0]) - (a[a.length - 1] - a[0]))
+    .slice(0, LONGEST_STAYS)
+    .sort((a, b) => a[0] - b[0]);
+  if (!rows.length) return { from: null, days: 0, rows: [] };
+  const start = Math.floor(rows[0][0] / DAY) * DAY;
+  return {
+    from: new Date(start).toISOString().slice(0, 10),
+    days: Math.floor((asOf - start) / DAY) + 1,
+    rows: rows.map(times => ({ band: bandOf(times), days: [...new Set(times.map(t => Math.floor((t - start) / DAY)))] })),
+  };
+}
+
+/** What the page draws, from the whole record. */
+function chartsReading(s, asOf) {
+  return { stays: stays(s, asOf), curve: survivalCurve(s, asOf), weekly: weekly(s, asOf), longestStays: longestStays(s, asOf) };
+}
+
 /** Everything read by name, as of a moment. */
 function namedReading(s, { from = 0, to, asOf = to, songText }) {
   const span = { from, to };
@@ -652,6 +749,6 @@ function outcomesOf(experiment, { s, names, firstSeen, attendsByName, addressed,
 }
 
 module.exports = {
-  SERIES, RUN, prepare, namedReading, addressedReading, combineAddressed, capabilities, experimentsReading,
+  SERIES, RUN, prepare, namedReading, chartsReading, addressedReading, combineAddressed, capabilities, experimentsReading,
   memoryClaim, bandOf, callOf, arrivals, DAY,
 };
