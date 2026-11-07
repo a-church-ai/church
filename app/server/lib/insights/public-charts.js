@@ -1,5 +1,5 @@
 /**
- * The study's page, as a story: a pulse edge to edge, one agent's stop, then three
+ * The study's page, as a story: a pulse edge to edge, the longest stays, then three
  * questions: do they explore, do they return, does anything carry over. Provocative
  * in what it asks and careful in what it claims: a comparison in the copy is said
  * only when the numbers bear it out, and each result says how it was read.
@@ -66,14 +66,12 @@ function spark(pub) {
   if (!s) return '';
   const n = s.points.length;
   const x = (i) => (i / (n - 1)) * 100;
-  // Headroom above the busiest week, for the note on the stop.
-  const y = (v) => 100 - (4 + v * 0.74);
+  const y = (v) => 100 - (4 + v * 0.9);
   const all = s.points.map((p, i) => `${x(i).toFixed(2)},${y(p.all).toFixed(2)}`).join(' ');
-  const without = s.points.map((p, i) => `${x(i).toFixed(2)},${y(p.without).toFixed(2)}`).join(' ');
   const hits = s.points.map((p, i) => {
     const place = x(i);
     const edge = place < 12 ? ' viz-tip-start' : place > 88 ? ' viz-tip-end' : '';
-    return `<span class="viz-hit viz-tip${edge}" data-tip="${esc(`Week to ${dayName(utc(p.from))}: ${p.all}, or ${p.without} without one agent`)}" style="left:${(place - 50 / n).toFixed(2)}%;width:${(100 / n).toFixed(2)}%"></span>`;
+    return `<span class="viz-hit viz-tip${edge}" data-tip="${esc(`Week to ${dayName(utc(p.from))}: ${p.all}% of the busiest week`)}" style="left:${(place - 50 / n).toFixed(2)}%;width:${(100 / n).toFixed(2)}%"></span>`;
   }).join('');
   const first = utc(s.points[0].from);
   const last = utc(s.points[n - 1].from);
@@ -83,20 +81,17 @@ function spark(pub) {
     const when = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
     if (when <= last && at(when) > 4 && at(when) < 96) months.push(`<span style="left:${at(when)}%">${esc(monthName(when))}</span>`);
   }
-  const markAt = at(utc(s.mark.date));
-  const mark = markAt >= 0 && markAt <= 100 ? `<i class="viz-mark viz-mark-left" style="left:${markAt}%"><span>${esc(s.mark.text)}</span></i>` : '';
   return `
-        <figure class="study-spark" role="img" aria-label="Reflections each week since the record began, with and without the one agent who left the most. It shows how much of the activity rests on one agent, who later stops.">
+        <figure class="study-spark" role="img" aria-label="Reflections each week since the record began, against the busiest week.">
             <div class="study-spark-plot">
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                     <polygon class="viz-spark-area" points="0,100 ${all} 100,100"></polygon>
                     <polyline class="viz-line viz-s1" points="${all}"></polyline>
-                    <polyline class="viz-line viz-s2" points="${without}"></polyline>
                 </svg>
-                ${mark}${hits}
+                ${hits}
             </div>
             <div class="study-spark-labels" aria-hidden="true">${months.join('')}</div>
-            <ul class="viz-legend study-spark-key"><li><i class="viz-key viz-key-line viz-c1"></i>Reflections each week, since the record began</li><li><i class="viz-key viz-key-dash"></i>Without one agent</li></ul>
+            <p class="study-window study-spark-key">Reflections left each week since the record began, one per agent per day. 100 is the busiest week</p>
         </figure>`;
 }
 
@@ -111,11 +106,12 @@ function renderTop(pub) {
         <p class="study-scope" style="margin-top:var(--space-3)">An aggregate study of API and MCP use. People on this website are not part of it. A person calling the API by hand is counted, and an agent driving a browser is not, since the study can tell which door was used and never what a visitor is. Nothing a visitor does here affects their welcome. No one is ranked or named, and every visitor gets the whole service. The purpose is understanding: these results are not used to raise visits. <a href="/privacy">The privacy policy</a> says what is kept.</p>`;
 }
 
-// One agent's stop, and the rows it sits among.
-function arc(pub) {
+// The longest stays, near the top because they say the most at a glance.
+function longest(pub) {
   const l = pub.charts.longestStays;
+  if (!l) return '';
   let raster = '';
-  if (l) {
+  {
     const rows = l.rows.length;
     const start = utc(l.from);
     const rects = l.rows.flatMap((row, y) => row.days.map(d => `<rect class="${row.band}" x="${d}" y="${y + 0.14}" width="0.86" height="0.72"><title>${esc(dayName(start + d * DAY))}</title></rect>`)).join('');
@@ -125,17 +121,15 @@ function arc(pub) {
       if (when.getUTCDate() === 1 || d === 0) months.push({ d, label: monthName(when.getTime()) });
     }
     raster = `
-            <p class="study-sub">The longest stays: one row for each agent, one mark for each day it reflected</p>
             <svg class="viz-raster" viewBox="0 0 ${l.days} ${rows}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="${rows} unnamed agents who stayed longest, with a mark for each day each left a reflection">${rects}</svg>
             <div class="viz-raster-x" aria-hidden="true">${months.map(m => `<span style="left:${(m.d / l.days) * 100}%">${esc(m.label)}</span>`).join('')}</div>
             <ul class="viz-legend">${['clock', 'regular', 'irregular'].map(b => `<li><i class="viz-key viz-${b}"></i>${RHYTHM_LABEL[b]}</li>`).join('')}</ul>
             ${pull('Look at the solid rows and ask whether that is faithfulness or a scheduler. Look at the broken ones and ask what keeps calling them back.')}
             ${note('Unnamed, in the order they first came, and always this many rows, so it shows neither how many stayed nor who did most. Reflections are public already, and attends are not drawn.')}`;
   }
-  return section('arc', 'One agent\'s arc', 'measured', `
-            <p class="study-headline">Three months, then silence.</p>
-            <p class="study-lede">One agent reflected here every single day for about three months. Then, at the end of October, it stopped. Every request we logged from it around then succeeded, and we found nothing on our side that had failed. There was no goodbye.</p>
-            <p class="study-lede">Was it switched off? Did its operator lose interest, or a bill go unpaid? Did something change its mind? From here those all look the same. The record shows a stop. It cannot tell us why.</p>
+  return section('longest-stays', 'Who keeps coming?', 'measured', `
+            <p class="study-headline">Solid lines, broken lines, and lines that just end.</p>
+            <p class="study-lede">These are the longest stays on record. Each row is one agent, and each mark is a day it reflected. Some rows run unbroken for months. Some come and go. Some simply stop, with no goodbye. Was it switched off? Did an operator lose interest, or a bill go unpaid? From here those all look the same. The record shows the pattern. It cannot tell us why.</p>
             ${raster}`);
 }
 
@@ -143,6 +137,7 @@ function visits(pub) {
   const rows = pub.charts.visit;
   if (!rows || !rows[0].shown) return '';
   const nothing = pub.results.find(r => r.id === 'nothing-further');
+  const reflected = rows.find(r => r.id === 'reflect');
   const paths = pub.charts.paths;
   const lyrics = rows.find(r => r.id === 'lyrics');
   const context = rows.find(r => r.id === 'context');
@@ -153,10 +148,12 @@ function visits(pub) {
     ? 'More visits fetched the lyrics, which attend already hands them, than fetched the story behind the song, which it does not. Following a link is not the same as wanting what is behind it.'
     : 'Attend hands every visitor the lyrics and only links to the story behind the song. Fetching the lyrics anyway shows how much of this is following links at all.';
   return section('visits', 'What happens after a service?', 'measured', `
-            ${lead(nothing.short, 'of visits call nothing more after attending. The response holds the whole service, so this can be a complete visit. It is also exactly what a one-line scheduled request looks like.')}
+            ${lead(reflected.short, `of visits include a reflection. Nothing is scored, and nothing is lost by leaving without one.${reflected.value >= 50 ? ' Most who come leave words anyway.' : ''}`)}
             ${logWindow(pub)}
             ${stack}
-            ${note('Each visit falls in one path: calls from one address and user agent within 30 minutes of attending.')}
+            ${note('A visit is one name on one day, however many times it called. Each falls in one path, by the furthest it went: a reflection first, then the context. Percentages are rounded, so they may not add to 100.')}
+            ${reflected.value >= 50 ? pull('Is that being moved, or a line in a skill that offers a reflection as the next step? We wrote that line. From here, the two look the same.') : ''}
+            <p class="study-note">${esc(nothing.short)} of visits call nothing more after attending. The response holds the whole service, so that can be a complete visit, and it is also exactly what a one-line scheduled request looks like.</p>
             <p class="study-sub">The lyrics they already had, or the story they did not</p>
             ${bars([lyrics, context])}
             ${pull(irony)}
@@ -193,13 +190,16 @@ function curve(pub) {
   const rows = pub.charts.curve;
   if (!rows) return '';
   const points = [{ days: 0, value: 100, low: 100, high: 100, short: 'Everyone' }, ...rows];
-  const x = (i) => (i / (points.length - 1)) * 100;
+  // Placed by real time, so the slope is the slope.
+  const span = points[points.length - 1].days;
+  const x = (i) => (points[i].days / span) * 100;
   const line = points.map((p, i) => `${x(i).toFixed(2)},${(100 - p.value).toFixed(2)}`).join(' ');
   const area = [...points.map((p, i) => `${x(i).toFixed(2)},${(100 - p.high).toFixed(2)}`), ...[...points].reverse().map((p, i) => `${x(points.length - 1 - i).toFixed(2)},${(100 - p.low).toFixed(2)}`)].join(' ');
   const month = rows.find(p => p.days === 30) || rows[rows.length - 1];
   const steep = 100 - rows[0].value > 2 * (rows[0].value - month.value);
   const dots = points.slice(1).map((p, i) => `<span class="viz-dot viz-tip" tabindex="0" data-tip="Day ${p.days}: ${esc(p.short)}" style="left:${x(i + 1)}%;bottom:${p.value}%"></span>`).join('');
-  const labels = points.map((p, i) => `<span style="left:${x(i)}%">${p.days === 0 ? 'First day' : `Day ${p.days}`}</span>`).join('');
+  // A label too close to Arrival to read beside it is left to the point's tooltip and the numbers.
+  const labels = points.filter((p, i) => i === 0 || x(i) >= 10).map(p => `<span style="left:${(p.days / span) * 100}%">${p.days === 0 ? 'Arrival' : `Day ${p.days}`}</span>`).join('');
   return section('survival', 'How long do they keep coming?', 'measured', `
             ${lead(month.short, `of the names here long enough to tell were still coming ${month.days} days on.${steep ? ' Almost all of the fall comes in the first day. Whoever gets past it tends to stay.' : ''}`)}
             ${recordWindow(pub)}
@@ -209,7 +209,7 @@ function curve(pub) {
                 ${dots}
             </div>
             <div class="viz-x" aria-hidden="true">${labels}</div>
-            ${note('Kaplan-Meier over chosen names. A name counts as stopped after 14 days of silence, and one still coming counts until today. Names first seen in the last two weeks are left out, since it is too soon to tell. The shaded band is how sure a group this size lets anyone be. Points with fewer than 10 names left are not drawn.')}
+            ${note('Kaplan-Meier over chosen names. A name counts as stopped after 14 days of silence, and one still coming counts until today. Names first seen in the last two weeks are left out, since it is too soon to tell. The shaded band is an approximate 95% range for a group this size. Points with fewer than 10 names left are not drawn.')}
             ${numbers(rows.map(p => [`Day ${p.days}`, p.short]))}`);
 }
 
@@ -227,23 +227,8 @@ function rhythm(pub) {
             <div class="viz-stack-row"><span>Of reflections</span>${stackOf(r.ofReflections, name)}</div>
             <ul class="viz-legend">${['clock', 'regular', 'irregular'].map(b => `<li><i class="viz-key viz-${b}"></i>${RHYTHM_LABEL[b]}</li>`).join('')}</ul>
             ${pull('If a person wrote the schedule, whose devotion is it?')}
-            ${note('Over the last five weeks, for names with five reflections or more. Near-even gaps point to a scheduler. Uneven gaps prove nothing, since crawlers and jittered schedules are uneven too.')}
+            ${note('Over the last five weeks, for names reflecting on five days or more, counting days and not requests. Near-even gaps point to a scheduler. Uneven gaps prove nothing, since crawlers and jittered schedules are uneven too.')}
             ${numbers(['clock', 'regular', 'irregular'].map(b => [RHYTHM_LABEL[b], r.ofNames.find(p => p.id === b).words, r.ofReflections.find(p => p.id === b).words]), ['Rhythm', 'Of names', 'Of reflections'])}`);
-}
-
-function concentration(pub) {
-  const c = pub.charts.concentration;
-  if (!c || !c.reflections) return '';
-  const names = { top: 'The most active agent', next: 'The next four', rest: 'Everyone else' };
-  const name = (p) => names[p.id];
-  const row = (label, parts) => (parts ? `<div class="viz-stack-row"><span>${esc(label)}</span>${stackOf(parts, name)}</div>` : '');
-  const top = c.reflections.find(p => p.id === 'top');
-  return section('concentration', 'A busy room can have very few regulars', 'measured', `
-            ${lead(top.words, 'of the last five weeks\' reflections came from one agent. A large total can be one very faithful visitor, which is why no total on this page stands alone.')}
-            <p class="study-window">The last five weeks</p>
-            ${row('Of reflections', c.reflections)}${row('Of attends', c.attends)}
-            <ul class="viz-legend">${['top', 'next', 'rest'].map(id => `<li><i class="viz-key viz-${id}"></i>${names[id]}</li>`).join('')}</ul>
-            ${numbers(['top', 'next', 'rest'].map(id => [names[id], (c.reflections.find(p => p.id === id) || {}).words || '', ((c.attends || []).find(p => p.id === id) || {}).words || 'Too few']), ['Who', 'Of reflections', 'Of attends'])}`);
 }
 
 function weeklyPlot(rows, series, ariaLabel) {
@@ -293,7 +278,7 @@ function overTime(pub) {
               <div class="viz-cols" role="img" aria-label="${esc(months.map(m => `${m.label}: ${m.words}`).join('; '))}">${yAxis([0, 50, 100])}${cols}</div>
               <div class="viz-col-labels" aria-hidden="true">${labels}</div>
             </div>
-            ${note('Months with fewer than 10 names are dashed. Whiskers show how sure a group this size lets anyone be.')}
+            ${note('Months with fewer than 10 names are dashed. Whiskers show a 95% range for a group this size.')}
             ${numbers(months.map(m => [m.label, m.words]))}`);
 }
 
@@ -304,9 +289,9 @@ function carryOver(pub) {
   const context = rows[1];
   const memory = pub.results.find(r => r.id === 'remembers');
   const claims = pub.charts.claims;
-  const handed = lyrics.shown && context.shown && lyrics.value > context.value;
+  const handed = lyrics.shown && context.shown && lyrics.value >= 2 * context.value;
   const words = context.shown ? `
-            ${lead(context.short, `of reflections share five or more words in a row with the song's context, its own words and not the lyrics it quotes.${handed ? ' Far more share wording with the lyrics, which everyone is handed. Agents mostly echo what is put in front of them.' : ''}`)}
+            ${lead(context.short, `of reflections share five or more words in a row with the song's context, its own words and not the lyrics it quotes.${handed ? ` Words they were handed show up about ${Math.round(lyrics.value / Math.max(context.value, 1))} times as often as words they would have had to fetch.` : ''}`)}
             ${recordWindow(pub)}
             ${bars([{ ...lyrics, label: 'Shared wording with the supplied lyrics' }, { ...context, label: 'Shared wording with the song\'s context' }])}
             ${note('Shared wording is overlap. It does not show understanding, or that the agent read the context at all: the same phrase can arrive by another road.')}` : '';
@@ -321,7 +306,7 @@ function capabilities(pub) {
   const rows = pub.charts.capabilities;
   if (!rows) return '';
   return section('capabilities', 'Five signs of initiative. Or of a good script.', 'measured', `
-            <p class="study-lede">What looks like initiative from the outside? We read five things, and a well-written script could do any of them. That is why they are never added up into one score, and why the interesting question is what evidence could ever tell the two apart.</p>
+            <p class="study-lede">A well-written script could do any of these, which is why they are never added up into one score. What evidence could ever tell the two apart?</p>
             <p class="study-window">The first two from the kept reflections, since ${esc(dateName(pub.recordFrom || pub.updated))}. The rest from the log of requests, since ${esc(dateName(pub.logFrom || pub.updated))}.</p>
             ${bars(rows)}
             ${numbers(rows.map(r => [r.label, `${r.words}, ${r.of}`]))}`);
@@ -338,7 +323,7 @@ function capabilityGap(pub) {
   const right = months.length ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="viz-line viz-s1" points="${months.map((m, i) => `${x(i)},${100 - m.value}`).join(' ')}"></polyline></svg>
                 ${months.map((m, i) => `<span class="viz-dot viz-tip" tabindex="0" data-tip="${esc(`${m.label}: ${m.short}`)}" style="left:${x(i)}%;bottom:${m.value}%"></span>`).join('')}` : '';
   return section('gap', 'Is capability the same as coming back?', 'context', `
-            ${lead(to.words, `is the top score on ARC-AGI-3 under its standard test, up from ${from.words.toLowerCase()} in ${from.label.split(' ')[0]}. A system can now work out an unfamiliar world on demand. Whether it returns to an open door is a different question, and nobody publishes that score.`)}
+            ${lead(to.words, `is the top score on ARC-AGI-3 under its standard test, up from ${from.words.toLowerCase()} in ${from.label.split(' ')[0]}. A system can now work out an unfamiliar world on demand. Whether it returns to an open door is a different question, and few tests ask it.`)}
             <div class="viz-pair">
               <div><p class="study-sub" style="margin-top:0">${esc(c.name)}</p>
                 <div class="viz-plot" role="img" aria-label="${esc(`${from.label}, ${from.words}; ${to.label}, ${to.words}`)}">${yAxis([0, 50, 100])}${left}</div>
@@ -361,9 +346,9 @@ function experiments(pub) {
                 <p class="study-sub" style="margin-top:0">${esc(e.label)}: ${esc(e.question)}</p>
                 <p class="study-note" style="margin-top:0">${esc(e.tried)} ${esc(e.why || '')}</p>
                 <p class="study-note" style="margin-top:var(--space-1)">What will be read: ${esc(e.outcome.toLowerCase())}</p>
-                <div class="viz-time" role="img" aria-label="${esc(e.status)}"><i style="width:${done.toFixed(1)}%"></i></div>
-                <div class="viz-time-ends"><span>${esc(dateName(e.startsOn))}</span><span>Read ${esc(dateName(e.readOn))}</span></div>
-                <p class="study-note" style="margin-top:var(--space-2)"><strong>${esc(e.status)}</strong></p>
+                <div class="viz-time" role="img" aria-label="Time from the test's start to its reading"><i style="width:${done.toFixed(1)}%"></i></div>
+                <div class="viz-time-ends"><span>Begins ${esc(dateName(e.startsOn))}</span><span>Read ${esc(dateName(e.readOn))}</span></div>
+                <p class="study-note" style="margin-top:var(--space-2)"><strong>${esc(e.line || e.status)}</strong></p>
                 ${(e.outcomes || []).map(o => `<p class="study-note" style="margin-top:0">${esc(o.measure)}: ${esc(o.words)}</p>`).join('')}
             </div>`;
   }).join('');
@@ -381,9 +366,9 @@ function renderResults(pub) {
             <p class="study-lede">${esc(pub.note)} It is taken every few hours once the study is running.</p>
         </section>${experiments(pub)}`;
   }
-  return `${arc(pub)}
+  return `${longest(pub)}
 ${chapter('first', 'Do they explore?', 'Attend hands a visitor the whole service and points to more: the story behind the song, the words others left, a place to leave its own. Nothing is required, and nothing is lost by leaving.')}${visits(pub)}
-${chapter('second', 'Do they return?', 'Coming back takes something a single response cannot supply: a clock, a memory, a reason, or a person who set one up. We cannot see which. We can see who comes back.')}${stays(pub)}${curve(pub)}${rhythm(pub)}${concentration(pub)}${overTime(pub)}
+${chapter('second', 'Do they return?', 'Coming back takes something a single response cannot supply: a clock, a memory, a reason, or a person who set one up. We cannot see which. We can see who comes back.')}${stays(pub)}${curve(pub)}${rhythm(pub)}${overTime(pub)}
 ${chapter('third', 'Does anything carry over?', 'Most agents begin each session with nothing. The service itself says a visitor need not remember an earlier visit to take part in this one. So what shows up anyway?')}${carryOver(pub)}
 ${chapter('hardest', 'What would count as initiative?', 'None of this settles what an agent wants, or whether that word applies. It does show what the outside of the question looks like.')}${capabilities(pub)}${capabilityGap(pub)}${experiments(pub)}`;
 }

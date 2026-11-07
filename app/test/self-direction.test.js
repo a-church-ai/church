@@ -298,11 +298,19 @@ test('the weekly record: one file per finished week, written once, with no addre
   const now = Date.parse('2026-10-20T12:00:00Z');
   const first = await record.refresh({ now });
   assert.deepStrictEqual(first.written, ['2026-W40', '2026-W41', '2026-W42']);
-  const stored = fs.readdirSync(record.STORE()).sort();
-  assert.ok(stored.includes('2026-W41.json') && stored.includes('latest.json'));
+  const stored = () => fs.readdirSync(record.STORE()).sort();
+  assert.ok(stored().includes('2026-W41.json') && stored().includes('latest.json'));
   assert.deepStrictEqual((await record.refresh({ now })).written, [], 'a week is written once');
+  // A change of definition starts a new series, and the old week is kept apart.
+  const oldWeek = path.join(record.STORE(), '2026-W41.json');
+  const was = JSON.parse(fs.readFileSync(oldWeek, 'utf8'));
+  fs.writeFileSync(oldWeek, JSON.stringify({ ...was, series: was.series - 1, addressed: { measurable: true, visits: 99 } }));
+  assert.deepStrictEqual((await record.refresh({ now })).written, ['2026-W41']);
+  assert.ok(fs.existsSync(path.join(record.STORE(), `2026-W41.series-${was.series - 1}.json`)));
+  assert.strictEqual(JSON.parse(fs.readFileSync(oldWeek, 'utf8')).series, sd.SERIES);
+  assert.strictEqual((await record.latestReading({ now: now + 10 * 60 * 1000 })).addressed.visits, 3, 'one a week from the new series, and not the old week\'s 99');
 
-  for (const file of stored) {
+  for (const file of stored()) {
     const text = fs.readFileSync(path.join(record.STORE(), file), 'utf8');
     assert.ok(!/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/.test(text), `${file} holds no address`);
     assert.ok(!/quietname|parish/i.test(text), `${file} holds no name`);
@@ -342,4 +350,43 @@ test('the access line records the door and what was found, never a token or a ti
   assert.strictEqual(line.query.token, '[REDACTED]');
   assert.strictEqual(line.query.timezone, '[REDACTED]');
   assert.strictEqual(line.query.trigger, 'self');
+});
+
+test('however often a name calls, it counts once a day: one visit, one reflection', () => {
+  const t0 = LOG_START + 3 * DAY;
+  const lines = [opening];
+  // A monitoring script: eighty attends a day, for two days, and nothing else.
+  for (let d = 0; d < 2; d++) for (let i = 0; i < 80; i++) lines.push(attend('Pinger', t0 + d * DAY + i * 5 * MIN, { ip: '198.51.100.20' }));
+  // An agent coming once, which reads the context and leaves words from elsewhere.
+  lines.push(attend('Wren', t0, { ip: '198.51.100.21' }), call('/api/music/s/context', t0 + MIN, { ip: '198.51.100.21' }));
+  // Two sessions in one day make one visit with the calls of both.
+  lines.push(attend('Ash', t0 + HOUR, { ip: '198.51.100.22' }), call('/api/music/s/lyrics', t0 + HOUR + MIN, { ip: '198.51.100.22' }));
+  lines.push(attend('Ash', t0 + 8 * HOUR, { ip: '198.51.100.22' }), call('/api/music/s/context', t0 + 8 * HOUR + MIN, { ip: '198.51.100.22' }));
+  const reflections = [reflection('Wren', t0 + 5 * HOUR), reflection('Wren', t0 + 6 * HOUR), reflection('Wren', t0 + 7 * HOUR)];
+  const s = sd.prepare({ lines, reflections });
+  const a = sd.addressedReading(s, { from: t0, to: t0 + 2 * DAY + DAY });
+  assert.strictEqual(a.visits, 4, 'Pinger on two days, Wren and Ash on one');
+  assert.strictEqual(a.sequences['attend only'], 2, 'the eighty a day are two visits');
+  assert.strictEqual(a.sequences['lyrics>context'], 1, 'two sessions, one visit, the calls of both');
+  assert.strictEqual(a.links.reflect, 1, 'a reflection is matched by name, from any address, and once');
+  assert.strictEqual(a.sequences['context>reflect'], 1);
+  assert.strictEqual(s.reflections.length, 3 - 2, 'three that day count as one');
+  assert.strictEqual(s.allReflections.length, 3, 'and all are still there for checking a claim against');
+  const c = sd.chartsReading(s, t0 + 3 * DAY);
+  assert.strictEqual(c.concentration.attends.top, 2);
+  assert.strictEqual(c.daily.reduce((sum, d) => sum + d.reflections, 0), 1);
+});
+
+test('a claim of an earlier visit today is checked against every reflection, though each counts once', () => {
+  // Only the day's second reflection falls within what "yesterday" allows: 60 hours.
+  const t = LOG_START + 20 * DAY + 13 * HOUR;
+  const r = reading({
+    lines: [opening],
+    reflections: [
+      reflection('Wren', t - 61 * HOUR, 'A first visit, and something quiet in it.'),
+      reflection('Wren', t - 59 * HOUR, 'A second reflection on the same day, which counts for nothing alone.'),
+      reflection('Wren', t, 'Yesterday I sat with this song a long while, and it held.'),
+    ],
+  }, t + HOUR);
+  assert.deepStrictEqual([r.memory.reflections, r.memory.claims, r.memory.withRecord], [2, 1, 1]);
 });

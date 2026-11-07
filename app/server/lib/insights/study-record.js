@@ -75,7 +75,11 @@ async function writeWeeks(s, { now = Date.now() } = {}) {
   if (s.logStart === null) return written;
   for (let week = weekOf(s.logStart); week.to <= now; week = weekOf(week.to)) {
     const file = path.join(STORE(), `${week.key}.json`);
-    if (await readWeek(week.key)) continue;
+    // A week of an older series is kept beside the new one under its own name,
+    // and read no more: a change of definition starts a new series.
+    const existing = await readWeek(week.key);
+    if (existing && existing.series === sd.SERIES) continue;
+    if (existing) await fs.rename(file, path.join(STORE(), `${week.key}.series-${existing.series}.json`));
     const span = { from: week.from, to: week.to };
     const snapshot = {
       series: sd.SERIES,

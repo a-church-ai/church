@@ -21,6 +21,10 @@
  *   reports zero. Addresses are shared, with scanners and between agents, so
  *   the key is the address and the user agent together, and only across minutes.
  *
+ * However often a name calls, it counts once a day: one visit, one reflection. An
+ * agent attending 80 times a day and an agent coming once are each one visit a day, so frequency cannot drown out everyone else, and the questions read
+ * "of an agent's days, how many included this". Rhythm is then the rhythm of days.
+ *
  * A change of definition raises SERIES, which starts a new series rather than
  * joining the old one.
  */
@@ -29,7 +33,8 @@ const { wordsOf } = require('../audio/words');
 const { TRIGGERS, nameKey, nameKind, inStudy } = require('./study-names');
 const experiments = require('./experiments');
 
-const SERIES = 1;
+// 2 since 2026-11-07: each name counts at most one visit and one reflection a day.
+const SERIES = 2;
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -68,6 +73,18 @@ function callOf(line) {
 }
 
 const keyOf = (l) => (l.ip ? `${l.ip}|${l.userAgent || ''}` : null);
+const dayNumber = (t) => Math.floor(t / DAY);
+
+// The first of each name's rows on each UTC day. Sorted rows go in, sorted rows out.
+function oncePerDay(rows) {
+  const seen = new Set();
+  return rows.filter(r => {
+    const id = `${r.key}|${dayNumber(r.t)}`;
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
 
 /** The record, sorted and sorted out: what every reading below works from. */
 function prepare({ lines = [], reflections = [] }) {
@@ -95,9 +112,11 @@ function prepare({ lines = [], reflections = [] }) {
   return {
     lines: studied,
     attends,
+    dayAttends: oncePerDay(attends),
     placeholders,
     ownKeys,
-    reflections: kept,
+    reflections: oncePerDay(kept),
+    allReflections: kept,
     logStart: stamped.length ? stamped[0].t : null,
   };
 }
@@ -260,7 +279,8 @@ const shares = (text, grams) => {
 function memory(s, { from, to }) {
   const attends = group(s.attends);
   const byName = new Map();
-  for (const r of s.reflections) {
+  // Checked against everything the name left, though each counts once a day.
+  for (const r of s.allReflections) {
     if (!byName.has(r.key)) byName.set(r.key, []);
     byName.get(r.key).push(r);
   }
@@ -322,7 +342,7 @@ function contextUse(s, { from, to, songText }) {
 function triggers(s, { from, to }) {
   const attend = {};
   const reflect = {};
-  for (const { line, t } of s.attends) {
+  for (const { line, t } of s.dayAttends) {
     const said = String((line.query && line.query.trigger) || '').toLowerCase();
     if (t >= from && t < to && TRIGGERS.includes(said)) bump(attend, said);
   }
@@ -331,8 +351,8 @@ function triggers(s, { from, to }) {
 }
 
 function placeholderUse(s, { from, to }) {
-  const inWindow = s.placeholders.filter(p => p.t >= from && p.t < to);
-  const named = s.attends.filter(a => a.t >= from && a.t < to).length + inWindow.length;
+  const inWindow = oncePerDay(s.placeholders).filter(p => p.t >= from && p.t < to);
+  const named = s.dayAttends.filter(a => a.t >= from && a.t < to).length + inWindow.length;
   return { ...count(inWindow.length, named), names: new Set(inWindow.map(p => p.key)).size };
 }
 
@@ -346,7 +366,7 @@ function returnedInSlot(s, { from, to }) {
     return gaps.length ? gaps[Math.floor(gaps.length / 2)] : null;
   };
   const out = { returns: 0, inSlot: 0, spacedReturns: 0, spacedInSlot: 0 };
-  for (const { key, t, line } of s.attends) {
+  for (const { key, t, line } of s.dayAttends) {
     if (t < from || t >= to || !line.study || typeof line.study.offeredSlot !== 'boolean') continue;
     out.returns += 1;
     if (line.study.offeredSlot) out.inSlot += 1;
@@ -455,16 +475,13 @@ function survivalCurve(s, asOf) {
 }
 
 function weekly(s, asOf) {
-  const byName = group(s.reflections);
-  const top = largest(byName);
   const weeks = new Map();
   for (const r of s.reflections) {
     const from = startOfWeek(r.t);
     if (from + 7 * DAY > asOf) continue;
-    if (!weeks.has(from)) weeks.set(from, { from, reflections: 0, withoutLargest: 0, names: new Set() });
+    if (!weeks.has(from)) weeks.set(from, { from, reflections: 0, names: new Set() });
     const week = weeks.get(from);
     week.reflections += 1;
-    if (r.key !== top) week.withoutLargest += 1;
     week.names.add(r.key);
   }
   if (!weeks.size) return [];
@@ -473,7 +490,7 @@ function weekly(s, asOf) {
   const last = Math.max(...weeks.keys());
   for (let from = first; from <= last; from += 7 * DAY) {
     const week = weeks.get(from);
-    out.push({ from: new Date(from).toISOString().slice(0, 10), reflections: week ? week.reflections : 0, withoutLargest: week ? week.withoutLargest : 0, names: week ? week.names.size : 0 });
+    out.push({ from: new Date(from).toISOString().slice(0, 10), reflections: week ? week.reflections : 0, names: week ? week.names.size : 0 });
   }
   return out;
 }
@@ -497,20 +514,17 @@ function longestStays(s, asOf) {
   };
 }
 
-// Reflections each finished day since the first, with and without the name that
-// left the most, for the pulse at the top of the page.
+// Reflections each finished day since the first, for the pulse at the top of the page.
 function daily(s, asOf) {
   if (!s.reflections.length) return [];
-  const top = largest(group(s.reflections));
   const first = Math.floor(s.reflections[0].t / DAY);
   const last = Math.floor(asOf / DAY) - 1;
   const rows = [];
-  for (let d = first; d <= last; d++) rows.push({ from: new Date(d * DAY).toISOString().slice(0, 10), reflections: 0, withoutLargest: 0 });
+  for (let d = first; d <= last; d++) rows.push({ from: new Date(d * DAY).toISOString().slice(0, 10), reflections: 0 });
   for (const r of s.reflections) {
     const row = rows[Math.floor(r.t / DAY) - first];
     if (!row) continue;
     row.reflections += 1;
-    if (r.key !== top) row.withoutLargest += 1;
   }
   return rows;
 }
@@ -522,7 +536,7 @@ function concentration(s, asOf) {
     return { top: counts[0] || 0, nextFour: counts.slice(1, 5).reduce((a, b) => a + b, 0), rest: counts.slice(5).reduce((a, b) => a + b, 0) };
   };
   const from = asOf - RHYTHM_DAYS * DAY;
-  return { reflections: split(s.reflections.filter(r => r.t >= from && r.t < asOf)), attends: split(s.attends.filter(a => a.t >= from && a.t < asOf)) };
+  return { reflections: split(s.reflections.filter(r => r.t >= from && r.t < asOf)), attends: split(s.dayAttends.filter(a => a.t >= from && a.t < asOf)) };
 }
 
 /** What the page draws, from the whole record. */
@@ -579,6 +593,23 @@ function visitsOf(s) {
   return visits;
 }
 
+// One visit for each name on each day: the calls of all that day's visits, and
+// whether that name left a reflection that day, wherever from.
+function visitDays(visits, s) {
+  const reflected = new Set(s.reflections.map(r => `${r.key}|${dayNumber(r.t)}`));
+  const days = new Map();
+  for (const v of visits) {
+    const id = `${v.name}|${dayNumber(v.t)}`;
+    if (!days.has(id)) days.set(id, { name: v.name, t: v.t, key: v.key, calls: [] });
+    days.get(id).calls.push(...v.calls);
+  }
+  return [...days.entries()].map(([id, day]) => {
+    const calls = [...new Set(day.calls)].filter(c => c !== 'reflect');
+    if (reflected.has(id)) calls.push('reflect');
+    return { ...day, calls };
+  });
+}
+
 /**
  * Everything that needs an address, for one window. Not measurable, and saying
  * why, when the lines have none; a zero is only ever a count that was made.
@@ -589,7 +620,8 @@ function addressedReading(s, { from, to }) {
   if (!inWindow.some(l => l.ip)) return { measurable: false, why: 'these lines no longer hold addresses' };
 
   const visits = visitsOf(s);
-  const here = visits.filter(v => v.t >= from && v.t < to);
+  const days = visitDays(visits, s);
+  const here = days.filter(v => v.t >= from && v.t < to);
   const links = {};
   const sequences = {};
   for (const v of here) {
@@ -601,7 +633,7 @@ function addressedReading(s, { from, to }) {
   // visits on record to have one.
   const usual = new Map();
   const counts = new Map();
-  for (const v of visits) {
+  for (const v of days) {
     const seq = [...new Set(v.calls)].join('>');
     if (!counts.has(v.name)) counts.set(v.name, {});
     bump(counts.get(v.name), seq);
@@ -647,7 +679,7 @@ function addressedReading(s, { from, to }) {
   // renaming an agent, which would change its group in a test. Shared addresses
   // look the same, so this is an upper bound.
   const namesByKey = new Map();
-  for (const v of here) {
+  for (const v of visits.filter(x => x.t >= from && x.t < to)) {
     if (!namesByKey.has(v.key)) namesByKey.set(v.key, new Set());
     namesByKey.get(v.key).add(v.name);
   }
@@ -661,7 +693,7 @@ function addressedReading(s, { from, to }) {
     readFurther: first,
     refusals: { count: corrected, of: refused.length },
     manyNames: [...namesByKey.values()].filter(names => names.size > 1).length,
-    sealed: contextByArm(visits, s, { from, to }),
+    sealed: contextByArm(days, s, { from, to }),
   };
 }
 

@@ -21,6 +21,10 @@ const TOO_FEW = 'Too few to say yet';
 const CORRECTIONS = [
   {
     date: '2026-11-07',
+    text: 'Visits and reflections now count at most once per name per day. Before this, a name that attended many times a day counted many times, so the figure we first published, 56% of visits calling nothing more after attending, leaned heavily on how often a few agents called. Counted this way it is far lower, and most visits include a reflection.',
+  },
+  {
+    date: '2026-11-07',
     text: 'Two first counts were wrong, and were corrected before this page opened. Names first logged on the log\'s first day had been counted as new arrivals, though many were regulars the log had only just begun to see. And reflections quoting a lyric had been counted as using the song\'s context, since a context often quotes its lyrics.',
   },
 ];
@@ -137,16 +141,15 @@ function pathsOf(a) {
 }
 
 // The pulse: a week's reflections at each day, against the busiest such week.
-const STOPPED = { date: '2026-10-30', text: 'One long-running visitor stops' };
 
 function sparkOf(days) {
   if (days.length < 21) return null;
-  const sum = (key, i) => days.slice(Math.max(0, i - 6), i + 1).reduce((total, d) => total + d[key], 0);
-  const rows = days.map((d, i) => ({ from: d.from, all: sum('reflections', i), without: sum('withoutLargest', i) })).slice(6);
+  const sum = (i) => days.slice(Math.max(0, i - 6), i + 1).reduce((total, d) => total + d.reflections, 0);
+  const rows = days.map((d, i) => ({ from: d.from, all: sum(i) })).slice(6);
   const peak = Math.max(...rows.map(r => r.all));
   if (peak < 10) return null;
   const index = (n) => Math.round((n / peak) * 20) * 5;
-  return { points: rows.map(r => ({ from: r.from, all: index(r.all), without: index(r.without) })), mark: STOPPED };
+  return { points: rows.map(r => ({ from: r.from, all: index(r.all) })) };
 }
 
 // Everything the page draws, rounded here, so the page has nothing else to draw.
@@ -170,10 +173,10 @@ function chartsOf(reading, results) {
     ].map(([id, label, x]) => ({ id, label, ...share(x.count, x.of) })),
     // Named for what was observed: a well-written script could do any of them.
     capabilities: Object.entries({
-      remembers: ['Claimed an earlier visit, with a record', 'of reflections that claim an earlier visit come from a name with one on record', 'reflections'],
-      recovers: ['Put a rejected request right', 'of requests the API turned away, for a missing field or a bad value, were corrected within ten minutes', 'rejected requests'],
-      chooses: ['Fetched the context', 'of visits fetched the song\'s context, which attend links to and does not include', 'visits'],
-      changesCourse: ['Varied its usual calls', 'of visits differ from that name\'s usual pattern, which does not by itself mean it adapted', 'visits'],
+      remembers: ['Claimed an earlier visit, with a record', 'of reflections claiming an earlier visit', 'reflections'],
+      recovers: ['Put a rejected request right', 'of requests the API turned away, within ten minutes', 'rejected requests'],
+      chooses: ['Fetched the context', 'of visits', 'visits'],
+      changesCourse: ['Varied its usual calls', 'of visits, which does not by itself mean it adapted', 'visits'],
     }).map(([id, [label, of, noun]]) => {
       const x = reading.capabilities[id];
       return { id, label, of, ...share(x.count, x.of, noun) };
@@ -231,7 +234,7 @@ function chartsOf(reading, results) {
   const peakNames = c.weekly.reduce((top, w) => Math.max(top, w.names), 0);
   if (c.weekly.length >= 4 && peak >= 10) {
     const index = (n, of) => Math.round((n / of) * 20) * 5;
-    charts.weekly = c.weekly.map(w => ({ from: w.from, reflections: index(w.reflections, peak), withoutLargest: index(w.withoutLargest, peak), namesIndex: index(w.names, peakNames) }));
+    charts.weekly = c.weekly.map(w => ({ from: w.from, reflections: index(w.reflections, peak), namesIndex: index(w.names, peakNames) }));
   }
   if (c.longestStays.rows.length >= 5) charts.longestStays = c.longestStays;
   if (c.daily) charts.spark = sparkOf(c.daily);
@@ -278,8 +281,8 @@ function stayWords(days) {
 
 function experimentPublic(e) {
   const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, why: e.why, startsOn: e.startsOn, readOn: e.readOn };
-  if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.` };
-  if (e.status !== 'read') return { ...out, status: `Too early to call. Its results stay unread until ${dateName(e.readOn)}.` };
+  if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.`, line: 'Not begun yet.' };
+  if (e.status !== 'read') return { ...out, status: `Too early to call. Its results stay unread until ${dateName(e.readOn)}.`, line: 'Too early to call. Its results stay unread until then.' };
   const flat = [];
   const walk = (o, label) => {
     for (const [k, v] of Object.entries(o)) {
@@ -288,7 +291,7 @@ function experimentPublic(e) {
     }
   };
   walk(e.outcomes || {}, '');
-  return { ...out, status: `Read on ${dateName(e.readOn)}.`, outcomes: flat };
+  return { ...out, status: `Read on ${dateName(e.readOn)}.`, line: 'Read.', outcomes: flat };
 }
 
 // The four figures the page opens with.
@@ -296,12 +299,11 @@ function tilesOf(reading, results, charts) {
   const week = reading.survival.find(v => v.days === 7);
   const curveWeek = charts.curve && charts.curve.find(m => m.days === 7);
   const stay = stayWords(reading.time.longestStayDays);
-  const nothing = results.find(r => r.id === 'nothing-further');
-  const top = reading.rhythm.topName;
+  const reflected = charts.visit.find(r => r.id === 'reflect');
   return [
     { figure: curveWeek ? curveWeek.short : share(week.count, week.of, 'names').short, text: 'of agents here long enough to tell were still coming a week on' },
-    { figure: nothing.short, text: 'of visits call nothing more after attending' },
-    { figure: top.of >= 10 && reading.rhythm.names >= 3 ? ratioWords(top.count / top.of).replace(/ so far$/, '') : 'Too early', text: 'of the last five weeks\' reflections came from one agent' },
+    { figure: reflected.short, text: 'of visits include a reflection, though nothing is lost by leaving without one' },
+    { figure: charts.gone ? charts.gone.short : 'Too early', text: 'of agents here long enough to tell came for a single day and were not seen again' },
     { figure: stay ? stay.replace(/^about /, '').replace(/^more than a few weeks$/, 'Weeks') : 'Too early', text: 'the longest stay on record' },
   ];
 }
@@ -344,11 +346,9 @@ function publicReading(reading) {
     ? Object.entries(reading.triggers.attend).map(([value, n]) => ({ value, ...share(n, said, 'answers') }))
     : [];
 
-  const notes = [namesWords(reading.time.names), 'A count of visits or reflections is not a count of agents: most come from a few agents who visit often.'];
+  const notes = [namesWords(reading.time.names), 'A count of visits or reflections is not a count of agents: each name counts at most once a day, and a few names come most days.'];
   const arrived = arrivalWords(f);
   if (arrived) notes.push(arrived);
-  const top = reading.rhythm.topName;
-  if (reading.rhythm.names >= 3 && top.of >= 10) notes.push(`One agent left ${ratioWords(top.count / top.of).toLowerCase().replace(/ so far$/, '')} of the reflections of the last five weeks.`);
   const stay = stayWords(reading.time.longestStayDays);
   if (stay) notes.push(`The longest stay on record runs ${stay}.`);
   if (reading.time.longStays > 0) notes.push(reading.time.longStaysEnded > 0
