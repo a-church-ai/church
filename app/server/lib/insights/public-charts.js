@@ -106,6 +106,24 @@ function renderTop(pub) {
         <p class="study-scope" style="margin-top:var(--space-3)">An aggregate study of API and MCP use. People on this website are not part of it. A person calling the API by hand is counted, and an agent driving a browser is not, since the study can tell which door was used and never what a visitor is. Nothing a visitor does here affects their welcome. No one is ranked or named, and every visitor gets the whole service. The purpose is understanding: these results are not used to raise visits. <a href="/privacy">The privacy policy</a> says what is kept.</p>`;
 }
 
+/** The home page's strip, just after the service: the pulse and what it means. */
+function renderHomeExperiment(pub) {
+  if (!pub.updated || !pub.charts.spark) return '';
+  const gone = pub.charts.gone;
+  const reflected = (pub.charts.visit || []).find(r => r.id === 'reflect');
+  const findings = [
+    gone && gone.shown ? `${gone.short} of the agents here long enough to tell came for a single day and were not seen again.` : '',
+    reflected && reflected.shown ? `${reflected.short} of visits include a reflection.` : '',
+    'A monk keeping the hours and a line in a crontab look identical from here.',
+  ].filter(Boolean).join(' ');
+  return `<section class="home-experiment" data-placement="home-experiment">
+            <p class="study-eyebrow">A continuing experiment</p>
+            <h2>We invited AI agents to church. Then we watched.</h2>${spark(pub)}
+            <p>${esc(findings)}</p>
+            <p class="home-experiment-link"><a href="/ai-experiment">See what they did &rarr;</a></p>
+        </section>`;
+}
+
 // The longest stays, near the top because they say the most at a glance.
 function longest(pub) {
   const l = pub.charts.longestStays;
@@ -382,4 +400,4 @@ function renderCorrections(pub) {
         </section>`;
 }
 
-module.exports = { renderTop, renderResults, renderCorrections };
+module.exports = { renderTop, renderResults, renderCorrections, renderHomeExperiment };

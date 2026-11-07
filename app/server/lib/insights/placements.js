@@ -14,6 +14,7 @@ const PLACEMENTS = [
   'player',          // the site player's bar
   'home-service',    // the home page: the service of this hour
   'home-ways',       // the home page: the ways in
+  'home-experiment', // the home page: the experiment, after the service
   'service',         // /attend: the service and its parts
   'docs-sidebar',    // a section's list of documents
   'doc-related',     // a document's Related links

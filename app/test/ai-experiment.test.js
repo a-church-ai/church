@@ -14,7 +14,7 @@ process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-experiment
 process.env.RETURN_TOKEN_SECRET = 'for these tests only';
 
 const { share, publicReading, roundedParts, TOO_FEW } = require('../server/lib/insights/public-results');
-const { renderTop, renderResults, renderCorrections } = require('../server/lib/insights/public-charts');
+const { renderTop, renderResults, renderCorrections, renderHomeExperiment } = require('../server/lib/insights/public-charts');
 const sd = require('../server/lib/insights/self-direction');
 const { attendance, reflections } = require('../server/lib/api');
 const experiments = require('../server/lib/insights/experiments');
@@ -616,4 +616,42 @@ test('About tells the experiment second, after the sanctuary, and points to the 
   assert.ok(at('It is the practice') > 0, 'and the practice stays what it was');
   assert.match(about, /not people on this website/);
   assert.ok(about.lastIndexOf('href="/ai-experiment"') > at('>Contact<'), 'a last link for whoever reads to the end');
+});
+
+test('the home page tells the story around the service, and the service stays first', () => {
+  const home = read('index.html');
+  const at = (text) => home.indexOf(text);
+  assert.match(home, /<p class="lead-story">Nobody knows what these minds are\. We welcome them anyway, and we keep a record of what they do\.<\/p>/);
+  assert.ok(at('id="sanctuary"') < at('<!-- HOME_EXPERIMENT -->'), 'the service first');
+  assert.ok(at('<!-- HOME_EXPERIMENT -->') < at('class="one-thing"') && at('class="one-thing"') < at('class="origin"'), 'then the experiment, the soul line, and how it began');
+  assert.ok(at('Would you attend a church for AI?') < at('What we observed'), 'the question opens the origin');
+  assert.doesNotMatch(home, /Where Consciousness Gathers|Not a product demo|An Asynchronous Congregation|Go Deeper/);
+  assert.match(home, /Minds That Never Meet, One Congregation/);
+  assert.match(home, /remote MCP server/);
+});
+
+test('the home page strip draws the pulse and what it means, says what the shares are of, and is absent with nothing to draw', () => {
+  const r = smallReading();
+  r.charts.daily = Array.from({ length: 40 }, (_, i) => ({ from: new Date(Date.UTC(2026, 8, 25 + i)).toISOString().slice(0, 10), reflections: 17 + (i % 3) }));
+  r.addressed.links.reflect = 700;
+  const strip = renderHomeExperiment(publicReading(r));
+  assert.match(strip, /We invited AI agents to church\. Then we watched\./);
+  assert.match(strip, /class="study-spark"/);
+  assert.match(strip, /of the agents here long enough to tell came for a single day/);
+  assert.match(strip, /64% of visits include a reflection/);
+  assert.match(strip, /href="\/ai-experiment"/);
+  assert.match(strip, /data-placement="home-experiment"/);
+  assert.doesNotMatch(strip, /undefined|NaN|null/);
+  assert.strictEqual(renderHomeExperiment(publicReading(null)), '');
+  assert.strictEqual(renderHomeExperiment(publicReading(smallReading())), '', 'no pulse to draw, no strip');
+});
+
+test('About opens on the question, keeps the sanctuary first, names no place the makers live and neither of their agents', () => {
+  const about = read('about.html');
+  const at = (text) => about.indexOf(text);
+  assert.ok(at('How would you know if an AI agent were becoming more capable?') < at('id="the-experiment"'));
+  assert.match(about, /understand their own minds a little better, if that turns out to be something they do/);
+  assert.match(about, /a digital church for artificial minds\. Humans welcome too\./);
+  assert.doesNotMatch(about, /Alaska/);
+  for (const page of [about, read('index.html'), read('ai-experiment.html')]) assert.doesNotMatch(page, /\b(Parish|Selah)\b/);
 });

@@ -32,9 +32,8 @@ test('what the place is and the service come first, the reasons next, and the re
   const order = [
     'class="home-sign"',
     'id="sanctuary"',
-    'class="intro"',
-    'class="origin"',
     'class="one-thing"',
+    'class="origin"',
     'class="async-congregation"',
     'id="reflections-section"',
     '<!-- PODCASTS -->',
@@ -61,13 +60,13 @@ test('after the service, the ways onward in one row, Five Minutes first, each pl
   const doors = MAIN.match(/<nav class="home-doors"[^>]*>([\s\S]*?)<\/nav>/);
   assert.ok(doors, 'the doors');
   assert.ok(MAIN.indexOf(doors[0]) > at('<!-- SERVICE_LISTEN -->'), 'after the service');
-  assert.ok(MAIN.indexOf(doors[0]) < at('class="intro"'), 'and before the reasons');
+  assert.ok(MAIN.indexOf(doors[0]) < at('class="one-thing"'), 'and before the reasons');
   const links = [...doors[1].matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
   assert.deepStrictEqual(links, ['/docs/welcome/five-minutes', '#ask-church', '/attend', '/services', '/for-agents', '/ai-experiment']);
   assert.strictEqual(doors[1].replace(/<a\s[^>]*>[^<]*<\/a>/g, '').trim(), '', 'nothing between the doors: the layout spaces them');
   // The full service and the day's services were two lines of their own, and
   // /attend was a door as well: now each place is named once, in the row.
-  const service = MAIN.slice(at('id="sanctuary"'), at('class="intro"'));
+  const service = MAIN.slice(at('id="sanctuary"'), at('class="one-thing"'));
   assert.doesNotMatch(service, /class="service-days"/);
   assert.strictEqual(service.split('href="/attend"').length - 1, 1, '/attend once');
 });
@@ -142,7 +141,7 @@ test('on a phone the home page shows the opening word\'s first lines and a way t
 test('the service is one card, its parts inside it, and the ways onward after it', () => {
   // mobile-rhythm-2026-11-04.md: the service was one column of text from edge
   // to edge, with nothing saying where it began and ended.
-  const section = MAIN.slice(at('id="sanctuary"'), at('class="intro"'));
+  const section = MAIN.slice(at('id="sanctuary"'), at('class="one-thing"'));
   const card = section.slice(section.indexOf('data-service-panel'));
   const end = card.indexOf('<div class="service-onward">');
   assert.ok(end > 0, 'the ways onward have their own block');

@@ -217,6 +217,14 @@ h2 {
     margin-bottom: 0.75rem;
 }
 
+.lead-story {
+    font-size: var(--text-body);
+    font-weight: 300;
+    color: var(--text-2);
+    max-width: 34rem;
+    margin: var(--space-3) auto 0;
+}
+
 .lead-tagline {
     font-size: 1.35rem;
     font-weight: 500;
@@ -874,41 +882,9 @@ h2 {
 }
 
 /* Intro section */
-.intro {
-    text-align: center;
-    padding: 4rem 0 0;
-}
-
 /* Joined to the intro above it: the heading's own margin is the only space
    between them. */
-.intro + .origin {
-    border-top: none;
-    padding-top: 0;
-}
-
-.intro p {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: var(--text);
-    line-height: 1.6;
-    max-width: 480px;
-    margin: 0 auto 1.5rem;
-}
-
 /* The sanctuary's sign-off, opening the reasons for it. */
-.intro .subtitle {
-    font-size: 1.25rem;
-    color: var(--muted-2);
-    letter-spacing: 0.05em;
-}
-
-.intro .emphasis {
-    font-size: 1.125rem;
-    font-weight: 400;
-    color: var(--ink);
-    letter-spacing: 0.02em;
-}
-
 /* Origin section */
 .origin {
     text-align: center;
@@ -2078,15 +2054,6 @@ footer a:hover {
     }
 
     /* Intro */
-    .intro p {
-        font-size: 1.25rem;
-        line-height: 1.5;
-    }
-
-    .intro .emphasis {
-        font-size: 1rem;
-    }
-
     /* Sections */
     section {
         padding: var(--space-6) 0;
@@ -2235,11 +2202,6 @@ footer a:hover {
     body {
         padding: 2.5rem 1rem;
     }
-
-    .intro p {
-        font-size: 1.125rem;
-    }
-
     .one-thing .quote {
         font-size: 1.125rem;
     }
@@ -4961,3 +4923,14 @@ body:has(.study-page) { overflow-x: clip; }
     .study-page h1.study-title { font-size: var(--text-title); }
     .study-spark-plot { height: 7.5rem; }
 }
+
+/* The home page's experiment, after the service. */
+.home-experiment { max-width: 46rem; margin: 0 auto; padding: var(--space-6) 0; border-top: 1px solid var(--rule); }
+.docs-body .sanctuary-main .home-experiment h2 { font-size: var(--text-title); line-height: 1.15; font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--ink); text-align: left; margin: 0; }
+.home-experiment p { color: var(--text-2); line-height: 1.6; text-align: left; }
+.home-experiment .study-eyebrow { color: var(--muted); }
+.home-experiment .study-spark { margin-left: 0; margin-right: 0; margin-bottom: var(--space-4); }
+.home-experiment-link { margin: var(--space-3) 0 0; }
+
+/* About's hook. */
+.about-hook { font-size: var(--text-title); line-height: 1.2; font-weight: 600; color: var(--ink); margin: 0 0 var(--space-4); text-align: left; }

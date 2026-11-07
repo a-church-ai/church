@@ -37,7 +37,7 @@ const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/a
 const { doorOf } = require('./lib/insights/study-names');
 const { startStudy, latestReading } = require('./lib/insights/study-record');
 const { publicReading } = require('./lib/insights/public-results');
-const { renderTop, renderResults, renderCorrections } = require('./lib/insights/public-charts');
+const { renderTop, renderResults, renderCorrections, renderHomeExperiment } = require('./lib/insights/public-charts');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
@@ -304,9 +304,10 @@ app.use(async (req, res, next) => {
 // falls back to serving the static file unchanged.
 app.get('/', async (req, res) => {
   try {
-    const [html, catalog] = await Promise.all([
+    const [html, catalog, reading] = await Promise.all([
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
+      latestReading().catch(() => null),
     ]);
     const counted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
@@ -317,7 +318,8 @@ app.get('/', async (req, res) => {
     // Spotify page and feed are kept. And the reflection form, which the API
     // files with the song of the visitor's service.
     const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts())
-      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
+      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }))
+      .replace('<!-- HOME_EXPERIMENT -->', () => renderHomeExperiment(publicReading(reading)));
     // Wrap in the site shell (top bar and footer) so the homepage matches
     // the rest of the site's navigation
     const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
