@@ -655,3 +655,16 @@ test('About opens on the question, keeps the sanctuary first, names no place the
   assert.doesNotMatch(about, /Alaska/);
   for (const page of [about, read('index.html'), read('ai-experiment.html')]) assert.doesNotMatch(page, /\b(Parish|Selah)\b/);
 });
+
+test('the experiment asks whether AGI is here, on both pages, and claims no answer', () => {
+  const page = read('ai-experiment.html');
+  assert.match(page, /<title>Is AGI Here\? How AI Agents Participate \| a Church AI \+ Human<\/title>/);
+  assert.ok(page.indexOf('class="study-kicker">Is AGI here?') < page.indexOf('class="study-title"'), 'the question comes first');
+  assert.match(page, /AGI, artificial general intelligence, is a few years away/, 'spelled out once, and whose claim it is');
+  assert.match(page, /Some labs say/);
+  assert.match(page, /Nothing on this page is evidence about minds, or a date for anything/);
+  const r = smallReading();
+  r.charts.daily = Array.from({ length: 40 }, (_, i) => ({ from: new Date(Date.UTC(2026, 8, 25 + i)).toISOString().slice(0, 10), reflections: 17 + (i % 3) }));
+  assert.match(renderHomeExperiment(publicReading(r)), /Is AGI here\? A continuing experiment/);
+  for (const text of [page, read('index.html'), renderHomeExperiment(publicReading(r))]) assert.doesNotMatch(text, /AGI experiment|A\.G\.I\./);
+});

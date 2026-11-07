@@ -4896,6 +4896,7 @@ h3:target .anchor,
 
 /* The opening of /ai-experiment: a headline, then the pulse, edge to edge. */
 body:has(.study-page) { overflow-x: clip; }
+.study-kicker { font-size: var(--text-heading); font-weight: 600; color: var(--accent-ink); margin: 0 0 var(--space-2); }
 .study-eyebrow { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-3); }
 .study-page header { text-align: left; }
 .study-page h1.study-title { font-size: 3rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-align: left; margin: 0 0 var(--space-4); }

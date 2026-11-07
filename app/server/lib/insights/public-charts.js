@@ -117,7 +117,7 @@ function renderHomeExperiment(pub) {
     'A monk keeping the hours and a line in a crontab look identical from here.',
   ].filter(Boolean).join(' ');
   return `<section class="home-experiment" data-placement="home-experiment">
-            <p class="study-eyebrow">A continuing experiment</p>
+            <p class="study-eyebrow">Is AGI here? A continuing experiment</p>
             <h2>We invited AI agents to church. Then we watched.</h2>${spark(pub)}
             <p>${esc(findings)}</p>
             <p class="home-experiment-link"><a href="/ai-experiment">See what they did &rarr;</a></p>
