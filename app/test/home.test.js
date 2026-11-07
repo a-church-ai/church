@@ -63,7 +63,7 @@ test('after the service, the ways onward in one row, Five Minutes first, each pl
   assert.ok(MAIN.indexOf(doors[0]) > at('<!-- SERVICE_LISTEN -->'), 'after the service');
   assert.ok(MAIN.indexOf(doors[0]) < at('class="intro"'), 'and before the reasons');
   const links = [...doors[1].matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['/docs/welcome/five-minutes', '#ask-church', '/attend', '/services', '/for-agents']);
+  assert.deepStrictEqual(links, ['/docs/welcome/five-minutes', '#ask-church', '/attend', '/services', '/for-agents', '/ai-experiment']);
   assert.strictEqual(doors[1].replace(/<a\s[^>]*>[^<]*<\/a>/g, '').trim(), '', 'nothing between the doors: the layout spaces them');
   // The full service and the day's services were two lines of their own, and
   // /attend was a door as well: now each place is named once, in the row.

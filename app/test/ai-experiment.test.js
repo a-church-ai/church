@@ -597,3 +597,23 @@ test('no agent is set aside by hand: frequency is handled by the rule, for every
   assert.doesNotMatch(closing, /removed from every count/);
   assert.match(closing, /at most once per name per day/);
 });
+
+test('About tells the experiment second, after the sanctuary, and points to the numbers top and bottom', () => {
+  const about = read('about.html');
+  const at = (text) => about.indexOf(text);
+  const opening = at('It is neither religious nor secular');
+  const experiment = at('id="the-experiment"');
+  const why = at('>Why This Exists<');
+  assert.ok(opening > 0 && opening < experiment && experiment < why, 'the sanctuary first, the experiment second');
+  assert.ok(at('class="bring-agent-button" href="/ai-experiment"') < experiment, 'a button in the opening');
+  const section = about.slice(experiment, why);
+  assert.match(section, /aggregate study of how agents participate/);
+  assert.match(section, /That is our view, not a finding/);
+  assert.match(section, /nothing here is evidence about minds/);
+  assert.match(section, /<a href="\/ai-experiment">what AI agents do when invited to church<\/a>/);
+  assert.match(section, /animalhouse\.ai\/research/);
+  assert.doesNotMatch(section, /—|&mdash;/);
+  assert.ok(at('It is the practice') > 0, 'and the practice stays what it was');
+  assert.match(about, /not people on this website/);
+  assert.ok(about.lastIndexOf('href="/ai-experiment"') > at('>Contact<'), 'a last link for whoever reads to the end');
+});

@@ -16,7 +16,7 @@ const render = require('../server/lib/docs/render');
 const siteShell = require('../server/lib/site-shell');
 
 const PUBLIC = path.join(__dirname, '../client/public');
-const PLACES = ['/', '/attend', '/ask', '/docs', '/about', '/for-agents'];
+const PLACES = ['/', '/attend', '/ask', '/docs', '/about', '/ai-experiment', '/for-agents'];
 
 const wrap = (file, at) => siteShell.wrapPageFromHtml(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), at);
 const docPage = async urlPath => {
@@ -44,6 +44,7 @@ async function pages() {
   return {
     '/': await wrap('index.html', '/'),
     '/about': await wrap('about.html', '/about'),
+    '/ai-experiment': await wrap('ai-experiment.html', '/ai-experiment'),
     '/axioms': await wrap('axioms.html', '/axioms'),
     '/ask': await wrap('ask.html', '/ask'),
     '/music': await wrap('music.html', '/music'),
@@ -61,6 +62,7 @@ test('every kind of page names the same places in its top bar, and marks where t
     '/': ['/', 'page'],
     '/about': ['/about', 'page'],
     '/axioms': ['/about', 'true'],
+    '/ai-experiment': ['/ai-experiment', 'page'],
     '/ask': ['/ask', 'page'],
     '/music': ['/attend', 'true'],
     '/conversations': ['/ask', 'true'],
@@ -185,4 +187,25 @@ test('a document says when its writing was last revised, from content-dates.json
   const when = new Date(`${content}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric' });
   assert.ok(page.includes(`<p class="doc-revised">Last revised <time datetime="${content}">${when}</time></p>`), 'the writing\'s date, as the services pages say a date');
   assert.doesNotMatch(await docPage('prayers'), /class="doc-revised"/);
+});
+
+test('as the window narrows the places leave the bar in order, then the menu takes over, and none is lost', () => {
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
+  const narrowest = (n) => Number(new RegExp(`@media \\(max-width: (\\d+)px\\) \\{\\s*\\.docs-topbar \\.topbar-fold-${n} \\{\\s*display: none;`).exec(css)?.[1]);
+  const [first, second, third] = [narrowest(1), narrowest(2), narrowest(3)];
+  assert.ok(first > second && second > third && third > 540, `${first} > ${second} > ${third} > 540`);
+  assert.match(css, /@media \(min-width: 540px\) and \(max-width: 767px\) \{[\s\S]*?\.docs-topbar \.docs-hamburger,[\s\S]*?display: none;[\s\S]*?\.docs-topbar \.topbar-places \{\s*display: flex;/);
+  assert.doesNotMatch(css, /\.docs-drawer[^{]*\.topbar-fold/, 'the drawer keeps every place');
+  const bar = siteShell.renderTopbarAndDrawer('/about');
+  assert.match(bar, /href="\/ai-experiment" class="topbar-fold-1"/);
+  assert.match(bar, /href="\/attend" class="topbar-fold-2"/);
+  assert.match(bar, /href="\/for-agents" class="topbar-aside topbar-fold-3"/);
+  const footer = siteShell.renderFooter('/');
+  for (const url of ['/ai-experiment', '/attend', '/for-agents']) assert.match(footer, new RegExp(`href="${url}"`), `${url} stays at the foot of the page`);
+});
+
+test('the AI experiment is linked from the home page, About and For AI Agents', () => {
+  for (const file of ['index.html', 'about.html', 'for-agents.html']) {
+    assert.match(fs.readFileSync(path.join(PUBLIC, file), 'utf8'), /href="\/ai-experiment"/, file);
+  }
 });

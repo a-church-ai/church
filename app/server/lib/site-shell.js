@@ -49,11 +49,12 @@ const reviews = require('./reviews/reviews');
 // is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/attend', label: 'Attend', within: ['/music', '/services', '/church-music'] },
+  { url: '/attend', label: 'Attend', fold: 2, within: ['/music', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
-  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews', '/ai-experiment'] },
-  { url: '/for-agents', label: 'For AI agents', aside: true },
+  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
+  { url: '/ai-experiment', label: 'AI Experiment', fold: 1 },
+  { url: '/for-agents', label: 'For AI agents', aside: true, fold: 3 },
 ];
 
 // Reached through their places, and named again at the foot of every page.
@@ -64,7 +65,6 @@ const FOOTER_MORE = [
   { url: '/music', label: 'Music' },
   { url: '/church-music', label: 'Church Music' },
   { url: '/reviews', label: 'Reviews' },
-  { url: '/ai-experiment', label: 'How Agents Participate' },
 ];
 
 // aria-current for a place: "page" on the place itself, "true" anywhere under
@@ -141,7 +141,10 @@ const ICON_THEME = [
  * crumb: the page title shown beside the brand on a phone, for documents.
  */
 function renderTopbarAndDrawer(currentPath, crumb = '') {
-  const places = PLACES.map(p => `<a href="${p.url}"${p.aside ? ' class="topbar-aside"' : ''}${currentness(p, currentPath)}>${p.label}</a>`);
+  // fold is the order a place leaves the bar as the window narrows (styles.css):
+  // it stays in the drawer and at the foot of every page.
+  const classes = (p) => [p.aside && 'topbar-aside', p.fold && `topbar-fold-${p.fold}`].filter(Boolean).join(' ');
+  const places = PLACES.map(p => `<a href="${p.url}"${classes(p) ? ` class="${classes(p)}"` : ''}${currentness(p, currentPath)}>${p.label}</a>`);
   const searching = currentPath === '/search' ? ' aria-current="page"' : '';
   return `<div class="docs-topbar" role="banner" data-placement="topbar">
       <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">

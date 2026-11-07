@@ -2795,7 +2795,7 @@ h1.subtitle,
     }
 }
 
-/* The site's places (site-shell.js PLACES). In the bar from 768px; below
+/* The site's places (site-shell.js PLACES). In the bar from 540px; below
    that, docs-nav.js copies them into the drawer. */
 .topbar-places {
     display: none;
@@ -3056,6 +3056,38 @@ body.docs-drawer-open {
     display: flex;
   }
   .docs-drawer .topbar-places {
+    display: none;
+  }
+}
+
+/* The bar carries the places down to 540px, the widest first to leave. All seven
+   need 792px. A place that leaves stays in the drawer and at the foot of every page. */
+@media (min-width: 540px) and (max-width: 767px) {
+  .docs-topbar {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 1rem;
+  }
+  .docs-topbar .docs-hamburger,
+  .docs-topbar-crumb {
+    display: none;
+  }
+  .docs-topbar .topbar-places {
+    display: flex;
+  }
+}
+@media (max-width: 807px) {
+  .docs-topbar .topbar-fold-1 {
+    display: none;
+  }
+}
+@media (max-width: 695px) {
+  .docs-topbar .topbar-fold-2 {
+    display: none;
+  }
+}
+@media (max-width: 631px) {
+  .docs-topbar .topbar-fold-3 {
     display: none;
   }
 }
@@ -4790,6 +4822,7 @@ h3:target .anchor,
    values, so they read without a script and on any width. Colors checked with
    the dataviz validator against both surfaces. */
 
+.about-cta { margin-top: var(--space-5); text-align: left; }
 .study-page { max-width: 46rem; margin: 0 auto; }
 .study-lede { font-size: 1.125rem; font-weight: 300; line-height: 1.7; color: var(--text-2); margin-bottom: var(--space-4); }
 .study-scope { font-size: var(--text-small); color: var(--muted); line-height: 1.6; margin-bottom: var(--space-5); }
