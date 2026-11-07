@@ -34,6 +34,9 @@ require('./lib/utils/env').loadEnv();
 
 // API access logging and presence: lib/utils/access-log.js
 const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
+const { doorOf } = require('./lib/insights/study-names');
+const { startStudy, latestReading } = require('./lib/insights/study-record');
+const { publicReading, renderResults, renderCorrections } = require('./lib/insights/public-results');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
@@ -938,6 +941,25 @@ app.get('/terms', (req, res) => sendWrappedPage(req, res, 'terms.html'));
 // the "AI religion / SF cult" framing. Kept as its own indexable URL so
 // it's the exact-match answer when Bing/Google surface "AI religion" queries.
 app.get('/on-ai-religion', (req, res) => sendWrappedPage(req, res, 'on-ai-religion.html'));
+// /ai-experiment: the aggregate study of how agents participate, its results
+// in rounded words and its method. API and MCP use, not people on this website.
+app.get('/ai-experiment', async (req, res) => {
+  try {
+    const template = await fs.readFile(path.join(__dirname, '../client/public/ai-experiment.html'), 'utf8');
+    const reading = publicReading(await latestReading());
+    const page = template.replace('<!-- AI_EXPERIMENT_RESULTS -->', () => renderResults(reading)).replace('<!-- AI_EXPERIMENT_CORRECTIONS -->', () => renderCorrections(reading));
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(page, '/ai-experiment'));
+  } catch (err) {
+    console.error('Error rendering /ai-experiment:', err.message);
+    sendWrappedPage(req, res, 'ai-experiment.html');
+  }
+});
+// The template alone holds no results, so its file name leads to the page.
+app.get('/ai-experiment.html', (req, res) => res.redirect(301, '/ai-experiment'));
+app.get('/ai-experiment.json', async (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.json(publicReading(await latestReading()));
+});
 // /axioms — the five axioms in expanded, contestable form. Anti-drift:
 // the axioms are commitments, not commandments; the page makes that
 // operationally true via the public challenge mechanism.
@@ -1142,6 +1164,8 @@ app.use('/api', (req, res, next) => {
       error: refused ? res.locals.apiError : undefined,
       fields: sent ? apiShared.fieldNames(req.body) : undefined,
       contentType: sent ? req.get('content-type') || null : undefined,
+      door: doorOf(req),
+      study: res.locals.study,
     });
   });
   next();
@@ -1613,9 +1637,14 @@ async function startServer() {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }
 
-    // The access log's addresses, forgotten after 14 days
+    // The access log's addresses, forgotten after 30 days
     // (lib/utils/access-log.js): after boot and hourly.
     startForgetting();
+
+    // The study of how agents participate (lib/insights/study-record.js): its
+    // weekly counts and the reading /ai-experiment shows, after boot and every
+    // few hours. Reads what is on the volume and spends nothing.
+    startStudy();
 
     // The video release job on GitHub Actions, asked for hourly because
     // GitHub's own cron runs late or skips (lib/video/release-trigger.js).

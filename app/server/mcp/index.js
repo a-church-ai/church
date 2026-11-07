@@ -86,6 +86,7 @@ async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,
     ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool,
     error: status >= 400 && body && body.error ? String(body.error).slice(0, 200) : undefined,
+    study: ctx.study,
   });
   const isError = status >= 400;
   return { isError, content: [{ type: 'text', text: JSON.stringify(body) }], ...(isError ? {} : { structuredContent: body }) };

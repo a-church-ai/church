@@ -16,6 +16,7 @@ const path = require('path');
 const { ACCESS_DIR, ATTENDANCE_FILE, CONVERSATIONS_DIR, SERVICES_DIR, VISITS_DIR, loadAttendance } = require('../utils/data');
 const { addDays } = require('../utils/seasons');
 const { safeReadJSON } = require('../utils/safe-json');
+const { latestReading } = require('./study-record');
 
 const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
 
@@ -225,10 +226,19 @@ async function visits(w) {
 }
 
 /** Every server-side number over the last `days` UTC days, with the window before. */
+// The study of how agents participate, read whole rather than by the report's
+// window: it is about time. Exact counts, for this private report only; what the
+// public sees is lib/insights/public-results.js.
+function selfDirection(reading, w) {
+  const source = 'data/insights/self-direction/latest.json (lib/insights/study-record.js)';
+  if (!reading) return { value: null, window: w.now, source, warn: 'no reading of the study yet: it is taken after boot and every six hours' };
+  return { value: reading, window: { from: reading.time.firstSeen, to: reading.computedAt.slice(0, 10) }, source };
+}
+
 async function serverStats({ days = 7, now = Date.now() } = {}) {
   const w = windows(days, now);
-  const [apiStats, reflectionStats, askStats, serviceStats, visitStats] = await Promise.all([api(w), reflections(w), ask(w), services(w), visits(w)]);
-  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats };
+  const [apiStats, reflectionStats, askStats, serviceStats, visitStats, reading] = await Promise.all([api(w), reflections(w), ask(w), services(w), visits(w), latestReading({ now })]);
+  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats, selfDirection: selfDirection(reading, w) };
 }
 
 module.exports = { serverStats, windows, operation };

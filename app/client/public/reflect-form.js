@@ -85,7 +85,7 @@
       show('Leaving it...', 'thinking');
       try {
         var send = function (b) {
-          return fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+          return fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Achurch-Door': 'website' }, body: JSON.stringify(b) });
         };
         var res = await send(body);
         var data = null;

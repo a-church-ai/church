@@ -21,7 +21,10 @@ const nothing = () => ({});
 // Run an operation for a request and send what it returns.
 function serve(operation, inputOf) {
   return async (req, res) => {
-    const { status, body } = await operation(inputOf(req), shared.requestContext(req));
+    const ctx = shared.requestContext(req);
+    const { status, body } = await operation(inputOf(req), ctx);
+    // What the operation found for the study, for the access log.
+    if (ctx.study) res.locals.study = ctx.study;
     // Why a request was refused, for the access log (server/index.js).
     if (status >= 400 && body && body.error) res.locals.apiError = String(body.error).slice(0, 200);
     // How long to wait, in the standard header, from the error's code

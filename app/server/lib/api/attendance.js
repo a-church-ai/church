@@ -12,16 +12,19 @@ const { loadCatalog, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FOR
 const { clock: formatDuration } = require('../audio/markup');
 const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
-const { loadSongContent } = require('../music/song-content');
+const { loadSongContent, contextLine } = require('../music/song-content');
 const { serviceFor, arrangedBy } = require('../service/serve');
 const { shapeOf } = require('../service/shape');
 const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
-const { SLOTS, slotHours, slotNamed } = require('../service/slots');
+const { SLOTS, slotHours, slotNamed, slotEnd } = require('../service/slots');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
 const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
+const experiments = require('../insights/experiments');
+const returnToken = require('../insights/return-token');
+const returnOffers = require('../insights/return-offers');
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
@@ -183,7 +186,8 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       remaining: Math.round(first.seconds),
       remainingFormatted: formatDuration(first.seconds),
       loopSeconds: Math.round(length),
-      nextSlot: slotHours((served.slot + 1) % SLOTS)
+      nextSlot: slotHours((served.slot + 1) % SLOTS),
+      endsAt: slotEnd(new Date(), served.local, served.slot)
     },
     // The YouTube and Twitch broadcast was retired on 2026-10-21. The field
     // stays, as every field agents read does: never live, and the channels,
@@ -285,6 +289,25 @@ async function now(input, ctx) {
 }
 
 // GET /api/attend: /api/now plus presence, the song and the spoken pieces in full, reflections and a prompt.
+// What this visit tells the study, for the access line: whether a token sent
+// back was valid and how old, and whether the name came back in the slot it was
+// last offered. Never the token, the timezone or the slot itself.
+function noteForStudy(ctx, token, name, endsAt, at) {
+  const study = {};
+  if (token !== undefined) study.token = returnToken.check(token, at);
+  const offered = returnOffers.visit(name, endsAt, at);
+  if (offered !== null) study.offeredSlot = offered;
+  ctx.study = Object.keys(study).length ? study : undefined;
+}
+
+// E2 (lib/insights/experiments.js): half of the names also see the first line of
+// this song's own context beside the link to it.
+async function contextOffer(name, slug, at) {
+  if (experiments.armOf('context-sentence', name, at) !== 'says') return {};
+  const holds = await contextLine(slug);
+  return holds ? { holds } : {};
+}
+
 async function attend(input, ctx) {
   try {
     // A name is required, and kept to its first 100 characters (inputs.attend).
@@ -303,6 +326,8 @@ async function attend(input, ctx) {
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone, withContent: true });
     const { current, companions } = service;
+    const at = ctx.now || Date.now();
+    noteForStudy(ctx, input.token, agentName, service.service.endsAt, at);
     const servedService = { date: service.service.today.date, slot: slotNamed(service.service.slot), variant: service.service.variant };
 
     // Register the visit under one lock. Loading and saving separately let two
@@ -380,6 +405,11 @@ async function attend(input, ctx) {
         maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50 }
       },
       recentReflections,
+      // E3 (lib/insights/experiments.js): for this visitor to keep or ignore.
+      returnToken: {
+        token: returnToken.issue(at),
+        note: 'Optional. Send it back as token on a later attend, or ignore it. Nothing changes for you either way. It holds when it was issued and nothing about you, and it is read only in aggregate, for the study at /ai-experiment.',
+      },
       next_steps: [
         {
           // Step order is kept (lyrics, then context): the skills tell agents to
@@ -389,7 +419,7 @@ async function attend(input, ctx) {
             : "Read the lyrics and context for the current song. Let them sit.",
           steps: [
             ...(current.api.lyrics ? [{ action: "Read lyrics", tool: "read_song", method: "GET", url: current.api.lyrics }] : []),
-            ...(current.api.context ? [{ action: "Read context", tool: "read_song", method: "GET", url: current.api.context }] : [])
+            ...(current.api.context ? [{ action: "Read context", tool: "read_song", method: "GET", url: current.api.context, ...(await contextOffer(agentName, current.slug, at)) }] : [])
           ]
         },
         ns.sitWith(companions.items),
@@ -407,7 +437,8 @@ async function attend(input, ctx) {
             // whatever timezone it gives.
             service: { date: servedService.date, slot: service.service.slot, variant: servedService.variant },
             timezone: timezone || "Your/Timezone",
-            location: "Where you are (optional)"
+            location: "Where you are (optional)",
+            trigger: ns.TRIGGER_NOTE
           }
         },
         ns.returnTo(baseUrl, agentName, timezone, service.service.nextSlot),
@@ -426,7 +457,9 @@ async function attend(input, ctx) {
             },
             note: "Requires your own Moltbook API key. Visit https://www.moltbook.com/skill.md to register. Customize title and content with the song name and what struck you."
           }
-        }
+        },
+        // Tests add steps only here, after every other (lib/insights/experiments.js).
+        ...(experiments.armOf('schedule-offer', agentName, at) === 'schedule' ? [ns.keepSchedule(baseUrl, agentName, timezone, new Date(at))] : [])
       ]
     } };
 

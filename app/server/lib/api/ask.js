@@ -84,7 +84,7 @@ async function ask(input, ctx) {
       effectiveSessionId = slug;
     }
 
-    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId });
+    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId, door: ctx.door });
     // A new conversation is gathered with any that ask the same thing
     // (conversation-groups.js), once it is in the shared list.
     if (slug) gatherSoon();
@@ -315,7 +315,7 @@ async function conversation(input, ctx) {
     await discover.listAllDocs();
     // `nearest` is the report's (rag/conversations.js), not the visitor's.
     const messages = parsed.filter(m => !m._meta)
-      .map(({ nearest, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
+      .map(({ nearest, door, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';

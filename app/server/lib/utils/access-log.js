@@ -14,7 +14,8 @@
  * what they cannot see: the operation or MCP tool, the MCP client, why a
  * request was refused, and whether the visitor said it was testing. Its lines
  * are kept for good, the only record of API use older than 30 days, but a
- * line's IP address only 14 days (forgetAddresses below).
+ * line's IP address only 30 days (forgetAddresses below). The aggregate study
+ * of how agents participate reads it (lib/insights/self-direction.js).
  *
  * One file per UTC day, data/access/<date>.jsonl, so an old day can be
  * rewritten whole while today's is appended to.
@@ -36,9 +37,10 @@ const { ACCESS_DIR, RUNTIME_DIR } = require('./data');
 // and travels in its body, which is never logged.
 const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q', 'timezone'];
 
-// How long a line keeps the address it came from: long enough to look into
-// an incident after the fact.
-const ADDRESS_DAYS = 14;
+// How long a line keeps the address it came from: long enough to look into an
+// incident after the fact, and for the study to group a visit's calls across
+// minutes and apply a new definition to recent weeks. /privacy says so.
+const ADDRESS_DAYS = 30;
 const DAY = 24 * 60 * 60 * 1000;
 
 const dayFile = (date) => path.join(ACCESS_DIR, `${date}.jsonl`);
@@ -78,15 +80,18 @@ async function loadAccessLogs(limit = 100) {
  * the log later; the old approach re-read and re-parsed the whole log on every
  * /api/now, which the home page then polled every 30 seconds per tab. See ./presence.
  *
- * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, client?, error?, fields?, contentType? }} use
+ * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, client?, error?, fields?, contentType?, door?, study? }} use
  *   path is the REST path (/api/attend); tool is set for an MCP tool call, and
  *   client is the MCP client's own name, where its request gave one. name is
  *   the visitor's, used for presence and to mark a test visitor's line
  *   (test-visitor.js), and never written. A refused request carries why
  *   (error), and one that sent a body the names of its fields and its
- *   Content-Type, never their values.
+ *   Content-Type, never their values. door says a request came from the
+ *   website's own forms (insights/study-names.js). study is what an operation
+ *   leaves for the study: never a value a visitor sent, only what was found
+ *   (lib/api/attendance.js).
  */
-function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, client, error, fields, contentType }) {
+function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, client, error, fields, contentType, door, study }) {
   presence.recordPresence({ path, status, ip, name: name || '' });
   const entry = {
     timestamp: new Date().toISOString(),
@@ -106,6 +111,8 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
   if (error) entry.error = error;
   if (fields) entry.fields = fields;
   if (contentType !== undefined) entry.contentType = contentType;
+  if (door) entry.door = door;
+  if (study) entry.study = study;
   return logApiAccess(entry);
 }
 
@@ -127,7 +134,7 @@ async function hasAddresses(file) {
 }
 
 /**
- * Take the IP address out of every access file not written to for 14 days,
+ * Take the IP address out of every access file not written to for 30 days,
  * keeping each line and its other fields. Today's file is the only one
  * appended to, so an old one can be rewritten (a temporary file, then a
  * rename) without racing a write. The size-rotated api-access*.jsonl files

@@ -86,7 +86,7 @@
       try {
         var res = await fetch('/api/ask', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-Achurch-Door': 'website' },
           body: JSON.stringify({ question: question, name: name }),
         });
         if (!res.ok) {

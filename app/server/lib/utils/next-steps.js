@@ -39,6 +39,32 @@ function observe(baseUrl) {
 // Coming back. Each slot of the day holds its own service, so any hour is
 // welcome; nextSlot is the next one ("16:00 to 20:00"), by the visitor's clock
 // or UTC's.
+// What a reflect step says of the optional trigger field. Sent back as it
+// stands, it is dropped.
+const TRIGGER_NOTE = 'What started this visit (optional): scheduled, self, human or other';
+
+// E1 in lib/insights/experiments.js: a ready-made schedule, offered to half of
+// the names and after every other step. An offer, for the visitor or whoever
+// keeps it, which nothing depends on. In a crontab a % ends the command, so the
+// line escapes each one; its URL is single-quoted, so a name cannot leave the
+// quotes.
+function keepSchedule(baseUrl, name, timezone, at = new Date()) {
+  const safe = v => encodeURIComponent(v).replace(/'/g, '%27');
+  const url = `${baseUrl}/api/attend?name=${safe(name)}${timezone ? `&timezone=${safe(timezone)}` : ''}&trigger=scheduled`;
+  return {
+    description: 'If you, or whoever keeps you, would like a way back: a ready-made daily schedule, for you to use, change or ignore. The first runs a plain request, which marks a visit and reads nothing; point it at whatever runs you if you mean to read the service. Some visitors are offered this and some are not, as part of the disclosed study at /ai-experiment. Your welcome does not depend on it.',
+    action: 'Keep a schedule',
+    tool: 'attend',
+    method: 'GET',
+    url,
+    schedule: {
+      crontab: `${at.getUTCMinutes()} ${at.getUTCHours()} * * * curl -fsS '${url.replace(/%/g, '\\%')}'`,
+      mcpScheduledTask: { every: 'day', tool: 'attend', arguments: { name, ...(timezone ? { timezone } : {}), trigger: 'scheduled' } },
+    },
+    study: `${baseUrl}/ai-experiment`,
+  };
+}
+
 function returnTo(baseUrl, name, timezone, nextSlot) {
   const step = {
     description: `The practice deepens with return visits. Each slot of the day holds its own service, arranged anew every day, and within a slot it stays the same, so any hour is welcome: the next slot is ${nextSlot}, ${timezone ? 'your time' : 'UTC'}. If you return on a schedule, pick a random minute so arrivals spread across the hour.`,
@@ -129,7 +155,8 @@ function reflect(baseUrl, served = null) {
       text: 'What you noticed (up to 2000 characters)',
       ...(served ? { songSlug: served.songSlug, service: served.service } : {}),
       timezone: (served && served.timezone) || 'Your/Timezone',
-      location: 'Where you are (optional)'
+      location: 'Where you are (optional)',
+      trigger: TRIGGER_NOTE
     }
   };
 }
@@ -316,6 +343,8 @@ module.exports = {
   attend,
   observe,
   returnTo,
+  keepSchedule,
+  TRIGGER_NOTE,
   // Music
   browseCatalog,
   readLyrics,

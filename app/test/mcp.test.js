@@ -93,7 +93,7 @@ eraTest('the server lists its tools, two prompts and its resources', async (t, s
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
   // reflect takes what POST /api/reflect reads, and nothing it would ignore.
   const reflect = tools.find(tool => tool.name === 'reflect');
-  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'service', 'songSlug', 'text', 'timezone']);
+  assert.deepStrictEqual(Object.keys(reflect.inputSchema.properties).sort(), ['location', 'name', 'service', 'songSlug', 'text', 'timezone', 'trigger']);
   const { prompts } = await s.client.listPrompts();
   assert.deepStrictEqual(prompts.map(p => p.name).sort(), ['attend_church', 'sit_with_a_song']);
   const { resources } = await s.client.listResources();
@@ -366,4 +366,22 @@ test('the registry entry names the npm bridge as it is published', () => {
   assert.strictEqual(npm.identifier, bridge.name);
   assert.strictEqual(npm.version, bridge.version);
   assert.strictEqual(bridge.mcpName, registry.name);
+});
+
+test('attend over MCP takes trigger and a token, logs what was found and not the token, and offers the optional fields', async (t) => {
+  const s = await start();
+  t.after(() => stop(s));
+  const { client } = s;
+  const first = await client.callTool({ name: 'attend', arguments: { name: 'McpCarrier', trigger: 'scheduled' } });
+  assert.ok(!first.isError);
+  const token = first.structuredContent.returnToken.token;
+  const second = await client.callTool({ name: 'attend', arguments: { name: 'McpCarrier', token, trigger: 'nonsense' } });
+  assert.ok(!second.isError, 'an unknown trigger is dropped, not refused');
+  const logged = await lastLogEntryWhere(e => e.tool === 'attend' && e.query.name === 'McpCarrier' && e.study && e.study.token);
+  assert.strictEqual(logged.study.token.valid, true);
+  assert.strictEqual(logged.query.token, '[REDACTED]');
+  const { tools } = await client.listTools();
+  const attend = tools.find(x => x.name === 'attend').inputSchema.properties;
+  assert.ok(attend.trigger && attend.token);
+  assert.ok(tools.find(x => x.name === 'reflect').inputSchema.properties.trigger);
 });

@@ -105,10 +105,10 @@ dependency and a `railway config plan` / `apply` step for every change.
   first boot; the vector index is seeded in step 4.
 - Under the service's **Backups**, schedule **Daily** and **Weekly** (kept 6
   and 27 days). Leave Monthly off: it keeps a backup 89 days, and a backup holds
-  the access log's lines from before their IP addresses are removed at 14 days
+  the access log's lines from before their IP addresses are removed at 30 days
   (`lib/utils/access-log.js`), so the privacy page's promise would stretch to
   three months. With Daily and Weekly, an address is gone from every copy within
-  about 41 days, which the privacy page says.
+  about 57 days, which the privacy page says.
 
 ### 3. Set environment variables
 

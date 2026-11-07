@@ -268,6 +268,7 @@ async function reflect(input, ctx) {
       location: str(input.location),
       timezone: str(input.timezone),
       songSlug: input.songSlug,
+      trigger: input.trigger,
     });
     if (refused) {
       // A missing field says what was sent and what is wanted, so a client
@@ -417,6 +418,10 @@ async function reflect(input, ctx) {
       service: filed
     };
     if (cleanLocation) reflection.location = cleanLocation;
+    // For the study at /ai-experiment, kept with the reflection and in no
+    // public answer, each of which names its own fields.
+    if (data.trigger) reflection.trigger = data.trigger;
+    if (ctx.door) reflection.door = ctx.door;
 
     // Append under one lock. Reflections are the corpus visitors leave behind,
     // so a lost one is lost for good; this is the write that most needed it.

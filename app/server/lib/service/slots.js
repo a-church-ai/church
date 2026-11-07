@@ -20,4 +20,12 @@ const slotNamed = value => {
   return slot === undefined ? null : slot;
 };
 
-module.exports = { SLOT_HOURS, SLOTS, slotOf, slotStart, slotHours, slotNamed };
+// When a slot ends: the moment plus what is left of it by the visitor's clock.
+// On a night the clocks change inside the slot this is an hour off; the page
+// reads the service again then, finds the same slot, and takes the new end.
+function slotEnd(at, local, slot) {
+  const left = slotStart(slot + 1) * 3600 - (local.hour * 3600 + local.minute * 60 + local.second);
+  return new Date(Math.floor(at.getTime() / 1000) * 1000 + left * 1000).toISOString();
+}
+
+module.exports = { slotEnd, SLOT_HOURS, SLOTS, slotOf, slotStart, slotHours, slotNamed };

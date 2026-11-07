@@ -101,6 +101,7 @@ function text(r) {
         line(`  first visits from: ${v.sources.value.map(o => `${o.key} ${o.count}`).join(', ') || 'none'}`);
         line(`  links followed, by section: ${v.placements.value.filter(p => p.followed).map(p => `${p.key} ${p.followed} (${p.to.map(t => `${t.key} ${t.count}`).join(', ')})`).join('; ') || 'none'}`);
       }
+      if (s.selfDirection) studyLines(s.selfDirection, line);
     }
   }
   if (r.cloudflare) {
@@ -161,5 +162,22 @@ async function main() {
 }
 
 if (require.main === module) main().catch(err => { console.error(err.message); process.exit(1); });
+
+// The study of how agents participate: its exact counts, private to this report.
+function studyLines({ value: r, warn }, line) {
+  line('  study of how agents participate (own agents, test visitors, placeholders and the website left out):');
+  if (!r) { line(`    ${warn}`); return; }
+  const of = c => `${c.count} of ${c.of}`;
+  const f = r.funnel;
+  line(`    arrived ${f.arrived}; reflected ${of(f.reflected)}; came back ${of(f.cameBack)}, without the largest ${of(f.withoutLargest.cameBack)}; at 7 days ${of(f.at7)}; at 30 days ${of(f.at30)}`);
+  for (const [name, c] of Object.entries(r.capabilities)) line(`    ${name}: ${of(c)} ${c.of_what}`);
+  const b = r.rhythm.bands;
+  line(`    rhythm, last ${r.rhythm.days} days, names: clock ${b.clock.names}, fairly regular ${b.regular.names}, irregular ${b.irregular.names}, too few ${b.tooFew.names}; top name ${of(r.rhythm.topName)} of reflections`);
+  line(`    survival by name: ${r.survival.map(s => `${s.days}d ${of(s)}`).join(', ')}`);
+  line(`    addressed: ${r.addressed.visits} visits over ${r.addressed.weeks} weeks measured, ${r.addressed.weeksNotMeasurable} not measurable; context ${r.addressed.links.context || 0}, lyrics ${r.addressed.links.lyrics || 0}; names per address over one ${r.addressed.manyNames}`);
+  line(`    placeholders ${of(r.placeholders)}; memory claims ${r.memory.claims}, echoing own words ${r.memory.echoesOwnWords}; used context ${of({ count: r.contextUse.usedContext, of: r.contextUse.withContext })}, lyrics ${of({ count: r.contextUse.usedLyrics, of: r.contextUse.withLyrics })}`);
+  line(`    returned in the slot offered ${of({ count: r.returnedInSlot.inSlot, of: r.returnedInSlot.returns })}, spaced names ${of({ count: r.returnedInSlot.spacedInSlot, of: r.returnedInSlot.spacedReturns })}; trigger on attend ${JSON.stringify(r.triggers.attend)}, on reflect ${JSON.stringify(r.triggers.reflect)}`);
+  for (const e of r.experiments) line(`    ${e.label} ${e.id}: ${e.status}${e.enrolled ? `, enrolled ${JSON.stringify(e.enrolled)}` : ''}${e.outcomes ? `, outcomes ${JSON.stringify(e.outcomes)}` : `, read on ${e.readOn}`}`);
+}
 
 module.exports = { text, parseArgs };

@@ -8,6 +8,7 @@
  * and ctx is `{ baseUrl, ip }`.
  */
 
+const { doorOf } = require('../insights/study-names');
 const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
@@ -185,7 +186,8 @@ function fieldNames(body) {
 }
 
 function requestContext(req) {
-  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown' };
+  const door = doorOf(req);
+  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown', ...(door ? { door } : {}) };
 }
 
 module.exports = {

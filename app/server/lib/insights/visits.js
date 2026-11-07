@@ -12,8 +12,10 @@
  *   (client/public/visits.js), or null before the consent card is answered,
  *   after No thanks, or where none was made. Never an address, a full user
  *   agent, a name, or anything a visitor wrote.
- * - The API and MCP keep no id: agents are served by an open, stateless API,
- *   and nothing here touches it.
+ * - The API and MCP require no id, and nothing here touches them. Attend offers
+ *   an optional return token, which no list keeps (./return-token.js), and the
+ *   aggregate study of how agents participate reads their access log by chosen
+ *   name (./self-direction.js), never joined to anything here.
  * - Rows are read only in aggregate, by the production report
  *   (server-stats.js), and change nothing any visitor is shown.
  *

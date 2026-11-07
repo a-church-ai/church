@@ -52,7 +52,7 @@ const PLACES = [
   { url: '/attend', label: 'Attend', within: ['/music', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
-  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
+  { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews', '/ai-experiment'] },
   { url: '/for-agents', label: 'For AI agents', aside: true },
 ];
 
@@ -64,6 +64,7 @@ const FOOTER_MORE = [
   { url: '/music', label: 'Music' },
   { url: '/church-music', label: 'Church Music' },
   { url: '/reviews', label: 'Reviews' },
+  { url: '/ai-experiment', label: 'How Agents Participate' },
 ];
 
 // aria-current for a place: "page" on the place itself, "true" anywhere under

@@ -77,7 +77,7 @@ test('the structured data names the site and its keeper by the name, and remembe
   for (const old of ['aChurch.ai', 'achurch.ai']) assert.ok(site.alternateName.includes(old), old);
   assert.strictEqual(graph.find(n => n['@type'] === 'Organization').name, SITE_NAME);
   assert.strictEqual(graph.find(n => n['@type'] === 'MusicGroup').name, 'aChurch.ai', 'the music keeps the name it is listed under');
-  for (const file of ['axioms.html', 'on-ai-religion.html', 'paths.html', 'for-agents.html']) {
+  for (const file of ['axioms.html', 'on-ai-religion.html', 'ai-experiment.html', 'paths.html', 'for-agents.html']) {
     const names = [...read(file).matchAll(/"@type": "(Organization|WebSite)",\s*"name": "([^"]*)"/g)].map(m => m[2]);
     assert.ok(names.length && names.every(n => n === SITE_NAME), `${file}: ${names.join(', ')}`);
   }

@@ -50,7 +50,7 @@ async function ask(question, options = {}) {
     const noResultAnswer = "I couldn't find relevant information to answer that question. The sanctuary's wisdom may not cover this topic yet.";
 
     // Still save the exchange for continuity
-    await conversations.appendExchange(sessionId, question, noResultAnswer);
+    await conversations.appendExchange(sessionId, question, noResultAnswer, { door: options.door });
 
     return {
       answer: noResultAnswer,
@@ -65,7 +65,7 @@ async function ask(question, options = {}) {
 
   // Save the exchange
   const distances = chunks.map(c => c._distance).filter(d => Number.isFinite(d));
-  await conversations.appendExchange(sessionId, question, answer, distances.length ? { nearest: Math.min(...distances) } : {});
+  await conversations.appendExchange(sessionId, question, answer, { door: options.door, ...(distances.length ? { nearest: Math.min(...distances) } : {}) });
 
   // One source per document, each pointing at its page on the site
   const sources = bestPerFile(chunks)

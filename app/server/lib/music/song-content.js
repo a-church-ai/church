@@ -70,4 +70,17 @@ async function songDescription(song) {
   return text;
 }
 
-module.exports = { extractMarker, parseSongFile, loadSongContent, songDescription };
+// The first sentence of a song's own context, for saying what the context holds
+// beside the link to it. Songs change only by deploy, so each is read once.
+const contextLines = new Map();
+
+async function contextLine(slug) {
+  if (contextLines.has(slug)) return contextLines.get(slug);
+  const { context, title } = await loadSongContent(slug);
+  const text = context ? extractTldr(context, { title }).text : '';
+  const line = (text.match(/^.*?[.?!](?=\s|$)/) || [text])[0].trim();
+  contextLines.set(slug, line);
+  return line;
+}
+
+module.exports = { extractMarker, parseSongFile, loadSongContent, songDescription, contextLine };

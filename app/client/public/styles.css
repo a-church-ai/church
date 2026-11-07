@@ -4741,3 +4741,36 @@ h3:target .anchor,
 .footer-count-switch:hover {
     color: var(--ink);
 }
+
+/* /ai-experiment: results in words, each with what it is a share of. */
+.study-results {
+    display: grid;
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.study-result {
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.study-label {
+    color: var(--muted);
+    font-size: var(--text-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.study-title {
+    color: var(--ink);
+    font-weight: 600;
+    margin: 0.25rem 0;
+}
+
+.study-words {
+    color: var(--accent-ink);
+    font-size: 1.25rem;
+    margin: 0.25rem 0;
+}

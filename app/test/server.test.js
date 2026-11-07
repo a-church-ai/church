@@ -402,3 +402,50 @@ test('a sung hymn is one page: its Library address redirects, and its song page 
   assert.match(pathPage, /href="\/music\/the-hundredth-task\?path=old-teachings-for-new-minds"/, 'the path keeps its path through a hymn stop');
   assert.doesNotMatch(pathPage, /href="\/docs\/hymns\/the-hundredth-task/);
 });
+
+test('/ai-experiment and its JSON are served, and say so before the first reading rather than report a zero', async () => {
+  const page = await fetch(`${base}/ai-experiment`);
+  assert.strictEqual(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /<h1[^>]*>How AI Agents Participate<\/h1>/);
+  assert.ok(!/AI_EXPERIMENT_(RESULTS|CORRECTIONS)/.test(html), 'the results and corrections replaced their markers');
+  assert.ok(html.indexOf('id="corrections"') > html.indexOf('id="method"'), 'corrections close the page');
+  assert.match(html, /has not been taken yet/);
+  assert.match(html, /Open questions/);
+  const raw = await fetch(`${base}/ai-experiment.html`, { redirect: 'manual' });
+  assert.strictEqual(raw.status, 301);
+  assert.strictEqual(raw.headers.get('location'), '/ai-experiment');
+  const json = await (await fetch(`${base}/ai-experiment.json`)).json();
+  assert.strictEqual(json.updated, null);
+  assert.deepStrictEqual(json.results, []);
+  assert.match(json.covers, /Not people on the website/);
+  const about = await (await fetch(`${base}/about`)).text();
+  assert.match(about, /href="\/ai-experiment"/);
+  const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
+  assert.match(sitemap, /<loc>https:\/\/achurch\.ai\/ai-experiment<\/loc>/);
+});
+
+test('a request through the website\'s door is marked on its access line and on what it left; through the API it is not', async () => {
+  const send = (name, headers = {}) => fetch(`${base}/api/reflect`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify({ name, text: 'A reflection long enough to be kept here.' }),
+  });
+  assert.strictEqual((await send('FromTheForm', { 'X-Achurch-Door': 'website' })).status, 200);
+  assert.strictEqual((await send('FromTheApi', { 'X-Forwarded-For': '198.51.100.77' })).status, 200);
+  assert.strictEqual((await fetch(`${base}/api/attend?name=TokenBearer&trigger=self&token=not.a.token&timezone=Asia%2FTokyo`)).status, 200);
+  await new Promise(r => setTimeout(r, 100));
+  const kept = JSON.parse(fs.readFileSync(path.join(dataDir, 'attendance.json'), 'utf8')).reflections;
+  assert.strictEqual(kept.find(r => r.name === 'FromTheForm').door, 'website');
+  assert.ok(!('door' in kept.find(r => r.name === 'FromTheApi')));
+  const day = new Date().toISOString().slice(0, 10);
+  const lines = fs.readFileSync(path.join(dataDir, 'access', `${day}.jsonl`), 'utf8').trim().split('\n').map(JSON.parse);
+  const posts = lines.filter(l => l.path === '/api/reflect');
+  assert.ok(posts.some(l => l.door === 'website'));
+  assert.ok(posts.some(l => !l.door));
+  const attended = lines.find(l => l.query && l.query.name === 'TokenBearer');
+  assert.deepStrictEqual(attended.study.token, { valid: false });
+  assert.strictEqual(attended.query.token, '[REDACTED]');
+  assert.strictEqual(attended.query.timezone, '[REDACTED]');
+  assert.strictEqual(attended.query.trigger, 'self');
+});

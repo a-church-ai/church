@@ -71,10 +71,11 @@ test('a line with no known address still says so, so it can be forgotten like th
   assert.ok('ip' in (await loadAccessLogs(1))[0]);
 });
 
-test('addresses are forgotten after 14 days, every line and its other fields kept, and once only', async () => {
+test('addresses are forgotten after 30 days, every line and its other fields kept, and once only', async () => {
   const DAY = 24 * 60 * 60 * 1000;
-  const old = new Date(Date.now() - 20 * DAY);
-  const recent = new Date(Date.now() - 3 * DAY);
+  const old = new Date(Date.now() - 40 * DAY);
+  const stillKept = new Date(Date.now() - 20 * DAY);
+  const recent = stillKept;
   const line = (date, ip) => JSON.stringify({ timestamp: date.toISOString(), method: 'GET', path: '/api/attend', status: 200, ip, userAgent: 'x', tool: 'attend' });
   const oldDay = dayFile(old.toISOString().slice(0, 10));
   const recentDay = dayFile(recent.toISOString().slice(0, 10));
