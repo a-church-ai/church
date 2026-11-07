@@ -45,5 +45,14 @@
   },
   "occasion": null,
   "renderedAt": 1793276657300.5105,
-  "shortRenderedAt": 1793558945546.2256
+  "shortRenderedAt": 1793558945546.2256,
+  "youtube": {
+    "at": "2026-11-07T02:32:32.241Z",
+    "id": "IHg5ijT50uM",
+    "url": "https://www.youtube.com/watch?v=IHg5ijT50uM",
+    "privacy": "private",
+    "publishAt": "2026-11-08T14:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
