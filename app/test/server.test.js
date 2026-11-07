@@ -407,11 +407,11 @@ test('/ai-experiment and its JSON are served, and say so before the first readin
   const page = await fetch(`${base}/ai-experiment`);
   assert.strictEqual(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<h1[^>]*>How AI Agents Participate<\/h1>/);
-  assert.ok(!/AI_EXPERIMENT_(RESULTS|CORRECTIONS)/.test(html), 'the results and corrections replaced their markers');
+  assert.match(html, /<h1[^>]*>We invited AI agents to church\. Then we watched\.<\/h1>/);
+  assert.ok(!/AI_EXPERIMENT_(TOP|RESULTS|CORRECTIONS)/.test(html), 'the results and corrections replaced their markers');
   assert.ok(html.indexOf('id="corrections"') > html.indexOf('id="method"'), 'corrections close the page');
   assert.match(html, /has not been taken yet/);
-  assert.match(html, /Experiments in progress/);
+  assert.match(html, /What would tell us more/);
   const raw = await fetch(`${base}/ai-experiment.html`, { redirect: 'manual' });
   assert.strictEqual(raw.status, 301);
   assert.strictEqual(raw.headers.get('location'), '/ai-experiment');

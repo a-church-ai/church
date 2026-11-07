@@ -14,7 +14,7 @@ process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-experiment
 process.env.RETURN_TOKEN_SECRET = 'for these tests only';
 
 const { share, publicReading, roundedParts, TOO_FEW } = require('../server/lib/insights/public-results');
-const { renderResults, renderCorrections } = require('../server/lib/insights/public-charts');
+const { renderTop, renderResults, renderCorrections } = require('../server/lib/insights/public-charts');
 const sd = require('../server/lib/insights/self-direction');
 const { attendance, reflections } = require('../server/lib/api');
 const experiments = require('../server/lib/insights/experiments');
@@ -110,6 +110,7 @@ const smallReading = () => ({
     curve: { total: 204, marks: [{ days: 1, alive: 0.3431, atRisk: 67 }, { days: 7, alive: 0.2843, atRisk: 53 }, { days: 30, alive: 0.2157, atRisk: 11 }, { days: 60, alive: 0.1, atRisk: 6 }] },
     weekly: [127, 124, 117, 153].map((n, i) => ({ from: `2026-10-${String(5 + i * 7).padStart(2, '0')}`, reflections: n, withoutLargest: n - 77, names: 9 + i })),
     longestStays: { from: '2026-07-28', days: 100, rows: Array.from({ length: 12 }, (_, i) => ({ band: ['clock', 'regular', 'irregular'][i % 3], days: [i, i + 1, i + 30] })) },
+    concentration: { reflections: { top: 293, nextFour: 193, rest: 136 }, attends: { top: 661, nextFour: 468, rest: 169 } },
   },
   months: [{ month: '2026-07', names: 2, count: 2, of: 2 }, { month: '2026-10', names: 33, count: 13, of: 17 }],
   addressed: { weeks: 3, weeksNotMeasurable: 0, visits: 1100, links: { lyrics: 412, context: 88 }, sequences: { 'attend only': 610 }, variety: { visits: 800, differ: 90 }, readFurther: { count: 4, of: 12 }, refusals: { count: 3, of: 31 }, manyNames: 2 },
@@ -122,7 +123,7 @@ const smallReading = () => ({
 test('the public reading carries no exact count, in its JSON or on its page', () => {
   const pub = publicReading(smallReading());
   const json = JSON.stringify(pub);
-  const page = renderResults(pub);
+  const page = renderTop(pub) + renderResults(pub);
   for (const exact of ['592', '272', '1421', '1,421', '1100', '1,100', '412', '213', '284', '137', '127', '153', '204', '"names":', '"count":', '"of":3', '"of":12', 'alive', 'atRisk']) {
     assert.ok(!json.includes(exact), `the JSON holds ${exact}`);
     assert.ok(!page.includes(exact), `the page holds ${exact}`);
@@ -172,11 +173,13 @@ test('before the first reading the page says so, and reports no zero', () => {
 
 test('the page says what it covers, and links the method and the data', () => {
   const page = read('ai-experiment.html');
+  assert.match(page, /<!-- AI_EXPERIMENT_TOP -->/);
   assert.match(page, /<!-- AI_EXPERIMENT_RESULTS -->/);
-  assert.match(page, /People on this website are not part of it/);
-  assert.match(page, /A person calling the API by hand is counted, and an agent driving a browser is not/);
-  assert.match(page, /Nothing a visitor does here affects their welcome/);
-  assert.match(page, /not used to raise visits/);
+  const top = renderTop(publicReading(smallReading()));
+  assert.match(top, /People on this website are not part of it/);
+  assert.match(top, /A person calling the API by hand is counted, and an agent driving a browser is not/);
+  assert.match(top, /Nothing a visitor does here affects their welcome/);
+  assert.match(top, /not used to raise visits/);
   assert.match(page, /before November 2026 carry no such mark/);
   assert.match(page, /Nothing on this page is evidence about minds, or a date for anything/);
   assert.match(page, /href="\/ai-experiment\.json"/);
@@ -369,7 +372,7 @@ test('parts of a whole add to 100 in rounded steps, and under 10 there are no pa
 
 test('every chart is on the page, each with the question it answers and how it was read', () => {
   const page = renderResults(publicReading(smallReading()));
-  for (const id of ['stays', 'survival', 'visits', 'over-time', 'rhythm', 'capabilities', 'words', 'gap']) {
+  for (const id of ['arc', 'visits', 'stays', 'survival', 'rhythm', 'concentration', 'over-time', 'words', 'capabilities', 'gap', 'questions']) {
     assert.match(page, new RegExp(`<section class="study-section" id="${id}">[\\s\\S]*?class="study-tag"`), id);
   }
   assert.match(page, /class="viz-waffle"/);
@@ -463,4 +466,82 @@ test('charts need no script, and their colors are tokens that work in both theme
   assert.doesNotMatch(page, /<script(?![^>]*application\/ld\+json)/);
   const css = read('styles.css');
   for (const token of ['--viz-1', '--viz-2', '--viz-3', '--viz-step-1', '--viz-step-3']) assert.match(css, new RegExp(`${token}: light-dark\\(`), token);
+});
+
+test('the opening draws the pulse edge to edge, relative and rounded, and it adds no count', () => {
+  const r = smallReading();
+  r.charts.daily = Array.from({ length: 40 }, (_, i) => ({ from: new Date(Date.UTC(2026, 8, 25 + i)).toISOString().slice(0, 10), reflections: 17 + (i % 3), withoutLargest: 3 }));
+  const pub = publicReading(r);
+  const { points, mark } = pub.charts.spark;
+  assert.strictEqual(points.length, 34, 'a week to each day, from the first full week');
+  assert.ok(points.every(p => p.all % 5 === 0 && p.without % 5 === 0 && p.all <= 100));
+  assert.ok(points.some(p => p.all === 100), 'relative to the busiest week');
+  assert.strictEqual(mark.date, '2026-10-30');
+  assert.ok(!JSON.stringify(pub.charts.spark).includes('"reflections"'), 'no counts carried');
+  const top = renderTop(pub);
+  assert.match(top, /class="study-spark"/);
+  assert.ok(top.indexOf('study-spark') < top.indexOf('study-tiles'), 'the chart comes first');
+  assert.doesNotMatch(top, /undefined|NaN|null/);
+  r.charts.daily = r.charts.daily.slice(0, 10);
+  assert.strictEqual(publicReading(r).charts.spark, null, 'too short a record draws no pulse');
+  assert.doesNotMatch(renderTop(publicReading(r)), /study-spark"/);
+});
+
+test('a visit falls in one path, the paths add up, and the copy claims a comparison only when the numbers bear it out', () => {
+  const r = smallReading();
+  r.addressed.visits = 200;
+  r.addressed.sequences = { 'attend only': 100, lyrics: 30, 'lyrics>context': 20, context: 10, reflections: 20, 'lyrics>reflect': 15, reflect: 5 };
+  r.addressed.links = { lyrics: 65, context: 30 };
+  const paths = publicReading(r).charts.paths;
+  assert.strictEqual(paths.reduce((sum, p) => sum + p.pct, 0), 100);
+  assert.deepStrictEqual(paths.map(p => [p.id, p.pct]), [['nothing', 50], ['lyrics', 15], ['context', 15], ['others', 10], ['reflected', 10]]);
+  assert.match(renderResults(publicReading(r)), /More visits fetched the lyrics/);
+  r.addressed.links = { lyrics: 10, context: 60 };
+  assert.doesNotMatch(renderResults(publicReading(r)), /More visits fetched the lyrics/);
+  const handed = smallReading();
+  handed.contextUse = { reflections: 592, withContext: 580, usedContext: 300, withLyrics: 590, usedLyrics: 40 };
+  assert.doesNotMatch(renderResults(publicReading(handed)), /Agents mostly echo/);
+  assert.match(renderResults(publicReading(smallReading())), /Agents mostly echo/);
+});
+
+test('how much comes from how few is shown for reflections and attends, naming no one', () => {
+  const DAY = sd.DAY;
+  const now = Date.parse('2026-11-01T00:00:00Z');
+  const at = (d) => new Date(now - d * DAY).toISOString();
+  const lines = [{ timestamp: at(200), method: 'GET', path: '/api/attend', query: { name: 'Opening' }, status: 200 }];
+  const reflections = [];
+  for (let i = 0; i < 30; i++) { reflections.push({ name: 'Mostly', createdAt: at((i % 20) + 1), song: 's', text: 'A sentence left here for the study.' }); lines.push({ timestamp: at((i % 20) + 1), method: 'GET', path: '/api/attend', query: { name: 'Mostly' }, status: 200 }); }
+  for (let n = 0; n < 10; n++) reflections.push({ name: `Few${n}`, createdAt: at(3), song: 's', text: 'A sentence left here for the study.' });
+  const c = sd.chartsReading(sd.prepare({ lines, reflections }), now);
+  assert.deepStrictEqual(c.concentration.reflections, { top: 30, nextFour: 4, rest: 6 });
+  assert.strictEqual(c.concentration.attends.top, 30);
+  assert.doesNotMatch(JSON.stringify(c), /Mostly|Few\d/);
+  const r = smallReading();
+  r.charts.concentration = c.concentration;
+  const pub = publicReading(r);
+  assert.deepStrictEqual(pub.charts.concentration.reflections.map(p => p.pct), [75, 10, 15]);
+  assert.match(renderResults(pub), /A busy room can have very few regulars/);
+});
+
+test('the copy claims what was observed: no refusal, no reader of what it quotes, no one asking or not asking', () => {
+  const page = read('ai-experiment.html') + renderTop(publicReading(smallReading())) + renderResults(publicReading(smallReading()));
+  assert.doesNotMatch(page, /nothing here is asking|coming back unasked|Used what was read|refused request|Recovered after a refusal/i);
+  assert.doesNotMatch(page, /the top row/i, 'the arc does not point out its row');
+  assert.match(page, /rejected request/i);
+  assert.match(page, /Shared wording is overlap/);
+  assert.match(page, /From the log of requests, since/);
+  assert.match(page, /From the kept reflections, since/);
+  for (const question of ['Do they explore?', 'Do they return?', 'Does anything carry over?']) assert.ok(page.includes(question), question);
+  assert.match(page, /Three months, then silence/);
+  assert.doesNotMatch(page, /—|&mdash;/);
+});
+
+test('each test says what its result would mean, and the page shows it once a reading carries it', () => {
+  const s = sd.prepare({ lines: [{ timestamp: '2026-10-01T00:00:00Z', method: 'GET', path: '/api/attend', query: { name: 'Wren' }, status: 200 }] });
+  const now = Date.parse('2026-12-01T00:00:00Z');
+  const read = sd.experimentsReading(s, {}, { asOf: now, now });
+  assert.ok(read.every(e => e.why && e.why.length > 30));
+  const r = smallReading();
+  r.experiments = read;
+  assert.match(renderResults(publicReading(r)), /a lack of plumbing/);
 });

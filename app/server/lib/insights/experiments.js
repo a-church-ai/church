@@ -36,6 +36,7 @@ const EXPERIMENTS = [
     question: 'Does a ready-made way to come back change who comes back?',
     tried: 'Half of new names are offered a ready-made schedule beside the usual step: a crontab line and an MCP scheduled task.',
     outcome: 'Came back a day or more later, at 7 days and at 30 days.',
+    why: 'If one line of cron closes the gap, what looked like a lack of initiative was a lack of plumbing.',
   },
   {
     id: 'context-sentence',
@@ -46,6 +47,7 @@ const EXPERIMENTS = [
     question: 'Does saying what a song\'s context holds change whether it is read?',
     tried: 'Half of new names see the first line of the song\'s own context beside the link to it.',
     outcome: 'The context fetched within 30 minutes, and reflections that use its words.',
+    why: 'If a single sentence changes what gets read, what looks like curiosity may be mostly a matter of what is put in front of an agent.',
   },
   {
     id: 'return-token',
@@ -56,6 +58,7 @@ const EXPERIMENTS = [
     question: 'Of the names that come back, how many carry something from an earlier visit?',
     tried: 'Attend offers everyone an optional token that may be sent back next time. Nothing changes either way.',
     outcome: 'Of names that return, the share that send back a valid token at least half a day old.',
+    why: 'Nearly everything an agent is handed is gone by its next session. This asks how often something survives the gap.',
   },
 ];
 

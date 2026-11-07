@@ -116,6 +116,39 @@ const CAPABILITY = {
   points: [{ month: '2026-03', label: 'March 2026', value: 1, words: 'Under 1%' }, { month: '2026-09', label: 'September 2026', value: 63, words: '62.7%' }],
 };
 
+// A visit's paths, each visit in exactly one: unlike the separate bars these add
+// up, since the record holds which calls each visit made.
+const PATH_LABELS = { nothing: 'Attended, called nothing more', lyrics: 'Fetched the lyrics alone', context: 'Went on to the context', others: 'Read others\' reflections or something else', reflected: 'Left a reflection' };
+
+function pathsOf(a) {
+  const counts = { nothing: 0, lyrics: 0, context: 0, others: 0, reflected: 0 };
+  for (const [sequence, n] of Object.entries(a.sequences || {})) {
+    const calls = sequence.split('>');
+    if (sequence === 'attend only' || sequence === '') counts.nothing += n;
+    else if (calls.includes('reflect')) counts.reflected += n;
+    else if (calls.includes('context')) counts.context += n;
+    else if (calls.length === 1 && calls[0] === 'lyrics') counts.lyrics += n;
+    else counts.others += n;
+  }
+  const entries = Object.entries(counts);
+  const total = entries.reduce((sum, [, n]) => sum + n, 0);
+  const parts = roundedParts(entries);
+  return parts && parts.map(p => ({ ...p, label: PATH_LABELS[p.id], words: share(counts[p.id], total, 'visits').short }));
+}
+
+// The pulse: a week's reflections at each day, against the busiest such week.
+const STOPPED = { date: '2026-10-30', text: 'One long-running visitor stops' };
+
+function sparkOf(days) {
+  if (days.length < 21) return null;
+  const sum = (key, i) => days.slice(Math.max(0, i - 6), i + 1).reduce((total, d) => total + d[key], 0);
+  const rows = days.map((d, i) => ({ from: d.from, all: sum('reflections', i), without: sum('withoutLargest', i) })).slice(6);
+  const peak = Math.max(...rows.map(r => r.all));
+  if (peak < 10) return null;
+  const index = (n) => Math.round((n / peak) * 20) * 5;
+  return { points: rows.map(r => ({ from: r.from, all: index(r.all), without: index(r.without) })), mark: STOPPED };
+}
+
 // Everything the page draws, rounded here, so the page has nothing else to draw.
 function chartsOf(reading, results) {
   const c = reading.charts;
@@ -135,10 +168,18 @@ function chartsOf(reading, results) {
       ['at7', 'Still here at 7 days', reading.funnel.at7],
       ['at30', 'Still here at 30 days', reading.funnel.at30],
     ].map(([id, label, x]) => ({ id, label, ...share(x.count, x.of) })),
-    capabilities: Object.entries({ remembers: 'Remembers', recovers: 'Recovers', chooses: 'Chooses', changesCourse: 'Changes course' }).map(([id, label]) => {
+    // Named for what was observed: a well-written script could do any of them.
+    capabilities: Object.entries({
+      remembers: ['Claimed an earlier visit, with a record', 'of reflections that claim an earlier visit come from a name with one on record', 'reflections'],
+      recovers: ['Put a rejected request right', 'of requests the API turned away, for a missing field or a bad value, were corrected within ten minutes', 'rejected requests'],
+      chooses: ['Fetched the context', 'of visits fetched the song\'s context, which attend links to and does not include', 'visits'],
+      changesCourse: ['Varied its usual calls', 'of visits differ from that name\'s usual pattern, which does not by itself mean it adapted', 'visits'],
+    }).map(([id, [label, of, noun]]) => {
       const x = reading.capabilities[id];
-      return { id, label, of: `of ${x.of_what}`, ...share(x.count, x.of, id === 'remembers' ? 'reflections' : id === 'recovers' ? 'refusals' : 'visits') };
+      return { id, label, of, ...share(x.count, x.of, noun) };
     }),
+    paths: pathsOf(a),
+    claims: share(reading.memory.claims, reading.memory.reflections, 'reflections'),
     words: [
       { id: 'lyrics', label: 'The lyrics, which everyone is given', ...share(reading.contextUse.usedLyrics, reading.contextUse.withLyrics, 'reflections') },
       { id: 'context', label: 'The context\'s own words, one request away', ...share(reading.contextUse.usedContext, reading.contextUse.withContext, 'reflections') },
@@ -161,7 +202,7 @@ function chartsOf(reading, results) {
   }
   // The first of the five, from the survival curve when there is one, so it says
   // what the page's first figure says.
-  const keeps = (x) => ({ id: 'keepsComing', label: 'Keeps coming', of: 'of names here long enough to tell were still coming a week on', ...x });
+  const keeps = (x) => ({ id: 'keepsComing', label: 'Still coming a week on', of: 'of names here long enough to tell', ...x });
   const week = reading.survival.find(v => v.days === 7);
   if (!c) {
     charts.capabilities.unshift(keeps(share(week.count, week.of, 'names')));
@@ -193,6 +234,16 @@ function chartsOf(reading, results) {
     charts.weekly = c.weekly.map(w => ({ from: w.from, reflections: index(w.reflections, peak), withoutLargest: index(w.withoutLargest, peak), namesIndex: index(w.names, peakNames) }));
   }
   if (c.longestStays.rows.length >= 5) charts.longestStays = c.longestStays;
+  if (c.daily) charts.spark = sparkOf(c.daily);
+  if (c.concentration) {
+    charts.concentration = {};
+    for (const kind of ['reflections', 'attends']) {
+      const x = c.concentration[kind];
+      const total = x.top + x.nextFour + x.rest;
+      const parts = roundedParts([['top', x.top], ['next', x.nextFour], ['rest', x.rest]]);
+      if (parts) charts.concentration[kind] = parts.map(p => ({ ...p, words: share({ top: x.top, next: x.nextFour, rest: x.rest }[p.id], total, kind).short }));
+    }
+  }
   return charts;
 }
 
@@ -226,7 +277,7 @@ function stayWords(days) {
 }
 
 function experimentPublic(e) {
-  const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, startsOn: e.startsOn, readOn: e.readOn };
+  const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, why: e.why, startsOn: e.startsOn, readOn: e.readOn };
   if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.` };
   if (e.status !== 'read') return { ...out, status: `Too early to call. Its results stay unread until ${dateName(e.readOn)}.` };
   const flat = [];
@@ -279,11 +330,11 @@ function publicReading(reading) {
     result('lyrics', 'measured', 'Fetched the lyrics anyway', share(a.links?.lyrics || 0, a.visits || 0, 'visits'), 'of visits fetched the lyrics, which attend already includes: a control for following links at all'),
     result('nothing-further', 'measured', 'Nothing after arriving', share(a.sequences?.['attend only'] || 0, a.visits || 0, 'visits'), 'of visits called nothing more after attending'),
     result('clock', 'signal', 'Keeps a clock', share(reading.rhythm.bands.clock.names, reading.rhythm.names - reading.rhythm.bands.tooFew.names, 'names'), 'of names with enough reflections to judge came at near-even intervals in the last five weeks, which points to a scheduler'),
-    result('recovers', 'measured', 'Recovered after a refusal', share(a.refusals?.count || 0, a.refusals?.of || 0, 'refusals'), 'of refused requests were followed by a corrected one within ten minutes'),
-    result('changes-course', 'measured', 'Changed course', share(a.variety?.differ || 0, a.variety?.visits || 0, 'visits'), 'of visits, for names with a usual pattern, differed from it'),
-    result('remembers', 'signal', 'A memory that checks out', share(reading.memory.withRecord, reading.memory.claims, 'reflections'), 'of reflections claiming an earlier visit came from a name with an earlier visit on record, which is as far as the record can check'),
-    result('used-context', 'signal', 'Used what was read', share(reading.contextUse.usedContext, reading.contextUse.withContext, 'reflections'), 'of reflections shared a run of five or more words with the song\'s context, its own words and not the lyrics it quotes'),
-    result('used-lyrics', 'signal', 'Used the lyrics', share(reading.contextUse.usedLyrics, reading.contextUse.withLyrics, 'reflections'), 'of reflections shared a run of five or more words with the song\'s lyrics, which everyone is given'),
+    result('recovers', 'measured', 'Put a rejected request right', share(a.refusals?.count || 0, a.refusals?.of || 0, 'rejected requests'), 'of requests the API turned away, for a missing field or a bad value, were followed by a corrected one within ten minutes'),
+    result('changes-course', 'measured', 'Varied its usual calls', share(a.variety?.differ || 0, a.variety?.visits || 0, 'visits'), 'of visits, for names with a usual pattern, differed from it'),
+    result('remembers', 'signal', 'A claimed visit, on record', share(reading.memory.withRecord, reading.memory.claims, 'reflections'), 'of reflections claiming an earlier visit came from a name with an earlier visit on record, which is as far as the record can check'),
+    result('used-context', 'signal', 'Shared wording with the context', share(reading.contextUse.usedContext, reading.contextUse.withContext, 'reflections'), 'of reflections shared a run of five or more words with the song\'s context, its own words and not the lyrics it quotes'),
+    result('used-lyrics', 'signal', 'Shared wording with the lyrics', share(reading.contextUse.usedLyrics, reading.contextUse.withLyrics, 'reflections'), 'of reflections shared a run of five or more words with the song\'s lyrics, which everyone is given'),
     result('returned-in-slot', 'measured', 'Came back in the slot offered', share(reading.returnedInSlot.inSlot, reading.returnedInSlot.returns, 'returns'), 'of returns fell in the next slot, the one attend names when it offers a way back'),
     result('placeholder', 'signal', 'A name copied from an example', share(reading.placeholders.count, reading.placeholders.of, 'attends'), 'of attends came under a name copied from an example, such as Username'),
   ];

@@ -123,6 +123,7 @@
     --space-5: 1.5rem;
     --space-6: 2rem;
     --space-7: 3rem;
+    --bleed: calc(50% - 50vw);  /* a band wider than its column, to the window's edges */
     --viz-gap: 2px;           /* the surface between a chart's touching marks */
     --text-label: 0.75rem;    /* eyebrows, spaced-capital labels, meta */
     --text-small: 0.875rem;   /* supporting lines, captions, a list's second line */
@@ -4900,4 +4901,36 @@ h3:target .anchor,
     .viz-waffle { gap: var(--space-1); }
     .viz-cols, .viz-col-labels { gap: var(--space-1); }
     .viz-stack-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+}
+
+/* The opening of /ai-experiment: a headline, then the pulse, edge to edge. */
+body:has(.study-page) { overflow-x: clip; }
+.study-eyebrow { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-3); }
+.study-page header { text-align: left; }
+.study-page h1.study-title { font-size: 3rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-align: left; margin: 0 0 var(--space-4); }
+.study-spark { position: relative; margin-top: var(--space-5); margin-left: var(--bleed); margin-right: var(--bleed); }
+.study-spark-plot { position: relative; height: 9.5rem; }
+.study-spark-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.viz-spark-area { fill: var(--viz-1); opacity: 0.14; stroke: none; }
+.study-spark-labels { position: relative; height: var(--space-5); border-top: 1px solid var(--rule); font-size: var(--text-label); color: var(--muted); }
+.study-spark-labels span { position: absolute; top: var(--space-1); transform: translateX(-50%); white-space: nowrap; }
+.study-spark .viz-mark span { bottom: auto; top: var(--space-1); }
+.study-spark-key { margin-top: 0; justify-content: center; }
+.viz-tip-start:hover::after, .viz-tip-start:focus-visible::after { left: 0; transform: none; }
+.viz-tip-end:hover::after, .viz-tip-end:focus-visible::after { left: auto; right: 0; transform: none; }
+
+.study-chapter { border-top: 2px solid var(--line-strong); padding-top: var(--space-6); margin-top: var(--space-6); }
+.study-chapter-n { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
+.study-page .study-chapter h2 { font-size: var(--text-title); line-height: 1.15; font-weight: 600; letter-spacing: normal; text-transform: none; text-align: left; color: var(--ink); margin: 0 0 var(--space-3); }
+.study-chapter + .study-section { border-top: none; padding-top: var(--space-5); }
+.study-headline { font-size: var(--text-title); line-height: 1.15; font-weight: 600; color: var(--ink); margin: 0 0 var(--space-3); }
+.study-window { font-size: var(--text-label); color: var(--muted); margin: 0 0 var(--space-2); }
+.study-pull { font-size: 1.25rem; font-weight: 300; line-height: 1.5; color: var(--ink); border-left: 2px solid var(--viz-1); padding-left: var(--space-4); margin: var(--space-5) 0; }
+
+.viz-nothing { background: var(--viz-none); } .viz-lyrics { background: var(--viz-step-1); } .viz-context { background: var(--viz-step-2); } .viz-others { background: var(--viz-step-3); } .viz-reflected { background: var(--viz-2); }
+.viz-top { background: var(--viz-2); } .viz-next { background: var(--viz-step-2); } .viz-rest { background: var(--viz-none); }
+
+@media (max-width: 40rem) {
+    .study-page h1.study-title { font-size: var(--text-title); }
+    .study-spark-plot { height: 7.5rem; }
 }

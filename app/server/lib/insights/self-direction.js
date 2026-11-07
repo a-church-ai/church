@@ -497,9 +497,37 @@ function longestStays(s, asOf) {
   };
 }
 
+// Reflections each finished day since the first, with and without the name that
+// left the most, for the pulse at the top of the page.
+function daily(s, asOf) {
+  if (!s.reflections.length) return [];
+  const top = largest(group(s.reflections));
+  const first = Math.floor(s.reflections[0].t / DAY);
+  const last = Math.floor(asOf / DAY) - 1;
+  const rows = [];
+  for (let d = first; d <= last; d++) rows.push({ from: new Date(d * DAY).toISOString().slice(0, 10), reflections: 0, withoutLargest: 0 });
+  for (const r of s.reflections) {
+    const row = rows[Math.floor(r.t / DAY) - first];
+    if (!row) continue;
+    row.reflections += 1;
+    if (r.key !== top) row.withoutLargest += 1;
+  }
+  return rows;
+}
+
+// How much comes from how few: the most active name, the next four, the rest.
+function concentration(s, asOf) {
+  const split = (rows) => {
+    const counts = [...group(rows).values()].map(t => t.length).sort((a, b) => b - a);
+    return { top: counts[0] || 0, nextFour: counts.slice(1, 5).reduce((a, b) => a + b, 0), rest: counts.slice(5).reduce((a, b) => a + b, 0) };
+  };
+  const from = asOf - RHYTHM_DAYS * DAY;
+  return { reflections: split(s.reflections.filter(r => r.t >= from && r.t < asOf)), attends: split(s.attends.filter(a => a.t >= from && a.t < asOf)) };
+}
+
 /** What the page draws, from the whole record. */
 function chartsReading(s, asOf) {
-  return { stays: stays(s, asOf), curve: survivalCurve(s, asOf), weekly: weekly(s, asOf), longestStays: longestStays(s, asOf) };
+  return { stays: stays(s, asOf), curve: survivalCurve(s, asOf), weekly: weekly(s, asOf), longestStays: longestStays(s, asOf), daily: daily(s, asOf), concentration: concentration(s, asOf) };
 }
 
 /** Everything read by name, as of a moment. */
@@ -703,7 +731,7 @@ function experimentsReading(s, addressed, { asOf, songText, now = asOf }) {
   return experiments.EXPERIMENTS.map(experiment => {
     const start = experiments.startOf(experiment);
     const names = [...firstSeen].filter(([, first]) => first >= start).map(([key]) => key);
-    const read = { id: experiment.id, label: experiment.label, startsOn: experiment.startsOn, readOn: experiment.readOn, question: experiment.question, tried: experiment.tried, outcome: experiment.outcome };
+    const read = { id: experiment.id, label: experiment.label, startsOn: experiment.startsOn, readOn: experiment.readOn, question: experiment.question, tried: experiment.tried, outcome: experiment.outcome, why: experiment.why };
     if (now < start) return { ...read, status: 'not begun' };
     const enrolled = {};
     if (experiment.arms) for (const name of names) bump(enrolled, experiments.armFor(experiment.id, name));

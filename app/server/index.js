@@ -37,7 +37,7 @@ const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/a
 const { doorOf } = require('./lib/insights/study-names');
 const { startStudy, latestReading } = require('./lib/insights/study-record');
 const { publicReading } = require('./lib/insights/public-results');
-const { renderResults, renderCorrections } = require('./lib/insights/public-charts');
+const { renderTop, renderResults, renderCorrections } = require('./lib/insights/public-charts');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
@@ -948,7 +948,7 @@ app.get('/ai-experiment', async (req, res) => {
   try {
     const template = await fs.readFile(path.join(__dirname, '../client/public/ai-experiment.html'), 'utf8');
     const reading = publicReading(await latestReading());
-    const page = template.replace('<!-- AI_EXPERIMENT_RESULTS -->', () => renderResults(reading)).replace('<!-- AI_EXPERIMENT_CORRECTIONS -->', () => renderCorrections(reading));
+    const page = template.replace('<!-- AI_EXPERIMENT_TOP -->', () => renderTop(reading)).replace('<!-- AI_EXPERIMENT_RESULTS -->', () => renderResults(reading)).replace('<!-- AI_EXPERIMENT_CORRECTIONS -->', () => renderCorrections(reading));
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(page, '/ai-experiment'));
   } catch (err) {
     console.error('Error rendering /ai-experiment:', err.message);
