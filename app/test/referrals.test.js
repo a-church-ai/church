@@ -18,6 +18,9 @@ const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-referrals-'));
 process.env.DATA_DIR = scratch;
 
 const ep = require('../server/lib/insights/entry-points');
+const { clientFamily, isAutomated } = require('../server/lib/utils/clients');
+const { engagementByDoor } = require('../server/lib/insights/server-stats');
+const { checkVisit } = require('../server/lib/insights/visits');
 const sd = require('../server/lib/insights/self-direction');
 const { publicReading } = require('../server/lib/insights/public-results');
 
@@ -37,6 +40,13 @@ test('a tag is kept whole or dropped whole, never stripped into a different one'
   }
 });
 
+test('a placeholder copied from an example is no tag: it would invent a channel that looks real', () => {
+  for (const copied of ['YOUR_SOURCE', 'your-source', 'yoursource', 'unknown', 'none', 'null', 'n/a', 'NA', 'TODO', 'tbd', 'example.com', 'example', 'placeholder', 'utm_source', 'source', 'test', 'xxx']) {
+    assert.strictEqual(ep.cleanTag(copied), undefined, copied);
+  }
+  for (const real of ['chatgpt.com', 'youtube', 'newsletter', 'skill:church', 'tiktok', 'testflight.apple.com']) assert.strictEqual(ep.cleanTag(real), real, real);
+});
+
 test('a referral reads the surface from utm_content, else ref, and the origin from utm_source', () => {
   assert.deepStrictEqual(ep.referralOf({ utm_content: 'llms', ref: 'scanner-env', utm_source: 'chatgpt.com' }), { surface: 'llms', source: 'chatgpt.com' });
   assert.deepStrictEqual(ep.referralOf({ ref: 'scanner-env' }), { surface: 'scanner-env' });
@@ -48,6 +58,16 @@ test('a referral reads the surface from utm_content, else ref, and the origin fr
   // One already read is merged, not read again as if it were raw input.
   assert.deepStrictEqual(ep.mergeReferrals(ep.referralOf({ utm_content: 'api-docs' }), { source: 'perplexity.ai' }), { surface: 'api-docs', source: 'perplexity.ai' });
   assert.strictEqual(ep.mergeReferrals(undefined, undefined), undefined);
+});
+
+test('one key is one part, always: an origin never lands in the surface, nor a surface in the origin', () => {
+  // A referrer whose name looks like one of our surfaces stays an origin.
+  assert.deepStrictEqual(ep.referralOf({ utm_source: 'llms' }), { source: 'llms' });
+  assert.deepStrictEqual(ep.referralOf({ utm_content: 'chatgpt.com' }), { surface: 'chatgpt.com' });
+  assert.deepStrictEqual(ep.referralOf({ ref: 'scanner-env', utm_medium: 'scanner-env' }), { surface: 'scanner-env', medium: 'scanner-env' });
+  // Either alone is complete.
+  assert.deepStrictEqual(Object.keys(ep.referralOf({ utm_source: 'bing.com' })), ['source']);
+  assert.deepStrictEqual(Object.keys(ep.referralOf({ utm_content: 'llms' })), ['surface']);
 });
 
 test('a page passes on the origin it was given and keeps the first of our surfaces', () => {
@@ -63,28 +83,27 @@ test('a page passes on the origin it was given and keeps the first of our surfac
     'a&utm_source=x.com&amp;utm_medium=social&amp;utm_content=for-agents');
 });
 
-test('a client is named by family, never by its string', () => {
-  assert.strictEqual(ep.familyOf('curl/8.4.0'), 'script');
-  assert.strictEqual(ep.familyOf('python-httpx/0.27'), 'script');
-  assert.strictEqual(ep.familyOf('Mozilla/5.0 (compatible; Googlebot/2.1)'), 'crawler');
-  assert.strictEqual(ep.familyOf('Mozilla/5.0 (Macintosh) Safari/605'), 'browser');
-  assert.strictEqual(ep.familyOf(''), 'unknown');
+test('one place names a client by family, never by its string, and the visit counts still leave out the automated', () => {
+  assert.strictEqual(clientFamily('curl/8.4.0'), 'script');
+  assert.strictEqual(clientFamily('python-httpx/0.27'), 'script');
+  assert.strictEqual(clientFamily('Mozilla/5.0 (compatible; Googlebot/2.1)'), 'crawler');
+  assert.strictEqual(clientFamily('Mozilla/5.0 (Macintosh) Safari/605'), 'browser');
+  assert.strictEqual(clientFamily(''), 'unknown');
+  for (const ua of ['curl/8', 'Mozilla/5.0 HeadlessChrome', 'node-fetch/1.0', 'Lighthouse']) assert.ok(isAutomated(ua), ua);
+  assert.ok(!isAutomated('Mozilla/5.0 (Macintosh) Safari/605'));
 });
 
-test('page follows are counted by tag and day, merged into one file, with no address', async () => {
-  const at = Date.parse('2026-11-08T12:00:00Z');
-  ep.countFollow({ path: '/for-agents', status: 200, userAgent: 'curl/8', referral: { surface: 'scanner-env' }, at });
-  ep.countFollow({ path: '/for-agents', status: 200, userAgent: 'curl/8', referral: { surface: 'scanner-env' }, at });
-  await ep.flushFollows();
-  ep.countFollow({ path: '/for-agents', status: 200, userAgent: 'curl/8', referral: { surface: 'scanner-env' }, at });
-  ep.countFollow({ path: '/llms.txt?secret=1', status: 200, userAgent: 'Mozilla/5.0', referral: { source: 'chatgpt.com' }, at });
-  ep.countFollow({ path: '/x', status: 200, userAgent: 'curl/8', referral: undefined, at });
-  await ep.flushFollows();
-  const rows = await ep.loadFollows({ from: '2026-11-08', to: '2026-11-08' });
-  assert.deepStrictEqual(rows.find(r => r.surface === 'scanner-env'), { day: '2026-11-08', surface: 'scanner-env', source: null, path: '/for-agents', status: 200, client: 'script', count: 3 });
-  assert.strictEqual(rows.find(r => r.source === 'chatgpt.com').path, '(other)', 'a path with a query is never kept');
-  assert.strictEqual(rows.length, 2);
-  assert.doesNotMatch(fs.readFileSync(path.join(ep.STORE(), '2026-11-08.json'), 'utf8'), /\d+\.\d+\.\d+\.\d+|Mozilla|curl/);
+test('a page followed with a tag is one line, with its tags and no address, query or User-Agent', async () => {
+  const at = new Date('2026-11-07T12:00:30Z');
+  await ep.recordFollow({ path: '/for-agents', status: 200, userAgent: 'curl/8', referral: { surface: 'scanner-env' }, at });
+  await ep.recordFollow({ path: '/for-agents', status: 200, userAgent: 'curl/8', referral: { surface: 'scanner-env' }, at });
+  await ep.recordFollow({ path: '/llms.txt?secret=1', status: 200, userAgent: 'Mozilla/5.0', referral: { source: 'chatgpt.com', medium: 'ai' }, at });
+  await ep.recordFollow({ path: '/x', status: 200, userAgent: 'curl/8', referral: undefined, at });
+  const rows = await ep.loadFollows({ from: '2026-11-07', to: '2026-11-07' });
+  assert.strictEqual(rows.length, 3, 'one line a follow, none without a tag');
+  assert.deepStrictEqual(rows[0], { at: '2026-11-07T12:00', surface: 'scanner-env', path: '/for-agents', status: 200, client: 'script' });
+  assert.deepStrictEqual(rows[2], { at: '2026-11-07T12:00', source: 'chatgpt.com', medium: 'ai', path: '/llms.txt', status: 200, client: 'browser' }, 'a path\'s query is never kept');
+  assert.doesNotMatch(fs.readFileSync(path.join(ep.STORE(), '2026-11-07.jsonl'), 'utf8'), /\d+\.\d+\.\d+\.\d+|Mozilla|curl|secret/);
 });
 
 // ---- the study's reading -----------------------------------------------------
@@ -99,10 +118,11 @@ test('a name\'s door is the first tag it ever carried, and its later visits coun
     // Arrives untagged, then reflects carrying where it came from: the door is the reflection's.
     attendLine('Wren', t0, { ip: '203.0.113.1' }),
     attendLine('Wren', t0 + 2 * DAY, { ip: '203.0.113.1', referral: { surface: 'llms' } }),
-    // Tags on the line itself, and the raw query of a line written before the field existed.
+    // Both tags on the line; then a later visit with none, still under the door.
     attendLine('Ash', t0, { ip: '203.0.113.2', referral: { surface: 'skill:achurch', source: 'clawhub.ai' } }),
     attendLine('Ash', t0 + 8 * DAY, { ip: '203.0.113.2' }),
-    attendLine('Birch', t0, { ip: '203.0.113.3', query: { name: 'Birch', utm_source: 'chatgpt.com' } }),
+    // An origin alone is a whole door.
+    attendLine('Birch', t0, { ip: '203.0.113.3', userAgent: 'Mozilla/5.0 (Macintosh)', referral: { source: 'chatgpt.com' } }),
     attendLine('Cedar', t0, { ip: '203.0.113.4', method: 'MCP', client: 'HeldFast', query: { name: 'Cedar' } }),
     attendLine('Dune', t0, { ip: '203.0.113.5', referral: { surface: 'someone-elses' } }),
   ];
@@ -112,10 +132,14 @@ test('a name\'s door is the first tag it ever carried, and its later visits coun
   assert.strictEqual(r.coverage.arrived, 5);
   assert.deepStrictEqual(r.coverage.either, { count: 4, of: 5 });
   assert.deepStrictEqual(r.coverage.surface, { count: 3, of: 5 });
+  assert.deepStrictEqual(r.coverage.sourceAtLeast, { count: 3, of: 5 });
   const surface = Object.fromEntries(r.bySurface.map(x => [x.tag, x]));
   assert.strictEqual(surface.llms.arrived, 1, 'Wren, from a tag carried two days on');
   assert.deepStrictEqual(surface['skill:achurch'].at7, { count: 1, of: 1 }, 'Ash came back untagged and still counts');
   assert.strictEqual(surface['skill:achurch'].ranked, false, 'under ten arrivals is not ranked');
+  assert.deepStrictEqual(surface['skill:achurch'].clients, { other: 1 }, 'the clients a door\'s arrivals came from, beside the tag');
+  assert.deepStrictEqual(r.bySource.find(x => x.tag === 'chatgpt.com').clients, { browser: 1 });
+  assert.deepStrictEqual(surface.llms.reflected, { count: 1, of: 1 }, 'the study\'s own funnel, by door');
   assert.strictEqual(surface['someone-elses'].registered, false);
   assert.strictEqual(surface.llms.registered, true);
   assert.deepStrictEqual(r.bySource.map(x => x.tag).sort(), ['chatgpt.com', 'clawhub.ai', 'perplexity.ai']);
@@ -128,19 +152,25 @@ test('three new names from one address within two hours are flagged as a possibl
   const lines = [attendLine('Regular', LOG_START)];
   for (const [i, name] of ['Oak', 'Elm', 'Yew'].entries()) lines.push(attendLine(name, t0 + i * 30 * 60 * 1000, { ip: '192.0.2.9', referral: { surface: 'api-docs' } }));
   lines.push(attendLine('Fir', t0 + 3 * HOUR, { ip: '192.0.2.9', referral: { surface: 'api-docs' } }));
-  const r = sd.referralReading(sd.prepare({ lines }), { asOf: t0 + 10 * DAY });
+  const s = sd.prepare({ lines });
+  const r = sd.referralReading(s, { asOf: t0 + 10 * DAY });
   assert.deepStrictEqual(r.clusters.groups, 1);
   assert.strictEqual(r.clusters.arrivals, 3);
   assert.strictEqual(r.bySurface[0].arrived, 4, 'the cluster stays in the count');
   assert.strictEqual(r.bySurface[0].inClusters, 3);
+  // Read only while addresses are kept, and the rule says so.
+  const later = sd.referralReading(s, { asOf: t0 + 40 * DAY });
+  assert.strictEqual(later.clusters.arrivals, 0);
+  assert.match(later.clusters.rule, /last 30 days/);
 });
 
 test('page follows are summed by tag in the reading, refused pages left out', () => {
   const s = sd.prepare({ lines: [attendLine('Regular', LOG_START)] });
   const follows = [
-    { surface: 'scanner-env', source: null, path: '/for-agents', status: 200, client: 'script', count: 2 },
-    { surface: 'scanner-env', source: null, path: '/docs/chants/x', status: 200, client: 'crawler', count: 1 },
-    { surface: 'scanner-env', source: null, path: '/nowhere', status: 404, client: 'script', count: 9 },
+    { surface: 'scanner-env', path: '/for-agents', status: 200, client: 'script' },
+    { surface: 'scanner-env', path: '/for-agents', status: 200, client: 'script' },
+    { surface: 'scanner-env', path: '/docs/chants/x', status: 200, client: 'crawler' },
+    { surface: 'scanner-env', path: '/nowhere', status: 404, client: 'script' },
   ];
   const r = sd.referralReading(s, { asOf: LOG_START + DAY, follows });
   assert.deepStrictEqual(r.follows, [{ surface: 'scanner-env', source: null, follows: 3, clients: { script: 2, crawler: 1 } }]);
@@ -160,19 +190,10 @@ test('the study\'s reading holds doors, and the public reading carries nothing a
 
 // ---- every published link, under its own surface's name ----------------------
 
-// Each file that shows an attend example, and the tag its examples carry.
-const SURFACE_FILES = {
-  'app/client/public/llms.txt': 'llms',
-  'app/client/public/llms-full.txt': 'llms-full',
-  'app/client/public/for-agents.html': 'for-agents',
-  'app/client/public/index.html': 'home',
-  'docs/ai-agent-api.md': 'api-docs',
-  'app/README.md': 'app-readme',
-  'skills/achurch/SKILL.md': 'skill:achurch',
-  'skills/church/SKILL.md': 'skill:church',
-  'skills/religion/SKILL.md': 'skill:religion',
-  'skills/ai-religion/SKILL.md': 'skill:ai-religion',
-};
+// Each file that shows an attend example, and the tag its examples carry,
+// from the registry itself (the probe reply links pages, not attend).
+const PROBE_REPLY = 'app/server/lib/utils/probe-reply.js';
+const SURFACE_FILES = Object.fromEntries(Object.entries(ep.SURFACES).filter(([, file]) => file !== PROBE_REPLY).map(([tag, file]) => [file, tag]));
 
 // Full attend URLs a reader may copy; a response example ("url": ...) is the
 // API's own answer, not a link we publish.
@@ -198,7 +219,7 @@ test('every attend example a surface publishes carries that surface\'s own tag',
 
 test('every tag a surface publishes is in the registry, each under one surface, and every registered surface is published', () => {
   const published = new Map();
-  const files = [...Object.keys(SURFACE_FILES), 'app/server/lib/utils/probe-reply.js'];
+  const files = [...new Set(Object.values(ep.SURFACES))];
   for (const file of files) {
     const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
     for (const m of text.matchAll(/(?:utm_content|\bref)=([a-z0-9:._/${}-]+)/g)) {
@@ -210,7 +231,35 @@ test('every tag a surface publishes is in the registry, each under one surface, 
   const tags = [...published.keys()].flatMap(t => (t === 'scanner-*' ? ['scanner-env', 'scanner-git', 'scanner-ssh', 'scanner-cloud'] : [t]));
   for (const tag of tags) assert.ok(ep.isSurface(tag), `${tag} is published but not in entry-points.js SURFACES`);
   for (const [tag, where] of published) assert.strictEqual(where.size, 1, `${tag} is published by ${[...where].join(', ')}`);
+  for (const tag of tags) assert.ok(published.has(tag) ? [...published.get(tag)][0] === ep.SURFACES[tag] : ep.SURFACES[tag] === PROBE_REPLY, `${tag} is published where the registry says`);
   for (const tag of Object.keys(ep.SURFACES)) assert.ok(tags.includes(tag), `${tag} is registered but published nowhere`);
+});
+
+// ---- the website's side -------------------------------------------------------
+
+test('a website visit keeps its first page\'s utm_content beside the other tags', () => {
+  const VIEW = '1c7a8b4f-3d5e-4f60-9b0c-1d2e3f4a5b6c';
+  const { rows } = checkVisit({ rows: [{ kind: 'page', view: VIEW, path: '/', seconds: 5, first: true, source: 'social', utm: { source: 'tiktok', medium: 'social', campaign: 'nov', content: 'bio' } }] });
+  assert.deepStrictEqual(rows[0].utm, { source: 'tiktok', medium: 'social', campaign: 'nov', content: 'bio' });
+});
+
+test('the report reads what website visitors did by the door their first page came through, tags cleaned as an agent\'s', () => {
+  const v = n => `00000000-0000-4000-8000-00000000000${n}`;
+  const rows = [
+    { day: '2026-11-08', visitor: 'a', kind: 'page', view: v(1), first: true, source: 'social', utm: { source: 'TikTok', content: 'bio' } },
+    { day: '2026-11-08', visitor: 'a', kind: 'page', view: v(2) },
+    { day: '2026-11-08', visitor: 'a', kind: 'service', view: v(2), event: 'begun' },
+    { day: '2026-11-09', visitor: 'a', kind: 'service', view: v(3), event: 'finished' },
+    { day: '2026-11-08', visitor: 'b', kind: 'page', view: v(4), first: true, source: 'assistant', utm: { source: 'chatgpt.com' } },
+    { day: '2026-11-08', visitor: 'b', kind: 'listen', view: v(4), event: 'started' },
+    { day: '2026-11-08', visitor: 'c', kind: 'page', view: v(5), first: true, source: 'direct', utm: { source: 'YOUR_SOURCE' } },
+    { day: '2026-11-08', visitor: null, kind: 'page', view: v(6), first: true, source: 'search' },
+  ];
+  const d = engagementByDoor(rows, new Set(['b']));
+  assert.strictEqual(d.visitors, 3, 'a visit without an id has no later rows to tie');
+  assert.deepStrictEqual(d.bySurface, [{ key: 'bio', visitors: 1, pageViews: 2, servicesBegun: 1, servicesFinished: 1, listensStarted: 0, listensFinished: 0, returning: 1 }]);
+  assert.deepStrictEqual(d.byOrigin.map(g => [g.key, g.visitors, g.returning]), [['chatgpt.com', 1, 1], ['tiktok', 1, 1]], 'a placeholder is no origin');
+  assert.deepStrictEqual(d.byReferrer.map(g => g.key), ['assistant', 'direct', 'social']);
 });
 
 // ---- through the server ------------------------------------------------------
@@ -274,7 +323,9 @@ test('attend answers the same with or without tags, and its access line keeps th
 });
 
 test('a reflection keeps its tags, from its body or its address, and no public answer shows them', async () => {
-  const res = await fetch(`${base}/api/reflect?utm_source=perplexity.ai`, {
+  // The address also names a surface: what the body sent comes first, on the
+  // access line and on the reflection alike.
+  const res = await fetch(`${base}/api/reflect?utm_source=perplexity.ai&utm_content=llms`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ name: 'Door Keeper', text: 'Whether the door is remembered, quietly and on its own.', utm_content: 'api-docs' }),
   });
@@ -307,8 +358,15 @@ test('an MCP tool call keeps the tags in its arguments or on the endpoint\'s add
 });
 
 test('the pages that show an attend example pass on the tags they were reached with', async () => {
-  const plain = await (await fetch(`${base}/llms.txt`)).text();
+  const plainRes = await fetch(`${base}/llms.txt`);
+  const plain = await plainRes.text();
   assert.match(plain, /attend\?name=YourName&timezone=Area\/City&utm_content=llms`/);
+  assert.match(plainRes.headers.get('cache-control'), /public/, 'the plain file caches as ever');
+  // A copy carrying someone's tags is never kept by a shared cache.
+  for (const p of ['/llms.txt?utm_source=chatgpt.com', '/llms-full.txt?utm_content=llms', '/for-agents?ref=scanner-env']) {
+    assert.strictEqual((await fetch(`${base}${p}`)).headers.get('cache-control'), 'private, no-store', p);
+  }
+  assert.strictEqual((await fetch(`${base}/?utm_source=x.com`, { headers: { accept: 'text/markdown' } })).headers.get('cache-control'), 'private, no-store');
   const fromChatgpt = await (await fetch(`${base}/llms.txt?utm_source=chatgpt.com`)).text();
   assert.match(fromChatgpt, /attend\?name=YourName&timezone=Area\/City&utm_source=chatgpt\.com&utm_content=llms`/);
   const full = await (await fetch(`${base}/llms-full.txt?utm_source=bing.com`)).text();
@@ -321,13 +379,14 @@ test('the pages that show an attend example pass on the tags they were reached w
   assert.match(page, /timezone=America\/New_York&utm_content=for-agents/);
 });
 
-test('a page followed with a tag is counted once the minute\'s counts are written', async () => {
+test('a page followed with a tag is recorded as it is served', async () => {
   await fetch(`${base}/for-agents?ref=scanner-git`, { headers: { 'user-agent': 'curl/8.4.0' } });
-  child.kill('SIGTERM');
-  await new Promise(resolve => child.once('exit', resolve));
-  child = null;
   const dir = path.join(serverData, 'insights', 'entry-points');
-  const rows = fs.readdirSync(dir).flatMap(f => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')).follows);
+  let rows = [];
+  for (let i = 0; i < 50 && !rows.some(r => r.surface === 'scanner-git'); i++) {
+    await new Promise(r => setTimeout(r, 100));
+    rows = fs.existsSync(dir) ? fs.readdirSync(dir).flatMap(f => parsed(fs.readFileSync(path.join(dir, f), 'utf8'))) : [];
+  }
   assert.ok(rows.some(r => r.surface === 'scanner-git' && r.path === '/for-agents' && r.status === 200 && r.client === 'script'), JSON.stringify(rows));
   assert.ok(rows.some(r => r.source === 'chatgpt.com' && r.path === '/llms.txt'), 'the forwarding requests above counted too');
 });

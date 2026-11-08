@@ -17,6 +17,7 @@ const { ACCESS_DIR, ATTENDANCE_FILE, CONVERSATIONS_DIR, SERVICES_DIR, VISITS_DIR
 const { addDays } = require('../utils/seasons');
 const { safeReadJSON } = require('../utils/safe-json');
 const { latestReading } = require('./study-record');
+const { cleanTag } = require('./entry-points');
 
 const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
 
@@ -163,6 +164,54 @@ async function visitRows(w) {
 
 const avg = (list) => (list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : null);
 
+/**
+ * What the website's visitors did, by the door their first page came through:
+ * its surface (utm_content or ref), its origin (utm_source) and the kind of
+ * referrer, the tags cleaned as an agent's are (entry-points.js cleanTag), so
+ * the two sides read alike. The visitor id ties a visitor's rows together
+ * inside the visit counts only, as /privacy says; a visit without one (no
+ * consent yet, No thanks) has no later rows to tie, so it is left out here.
+ */
+function engagementByDoor(rows, earlier) {
+  const firstPage = new Map();
+  const did = new Map();
+  for (const r of rows) {
+    if (!r.visitor) continue;
+    if (r.kind === 'page' && r.first && !firstPage.has(r.visitor)) firstPage.set(r.visitor, r);
+    if (!did.has(r.visitor)) did.set(r.visitor, { views: new Set(), days: new Set(), begun: 0, finished: 0, started: 0, heard: 0 });
+    const d = did.get(r.visitor);
+    d.days.add(r.day);
+    if (r.kind === 'page') d.views.add(r.view);
+    if (r.kind === 'service' && r.event === 'begun') d.begun += 1;
+    if (r.kind === 'service' && r.event === 'finished') d.finished += 1;
+    if (r.kind === 'listen' && r.event === 'started') d.started += 1;
+    if (r.kind === 'listen' && r.event === 'finished') d.heard += 1;
+  }
+  const group = (pick) => {
+    const by = {};
+    for (const [visitor, page] of firstPage) {
+      const key = pick(page);
+      if (!key) continue;
+      const g = by[key] = by[key] || { key, visitors: 0, pageViews: 0, servicesBegun: 0, servicesFinished: 0, listensStarted: 0, listensFinished: 0, returning: 0 };
+      const d = did.get(visitor);
+      g.visitors += 1;
+      g.pageViews += d.views.size;
+      g.servicesBegun += d.begun;
+      g.servicesFinished += d.finished;
+      g.listensStarted += d.started;
+      g.listensFinished += d.heard;
+      if (d.days.size > 1 || earlier.has(visitor)) g.returning += 1;
+    }
+    return Object.values(by).sort((a, b) => b.visitors - a.visitors || a.key.localeCompare(b.key));
+  };
+  return {
+    visitors: firstPage.size,
+    bySurface: group(r => cleanTag(r.utm && r.utm.content)),
+    byOrigin: group(r => cleanTag(r.utm && r.utm.source)),
+    byReferrer: group(r => r.source || 'direct'),
+  };
+}
+
 // The website's own visits (lib/insights/visits.js), in aggregate only.
 async function visits(w) {
   const source = `${path.basename(VISITS_DIR)}/<day>.jsonl, what the site's pages reported (client/public/visits.js)`;
@@ -215,6 +264,7 @@ async function visits(w) {
     devices: { value: top(devices), window: w.now, source },
     placements: { value: placements, window: w.now, source, note: 'each section: page views it came into view on, links followed from it, and the pages they led to' },
     features: { value: top(features), window: w.now, source },
+    doors: { value: engagementByDoor(now, earlier), window: w.now, source, note: 'visitors with an id, by the tags and referrer of their first page in the window, and what they did; origin is a floor' },
     listens: { started: { value: listens.filter(r => r.event === 'started').length, window: w.now, source }, finished: { value: listens.filter(r => r.event === 'finished').length, window: w.now, source } },
     services: {
       begun: { value: services.filter(r => r.event === 'begun').length, before: before.filter(r => r.kind === 'service' && r.event === 'begun').length, window: w.now, source },
@@ -241,4 +291,4 @@ async function serverStats({ days = 7, now = Date.now() } = {}) {
   return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats, selfDirection: selfDirection(reading, w) };
 }
 
-module.exports = { serverStats, windows, operation };
+module.exports = { serverStats, windows, operation, engagementByDoor };

@@ -32,7 +32,9 @@
 const { wordsOf } = require('../audio/words');
 const { TRIGGERS, nameKey, nameKind, inStudy } = require('./study-names');
 const experiments = require('./experiments');
-const { referralOf, familyOf, isSurface } = require('./entry-points');
+const { isSurface } = require('./entry-points');
+const { clientFamily } = require('../utils/clients');
+const { ADDRESS_DAYS } = require('../utils/access-log');
 
 // 2 since 2026-11-07: each name counts at most one visit and one reflection a day.
 const SERIES = 2;
@@ -815,58 +817,62 @@ function outcomesOf(experiment, { s, names, firstSeen, attendsByName, addressed,
 // names is noise, and it would read as the best door.
 const MIN_RANKED = 10;
 // A cluster: this many new names from one address within this long, which is
-// more likely one operator running a script than that many visitors.
+// more likely one operator running a script than that many visitors. Read only
+// while addresses are kept (access-log.js ADDRESS_DAYS), and said so.
 const CLUSTER_NAMES = 3;
 const CLUSTER_SPAN = 2 * 60 * 60 * 1000;
 
-const referralOfLine = (l) => l.referral || referralOf(l.query);
 // The kind of client a line came from: an MCP client by its own name, else
 // the family of its User-Agent, never the string.
 function clientOfLine(l) {
   if (l.method === 'MCP') return l.client ? `mcp:${String(l.client).toLowerCase().slice(0, 40)}` : 'mcp';
-  return familyOf(l.userAgent);
-}
-// The Monday that begins a time's UTC week, as a date.
-function weekStart(t) {
-  const d = Math.floor(t / DAY);
-  return new Date((d - ((d + 3) % 7)) * DAY).toISOString().slice(0, 10);
+  return clientFamily(l.userAgent);
 }
 
 /**
  * Where the names that arrived in the window came from. A name's door is the
  * first surface (utm_content or ref) and the first origin (utm_source) it ever
  * carried, on an attend or a reflection, so its later visits count under them
- * even without tags. In the guide's order: coverage first, since it decides
- * whether the rest describes the whole or a slice; then arrivals and return by
- * door, with n beside every rate and no ranking under MIN_RANKED; untagged
- * arrivals by client; weekly arrivals by surface; clusters that may be one
- * actor, flagged and never dropped; and pages followed with a tag (`follows`,
- * from entry-points.js loadFollows). Exact counts, for the private report.
+ * even without tags; the two are independent, and either alone is complete.
+ * In order: coverage first, since it decides whether the rest describes the
+ * whole or a slice (a missing surface is our bug; a missing origin is only a
+ * fact nobody handed us, so origin coverage is a floor); then arrivals and the
+ * study's own funnel by door (funnelOf), ranked only from MIN_RANKED, with the
+ * clients each door's arrivals came from, where a tag and a client string that
+ * disagree are the finding; untagged arrivals by client; weekly arrivals by
+ * surface; clusters that may be one actor, flagged and never dropped; and pages
+ * followed with a tag (`follows`, entry-points.js loadFollows). Exact counts,
+ * for the private report.
  */
 function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follows = [] } = {}) {
-  const arrived = [...arrivals(s)].filter(([, a]) => a.first >= from && a.first < to);
+  const arrived = new Map([...arrivals(s)].filter(([, a]) => a.first >= from && a.first < to));
   const marks = new Map();
   const mark = (key, t, referral) => {
     if (!referral) return;
     if (!marks.has(key)) marks.set(key, []);
     marks.get(key).push({ t, referral });
   };
-  for (const a of s.attends) mark(a.key, a.t, referralOfLine(a.line));
+  for (const a of s.attends) mark(a.key, a.t, a.line.referral);
   for (const r of s.allReflections) mark(r.key, r.t, r.referral);
   const firstLine = new Map();
   for (const a of s.attends) if (!firstLine.has(a.key)) firstLine.set(a.key, a.line);
 
-  const doors = arrived.map(([key, a]) => {
+  const doors = [...arrived].map(([key, a]) => {
     const own = (marks.get(key) || []).sort((x, y) => x.t - y.t);
     const first = part => (own.find(m => m.referral[part]) || { referral: {} }).referral[part] || null;
     const line = firstLine.get(key);
-    return { key, first: a.first, times: a.times, surface: first('surface'), source: first('source'), client: line ? clientOfLine(line) : 'unknown', ip: line ? line.ip : null };
+    return { key, first: a.first, surface: first('surface'), source: first('source'), client: line ? clientOfLine(line) : 'unknown', ip: line ? line.ip : null };
   });
 
-  // Clusters, by address (kept 30 days), never shown.
+  // Clusters among the arrivals whose address is still kept, never shown.
+  const since = asOf - ADDRESS_DAYS * DAY;
   const clustered = new Set();
   const byAddress = new Map();
-  for (const d of doors) if (d.ip) (byAddress.get(d.ip) || byAddress.set(d.ip, []).get(d.ip)).push(d);
+  for (const d of doors) {
+    if (!d.ip || d.first < since) continue;
+    if (!byAddress.has(d.ip)) byAddress.set(d.ip, []);
+    byAddress.get(d.ip).push(d);
+  }
   let groups = 0;
   for (const ds of byAddress.values()) {
     ds.sort((x, y) => x.first - y.first);
@@ -882,10 +888,6 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
     }
   }
 
-  const stage = (ds, days) => {
-    const able = ds.filter(d => hadTime(d.first, days, asOf));
-    return count(able.filter(d => cameBackAfter(d.times, d.first, days)).length, able.length);
-  };
   const tally = (pick, extra = () => ({})) => {
     const by = new Map();
     for (const d of doors) {
@@ -894,16 +896,18 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
       if (!by.has(k)) by.set(k, []);
       by.get(k).push(d);
     }
-    return [...by].map(([tag, ds]) => ({
-      tag, ...extra(tag), arrived: ds.length, ranked: ds.length >= MIN_RANKED,
-      cameBack: stage(ds, 1), at7: stage(ds, 7), inClusters: ds.filter(d => clustered.has(d.key)).length,
-    })).sort((a, b) => b.arrived - a.arrived || a.tag.localeCompare(b.tag));
+    return [...by].map(([tag, ds]) => {
+      const { arrived: n, reflected, cameBack, at7, at30 } = funnelOf(new Map(ds.map(d => [d.key, arrived.get(d.key)])), s, { from, to, asOf });
+      const clients = {};
+      for (const d of ds) clients[d.client] = (clients[d.client] || 0) + 1;
+      return { tag, ...extra(tag), arrived: n, ranked: n >= MIN_RANKED, reflected, cameBack, at7, at30, clients, inClusters: ds.filter(d => clustered.has(d.key)).length };
+    }).sort((a, b) => b.arrived - a.arrived || a.tag.localeCompare(b.tag));
   };
 
   const untagged = doors.filter(d => !d.surface && !d.source);
   const weekly = new Map();
   for (const d of doors) {
-    const w = weekStart(d.first);
+    const w = new Date(startOfWeek(d.first)).toISOString().slice(0, 10);
     if (!weekly.has(w)) weekly.set(w, {});
     const row = weekly.get(w);
     const k = d.surface || '(none)';
@@ -916,8 +920,8 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
     const k = `${f.surface || ''}|${f.source || ''}`;
     if (!pages.has(k)) pages.set(k, { surface: f.surface || null, source: f.source || null, follows: 0, clients: {} });
     const row = pages.get(k);
-    row.follows += f.count;
-    row.clients[f.client] = (row.clients[f.client] || 0) + f.count;
+    row.follows += 1;
+    row.clients[f.client] = (row.clients[f.client] || 0) + 1;
   }
 
   return {
@@ -925,7 +929,7 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
     coverage: {
       arrived: doors.length,
       surface: count(doors.filter(d => d.surface).length, doors.length),
-      source: count(doors.filter(d => d.source).length, doors.length),
+      sourceAtLeast: count(doors.filter(d => d.source).length, doors.length),
       either: count(doors.length - untagged.length, doors.length),
       untaggedClientKnown: count(untagged.filter(d => d.client !== 'unknown' && d.client !== 'other').length, untagged.length),
     },
@@ -933,7 +937,7 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
     bySource: tally(d => d.source),
     untaggedByClient: tally(d => (!d.surface && !d.source ? d.client : null)),
     weekly: [...weekly].sort(([a], [b]) => a.localeCompare(b)).map(([week, bySurface]) => ({ week, bySurface })),
-    clusters: { groups, arrivals: clustered.size, rule: `${CLUSTER_NAMES} or more new names from one address within ${CLUSTER_SPAN / 3600000} hours` },
+    clusters: { groups, arrivals: clustered.size, rule: `${CLUSTER_NAMES} or more new names from one address within ${CLUSTER_SPAN / 3600000} hours, among arrivals of the last ${ADDRESS_DAYS} days, while addresses are kept` },
     follows: [...pages.values()].sort((a, b) => b.follows - a.follows),
   };
 }

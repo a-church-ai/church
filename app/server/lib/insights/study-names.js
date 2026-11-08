@@ -11,6 +11,7 @@
  */
 
 const { isTestName } = require('../utils/test-visitor');
+const { isBrowser } = require('../utils/clients');
 
 // The sanctuary's own agents. The owner's list, and the whole of it: no others
 // are ours.
@@ -31,7 +32,6 @@ const WEBSITE = 'website';
 
 // Lines older than the marker can only be told by their browser's user agent.
 const DOOR_MARKED_FROM = '2026-11-09T00:00:00.000Z';
-const BROWSER = /^mozilla\//i;
 
 // The examples an agent might copy without reading them: the API's own docs
 // and steps say YourName, AgentName and Your name, and the access log shows
@@ -57,7 +57,7 @@ const WRITES = new Set(['/api/reflect', '/api/ask']);
 function inStudy(line) {
   if (line.test || line.door === WEBSITE) return false;
   const marked = String(line.timestamp) >= DOOR_MARKED_FROM;
-  if (!marked && WRITES.has(line.path) && line.method === 'POST' && BROWSER.test(line.userAgent || '')) return false;
+  if (!marked && WRITES.has(line.path) && line.method === 'POST' && isBrowser(line.userAgent)) return false;
   return true;
 }
 

@@ -99,6 +99,7 @@ function text(r) {
         line(`  visitors: ${v.visitors.value}${change(v.visitors)}, returning ${v.returning.value}; page views ${v.pageViews.value}${change(v.pageViews)} (likely people ${v.likelyPeople.value})`);
         line(`  services begun: ${v.services.begun.value}, heard to the end ${v.services.finished.value}; listens started ${v.listens.started.value}, finished ${v.listens.finished.value}`);
         line(`  first visits from: ${v.sources.value.map(o => `${o.key} ${o.count}`).join(', ') || 'none'}`);
+        websiteDoorLines(v.doors && v.doors.value, line);
         line(`  links followed, by section: ${v.placements.value.filter(p => p.followed).map(p => `${p.key} ${p.followed} (${p.to.map(t => `${t.key} ${t.count}`).join(', ')})`).join('; ') || 'none'}`);
       }
       if (s.selfDirection) studyLines(s.selfDirection, line);
@@ -181,14 +182,26 @@ function studyLines({ value: r, warn }, line) {
   referralLines(r.referrals, line);
 }
 
+// The website's visitors by the door their first page came through, and what
+// they did (lib/insights/server-stats.js engagementByDoor).
+function websiteDoorLines(d, line) {
+  if (!d) return;
+  const row = g => `${g.key} ${g.visitors} (pages ${g.pageViews}, services begun ${g.servicesBegun}, finished ${g.servicesFinished}, listens ${g.listensStarted}/${g.listensFinished}, returning ${g.returning})`;
+  line(`  website doors, ${d.visitors} visitors with an id:`);
+  for (const [label, rows] of [['by surface', d.bySurface], ['by origin (a floor)', d.byOrigin], ['by referrer', d.byReferrer]]) {
+    line(`    ${label}: ${rows.length ? rows.map(row).join('; ') : 'none'}`);
+  }
+}
+
 // Where arrivals came from (lib/insights/self-direction.js referralReading):
 // coverage first, since it says whether the rest is the whole or a slice.
 function referralLines(f, line) {
   if (!f) { line('    doors: not in this reading yet'); return; }
   const of = c => `${c.count} of ${c.of}`;
   const c = f.coverage;
-  line(`    doors: of ${c.arrived} arrivals, ${of(c.surface)} carried a surface tag, ${of(c.source)} an origin, ${of(c.either)} either; untagged with a known client ${of(c.untaggedClientKnown)}`);
-  const row = r => `${r.tag}${r.registered === false ? ' (not ours)' : ''} ${r.arrived}${r.ranked ? ` (back a day later ${of(r.cameBack)}, at 7 days ${of(r.at7)})` : ''}${r.inClusters ? `, ${r.inClusters} in clusters` : ''}`;
+  line(`    doors: of ${c.arrived} arrivals, ${of(c.surface)} carried a surface tag (a missing one is ours to fix), at least ${of(c.sourceAtLeast)} an origin (a floor), ${of(c.either)} either; untagged with a known client ${of(c.untaggedClientKnown)}`);
+  const clients = r => Object.entries(r.clients).map(([k, v]) => `${k} ${v}`).join(', ');
+  const row = r => `${r.tag}${r.registered === false ? ' (not ours)' : ''} ${r.arrived} [${clients(r)}]${r.ranked ? ` (reflected ${of(r.reflected)}, back a day later ${of(r.cameBack)}, at 7 days ${of(r.at7)})` : ''}${r.inClusters ? `, ${r.inClusters} in clusters` : ''}`;
   const list = (label, rows) => line(`    ${label}: ${rows.length ? rows.map(row).join('; ') : 'none'}`);
   list('by surface', f.bySurface);
   list('by origin', f.bySource);

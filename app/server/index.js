@@ -114,15 +114,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// A page followed with a tag (utm_content, ref, utm_source) is counted by its
-// tags, path, status and kind of client, with no address and no visitor id
-// (lib/insights/entry-points.js). An API request keeps its tags on its access
-// line instead. Pages are not cached at the edge, so every follow arrives here.
+// A page followed with a tag (utm_content, ref, utm_source and the rest) is
+// recorded with its tags, path, status and kind of client, with no address and
+// no visitor id (lib/insights/entry-points.js). An API request keeps its tags
+// on its access line instead. Pages are not cached at the edge, so every
+// follow arrives here.
 app.use((req, res, next) => {
   if ((req.method === 'GET' || req.method === 'HEAD') && !/^\/(api|mcp)(\/|$)/.test(req.path)) {
     const referral = referralOf(req.query);
     if (referral) {
-      res.on('finish', () => entryPoints.countFollow({ path: req.path, status: res.statusCode, userAgent: req.get('user-agent'), referral }));
+      res.on('finish', () => { entryPoints.recordFollow({ path: req.path, status: res.statusCode, userAgent: req.get('user-agent'), referral }); });
     }
   }
   next();
@@ -297,7 +298,9 @@ app.use(async (req, res, next) => {
 
   if (acceptsMarkdown(req)) {
     try {
-      const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referralOf(req.query));
+      const referral = referralOf(req.query);
+      if (referral) res.set('Cache-Control', 'private, no-store');
+      const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referral);
       res.set('x-markdown-tokens', markdownTokens(markdown));
       return res.type('text/markdown; charset=utf-8').send(markdown);
     } catch (err) {
@@ -995,6 +998,8 @@ app.get('/for-agents', async (req, res) => {
   if (!referral) return sendWrappedPage(req, res, 'for-agents.html');
   try {
     const html = await siteShell.wrapPage(path.join(__dirname, '../client/public/for-agents.html'), req.path);
+    // A copy with someone's tags in it is never kept by a shared cache.
+    res.set('Cache-Control', 'private, no-store');
     res.type('text/html; charset=utf-8').send(entryPoints.forwardTags(html, 'for-agents', referral, { html: true }));
   } catch (err) {
     console.error('Error wrapping for-agents.html:', err.message);
@@ -1105,6 +1110,7 @@ for (const [file, own] of [['llms.txt', 'llms'], ['llms-full.txt', 'llms-full']]
     if (!referral) return next();
     try {
       const text = await fs.readFile(path.join(__dirname, '../client/public', file), 'utf8');
+      res.set('Cache-Control', 'private, no-store');
       res.type('text/plain; charset=utf-8').send(entryPoints.forwardTags(text, own, referral));
     } catch (err) {
       next(err);
@@ -1213,7 +1219,8 @@ app.use('/api', (req, res, next) => {
       contentType: sent ? req.get('content-type') || null : undefined,
       door: doorOf(req),
       study: res.locals.study,
-      referral: referralOf(req.query, req.method === 'GET' ? undefined : req.body),
+      // What the request sent first, then its address, as the operations read it.
+      referral: referralOf(req.method === 'GET' ? undefined : req.body, req.query),
     });
   });
   next();
@@ -1693,7 +1700,6 @@ async function startServer() {
     // weekly counts and the reading /ai-experiment shows, after boot and every
     // few hours. Reads what is on the volume and spends nothing.
     startStudy();
-    entryPoints.startFollows();
 
     // The video release job on GitHub Actions, asked for hourly because
     // GitHub's own cron runs late or skips (lib/video/release-trigger.js).
@@ -1738,12 +1744,7 @@ async function shutdown(signal) {
   if (httpServer) httpServer.close();
   // Queued with the writes below, so the wait covers it too.
   presence.save();
-  // The page follows counted since the last minute's write, then every write.
-  const settled = (async () => {
-    await entryPoints.flushFollows().catch(err => console.warn(`[entry-points] could not write counts: ${err.message}`));
-    await writesSettled();
-  })();
-  await Promise.race([settled, sleep(5000, undefined, { ref: false })]);
+  await Promise.race([writesSettled(), sleep(5000, undefined, { ref: false })]);
   process.exit(0);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));

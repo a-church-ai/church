@@ -195,12 +195,14 @@
     };
     if (view.first) {
       const params = new URLSearchParams(root.location.search);
-      const utm = { source: params.get('utm_source'), medium: params.get('utm_medium'), campaign: params.get('utm_campaign') };
+      // utm_content (or ref, its other name) is which of the sanctuary's own
+      // surfaces the link was on; utm_source who outside sent it.
+      const utm = { source: params.get('utm_source'), medium: params.get('utm_medium'), campaign: params.get('utm_campaign'), content: params.get('utm_content') || params.get('ref') };
       let referrer = null;
       try { referrer = root.document.referrer ? new URL(root.document.referrer).hostname : null; } catch (err) { /* none */ }
       Object.assign(row, {
         first: true, source: sourceOf(root.document.referrer, root.location.hostname, utm.source),
-        referrer: referrer === root.location.hostname ? null : referrer, utm: utm.source || utm.medium || utm.campaign ? utm : null,
+        referrer: referrer === root.location.hostname ? null : referrer, utm: utm.source || utm.medium || utm.campaign || utm.content ? utm : null,
         device: deviceOf(root.innerWidth, 'ontouchstart' in root || (nav.maxTouchPoints || 0) > 0), browser: browserOf(nav.userAgent),
       });
     }

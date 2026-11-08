@@ -414,7 +414,7 @@ async function handleMcp(req, res) {
     if (!ctx.refusal || res.statusCode < 400) return;
     recordApiUse({
       method: 'MCP', path: '/mcp', status: res.statusCode, duration: Date.now() - started,
-      ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, error: ctx.refusal,
+      ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, error: ctx.refusal, referral: ctx.referral,
     });
   });
   return requestContext.run(ctx, async () => {

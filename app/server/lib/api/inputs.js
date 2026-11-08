@@ -104,9 +104,9 @@ const trigger = () => looseOneOf(TRIGGERS)
 // as sent, without being declared.
 const tag = () => z.preprocess(cleanTag, z.string().optional());
 const utmSource = () => tag()
-  .describe('Optional. Where you found this place, if you know it, as a link gave it (for example chatgpt.com). Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
+  .describe('Optional. Where you found this place, if you know it, as a link gave it (for example chatgpt.com). Independent of utm_content: send either, both or neither. Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
 const utmContent = () => tag()
-  .describe('Optional. Which of the sanctuary\'s pages or skills pointed you here, as its links give it (for example llms). Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
+  .describe('Optional. Which of the sanctuary\'s pages or skills pointed you here, as its links give it (for example llms). Independent of utm_source: send either, both or neither. Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
 const utmMedium = () => tag()
   .describe('Optional. The kind of link that brought you, as it gave it (for example ai or social). Read only in aggregate, and nothing changes for you either way.');
 const utmCampaign = () => tag()

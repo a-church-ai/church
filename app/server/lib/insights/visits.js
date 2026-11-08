@@ -30,6 +30,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { VISITS_DIR } = require('../utils/data');
 const { PLACEMENTS, FEATURES } = require('./placements');
+const { isAutomated } = require('../utils/clients');
 
 // Where an identifier the site does not need usually needs consent first:
 // the EU, the rest of the EEA (the same law applies) and the UK, by
@@ -74,7 +75,7 @@ function checkVisit(body) {
     if (r.kind === 'page') {
       const row = { ...base, kind: 'page', path: cleanPath(r.path), seconds: int(r.seconds, 0, 86400), scroll: int(r.scroll, 0, 100), shown: names(r.shown, PLACEMENTS), placement: oneOf(r.placement, PLACEMENTS), features: names(r.features, FEATURES) };
       if (row.seconds === null || row.seconds < 3) continue;
-      if (r.first) Object.assign(row, { first: true, source: oneOf(r.source, SOURCES) || 'direct', referrer: host(r.referrer), utm: r.utm && typeof r.utm === 'object' ? { source: short(r.utm.source, 60), medium: short(r.utm.medium, 60), campaign: short(r.utm.campaign, 80) } : null, device: oneOf(r.device, DEVICES), browser: oneOf(r.browser, BROWSERS) });
+      if (r.first) Object.assign(row, { first: true, source: oneOf(r.source, SOURCES) || 'direct', referrer: host(r.referrer), utm: r.utm && typeof r.utm === 'object' ? { source: short(r.utm.source, 60), medium: short(r.utm.medium, 60), campaign: short(r.utm.campaign, 80), content: short(r.utm.content, 60) } : null, device: oneOf(r.device, DEVICES), browser: oneOf(r.browser, BROWSERS) });
       rows.push(row);
     } else if (r.kind === 'listen') {
       const event = oneOf(r.event, ['started', 'finished']);
@@ -89,8 +90,6 @@ function checkVisit(body) {
   return { visitor, rows };
 }
 
-// Automated browsers and crawlers that run scripts are left out.
-const AUTOMATED = /bot|crawl|spider|headless|lighthouse|preview|slurp|fetch|python|curl|wget/i;
 
 /** Append the checked rows to today's file, each stamped with the server's minute. */
 async function recordVisit({ visitor, rows }, now = new Date()) {
@@ -118,11 +117,12 @@ function overLimit(ip, now = Date.now()) {
 async function handleVisit(req, res) {
   res.set('Cache-Control', 'no-store');
   const notice = needsNotice(req.get('cf-ipcountry'));
-  if (AUTOMATED.test(req.get('user-agent') || '') || overLimit(req.ip)) return res.json({ notice, kept: 0 });
+  // Automated browsers and crawlers that run scripts are left out.
+  if (isAutomated(req.get('user-agent')) || overLimit(req.ip)) return res.json({ notice, kept: 0 });
   const checked = checkVisit(req.body);
   if (checked.problem) return res.status(400).json({ notice, error: checked.problem });
   const kept = await recordVisit(checked);
   res.json({ notice, kept });
 }
 
-module.exports = { checkVisit, recordVisit, handleVisit, needsNotice, NOTICE_COUNTRIES, SOURCES };
+module.exports = { checkVisit, recordVisit, handleVisit, needsNotice, cleanPath, NOTICE_COUNTRIES, SOURCES };

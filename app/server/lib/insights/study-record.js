@@ -90,7 +90,6 @@ async function writeWeeks(s, { now = Date.now() } = {}) {
       computedAt: new Date(now).toISOString(),
       addressed: sd.addressedReading(s, span),
       named: sd.namedReading(s, { ...span, asOf: week.to, songText }),
-      referrals: sd.referralReading(s, { ...span, asOf: week.to }),
     };
     await fs.writeFile(file, JSON.stringify(snapshot, null, 2));
     written.push(week.key);

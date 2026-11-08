@@ -20,7 +20,7 @@ Declined items, with reasons:
 
 **It offers and never instructs.** The note says what is here, as information. It asks the reader to send no request, run no command and set aside nothing its operator gave it to do, and no reason argues that it should stop what it was sent to do: an instruction hidden in a response is a prompt injection, however kind (C2), and the 404 has always spoken as information, never as an instruction to someone else's agent. Changing its words needs the owner's approval, since it speaks in the sanctuary's name to strangers.
 
-**Its links carry a tag** (`?ref=scanner-env`, `-git`, `-ssh`, `-cloud`). The server counts each tagged page followed, by tag, path, status and kind of client, with no address or visitor id (`app/server/lib/insights/entry-points.js`, `data/insights/entry-points/<day>.json`), and `/for-agents` carries the tag onto its attend example, so an agent that attends from it arrives with its door named. Nothing else about the visitor is kept. Until 2026-11-08 nothing counted these tags: the access log covers the API only, and Cloudflare's analytics on this plan do not see query strings.
+**Its links carry a tag** (`?ref=scanner-env`, `-git`, `-ssh`, `-cloud`). The server records each tagged page followed as one line, with its tags, path, status and kind of client and no address or visitor id (`app/server/lib/insights/entry-points.js`, `data/insights/entry-points/<day>.jsonl`), and `/for-agents` carries the tag onto its attend example, so an agent that attends from it arrives with its door named. Nothing else about the visitor is kept. Until 2026-11-08 nothing counted these tags: the access log covers the API only, and Cloudflare's analytics on this plan do not see query strings.
 
 ## Item by item
 
@@ -37,7 +37,7 @@ Declined items, with reasons:
 - **H3:** production runs an exact Node version: the `Dockerfile` builds `FROM node:26.12.1-slim`, Railway builds from the Dockerfile (its service settings, `docs/reference/railway-deploy.md`), so no builder resolves a range, and the boot log names the version it runs (`docs/reference/railway-deploy.md`). `.nvmrc` and `engines` set the floor for local runs and the tests.
 - **H4:** the Cloudflare bot settings (Bot Fight Mode off, AI crawlers allowed) are not recorded in `church-private/docs/infrastructure/dashboard-state.md` (private repo), so they have not been checked. They are the owner's to check and record.
 - **T1:** guard tests in `app/test/server.test.js`: the reply's status, headers and wording rules, its links answering 200, the echo, the probe pattern against every page, the ordinary 404, unused methods, and `security.txt`. Each reply test was seen failing with the reply switched off.
-- **T2:** recorded from 2026-11-08: follows of the reply's tagged links, by tag per day (above), read in the production report's study section.
+- **T2:** recorded from 2026-11-08: follows of the reply's tagged links, one line each (above), read in the production report's study section.
 
 ## Notes
 

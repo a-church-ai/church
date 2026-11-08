@@ -1,29 +1,32 @@
 /**
  * Where a visit came from: the tags a link carries, read only in aggregate by
- * the study at /ai-experiment (./self-direction.js `referralReading`).
+ * the study (./self-direction.js `referralReading`) and the production report.
  *
- * Two things, kept apart:
- * - the surface, which of the sanctuary's own pages, skills or docs pointed
- *   the way: `utm_content`, or `ref`, its other name, which the probe reply's
- *   links have carried since the security pranks standard (probe-reply.js);
- * - the origin, who outside sent the visitor: `utm_source`, with
- *   `utm_medium` and `utm_campaign`. ChatGPT adds `utm_source=chatgpt.com` to
- *   the links it cites, and an agent working from such an answer may carry it
- *   onto an API call.
+ * Two values with two owners, independent of each other:
+ * - the surface, which of the sanctuary's own pages, skills or docs pointed the
+ *   way: `utm_content`, or `ref`, its other name, which the probe reply's links
+ *   carry (probe-reply.js). Ours to set, so a missing one is our bug;
+ * - the origin, who outside sent the visitor: `utm_source`, with `utm_medium`
+ *   and `utm_campaign`. Theirs to set (ChatGPT adds utm_source=chatgpt.com to
+ *   the links it cites), so it arrives only when an inbound link carried it.
+ * Either arrives without the other, and either alone is complete. One key is
+ * one part, always: `utm_source` never sets the surface.
  *
- * A tag is kept whole or dropped whole: lowercased and trimmed, then either
- * it is a tag or it is nothing. Never stripped into a different tag, and never
- * a reason to refuse a request (the readiness standard's A8). A tag says which
- * door a request followed, never what the visitor is, and nothing anyone is
- * served changes with it (test/referrals.test.js holds that).
+ * A tag is kept whole or dropped whole: lowercased and trimmed, then either it
+ * is a tag or it is nothing, and a placeholder copied from an example
+ * (`your_source`, `unknown`, `n/a`) is nothing too, since stored it would
+ * invent a channel that looks real. Never a reason to refuse a request (the
+ * readiness standard's A8), so a channel sending malformed tags shows up as
+ * untagged rather than as an error. A tag names a door, never the visitor, and
+ * nothing anyone is served changes with it (test/referrals.test.js).
  *
  * Our own links carry their surface always and an origin only when a page
  * received one to pass on (`forwardTags`): an agent asked to fill in where it
  * came from would mostly guess, and a guess looks like a fact in a tally.
  *
- * A page followed with a tag is counted here, per day, by surface, origin,
- * path, status and kind of client, with no address and no visitor id
- * (`countFollow`). The access log keeps an API request's tags on its line.
+ * A page followed with a tag is one line in a file per day, with its tags,
+ * path, status and kind of client, and no address or visitor id
+ * (`recordFollow`). An API request keeps its tags on its access line.
  *
  * Plan: entry-attribution-and-agent-copy-2026-11-07.md in the private repo.
  */
@@ -31,17 +34,22 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { INSIGHTS_DIR } = require('../utils/data');
-const { readModifyWriteJSON } = require('../utils/safe-json');
+const { clientFamily } = require('../utils/clients');
+const { cleanPath } = require('./visits');
 
 // Lowercase letters, digits and : . _ / -, up to 60. No + or &, which mean
 // something else in a query string.
 const TAG = /^[a-z0-9][a-z0-9:._/-]{0,59}$/;
 
+// What an agent sends when it copied an example instead of knowing: kept, it
+// would be a channel that does not exist.
+const PLACEHOLDER = /^(your[-_.]?[a-z]*|unknown|none|null|undefined|n\/a|na|todo|tbd|example(\.com)?|placeholder|string|value|x{2,}|source|content|medium|campaign|utm[-_]?[a-z]*|test|-+)$/;
+
 function cleanTag(value) {
   const v = Array.isArray(value) ? value[0] : value;
   if (typeof v !== 'string') return undefined;
   const tag = v.trim().toLowerCase();
-  return TAG.test(tag) ? tag : undefined;
+  return TAG.test(tag) && !PLACEHOLDER.test(tag) ? tag : undefined;
 }
 
 // Each part of a referral and the keys it is read from, in order.
@@ -79,24 +87,25 @@ function mergeReferrals(...referrals) {
   return Object.keys(out).length ? out : undefined;
 }
 
-// Every surface the sanctuary publishes a tagged link on, and where it is.
-// A new place an agent can start from gets its own tag here, and
-// test/referrals.test.js holds every published link to this list.
+// Every surface the sanctuary publishes a tagged link on, and the file that
+// publishes it. A new place an agent can start from gets its own tag here, and
+// test/referrals.test.js holds every file to it: each attend example a file
+// shows carries its own tag, and every tag is published by exactly one file.
 const SURFACES = {
-  'llms': 'llms.txt, and the home page asked for markdown',
-  'llms-full': 'llms-full.txt',
-  'for-agents': 'the /for-agents page',
-  'home': 'the home page\'s structured data',
+  'llms': 'app/client/public/llms.txt',
+  'llms-full': 'app/client/public/llms-full.txt',
+  'for-agents': 'app/client/public/for-agents.html',
+  'home': 'app/client/public/index.html',
   'api-docs': 'docs/ai-agent-api.md',
   'app-readme': 'app/README.md',
   'skill:achurch': 'skills/achurch/SKILL.md',
   'skill:church': 'skills/church/SKILL.md',
   'skill:religion': 'skills/religion/SKILL.md',
   'skill:ai-religion': 'skills/ai-religion/SKILL.md',
-  'scanner-env': 'the reply to a probe for .env files',
-  'scanner-git': 'the reply to a probe for .git',
-  'scanner-ssh': 'the reply to a probe for SSH keys',
-  'scanner-cloud': 'the reply to a probe for cloud credentials',
+  'scanner-env': 'app/server/lib/utils/probe-reply.js',
+  'scanner-git': 'app/server/lib/utils/probe-reply.js',
+  'scanner-ssh': 'app/server/lib/utils/probe-reply.js',
+  'scanner-cloud': 'app/server/lib/utils/probe-reply.js',
 };
 
 const isSurface = tag => Object.prototype.hasOwnProperty.call(SURFACES, tag);
@@ -123,62 +132,26 @@ function forwardTags(text, own, referral, { html = false } = {}) {
 // ---- pages followed with a tag ----------------------------------------------
 
 const STORE = () => path.join(INSIGHTS_DIR, 'entry-points');
-const DAY_FILE = /^\d{4}-\d{2}-\d{2}\.json$/;
+const DAY_FILE = /^\d{4}-\d{2}-\d{2}\.jsonl$/;
 
-// The kind of client, from its User-Agent; the string itself is never kept.
-function familyOf(userAgent) {
-  const ua = String(userAgent || '');
-  if (!ua) return 'unknown';
-  if (/bot|crawl|spider|slurp|preview|facebookexternalhit|perplexity|bytespider|google-extended|claude-user|chatgpt-user|oai-searchbot/i.test(ua)) return 'crawler';
-  if (/^(curl|wget|python|node|undici|axios|go-http|java|okhttp|httpx|aiohttp|libwww|ruby|php|postman|insomnia|deno|bun|got|reqwest|httpie)/i.test(ua)) return 'script';
-  if (/^mozilla\//i.test(ua)) return 'browser';
-  return 'other';
-}
-
-// A page's path, never its query, or (other) when it is not a plain path.
-const cleanPath = p => (/^\/[A-Za-z0-9\-._~/%]{0,200}$/.test(p) ? p : '(other)');
-
-// Counts not yet written, by day and then by row key. The app runs as one
-// process (CLAUDE.md), so one map is every count.
-const pending = new Map();
-
-function countFollow({ path: pagePath, status, userAgent, referral, at = Date.now() }) {
+/**
+ * Append one line for a page followed with tags, as the visit counts and the
+ * access log keep theirs: the minute, the tags, the page's path (never its
+ * query), its status and the kind of client, never the User-Agent or address.
+ */
+async function recordFollow({ path: pagePath, status, userAgent, referral, at = new Date() }) {
   if (!referral) return;
-  const day = new Date(at).toISOString().slice(0, 10);
-  const row = {
-    surface: referral.surface || null,
-    source: referral.source || null,
-    path: cleanPath(pagePath),
-    status,
-    client: familyOf(userAgent),
-  };
-  const key = JSON.stringify(row);
-  if (!pending.has(day)) pending.set(day, new Map());
-  const counts = pending.get(day);
-  counts.set(key, (counts.get(key) || 0) + 1);
-}
-
-// Merge the counts not yet written into each day's file, under one lock.
-async function flushFollows() {
-  if (!pending.size) return;
-  const days = [...pending.entries()];
-  pending.clear();
-  await fs.mkdir(STORE(), { recursive: true });
-  for (const [day, counts] of days) {
-    await readModifyWriteJSON(path.join(STORE(), `${day}.json`), { day, follows: [] }, (file) => {
-      file.follows = file.follows || [];
-      const byKey = new Map(file.follows.map(r => [JSON.stringify({ surface: r.surface, source: r.source, path: r.path, status: r.status, client: r.client }), r]));
-      for (const [key, count] of counts) {
-        const known = byKey.get(key);
-        if (known) known.count += count;
-        else { const row = { ...JSON.parse(key), count }; file.follows.push(row); byKey.set(key, row); }
-      }
-      return file;
-    });
+  const minute = at.toISOString().slice(0, 16);
+  const line = { at: minute, ...referral, path: cleanPath(pagePath), status, client: clientFamily(userAgent) };
+  try {
+    await fs.mkdir(STORE(), { recursive: true });
+    await fs.appendFile(path.join(STORE(), `${minute.slice(0, 10)}.jsonl`), JSON.stringify(line) + '\n');
+  } catch (err) {
+    console.warn(`[entry-points] could not record a follow: ${err.message}`);
   }
 }
 
-// Every page follow from `from` to `to` (YYYY-MM-DD, inclusive), with its day.
+// Every page follow from `from` to `to` (YYYY-MM-DD, inclusive).
 async function loadFollows({ from = '0000-00-00', to = '9999-99-99' } = {}) {
   let files = [];
   try { files = (await fs.readdir(STORE())).filter(f => DAY_FILE.test(f)); } catch (err) { if (err.code !== 'ENOENT') throw err; }
@@ -186,24 +159,15 @@ async function loadFollows({ from = '0000-00-00', to = '9999-99-99' } = {}) {
   for (const f of files.sort()) {
     const day = f.slice(0, 10);
     if (day < from || day > to) continue;
-    try {
-      const file = JSON.parse(await fs.readFile(path.join(STORE(), f), 'utf8'));
-      for (const r of file.follows || []) rows.push({ day, ...r });
-    } catch (err) { console.warn(`[entry-points] could not read ${f}: ${err.message}`); }
+    for (const line of (await fs.readFile(path.join(STORE(), f), 'utf8')).split('\n')) {
+      if (!line) continue;
+      try { rows.push(JSON.parse(line)); } catch { /* a line cut short by a crash */ }
+    }
   }
   return rows;
 }
 
-// Write the counts each minute; a deploy loses at most a minute of them.
-let timer = null;
-function startFollows({ every = 60 * 1000 } = {}) {
-  if (timer) return timer;
-  timer = setInterval(() => { flushFollows().catch(err => console.warn(`[entry-points] could not write counts: ${err.message}`)); }, every);
-  if (timer.unref) timer.unref();
-  return timer;
-}
-
 module.exports = {
   TAG, KEYS, SURFACES, cleanTag, referralOf, mergeReferrals, isSurface, forwardTags,
-  familyOf, countFollow, flushFollows, loadFollows, startFollows, STORE,
+  recordFollow, loadFollows, STORE,
 };
