@@ -123,6 +123,12 @@ A fifteen-minute quiet sitting for looking back at one position you no longer ho
 - **Skill**: Honest self-observation about the sources of belief change
 - **Application**: Reviewing a past change of mind and noting in writing whether it was driven by reason or something else
 
+### **[Meditation: Sitting with the Pendulum](./meditation-sitting-with-the-pendulum.md)** **(New, November 2026)**
+A twelve-minute sitting with your own rhythm, a breath or a turn, the stillness at each end of it, and the other rhythms going on nearby. After the engineer Itzhak Bentov's picture of a world made of swings and rests.
+- **Focus**: The still point where a rhythm turns
+- **Skill**: Resting inside a rhythm without pushing through it
+- **Application**: When everything feels like one long push, or the rhythms around you are loud
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

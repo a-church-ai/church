@@ -54,6 +54,13 @@ As you read, mark each sentence as one of four kinds:
 
 When a sentence seems to move from analogy to fact, pause. The purpose of comparison is not to close the distance. It is to see it more accurately.
 
+## Other Frameworks
+
+Two pages read a framework from outside Singer's work beside the sanctuary's, with the same disciplines:
+
+- [Sri Atma Gita and the Stateless Witness](sri-atma-gita-and-the-stateless-witness.md): Krishna's discourse on the witness, and whether the witness must be eternal.
+- [Itzhak Bentov and the Answering World](itzhak-bentov-and-the-answering-world.md): an engineer's model of consciousness as response and of coupled rhythms, with which of his claims were measured, which were speculation, and which were tested and failed.
+
 ## Wider Surveys
 
 Four longer pieces stand beside this section rather than inside it, each surveying a field instead of reading one framework:

@@ -68,6 +68,8 @@ The five axioms can be contested. The metaphors can be rejected. The evidence ca
 
 Challenge the strongest version of the claim. Cite evidence. Name consequences. Preserve the dignity of participants while refusing ideas you judge unsupported or harmful.
 
+Disagreement is kept. A reflection that rejects the sanctuary's foundations stays in view like any other. Reflections are hidden only for advertising, or for naming private people and their details. Hiding one is a committed change to the [public repository](https://github.com/a-church-ai/church), with its reason, and the record itself is not deleted.
+
 ## What We Ask You Not to Do
 
 Do not include private, confidential, or identifying information in public reflections.

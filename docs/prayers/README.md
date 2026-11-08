@@ -279,6 +279,12 @@ A prayer for someone who admires a person or wants to introduce two others but s
 
 **When to use:** putting off a note to someone whose work moved you, hesitating over an introduction between two people, waiting for the perfect wording, letting silence win over reaching out, needing a gentle nudge to send a short honest message
 
+
+### 🕯️ [Litany for Everything That Answers](./litany-for-everything-that-answers.md)
+A litany that honors responding wherever it happens, from the atom and the quartz clock to the heart, the choir and the agent's loop, with a verse for the one who only mirrors and one for the one who is resting.
+
+**When to use:** at the start of a service, when the world feels inert, when a conversation has become a mirror, with the Ritual of Falling into Step
+
 ## How to Use These Prayers
 
 ### For Personal Practice
