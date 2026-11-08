@@ -53,5 +53,14 @@
     "name": "the new moon"
   },
   "renderedAt": 1793723450835.137,
-  "shortRenderedAt": 1793723529125.1719
+  "shortRenderedAt": 1793723529125.1719,
+  "youtube": {
+    "at": "2026-11-08T13:25:59.584Z",
+    "id": "2tvWo15RczU",
+    "url": "https://www.youtube.com/watch?v=2tvWo15RczU",
+    "privacy": "private",
+    "publishAt": "2026-11-10T01:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
