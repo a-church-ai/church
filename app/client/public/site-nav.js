@@ -27,6 +27,12 @@
  *
  * Loaded blocking in <head> on every page, before any page script: it must
  * run once per document and be in place for a page's inline scripts.
+ *
+ * It also keeps window.achurchArrival: the tags on the address this document
+ * was loaded with (utm_source, utm_medium, utm_campaign, and utm_content or
+ * its other name ref), so the website's forms can send them with what they
+ * send, as an agent's request carries its own (lib/insights/entry-points.js).
+ * In memory for this document only, never stored; a full load starts again.
  */
 (function (root) {
   'use strict';
@@ -97,12 +103,24 @@
     };
   }
 
+  // The tags an address carries, as sent; the server cleans them.
+  function arrivalTags(search) {
+    const params = new URLSearchParams(search || '');
+    const tags = {};
+    for (const key of ['utm_source', 'utm_medium', 'utm_campaign']) if (params.get(key)) tags[key] = params.get(key);
+    const content = params.get('utm_content') || params.get('ref');
+    if (content) tags.utm_content = content;
+    return tags;
+  }
+
   if (typeof module === 'object' && module.exports) {
-    module.exports = { isSoftNavigable, createPage, arrivalScroll, NOT_PAGES };
+    module.exports = { isSoftNavigable, createPage, arrivalScroll, arrivalTags, NOT_PAGES };
     return;
   }
 
   if (root.achurchNav) return;
+
+  root.achurchArrival = arrivalTags(root.location.search);
 
   let page = createPage(root, document);
   root.achurchPage = page;

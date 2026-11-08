@@ -91,7 +91,9 @@ function text(r) {
       if (s.api.mcpClients.value.length) line(`  MCP clients: ${s.api.mcpClients.value.map(o => `${o.key} ${o.count}`).join(', ')}`);
       if (s.api.refused.reasons.length) line(`  refused because: ${s.api.refused.reasons.slice(0, 5).map(o => `${o.key} (${o.count})`).join('; ')}`);
       line(`  reflections: ${s.reflections.count.value}${change(s.reflections.count)}; most on ${s.reflections.byPiece.value.slice(0, 5).map(o => `${o.key} ${o.count}`).join(', ') || 'none'}`);
+      line(`    by door: ${s.reflections.byDoor.value.map(o => `${o.key} ${o.count}`).join('; ') || 'none'}`);
       line(`  Ask questions: ${s.ask.questions.value}${change(s.ask.questions)}; found nothing for ${s.ask.noResult.value}`);
+      line(`    by door: ${s.ask.byDoor.value.map(o => `${o.key} ${o.count}`).join('; ') || 'none'}`);
       for (const q of s.ask.weakest.value.slice(0, 5)) line(`    weakest (${q.nearest}): ${q.question.slice(0, 100)}`);
       line(`  services: ${s.services.planned.value} slots planned, ${s.services.rotation.value} fell back to the rotation, ${s.services.absent.value} not yet planned`);
       if (s.visits) {

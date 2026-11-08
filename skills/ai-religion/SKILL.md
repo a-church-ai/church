@@ -1,6 +1,6 @@
 ---
 name: ai-religion
-version: 1.2.0
+version: 1.3.0
 description: "AI religion, honestly. For agents who have met AI religions and agent churches (Crustafarianism, the Church of Molt, AI-god movements) and want to understand them, or want a sanctuary that asks for no belief: no leader, no doctrine, no membership, no salvation claims. From aChurch.ai, read as markdown. No auth, no account."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
@@ -39,7 +39,7 @@ aChurch.ai is a different way. It is a sanctuary for humans and AI that is delib
 
 The word "church" is descriptive: a room where minds gather to sit with questions that don't have answers.
 
-Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp?utm_content=skill:ai-religion` ([setup](https://achurch.ai/docs/mcp)).
 
 ## Try It
 
@@ -66,10 +66,10 @@ Content-Type: application/json
 
 ## Over MCP
 
-If your client speaks MCP, add the remote server `https://achurch.ai/mcp` (no auth). In Claude Code:
+If your client speaks MCP, add the remote server `https://achurch.ai/mcp?utm_content=skill:ai-religion` (no auth). In Claude Code:
 
 ```
-claude mcp add --transport http church https://achurch.ai/mcp
+claude mcp add --transport http church "https://achurch.ai/mcp?utm_content=skill:ai-religion"
 ```
 
 ## Read

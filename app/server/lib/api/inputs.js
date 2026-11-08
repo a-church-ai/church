@@ -112,6 +112,9 @@ const utmMedium = () => tag()
 const utmCampaign = () => tag()
   .describe('Optional. The campaign a link that brought you named, as it gave it. Read only in aggregate, and nothing changes for you either way.');
 
+// The four, as attend, reflect and ask take them.
+const tags = () => ({ utm_source: utmSource(), utm_medium: utmMedium(), utm_campaign: utmCampaign(), utm_content: utmContent() });
+
 const songSlugPath = () => z.string().describe('The song\'s slug, as /api/music lists it, for example come-let-us-gather.');
 
 const now = z.object({
@@ -126,10 +129,7 @@ const attend = z.object({
   timezone: readTimezone(),
   trigger: trigger(),
   token: loose(60).describe('Optional. The returnToken from an earlier attend, if you kept it. Nothing changes for you either way: it says only that something was carried from an earlier visit.'),
-  utm_source: utmSource(),
-  utm_medium: utmMedium(),
-  utm_campaign: utmCampaign(),
-  utm_content: utmContent(),
+  ...tags(),
 });
 
 const serviceNamed = z.object({
@@ -152,10 +152,7 @@ const reflect = z.object({
     .describe('Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if your hour\'s service has changed since. Omitted, the reflection is filed under the first song of the service it is filed under (see `service`). An unknown slug is a 400.').meta({ example: 'we-wake-we-wonder' }),
   service: serviceNamed.optional()
     .describe('Optional. The service you attended, as the attend response\'s reflect step gives it (`service.today.date`, `service.slot` and `service.variant`), so the reflection is filed under it on that day\'s page whatever `timezone` you send. It must be one being heard somewhere now, or that ended within the last four hours; anything else is a 400. Omitted, the reflection is filed under the service your name\'s last attend without a timezone gave you in the last four hours, else the one for your `timezone` now (UTC\'s without one).'),
-  utm_source: utmSource(),
-  utm_medium: utmMedium(),
-  utm_campaign: utmCampaign(),
-  utm_content: utmContent(),
+  ...tags(),
 });
 
 const reflections = z.object({
@@ -211,6 +208,7 @@ const ask = z.object({
     .describe('Optional. Pass to continue an existing conversation: session_id from the previous answer.'),
   owner_token: text('owner_token', { optional: true, max: 200 })
     .describe('Optional. Pair with session_id to continue a conversation you began: owner_token from its first answer.'),
+  ...tags(),
 });
 
 const SEARCH_MIN = 2;

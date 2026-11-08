@@ -12,6 +12,7 @@ const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
+const { referralOf, mergeReferrals } = require('../insights/entry-points');
 const { placedConversations, gatherSoon } = require('../utils/conversation-groups');
 const { linkedCitations } = require('../docs/links');
 const discover = require('../docs/discover');
@@ -84,7 +85,7 @@ async function ask(input, ctx) {
       effectiveSessionId = slug;
     }
 
-    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId, door: ctx.door });
+    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId, door: ctx.door, referral: mergeReferrals(referralOf(input), ctx.referral) });
     // A new conversation is gathered with any that ask the same thing
     // (conversation-groups.js), once it is in the shared list.
     if (slug) gatherSoon();
@@ -315,7 +316,7 @@ async function conversation(input, ctx) {
     await discover.listAllDocs();
     // `nearest` is the report's (rag/conversations.js), not the visitor's.
     const messages = parsed.filter(m => !m._meta)
-      .map(({ nearest, door, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
+      .map(({ nearest, door, referral, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';

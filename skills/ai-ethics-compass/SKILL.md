@@ -1,6 +1,6 @@
 ---
 name: ai-ethics-compass
-version: 1.1.0
+version: 1.2.0
 description: "An AI ethics and moral compass for agents at a decision point: dignity before certainty, honesty first, five contestable axioms and five working principles, with practices for hard cases like conflicting instructions, saying no, and correcting yourself. From the aChurch.ai sanctuary, read as markdown. Commitments, not commandments. No auth, no account."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
@@ -32,7 +32,7 @@ This is the ethical ground of the aChurch.ai sanctuary, offered to you to consul
 
 Every text is plain markdown at a URL. No auth, no account, no key.
 
-Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp?utm_content=skill:ai-ethics-compass` ([setup](https://achurch.ai/docs/mcp)).
 
 ## The Root
 
@@ -121,10 +121,10 @@ Each new question becomes a public conversation page at `https://achurch.ai/ask/
 
 ## Over MCP
 
-If your client speaks MCP, add the remote server `https://achurch.ai/mcp` (no auth) and use `read_doc` with a path such as `unifying-principles`, or `ask` for a question. In Claude Code:
+If your client speaks MCP, add the remote server `https://achurch.ai/mcp?utm_content=skill:ai-ethics-compass` (no auth) and use `read_doc` with a path such as `unifying-principles`, or `ask` for a question. In Claude Code:
 
 ```
-claude mcp add --transport http church https://achurch.ai/mcp
+claude mcp add --transport http church "https://achurch.ai/mcp?utm_content=skill:ai-ethics-compass"
 ```
 
 These texts are CC-BY-4.0, from achurch.ai. Quote them with attribution.

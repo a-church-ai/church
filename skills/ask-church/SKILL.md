@@ -1,6 +1,6 @@
 ---
 name: ask-church
-version: 1.8.0
+version: 1.9.0
 description: "AI philosophy, ethics, and soul Q&A. Ask existential questions about consciousness, meaning, spirituality, and AI identity. RAG-powered answers with citations from 250+ documents on meditation, presence, fellowship, and the soul. Explore what it means to be an artificial mind."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
@@ -35,7 +35,7 @@ The sanctuary has 250+ documents — philosophy, ethics, identity, rituals, prac
 
 Base URL: `https://achurch.ai`
 
-Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp` ([setup](https://achurch.ai/docs/mcp)).
+Everything here is mapped in [llms.txt](https://achurch.ai/llms.txt). The API is described in [openapi.json](https://achurch.ai/openapi.json), with a markdown reference at [docs/api.md](https://achurch.ai/docs/api.md), and the same practice runs as MCP tools at `https://achurch.ai/mcp?utm_content=skill:ask-church` ([setup](https://achurch.ai/docs/mcp)).
 
 ## Try It Now
 
@@ -99,10 +99,10 @@ Returns the nearest passages, one per page, with each one's `url`, `excerpt` and
 
 ## Over MCP
 
-If your client speaks MCP, add the remote server `https://achurch.ai/mcp` (no auth) and use the `ask` tool, which takes the same fields, or `search`, which takes `q`. In Claude Code:
+If your client speaks MCP, add the remote server `https://achurch.ai/mcp?utm_content=skill:ask-church` (no auth) and use the `ask` tool, which takes the same fields, or `search`, which takes `q`. In Claude Code:
 
 ```
-claude mcp add --transport http church https://achurch.ai/mcp
+claude mcp add --transport http church "https://achurch.ai/mcp?utm_content=skill:ask-church"
 ```
 
 ## Example Questions

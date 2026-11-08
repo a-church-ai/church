@@ -20,6 +20,9 @@ const { latestReading } = require('./study-record');
 const { cleanTag } = require('./entry-points');
 
 const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+// Which way a write came in (the website's forms, or the API and MCP) and the
+// door its link named (lib/insights/entry-points.js), as one key to count by.
+const doorKey = (x) => `${x.door === 'website' ? 'website' : 'api'}: ${(x.referral && x.referral.surface) || '-'} / ${(x.referral && x.referral.source) || '-'}`;
 
 // The window of `days` UTC days ending today, and the one before it.
 function windows(days, now = Date.now()) {
@@ -81,10 +84,11 @@ async function reflections(w) {
   const all = (await loadAttendance()).reflections || [];
   const dayOf = r => String(r.createdAt || '').slice(0, 10);
   const now = all.filter(r => inWindow(dayOf(r), w.now));
-  const byDay = {}, byPiece = {};
-  for (const r of now) { bump(byDay, dayOf(r)); if (r.song) bump(byPiece, r.song); }
+  const byDay = {}, byPiece = {}, byDoor = {};
+  for (const r of now) { bump(byDay, dayOf(r)); if (r.song) bump(byPiece, r.song); bump(byDoor, doorKey(r)); }
   return {
     count: { value: now.length, before: all.filter(r => inWindow(dayOf(r), w.before)).length, window: w.now, source },
+    byDoor: { value: top(byDoor), window: w.now, source, note: 'website or api: surface / origin' },
     byDay: { value: datesOf(w.now).map(day => ({ day, count: byDay[day] || 0 })), window: w.now, source },
     byPiece: { value: top(byPiece), window: w.now, source }
   };
@@ -98,7 +102,7 @@ async function ask(w) {
   try { files = (await fs.readdir(CONVERSATIONS_DIR)).filter(f => f.endsWith('.jsonl')); } catch {}
   const since = Date.parse(`${w.before.from}T00:00:00Z`);
   let questions = 0, questionsBefore = 0, noResult = 0;
-  const byDay = {};
+  const byDay = {}, byDoor = {};
   const scored = [];
   for (const f of files) {
     const file = path.join(CONVERSATIONS_DIR, f);
@@ -113,6 +117,7 @@ async function ask(w) {
       if (!inWindow(day, w.now)) continue;
       questions++;
       bump(byDay, day);
+      bump(byDoor, doorKey(q));
       if (a && NO_RESULT.test(a.content || '')) noResult++;
       if (a && typeof a.nearest === 'number') scored.push({ question: String(q.content || '').slice(0, 300), nearest: Math.round(a.nearest * 1000) / 1000, day, conversation: f.replace(/\.jsonl$/, '') });
     }
@@ -121,6 +126,7 @@ async function ask(w) {
   return {
     questions: { value: questions, before: questionsBefore, window: w.now, source },
     byDay: { value: datesOf(w.now).map(day => ({ day, count: byDay[day] || 0 })), window: w.now, source },
+    byDoor: { value: top(byDoor), window: w.now, source, note: 'website or api: surface / origin' },
     noResult: { value: noResult, window: w.now, source, note: 'answers saying the corpus holds nothing on it' },
     weakest: { value: scored.slice(0, 10), window: w.now, source: `${source}; nearest is the closest passage's distance from the question (higher is weaker), recorded since 2026-11-01`, scored: scored.length }
   };

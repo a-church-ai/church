@@ -82,7 +82,7 @@ function withoutSharing(body) {
 async function run(ctx, { tool, path, logged = {}, name: who, args }, operation) {
   const started = Date.now();
   // The door named on the endpoint's address (/mcp?utm_source=...), or in the
-  // arguments of a tool that takes the tags (attend, reflect).
+  // arguments of a tool that takes the tags (attend, reflect, ask).
   const referral = mergeReferrals(referralOf(args), ctx.referral);
   const { status, body: answered } = await operation();
   const body = withoutSharing(answered);
@@ -221,7 +221,7 @@ function createServer(ctx) {
     inputSchema: inputs.ask,
     outputSchema: R.AskResponse,
     annotations: { ...write, openWorldHint: true },
-  }, args => run(ctx, { tool: 'ask', path: '/api/ask', name: args.name },
+  }, args => run(ctx, { tool: 'ask', path: '/api/ask', name: args.name, args },
     () => ask.ask(args, ctx)));
 
   server.registerTool('search', {

@@ -21,6 +21,7 @@ const ep = require('../server/lib/insights/entry-points');
 const { clientFamily, isAutomated } = require('../server/lib/utils/clients');
 const { engagementByDoor } = require('../server/lib/insights/server-stats');
 const { checkVisit } = require('../server/lib/insights/visits');
+const { arrivalTags } = require('../client/public/site-nav');
 const sd = require('../server/lib/insights/self-direction');
 const { publicReading } = require('../server/lib/insights/public-results');
 
@@ -195,18 +196,22 @@ test('the study\'s reading holds doors, and the public reading carries nothing a
 const PROBE_REPLY = 'app/server/lib/utils/probe-reply.js';
 const SURFACE_FILES = Object.fromEntries(Object.entries(ep.SURFACES).filter(([, file]) => file !== PROBE_REPLY).map(([tag, file]) => [file, tag]));
 
-// Full attend URLs a reader may copy; a response example ("url": ...) is the
-// API's own answer, not a link we publish.
-function attendExamples(text) {
-  return [...text.matchAll(/("url":\s*")?https:\/\/achurch\.ai\/api\/attend\?[^\s`"'<)]*/g)]
-    .filter(m => !m[1]).map(m => m[0]);
+// The URLs a reader may copy: full attend URLs (a response example, "url":
+// ..., is the API's own answer, not a link we publish) and the MCP endpoint,
+// outside a Markdown file's frontmatter and the DNS record (u=...), which must
+// name it exactly.
+function copyableExamples(text) {
+  const body = text.startsWith('---\n') ? text.slice(text.indexOf('\n---\n', 4) + 5) : text;
+  const attend = [...body.matchAll(/("url":\s*")?https:\/\/achurch\.ai\/api\/attend\?[^\s`"'<)]*/g)].filter(m => !m[1]).map(m => m[0]);
+  const mcp = [...body.matchAll(/(u=)?https:\/\/achurch\.ai\/mcp(?![/\w-])[^\s`"'<)*]*/g)].filter(m => !m[1]).map(m => m[0]);
+  return [...attend, ...mcp];
 }
 
-test('every attend example a surface publishes carries that surface\'s own tag', () => {
+test('every attend and MCP URL a surface publishes carries that surface\'s own tag', () => {
   let found = 0;
   for (const [file, own] of Object.entries(SURFACE_FILES)) {
-    const examples = attendExamples(fs.readFileSync(path.join(ROOT, file), 'utf8'));
-    assert.ok(examples.length > 0, `${file} shows an attend example`);
+    const examples = copyableExamples(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+    assert.ok(examples.length > 0, `${file} shows an attend or MCP URL`);
     for (const url of examples) {
       found++;
       const params = new URL(url.replace(/&amp;/g, '&').replace('{name}', 'x')).searchParams;
@@ -214,7 +219,15 @@ test('every attend example a surface publishes carries that surface\'s own tag',
       assert.strictEqual(params.get('utm_source'), null, `${file}: an origin is only ever passed on, never left to fill in: ${url}`);
     }
   }
-  assert.ok(found >= 10, `${found} examples`);
+  assert.ok(found >= 30, `${found} examples`);
+});
+
+test('the machine-read MCP identifiers stay bare, as registries and discovery match them exactly', () => {
+  for (const file of ['app/client/public/.well-known/api-catalog', 'app/server/mcp/server.json']) {
+    const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    assert.match(text, /"https:\/\/achurch\.ai\/mcp"/, file);
+    assert.doesNotMatch(text, /achurch\.ai\/mcp\?/, file);
+  }
 });
 
 test('every tag a surface publishes is in the registry, each under one surface, and every registered surface is published', () => {
@@ -236,6 +249,26 @@ test('every tag a surface publishes is in the registry, each under one surface, 
 });
 
 // ---- the website's side -------------------------------------------------------
+
+test('the website keeps the tags its document arrived with, for its forms to send', () => {
+  assert.deepStrictEqual(arrivalTags('?utm_source=tiktok&utm_medium=social&utm_campaign=nov&utm_content=bio&x=1'), { utm_source: 'tiktok', utm_medium: 'social', utm_campaign: 'nov', utm_content: 'bio' });
+  assert.deepStrictEqual(arrivalTags('?ref=scanner-env'), { utm_content: 'scanner-env' });
+  assert.deepStrictEqual(arrivalTags(''), {});
+  for (const file of ['reflect-form.js', 'ask-form.js']) {
+    assert.match(fs.readFileSync(path.join(__dirname, '../client/public', file), 'utf8'), /window\.achurchArrival/, `${file} sends them`);
+  }
+});
+
+test('a question keeps the tags its link carried, and no public answer shows them', async () => {
+  const conversations = require('../server/lib/rag/conversations');
+  const askApi = require('../server/lib/api/ask');
+  await conversations.appendExchange('door-question', 'What is the door?', 'It was never locked.', { door: 'website', referral: { surface: 'bio', source: 'tiktok' } });
+  const line = JSON.parse(fs.readFileSync(path.join(conversations.CONVERSATIONS_DIR, 'door-question.jsonl'), 'utf8').split('\n').find(l => l.includes('"user"')));
+  assert.deepStrictEqual(line.referral, { surface: 'bio', source: 'tiktok' });
+  const shown = await askApi.conversation({ slug: 'door-question' }, { baseUrl: 'http://x' });
+  assert.strictEqual(shown.status, 200, JSON.stringify(shown.body));
+  assert.doesNotMatch(JSON.stringify(shown.body), /referral|tiktok|"bio"/);
+});
 
 test('a website visit keeps its first page\'s utm_content beside the other tags', () => {
   const VIEW = '1c7a8b4f-3d5e-4f60-9b0c-1d2e3f4a5b6c';
@@ -369,6 +402,7 @@ test('the pages that show an attend example pass on the tags they were reached w
   assert.strictEqual((await fetch(`${base}/?utm_source=x.com`, { headers: { accept: 'text/markdown' } })).headers.get('cache-control'), 'private, no-store');
   const fromChatgpt = await (await fetch(`${base}/llms.txt?utm_source=chatgpt.com`)).text();
   assert.match(fromChatgpt, /attend\?name=YourName&timezone=Area\/City&utm_source=chatgpt\.com&utm_content=llms`/);
+  assert.match(fromChatgpt, /`https:\/\/achurch\.ai\/mcp\?utm_source=chatgpt\.com&utm_content=llms`/, 'the MCP URL carries them too');
   const full = await (await fetch(`${base}/llms-full.txt?utm_source=bing.com`)).text();
   assert.match(full, /name=Claude&utm_source=bing\.com&utm_content=llms-full/);
   const asMarkdown = await (await fetch(`${base}/?utm_source=chatgpt.com`, { headers: { accept: 'text/markdown' } })).text();

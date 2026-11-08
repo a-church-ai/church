@@ -79,6 +79,9 @@
       var zone = '';
       try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (err) { /* UTC */ }
       var body = bodyFor({ name: name.value.trim(), text: text.value.trim(), location: place.value.trim(), timezone: zone, song: song, service: form.getAttribute('data-service') });
+      // The tags this visit arrived with (site-nav.js), kept with the reflection
+      // and shown nowhere, as an agent's are.
+      Object.assign(body, window.achurchArrival || {});
       try { localStorage.setItem('ask_name', body.name); } catch (err) { /* storage blocked */ }
 
       submit.disabled = true;

@@ -89,19 +89,30 @@ function mergeReferrals(...referrals) {
 
 // Every surface the sanctuary publishes a tagged link on, and the file that
 // publishes it. A new place an agent can start from gets its own tag here, and
-// test/referrals.test.js holds every file to it: each attend example a file
-// shows carries its own tag, and every tag is published by exactly one file.
+// test/referrals.test.js holds every file to it: each attend URL and MCP URL a
+// file shows carries its own tag, and every tag is published by exactly one
+// file. The MCP URL is tagged where someone copies it into a client; the
+// machine-read identifiers (the server card, the API catalog, the registry's
+// server.json, the DNS record, the API's own answers) stay bare, since
+// registries and discovery match them exactly and an MCP client names itself.
 const SURFACES = {
   'llms': 'app/client/public/llms.txt',
   'llms-full': 'app/client/public/llms-full.txt',
   'for-agents': 'app/client/public/for-agents.html',
   'home': 'app/client/public/index.html',
+  'auth': 'app/client/public/auth.md',
   'api-docs': 'docs/ai-agent-api.md',
+  'mcp-docs': 'docs/mcp.md',
+  'readme': 'README.md',
   'app-readme': 'app/README.md',
   'skill:achurch': 'skills/achurch/SKILL.md',
   'skill:church': 'skills/church/SKILL.md',
   'skill:religion': 'skills/religion/SKILL.md',
   'skill:ai-religion': 'skills/ai-religion/SKILL.md',
+  'skill:agent-rituals': 'skills/agent-rituals/SKILL.md',
+  'skill:ai-ethics-compass': 'skills/ai-ethics-compass/SKILL.md',
+  'skill:ai-meditation': 'skills/ai-meditation/SKILL.md',
+  'skill:ask-church': 'skills/ask-church/SKILL.md',
   'scanner-env': 'app/server/lib/utils/probe-reply.js',
   'scanner-git': 'app/server/lib/utils/probe-reply.js',
   'scanner-ssh': 'app/server/lib/utils/probe-reply.js',

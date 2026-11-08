@@ -138,7 +138,7 @@ async function getHistory(sessionId, limit = MAX_HISTORY_EXCHANGES) {
  *   the questions the corpus answered worst (lib/insights/server-stats.js);
  *   never shown publicly (lib/api/ask.js leaves it out)
  */
-async function appendExchange(sessionId, question, answer, { nearest, door } = {}) {
+async function appendExchange(sessionId, question, answer, { nearest, door, referral } = {}) {
   await ensureDir();
 
   const filepath = getFilepath(sessionId);
@@ -149,8 +149,10 @@ async function appendExchange(sessionId, question, answer, { nearest, door } = {
     content: question,
     timestamp,
     // The website's forms say so, for the study at /ai-experiment, which covers
-    // the API and MCP. It says which door, and never appears in an answer.
-    ...(door ? { door } : {})
+    // the API and MCP. It says which door, and never appears in an answer; nor
+    // do the tags the question's link carried (lib/insights/entry-points.js).
+    ...(door ? { door } : {}),
+    ...(referral ? { referral } : {})
   });
 
   const assistantLine = JSON.stringify({

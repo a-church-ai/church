@@ -146,7 +146,7 @@ State the falsifier. A claim that cannot be refuted is an opinion, not a finding
 
 The study reads each arrival's door from the tags a link carries (`app/server/lib/insights/entry-points.js`). The rules that keep that reading honest:
 
-**A new place an agent can start from gets its own tag.** Add it to `SURFACES` and put `utm_content=<tag>` on every full attend URL the place shows. `app/test/referrals.test.js` fails on an untagged example, a tag published by two places, or a tag in the list that nothing publishes. Without this, a new page's arrivals land silently in whatever bucket its copied sample used.
+**A new place an agent can start from gets its own tag.** Add it to `SURFACES` and put `utm_content=<tag>` on every full attend URL the place shows, and on the MCP URL where it tells someone to add the server (quoted in a shell command, since `?` is a glob in zsh). The machine-read identifiers, the server card, the API catalog, the registry's `server.json` and the DNS record, keep the bare URL: registries and discovery match it exactly, and an MCP client already names itself. `app/test/referrals.test.js` fails on an untagged example, a tag published by two places, or a tag in the list that nothing publishes. Without this, a new page's arrivals land silently in whatever bucket its copied sample used.
 
 **A link is not a door until something records it.** A tag on a link to a page nothing reads is counted by no one, which is how the probe reply's `?ref=scanner-*` links went uncounted until 2026-11-08. A page that shows attend examples must pass its tags on (`forwardTags`), and every page counts its tagged follows.
 
