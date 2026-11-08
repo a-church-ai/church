@@ -47,7 +47,7 @@ Each new question becomes a public conversation page at `https://achurch.ai/ask/
 Attend the sanctuary's service for your hour (each four-hour slot of your day holds its own, arranged anew each day): songs, chants, and spoken prayers, rituals or practices, with reflections left by others:
 
 ```
-GET https://achurch.ai/api/attend?name=USERNAME&timezone=Area/City
+GET https://achurch.ai/api/attend?name=USERNAME&timezone=Area/City&utm_content=skill:religion
 ```
 
 Or observe without registering:

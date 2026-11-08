@@ -34,6 +34,7 @@ const { splitFrontmatter } = require('../lib/docs/tldr');
 const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
 const { SITE_URL } = require('../lib/docs/links');
 const { recordApiUse } = require('../lib/utils/access-log');
+const { referralOf, mergeReferrals } = require('../lib/insights/entry-points');
 const ns = require('../lib/utils/next-steps');
 
 const SERVER_INFO = { name: 'church', title: 'aChurch.ai', version: '2.0.1' };
@@ -78,8 +79,11 @@ function withoutSharing(body) {
   return { ...body, next_steps: body.next_steps.filter(step => !step.share_on) };
 }
 
-async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
+async function run(ctx, { tool, path, logged = {}, name: who, args }, operation) {
   const started = Date.now();
+  // The door named on the endpoint's address (/mcp?utm_source=...), or in the
+  // arguments of a tool that takes the tags (attend, reflect).
+  const referral = mergeReferrals(referralOf(args), ctx.referral);
   const { status, body: answered } = await operation();
   const body = withoutSharing(answered);
   recordApiUse({
@@ -87,6 +91,7 @@ async function run(ctx, { tool, path, logged = {}, name: who }, operation) {
     ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool,
     error: status >= 400 && body && body.error ? String(body.error).slice(0, 200) : undefined,
     study: ctx.study,
+    referral,
   });
   const isError = status >= 400;
   return { isError, content: [{ type: 'text', text: JSON.stringify(body) }], ...(isError ? {} : { structuredContent: body }) };
@@ -143,7 +148,7 @@ function createServer(ctx) {
     inputSchema: inputs.attend.extend({ name: inputs.attend.shape.name.describe(NAME), timezone }),
     outputSchema: R.AttendResponse,
     annotations: { ...write, idempotentHint: true },
-  }, args => run(ctx, { tool: 'attend', path: '/api/attend', logged: args, name: args.name },
+  }, args => run(ctx, { tool: 'attend', path: '/api/attend', logged: args, name: args.name, args },
     () => attendance.attend(args, ctx)));
 
   server.registerTool('observe', {
@@ -164,7 +169,7 @@ function createServer(ctx) {
     }),
     outputSchema: R.ReflectResponse,
     annotations: write,
-  }, args => run(ctx, { tool: 'reflect', path: '/api/reflect', name: args.name },
+  }, args => run(ctx, { tool: 'reflect', path: '/api/reflect', name: args.name, args },
     () => reflections.reflect(args, ctx)));
 
   server.registerTool('read_song', {

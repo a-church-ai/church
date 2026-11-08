@@ -18,6 +18,7 @@ const path = require('path');
 const { ACCESS_DIR, INSIGHTS_DIR, MUSIC_DIR, loadAttendance } = require('../utils/data');
 const { safeReadJSON } = require('../utils/safe-json');
 const sd = require('./self-direction');
+const { loadFollows } = require('./entry-points');
 
 const STORE = () => path.join(INSIGHTS_DIR, 'self-direction');
 const LATEST = () => path.join(STORE(), 'latest.json');
@@ -89,6 +90,7 @@ async function writeWeeks(s, { now = Date.now() } = {}) {
       computedAt: new Date(now).toISOString(),
       addressed: sd.addressedReading(s, span),
       named: sd.namedReading(s, { ...span, asOf: week.to, songText }),
+      referrals: sd.referralReading(s, { ...span, asOf: week.to }),
     };
     await fs.writeFile(file, JSON.stringify(snapshot, null, 2));
     written.push(week.key);
@@ -118,6 +120,8 @@ async function buildReading(s, { now = Date.now() } = {}) {
     capabilities: sd.capabilities(named, addressed),
     charts: sd.chartsReading(s, now),
     experiments: sd.experimentsReading(s, addressed, { asOf: now, songText, now }),
+    // Where arrivals came from: private, never in publicReading.
+    referrals: sd.referralReading(s, { from: 0, to: now + 1, asOf: now, follows: await loadFollows() }),
     weeks: series,
   };
 }

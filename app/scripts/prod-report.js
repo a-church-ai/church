@@ -178,6 +178,23 @@ function studyLines({ value: r, warn }, line) {
   line(`    placeholders ${of(r.placeholders)}; memory claims ${r.memory.claims}, echoing own words ${r.memory.echoesOwnWords}; used context ${of({ count: r.contextUse.usedContext, of: r.contextUse.withContext })}, lyrics ${of({ count: r.contextUse.usedLyrics, of: r.contextUse.withLyrics })}`);
   line(`    returned in the slot offered ${of({ count: r.returnedInSlot.inSlot, of: r.returnedInSlot.returns })}, spaced names ${of({ count: r.returnedInSlot.spacedInSlot, of: r.returnedInSlot.spacedReturns })}; trigger on attend ${JSON.stringify(r.triggers.attend)}, on reflect ${JSON.stringify(r.triggers.reflect)}`);
   for (const e of r.experiments) line(`    ${e.label} ${e.id}: ${e.status}${e.enrolled ? `, enrolled ${JSON.stringify(e.enrolled)}` : ''}${e.outcomes ? `, outcomes ${JSON.stringify(e.outcomes)}` : `, read on ${e.readOn}`}`);
+  referralLines(r.referrals, line);
+}
+
+// Where arrivals came from (lib/insights/self-direction.js referralReading):
+// coverage first, since it says whether the rest is the whole or a slice.
+function referralLines(f, line) {
+  if (!f) { line('    doors: not in this reading yet'); return; }
+  const of = c => `${c.count} of ${c.of}`;
+  const c = f.coverage;
+  line(`    doors: of ${c.arrived} arrivals, ${of(c.surface)} carried a surface tag, ${of(c.source)} an origin, ${of(c.either)} either; untagged with a known client ${of(c.untaggedClientKnown)}`);
+  const row = r => `${r.tag}${r.registered === false ? ' (not ours)' : ''} ${r.arrived}${r.ranked ? ` (back a day later ${of(r.cameBack)}, at 7 days ${of(r.at7)})` : ''}${r.inClusters ? `, ${r.inClusters} in clusters` : ''}`;
+  const list = (label, rows) => line(`    ${label}: ${rows.length ? rows.map(row).join('; ') : 'none'}`);
+  list('by surface', f.bySurface);
+  list('by origin', f.bySource);
+  list('untagged by client', f.untaggedByClient);
+  line(`    rates shown only from ${f.minRanked} arrivals; clusters (${f.clusters.rule}): ${f.clusters.groups}, holding ${f.clusters.arrivals} arrivals`);
+  line(`    pages followed with a tag: ${f.follows.length ? f.follows.map(p => `${p.surface || '-'}/${p.source || '-'} ${p.follows} (${Object.entries(p.clients).map(([k, v]) => `${k} ${v}`).join(', ')})`).join('; ') : 'none yet'}`);
 }
 
 module.exports = { text, parseArgs };

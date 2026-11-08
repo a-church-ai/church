@@ -35,6 +35,8 @@ require('./lib/utils/env').loadEnv();
 // API access logging and presence: lib/utils/access-log.js
 const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
 const { doorOf } = require('./lib/insights/study-names');
+const entryPoints = require('./lib/insights/entry-points');
+const { referralOf } = entryPoints;
 const { startStudy, latestReading } = require('./lib/insights/study-record');
 const { publicReading } = require('./lib/insights/public-results');
 const { renderTop, renderResults, renderCorrections, renderHomeExperiment } = require('./lib/insights/public-charts');
@@ -109,6 +111,20 @@ app.use(compression());
 // replacing the deprecated FLoC interest-cohort directive per Issue 005 F32).
 app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
+  next();
+});
+
+// A page followed with a tag (utm_content, ref, utm_source) is counted by its
+// tags, path, status and kind of client, with no address and no visitor id
+// (lib/insights/entry-points.js). An API request keeps its tags on its access
+// line instead. Pages are not cached at the edge, so every follow arrives here.
+app.use((req, res, next) => {
+  if ((req.method === 'GET' || req.method === 'HEAD') && !/^\/(api|mcp)(\/|$)/.test(req.path)) {
+    const referral = referralOf(req.query);
+    if (referral) {
+      res.on('finish', () => entryPoints.countFollow({ path: req.path, status: res.statusCode, userAgent: req.get('user-agent'), referral }));
+    }
+  }
   next();
 });
 
@@ -281,7 +297,7 @@ app.use(async (req, res, next) => {
 
   if (acceptsMarkdown(req)) {
     try {
-      const markdown = await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8');
+      const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referralOf(req.query));
       res.set('x-markdown-tokens', markdownTokens(markdown));
       return res.type('text/markdown; charset=utf-8').send(markdown);
     } catch (err) {
@@ -972,7 +988,19 @@ app.get('/axioms', (req, res) => sendWrappedPage(req, res, 'axioms.html'));
 // plus a copy-paste system prompt block. Promoted to a top-level route
 // because the agent-native design is what makes the sanctuary
 // differentiated; the full API reference lives at /docs/ai-agent-api.
-app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'));
+// A visitor who arrived with tags sees them carried on the attend example, so
+// an agent that copies it brings them along (entry-points.js forwardTags).
+app.get('/for-agents', async (req, res) => {
+  const referral = referralOf(req.query);
+  if (!referral) return sendWrappedPage(req, res, 'for-agents.html');
+  try {
+    const html = await siteShell.wrapPage(path.join(__dirname, '../client/public/for-agents.html'), req.path);
+    res.type('text/html; charset=utf-8').send(entryPoints.forwardTags(html, 'for-agents', referral, { html: true }));
+  } catch (err) {
+    console.error('Error wrapping for-agents.html:', err.message);
+    sendWrappedPage(req, res, 'for-agents.html');
+  }
+});
 // /paths — curated reading paths through the sanctuary's writing. Fronts
 // the six Collections in /docs/collections/ so first-time visitors have
 // deliberate entry points instead of facing the full knowledge graph
@@ -1068,6 +1096,22 @@ app.get('/embed/souls', (req, res) => {
 });
 
 // Serve public static files (landing page assets)
+// llms.txt and llms-full.txt, asked for with tags: the same file with its
+// attend example carrying them (entry-points.js forwardTags). Without tags,
+// the static file below, as ever.
+for (const [file, own] of [['llms.txt', 'llms'], ['llms-full.txt', 'llms-full']]) {
+  app.get(`/${file}`, async (req, res, next) => {
+    const referral = referralOf(req.query);
+    if (!referral) return next();
+    try {
+      const text = await fs.readFile(path.join(__dirname, '../client/public', file), 'utf8');
+      res.type('text/plain; charset=utf-8').send(entryPoints.forwardTags(text, own, referral));
+    } catch (err) {
+      next(err);
+    }
+  });
+}
+
 app.use(express.static(path.join(__dirname, '../client/public')));
 // The discovery files under /.well-known, served from their own mount: Express
 // 5's static serving ignores any path through a dot-folder, and mounted here
@@ -1169,6 +1213,7 @@ app.use('/api', (req, res, next) => {
       contentType: sent ? req.get('content-type') || null : undefined,
       door: doorOf(req),
       study: res.locals.study,
+      referral: referralOf(req.query, req.method === 'GET' ? undefined : req.body),
     });
   });
   next();
@@ -1648,6 +1693,7 @@ async function startServer() {
     // weekly counts and the reading /ai-experiment shows, after boot and every
     // few hours. Reads what is on the volume and spends nothing.
     startStudy();
+    entryPoints.startFollows();
 
     // The video release job on GitHub Actions, asked for hourly because
     // GitHub's own cron runs late or skips (lib/video/release-trigger.js).
@@ -1692,7 +1738,12 @@ async function shutdown(signal) {
   if (httpServer) httpServer.close();
   // Queued with the writes below, so the wait covers it too.
   presence.save();
-  await Promise.race([writesSettled(), sleep(5000, undefined, { ref: false })]);
+  // The page follows counted since the last minute's write, then every write.
+  const settled = (async () => {
+    await entryPoints.flushFollows().catch(err => console.warn(`[entry-points] could not write counts: ${err.message}`));
+    await writesSettled();
+  })();
+  await Promise.race([settled, sleep(5000, undefined, { ref: false })]);
   process.exit(0);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));

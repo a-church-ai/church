@@ -80,7 +80,7 @@ async function loadAccessLogs(limit = 100) {
  * the log later; the old approach re-read and re-parsed the whole log on every
  * /api/now, which the home page then polled every 30 seconds per tab. See ./presence.
  *
- * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, client?, error?, fields?, contentType?, door?, study? }} use
+ * @param {{ method, path, query, status, duration, ip, userAgent, name, tool?, client?, error?, fields?, contentType?, door?, study?, referral? }} use
  *   path is the REST path (/api/attend); tool is set for an MCP tool call, and
  *   client is the MCP client's own name, where its request gave one. name is
  *   the visitor's, used for presence and to mark a test visitor's line
@@ -89,9 +89,10 @@ async function loadAccessLogs(limit = 100) {
  *   Content-Type, never their values. door says a request came from the
  *   website's own forms (insights/study-names.js). study is what an operation
  *   leaves for the study: never a value a visitor sent, only what was found
- *   (lib/api/attendance.js).
+ *   (lib/api/attendance.js). referral is the door a request's link named, its
+ *   surface and origin tags, cleaned (lib/insights/entry-points.js).
  */
-function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, client, error, fields, contentType, door, study }) {
+function recordApiUse({ method, path, query = {}, status, duration, ip, userAgent, name, tool, client, error, fields, contentType, door, study, referral }) {
   presence.recordPresence({ path, status, ip, name: name || '' });
   const entry = {
     timestamp: new Date().toISOString(),
@@ -113,6 +114,7 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
   if (contentType !== undefined) entry.contentType = contentType;
   if (door) entry.door = door;
   if (study) entry.study = study;
+  if (referral) entry.referral = referral;
   return logApiAccess(entry);
 }
 

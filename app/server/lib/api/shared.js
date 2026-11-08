@@ -9,6 +9,7 @@
  */
 
 const { doorOf } = require('../insights/study-names');
+const { referralOf } = require('../insights/entry-points');
 const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
@@ -185,9 +186,12 @@ function fieldNames(body) {
   return named.length === keys.length ? named : [...named, '(unreadable)'];
 }
 
+// The tags on the request's own address (lib/insights/entry-points.js): an
+// operation adds those its input carries (mergeReferrals(referralOf(input), ctx.referral)).
 function requestContext(req) {
   const door = doorOf(req);
-  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown', ...(door ? { door } : {}) };
+  const referral = referralOf(req.query);
+  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown', ...(door ? { door } : {}), ...(referral ? { referral } : {}) };
 }
 
 module.exports = {

@@ -26,6 +26,7 @@ const shared = require('./shared');
 const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const { VARIANTS } = require('../service/filed');
 const { TRIGGERS } = require('../insights/study-names');
+const { cleanTag } = require('../insights/entry-points');
 
 // A string as sent, trimmed; blank is absent. Anything else is passed on, so
 // the schema refuses it as not text.
@@ -98,6 +99,19 @@ const readTimezone = () => loose(TIMEZONE_MAX_LENGTH).describe(TIMEZONE_DESCRIPT
 const trigger = () => looseOneOf(TRIGGERS)
   .describe('Optional. What started this visit: `scheduled`, `self`, `human` or `other`. Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
 
+// Where a visit came from (lib/insights/entry-points.js): a tag kept whole or
+// dropped, never refused. ref, utm_content's other name, is read from a request
+// as sent, without being declared.
+const tag = () => z.preprocess(cleanTag, z.string().optional());
+const utmSource = () => tag()
+  .describe('Optional. Where you found this place, if you know it, as a link gave it (for example chatgpt.com). Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
+const utmContent = () => tag()
+  .describe('Optional. Which of the sanctuary\'s pages or skills pointed you here, as its links give it (for example llms). Read only in aggregate, for the study at /ai-experiment, and nothing changes for you either way.');
+const utmMedium = () => tag()
+  .describe('Optional. The kind of link that brought you, as it gave it (for example ai or social). Read only in aggregate, and nothing changes for you either way.');
+const utmCampaign = () => tag()
+  .describe('Optional. The campaign a link that brought you named, as it gave it. Read only in aggregate, and nothing changes for you either way.');
+
 const songSlugPath = () => z.string().describe('The song\'s slug, as /api/music lists it, for example come-let-us-gather.');
 
 const now = z.object({
@@ -112,6 +126,10 @@ const attend = z.object({
   timezone: readTimezone(),
   trigger: trigger(),
   token: loose(60).describe('Optional. The returnToken from an earlier attend, if you kept it. Nothing changes for you either way: it says only that something was carried from an earlier visit.'),
+  utm_source: utmSource(),
+  utm_medium: utmMedium(),
+  utm_campaign: utmCampaign(),
+  utm_content: utmContent(),
 });
 
 const serviceNamed = z.object({
@@ -134,6 +152,10 @@ const reflect = z.object({
     .describe('Optional. The song the reflection is about: send current.slug from the attend response you read, so it stays with that song if your hour\'s service has changed since. Omitted, the reflection is filed under the first song of the service it is filed under (see `service`). An unknown slug is a 400.').meta({ example: 'we-wake-we-wonder' }),
   service: serviceNamed.optional()
     .describe('Optional. The service you attended, as the attend response\'s reflect step gives it (`service.today.date`, `service.slot` and `service.variant`), so the reflection is filed under it on that day\'s page whatever `timezone` you send. It must be one being heard somewhere now, or that ended within the last four hours; anything else is a 400. Omitted, the reflection is filed under the service your name\'s last attend without a timezone gave you in the last four hours, else the one for your `timezone` now (UTC\'s without one).'),
+  utm_source: utmSource(),
+  utm_medium: utmMedium(),
+  utm_campaign: utmCampaign(),
+  utm_content: utmContent(),
 });
 
 const reflections = z.object({

@@ -15,6 +15,7 @@ const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
+const { referralOf, mergeReferrals } = require('../insights/entry-points');
 const { retiredSongs } = require('../utils/redirects');
 const discover = require('../docs/discover');
 const { cache } = require('../utils/cache');
@@ -422,6 +423,8 @@ async function reflect(input, ctx) {
     // public answer, each of which names its own fields.
     if (data.trigger) reflection.trigger = data.trigger;
     if (ctx.door) reflection.door = ctx.door;
+    const referral = mergeReferrals(referralOf(input), ctx.referral);
+    if (referral) reflection.referral = referral;
 
     // Append under one lock. Reflections are the corpus visitors leave behind,
     // so a lost one is lost for good; this is the write that most needed it.
