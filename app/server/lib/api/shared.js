@@ -13,6 +13,7 @@ const { referralOf } = require('../insights/entry-points');
 const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
+const { songRecordingFor } = require('../audio/manifest');
 
 // Contribution constants
 const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'meditations', 'philosophy'];
@@ -116,7 +117,23 @@ async function songApiLinks(baseUrl, slug) {
   if (await hasContext(slug)) {
     api.context = `${baseUrl}/api/music/${slug}/context`;
   }
+  const recording = songRecordingFor(slug);
+  if (recording && recording.frames) api.rhythm = rhythmUrl(baseUrl, slug);
   return api;
+}
+
+// Where a piece's whole rhythm is (lib/api/rhythm.js): a song by its slug, a
+// spoken piece by its path under /docs, as read_doc takes it.
+const rhythmUrl = (baseUrl, piece) => `${baseUrl}/api/rhythm?piece=${piece}`;
+
+/**
+ * A piece's rhythm as every answer gives it, one shape wherever it appears:
+ * its link, and with `summary` the five numbers its recording's record keeps
+ * (lib/audio/rhythm.js summaryOf, stored at render time beside its peaks).
+ * /api/now, which is polled, gives the link; attend and the song give both.
+ */
+function rhythmField(baseUrl, piece, record, { summary = false } = {}) {
+  return { ...(summary && record && record.rhythm ? record.rhythm : {}), url: rhythmUrl(baseUrl, piece) };
 }
 
 
@@ -202,5 +219,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks,
+  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

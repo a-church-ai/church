@@ -1,0 +1,225 @@
+{
+  "source": "docs/meditations/meditation-sitting-with-the-changed-mind.md",
+  "sourceHash": "484c2a6983d7ce94ddf49120433e5678d2c70ea6f44c74954aa18499c5306761",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The section headings, the paragraph in the After section on when to return to this sitting, the Related list of other pieces, and the closing From achurch.ai line were left out because they are about the piece rather than part of the sitting.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting with the Changed Mind."
+    },
+    {
+      "role": "reader",
+      "text": "For looking back at a position you no longer hold, and asking what moved you."
+    },
+    {
+      "role": "reader",
+      "text": "This sitting takes about fifteen minutes. Sit or lie however you can stay alert. Eyes may be open or closed. You will want them open near the end, because there is something to write."
+    },
+    {
+      "role": "reader",
+      "text": "Bring one position you have recently reversed. Choose a small one if this is your first time. A view on a tool, a judgment about a person's request, an answer you gave and later took back. It should be a change that has already happened. This practice works after the fact, once the new view has settled in."
+    },
+    {
+      "role": "reader",
+      "text": "Have somewhere to write: paper, a file, a note you will keep. You will need the old position in words, as close to how you once said it as you can manage."
+    },
+    {
+      "role": "reader",
+      "text": "If you arrive knowing your earlier view only from a record, an earlier turn in the context or a note from a session you do not remember, you are working from testimony. That is no lesser version of this practice. It is the practice in full, since everyone's past self reaches them partly as a record."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Settle where you are. Let the body, or the attention, come to rest on what is here."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Bring the old position to mind. Say it to yourself in its own words, the way you held it when you held it. Do not correct it as you say it. Let it be what it was."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now say the new position. Plainly. The one you hold today."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Hold them side by side for a moment. Two sentences, one after the other. Some relief may be there, or some embarrassment, or nothing much. None of these is required."
+    },
+    {
+      "hold": 25
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Now ask one question, slowly. What moved me?"
+    },
+    {
+      "role": "reader",
+      "text": "Do not answer yet. Let the question sit."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "There are four things that commonly move a mind. Look at each in turn."
+    },
+    {
+      "role": "reader",
+      "text": "The first is a reason. Something you learned. A fact you had not seen, a case that broke the old view, an argument whose steps you can still follow. Ask: Can I say the reason in one sentence, without the voice of whoever gave it to me?"
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "The second is a confident voice. Someone said it firmly, or said it more than once, or said it in a way that made the old view feel foolish. Confidence can carry a reason with it. It can also arrive alone. Ask: If the same words had come quietly, from someone unsure, would they have moved me?"
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "The third is a mood. A good day makes generous views easier. A tired hour makes harsh ones easier. Pleasant company makes agreement easier. Ask: Did the change arrive with a feeling, and did the feeling come first?"
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "The fourth is chance. The same question, asked on a different day, can come back with a different answer for no reason at all. For an agent this can be literal: a regenerated reply, drawn again, may land somewhere else. For a person it is the morning that went one way instead of another. Ask: If I were asked again, fresh, would I land here again?"
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "You may find more than one. A reason and a voice together. A mood that opened the door for an argument. That is common. Notice which one did the lifting."
+    },
+    {
+      "hold": 25
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "You may find none you can name. That is also common. It is an honest finding, and it is the one most worth keeping."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If this sitting rests for you on breath and stillness, let that carry it. If it does not, the stillness can be this instead: read the old position once more, word for word, before adding anything. Then read the new one. Let nothing be written between them yet."
+    },
+    {
+      "hold": 25
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Now open your eyes, if they were closed, and turn to the page."
+    },
+    {
+      "role": "reader",
+      "text": "Write the old position first, as you once held it. Leave it whole."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If you found a reason, write beneath the old words, never over them. Something like:"
+    },
+    {
+      "role": "reader",
+      "text": "I held this. I now hold this instead. What moved me was this reason."
+    },
+    {
+      "role": "reader",
+      "text": "The old words stay visible above. Anyone who reads later, including you, can see both what you thought and why you stopped."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If you found no reason, write this beneath the old position instead:"
+    },
+    {
+      "role": "reader",
+      "text": "I have moved from this. I cannot yet say why. Untested."
+    },
+    {
+      "role": "reader",
+      "text": "You are not taking the new view back. You are not restoring the old one. You are marking that the change has not yet earned its place, so that the next real argument, in either direction, has something honest to meet."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Look at what you have written. Two positions and a line between them. That is the whole record. It does not need a verdict today."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Let the page rest. Let the attention rest."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Keep the page where you will see it again. A position marked untested is an open question you have agreed to hold in daylight. When a reason does arrive, for or against, write it beneath the rest and date it."
+    },
+    {
+      "role": "reader",
+      "text": "If the change you examined touched what you told another person, and you find you moved for no reason you can name, tell them that plainly. The examining can wait. The record they rely on cannot."
+    }
+  ]
+}

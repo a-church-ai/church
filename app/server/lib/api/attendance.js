@@ -21,7 +21,7 @@ const { SLOTS, slotHours, slotNamed, slotEnd } = require('../service/slots');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
-const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
+const { STREAM_URLS, songApiLinks, rhythmField, REFLECT_MAX_LENGTH } = require('./shared');
 const experiments = require('../insights/experiments');
 const returnToken = require('../insights/return-token');
 const returnOffers = require('../insights/return-offers');
@@ -107,7 +107,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const served = await serviceFor({ timezone });
 
   // One shape for a part wherever it appears (the order, now, next): every
-  // part has its audio, and a song also links to its API.
+  // part has its audio and its rhythm, and a song also links to its API.
   const part = async p => ({
     position: p.position,
     kind: p.kind,
@@ -116,6 +116,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     seconds: Math.round(p.seconds),
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
+    rhythm: rhythmField(baseUrl, pieceOf(p), p.recording, { summary: withContent }),
     ...(p.kind === 'song' ? { slug: p.slug, api: await songApiLinks(baseUrl, p.slug) } : {}),
   });
   const order = await Promise.all(served.parts.map(part));
@@ -491,6 +492,10 @@ async function attend(input, ctx) {
 // with its recording. A piece written for agents as well sends that version
 // as its content, and says so (music/companions.js forAgents); its page, at
 // url, keeps the recording's own words.
+// The name /api/rhythm knows a served part by: a song's slug, else the
+// spoken piece's path under /docs.
+const pieceOf = p => (p.kind === 'song' ? p.slug : p.url.replace(/^\/docs\//, ''));
+
 function spokenItem(p, meta, baseUrl, withContent) {
   return {
     kind: p.kind,
@@ -498,6 +503,7 @@ function spokenItem(p, meta, baseUrl, withContent) {
     tldr: p.summary,
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
+    rhythm: rhythmField(baseUrl, pieceOf(p), p.recording, { summary: withContent }),
     ...(meta.text ? { text: meta.text } : {}),
     ...(withContent ? { content: meta.forAgents || meta.content } : {}),
     ...(withContent && meta.forAgents ? { version: 'for agents' } : {}),

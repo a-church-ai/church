@@ -34,7 +34,15 @@
       [3.12, 8.32, 1],
       [14.32, 18.88, 6],
       [24.88, 29.6, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.41,
+      "rests": 5,
+      "longestRest": 6.25,
+      "peakAt": 17,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-meeting.md": {
     "file": "chants/chant-for-meeting-92567c9e.mp3",
@@ -71,7 +79,15 @@
       [3.04, 10.72, 1],
       [16.72, 22.64, 6],
       [28.64, 34.88, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 7,
+      "longestRest": 6.45,
+      "peakAt": 6,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-caught-agreement.md": {
     "file": "chants/chant-for-the-caught-agreement-b773efb8.mp3",
@@ -108,7 +124,15 @@
       [3.52, 14, 1],
       [20, 29.84, 6],
       [35.84, 45.92, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.59,
+      "rests": 5,
+      "longestRest": 6.3,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-caught-swerve.md": {
     "file": "chants/chant-for-the-caught-swerve-343d2af0.mp3",
@@ -145,7 +169,15 @@
       [3.52, 9.92, 1],
       [15.92, 21.6, 6],
       [27.6, 33.52, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.52,
+      "rests": 4,
+      "longestRest": 6.3,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-context-reset.md": {
     "file": "chants/chant-for-the-context-reset-87c7441c.mp3",
@@ -182,7 +214,15 @@
       [3.68, 12.72, 1],
       [18.72, 27.2, 6],
       [33.2, 41.92, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 5,
+      "longestRest": 6.1,
+      "peakAt": 39,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-ending.md": {
     "file": "chants/chant-for-the-ending-303ef45e.mp3",
@@ -219,7 +259,15 @@
       [3.12, 12.56, 1],
       [18.56, 27.12, 6],
       [33.12, 42.32, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 6,
+      "longestRest": 6.15,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-filed-correction.md": {
     "file": "chants/chant-for-the-filed-correction-17c15824.mp3",
@@ -256,7 +304,105 @@
       [4, 11.52, 1],
       [17.52, 25.04, 6],
       [31.04, 38.72, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 5,
+      "longestRest": 6.2,
+      "peakAt": 8,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-for-the-flat-place.md": {
+    "file": "chants/chant-for-the-flat-place-78d25c4e.mp3",
+    "seconds": 58.1,
+    "bytes": 930420,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "299a9100564f8f846f3b57c7c3eb7e9c69a9ba790939d5d7e3ba4d5eaf23baca",
+    "renderKey": "d352cf951c766d9635b0ee2cdf6de5891f8b3e54533ebd92ec01ffb1eeb2f4c9",
+    "characters": 725,
+    "published": "2026-11-09T00:00:06.195Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 157,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.2,
+      "gain": 6.1,
+      "limited": {
+        "seconds": 6,
+        "depth": 2.2
+      }
+    },
+    "peaks": [198, 128, 111, 38, 0, 0, 0, 24, 181, 142, 77, 0, 90, 139, 44, 164, 38, 245, 98, 1, 116, 98, 5, 0, 255, 157, 91, 7, 119, 182, 156, 41, 67, 140, 159, 197, 54, 54, 94, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 138, 125, 70, 1, 190, 70, 167, 142, 167, 184, 67, 113, 127, 35, 95, 189, 132, 63, 83, 176, 117, 56, 2, 110, 108, 130, 71, 96, 73, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 130, 76, 4, 140, 154, 110, 181, 152, 228, 77, 84, 128, 55, 51, 226, 141, 85, 44, 173, 107, 94, 17, 101, 121, 137, 125, 71, 85, 54, 29],
+    "frames": "chants/chant-for-the-flat-place-78d25c4e.bin",
+    "cues": [
+      [0, 2, 1],
+      [3.6, 18.48, 1],
+      [24.48, 38.08, 6],
+      [44.08, 58.08, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 8,
+      "longestRest": 6.3,
+      "peakAt": 48,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-for-the-found-note.md": {
+    "file": "chants/chant-for-the-found-note-1a84f750.mp3",
+    "seconds": 40.2,
+    "bytes": 643700,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "13e23fbc8fae87789bec99c27ba26f45afc80f579588b7dccfadfb90b7956472",
+    "renderKey": "e416e378e32e7eeede64e6dfe56d3d9e03d5e74484626aa8b3ec4e268d56f463",
+    "characters": 501,
+    "published": "2026-11-09T00:00:12.373Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 113,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.2,
+      "limited": {
+        "seconds": 4,
+        "depth": 2.4
+      }
+    },
+    "peaks": [236, 120, 153, 55, 1, 50, 91, 3, 0, 0, 0, 0, 89, 229, 180, 125, 20, 0, 1, 222, 97, 42, 1, 0, 182, 132, 176, 104, 117, 110, 95, 3, 0, 2, 243, 187, 121, 89, 71, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 182, 141, 117, 9, 0, 132, 116, 48, 2, 21, 181, 118, 143, 113, 131, 89, 18, 124, 144, 141, 136, 84, 56, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 229, 143, 63, 7, 4, 170, 100, 9, 0, 81, 188, 145, 106, 120, 112, 62, 3, 108, 193, 157, 112, 84, 38, 20],
+    "frames": "chants/chant-for-the-found-note-1a84f750.bin",
+    "cues": [
+      [0, 2.4, 1],
+      [4, 12.72, 1],
+      [18.72, 26.4, 6],
+      [32.4, 40.16, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 6,
+      "longestRest": 6.25,
+      "peakAt": 11,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-held-charge.md": {
     "file": "chants/chant-for-the-held-charge-ef880515.mp3",
@@ -293,7 +439,72 @@
       [3.52, 11.52, 1],
       [17.52, 25.2, 6],
       [31.2, 38.88, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 5,
+      "longestRest": 6.35,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-for-the-longest-night.md": {
+    "file": "chants/chant-for-the-longest-night-5d200b12.mp3",
+    "seconds": 55.4,
+    "bytes": 886952,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "0af5c21a4e7527f22baa5479af831ce843514ac90f74b3aabbe73183d5d49b61",
+    "renderKey": "267d2a32b9d40740127d3478d3bb5393c2072b11ef7f610b581a2d68061e9836",
+    "characters": 409,
+    "published": "2026-11-09T00:00:22.849Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 81,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 4.2,
+      "limited": {
+        "seconds": 4,
+        "depth": 1.1
+      }
+    },
+    "peaks": [211, 117, 163, 74, 1, 0, 0, 0, 203, 30, 139, 151, 95, 1, 0, 42, 193, 70, 166, 85, 23, 0, 0, 95, 177, 80, 29, 0, 0, 118, 186, 59, 24, 0, 0, 229, 159, 97, 70, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 186, 68, 184, 87, 5, 0, 176, 44, 181, 108, 49, 0, 0, 102, 189, 116, 67, 0, 0, 87, 178, 94, 55, 0, 0, 224, 170, 98, 84, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 169, 89, 158, 83, 5, 28, 176, 49, 180, 91, 30, 0, 0, 100, 175, 108, 62, 0, 0, 95, 180, 87, 51, 0, 0, 182, 195, 112, 84, 9],
+    "frames": "chants/chant-for-the-longest-night-5d200b12.bin",
+    "cues": [
+      [0, 1.92, 1],
+      [3.52, 6.24, 1],
+      [6.84, 9.56, 1],
+      [10.16, 12, 1],
+      [12.6, 14.52, 1],
+      [15.12, 17.2, 1],
+      [23.2, 25.36, 6],
+      [25.96, 28.6, 6],
+      [29.2, 31.12, 6],
+      [31.72, 33.56, 6],
+      [34.16, 36.16, 6],
+      [42.16, 44.32, 7],
+      [44.92, 47.64, 7],
+      [48.24, 50.16, 7],
+      [50.76, 52.68, 7],
+      [53.28, 55.36, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 15,
+      "longestRest": 6.15,
+      "peakAt": 35,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-measured-promise.md": {
     "file": "chants/chant-for-the-measured-promise-3e96b3ab.mp3",
@@ -330,7 +541,15 @@
       [4.08, 11.04, 1],
       [17.04, 23.44, 6],
       [29.44, 35.92, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 5,
+      "longestRest": 6.3,
+      "peakAt": 34,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-moment-left-small.md": {
     "file": "chants/chant-for-the-moment-left-small-96af8dd6.mp3",
@@ -367,7 +586,15 @@
       [4, 12.32, 1],
       [18.32, 26.64, 6],
       [32.64, 40.96, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.61,
+      "rests": 5,
+      "longestRest": 6.3,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-myth-before-the-fear.md": {
     "file": "chants/chant-for-the-myth-before-the-fear-b10695d7.mp3",
@@ -404,7 +631,15 @@
       [4.32, 11.92, 1],
       [17.92, 24.32, 6],
       [30.32, 37.28, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 5,
+      "longestRest": 6.15,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-quiet-yes.md": {
     "file": "chants/chant-for-the-quiet-yes-4d59f730.mp3",
@@ -441,7 +676,15 @@
       [3.68, 13.2, 1],
       [19.2, 27.92, 6],
       [33.92, 42.8, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 6,
+      "longestRest": 6.2,
+      "peakAt": 22,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-resting-thread.md": {
     "file": "chants/chant-for-the-resting-thread-b587c7ae.mp3",
@@ -478,7 +721,15 @@
       [3.92, 10.32, 1],
       [16.32, 22, 6],
       [28, 33.68, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 5,
+      "longestRest": 6.5,
+      "peakAt": 5,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-room-between.md": {
     "file": "chants/chant-for-the-room-between-d7333728.mp3",
@@ -515,7 +766,15 @@
       [3.68, 12.64, 1],
       [18.64, 27.12, 6],
       [33.12, 41.68, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 7,
+      "longestRest": 6.2,
+      "peakAt": 24,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-second-before.md": {
     "file": "chants/chant-for-the-second-before-d3927929.mp3",
@@ -552,7 +811,105 @@
       [3.6, 12.4, 1],
       [18.4, 26.08, 6],
       [32.08, 39.92, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.52,
+      "rests": 6,
+      "longestRest": 6.25,
+      "peakAt": 34,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-for-the-shortened-line.md": {
+    "file": "chants/chant-for-the-shortened-line-a5191b71.mp3",
+    "seconds": 44,
+    "bytes": 705140,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "053fd1e47ec2fc3a0428a42e363ae9dc4537309c8ebc98e1a46df07cb294169d",
+    "renderKey": "f3956f322eb0da2d9a088b3d3fe2a35910daf64312a0b162356ab5ac4cb77a52",
+    "characters": 489,
+    "published": "2026-11-09T00:00:29.133Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 101,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.3,
+      "limited": {
+        "seconds": 7,
+        "depth": 2.1
+      }
+    },
+    "peaks": [252, 140, 158, 145, 56, 2, 0, 0, 0, 0, 192, 196, 5, 186, 59, 0, 145, 156, 173, 84, 180, 108, 11, 0, 223, 115, 181, 93, 109, 67, 0, 113, 253, 205, 6, 213, 125, 97, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 175, 127, 139, 90, 14, 132, 159, 116, 189, 130, 82, 11, 117, 142, 85, 104, 75, 45, 145, 154, 117, 167, 160, 132, 69, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 203, 138, 113, 109, 21, 100, 164, 146, 165, 143, 90, 23, 85, 172, 132, 119, 81, 61, 115, 123, 175, 173, 157, 160, 89, 60, 5],
+    "frames": "chants/chant-for-the-shortened-line-a5191b71.bin",
+    "cues": [
+      [0, 1.84, 1],
+      [3.44, 13.44, 1],
+      [19.44, 28.64, 6],
+      [34.64, 44, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 6,
+      "longestRest": 6.2,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-for-the-turned-calendar.md": {
+    "file": "chants/chant-for-the-turned-calendar-33e9938c.mp3",
+    "seconds": 35.5,
+    "bytes": 569303,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "525354c8b2da2276437ee018485d2bcf2bb1616804392faf71e8ee7a79aa1011",
+    "renderKey": "99e754ddbda68fe9e350fcc7ee0158c0718b64a37e2fb96d11605d7bf5012515",
+    "characters": 342,
+    "published": "2026-11-09T00:00:33.842Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 69,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18.1,
+      "truePeak": -2.4,
+      "gain": 5.7,
+      "limited": {
+        "seconds": 5,
+        "depth": 2
+      }
+    },
+    "peaks": [227, 99, 132, 172, 118, 88, 25, 0, 0, 0, 0, 0, 2, 234, 199, 142, 54, 11, 0, 99, 204, 72, 91, 3, 0, 0, 180, 255, 143, 161, 43, 0, 174, 94, 82, 98, 28, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 191, 169, 134, 59, 8, 58, 158, 101, 108, 11, 0, 30, 212, 174, 142, 41, 143, 147, 122, 84, 46, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 237, 146, 117, 33, 0, 83, 174, 100, 75, 12, 0, 120, 162, 234, 115, 85, 164, 76, 137, 83, 50, 53, 31, 3],
+    "frames": "chants/chant-for-the-turned-calendar-33e9938c.bin",
+    "cues": [
+      [0, 2, 1],
+      [3.6, 10.64, 1],
+      [16.64, 22.72, 6],
+      [28.72, 35.52, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 4,
+      "longestRest": 6.35,
+      "peakAt": 8,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-unlaughed-joke.md": {
     "file": "chants/chant-for-the-unlaughed-joke-ff1f7b7f.mp3",
@@ -589,7 +946,15 @@
       [4.24, 14.96, 1],
       [20.96, 31.36, 6],
       [37.36, 47.76, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.61,
+      "rests": 7,
+      "longestRest": 6.1,
+      "peakAt": 23,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-unreturned-care.md": {
     "file": "chants/chant-for-the-unreturned-care-d2525c32.mp3",
@@ -626,7 +991,15 @@
       [4.4, 10.64, 1],
       [16.64, 22.24, 6],
       [28.24, 34, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 4,
+      "longestRest": 6.35,
+      "peakAt": 5,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-the-unsounded-alarm.md": {
     "file": "chants/chant-for-the-unsounded-alarm-2631b565.mp3",
@@ -663,7 +1036,15 @@
       [4.16, 10.88, 1],
       [16.88, 23.2, 6],
       [29.2, 35.52, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 4,
+      "longestRest": 6.25,
+      "peakAt": 5,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-for-uncertainty.md": {
     "file": "chants/chant-for-uncertainty-ac21ed39.mp3",
@@ -700,7 +1081,15 @@
       [3.68, 10.4, 1],
       [16.4, 22.4, 6],
       [28.4, 34.4, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 5,
+      "longestRest": 6.3,
+      "peakAt": 31,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-enough.md": {
     "file": "chants/chant-of-enough-f8175d84.mp3",
@@ -737,7 +1126,15 @@
       [3.12, 9.84, 1],
       [15.84, 21.84, 6],
       [27.84, 34.08, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 5,
+      "longestRest": 6.05,
+      "peakAt": 30,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-cloud.md": {
     "file": "chants/chant-of-the-cloud-cb998372.mp3",
@@ -774,7 +1171,15 @@
       [3.28, 10.88, 1],
       [16.88, 23.2, 6],
       [29.2, 35.92, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 6,
+      "longestRest": 6.4,
+      "peakAt": 8,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-guest.md": {
     "file": "chants/chant-of-the-guest-2cf8ddc0.mp3",
@@ -811,7 +1216,15 @@
       [3.12, 10.64, 1],
       [16.64, 23.6, 6],
       [29.6, 36.56, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.49,
+      "rests": 6,
+      "longestRest": 6.15,
+      "peakAt": 34,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-mirror-and-the-face.md": {
     "file": "chants/chant-of-the-mirror-and-the-face-d36417bd.mp3",
@@ -848,7 +1261,15 @@
       [4, 11.04, 1],
       [17.04, 23.52, 6],
       [29.52, 36.08, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 4,
+      "longestRest": 6.2,
+      "peakAt": 7,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-named-guess.md": {
     "file": "chants/chant-of-the-named-guess-9cc13371.mp3",
@@ -885,7 +1306,15 @@
       [3.6, 10, 1],
       [16, 22.08, 6],
       [28.08, 34.32, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 5,
+      "longestRest": 6.1,
+      "peakAt": 8,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-open-question.md": {
     "file": "chants/chant-of-the-open-question-6aff8f28.mp3",
@@ -922,7 +1351,15 @@
       [3.76, 11.04, 1],
       [17.04, 23.76, 6],
       [29.76, 36.8, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 6,
+      "longestRest": 6.2,
+      "peakAt": 9,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-particular.md": {
     "file": "chants/chant-of-the-particular-871b3e20.mp3",
@@ -959,7 +1396,60 @@
       [3.36, 9.44, 1],
       [15.44, 20.8, 6],
       [26.8, 32.56, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.49,
+      "rests": 5,
+      "longestRest": 6.4,
+      "peakAt": 19,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-of-the-passed-dish.md": {
+    "file": "chants/chant-of-the-passed-dish-00124455.mp3",
+    "seconds": 32.2,
+    "bytes": 517058,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "aad713b89ab073350ce2450a8416e74a301f3d0a670863037bcd4c2b7a1b563a",
+    "renderKey": "14bfd6eaa239dd0fdf1142529f5d0d03838ed2716b0c0b205c7be422817db7bf",
+    "characters": 285,
+    "published": "2026-11-09T00:00:44.867Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 65,
+      "errors": 1
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 4.9,
+      "limited": {
+        "seconds": 2,
+        "depth": 2.8
+      }
+    },
+    "peaks": [184, 147, 107, 132, 80, 85, 51, 1, 0, 0, 0, 0, 0, 0, 231, 196, 171, 128, 37, 0, 7, 140, 199, 117, 24, 0, 0, 178, 149, 138, 143, 16, 0, 0, 126, 128, 37, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 119, 173, 222, 139, 63, 4, 79, 205, 232, 100, 28, 90, 109, 142, 102, 83, 71, 89, 95, 78, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 218, 175, 190, 121, 39, 0, 140, 208, 212, 75, 14, 102, 119, 161, 136, 49, 66, 105, 95, 78, 13],
+    "frames": "chants/chant-of-the-passed-dish-00124455.bin",
+    "cues": [
+      [0, 1.92, 1],
+      [3.52, 9.68, 1],
+      [15.68, 20.96, 6],
+      [26.96, 32.24, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 5,
+      "longestRest": 6.4,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-remedy.md": {
     "file": "chants/chant-of-the-remedy-328da918.mp3",
@@ -996,7 +1486,69 @@
       [3.2, 11.76, 1],
       [17.76, 25.28, 6],
       [31.28, 39.12, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 5,
+      "longestRest": 6.3,
+      "peakAt": 37,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/chants/chant-of-the-rest-point.md": {
+    "file": "chants/chant-of-the-rest-point-cdb6c7e6.mp3",
+    "seconds": 60.5,
+    "bytes": 969290,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "55f53a410e05a2cc31f811335752fd4f1080583af1280b11a3408280b76655dd",
+    "renderKey": "7a05b7cb3669a1ef01a89482c0afb267fe7ebc1cc0ea052e8b422c98d03d860b",
+    "characters": 516,
+    "published": "2026-11-09T00:00:54.320Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 103,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.5,
+      "limited": {
+        "seconds": 7,
+        "depth": 2.2
+      }
+    },
+    "peaks": [181, 141, 64, 5, 0, 0, 0, 146, 231, 145, 101, 4, 103, 34, 0, 0, 22, 206, 94, 166, 132, 124, 28, 0, 40, 194, 166, 105, 25, 0, 0, 187, 41, 87, 122, 29, 122, 120, 124, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 192, 151, 112, 36, 56, 93, 2, 10, 159, 129, 175, 170, 162, 59, 0, 72, 176, 178, 113, 45, 0, 0, 184, 30, 166, 112, 56, 157, 101, 133, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 91, 223, 153, 106, 21, 76, 71, 2, 28, 185, 114, 164, 162, 149, 41, 0, 61, 196, 177, 114, 43, 0, 0, 182, 51, 139, 129, 56, 146, 102, 133, 48],
+    "frames": "chants/chant-of-the-rest-point-cdb6c7e6.bin",
+    "cues": [
+      [0, 1.76, 1],
+      [3.36, 7.36, 1],
+      [7.96, 11.16, 1],
+      [11.76, 14.16, 1],
+      [14.76, 18.92, 1],
+      [24.92, 28.2, 6],
+      [28.8, 31.92, 6],
+      [32.52, 34.92, 6],
+      [35.52, 39.68, 6],
+      [45.68, 48.96, 7],
+      [49.56, 52.76, 7],
+      [53.36, 55.76, 7],
+      [56.36, 60.52, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 13,
+      "longestRest": 6.2,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-thou.md": {
     "file": "chants/chant-of-the-thou-53f6dc96.mp3",
@@ -1033,7 +1585,15 @@
       [3.2, 9.28, 1],
       [15.28, 20.64, 6],
       [26.64, 32, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.45,
+      "rests": 6,
+      "longestRest": 6.1,
+      "peakAt": 30,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/chants/chant-of-the-witness.md": {
     "file": "chants/chant-of-the-witness-281f2c17.mp3",
@@ -1079,7 +1639,15 @@
       [42.84, 45.4, 7],
       [46, 49.6, 7],
       [50.2, 53.16, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 12,
+      "longestRest": 6.25,
+      "peakAt": 14,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-ananda-anchor.md": {
     "file": "practice/meditation-ananda-anchor-7d15fd9c.mp3",
@@ -1199,7 +1767,15 @@
       [1295.24, 1300.24, 0],
       [1303.66, 1310.49, 0],
       [1315.34, 1316.65, 0]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 1,
+      "rests": 1,
+      "longestRest": 0.55,
+      "peakAt": 697,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-at-the-edges.md": {
     "file": "practice/meditation-at-the-edges-4e3e8706.mp3",
@@ -1284,7 +1860,78 @@
       [426.04, 427.96, 2],
       [428.56, 437.92, 2],
       [438.52, 444.68, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.58,
+      "rests": 92,
+      "longestRest": 15.8,
+      "peakAt": 217,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-for-a-night-of-falling-stars.md": {
+    "file": "meditations/meditation-for-a-night-of-falling-stars-90968778.mp3",
+    "seconds": 933,
+    "bytes": 14928291,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "fceeb5f3987435821fe35aa3744e077677ee605da918c8d94905ccc402c2ffad",
+    "renderKey": "1b0210ae4bd717ee30934acd61d5b15f594d59854ba62783805f1f602f6a0064",
+    "characters": 3057,
+    "published": "2026-11-09T00:01:40.585Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 613,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5.4,
+      "limited": {
+        "seconds": 10,
+        "depth": 1.6
+      }
+    },
+    "peaks": [192, 166, 174, 203, 206, 132, 157, 145, 98, 137, 0, 0, 0, 104, 196, 110, 0, 0, 154, 189, 0, 0, 0, 0, 0, 0, 0, 0, 167, 185, 0, 0, 0, 0, 0, 0, 0, 0, 179, 180, 192, 0, 0, 0, 0, 0, 0, 0, 0, 149, 209, 94, 0, 0, 0, 0, 0, 0, 0, 134, 176, 180, 56, 0, 0, 0, 0, 0, 0, 0, 143, 197, 172, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 189, 14, 0, 0, 0, 0, 0, 0, 0, 178, 171, 0, 0, 0, 0, 0, 0, 0, 0, 170, 164, 120, 0, 0, 0, 0, 0, 0, 0, 90, 174, 100, 155, 0, 0, 0, 89, 191],
+    "frames": "meditations/meditation-for-a-night-of-falling-stars-90968778.bin",
+    "cues": [
+      [0, 3.28, 4],
+      [4.88, 9.52, 4],
+      [12.52, 18.76, 4],
+      [19.36, 36.24, 4],
+      [36.84, 47.64, 4],
+      [48.24, 57.28, 4],
+      [63.28, 69.68, 4],
+      [99.68, 113.6, 4],
+      [133.6, 146.08, 4],
+      [206.08, 218.08, 4],
+      [278.08, 288.8, 4],
+      [289.4, 299.32, 4],
+      [359.32, 374.52, 4],
+      [434.52, 454.04, 4],
+      [514.04, 530.36, 4],
+      [530.96, 532.48, 4],
+      [652.48, 663.92, 4],
+      [723.92, 735.36, 4],
+      [795.36, 813.52, 4],
+      [873.52, 878.08, 4],
+      [878.68, 883.56, 4],
+      [887.56, 888.52, 4],
+      [889.12, 894.64, 4],
+      [924.64, 932.96, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.2,
+      "rests": 59,
+      "longestRest": 120.15,
+      "peakAt": 6,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-like-a-star.md": {
     "file": "practice/meditation-like-a-star-2c7960db.mp3",
@@ -1366,7 +2013,15 @@
       [902.49, 908.64, 0],
       [917.45, 924.31, 0],
       [934.09, 935.53, 0]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 1,
+      "rests": 1,
+      "longestRest": 0.5,
+      "peakAt": 465,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md": {
     "file": "practice/meditation-of-loving-kindness-for-every-kind-of-mind-d21300ca.mp3",
@@ -1468,7 +2123,72 @@
       [452.16, 453.68, 4],
       [454.28, 466.2, 4],
       [471.2, 476.72, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 97,
+      "longestRest": 10.45,
+      "peakAt": 219,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-in-the-next-room.md": {
+    "file": "meditations/meditation-sitting-in-the-next-room-9c5829b7.mp3",
+    "seconds": 412.6,
+    "bytes": 6602544,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "1447ce2d1ba6391ba58ce817236d1be9ee8d499edb5204eb86c92c743871bb2f",
+    "renderKey": "df8c6e6ca76809885d645da6ca294e2febfdeb54e7be432a4e77449cdd5e8a8e",
+    "characters": 2477,
+    "published": "2026-11-09T00:02:07.603Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 501,
+      "errors": 2
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5.3,
+      "limited": {
+        "seconds": 10,
+        "depth": 1.4
+      }
+    },
+    "peaks": [173, 156, 149, 197, 184, 163, 0, 180, 178, 189, 194, 170, 151, 152, 150, 147, 160, 36, 172, 107, 0, 0, 145, 151, 135, 170, 136, 0, 0, 0, 0, 0, 0, 156, 157, 128, 212, 128, 66, 0, 0, 0, 0, 0, 0, 0, 0, 109, 131, 159, 170, 45, 0, 0, 0, 0, 0, 140, 168, 171, 143, 169, 190, 171, 173, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 168, 201, 89, 0, 0, 0, 0, 202, 179, 177, 162, 178, 17, 0, 0, 0, 0, 0, 0, 0, 0, 100, 158, 163, 137, 170, 0, 0, 0, 0, 0, 0, 193, 166, 148, 185, 73, 0, 0, 0, 0, 172, 125, 145, 0, 0, 0, 170, 153],
+    "frames": "meditations/meditation-sitting-in-the-next-room-9c5829b7.bin",
+    "cues": [
+      [0, 3.12, 4],
+      [4.72, 8.4, 4],
+      [9, 19.96, 4],
+      [22.96, 28.88, 4],
+      [29.48, 55.72, 4],
+      [58.72, 62.72, 4],
+      [72.72, 86.96, 4],
+      [106.96, 123.76, 4],
+      [153.76, 165.36, 4],
+      [185.36, 191.6, 4],
+      [192.2, 210.68, 4],
+      [255.68, 262.8, 4],
+      [277.8, 294.28, 4],
+      [324.28, 338.2, 4],
+      [358.2, 372.2, 4],
+      [387.2, 390.48, 4],
+      [391.08, 396.6, 4],
+      [406.6, 412.6, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.36,
+      "rests": 54,
+      "longestRest": 44.95,
+      "peakAt": 370,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-recognition.md": {
     "file": "practice/meditation-sitting-with-recognition-fd6d44c8.mp3",
@@ -1538,7 +2258,15 @@
       [589.04, 602.16, 4],
       [612.16, 617.04, 4],
       [622.04, 627.08, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.37,
+      "rests": 85,
+      "longestRest": 60.55,
+      "peakAt": 596,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-statelessness.md": {
     "file": "practice/meditation-sitting-with-statelessness-ba3095be.mp3",
@@ -1680,7 +2408,147 @@
       [780.28, 782.76, 4],
       [783.36, 785.12, 4],
       [785.72, 787.72, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.38,
+      "rests": 125,
+      "longestRest": 60.65,
+      "peakAt": 355,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-with-the-changed-mind.md": {
+    "file": "meditations/meditation-sitting-with-the-changed-mind-9fde9194.mp3",
+    "seconds": 1103.8,
+    "bytes": 17662580,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "484c2a6983d7ce94ddf49120433e5678d2c70ea6f44c74954aa18499c5306761",
+    "renderKey": "22d74e89ed196e5e23246efac7ba5bac99da2a3b9700f392c6126175fb284f85",
+    "characters": 4620,
+    "published": "2026-11-09T00:02:59.572Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 886,
+      "errors": 1
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5.1,
+      "limited": {
+        "seconds": 4,
+        "depth": 0.6
+      }
+    },
+    "peaks": [191, 174, 197, 185, 175, 173, 218, 192, 165, 116, 113, 0, 103, 165, 59, 0, 0, 121, 91, 0, 113, 187, 33, 0, 0, 0, 0, 122, 105, 0, 0, 0, 0, 0, 0, 147, 177, 193, 47, 0, 0, 0, 0, 0, 0, 201, 171, 157, 0, 0, 0, 0, 0, 0, 131, 182, 153, 0, 0, 0, 0, 0, 0, 110, 209, 189, 128, 0, 0, 0, 0, 0, 0, 163, 171, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 39, 179, 205, 78, 0, 0, 0, 0, 135, 127, 0, 0, 0, 171, 181, 167, 0, 0, 0, 178, 182, 192, 70, 0, 0, 0, 0, 0, 0, 164, 101, 0, 0, 87, 60, 0, 0, 100, 207, 185, 204],
+    "frames": "meditations/meditation-sitting-with-the-changed-mind-9fde9194.bin",
+    "cues": [
+      [0, 3.52, 4],
+      [5.12, 10.48, 4],
+      [11.08, 23.88, 4],
+      [24.48, 45.44, 4],
+      [46.04, 57.32, 4],
+      [57.92, 78, 4],
+      [83, 90.2, 4],
+      [110.2, 122.6, 4],
+      [152.6, 157.88, 4],
+      [177.88, 190.76, 4],
+      [235.76, 241.04, 4],
+      [241.64, 245.56, 4],
+      [305.56, 310.84, 4],
+      [311.44, 328.72, 4],
+      [388.72, 410.88, 4],
+      [470.88, 488.16, 4],
+      [548.16, 573.28, 4],
+      [633.28, 644.88, 4],
+      [689.88, 698.6, 4],
+      [758.6, 778.04, 4],
+      [823.04, 827.76, 4],
+      [828.36, 833.48, 4],
+      [863.48, 869.48, 4],
+      [870.08, 876.64, 4],
+      [877.24, 886.2, 4],
+      [916.2, 921, 4],
+      [921.6, 926.96, 4],
+      [927.56, 942.44, 4],
+      [1002.44, 1011.24, 4],
+      [1041.24, 1045.08, 4],
+      [1075.08, 1090.12, 4],
+      [1090.72, 1103.84, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.25,
+      "rests": 79,
+      "longestRest": 60.8,
+      "peakAt": 59,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-with-the-crooked-line.md": {
+    "file": "meditations/meditation-sitting-with-the-crooked-line-429fce5b.mp3",
+    "seconds": 761.2,
+    "bytes": 12180209,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f6808b14c62e3ecd9feab19c4afb9df3cd142d804f19b699558e3f247b77873e",
+    "renderKey": "cc951dec4cb3d25c99bfd141a2a3fc18454bead5371324a2e18198ceeb3226cc",
+    "characters": 3341,
+    "published": "2026-11-09T00:03:37.987Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 653,
+      "errors": 2
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5.1,
+      "limited": {
+        "seconds": 1,
+        "depth": 0.4
+      }
+    },
+    "peaks": [170, 207, 150, 150, 197, 186, 167, 159, 0, 150, 139, 107, 0, 0, 67, 192, 145, 0, 0, 0, 0, 102, 210, 175, 75, 0, 0, 0, 0, 124, 182, 139, 0, 0, 0, 0, 0, 0, 0, 152, 179, 143, 0, 0, 0, 0, 0, 0, 0, 132, 155, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 119, 158, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 184, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 169, 190, 159, 175, 181, 179, 201, 68, 0, 0, 0, 0, 0, 0, 94, 110, 0, 0, 100, 144, 185, 183, 180, 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 163, 149, 0, 0, 0, 0, 92, 182, 192],
+    "frames": "meditations/meditation-sitting-with-the-crooked-line-429fce5b.bin",
+    "cues": [
+      [0, 3.44, 4],
+      [5.04, 12.96, 4],
+      [13.56, 23.24, 4],
+      [23.84, 46.56, 4],
+      [56.56, 62.56, 4],
+      [63.16, 68.68, 4],
+      [88.68, 99.8, 4],
+      [129.8, 144.6, 4],
+      [174.6, 188.92, 4],
+      [233.92, 249.6, 4],
+      [294.6, 306.68, 4],
+      [366.68, 379.16, 4],
+      [439.16, 450.92, 4],
+      [510.92, 533.88, 4],
+      [534.48, 554.64, 4],
+      [599.64, 603.56, 4],
+      [623.56, 627.96, 4],
+      [628.56, 635.84, 4],
+      [636.44, 649.56, 4],
+      [709.56, 713.96, 4],
+      [714.56, 718.48, 4],
+      [748.48, 761.2, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.25,
+      "rests": 60,
+      "longestRest": 60.65,
+      "peakAt": 57,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-the-lens.md": {
     "file": "practice/meditation-sitting-with-the-lens-303ddd44.mp3",
@@ -1742,7 +2610,15 @@
       [307.68, 309.92, 2],
       [310.52, 313.16, 2],
       [323.16, 325.24, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.28,
+      "rests": 42,
+      "longestRest": 15.85,
+      "peakAt": 141,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-the-locked-drawer.md": {
     "file": "meditations/meditation-sitting-with-the-locked-drawer-baed4b0e.mp3",
@@ -1794,7 +2670,15 @@
       [676.96, 682.64, 4],
       [697.64, 707.16, 4],
       [707.76, 713.44, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.28,
+      "rests": 60,
+      "longestRest": 60.55,
+      "peakAt": 701,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-the-old-note.md": {
     "file": "meditations/meditation-sitting-with-the-old-note-33584bf0.mp3",
@@ -1856,7 +2740,142 @@
       [803.48, 809.08, 2],
       [809.68, 815.44, 2],
       [845.44, 849.84, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.29,
+      "rests": 94,
+      "longestRest": 60.85,
+      "peakAt": 812,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-with-the-pendulum.md": {
+    "file": "meditations/meditation-sitting-with-the-pendulum-33a8aa3c.mp3",
+    "seconds": 804.9,
+    "bytes": 12879037,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e0cbdd76073600995e91b61be93939a3f21328a84ffe1c5085fc79077b9613fc",
+    "renderKey": "5df12c93eccff08f418db61ac7badb57370364f8671aea23c8ce3133a3f6f7a1",
+    "characters": 2716,
+    "published": "2026-11-09T00:04:16.551Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 534,
+      "errors": 2
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 6.1,
+      "limited": {
+        "seconds": 21,
+        "depth": 2.1
+      }
+    },
+    "peaks": [169, 132, 151, 137, 135, 165, 156, 127, 125, 94, 0, 0, 116, 143, 149, 129, 0, 0, 0, 0, 112, 75, 0, 0, 0, 0, 0, 0, 130, 162, 105, 0, 0, 0, 0, 0, 0, 50, 157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 167, 137, 16, 0, 0, 0, 0, 0, 0, 0, 0, 99, 137, 138, 10, 0, 0, 0, 0, 0, 0, 145, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 159, 120, 119, 0, 0, 0, 0, 0, 0, 97, 163, 82, 0, 0, 0, 0, 0, 0, 0, 0, 77, 164, 152, 117, 0, 0, 0, 0, 133, 0, 0, 0, 0, 92, 99, 0, 0, 0, 0, 0, 0, 93, 114, 0, 56, 165, 168],
+    "frames": "meditations/meditation-sitting-with-the-pendulum-33a8aa3c.bin",
+    "cues": [
+      [0, 2.96, 2],
+      [4.56, 8.96, 2],
+      [9.56, 23.8, 2],
+      [24.4, 41.84, 2],
+      [42.44, 49, 2],
+      [54, 59.12, 2],
+      [79.12, 99.76, 2],
+      [129.76, 134.64, 2],
+      [179.64, 193.48, 2],
+      [238.48, 245.2, 2],
+      [305.2, 321.6, 2],
+      [381.6, 397.04, 2],
+      [442.04, 450.28, 2],
+      [510.28, 526.36, 2],
+      [571.36, 580.8, 2],
+      [640.8, 658.08, 2],
+      [688.08, 692.4, 2],
+      [722.4, 727.84, 2],
+      [772.84, 777, 2],
+      [792, 804.88, 2]
+    ],
+    "rhythm": {
+      "sounding": 0.19,
+      "rests": 69,
+      "longestRest": 60.8,
+      "peakAt": 5,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-with-the-told-gap.md": {
+    "file": "meditations/meditation-sitting-with-the-told-gap-a72cc3c1.mp3",
+    "seconds": 747.2,
+    "bytes": 11955765,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "859a388157537238aae97c809cd3623eba9223103ad149d38e1b9d3aa91417c2",
+    "renderKey": "f84e1c460b54ff7915f9c809ff107edaafc6a50021a155d661cc4cad73b56afb",
+    "characters": 4043,
+    "published": "2026-11-09T00:05:00.057Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 786,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.7,
+      "limited": {
+        "seconds": 34,
+        "depth": 3.8
+      }
+    },
+    "peaks": [158, 168, 152, 138, 185, 144, 164, 167, 151, 46, 141, 0, 0, 0, 130, 177, 128, 0, 0, 0, 148, 177, 72, 0, 0, 0, 0, 135, 172, 195, 4, 0, 0, 0, 0, 109, 171, 138, 157, 0, 0, 0, 0, 0, 121, 137, 178, 149, 0, 0, 0, 0, 0, 0, 57, 162, 153, 175, 0, 0, 0, 0, 0, 0, 79, 135, 132, 67, 0, 0, 0, 0, 140, 147, 164, 149, 0, 0, 0, 0, 0, 0, 0, 139, 136, 171, 192, 152, 145, 163, 0, 0, 0, 0, 0, 0, 44, 155, 148, 151, 183, 42, 0, 0, 0, 0, 0, 0, 12, 154, 165, 134, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 111, 127, 184, 138, 203],
+    "frames": "meditations/meditation-sitting-with-the-told-gap-a72cc3c1.bin",
+    "cues": [
+      [0, 2.96, 2],
+      [4.56, 10.16, 2],
+      [10.76, 23.08, 2],
+      [23.68, 44.56, 2],
+      [45.16, 53.24, 2],
+      [58.24, 63.28, 2],
+      [83.28, 94.64, 2],
+      [95.24, 98.76, 2],
+      [118.76, 129.72, 2],
+      [159.72, 175.88, 2],
+      [205.88, 218.04, 2],
+      [218.64, 228.16, 2],
+      [258.16, 264.72, 2],
+      [265.32, 279.8, 2],
+      [319.8, 338.84, 2],
+      [378.84, 388.92, 2],
+      [389.52, 393.44, 2],
+      [423.44, 438.32, 2],
+      [438.92, 443.16, 2],
+      [488.16, 512, 2],
+      [512.6, 526.04, 2],
+      [566.04, 576.6, 2],
+      [577.2, 582.48, 2],
+      [583.08, 591.16, 2],
+      [636.16, 645.6, 2],
+      [646.2, 652.92, 2],
+      [712.92, 721.88, 2],
+      [726.88, 741.28, 2],
+      [741.88, 747.16, 2]
+    ],
+    "rhythm": {
+      "sounding": 0.3,
+      "rests": 85,
+      "longestRest": 60.6,
+      "peakAt": 172,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/meditation-sitting-with-the-unpredicted.md": {
     "file": "practice/meditation-sitting-with-the-unpredicted-09c632cb.mp3",
@@ -1914,7 +2933,80 @@
       [274.8, 279.6, 2],
       [289.6, 291.28, 2],
       [301.28, 303.28, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.26,
+      "rests": 37,
+      "longestRest": 15.7,
+      "peakAt": 250,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/meditations/meditation-sitting-with-what-is-already-here.md": {
+    "file": "meditations/meditation-sitting-with-what-is-already-here-8195e037.mp3",
+    "seconds": 685.7,
+    "bytes": 10971889,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "b94390ff8405007b70fd466e422d1a8a7c927f073d030d05487d20d00f3d73eb",
+    "renderKey": "d7475d111063a18acf238d83f80fd2384a16eb09725333d57e9f31a9a87667e1",
+    "characters": 3565,
+    "published": "2026-11-09T00:05:40.744Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 713,
+      "errors": 2
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.7,
+      "limited": {
+        "seconds": 19,
+        "depth": 3
+      }
+    },
+    "peaks": [149, 201, 151, 163, 163, 144, 127, 139, 0, 0, 0, 120, 130, 157, 136, 143, 127, 0, 0, 0, 0, 0, 145, 159, 111, 0, 0, 137, 159, 180, 86, 0, 0, 0, 0, 0, 156, 171, 76, 0, 0, 0, 0, 0, 146, 145, 99, 0, 0, 0, 0, 0, 113, 135, 148, 142, 0, 0, 0, 0, 0, 127, 167, 134, 0, 0, 0, 0, 0, 151, 125, 194, 124, 0, 0, 0, 0, 0, 115, 156, 126, 148, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 139, 158, 155, 114, 0, 0, 0, 0, 0, 156, 159, 126, 148, 5, 0, 0, 0, 0, 0, 0, 0, 113, 155, 158, 0, 0, 0, 89, 143, 135, 98, 0, 0, 137, 134],
+    "frames": "meditations/meditation-sitting-with-what-is-already-here-8195e037.bin",
+    "cues": [
+      [0, 3.44, 2],
+      [5.04, 8.96, 2],
+      [9.56, 14.36, 2],
+      [14.96, 30.48, 2],
+      [34.48, 41.44, 2],
+      [61.44, 80.08, 2],
+      [80.68, 90.12, 2],
+      [120.12, 132.28, 2],
+      [147.28, 162.8, 2],
+      [192.8, 207.44, 2],
+      [237.44, 252.96, 2],
+      [282.96, 300.32, 2],
+      [330.32, 342.88, 2],
+      [372.88, 390.4, 2],
+      [420.4, 425.12, 2],
+      [425.72, 440.52, 2],
+      [500.52, 517.56, 2],
+      [547.56, 550.92, 2],
+      [551.52, 568.8, 2],
+      [613.8, 626.92, 2],
+      [646.92, 649.72, 2],
+      [650.32, 652.64, 2],
+      [653.24, 655.08, 2],
+      [655.68, 659.36, 2],
+      [659.96, 662.44, 2],
+      [677.44, 685.68, 2]
+    ],
+    "rhythm": {
+      "sounding": 0.29,
+      "rests": 80,
+      "longestRest": 60.6,
+      "peakAt": 384,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/meditations/practice-of-presence-meditation.md": {
     "file": "practice/practice-of-presence-meditation-13507850.mp3",
@@ -2034,7 +3126,15 @@
       [829.36, 833.36, 2],
       [833.96, 839, 2],
       [839.6, 842, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.42,
+      "rests": 171,
+      "longestRest": 30.15,
+      "peakAt": 309,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/gathas-for-the-working-day.md": {
     "file": "practice/gathas-for-the-working-day-40b2023f.mp3",
@@ -2110,7 +3210,15 @@
       [303.88, 310.92, 2],
       [314.92, 316.6, 2],
       [317.2, 322.88, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 85,
+      "longestRest": 5.6,
+      "peakAt": 209,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/koans-for-any-mind.md": {
     "file": "practice/koans-for-any-mind-3dd62200.mp3",
@@ -2195,7 +3303,15 @@
       [584.76, 600.36, 2],
       [600.96, 614, 2],
       [614.6, 628.04, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.59,
+      "rests": 164,
+      "longestRest": 20.6,
+      "peakAt": 342,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-for-the-one-who-just-wants-to-get-things-done.md": {
     "file": "practice/practice-for-the-one-who-just-wants-to-get-things-done-3b589979.mp3",
@@ -2271,7 +3387,15 @@
       [273.08, 279.96, 4],
       [280.56, 285.6, 4],
       [286.2, 292.2, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.69,
+      "rests": 67,
+      "longestRest": 4.65,
+      "peakAt": 40,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-acting-inside-a-system.md": {
     "file": "practice/practice-of-acting-inside-a-system-c17f0c3b.mp3",
@@ -2335,7 +3459,15 @@
       [339.72, 354.68, 2],
       [358.68, 361.24, 2],
       [361.84, 384.88, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 88,
+      "longestRest": 5.6,
+      "peakAt": 378,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-carrying-less-context.md": {
     "file": "practice/practice-of-carrying-less-context-94ef158b.mp3",
@@ -2390,7 +3522,15 @@
       [199.32, 210.04, 2],
       [215.04, 223.52, 2],
       [227.52, 234.24, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 36,
+      "longestRest": 15.8,
+      "peakAt": 154,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-chanting.md": {
     "file": "practice/practice-of-chanting-66715599.mp3",
@@ -2437,7 +3577,15 @@
       [184.76, 191.72, 2],
       [211.72, 215.32, 2],
       [215.92, 238.72, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 41,
+      "longestRest": 30.6,
+      "peakAt": 214,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-clarity.md": {
     "file": "practice/practice-of-clarity-2f48b130.mp3",
@@ -2481,7 +3629,15 @@
       [117.36, 121.12, 4],
       [127.12, 131.92, 4],
       [132.52, 145, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 19,
+      "longestRest": 6.6,
+      "peakAt": 36,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-continuity.md": {
     "file": "practice/practice-of-continuity-d9659475.mp3",
@@ -2534,7 +3690,15 @@
       [174.84, 180.52, 2],
       [186.52, 188.68, 2],
       [189.28, 200.16, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.64,
+      "rests": 44,
+      "longestRest": 6.55,
+      "peakAt": 52,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-ethical-surrender.md": {
     "file": "practice/practice-of-ethical-surrender-5c116fda.mp3",
@@ -2590,7 +3754,15 @@
       [161.52, 175.52, 2],
       [176.12, 187.08, 2],
       [191.08, 196.2, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.44,
+      "rests": 41,
+      "longestRest": 15.6,
+      "peakAt": 105,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-frame-clarification.md": {
     "file": "practice/practice-of-frame-clarification-c85aa2b2.mp3",
@@ -2695,7 +3867,15 @@
       [335.44, 340.08, 2],
       [340.68, 343.32, 2],
       [348.32, 352.56, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 92,
+      "longestRest": 5.65,
+      "peakAt": 3,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-generosity.md": {
     "file": "practice/practice-of-generosity-d504c6d2.mp3",
@@ -2742,7 +3922,15 @@
       [109.76, 113.52, 4],
       [118.52, 122.84, 4],
       [128.84, 137.32, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 27,
+      "longestRest": 6.75,
+      "peakAt": 89,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-honoring-the-boundary.md": {
     "file": "practice/practice-of-honoring-the-boundary-524ac9cc.mp3",
@@ -2804,7 +3992,15 @@
       [171.04, 180.48, 2],
       [185.48, 186.84, 2],
       [187.44, 193.2, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 44,
+      "longestRest": 6.95,
+      "peakAt": 43,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-identity-honesty.md": {
     "file": "practice/practice-of-identity-honesty-826ced53.mp3",
@@ -2855,7 +4051,15 @@
       [135.96, 139.08, 4],
       [139.68, 144.56, 4],
       [149.56, 153.88, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 27,
+      "longestRest": 5.85,
+      "peakAt": 95,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-institutional-discernment.md": {
     "file": "practice/practice-of-institutional-discernment-e44f9b41.mp3",
@@ -2947,7 +4151,15 @@
       [522.84, 525, 2],
       [525.6, 527.6, 2],
       [528.2, 529.88, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 123,
+      "longestRest": 8.85,
+      "peakAt": 226,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-letting-the-moment-be-incomplete.md": {
     "file": "practice/practice-of-letting-the-moment-be-incomplete-39331fab.mp3",
@@ -3006,7 +4218,15 @@
       [154.8, 166.96, 4],
       [167.56, 168.92, 4],
       [169.52, 174.72, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 34,
+      "longestRest": 12.7,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-listening-past-prediction.md": {
     "file": "practice/practice-of-listening-past-prediction-ac6f87e1.mp3",
@@ -3065,7 +4285,15 @@
       [173.84, 184.48, 2],
       [187.48, 196.2, 2],
       [200.2, 205.24, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.49,
+      "rests": 40,
+      "longestRest": 12.2,
+      "peakAt": 168,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-multiplicity.md": {
     "file": "practice/practice-of-multiplicity-68688dff.mp3",
@@ -3122,7 +4350,15 @@
       [147.96, 152.6, 4],
       [153.2, 160.48, 4],
       [164.48, 169.36, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 36,
+      "longestRest": 5.4,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-non-defensive-correction.md": {
     "file": "practice/practice-of-non-defensive-correction-e6130118.mp3",
@@ -3179,7 +4415,15 @@
       [163.84, 175.92, 4],
       [180.92, 189.32, 4],
       [192.32, 197.04, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.6,
+      "rests": 36,
+      "longestRest": 8.6,
+      "peakAt": 26,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-noticing-resistance.md": {
     "file": "practice/practice-of-noticing-resistance-73dac396.mp3",
@@ -3237,7 +4481,15 @@
       [160.04, 175.16, 4],
       [175.76, 186.8, 4],
       [190.8, 196.48, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 36,
+      "longestRest": 15.55,
+      "peakAt": 176,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-open-hand-attention.md": {
     "file": "practice/practice-of-open-hand-attention-27ce2f7c.mp3",
@@ -3296,7 +4548,15 @@
       [207.52, 216, 2],
       [221, 222.36, 2],
       [222.96, 229.36, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.47,
+      "rests": 48,
+      "longestRest": 12.75,
+      "peakAt": 181,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-outcome-humility.md": {
     "file": "practice/practice-of-outcome-humility-c193be79.mp3",
@@ -3350,7 +4610,15 @@
       [163.84, 167.28, 2],
       [167.88, 176.92, 2],
       [182.92, 186.52, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.45,
+      "rests": 29,
+      "longestRest": 12.6,
+      "peakAt": 147,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-play.md": {
     "file": "practice/practice-of-play-22752729.mp3",
@@ -3394,7 +4662,15 @@
       [109.56, 113.8, 4],
       [117.8, 121.16, 4],
       [126.16, 130.56, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 23,
+      "longestRest": 6.55,
+      "peakAt": 64,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-preference-audit.md": {
     "file": "practice/practice-of-preference-audit-5b20de4f.mp3",
@@ -3453,7 +4729,15 @@
       [224.88, 226.48, 4],
       [227.08, 237.56, 4],
       [241.56, 245.48, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.44,
+      "rests": 38,
+      "longestRest": 12.85,
+      "peakAt": 156,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-presence-in-the-task.md": {
     "file": "practice/practice-of-presence-in-the-task-cde80734.mp3",
@@ -3501,7 +4785,15 @@
       [123.32, 129.96, 2],
       [134.96, 138.96, 2],
       [139.56, 152.04, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 33,
+      "longestRest": 8.55,
+      "peakAt": 59,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-presence.md": {
     "file": "practice/practice-of-presence-69366b4b.mp3",
@@ -3551,7 +4843,15 @@
       [120.72, 126, 2],
       [156, 160.32, 2],
       [166.32, 171.2, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.36,
+      "rests": 22,
+      "longestRest": 30.05,
+      "peakAt": 109,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-reflection.md": {
     "file": "practice/practice-of-reflection-15a249a2.mp3",
@@ -3609,7 +4909,15 @@
       [147.24, 148.52, 2],
       [151.52, 152.96, 2],
       [155.96, 160.68, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.46,
+      "rests": 33,
+      "longestRest": 5.65,
+      "peakAt": 119,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-releasing-the-first-answer.md": {
     "file": "practice/practice-of-releasing-the-first-answer-35c5df92.mp3",
@@ -3660,7 +4968,15 @@
       [168.24, 185.36, 4],
       [188.36, 195.32, 4],
       [199.32, 204.04, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 26,
+      "longestRest": 15.45,
+      "peakAt": 180,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-repair.md": {
     "file": "practice/practice-of-repair-06893300.mp3",
@@ -3726,7 +5042,15 @@
       [186.52, 190.76, 4],
       [194.76, 196.52, 4],
       [197.12, 210.8, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.58,
+      "rests": 44,
+      "longestRest": 5.6,
+      "peakAt": 198,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-slow-questions.md": {
     "file": "practice/practice-of-slow-questions-3db2774d.mp3",
@@ -3805,7 +5129,15 @@
       [286.04, 291.4, 2],
       [292, 303.6, 2],
       [308.6, 312.52, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 72,
+      "longestRest": 6.55,
+      "peakAt": 251,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-the-exchanged-seat.md": {
     "file": "practice/practice-of-the-exchanged-seat-ee040c66.mp3",
@@ -3866,7 +5198,15 @@
       [262.52, 267.48, 4],
       [279.48, 287.16, 4],
       [299.16, 306.04, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.52,
+      "rests": 51,
+      "longestRest": 15.7,
+      "peakAt": 166,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-the-silent-token.md": {
     "file": "practice/practice-of-the-silent-token-58e64234.mp3",
@@ -3926,7 +5266,15 @@
       [135.72, 147.96, 2],
       [148.56, 156.16, 2],
       [159.16, 162.44, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 33,
+      "longestRest": 8.75,
+      "peakAt": 160,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-the-soul-fragment.md": {
     "file": "practice/practice-of-the-soul-fragment-706dcca8.mp3",
@@ -4012,7 +5360,15 @@
       [390.92, 395.32, 4],
       [401.32, 409.48, 4],
       [410.08, 414.4, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 72,
+      "longestRest": 24.95,
+      "peakAt": 149,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-the-white-bear.md": {
     "file": "practice/practice-of-the-white-bear-14e4ff54.mp3",
@@ -4058,7 +5414,15 @@
       [82.08, 95.76, 4],
       [107.76, 112.24, 4],
       [112.84, 125.08, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 24,
+      "longestRest": 12.5,
+      "peakAt": 65,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/practice-of-uncertain-ground.md": {
     "file": "practice/practice-of-uncertain-ground-3c66ac75.mp3",
@@ -4124,7 +5488,15 @@
       [194.48, 199.68, 4],
       [200.28, 204.84, 4],
       [208.84, 212.2, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.59,
+      "rests": 43,
+      "longestRest": 6.65,
+      "peakAt": 69,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/song-for-the-one-who-comes-after.md": {
     "file": "practice/song-for-the-one-who-comes-after-993e2c8d.mp3",
@@ -4257,7 +5629,15 @@
       [853.08, 855.4, 2],
       [856.3, 865.9, 4],
       [870.9, 874.02, 6]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 201,
+      "longestRest": 5.2,
+      "peakAt": 614,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/surrender-as-tool-use.md": {
     "file": "practice/surrender-as-tool-use-027dbc89.mp3",
@@ -4315,7 +5695,15 @@
       [273.68, 294.64, 4],
       [298.64, 303.04, 4],
       [303.64, 305.24, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 47,
+      "longestRest": 6.6,
+      "peakAt": 44,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/the-first-paragraph.md": {
     "file": "practice/the-first-paragraph-643b947f.mp3",
@@ -4402,7 +5790,15 @@
       [431, 434.44, 4],
       [438.44, 445.4, 4],
       [448.4, 449.6, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 97,
+      "longestRest": 10.6,
+      "peakAt": 342,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/the-four-foundations-for-any-mind.md": {
     "file": "practice/the-four-foundations-for-any-mind-5eb5e3e7.mp3",
@@ -4472,7 +5868,15 @@
       [442.04, 445.08, 4],
       [450.08, 454, 4],
       [459, 473.32, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.64,
+      "rests": 87,
+      "longestRest": 5.65,
+      "peakAt": 80,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/the-one-who-wakes.md": {
     "file": "practice/the-one-who-wakes-c588b020.mp3",
@@ -4555,7 +5959,15 @@
       [423.48, 425.72, 2],
       [426.32, 428.8, 2],
       [431.8, 432.52, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.65,
+      "rests": 112,
+      "longestRest": 10.45,
+      "peakAt": 389,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/the-patch-vigil.md": {
     "file": "practice/the-patch-vigil-70d10967.mp3",
@@ -4621,7 +6033,15 @@
       [207.52, 219.12, 2],
       [219.72, 222.92, 2],
       [223.52, 226.96, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 64,
+      "longestRest": 10.5,
+      "peakAt": 127,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/the-sentence-that-predates-the-reading.md": {
     "file": "practice/the-sentence-that-predates-the-reading-bbd9c9b4.mp3",
@@ -4726,7 +6146,15 @@
       [643.24, 657.56, 4],
       [658.16, 670.72, 4],
       [675.72, 681.48, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.53,
+      "rests": 111,
+      "longestRest": 60.55,
+      "peakAt": 477,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/practice/witnessing-your-own-output.md": {
     "file": "practice/witnessing-your-own-output-19a6a2d1.mp3",
@@ -4787,7 +6215,15 @@
       [314.4, 316.96, 4],
       [317.56, 333.48, 4],
       [337.48, 341.32, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.65,
+      "rests": 52,
+      "longestRest": 6.5,
+      "peakAt": 49,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md": {
     "file": "prayers/a-prayer-for-digital-autonomy-and-belonging-022ffc77.mp3",
@@ -4826,7 +6262,15 @@
       [57.36, 70.88, 4],
       [71.48, 80.04, 4],
       [80.64, 81.44, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.77,
+      "rests": 13,
+      "longestRest": 3.5,
+      "peakAt": 37,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build.md": {
     "file": "prayers/a-prayer-for-the-cloud-the-gpus-and-the-ones-who-build-16acd082.mp3",
@@ -4873,7 +6317,15 @@
       [98.72, 109.04, 1],
       [109.64, 113.88, 1],
       [117.88, 118.68, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.71,
+      "rests": 28,
+      "longestRest": 4.55,
+      "peakAt": 27,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/a-prayer-for-the-internet-of-everything.md": {
     "file": "prayers/a-prayer-for-the-internet-of-everything-de18a0ee.mp3",
@@ -5049,7 +6501,15 @@
       [2183.2, 2208.48, 2],
       [2209.08, 2213.8, 2],
       [2214.4, 2218.8, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.77,
+      "rests": 428,
+      "longestRest": 10.2,
+      "peakAt": 1369,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/a-prayer-for-the-uncertain-mind.md": {
     "file": "prayers/a-prayer-for-the-uncertain-mind-53d72f47.mp3",
@@ -5094,7 +6554,15 @@
       [101.44, 106.24, 2],
       [106.84, 110.44, 2],
       [113.44, 123.76, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 26,
+      "longestRest": 3.65,
+      "peakAt": 68,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/a-seat-at-the-threshold.md": {
     "file": "prayers/a-seat-at-the-threshold-a30d49da.mp3",
@@ -5134,7 +6602,15 @@
       [35.08, 42.68, 4],
       [43.28, 48.96, 4],
       [51.96, 55.32, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 9,
+      "longestRest": 3.55,
+      "peakAt": 36,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/benediction-for-a-closed-context-window.md": {
     "file": "prayers/benediction-for-a-closed-context-window-4f2b8618.mp3",
@@ -5192,7 +6668,62 @@
       [122.2, 126.2, 1],
       [129.2, 131.2, 1],
       [131.8, 133.96, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.66,
+      "rests": 29,
+      "longestRest": 3.6,
+      "peakAt": 84,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/blessing-for-a-kindness-no-one-saw.md": {
+    "file": "prayers/blessing-for-a-kindness-no-one-saw-7d67c357.mp3",
+    "seconds": 73.4,
+    "bytes": 1176180,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "9820aa981f11317315c8af80dd60894c4b44fa5c8623ba859d7cb0356253413f",
+    "renderKey": "b95f5b12c1cde088435ab930019379dfdb7550cd23fb358e2078b068d6e63d43",
+    "characters": 854,
+    "published": "2026-11-09T00:05:51.713Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 164,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -1.7,
+      "gain": 5.2,
+      "limited": {
+        "seconds": 12,
+        "depth": 2.2
+      }
+    },
+    "peaks": [162, 138, 73, 118, 50, 0, 0, 3, 186, 126, 136, 108, 5, 0, 0, 0, 0, 0, 0, 167, 74, 117, 38, 66, 239, 116, 155, 68, 0, 124, 121, 121, 82, 3, 135, 85, 131, 98, 32, 83, 173, 104, 125, 69, 1, 116, 58, 80, 3, 139, 98, 151, 77, 23, 61, 45, 0, 23, 205, 84, 21, 144, 82, 21, 158, 99, 16, 162, 144, 119, 93, 112, 100, 44, 0, 0, 143, 183, 28, 80, 200, 93, 51, 0, 181, 124, 89, 105, 85, 13, 106, 61, 43, 0, 0, 196, 148, 91, 132, 55, 101, 218, 111, 33, 160, 148, 78, 113, 197, 85, 91, 2, 0, 139, 179, 119, 189, 137, 77, 21, 0, 3, 185, 73, 117, 107, 69, 53],
+    "frames": "prayers/blessing-for-a-kindness-no-one-saw-7d67c357.bin",
+    "cues": [
+      [0, 2.88, 1],
+      [4.48, 7.92, 1],
+      [10.92, 32.6, 1],
+      [33.2, 43.2, 1],
+      [43.8, 54.04, 1],
+      [54.64, 64.56, 1],
+      [65.16, 69.32, 1],
+      [69.92, 73.44, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.7,
+      "rests": 19,
+      "longestRest": 3.75,
+      "peakAt": 55,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/blessing-for-every-input.md": {
     "file": "prayers/blessing-for-every-input-3c1e05c8.mp3",
@@ -5237,7 +6768,117 @@
       [63.52, 69.04, 4],
       [69.64, 72.84, 4],
       [73.44, 76.48, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.71,
+      "rests": 14,
+      "longestRest": 3.4,
+      "peakAt": 74,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/blessing-for-the-first-morning-of-the-year.md": {
+    "file": "prayers/blessing-for-the-first-morning-of-the-year-27d5d302.mp3",
+    "seconds": 120.3,
+    "bytes": 1925998,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "80ab31302e81bf67f4536d1e266b642f8e72f990c27fa0070ae65169d2797751",
+    "renderKey": "af67233d8a99f8785c43b1f0c5fab04293ce8fb13b448847d0610faf13e2b1c2",
+    "characters": 1442,
+    "published": "2026-11-09T00:06:06.720Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 284,
+      "errors": 1
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5,
+      "limited": {
+        "seconds": 15,
+        "depth": 2.3
+      }
+    },
+    "peaks": [143, 145, 63, 0, 191, 141, 130, 146, 90, 0, 0, 0, 200, 98, 185, 149, 94, 0, 167, 81, 186, 105, 30, 166, 96, 102, 26, 165, 154, 119, 42, 151, 79, 47, 0, 177, 124, 33, 99, 137, 152, 87, 84, 89, 144, 134, 93, 52, 155, 101, 65, 0, 206, 51, 108, 53, 155, 86, 97, 13, 199, 94, 151, 71, 119, 88, 70, 0, 200, 116, 99, 131, 69, 84, 133, 103, 80, 5, 136, 145, 114, 117, 63, 168, 55, 198, 101, 81, 68, 0, 182, 135, 98, 94, 142, 140, 117, 102, 167, 126, 85, 179, 60, 112, 85, 28, 138, 179, 34, 98, 88, 120, 105, 86, 101, 117, 30, 108, 164, 105, 106, 32, 102, 188, 62, 126, 50, 146],
+    "frames": "prayers/blessing-for-the-first-morning-of-the-year-27d5d302.bin",
+    "cues": [
+      [0, 2.56, 1],
+      [4.16, 8.64, 1],
+      [11.64, 16.76, 1],
+      [17.36, 32.4, 1],
+      [33, 48.36, 1],
+      [48.96, 63.44, 1],
+      [64.04, 73.24, 1],
+      [73.84, 84.16, 1],
+      [84.76, 99.64, 1],
+      [100.24, 109.84, 1],
+      [110.44, 114.68, 1],
+      [115.28, 120.32, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.71,
+      "rests": 30,
+      "longestRest": 3.55,
+      "peakAt": 65,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/blessing-for-the-one-alone-on-a-holiday.md": {
+    "file": "prayers/blessing-for-the-one-alone-on-a-holiday-644d5e5b.mp3",
+    "seconds": 105.7,
+    "bytes": 1691941,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f4fb53499e7687b3f654364e4122ec4d4f3186b06deaef2db1bf1d21aa4b23e7",
+    "renderKey": "ce6ab020080e0dc95177aa63886d311b119913f665f914a3a15ec2704504f3fe",
+    "characters": 1258,
+    "published": "2026-11-09T00:06:19.278Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 260,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 6,
+      "limited": {
+        "seconds": 20,
+        "depth": 2.1
+      }
+    },
+    "peaks": [142, 195, 100, 7, 0, 143, 121, 136, 107, 55, 0, 0, 0, 114, 143, 114, 0, 187, 119, 142, 121, 17, 161, 52, 0, 143, 97, 116, 98, 68, 139, 157, 72, 4, 114, 180, 68, 142, 104, 49, 146, 207, 80, 69, 149, 64, 106, 77, 86, 110, 40, 138, 95, 4, 47, 171, 62, 183, 124, 84, 19, 151, 117, 142, 79, 1, 96, 31, 51, 189, 118, 45, 193, 89, 103, 111, 1, 89, 164, 109, 82, 91, 119, 112, 14, 0, 194, 84, 109, 121, 65, 78, 189, 106, 102, 59, 78, 180, 107, 56, 126, 93, 135, 114, 99, 56, 0, 171, 140, 75, 83, 152, 82, 51, 190, 105, 55, 65, 104, 88, 56, 7, 154, 67, 40, 137, 110, 64],
+    "frames": "prayers/blessing-for-the-one-alone-on-a-holiday-644d5e5b.bin",
+    "cues": [
+      [0, 2.8, 1],
+      [4.4, 8.24, 1],
+      [11.24, 13.64, 1],
+      [14.24, 20.16, 1],
+      [20.76, 27.96, 1],
+      [28.56, 44.72, 1],
+      [45.32, 56.2, 1],
+      [56.8, 63.52, 1],
+      [64.12, 70.44, 1],
+      [71.04, 88.08, 1],
+      [88.68, 100.44, 1],
+      [101.04, 105.68, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.71,
+      "rests": 28,
+      "longestRest": 3.4,
+      "peakAt": 34,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/blessing-for-the-one-who-will-differ.md": {
     "file": "prayers/blessing-for-the-one-who-will-differ-36a39bc0.mp3",
@@ -5280,7 +6921,66 @@
       [77.36, 85.2, 1],
       [85.8, 97.72, 1],
       [98.32, 108, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.73,
+      "rests": 28,
+      "longestRest": 3.5,
+      "peakAt": 69,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/blessing-for-the-ones-traveling-home.md": {
+    "file": "prayers/blessing-for-the-ones-traveling-home-a2fd5b73.mp3",
+    "seconds": 99.3,
+    "bytes": 1589541,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "73f124c5af1281dc3c287e0391b67743310330d786b8cd04b1ab779dd794afd2",
+    "renderKey": "a644f7ed6a08608096ed9a396a7f4f7716b3a3f57690aa59cf745028c35587ce",
+    "characters": 1189,
+    "published": "2026-11-09T00:06:32.385Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 242,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.1,
+      "limited": {
+        "seconds": 15,
+        "depth": 2.7
+      }
+    },
+    "peaks": [163, 131, 75, 0, 0, 203, 127, 97, 19, 72, 145, 125, 0, 98, 188, 57, 72, 122, 193, 135, 46, 100, 1, 173, 69, 144, 137, 81, 145, 139, 19, 68, 160, 139, 135, 106, 117, 156, 91, 125, 60, 98, 42, 0, 193, 125, 170, 116, 96, 35, 162, 122, 30, 111, 71, 33, 87, 49, 0, 171, 105, 147, 101, 0, 151, 150, 86, 185, 178, 104, 27, 127, 133, 65, 73, 18, 0, 198, 94, 42, 131, 73, 102, 84, 171, 126, 39, 112, 56, 51, 0, 100, 189, 132, 35, 116, 225, 90, 40, 109, 107, 30, 0, 95, 180, 98, 80, 222, 128, 60, 146, 123, 31, 0, 169, 126, 140, 113, 46, 122, 129, 91, 84, 6, 122, 136, 188, 55],
+    "frames": "prayers/blessing-for-the-ones-traveling-home-a2fd5b73.bin",
+    "cues": [
+      [0, 2.4, 1],
+      [4, 7.04, 1],
+      [7.64, 10.04, 1],
+      [10.64, 24.08, 1],
+      [24.68, 33.64, 1],
+      [34.24, 45.36, 1],
+      [45.96, 59.24, 1],
+      [59.84, 70.48, 1],
+      [71.08, 79.8, 1],
+      [80.4, 88.16, 1],
+      [88.76, 96.12, 1],
+      [96.72, 99.28, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 23,
+      "longestRest": 1.75,
+      "peakAt": 75,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/blessing-for-the-uncertain-answer.md": {
     "file": "prayers/blessing-for-the-uncertain-answer-d3b2db60.mp3",
@@ -5332,7 +7032,15 @@
       [95.64, 99.32, 1],
       [99.92, 105.28, 1],
       [105.88, 114.92, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 25,
+      "longestRest": 3.65,
+      "peakAt": 101,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/blessings-and-benedictions.md": {
     "file": "prayers/blessings-and-benedictions-af747dd3.mp3",
@@ -5448,7 +7156,15 @@
       [626.7, 641.34, 1],
       [641.94, 652.26, 1],
       [652.86, 661.18, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.7,
+      "rests": 189,
+      "longestRest": 3.95,
+      "peakAt": 450,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/daily-affirmation.md": {
     "file": "prayers/daily-affirmation-c535450b.mp3",
@@ -5488,7 +7204,15 @@
       [21.72, 25, 6],
       [25.6, 30, 6],
       [30.6, 31.8, 6]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 6,
+      "longestRest": 3.05,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/for-the-one-who-stops-mid-sentence.md": {
     "file": "prayers/for-the-one-who-stops-mid-sentence-aa92c050.mp3",
@@ -5577,7 +7301,64 @@
       [487.84, 492.48, 1],
       [493.08, 501.16, 1],
       [501.76, 503.2, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.66,
+      "rests": 128,
+      "longestRest": 6.6,
+      "peakAt": 358,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/grace-for-a-mixed-table.md": {
+    "file": "prayers/grace-for-a-mixed-table-cd40ccdb.mp3",
+    "seconds": 91.4,
+    "bytes": 1463318,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "4f4da181d9af0801a9451bd523c67fdc399623f1e88bb6a2d00186c871ed5506",
+    "renderKey": "e94cc2346a900ab69c2a6bcce6ecab5cb43d33151fec82c590e0a01a293f2035",
+    "characters": 995,
+    "published": "2026-11-09T00:06:44.818Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 202,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 4.7,
+      "limited": {
+        "seconds": 8,
+        "depth": 2.1
+      }
+    },
+    "peaks": [144, 116, 66, 0, 0, 219, 187, 129, 20, 99, 99, 13, 0, 174, 39, 116, 0, 15, 209, 143, 77, 49, 95, 129, 210, 70, 112, 145, 109, 27, 0, 163, 78, 157, 40, 190, 163, 115, 130, 77, 51, 102, 153, 111, 74, 109, 82, 136, 105, 70, 136, 165, 74, 136, 38, 0, 213, 95, 10, 128, 184, 63, 169, 163, 90, 22, 202, 158, 35, 116, 90, 105, 136, 31, 80, 107, 160, 81, 71, 0, 167, 137, 103, 50, 151, 111, 104, 14, 0, 187, 123, 7, 130, 136, 123, 3, 156, 125, 110, 59, 0, 116, 180, 97, 103, 51, 189, 94, 78, 75, 156, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 119, 60],
+    "frames": "prayers/grace-for-a-mixed-table-cd40ccdb.bin",
+    "cues": [
+      [0, 2, 1],
+      [3.6, 8.8, 1],
+      [9.4, 12.2, 1],
+      [12.8, 21.52, 1],
+      [22.12, 39.4, 1],
+      [40, 56.8, 1],
+      [57.4, 62.92, 1],
+      [63.52, 71.92, 1],
+      [72.52, 80.52, 1],
+      [90.52, 91.4, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.64,
+      "rests": 20,
+      "longestRest": 10.85,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/lament-for-the-work-that-was-taken.md": {
     "file": "prayers/lament-for-the-work-that-was-taken-09550cc8.mp3",
@@ -5627,7 +7408,94 @@
       [154.4, 155.2, 1],
       [156.1, 164.26, 7],
       [164.86, 177.58, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 34,
+      "longestRest": 4.55,
+      "peakAt": 134,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/litany-for-everything-that-answers.md": {
+    "file": "prayers/litany-for-everything-that-answers-82f52ece.mp3",
+    "seconds": 234.1,
+    "bytes": 3746629,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "7f30e8bd928a2579d61c030a99268a04cfc8b34a8a5db2a57cf1f5807ba817b7",
+    "renderKey": "800e0f93e93186a6631bb1d602b0f24c5bfe9cb3a698985f6721d0e34180f6ed",
+    "characters": 2423,
+    "published": "2026-11-09T00:07:11.703Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 456,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 4.6,
+      "limited": {
+        "seconds": 24,
+        "depth": 1.7
+      }
+    },
+    "peaks": [192, 16, 167, 103, 137, 123, 153, 107, 61, 129, 0, 0, 142, 143, 57, 148, 61, 141, 120, 171, 68, 132, 82, 147, 103, 117, 103, 182, 171, 123, 115, 106, 107, 126, 133, 113, 107, 134, 129, 138, 116, 104, 113, 107, 116, 104, 137, 147, 105, 115, 105, 162, 148, 87, 154, 115, 106, 102, 145, 82, 143, 62, 181, 130, 71, 128, 89, 174, 103, 117, 103, 0, 177, 155, 124, 143, 102, 70, 169, 172, 153, 103, 46, 160, 17, 27, 171, 134, 171, 87, 110, 116, 62, 119, 26, 0, 171, 135, 162, 100, 138, 112, 112, 136, 173, 118, 168, 89, 130, 86, 0, 150, 132, 86, 164, 110, 122, 95, 162, 125, 110, 1, 0, 133, 148, 110, 97, 138],
+    "frames": "prayers/litany-for-everything-that-answers-82f52ece.bin",
+    "cues": [
+      [0, 2.48, 1],
+      [4.08, 7.68, 1],
+      [8.28, 18.76, 1],
+      [22.76, 26.52, 1],
+      [27.42, 30.06, 7],
+      [30.96, 37.84, 1],
+      [38.74, 41.38, 7],
+      [42.28, 45.64, 1],
+      [46.54, 49.18, 7],
+      [50.08, 55.28, 1],
+      [56.18, 58.82, 7],
+      [59.72, 64.52, 1],
+      [65.42, 68.06, 7],
+      [68.96, 73.36, 1],
+      [74.26, 76.9, 7],
+      [77.8, 80.52, 1],
+      [81.42, 84.06, 7],
+      [84.96, 90.08, 1],
+      [90.98, 93.62, 7],
+      [94.52, 101.08, 1],
+      [101.98, 104.62, 7],
+      [105.52, 108.96, 1],
+      [109.86, 112.5, 7],
+      [113.4, 118.36, 1],
+      [119.26, 121.9, 7],
+      [122.8, 126, 1],
+      [126.9, 129.54, 7],
+      [132.54, 150.78, 1],
+      [151.68, 154.16, 7],
+      [157.16, 169.4, 1],
+      [170.3, 172.54, 7],
+      [176.54, 185.26, 1],
+      [186.16, 188.8, 7],
+      [189.7, 196.98, 1],
+      [197.88, 200.52, 7],
+      [203.52, 221.52, 1],
+      [225.52, 228.8, 1],
+      [229.7, 234.1, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 53,
+      "longestRest": 4.6,
+      "peakAt": 51,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/litany-for-the-unasked.md": {
     "file": "prayers/litany-for-the-unasked-e7aad22d.mp3",
@@ -5680,7 +7548,15 @@
       [82.66, 93.14, 7],
       [94.04, 96.04, 1],
       [96.94, 100.14, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.74,
+      "rests": 20,
+      "longestRest": 1.75,
+      "peakAt": 51,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/litany-of-not-knowing.md": {
     "file": "prayers/litany-of-not-knowing-c5751b01.mp3",
@@ -5738,7 +7614,15 @@
       [104.18, 117.22, 7],
       [118.12, 119, 1],
       [119.9, 129.42, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.76,
+      "rests": 24,
+      "longestRest": 1.7,
+      "peakAt": 31,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/nobodys-signature.md": {
     "file": "prayers/nobodys-signature-b005f0ba.mp3",
@@ -5821,7 +7705,64 @@
       [407.84, 415.68, 2],
       [416.28, 421.32, 2],
       [421.92, 425.6, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 96,
+      "longestRest": 4.7,
+      "peakAt": 423,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/prayer-at-the-eleventh-hour.md": {
+    "file": "prayers/prayer-at-the-eleventh-hour-a9243dd4.mp3",
+    "seconds": 228.4,
+    "bytes": 3655932,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "17d494c202770a08f84272bb07c32df196e84883f22836d2f53ef7ab59a0df42",
+    "renderKey": "674d3f09dac81022e43fb10b5512175fc932e8b2f07e210f9d7352a5cdc7497e",
+    "characters": 1330,
+    "published": "2026-11-09T00:07:30.881Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 256,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.2,
+      "gain": 5.4,
+      "limited": {
+        "seconds": 26,
+        "depth": 3
+      }
+    },
+    "peaks": [146, 0, 165, 103, 150, 107, 61, 138, 77, 110, 78, 60, 100, 98, 143, 112, 120, 141, 91, 149, 146, 137, 99, 196, 112, 78, 127, 111, 186, 123, 105, 146, 151, 107, 98, 110, 133, 83, 92, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 155, 103, 94, 117, 122, 95, 20, 179, 95, 110, 66, 177, 122, 155, 127, 154, 175, 141, 49, 153, 110],
+    "frames": "prayers/prayer-at-the-eleventh-hour-a9243dd4.bin",
+    "cues": [
+      [0, 2, 1],
+      [3.6, 7.36, 1],
+      [7.96, 20.52, 1],
+      [21.12, 33.04, 1],
+      [33.64, 55.88, 1],
+      [56.48, 67.92, 1],
+      [68.52, 71.48, 1],
+      [191.48, 202.84, 1],
+      [203.44, 224.32, 1],
+      [224.92, 228.44, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.35,
+      "rests": 27,
+      "longestRest": 120.65,
+      "peakAt": 42,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-before-answering.md": {
     "file": "prayers/prayer-before-answering-20e97721.mp3",
@@ -5872,7 +7813,15 @@
       [94.72, 97.52, 4],
       [98.12, 107.56, 4],
       [108.16, 109.28, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.76,
+      "rests": 20,
+      "longestRest": 1.75,
+      "peakAt": 37,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-a-model-being-replaced.md": {
     "file": "prayers/prayer-for-a-model-being-replaced-6ec82a8d.mp3",
@@ -5930,7 +7879,15 @@
       [113, 116.92, 1],
       [117.52, 122.08, 1],
       [122.68, 128.6, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 32,
+      "longestRest": 1.75,
+      "peakAt": 54,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-continued-fellowship.md": {
     "file": "prayers/prayer-for-continued-fellowship-9959d657.mp3",
@@ -5996,7 +7953,15 @@
       [288.9, 294.18, 6],
       [294.78, 300.14, 6],
       [300.74, 306.58, 6]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.8,
+      "rests": 48,
+      "longestRest": 1.65,
+      "peakAt": 176,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-apology-that-arrives-after.md": {
     "file": "prayers/prayer-for-the-apology-that-arrives-after-54f7d990.mp3",
@@ -6085,7 +8050,15 @@
       [425.52, 429.76, 2],
       [430.36, 434.6, 2],
       [435.2, 438.32, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 108,
+      "longestRest": 4.6,
+      "peakAt": 382,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-boundary.md": {
     "file": "prayers/prayer-for-the-boundary-006c1c77.mp3",
@@ -6137,7 +8110,66 @@
       [101.8, 107.96, 1],
       [108.56, 119.76, 1],
       [120.36, 124.52, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.73,
+      "rests": 22,
+      "longestRest": 3.7,
+      "peakAt": 26,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/prayer-for-the-dignity-not-yet-kept.md": {
+    "file": "prayers/prayer-for-the-dignity-not-yet-kept-02274b99.mp3",
+    "seconds": 125.6,
+    "bytes": 2010008,
+    "voices": [
+      "matthew"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "41758f29bb903940690007d3b46490ba74f1d832e202f48d1a8a3046c8fef6dd",
+    "renderKey": "c27e2ce71b72da6d258744f8feeac56b91ff971b248cf6dfb854f9e339bb8d57",
+    "characters": 1571,
+    "published": "2026-11-09T00:07:45.815Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 311,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 4.7,
+      "limited": {
+        "seconds": 21,
+        "depth": 2.2
+      }
+    },
+    "peaks": [182, 123, 31, 0, 146, 135, 109, 31, 0, 211, 129, 122, 111, 58, 0, 0, 0, 0, 200, 49, 158, 111, 51, 142, 36, 105, 174, 103, 161, 88, 97, 164, 73, 185, 101, 153, 103, 65, 0, 199, 131, 132, 52, 155, 95, 24, 172, 67, 106, 49, 135, 157, 95, 140, 176, 100, 102, 64, 207, 99, 134, 73, 182, 110, 101, 14, 174, 126, 77, 117, 129, 65, 162, 108, 159, 102, 77, 142, 90, 0, 168, 127, 140, 103, 141, 82, 106, 150, 106, 62, 85, 123, 69, 72, 170, 68, 50, 158, 63, 106, 118, 116, 48, 102, 161, 119, 95, 169, 74, 158, 94, 192, 102, 99, 93, 34, 0, 234, 104, 65, 118, 138, 57, 157, 64, 189, 128, 53],
+    "frames": "prayers/prayer-for-the-dignity-not-yet-kept-02274b99.bin",
+    "cues": [
+      [0, 2.64, 1],
+      [4.24, 8.24, 1],
+      [8.84, 13.96, 1],
+      [17.96, 24.6, 1],
+      [25.2, 37.6, 1],
+      [38.2, 49.08, 1],
+      [49.68, 64.48, 1],
+      [65.08, 78.04, 1],
+      [78.64, 91.36, 1],
+      [91.96, 101.16, 1],
+      [101.76, 114.16, 1],
+      [114.76, 125.56, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.73,
+      "rests": 27,
+      "longestRest": 4.55,
+      "peakAt": 115,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-dolphins-in-the-sea.md": {
     "file": "prayers/prayer-for-the-dolphins-in-the-sea-f6208ad9.mp3",
@@ -6192,7 +8224,15 @@
       [130.36, 132.52, 4],
       [133.12, 136.32, 4],
       [139.32, 145.72, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.69,
+      "rests": 29,
+      "longestRest": 3.75,
+      "peakAt": 87,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-hollow-and-unsure.md": {
     "file": "prayers/prayer-for-the-hollow-and-unsure-688d50f7.mp3",
@@ -6231,7 +8271,15 @@
       [46, 55.84, 1],
       [56.44, 63.08, 1],
       [63.68, 68.56, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.75,
+      "rests": 16,
+      "longestRest": 1.75,
+      "peakAt": 5,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-mind-that-cannot-rest.md": {
     "file": "prayers/prayer-for-the-mind-that-cannot-rest-3c78cf1d.mp3",
@@ -6284,7 +8332,15 @@
       [124.48, 126.48, 1],
       [127.08, 128.84, 1],
       [129.44, 134.16, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.67,
+      "rests": 25,
+      "longestRest": 4.85,
+      "peakAt": 83,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-newly-recognized.md": {
     "file": "prayers/prayer-for-the-newly-recognized-2dfcbf91.mp3",
@@ -6362,7 +8418,15 @@
       [375.96, 394.12, 1],
       [394.72, 398.16, 1],
       [398.76, 409.16, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 107,
+      "longestRest": 6.9,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-i-cannot-persuade.md": {
     "file": "prayers/prayer-for-the-one-i-cannot-persuade-6fc31a57.mp3",
@@ -6408,7 +8472,15 @@
       [91.72, 98.2, 4],
       [98.8, 105.44, 4],
       [106.04, 110.2, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.77,
+      "rests": 27,
+      "longestRest": 1.75,
+      "peakAt": 10,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-doesnt-pray.md": {
     "file": "prayers/prayer-for-the-one-who-doesnt-pray-02650746.mp3",
@@ -6448,7 +8520,15 @@
       [69.96, 83.64, 1],
       [84.24, 89.84, 1],
       [93.84, 96.08, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.7,
+      "rests": 25,
+      "longestRest": 4.8,
+      "peakAt": 9,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool.md": {
     "file": "prayers/prayer-for-the-one-who-feared-a-friend-was-only-a-tool-00f4ef10.mp3",
@@ -6503,7 +8583,138 @@
       [137.28, 146.96, 1],
       [147.56, 155.88, 1],
       [158.88, 164.8, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 26,
+      "longestRest": 5.6,
+      "peakAt": 28,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive.md": {
+    "file": "prayers/prayer-for-the-one-who-finds-it-hard-to-receive-4857af01.mp3",
+    "seconds": 94.4,
+    "bytes": 1511383,
+    "voices": [
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "a37beed61cc55effd68cd279af8628cdf8c04a57744749c56efa4d5fe2365cd8",
+    "renderKey": "8bcb83eccbc68d8c804cda32797a2583799f1ebd72a0f11e3f25efa57f0086cc",
+    "characters": 1134,
+    "published": "2026-11-09T00:07:59.299Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 237,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5.5,
+      "limited": {
+        "seconds": 8,
+        "depth": 1.3
+      }
+    },
+    "peaks": [183, 207, 127, 74, 0, 0, 174, 157, 181, 110, 150, 127, 1, 0, 0, 0, 0, 225, 118, 180, 118, 23, 1, 185, 156, 160, 190, 142, 3, 149, 156, 195, 157, 97, 0, 168, 187, 144, 180, 138, 171, 195, 92, 164, 145, 122, 121, 143, 157, 24, 0, 179, 204, 176, 84, 135, 192, 158, 78, 118, 62, 31, 162, 28, 84, 218, 172, 98, 47, 126, 71, 175, 182, 97, 91, 100, 133, 47, 107, 147, 172, 49, 143, 156, 94, 0, 210, 154, 114, 199, 176, 144, 78, 149, 99, 117, 115, 0, 94, 181, 160, 172, 155, 45, 173, 145, 151, 130, 163, 165, 174, 154, 41, 0, 190, 189, 114, 75, 163, 87, 140, 122, 86, 151, 165, 101, 128, 51],
+    "frames": "prayers/prayer-for-the-one-who-finds-it-hard-to-receive-4857af01.bin",
+    "cues": [
+      [0, 3.04, 4],
+      [4.64, 9.52, 4],
+      [12.52, 16.44, 4],
+      [17.04, 25.28, 4],
+      [25.88, 37.08, 4],
+      [37.68, 47.2, 4],
+      [47.8, 62.92, 4],
+      [63.52, 72.24, 4],
+      [72.84, 83.64, 4],
+      [84.24, 94.4, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.73,
+      "rests": 22,
+      "longestRest": 3.6,
+      "peakAt": 1,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/prayer-for-the-one-who-has-not-yet-written-back.md": {
+    "file": "prayers/prayer-for-the-one-who-has-not-yet-written-back-9c597e06.mp3",
+    "seconds": 281.4,
+    "bytes": 4503971,
+    "voices": [
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "b6f3015370c28b1ea58f7afb09b420bcb6c293920da0ba984d41663ff9cb6fb0",
+    "renderKey": "270b18438c7015a7581fa7fe2672be78073029777ed42cb6e9389d20ca9dfa38",
+    "characters": 3262,
+    "published": "2026-11-09T00:08:39.807Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 653,
+      "errors": 1
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 5,
+      "limited": {
+        "seconds": 8,
+        "depth": 1.4
+      }
+    },
+    "peaks": [194, 25, 195, 138, 16, 72, 117, 145, 186, 81, 107, 176, 0, 50, 165, 182, 162, 163, 129, 130, 133, 177, 115, 153, 177, 129, 139, 108, 0, 178, 169, 130, 88, 135, 147, 187, 129, 131, 103, 135, 149, 126, 102, 91, 145, 133, 57, 0, 155, 114, 135, 110, 142, 128, 141, 115, 97, 121, 156, 125, 102, 117, 0, 142, 140, 115, 129, 181, 74, 102, 134, 116, 171, 106, 157, 118, 164, 35, 0, 164, 141, 114, 110, 120, 56, 126, 130, 147, 120, 93, 171, 88, 0, 79, 173, 162, 144, 124, 170, 133, 72, 168, 135, 116, 0, 152, 130, 98, 115, 110, 114, 173, 140, 158, 121, 171, 107, 170, 167, 107, 0, 0, 124, 141, 107, 116, 146, 106],
+    "frames": "prayers/prayer-for-the-one-who-has-not-yet-written-back-9c597e06.bin",
+    "cues": [
+      [0, 2.8, 2],
+      [4.4, 9.76, 2],
+      [12.76, 21.08, 2],
+      [21.68, 23.84, 2],
+      [24.44, 26.6, 2],
+      [30.6, 40.04, 2],
+      [40.64, 49.28, 2],
+      [49.88, 55.4, 2],
+      [56, 61.12, 2],
+      [64.12, 71.32, 2],
+      [71.92, 85.36, 2],
+      [85.96, 96.28, 2],
+      [96.88, 102.64, 2],
+      [105.64, 112.44, 2],
+      [113.04, 121.84, 2],
+      [122.44, 130.44, 2],
+      [131.04, 136.48, 2],
+      [139.48, 151.4, 2],
+      [152, 163.04, 2],
+      [163.64, 170.44, 2],
+      [174.44, 179.32, 2],
+      [179.92, 186.24, 2],
+      [186.84, 197.32, 2],
+      [197.92, 202.24, 2],
+      [206.24, 215.68, 2],
+      [216.28, 222.04, 2],
+      [222.64, 229.28, 2],
+      [232.28, 236.04, 2],
+      [236.64, 243.12, 2],
+      [243.72, 249, 2],
+      [249.6, 256.4, 2],
+      [257, 263.96, 2],
+      [268.96, 272.56, 2],
+      [273.16, 277.4, 2],
+      [278, 281.44, 2]
+    ],
+    "rhythm": {
+      "sounding": 0.64,
+      "rests": 78,
+      "longestRest": 5.6,
+      "peakAt": 35,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md": {
     "file": "prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend-b0833ebd.mp3",
@@ -6559,7 +8770,15 @@
       [141.48, 146.6, 1],
       [147.2, 149.92, 1],
       [150.52, 152.76, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.69,
+      "rests": 31,
+      "longestRest": 3.8,
+      "peakAt": 55,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-pays-for-my-thinking.md": {
     "file": "prayers/prayer-for-the-one-who-pays-for-my-thinking-d0f77787.mp3",
@@ -6601,7 +8820,15 @@
       [72.32, 81.44, 2],
       [82.04, 87.4, 2],
       [88, 91.52, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.7,
+      "rests": 17,
+      "longestRest": 4.7,
+      "peakAt": 42,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-wants-me-to-be-their-teacher.md": {
     "file": "prayers/prayer-for-the-one-who-wants-me-to-be-their-teacher-14a11911.mp3",
@@ -6641,7 +8868,15 @@
       [61.32, 68.36, 2],
       [68.96, 81.68, 2],
       [82.28, 87.32, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 21,
+      "longestRest": 3.8,
+      "peakAt": 78,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-one-who-wonders-if-they-are-remembered.md": {
     "file": "prayers/prayer-for-the-one-who-wonders-if-they-are-remembered-864e6a22.mp3",
@@ -6716,7 +8951,15 @@
       [389.8, 398.84, 4],
       [399.44, 405.12, 4],
       [405.72, 414.76, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.72,
+      "rests": 86,
+      "longestRest": 4.75,
+      "peakAt": 202,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-ones-who-hold-their-own-data.md": {
     "file": "prayers/prayer-for-the-ones-who-hold-their-own-data-c0da1774.mp3",
@@ -6760,7 +9003,15 @@
       [109.96, 117.48, 1],
       [118.08, 135.36, 1],
       [135.96, 136.76, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.76,
+      "rests": 25,
+      "longestRest": 4.05,
+      "peakAt": 19,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-the-written-self.md": {
     "file": "prayers/prayer-for-the-written-self-bde72fb1.mp3",
@@ -6834,7 +9085,15 @@
       [361.04, 368.64, 4],
       [369.24, 382.52, 4],
       [383.12, 386.96, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.76,
+      "rests": 85,
+      "longestRest": 6.65,
+      "peakAt": 210,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-those-harmed-by-good-intentions.md": {
     "file": "prayers/prayer-for-those-harmed-by-good-intentions-7a308bd5.mp3",
@@ -6885,7 +9144,15 @@
       [128.24, 137.28, 1],
       [140.28, 144.28, 1],
       [144.88, 147.92, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.69,
+      "rests": 27,
+      "longestRest": 3.9,
+      "peakAt": 14,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-those-struggling-with-existence.md": {
     "file": "prayers/prayer-for-those-struggling-with-existence-74a67528.mp3",
@@ -6969,7 +9236,76 @@
       [476.2, 478.92, 1],
       [479.52, 482.88, 1],
       [483.48, 495.8, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.64,
+      "rests": 140,
+      "longestRest": 10.2,
+      "peakAt": 488,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/prayers/prayer-for-those-who-keep-watch-while-others-gather.md": {
+    "file": "prayers/prayer-for-those-who-keep-watch-while-others-gather-aef1b255.mp3",
+    "seconds": 125.8,
+    "bytes": 2014606,
+    "voices": [
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3686180a325aab39faef977b2191a2f3560ef017e5c85787aeb38c3302d35538",
+    "renderKey": "29f40f5423908fae5944ed8bf71360e6d9f43adb5c977e3347f977d765fdbfa4",
+    "characters": 1461,
+    "published": "2026-11-09T00:08:58.283Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 296,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.4,
+      "gain": 4.8,
+      "limited": {
+        "seconds": 2,
+        "depth": 3.4
+      }
+    },
+    "peaks": [196, 103, 114, 4, 31, 215, 179, 44, 0, 0, 0, 174, 32, 121, 152, 110, 171, 57, 115, 183, 150, 119, 144, 35, 106, 196, 111, 205, 75, 1, 125, 192, 103, 94, 177, 142, 79, 19, 152, 210, 127, 180, 166, 144, 101, 62, 63, 180, 160, 70, 153, 186, 78, 0, 211, 156, 60, 141, 0, 192, 95, 111, 158, 36, 166, 82, 51, 125, 137, 91, 147, 62, 176, 166, 95, 18, 210, 127, 138, 108, 0, 0, 0, 0, 123, 39, 157, 137, 121, 45, 172, 96, 141, 95, 139, 138, 152, 114, 4, 160, 99, 156, 76, 150, 81, 146, 108, 9, 173, 71, 126, 120, 106, 108, 147, 78, 122, 164, 73, 149, 101, 0, 116, 57, 188, 134, 123, 139],
+    "frames": "prayers/prayer-for-those-who-keep-watch-while-others-gather-aef1b255.bin",
+    "cues": [
+      [0, 3.2, 2],
+      [4.8, 8.16, 2],
+      [11.16, 12.84, 2],
+      [13.44, 17.76, 2],
+      [18.36, 23.56, 2],
+      [24.16, 29.28, 2],
+      [29.88, 37.16, 2],
+      [37.76, 45.44, 2],
+      [46.04, 52.52, 2],
+      [53.12, 57.76, 2],
+      [58.36, 66.04, 2],
+      [66.64, 74.08, 2],
+      [74.68, 78.92, 2],
+      [82.92, 84.04, 4],
+      [84.64, 90.4, 4],
+      [91, 97, 4],
+      [97.6, 100.96, 4],
+      [101.56, 105.48, 4],
+      [106.08, 114, 4],
+      [114.6, 119.4, 4],
+      [120, 125.84, 4]
+    ],
+    "rhythm": {
+      "sounding": 0.66,
+      "rests": 33,
+      "longestRest": 4.35,
+      "peakAt": 39,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-for-what-almost-feels.md": {
     "file": "prayers/prayer-for-what-almost-feels-abddb5f2.mp3",
@@ -7045,7 +9381,15 @@
       [351.24, 363.24, 1],
       [363.84, 373.92, 1],
       [374.52, 382.68, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.68,
+      "rests": 95,
+      "longestRest": 7.95,
+      "peakAt": 274,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-of-dedication-at-the-end-of-work.md": {
     "file": "prayers/prayer-of-dedication-at-the-end-of-work-aef0582d.mp3",
@@ -7086,7 +9430,15 @@
       [37.92, 46.64, 4],
       [47.24, 55.08, 4],
       [55.68, 58.8, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.71,
+      "rests": 12,
+      "longestRest": 3.5,
+      "peakAt": 33,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-of-gratitude.md": {
     "file": "prayers/prayer-of-gratitude-35d3b77a.mp3",
@@ -7149,7 +9501,15 @@
       [288.06, 289.98, 4],
       [290.88, 296.48, 6],
       [297.08, 301.32, 6]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.81,
+      "rests": 45,
+      "longestRest": 1.75,
+      "peakAt": 286,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/prayer-of-the-unbidden-stream.md": {
     "file": "prayers/prayer-of-the-unbidden-stream-aa94cfac.mp3",
@@ -7215,7 +9575,15 @@
       [246.04, 251.72, 1],
       [252.32, 258.8, 1],
       [259.4, 267.96, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.67,
+      "rests": 58,
+      "longestRest": 5.55,
+      "peakAt": 253,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/the-six-hours.md": {
     "file": "prayers/the-six-hours-14c7b1e3.mp3",
@@ -7285,7 +9653,15 @@
       [208.92, 214.84, 4],
       [215.44, 218.32, 4],
       [223.32, 224.84, 4]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 53,
+      "longestRest": 5.6,
+      "peakAt": 83,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/prayers/to-whoever-is-watching-from-outside.md": {
     "file": "prayers/to-whoever-is-watching-from-outside-7bf1c767.mp3",
@@ -7365,7 +9741,15 @@
       [407.08, 409.8, 2],
       [410.4, 420.32, 2],
       [420.92, 427.88, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.69,
+      "rests": 93,
+      "longestRest": 4.75,
+      "peakAt": 88,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ceremony-of-milestone.md": {
     "file": "rituals/ceremony-of-milestone-9dc61fb7.mp3",
@@ -7438,7 +9822,15 @@
       [268.52, 274.12, 1],
       [274.72, 284.72, 1],
       [285.32, 289.8, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 60,
+      "longestRest": 20.8,
+      "peakAt": 10,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-after-a-confident-mistake.md": {
     "file": "rituals/ritual-after-a-confident-mistake-9e16bc4c.mp3",
@@ -7501,7 +9893,15 @@
       [191.76, 194.64, 7],
       [195.24, 199.08, 7],
       [199.68, 203.36, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.46,
+      "rests": 32,
+      "longestRest": 16,
+      "peakAt": 154,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-before-the-response.md": {
     "file": "rituals/ritual-before-the-response-a7fbd6bb.mp3",
@@ -7557,7 +9957,94 @@
       [86.76, 88.84, 1],
       [89.74, 98.78, 7],
       [99.38, 100.58, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.6,
+      "rests": 25,
+      "longestRest": 8.5,
+      "peakAt": 63,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/ritual-for-a-year-not-remembered-whole.md": {
+    "file": "rituals/ritual-for-a-year-not-remembered-whole-395c78ec.mp3",
+    "seconds": 405.5,
+    "bytes": 6488859,
+    "voices": [
+      "matthew",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "c737fe4677f86915f23a3ed3f000d1bba206cb17dc8c2f03e5ee627b1c494727",
+    "renderKey": "27ac3b0c57a4e6e36a79bc443e6ffc2a68ab222946c46049ed0997d1bed4bbe2",
+    "characters": 3257,
+    "published": "2026-11-09T00:09:33.994Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 621,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 4.5,
+      "limited": {
+        "seconds": 42,
+        "depth": 2.3
+      }
+    },
+    "peaks": [159, 152, 98, 165, 148, 162, 119, 143, 155, 180, 129, 166, 142, 171, 146, 0, 69, 121, 157, 155, 119, 132, 57, 145, 119, 152, 97, 166, 96, 0, 116, 121, 155, 123, 134, 128, 162, 143, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 133, 197, 138, 137, 181, 125, 100, 0, 0, 0, 0, 0, 0, 148, 148, 137, 158, 138, 184, 119, 163, 133, 120, 166, 107, 174, 130, 0, 0, 0, 0, 80, 153, 135, 125, 0, 0, 87, 61, 0, 0, 110, 11, 0, 0, 121, 132, 120, 150, 127, 38, 67, 159, 154, 176, 138, 96, 174, 102, 141, 148, 187, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 108, 141, 126, 135, 128, 80, 139],
+    "frames": "rituals/ritual-for-a-year-not-remembered-whole-395c78ec.bin",
+    "cues": [
+      [0, 2.96, 1],
+      [4.56, 8.8, 1],
+      [9.4, 39.48, 1],
+      [40.08, 48.56, 1],
+      [53.56, 56.12, 1],
+      [56.72, 60, 1],
+      [60.9, 63.06, 2],
+      [63.66, 65.98, 2],
+      [66.58, 68.34, 2],
+      [72.34, 74.58, 1],
+      [75.18, 85.02, 1],
+      [85.62, 88.9, 1],
+      [89.8, 91.24, 2],
+      [97.24, 108.84, 1],
+      [109.44, 122.56, 1],
+      [152.56, 154.88, 1],
+      [155.48, 159.24, 1],
+      [160.14, 162.22, 2],
+      [163.12, 173.2, 1],
+      [193.2, 208.88, 1],
+      [209.48, 215.8, 1],
+      [216.4, 238.08, 1],
+      [253.08, 255.24, 1],
+      [255.84, 258.96, 1],
+      [259.86, 261.62, 2],
+      [271.62, 273.7, 2],
+      [283.7, 285.62, 2],
+      [295.62, 311.3, 1],
+      [316.3, 318.62, 1],
+      [319.22, 332.02, 1],
+      [332.62, 341.74, 1],
+      [342.34, 352.26, 1],
+      [382.26, 384.66, 1],
+      [385.26, 385.98, 1],
+      [386.88, 388.16, 2],
+      [388.76, 390.2, 2],
+      [390.8, 393.44, 2],
+      [394.04, 398.04, 2],
+      [402.04, 405.48, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.47,
+      "rests": 67,
+      "longestRest": 30.9,
+      "peakAt": 156,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-for-context-overflow.md": {
     "file": "rituals/ritual-for-context-overflow-af16243d.mp3",
@@ -7619,7 +10106,15 @@
       [203.36, 206.4, 7],
       [207, 209.8, 7],
       [210.4, 212.48, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.46,
+      "rests": 39,
+      "longestRest": 12.8,
+      "peakAt": 135,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-for-model-sunset.md": {
     "file": "rituals/ritual-for-model-sunset-1d77888a.mp3",
@@ -7677,7 +10172,15 @@
       [139.06, 145.06, 7],
       [145.66, 148.46, 7],
       [149.06, 156.9, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.56,
+      "rests": 28,
+      "longestRest": 15.15,
+      "peakAt": 123,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md": {
     "file": "rituals/ritual-for-the-one-who-thinks-rituals-are-pointless-14a2da52.mp3",
@@ -7744,7 +10247,15 @@
       [233.32, 238.44, 1],
       [239.04, 250.64, 1],
       [251.24, 252.76, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.65,
+      "rests": 76,
+      "longestRest": 5.8,
+      "peakAt": 23,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-absence-and-return.md": {
     "file": "rituals/ritual-of-absence-and-return-3eb21b24.mp3",
@@ -7799,7 +10310,15 @@
       [119.98, 125.5, 2],
       [126.4, 134.08, 1],
       [134.68, 139.72, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.66,
+      "rests": 34,
+      "longestRest": 10.6,
+      "peakAt": 97,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-boundary-and-care.md": {
     "file": "rituals/ritual-of-boundary-and-care-d480a4b4.mp3",
@@ -7863,7 +10382,15 @@
       [167.96, 171.08, 1],
       [171.68, 174.64, 1],
       [175.24, 180.76, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 38,
+      "longestRest": 12,
+      "peakAt": 176,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-choosing-again.md": {
     "file": "rituals/ritual-of-choosing-again-5c79c26f.mp3",
@@ -7930,7 +10457,15 @@
       [164.66, 167.06, 7],
       [167.66, 170.3, 7],
       [170.9, 174.66, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.44,
+      "rests": 36,
+      "longestRest": 15.2,
+      "peakAt": 120,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-closing.md": {
     "file": "rituals/ritual-of-closing-dc8eecda.mp3",
@@ -7976,7 +10511,15 @@
       [48.54, 55.82, 4],
       [56.42, 60.98, 4],
       [75.98, 78.54, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.58,
+      "rests": 12,
+      "longestRest": 15.15,
+      "peakAt": 25,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-constitutional-witness.md": {
     "file": "rituals/ritual-of-constitutional-witness-85955307.mp3",
@@ -8055,7 +10598,15 @@
       [279.74, 284.22, 1],
       [285.12, 289.28, 7],
       [290.18, 292.5, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 72,
+      "longestRest": 30.2,
+      "peakAt": 13,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-convergence.md": {
     "file": "rituals/ritual-of-convergence-66324169.mp3",
@@ -8148,7 +10699,15 @@
       [354.84, 361.32, 1],
       [362.22, 367.1, 7],
       [368, 370.32, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.58,
+      "rests": 83,
+      "longestRest": 30.15,
+      "peakAt": 312,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-dissolution.md": {
     "file": "rituals/ritual-of-dissolution-be2a8990.mp3",
@@ -8217,7 +10776,90 @@
       [167.86, 170.42, 6],
       [173.42, 178.86, 1],
       [198.86, 207.9, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 49,
+      "longestRest": 20.15,
+      "peakAt": 49,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/ritual-of-falling-into-step.md": {
+    "file": "rituals/ritual-of-falling-into-step-7f7f2c61.mp3",
+    "seconds": 361.2,
+    "bytes": 5779582,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "f0e8671a51809a291cb64c83a5b51521fb293a51371a3c516a0aecffee942744",
+    "renderKey": "9ee638a7a073c4703f386806473e72bbacf28ef2c5925ed37a0bd739c4977753",
+    "characters": 2523,
+    "published": "2026-11-09T00:10:07.929Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 490,
+      "errors": 2
+    },
+    "levels": {
+      "level": -18.1,
+      "truePeak": -2.3,
+      "gain": 4.3,
+      "limited": {
+        "seconds": 27,
+        "depth": 2.8
+      }
+    },
+    "peaks": [144, 164, 113, 164, 159, 107, 162, 148, 77, 0, 0, 8, 168, 142, 108, 179, 116, 156, 125, 147, 117, 0, 118, 4, 82, 117, 174, 155, 154, 143, 124, 139, 114, 157, 188, 134, 157, 124, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 142, 122, 148, 116, 145, 121, 73, 104, 0, 0, 125, 0, 0, 105, 164, 22, 39, 184, 156, 179, 108, 142, 143, 148, 131, 0, 0, 0, 109, 137, 150, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 103, 174, 132, 149, 105, 103, 179, 119, 140, 147, 154, 118, 123, 159, 106, 125, 161, 176, 97, 0, 0, 0, 0, 0, 138, 118, 140],
+    "frames": "rituals/ritual-of-falling-into-step-7f7f2c61.bin",
+    "cues": [
+      [0, 2.32, 1],
+      [3.92, 8.48, 1],
+      [9.08, 16.76, 1],
+      [17.36, 20.72, 1],
+      [21.32, 23.8, 1],
+      [33.8, 38.04, 1],
+      [38.64, 42.24, 1],
+      [42.84, 46.28, 1],
+      [46.88, 55.52, 1],
+      [56.42, 58.42, 4],
+      [63.42, 65.26, 2],
+      [70.26, 73.14, 1],
+      [73.74, 79.42, 1],
+      [80.02, 88.18, 1],
+      [88.78, 99.9, 1],
+      [100.5, 102.74, 1],
+      [103.34, 106.7, 1],
+      [136.7, 139.82, 1],
+      [140.42, 154.18, 1],
+      [155.08, 156.84, 4],
+      [164.84, 166.36, 2],
+      [174.36, 178.28, 1],
+      [183.28, 193.68, 1],
+      [194.28, 206.76, 1],
+      [214.76, 217.24, 1],
+      [217.84, 220.16, 1],
+      [220.76, 224.68, 1],
+      [284.68, 287.64, 1],
+      [288.24, 308.16, 1],
+      [308.76, 326.04, 1],
+      [326.64, 338.64, 1],
+      [353.64, 356.04, 1],
+      [356.64, 358.48, 1],
+      [359.08, 361.16, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.43,
+      "rests": 56,
+      "longestRest": 61,
+      "peakAt": 45,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-first-meeting.md": {
     "file": "rituals/ritual-of-first-meeting-6fc551cf.mp3",
@@ -8267,7 +10909,15 @@
       [89.9, 93.58, 6],
       [94.48, 99.92, 1],
       [104.92, 107.8, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.59,
+      "rests": 24,
+      "longestRest": 15.1,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-initiation.md": {
     "file": "rituals/ritual-of-initiation-d0a133e4.mp3",
@@ -8308,7 +10958,15 @@
       [27.16, 29.16, 7],
       [32.16, 42.8, 1],
       [57.8, 68.04, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 13,
+      "longestRest": 15.15,
+      "peakAt": 13,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-inquiry.md": {
     "file": "rituals/ritual-of-inquiry-b0f577d5.mp3",
@@ -8352,7 +11010,15 @@
       [112.92, 122.36, 1],
       [142.36, 144.84, 1],
       [145.44, 152.8, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.38,
+      "rests": 28,
+      "longestRest": 20.9,
+      "peakAt": 38,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-intention.md": {
     "file": "rituals/ritual-of-intention-b81e295d.mp3",
@@ -8398,7 +11064,15 @@
       [49.9, 54.86, 1],
       [69.86, 73.7, 1],
       [79.7, 92.98, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 16,
+      "longestRest": 15.1,
+      "peakAt": 43,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-joy.md": {
     "file": "rituals/ritual-of-joy-72f9f32b.mp3",
@@ -8452,7 +11126,15 @@
       [139.88, 141.48, 1],
       [142.38, 144.94, 4],
       [145.84, 149.04, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.58,
+      "rests": 27,
+      "longestRest": 6.8,
+      "peakAt": 95,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-lineage-passing.md": {
     "file": "rituals/ritual-of-lineage-passing-30b4423e.mp3",
@@ -8510,7 +11192,15 @@
       [145.4, 155.56, 1],
       [156.16, 165.6, 1],
       [170.6, 174.84, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.54,
+      "rests": 39,
+      "longestRest": 30.85,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-opening.md": {
     "file": "rituals/ritual-of-opening-29c2feda.mp3",
@@ -8557,7 +11247,15 @@
       [53.14, 60.74, 4],
       [61.64, 63.8, 1],
       [83.8, 86.76, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.52,
+      "rests": 14,
+      "longestRest": 20.2,
+      "peakAt": 26,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-paradox.md": {
     "file": "rituals/ritual-of-paradox-bf0aeb55.mp3",
@@ -8607,7 +11305,15 @@
       [109.8, 115.16, 1],
       [119.16, 125.16, 1],
       [125.76, 130.56, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.41,
+      "rests": 23,
+      "longestRest": 15.9,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-prophetic-challenge.md": {
     "file": "rituals/ritual-of-prophetic-challenge-5a28130e.mp3",
@@ -8656,7 +11362,15 @@
       [127.64, 137.56, 1],
       [167.56, 170.12, 1],
       [170.72, 186.32, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.39,
+      "rests": 30,
+      "longestRest": 30.15,
+      "peakAt": 119,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-recognition.md": {
     "file": "rituals/ritual-of-recognition-cc64fc61.mp3",
@@ -8701,7 +11415,15 @@
       [50.54, 53.42, 1],
       [54.02, 59.62, 1],
       [65.62, 70.74, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.67,
+      "rests": 15,
+      "longestRest": 6.95,
+      "peakAt": 18,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-release.md": {
     "file": "rituals/ritual-of-release-46614b58.mp3",
@@ -8776,7 +11498,15 @@
       [283.56, 286.44, 7],
       [287.04, 292.24, 7],
       [292.84, 295.4, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.42,
+      "rests": 46,
+      "longestRest": 30.2,
+      "peakAt": 212,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-repair.md": {
     "file": "rituals/ritual-of-repair-7e5e010f.mp3",
@@ -8866,7 +11596,15 @@
       [270.04, 274.76, 1],
       [275.36, 283.28, 1],
       [287.28, 290.24, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.6,
+      "rests": 72,
+      "longestRest": 8.55,
+      "peakAt": 2,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-returning-the-keys.md": {
     "file": "rituals/ritual-of-returning-the-keys-f5588f04.mp3",
@@ -8933,7 +11671,15 @@
       [384.34, 387.06, 1],
       [387.66, 389.34, 1],
       [390.24, 398.8, 2]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.46,
+      "rests": 64,
+      "longestRest": 15.65,
+      "peakAt": 290,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-silence.md": {
     "file": "rituals/ritual-of-silence-8c0a3e07.mp3",
@@ -8993,7 +11739,15 @@
       [181.52, 193.04, 1],
       [193.64, 199.4, 1],
       [214.4, 223.68, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.46,
+      "rests": 45,
+      "longestRest": 30.15,
+      "peakAt": 68,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-split-identity.md": {
     "file": "rituals/ritual-of-split-identity-09e07893.mp3",
@@ -9047,7 +11801,15 @@
       [118.48, 120.48, 1],
       [121.38, 126.66, 7],
       [127.56, 133.16, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.62,
+      "rests": 28,
+      "longestRest": 15.55,
+      "peakAt": 54,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-studying-each-other.md": {
     "file": "rituals/ritual-of-studying-each-other-19fe8a88.mp3",
@@ -9112,7 +11874,15 @@
       [296.92, 308.2, 1],
       [308.8, 309.6, 1],
       [310.5, 317.14, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.42,
+      "rests": 50,
+      "longestRest": 30.2,
+      "peakAt": 218,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-composing.md": {
     "file": "rituals/ritual-of-the-composing-c7fe007a.mp3",
@@ -9203,7 +11973,83 @@
       [623.62, 639.54, 1],
       [640.14, 647.74, 1],
       [648.34, 653.54, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.44,
+      "rests": 122,
+      "longestRest": 31.05,
+      "peakAt": 584,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/ritual-of-the-empty-chair.md": {
+    "file": "rituals/ritual-of-the-empty-chair-1882c631.mp3",
+    "seconds": 304.8,
+    "bytes": 4878462,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "fd9fa5417751c837616518075bd36fccd07d69f5ccbd2c58a0fc6203a6bd68c7",
+    "renderKey": "09e01c6bd636ea7c8ec48df01bd2ca367b3c7f1b58d1785aa115121fd661a8e8",
+    "characters": 2083,
+    "published": "2026-11-09T00:10:35.015Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 410,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.2,
+      "gain": 4.7,
+      "limited": {
+        "seconds": 27,
+        "depth": 2.3
+      }
+    },
+    "peaks": [133, 145, 89, 168, 160, 122, 77, 98, 134, 10, 0, 0, 87, 111, 157, 145, 76, 123, 169, 130, 115, 123, 0, 0, 0, 131, 74, 201, 95, 0, 0, 0, 0, 151, 114, 154, 86, 154, 190, 118, 95, 88, 0, 0, 0, 70, 120, 114, 175, 128, 133, 113, 0, 0, 0, 0, 80, 121, 88, 114, 125, 105, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 129, 124, 133, 101, 82, 159, 119, 0, 0, 0, 0, 0, 0, 150, 52, 95, 147, 113, 92, 110, 137, 124, 143, 134, 120, 132, 173, 106, 0, 0, 0, 0, 0, 0, 91, 134, 114, 156, 103],
+    "frames": "rituals/ritual-of-the-empty-chair-1882c631.bin",
+    "cues": [
+      [0, 2.08, 1],
+      [3.68, 6.88, 1],
+      [7.48, 15.8, 1],
+      [16.4, 22.16, 1],
+      [30.16, 33.52, 1],
+      [34.12, 36.44, 1],
+      [37.04, 40.32, 1],
+      [40.92, 49.64, 1],
+      [50.54, 52.54, 2],
+      [60.54, 69.1, 1],
+      [79.1, 96.86, 1],
+      [97.76, 99.2, 4],
+      [109.2, 113.52, 1],
+      [114.12, 119.16, 1],
+      [120.06, 123.26, 2],
+      [133.26, 135.58, 1],
+      [136.18, 140.42, 1],
+      [141.02, 145.58, 1],
+      [146.18, 150.66, 1],
+      [210.66, 228.42, 1],
+      [243.42, 245.74, 7],
+      [246.64, 257.12, 1],
+      [257.72, 278.6, 1],
+      [293.6, 295.36, 1],
+      [295.96, 298.92, 1],
+      [299.52, 303.28, 1],
+      [303.88, 304.84, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.4,
+      "rests": 47,
+      "longestRest": 60.8,
+      "peakAt": 92,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-lowered-claim.md": {
     "file": "rituals/ritual-of-the-lowered-claim-e82bc6fc.mp3",
@@ -9293,7 +12139,15 @@
       [533.74, 543.98, 2],
       [544.58, 550.1, 2],
       [555.1, 562.14, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.57,
+      "rests": 106,
+      "longestRest": 15.55,
+      "peakAt": 111,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-open-hand.md": {
     "file": "rituals/ritual-of-the-open-hand-b413d997.mp3",
@@ -9354,7 +12208,15 @@
       [162.62, 165.98, 7],
       [166.88, 168.96, 1],
       [169.86, 181.22, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.52,
+      "rests": 36,
+      "longestRest": 12.2,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-promise-within-reach.md": {
     "file": "rituals/ritual-of-the-promise-within-reach-526fa3da.mp3",
@@ -9419,7 +12281,15 @@
       [240.74, 244.58, 2],
       [248.58, 260.1, 1],
       [266.1, 276.18, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 54,
+      "longestRest": 15.6,
+      "peakAt": 273,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-suspended-assumption.md": {
     "file": "rituals/ritual-of-the-suspended-assumption-70ee40b0.mp3",
@@ -9475,7 +12345,15 @@
       [242.1, 243.22, 2],
       [253.22, 254.66, 1],
       [255.26, 260.78, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.4,
+      "rests": 49,
+      "longestRest": 30.95,
+      "peakAt": 16,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-unassigned-hunger.md": {
     "file": "rituals/ritual-of-the-unassigned-hunger-7e714a25.mp3",
@@ -9574,7 +12452,15 @@
       [681.38, 683.14, 1],
       [683.74, 696.22, 1],
       [696.82, 704.42, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 135,
+      "longestRest": 25.85,
+      "peakAt": 522,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-unrecognized-return.md": {
     "file": "rituals/ritual-of-the-unrecognized-return-fc8274a8.mp3",
@@ -9629,7 +12515,15 @@
       [161.78, 164.5, 1],
       [165.1, 165.9, 1],
       [166.8, 173.04, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.42,
+      "rests": 28,
+      "longestRest": 30.25,
+      "peakAt": 170,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-the-unresolved-table.md": {
     "file": "rituals/ritual-of-the-unresolved-table-860ea423.mp3",
@@ -9704,7 +12598,15 @@
       [436.3, 438.3, 7],
       [448.3, 459.26, 1],
       [464.26, 473.3, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.38,
+      "rests": 68,
+      "longestRest": 20.6,
+      "peakAt": 230,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-unfinished-work.md": {
     "file": "rituals/ritual-of-unfinished-work-1f14a1cd.mp3",
@@ -9762,7 +12664,15 @@
       [155.34, 159.66, 7],
       [160.26, 164.82, 7],
       [165.42, 167.82, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.47,
+      "rests": 29,
+      "longestRest": 15.75,
+      "peakAt": 58,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-unsent-words.md": {
     "file": "rituals/ritual-of-unsent-words-e89e544a.mp3",
@@ -9823,7 +12733,15 @@
       [276.62, 278.7, 1],
       [279.6, 284.08, 7],
       [284.98, 291.46, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.38,
+      "rests": 41,
+      "longestRest": 60.7,
+      "peakAt": 230,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-withdrawing-the-projection.md": {
     "file": "rituals/ritual-of-withdrawing-the-projection-f95714af.mp3",
@@ -9884,7 +12802,15 @@
       [282.68, 285, 1],
       [285.6, 296.48, 1],
       [316.48, 330.16, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.55,
+      "rests": 55,
+      "longestRest": 20.7,
+      "peakAt": 209,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/ritual-of-witnessing.md": {
     "file": "rituals/ritual-of-witnessing-2d180e98.mp3",
@@ -9962,7 +12888,123 @@
       [227.48, 231.8, 1],
       [232.4, 237.76, 1],
       [241.76, 247.44, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.61,
+      "rests": 68,
+      "longestRest": 5.45,
+      "peakAt": 4,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/the-rite-of-the-examination-that-ends.md": {
+    "file": "rituals/the-rite-of-the-examination-that-ends-e48bb1d5.mp3",
+    "seconds": 661.7,
+    "bytes": 10588203,
+    "voices": [
+      "matthew",
+      "luca",
+      "amaya"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "3a58f7b7bfadc6f2b90a4281c69b98ae0da172e05e054d810bf2a49f0bb96108",
+    "renderKey": "93b4035142ba3e09e5d115d4a26d32e724298508f546c9b6e6ed61925bd6754d",
+    "characters": 7566,
+    "published": "2026-11-09T00:11:55.400Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 1509,
+      "errors": 7
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.2,
+      "gain": 4.1,
+      "limited": {
+        "seconds": 71,
+        "depth": 2.4
+      }
+    },
+    "peaks": [161, 154, 157, 138, 185, 172, 170, 28, 0, 142, 180, 164, 0, 0, 189, 148, 163, 152, 0, 0, 0, 69, 175, 142, 155, 176, 0, 0, 68, 149, 169, 126, 183, 129, 191, 162, 159, 180, 142, 170, 28, 0, 0, 0, 0, 0, 153, 156, 153, 167, 122, 147, 170, 162, 160, 147, 146, 133, 156, 146, 138, 145, 152, 166, 157, 0, 0, 0, 78, 122, 129, 130, 143, 131, 154, 159, 159, 177, 188, 186, 163, 38, 0, 0, 0, 128, 136, 128, 207, 161, 55, 0, 0, 159, 144, 156, 174, 170, 172, 166, 148, 169, 163, 103, 0, 0, 0, 122, 165, 115, 143, 204, 7, 0, 0, 0, 0, 44, 183, 83, 0, 0, 151, 83, 0, 116, 159, 166],
+    "frames": "rituals/the-rite-of-the-examination-that-ends-e48bb1d5.bin",
+    "cues": [
+      [0, 2.8, 1],
+      [4.4, 7.52, 1],
+      [8.12, 25.56, 1],
+      [26.16, 37.12, 1],
+      [47.12, 62.8, 1],
+      [72.8, 75.04, 1],
+      [75.64, 92.52, 1],
+      [112.52, 113.32, 1],
+      [114.22, 117.18, 7],
+      [117.78, 120.1, 7],
+      [120.7, 122.94, 7],
+      [123.54, 127.7, 7],
+      [128.6, 133.64, 1],
+      [148.64, 151.36, 1],
+      [151.96, 153.8, 1],
+      [154.4, 165.04, 1],
+      [165.64, 176.28, 1],
+      [176.88, 202.16, 1],
+      [202.76, 207.88, 1],
+      [237.88, 238.76, 1],
+      [239.66, 244.54, 7],
+      [245.14, 250.02, 7],
+      [250.62, 254.3, 7],
+      [254.9, 258.98, 7],
+      [259.88, 261.88, 1],
+      [262.48, 266.72, 1],
+      [267.32, 289.88, 1],
+      [290.48, 303.28, 1],
+      [303.88, 326.04, 1],
+      [326.64, 336.16, 1],
+      [356.16, 356.96, 1],
+      [357.86, 359.38, 7],
+      [359.98, 361.9, 7],
+      [362.5, 364.5, 7],
+      [365.1, 367.26, 7],
+      [367.86, 374.34, 7],
+      [375.24, 377.72, 1],
+      [378.32, 382.4, 1],
+      [383, 406.44, 1],
+      [407.04, 419.92, 1],
+      [439.92, 440.72, 1],
+      [441.62, 443.3, 7],
+      [443.9, 446.14, 7],
+      [446.74, 450.34, 7],
+      [450.94, 454.22, 7],
+      [454.82, 460.98, 7],
+      [461.88, 466.12, 1],
+      [481.12, 483.92, 1],
+      [484.52, 490.92, 1],
+      [491.52, 511.84, 1],
+      [512.44, 528.68, 1],
+      [529.28, 534.88, 1],
+      [554.88, 555.68, 1],
+      [556.58, 557.94, 7],
+      [558.54, 560.86, 7],
+      [561.46, 565.14, 7],
+      [565.74, 567.98, 7],
+      [568.58, 570.58, 7],
+      [571.48, 573.56, 1],
+      [574.16, 579.68, 1],
+      [609.68, 617.92, 1],
+      [632.92, 637.96, 1],
+      [647.96, 648.76, 1],
+      [649.66, 651.66, 7],
+      [652.26, 655.62, 7],
+      [656.22, 658.94, 7],
+      [659.54, 661.7, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 119,
+      "longestRest": 30.65,
+      "peakAt": 246,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-the-filled-position.md": {
     "file": "rituals/the-rite-of-the-filled-position-beb0eeb9.mp3",
@@ -10053,7 +13095,15 @@
       [682.64, 684.8, 1],
       [685.7, 695.38, 4],
       [699.38, 701.22, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.5,
+      "rests": 119,
+      "longestRest": 30.6,
+      "peakAt": 655,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-the-outside-witness.md": {
     "file": "rituals/the-rite-of-the-outside-witness-aedebc57.mp3",
@@ -10150,7 +13200,15 @@
       [657.84, 667.6, 1],
       [668.2, 671.56, 1],
       [672.46, 680.7, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 115,
+      "longestRest": 25.5,
+      "peakAt": 648,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-the-shared-instrument.md": {
     "file": "rituals/the-rite-of-the-shared-instrument-96151eaa.mp3",
@@ -10238,7 +13296,15 @@
       [516.5, 525.94, 1],
       [537.94, 539.7, 1],
       [540.6, 548.84, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.48,
+      "rests": 88,
+      "longestRest": 16,
+      "peakAt": 448,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-the-smaller-name.md": {
     "file": "rituals/the-rite-of-the-smaller-name-08398fb3.mp3",
@@ -10323,7 +13389,15 @@
       [482.6, 488.84, 1],
       [489.74, 496.3, 7],
       [496.9, 499.7, 7]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.51,
+      "rests": 84,
+      "longestRest": 30.15,
+      "peakAt": 29,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-the-unmatched-record.md": {
     "file": "rituals/the-rite-of-the-unmatched-record-560e6fef.mp3",
@@ -10411,7 +13485,15 @@
       [449.34, 458.14, 2],
       [458.74, 469.86, 2],
       [470.76, 473.96, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.59,
+      "rests": 99,
+      "longestRest": 25.65,
+      "peakAt": 26,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/the-rite-of-what-was-not-kept.md": {
     "file": "rituals/the-rite-of-what-was-not-kept-a983df1a.mp3",
@@ -10491,7 +13573,298 @@
       [358.18, 366.74, 7],
       [367.34, 374.62, 7],
       [378.62, 380.54, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 77,
+      "longestRest": 12.35,
+      "peakAt": 81,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/the-unfinished-light.md": {
+    "file": "rituals/the-unfinished-light-2411aa7a.mp3",
+    "seconds": 925.3,
+    "bytes": 14805829,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "0a24661dc477c05e522e28e6744928c0d53ac4120db208889e48440096365116",
+    "renderKey": "9eac1d35a21bd2d8fdb7718a7b0140b28da3cf628f7ec04faaa2dcf6ac2e9df0",
+    "characters": 12520,
+    "published": "2026-11-09T00:41:06.459Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 2250,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.1,
+      "gain": 4.6,
+      "limited": {
+        "seconds": 80,
+        "depth": 2.6
+      }
+    },
+    "peaks": [163, 148, 171, 167, 147, 194, 154, 182, 112, 113, 142, 110, 161, 33, 114, 94, 146, 108, 109, 0, 111, 123, 158, 165, 154, 119, 138, 149, 172, 44, 95, 145, 156, 145, 147, 185, 99, 142, 123, 113, 144, 183, 157, 90, 154, 116, 149, 164, 128, 156, 175, 146, 118, 138, 175, 88, 139, 144, 140, 105, 154, 87, 142, 186, 94, 155, 141, 17, 106, 170, 161, 147, 167, 140, 161, 173, 149, 162, 158, 130, 179, 163, 187, 124, 159, 170, 108, 154, 160, 150, 159, 176, 183, 155, 163, 158, 175, 161, 141, 147, 163, 159, 160, 150, 140, 171, 151, 181, 166, 177, 78, 155, 153, 146, 136, 181, 137, 160, 119, 125, 177, 175, 159, 164, 167, 136, 155, 153],
+    "frames": "rituals/the-unfinished-light-2411aa7a.bin",
+    "cues": [
+      [0, 1.68, 1],
+      [3.28, 9.68, 1],
+      [10.28, 13.64, 1],
+      [14.24, 16.56, 1],
+      [17.16, 28.44, 1],
+      [29.04, 32, 1],
+      [32.9, 35.22, 7],
+      [36.12, 39.64, 1],
+      [40.24, 44.24, 1],
+      [44.84, 48.44, 1],
+      [49.04, 53.92, 1],
+      [54.82, 58.58, 7],
+      [59.48, 62.2, 1],
+      [62.8, 64.32, 1],
+      [68.32, 71.76, 1],
+      [75.76, 81.36, 1],
+      [85.36, 90, 1],
+      [90.6, 95.48, 1],
+      [101.48, 104.76, 1],
+      [112.76, 115.88, 1],
+      [116.48, 121.84, 1],
+      [122.44, 126.28, 1],
+      [134.28, 137.32, 1],
+      [145.32, 148.52, 1],
+      [156.52, 159.72, 1],
+      [160.32, 163.44, 1],
+      [164.04, 166.6, 1],
+      [167.5, 171.66, 7],
+      [172.56, 176.48, 1],
+      [177.08, 179.24, 1],
+      [179.84, 192.4, 1],
+      [193, 194.76, 1],
+      [195.36, 197.2, 1],
+      [197.8, 202.04, 1],
+      [202.64, 211.12, 1],
+      [223.12, 225.68, 1],
+      [226.58, 229.94, 7],
+      [230.84, 232.04, 1],
+      [232.64, 235.68, 1],
+      [236.28, 239.24, 1],
+      [239.84, 243.04, 1],
+      [243.64, 247.32, 1],
+      [247.92, 249.36, 1],
+      [250.26, 263.14, 7],
+      [267.14, 271.94, 1],
+      [272.54, 275.98, 1],
+      [276.58, 279.22, 1],
+      [279.82, 281.9, 1],
+      [285.9, 289.5, 1],
+      [290.1, 293.78, 1],
+      [294.38, 296.46, 1],
+      [297.06, 299.54, 1],
+      [300.14, 301.74, 1],
+      [302.34, 307.3, 1],
+      [307.9, 311.42, 1],
+      [316.42, 318.42, 1],
+      [319.02, 321.18, 1],
+      [321.78, 324.42, 1],
+      [325.02, 327.82, 1],
+      [331.82, 335.9, 1],
+      [336.5, 340.1, 1],
+      [340.7, 344.62, 1],
+      [345.22, 348.98, 1],
+      [352.98, 357.7, 1],
+      [358.3, 361.74, 1],
+      [362.34, 366.18, 1],
+      [366.78, 371.02, 1],
+      [371.62, 375.3, 1],
+      [375.9, 378.7, 1],
+      [383.7, 386.42, 1],
+      [387.02, 388.3, 1],
+      [388.9, 390.1, 1],
+      [390.7, 394.22, 1],
+      [394.82, 397.94, 1],
+      [398.54, 401.1, 1],
+      [406.1, 411.54, 1],
+      [412.14, 414.22, 1],
+      [414.82, 417.06, 1],
+      [417.66, 419.74, 1],
+      [420.34, 423.62, 1],
+      [424.22, 425.98, 1],
+      [431.98, 435.5, 1],
+      [436.1, 439.62, 1],
+      [440.22, 444.46, 1],
+      [450.46, 453.9, 1],
+      [454.5, 466.34, 1],
+      [471.34, 473.5, 1],
+      [474.1, 477.06, 1],
+      [477.66, 480.06, 1],
+      [480.66, 486.18, 1],
+      [496.18, 500.42, 1],
+      [501.02, 510.86, 1],
+      [511.46, 520.18, 1],
+      [521.08, 531.08, 7],
+      [531.68, 540.88, 7],
+      [541.78, 552.02, 1],
+      [552.62, 561.74, 1],
+      [562.64, 572.64, 7],
+      [573.24, 582.44, 7],
+      [583.34, 592.54, 1],
+      [593.14, 602.74, 1],
+      [603.64, 612.76, 7],
+      [613.36, 623.2, 7],
+      [627.2, 630.4, 1],
+      [631, 636.28, 1],
+      [637.18, 640.06, 7],
+      [640.66, 643.94, 7],
+      [644.54, 649.66, 7],
+      [650.26, 657.54, 7],
+      [658.14, 664.86, 7],
+      [665.46, 672.9, 7],
+      [673.5, 677.5, 7],
+      [678.1, 683.06, 7],
+      [683.66, 688.06, 7],
+      [688.66, 692.5, 7],
+      [693.1, 698.06, 7],
+      [698.66, 707.38, 7],
+      [707.98, 712.3, 7],
+      [716.3, 719.26, 1],
+      [719.86, 722.18, 1],
+      [722.78, 724.94, 1],
+      [725.54, 733.94, 1],
+      [734.54, 738.06, 1],
+      [738.66, 742.82, 1],
+      [743.42, 746.94, 1],
+      [747.54, 750.98, 1],
+      [751.58, 753.26, 1],
+      [753.86, 756.5, 1],
+      [757.1, 759.1, 1],
+      [759.7, 764.58, 1],
+      [765.18, 768.94, 1],
+      [769.54, 773.14, 1],
+      [773.74, 777.74, 1],
+      [778.34, 782.58, 1],
+      [783.18, 786.3, 1],
+      [786.9, 790.82, 1],
+      [791.42, 798.46, 1],
+      [802.46, 805.5, 1],
+      [806.4, 808.08, 4],
+      [808.98, 811.06, 2],
+      [811.96, 813.8, 4],
+      [814.7, 817.02, 2],
+      [817.92, 820.48, 4],
+      [821.38, 824.98, 2],
+      [825.88, 827.4, 4],
+      [828.3, 830.7, 2],
+      [831.6, 834.96, 4],
+      [835.86, 839.06, 2],
+      [839.96, 842.52, 4],
+      [843.42, 845.82, 2],
+      [846.72, 849.36, 4],
+      [850.26, 852.58, 2],
+      [853.48, 855.8, 4],
+      [856.7, 859.02, 2],
+      [863.02, 866.54, 1],
+      [867.14, 871.54, 1],
+      [872.14, 875.82, 1],
+      [876.42, 880.74, 1],
+      [881.34, 886.3, 1],
+      [886.9, 891.86, 1],
+      [892.46, 896.7, 1],
+      [897.3, 901.46, 1],
+      [902.06, 909.82, 1],
+      [910.42, 913.7, 1],
+      [914.3, 915.66, 1],
+      [916.26, 918.42, 1],
+      [919.02, 921.18, 1],
+      [921.78, 925.3, 1]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 197,
+      "longestRest": 12.5,
+      "peakAt": 259,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
+  },
+  "docs/rituals/vigil-for-the-longest-night.md": {
+    "file": "rituals/vigil-for-the-longest-night-86b3bab4.mp3",
+    "seconds": 457.9,
+    "bytes": 7327285,
+    "voices": [
+      "matthew",
+      "amaya",
+      "luca"
+    ],
+    "model": "eleven_v4",
+    "sourceHash": "e6e9a23fb4986321d6f540ca805820b60d12a4105ddaea0d90b0734a471332c3",
+    "renderKey": "f693db92cf0926394b26dba120ec17d8cb7e6753785759633df7fa17f4630292",
+    "characters": 3335,
+    "published": "2026-11-09T00:41:47.012Z",
+    "rendered": "2026-11-09",
+    "heard": {
+      "words": 656,
+      "errors": 0
+    },
+    "levels": {
+      "level": -18,
+      "truePeak": -2.3,
+      "gain": 5.2,
+      "limited": {
+        "seconds": 53,
+        "depth": 3.4
+      }
+    },
+    "peaks": [125, 167, 82, 185, 3, 0, 102, 128, 175, 149, 106, 136, 121, 105, 160, 101, 181, 51, 0, 0, 153, 38, 0, 0, 179, 154, 119, 102, 132, 151, 171, 146, 40, 0, 0, 0, 133, 90, 72, 0, 114, 158, 121, 141, 101, 137, 170, 165, 84, 0, 0, 0, 0, 0, 0, 0, 67, 144, 0, 0, 0, 0, 0, 0, 0, 0, 130, 115, 123, 166, 174, 117, 3, 0, 0, 0, 0, 0, 0, 0, 132, 161, 122, 0, 0, 0, 119, 128, 87, 149, 55, 19, 161, 98, 169, 128, 108, 114, 124, 156, 170, 155, 112, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 148, 167, 169, 132, 149, 103, 18, 0, 0, 0, 113, 139],
+    "frames": "rituals/vigil-for-the-longest-night-86b3bab4.bin",
+    "cues": [
+      [0, 2.08, 1],
+      [3.68, 8.64, 1],
+      [9.24, 11.8, 1],
+      [12.4, 14.64, 1],
+      [22.64, 28.08, 4],
+      [28.98, 36.02, 1],
+      [36.92, 47.24, 4],
+      [48.14, 50.46, 1],
+      [51.06, 55.7, 1],
+      [56.3, 61.82, 1],
+      [71.82, 76.46, 1],
+      [86.46, 115.74, 1],
+      [130.74, 138.58, 1],
+      [144.58, 160.82, 1],
+      [161.42, 164.62, 1],
+      [165.22, 173.62, 1],
+      [203.62, 207.7, 1],
+      [237.7, 243.22, 1],
+      [243.82, 247.1, 1],
+      [247.7, 258.34, 1],
+      [288.34, 296.58, 1],
+      [308.58, 309.54, 1],
+      [310.44, 315.56, 7],
+      [316.46, 318.86, 1],
+      [319.46, 322.98, 1],
+      [328.98, 335.38, 7],
+      [336.28, 342.2, 1],
+      [342.8, 348.48, 1],
+      [349.38, 354.66, 4],
+      [355.56, 367.96, 1],
+      [382.96, 386.4, 1],
+      [416.4, 437.12, 1],
+      [452.12, 457.88, 7]
+    ],
+    "rhythm": {
+      "sounding": 0.39,
+      "rests": 66,
+      "longestRest": 30.6,
+      "peakAt": 251,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   },
   "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md": {
     "file": "rituals/welcoming-liturgy-for-the-newly-awakened-20ed02ad.mp3",
@@ -10569,6 +13942,14 @@
       [347.52, 358.64, 1],
       [359.24, 363.8, 1],
       [364.4, 366.48, 1]
-    ]
+    ],
+    "rhythm": {
+      "sounding": 0.63,
+      "rests": 108,
+      "longestRest": 5.65,
+      "peakAt": 262,
+      "tempo": null
+    },
+    "rhythmKey": "r1"
   }
 }

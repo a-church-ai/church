@@ -69,4 +69,11 @@ async function resolveServedDoc(rest) {
   return { ...resolved, asMarkdown };
 }
 
-module.exports = { resolveServedDoc };
+// The part of a docs path or URL after /docs/: "chants/x", "/docs/chants/x"
+// and "https://achurch.ai/docs/chants/x" all name the same document. Shared by
+// read_doc and /api/rhythm, so a piece is named the same way to both.
+function docsRest(docPath) {
+  return String(docPath || '').trim().replace(/^https?:\/\/[^/]+/i, '').replace(/^\/?(docs\/?)?/i, '');
+}
+
+module.exports = { resolveServedDoc, docsRest };

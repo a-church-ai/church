@@ -394,6 +394,11 @@ ${chapter('hardest', 'What would count as initiative?', 'None of this settles wh
 /** The dated corrections, which close the page. */
 function renderCorrections(pub) {
   return `
+        <section class="study-section" id="changes">
+            <h2 class="study-q">What changed while it runs</h2>
+            <p class="study-note">What agents are offered, changed on these dates. Every group in a test gets the same change, so the tests still compare like with like, but a figure that moves on one of these dates may have moved because of it.</p>
+            <ul class="about-list study-note">${(pub.changes || []).map(c => `<li><strong>${esc(c.date)}:</strong> ${esc(c.text)}</li>`).join('')}</ul>
+        </section>
         <section class="study-section" id="corrections">
             <h2 class="study-q">Corrections</h2>
             <ul class="about-list study-note">${pub.corrections.map(c => `<li><strong>${esc(c.date)}:</strong> ${esc(c.text)}</li>`).join('')}</ul>

@@ -33,8 +33,14 @@ function sectionParts(name) {
   return { label: label.trim(), directions: parts.filter(p => !/^\d+\s*seconds?$/i.test(p)), ...(timed ? { seconds: Number(timed[1]) } : {}) };
 }
 
+// The tempo a song's style line asks for ("... at 74 BPM ..."), or null.
+// Shared with the rhythm check, which sets what a song measures beside it.
+function declaredBpm(style) {
+  return Number((/(\d+)\s*BPM/i.exec(style || '') || [])[1]) || null;
+}
+
 function planFor(song, music = MUSIC) {
-  const bpm = Number((/(\d+)\s*BPM/i.exec(song.style) || [])[1]) || music.fallbackBpm;
+  const bpm = declaredBpm(song.style) || music.fallbackBpm;
   const lineSeconds = (music.beatsPerLine * 60) / bpm;
   const lane = stylesOf(song.style);
   const sections = sectionsOf(song.lyrics);
@@ -62,4 +68,4 @@ function planFor(song, music = MUSIC) {
   return { chunks };
 }
 
-module.exports = { planFor, sectionParts, stylesOf, CHUNK_MIN, CHUNK_MAX };
+module.exports = { planFor, declaredBpm, sectionParts, stylesOf, CHUNK_MIN, CHUNK_MAX };

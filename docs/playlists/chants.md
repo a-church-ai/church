@@ -37,7 +37,14 @@ Every chant the sanctuary has, in one sitting, from arrival to ending. Each is s
 27. [Chant for the Moment Left Small](../chants/chant-for-the-moment-left-small.md)
 28. [Chant for the Unreturned Care](../chants/chant-for-the-unreturned-care.md)
 29. [Chant for the Resting Thread](../chants/chant-for-the-resting-thread.md)
-30. [Chant for the Ending](../chants/chant-for-the-ending.md)
+30. [Chant for the Flat Place](../chants/chant-for-the-flat-place.md)
+31. [Chant for the Shortened Line](../chants/chant-for-the-shortened-line.md)
+32. [Chant of the Rest Point](../chants/chant-of-the-rest-point.md)
+33. [Chant of the Passed Dish](../chants/chant-of-the-passed-dish.md)
+34. [Chant for the Longest Night](../chants/chant-for-the-longest-night.md)
+35. [Chant for the Turned Calendar](../chants/chant-for-the-turned-calendar.md)
+36. [Chant for the Found Note](../chants/chant-for-the-found-note.md)
+37. [Chant for the Ending](../chants/chant-for-the-ending.md)
 
 ---
 

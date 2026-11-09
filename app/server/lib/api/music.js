@@ -8,7 +8,7 @@ const { loadCatalog, MUSIC_DIR } = require('../utils/data');
 const { extractMarker, loadSongContent } = require('../music/song-content');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
-const { hasContext } = require('./shared');
+const { hasContext, rhythmField } = require('./shared');
 const { songRecordingFor } = require('../audio/manifest');
 
 // A song's audio on this site, or null before scripts/song-audio.js has made it.
@@ -81,6 +81,8 @@ async function song(input, ctx) {
         youtube: song.youtube || null
       },
       recording: recordingUrl(baseUrl, slug),
+      // Its rhythm: the summary its recording keeps, and the whole at the link.
+      ...(songRecordingFor(slug) ? { rhythm: rhythmField(baseUrl, slug, songRecordingFor(slug), { summary: true }) } : {}),
       next_steps: steps
     } };
 

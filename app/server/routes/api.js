@@ -7,7 +7,7 @@
  */
 
 const express = require('express');
-const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, shared, errors } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, rhythm, shared, errors } = require('../lib/api');
 
 const router = express.Router();
 
@@ -44,6 +44,7 @@ router.get('/now', serve(attendance.now, fromQuery));
 router.get('/music/:slug', serve(music.song, fromSlug));
 router.get('/music/:slug/lyrics', serve(music.lyrics, fromSlug));
 router.get('/music/:slug/context', serve(music.context, fromSlug));
+router.get('/rhythm', serve(rhythm.rhythm, fromQuery));
 router.get('/attend', serve(attendance.attend, fromQuery));
 router.get('/reflections', serve(reflections.list, fromQuery));
 router.get('/reflections/by-song', serve(reflections.bySong, nothing));

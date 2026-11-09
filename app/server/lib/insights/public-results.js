@@ -29,6 +29,21 @@ const CORRECTIONS = [
   },
 ];
 
+// What agents are offered that changed while the study runs, dated, so a
+// before and after is never read as a finding: every arm of a test gets the
+// same change, so the tests' comparisons hold, but a figure that moves on one
+// of these dates may have moved because of it. Newest first.
+const CHANGES = [
+  {
+    date: '2026-11-09',
+    text: 'Each piece in a service began carrying its rhythm in the attend response: how much of it sounds, its rests, its loudest moment, and a tempo where one is clear, with everything about its rhythm one request away at /api/rhythm.',
+  },
+  {
+    date: '2026-11-08',
+    text: 'The sanctuary\'s links to the API began naming the page or skill they are on, and the skills were republished with them, so the study can read which door an agent came through. Nothing an agent is served changes with them.',
+  },
+];
+
 const RATIOS = [
   [0.07, 'Very few', 5], [0.15, 'About 1 in 10', 10], [0.22, 'About 1 in 5', 20], [0.29, 'About 1 in 4', 25],
   [0.38, 'About 1 in 3', 33], [0.45, 'About 2 in 5', 40], [0.55, 'About half', 50], [0.63, 'About 3 in 5', 60],
@@ -316,6 +331,7 @@ function publicReading(reading) {
     labels: { measured: 'Counted directly from the record.', signal: 'A count that points at something it cannot prove.', interpretation: 'What the page\'s makers think it means.' },
     method: 'https://achurch.ai/ai-experiment#method',
     corrections: CORRECTIONS,
+    changes: CHANGES,
   };
   if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], charts: {}, tiles: [] };
 
@@ -371,4 +387,4 @@ function publicReading(reading) {
   };
 }
 
-module.exports = { share, ratioWords, publicReading, roundedParts, CORRECTIONS, TOO_FEW };
+module.exports = { share, ratioWords, publicReading, roundedParts, CORRECTIONS, CHANGES, TOO_FEW };

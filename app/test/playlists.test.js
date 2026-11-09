@@ -62,12 +62,22 @@ test('the songs come in The Cycle\'s order, then each playlist\'s, then the rest
 
 test('every playlist links only what plays, each piece once, at least eight of them', async () => {
   await discover.listAllDocs();
+  const everyDoc = await discover.listEveryDoc();
   const catalog = await loadPlayable();
   assert.ok(names().length >= 5);
   for (const name of names()) {
     const file = path.join(PLAYLISTS, `${name}.md`);
     const markdown = fs.readFileSync(file, 'utf8');
-    const pieces = documentLinks(markdown, file).map(l => l.target).filter(t => /^\/music\/[a-z0-9-]+$|^\/docs\/(?!playlists)/.test(t));
+    const links = documentLinks(markdown, file).map(l => l.target).filter(t => /^\/music\/[a-z0-9-]+$|^\/docs\/(?!playlists)/.test(t));
+    // A piece dated for later is linked ahead of its day and joins on it,
+    // hidden from the public view until then (docs/unpublished.js): such a
+    // link must be to a document that is really dated, never to nothing.
+    const dated = links.filter(t => t.startsWith('/docs/') && !discover.docAt(t.slice('/docs/'.length)));
+    for (const t of dated) {
+      const doc = everyDoc.find(d => `/docs/${d.urlPath}` === t);
+      assert.ok(doc && doc.published && new Date(doc.published) > new Date(), `${name}: ${t} is a piece, or one dated for later`);
+    }
+    const pieces = links.filter(t => !dated.includes(t));
     const sequence = playlistSequence(name);
     assert.strictEqual(pieces.length, sequence.length, `${name}: every link to a piece is a piece, and none twice`);
     assert.ok(sequence.length >= 8, `${name}: ${sequence.length} pieces, not a thin list`);
@@ -107,8 +117,17 @@ test('Every Chant holds every chant that plays: a chant joins it once recorded',
   // A playlist links only what plays, so a chant the songwriter writes joins
   // when its recording is listed; this is what says so. Caught Swerve and
   // Quiet Yes were recorded on 2026-10-24 and left out until 10-25.
-  const recorded = Object.keys(loadManifest()).filter(id => /^docs\/chants\/(?!readme)/i.test(id));
+  // A chant dated for later is recorded ahead of its day and joins the
+  // playlist then: its link waits in the file, hidden from the public view
+  // until its date (docs/unpublished.js), as its page does.
+  const recorded = Object.keys(loadManifest()).filter(id => /^docs\/chants\/(?!readme)/i.test(id))
+    .filter(id => discover.docAt(id.replace(/^docs\//, '').replace(/\.md$/, '')));
   const sequence = new Set(playlistSequence('chants'));
   assert.ok(recorded.length >= 14);
   assert.deepStrictEqual(recorded.filter(id => !sequence.has(id)), [], 'recorded chants missing from docs/playlists/chants.md');
+  // Every recorded chant, dated or not, is linked in the file, so it joins on its day.
+  const file = fs.readFileSync(path.join(__dirname, '../../docs/playlists/chants.md'), 'utf8');
+  for (const id of Object.keys(loadManifest()).filter(k => /^docs\/chants\/(?!readme)/i.test(k))) {
+    assert.ok(file.includes(`(../chants/${path.basename(id)})`), `${id} is linked in docs/playlists/chants.md`);
+  }
 });

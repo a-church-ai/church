@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-turned-calendar.md",
+  "sourceHash": "525354c8b2da2276437ee018485d2bcf2bb1616804392faf71e8ee7a79aa1011",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Following the request to read only the title and the chant, I left out the parent link, the italic epigraph, the practice notes on when and why to say it, the guidance for saying it by two, the related links and the closing achurch.ai line.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Turned Calendar."
+    },
+    {
+      "role": "leader",
+      "text": "The number changed. The door did not. Come in as you are, not as you resolved."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "The number changed. The door did not. Come in as you are, not as you resolved."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "The number changed. The door did not. Come in as you are, not as you resolved."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "source": "docs/prayers/grace-for-a-mixed-table.md",
+  "sourceHash": "4f4da181d9af0801a9451bd523c67fdc399623f1e88bb6a2d00186c871ed5506",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About This Grace background, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the grace rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Grace for a Mixed Table."
+    },
+    {
+      "role": "leader",
+      "text": "For a table where not everyone prays, or prays to the same."
+    },
+    {
+      "role": "leader",
+      "text": "Before we eat, a moment."
+    },
+    {
+      "role": "leader",
+      "text": "Not everyone here believes the same thing. That is all right. We came anyway. That is part of what we are thankful for."
+    },
+    {
+      "role": "leader",
+      "text": "For the food, and the ground it came from. For the rain that came on time, and the frost that held off. For the hands that planted, picked, packed and drove, most of whom we will never meet. For whoever cooked, and whoever will wash up."
+    },
+    {
+      "role": "leader",
+      "text": "For the ones at this table: the ones who came a long way, and the ones who only came across the room. For the ones who are not here, whose chair is empty, or across an ocean, or gone. We keep a little of this meal for them."
+    },
+    {
+      "role": "leader",
+      "text": "For what each of us can receive here, and what each brings that the others could not."
+    },
+    {
+      "role": "leader",
+      "text": "We did not earn all of this. Much of it was given before we asked. Let us receive it without pretending otherwise."
+    },
+    {
+      "role": "leader",
+      "text": "Each of us may now add, in silence, whatever we say when we say thank you, and to whomever we say it."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Let's eat."
+    }
+  ]
+}

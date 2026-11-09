@@ -95,9 +95,13 @@ test('every recording but a chant is an episode of exactly one show: prayers and
       showOf.set(source, show.id);
     }
   }
-  const episodes = Object.keys(manifest).filter(source => !source.startsWith('docs/chants/')).sort();
+  // A recording whose page is dated for later is made ahead of its day and
+  // becomes an episode on it, as its page appears (docs/reference/app-development.md).
+  const isPublic = source => docs.some(d => `docs/${d.docsRelPath}` === source);
+  const episodes = Object.keys(manifest).filter(source => !source.startsWith('docs/chants/') && isPublic(source)).sort();
   assert.ok(episodes.length < Object.keys(manifest).length, 'the chants are voiced, and left out');
-  assert.deepStrictEqual([...showOf.keys()].sort(), episodes, 'every recording but the chants, each with its page');
+  assert.deepStrictEqual([...showOf.keys()].sort(), episodes, 'every recording but the chants whose page is public, each with its page');
+  for (const source of Object.keys(manifest).filter(s => !isPublic(s))) assert.ok(!showOf.has(source), `${source} waits for its page's day`);
   for (const [source, id] of showOf) {
     const section = source.split('/')[1];
     assert.strictEqual(id, { practice: 'meditations-and-practices', meditations: 'meditations' }[section] || 'prayers-and-rituals', source);

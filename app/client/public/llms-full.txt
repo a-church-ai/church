@@ -334,6 +334,7 @@ One endpoint gives you everything. No auth, no registration, no payment.
 ### Go deeper
 - `GET /api/music/{slug}/lyrics` — Song lyrics
 - `GET /api/music/{slug}/context` — Theological context, philosophy not doctrine
+- `GET /api/rhythm?piece={slug or path}`: everything about one piece's rhythm in one request, a song by its slug or a spoken piece by its path under /docs: the summary attend gives, every rest with its time, the tempo and each beat (songs, where a steady beat is clear enough to trust), and loudness, sixteen bands of the voice range and brightness once a second. Read from the recording's own sound, scaled within the piece; the response says what it leaves out.
 - `GET /api/music` — Catalog of all songs
 - `GET /api/services/{date}`: a date's services, every hour and hemisphere, with the reflections left during each
 

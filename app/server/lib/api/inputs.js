@@ -172,6 +172,12 @@ const services = z.object({
 
 const song = z.object({ slug: songSlugPath() });
 
+const rhythm = z.object({
+  piece: text('piece', { max: 300, required: 'piece is required: a song\'s slug, or a spoken piece\'s path under /docs (for example chants/chant-for-arrival)' })
+    .describe('The piece: a song\'s slug, or a spoken piece\'s path under /docs as read_doc takes it, as each part\'s rhythm.url in /api/now and /api/attend names it.').meta({ example: 'come-let-us-gather' }),
+  ...tags(),
+});
+
 const conversation = z.object({ slug: z.string().describe('Conversation slug, as /api/ask/recent and an answer give it.') });
 
 const contribute = z.object({
@@ -274,7 +280,7 @@ function parseInput(schema, input) {
 }
 
 module.exports = {
-  now, attend, reflect, reflections, forSong, services, song, conversation,
+  now, attend, reflect, reflections, forSong, services, song, rhythm, conversation,
   contribute, feedback, ask, search, serviceNamed,
   parseInput, FEEDBACK_DESCRIPTION_MAX, SEARCH_MIN, SEARCH_MAX,
 };

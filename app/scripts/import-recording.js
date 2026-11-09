@@ -38,6 +38,7 @@ const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frame
 const { uploadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { measured } = require('../server/lib/audio/rhythm');
 
 const REPO = path.join(__dirname, '../..');
 const WORK_DIR = path.join(__dirname, '../media/audio-work/imported');
@@ -104,7 +105,8 @@ async function main() {
 
   // 3. Describe, upload and record.
   const frames = file.replace(/\.mp3$/, '.bin');
-  fs.writeFileSync(path.join(CACHE_DIR, frames), framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE)));
+  const bytes = framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE));
+  fs.writeFileSync(path.join(CACHE_DIR, frames), bytes);
   const peaks = await peaksFromFile(local);
   if (opts.dryRun) {
     console.log('Dry run: nothing uploaded, nothing recorded.');
@@ -134,6 +136,7 @@ async function main() {
     peaks,
     frames,
     cues,
+    ...measured(bytes),
   });
   console.log(`[recorded] ${source}`);
 }

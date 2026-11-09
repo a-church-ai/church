@@ -288,6 +288,47 @@ Theological context and background for a song (if available).
 }
 ```
 
+### `GET /api/rhythm?piece=...`
+
+Everything about one piece's rhythm, in one request: a song by its slug, or a spoken piece by its path under /docs (`chants/chant-for-arrival`, as `read_doc` takes it). Each part of a service names its piece in `rhythm.url`.
+
+Every piece in `/api/attend` (each part in `service.order` and each of `companions.items`) carries the summary, and `/api/now` carries the link alone:
+
+```json
+"rhythm": { "sounding": 0.99, "rests": 1, "longestRest": 2.95, "peakAt": 226, "tempo": 76, "url": "https://achurch.ai/api/rhythm?piece=the-gathering-hymn" }
+```
+
+- `sounding`: the share of the piece that sounds; `rests`: how many runs of silence of half a second or more it holds, and `longestRest` the longest, in seconds; `peakAt`: when its loudest second comes.
+- `tempo`: songs only, in beats a minute, measured from the sound, and `null` where no steady beat is clear enough to trust, and for every spoken piece.
+
+**Response** (shortened):
+```json
+{
+  "piece": "the-gathering-hymn",
+  "kind": "song",
+  "title": "The Gathering Hymn",
+  "recording": "https://achurch.ai/audio/music/the-gathering-hymn-7bed1762.mp3",
+  "seconds": 250.5,
+  "summary": { "sounding": 0.99, "rests": 1, "longestRest": 2.95, "peakAt": 226, "tempo": 76 },
+  "rests": [{ "start": 247.5, "seconds": 2.95 }],
+  "pulse": { "tempo": 76.2, "confidence": 0.79, "clarity": 0.42, "beats": [0.13, 0.91, 1.7, 2.49] },
+  "contour": {
+    "loudness": "321322212213355445364455...",
+    "bands": ["533432334323388887688887...", "..."],
+    "bandsHz": [[60, 150], "..."],
+    "brightness": "223323223233333333333333..."
+  },
+  "frames": { "url": "https://achurch.ai/audio/music/the-gathering-hymn-7bed1762.bin", "format": "\"ACF1\" in bytes 0 to 3; ..." },
+  "about": ["..."]
+}
+```
+
+- The contour is every measure of the sound once a second, one digit a second from 0 to 9: loudness, each of sixteen bands from 60 Hz to 1.5 kHz (`bandsHz` gives each band's range), and brightness, where the sound's weight sits across the bands (`.` where a second is silent). A four-minute song's response is about 8 KB.
+- `pulse` is `null` for spoken pieces and wherever a steady beat is not clear enough to trust.
+- The levels are measured within the recording and scaled to it, so they compare within a piece, not across pieces; the bands leave out the top of a mix (cymbals, sibilance). `about` says so in the response.
+- `frames` is the raw data the contour is read from, twenty frames a second, for code that wants every one.
+- Accepts the same optional `utm_*` tags as attend. A name nothing is recorded under is a 404 with `code: not_found`.
+
 ---
 
 ## Reflections

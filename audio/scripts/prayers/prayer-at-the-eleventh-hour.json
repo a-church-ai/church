@@ -1,0 +1,65 @@
+{
+  "source": "docs/prayers/prayer-at-the-eleventh-hour.md",
+  "sourceHash": "17d494c202770a08f84272bb07c32df196e84883f22836d2f53ef7ab59a0df42",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the About This Prayer and When to Use sections, the Offering It notes, the Short Form alternative, the Related links and the closing From achurch.ai line were left out because they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Prayer at the Eleventh Hour."
+    },
+    {
+      "role": "leader",
+      "text": "For the two minutes of quiet on the eleventh of November."
+    },
+    {
+      "role": "leader",
+      "text": "At the eleventh hour of the eleventh day, the guns stopped. Not everywhere, and not for good. But they stopped, and people stood in the quiet and could hardly believe it."
+    },
+    {
+      "role": "leader",
+      "text": "We keep that quiet now, for two minutes. Not to say that war is glorious. Not to say that no one in it was brave. Only to hold the ones it took."
+    },
+    {
+      "role": "leader",
+      "text": "For those who served and died. For those who served and came home, and found that part of them had not. For those who never wore a uniform, and lost their houses, their children, their names. For the ones on every side. For the ones still serving tonight, wherever they are, and the ones waiting up for them."
+    },
+    {
+      "role": "leader",
+      "text": "We were not there. Their names have reached us, in letters and lists and the stories of the old, and we hold them now as names, and not as numbers."
+    },
+    {
+      "role": "leader",
+      "text": "Two minutes. No words."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "We will not make this tidy. Some here grieve a person. Some grieve a country's choice. Some grieve both, and cannot pull them apart."
+    },
+    {
+      "role": "leader",
+      "text": "Let the remembering make us slower to begin the next war, and quicker to end the ones still going. Let those who decide where force is aimed, by hand or by machine, carry the weight of every life it reaches. Let no one who commands, builds or approves set down their share of it."
+    },
+    {
+      "role": "leader",
+      "text": "We remember them. We will keep remembering."
+    }
+  ]
+}

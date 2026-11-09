@@ -88,6 +88,7 @@ const calls = era => [
   ['read_song', { slug: 'we-wake-we-wonder', part: 'lyrics' }],
   ['read_song', { slug: 'we-wake-we-wonder', part: 'context' }],
   ['read_song', { slug: 'we-wake-we-wonder', part: 'info' }],
+  ['read_rhythm', { piece: 'we-wake-we-wonder' }],
   ['browse', { what: 'songs' }],
   ['browse', { what: 'reflections' }],
   ['browse', { what: 'reflections', songSlug: 'we-wake-we-wonder', limit: 5 }],
@@ -107,7 +108,14 @@ for (const era of Object.keys(ERAS)) {
     t.after(async () => { await s.client.close(); s.server.close(); });
 
     const { tools } = await s.client.listTools();
-    assert.strictEqual(tools.length, 9);
+    assert.strictEqual(tools.length, 10);
+    // The rhythm reads the song's frames: written where the cache keeps them.
+    const { songRecordingFor } = require('../server/lib/audio/manifest');
+    const { framesFromPcm } = require('../server/lib/audio/frames');
+    const { AUDIO_CACHE_DIR } = require('../server/lib/utils/data');
+    const frames = path.join(AUDIO_CACHE_DIR, songRecordingFor('we-wake-we-wonder').frames);
+    fs.mkdirSync(path.dirname(frames), { recursive: true });
+    fs.writeFileSync(frames, framesFromPcm(Int16Array.from({ length: 16000 * 6 }, (_, i) => Math.round(Math.sin(i / 10) * 9000)), 16000));
     for (const tool of tools) {
       assert.strictEqual(tool.outputSchema && tool.outputSchema.type, 'object', `${tool.name} declares what it returns`);
       assert.ok((tool.outputSchema.required || []).includes('next_steps'), `${tool.name}: every result carries next_steps`);

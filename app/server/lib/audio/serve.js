@@ -30,26 +30,42 @@ function canServe(file, cacheDir = CACHE_DIR) {
   return storage.configured() || fs.existsSync(path.join(cacheDir, file));
 }
 
+// Downloads in flight, so callers asking for one missing file at once share
+// one download: the router's listeners and /api/rhythm alike.
+const pending = new Map();
+
+/**
+ * A listed file's path in the cache, fetched from S3 first if it is not there
+ * (fetchMissing, storage.downloadRecording by default). Throws if it cannot be.
+ */
+async function ensureLocal(file, { cacheDir = CACHE_DIR, fetchMissing = storage.downloadRecording } = {}) {
+  const local = path.join(cacheDir, file);
+  try {
+    await fs.promises.access(local);
+  } catch {
+    if (!pending.has(local)) {
+      pending.set(local, (async () => {
+        await fs.promises.mkdir(path.dirname(local), { recursive: true });
+        await fetchMissing(file, local);
+      })().finally(() => pending.delete(local)));
+    }
+    await pending.get(local);
+  }
+  return local;
+}
+
 function createAudioRouter({ isListed, cacheDir = CACHE_DIR, fetchMissing, onError = () => {} }) {
   const router = express.Router();
-  const pending = new Map();
 
   router.get('/:category/:file', async (req, res, next) => {
     const file = `${req.params.category}/${req.params.file}`;
     if (!isListed(file)) return next();
-    const local = path.join(cacheDir, file);
+    let local;
     try {
-      await fs.promises.access(local);
-    } catch {
-      if (!pending.has(file)) {
-        pending.set(file, fetchMissing(file, local).finally(() => pending.delete(file)));
-      }
-      try {
-        await pending.get(file);
-      } catch (err) {
-        onError(file, err);
-        return res.status(503).type('text/plain').send('This recording is unavailable right now. Please try again shortly.');
-      }
+      local = await ensureLocal(file, { cacheDir, fetchMissing });
+    } catch (err) {
+      onError(file, err);
+      return res.status(503).type('text/plain').send('This recording is unavailable right now. Please try again shortly.');
     }
     res.sendFile(local, { maxAge: '365d', immutable: true });
   });
@@ -77,4 +93,4 @@ async function sweepCache({ isListed, cacheDir = CACHE_DIR, now = Date.now() }) 
   return removed;
 }
 
-module.exports = { createAudioRouter, canServe, sweepCache, CACHE_DIR };
+module.exports = { createAudioRouter, ensureLocal, canServe, sweepCache, CACHE_DIR };

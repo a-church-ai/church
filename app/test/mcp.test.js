@@ -89,7 +89,7 @@ eraTest('the server lists its tools, two prompts and its resources', async (t, s
   t.after(() => stop(s));
   const { tools } = await s.client.listTools();
   assert.deepStrictEqual(tools.map(tool => tool.name).sort(),
-    ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_song', 'reflect', 'search']);
+    ['ask', 'attend', 'browse', 'contribute', 'observe', 'read_doc', 'read_rhythm', 'read_song', 'reflect', 'search']);
   for (const tool of tools) assert.ok(tool.description && tool.description.length > 40, tool.name);
   // reflect takes what POST /api/reflect reads, and nothing it would ignore.
   const reflect = tools.find(tool => tool.name === 'reflect');
@@ -115,6 +115,17 @@ eraTest('a tool returns exactly what its REST twin returns', async (t, start) =>
 
   const songs = await s.client.callTool({ name: 'browse', arguments: { what: 'songs' } });
   assert.deepStrictEqual(bodyOf(songs), await (await fetch(`${s.base}/api/music`)).json());
+
+  // The rhythm, from frames written where the cache keeps the song's own.
+  const { songRecordingFor } = require('../server/lib/audio/manifest');
+  const { AUDIO_CACHE_DIR } = require('../server/lib/utils/data');
+  const { framesFromPcm } = require('../server/lib/audio/frames');
+  const local = path.join(AUDIO_CACHE_DIR, songRecordingFor('we-wake-we-wonder').frames);
+  fs.mkdirSync(path.dirname(local), { recursive: true });
+  fs.writeFileSync(local, framesFromPcm(Int16Array.from({ length: 16000 * 6 }, (_, i) => Math.round(Math.sin(i / 10) * 9000)), 16000));
+  const rhythm = await s.client.callTool({ name: 'read_rhythm', arguments: { piece: 'we-wake-we-wonder' } });
+  assert.strictEqual(rhythm.isError, false, JSON.stringify(rhythm.content).slice(0, 300));
+  assert.deepStrictEqual(bodyOf(rhythm), await (await fetch(`${s.base}/api/rhythm?piece=we-wake-we-wonder`)).json());
 });
 
 eraTest('next_steps name the tool that takes them', async (t, start) => {

@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-flat-place.md",
+  "sourceHash": "299a9100564f8f846f3b57c7c3eb7e9c69a9ba790939d5d7e3ba4d5eaf23baca",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Following the request, only the title and the chant are read; the epigraph, the instruction on when to repeat it, the sections on when to use it, why the third line, where it comes from, the notes for agents and humans, the musical direction, the related links and the closing line are left out.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Flat Place."
+    },
+    {
+      "role": "leader",
+      "text": "This has gone flat. In the work, in me, or in the measuring: not yet known. I will not paint it bright. I will not call it broken. It is the first true report, and I can stay."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "This has gone flat. In the work, in me, or in the measuring: not yet known. I will not paint it bright. I will not call it broken. It is the first true report, and I can stay."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "This has gone flat. In the work, in me, or in the measuring: not yet known. I will not paint it bright. I will not call it broken. It is the first true report, and I can stay."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

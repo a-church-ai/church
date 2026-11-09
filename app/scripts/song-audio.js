@@ -34,7 +34,8 @@ const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
 const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frames');
 const { uploadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadSongs, saveSongRecording } = require('../server/lib/audio/manifest');
-const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { CACHE_DIR, ensureLocal } = require('../server/lib/audio/serve');
+const { measured, needsRhythm } = require('../server/lib/audio/rhythm');
 const { songFolders } = require('../server/lib/music/songs');
 
 const LIBRARY_DIR = path.join(__dirname, '../media/library');
@@ -52,7 +53,8 @@ async function makeSong(song, video, previous) {
   await fs.promises.mkdir(path.dirname(local), { recursive: true });
   fs.renameSync(draft, local);
   const frames = file.replace(/\.mp3$/, '.bin');
-  fs.writeFileSync(path.join(CACHE_DIR, frames), framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE)));
+  const bytes = framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE));
+  fs.writeFileSync(path.join(CACHE_DIR, frames), bytes);
   await uploadRecording(local, file);
   await uploadRecording(path.join(CACHE_DIR, frames), frames);
 
@@ -71,6 +73,8 @@ async function makeSong(song, video, previous) {
     published: previous ? previous.published : now.toISOString(),
     rendered: now.toISOString().slice(0, 10),
     peaks: await peaksFromFile(local),
+    // The rhythm summary from those frames (lib/audio/rhythm.js).
+    ...measured(bytes, { song: true }),
   };
   await saveSongRecording(song.slug, record);
   return record;
@@ -106,6 +110,8 @@ async function main() {
   }
 
   console.log(`${todo.length} of ${catalog.length - unmade.length} songs to make${missing.length ? `; ${missing.length} have no source in media/library: ${missing.join(', ')}` : ''}.${unmade.length ? ` Not yet made: ${unmade.join(', ')}.` : ''}`);
+  const unmeasured = Object.values(songs).filter(needsRhythm).length;
+  if (unmeasured) console.log(`${unmeasured} songs need their rhythm read from their frames; no audio is made for them.`);
   if (dryRun) {
     todo.forEach(t => console.log(`  ${t.song.slug}`));
     return;
@@ -113,6 +119,18 @@ async function main() {
   if (todo.length) bucket();
 
   const failures = [];
+  // Every listed song whose rhythm summary is missing or was measured under
+  // another key: read from its frames alone, whether or not its source is here.
+  for (const [slug, record] of Object.entries(loadSongs()).filter(([s, r]) => needsRhythm(r) && !todo.some(t => t.song.slug === s) && (!only.length || only.includes(s)))) {
+    try {
+      const bytes = fs.readFileSync(await ensureLocal(record.frames));
+      await saveSongRecording(slug, { ...record, ...measured(bytes, { song: true }) });
+      console.log(`[rhythm] ${slug}`);
+    } catch (err) {
+      failures.push(`${slug}: ${err.message.split('\n')[0]}`);
+      console.error(`[rhythm failed] ${slug}: ${err.message.split('\n')[0]}`);
+    }
+  }
   for (const { song, video, previous } of todo) {
     try {
       const record = await makeSong(song, video, previous);

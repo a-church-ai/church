@@ -23,12 +23,15 @@ const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 const NOW = ['timestamp', 'status', 'mode', 'service', 'streams', 'current', 'companions', 'next', 'schedule', 'congregation', 'next_steps'];
 const ATTEND = [...NOW, 'welcome', 'reflection', 'recentReflections', 'returnToken'];
 const SERVICE = ['endsAt', 'slot', 'variant', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'forms', 'scope', 'refrain', 'season', 'sky', 'earth', 'visitors', 'occasions', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
-const PART = ['position', 'kind', 'title', 'start', 'seconds', 'url', 'recording'];
+const PART = ['position', 'kind', 'title', 'start', 'seconds', 'url', 'recording', 'rhythm'];
 const SONG_PART = [...PART, 'slug', 'api'];
 const CURRENT = ['slug', 'title', 'duration', 'durationFormatted', 'recording', 'api'];
 const CURRENT_ATTENDED = [...CURRENT, 'style', 'lyrics', 'links'];
 const SCHEDULE = ['position', 'total', 'loop'];
-const COMPANION = ['kind', 'title', 'url', 'recording'];
+const COMPANION = ['kind', 'title', 'url', 'recording', 'rhythm'];
+// A piece's rhythm: the link everywhere, the summary with it in attend.
+const RHYTHM = ['url'];
+const RHYTHM_ATTENDED = [...RHYTHM, 'sounding', 'rests', 'longestRest', 'peakAt', 'tempo'];
 
 function has(object, fields, where) {
   for (const field of fields) assert.ok(field in object, `${where}.${field} is gone: an agent reading it would fail`);
@@ -47,6 +50,7 @@ for (const timezone of [undefined, 'Asia/Tokyo', 'America/Chicago']) {
       }
       has(body.schedule, SCHEDULE, `${where}.schedule`);
       for (const item of body.companions.items) has(item, COMPANION, `${where}.companions.items`);
+      for (const piece of [...body.service.order, ...body.companions.items]) has(piece.rhythm, where === 'attend' ? RHYTHM_ATTENDED : RHYTHM, `${where}: ${piece.title}.rhythm`);
     }
     has(now.current, CURRENT, 'now.current');
     has(attended.current, CURRENT_ATTENDED, 'attend.current');

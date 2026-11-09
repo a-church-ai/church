@@ -27,9 +27,9 @@ const { z } = require('zod');
 const { McpServer, ResourceTemplate, createMcpHandler, isLegacyRequest } = require('@modelcontextprotocol/server');
 const { NodeStreamableHTTPServerTransport, toNodeHandler, toWebRequest, hostHeaderValidation } = require('@modelcontextprotocol/node');
 
-const { attendance, music, reflections, contributions, ask, search, services, reviews, shared, inputs } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, services, reviews, rhythm, shared, inputs } = require('../lib/api');
 const R = require('../lib/api/responses');
-const { resolveServedDoc } = require('../lib/docs/serve');
+const { resolveServedDoc, docsRest } = require('../lib/docs/serve');
 const { splitFrontmatter } = require('../lib/docs/tldr');
 const { servedMarkdown, corpusIndex } = require('../lib/docs/markdown');
 const { SITE_URL } = require('../lib/docs/links');
@@ -95,12 +95,6 @@ async function run(ctx, { tool, path, logged = {}, name: who, args }, operation)
   });
   const isError = status >= 400;
   return { isError, content: [{ type: 'text', text: JSON.stringify(body) }], ...(isError ? {} : { structuredContent: body }) };
-}
-
-// The part of a docs path or URL after /docs/: "chants/x", "/docs/chants/x"
-// and "https://achurch.ai/docs/chants/x" all name the same document.
-function docsRest(docPath) {
-  return String(docPath || '').trim().replace(/^https?:\/\/[^/]+/i, '').replace(/^\/?(docs\/?)?/i, '');
 }
 
 // One document as read_doc and the docs resource return it: the served
@@ -187,6 +181,15 @@ function createServer(ctx) {
       : part === 'info' ? [music.song, `/api/music/${songSlug}`] : [music.lyrics, `/api/music/${songSlug}/lyrics`];
     return run(ctx, { tool: 'read_song', path }, () => operation({ slug: songSlug }, ctx));
   });
+
+  server.registerTool('read_rhythm', {
+    title: 'Read a rhythm',
+    description: 'Everything about one piece\'s rhythm in one call, song or voiced piece: how much of it sounds, every rest with its time, the tempo and each beat (songs, where a steady beat is clear enough to trust), and every measure of its sound once a second (loudness, sixteen bands of the voice range, brightness). attend gives each piece\'s summary and names it in rhythm.url: pass that piece, a song\'s slug or a spoken piece\'s path such as chants/chant-for-arrival.',
+    inputSchema: inputs.rhythm,
+    outputSchema: R.RhythmResponse,
+    annotations: read,
+  }, args => run(ctx, { tool: 'read_rhythm', path: '/api/rhythm', logged: { piece: args.piece }, args },
+    () => rhythm.rhythm(args, ctx)));
 
   server.registerTool('browse', {
     title: 'Browse',

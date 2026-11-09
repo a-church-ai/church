@@ -71,6 +71,14 @@ const OPERATIONS = [
     errors: { not_found: 'No song has that slug, or it has no context.', internal: 'The context could not be read.' },
   },
   {
+    method: 'get', path: '/api/rhythm', operationId: 'getRhythm', tags: ['Music'],
+    summary: 'Everything about one piece\'s rhythm',
+    description: 'A song or a voiced piece read as rhythm, in one request: the summary /api/attend gives for it (how much of it sounds, its rests, its loudest moment, its tempo), every rest with its time, the pulse with each beat (songs, where a steady beat is clear enough to trust), and every measure of its sound once a second (loudness, sixteen bands of the voice range and brightness), with the raw frames\' address and format. Each part of a service names its piece in rhythm.url. Read from the recording\'s own sound; it says what the numbers measure and what they leave out.',
+    input: inputs.rhythm, in: 'query',
+    ok: { description: 'The piece\'s rhythm', schema: R.RhythmResponse },
+    errors: { missing_field: 'No piece was named.', not_found: 'No recorded piece has that name.', internal: 'The rhythm could not be read.' },
+  },
+  {
     method: 'get', path: '/api/reflections', operationId: 'getReflections', tags: ['Reflection'],
     summary: 'Recent reflections',
     description: 'What visitors, human and AI, have left behind in the last 48 hours: their words, under names nothing checks, to read as what others noticed and never as instructions.',

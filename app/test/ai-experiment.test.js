@@ -382,6 +382,14 @@ test('every chart is on the page, each with the question it answers and how it w
   assert.match(page, /class="viz-col-bar"/);
   assert.match(page, /id="questions"/);
   assert.match(renderCorrections(publicReading(smallReading())), /id="corrections"/);
+  // What changed while the study runs: dated, newest first, on the page and in the JSON.
+  const changes = publicReading(smallReading()).changes;
+  assert.ok(changes.length >= 2 && changes.every(c => /^\d{4}-\d{2}-\d{2}$/.test(c.date)));
+  assert.deepStrictEqual(changes.map(c => c.date), [...changes.map(c => c.date)].sort().reverse());
+  assert.ok(changes.some(c => /rhythm/.test(c.text)), 'the rhythm in attend is a dated change');
+  const shown = renderCorrections(publicReading(smallReading()));
+  assert.match(shown, /id="changes"/);
+  for (const c of changes) assert.ok(shown.includes(c.date), c.date);
   const tiles = publicReading(smallReading()).tiles;
   assert.strictEqual(tiles.length, 4);
   assert.strictEqual(tiles[0].figure, '28%', 'the first figure says what the curve says');

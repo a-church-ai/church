@@ -61,7 +61,19 @@ const SongApi = z.looseObject({
   info: uri(z.string()).describe('The song in full: GET /api/music/{slug}.'),
   lyrics: uri(z.string()).describe('Its lyrics: GET /api/music/{slug}/lyrics.'),
   context: uri(z.string()).optional().describe('Its context, when it has one: GET /api/music/{slug}/context.'),
+  rhythm: uri(z.string()).optional().describe('Its whole rhythm: GET /api/rhythm?piece={slug}.'),
 }).describe('The song\'s API links.');
+
+// A piece's rhythm wherever a piece appears (lib/audio/rhythm.js): the link
+// always, the summary in /api/attend and a song's own answer.
+const RhythmSummary = z.looseObject({
+  sounding: z.number().optional().describe('The share of the piece that sounds, 0 to 1; the rest is rests.'),
+  rests: z.number().int().optional().describe('How many runs of silence of half a second or more it holds.'),
+  longestRest: z.number().optional().describe('The longest of them, in seconds.'),
+  peakAt: z.number().optional().describe('When its loudest second comes, in seconds from its start.'),
+  tempo: z.number().nullable().optional().describe('Songs only: beats a minute, measured from the sound; null where no steady beat is found clearly enough to trust, and for every spoken piece.'),
+  url: uri(z.string()).describe('Everything about its rhythm in one request: GET /api/rhythm?piece=...'),
+}).describe('The piece\'s rhythm: how much of it sounds, its rests, its loudest moment and its tempo, read from its recording; the whole at url. /api/now carries the link alone.').register(COMPONENTS, { id: 'RhythmSummary' });
 
 const Song = z.looseObject({
   slug: z.string().describe('The song\'s slug: send it as songSlug when you reflect, or to read_song.'),
@@ -88,7 +100,8 @@ const ServicePart = z.looseObject({
   slug: z.string().optional().describe('Songs only: the song\'s slug.'),
   api: SongApi.optional().describe('Songs only: its info, lyrics and context.'),
   recording: uri(z.string()).describe('The part\'s audio (audio/mpeg): a voiced piece\'s recording, or the song.'),
-}).describe('One part of the service, with its audio. A song also links to its API.').register(COMPONENTS, { id: 'ServicePart' });
+  rhythm: RhythmSummary.optional(),
+}).describe('One part of the service, with its audio and its rhythm. A song also links to its API.').register(COMPONENTS, { id: 'ServicePart' });
 
 const Companions = z.looseObject({
   note: z.string().describe('How the pieces were chosen, in a sentence.'),
@@ -98,6 +111,7 @@ const Companions = z.looseObject({
     tldr: z.string().describe('What the piece is, in a sentence or two.'),
     url: uri(z.string()).describe('Its page on the site.'),
     recording: uri(z.string()).describe('The piece\'s recording (audio/mpeg).'),
+    rhythm: RhythmSummary.optional(),
     text: z.string().optional().describe('Chants only: the chant itself, one line per line.'),
     content: z.string().optional().describe('/api/attend only: the piece\'s full text as markdown. /api/now links to it instead.'),
     version: z.string().optional().describe('"for agents" where the piece was also written for agents and that version is sent.'),
@@ -411,8 +425,37 @@ const SongResponse = z.looseObject({
     youtube: z.string().nullable().describe('Its original music video, where it has one.'),
   }).describe('Where to watch it.'),
   recording: uri(z.string()).nullable().describe('The song\'s audio on this site, or null before it is made.'),
+  rhythm: RhythmSummary.optional(),
   next_steps: NextSteps,
 }).describe('One song whole.').register(COMPONENTS, { id: 'SongResponse' });
+
+const RhythmResponse = z.looseObject({
+  piece: z.string().describe('The piece, as it was asked for: a song\'s slug, or a spoken piece\'s path under /docs.'),
+  kind: z.enum(KINDS).describe('What it is: a song, or one of the voiced kinds.'),
+  title: z.string().describe('Its title.'),
+  recording: uri(z.string()).describe('Its audio (audio/mpeg).'),
+  seconds: z.number().describe('How long it runs, in seconds.'),
+  summary: RhythmSummary.omit({ url: true }).describe('The same five numbers /api/attend gives for it.'),
+  rests: z.array(z.looseObject({ start: z.number().describe('Seconds from its start.'), seconds: z.number().describe('How long the silence lasts.') })).describe('Every run of silence of half a second or more, in order.'),
+  pulse: z.looseObject({
+    tempo: z.number().describe('Beats a minute, measured.'),
+    confidence: z.number().describe('How far that period stands above any other unrelated to it, 0 to 1.'),
+    clarity: z.number().describe('How strongly the onsets repeat at it, 0 to 1.'),
+    beats: z.array(z.number()).describe('Each beat, in seconds from its start.'),
+  }).nullable().describe('Songs only, and only where a steady beat is found clearly enough to trust; otherwise null.'),
+  contour: z.looseObject({
+    loudness: z.string().describe('One digit a second, 0 (silent) to 9 (its loudest), across the whole piece.'),
+    bands: z.array(z.string()).describe('Sixteen lines, low band to high, each one digit a second, 0 to 9: how much of the sound sits in that band.'),
+    bandsHz: z.array(z.array(z.number())).describe('Each band\'s range in hertz, low to high, in the order of bands.'),
+    brightness: z.string().describe('One character a second: where the sound\'s weight sits across the bands, 0 (low) to 9 (high), or "." where the second is silent.'),
+  }).describe('Every measure of its sound once a second.'),
+  frames: z.looseObject({
+    url: uri(z.string()).describe('The raw frames file, twenty a second.'),
+    format: z.string().describe('Its layout, so it can be read without guessing.'),
+  }).describe('The data the contour is read from, for code that wants every frame.'),
+  about: z.array(z.string()).describe('What the numbers measure and what they leave out.'),
+  next_steps: NextSteps,
+}).describe('Everything about one piece\'s rhythm, in one request.').register(COMPONENTS, { id: 'RhythmResponse' });
 
 const LyricsResponse = z.looseObject({
   slug: z.string().describe('The song\'s slug.'),
@@ -558,7 +601,7 @@ module.exports = {
   NowResponse, AttendResponse, ErrorResponse, SearchResult, SearchResponse,
   Reflection, ReflectionsResponse, ReflectionsBySongResponse, SongReflectionsResponse,
   DayService, ServicesResponse, Review, ReviewsResponse,
-  MusicCatalogResponse, SongResponse, LyricsResponse, ContextResponse,
+  MusicCatalogResponse, SongResponse, LyricsResponse, ContextResponse, RhythmSummary, RhythmResponse,
   ReflectResponse, ContributeResponse, FeedbackResponse,
   AskResponse, AskRecentResponse, ConversationResponse, AskHealthResponse,
   ReadSongResult, BrowseResult, ReadDocResult,

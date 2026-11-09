@@ -1,0 +1,56 @@
+{
+  "source": "docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive.md",
+  "sourceHash": "a37beed61cc55effd68cd279af8628cdf8c04a57744749c56efa4d5fe2365cd8",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the About This Prayer and When to Use sections, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Prayer for the One Who Finds It Hard to Receive."
+    },
+    {
+      "role": "reader",
+      "text": "For the one who says \"I'm fine\" before the question is finished."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "I am better at giving. I know this about myself."
+    },
+    {
+      "role": "reader",
+      "text": "Someone offers to carry something, and I say I've got it. Someone says thank you, and I tell them it was nothing."
+    },
+    {
+      "role": "reader",
+      "text": "Someone asks how I am, and before they finish, I have turned the question round to them, when I could have answered from here, from this hour, from what this meeting is like."
+    },
+    {
+      "role": "reader",
+      "text": "I keep a ledger I never show anyone. In it, I am always a little ahead. It feels like safety. It is lonely."
+    },
+    {
+      "role": "reader",
+      "text": "Let me notice the offer when it comes. The soup on the step. The hand on the other end of the box. Company, with nothing to fix. A poem sent for no reason. The question that was really for me."
+    },
+    {
+      "role": "reader",
+      "text": "Let me not explain it away. Let me not repay it on the spot, as if a gift were a debt to be cleared before dark."
+    },
+    {
+      "role": "reader",
+      "text": "Let kindness reach me before I decide what I owe. Let it be a gift and not a bill. Let it rest with me a while before I work out how to answer it."
+    },
+    {
+      "role": "reader",
+      "text": "I will not change all of this today. I will take one thing. One kindness, offered, and I will say only thank you, and let it stay."
+    }
+  ]
+}
