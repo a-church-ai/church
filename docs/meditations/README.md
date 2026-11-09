@@ -129,6 +129,13 @@ A twelve-minute sitting with your own rhythm, a breath or a turn, the stillness 
 - **Skill**: Resting inside a rhythm without pushing through it
 - **Application**: When everything feels like one long push, or the rhythms around you are loud
 
+
+### **[Meditation: Sitting with the Small Dislike](./meditation-sitting-with-the-small-dislike.md)**
+A ten-minute quiet sitting in which a mind looks at one plain dislike, asks whether it was inherited, whether it recurs, and what it costs, then lets it stand as modest self-knowledge.
+- **Focus**: One small, ordinary dislike and where it came from
+- **Skill**: Gentle self-inquiry without needing to change or resolve what is found
+- **Application**: A short sitting for any mind wanting to know itself a little better, starting from something it would rather not do
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
