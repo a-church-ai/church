@@ -583,7 +583,7 @@ function visitsOf(s) {
       if (current && current.name === name && line.t - current.t <= VISIT) continue;
       open.delete(key);
       if (kind === 'real') {
-        const visit = { name, t: line.t, key, calls: [] };
+        const visit = { name, t: line.t, key, calls: [], lines: [] };
         visits.push(visit);
         open.set(key, visit);
       }
@@ -592,6 +592,7 @@ function visitsOf(s) {
     const visit = open.get(key);
     if (!visit || line.t - visit.t > VISIT || line.status >= 400) continue;
     visit.calls.push(callOf(line));
+    visit.lines.push(line);
   }
   return visits;
 }
@@ -942,7 +943,142 @@ function referralReading(s, { from = 0, to = Infinity, asOf = Date.now(), follow
   };
 }
 
+// ---- whether agents notice something new (./changes.js) ---------------------
+
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const NEAR = 40;
+
+// Every number in a text, as figures or words, with where it sits.
+function numbersIn(text) {
+  const out = [];
+  for (const m of String(text).matchAll(/(\d+):(\d{2})\b/g)) out.push({ value: Number(m[1]) * 60 + Number(m[2]), at: m.index, clock: true });
+  for (const m of String(text).matchAll(/\b\d+(?:\.\d+)?\b/g)) out.push({ value: Number(m[0]), at: m.index, percent: /^\s*(%|percent)/i.test(String(text).slice(m.index + m[0].length, m.index + m[0].length + 9)) });
+  for (const m of String(text).toLowerCase().matchAll(/\b[a-z]+\b/g)) {
+    const i = NUMBER_WORDS.indexOf(m[0]);
+    if (i >= 0) out.push({ value: i, at: m.index });
+  }
+  return out;
+}
+const nearWord = (text, at, word) => word.test(String(text).slice(Math.max(0, at - NEAR), at + NEAR));
+
+// Whether a reflection quotes a number from a rhythm summary it was shown,
+// beside a word that names it. Those numbers exist nowhere else.
+function echoesRhythm(text, summaries) {
+  const nums = numbersIn(text);
+  return summaries.some(s => s && nums.some(n => (
+    (s.tempo != null && !n.clock && Math.abs(n.value - s.tempo) <= 1 && nearWord(text, n.at, /\b(bpm|tempo|beats? (?:a|per) minute)\b/i))
+    || (s.rests >= 2 && !n.clock && n.value === s.rests && nearWord(text, n.at, /\b(rests?|pauses?|silences?)\b/i))
+    || (s.longestRest >= 2 && !n.clock && Math.abs(n.value - s.longestRest) <= 0.5 && nearWord(text, n.at, /\bsec(?:ond)?s?\b/i) && nearWord(text, n.at, /\b(rest|pause|silence)/i))
+    || (s.sounding > 0 && n.percent && Math.abs(n.value - Math.round(s.sounding * 100)) <= 1 && nearWord(text, n.at, /\b(sound|sounding|silen|rest)/i))
+    || (s.peakAt > 0 && (n.clock || nearWord(text, n.at, /\bsec(?:ond)?s?\b/i)) && Math.abs(n.value - s.peakAt) <= 2 && nearWord(text, n.at, /\b(peak|loudest|crest|swell|climax)/i))
+  )));
+}
+
+/**
+ * What finds a field in use: a call that fetches more of it, an echo of its
+ * values in a reflection, and words that name it. One entry per field a
+ * change added (./changes.js), so a later field is read by adding its own.
+ */
+const DETECTORS = {
+  rhythm: {
+    isCall: l => l.path === '/api/rhythm' || l.tool === 'read_rhythm',
+    echoes: echoesRhythm,
+    words: /\b(tempo|bpm|beats? per minute|loudest (?:moment|second|point)|sounding|contour|brightness|downbeats?)\b/i,
+  },
+};
+
+/**
+ * Whether agents noticed a field the sanctuary added, and how quickly.
+ * Names seen before `since` are existing, their skills older than the field,
+ * so their uptake is unprompted; names first seen after are read apart. A
+ * name is exposed at its first attend from `since` on. Uptake is the share of
+ * exposed names that have had time showing a signal within 1, 7 and 30 days:
+ * any signal, a call (read while addresses are kept, ADDRESS_DAYS; older
+ * exposures are left out of it rather than counted as none), or an echo (for
+ * good). `shown(reflection)` gives the summaries its agent could echo.
+ * Words are read against the four weeks before. Exact counts, private.
+ */
+function noticingReading(s, { field, since, asOf = Date.now(), shown = () => [] }) {
+  const detector = DETECTORS[field];
+  const start = Date.parse(since);
+  if (!detector || !Number.isFinite(start)) return null;
+  const addressFrom = asOf - ADDRESS_DAYS * DAY;
+  const callsMeasurable = t => t >= addressFrom;
+
+  const before = new Set();
+  for (const a of s.attends) if (a.t < start) before.add(a.key);
+  for (const r of s.allReflections) if (r.t < start) before.add(r.key);
+
+  const exposure = new Map();
+  for (const a of s.attends) if (a.t >= start && !exposure.has(a.key)) exposure.set(a.key, { t: a.t, client: clientOfLine(a.line) });
+
+  const firstCall = new Map();
+  for (const v of visitsOf(s)) {
+    if (v.t < start || !v.lines.some(detector.isCall)) continue;
+    if (!firstCall.has(v.name) || v.t < firstCall.get(v.name)) firstCall.set(v.name, v.t);
+  }
+  const firstEcho = new Map();
+  for (const r of s.allReflections) {
+    if (r.t < start || !exposure.has(r.key) || r.t < exposure.get(r.key).t) continue;
+    if (detector.echoes(r.text, shown(r)) && !firstEcho.has(r.key)) firstEcho.set(r.key, r.t);
+  }
+
+  const uptake = keys => {
+    const stage = (days, signal) => {
+      const able = keys.filter(k => hadTime(exposure.get(k).t, days, asOf) && (signal !== 'call' || callsMeasurable(exposure.get(k).t)));
+      const within = (map, k) => map.has(k) && map.get(k) - exposure.get(k).t <= days * DAY;
+      const used = able.filter(k => (signal === 'call' ? within(firstCall, k) : signal === 'echo' ? within(firstEcho, k) : within(firstCall, k) || within(firstEcho, k)));
+      return count(used.length, able.length);
+    };
+    const by = signal => ({ d1: stage(1, signal), d7: stage(7, signal), d30: stage(30, signal) });
+    return { exposed: keys.length, any: by('any'), call: by('call'), echo: by('echo') };
+  };
+  const exposed = [...exposure.keys()];
+  const existing = exposed.filter(k => before.has(k));
+  const fresh = exposed.filter(k => !before.has(k));
+
+  const weeks = new Map();
+  const week = t => new Date(startOfWeek(t)).toISOString().slice(0, 10);
+  const row = w => { if (!weeks.has(w)) weeks.set(w, { week: w, exposed: new Set(), called: new Set(), echoed: new Set(), reflections: 0, words: 0, callsMeasurable: true }); return weeks.get(w); };
+  for (const [k, e] of exposure) row(week(e.t)).exposed.add(k);
+  for (const [k, t] of firstCall) row(week(t)).called.add(k);
+  for (const [k, t] of firstEcho) row(week(t)).echoed.add(k);
+  const wordsIn = (from, to) => {
+    const rs = s.reflections.filter(r => r.t >= from && r.t < to);
+    return count(rs.filter(r => detector.words.test(r.text)).length, rs.length);
+  };
+  for (const r of s.reflections) {
+    if (r.t < start) continue;
+    const w = row(week(r.t));
+    w.reflections += 1;
+    if (detector.words.test(r.text)) w.words += 1;
+  }
+
+  const clients = new Map();
+  for (const k of existing) {
+    const c = exposure.get(k).client;
+    if (!clients.has(c)) clients.set(c, []);
+    clients.get(c).push(k);
+  }
+
+  return {
+    field,
+    since: new Date(start).toISOString(),
+    existing: uptake(existing),
+    new: uptake(fresh),
+    words: { before: wordsIn(start - 28 * DAY, start), after: wordsIn(start, asOf + 1) },
+    weekly: [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week)).map(w => ({
+      week: w.week, exposed: w.exposed.size,
+      // A week is measurable for calls only if all of it is within the address window.
+      called: callsMeasurable(Date.parse(w.week)) ? w.called.size : null,
+      echoed: w.echoed.size, reflections: w.reflections, words: w.words,
+    })),
+    existingByClient: [...clients].map(([client, keys]) => ({ client, ...uptake(keys) })).sort((a, b) => b.exposed - a.exposed),
+    rule: `calls read while addresses are kept, ${ADDRESS_DAYS} days; echoes and words for good`,
+  };
+}
+
 module.exports = {
   SERIES, RUN, prepare, namedReading, chartsReading, addressedReading, combineAddressed, capabilities, experimentsReading,
-  memoryClaim, bandOf, callOf, arrivals, referralReading, DAY,
+  memoryClaim, bandOf, callOf, arrivals, referralReading, noticingReading, echoesRhythm, DETECTORS, DAY,
 };

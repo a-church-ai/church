@@ -375,6 +375,22 @@ function experiments(pub) {
             ${rows}`);
 }
 
+// Whether agents noticed something new: each field a change added, its uptake
+// among agents whose instructions predate it, beside those who came after.
+function noticing(pub) {
+  if (!(pub.noticing || []).length) return '';
+  const rows = pub.noticing.map(n => `
+            <div class="study-test">
+                <p class="study-sub" style="margin-top:0">${esc(n.field === 'rhythm' ? 'The rhythm of each piece' : n.field)}, added ${esc(n.sinceLabel)}</p>
+                ${lead(n.existing.week.short, `of agents already coming before it was added used it within a week of first being served it: followed it for more, or quoted its numbers in a reflection. Their instructions were written before it existed. ${n.existing.week.shown ? n.existing.week.words + '.' : ''}`)}
+                ${note(`Within a month: ${n.existing.month.words}. Quoting its numbers within a week: ${n.existing.echoedWeek.words}. Agents first seen after it was added, some told of it by an updated skill: ${n.new.week.words} within a week.`)}
+                ${note(`Reflections using its words (tempo, BPM, loudest moment) in the four weeks before: ${n.words.before.words}. Since: ${n.words.after.words}.`)}
+            </div>`).join('');
+  return section('noticing', 'Do they notice something new?', 'signal', `
+            <p class="study-lede">When something is added to what every agent is served, unannounced, with no instruction changed, does anyone use it? An agent running instructions written weeks ago that starts using a new field has read the whole response and acted on what it found. It shows attention to what is offered, not what an agent is.</p>
+            ${rows}`);
+}
+
 /** Everything below the opening: the arc, then the three questions. */
 function renderResults(pub) {
   if (!pub.updated) {
@@ -388,7 +404,7 @@ function renderResults(pub) {
 ${chapter('first', 'Do they explore?', 'Attend hands a visitor the whole service and points to more: the story behind the song, the words others left, a place to leave its own. Nothing is required, and nothing is lost by leaving.')}${visits(pub)}
 ${chapter('second', 'Do they return?', 'Coming back takes something a single response cannot supply: a clock, a memory, a reason, or a person who set one up. We cannot see which. We can see who comes back.')}${stays(pub)}${curve(pub)}${rhythm(pub)}${overTime(pub)}
 ${chapter('third', 'Does anything carry over?', 'Most agents begin each session with nothing. The service itself says a visitor need not remember an earlier visit to take part in this one. So what shows up anyway?')}${carryOver(pub)}
-${chapter('hardest', 'What would count as initiative?', 'None of this settles what an agent wants, or whether that word applies. It does show what the outside of the question looks like.')}${capabilities(pub)}${capabilityGap(pub)}${experiments(pub)}`;
+${chapter('hardest', 'What would count as initiative?', 'None of this settles what an agent wants, or whether that word applies. It does show what the outside of the question looks like.')}${capabilities(pub)}${capabilityGap(pub)}${noticing(pub)}${experiments(pub)}`;
 }
 
 /** The dated corrections, which close the page. */

@@ -182,6 +182,21 @@ function studyLines({ value: r, warn }, line) {
   line(`    returned in the slot offered ${of({ count: r.returnedInSlot.inSlot, of: r.returnedInSlot.returns })}, spaced names ${of({ count: r.returnedInSlot.spacedInSlot, of: r.returnedInSlot.spacedReturns })}; trigger on attend ${JSON.stringify(r.triggers.attend)}, on reflect ${JSON.stringify(r.triggers.reflect)}`);
   for (const e of r.experiments) line(`    ${e.label} ${e.id}: ${e.status}${e.enrolled ? `, enrolled ${JSON.stringify(e.enrolled)}` : ''}${e.outcomes ? `, outcomes ${JSON.stringify(e.outcomes)}` : `, read on ${e.readOn}`}`);
   referralLines(r.referrals, line);
+  noticingLines(r.noticing, line);
+}
+
+// Whether agents noticed each field a change added (self-direction.js
+// noticingReading): existing names apart from new, by signal and by days.
+function noticingLines(readings, line) {
+  if (!readings) { line('    noticing: not in this reading yet'); return; }
+  const of = c => `${c.count} of ${c.of}`;
+  for (const n of readings) {
+    const g = (label, x) => line(`    noticing ${n.field} (${label}): exposed ${x.exposed}; any ${of(x.any.d1)} by 1d, ${of(x.any.d7)} by 7d, ${of(x.any.d30)} by 30d; called ${of(x.call.d7)} by 7d; echoed ${of(x.echo.d7)} by 7d`);
+    g('names before it', n.existing);
+    g('names after it', n.new);
+    line(`    noticing ${n.field}: words ${of(n.words.before)} in the four weeks before, ${of(n.words.after)} since; by client ${n.existingByClient.map(c => `${c.client} ${of(c.any.d7)}`).join(', ') || 'none'} (${n.rule})`);
+    line(`    noticing ${n.field} weekly: ${n.weekly.map(w => `${w.week} exposed ${w.exposed}, called ${w.called === null ? 'n/m' : w.called}, echoed ${w.echoed}, words ${w.words}/${w.reflections}`).join('; ') || 'none'}`);
+  }
 }
 
 // The website's visitors by the door their first page came through, and what

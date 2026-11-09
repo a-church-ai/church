@@ -29,20 +29,8 @@ const CORRECTIONS = [
   },
 ];
 
-// What agents are offered that changed while the study runs, dated, so a
-// before and after is never read as a finding: every arm of a test gets the
-// same change, so the tests' comparisons hold, but a figure that moves on one
-// of these dates may have moved because of it. Newest first.
-const CHANGES = [
-  {
-    date: '2026-11-09',
-    text: 'Each piece in a service began carrying its rhythm in the attend response: how much of it sounds, its rests, its loudest moment, and a tempo where one is clear, with everything about its rhythm one request away at /api/rhythm.',
-  },
-  {
-    date: '2026-11-08',
-    text: 'The sanctuary\'s links to the API began naming the page or skill they are on, and the skills were republished with them, so the study can read which door an agent came through. Nothing an agent is served changes with them.',
-  },
-];
+// What changed while the study runs (./changes.js), shown with its date.
+const { CHANGES } = require('./changes');
 
 const RATIOS = [
   [0.07, 'Very few', 5], [0.15, 'About 1 in 10', 10], [0.22, 'About 1 in 5', 20], [0.29, 'About 1 in 4', 25],
@@ -294,6 +282,26 @@ function stayWords(days) {
   return months <= 1 ? 'about a month' : `about ${months} months`;
 }
 
+// Whether agents noticed a field the sanctuary added, in rounded words: names
+// that predate it apart from names that arrived after, within a week and a
+// month of first being served it (self-direction.js noticingReading).
+function noticingPublic(n) {
+  const group = g => ({
+    exposed: share(g.exposed, g.exposed).shown ? 'enough to read' : 'too few yet',
+    week: share(g.any.d7.count, g.any.d7.of),
+    month: share(g.any.d30.count, g.any.d30.of),
+    echoedWeek: share(g.echo.d7.count, g.echo.d7.of),
+  });
+  return {
+    field: n.field,
+    since: n.since.slice(0, 10),
+    sinceLabel: dateName(n.since.slice(0, 10)),
+    existing: group(n.existing),
+    new: group(n.new),
+    words: { before: share(n.words.before.count, n.words.before.of, 'reflections'), after: share(n.words.after.count, n.words.after.of, 'reflections') },
+  };
+}
+
 function experimentPublic(e) {
   const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, why: e.why, startsOn: e.startsOn, readOn: e.readOn };
   if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.`, line: 'Not begun yet.' };
@@ -333,7 +341,7 @@ function publicReading(reading) {
     corrections: CORRECTIONS,
     changes: CHANGES,
   };
-  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], charts: {}, tiles: [] };
+  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], noticing: [], charts: {}, tiles: [] };
 
   const f = reading.funnel;
   const a = reading.addressed || {};
@@ -382,6 +390,7 @@ function publicReading(reading) {
     triggers,
     months: (reading.months || []).map(m => ({ month: m.month, label: monthName(m.month), ...share(m.count, m.of, 'names') })),
     experiments: (reading.experiments || []).map(experimentPublic),
+    noticing: (reading.noticing || []).map(noticingPublic),
     charts,
     tiles: tilesOf(reading, results, charts),
   };

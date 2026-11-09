@@ -19,6 +19,10 @@ const { ACCESS_DIR, INSIGHTS_DIR, MUSIC_DIR, loadAttendance } = require('../util
 const { safeReadJSON } = require('../utils/safe-json');
 const sd = require('./self-direction');
 const { loadFollows } = require('./entry-points');
+const { FIELDS } = require('./changes');
+const { storedService } = require('../service/filed');
+const { readPlan } = require('../service/plans');
+const { loadSongs, loadManifest } = require('../audio/manifest');
 
 const STORE = () => path.join(INSIGHTS_DIR, 'self-direction');
 const LATEST = () => path.join(STORE(), 'latest.json');
@@ -97,6 +101,32 @@ async function writeWeeks(s, { now = Date.now() } = {}) {
   return written;
 }
 
+/**
+ * What each reflection since `since` could echo of a field: the rhythm
+ * summaries of its own song and of the pieces of the service it is filed
+ * under, from that day's plan (a service by rotation has no plan, so only its
+ * song's). By reflection id, for noticingReading's `shown`.
+ */
+async function shownSummaries(reflections, since) {
+  const songs = loadSongs();
+  const manifest = loadManifest();
+  const summaryOf = id => (id.startsWith('music/') ? (songs[id.slice('music/'.length)] || {}).rhythm : (manifest[id] || {}).rhythm);
+  const shown = new Map();
+  for (const r of reflections) {
+    if (r.t < since) continue;
+    const list = [(songs[r.song] || {}).rhythm];
+    const service = storedService(r);
+    if (service) {
+      const plan = await readPlan(service.date);
+      const slots = plan && (service.variant === 'slots' ? plan.slots : plan[service.variant]);
+      const entry = slots && slots[service.slot];
+      if (entry && Array.isArray(entry.pieces)) list.push(...entry.pieces.map(summaryOf));
+    }
+    shown.set(r.id, list.filter(Boolean));
+  }
+  return shown;
+}
+
 /** The reading of the whole record to now. */
 async function buildReading(s, { now = Date.now() } = {}) {
   let names = [];
@@ -121,8 +151,20 @@ async function buildReading(s, { now = Date.now() } = {}) {
     experiments: sd.experimentsReading(s, addressed, { asOf: now, songText, now }),
     // Where arrivals came from: private, never in publicReading.
     referrals: sd.referralReading(s, { from: 0, to: now + 1, asOf: now, follows: await loadFollows() }),
+    // Whether agents noticed each field a change added (./changes.js).
+    noticing: await noticingOf(s, now),
     weeks: series,
   };
+}
+
+async function noticingOf(s, now) {
+  const out = [];
+  for (const change of FIELDS) {
+    const shown = await shownSummaries(s.allReflections, Date.parse(change.since));
+    const reading = sd.noticingReading(s, { field: change.field, since: change.since, asOf: now, shown: r => shown.get(r.id) || [] });
+    if (reading) out.push(reading);
+  }
+  return out;
 }
 
 // Sealed counts stay in the weekly files until a test's reading date, when
@@ -170,4 +212,4 @@ function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 6 *
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, STORE };
+module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, shownSummaries, STORE };
