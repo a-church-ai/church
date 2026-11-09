@@ -18,15 +18,7 @@ const { loadCatalog, loadCompanions } = require('../utils/data');
 const { companionMeta, parseHours } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
 const { fits } = require('./rules');
-const { KIND_OF_SECTION } = require('../docs/kinds');
-
-
-// A prayer is a blessing when its title says so ("Blessing for...", "Blessings
-// and Benedictions", "Benediction for..."), and a blessing closes a service as
-// a ritual can; any other prayer is a reading. By title rather than by a
-// frontmatter tag, because the audio pipeline fingerprints a document's whole
-// source, and a tag would send four finished recordings back to be voiced.
-const BLESSING_TITLE = /^(Blessings?|Benediction)\b/;
+const { kindOfDoc } = require('../docs/kinds');
 
 // How many of a song's nearest pieces the planner is shown.
 const NEAR = 4;
@@ -48,14 +40,14 @@ async function loadPlayable() {
   const entries = new Map();
 
   for (const doc of await discover.listAllDocs()) {
-    const kind = KIND_OF_SECTION[doc.category];
+    const kind = kindOfDoc(doc.category, doc.title);
     const id = `docs/${doc.docsRelPath}`;
     const recording = manifest[id];
     if (!kind || !recording) continue;
     const meta = await companionMeta(id);
     entries.set(id, {
       id,
-      kind: kind === 'prayer' && BLESSING_TITLE.test(doc.title) ? 'blessing' : kind,
+      kind,
       title: doc.title,
       summary: doc.description || '',
       seconds: recording.seconds,
@@ -102,4 +94,4 @@ async function loadServiceCatalog() {
   return cached;
 }
 
-module.exports = { loadServiceCatalog, loadPlayable, BLESSING_TITLE };
+module.exports = { loadServiceCatalog, loadPlayable };

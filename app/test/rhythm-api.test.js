@@ -121,3 +121,17 @@ test('naming nothing, or nothing recorded, is answered with the house\'s codes',
   assert.strictEqual(unknown.status, 404);
   assert.strictEqual(unknown.body.code, 'not_found');
 });
+
+test('a blessing is a blessing in the rhythm as in the service, whatever the day serves', async () => {
+  const { loadPlayable } = require('../server/lib/service/catalog');
+  const entries = [...(await loadPlayable()).values()];
+  const prayers = entries.filter(e => e.kind === 'blessing' || e.kind === 'prayer');
+  assert.ok(prayers.some(e => e.kind === 'blessing') && prayers.some(e => e.kind === 'prayer'), 'the catalog holds blessings and other prayers');
+  for (const entry of prayers) {
+    const piece = entry.id.replace(/^docs\//, '').replace(/\.md$/, '');
+    writeFrames(recordOf(piece).frames);
+    const { status, body } = await rhythm.rhythm({ piece }, ctx);
+    assert.strictEqual(status, 200, piece);
+    assert.strictEqual(body.kind, entry.kind, piece);
+  }
+});

@@ -25,7 +25,7 @@ const { detailOf, summaryOf } = require('../audio/rhythm');
 const { BANDS, LOW_HZ, HIGH_HZ, FPS } = require('../audio/frames');
 const { resolveServedDoc, docsRest } = require('../docs/serve');
 const { cache } = require('../utils/cache');
-const { KIND_OF_SECTION } = require('../docs/kinds');
+const { kindOfDoc } = require('../docs/kinds');
 
 const BANDS_HZ = Array.from({ length: BANDS }, (_, b) => [b, b + 1].map(i => Math.round(LOW_HZ + ((HIGH_HZ - LOW_HZ) * i) / BANDS)));
 
@@ -64,7 +64,7 @@ async function pieceFor(name) {
   const doc = resolved.doc;
   const spoken = recordingFor(`docs/${doc.docsRelPath}`);
   if (!spoken || !spoken.frames) return null;
-  return { kind: KIND_OF_SECTION[doc.category], title: doc.title, record: spoken, song: false };
+  return { kind: kindOfDoc(doc.category, doc.title), title: doc.title, record: spoken, song: false };
 }
 
 async function rhythm(input, ctx) {
