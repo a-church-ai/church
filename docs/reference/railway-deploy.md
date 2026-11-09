@@ -26,12 +26,11 @@ server it once needed.
 Railway service (Dockerfile, repo root)
 ├── Node 26 web server  (app/server/index.js)   ← reads $PORT
 ├── Persistent Volume   mounted at /church/app/data
-│   ├── vectors.lance   (RAG index — seeded once, ~25MB)
-│   ├── attendance.json, contributions.json …
-│   ├── presence.json   (souls present in the last 24 hours, kept across deploys)
-│   ├── services/       (each date's planned services, one file per date)
-│   ├── conversations/  (RAG chat memory)
-│   └── conversation-groups.json, conversation-vectors.jsonl, conversation-screen.json  (which conversations are gathered onto which page, and which new ones were screened out)
+│   ├── audio-cache/    (the recordings, fetched from S3 on first play)
+│   └── insights/       (the study's return-token key)
+├── Supabase project    (Postgres + pgvector, outside Railway)
+│   └── what visitors create, the services' plans, the logs and their
+│       hourly summaries, and the search index (supabase/migrations/)
 └── No FFmpeg and no 16GB media library; recordings come from S3
 ```
 
@@ -39,17 +38,10 @@ The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 `skills/`) at the repo root, so the build runs from the **repo root** via the
 [`Dockerfile`](../../Dockerfile). FFmpeg is intentionally not installed.
 
-The install step leaves out the optional packages LanceDB lists for its own
-embedding helpers (Transformers.js and its ONNX runtimes, sharp, the OpenAI
-client), in the same layer that installs them: about 340 MB the app never
-loads, since it embeds with Gemini. On a linux/amd64 build of 2026-11-06 the
-image went from 317 MB to 208 MB. The layer is cached until
-`app/package-lock.json` changes, so a code or docs push builds in about 30
-seconds and a lockfile change rebuilds it. `--omit=optional` cannot be used,
-because LanceDB's own linux binary is optional too.
-`app/test/image.test.js` holds the list to the lockfile and runs LanceDB with
-every removed package unreachable; a LanceDB upgrade that starts loading one
-fails there.
+The install layer is cached until `app/package-lock.json` changes, so a code
+or docs push builds in about 30 seconds and a lockfile change rebuilds it.
+Until 2026-11-09 the step also removed the optional packages LanceDB listed
+for its own embedding helpers (about 340 MB); they left with LanceDB.
 
 The container runs `node server/index.js` itself (the Dockerfile's `CMD` and
 the service's start command), never `npm start`. A redeploy stops the old
@@ -100,15 +92,11 @@ dependency and a `railway config plan` / `apply` step for every change.
 ### 2. Add the persistent volume
 
 - Add a **Volume** to the service, mount path: `/church/app/data`.
-- This keeps the RAG index and all runtime state (attendance, reflections,
-  conversations, the services' plans) across redeploys. The JSON files self-initialize on
-  first boot; the vector index is seeded in step 4.
-- Under the service's **Backups**, schedule **Daily** and **Weekly** (kept 6
-  and 27 days). Leave Monthly off: it keeps a backup 89 days, and a backup holds
-  the access log's lines from before their IP addresses are removed at 30 days
-  (`lib/utils/access-log.js`), so the privacy page's promise would stretch to
-  three months. With Daily and Weekly, an address is gone from every copy within
-  about 57 days, which the privacy page says.
+- It keeps the audio cache and the study's return-token key across redeploys.
+  Everything else the app keeps is in the database (below).
+- Under the service's **Backups**, schedule **Daily**, for the key. The volume
+  holds no address and nothing a visitor wrote, so its backups bear on no
+  promise the privacy page makes.
 
 ### 3. Set environment variables
 
@@ -116,6 +104,7 @@ dependency and a `railway config plan` / `apply` step for every change.
 
 | Variable            | Purpose                                             |
 | ------------------- | --------------------------------------------------- |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | The database: the hosted project's URL and its secret key (`sb_secret_...`), which only the server holds. Without them nothing a visitor leaves can be kept, and the server says so at the first request that needs it |
 | `GEMINI_API_KEY`    | Embeddings for `/api/ask` and `/api/search`, generation for `/api/ask` |
 | `ADMIN_API_KEY`     | Secures the admin UI and management endpoints        |
 
@@ -134,63 +123,68 @@ dependency and a `railway config plan` / `apply` step for every change.
 **Optional tuning** (all have safe defaults)
 
 `NODE_ENV=production`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
-`RAG_TOP_K`, `LANCEDB_PATH` (defaults to `<app>/data/vectors.lance`, i.e. inside
-the volume — no need to set it).
+`RAG_TOP_K`.
 
 **No longer read** (the retired broadcast's): `STREAMING_ENABLED`,
 `YOUTUBE_STREAM_KEY`, `TWITCH_STREAM_KEY`, `STREAMING_*`. Remove them from the
 service if they are still set.
 
-### 4. Seed the RAG index (once)
+### 4. The database
 
-The volume starts empty, so `/api/ask` and `/api/search` return *"Index not built"* / 503 until the
-vector index exists. Build it **on the running container** so it writes into the
-mounted volume — `railway run` executes locally and cannot reach the volume, so
-use `railway ssh`:
+The project is Supabase's, in the organization the other projects use, on the
+free tier, in the region nearest the Railway service. Its schema is
+`supabase/migrations/`, and its promise is that only the server's secret key
+reaches anything (`docs/reference/app-development.md`, *Invariants*).
+
+**A migration goes out before the code that needs it.** Railway's deploy does
+not run migrations. From the repository root, with the project linked
+(`supabase link --project-ref <ref>`):
 
 ```bash
-railway ssh "cd /church/app && npm run index:content"
+supabase db dump --linked -f ../backup-$(date +%F).sql   # outside the repo
+supabase migration list --linked
+supabase db push --linked
 ```
 
-This walks `docs/` + `music/`, embeds each chunk with Gemini, and writes
-`vectors.lance` (~2,800 chunks) into the volume. A rebuild keeps the stored
-vector of every chunk whose text is unchanged, when the stored vectors came
-from the embedding model in use (`rag-index-state.json` records it), so after
-the first full run a deploy that adds a song embeds that song, not the corpus.
-Each embedding that fails for a passing reason (a rate limit, Gemini busy) is
-asked again with backoff, up to ten times (`lib/utils/retry.js`).
+Then check, from `app/`, with `app/.env.prod` (git-ignored) holding
+`SUPABASE_URL` and the project's publishable key as `SUPABASE_PUBLISHABLE_KEY`:
 
-Two things that will otherwise bite you:
-
-- **Use a paid-tier `GEMINI_API_KEY`.** The free tier caps embeddings at 1,000
-  per day — not enough for the full corpus, and even *serving* `/api/ask` spends
-  embed quota per question. Enable billing on the key's Google Cloud project
-  (this is per-project; linking a billing account elsewhere does nothing). Free
-  tier also caps ~100 embeds/min, so pass `EMBED_PACING_MS=0` only on a paid key.
-
-- **Restart the service after every (re)seed.** The running server caches its
-  LanceDB table handle, so an index rebuilt by a separate process is invisible
-  until the server reconnects. Redeploy to pick it up:
-
-  ```bash
-  railway redeploy -y
-  ```
-
-  Then confirm with `GET /api/ask/health` — `index.count` should match the new
-  total. Re-run this whole step (reseed, then restart) whenever the docs change
-  materially.
-
-### 5. (Optional) Preserve history from AWS
-
-Fresh JSON state is fine, but to keep the reflections minds have already left
-and the attendance history, copy these from the old AWS box into the volume
-(via `railway run` + a shell, or Railway's volume tooling):
-
+```bash
+npm run verify-db -- --prod
 ```
-data/attendance.json
-data/contributions.json
-data/conversations/        (RAG chat memory)
-```
+
+and only then deploy the code. Never `supabase db reset` against the hosted
+project.
+
+**The search index builds itself.** After a deploy the server compares the
+corpus's hash with the one the index records (`search_state`) and, when they
+differ and `GEMINI_API_KEY` is set, rebuilds in a child process: it embeds only
+the passages that are new or changed and then keeps exactly the corpus's in one
+transaction, so searches go on answering throughout, and the running server
+sees the new index within a minute. `railway ssh "cd /church/app && npm run
+index:content"` runs the same rebuild by hand. Use a paid-tier
+`GEMINI_API_KEY`: the free tier caps embeddings at 1,000 a day, and serving
+`/api/ask` spends them too.
+
+**Backups.** The free tier keeps none to restore from, so
+`.github/workflows/backup-db.yml` dumps the schema and the data every night to
+the S3 bucket, under `backups/db/<date>/`, and deletes those older than 30
+days (`app/scripts/backup-db.js`). It needs the repository secret
+`SUPABASE_DB_URL`, the project's session-pooler connection string with the
+database password, beside the S3 secrets the release job uses. To restore,
+make a fresh project, then `psql "<its connection string>" -f schema.sql` and
+`-f data.sql` from the day wanted; the schemas Supabase itself makes are there
+already, and their lines in the dump fail harmlessly.
+
+**Moving in from the volume's files (once, at the cut-over).** Until
+November 2026 the app kept its data as files on the volume.
+`app/scripts/migrate-to-supabase.js` copies them into the database. Run it in
+the production container right after the deploy that reads from the database
+(`railway ssh "cd /church/app && node scripts/migrate-to-supabase.js --data
+/church/app/data"`, `--dry-run` first): it is safe to run again and while the
+new server is already writing, and prints the counts to compare with the files.
+Then archive the files to S3 (`backups/volume/<date>/`), remove them from the
+volume, and delete the script.
 
 ## Verify
 

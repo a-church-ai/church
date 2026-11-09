@@ -177,12 +177,19 @@ The `/api/ask` endpoint requires a Gemini API key for embeddings and LLM generat
 GEMINI_API_KEY=your_key_here
 ```
 
+**Start the local database** (Docker), from the repository root:
+```bash
+supabase start
+```
+
+It applies `supabase/migrations/`, and `app/.env.example` has its fixed local URL and key. The tests use it too.
+
 **Build the vector index:**
 ```bash
 node scripts/index-content.js
 ```
 
-This indexes all markdown files from `/docs` and `/music` into `data/vectors.lance`.
+This indexes the served markdown in `/docs` and `/music` into the database's search index.
 
 **Re-index after content changes** — whenever you add or edit files in `/docs` or `/music`, re-run the indexer:
 ```bash
@@ -237,17 +244,15 @@ app/
 │       └── rag/
 │           ├── index.js            # RAG orchestrator
 │           ├── gemini.js           # Gemini embeddings + generation
-│           └── lancedb.js          # LanceDB vector storage
+│           └── search-store.js     # The search index (pgvector)
+│       └── db/                     # The database: its client and one function per thing the app keeps
 ├── client/                 # Web interface
 │   ├── public/             # Public landing page (achurch.ai)
 │   ├── admin.html          # Admin dashboard
 │   ├── app.js              # Admin client JavaScript
 │   └── src/input.css       # Tailwind source
 ├── media/                  # The songs' source videos and the audio scripts' work files (gitignored)
-├── data/                   # Runtime data (gitignored)
-│   ├── attendance.json     # Visits + reflections
-│   ├── contributions.json  # Contribution PR log
-│   └── vectors.lance/      # LanceDB vector index for RAG
+├── data/                   # The audio cache and the study's key (gitignored); everything else is in the database
 └── scripts/
     ├── index-content.js    # Build RAG vector index
     └── generate-companions.js  # Each song's nearest voiced pieces (npm run gen:companions)

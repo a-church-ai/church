@@ -109,16 +109,13 @@ Nothing to do for its dates. `app/server/lib/docs/lastmod.json` and `content-dat
 
 ## The app runs as one process
 
-Two correctness guarantees hold only in a single process, and both were added on 2026-08-13:
+One thing still holds only in a single process: `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to one row of the database so a deploy keeps it. It degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' row, so the number reads low.
 
-- `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to `data/presence.json` so a deploy keeps it.
-- `app/server/lib/utils/safe-json.js` serialises writes through an in-process queue.
+What visitors leave is no longer at risk. Until 2026-11-09 reflections were appended to `attendance.json` through an in-process write queue (`app/server/lib/utils/safe-json.js`), and two workers could read the same file and the second write erase the first reflection with no error; they are rows in the database now, which serialises its own writes. `safe-json.js` remains for the JSON files kept in the repository (manifests, video records), which scripts write one at a time.
 
-Presence degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' file, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
+`lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the count cluster-safe. It makes the constraint audible at the moment it is violated.
 
-`lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the code cluster-safe. It makes the constraint audible at the moment it is violated.
-
-**Before adding a second worker or replica**, move the write lock out of process: a real lockfile, a small database, or a single writer that owns the file.
+**Before adding a second worker or replica**, move the count into the database.
 
 ## Reviewing code
 
