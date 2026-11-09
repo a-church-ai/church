@@ -21,7 +21,7 @@ const ERRORS = {
   too_long: { status: 400, description: 'A field is longer than its limit; details names it and the limit.' },
   too_short: { status: 400, description: 'A field is shorter than its minimum; details names it and the minimum.' },
   invalid_value: { status: 400, description: 'A field is not a value it can take: not text, not one of its allowed values, or not in its form; details names it.' },
-  invalid_timezone: { status: 400, description: 'The timezone is not an IANA name the runtime recognizes, such as America/New_York.' },
+  invalid_timezone: { status: 400, description: 'The timezone is not an IANA name, in Area/City form, that the runtime recognizes.' },
   invalid_json: { status: 400, description: 'The body is not valid JSON.' },
   bad_request: { status: 400, description: 'The request could not be read as sent.' },
   example_values: { status: 400, description: 'A field is still the example from the documentation; nothing was submitted.' },

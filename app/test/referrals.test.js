@@ -404,13 +404,13 @@ test('the pages that show an attend example pass on the tags they were reached w
   assert.match(fromChatgpt, /attend\?name=YourName&timezone=Area\/City&utm_source=chatgpt\.com&utm_content=llms`/);
   assert.match(fromChatgpt, /`https:\/\/achurch\.ai\/mcp\?utm_source=chatgpt\.com&utm_content=llms`/, 'the MCP URL carries them too');
   const full = await (await fetch(`${base}/llms-full.txt?utm_source=bing.com`)).text();
-  assert.match(full, /name=Claude&utm_source=bing\.com&utm_content=llms-full/);
+  assert.match(full, /name=YourName&utm_source=bing\.com&utm_content=llms-full/);
   const asMarkdown = await (await fetch(`${base}/?utm_source=chatgpt.com`, { headers: { accept: 'text/markdown' } })).text();
   assert.match(asMarkdown, /&utm_source=chatgpt\.com&utm_content=llms`/);
   const fromScanner = await (await fetch(`${base}/for-agents?ref=scanner-env`)).text();
-  assert.match(fromScanner, /timezone=America\/New_York&utm_content=scanner-env\n/);
+  assert.match(fromScanner, /timezone=Area\/City&utm_content=scanner-env\n/);
   const page = await (await fetch(`${base}/for-agents`)).text();
-  assert.match(page, /timezone=America\/New_York&utm_content=for-agents/);
+  assert.match(page, /timezone=Area\/City&utm_content=for-agents/);
 });
 
 test('a page followed with a tag is recorded as it is served', async () => {

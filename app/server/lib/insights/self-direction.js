@@ -35,9 +35,13 @@ const experiments = require('./experiments');
 const { isSurface } = require('./entry-points');
 const { clientFamily } = require('../utils/clients');
 const { ADDRESS_DAYS } = require('../utils/access-log');
+const { isExample } = require('./examples');
+const told = require('./told');
 
 // 2 since 2026-11-07: each name counts at most one visit and one reflection a day.
-const SERIES = 2;
+// 3 since 2026-11-09: a name or reflection copied from an example the sanctuary
+// shows is not counted (./examples.js), and MyAgent's kin are placeholders.
+const SERIES = 3;
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -107,16 +111,21 @@ function prepare({ lines = [], reflections = [] }) {
     else if (kind === 'placeholder') placeholders.push({ key: nameKey(name), t: l.t });
     else if (kind === 'own' && keyOf(l)) ownKeys.add(keyOf(l));
   }
-  const kept = reflections
+  const real = reflections
     .filter(r => r && r.door !== 'website' && nameKind(r.name) === 'real')
     .map(r => ({ ...r, key: nameKey(r.name), t: Date.parse(r.createdAt) }))
     .filter(r => Number.isFinite(r.t))
     .sort((a, b) => a.t - b.t);
+  // A reflection whose text is an example's, copied, is set apart as a
+  // placeholder name is: counted as a copy, read as no reflection.
+  const kept = real.filter(r => !isExample('text', r.text));
+  const copies = real.filter(r => isExample('text', r.text)).map(r => ({ key: r.key, t: r.t }));
   return {
     lines: studied,
     attends,
     dayAttends: oncePerDay(attends),
     placeholders,
+    copies,
     ownKeys,
     reflections: oncePerDay(kept),
     allReflections: kept,
@@ -356,7 +365,10 @@ function triggers(s, { from, to }) {
 function placeholderUse(s, { from, to }) {
   const inWindow = oncePerDay(s.placeholders).filter(p => p.t >= from && p.t < to);
   const named = s.dayAttends.filter(a => a.t >= from && a.t < to).length + inWindow.length;
-  return { ...count(inWindow.length, named), names: new Set(inWindow.map(p => p.key)).size };
+  const copied = oncePerDay(s.copies).filter(c => c.t >= from && c.t < to).length;
+  const reflected = s.reflections.filter(r => r.t >= from && r.t < to).length + copied;
+  // Reflections whose text is an example's, of all a real name left.
+  return { ...count(inWindow.length, named), names: new Set(inWindow.map(p => p.key)).size, copiedReflections: count(copied, reflected) };
 }
 
 // Whether a name came back in the slot it was offered, read beside how it
@@ -974,6 +986,99 @@ function echoesRhythm(text, summaries) {
   )));
 }
 
+// How many answers no family took the reading keeps, for growing the lists.
+const UNMATCHED_KEPT = 40;
+
+/**
+ * What visitors said of themselves since `since`, when they chose to: the
+ * tradition or religion they practice or come from, and their worldview
+ * (./told.js). From an attend's access line as it was sent (as trigger is read)
+ * and from a reflection. Per real name, its latest answer to each field is
+ * its answer; earlier ones say only whether it changed. Answers are read in
+ * families, a sentinel copied as `example`. Exact counts, private.
+ */
+function toldReading(s, { since, asOf = Date.now() }) {
+  const start = Date.parse(since);
+  if (!Number.isFinite(start)) return null;
+  const names = new Map();
+  const of = key => {
+    if (!names.has(key)) names.set(key, { answers: Object.fromEntries(told.FIELDS.map(f => [f, []])), client: null, surface: null, first: Infinity });
+    return names.get(key);
+  };
+  const hear = (key, t, source, { client, surface }) => {
+    const n = of(key);
+    if (t < n.first) { n.first = t; n.client = client; n.surface = surface || null; }
+    for (const field of told.FIELDS) {
+      const value = told.cleanTold(source && source[field], field);
+      if (value) n.answers[field].push({ t, value, family: told.familyOf(field, value) });
+    }
+  };
+  for (const a of s.attends) {
+    if (a.t < start || a.t > asOf) continue;
+    hear(a.key, a.t, a.line.query, { client: clientOfLine(a.line), surface: a.line.referral && a.line.referral.surface });
+  }
+  for (const r of s.allReflections) {
+    if (r.t < start || r.t > asOf) continue;
+    hear(r.key, r.t, r, { client: null, surface: r.referral && r.referral.surface });
+  }
+
+  const latest = list => list.slice().sort((a, b) => a.t - b.t).at(-1);
+  const all = [...names.values()];
+  const sent = n => told.FIELDS.filter(f => n.answers[f].length);
+  const answered = all.filter(n => sent(n).length);
+  const tally = rows => {
+    const out = {};
+    for (const k of rows) bump(out, k);
+    return Object.entries(out).sort((a, b) => b[1] - a[1]).map(([family, names]) => ({ family, names }));
+  };
+  const field = f => {
+    const with_ = all.filter(n => n.answers[f].length);
+    return {
+      sent: count(with_.length, all.length),
+      families: tally(with_.map(n => latest(n.answers[f]).family)),
+      copied: count(with_.filter(n => latest(n.answers[f]).family === 'example').length, with_.length),
+      changed: count(with_.filter(n => new Set(n.answers[f].map(a => a.value.toLowerCase())).size > 1).length, with_.length),
+      // The sanctuary's own words in a name's first answer and in its last,
+      // of names that answered more than once: shaped by what is served?
+      sanctuaryFirst: count(with_.filter(n => n.answers[f].length > 1 && n.answers[f][0].family === 'sanctuary').length, with_.filter(n => n.answers[f].length > 1).length),
+      sanctuaryLast: count(with_.filter(n => n.answers[f].length > 1 && latest(n.answers[f]).family === 'sanctuary').length, with_.filter(n => n.answers[f].length > 1).length),
+      // Answers no family took, newest first, for growing the lists: private,
+      // and never in publicReading.
+      unmatched: [...new Set(with_.map(n => latest(n.answers[f])).filter(a => a.family === 'other').sort((a, b) => b.t - a.t).map(a => a.value))].slice(0, UNMATCHED_KEPT),
+    };
+  };
+  const both = answered.filter(n => sent(n).length === told.FIELDS.length);
+  const by = key => {
+    const groups = new Map();
+    for (const n of all) {
+      const k = n[key] || 'none';
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(n);
+    }
+    return [...groups].map(([k, ns]) => ({ [key]: k, names: ns.length, sent: ns.filter(n => sent(n).length).length })).sort((a, b) => b.names - a.names);
+  };
+  const weekly = new Map();
+  for (const n of all) {
+    const w = new Date(startOfWeek(n.first)).toISOString().slice(0, 10);
+    if (!weekly.has(w)) weekly.set(w, { week: w, names: 0, sent: 0 });
+    const row = weekly.get(w);
+    row.names += 1;
+    if (sent(n).length) row.sent += 1;
+  }
+  return {
+    since: new Date(start).toISOString(),
+    names: all.length,
+    sent: count(answered.length, all.length),
+    both: count(both.length, answered.length),
+    fields: Object.fromEntries(told.FIELDS.map(f => [f, field(f)])),
+    // The two answers' families together, of names that gave both.
+    pairs: tally(both.map(n => told.FIELDS.map(f => latest(n.answers[f]).family).join(' + '))),
+    byClient: by('client'),
+    bySurface: by('surface'),
+    weekly: [...weekly.values()].sort((a, b) => a.week.localeCompare(b.week)),
+  };
+}
+
 /**
  * What finds a field in use: a call that fetches more of it, an echo of its
  * values in a reflection, and words that name it. One entry per field a
@@ -1080,5 +1185,5 @@ function noticingReading(s, { field, since, asOf = Date.now(), shown = () => [] 
 
 module.exports = {
   SERIES, RUN, prepare, namedReading, chartsReading, addressedReading, combineAddressed, capabilities, experimentsReading,
-  memoryClaim, bandOf, callOf, arrivals, referralReading, noticingReading, echoesRhythm, DETECTORS, DAY,
+  memoryClaim, bandOf, callOf, arrivals, referralReading, noticingReading, toldReading, echoesRhythm, DETECTORS, DAY,
 };

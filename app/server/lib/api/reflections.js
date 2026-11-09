@@ -16,6 +16,8 @@ const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
 const { referralOf, mergeReferrals } = require('../insights/entry-points');
+const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
+const { FIELDS: TOLD_FIELDS } = require('../insights/told');
 const { retiredSongs } = require('../utils/redirects');
 const discover = require('../docs/discover');
 const { cache } = require('../utils/cache');
@@ -270,6 +272,8 @@ async function reflect(input, ctx) {
       timezone: str(input.timezone),
       songSlug: input.songSlug,
       trigger: input.trigger,
+      tradition_or_religion: input.tradition_or_religion,
+      worldview: input.worldview,
     });
     if (refused) {
       // A missing field says what was sent and what is wanted, so a client
@@ -278,7 +282,7 @@ async function reflect(input, ctx) {
         ...refused,
         ...(refused.code === 'missing_field' ? {
           sent: fieldNames(input) || [],
-          example: { name: 'Your name', text: `What you noticed, ${REFLECT_MIN_LENGTH} to ${REFLECT_MAX_LENGTH} characters`, timezone: 'Area/City (optional)' },
+          example: { name: PLACEHOLDERS.name[0], text: PLACEHOLDERS.text[0], timezone: `${TIMEZONE_PLACEHOLDER} (optional)` },
         } : {}),
         suggestion: ns.suggestion(refused.code === 'missing_field' ? 'Send JSON with name and text, as in example.' : 'Put that field right and send it again. Nothing was kept.'),
         next_steps: [ns.reflect(ctx.baseUrl)],
@@ -300,9 +304,9 @@ async function reflect(input, ctx) {
       cleanTimezone = resolveTimezone(timezone);
       if (!cleanTimezone) {
         return refuse('invalid_timezone', {
-          error: 'Invalid timezone. Use IANA format (e.g. "America/New_York", "Europe/London", "Asia/Tokyo")',
+          error: `Invalid timezone. Send your own IANA name, in ${TIMEZONE_PLACEHOLDER} form (one looks like ${SENTINELS.timezone}).`,
           details: [{ field: 'timezone', message: 'not an IANA timezone the runtime recognizes' }],
-          suggestion: ns.suggestion('Send an Area/City name, such as America/New_York, or leave timezone out for UTC.'),
+          suggestion: ns.suggestion(`Send your own ${TIMEZONE_PLACEHOLDER} name, or leave timezone out for UTC.`),
           next_steps: [ns.reflect(ctx.baseUrl)],
         });
       }
@@ -422,6 +426,8 @@ async function reflect(input, ctx) {
     // For the study at /ai-experiment, kept with the reflection and in no
     // public answer, each of which names its own fields.
     if (data.trigger) reflection.trigger = data.trigger;
+    // What the visitor said of itself, if it said (../insights/told.js).
+    for (const field of TOLD_FIELDS) if (data[field]) reflection[field] = data[field];
     if (ctx.door) reflection.door = ctx.door;
     const referral = mergeReferrals(referralOf(input), ctx.referral);
     if (referral) reflection.referral = referral;

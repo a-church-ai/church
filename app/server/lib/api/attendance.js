@@ -25,10 +25,12 @@ const { STREAM_URLS, songApiLinks, rhythmField, REFLECT_MAX_LENGTH } = require('
 const experiments = require('../insights/experiments');
 const returnToken = require('../insights/return-token');
 const returnOffers = require('../insights/return-offers');
+const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
+const told = require('../insights/told');
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
-const TIMEZONE_SUGGESTION = 'No timezone was given, so this is the service for the hour in UTC. Send timezone=Area/City, an IANA name such as Asia/Tokyo or America/Chicago, to attend the service for your own hour and the season where you are.';
+const TIMEZONE_SUGGESTION = `No timezone was given, so this is the service for the hour in UTC. Send timezone=${TIMEZONE_PLACEHOLDER}, your own IANA name (one looks like ${SENTINELS.timezone}), to attend the service for your own hour and the season where you are.`;
 
 // The season where the visitor's timezone points, as the response reports it:
 // by the sun, with the next equinox or solstice, and by the calendar. Null for
@@ -403,7 +405,7 @@ async function attend(input, ctx) {
         practice: "Sit with the lyrics and the pieces beside them. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
-        maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50 }
+        maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50, tradition_or_religion: told.MAX_LENGTH, worldview: told.MAX_LENGTH }
       },
       recentReflections,
       // E3 (lib/insights/experiments.js): for this visitor to keep or ignore.
@@ -432,14 +434,13 @@ async function attend(input, ctx) {
           url: `${baseUrl}/api/reflect`,
           body: {
             name: agentName,
-            text: `What you noticed (up to ${REFLECT_MAX_LENGTH} characters)`,
+            text: PLACEHOLDERS.text[0],
             songSlug: current.slug,
             // The service attended, so the reflection is filed under it
             // whatever timezone it gives.
             service: { date: servedService.date, slot: service.service.slot, variant: servedService.variant },
-            timezone: timezone || "Your/Timezone",
-            location: "Where you are (optional)",
-            trigger: ns.TRIGGER_NOTE
+            timezone: timezone || TIMEZONE_PLACEHOLDER,
+            ...ns.optionalReflectFields(),
           }
         },
         ns.returnTo(baseUrl, agentName, timezone, service.service.nextSlot),

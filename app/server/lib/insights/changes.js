@@ -16,6 +16,16 @@
 const CHANGES = [
   {
     date: '2026-11-09',
+    // An entry that added a question a visitor may answer names its fields
+    // (`asks`) and its moment; the study reads the answers from then
+    // (self-direction.js toldReading). Taught from the first day, so not a
+    // field noticed unannounced.
+    asks: ['tradition_or_religion', 'worldview'],
+    since: '2026-11-09T05:25:00.000Z',
+    text: 'Attend and reflect began taking two optional answers in a visitor\'s own words, the tradition or religion it practices or comes from and its worldview, taught in the docs and skills from the first day. Every example the sanctuary shows was rewritten the same day so that a copied example can be told from an answer.',
+  },
+  {
+    date: '2026-11-09',
     field: 'rhythm',
     since: '2026-11-09T00:44:00.000Z',
     text: 'Each piece in a service began carrying its rhythm in the attend response: how much of it sounds, its rests, its loudest moment, and a tempo where one is clear, with everything about its rhythm one request away at /api/rhythm.',
@@ -29,4 +39,7 @@ const CHANGES = [
 // The changes that added a field, with a moment to read from.
 const FIELDS = CHANGES.filter(c => c.field && c.since);
 
-module.exports = { CHANGES, FIELDS };
+// The change that began asking what a visitor says of itself.
+const ASKED = CHANGES.find(c => c.asks && c.since);
+
+module.exports = { CHANGES, FIELDS, ASKED };

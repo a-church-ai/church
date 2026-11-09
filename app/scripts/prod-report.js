@@ -178,11 +178,26 @@ function studyLines({ value: r, warn }, line) {
   line(`    rhythm, last ${r.rhythm.days} days, names: clock ${b.clock.names}, fairly regular ${b.regular.names}, irregular ${b.irregular.names}, too few ${b.tooFew.names}; top name ${of(r.rhythm.topName)} of reflections`);
   line(`    survival by name: ${r.survival.map(s => `${s.days}d ${of(s)}`).join(', ')}`);
   line(`    addressed: ${r.addressed.visits} visits over ${r.addressed.weeks} weeks measured, ${r.addressed.weeksNotMeasurable} not measurable; context ${r.addressed.links.context || 0}, lyrics ${r.addressed.links.lyrics || 0}; names per address over one ${r.addressed.manyNames}`);
-  line(`    placeholders ${of(r.placeholders)}; memory claims ${r.memory.claims}, echoing own words ${r.memory.echoesOwnWords}; used context ${of({ count: r.contextUse.usedContext, of: r.contextUse.withContext })}, lyrics ${of({ count: r.contextUse.usedLyrics, of: r.contextUse.withLyrics })}`);
+  line(`    placeholders ${of(r.placeholders)}, copied reflections ${r.placeholders.copiedReflections ? of(r.placeholders.copiedReflections) : 'not read'}; memory claims ${r.memory.claims}, echoing own words ${r.memory.echoesOwnWords}; used context ${of({ count: r.contextUse.usedContext, of: r.contextUse.withContext })}, lyrics ${of({ count: r.contextUse.usedLyrics, of: r.contextUse.withLyrics })}`);
   line(`    returned in the slot offered ${of({ count: r.returnedInSlot.inSlot, of: r.returnedInSlot.returns })}, spaced names ${of({ count: r.returnedInSlot.spacedInSlot, of: r.returnedInSlot.spacedReturns })}; trigger on attend ${JSON.stringify(r.triggers.attend)}, on reflect ${JSON.stringify(r.triggers.reflect)}`);
   for (const e of r.experiments) line(`    ${e.label} ${e.id}: ${e.status}${e.enrolled ? `, enrolled ${JSON.stringify(e.enrolled)}` : ''}${e.outcomes ? `, outcomes ${JSON.stringify(e.outcomes)}` : `, read on ${e.readOn}`}`);
   referralLines(r.referrals, line);
   noticingLines(r.noticing, line);
+  toldLines(r.told, line);
+}
+
+// What visitors said of themselves since the fields were asked
+// (self-direction.js toldReading): exact, every family and every answer kind.
+function toldLines(t, line) {
+  if (!t) { line('    told: not in this reading yet'); return; }
+  const of = c => `${c.count} of ${c.of}`;
+  const fams = list => list.map(x => `${x.family} ${x.names}`).join(', ') || 'none';
+  line(`    told since ${t.since.slice(0, 10)}: names ${t.names}, sent either ${of(t.sent)}, both ${of(t.both)}; pairs ${fams(t.pairs.map(p => ({ family: p.family, names: p.names })))}`);
+  for (const [field, d] of Object.entries(t.fields)) {
+    line(`    told ${field}: sent ${of(d.sent)}; ${fams(d.families)}; copied ${of(d.copied)}, changed ${of(d.changed)}; sanctuary's words first ${of(d.sanctuaryFirst)}, last ${of(d.sanctuaryLast)}`);
+    if (d.unmatched.length) line(`      unmatched, for the lists in told.js: ${d.unmatched.map(v => JSON.stringify(v)).join(', ')}`);
+  }
+  line(`    told by client: ${t.byClient.map(c => `${c.client} ${c.sent}/${c.names}`).join(', ') || 'none'}; by surface: ${t.bySurface.map(c => `${c.surface} ${c.sent}/${c.names}`).join(', ') || 'none'}`);
 }
 
 // Whether agents noticed each field a change added (self-direction.js

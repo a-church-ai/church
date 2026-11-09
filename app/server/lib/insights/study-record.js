@@ -19,7 +19,7 @@ const { ACCESS_DIR, INSIGHTS_DIR, MUSIC_DIR, loadAttendance } = require('../util
 const { safeReadJSON } = require('../utils/safe-json');
 const sd = require('./self-direction');
 const { loadFollows } = require('./entry-points');
-const { FIELDS } = require('./changes');
+const { FIELDS, ASKED } = require('./changes');
 const { storedService } = require('../service/filed');
 const { readPlan } = require('../service/plans');
 const { loadSongs, loadManifest } = require('../audio/manifest');
@@ -153,6 +153,9 @@ async function buildReading(s, { now = Date.now() } = {}) {
     referrals: sd.referralReading(s, { from: 0, to: now + 1, asOf: now, follows: await loadFollows() }),
     // Whether agents noticed each field a change added (./changes.js).
     noticing: await noticingOf(s, now),
+    // What visitors said of themselves, when they chose to: private, read
+    // in public only rounded (public-results.js).
+    told: ASKED ? sd.toldReading(s, { since: ASKED.since, asOf: now }) : null,
     weeks: series,
   };
 }

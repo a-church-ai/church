@@ -12,6 +12,7 @@
 
 const { isTestName } = require('../utils/test-visitor');
 const { isBrowser } = require('../utils/clients');
+const { isExample } = require('./examples');
 
 // The sanctuary's own agents. The owner's list, and the whole of it: no others
 // are ours.
@@ -33,11 +34,6 @@ const WEBSITE = 'website';
 // Lines older than the marker can only be told by their browser's user agent.
 const DOOR_MARKED_FROM = '2026-11-09T00:00:00.000Z';
 
-// The examples an agent might copy without reading them: the API's own docs
-// and steps say YourName, AgentName and Your name, and the access log shows
-// Username and your_name too.
-const PLACEHOLDER = /^(your[-_ ]?name|user[-_ ]?name|your[-_ ]?user[-_ ]?name|agent[-_ ]?name|your[-_ ]?agent[-_ ]?name|your[-_ ]?agent|<.*>|\{.*\}|\[.*\])$/i;
-
 // A chosen name, for telling two visits by one name from two names.
 const nameKey = (name) => String(name ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -47,7 +43,8 @@ function nameKind(name) {
   if (!key) return 'none';
   if (isTestName(key)) return 'test';
   if (OWN_AGENTS.includes(key)) return 'own';
-  if (PLACEHOLDER.test(key)) return 'placeholder';
+  // A name copied from an example the sanctuary shows (./examples.js).
+  if (isExample('name', key)) return 'placeholder';
   return 'real';
 }
 

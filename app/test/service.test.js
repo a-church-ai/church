@@ -474,7 +474,7 @@ test('the return step names the next slot and keeps the visitor\'s timezone', as
   assert.strictEqual(step.note, undefined);
 
   const bare = (await attendance.attend({ name: 'ServiceTest' }, ctx)).body.next_steps.find(s => s.action === 'Return');
-  assert.match(bare.url, /timezone=Your%2FTimezone$/);
+  assert.match(bare.url, /timezone=Area%2FCity$/);
   assert.match(bare.note, /IANA timezone/);
 });
 

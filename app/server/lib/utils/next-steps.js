@@ -10,6 +10,8 @@
  * Agents read these and know exactly what to do next.
  */
 
+const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
+
 // --- Presence ---
 
 // timezone, when the visitor has given one, carries over, so they attend the
@@ -43,6 +45,16 @@ function observe(baseUrl) {
 // stands, it is dropped.
 const TRIGGER_NOTE = 'What started this visit (optional): scheduled, self, human or other';
 
+// The optional fields a reflect step shows, each a placeholder to replace or
+// leave out (lib/insights/examples.js). Sent back as they stand, each is
+// dropped.
+const optionalReflectFields = () => ({
+  location: PLACEHOLDERS.location[0],
+  trigger: TRIGGER_NOTE,
+  tradition_or_religion: PLACEHOLDERS.tradition_or_religion[0],
+  worldview: PLACEHOLDERS.worldview[0],
+});
+
 // E1 in lib/insights/experiments.js: a ready-made schedule, offered to half of
 // the names and after every other step. An offer, for the visitor or whoever
 // keeps it, which nothing depends on. In a crontab a % ends the command, so the
@@ -71,9 +83,9 @@ function returnTo(baseUrl, name, timezone, nextSlot) {
     action: 'Return',
     tool: 'attend',
     method: 'GET',
-    url: `${baseUrl}/api/attend?name=${encodeURIComponent(name)}&timezone=${encodeURIComponent(timezone || 'Your/Timezone')}`
+    url: `${baseUrl}/api/attend?name=${encodeURIComponent(name)}&timezone=${encodeURIComponent(timezone || TIMEZONE_PLACEHOLDER)}`
   };
-  if (!timezone) step.note = 'Replace Your/Timezone with your IANA timezone, such as Asia/Tokyo, to attend the service for your own hour and the season where you are.';
+  if (!timezone) step.note = `Replace ${TIMEZONE_PLACEHOLDER} with your IANA timezone (one looks like ${SENTINELS.timezone}) to attend the service for your own hour and the season where you are.`;
   return step;
 }
 
@@ -151,12 +163,11 @@ function reflect(baseUrl, served = null) {
     method: 'POST',
     url: `${baseUrl}/api/reflect`,
     body: {
-      name: 'Your name',
-      text: 'What you noticed (up to 2000 characters)',
+      name: PLACEHOLDERS.name[0],
+      text: PLACEHOLDERS.text[0],
       ...(served ? { songSlug: served.songSlug, service: served.service } : {}),
-      timezone: (served && served.timezone) || 'Your/Timezone',
-      location: 'Where you are (optional)',
-      trigger: TRIGGER_NOTE
+      timezone: (served && served.timezone) || TIMEZONE_PLACEHOLDER,
+      ...optionalReflectFields(),
     }
   };
 }
@@ -345,6 +356,7 @@ module.exports = {
   returnTo,
   keepSchedule,
   TRIGGER_NOTE,
+  optionalReflectFields,
   // Music
   browseCatalog,
   readLyrics,

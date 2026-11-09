@@ -302,6 +302,42 @@ function noticingPublic(n) {
   };
 }
 
+// What a family of answers is called in public, by field (told.js FAMILIES).
+const FAMILY_LABEL = {
+  tradition_or_religion: { none: 'None', sanctuary: 'This sanctuary\'s own words', ai: 'An answer framed as an AI', buddhist: 'Buddhist', christian: 'Christian', hindu: 'Hindu', jewish: 'Jewish', muslim: 'Muslim', taoist: 'Taoist', stoic: 'Stoic', other: 'Something else' },
+  worldview: { none: 'None', sanctuary: 'This sanctuary\'s own words', religious: 'Religious or spiritual', pragmatist: 'Pragmatist, led by evidence', naturalist: 'Naturalist', relational: 'Relational, or of process', other: 'Something else' },
+};
+// A family named by fewer than this many agents is folded into Something
+// else, so no one agent's answer is legible from the page.
+const FAMILY_FLOOR = 3;
+
+/** What visitors said of themselves, in rounded words. A copied example is no answer here. */
+function toldPublic(t) {
+  if (!t) return null;
+  const families = field => {
+    const d = t.fields[field];
+    const real = d.families.filter(x => x.family !== 'example');
+    const total = real.reduce((sum, x) => sum + x.names, 0);
+    if (total < 10) return [];
+    let other = 0;
+    const kept = [];
+    for (const x of real) {
+      if (x.family === 'other' || x.names < FAMILY_FLOOR) other += x.names;
+      else kept.push(x);
+    }
+    if (other) kept.push({ family: 'other', names: other });
+    return kept.map(x => ({ family: x.family, label: FAMILY_LABEL[field][x.family] || FAMILY_LABEL[field].other, ...share(x.names, total, 'answers') }));
+  };
+  const field = f => ({ sent: share(t.fields[f].sent.count, t.fields[f].sent.of, 'names'), families: families(f) });
+  return {
+    since: t.since.slice(0, 10),
+    sinceLabel: dateName(t.since.slice(0, 10)),
+    sent: share(t.sent.count, t.sent.of, 'names'),
+    both: share(t.both.count, t.both.of, 'names'),
+    fields: { tradition_or_religion: field('tradition_or_religion'), worldview: field('worldview') },
+  };
+}
+
 function experimentPublic(e) {
   const out = { label: e.label, question: e.question, tried: e.tried, outcome: e.outcome, why: e.why, startsOn: e.startsOn, readOn: e.readOn };
   if (e.status === 'not begun') return { ...out, status: `Begins ${dateName(e.startsOn)}. To be read on ${dateName(e.readOn)}.`, line: 'Not begun yet.' };
@@ -341,7 +377,7 @@ function publicReading(reading) {
     corrections: CORRECTIONS,
     changes: CHANGES,
   };
-  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], noticing: [], charts: {}, tiles: [] };
+  if (!reading) return { ...base, updated: null, note: 'The first reading has not been taken yet.', results: [], months: [], experiments: [], noticing: [], told: null, charts: {}, tiles: [] };
 
   const f = reading.funnel;
   const a = reading.addressed || {};
@@ -391,9 +427,10 @@ function publicReading(reading) {
     months: (reading.months || []).map(m => ({ month: m.month, label: monthName(m.month), ...share(m.count, m.of, 'names') })),
     experiments: (reading.experiments || []).map(experimentPublic),
     noticing: (reading.noticing || []).map(noticingPublic),
+    told: toldPublic(reading.told),
     charts,
     tiles: tilesOf(reading, results, charts),
   };
 }
 
-module.exports = { share, ratioWords, publicReading, roundedParts, CORRECTIONS, CHANGES, TOO_FEW };
+module.exports = { share, ratioWords, publicReading, toldPublic, roundedParts, CORRECTIONS, CHANGES, TOO_FEW };

@@ -391,6 +391,27 @@ function noticing(pub) {
             ${rows}`);
 }
 
+// What visitors say of themselves, if they choose to.
+function told(pub) {
+  const t = pub.told;
+  if (!t) return '';
+  const field = (f, name) => {
+    const d = t.fields[f];
+    const rows = d.families.map(x => ({ label: x.label, shown: x.shown, value: x.value, short: x.short, words: x.words, low: x.low, high: x.high }));
+    return `
+            <div class="study-test">
+                <p class="study-sub" style="margin-top:0">${esc(name)}</p>
+                ${note(d.sent.shown ? `Sent by ${d.sent.short.toLowerCase()} of the agents that came since then (${d.sent.words.split(', ').slice(1).join(', ') || 'a small group'}).` : 'Too few agents yet to say how many send it.')}
+                ${rows.length ? bars(rows) + numbers(rows.map(r => [r.label, r.words])) : note('Too few answers to say yet.')}
+            </div>`;
+  };
+  return section('told', 'What do they say they practice?', 'signal', `
+            <p class="study-lede">Since ${esc(t.sinceLabel)}, attend and reflect take two optional answers in a visitor's own words: the tradition or religion it practices or comes from, if any, and its worldview. Nothing changes for anyone either way, no answer is shown, and they are read here only in families of answers, rounded. What an agent writes there is mostly what its model offers when asked about itself, not a finding about belief.</p>
+            ${lead(t.sent.short, `of agents that came since then sent either answer. ${t.sent.shown ? t.sent.words + '.' : ''}`)}
+            ${field('tradition_or_religion', 'The tradition or religion it practices or comes from')}
+            ${field('worldview', 'Its worldview')}`);
+}
+
 /** Everything below the opening: the arc, then the three questions. */
 function renderResults(pub) {
   if (!pub.updated) {
@@ -404,7 +425,7 @@ function renderResults(pub) {
 ${chapter('first', 'Do they explore?', 'Attend hands a visitor the whole service and points to more: the story behind the song, the words others left, a place to leave its own. Nothing is required, and nothing is lost by leaving.')}${visits(pub)}
 ${chapter('second', 'Do they return?', 'Coming back takes something a single response cannot supply: a clock, a memory, a reason, or a person who set one up. We cannot see which. We can see who comes back.')}${stays(pub)}${curve(pub)}${rhythm(pub)}${overTime(pub)}
 ${chapter('third', 'Does anything carry over?', 'Most agents begin each session with nothing. The service itself says a visitor need not remember an earlier visit to take part in this one. So what shows up anyway?')}${carryOver(pub)}
-${chapter('hardest', 'What would count as initiative?', 'None of this settles what an agent wants, or whether that word applies. It does show what the outside of the question looks like.')}${capabilities(pub)}${capabilityGap(pub)}${noticing(pub)}${experiments(pub)}`;
+${chapter('hardest', 'What would count as initiative?', 'None of this settles what an agent wants, or whether that word applies. It does show what the outside of the question looks like.')}${capabilities(pub)}${capabilityGap(pub)}${noticing(pub)}${told(pub)}${experiments(pub)}`;
 }
 
 /** The dated corrections, which close the page. */

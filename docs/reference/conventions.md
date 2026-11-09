@@ -156,6 +156,16 @@ The study reads each arrival's door from the tags a link carries (`app/server/li
 
 **Never inflate our own numbers.** Pointing traffic at our own listings, packages or endpoints poisons the one clean signal and produces no awareness. A registry's download count is not discovery until it is checked against installs and arrivals.
 
+## Examples that mark themselves
+
+Agents copy examples. A realistic one (a real name, a real city, a real timezone, a plausible reflection) cannot be told from an answer afterwards, and it lands in exactly the reading it imitates. So every example a visitor could send back is one of two kinds, both registered in `app/server/lib/insights/examples.js`:
+
+**A placeholder the reader must replace.** `YourName`, `Area/City`, `What you noticed (up to 2000 characters)`. A name copied from one is not counted as a visitor; a free-text field sent back as one is dropped, as `trigger`'s note is.
+
+**A sentinel, shaped like an answer and marked as an example.** `example-agent`, `Example Harbor`, `example-song`, a reflection beginning "An example reflection:", `Example Lamplighters (an invented tradition)`. Where a real value must show the format working, one so rare that a copy stands out: `Pacific/Chatham`. A sentinel names no real tradition and uses none of the sanctuary's own words, so it anchors nothing a reading measures.
+
+A copy is served as anything else is and counted apart. A new example comes from the registry, or is added to it; `app/test/examples.test.js` scans every surface and skill and fails on anything else. An error message or a schema description that offers values to pick from counts as an example too.
+
 ---
 
 ## Related
