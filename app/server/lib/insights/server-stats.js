@@ -1,7 +1,7 @@
 /**
- * The numbers only the server can count, from what it keeps on the volume:
- * the API access log, reflections, Ask's conversations and the planned
- * services. Read by GET /admin/api/insights, which scripts/prod-report.js
+ * The numbers only the server can count, from what it keeps in the database
+ * (../db): the API access log, reflections, Ask's conversations, the planned
+ * services and the website's visits. Read by GET /admin/api/insights, which scripts/prod-report.js
  * asks for; aggregates only, except the text of Ask's weakest questions,
  * which the admin's conversation log already shows.
  *
@@ -11,11 +11,10 @@
  * private repo.
  */
 
-const fs = require('fs').promises;
-const path = require('path');
-const { ACCESS_DIR, ATTENDANCE_FILE, CONVERSATIONS_DIR, SERVICES_DIR, VISITS_DIR, loadAttendance } = require('../utils/data');
+const { loadReflections } = require('../utils/data');
 const { addDays } = require('../utils/seasons');
-const { safeReadJSON } = require('../utils/safe-json');
+const { operation } = require('../utils/access-log');
+const store = require('../db');
 const { latestReading } = require('./study-record');
 const { cleanTag } = require('./entry-points');
 
@@ -38,27 +37,15 @@ const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1; };
 
 // A REST path with its variable part collapsed, so /api/music/x and
 // /api/music/y count as one operation.
-function operation(line) {
-  if (line.tool) return `mcp ${line.tool}`;
-  const parts = String(line.path || '').split('?')[0].split('/').filter(Boolean);
-  return `${line.method || 'GET'} /${parts.slice(0, 3).join('/')}${parts.length > 3 ? '/…' : ''}`;
-}
+// A window's start and its end, the moment after its last day.
+const span = (w) => ({ from: new Date(`${w.from}T00:00:00Z`), to: new Date(`${addDays(w.to, 1)}T00:00:00Z`) });
 
 async function accessLines(w) {
-  const lines = [];
-  for (const day of datesOf(w)) {
-    let text;
-    try { text = await fs.readFile(path.join(ACCESS_DIR, `${day}.jsonl`), 'utf8'); } catch { continue; }
-    for (const raw of text.split('\n')) {
-      if (!raw) continue;
-      try { const l = JSON.parse(raw); if (!l.test) lines.push({ ...l, day }); } catch {}
-    }
-  }
-  return lines;
+  return (await store.apiRequests(span(w))).filter(l => !l.test).map(l => ({ ...l, day: l.timestamp.slice(0, 10) }));
 }
 
 async function api(w) {
-  const source = `access log (${path.basename(ACCESS_DIR)}/<day>.jsonl), test visitors left out`;
+  const source = 'access log (api_requests), test visitors left out';
   const [now, before] = await Promise.all([accessLines(w.now), accessLines(w.before)]);
   const attends = (ls) => ls.filter(l => l.path === '/api/attend' || l.tool === 'attend');
   const byDay = {};
@@ -80,8 +67,8 @@ async function api(w) {
 }
 
 async function reflections(w) {
-  const source = `${path.basename(ATTENDANCE_FILE)} reflections, hidden and test reflections left out`;
-  const all = (await loadAttendance()).reflections || [];
+  const source = 'reflections, hidden and test reflections left out';
+  const all = await loadReflections();
   const dayOf = r => String(r.createdAt || '').slice(0, 10);
   const now = all.filter(r => inWindow(dayOf(r), w.now));
   const byDay = {}, byPiece = {}, byDoor = {};
@@ -97,17 +84,17 @@ async function reflections(w) {
 const NO_RESULT = /^I couldn't find relevant information/;
 
 async function ask(w) {
-  const source = `${path.basename(CONVERSATIONS_DIR)}/*.jsonl, each exchange's question and answer`;
-  let files = [];
-  try { files = (await fs.readdir(CONVERSATIONS_DIR)).filter(f => f.endsWith('.jsonl')); } catch {}
-  const since = Date.parse(`${w.before.from}T00:00:00Z`);
+  const source = 'conversations, each exchange\'s question and answer';
+  const since = new Date(`${w.before.from}T00:00:00Z`);
   let questions = 0, questionsBefore = 0, noResult = 0;
   const byDay = {}, byDoor = {};
   const scored = [];
-  for (const f of files) {
-    const file = path.join(CONVERSATIONS_DIR, f);
-    try { if ((await fs.stat(file)).mtimeMs < since) continue; } catch { continue; }
-    const lines = (await fs.readFile(file, 'utf8')).split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  const bySlug = new Map();
+  for (const t of await store.turnsSince(since)) {
+    if (!bySlug.has(t.slug)) bySlug.set(t.slug, []);
+    bySlug.get(t.slug).push(t);
+  }
+  for (const [slug, lines] of bySlug) {
     for (let i = 0; i < lines.length; i++) {
       const q = lines[i];
       if (q.role !== 'user') continue;
@@ -119,7 +106,7 @@ async function ask(w) {
       bump(byDay, day);
       bump(byDoor, doorKey(q));
       if (a && NO_RESULT.test(a.content || '')) noResult++;
-      if (a && typeof a.nearest === 'number') scored.push({ question: String(q.content || '').slice(0, 300), nearest: Math.round(a.nearest * 1000) / 1000, day, conversation: f.replace(/\.jsonl$/, '') });
+      if (a && typeof a.nearest === 'number') scored.push({ question: String(q.content || '').slice(0, 300), nearest: Math.round(a.nearest * 1000) / 1000, day, conversation: slug });
     }
   }
   scored.sort((x, y) => y.nearest - x.nearest);
@@ -133,11 +120,12 @@ async function ask(w) {
 }
 
 async function services(w) {
-  const source = `${path.basename(SERVICES_DIR)}/<date>.json, every slot of the place unknown and both hemispheres`;
+  const source = 'services, every slot of the place unknown and both hemispheres';
   let planned = 0, rotation = 0, missing = 0;
   const byDay = [];
+  const plans = await store.plansBetween(w.now.from, w.now.to);
   for (const day of datesOf(w.now)) {
-    const plan = await safeReadJSON(path.join(SERVICES_DIR, `${day}.json`), null);
+    const plan = plans.get(day) || null;
     let p = 0, r = 0;
     for (const variant of ['slots', 'north', 'south']) {
       for (const entry of Object.values((plan && plan[variant]) || {})) {
@@ -158,14 +146,10 @@ async function services(w) {
   };
 }
 
+// A page visit row is kept 30 days (then its hours are summarized), so a
+// window older than that has none.
 async function visitRows(w) {
-  const rows = [];
-  for (const day of datesOf(w)) {
-    let text;
-    try { text = await fs.readFile(path.join(VISITS_DIR, `${day}.jsonl`), 'utf8'); } catch { continue; }
-    for (const raw of text.split('\n')) { if (!raw) continue; try { rows.push({ ...JSON.parse(raw), day }); } catch {} }
-  }
-  return rows;
+  return (await store.pageVisits(span(w))).map(r => ({ ...r, day: r.at.slice(0, 10) }));
 }
 
 const avg = (list) => (list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : null);
@@ -220,7 +204,7 @@ function engagementByDoor(rows, earlier) {
 
 // The website's own visits (lib/insights/visits.js), in aggregate only.
 async function visits(w) {
-  const source = `${path.basename(VISITS_DIR)}/<day>.jsonl, what the site's pages reported (client/public/visits.js)`;
+  const source = 'page_visits, what the site\'s pages reported (client/public/visits.js), kept 30 days';
   const [now, before] = await Promise.all([visitRows(w.now), visitRows(w.before)]);
   // A page view is sent again when its tab comes back into view and is hidden
   // again (visits.js), so each view counts once, at its longest.
@@ -286,15 +270,23 @@ async function visits(w) {
 // window: it is about time. Exact counts, for this private report only; what the
 // public sees is lib/insights/public-results.js.
 function selfDirection(reading, w) {
-  const source = 'data/insights/self-direction/latest.json (lib/insights/study-record.js)';
+  const source = 'study_latest (lib/insights/study-record.js)';
   if (!reading) return { value: null, window: w.now, source, warn: 'no reading of the study yet: it is taken after boot and every six hours' };
   return { value: reading, window: { from: reading.time.firstSeen, to: reading.computedAt.slice(0, 10) }, source };
 }
 
+// The database's size against the free tier's 500 MB, warned of at 300.
+const DATABASE_LIMIT = 500 * 1024 * 1024;
+const DATABASE_WARN = 300 * 1024 * 1024;
+async function database(w) {
+  const bytes = Number(await store.databaseSize());
+  return { size: { value: bytes, window: w.now, source: 'pg_database_size', limit: DATABASE_LIMIT, ...(bytes >= DATABASE_WARN ? { warn: `the database holds ${Math.round(bytes / 1048576)} MB of the free tier's 500` } : {}) } };
+}
+
 async function serverStats({ days = 7, now = Date.now() } = {}) {
   const w = windows(days, now);
-  const [apiStats, reflectionStats, askStats, serviceStats, visitStats, reading] = await Promise.all([api(w), reflections(w), ask(w), services(w), visits(w), latestReading({ now })]);
-  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats, selfDirection: selfDirection(reading, w) };
+  const [apiStats, reflectionStats, askStats, serviceStats, visitStats, reading, databaseStats] = await Promise.all([api(w), reflections(w), ask(w), services(w), visits(w), latestReading({ now }), database(w)]);
+  return { generatedAt: new Date(now).toISOString(), days, window: w.now, before: w.before, api: apiStats, reflections: reflectionStats, ask: askStats, services: serviceStats, visits: visitStats, selfDirection: selfDirection(reading, w), database: databaseStats };
 }
 
 module.exports = { serverStats, windows, operation, engagementByDoor };

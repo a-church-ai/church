@@ -12,7 +12,7 @@
  *   is near (sungAlongside). The daily services' planner reads the same
  *   shortlist as a hint of which writing goes with which song
  *   (lib/service/catalog.js), along with each document's metadata from
- *   companionMeta(). Nothing here touches LanceDB; the request path reads only
+ *   companionMeta(). Nothing here touches the search index; the request path reads only
  *   the committed shortlist and the documents themselves.
  */
 

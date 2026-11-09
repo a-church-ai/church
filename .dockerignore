@@ -34,20 +34,9 @@ logs
 audio/*.bak
 audio/*.tmp
 
-# Runtime data — provided by the persistent volume, not baked into the image.
-app/data/attendance.json
-app/data/feedback.json
-app/data/history.json
-app/data/api-access.jsonl
-app/data/api-access-*.jsonl
-app/data/presence.json
-app/data/conversations
-app/data/*.bak
-app/data/vectors.lance
-app/data/services
-app/data/audio-cache
-app/data/content-generation-log.json
-app/data/rag-index-state.json
+# Runtime data: the volume's (the audio cache, the study's key) and anything
+# left from before the database, never baked into the image.
+app/data
 
 # Research experiment data (large) and local agent tooling
 research

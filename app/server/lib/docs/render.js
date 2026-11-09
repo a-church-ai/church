@@ -28,7 +28,7 @@ const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
 const { longDate } = require('../utils/page-lists');
-const { loadCatalog, loadCompanions, loadAttendance } = require('../utils/data');
+const { loadCatalog, loadCompanions, loadReflections } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox, renderReflectionItem } = require('../utils/page-lists');
 const { retiredSongs } = require('../utils/redirects');
@@ -342,7 +342,7 @@ async function playlistFor(name, doc, title) {
 async function renderSungReflections(doc) {
   const slugs = [...retiredSongs()].filter(([, to]) => to === doc.urlPath).map(([slug]) => slug);
   if (!slugs.length) return '';
-  const left = (await loadAttendance()).reflections
+  const left = (await loadReflections())
     .filter(r => slugs.includes(r.song))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .map(r => ({ ...r, createdAtFormatted: formatLocal(r.createdAt, r.timezone || 'UTC') }));

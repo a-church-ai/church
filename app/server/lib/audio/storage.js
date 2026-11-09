@@ -6,13 +6,14 @@
  *
  * The rendered videos live there too, under video/<slug>/, so the release
  * job (scripts/release-videos.js, run by GitHub Actions) can post them from
- * a machine that did not render them.
+ * a machine that did not render them; and the database's nightly backups,
+ * under backups/db/<date>/ (scripts/backup-db.js).
  */
 
 const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream/promises');
-const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
 let client = null;
 
@@ -75,4 +76,25 @@ async function downloadObject(Key, localPath) {
   }
 }
 
-module.exports = { uploadRecording, downloadRecording, uploadObject, downloadObject, bucket, configured };
+// Every key under a prefix, a page of a thousand at a time.
+async function listObjects(Prefix) {
+  const Bucket = bucket();
+  const keys = [];
+  let ContinuationToken;
+  do {
+    const res = await client.send(new ListObjectsV2Command({ Bucket, Prefix, ContinuationToken }));
+    for (const o of res.Contents || []) keys.push(o.Key);
+    ContinuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+  } while (ContinuationToken);
+  return keys;
+}
+
+// Delete keys, a thousand to a request (S3's own limit).
+async function deleteObjects(keys) {
+  const Bucket = bucket();
+  for (let i = 0; i < keys.length; i += 1000) {
+    await client.send(new DeleteObjectsCommand({ Bucket, Delete: { Objects: keys.slice(i, i + 1000).map(Key => ({ Key })) } }));
+  }
+}
+
+module.exports = { uploadRecording, downloadRecording, uploadObject, downloadObject, listObjects, deleteObjects, bucket, configured };

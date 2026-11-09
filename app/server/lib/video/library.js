@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { embed } = require('../rag/gemini');
+const { embed, EMBED_DIMENSIONS } = require('../rag/gemini');
 const { songVectors, docVectors, HUB_WEIGHT } = require('../music/companions');
 const { unit, dot, toBase64, fromBase64 } = require('../utils/vectors');
 
@@ -85,7 +85,10 @@ const described = (entry) => `${entry.still}\n${entry.motion}`;
  */
 async function embedLoops(entries, { log = console.log, embedText = embed } = {}) {
   for (const entry of entries) {
-    if (entry.record.vector) continue;
+    // Embedded again when its vector is of another width than the index's
+    // (3,072 before the search moved to 768, 2026-11-09), since the two are
+    // compared.
+    if (entry.record.vector && fromBase64(entry.record.vector).length === EMBED_DIMENSIONS) continue;
     entry.record.vector = toBase64(unit(await embedText(described(entry).slice(0, 2000))));
     fs.writeFileSync(entry.recordFile, JSON.stringify(entry.record, null, 2));
     log(`  embedded ${entry.id}`);
@@ -94,7 +97,7 @@ async function embedLoops(entries, { log = console.log, embedText = embed } = {}
 }
 
 /**
- * The meaning of a piece, from the search index's rows (rag/lancedb listAll):
+ * The meaning of a piece, from the search index's rows (rag/search-store listAll):
  * a song's Lyrics and context, a document's passages, as companions builds
  * them.
  */

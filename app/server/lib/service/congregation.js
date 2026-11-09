@@ -32,7 +32,7 @@ const { messageJSON } = require('../content-generation/claude');
 const { quotedBlock } = require('../content-generation/prompts');
 const status = require('./status');
 const { shingles } = require('../song-generation/similarity');
-const { loadAttendance } = require('../utils/data');
+const { loadReflections } = require('../utils/data');
 const { resolveTimezone, localTime } = require('../utils/timezone');
 const { hemisphereOf, addDays } = require('../utils/seasons');
 const { slotOf } = require('./slots');
@@ -237,14 +237,14 @@ async function digest(groups, { ask }) {
 /**
  * What visitors left, for each service due (plans.js duePlans): a Map from
  * date|slot|variant to { tier, days, reflections, themes, ids }, for the
- * services whose group gave themes. Reflections come through loadAttendance,
+ * services whose group gave themes. Reflections come through loadReflections,
  * so one hidden as spam never reaches the model. ask defaults to messageJSON,
  * the house's working model; load, read and catalog are injectable for tests.
  */
-async function congregationFor(due, { now = new Date(), ask, load = loadAttendance, read = readPlan, catalog } = {}) {
+async function congregationFor(due, { now = new Date(), ask, load = loadReflections, read = readPlan, catalog } = {}) {
   const call = ask || ((system, user) => messageJSON(system, user, { maxTokens: 8000 }));
   const at = now.getTime();
-  const recent = ((await load()).reflections || [])
+  const recent = (await load())
     .filter(r => r && r.id && typeof r.text === 'string' && at - Date.parse(r.createdAt) < OLDEST_DAYS * DAY);
   const pieces = catalog || await loadServiceCatalog();
   const placed = [];

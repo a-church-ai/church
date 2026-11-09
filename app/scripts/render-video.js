@@ -44,7 +44,7 @@ const { pieceFor, allPieces, pieceText, recordingIn, shapeOf } = require('../ser
 const { writeBrief, restyleBrief, reuseRule } = require('../server/lib/video/brief');
 const { lookOf, lookName } = require('../server/lib/video/looks');
 const library = require('../server/lib/video/library');
-const lancedb = require('../server/lib/rag/lancedb');
+const searchStore = require('../server/lib/rag/search-store');
 const { makeStill, makeClip, spent, VIDEO_MODEL } = require('../server/lib/video/loops');
 const { reportVideo } = require('../server/lib/video/checks');
 const { renderLayers, surveyPresets, presetChoices } = require('../server/lib/video/visual');
@@ -98,7 +98,7 @@ async function newBrief(piece, about, log) {
     presets: presetRule(piece, about),
     loops: reuseRule(others.map(v => ({ items: v.loops, at: v.at })), 'loop')
   };
-  const rows = await lancedb.listAll();
+  const rows = await searchStore.listAll();
   const vector = library.pieceVector(rows, piece);
   let shortlist = [];
   if (!vector) log('not in the search index, so no loops are offered from the library');

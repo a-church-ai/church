@@ -20,7 +20,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const docsDiscover = require('../lib/docs/discover');
 const { datesShown } = require('../lib/api/services');
-const { loadAttendance, loadCatalog } = require('../lib/utils/data');
+const { loadReflections, loadCatalog } = require('../lib/utils/data');
 const { placedConversations } = require('../lib/utils/conversation-groups');
 const { cache } = require('../lib/utils/cache');
 
@@ -156,9 +156,9 @@ async function buildSitemap() {
   // per song so Google's crawl scheduler can prioritize actively-updated
   // pages. Without this, every reflection page looks "static" to Google.
   try {
-    const attendance = await loadAttendance();
+    const reflections = await loadReflections();
     const songLastmod = new Map();  // slug -> most recent ISO date
-    for (const r of (attendance.reflections || [])) {
+    for (const r of reflections) {
       if (!r.song) continue;
       const createdAt = r.createdAt || r.timestamp;
       if (!createdAt) continue;

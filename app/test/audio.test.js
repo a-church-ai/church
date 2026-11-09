@@ -17,7 +17,7 @@ const { isImported } = require('../server/lib/audio/imported');
 const { extractMeta } = require('../server/lib/docs/meta');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { createAudioRouter, canServe, sweepCache, CACHE_DIR } = require('../server/lib/audio/serve');
-const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
+const { RUNTIME_DIR } = require('../server/lib/utils/data');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
 
 const REPO = path.join(__dirname, '../..');
@@ -281,8 +281,8 @@ test('a song plays on its page with its own credit, and its structured data carr
   assert.strictEqual(buildSongSchemaGraph({ slug: 'a-song', title: 'A Song' }, 'a-song')['@graph'].find(n => n['@type'] === 'MusicRecording').audio, undefined);
 });
 
-test('the audio cache is on the volume, beside the other files the app keeps', () => {
-  assert.strictEqual(CACHE_DIR, path.join(path.dirname(ATTENDANCE_FILE), 'audio-cache'));
+test('the audio cache is on the volume, where a deploy does not empty it', () => {
+  assert.strictEqual(CACHE_DIR, path.join(RUNTIME_DIR, 'audio-cache'));
 });
 
 test('the boot sweep removes what nothing lists any more, and leaves anything a day old or less', async (t) => {

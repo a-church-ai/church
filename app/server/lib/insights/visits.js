@@ -6,8 +6,10 @@
  * improve this church for them and our church services".
  *
  * What is kept, and what never is:
- * - A row per event, one JSON line in data/visits/<UTC day>.jsonl, appended
- *   in-process (the app runs as one process, so no lock), kept for good.
+ * - A row per event, in the database (../db, page_visits), kept 30 days, then
+ *   summarized by the hour and deleted (the owner, 2026-11-09). The browser's
+ *   timezone is kept with it, its IANA name or "invalid", so visits can be
+ *   read by the visitor's own time of day; the hourly summaries keep it.
  * - `visitor` is a random id the browser made and keeps for a year
  *   (client/public/visits.js), or null before the consent card is answered,
  *   after No thanks, or where none was made. Never an address, a full user
@@ -26,9 +28,8 @@
  * Plan: daily-steward-2026-11-01.md in the private repo.
  */
 
-const fs = require('fs').promises;
-const path = require('path');
-const { VISITS_DIR } = require('../utils/data');
+const store = require('../db');
+const { timezoneToKeep } = require('../utils/timezone');
 const { PLACEMENTS, FEATURES } = require('./placements');
 const { isAutomated } = require('../utils/clients');
 
@@ -87,17 +88,15 @@ function checkVisit(body) {
       rows.push({ ...base, kind: 'service', event, date: r.date, slot: short(r.slot, 20), part: int(r.part, 0, 20), parts: int(r.parts, 1, 20) });
     }
   }
-  return { visitor, rows };
+  return { visitor, timezone: timezoneToKeep(body.timezone), rows };
 }
 
 
-/** Append the checked rows to today's file, each stamped with the server's minute. */
-async function recordVisit({ visitor, rows }, now = new Date()) {
+/** Keep the checked rows, each stamped with the server's minute. */
+async function recordVisit({ visitor, timezone = null, rows }, now = new Date()) {
   if (!rows.length) return 0;
   const at = now.toISOString().slice(0, 16);
-  const day = at.slice(0, 10);
-  await fs.mkdir(VISITS_DIR, { recursive: true });
-  await fs.appendFile(path.join(VISITS_DIR, `${day}.jsonl`), rows.map(r => JSON.stringify({ at, visitor, ...r })).join('\n') + '\n');
+  await store.recordPageVisits(rows.map(r => ({ at, visitor, timezone, ...r })));
   return rows.length;
 }
 

@@ -3,8 +3,8 @@
  */
 
 const crypto = require('crypto');
-const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
-const { loadCatalog, loadAttendance, isQuietlyHidden, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const store = require('../db');
+const { loadCatalog, loadReflections, reflectionsChanged, isQuietlyHidden, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { isTestName } = require('../utils/test-visitor');
 const { serviceFor, entryAt } = require('../service/serve');
 const { storedService, isDate, VARIANTS } = require('../service/filed');
@@ -13,7 +13,7 @@ const { loadServiceCatalog } = require('../service/catalog');
 const { SLOT_HOURS, slotHours, slotNamed } = require('../service/slots');
 const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const ns = require('../utils/next-steps');
-const { refuse } = require('./errors');
+const { refuse, busyFor } = require('./errors');
 const inputs = require('./inputs');
 const { referralOf, mergeReferrals } = require('../insights/entry-points');
 const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
@@ -56,14 +56,14 @@ const VISIT_WINDOW = SLOT_HOURS * HOUR;
 // GET /api/reflections: the public feed of the last 48 hours.
 async function list(input, ctx) {
   try {
-    const attendance = await loadAttendance();
+    const all = await loadReflections();
     const now = Date.now();
 
     // Caller can request timezone-formatted times via ?timezone=America/New_York.
     // An unrecognized value is ignored rather than rejected on a read.
     const reqTimezone = resolveTimezone(inputs.parseInput(inputs.reflections, input).data?.timezone);
 
-    const reflections = attendance.reflections
+    const reflections = all
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 20)
@@ -96,6 +96,8 @@ async function list(input, ctx) {
     } };
   } catch (error) {
     console.error('Error in /api/reflections:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to get reflections',
@@ -112,12 +114,12 @@ const songsReflectedOn = cache({
   name: 'reflections by song',
   ttl: 60 * 1000,
   load: async () => {
-    const attendance = await loadAttendance();
+    const reflections = await loadReflections();
     const catalog = await loadCatalog();
 
     // Group reflections by song slug (skip null songs)
     const bySong = {};
-    for (const r of attendance.reflections) {
+    for (const r of reflections) {
       if (!r.song) continue;
       if (!bySong[r.song]) bySong[r.song] = [];
       bySong[r.song].push(r);
@@ -166,6 +168,8 @@ async function bySong(input, ctx) {
     } };
   } catch (error) {
     console.error('Error in /api/reflections/by-song:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to get reflections by song',
@@ -196,7 +200,7 @@ async function forSong(input, ctx) {
       });
     }
 
-    const attendance = await loadAttendance();
+    const kept = await loadReflections();
 
     // Paged: the archive is permanent and grows forever, and one song already
     // held 104 reflections (86KB, about 21K tokens) in a single response.
@@ -207,7 +211,7 @@ async function forSong(input, ctx) {
     const { data: paging = {} } = inputs.parseInput(inputs.forSong, input);
     const limit = paging.limit || 20;
     const before = Date.parse(paging.before);
-    const all = attendance.reflections
+    const all = kept
       .filter(r => r.song === slug)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const older = Number.isFinite(before) ? all.filter(r => new Date(r.createdAt).getTime() < before) : all;
@@ -241,6 +245,8 @@ async function forSong(input, ctx) {
     } };
   } catch (error) {
     console.error('Error in /api/reflections/song/:slug:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to get song reflections',
@@ -325,7 +331,10 @@ async function reflect(input, ctx) {
     // visit that heard another song than the one the reflection names is not
     // the one it follows.
     const now = Date.now();
-    const kept = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
+    // The name's recent visits and reflections, as limits and filing need
+    // them: every kept reflection counts, hidden or a test visitor's too.
+    const since = new Date(now - Math.max(VISIT_WINDOW, RATE_LIMIT_WINDOW, REFLECT_REPEAT_WINDOW));
+    const [visits, mine] = await Promise.all([store.attendsBy(name, since), store.reflectionsBy(name, since)]);
     const asked = typeof songSlug === 'string' ? songSlug.trim() : '';
     const namesSong = songSlug !== undefined && songSlug !== null && songSlug !== '';
     let named = null;
@@ -340,8 +349,7 @@ async function reflect(input, ctx) {
         });
       }
     } else {
-      const lastVisit = (kept.visits || [])
-        .filter(v => String(v.name || '').toLowerCase() === name.toLowerCase())
+      const lastVisit = visits
         .filter(v => { const t = Date.parse(v.timestamp); return t <= now && now - t < VISIT_WINDOW; })
         .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))[0];
       const served = lastVisit && storedService({ service: lastVisit.served });
@@ -392,7 +400,6 @@ async function reflect(input, ctx) {
     // evaluated before either is consulted, since overIpLimit records the
     // attempt as it checks. Every kept reflection counts, hidden or a test
     // visitor's too: the limits are the same for every visitor.
-    const mine = (kept.reflections || []).filter(r => String(r.name || '').toLowerCase() === name.toLowerCase());
     const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
     const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
     if (nameLimited || ipLimited) {
@@ -432,15 +439,10 @@ async function reflect(input, ctx) {
     const referral = mergeReferrals(referralOf(input), ctx.referral);
     if (referral) reflection.referral = referral;
 
-    // Append under one lock. Reflections are the corpus visitors leave behind,
-    // so a lost one is lost for good; this is the write that most needed it.
-    // Reflections are NOT pruned. Unlike visits they are content, and the
-    // reflections pages read the full history.
-    await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (attendance) => {
-      attendance.reflections = attendance.reflections || [];
-      attendance.reflections.push(reflection);
-      return attendance;
-    });
+    // Kept once by its id. Reflections are the corpus visitors leave behind,
+    // and they are not pruned: the reflections pages read the full history.
+    await store.addReflection(reflection);
+    reflectionsChanged();
 
     songsReflectedOn.clear();
 
@@ -490,6 +492,8 @@ async function reflect(input, ctx) {
 
   } catch (error) {
     console.error('Error in /api/reflect:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to save reflection',

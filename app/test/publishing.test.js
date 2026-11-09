@@ -15,7 +15,7 @@ const discover = require('../server/lib/docs/discover');
 const { publishedAt } = require('../server/lib/docs/meta');
 const { withoutUnpublished } = require('../server/lib/docs/unpublished');
 const { readingSequence } = require('../server/lib/docs/links');
-const { servedCorpusFilter } = require('../server/lib/rag/corpus');
+const { servedCorpusParams } = require('../server/lib/rag/corpus');
 
 const DOCS = path.join(__dirname, '../../docs');
 
@@ -89,12 +89,12 @@ test('a document still to come is unlisted everywhere and served at its address,
 
   const listed = new Set((await discover.listAllDocs()).map(d => d.docsRelPath));
   const inSections = new Set((await discover.listSections()).flatMap(s => s.docs.map(d => d.docsRelPath)));
-  const filter = servedCorpusFilter();
+  const { p_unpublished: unpublished } = servedCorpusParams();
   for (const doc of coming) {
     assert.ok(!listed.has(doc.docsRelPath) && !inSections.has(doc.docsRelPath), `${doc.docsRelPath} is listed before its day`);
     assert.strictEqual(discover.docAt(doc.urlPath), null, 'nor found by address among public documents');
     assert.ok(discover.unpublishedAt(doc.href), 'and known as unpublished by its address');
-    assert.ok(filter.includes(`'docs/${doc.docsRelPath}'`), 'and left out of every search');
+    assert.ok(unpublished.includes(`docs/${doc.docsRelPath}`), 'and left out of every search');
   }
   for (const doc of passed) assert.ok(listed.has(doc.docsRelPath), `${doc.docsRelPath} is public after its day`);
   for (const name of ['the-turning-of-the-year']) {

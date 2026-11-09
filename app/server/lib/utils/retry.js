@@ -9,7 +9,8 @@
  *
  * One helper for every outside request the app makes that is safe to repeat:
  * Gemini (rag/gemini.js), NOAA, JPL and NASA (utils/fetch-public.js),
- * ElevenLabs and OpenAI's transcription (audio/). Claude calls get the same
+ * ElevenLabs and OpenAI's transcription (audio/), and the database (db/), whose
+ * requests end at 20 seconds and say why they failed. Claude calls get the same
  * from the Anthropic SDK itself (content-generation/claude.js maxRetries).
  * Writes that could land twice (a pull request opened on GitHub) are not
  * retried. When the last try fails, the caller logs the error with
@@ -20,7 +21,7 @@ const { setTimeout: sleep } = require('timers/promises');
 
 // Statuses and messages that mean "try again shortly".
 const TRANSIENT_STATUS = [408, 425, 429, 500, 502, 503, 504, 529];
-const TRANSIENT_MESSAGE = /\b(408|429|500|502|503|504|529)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED|INTERNAL|overloaded|quota|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|socket hang up|fetch failed/i;
+const TRANSIENT_MESSAGE = /\b(408|429|500|502|503|504|529)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED|INTERNAL|overloaded|quota|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|socket hang up|fetch failed|TimeoutError|operation was aborted/i;
 
 /**
  * A refusal for payment: Gemini's 402 when an account's prepaid credits are

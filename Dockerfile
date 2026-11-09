@@ -12,10 +12,9 @@
 # /church/app.
 #
 # Node 26, LTS from 2026-10-28 and supported until April 2029. The native
-# modules (@lancedb/lancedb, @resvg/resvg-js) are N-API builds with prebuilt
-# linux-x64 binaries, which do not depend on the Node major. 20 was the pin
-# while lancedb was at 0.4, which shipped per-major binaries; it left with
-# lancedb 0.37. Plan: node-26-2026-10-18.md in the private repo.
+# module (@resvg/resvg-js) is an N-API build with a prebuilt linux-x64
+# binary, which does not depend on the Node major. Plan: node-26-2026-10-18.md
+# in the private repo.
 #
 # Pinned to the patch: a floating tag can be served from a build cache, and
 # the deployed Node must be one with the security fixes. 26.12.1 is
@@ -31,19 +30,7 @@ WORKDIR /church
 # (tailwind) are omitted — the compiled CSS is committed, so no build
 # step is needed at image time.
 COPY app/package.json app/package-lock.json ./app/
-#
-# Then the optional packages LanceDB lists for its own embedding helpers are
-# taken out, in the same step so they never reach a layer: Transformers.js
-# with its ONNX runtimes and sharp, and the OpenAI client. They were about
-# 330 MB of a 560 MB install, more than LanceDB's own binary, and most of the
-# 80 seconds a lockfile change spent pushing its layer. The sanctuary embeds
-# with Gemini (lib/rag/gemini.js) and never calls those helpers, which load
-# them only by a dynamic import inside themselves. --omit=optional cannot do
-# this: LanceDB's own linux binary is optional too. app/test/image.test.js
-# holds the list to the lockfile and runs LanceDB with them unreachable.
-RUN cd app && npm ci --omit=dev && npm cache clean --force \
- && rm -rf node_modules/@huggingface node_modules/onnxruntime-node node_modules/onnxruntime-web \
-      node_modules/onnxruntime-common node_modules/sharp node_modules/@img node_modules/openai
+RUN cd app && npm ci --omit=dev && npm cache clean --force
 
 # Copy the rest of the repo. node_modules, media, logs, and runtime data are
 # excluded via .dockerignore, so this does not clobber the installed modules.

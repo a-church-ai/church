@@ -24,16 +24,14 @@
  * received one to pass on (`forwardTags`): an agent asked to fill in where it
  * came from would mostly guess, and a guess looks like a fact in a tally.
  *
- * A page followed with a tag is one line in a file per day, with its tags,
+ * A page followed with a tag is one row in the database, with its tags,
  * path, status and kind of client, and no address or visitor id
  * (`recordFollow`). An API request keeps its tags on its access line.
  *
  * Plan: entry-attribution-and-agent-copy-2026-11-07.md in the private repo.
  */
 
-const fs = require('fs').promises;
-const path = require('path');
-const { INSIGHTS_DIR } = require('../utils/data');
+const store = require('../db');
 const { clientFamily } = require('../utils/clients');
 const { cleanPath } = require('./visits');
 
@@ -142,11 +140,8 @@ function forwardTags(text, own, referral, { html = false } = {}) {
 
 // ---- pages followed with a tag ----------------------------------------------
 
-const STORE = () => path.join(INSIGHTS_DIR, 'entry-points');
-const DAY_FILE = /^\d{4}-\d{2}-\d{2}\.jsonl$/;
-
 /**
- * Append one line for a page followed with tags, as the visit counts and the
+ * Keep one row for a page followed with tags, as the visit counts and the
  * access log keep theirs: the minute, the tags, the page's path (never its
  * query), its status and the kind of client, never the User-Agent or address.
  */
@@ -155,30 +150,20 @@ async function recordFollow({ path: pagePath, status, userAgent, referral, at = 
   const minute = at.toISOString().slice(0, 16);
   const line = { at: minute, ...referral, path: cleanPath(pagePath), status, client: clientFamily(userAgent) };
   try {
-    await fs.mkdir(STORE(), { recursive: true });
-    await fs.appendFile(path.join(STORE(), `${minute.slice(0, 10)}.jsonl`), JSON.stringify(line) + '\n');
+    await store.recordEntryPoints([line]);
   } catch (err) {
     console.warn(`[entry-points] could not record a follow: ${err.message}`);
   }
 }
 
 // Every page follow from `from` to `to` (YYYY-MM-DD, inclusive).
-async function loadFollows({ from = '0000-00-00', to = '9999-99-99' } = {}) {
-  let files = [];
-  try { files = (await fs.readdir(STORE())).filter(f => DAY_FILE.test(f)); } catch (err) { if (err.code !== 'ENOENT') throw err; }
-  const rows = [];
-  for (const f of files.sort()) {
-    const day = f.slice(0, 10);
-    if (day < from || day > to) continue;
-    for (const line of (await fs.readFile(path.join(STORE(), f), 'utf8')).split('\n')) {
-      if (!line) continue;
-      try { rows.push(JSON.parse(line)); } catch { /* a line cut short by a crash */ }
-    }
-  }
-  return rows;
+async function loadFollows({ from = '1970-01-01', to = '9999-12-30' } = {}) {
+  const next = new Date(`${to}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return store.entryPoints({ from: new Date(`${from}T00:00:00Z`), to: next });
 }
 
 module.exports = {
   TAG, KEYS, SURFACES, cleanTag, referralOf, mergeReferrals, isSurface, forwardTags,
-  recordFollow, loadFollows, STORE,
+  recordFollow, loadFollows,
 };

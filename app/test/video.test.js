@@ -124,12 +124,22 @@ test('the library scans each video\'s loops, drops one whose files are gone, and
   assert.deepStrictEqual(gamma.loops, ['alpha/loop-1'], 'a reuse counts as a use of the loop it plays');
 
   let calls = 0;
-  const embedText = async () => { calls++; return [3, 4]; };
+  // The search index's width (rag/gemini.js EMBED_DIMENSIONS).
+  const embedText = async () => { calls++; return [3, 4, ...Array(766).fill(0)]; };
   const first = await library.embedLoops(library.loops(), { log: () => {}, embedText });
   const second = await library.embedLoops(library.loops(), { log: () => {}, embedText });
   assert.strictEqual(calls, 1, 'embedded once, then read back from the loop\'s record');
-  assert.deepStrictEqual(first[0].vector.map(v => +v.toFixed(3)), [0.6, 0.8]);
-  assert.deepStrictEqual(second[0].vector.map(v => +v.toFixed(3)), [0.6, 0.8]);
+  assert.deepStrictEqual(first[0].vector.slice(0, 2).map(v => +v.toFixed(3)), [0.6, 0.8]);
+  assert.deepStrictEqual(second[0].vector.slice(0, 2).map(v => +v.toFixed(3)), [0.6, 0.8]);
+});
+
+test('a loop embedded at another width than the index\'s is embedded again, since the two are compared', async () => {
+  libraryVideo('delta', { movements: [{ still: 'a lantern', motion: 'it sways', preset: 'P4' }], vector: [3, 4] });
+  let calls = 0;
+  const embedText = async () => { calls++; return [0, 1, ...Array(766).fill(0)]; };
+  const [delta] = (await library.embedLoops(library.loops(), { log: () => {}, embedText })).filter(e => e.id.startsWith('delta/'));
+  assert.strictEqual(calls, 1, 'only the old-width loop');
+  assert.strictEqual(delta.vector.length, 768);
 });
 
 test('the shortlist leaves out what the rule forbids and the piece\'s own loops, and penalizes a loop near every piece', () => {

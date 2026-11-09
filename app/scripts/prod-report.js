@@ -96,6 +96,7 @@ function text(r) {
       line(`    by door: ${s.ask.byDoor.value.map(o => `${o.key} ${o.count}`).join('; ') || 'none'}`);
       for (const q of s.ask.weakest.value.slice(0, 5)) line(`    weakest (${q.nearest}): ${q.question.slice(0, 100)}`);
       line(`  services: ${s.services.planned.value} slots planned, ${s.services.rotation.value} fell back to the rotation, ${s.services.absent.value} not yet planned`);
+      if (s.database) line(`  database: ${Math.round(s.database.size.value / 1048576)} MB of the free tier's ${Math.round(s.database.size.limit / 1048576)}`);
       if (s.visits) {
         const v = s.visits;
         line(`  visitors: ${v.visitors.value}${change(v.visitors)}, returning ${v.returning.value}; page views ${v.pageViews.value}${change(v.pageViews)} (likely people ${v.likelyPeople.value})`);

@@ -27,7 +27,7 @@
   const pathOf = url => { try { return new URL(url, location.href).pathname; } catch (e) { return url; } };
 
   // The visitor's own clock decides which service they attend. The browser's
-  // timezone goes with each request and is not stored; without one, the
+  // timezone goes with each request and is kept in the access log; without one, the
   // service is UTC's, and the page says so.
   let timezone = '';
   try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* none */ }

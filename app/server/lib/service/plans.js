@@ -1,15 +1,15 @@
 /**
- * The planned services, one file per date on the data volume
- * (data/services/2026-10-07.json: { date, slots: { "0": { pieces, name,
- * word, arrangedBy, plannedAt, context }, ... }, north: { ... }, south:
- * { ... } }), and the job that keeps them planned.
+ * The planned services, one row per date in the database (services: the plan
+ * as { date, slots: { "0": { pieces, name, word, arrangedBy, plannedAt,
+ * context }, ... }, north: { ... }, south: { ... } }), and the job that keeps
+ * them planned.
  *
  * Each slot is planned three times: `slots` for a place unknown (no timezone,
  * UTC, an Etc/ zone), as every plan was before seasons, and `north` and
  * `south` for the hemispheres, each told its season and light (planner.js).
  * A visitor gets their hemisphere's plan, or else the season-less one, or
  * else the rotation (serve.js), so a failed seasonal plan costs the season,
- * never the service. A file written before seasons has no `north` or `south`
+ * never the service. A plan written before seasons has no `north` or `south`
  * at all, and its date is served season-less; nothing is migrated. In a
  * hemisphere's map a null slot means "decided: use the season-less plan",
  * written when its date is already in use and the model failed, so it is not
@@ -18,7 +18,7 @@
  *
  * A plan for a date, slot and hemisphere is the same for everyone in it, the
  * same way the clock is. Plans are kept, so any day's services can be read later,
- * and a poor one can be replaced by editing its file; the server reads it
+ * and a poor one can be replaced by editing its row; the server reads it
  * again within a minute.
  *
  * The job runs after boot and then hourly, and plans each slot just in time:
@@ -35,12 +35,9 @@
  * in the private repo, which says why not two days ahead, as it was.
  */
 
-const fs = require('fs').promises;
-const path = require('path');
-const { readModifyWriteJSON, safeReadJSON } = require('../utils/safe-json');
 const { cache } = require('../utils/cache');
 const status = require('./status');
-const { SERVICES_DIR } = require('../utils/data');
+const store = require('../db');
 const { rotation, exclusions } = require('./rules');
 const { addDays } = require('../utils/seasons');
 const { SLOTS, SLOT_HOURS, slotStart } = require('./slots');
@@ -49,22 +46,23 @@ const { describeError } = require('../utils/describe-error');
 // The hemispheres planned beside the season-less `slots`.
 const HEMISPHERES = ['north', 'south'];
 
-const fileFor = date => path.join(SERVICES_DIR, `${date}.json`);
-
 // Read plans are kept for a minute: /api/now is polled, and a plan replaced
-// by hand on the volume still shows within the minute. A saved plan is put
+// by hand in the database still shows within the minute. A saved plan is put
 // in place at once (saveSlot).
-const planCache = cache({ name: 'plans by date', ttl: 60 * 1000, load: date => safeReadJSON(fileFor(date), null) });
+const planCache = cache({ name: 'plans by date', ttl: 60 * 1000, load: date => store.readPlan(date) });
 
 const readPlan = date => planCache.get(date);
 
 // The date and the days before it that a slot's rules and the planner look
 // back over, as a map from date to plan.
 async function plansAround(date, back = 21) {
+  // One query for the whole span, each date then held as readPlan holds it.
+  const found = await store.plansBetween(addDays(date, -back), date);
   const plans = new Map();
   for (let d = 0; d <= back; d++) {
     const day = addDays(date, -d);
-    const plan = await readPlan(day);
+    const plan = found.get(day) || null;
+    planCache.set(day, plan);
     if (plan) plans.set(day, plan);
   }
   return plans;
@@ -72,22 +70,14 @@ async function plansAround(date, back = 21) {
 
 // Every date with plans, newest first: what the day pages list.
 async function plannedDates() {
-  const files = await fs.readdir(SERVICES_DIR).catch(() => []);
-  return files.filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10)).sort().reverse();
+  return (await store.plannedDates()).reverse();
 }
 
 // Save a slot's entry: in `slots` (the season-less plan) or a hemisphere's
-// map. A new file starts with both hemispheres' maps, which is what marks a
-// date as planned with seasons.
+// map, in one statement. A new date starts with both hemispheres' maps, which
+// is what marks a date as planned with seasons.
 async function saveSlot(date, slot, entry, variant = 'slots') {
-  await fs.mkdir(SERVICES_DIR, { recursive: true });
-  const plan = await readModifyWriteJSON(fileFor(date), { date, slots: {}, north: {}, south: {} }, current => {
-    current.date = date;
-    current.slots = current.slots || {};
-    current[variant] = current[variant] || {};
-    current[variant][slot] = entry;
-    return current;
-  });
+  const plan = await store.setServiceSlot(date, variant, slot, entry);
   planCache.set(date, plan);
   return plan;
 }
@@ -214,4 +204,4 @@ function startPlanning({ catalog, plan, context, feeds, log = console, firstAfte
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { readPlan, plansAround, plannedDates, planView, saveSlot, rotationEntry, duePlans, ensurePlans, startPlanning, firstHeard, lastHeard, fileFor, HEMISPHERES, LEAD_HOURS };
+module.exports = { readPlan, plansAround, plannedDates, planView, saveSlot, rotationEntry, duePlans, ensurePlans, startPlanning, firstHeard, lastHeard, HEMISPHERES, LEAD_HOURS };

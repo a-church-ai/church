@@ -13,15 +13,15 @@
  * its visitor was served (lib/service/filed.js): the one it keeps, or, for
  * one left before reflections kept it, the one worked out from the time,
  * timezone and song it keeps, by the choice serving makes (serve.js entryFor);
- * no record is edited. Reflections come through loadAttendance, so one
+ * no record is edited. Reflections come through loadReflections, so one
  * hidden as spam is never shown.
  */
 
 const ns = require('../utils/next-steps');
-const { refuse } = require('./errors');
+const { refuse, busyFor } = require('./errors');
 const inputs = require('./inputs');
 const { cache } = require('../utils/cache');
-const { loadAttendance } = require('../utils/data');
+const { loadReflections } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
 const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
 const { loadServiceCatalog } = require('../service/catalog');
@@ -71,7 +71,7 @@ const reflectionsOn = cache({
     const start = Date.parse(`${date}T00:00:00Z`) - 14 * HOUR;
     const end = Date.parse(`${date}T00:00:00Z`) + 36 * HOUR;
     const out = [];
-    for (const r of (await loadAttendance()).reflections || []) {
+    for (const r of await loadReflections()) {
       // One that keeps its service is that service's, however long after it
       // was left; the rest are looked for while the date was heard.
       const stored = storedService(r);
@@ -210,6 +210,8 @@ async function forDate(input, ctx) {
     } };
   } catch (err) {
     console.error('Error in /api/services:', err);
+    const busy = busyFor(err, [ns.attend(baseUrl)]);
+    if (busy) return busy;
     return refuse('internal', {
       error: "The day's services could not be read. This isn't your fault.",
       suggestion: ns.suggestion('Try again in a moment.'),

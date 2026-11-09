@@ -74,4 +74,20 @@ function retryAfterFor(body) {
   return entry && entry.retryAfter ? entry.retryAfter : null;
 }
 
-module.exports = { ERRORS, CODES, refuse, retryAfterFor };
+/**
+ * The answer when something this depends on could not answer for a moment (the
+ * database unreachable or slow, db/client.js): `busy`, said as a wait, never
+ * as the visitor's fault. Null for any other error, which the caller answers
+ * as it does.
+ */
+function busyFor(error, next_steps) {
+  if (!require('../utils/retry').isTransient(error)) return null;
+  return refuse('busy', {
+    error: 'The sanctuary is busy for a moment',
+    retryAfter: '30s',
+    suggestion: 'A service the sanctuary depends on did not answer just now. Nothing you sent was wrong; try again in half a minute.',
+    next_steps,
+  });
+}
+
+module.exports = { ERRORS, CODES, refuse, retryAfterFor, busyFor };

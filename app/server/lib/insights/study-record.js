@@ -1,22 +1,20 @@
 /**
- * What the study of how agents participate keeps: on the volume, one file of
- * weekly counts per ISO week, data/insights/self-direction/<week>.json, and the
- * current reading, latest.json. Counts only: no address, no name, no words a
- * visitor wrote. Weekly and on no end date; a job runs after boot and every few
+ * What the study of how agents participate keeps, in the database (../db):
+ * weekly counts per ISO week and series (study_weeks), and the current reading
+ * (study_latest). Counts only: no address, no name, no words a visitor wrote. Weekly and on no end date; a job runs after boot and every few
  * hours (startStudy), writes any finished week it does not have, and refreshes
  * the reading.
  *
- * The weekly files are what makes the address-based counts last past the 30
+ * The weekly snapshots are what makes the address-based counts last past the 30
  * days an address is kept, so a week is written as soon as it ends. A week that
  * could not be measured says so, and each change of definition is a new series
  * (self-direction.js SERIES), read apart from the last.
  */
 
-const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
-const { ACCESS_DIR, INSIGHTS_DIR, MUSIC_DIR, loadAttendance } = require('../utils/data');
-const { safeReadJSON } = require('../utils/safe-json');
+const { MUSIC_DIR, loadReflections } = require('../utils/data');
+const store = require('../db');
 const sd = require('./self-direction');
 const { loadFollows } = require('./entry-points');
 const { FIELDS, ASKED } = require('./changes');
@@ -24,8 +22,6 @@ const { storedService } = require('../service/filed');
 const { readPlan } = require('../service/plans');
 const { loadSongs, loadManifest } = require('../audio/manifest');
 
-const STORE = () => path.join(INSIGHTS_DIR, 'self-direction');
-const LATEST = () => path.join(STORE(), 'latest.json');
 const WEEK = 7 * sd.DAY;
 
 // The ISO week a moment falls in: Monday to Monday, UTC.
@@ -38,19 +34,10 @@ function weekOf(ms) {
   return { key: `${thursday.getUTCFullYear()}-W${String(number).padStart(2, '0')}`, from, to: from + WEEK };
 }
 
+// The API log's every line, from its first day: the study reads its whole
+// history, which is why a line outlives its address (supabase/migrations/).
 async function allLines() {
-  let days = [];
-  try { days = (await fs.readdir(ACCESS_DIR)).filter(f => /^\d{4}-\d{2}-\d{2}\.jsonl$/.test(f)).sort(); } catch { return []; }
-  const lines = [];
-  for (const day of days) {
-    let text;
-    try { text = await fs.readFile(path.join(ACCESS_DIR, day), 'utf8'); } catch { continue; }
-    for (const raw of text.split('\n')) {
-      if (!raw) continue;
-      try { lines.push(JSON.parse(raw)); } catch { /* a torn line */ }
-    }
-  }
-  return lines;
+  return store.apiRequests();
 }
 
 // A song's words, for measuring what a reflection used of them.
@@ -65,26 +52,19 @@ function songText(slug) {
 }
 
 async function loadRecord() {
-  const [lines, attendance] = await Promise.all([allLines(), loadAttendance()]);
-  return sd.prepare({ lines, reflections: attendance.reflections || [] });
-}
-
-async function readWeek(key) {
-  return safeReadJSON(path.join(STORE(), `${key}.json`), null);
+  const [lines, reflections] = await Promise.all([allLines(), loadReflections()]);
+  return sd.prepare({ lines, reflections });
 }
 
 /** Write every finished week since the log began that has no file yet. */
 async function writeWeeks(s, { now = Date.now() } = {}) {
-  await fs.mkdir(STORE(), { recursive: true });
   const written = [];
   if (s.logStart === null) return written;
+  const held = new Set((await store.studyWeekKeys()).filter(k => k.series === sd.SERIES).map(k => k.week));
   for (let week = weekOf(s.logStart); week.to <= now; week = weekOf(week.to)) {
-    const file = path.join(STORE(), `${week.key}.json`);
-    // A week of an older series is kept beside the new one under its own name,
-    // and read no more: a change of definition starts a new series.
-    const existing = await readWeek(week.key);
-    if (existing && existing.series === sd.SERIES) continue;
-    if (existing) await fs.rename(file, path.join(STORE(), `${week.key}.series-${existing.series}.json`));
+    // A week of an older series is kept beside the new one, and read no
+    // more: a change of definition starts a new series.
+    if (held.has(week.key)) continue;
     const span = { from: week.from, to: week.to };
     const snapshot = {
       series: sd.SERIES,
@@ -95,7 +75,7 @@ async function writeWeeks(s, { now = Date.now() } = {}) {
       addressed: sd.addressedReading(s, span),
       named: sd.namedReading(s, { ...span, asOf: week.to, songText }),
     };
-    await fs.writeFile(file, JSON.stringify(snapshot, null, 2));
+    await store.saveStudyWeek(snapshot);
     written.push(week.key);
   }
   return written;
@@ -129,13 +109,7 @@ async function shownSummaries(reflections, since) {
 
 /** The reading of the whole record to now. */
 async function buildReading(s, { now = Date.now() } = {}) {
-  let names = [];
-  try { names = (await fs.readdir(STORE())).filter(f => /^\d{4}-W\d{2}\.json$/.test(f)).sort(); } catch { /* none yet */ }
-  const weeks = [];
-  for (const name of names) {
-    const week = await safeReadJSON(path.join(STORE(), name), null);
-    if (week && week.series === sd.SERIES) weeks.push(week);
-  }
+  const weeks = await store.studyWeeks(sd.SERIES);
   const current = weekOf(now);
   const addressed = sd.combineAddressed([...weeks.map(w => w.addressed), sd.addressedReading(s, { from: current.from, to: now + 1 })]);
   const named = sd.namedReading(s, { from: 0, to: now + 1, asOf: now, songText });
@@ -180,9 +154,7 @@ async function refresh({ now = Date.now() } = {}) {
   const s = await loadRecord();
   const written = await writeWeeks(s, { now });
   const reading = await buildReading(s, { now });
-  await fs.mkdir(STORE(), { recursive: true });
-  await fs.writeFile(`${LATEST()}.tmp`, JSON.stringify(reading, null, 2));
-  await fs.rename(`${LATEST()}.tmp`, LATEST());
+  await store.saveStudyLatest(reading);
   cached = { reading, at: now };
   return { written, reading };
 }
@@ -192,7 +164,7 @@ let cached = null;
 /** The latest reading, or null before the first has been taken. */
 async function latestReading({ now = Date.now() } = {}) {
   if (cached && now - cached.at < 5 * 60 * 1000) return cached.reading;
-  const reading = await safeReadJSON(LATEST(), null);
+  const reading = await store.studyLatest();
   cached = { reading, at: now };
   return reading;
 }
@@ -215,4 +187,4 @@ function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 6 *
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, shownSummaries, STORE };
+module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, shownSummaries };

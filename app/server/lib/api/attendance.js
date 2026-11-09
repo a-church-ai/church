@@ -7,8 +7,8 @@
  * report it through one builder, so the two can't drift apart.
  */
 
-const { readModifyWriteJSON } = require('../utils/safe-json');
-const { loadCatalog, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const store = require('../db');
+const { loadCatalog, countSoulsPresent, loadReflections, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { clock: formatDuration } = require('../audio/markup');
 const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
@@ -19,7 +19,7 @@ const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
 const { SLOTS, slotHours, slotNamed, slotEnd } = require('../service/slots');
 const ns = require('../utils/next-steps');
-const { refuse } = require('./errors');
+const { refuse, busyFor } = require('./errors');
 const inputs = require('./inputs');
 const { STREAM_URLS, songApiLinks, rhythmField, REFLECT_MAX_LENGTH } = require('./shared');
 const experiments = require('../insights/experiments');
@@ -282,6 +282,8 @@ async function now(input, ctx) {
 
   } catch (error) {
     console.error('Error in /api/now:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to get current status',
@@ -333,43 +335,19 @@ async function attend(input, ctx) {
     noteForStudy(ctx, input.token, agentName, service.service.endsAt, at);
     const servedService = { date: service.service.today.date, slot: slotNamed(service.service.slot), variant: service.service.variant };
 
-    // Register the visit under one lock. Loading and saving separately let two
-    // concurrent visitors read the same array and the second write erase the
-    // first, silently. Also prune: visits older than 48h are not read by
-    // anything, and an unbounded array means rewriting a file that only grows.
-    // readModifyWriteJSON returns the mutated object. Capture it: the
-    // reflections list below is read from it, and the callback's parameter is
-    // not in scope out here. Discarding the return value threw
-    // "ReferenceError: attendance is not defined" on every single request,
-    // which the handler's catch turned into a 500.
-    const attendance = await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (current) => {
-      current.visits = current.visits || [];
-      current.reflections = current.reflections || [];
-      // A visit without a timezone keeps the service it was given, UTC's for
-      // a place unknown, so a reflection left after it is filed there even
-      // when it names the visitor's own timezone (reflections.js). One with a
-      // timezone keeps nothing more: the timezone is not stored.
-      current.visits.push({
-        name: agentName,
-        timestamp: new Date().toISOString(),
-        song: service.current.slug,
-        ...(timezone ? {} : { served: servedService })
-      });
-      const cutoff = Date.now() - FORTY_EIGHT_HOURS;
-      current.visits = current.visits.filter(v => {
-        const t = new Date(v.timestamp).getTime();
-        return Number.isNaN(t) ? true : t >= cutoff;
-      });
-      return current;
-    });
+    // Record the visit. A visit without a timezone keeps the service it was
+    // given, UTC's for a place unknown, so a reflection left after it is
+    // filed there even when it names the visitor's own timezone
+    // (reflections.js). One with a timezone keeps nothing more. The database
+    // lets go of visits older than 48 hours, which nothing reads.
+    await store.recordAttend({ name: agentName, song: service.current.slug, served: timezone ? null : servedService, at: new Date() });
 
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
 
     // Filter reflections to last 48h, return most recent 10
     const now = Date.now();
-    const recentReflections = attendance.reflections
-      .filter(r => !isHiddenReflection(r))
+    const recentReflections = (await loadReflections())
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 10)
@@ -467,6 +445,8 @@ async function attend(input, ctx) {
 
   } catch (error) {
     console.error('Error in /api/attend:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
     return refuse('internal', {
       error: 'Failed to attend',

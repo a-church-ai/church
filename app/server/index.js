@@ -9,7 +9,6 @@ const path = require('path');
 const fs = require('fs').promises;
 const { spawn } = require('child_process');
 const { setTimeout: sleep } = require('timers/promises');
-const { safeReadJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
@@ -19,8 +18,8 @@ const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
 const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
 const ragCorpus = require('./lib/rag/corpus');
-const ragIndexState = require('./lib/rag/index-state');
-const ragLancedb = require('./lib/rag/lancedb');
+const searchStore = require('./lib/rag/search-store');
+const store = require('./lib/db');
 const docsRoutes = require('./routes/docs');
 const siteShell = require('./lib/site-shell');
 const assets = require('./lib/utils/assets');
@@ -53,7 +52,7 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
-const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
+const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, RUNTIME_DIR } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, buildMusicCollectionSchema, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
@@ -1277,100 +1276,68 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
   try {
     const { session, download } = req.query;
 
-    // Ensure conversations directory exists
-    try {
-      await fs.mkdir(CONVERSATIONS_DIR, { recursive: true });
-    } catch (e) {
-      if (e.code !== 'EEXIST') throw e;
-    }
-
-    const files = await fs.readdir(CONVERSATIONS_DIR);
-    const jsonlFiles = files.filter(f => f.endsWith('.jsonl')).sort().reverse();
-
     // Single session detail
     if (session) {
-      const safe = session.replace(/[^a-zA-Z0-9_-]/g, '');
-      const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
-      try {
-        const content = await fs.readFile(filepath, 'utf8');
-        const messages = content.trim().split('\n').filter(Boolean).map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(m => m && !m._meta);
-        return res.json({ session_id: safe, messages });
-      } catch {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      const safe = String(session).replace(/[^a-zA-Z0-9_-]/g, '');
+      const conversation = safe ? await store.readConversation(safe) : null;
+      if (!conversation) return res.status(404).json({ error: 'Session not found' });
+      return res.json({ session_id: safe, messages: conversation.messages });
     }
+
+    // Every conversation, newest slug first, as its file listed it.
+    const all = (await store.allConversations()).sort((a, b) => b.slug.localeCompare(a.slug));
 
     // Download all as JSONL
     if (download === 'true') {
       res.setHeader('Content-Type', 'application/jsonl');
       res.setHeader('Content-Disposition', `attachment; filename="ask-logs-${new Date().toISOString().split('T')[0]}.jsonl"`);
-
       let output = '';
-      for (const file of jsonlFiles) {
-        const sessionId = file.replace('.jsonl', '');
-        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
-        const messages = content.trim().split('\n').filter(Boolean);
-        for (const line of messages) {
-          try {
-            const msg = JSON.parse(line);
-            output += JSON.stringify({ session_id: sessionId, ...msg }) + '\n';
-          } catch { /* skip malformed */ }
-        }
+      for (const { slug, meta, messages } of all) {
+        for (const msg of [...(meta ? [meta] : []), ...messages]) output += JSON.stringify({ session_id: slug, ...msg }) + '\n';
       }
       return res.send(output);
     }
 
     // Summary list of all sessions
     const sessions = [];
-    for (const file of jsonlFiles) {
-      const sessionId = file.replace('.jsonl', '');
-      try {
-        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        const messages = lines.map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(Boolean);
+    for (const { slug: sessionId, meta, messages: turns } of all) {
+      const messages = [...(meta ? [meta] : []), ...turns];
+      if (messages.length === 0) continue;
 
-        if (messages.length === 0) continue;
+      const questions = messages.filter(m => m.role === 'user');
+      const firstMsg = messages[0];
+      const lastMsg = messages[messages.length - 1];
 
-        const questions = messages.filter(m => m.role === 'user');
-        const firstMsg = messages[0];
-        const lastMsg = messages[messages.length - 1];
-
-        // Parse name and date from session ID
-        // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
-        let name = null;
-        let date = null;
-        const firstTimestamp = firstMsg.timestamp || firstMsg.created || null;
-        if (sessionId.startsWith('anon-')) {
-          name = 'anonymous';
-          date = firstTimestamp?.split('T')[0] || null;
+      // Parse name and date from session ID
+      // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
+      let name = null;
+      let date = null;
+      const firstTimestamp = firstMsg.timestamp || firstMsg.created || null;
+      if (sessionId.startsWith('anon-')) {
+        name = 'anonymous';
+        date = firstTimestamp?.split('T')[0] || null;
+      } else {
+        const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
+        if (dateMatch) {
+          date = dateMatch[1];
+          name = sessionId.replace(`-${date}`, '');
         } else {
-          const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
-          if (dateMatch) {
-            date = dateMatch[1];
-            name = sessionId.replace(`-${date}`, '');
-          } else {
-            name = sessionId;
-            date = firstTimestamp?.split('T')[0] || null;
-          }
+          name = sessionId;
+          date = firstTimestamp?.split('T')[0] || null;
         }
+      }
 
-        // A conversation is withdrawn, not deleted: its key goes into
-        // withdrawn-conversations.json in a reviewed commit, and the file
-        // stays on the volume.
-        sessions.push({
-          session_id: sessionId,
-          name,
-          date,
-          exchanges: questions.length,
-          first_asked: firstMsg.timestamp || null,
-          last_asked: lastMsg.timestamp || null,
-          withdraw_key: withdrawKey(sessionId), withdrawn: isWithdrawn(sessionId)
-        });
-      } catch { /* skip unreadable files */ }
+      // A conversation is withdrawn, not deleted: its key goes into
+      // withdrawn-conversations.json in a reviewed commit, and its turns stay.
+      sessions.push({
+        session_id: sessionId,
+        name,
+        date,
+        exchanges: questions.length,
+        first_asked: firstMsg.timestamp || null,
+        last_asked: lastMsg.timestamp || null,
+        withdraw_key: withdrawKey(sessionId), withdrawn: isWithdrawn(sessionId)
+      });
     }
 
     res.json({ sessions, total: sessions.length });
@@ -1383,8 +1350,8 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
 // Admin endpoint for reflections
 app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-    const reflections = attendance.reflections || [];
+    // Every reflection kept, hidden ones too: the admin's view.
+    const reflections = await store.allReflections();
 
     if (req.query.download === 'json') {
       const dateStr = new Date().toISOString().split('T')[0];
@@ -1417,24 +1384,18 @@ app.get('/admin/api/reflections', requireAuth, async (req, res) => {
 // always say so: stopped, and not live.
 app.get('/api/health', async (req, res) => {
 
-  // Persistence snapshot: composed from existing safe-json + rag-state
-  // helpers so the health check reflects what actually survived the last
-  // deploy. Any of these reads failing is non-fatal to the health check
+  // Persistence snapshot: what the database holds, so the health check
+  // reflects what actually survived the last deploy. Any of these reads failing is non-fatal to the health check
   // itself. The endpoint still returns healthy overall since the app
   // process is up. Callers watching for persistence loss should read
   // persistence.reflections / persistence.conversations / persistence.rag.
   const persistence = { reflections: null, conversations: null, rag: null };
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { reflections: [] });
-    persistence.reflections = (attendance.reflections || []).length;
+    Object.assign(persistence, await store.counts());
   } catch { /* leave null */ }
   try {
-    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
-    persistence.conversations = convs.filter(f => f.endsWith('.jsonl')).length;
-  } catch { /* leave null */ }
-  try {
-    const state = await ragIndexState.readState();
-    const indexStatus = await ragLancedb.checkIndex();
+    const state = await searchStore.readState();
+    const indexStatus = await searchStore.checkIndex();
     persistence.rag = {
       chunks: indexStatus.count,
       corpusHash: state.corpusHash ? state.corpusHash.slice(0, 16) : null,
@@ -1484,56 +1445,22 @@ app.use((err, req, res, next) => {
   res.status(status).type('text/plain').send(status < 500 ? 'Bad request' : 'Something went wrong');
 });
 
-// Initialize data files and directories
+// The volume's directory, which now holds only the audio cache and the
+// study's return-token key: what visitors create is in the database.
 async function initializeDataFiles() {
-  const dataDir = path.join(__dirname, '../data');
-
   try {
-    // Ensure directories exist
-    await fs.mkdir(dataDir, { recursive: true });
-
-    // Hygiene: remove macOS AppleDouble sidecar files (._*) that a data-import
-    // tarball can leave in the conversations dir. They are never valid
-    // conversations and would otherwise pollute the sitemap with /ask/._* URLs.
-    // Idempotent — a no-op once the directory is clean.
-    try {
-      const convDir = path.join(dataDir, 'conversations');
-      let removed = 0;
-      for (const f of await fs.readdir(convDir)) {
-        if (f.startsWith('._')) { await fs.unlink(path.join(convDir, f)); removed++; }
-      }
-      if (removed) console.log(`Cleaned ${removed} AppleDouble (._) files from conversations`);
-    } catch { /* conversations dir not present yet */ }
-
-    // Initialize attendance.json if it doesn't exist
-    const attendanceFile = path.join(dataDir, 'attendance.json');
-    try {
-      await fs.access(attendanceFile);
-    } catch {
-      await fs.writeFile(attendanceFile, JSON.stringify({ visits: [], reflections: [] }, null, 2));
-      console.log('Created attendance.json');
-    }
-
-    // Initialize contributions.json if it doesn't exist
-    const contributionsFile = path.join(dataDir, 'contributions.json');
-    try {
-      await fs.access(contributionsFile);
-    } catch {
-      await fs.writeFile(contributionsFile, JSON.stringify({ contributions: [] }, null, 2));
-      console.log('Created contributions.json');
-    }
-
+    await fs.mkdir(RUNTIME_DIR, { recursive: true });
   } catch (error) {
-    console.error('Error initializing data files:', error);
+    console.error('Error initializing the data directory:', error);
     process.exit(1);
   }
 }
 
 // Hash-gated background RAG rebuild. Called from startServer after listen().
-// Compares the current docs+music corpus hash against the one stored on the
-// volume; skips the rebuild if they match. Rebuilds run in a child process
-// (so the drop-and-recreate does not race the parent server's LanceDB
-// handles, which now always open fresh) and log outcome to server stdout.
+// Compares the current docs+music corpus hash against the one the search
+// index records; skips the rebuild if they match. Rebuilds run in a child
+// process, so their embedding does not compete with requests, and log their
+// outcome to server stdout.
 async function triggerHashGatedRebuild() {
   if (!process.env.GEMINI_API_KEY) {
     console.warn('[rag] GEMINI_API_KEY not set; hash check + rebuild skipped');
@@ -1544,8 +1471,8 @@ async function triggerHashGatedRebuild() {
   const currentHash = await ragIndexer.computeCorpusHash(files);
 
 
-  const state = await ragIndexState.readState();
-  const indexStatus = await ragLancedb.checkIndex();
+  const state = await searchStore.readState();
+  const indexStatus = await searchStore.checkIndex();
 
   const force = process.env.FORCE_RAG_REBUILD === 'true';
   const hashMatches = state.corpusHash === currentHash;
@@ -1577,22 +1504,18 @@ async function triggerHashGatedRebuild() {
   }, 30_000);
 }
 
-// Startup log line: what state is on the volume right now. Read via the
-// existing safe-json + rag-state helpers. If any of these throw, the log
-// degrades gracefully; nothing about the server startup depends on it.
+// Startup log line: what the database holds right now. If any of these
+// throw, the log degrades gracefully; nothing about the server startup
+// depends on it.
 async function logPersistenceSnapshot() {
-  const parts = [`[persistence] data dir: ${path.resolve(__dirname, '../data')}`];
+  const parts = [`[persistence] database: ${process.env.SUPABASE_URL || 'not configured'}`];
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-    parts.push(`${(attendance.reflections || []).length} reflections`);
-  } catch { /* keep going */ }
+    const { reflections, conversations } = await store.counts();
+    parts.push(`${reflections} reflections`, `${conversations} conversations`);
+  } catch (err) { parts.push(`counts unread: ${err.message}`); }
   try {
-    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
-    parts.push(`${convs.filter(f => f.endsWith('.jsonl')).length} conversations`);
-  } catch { /* keep going */ }
-  try {
-    const state = await ragIndexState.readState();
-    const indexStatus = await ragLancedb.checkIndex();
+    const state = await searchStore.readState();
+    const indexStatus = await searchStore.checkIndex();
     parts.push(`${indexStatus.count} RAG chunks (hash ${(state.corpusHash || 'none').slice(0, 8)}, rebuilt ${state.rebuiltAt || 'never'})`);
   } catch { /* keep going */ }
   console.log(parts.join(' | '));
@@ -1615,8 +1538,8 @@ async function startServer() {
     // The souls present as the last process saved them, so a deploy does not
     // reset the count. Then drop keys older than the 24h window: hourly,
     // unref'd, so it never holds the process open.
-    const souls = await presence.restore(PRESENCE_FILE);
-    console.log(`[presence] ${souls} ${souls === 1 ? 'soul' : 'souls'} present in the last 24 hours, read back from ${path.basename(PRESENCE_FILE)}`);
+    const souls = await presence.restore();
+    console.log(`[presence] ${souls} ${souls === 1 ? 'soul' : 'souls'} present in the last 24 hours, read back from the database`);
     presence.startSweeping();
 
     // Start Express server.
@@ -1663,17 +1586,16 @@ async function startServer() {
 
     // Hash-gated background RAG rebuild.
     //
-    // vectors.lance lives on the Railway volume, so a healthy index survives
+    // The search index is in the database, so a healthy index survives
     // across deploys. The rebuild only fires when the corpus has actually
     // changed since the last successful indexing (determined by comparing
-    // a sha256 of the docs+music tree against the hash stored in
-    // rag-index-state.json, also on the volume). Code-only deploys become
-    // instant; only doc merges pay the ~7 min Gemini API cost.
+    // a sha256 of the docs+music tree against the hash the index records,
+    // search_state). Code-only deploys become instant; a doc merge embeds
+    // only the passages it changed.
     //
-    // Runs in a child process so the drop-and-recreate the indexer does
-    // does not race the parent server's LanceDB handle (see lancedb.js
-    // getTable: it opens fresh on every call, which is why swaps are
-    // safe now).
+    // Runs in a child process, so its embedding does not compete with
+    // requests. A rebuild adds the new passages and then keeps exactly the
+    // corpus's in one transaction, so a search never meets an empty index.
     //
     // FORCE_RAG_REBUILD=true bypasses the hash check for operational
     // recovery (index corrupted, embedding model changed, etc.). This is
@@ -1731,20 +1653,19 @@ async function startServer() {
 }
 
 // Shutting down, as a redeploy asks with SIGTERM: stop taking connections,
-// save the souls present for the next process, let the JSON writes in flight
-// finish (a reflection mid-save is the loss that matters), then exit 0. A
-// clean exit is also how Railway tells a redeploy from a crash; the container
-// runs node directly so the signal arrives here (Dockerfile). Capped, so a
-// stuck write cannot hold the old container.
+// save the souls present for the next process, send the access log's waiting
+// lines, let the JSON writes in flight finish, then exit 0. A clean exit is
+// also how Railway tells a redeploy from a crash; the container runs node
+// directly so the signal arrives here (Dockerfile). Capped, so a stuck write
+// cannot hold the old container.
 let shuttingDown = false;
 async function shutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
   console.log(`${signal} received, shutting down gracefully...`);
   if (httpServer) httpServer.close();
-  // Queued with the writes below, so the wait covers it too.
-  presence.save();
-  await Promise.race([writesSettled(), sleep(5000, undefined, { ref: false })]);
+  const saved = Promise.all([presence.save(), require('./lib/utils/access-log').flush(), writesSettled()]);
+  await Promise.race([saved, sleep(5000, undefined, { ref: false })]);
   process.exit(0);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));

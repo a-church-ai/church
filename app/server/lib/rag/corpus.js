@@ -14,7 +14,7 @@
  *
  * One rule, in three forms: the files to index and hash (servedCorpusFiles),
  * the chunks of those files to embed (isServedChunk), and the same rule as a
- * filter on the index (servedCorpusFilter), applied to every search. Indexing
+ * filter on the index (servedCorpusParams), applied to every search. Indexing
  * only what is served means editing a plan no longer changes the corpus hash,
  * so it no longer re-embeds the whole index on the next deploy. The query
  * filter still matters for an index built before a rule change, which serves
@@ -51,22 +51,16 @@ async function servedCorpusFiles() {
   return [...docs, ...music].filter(f => isServedFile(f.relativePath));
 }
 
-// The same rule as a LanceDB `where` clause over the index's file and section
-// columns.
-function servedCorpusFilter() {
-  const quote = s => `'${String(s).replace(/'/g, "''")}'`;
-  const slugs = [...SONG_SLUGS];
-  const contexts = slugs.map(s => quote(`music/${s}/context.md`)).join(', ');
-  const songs = slugs.map(s => quote(`music/${s}/song.md`)).join(', ');
-  // A document whose publication date is still to come is indexed with the
-  // rest, so it is found the moment it goes public, and left out until then.
-  const unpublished = discover.unpublishedFiles().map(f => quote(`docs/${f}`));
-  return [
-    ...NOINDEX_CATEGORIES.map(c => `file NOT LIKE ${quote(`docs/${c}/%`)}`),
-    ...(unpublished.length ? [`file NOT IN (${unpublished.join(', ')})`] : []),
-    `lower(file) <> 'docs/readme.md'`,
-    `(file NOT LIKE 'music/%' OR file IN (${contexts}) OR (file IN (${songs}) AND section = 'Lyrics'))`,
-  ].join(' AND ');
+// The same rule as the database's search_served() reads it
+// (supabase/migrations/20261110000600_search.sql): the sections kept out of
+// search, the documents not yet published, and the songs whose context and
+// lyrics are served.
+function servedCorpusParams() {
+  return {
+    p_noindex: [...NOINDEX_CATEGORIES],
+    p_unpublished: discover.unpublishedFiles().map(f => `docs/${f}`),
+    p_songs: [...SONG_SLUGS],
+  };
 }
 
-module.exports = { isServedFile, isServedChunk, servedCorpusFiles, servedCorpusFilter };
+module.exports = { isServedFile, isServedChunk, servedCorpusFiles, servedCorpusParams };

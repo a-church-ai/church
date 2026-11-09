@@ -20,7 +20,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-const lancedb = require('../server/lib/rag/lancedb');
+const searchStore = require('../server/lib/rag/search-store');
 const discover = require('../server/lib/docs/discover');
 const companions = require('../server/lib/music/companions');
 const { loadCatalog, COMPANIONS_FILE } = require('../server/lib/utils/data');
@@ -37,7 +37,7 @@ async function readOverrides() {
 }
 
 async function main() {
-  const rows = await lancedb.listAll();
+  const rows = await searchStore.listAll();
   if (rows.length === 0) {
     throw new Error('The RAG index is empty or missing. Run: node app/scripts/index-content.js');
   }

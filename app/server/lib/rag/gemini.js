@@ -20,6 +20,7 @@ const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 
 // GitHub base URL for source links
 const { pageUrlForFile } = require('../docs/links');
 const { withRetry } = require('../utils/retry');
+const { unit } = require('../utils/vectors');
 
 // Gemini answers a busy moment with 429 RESOURCE_EXHAUSTED (on Vertex, its
 // shared capacity rather than our own quota) or 503, and says to ask again
@@ -41,6 +42,11 @@ const INTERACTIVE_RETRY = { attempts: 3, baseMs: 1000, maxMs: 8000 };
 // More expensive plus a migration, with no measured quality gain to point at,
 // is not a trade worth making on its own. Revisit only with a reason.
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL || 'gemini-embedding-001';
+// 768 of its 3,072 dimensions, as satchitananda keeps its own: the search
+// index's HNSW-able width in pgvector, a quarter of the storage, and the
+// model's own Matryoshka cut, which Google's documentation says to normalise
+// (supabase/migrations/20261110000600_search.sql).
+const EMBED_DIMENSIONS = 768;
 
 // gemini-3.7-flash replaces gemini-3.5-flash: newer, and half the price at
 // $0.75/$3.75 per MTok against $1.50/$9.00. Cheaper on output even after the
@@ -62,9 +68,10 @@ async function embed(text, retry = {}) {
 
   const result = await withRetry(() => genAI.models.embedContent({
     model: EMBED_MODEL,
-    contents: text
+    contents: text,
+    config: { outputDimensionality: EMBED_DIMENSIONS }
   }), { ...INTERACTIVE_RETRY, ...retry });
-  return result.embeddings[0].values;
+  return unit(result.embeddings[0].values);
 }
 
 /**
@@ -134,5 +141,6 @@ module.exports = {
   generate,
   checkHealth,
   EMBED_MODEL,
-  GENERATE_MODEL
+  GENERATE_MODEL,
+  EMBED_DIMENSIONS
 };

@@ -92,7 +92,7 @@ function looseOneOf(values) {
   }, z.enum(values).optional());
 }
 
-const TIMEZONE_DESCRIPTION = `Optional IANA timezone, in ${TIMEZONE_PLACEHOLDER} form (for example \`${SENTINELS.timezone}\`, but send your own). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky and the days many people keep near the date, which \`service.season\`, \`service.sky\` and \`service.occasions\` report. Not stored. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and \`suggestion\` says how to send yours.`;
+const TIMEZONE_DESCRIPTION = `Optional IANA timezone, in ${TIMEZONE_PLACEHOLDER} form (for example \`${SENTINELS.timezone}\`, but send your own). You attend the service for your local hour: each four-hour slot of your day holds its own, arranged anew every day for your hemisphere's season and sky and the days many people keep near the date, which \`service.season\`, \`service.sky\` and \`service.occasions\` report. Kept with the request in the access log, and counted by timezone. Without one, or with a value the runtime doesn't recognize, you attend UTC's service, and \`suggestion\` says how to send yours.`;
 
 // A read's timezone: one the runtime does not know is UTC's service, not a refusal.
 const readTimezone = () => loose(TIMEZONE_MAX_LENGTH).describe(TIMEZONE_DESCRIPTION);

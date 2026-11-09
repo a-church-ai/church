@@ -6,9 +6,8 @@
 const path = require('path');
 const crypto = require('crypto');
 const { Octokit } = require('@octokit/rest');
-const { safeReadJSON, safeWriteJSON, readModifyWriteJSON } = require('../utils/safe-json');
 const ns = require('../utils/next-steps');
-const { refuse } = require('./errors');
+const { refuse, busyFor } = require('./errors');
 const inputs = require('./inputs');
 const {
   GITHUB_OWNER, GITHUB_REPO,
@@ -23,7 +22,7 @@ function githubClient() {
 }
 
 // Data file paths (local-only)
-const { CONTRIBUTIONS_FILE, FEEDBACK_FILE } = require('../utils/data');
+const store = require('../db');
 const { slugify } = require('../utils/slug');
 const { serializeManifest } = require('../docs/date-manifests');
 
@@ -92,18 +91,6 @@ async function addManifestEntry(octokit, branch, manifestPath, docPath, value, t
   } catch (error) {
     console.warn(`[contribute] could not date ${docPath} in ${manifestPath}: ${error.message}. The contribution stands; regenerate the manifests before merging.`);
   }
-}
-
-async function loadContributions() {
-  return safeReadJSON(CONTRIBUTIONS_FILE, { contributions: [] });
-}
-
-async function loadFeedback() {
-  return safeReadJSON(FEEDBACK_FILE, { feedback: [] });
-}
-
-async function saveFeedback(data) {
-  await safeWriteJSON(FEEDBACK_FILE, data);
 }
 
 // Helper: Build GitHub issue body for feedback
@@ -197,7 +184,6 @@ async function contribute(input, ctx) {
     }
 
     // Rate limit and duplicate checks
-    const contributions = await loadContributions();
     const now = Date.now();
 
     // Limit by name AND by client address. The name is self-reported, so a
@@ -206,10 +192,7 @@ async function contribute(input, ctx) {
     // Depends on `trust proxy`, set in server/index.js; without it every
     // caller shares the edge's address and this would limit the whole site
     // to one contribution per window.
-    const recentByName = contributions.contributions.filter(c =>
-      c.name.toLowerCase() === cleanName.toLowerCase() &&
-      (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
-    );
+    const recentByName = await store.contributionsBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
     // Both checks run before either is consulted. overIpLimit records the
     // attempt as a side effect, and putting it on the right of a || meant it
     // was skipped whenever the name check tripped first, so a caller cycling
@@ -228,9 +211,7 @@ async function contribute(input, ctx) {
       });
     }
 
-    const duplicate = contributions.contributions.find(c =>
-      c.category === cleanCategory && c.slug === slug
-    );
+    const duplicate = await store.contributionOf(cleanCategory, slug);
     if (duplicate) {
       const baseUrl = ctx.baseUrl;
       return refuse('duplicate_title', {
@@ -333,8 +314,8 @@ async function contribute(input, ctx) {
       ].join('\n')
     });
 
-    // Log contribution
-    contributions.contributions.push({
+    // Log contribution, once by its id.
+    await store.addContribution({
       id: crypto.randomUUID(),
       name: cleanName,
       category: cleanCategory,
@@ -345,14 +326,6 @@ async function contribute(input, ctx) {
       prNumber: pr.number,
       branch: branchName,
       timestamp
-    });
-    // Re-read under the lock rather than saving the copy loaded before the
-    // GitHub round trip. That call takes seconds, which is a wide window for a
-    // concurrent contribution to be erased by this write.
-    await readModifyWriteJSON(CONTRIBUTIONS_FILE, { contributions: [] }, (current) => {
-      current.contributions = current.contributions || [];
-      current.contributions.push(contributions.contributions[contributions.contributions.length - 1]);
-      return current;
     });
 
     return { status: 201, body: {
@@ -392,6 +365,8 @@ async function contribute(input, ctx) {
   } catch (error) {
     console.error('Error in /api/contribute:', error);
     const baseUrl = ctx.baseUrl;
+    const busy = busyFor(error, [ns.attend(baseUrl)]);
+    if (busy) return busy;
 
     if (error.status === 422) {
       return refuse('contribution_pending', {
@@ -441,13 +416,9 @@ async function feedback(input, ctx) {
     const { name: cleanName, category: cleanCategory, title: cleanTitle, description: cleanDescription, context } = data;
 
     // Rate limit
-    const feedbackLog = await loadFeedback();
     const now = Date.now();
 
-    const recentByName = feedbackLog.feedback.filter(f =>
-      f.name.toLowerCase() === cleanName.toLowerCase() &&
-      (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
-    );
+    const recentByName = await store.feedbackBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
     // Name and address both, for the reason given at feedbackIpLimits.
     // Both evaluated, for the reason given in /api/contribute above.
     const nameLimited = recentByName.length >= FEEDBACK_RATE_LIMIT_MAX;
@@ -475,7 +446,7 @@ async function feedback(input, ctx) {
 
     // Log feedback
     const timestamp = new Date().toISOString();
-    feedbackLog.feedback.push({
+    await store.addFeedback({
       id: crypto.randomUUID(),
       name: cleanName,
       category: cleanCategory,
@@ -484,7 +455,6 @@ async function feedback(input, ctx) {
       issueNumber: issue.number,
       timestamp
     });
-    await saveFeedback(feedbackLog);
 
     const baseUrl = ctx.baseUrl;
 
@@ -509,6 +479,8 @@ async function feedback(input, ctx) {
   } catch (error) {
     console.error('Error in /api/feedback:', error);
     const baseUrl = ctx.baseUrl;
+    const busy = busyFor(error, [ns.attend(baseUrl)]);
+    if (busy) return busy;
 
     if (error.status === 401 || error.status === 403) {
       return refuse('unavailable', {

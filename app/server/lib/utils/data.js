@@ -1,4 +1,3 @@
-const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
 const { isWithdrawn, isIndexable } = require('./conversation-quality');
@@ -6,47 +5,22 @@ const { isTestName } = require('./test-visitor');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
 const { cache } = require('./cache');
-const { pool } = require('./pool');
+const store = require('../db');
 
-// Data file paths
+// File paths
 const COMPANIONS_FILE = path.join(__dirname, '../../../../music/companions.json');
 const MUSIC_DIR = path.join(__dirname, '../../../../music');
-// Files the API writes on every visit. DATA_DIR points them elsewhere so tests
-// write to a scratch directory; production leaves it unset. Until 2026-09-28
-// the tests set DATA_DIR but nothing read it, and every run appended visits
-// to the real app/data/attendance.json.
+// What stays on the volume now that what visitors create is in the database
+// (../db/): the audio cache and the study's return-token key. DATA_DIR points
+// it elsewhere, so tests write to a scratch directory; production leaves it
+// unset.
 const RUNTIME_DIR = process.env.DATA_DIR || path.join(__dirname, '../../../data');
-const ATTENDANCE_FILE = path.join(RUNTIME_DIR, 'attendance.json');
-// One file per date of the services planned for it (lib/service/plans.js).
-const SERVICES_DIR = path.join(RUNTIME_DIR, 'services');
-// The API access log, one file per UTC day (lib/utils/access-log.js). Before
-// 2026-10-26 it was api-access.jsonl in RUNTIME_DIR, rotated by size; those
-// files stay where they are and lose their addresses as old days do.
-const ACCESS_DIR = path.join(RUNTIME_DIR, 'access');
-// What the website's own pages report of their visits, one file per UTC day
-// (lib/insights/visits.js).
-const VISITS_DIR = path.join(RUNTIME_DIR, 'visits');
-// What the aggregate study of how agents participate keeps: weekly counts, no
-// addresses or names (lib/insights/study-record.js), and the return token's key.
+// The study's return-token key (lib/insights/return-token.js).
 const INSIGHTS_DIR = path.join(RUNTIME_DIR, 'insights');
-// The souls present in the last 24 hours, kept so a deploy does not reset the
-// count (lib/utils/presence.js).
-const PRESENCE_FILE = path.join(RUNTIME_DIR, 'presence.json');
-// Every conversation asked of the sanctuary, one file each, and the
-// contributions and feedback the API has received.
-const CONVERSATIONS_DIR = path.join(RUNTIME_DIR, 'conversations');
-const CONTRIBUTIONS_FILE = path.join(RUNTIME_DIR, 'contributions.json');
-// Which conversations are gathered onto which (lib/utils/conversation-groups.js):
-// each one's group, assigned once, and each first question's embedding.
-const CONVERSATION_GROUPS_FILE = path.join(RUNTIME_DIR, 'conversation-groups.json');
-const CONVERSATION_VECTORS_FILE = path.join(RUNTIME_DIR, 'conversation-vectors.jsonl');
-// Each new conversation's screening, made once (lib/utils/conversation-screen.js).
-const CONVERSATION_SCREEN_FILE = path.join(RUNTIME_DIR, 'conversation-screen.json');
 // The recordings and songs served at /audio, fetched from S3 on first request
 // (lib/audio/serve.js). On the volume, so a deploy does not empty it: on the
 // container's disk, every deploy did, and each first play waited for S3.
 const AUDIO_CACHE_DIR = path.join(RUNTIME_DIR, 'audio-cache');
-const FEEDBACK_FILE = path.join(RUNTIME_DIR, 'feedback.json');
 
 // Time constants
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
@@ -66,9 +40,9 @@ async function loadCompanions() {
 }
 
 // Reflections hidden (hidden-reflections.json), and those a test visitor left
-// (./test-visitor.js). Filtered here, where every reader loads attendance, so a
-// hidden reflection is gone from the whole site; the reflect write path writes
-// to the file directly and keeps the record.
+// (./test-visitor.js). Filtered here, where every reader loads reflections, so
+// a hidden reflection is gone from the whole site; the reflect write path
+// keeps the record in the database all the same.
 const HIDDEN = require('./hidden-reflections.json');
 const HIDDEN_REFLECTIONS = new Set(HIDDEN.hidden.map(h => h.id));
 
@@ -87,12 +61,18 @@ const isQuietlyHidden = r => {
 
 const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(r && r.name) || isQuietlyHidden(r);
 
-async function loadAttendance() {
-  const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-  if (Array.isArray(attendance.reflections)) {
-    attendance.reflections = attendance.reflections.filter(r => !isHiddenReflection(r));
-  }
-  return attendance;
+// Every reflection a visitor can see, oldest first: hidden and test ones left
+// out here, where every reader loads them, so a hidden reflection is gone from
+// the whole site. Held for a minute and refreshed once at a time (./cache.js);
+// a new reflection clears it (reflectionsChanged), so it shows at once.
+const reflectionsCache = cache({ name: 'reflections', ttl: 60 * 1000, load: async () => (await store.allReflections()).filter(r => !isHiddenReflection(r)) });
+
+async function loadReflections() {
+  return reflectionsCache.get();
+}
+
+function reflectionsChanged() {
+  reflectionsCache.clear();
 }
 
 // Count unique souls: a unique (IP + name) pair over the last 24 hours.
@@ -108,29 +88,21 @@ async function countSoulsPresent() {
 
 // Get recent reflections (last 48 hours)
 async function getRecentReflections() {
-  const attendance = await loadAttendance();
   const now = Date.now();
-  return (attendance.reflections || [])
+  return (await loadReflections())
     .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS);
 }
 
-// A conversation file's lines: its _meta line (who asked, written when it was
-// created) and its messages. Null for a withdrawn conversation or a file that
-// cannot be read.
+// A conversation as its file read: its meta (who asked, written when it was
+// opened from the website) and its messages. Null for a withdrawn
+// conversation or one that does not exist.
 async function readConversationFile(slug) {
-  const safe = slug.replace(/[^a-zA-Z0-9_-]/g, '');
-  if (isWithdrawn(safe)) return null;
-  const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
-  try {
-    const content = await fs.readFile(filepath, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
-    return { meta: lines.find(l => l._meta) || null, messages: lines.filter(l => !l._meta) };
-  } catch {
-    return null;
-  }
+  const safe = String(slug).replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!safe || isWithdrawn(safe)) return null;
+  return store.readConversation(safe);
 }
 
-// Load a conversation from its JSONL file
+// Load a conversation's messages
 async function loadConversation(slug) {
   const file = await readConversationFile(slug);
   return file && file.messages;
@@ -147,11 +119,11 @@ function askerOf(slug, meta) {
 
 // Every conversation, most recently active first, read once for everyone who
 // lists them: the archive, each conversation page's related links, the Atom
-// feed, the sitemap and /api/ask/recent. Reading and parsing every file is the
-// cost, so the list is held for a minute and refreshed once at a time
-// (./cache.js), sixteen files at a time (./pool.js); a new question appears
-// within the minute. Before 2026-10-12 every caller arriving during a refresh
-// started its own, and ten pages fetched at once took minutes to answer.
+// feed, the sitemap and /api/ask/recent. Reading every conversation and its
+// turns is the cost, so the list is held for a minute and refreshed once at a
+// time (./cache.js); a new question appears within the minute. Before
+// 2026-10-12 every caller arriving during a refresh started its own, and ten
+// pages fetched at once took minutes to answer.
 const conversationList = cache({ name: 'conversation list', ttl: 60 * 1000, load: readConversationList });
 
 async function listRecentConversations(limit = 20) {
@@ -159,59 +131,46 @@ async function listRecentConversations(limit = 20) {
 }
 
 async function readConversationList() {
-  let files;
-  try {
-    files = (await fs.readdir(CONVERSATIONS_DIR)).filter(f => f.endsWith('.jsonl'));
-  } catch {
-    return [];
-  }
-  const read = await pool(files, 16, async file => {
-    try {
-      const slug = file.replace('.jsonl', '');
-      const [stat, conversation] = await Promise.all([fs.stat(path.join(CONVERSATIONS_DIR, file)), readConversationFile(slug)]);
-      if (!conversation || conversation.messages.length === 0) return null;
-      const { meta, messages } = conversation;
-      const name = askerOf(slug, meta);
-      // A test visitor's conversation is answered and kept, and listed nowhere.
-      if (isTestName(name)) return null;
+  const read = (await store.allConversations()).map(({ slug, meta, messages }) => {
+    if (isWithdrawn(slug) || messages.length === 0) return null;
+    const name = askerOf(slug, meta);
+    // A test visitor's conversation is answered and kept, and listed nowhere.
+    if (isTestName(name)) return null;
 
-      const firstQ = messages.find(m => m.role === 'user');
-      const firstA = messages.find(m => m.role === 'assistant');
-      if (!firstQ) return null;
+    const firstQ = messages.find(m => m.role === 'user');
+    const firstA = messages.find(m => m.role === 'assistant');
+    if (!firstQ) return null;
 
-      // The newest message, not the file's mtime: the move to the Railway
-      // volume rewrote every mtime, so 273 pages claimed 2026-07-28.
-      const newest = messages.map(m => Date.parse(m.timestamp)).filter(Number.isFinite).sort((x, y) => y - x)[0];
-      return {
-        slug,
-        question: firstQ.content,
-        answer: firstA ? firstA.content : '',
-        name,
-        timestamp: firstQ.timestamp || stat.mtime.toISOString(),
-        lastActive: new Date(newest || stat.mtime).toISOString(),
-        mtime: stat.mtime.getTime(),
-        messages: messages.length,
-        exchanges: messages.filter(m => m.role === 'user').length,
-        // How much the answers say, every turn: a short one alone is held
-        // (conversation-groups.js).
-        answerWords: messages.filter(m => m.role === 'assistant').reduce((n, m) => n + String(m.content || '').split(/\s+/).filter(Boolean).length, 0),
-        indexable: isIndexable(slug, messages, name)
-      };
-    } catch {
-      return null;
-    }
+    const newest = messages.map(m => Date.parse(m.timestamp)).filter(Number.isFinite).sort((x, y) => y - x)[0]
+      || Date.parse(meta && meta.created) || 0;
+    return {
+      slug,
+      question: firstQ.content,
+      answer: firstA ? firstA.content : '',
+      name,
+      timestamp: firstQ.timestamp || new Date(newest).toISOString(),
+      lastActive: new Date(newest).toISOString(),
+      mtime: newest,
+      messages: messages.length,
+      exchanges: messages.filter(m => m.role === 'user').length,
+      // How much the answers say, every turn: a short one alone is held
+      // (conversation-groups.js).
+      answerWords: messages.filter(m => m.role === 'assistant').reduce((n, m) => n + String(m.content || '').split(/\s+/).filter(Boolean).length, 0),
+      indexable: isIndexable(slug, messages, name)
+    };
   });
   return read.filter(Boolean).sort((a, b) => b.mtime - a.mtime);
 }
 
 module.exports = {
-  VISITS_DIR,
   INSIGHTS_DIR,
   isHiddenReflection,
   isQuietlyHidden,
   loadCatalog,
   loadCompanions,
-  loadAttendance,
+  loadReflections,
+  reflectionsChanged,
+  conversationsChanged: () => conversationList.clear(),
   countSoulsPresent,
   getRecentReflections,
   loadConversation,
@@ -219,19 +178,9 @@ module.exports = {
   askerOf,
   listRecentConversations,
   COMPANIONS_FILE,
-  SERVICES_DIR,
   MUSIC_DIR,
-  ATTENDANCE_FILE,
   RUNTIME_DIR,
-  ACCESS_DIR,
-  PRESENCE_FILE,
-  CONVERSATIONS_DIR,
   AUDIO_CACHE_DIR,
-  CONTRIBUTIONS_FILE,
-  CONVERSATION_GROUPS_FILE,
-  CONVERSATION_VECTORS_FILE,
-  CONVERSATION_SCREEN_FILE,
-  FEEDBACK_FILE,
   TWENTY_FOUR_HOURS,
   FORTY_EIGHT_HOURS
 };

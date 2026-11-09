@@ -23,6 +23,17 @@ function resolveTimezone(input) {
   }
 }
 
+// The timezone a visitor sent, as the logs keep it (the owner, 2026-11-09:
+// "if timezone is specified, please include that in the logs so we can
+// analyze by timezone"): its canonical IANA name, "invalid" for one the
+// runtime does not know (never what was typed), or null when none was sent.
+function timezoneToKeep(input) {
+  if (input === undefined || input === null || input === '') return null;
+  const tz = resolveTimezone(input);
+  if (!tz) return 'invalid';
+  return new Intl.DateTimeFormat('en-US', { timeZone: tz }).resolvedOptions().timeZone;
+}
+
 // The date, weekday and time of day in the given (already resolved) timezone:
 // what a visitor's clock says, which is what their service is chosen by.
 function localTime(tz, date = new Date()) {
@@ -62,4 +73,4 @@ function instantAt(tz, date, hour) {
   return new Date(t);
 }
 
-module.exports = { resolveTimezone, localTime, formatLocal, instantAt, MAX_LENGTH };
+module.exports = { resolveTimezone, timezoneToKeep, localTime, formatLocal, instantAt, MAX_LENGTH };

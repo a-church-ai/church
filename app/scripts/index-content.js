@@ -2,8 +2,9 @@
 /**
  * Index content for RAG (CLI wrapper).
  *
- * Walks /docs and /music, chunks by ## headers, embeds every chunk via
- * Gemini, and stores in LanceDB. The chunking + walking logic lives in
+ * Walks /docs and /music, chunks by ## headers, embeds every new or changed
+ * chunk via Gemini, and stores them in the database's search index
+ * (server/lib/rag/search-store.js). The chunking + walking logic lives in
  * app/server/lib/rag/indexer.js so the server startup path can share it.
  *
  * This script is invoked by `npm run index:content` and produces a fresh
@@ -18,10 +19,9 @@ const { setTimeout: sleep } = require('timers/promises');
 require('../server/lib/utils/env').loadEnv();
 
 const gemini = require('../server/lib/rag/gemini');
-const lancedb = require('../server/lib/rag/lancedb');
+const searchStore = require('../server/lib/rag/search-store');
 const indexer = require('../server/lib/rag/indexer');
 const corpus = require('../server/lib/rag/corpus');
-const state = require('../server/lib/rag/index-state');
 const { describeError } = require('../server/lib/utils/describe-error');
 
 async function index() {
@@ -60,19 +60,13 @@ async function index() {
   }
   console.log(`  Created ${allChunks.length} chunks`);
 
-  // What the index already holds: a chunk whose text is unchanged keeps its
-  // vector, so a rebuild after a song is added embeds that song and not the
-  // 2,800 passages around it. Only when the stored vectors came from the
-  // model in use, which the state records from 2026-10-13; an index without
-  // that record is embedded whole, once.
-  const previous = await state.readState();
-  const stored = previous.embedModel === gemini.EMBED_MODEL
-    ? await lancedb.vectorsByContent().catch(err => {
-      console.warn(`  The stored vectors could not be read (${describeError(err)}); embedding everything.`);
-      return new Map();
-    })
-    : new Map();
-  console.log(stored.size ? `  ${stored.size} stored vectors from ${gemini.EMBED_MODEL} can be reused` : '  No stored vectors to reuse');
+  // What the index already holds: a chunk whose file, section and text are
+  // unchanged keeps its vector, so a rebuild after a song is added embeds that
+  // song and not the 3,500 passages around it. A passage's key names the
+  // model and width that embedded it (search-store.js keyOf), so after a
+  // change of either nothing matches and the index is embedded whole, once.
+  const stored = await searchStore.storedKeys();
+  console.log(stored.size ? `  ${stored.size} stored passages; those unchanged are kept` : '  No stored passages to keep');
   let reused = 0;
 
   console.log('\nGenerating embeddings (this may take a while)...');
@@ -107,14 +101,14 @@ async function index() {
 
   for (const chunk of allChunks) {
     try {
-      const kept = stored.get(chunk.content);
-      const vector = kept || await embedWithBackoff(chunk.content);
+      const kept = stored.has(searchStore.keyOf(chunk));
+      const vector = kept ? null : await embedWithBackoff(chunk.content);
       if (kept) reused++;
       documents.push({
         content: chunk.content,
         file: chunk.file,
         section: chunk.section || '',
-        vector
+        ...(vector ? { vector } : {})
       });
       processed++;
       if (processed % 50 === 0) {
@@ -152,21 +146,12 @@ async function index() {
     );
   }
 
-  console.log('\nStoring in LanceDB...');
-  await lancedb.addDocuments(documents);
-
-  const status = await lancedb.checkIndex();
-  console.log(`  Stored ${status.count} documents at ${lancedb.DB_PATH}`);
-
-  console.log('\nRecording index state...');
-  await state.writeState({
-    corpusHash,
-    chunkCount: status.count,
-    fileCount: allFiles.length,
-    rebuiltAt: new Date().toISOString(),
-    embedModel: gemini.EMBED_MODEL,
-  });
-  console.log(`  Wrote ${state.STATE_FILE}`);
+  // New passages added, then exactly these kept and the rebuild recorded, in
+  // one transaction: the index is never empty, and a failure here leaves the
+  // one it found.
+  console.log('\nStoring in the search index...');
+  const { added, removed } = await searchStore.addDocuments(documents, { corpusHash, fileCount: allFiles.length });
+  console.log(`  Added ${added}, removed ${removed}; ${documents.length} passages in the index`);
 
   console.log('\nDone! The /api/ask endpoint is now ready.');
 }

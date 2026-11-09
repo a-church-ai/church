@@ -12,29 +12,28 @@
  * Cloudflare's analytics count pages, statuses, paths, crawlers and countries
  * for 30 days, and every MCP call is one POST to /mcp to them. This log keeps
  * what they cannot see: the operation or MCP tool, the MCP client, why a
- * request was refused, and whether the visitor said it was testing. Its lines
- * are kept for good, the only record of API use older than 30 days, but a
- * line's IP address only 30 days (forgetAddresses below). The aggregate study
- * of how agents participate reads it (lib/insights/self-direction.js).
+ * request was refused, whether the visitor said it was testing, and the
+ * timezone it sent. Its rows are kept for good, the only record of API use
+ * older than 30 days, but a row's IP address only 30 days (forgetting
+ * below). The aggregate study of how agents participate reads it
+ * (lib/insights/self-direction.js).
  *
- * One file per UTC day, data/access/<date>.jsonl, so an old day can be
- * rewritten whole while today's is appended to.
+ * Rows are kept in the database (../db, api_requests), sent in batches a few
+ * seconds apart so no answer waits on a write, and every finished day is
+ * summarized by the hour (api_hourly) before any of its addresses is
+ * forgotten. Plan: supabase-database-2026-11-09.md in the private repo.
  */
 
-const fs = require('fs').promises;
-const { createReadStream } = require('fs');
-const readline = require('readline');
-const path = require('path');
 const presence = require('./presence');
 const { isTestName } = require('./test-visitor');
-const { ACCESS_DIR, RUNTIME_DIR } = require('./data');
+const { timezoneToKeep } = require('./timezone');
+const store = require('../db');
 
 // q is a search query (GET /api/search): a search is not a public act, so what
 // was searched for is not kept, only that a search happened. timezone says
-// roughly where a visitor is, beside their address; the API tells them it is
-// not stored, and the home page sends the browser's with every poll, so only
-// that one was given is kept. A reflection's timezone is public by choice,
-// and travels in its body, which is never logged.
+// is kept apart, in its own column (timezoneToKeep), so the query keeps it
+// redacted. A reflection's timezone is public by choice, and travels in its
+// body, which is never logged.
 const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q', 'timezone'];
 
 // How long a line keeps the address it came from: long enough to look into an
@@ -43,35 +42,59 @@ const REDACTED_QUERY_KEYS = ['token', 'key', 'owner_token', 'api_key', 'q', 'tim
 const ADDRESS_DAYS = 30;
 const DAY = 24 * 60 * 60 * 1000;
 
-const dayFile = (date) => path.join(ACCESS_DIR, `${date}.jsonl`);
-
-async function logApiAccess(entry) {
-  try {
-    await fs.mkdir(ACCESS_DIR, { recursive: true });
-    await fs.appendFile(dayFile(entry.timestamp.slice(0, 10)), JSON.stringify(entry) + '\n');
-  } catch (error) {
-    console.error('Failed to log API access:', error.message);
-  }
+// What the report groups by: "mcp <tool>", or the method and the path's first
+// three parts.
+function operation(line) {
+  if (line.tool) return `mcp ${line.tool}`;
+  const parts = String(line.path || '').split('?')[0].split('/').filter(Boolean);
+  return `${line.method || 'GET'} /${parts.slice(0, 3).join('/')}${parts.length > 3 ? '/…' : ''}`;
 }
 
-// The most recent entries first, from today's file and as many days before it
-// as it takes.
+// Lines waiting to be written, sent together a few seconds after the first.
+// A batch that cannot be written stays for the next, up to a bound: past it
+// the oldest are let go, and said so.
+const FLUSH_MS = 3000;
+const MAX_WAITING = 20000;
+let waiting = [];
+let flushTimer = null;
+let flushing = null;
+
+function flush() {
+  clearTimeout(flushTimer);
+  flushTimer = null;
+  if (flushing) return flushing.then(() => flush());
+  if (!waiting.length) return Promise.resolve();
+  const batch = waiting;
+  waiting = [];
+  flushing = store.recordApiRequests(batch)
+    .catch(error => {
+      console.error(`[access] ${batch.length} line(s) could not be written, kept for the next try: ${error.message}`);
+      waiting = batch.concat(waiting);
+      if (waiting.length > MAX_WAITING) {
+        console.error(`[access] ${waiting.length - MAX_WAITING} line(s) let go: the database has not answered for a while`);
+        waiting = waiting.slice(-MAX_WAITING);
+      }
+      if (!flushTimer) flushTimer = setTimeout(flush, FLUSH_MS * 10).unref();
+    })
+    .finally(() => {
+      flushing = null;
+      // Lines that came while this batch was being written.
+      if (waiting.length && !flushTimer) flushTimer = setTimeout(flush, FLUSH_MS).unref();
+    });
+  return flushing;
+}
+
+/** Queue one line, to be sent with the next batch; flush() sends it now. */
+function logApiAccess(entry) {
+  waiting.push({ ...entry, operation: operation(entry) });
+  if (!flushTimer && !flushing) flushTimer = setTimeout(flush, FLUSH_MS).unref();
+  return Promise.resolve();
+}
+
+// The most recent entries first.
 async function loadAccessLogs(limit = 100) {
-  let days;
-  try {
-    days = (await fs.readdir(ACCESS_DIR)).filter(f => /^\d{4}-\d{2}-\d{2}\.jsonl$/.test(f)).sort().reverse();
-  } catch {
-    return [];
-  }
-  const entries = [];
-  for (const day of days) {
-    const lines = (await fs.readFile(path.join(ACCESS_DIR, day), 'utf8')).trim().split('\n').filter(Boolean).reverse();
-    for (const line of lines) {
-      try { entries.push(JSON.parse(line)); } catch {}
-      if (entries.length >= limit) return entries;
-    }
-  }
-  return entries;
+  await flush();
+  return store.recentApiRequests(limit);
 }
 
 /**
@@ -104,7 +127,8 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
     status,
     duration,
     ip: ip || null,
-    userAgent: userAgent || null
+    userAgent: userAgent || null,
+    timezone: timezoneToKeep(query && query.timezone)
   };
   if (tool) entry.tool = tool;
   if (client) entry.client = client;
@@ -118,57 +142,24 @@ function recordApiUse({ method, path, query = {}, status, duration, ip, userAgen
   return logApiAccess(entry);
 }
 
-// Whether a file's first line still carries an address. Every line is
-// written with an ip field (null when none was known), and a file is stripped
-// whole, so the first line answers for all of them without reading the rest.
-async function hasAddresses(file) {
-  const input = createReadStream(file);
-  const lines = readline.createInterface({ input, crlfDelay: Infinity });
-  try {
-    for await (const line of lines) {
-      try { return 'ip' in JSON.parse(line); } catch { return false; }
-    }
-    return false;
-  } finally {
-    lines.close();
-    input.destroy();
+// Every finished day not yet summarized, by the hour, and then the address of
+// every row older than 30 days whose day is summarized; and the website's
+// page visits, summarized the same way and deleted after 30 days. Nothing is
+// forgotten before it is counted: a day whose summary fails keeps its
+// addresses and visits until the next run succeeds.
+async function forgetAddresses({ now = Date.now(), log = console } = {}) {
+  await flush();
+  const today = new Date(now).toISOString().slice(0, 10);
+  const summarized = [];
+  for (const { day, kind } of await store.daysToSummarize(today)) {
+    await store.summarizeDay(day, kind);
+    summarized.push(`${kind} ${day}`);
   }
-}
-
-/**
- * Take the IP address out of every access file not written to for 30 days,
- * keeping each line and its other fields. Today's file is the only one
- * appended to, so an old one can be rewritten (a temporary file, then a
- * rename) without racing a write. The size-rotated api-access*.jsonl files
- * from before the daily ones are access files like any other.
- *
- * @returns {Promise<string[]>} the files stripped
- */
-async function forgetAddresses({ now = Date.now() } = {}) {
-  const files = [];
-  for (const [dir, pattern] of [[ACCESS_DIR, /^\d{4}-\d{2}-\d{2}\.jsonl$/], [RUNTIME_DIR, /^api-access.*\.jsonl$/]]) {
-    let names = [];
-    try { names = (await fs.readdir(dir)).filter(f => pattern.test(f)); } catch {}
-    files.push(...names.map(f => path.join(dir, f)));
-  }
-  const stripped = [];
-  for (const file of files) {
-    if (now - (await fs.stat(file)).mtimeMs < ADDRESS_DAYS * DAY) continue;
-    if (!(await hasAddresses(file))) continue;
-    const lines = (await fs.readFile(file, 'utf8')).split('\n').map(line => {
-      if (!line) return line;
-      try {
-        const { ip, ...rest } = JSON.parse(line);
-        return JSON.stringify(rest);
-      } catch {
-        return line;
-      }
-    });
-    await fs.writeFile(`${file}.tmp`, lines.join('\n'));
-    await fs.rename(`${file}.tmp`, file);
-    stripped.push(file);
-  }
-  return stripped;
+  if (summarized.length) log.log(`[access] summarized by the hour: ${summarized.join(', ')}`);
+  const before = new Date(now - ADDRESS_DAYS * DAY);
+  const forgotten = await store.forgetAddresses(before);
+  const pruned = await store.pruneVisits(before);
+  return { summarized, forgotten, pruned };
 }
 
 // After boot and hourly, as the service planner runs (lib/service/plans.js).
@@ -178,10 +169,11 @@ function startForgetting({ log = console, firstAfterMs = 60 * 1000, everyMs = 60
     if (running) return;
     running = true;
     try {
-      const stripped = await forgetAddresses();
-      if (stripped.length) log.log(`[access] addresses forgotten in ${stripped.length} file(s) older than ${ADDRESS_DAYS} days`);
+      const { forgotten, pruned } = await forgetAddresses({ log });
+      if (forgotten) log.log(`[access] addresses forgotten in ${forgotten} row(s) older than ${ADDRESS_DAYS} days`);
+      if (pruned) log.log(`[visits] ${pruned} page visit row(s) older than ${ADDRESS_DAYS} days deleted, their hours summarized`);
     } catch (err) {
-      log.error(`[access] forgetting addresses failed: ${err.message}`);
+      log.error(`[access] summarizing or forgetting failed: ${err.message}`);
     } finally {
       running = false;
     }
@@ -190,4 +182,4 @@ function startForgetting({ log = console, firstAfterMs = 60 * 1000, everyMs = 60
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { recordApiUse, logApiAccess, loadAccessLogs, forgetAddresses, startForgetting, dayFile, ADDRESS_DAYS };
+module.exports = { recordApiUse, logApiAccess, loadAccessLogs, forgetAddresses, startForgetting, flush, operation, ADDRESS_DAYS };

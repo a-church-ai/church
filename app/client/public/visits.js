@@ -7,6 +7,8 @@
  *   three seconds: its path, time in view, how far it was scrolled, which
  *   sections came into view, the section whose link brought the visitor here,
  *   what was used on it, and on a load's first page where the visit came from.
+ * - The browser's timezone, its IANA name, so visits can be read by the
+ *   visitor's own time of day.
  * - A recording begun or heard to its end, and a service begun, each part
  *   reached and the service heard through, as the player tells them
  *   (site-player.js, achurch:listen).
@@ -138,9 +140,14 @@
 
   // ---- sending ---------------------------------------------------------------
 
+  // The browser's own timezone, or none where it cannot say.
+  function timezoneOf() {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (err) { return null; }
+  }
+
   function post(rows, { answer = false } = {}) {
     if (isOff()) return;
-    const body = JSON.stringify({ visitor: visitorId(), rows });
+    const body = JSON.stringify({ visitor: visitorId(), timezone: timezoneOf(), rows });
     if (!answer && nav.sendBeacon) {
       try { if (nav.sendBeacon('/visit', new Blob([body], { type: 'application/json' }))) return; } catch (err) { /* fall through */ }
     }

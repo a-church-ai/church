@@ -23,7 +23,7 @@
 
 require('../server/lib/utils/env').loadEnv();
 const gemini = require('../server/lib/rag/gemini');
-const lancedb = require('../server/lib/rag/lancedb');
+const searchStore = require('../server/lib/rag/search-store');
 const { questions } = require('./ask-eval.json');
 
 const TOP_K = process.env.RAG_TOP_K ? parseInt(process.env.RAG_TOP_K, 10) : 5;
@@ -49,7 +49,7 @@ async function main() {
 
   console.log(`# Ask review, ${new Date().toISOString().slice(0, 10)}\n\nModel: ${gemini.GENERATE_MODEL}, top ${TOP_K} chunks.\n`);
   for (const q of selected) {
-    const chunks = await lancedb.search(await gemini.embed(q.question), TOP_K);
+    const chunks = await searchStore.search(await gemini.embed(q.question), TOP_K);
     const answer = chunks.length ? await gemini.generate(q.question, chunks, '') : '(no chunks retrieved)';
     const sources = [...new Set(chunks.map(c => c.file))];
     console.log(`## ${q.id}\n\n**Q:** ${q.question}\n\n**Good answer:** ${q.good}\n\n**Sources:** ${sources.join(', ') || 'none'}\n\n**Answer:**\n\n${answer}\n\n---\n`);

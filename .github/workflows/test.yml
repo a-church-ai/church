@@ -54,10 +54,21 @@ jobs:
         working-directory: app
         run: npm ci
 
+      # The tests' database: the local Supabase stack, from the migrations and
+      # supabase/seed.sql (app/test/setup.js points every test at it). A run
+      # where it does not start fails; no test is skipped for want of it.
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Start the local database
+        run: supabase start -x studio,postgres-meta
+
       - name: Run the test suite
         working-directory: app
-        # No secrets and no app/data: a fresh checkout is exactly what a new
-        # contributor has, and the suite is expected to pass there.
+        # No secrets and no app/data: a fresh checkout and the local database
+        # are exactly what a new contributor has, and the suite is expected to
+        # pass there.
         run: npm test
         # The date manifests are not checked here: page-dates.yml regenerates
         # and commits them after each push to main, so a stale one is a few

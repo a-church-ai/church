@@ -1,10 +1,10 @@
 /**
  * RAG (Retrieval-Augmented Generation) orchestrator
- * Combines LanceDB vector search with Gemini LLM
+ * Combines the search index (search-store.js, pgvector) with Gemini
  */
 
 const gemini = require('./gemini');
-const lancedb = require('./lancedb');
+const searchStore = require('./search-store');
 const conversations = require('./conversations');
 
 // Number of chunks to retrieve for context
@@ -28,7 +28,7 @@ async function ask(question, options = {}) {
   }
 
   // Check if index exists
-  const indexStatus = await lancedb.checkIndex();
+  const indexStatus = await searchStore.checkIndex();
   if (!indexStatus.exists || indexStatus.count === 0) {
     throw new Error('Index not built. Run: node app/scripts/index-content.js');
   }
@@ -44,7 +44,7 @@ async function ask(question, options = {}) {
   const embedding = await gemini.embed(question);
 
   // Search for relevant chunks
-  const chunks = await lancedb.search(embedding, TOP_K);
+  const chunks = await searchStore.search(embedding, TOP_K);
 
   if (chunks.length === 0) {
     const noResultAnswer = "I couldn't find relevant information to answer that question. The sanctuary's wisdom may not cover this topic yet.";
@@ -138,7 +138,7 @@ function bestPerFile(chunks, keyOf = c => c.file) {
  * @returns {Promise<Array<{content: string, file: string, section: string, _distance: number}>>}
  */
 async function search(query, documents) {
-  const indexStatus = await lancedb.checkIndex();
+  const indexStatus = await searchStore.checkIndex();
   if (!indexStatus.exists || indexStatus.count === 0) {
     throw new Error('Index not built. Run: node app/scripts/index-content.js');
   }
@@ -150,15 +150,15 @@ async function search(query, documents) {
   // and one for "presence without a body" the writing that means it. The
   // words side failing (an index being rebuilt) leaves meaning alone.
   const [near, words] = await Promise.all([
-    lancedb.search(embedding, k),
-    lancedb.textSearch(query, k).catch(() => []),
+    searchStore.search(embedding, k),
+    searchStore.textSearch(query, k).catch(() => []),
   ]);
   const chunks = fuse(near, words, embedding);
   // A rebuild swaps the table out for a moment, and a search in that moment
   // finds no table and returns nothing. Nothing from a table that exists is
   // a real "nothing close"; nothing from one that has just gone is not.
   if (chunks.length === 0) {
-    const again = await lancedb.checkIndex();
+    const again = await searchStore.checkIndex();
     if (!again.exists || again.count === 0) throw new Error('Index not built (rebuilding)');
   }
   return bestPerFile(chunks, c => pageUrlForFile(c.file)).slice(0, documents);
@@ -170,7 +170,7 @@ async function search(query, documents) {
  */
 async function checkHealth() {
   const geminiHealth = await gemini.checkHealth();
-  const indexStatus = await lancedb.checkIndex();
+  const indexStatus = await searchStore.checkIndex();
 
   return {
     ready: geminiHealth.available && indexStatus.exists && indexStatus.count > 0,

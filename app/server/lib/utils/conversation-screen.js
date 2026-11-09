@@ -7,9 +7,9 @@
  * Each new indexable conversation's first question is screened once, by the
  * gather job (conversation-groups.js), before it is gathered. A hidden one is
  * like a held one: its page opens for whoever has the link, noindexed, and it
- * is listed nowhere and never gathered. The decision is kept in
- * data/conversation-screen.json and never made again; editing an entry there
- * to "show": true reverses it.
+ * is listed nowhere and never gathered. The decision is kept on the
+ * conversation's row (conversations.screen) and never made again; setting it
+ * to { "show": true } in the database reverses it.
  *
  * Calibrated on 2026-10-22 against the 454 conversations the owner had
  * reviewed by hand, one question at a time with its full text, as the job

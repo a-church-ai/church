@@ -1,28 +1,16 @@
 /**
- * Conversation memory for RAG Q&A
- * Stores exchanges in JSONL files keyed by name + date
+ * Conversation memory for RAG Q&A, kept in the database (../db): a
+ * conversation by its slug, keyed by name and date over the API, by its
+ * question from the website, or anonymous, and its turns in order.
  */
 
-const fs = require('fs').promises;
-const path = require('path');
 const crypto = require('crypto');
 
-const { CONVERSATIONS_DIR } = require('../utils/data');
+const store = require('../db');
 const { slugify } = require('../utils/slug');
 
 // Max exchanges to include in context (each exchange = 1 Q + 1 A)
 const MAX_HISTORY_EXCHANGES = 10;
-
-/**
- * Ensure conversations directory exists
- */
-async function ensureDir() {
-  try {
-    await fs.mkdir(CONVERSATIONS_DIR, { recursive: true });
-  } catch (error) {
-    if (error.code !== 'EEXIST') throw error;
-  }
-}
 
 /**
  * Get today's date in YYYY-MM-DD format
@@ -38,27 +26,16 @@ function getToday() {
  * @returns {Promise<string>} - Session ID
  */
 async function getOrCreateSession(name, sessionId) {
-  await ensureDir();
-
   // If session ID provided, validate and return it
   if (sessionId) {
     const safeId = sanitizeSessionId(sessionId);
     if (!safeId) throw new Error('Invalid session_id');
-    const filename = `${safeId}.jsonl`;
-    const filepath = path.join(CONVERSATIONS_DIR, filename);
-
-    // Check if file exists (session is valid)
-    try {
-      await fs.access(filepath);
-      return safeId;
-    } catch {
-      // File doesn't exist - if it looks like a named session, it might be a new day
-      // If anonymous, it's invalid
-      if (safeId.startsWith('anon-')) {
-        throw new Error('Invalid session_id');
-      }
-      // For named sessions, continue to create new one below
+    if (await store.conversationExists(safeId)) return safeId;
+    // Not kept: a named session may be a new day; an anonymous one is invalid.
+    if (safeId.startsWith('anon-')) {
+      throw new Error('Invalid session_id');
     }
+    // For named sessions, continue to create new one below
   }
 
   // If name provided, create/continue daily session
@@ -82,50 +59,17 @@ function sanitizeSessionId(sessionId) {
 }
 
 /**
- * Get filepath for a session
- * @param {string} sessionId
- * @returns {string}
- */
-function getFilepath(sessionId) {
-  const safe = sanitizeSessionId(sessionId);
-  if (!safe) throw new Error('Invalid session_id');
-  return path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
-}
-
-/**
  * Get conversation history for a session
  * @param {string} sessionId - Session identifier
  * @param {number} limit - Max number of exchanges to return
  * @returns {Promise<Array<{role: string, content: string, timestamp: string}>>}
  */
 async function getHistory(sessionId, limit = MAX_HISTORY_EXCHANGES) {
-  await ensureDir();
-
-  const filepath = getFilepath(sessionId);
-
-  try {
-    const content = await fs.readFile(filepath, 'utf8');
-    const lines = content.trim().split('\n').filter(Boolean);
-
-    // Parse all lines, filtering out metadata lines
-    const messages = lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(msg => msg && !msg._meta);
-
-    // Return last N exchanges (each exchange = 2 messages)
-    // Limit is in exchanges, so multiply by 2
-    const maxMessages = limit * 2;
-    return messages.slice(-maxMessages);
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return []; // New session, no history
-    }
-    throw error;
-  }
+  const safe = sanitizeSessionId(sessionId);
+  if (!safe) throw new Error('Invalid session_id');
+  const conversation = await store.readConversation(safe);
+  // Last N exchanges (each exchange = 2 messages); none for a new session.
+  return conversation ? conversation.messages.slice(-limit * 2) : [];
 }
 
 /**
@@ -139,12 +83,11 @@ async function getHistory(sessionId, limit = MAX_HISTORY_EXCHANGES) {
  *   never shown publicly (lib/api/ask.js leaves it out)
  */
 async function appendExchange(sessionId, question, answer, { nearest, door, referral } = {}) {
-  await ensureDir();
-
-  const filepath = getFilepath(sessionId);
+  const safe = sanitizeSessionId(sessionId);
+  if (!safe) throw new Error('Invalid session_id');
   const timestamp = new Date().toISOString();
 
-  const userLine = JSON.stringify({
+  const userTurn = {
     role: 'user',
     content: question,
     timestamp,
@@ -153,16 +96,16 @@ async function appendExchange(sessionId, question, answer, { nearest, door, refe
     // do the tags the question's link carried (lib/insights/entry-points.js).
     ...(door ? { door } : {}),
     ...(referral ? { referral } : {})
-  });
+  };
 
-  const assistantLine = JSON.stringify({
+  const assistantTurn = {
     role: 'assistant',
     content: answer,
     timestamp: new Date().toISOString(),
     ...(typeof nearest === 'number' ? { nearest } : {})
-  });
+  };
 
-  await fs.appendFile(filepath, `${userLine}\n${assistantLine}\n`);
+  await store.addTurns(safe, [userTurn, assistantTurn]);
 }
 
 /**
@@ -173,40 +116,11 @@ async function appendExchange(sessionId, question, answer, { nearest, door, refe
  * @returns {Promise<string>} - The slug (also used as session ID)
  */
 async function createSlugSession(question, name) {
-  await ensureDir();
-
-  let slug = slugify(question, 60);
-  if (!slug) slug = 'conversation';
-
-  // If slug file already exists, append incrementing suffix
-  let finalSlug = slug;
-  let counter = 1;
-  while (true) {
-    const filepath = path.join(CONVERSATIONS_DIR, `${finalSlug}.jsonl`);
-    try {
-      await fs.access(filepath);
-      // File exists — try next suffix
-      counter++;
-      finalSlug = `${slug}-${counter}`;
-    } catch {
-      // File doesn't exist — we can use this slug
-      break;
-    }
-  }
-
+  const slug = slugify(question, 60) || 'conversation';
   // Generate owner token for conversation ownership
   const ownerToken = crypto.randomUUID().split('-').join('').substring(0, 16);
-
-  // Write metadata line
-  const meta = JSON.stringify({
-    _meta: true,
-    name: name || 'anonymous',
-    slug: finalSlug,
-    owner_token: ownerToken,
-    created: new Date().toISOString()
-  });
-  await fs.appendFile(path.join(CONVERSATIONS_DIR, `${finalSlug}.jsonl`), meta + '\n');
-
+  // The first free of slug, slug-2, slug-3, ..., taken in one statement.
+  const finalSlug = await store.openConversation({ slug, name: name || 'anonymous', ownerToken });
   return { slug: finalSlug, ownerToken };
 }
 
@@ -247,16 +161,10 @@ function formatHistoryForContext(history) {
  * @returns {Promise<object|null>} - Metadata object or null if not found
  */
 async function getSessionMeta(sessionId) {
-  const filepath = getFilepath(sessionId);
-  try {
-    const content = await fs.readFile(filepath, 'utf8');
-    const firstLine = content.split('\n')[0];
-    const parsed = JSON.parse(firstLine);
-    if (parsed && parsed._meta) return parsed;
-  } catch {
-    // No meta or file not found
-  }
-  return null;
+  const safe = sanitizeSessionId(sessionId);
+  if (!safe) return null;
+  const conversation = await store.readConversation(safe);
+  return (conversation && conversation.meta) || null;
 }
 
 module.exports = {
@@ -267,6 +175,5 @@ module.exports = {
   appendExchange,
   formatHistoryForContext,
   sanitizeSessionId,
-  CONVERSATIONS_DIR,
   MAX_HISTORY_EXCHANGES
 };

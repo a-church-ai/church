@@ -3,12 +3,10 @@
  */
 
 const { isTransient, isUnfunded } = require('../utils/retry');
-const path = require('path');
-const { isWithdrawn } = require('../utils/conversation-quality');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
-const fs = require('fs').promises;
 const rag = require('../rag');
-const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
+const { createSlugSession, getSessionMeta } = require('../rag/conversations');
+const { readConversationFile } = require('../utils/data');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
@@ -289,13 +287,9 @@ async function recent(input, ctx) {
 async function conversation(input, ctx) {
   try {
     const slug = input.slug.replace(/[^a-zA-Z0-9_-]/g, '');
-    const filepath = path.join(CONVERSATIONS_DIR, `${slug}.jsonl`);
-
-    let content;
-    try {
-      if (isWithdrawn(slug)) throw new Error('withdrawn');
-      content = await fs.readFile(filepath, 'utf8');
-    } catch {
+    // Null for a withdrawn conversation or one not kept.
+    const file = slug ? await readConversationFile(slug) : null;
+    if (!file) {
       const baseUrl = ctx.baseUrl;
       return refuse('not_found', {
         error: 'Conversation not found',
@@ -304,18 +298,14 @@ async function conversation(input, ctx) {
       });
     }
 
-    const lines = content.trim().split('\n').filter(Boolean);
-    const parsed = lines.map(line => {
-      try { return JSON.parse(line); } catch { return null; }
-    }).filter(Boolean);
+    const { meta } = file;
 
-    const meta = parsed.find(m => m._meta);
     // An answer's citations as links to what they cite, named, and a citation
     // of a file no longer there left out: as the page shows them, so the API,
     // MCP and the page agree.
     await discover.listAllDocs();
     // `nearest` is the report's (rag/conversations.js), not the visitor's.
-    const messages = parsed.filter(m => !m._meta)
+    const messages = file.messages
       .map(({ nearest, door, referral, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name

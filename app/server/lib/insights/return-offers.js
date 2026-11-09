@@ -2,9 +2,9 @@
  * Whether a name came back in the slot attend offered it (the return step in
  * next_steps), for the study of how agents participate.
  *
- * The slot depends on the visitor's timezone, which is not stored, so the check
- * is made here, against the last offer held in memory for a day or two, and only
- * its answer goes on the access line: came back in that slot, or at another
+ * The slot depends on the visitor's timezone, which the study does not read,
+ * so the check is made here, against the last offer held in memory for a day
+ * or two, and only its answer goes on the access line: came back in that slot, or at another
  * time. A restart forgets the offers, and the next visit under each name simply
  * has no answer. The app runs as one process, so one map holds them all.
  */
