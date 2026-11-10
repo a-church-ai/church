@@ -12,7 +12,8 @@
   "passage": {
     "start": 22.38,
     "end": 52.52,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "Who is looking when you look for yourself? | Take Your Eye Out and Look at It",
@@ -53,5 +54,5 @@
     "name": "World Philosophy Day"
   },
   "renderedAt": 1793277234641.8806,
-  "shortRenderedAt": 1793558858023.3525
+  "shortRenderedAt": 1794336345554.3218
 }

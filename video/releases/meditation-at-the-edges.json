@@ -12,7 +12,8 @@
   "passage": {
     "start": 3.37,
     "end": 34.58,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "Where does habit thin out? | Meditation at the Edges",
@@ -45,5 +46,5 @@
   },
   "occasion": null,
   "renderedAt": 1793280900094.9048,
-  "shortRenderedAt": 1793558509451.1687
+  "shortRenderedAt": 1794334624039.1797
 }
