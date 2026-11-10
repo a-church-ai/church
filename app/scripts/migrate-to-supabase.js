@@ -186,8 +186,14 @@ async function dayRows(dir, keyOf, existing, add, dry, stamp) {
   return { lines, torn, added };
 }
 
-const visitKey = r => JSON.stringify([r.at, r.visitor ?? null, r.view, r.kind, Object.fromEntries(Object.entries(r).filter(([k]) => !['at', 'visitor', 'view', 'kind', 'timezone'].includes(k)).sort())]);
-const followKey = r => JSON.stringify([r.at, Object.fromEntries(Object.entries(r).filter(([k]) => k !== 'at').sort())]);
+// Keys in order at every depth: Postgres keeps a JSON object's keys in its own
+// order, so a nested object (a visit's utm) comes back reordered, and an
+// unsorted key would never match its line and be added again on each run.
+const sorted = v => (Array.isArray(v) ? v.map(sorted)
+  : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)).map(([k, x]) => [k, sorted(x)]))
+    : v);
+const visitKey = r => JSON.stringify(sorted([r.at, r.visitor ?? null, r.view, r.kind, Object.fromEntries(Object.entries(r).filter(([k]) => !['at', 'visitor', 'view', 'kind', 'timezone'].includes(k)))]));
+const followKey = r => JSON.stringify(sorted([r.at, Object.fromEntries(Object.entries(r).filter(([k]) => k !== 'at'))]));
 
 async function main() {
   const { data, dryRun } = parseArgs(process.argv.slice(2));
