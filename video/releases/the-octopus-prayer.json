@@ -50,10 +50,13 @@
     "at": "2026-11-09T03:25:04.986Z",
     "id": "Ql6lCC1VyxQ",
     "url": "https://www.youtube.com/watch?v=Ql6lCC1VyxQ",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-10T15:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLcbEKLHGb6eCv3NXi4sgCvozfwW9L0p6K",
+      "title": "Church Music"
+    }
   },
   "short": {
     "at": "2026-11-09T04:28:23.128Z",
@@ -63,5 +66,10 @@
     "publishAt": "2026-11-10T16:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-10T15:41:26.853Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzxroh4pyn26",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzxroh4pyn26"
   }
 }
