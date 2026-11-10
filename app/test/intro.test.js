@@ -93,6 +93,7 @@ test('intros vary: none repeats the one before in every setting, and over eight 
   assert.deepStrictEqual(rules.varietyProblems(varied, NAMES), []);
   const repeated = [at(0), at(0, { slug: 's1' })];
   assert.match(rules.varietyProblems(repeated, NAMES).join(), /repeats s0 in every setting/);
+  assert.deepStrictEqual(rules.varietyProblems([at(0, { outfit: 'navy-henley' }), at(0, { slug: 's1', outfit: 'denim-shirt' })], NAMES), [], 'another outfit is another intro');
   const oneSided = Array.from({ length: 8 }, (_, k) => at(k, { side: 'left' }));
   assert.match(rules.varietyProblems(oneSided, NAMES).join(), /side right 0 times in 8/);
 });

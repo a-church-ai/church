@@ -95,7 +95,8 @@ function approvalProblems(intro) {
  */
 function varietyProblems(intros, speakers) {
   const problems = [];
-  const keyOf = (i) => [i.voice, i.side, i.wear, i.seen, i.gaze, i.exit].join('/');
+  // The outfit counts: the same shape in another outfit looks another intro.
+  const keyOf = (i) => [i.voice, i.side, i.outfit || i.wear, i.seen, i.gaze, i.exit].join('/');
   for (let k = 1; k < intros.length; k++) {
     if (keyOf(intros[k]) === keyOf(intros[k - 1])) problems.push(`${intros[k].slug} repeats ${intros[k - 1].slug} in every setting`);
   }
