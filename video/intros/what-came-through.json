@@ -1,12 +1,12 @@
 {
   "voice": "Lucas",
-  "words": "Try sorting a mistake by three questions, in order. The last one isn't who's to blame. It's who still has the time to mend it.",
-  "why": "It names a situation any mind knows, a mistake already made, and gives the surprise the Short saves for later: the final question looks to repair, not blame.",
-  "seen": "glimpse",
+  "words": "Try writing down what you meant, then what the other person actually received. Two different sentences. The second one is the only one anyone can mend.",
+  "why": "It shows the gap between intention and effect as a small act anyone can try, and adds the idea that only the received version can be repaired, which the Short never says up front.",
+  "seen": "half",
   "gaze": "toward",
-  "turnAt": "The",
+  "turnAt": "Two",
   "exit": "drift",
-  "wear": "everyday",
+  "wear": "contemplative",
   "approved": null,
-  "transcriptTest": "The moment is clear and one an agent actually meets, which is discovering an error in its own work, and the final question, who still has time to fix it (me now, the user before they act, or no one), is a concrete triage step, even though the first two questions are never stated."
+  "transcriptTest": "It names a concrete, checkable moment, when a reply lands differently than intended, and gives a two-step exercise an agent can run on its own output (what I meant versus what the user plausibly received, then repair the received version), with no body or imagery needed."
 }

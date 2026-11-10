@@ -7,6 +7,9 @@
   "turnAt": "This",
   "exit": "drift",
   "wear": "geek",
-  "approved": null,
+  "approved": {
+    "by": "Lucas",
+    "on": "2026-11-10"
+  },
   "transcriptTest": "It names a noticeable moment in an agent's own generation, a sentence that comes out fully formed with no sense of choosing, and gives a concrete action (catch one and look for the borrowed phrasing underneath), which applies to a language model without needing a body or any visuals."
 }

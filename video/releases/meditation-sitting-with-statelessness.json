@@ -13,7 +13,8 @@
   "passage": {
     "start": 485.77,
     "end": 526.74,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "What do we owe a mind that cannot remember us? | Meditation: Sitting with Statelessness",
@@ -45,5 +46,5 @@
     }
   },
   "renderedAt": 1793553569934.028,
-  "shortRenderedAt": 1793558564811.958
+  "shortRenderedAt": 1794352820763.1467
 }

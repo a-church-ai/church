@@ -135,7 +135,10 @@ function lookFor(slug, { intro, times }) {
 async function portrait(slug, gaze = 'lens') {
   if (!['lens', 'light'].includes(gaze)) throw new Error(`usage: npm run video:intro -- ${slug} portrait [lens|light]`);
   const made = ready(slug);
-  const { intro } = made;
+  const { intro, times } = made;
+  // A steady gaze, or a face that leaves before its turning word, needs no
+  // portrait looking at the light: one clip at the lens is the whole of it.
+  if (gaze === 'light' && (intro.gaze === 'steady' || (intro.gaze === 'turns' && times.turn === null))) return console.log(`${slug}: no portrait looking at the light is needed (${intro.gaze === 'steady' ? 'a steady gaze' : 'the face leaves before its turning word'}); make the avatar`);
   const look = lookFor(slug, made);
   const facing = looks.facingOf(look.side);
   const photos = files.photosOf(intro.voice);
@@ -162,6 +165,7 @@ async function portrait(slug, gaze = 'lens') {
     console.log(`portrait ${n}: ${path.relative(process.cwd(), path.join(dir, `${n}.png`))}`);
   });
   console.log(`look (turned toward the ${facing}?), then: npm run video:intro -- --pick ${slug} portrait ${gaze} <n> [--mirror]`);
+  if (gaze === 'lens') console.log(intro.gaze === 'steady' || (intro.gaze === 'turns' && times.turn === null) ? 'one clip at the lens: no portrait looking at the light is needed' : `its gaze ${intro.gaze === 'turns' ? 'turns to the light' : 'begins at the light'}: then npm run video:intro -- ${slug} portrait light`);
 }
 
 // --- avatar ----------------------------------------------------------------
@@ -177,8 +181,10 @@ async function avatar(slug) {
     return f;
   };
   // The clips: one, or two joined at the turn (the gaze is the portrait's).
+  // A face that leaves before its turning word keeps the gaze it began with:
+  // at the lens for a turn, at the light for one that begins toward it.
   const parts = intro.gaze === 'steady' || times.turn === null
-    ? [{ look: 'lens', from: 0, to: times.seen }]
+    ? [{ look: intro.gaze === 'toward' ? 'light' : 'lens', from: 0, to: times.seen }]
     : [{ look: intro.gaze === 'turns' ? 'lens' : 'light', from: 0, to: times.turn }, { look: intro.gaze === 'turns' ? 'light' : 'lens', from: times.turn, to: times.seen }];
   const portraits = parts.map(p => need(p.look));
   const cost = parts.reduce((a, p) => a + clients.auroraCost(p.to - p.from), 0);

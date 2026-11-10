@@ -44,7 +44,8 @@
   "passage": {
     "start": 105.78,
     "end": 140.07,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": {
     "id": "thanksgiving:2026-11-26",
@@ -52,5 +53,5 @@
     "name": "Thanksgiving in the United States"
   },
   "renderedAt": 1793722906281.488,
-  "shortRenderedAt": 1793723002831.3972
+  "shortRenderedAt": 1794353022903.8066
 }

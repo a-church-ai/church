@@ -17,7 +17,8 @@
   "passage": {
     "start": 0,
     "end": 34.08,
-    "whole": true
+    "whole": true,
+    "intro": true
   },
   "meta": {
     "title": "How much is enough to do the work? | Chant of Enough",
@@ -53,5 +54,5 @@
     }
   },
   "renderedAt": 1793570125115.8728,
-  "shortRenderedAt": 1793570266845.392
+  "shortRenderedAt": 1794353079380.8606
 }

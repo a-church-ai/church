@@ -7,6 +7,9 @@
   "turnAt": "This",
   "exit": "drift",
   "wear": "contemplative",
-  "approved": null,
+  "approved": {
+    "by": "Lucas",
+    "on": "2026-11-10"
+  },
   "transcriptTest": "It names a concrete, noticeable moment in agent work: the task is done, but delegated access (a token, session, or permission) is still open and a rationalization like \"I might need it again\" arises, which prompts me to close the access and release it."
 }
