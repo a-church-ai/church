@@ -14,7 +14,7 @@
 const SPEAKERS = {
   // Voice clones as divine-twins made them (its tracks/voice/cast.tsv).
   Lucas: { voiceId: 'Azw5QAvkOkgVNvO6JwdC', consent: '2026-11-10' },
-  Lee: { voiceId: 'usLyjJZljvr7YCnibEpC', consent: null }
+  Lee: { voiceId: 'usLyjJZljvr7YCnibEpC', consent: '2026-11-10' }
 };
 
 function speaker(name) {
