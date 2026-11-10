@@ -9,13 +9,14 @@
  *   npm run video:intro -- <slug> draft                 words and shape drafted by Claude into video/intros/<slug>.json, for approval
  *   npm run video:intro -- check                        every intro against the rules, and the variety across them
  *   npm run video:intro -- <slug> voice                 two takes in the speaker's clone (ElevenLabs), with their timing; cents
- *   npm run video:intro -- portrait <Speaker> <outfit> <left|right> [lens|light]
- *                                                       two portraits for the speaker's library (OpenAI), about $0.10 each;
- *                                                       the outfits are lib/video/intro/looks.js's wardrobe
+ *   npm run video:intro -- <slug> portrait [lens|light] two portraits for this Short (OpenAI), about $0.10 each: the first
+ *                                                       time, its look is chosen and kept (lib/video/intro/looks.js: the
+ *                                                       side measured, the garment in rotation, its colour from the piece's
+ *                                                       palette, the hair in rotation); --relook chooses again
  *   npm run video:intro -- <slug> avatar                the picked take spoken by the portraits its shape needs (Aurora on fal),
- *                                                       about $0.14 a second of face; the side measured from the footage
+ *                                                       about $0.14 a second of face
  *   npm run video:intro -- --pick <slug> voice|avatar <n>
- *   npm run video:intro -- --pick portrait <Speaker> <outfit> <left|right> <lens|light> <n>
+ *   npm run video:intro -- --pick <slug> portrait <lens|light> <n> [--mirror]
  *   add --dry-run to print what would be sent and spend nothing
  *
  * Then `npm run video -- <slug>` renders the Short with the intro before it.
@@ -24,7 +25,7 @@
  * (what made it, and its cost). Picks: intro/voice.mp3 (and voice.json),
  * intro/avatar.mp4 (and avatar.json), each naming what it was made from, so
  * the render refuses one whose words, take or portraits have changed since.
- * The speaker's photos and portraits: app/media/people/<Speaker>/ (private:
+ * The speaker's photos: app/media/people/<Speaker>/photos/ (private:
  * .gitignore names it, and Docker leaves out all of app/media).
  */
 
@@ -88,39 +89,7 @@ async function voice(slug) {
   console.log(`listen, then: npm run video:intro -- --pick ${slug} voice <n>`);
 }
 
-// --- portraits -------------------------------------------------------------
-
-async function portrait(name, outfit, side, look = 'lens') {
-  speaker(name);
-  if (!looks.familyOf(name, outfit) || !rules.SIDES.includes(side) || !['lens', 'light'].includes(look)) throw new Error(`usage: portrait <${NAMES.join('|')}> <outfit> <left|right> [lens|light]; ${name}'s outfits: ${Object.values(looks.WARDROBE[name] || {}).flatMap(Object.keys).join(', ')}`);
-  const facing = looks.facingOf(side);
-  const photos = files.photosOf(name);
-  let prompt, images;
-  if (look === 'lens') {
-    prompt = looks.lensPrompt({ speaker: name, outfit, facing });
-    images = photos;
-  } else {
-    const lens = files.portraitFile(name, { outfit, facing, look: 'lens' });
-    if (!fs.existsSync(lens)) throw new Error(`a portrait looking at the light is made from the one at the lens: make and pick ${name} ${outfit} ${side} lens first`);
-    prompt = looks.lightPrompt({ facing });
-    images = [lens, ...photos.slice(0, 2)];
-  }
-  const label = looks.portraitName({ outfit, facing, look });
-  const dir = path.join(files.peopleDir(name), 'portraits', 'candidates', label);
-  if (dryRun) return console.log(`would make two ${label} portraits of ${name} from ${images.length} pictures:\n${prompt}`);
-  fs.mkdirSync(dir, { recursive: true });
-  const first = next(dir);
-  const pngs = await Promise.all([0, 1].map(() => clients.portrait(prompt, images)));
-  pngs.forEach((png, k) => {
-    const n = first + k;
-    fs.writeFileSync(path.join(dir, `${n}.png`), png);
-    note(path.join(dir, `${n}.txt`), [`${name} ${label}, from ${images.map(i => path.basename(i)).join(', ')}, about $0.10`, prompt]);
-    console.log(`portrait ${n}: ${path.relative(process.cwd(), path.join(dir, `${n}.png`))}`);
-  });
-  console.log(`look, then: npm run video:intro -- --pick portrait ${name} ${outfit} ${side} ${look} <n>`);
-}
-
-// --- avatar ----------------------------------------------------------------
+// --- the look and its portraits --------------------------------------------
 
 // The brightness of each column of the footage behind the speaker, at the middle of the intro.
 function columnsAt(base, at) {
@@ -128,24 +97,83 @@ function columnsAt(base, at) {
   return Array.from({ length: 64 }, (_, x) => Array.from({ length: 36 }, (_, y) => raw[y * 64 + x]).reduce((a, b) => a + b, 0));
 }
 
-async function avatar(slug) {
+// An approved intro ready to be made, with its picked take and its times.
+function ready(slug) {
   const intro = files.introOf(slug);
   speaker(intro.voice);
   const problems = [...rules.introProblems(intro, { opening: files.openingOf(slug), speakers: NAMES }), ...rules.approvalProblems(intro)];
   if (problems.length) throw new Error(`${slug}'s intro: ${problems.join('; ')}`);
   const take = files.pickedVoice(slug, intro);
-  const spoken = rules.spokenWords(intro.words, take.alignment);
-  const times = rules.timesOf(intro, spoken);
-  const { passage, base } = files.shortOf(slug);
+  return { intro, take, times: rules.timesOf(intro, rules.spokenWords(intro.words, take.alignment)) };
+}
+
+/**
+ * This Short's look, chosen once and kept (intro/look.json), so every later
+ * step stands the speaker in the same place in the same clothes: the side
+ * away from the light, measured; the garment worn longest ago in the family
+ * the piece calls for; its colour from the piece's palette within his
+ * signature; the hair worn longest ago. --relook chooses again.
+ */
+function lookFor(slug, { intro, times }) {
+  const kept = files.lookOf(slug);
+  if (kept && kept.family === intro.wear && !args.includes('--relook')) return kept;
+  const { passage, base, brief } = files.shortOf(slug);
   const from = Math.max(0, passage.start - times.total);
   const side = rules.sideFor(columnsAt(base, from + times.total / 2), files.sidesUsed(slug));
-  const facing = looks.facingOf(side);
-  // The outfit in the family the piece calls for that this speaker has worn longest ago.
-  const worn = files.inReleaseOrder(files.allIntros()).filter(i => i.voice === intro.voice && i.slug !== slug && i.outfit);
-  const outfit = looks.chooseOutfit(intro.voice, intro.wear, worn);
-  const need = (look) => {
-    const f = files.portraitFile(intro.voice, { outfit, facing, look });
-    if (!fs.existsSync(f)) throw new Error(`${slug}'s intro stands on the ${side} in ${intro.voice}'s ${outfit} and needs its ${looks.portraitName({ outfit, facing, look })} portrait: npm run video:intro -- portrait ${intro.voice} ${outfit} ${side} ${look}, then pick one`);
+  const worn = files.inReleaseOrder(files.allIntros()).filter(i => i.voice === intro.voice && i.slug !== slug);
+  const garment = looks.chooseGarment(intro.wear, worn.filter(i => i.garment));
+  const colour = looks.colourFor(intro.voice, brief.palette, worn.filter(i => i.colour));
+  const hair = looks.chooseHair(worn.filter(i => i.hair));
+  const look = { side, family: intro.wear, garment, colour: colour.name, colourHex: colour.hex, accent: colour.accent, outfit: looks.outfitName({ garment, colour: colour.name }), hair };
+  if (!dryRun) {
+    fs.mkdirSync(files.introDir(slug), { recursive: true });
+    fs.writeFileSync(files.lookFile(slug), JSON.stringify(look, null, 2));
+  }
+  return look;
+}
+
+async function portrait(slug, gaze = 'lens') {
+  if (!['lens', 'light'].includes(gaze)) throw new Error(`usage: npm run video:intro -- ${slug} portrait [lens|light]`);
+  const made = ready(slug);
+  const { intro } = made;
+  const look = lookFor(slug, made);
+  const facing = looks.facingOf(look.side);
+  const photos = files.photosOf(intro.voice);
+  let prompt, images;
+  if (gaze === 'lens') {
+    prompt = looks.lensPrompt({ speaker: intro.voice, look, facing });
+    images = photos;
+  } else {
+    const lens = files.portraitFile(slug, 'lens');
+    if (!fs.existsSync(lens)) throw new Error(`a portrait looking at the light is made from the one at the lens: npm run video:intro -- ${slug} portrait, then pick one`);
+    prompt = looks.lightPrompt({ facing });
+    images = [lens, ...photos.slice(0, 2)];
+  }
+  console.log(`${slug}: ${intro.voice} on the ${look.side}, facing the light on the ${facing}, in ${look.outfit}${look.accent ? '' : ' (a neutral)'}, hair ${look.hair}`);
+  if (dryRun) return console.log(`would make two portraits ${gaze === 'lens' ? 'at the lens' : 'looking at the light'} from ${images.length} pictures:\n${prompt}`);
+  const dir = path.join(files.introDir(slug), 'portrait', gaze);
+  fs.mkdirSync(dir, { recursive: true });
+  const first = next(dir);
+  const pngs = await Promise.all([0, 1].map(() => clients.portrait(prompt, images)));
+  pngs.forEach((png, k) => {
+    const n = first + k;
+    fs.writeFileSync(path.join(dir, `${n}.png`), png);
+    note(path.join(dir, `${n}.txt`), [`${intro.voice}, ${look.outfit}, hair ${look.hair}, ${gaze}, from ${images.map(i => path.basename(i)).join(', ')}, about $0.10`, prompt]);
+    console.log(`portrait ${n}: ${path.relative(process.cwd(), path.join(dir, `${n}.png`))}`);
+  });
+  console.log(`look (turned toward the ${facing}?), then: npm run video:intro -- --pick ${slug} portrait ${gaze} <n> [--mirror]`);
+}
+
+// --- avatar ----------------------------------------------------------------
+
+async function avatar(slug) {
+  const { intro, take, times } = ready(slug);
+  const look = files.lookOf(slug);
+  if (!look) throw new Error(`${slug} has no look yet: npm run video:intro -- ${slug} portrait, then pick one`);
+  const side = look.side;
+  const need = (gaze) => {
+    const f = files.portraitFile(slug, gaze);
+    if (!fs.existsSync(f)) throw new Error(`${slug}'s intro needs its portrait ${gaze === 'lens' ? 'at the lens' : 'looking at the light'}: npm run video:intro -- ${slug} portrait ${gaze}, then pick one`);
     return f;
   };
   // The clips: one, or two joined at the turn (the gaze is the portrait's).
@@ -154,7 +182,7 @@ async function avatar(slug) {
     : [{ look: intro.gaze === 'turns' ? 'lens' : 'light', from: 0, to: times.turn }, { look: intro.gaze === 'turns' ? 'light' : 'lens', from: times.turn, to: times.seen }];
   const portraits = parts.map(p => need(p.look));
   const cost = parts.reduce((a, p) => a + clients.auroraCost(p.to - p.from), 0);
-  console.log(`${slug}: ${intro.voice} on the ${side}, ${outfit} (${intro.wear}), ${intro.seen} (${times.seen.toFixed(1)} of ${times.total.toFixed(1)} s seen), ${intro.gaze}${times.turn !== null ? ` at ${times.turn.toFixed(1)} s` : ''}, ${intro.exit}: ${parts.length} clip(s), about $${cost.toFixed(2)}`);
+  console.log(`${slug}: ${intro.voice} on the ${side}, ${look.outfit}, hair ${look.hair}, ${intro.seen} (${times.seen.toFixed(1)} of ${times.total.toFixed(1)} s seen), ${intro.gaze}${times.turn !== null ? ` at ${times.turn.toFixed(1)} s` : ''}, ${intro.exit}: ${parts.length} clip(s), about $${cost.toFixed(2)}`);
   if (dryRun) return;
   const dir = path.join(files.introDir(slug), 'avatar');
   fs.mkdirSync(dir, { recursive: true });
@@ -183,24 +211,27 @@ async function avatar(slug) {
       `[0:v]fps=25,format=yuv420p,trim=0:${(a.to + x).toFixed(3)},setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration=${x}[a];[1:v]fps=25,format=yuv420p,setpts=PTS-STARTPTS[b];[a][b]xfade=transition=fade:duration=${x}:offset=${a.to.toFixed(3)}[v]`,
       '-map', '[v]', '-an', '-c:v', 'libx264', '-crf', '14', '-y', out]);
   }
-  fs.writeFileSync(path.join(dir, `${n}.json`), JSON.stringify({ side, outfit, times, voice: take.sha, words: intro.words, shape: files.shapeKey(intro), portraits: portraits.map(sha), clips: clips.map(c => ({ look: c.look, from: c.from, to: c.to, requestId: c.requestId })) }, null, 2));
-  note(path.join(dir, `${n}.txt`), [`${intro.voice} on the ${side}, ${parts.map(p => p.look).join(' then ')}, ${seconds(out).toFixed(1)} s, about $${cost.toFixed(2)}`]);
+  fs.writeFileSync(path.join(dir, `${n}.json`), JSON.stringify({ side, outfit: look.outfit, garment: look.garment, colour: look.colour, hair: look.hair, times, voice: take.sha, words: intro.words, shape: files.shapeKey(intro), portraits: portraits.map(sha), clips: clips.map(c => ({ look: c.look, from: c.from, to: c.to, requestId: c.requestId })) }, null, 2));
+  note(path.join(dir, `${n}.txt`), [`${intro.voice} on the ${side}, ${look.outfit}, ${parts.map(p => p.look).join(' then ')}, ${seconds(out).toFixed(1)} s, about $${cost.toFixed(2)}`]);
   console.log(`avatar ${n}: ${path.relative(process.cwd(), out)}\nlook, then: npm run video:intro -- --pick ${slug} avatar ${n}`);
 }
 
 // --- picks -----------------------------------------------------------------
 
-function pickOne() {
-  if (rest[0] === 'portrait') {
-    const [, name, outfit, side, look, n] = rest;
-    const label = looks.portraitName({ outfit, facing: looks.facingOf(side), look });
-    const src = path.join(files.peopleDir(name), 'portraits', 'candidates', label, `${n}.png`);
-    if (!fs.existsSync(src)) throw new Error(`no ${src}`);
-    const to = files.portraitFile(name, { outfit, facing: looks.facingOf(side), look });
-    fs.copyFileSync(src, to);
-    return console.log(`picked ${path.relative(process.cwd(), to)}`);
+async function pickOne() {
+  const [slug, step, a, b] = rest;
+  if (step === 'portrait') {
+    // --pick <slug> portrait <lens|light> <n> [--mirror]: a mirrored candidate
+    // turns the right way when the image model turned it the wrong way.
+    const gaze = a, n = b;
+    const src = path.join(files.introDir(slug), 'portrait', gaze, `${n}.png`);
+    if (!fs.existsSync(src)) throw new Error(`no ${path.relative(process.cwd(), src)}`);
+    const to = files.portraitFile(slug, gaze);
+    if (args.includes('--mirror')) await ffmpeg(['-i', src, '-vf', 'hflip', '-y', to]);
+    else fs.copyFileSync(src, to);
+    return console.log(`picked ${slug} portrait ${gaze} ${n}${args.includes('--mirror') ? ', mirrored' : ''}`);
   }
-  const [slug, step, n] = rest;
+  const n = a;
   const dir = path.join(files.introDir(slug), step);
   if (step === 'voice') {
     fs.copyFileSync(path.join(dir, `${n}.mp3`), path.join(files.introDir(slug), 'voice.mp3'));
@@ -208,7 +239,7 @@ function pickOne() {
   } else if (step === 'avatar') {
     fs.copyFileSync(path.join(dir, `${n}.mp4`), path.join(files.introDir(slug), 'avatar.mp4'));
     fs.copyFileSync(path.join(dir, `${n}.json`), path.join(files.introDir(slug), 'avatar.json'));
-  } else throw new Error('pick voice, avatar or portrait');
+  } else throw new Error('pick voice, portrait or avatar');
   console.log(`picked ${slug} ${step} ${n}`);
 }
 
@@ -231,8 +262,8 @@ async function draft(slug) {
 (async () => {
   if (pick) return pickOne();
   if (rest[0] === 'check') return check();
-  if (rest[0] === 'portrait') return portrait(...rest.slice(1));
   const [slug, step] = rest;
+  if (step === 'portrait') return portrait(slug, rest[2]);
   if (step === 'voice') return voice(slug);
   if (step === 'avatar') return avatar(slug);
   if (step === 'draft') return draft(slug);

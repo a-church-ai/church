@@ -5,7 +5,12 @@
  *   reviewable change.
  * - Its picks: app/media/video/<slug>/intro/ (voice.mp3 and voice.json,
  *   avatar.mp4 and avatar.json), local like everything a render makes.
- * - The speakers' photos and portraits: app/media/people/<Speaker>/, private.
+ * - Its look, chosen when its portraits are made and kept so every later
+ *   step stands the speaker in the same place in the same clothes:
+ *   intro/look.json (side, garment, colour, outfit, hair).
+ * - Its portraits, made for it: intro/portrait-lens.png and, where the gaze
+ *   turns, intro/portrait-light.png.
+ * - The speakers' photos: app/media/people/<Speaker>/photos/, private.
  *
  * A pick names what it was made from, and is refused once that has changed:
  * a take whose words are no longer the intro's, an avatar from another take
@@ -47,7 +52,10 @@ function photosOf(name) {
   return photos;
 }
 
-const portraitFile = (name, { outfit, facing, look }) => path.join(peopleDir(name), 'portraits', `${outfit}-${facing}-${look}.png`);
+// This Short's portrait at the lens or looking at the light.
+const portraitFile = (slug, look) => path.join(introDir(slug), `portrait-${look}.png`);
+const lookFile = (slug) => path.join(introDir(slug), 'look.json');
+const lookOf = (slug) => (fs.existsSync(lookFile(slug)) ? readJson(lookFile(slug)) : null);
 
 // The picked take, refused unless it says the intro's words in its voice.
 function pickedVoice(slug, intro) {
@@ -98,11 +106,12 @@ function inReleaseOrder(all) {
     const f = path.join(RELEASES, `${slug}.json`);
     return fs.existsSync(f) ? readJson(f).at || '' : '9999';
   };
-  // What was measured or chosen when its avatar was made: its side and outfit.
+  // What was measured or chosen for it: its look, or what its avatar recorded
+  // (intros made before looks were kept per Short).
   const made = (slug) => {
     const f = path.join(introDir(slug), 'avatar.json');
-    const m = fs.existsSync(f) ? readJson(f) : {};
-    return { side: m.side || null, outfit: m.outfit || null };
+    const m = { ...(fs.existsSync(f) ? readJson(f) : {}), ...(lookOf(slug) || {}) };
+    return { side: m.side || null, outfit: m.outfit || null, garment: m.garment || null, colour: m.colour || null, hair: m.hair || null };
   };
   return all.map(({ slug, intro }) => ({ slug, ...intro, ...made(slug), at: at(slug) })).sort((a, b) => a.at.localeCompare(b.at));
 }
@@ -115,4 +124,4 @@ function sidesUsed(slug) {
   return { left: before.filter(i => i.side === 'left').length, right: before.filter(i => i.side === 'right').length };
 }
 
-module.exports = { introFile, hasIntro, introOf, allIntros, introDir, peopleDir, photosOf, portraitFile, pickedVoice, pickedAvatar, shortOf, openingOf, inReleaseOrder, sidesUsed, shapeKey, ROOT };
+module.exports = { introFile, hasIntro, introOf, allIntros, introDir, peopleDir, photosOf, portraitFile, lookFile, lookOf, pickedVoice, pickedAvatar, shortOf, openingOf, inReleaseOrder, sidesUsed, shapeKey, ROOT };
