@@ -41,11 +41,12 @@
   "passage": {
     "start": 25.74,
     "end": 66.52,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": null,
   "renderedAt": 1793278751016.1157,
-  "shortRenderedAt": 1793558989035.5852,
+  "shortRenderedAt": 1794343916846.5571,
   "youtube": {
     "at": "2026-11-09T03:25:04.986Z",
     "id": "Ql6lCC1VyxQ",
@@ -58,18 +59,13 @@
       "title": "Church Music"
     }
   },
-  "short": {
-    "at": "2026-11-09T04:28:23.128Z",
-    "id": "2mBHnv_GpSo",
-    "url": "https://www.youtube.com/watch?v=2mBHnv_GpSo",
-    "privacy": "public",
-    "publishAt": "2026-11-10T16:00:00.000Z",
-    "found": false,
-    "playlist": null
-  },
   "bluesky": {
     "at": "2026-11-10T15:41:26.853Z",
     "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzxroh4pyn26",
     "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzxroh4pyn26"
+  },
+  "replacedShort": {
+    "id": "2mBHnv_GpSo",
+    "on": "2026-11-10T20:52:27.794Z"
   }
 }
