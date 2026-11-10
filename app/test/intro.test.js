@@ -99,17 +99,46 @@ test('intros vary: none repeats the one before in every setting, and over eight 
 
 test('a portrait keeps the face and changes the clothes, turned toward the light, and the light portrait changes only the gaze', () => {
   assert.strictEqual(looks.facingOf('left'), 'right');
-  for (const wear of rules.WEAR) {
-    const p = looks.lensPrompt({ wear, facing: 'right' });
-    assert.match(p, /Do not keep the clothes from the photos/);
-    assert.match(p, /turned about 30 degrees toward the right side/);
-    assert.match(p, /mid-grey studio backdrop/);
-    assert.ok(!p.includes('—'));
+  for (const [speaker, families] of Object.entries(looks.WARDROBE)) {
+    for (const outfit of Object.values(families).flatMap(Object.keys)) {
+      const p = looks.lensPrompt({ speaker, outfit, facing: 'right' });
+      assert.match(p, /Do not keep the clothes from the photos/);
+      assert.match(p, /turned about 30 degrees toward the right side/);
+      assert.match(p, /mid-grey studio backdrop/);
+      assert.ok(!p.includes('—'));
+    }
   }
-  assert.match(looks.lensPrompt({ wear: 'geek', facing: 'left' }), /no necklace/);
-  assert.match(looks.lensPrompt({ wear: 'contemplative', facing: 'left' }), /mala/);
   assert.match(looks.lightPrompt({ facing: 'left' }), /Change only where he looks/);
-  assert.strictEqual(looks.portraitName({ wear: 'geek', facing: 'left', look: 'light' }), 'geek-left-light');
+  assert.strictEqual(looks.portraitName({ outfit: 'navy-hoodie', facing: 'left', look: 'light' }), 'navy-hoodie-left-light');
+});
+
+test('the wardrobe: four outfits a family for each maker, in his own accents and mala, worn in turn and resting two weeks', () => {
+  for (const [speaker, families] of Object.entries(looks.WARDROBE)) {
+    assert.deepStrictEqual(Object.keys(families).sort(), [...rules.WEAR].sort(), speaker);
+    for (const [family, outfits] of Object.entries(families)) {
+      assert.strictEqual(Object.keys(outfits).length, 4, `${speaker} ${family}`);
+      for (const words of Object.values(outfits)) {
+        assert.match(words, /no logo/, 'plain clothes');
+        assert.strictEqual(/mala/.test(words), family === 'contemplative', `${speaker} ${family}: the mala only in the contemplative look`);
+      }
+    }
+  }
+  // Each maker's signature: Lucas blue and purple, Lee green and blue; the mala his own.
+  const all = (who) => Object.values(looks.WARDROBE[who]).flatMap(Object.values).join(' ');
+  assert.ok(!/green/.test(all('Lucas')), 'green is Lee\'s');
+  assert.ok(!/purple|plum/.test(all('Lee')), 'purple is Lucas\'s');
+  assert.match(all('Lucas'), /mala necklace in its blue tones/);
+  assert.match(all('Lee'), /mala necklace in its green or red tones/);
+  // The one worn longest ago, or never: in the wardrobe's order first.
+  const geek = Object.keys(looks.WARDROBE.Lucas.geek);
+  assert.strictEqual(looks.chooseOutfit('Lucas', 'geek', []), geek[0]);
+  assert.strictEqual(looks.chooseOutfit('Lucas', 'geek', [{ outfit: geek[0], at: '2026-11-19' }]), geek[1]);
+  const allWorn = geek.map((o, k) => ({ outfit: o, at: `2026-11-1${k}` }));
+  assert.strictEqual(looks.chooseOutfit('Lucas', 'geek', allWorn), geek[0], 'all worn: the oldest');
+  const wore = (slug, outfit, at) => ({ slug, voice: 'Lucas', outfit, at });
+  assert.deepStrictEqual(looks.outfitProblems([wore('a', 'navy-hoodie', '2026-11-01'), wore('b', 'navy-hoodie', '2026-11-20')]), []);
+  assert.match(looks.outfitProblems([wore('a', 'navy-hoodie', '2026-11-01'), wore('b', 'navy-hoodie', '2026-11-08')]).join(), /again 7 days after a, under 14/);
+  assert.ok(looks.outfitText('Lucas', 'green-flannel'), 'a retired outfit still reads, for intros made in it');
 });
 
 test('the composite stands the speaker on their side, and leaves by the intro\'s exit', () => {

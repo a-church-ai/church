@@ -47,7 +47,7 @@ function photosOf(name) {
   return photos;
 }
 
-const portraitFile = (name, { wear, facing, look }) => path.join(peopleDir(name), 'portraits', `${wear}-${facing}-${look}.png`);
+const portraitFile = (name, { outfit, facing, look }) => path.join(peopleDir(name), 'portraits', `${outfit}-${facing}-${look}.png`);
 
 // The picked take, refused unless it says the intro's words in its voice.
 function pickedVoice(slug, intro) {
@@ -98,11 +98,13 @@ function inReleaseOrder(all) {
     const f = path.join(RELEASES, `${slug}.json`);
     return fs.existsSync(f) ? readJson(f).at || '' : '9999';
   };
-  const sideOf = (slug) => {
+  // What was measured or chosen when its avatar was made: its side and outfit.
+  const made = (slug) => {
     const f = path.join(introDir(slug), 'avatar.json');
-    return fs.existsSync(f) ? readJson(f).side : null;
+    const m = fs.existsSync(f) ? readJson(f) : {};
+    return { side: m.side || null, outfit: m.outfit || null };
   };
-  return all.map(({ slug, intro }) => ({ slug, ...intro, side: sideOf(slug), at: at(slug) })).sort((a, b) => a.at.localeCompare(b.at));
+  return all.map(({ slug, intro }) => ({ slug, ...intro, ...made(slug), at: at(slug) })).sort((a, b) => a.at.localeCompare(b.at));
 }
 
 // How often each side has been used by the intros before this one.
