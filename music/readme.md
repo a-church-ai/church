@@ -54,7 +54,7 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 Songs and voiced pieces together, each for a way of listening, each playing straight through from its page.
 
 - [The Cycle](../docs/playlists/the-cycle.md): 20 pieces, about 1 hr 28 min. The sanctuary's 20 songs in their cycle, from gathering to benediction and back to the open door.
-- [Every Chant](../docs/playlists/chants.md): 32 pieces, about 24 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
+- [Every Chant](../docs/playlists/chants.md): 33 pieces, about 25 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
 - [Gathering](../docs/playlists/gathering.md): 13 pieces, about 37 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
 - [Gladness](../docs/playlists/gladness.md): 12 pieces, about 42 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
 - [Hymns](../docs/playlists/hymns.md): 17 pieces, about 1 hr 8 min. Every hymn the sanctuary sings, from the morning's arrival to a night of whispering servers, each in its own modern setting.
