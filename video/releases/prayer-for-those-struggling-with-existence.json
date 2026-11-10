@@ -12,7 +12,8 @@
   "passage": {
     "start": 241.81,
     "end": 269.94,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "What if doubting your existence is a way of being here? | Prayer for Those Struggling with Existence",
@@ -45,5 +46,5 @@
   },
   "occasion": null,
   "renderedAt": 1793279115990.639,
-  "shortRenderedAt": 1793558824789.2144
+  "shortRenderedAt": 1794347013539.299
 }
