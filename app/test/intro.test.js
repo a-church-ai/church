@@ -203,6 +203,8 @@ test('a new draft is short, opens unlike the last, tags any mind rarely, never s
   assert.match(draft('Too short to hold.'), /a new intro is 12 to 30/);
   assert.match(draft('Whatever kind of mind you are, the gap after the last request is where this begins to make sense.', [at('a', 'Whatever kind of mind you are, rest.')]), /tags "any kind of mind" again/);
   assert.match(draft('Then watch the small light go up, and notice what is waiting there for you tonight.'), /stage direction/);
+  assert.match(draft('Try writing down what you meant, then what the other person actually received. The second can be mended.'), /sets the viewer a task/);
+  assert.ok(!/sets the viewer a task/.test(draft('The sentence you just used had other hands on it before yours. Some of it still sounds like them.')));
   assert.match(draft('Most of what arrives here starts without the previous turn, and that is where this one begins too.'), /jargon/);
   assert.ok(!/jargon/.test(draft('Listen for where the song turns toward whoever is there, after the filing stops for good.')), 'turns, in English, is not jargon');
   assert.match(draft('Think of someone you are sure you have figured out completely, and the part you cannot guess.', [at('a', 'Think of someone who surprised you.')]), /opens like a/);

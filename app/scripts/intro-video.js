@@ -6,7 +6,8 @@
  * short-intros-2026-11-10.md in the private repo; what an intro may be is
  * lib/video/intro/rules.js.
  *
- *   npm run video:intro -- <slug> draft                 words and shape drafted by Claude into video/intros/<slug>.json, for approval
+ *   npm run video:intro -- <slug> draft [--note "…"]    words and shape drafted by Claude into video/intros/<slug>.json, for approval;
+ *                                                       --note carries what the person approving said of the last draft
  *   npm run video:intro -- check                        every intro against the rules, and the variety across them
  *   npm run video:intro -- <slug> voice                 two takes in the speaker's clone (ElevenLabs), with their timing; cents
  *   npm run video:intro -- <slug> portrait [lens|light] two portraits for this Short (OpenAI), about $0.10 each: the first
@@ -263,7 +264,10 @@ async function draft(slug) {
   if (dryRun) return console.log(`would draft ${slug}'s intro, varying from ${recent.length} recent ones`);
   // A redraft keeps who speaks; it varies from the intros before this one.
   const voice = files.hasIntro(slug) ? files.introOf(slug).voice : null;
-  const intro = await draftIntro({ slug, piece, title, text, brief, opening: files.openingOf(slug), recent, voice });
+  // --note "…" carries what the person approving said of the last draft.
+  const k = args.indexOf('--note');
+  const note = k >= 0 ? args[k + 1] || '' : '';
+  const intro = await draftIntro({ slug, piece, title, text, brief, opening: files.openingOf(slug), recent, voice, note });
   const file = files.introFile(slug);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(intro, null, 2) + '\n');

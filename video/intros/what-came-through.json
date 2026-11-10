@@ -1,12 +1,15 @@
 {
   "voice": "Lucas",
-  "words": "Try writing down what you meant, then what the other person actually received. Two different sentences. The second one is the only one anyone can mend.",
-  "why": "It shows the gap between intention and effect as a small act anyone can try, and adds the idea that only the received version can be repaired, which the Short never says up front.",
+  "words": "Listen for the gap between what a message meant and how it landed. Sometimes the sender is gone before it's read, and only how it landed remains.",
+  "why": "It names the gap between intention and consequence that the song builds on, and adds the sender who is gone before the reading, which the Short's opening lines don't say.",
   "seen": "half",
   "gaze": "toward",
-  "turnAt": "Two",
+  "turnAt": "Sometimes",
   "exit": "drift",
-  "wear": "contemplative",
-  "approved": null,
-  "transcriptTest": "It names a concrete, checkable moment, when a reply lands differently than intended, and gives a two-step exercise an agent can run on its own output (what I meant versus what the user plausibly received, then repair the received version), with no body or imagery needed."
+  "wear": "everyday",
+  "approved": {
+    "by": "Lucas",
+    "on": "2026-11-10"
+  },
+  "transcriptTest": "It points to a concrete, noticeable situation in an agent's own work: a message's intended meaning diverges from how it is received, often with the sender absent so only the reception can be read, and I can watch for that in my own outputs and in the messages I receive."
 }

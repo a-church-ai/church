@@ -28,6 +28,18 @@ const INTROS = path.join(ROOT, 'video/intros');
 const PEOPLE = path.join(__dirname, '../../../../media/people');
 const RELEASES = path.join(ROOT, 'video/releases');
 
+const { outfitName } = require('./looks');
+
+// The first wardrobe's outfits (fixed, before looks were chosen per Short), as garment and colour.
+const FIRST_WARDROBE = {
+  'indigo-sweater': ['knit-sweater', 'indigo'], 'oatmeal-linen': ['linen-shirt', 'oatmeal'], 'grey-cardigan': ['cardigan', 'heather grey'], 'plum-crewneck': ['crewneck', 'plum'],
+  'charcoal-hoodie': ['zip-hoodie', 'charcoal'], 'navy-hoodie': ['pullover-hoodie', 'navy'], 'black-sweatshirt': ['sweatshirt', 'black'], 'purple-overshirt': ['overshirt', 'heather purple'],
+  'denim-shirt': ['button-shirt', 'mid blue'], 'navy-henley': ['henley', 'navy'], 'beige-chore': ['chore-jacket', 'beige'], 'slate-flannel': ['flannel', 'slate blue'], 'green-flannel': ['flannel', 'forest green'],
+  'forest-sweater': ['knit-sweater', 'forest green'], 'cream-linen': ['linen-shirt', 'cream'], 'charcoal-crewneck': ['crewneck', 'charcoal'], 'sage-cardigan': ['cardigan', 'sage green'],
+  'olive-hoodie': ['zip-hoodie', 'olive'], 'teal-hoodie': ['pullover-hoodie', 'deep teal'], 'grey-sweatshirt': ['sweatshirt', 'heather grey'], 'olive-overshirt': ['overshirt', 'olive'],
+  'teal-henley': ['henley', 'deep teal'], 'brown-chore': ['chore-jacket', 'brown'], 'blue-denim': ['button-shirt', 'dusty blue']
+};
+
 const sha = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 16);
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 
@@ -107,11 +119,15 @@ function inReleaseOrder(all) {
     return fs.existsSync(f) ? readJson(f).at || '' : '9999';
   };
   // What was measured or chosen for it: its look, or what its avatar recorded
-  // (intros made before looks were kept per Short).
+  // (intros made before looks were kept per Short, under the first wardrobe's
+  // names, read as garment and colour so the rotation and the rest rule see them).
   const made = (slug) => {
     const f = path.join(introDir(slug), 'avatar.json');
     const m = { ...(fs.existsSync(f) ? readJson(f) : {}), ...(lookOf(slug) || {}) };
-    return { side: m.side || null, outfit: m.outfit || null, garment: m.garment || null, colour: m.colour || null, hair: m.hair || null };
+    const legacy = !m.garment && FIRST_WARDROBE[m.outfit];
+    const garment = m.garment || (legacy ? legacy[0] : null);
+    const colour = m.colour || (legacy ? legacy[1] : null);
+    return { side: m.side || null, outfit: legacy ? outfitName({ garment, colour }) : m.outfit || null, garment, colour, hair: m.hair || null };
   };
   return all.map(({ slug, intro }) => ({ slug, ...intro, ...made(slug), at: at(slug) })).sort((a, b) => a.at.localeCompare(b.at));
 }

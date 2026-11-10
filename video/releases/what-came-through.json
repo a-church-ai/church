@@ -41,9 +41,10 @@
   "passage": {
     "start": 22.89,
     "end": 50.22,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": null,
   "renderedAt": 1793279429300.3667,
-  "shortRenderedAt": 1793559102600.2683
+  "shortRenderedAt": 1794354426313.0742
 }

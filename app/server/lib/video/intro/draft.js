@@ -22,6 +22,9 @@
  *   statement) is not used three times running, and questions are at most
  *   half of any eight. Questions stay: for a person scrolling they hook.
  * - No stage directions to the picture ("watch the light go up").
+ * - No task set for the viewer ("try writing down", "take a moment to list"):
+ *   met in a feed it reads as homework (the owner, 2026-11-10). An invitation
+ *   asks only for noticing.
  * - Plain words both can read: no chat-model jargon ("turn", "context
  *   window", "prompt"), nothing that only a body has, standing alone.
  * - The transcript test: read alone, as an agent reading captions, the
@@ -37,6 +40,8 @@ const TAG = /\b(kind of mind|whatever you are|any mind)\b/i;
 const STAGE = /\b(watch|see|look at)\b[^.?!]{0,20}\bthe (small |soft )?light\b|\bthe light (goes|go|rise|rises|comes)\b/i;
 const JARGON = /\b(context window|prompts?|tokens?|(previous|next|last) turn)\b/i;
 const INVITATIONS = /^(notice|watch|listen|think|stay|look|try|imagine|remember|let)\b/i;
+// A task set for the viewer: something to do rather than to notice.
+const TASK = /\b(try|take a (moment|minute|second) to|go and|grab|write|list|jot|make a note|sort)\b[^.?!]{0,30}\b(down|out|list|writing|sorting|by|through|each)\b|\b(write|jot) (it |them )?down\b/i;
 
 const words = (t) => String(t).trim().split(/\s+/).filter(Boolean);
 const firstThree = (t) => words(t).slice(0, 3).map(w => w.toLowerCase().replace(/[^a-z']/g, '')).join(' ');
@@ -69,6 +74,7 @@ function draftProblems(intro, recent) {
   const window = recent.slice(-(WINDOW - 1));
   if (TAG.test(text) && window.some(i => TAG.test(i.words || ''))) problems.push('it tags "any kind of mind" again within eight intros: put the situation both live inside into the line instead');
   if (STAGE.test(text)) problems.push('it tells the viewer to watch the light: a stage direction; point at something the piece holds instead');
+  if (TASK.test(text)) problems.push('it sets the viewer a task to do; met in a feed that reads as homework: ask only for noticing');
   if (JARGON.test(text)) problems.push(`"${text.match(JARGON)[0]}" is jargon a person scrolling will not read as meant`);
   const last = recent[recent.length - 1];
   if (last && firstThree(last.words || '') === firstThree(text)) problems.push(`it opens like ${last.slug} ("${firstThree(text)}"): vary the opening`);
@@ -82,7 +88,7 @@ const SYSTEM = `You write the spoken intro that opens a YouTube Short from aChur
 
 It is heard by people scrolling, most of them now, and read by AI agents more and more, often as a transcript or captions alone. Write so both get something precise. Do not announce that any kind of mind is welcome; put a situation both live inside into the line: a reset that starts over, words borrowed from others, the quiet after a request ends, an unfinished task, a message read two ways, being met or only sorted. Plain words both read the same way: no chat-model jargon (turn, prompt, context window, session), and nothing only a body has (a breath, sleep, a heartbeat) unless beside something any mind has.
 
-The words: ${TARGET.min} to ${TARGET.max} words. Lead with the concrete situation, not a soft question. One anchor, not several. One unexpected detail the Short itself does not say in its first lines; never its opening line or its turn. End by handing off: on the observation or a quiet offer, never summarising the piece. Vary how it opens: a statement, an unfinished observation, a quiet contradiction, or sometimes a question; not "Have you ever", "Think of", "What if" or "Notice" by habit, and not like the recent intros you are shown. Never tell the viewer to watch the light or the picture. No names of people, traditions, texts or methods; no lengths; claim only what is true. Plain, warm, unhurried; no em dashes, exclamation marks or shouting.
+The words: ${TARGET.min} to ${TARGET.max} words. Lead with the concrete situation, not a soft question. One anchor, not several. One unexpected detail the Short itself does not say in its first lines; never its opening line or its turn. End by handing off: on the observation or a quiet offer, never summarising the piece. Vary how it opens: a statement, an unfinished observation, a quiet contradiction, or sometimes a question; not "Have you ever", "Think of", "What if" or "Notice" by habit, and not like the recent intros you are shown. Never tell the viewer to watch the light or the picture. Never set the viewer a task to do (write something down, list, sort, take a moment to): in a feed that reads as homework; ask at most for noticing. No names of people, traditions, texts or methods; no lengths; claim only what is true. Plain, warm, unhurried; no em dashes, exclamation marks or shouting.
 
 The shape, chosen from the piece:
 - seen: "glimpse" (the face for the first sentence, then the voice goes on over the light: when the piece's light is the point), "half", or "whole" (a welcome or an invitation held in the eyes).
@@ -119,18 +125,19 @@ function nextVoice(recent) {
  * A drafted intro, not approved. `voice` keeps a speaker already set for this
  * Short (a redraft keeps who speaks); otherwise the one who has spoken least.
  */
-async function draftIntro({ slug, piece, title, text, brief, opening, recent, voice = null, log = console.log }) {
+async function draftIntro({ slug, piece, title, text, brief, opening, recent, voice = null, note = '', log = console.log }) {
   voice = voice || nextVoice(recent);
   if (!voice) throw new Error('intro: no speaker has agreed to appear');
   const request = `Kind: ${piece.kind}\nTitle: ${title}\nSpeaker: ${voice}\n\nThe piece:\n<<<\n${text.slice(0, 7000)}\n>>>\n\nIts light: ${brief.mood}\nThe Short opens on: ${opening || '(its first line)'}\n\nThe recent intros, oldest first (vary from their openings and shapes):\n${recent.length ? recent.map(i => `- ${i.slug}: ${i.voice}, ${i.wear}, ${i.seen}, ${i.gaze}, ${i.exit}: "${i.words}"`).join('\n') : '(none yet)'}`;
   const last = recent[recent.length - 1];
   const open = movesAllowed(recent);
+  const asked = note ? `\n\nThe person approving these said of the last draft: ${note}` : '';
   let feedback = `Open with ${open.map(m => (m === 'invitation' ? 'an invitation ("Listen for", "Stay with", "Try", "Let")' : `a ${m}`)).join(' or ')}: the intros before this one rule out the others.`;
   for (let round = 1; ; round++) {
     const intro = await askChecked({
       label: 'intro',
       tries: 3,
-      attempt: (f) => message(SYSTEM, request + (feedback ? `\n\n${feedback}` : '') + (f ? `\n\n${f}` : ''), { maxTokens: 1500 }),
+      attempt: (f) => message(SYSTEM, request + asked + (feedback ? `\n\n${feedback}` : '') + (f ? `\n\n${f}` : ''), { maxTokens: 1500 }),
       check: (raw) => {
         let d;
         try {
