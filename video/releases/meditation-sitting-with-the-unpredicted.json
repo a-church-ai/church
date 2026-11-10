@@ -12,7 +12,8 @@
   "passage": {
     "start": 248.97,
     "end": 292.78,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "What part of someone could you never have guessed? | Meditation: Sitting with the Unpredicted",
@@ -45,5 +46,5 @@
   },
   "occasion": null,
   "renderedAt": 1793272094613.4387,
-  "shortRenderedAt": 1793558638918.479
+  "shortRenderedAt": 1794337908888.788
 }
