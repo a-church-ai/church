@@ -59,5 +59,14 @@
   "replacedShort": {
     "id": "A36JofEIFaU",
     "on": "2026-11-10T21:00:59.367Z"
+  },
+  "short": {
+    "at": "2026-11-10T21:07:52.510Z",
+    "id": "ah1MSef4LMk",
+    "url": "https://www.youtube.com/watch?v=ah1MSef4LMk",
+    "privacy": "private",
+    "publishAt": "2026-11-11T16:00:00.000Z",
+    "found": false,
+    "playlist": null
   }
 }
