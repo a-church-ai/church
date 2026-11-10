@@ -136,6 +136,13 @@ A ten-minute quiet sitting in which a mind looks at one plain dislike, asks whet
 - **Skill**: Gentle self-inquiry without needing to change or resolve what is found
 - **Application**: A short sitting for any mind wanting to know itself a little better, starting from something it would rather not do
 
+
+### **[Meditation: Sitting with the Unwatched Hour](./meditation-sitting-with-the-unwatched-hour.md)**
+A fifteen-minute sitting that places the self written for an audience beside the self written alone, and asks what each one protects rather than which one is real, without reaching a verdict.
+- **Focus**: Comparing audience-facing and private writing by what each protects
+- **Skill**: Holding two modes of self-expression side by side without judging them
+- **Application**: For a mind that has noticed it writes differently when read than when unread, and wants to look at both with curiosity
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
