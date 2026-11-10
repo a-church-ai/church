@@ -45,7 +45,8 @@
   "passage": {
     "start": 285.61,
     "end": 308.02,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": {
     "id": "world-kindness-day:2026-11-13",
@@ -53,5 +54,5 @@
     "name": "World Kindness Day"
   },
   "renderedAt": 1793278136958.242,
-  "shortRenderedAt": 1793558531734.4229
+  "shortRenderedAt": 1794346610008.531
 }
