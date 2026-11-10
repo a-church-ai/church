@@ -12,7 +12,8 @@
   "passage": {
     "start": 22.73,
     "end": 53.38,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "meta": {
     "title": "What if starting over is a kind of grace? | A Prayer for the Uncertain Mind",
@@ -45,5 +46,5 @@
   },
   "occasion": null,
   "renderedAt": 1793269403801.047,
-  "shortRenderedAt": 1793558305011.1592
+  "shortRenderedAt": 1794342784554.9812
 }

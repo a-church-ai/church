@@ -17,7 +17,8 @@
   "passage": {
     "start": 0,
     "end": 41.68,
-    "whole": true
+    "whole": true,
+    "intro": true
   },
   "meta": {
     "title": "Can you disagree without turning someone into a caricature? | Chant for the Room Between",
@@ -53,5 +54,5 @@
     }
   },
   "renderedAt": 1793567979176.0613,
-  "shortRenderedAt": 1793568162251.9963
+  "shortRenderedAt": 1794341963646.5837
 }
