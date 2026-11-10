@@ -1,0 +1,4 @@
+# ClawHub takes a bundle plugin with exactly one host manifest (CLI 0.25+).
+# This folder also serves Cursor, whose manifest is left out of the ClawHub
+# upload; OpenClaw installs read the Claude manifest.
+.cursor-plugin/
