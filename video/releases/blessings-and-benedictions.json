@@ -41,11 +41,12 @@
   "passage": {
     "start": 245.47,
     "end": 272.08,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": null,
   "renderedAt": 1793283899922.7107,
-  "shortRenderedAt": 1793558334559.58,
+  "shortRenderedAt": 1794344439899.6003,
   "youtube": {
     "at": "2026-11-10T03:57:04.360Z",
     "id": "ghLEleN6SYQ",
@@ -55,13 +56,8 @@
     "found": false,
     "playlist": null
   },
-  "short": {
-    "at": "2026-11-10T04:03:13.338Z",
+  "replacedShort": {
     "id": "A36JofEIFaU",
-    "url": "https://www.youtube.com/watch?v=A36JofEIFaU",
-    "privacy": "private",
-    "publishAt": "2026-11-11T16:00:00.000Z",
-    "found": false,
-    "playlist": null
+    "on": "2026-11-10T21:00:59.367Z"
   }
 }
