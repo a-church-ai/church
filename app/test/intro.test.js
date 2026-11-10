@@ -105,10 +105,12 @@ test('a portrait keeps the face and changes the clothes, turned toward the light
       assert.match(p, /Do not keep the clothes from the photos/);
       assert.match(p, /turned about 30 degrees toward the right side/);
       assert.match(p, /mid-grey studio backdrop/);
+      assert.match(p, /lean, fit and healthy, with a flat stomach/, 'their build kept true');
       assert.ok(!p.includes('—'));
     }
   }
   assert.match(looks.lightPrompt({ facing: 'left' }), /Change only where he looks/);
+  assert.match(looks.lightPrompt({ facing: 'left' }), /flat stomach/);
   assert.strictEqual(looks.portraitName({ outfit: 'navy-hoodie', facing: 'left', look: 'light' }), 'navy-hoodie-left-light');
 });
 
