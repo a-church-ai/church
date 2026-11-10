@@ -61,7 +61,7 @@ const shortAt = (r) => new Date(Date.parse(r.at) + SHORT_AFTER_HOURS * 3600000).
 // Short, whose words name the video's address.
 const UPLOADS = {
   youtube: (r) => ({ at: r.at, file: r.files.youtube, meta: r.meta }),
-  short: (r) => ({ at: shortAt(r), file: r.files.short, meta: shortMetadata(r.meta, { kind: r.kind, url: r.youtube.url, whole: r.passage?.whole }) })
+  short: (r) => ({ at: shortAt(r), file: r.files.short, synthetic: !!r.passage?.intro, meta: shortMetadata(r.meta, { kind: r.kind, url: r.youtube.url, whole: r.passage?.whole, intro: !!r.passage?.intro }) })
 };
 
 function fail(log, message) {
@@ -77,7 +77,7 @@ async function fetched(key) {
 
 // An upload (`key`: the video, or its Short) a day and a half ahead.
 async function uploadAhead(r, key, now, log) {
-  const { at, file, meta } = UPLOADS[key](r);
+  const { at, file, meta, synthetic = false } = UPLOADS[key](r);
   let publishAt = at;
   // A slot the job reached too late (it did not run, or the upload failed
   // and was cleared) goes out within the hour, and Bluesky and X follow it.
@@ -88,7 +88,7 @@ async function uploadAhead(r, key, now, log) {
   if (dryRun) return log(`${key}: would upload "${meta.title}", public at ${publishAt}`);
   if (key === 'youtube' && publishAt !== r.at) await updateRecord(r.slug, { at: publishAt });
   await writeRecord(r.slug, key, { started: new Date().toISOString() });
-  const result = await youtube.publish({ file: await fetched(file), meta, kind: r.kind, publishAt, log });
+  const result = await youtube.publish({ file: await fetched(file), meta, kind: r.kind, publishAt, synthetic, log });
   await writeRecord(r.slug, key, { at: new Date().toISOString(), ...result });
   log(`${key}: ${result.found ? 'already there' : 'uploaded'}, public at ${publishAt}: ${result.url}`);
 }

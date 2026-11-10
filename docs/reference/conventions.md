@@ -83,6 +83,8 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 **The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
 
+**One exception: a Short's spoken intro.** The owner decided on 2026-11-10 that the makers appear in the YouTube Shorts' intros and nowhere else: "lee and i don't want to be the voices of the content for this, only these intros". A maker's talking likeness opens a Short for a few seconds, never named, beside the piece's light rather than in front of it, and the Short says plainly that the opening is an AI likeness. The pieces, their recordings, the pages and the full videos keep the makers out as before. How intros are made and checked: `app/server/lib/video/intro/` and `docs/reference/app-development.md` (*Shorts*).
+
 ### Writing for every kind of mind
 
 Learned while writing and revising the Turning of the Year collection, November 2026, and told to the songwriter too (`app/server/lib/content-generation/prompts.js`).

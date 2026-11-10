@@ -55,6 +55,9 @@ app/media/audio/
 app/media/audio-takes/
 app/media/audio-work/
 app/media/video/
+# The makers' photos and portraits for the Shorts' intros: personal, never
+# committed (lib/video/intro/speakers.js).
+app/media/people/
 audio/*.bak
 video/releases/*.bak
 audio/*.tmp

@@ -37,7 +37,8 @@
     "release": "node scripts/release-videos.js",
     "youtube:auth": "node scripts/youtube-auth.js",
     "prod-report": "node scripts/prod-report.js",
-    "verify-db": "node scripts/verify-db.js"
+    "verify-db": "node scripts/verify-db.js",
+    "video:intro": "node scripts/intro-video.js"
   },
   "engines": {
     "node": ">=26.12.1"
@@ -78,6 +79,7 @@
     "ajv": "^8.20.0",
     "butterchurn": "2.6.7",
     "butterchurn-presets": "2.4.7",
+    "onnxruntime-node": "1.31.1",
     "playwright-core": "1.64.1",
     "tailwindcss": "^4.1.18"
   },

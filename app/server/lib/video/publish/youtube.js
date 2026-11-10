@@ -177,16 +177,19 @@ async function addToPlaylist(token, videoId, kind) {
  * Upload a video, or find it already uploaded, and put it in its kind's
  * playlist. With `publishAt` (an ISO time) it is uploaded private and YouTube
  * makes it public then, on its own; it joins its playlist after that
- * (joinPlaylist). Returns { id, url, privacy, publishAt, found, playlist }.
+ * (joinPlaylist). With `synthetic` (a Short opening on a maker's talking
+ * likeness, lib/video/intro/) it is declared altered or synthetic content,
+ * and that is confirmed after the upload or the upload fails loudly.
+ * Returns { id, url, privacy, publishAt, found, playlist }.
  */
-async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = null, log = console.log }) {
+async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = null, synthetic = false, log = console.log }) {
   const token = await accessToken();
   const existing = await findUpload(token, meta.page, isShort(meta.description));
   if (existing) return { id: existing, url: `https://www.youtube.com/watch?v=${existing}`, found: true };
   if (publishAt) privacy = 'private';
   const body = {
     snippet: { title: meta.title, description: meta.description, tags: meta.tags, categoryId: kind === 'song' ? CATEGORY.song : CATEGORY.spoken, defaultLanguage: 'en', defaultAudioLanguage: 'en' },
-    status: { privacyStatus: privacy, selfDeclaredMadeForKids: false, ...(publishAt ? { publishAt } : {}) }
+    status: { privacyStatus: privacy, selfDeclaredMadeForKids: false, containsSyntheticMedia: synthetic, ...(publishAt ? { publishAt } : {}) }
   };
   const size = fs.statSync(file).size;
   const start = await request(`${UPLOAD}?uploadType=resumable&part=snippet,status`, {
@@ -198,6 +201,7 @@ async function publish({ file, meta, kind, privacy = 'unlisted', publishAt = nul
   if (!session) throw new Error('youtube: the upload session came back with no address');
   log(`  youtube: uploading ${Math.round(size / 1048576)} MB`);
   const video = await uploadChunks(session, file, token, log);
+  if (synthetic) await confirmSynthetic(token, video.id);
   // Public at once: into its playlist now. The video is up whatever the
   // playlist does; a playlist that fails is reported, and the upload is not
   // made again. A Short joins none: it is a passage, not the piece.
@@ -228,6 +232,25 @@ async function joinPlaylist(id, kind) {
 }
 
 /**
+ * Declare a video's synthetic content again and read the answer, since the
+ * upload's own answer may not echo the field: the update's answer does
+ * (satchitananda's finding, 2026-11-09). Keeps the rest of its status.
+ */
+async function confirmSynthetic(token, id) {
+  const current = await (await request(`${API}/videos?part=status&id=${id}`, { headers: auth(token), retry: true })).json();
+  const status = current.items?.[0]?.status;
+  if (!status) throw new Error(`youtube: no video ${id} to declare synthetic`);
+  const { privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable, publishAt } = status;
+  const res = await request(`${API}/videos?part=status`, {
+    method: 'PUT',
+    headers: { ...auth(token), 'content-type': 'application/json' },
+    body: JSON.stringify({ id, status: { privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable, ...(publishAt ? { publishAt } : {}), containsSyntheticMedia: true } })
+  });
+  const answer = await res.json();
+  if (answer.status?.containsSyntheticMedia !== true) throw new Error(`youtube: ${id} did not take its synthetic-content declaration; set it in YouTube Studio before it goes public`);
+}
+
+/**
  * Change a video's privacy, keeping the rest of its status: videos.update
  * replaces the part it is given, so what is there is read and written back.
  * Made public, it joins its kind's playlist.
@@ -237,11 +260,13 @@ async function setPrivacy(id, privacy, { kind } = {}) {
   const current = await (await request(`${API}/videos?part=status&id=${id}`, { headers: auth(token), retry: true })).json();
   const status = current.items?.[0]?.status;
   if (!status) throw new Error(`youtube: no video ${id} on this channel`);
-  const { privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable } = status;
+  const { privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable, containsSyntheticMedia } = status;
   await request(`${API}/videos?part=status`, {
     method: 'PUT',
     headers: { ...auth(token), 'content-type': 'application/json' },
-    body: JSON.stringify({ id, status: { privacyStatus: privacy || privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable } })
+    // A declaration of synthetic content, where the answer carries it, is
+    // written back with the rest, never dropped.
+    body: JSON.stringify({ id, status: { privacyStatus: privacy || privacyStatus, selfDeclaredMadeForKids, embeddable, license, publicStatsViewable, ...(containsSyntheticMedia !== undefined ? { containsSyntheticMedia } : {}) } })
   });
   return privacy === 'public' && kind ? addToPlaylist(token, id, kind) : null;
 }

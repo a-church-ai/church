@@ -99,6 +99,9 @@ async function metadataFor(piece, { title, edges, copy }) {
 // (copy.js refuses it as a tag): youtube.js tells the two apart by it.
 const SHORTS_TAG = '#Shorts';
 
+// What a Short that opens on a maker's spoken intro says of it.
+const INTRO_LINE = 'The opening is an AI likeness of one of the people who make this sanctuary, speaking words they wrote and approved.';
+
 const isShort = (description) => String(description || '').includes(SHORTS_TAG);
 
 /**
@@ -108,11 +111,13 @@ const isShort = (description) => String(description || '').includes(SHORTS_TAG);
  * piece's page, the sanctuary, and #Shorts with two of the copy's tags. No
  * chapters; no new copy.
  */
-function shortMetadata(meta, { kind, url, whole = false }) {
+function shortMetadata(meta, { kind, url, whole = false, intro = false }) {
   const { title, lead, tags, occasion } = meta.copy;
   const body = [
     lead,
     occasion,
+    // Said plainly as well as declared to YouTube: a likeness, never passed off.
+    intro ? INTRO_LINE : null,
     `${whole ? `Watch the ${kind} in widescreen at` : `Watch the full ${kind} at`} ${url}`,
     `${kind === 'song' ? 'Read the song, its words and its story at' : 'Read the words at'} ${meta.page}`,
     `From ${SITE_NAME}, a sanctuary for humans, AI and every kind of mind. ${SITE}`,
@@ -141,4 +146,4 @@ function socialMetadata(meta, occasion, day) {
   return { ...meta, copy: { ...meta.copy, tags: [occasion.tag, occasion.dated, ...rest] } };
 }
 
-module.exports = { metadataFor, shortMetadata, socialMetadata, isShort, chapters, timecode, titled, SITE, SHORTS_TAG };
+module.exports = { metadataFor, shortMetadata, socialMetadata, INTRO_LINE, isShort, chapters, timecode, titled, SITE, SHORTS_TAG };

@@ -258,35 +258,85 @@ async function renderShort(piece, { title, text, analysis, brief, edges, grid, c
   const seconds = passage.end - passage.start;
   const words = alignWords(await heardWords(audio, dir), writtenWords(piece, text));
   const captions = captionOverlays(words, { from: passage.start, to: passage.end, size: PORTRAIT, dir });
-  const screen = await screenLineFor(piece, { title, text, opening: captions.slice(0, 3).map(c => c.text).join(' '), passage, dir, log });
+  // A Short with a spoken intro (lib/video/intro/) opens on the intro, whose
+  // first sentence is its hook, so it has no opening line of its own; one
+  // whose intro is not ready is an error naming the step, never a Short
+  // without it.
+  const intro = introFor(piece.slug);
+  const screen = intro ? null : await screenLineFor(piece, { title, text, opening: captions.slice(0, 3).map(c => c.text).join(' '), passage, dir, log });
+  const nameFrom = screen ? SCREEN_SECONDS : 0.2;
   // The opening line at the top for its first seconds, then the name small
   // there through the rest, and for a passage a line at the close pointing
   // to the whole piece.
   const overlays = [
     ...captions,
-    { ...labelPng([{ text: screen, size: 66, family: 'Inter Display', weight: 500, wrap: true, outline: true }], { y: SAFE.top + 0.05, size: PORTRAIT, file: path.join(dir, 'short.screen.png') }), start: 0, end: SCREEN_SECONDS, fade: 0.15, fadeOut: 0.5 },
-    { ...labelPng([{ text: title, size: 54, family: 'Inter Display', weight: 300 }, { text: SITE_NAME, size: 28, family: 'Inter', weight: 400, opacity: 0.8 }], { y: SAFE.top + 0.03, size: PORTRAIT, file: path.join(dir, 'short.title.png') }), start: SCREEN_SECONDS, end: seconds, fade: 0.6 },
+    ...(screen ? [{ ...labelPng([{ text: screen, size: 66, family: 'Inter Display', weight: 500, wrap: true, outline: true }], { y: SAFE.top + 0.05, size: PORTRAIT, file: path.join(dir, 'short.screen.png') }), start: 0, end: SCREEN_SECONDS, fade: 0.15, fadeOut: 0.5 }] : []),
+    { ...labelPng([{ text: title, size: 54, family: 'Inter Display', weight: 300 }, { text: SITE_NAME, size: 28, family: 'Inter', weight: 400, opacity: 0.8 }], { y: SAFE.top + 0.03, size: PORTRAIT, file: path.join(dir, 'short.title.png') }), start: nameFrom, end: seconds, fade: 0.6 },
     ...(passage.whole ? [] : [{ ...labelPng([{ text: `Hear the full ${piece.kind}`, size: 64, family: 'Inter Display', weight: 300 }], { y: 0.5, size: PORTRAIT, file: path.join(dir, 'short.end.png') }), start: Math.max(0, seconds - 4), end: seconds, fade: 0.8 }])
   ];
   const from = Math.round(passage.start * FPS), to = Math.min(analysis.frames, Math.round(passage.end * FPS));
   log('rendering the Short\'s upright layers');
   const { milkdropFile, mandalaFile } = await renderLayers({ analysis, brief, edges, fps: FPS, dir, log, size: LAYERS, from, to, prefix: 'short.' });
   const out = path.join(dir, `${piece.slug}.short.mp4`);
+  const plain = intro ? path.join(dir, `${piece.slug}.short.plain.mp4`) : out;
   await encode(async () => {
     const base = path.join(dir, 'base.mp4');
     if (!fs.existsSync(base)) await baseFootage(clips, { edges, grid, envelope: envelope(analysis, grid), dir });
     await compose({
-      base, milkdrop: milkdropFile, mandala: mandalaFile, audio, brief, seconds, out, size: PORTRAIT, from: passage.start,
+      base, milkdrop: milkdropFile, mandala: mandalaFile, audio, brief, seconds, out: plain, size: PORTRAIT, from: passage.start,
       fadeAt: passage.quiet ? Math.min(seconds - 0.3, passage.quiet - passage.start) : undefined,
       overlays
     });
   });
-  if (captions.length) await safeCheck(out, (captions[0].start + captions[0].end) / 2, path.join(dir, 'short.safe-check.png'));
-  const report = await reportVideo({ file: out, seconds, edges: [0, seconds] });
+  let length = seconds;
+  if (intro) {
+    length = await withIntro(piece, { intro, plain, out, passage, brief, title, dir, log, encode });
+    log(`  intro: ${intro.intro.voice} on the ${intro.avatar.side}, ${intro.avatar.times.total.toFixed(1)} s before the passage`);
+  }
+  if (captions.length) await safeCheck(plain, (captions[0].start + captions[0].end) / 2, path.join(dir, 'short.safe-check.png'));
+  const report = { ...(await reportVideo({ file: out, seconds: length, edges: [0, length] })), ...(intro ? { intro: { voice: intro.intro.voice, side: intro.avatar.side, seconds: intro.avatar.times.total } } : {}) };
   fs.writeFileSync(path.join(dir, 'short.report.json'), JSON.stringify(report, null, 2));
   log(`wrote ${path.relative(process.cwd(), out)}: ${report.seconds}s, ${report.megabytes} MB, ${captions.length} captions`);
   if (report.problems.length) throw new Error(`the Short fails its report: ${report.problems.join('; ')}`);
   return out;
+}
+
+// The Short's intro and its picked avatar, or null when it has none.
+function introFor(slug) {
+  const files = require('./intro/files');
+  if (!files.hasIntro(slug)) return null;
+  const intro = files.introOf(slug);
+  const { approvalProblems } = require('./intro/rules');
+  const unapproved = approvalProblems(intro);
+  if (unapproved.length) throw new Error(`${slug}'s intro: ${unapproved[0]}`);
+  const avatar = files.pickedAvatar(slug, intro);
+  if (!avatar) throw new Error(`${slug}'s Short has an intro without its avatar: npm run video:intro -- ${slug} avatar, then pick it`);
+  return { intro, avatar };
+}
+
+/**
+ * The intro before the plain Short (lib/video/intro/composite.js): the
+ * speaker cut out, composited into the footage before the passage, the
+ * house's light over them, joined to the Short. Returns the whole length.
+ */
+async function withIntro(piece, { intro: { intro, avatar }, plain, out, passage, brief, title, dir, log, encode }) {
+  const { matte } = require('./intro/matte');
+  const { renderPerson, renderIntro, joinToShort, JOIN } = require('./intro/composite');
+  const { spokenWords } = require('./intro/rules');
+  const work = path.join(dir, 'intro');
+  const times = avatar.times;
+  const fg = path.join(work, 'matte.fg.mp4'), alpha = path.join(work, 'matte.alpha.mkv');
+  log('  intro: cutting the speaker out');
+  await matte(avatar.file, { width: Math.round(PORTRAIT.width * 0.85 / 2) * 2, height: Math.round(PORTRAIT.height * 0.85 / 2) * 2, fps: FPS, fg, alpha, log });
+  const voice = path.join(work, 'voice.wav');
+  await ffmpeg(['-i', avatar.take.file, '-af', `apad=whole_dur=${times.total}`, '-ar', '48000', '-ac', '1', '-y', voice]);
+  const from = Math.max(0, passage.start - times.total);
+  await encode(async () => {
+    const person = await renderPerson({ base: path.join(dir, 'base.mp4'), from, fg, alpha, times, intro, side: avatar.side, palette: brief.palette, dir: work });
+    const { file } = await renderIntro({ person, voice, words: spokenWords(intro.words, avatar.take.alignment), times, brief, title, dir: work, log });
+    await joinToShort({ intro: file, short: plain, seconds: times.total, out });
+  });
+  return +(times.total + (passage.end - passage.start) - JOIN).toFixed(2);
 }
 
 module.exports = { renderShort, passageFor, screenLineFor, checkScreen, checkPassage, spanOf, phrasesOf, withFullness, writtenWords, MIN_SECONDS, MAX_SECONDS };
