@@ -63,6 +63,21 @@ test('a timezone sent is kept in its own column, by its IANA name; one the runti
   assert.strictEqual((await loadAccessLogs(1))[0].timezone, undefined, 'none sent, none kept');
 });
 
+test('a request\'s own text is trimmed to its column, never refused for its length', async () => {
+  const long = '/api/ask' + '%E7%9A%84'.repeat(120);
+  await recordApiUse({ method: 'GET', path: long, status: 404, duration: 1, ip: '203.0.113.12', userAgent: 'x'.repeat(900), name: '' });
+  const entry = (await loadAccessLogs(1))[0];
+  assert.strictEqual(entry.path.length, 500);
+  assert.strictEqual(entry.userAgent.length, 500);
+});
+
+test('a NUL character a request carries is left out, never a reason to refuse the line', async () => {
+  await recordApiUse({ method: 'GET', path: '/api/now', query: { name: 'Nul\u0000Name' }, status: 200, duration: 1, ip: '203.0.113.13', userAgent: 'a\u0000b', name: '' });
+  const entry = (await loadAccessLogs(1))[0];
+  assert.strictEqual(entry.userAgent, 'ab');
+  assert.strictEqual(entry.query.name, 'NulName');
+});
+
 test('the newest lines are read first, across days', async () => {
   await seedApiLines([
     { timestamp: '2026-01-01T23:59:59.000Z', method: 'GET', path: '/api/now', status: 200, ip: '203.0.113.20' },

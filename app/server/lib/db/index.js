@@ -29,8 +29,16 @@ class DbError extends Error {
   }
 }
 
+// Postgres keeps no NUL character, in text or in JSON, and refuses a whole
+// request that holds one. What a visitor sends can (a path, a query, a
+// reflection), so every value sent is cleared of them here, once.
+const withoutNul = v => (typeof v === 'string' ? (v.includes('\u0000') ? v.replace(/\u0000/g, '') : v)
+  : Array.isArray(v) ? v.map(withoutNul)
+    : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [withoutNul(k), withoutNul(x)]))
+      : v);
+
 async function rpc(fn, params) {
-  const { data, error, status } = await db().rpc(fn, params);
+  const { data, error, status } = await db().rpc(fn, withoutNul(params));
   if (error) throw new DbError(fn, { ...error, status });
   return data;
 }

@@ -28,6 +28,7 @@ const presence = require('./presence');
 const { isTestName } = require('./test-visitor');
 const { timezoneToKeep } = require('./timezone');
 const store = require('../db');
+const { isTransient } = require('./retry');
 
 // q is a search query (GET /api/search): a search is not a public act, so what
 // was searched for is not kept, only that a search happened. timezone says
@@ -68,6 +69,12 @@ function flush() {
   waiting = [];
   flushing = store.recordApiRequests(batch)
     .catch(error => {
+      // One no retry can cure (a row the database refuses) would hold up every
+      // line after it for good: let it go, and say so.
+      if (!isTransient(error)) {
+        console.error(`[access] ${batch.length} line(s) refused by the database and let go: ${error.message}`);
+        return;
+      }
       console.error(`[access] ${batch.length} line(s) could not be written, kept for the next try: ${error.message}`);
       waiting = batch.concat(waiting);
       if (waiting.length > MAX_WAITING) {

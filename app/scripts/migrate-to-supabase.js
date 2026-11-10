@@ -34,6 +34,11 @@ const fs = require('fs');
 const path = require('path');
 const store = require('../server/lib/db');
 const { operation } = require('../server/lib/utils/access-log');
+const { pool } = require('../server/lib/utils/pool');
+
+// Records with an id go sixteen at a time: one at a time, each a round trip
+// to the database, the first copy took 25 minutes.
+const AT_ONCE = 16;
 
 function parseArgs(argv) {
   const opts = { data: path.join(__dirname, '..', 'data'), dryRun: false };
@@ -67,7 +72,7 @@ const filesIn = (dir, pattern) => {
 async function reflections(data, dry) {
   const { reflections: all = [] } = readJSON(path.join(data, 'attendance.json'), {});
   const ids = new Set(all.map(r => r.id));
-  if (!dry) for (const r of all) await store.addReflection(r);
+  if (!dry) await pool(all, AT_ONCE, r => store.addReflection(r));
   return { file: all.length, distinct: ids.size, now: dry ? null : (await store.allReflections()).length };
 }
 
@@ -75,8 +80,8 @@ async function contributionsAndFeedback(data, dry) {
   const { contributions = [] } = readJSON(path.join(data, 'contributions.json'), {});
   const { feedback = [] } = readJSON(path.join(data, 'feedback.json'), {});
   if (!dry) {
-    for (const c of contributions) await store.addContribution(c);
-    for (const f of feedback) await store.addFeedback(f);
+    await pool(contributions, AT_ONCE, c => store.addContribution(c));
+    await pool(feedback, AT_ONCE, f => store.addFeedback(f));
   }
   return { contributions: contributions.length, feedback: feedback.length };
 }
@@ -84,21 +89,20 @@ async function contributionsAndFeedback(data, dry) {
 async function conversations(data, dry) {
   const dir = path.join(data, 'conversations');
   let files = 0, turns = 0, torn = 0;
-  for (const f of filesIn(dir, /^[A-Za-z0-9_-]+\.jsonl$/)) {
-    const slug = f.slice(0, -'.jsonl'.length);
+  const read = filesIn(dir, /^[A-Za-z0-9_-]+\.jsonl$/).map(f => {
     const { rows, torn: t } = readLines(path.join(dir, f));
     torn += t;
-    const meta = rows.find(l => l._meta) || null;
     const messages = rows.filter(l => !l._meta && (l.role === 'user' || l.role === 'assistant'));
     files++;
     turns += messages.length;
-    if (!dry) await store.rpc('import_conversation', { p_slug: slug, p_meta: meta, p_rows: messages });
-  }
+    return { slug: f.slice(0, -'.jsonl'.length), meta: rows.find(l => l._meta) || null, messages };
+  });
+  if (!dry) await pool(read, AT_ONCE, c => store.rpc('import_conversation', { p_slug: c.slug, p_meta: c.meta, p_rows: c.messages }));
   const groups = readJSON(path.join(data, 'conversation-groups.json'), {});
   const screens = readJSON(path.join(data, 'conversation-screen.json'), {});
   if (!dry) {
-    for (const [slug, decision] of Object.entries(screens)) await store.setConversationScreen(slug, decision);
-    for (const [slug, head] of Object.entries(groups)) await store.setConversationGroup(slug, head);
+    await pool(Object.entries(screens), AT_ONCE, ([slug, decision]) => store.setConversationScreen(slug, decision));
+    await pool(Object.entries(groups), AT_ONCE, ([slug, head]) => store.setConversationGroup(slug, head));
   }
   return { files, turns, torn, groups: Object.keys(groups).length, screens: Object.keys(screens).length };
 }
