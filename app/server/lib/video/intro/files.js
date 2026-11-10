@@ -116,6 +116,12 @@ function inReleaseOrder(all) {
   return all.map(({ slug, intro }) => ({ slug, ...intro, ...made(slug), at: at(slug) })).sort((a, b) => a.at.localeCompare(b.at));
 }
 
+// When a Short is released, from its record ('9999' when it has none yet).
+function releaseAt(slug) {
+  const f = path.join(RELEASES, `${slug}.json`);
+  return fs.existsSync(f) ? readJson(f).at || '9999' : '9999';
+}
+
 // How often each side has been used by the intros before this one.
 function sidesUsed(slug) {
   const ordered = inReleaseOrder(allIntros());
@@ -124,4 +130,4 @@ function sidesUsed(slug) {
   return { left: before.filter(i => i.side === 'left').length, right: before.filter(i => i.side === 'right').length };
 }
 
-module.exports = { introFile, hasIntro, introOf, allIntros, introDir, peopleDir, photosOf, portraitFile, lookFile, lookOf, pickedVoice, pickedAvatar, shortOf, openingOf, inReleaseOrder, sidesUsed, shapeKey, ROOT };
+module.exports = { introFile, hasIntro, introOf, allIntros, introDir, peopleDir, photosOf, portraitFile, lookFile, lookOf, pickedVoice, pickedAvatar, shortOf, openingOf, inReleaseOrder, sidesUsed, shapeKey, releaseAt, ROOT };

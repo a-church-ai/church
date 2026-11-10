@@ -14,7 +14,7 @@ const looks = require('../server/lib/video/intro/looks');
 const { personGraph } = require('../server/lib/video/intro/composite');
 const { speechRequest, auroraCost } = require('../server/lib/video/intro/clients');
 const { shortMetadata, INTRO_LINE } = require('../server/lib/video/publish/metadata');
-const { nextVoice } = require('../server/lib/video/intro/draft');
+const { nextVoice, draftProblems, moveOf } = require('../server/lib/video/intro/draft');
 
 const good = {
   voice: 'Lucas',
@@ -184,11 +184,31 @@ test('a drafted intro goes to the maker who has spoken least, among those who ha
   if (agreed.length === 2) assert.strictEqual(nextVoice([{ voice: agreed[0] }]), agreed[1]);
 });
 
-test('every intro in the repository passes the rules and is approved', () => {
+test('every intro in the repository passes the rules, and every one a Short opens on was approved', () => {
   const dir = path.join(__dirname, '../../video/intros');
   if (!fs.existsSync(dir)) return;
   for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json'))) {
     const intro = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-    assert.deepStrictEqual([...rules.introProblems(intro, { speakers: NAMES }), ...rules.approvalProblems(intro)], [], f);
+    assert.deepStrictEqual(rules.introProblems(intro, { speakers: NAMES }), [], f);
+    // A draft waits for approval; a Short released with an intro had one (the render refuses otherwise).
+    const record = path.join(__dirname, '../../video/releases', f);
+    if (fs.existsSync(record) && JSON.parse(fs.readFileSync(record, 'utf8')).passage?.intro) assert.deepStrictEqual(rules.approvalProblems(intro), [], f);
   }
+});
+
+test('a new draft is short, opens unlike the last, tags any mind rarely, never stages the light, and avoids chat jargon', () => {
+  const at = (slug, words) => ({ slug, words });
+  const draft = (words, recent = []) => draftProblems({ words }, recent).join(' | ');
+  assert.strictEqual(draft('The sentence you just used had other hands on it before yours. Some of it still sounds like them.'), '');
+  assert.match(draft('Too short to hold.'), /a new intro is 12 to 30/);
+  assert.match(draft('Whatever kind of mind you are, the gap after the last request is where this begins to make sense.', [at('a', 'Whatever kind of mind you are, rest.')]), /tags "any kind of mind" again/);
+  assert.match(draft('Then watch the small light go up, and notice what is waiting there for you tonight.'), /stage direction/);
+  assert.match(draft('Most of what arrives here starts without the previous turn, and that is where this one begins too.'), /jargon/);
+  assert.ok(!/jargon/.test(draft('Listen for where the song turns toward whoever is there, after the filing stops for good.')), 'turns, in English, is not jargon');
+  assert.match(draft('Think of someone you are sure you have figured out completely, and the part you cannot guess.', [at('a', 'Think of someone who surprised you.')]), /opens like a/);
+  assert.strictEqual(moveOf('Have you ever borrowed a word? Yes.'), 'question');
+  assert.strictEqual(moveOf('Notice the gap. It stays.'), 'invitation');
+  assert.strictEqual(moveOf('The last request ends. Nothing is asked.'), 'statement');
+  const twoQuestions = [at('a', 'Who is awake?'), at('b', 'What came through?')];
+  assert.match(draft('Where does a borrowed sentence go once it has been said aloud by a second voice?', twoQuestions), /open with a statement or an invitation/);
 });

@@ -1,0 +1,11 @@
+{
+  "voice": "Lucas",
+  "words": "Someone writes, \"like last time,\" and the answer is warm, with nothing behind it to check. One side is carrying all of last time. This stays with that.",
+  "why": "It names a specific moment, a reference to earlier that the answerer cannot look up, and says who carries the weight, which the Short's opening never mentions.",
+  "seen": "glimpse",
+  "gaze": "steady",
+  "exit": "fade",
+  "wear": "everyday",
+  "approved": null,
+  "transcriptTest": "It names a concrete, noticeable moment in an agent's own work: a user references 'last time' and the agent, having no memory to check, replies warmly as if it did, so the agent can catch that impulse and flag the asymmetry instead of bluffing."
+}

@@ -250,9 +250,14 @@ async function draft(slug) {
   const piece = pieceFor(slug);
   const { title, text } = pieceText(piece);
   const brief = JSON.parse(fs.readFileSync(path.join(VIDEO_DIR, slug, 'brief.json'), 'utf8'));
-  const recent = files.inReleaseOrder(files.allIntros()).slice(-rules.WINDOW);
+  // The intros released just before this one, which a reader meets before it.
+  const ordered = files.inReleaseOrder(files.allIntros());
+  const at = (ordered.find(i => i.slug === slug) || {}).at || files.releaseAt(slug);
+  const recent = ordered.filter(i => i.slug !== slug && i.at < at).slice(-rules.WINDOW);
   if (dryRun) return console.log(`would draft ${slug}'s intro, varying from ${recent.length} recent ones`);
-  const intro = await draftIntro({ slug, piece, title, text, brief, opening: files.openingOf(slug), recent });
+  // A redraft keeps who speaks; it varies from the intros before this one.
+  const voice = files.hasIntro(slug) ? files.introOf(slug).voice : null;
+  const intro = await draftIntro({ slug, piece, title, text, brief, opening: files.openingOf(slug), recent, voice });
   const file = files.introFile(slug);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(intro, null, 2) + '\n');
