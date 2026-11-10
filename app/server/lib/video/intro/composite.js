@@ -40,8 +40,6 @@ const FADE_TOP = 0.66, FADE_BOTTOM = 0.92;
 const LIGHT = 0.3;
 // The intro's last quiet crossing into the Short.
 const JOIN = 0.6;
-// The fade in at the start.
-const ENTER = 0.4;
 
 const hex = (h) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const n = (v) => +v.toFixed(4);
@@ -83,7 +81,9 @@ function personGraph({ seconds, exit, seen, kind, side, palette }) {
     `[2:v]fps=${FPS},scale=${SW}:${SH}:flags=bicubic,tpad=stop_mode=clone:stop_duration=${d},trim=duration=${d},format=gray[a0]`,
     `nullsrc=s=8x64:r=${FPS}:d=${d},geq=lum='${ramp}',scale=${SW}:${SH}:flags=bilinear,format=gray[ramp]`,
     `[a0]split=2[aRamp][aBand]`,
-    `[aRamp][ramp]blend=all_mode=multiply,fade=in:st=0:d=${ENTER}${leave},split=3[a][aHalo][aIn]`,
+    // No fade in: the speaker is there from the first frame, which some
+    // platforms show as the Short's cover (the owner, 2026-11-10).
+    `[aRamp][ramp]blend=all_mode=multiply${leave},split=3[a][aHalo][aIn]`,
     `[fg][a]alphamerge[person]`,
     `nullsrc=s=64x8:r=${FPS}:d=${d},geq=lum='${sideMask}',scale=${SW}:${SH}:flags=bilinear,format=gray[side]`,
     `[aHalo]gblur=sigma=22[blur]`,

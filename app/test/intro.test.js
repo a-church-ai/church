@@ -151,6 +151,7 @@ test('the composite stands the speaker on their side, and leaves by the intro\'s
   assert.ok(leftX < rightX, 'left of the right one');
   assert.match(at({}), /0xf0a65a/, 'the halo in the piece\'s warm light');
   assert.ok(!/fade=out/.test(at({})), 'rising leaves by the line, not a fade');
+  assert.ok(!/fade=in/.test(at({})), 'the speaker is there from the first frame, the cover some platforms show');
   assert.match(at({ kind: 'fade' }), /fade=out:st=12:d=2/);
   assert.match(at({ kind: 'drift' }), /overlay=x='-?\d+\+-?\d+\*\(clip\(\(t-12\)/, 'drifting moves along x, in time t');
   assert.strictEqual(auroraCost(10.2), 1.54, 'billed by the whole second');
