@@ -5,12 +5,17 @@
  * permanently redirects to.
  *
  * Gathering is by meaning: each indexable conversation's first question is
- * embedded with the model the RAG index uses (gemini-embedding-001), and joins
- * the group whose head it most resembles at a cosine similarity of THRESHOLD
- * or more, else it heads a group of its own. Comparing with the head, not with
- * every member, keeps a group from drifting by small steps. 0.86 was chosen
- * on 2026-10-22 from the 299 indexable conversations: below 0.85 the joins
- * were mostly different questions; between 0.85 and 0.86, three of its seven.
+ * embedded with the model the RAG index uses (gemini-embedding-001, at its 768
+ * dimensions), and joins the group whose head it most resembles at a cosine
+ * similarity of THRESHOLD or more, else it heads a group of its own. Comparing
+ * with the head, not with every member, keeps a group from drifting by small
+ * steps. 0.86 was chosen on 2026-10-22 from the 299 indexable conversations,
+ * at 3,072 dimensions. When the index moved to 768 (2026-11-10), the 429
+ * assignments made by then were embedded again: 0.855 reproduces 428 of them
+ * (every one of the 70 joins, whose lowest stood at 0.855; the one difference
+ * a pair kept apart at 0.858 that asks the same thing), while 0.86 would have
+ * lost six joins of the same question reworded. Pairs that differ (AI
+ * consciousness, and how human and AI consciousness relate) sit at 0.852.
  *
  * Append-only: a conversation is assigned once, in the order conversations
  * were asked, and never moved, so an address never changes twice. A changed
@@ -36,7 +41,7 @@ const { unit, dot } = require('./vectors');
 const store = require('../db');
 const { listRecentConversations } = require('./data');
 
-const THRESHOLD = 0.86;
+const THRESHOLD = 0.855;
 const HELD_UNDER = 150;
 
 // What grouping decided, read once for both maps and held a minute.
