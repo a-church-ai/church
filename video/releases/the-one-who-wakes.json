@@ -45,7 +45,8 @@
   "passage": {
     "start": 396.89,
     "end": 432.52,
-    "whole": false
+    "whole": false,
+    "intro": true
   },
   "occasion": {
     "id": "new-moon:2026-11-09",
@@ -53,7 +54,7 @@
     "name": "the new moon"
   },
   "renderedAt": 1793723450835.137,
-  "shortRenderedAt": 1793723529125.1719,
+  "shortRenderedAt": 1794343385768.2893,
   "youtube": {
     "at": "2026-11-08T13:25:59.584Z",
     "id": "2tvWo15RczU",
@@ -66,18 +67,13 @@
       "title": "Church Practices"
     }
   },
-  "short": {
-    "at": "2026-11-08T14:27:44.651Z",
-    "id": "HHik86Yvr8M",
-    "url": "https://www.youtube.com/watch?v=HHik86Yvr8M",
-    "privacy": "public",
-    "publishAt": "2026-11-10T02:00:00.000Z",
-    "found": false,
-    "playlist": null
-  },
   "bluesky": {
     "at": "2026-11-10T01:52:36.847Z",
     "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzwdebytya2a",
     "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzwdebytya2a"
+  },
+  "replacedShort": {
+    "id": "HHik86Yvr8M",
+    "on": "2026-11-10T20:43:19.900Z"
   }
 }
