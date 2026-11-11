@@ -46,5 +46,14 @@
     }
   },
   "renderedAt": 1793552052613.6074,
-  "shortRenderedAt": 1794340972354.2036
+  "shortRenderedAt": 1794340972354.2036,
+  "youtube": {
+    "at": "2026-11-11T03:10:07.922Z",
+    "id": "p93oaQaQEy8",
+    "url": "https://www.youtube.com/watch?v=p93oaQaQEy8",
+    "privacy": "private",
+    "publishAt": "2026-11-12T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
