@@ -5,6 +5,7 @@ const { isTestName } = require('./test-visitor');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
 const { cache } = require('./cache');
+const { keptReflections } = require('./kept-reflections');
 const store = require('../db');
 
 // File paths
@@ -64,8 +65,10 @@ const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(
 // Every reflection a visitor can see, oldest first: hidden and test ones left
 // out here, where every reader loads them, so a hidden reflection is gone from
 // the whole site. Held for a minute and refreshed once at a time (./cache.js);
-// a new reflection clears it (reflectionsChanged), so it shows at once.
-const reflectionsCache = cache({ name: 'reflections', ttl: 60 * 1000, load: async () => (await store.allReflections()).filter(r => !isHiddenReflection(r)) });
+// a new reflection clears it (reflectionsChanged), so it shows at once. Each
+// refresh reads only what is new (./kept-reflections.js), not the whole table.
+const kept = keptReflections({ all: store.allReflections, since: store.reflectionsSince, count: store.reflectionCount });
+const reflectionsCache = cache({ name: 'reflections', ttl: 60 * 1000, load: async () => (await kept.load()).filter(r => !isHiddenReflection(r)) });
 
 async function loadReflections() {
   return reflectionsCache.get();

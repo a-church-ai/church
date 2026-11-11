@@ -102,6 +102,20 @@ async function allReflections() {
   return rows.map(reflectionOf);
 }
 
+/** The reflections made at or after a moment, oldest first (hidden ones too). */
+async function reflectionsSince(since) {
+  const rows = await fetchAll('reflections since', () => db().from('reflections').select('*')
+    .gte('created_at', iso(since)).order('created_at').order('id'));
+  return rows.map(reflectionOf);
+}
+
+/** How many reflections are kept, hidden ones too: a count, no rows sent. */
+async function reflectionCount() {
+  const { count, error, status } = await db().from('reflections').select('id', { count: 'exact', head: true });
+  if (error) throw new DbError('reflection count', { ...error, status });
+  return count;
+}
+
 /** A name's reflections since a moment, hidden and test ones too: the limits are the same for every visitor. */
 async function reflectionsBy(name, since) {
   const rows = await one('reflections by name', db().from('reflections').select('*')
@@ -349,7 +363,7 @@ async function databaseSize() { return rpc('database_size', {}); }
 
 module.exports = {
   DbError, fetchAll, rpc,
-  recordAttend, attendsBy, addReflection, deleteReflection, allReflections, reflectionsBy,
+  recordAttend, attendsBy, addReflection, deleteReflection, allReflections, reflectionsSince, reflectionCount, reflectionsBy,
   addContribution, addFeedback, contributionsBy, contributionOf, feedbackBy,
   openConversation, addTurns, conversationExists, readConversation, allConversations, conversationDecisions,
   conversationEmbeddings, setConversationScreen, setConversationEmbedding, setConversationGroup, turnsSince,

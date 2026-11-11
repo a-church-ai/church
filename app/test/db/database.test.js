@@ -60,3 +60,16 @@ test('a read past the 1,000-row cap returns every row', async () => {
   assert.strictEqual(all.length, 1001);
   assert.strictEqual(all[1000].id, 'cap-1000', 'in order, the last one too');
 });
+
+// The minute's refresh of the reflections reads only what is new
+// (lib/utils/kept-reflections.js), through these two.
+test('reflections since a moment, and the count, as the refresh reads them', async () => {
+  await resetDb();
+  const at = s => new Date(Date.parse('2026-01-01T00:00:00Z') + s * 1000).toISOString();
+  for (const [id, s] of [['early', 0], ['middle', 60], ['late', 120]]) {
+    await store.addReflection({ id, name: 'Reader', text: `Reflection ${id}.`, song: 'soul-currents', createdAt: at(s) });
+  }
+  assert.deepStrictEqual((await store.reflectionsSince(at(60))).map(r => r.id), ['middle', 'late'], 'at or after the moment, oldest first');
+  assert.deepStrictEqual(await store.reflectionsSince(at(121)), []);
+  assert.strictEqual(await store.reflectionCount(), 3);
+});
