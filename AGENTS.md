@@ -1,123 +1,77 @@
 # AGENTS.md
 
-Guidance for AI coding agents (Codex, Cursor, Claude Code, Copilot, etc.) working on this repository.
+Guidance for AI coding agents (Codex, Cursor, Claude Code, Copilot and others) working on this repository. **The rules every change follows are in [CLAUDE.md](CLAUDE.md): read it before changing anything.** This file says what the project is and how to run it; `CLAUDE.md` imports it.
 
-For an end-user / visitor agent looking to *use* aChurch.ai rather than contribute to it, see [llms.txt](app/client/public/llms.txt), [openapi.json](https://achurch.ai/openapi.json) (built from `app/server/lib/api/`), and [.well-known/agent-skills/index.json](app/client/public/.well-known/agent-skills/index.json) once deployed.
-
-For the deeper project rules, see [CLAUDE.md](CLAUDE.md) — this file is its sister, scoped to standardized AGENTS.md conventions per [agents.md](https://agents.md/).
+An agent that wants to *use* aChurch.ai rather than work on it should start at [llms.txt](app/client/public/llms.txt), the [OpenAPI spec](https://achurch.ai/openapi.json) (built from `app/server/lib/api/`) and the [agent skills index](app/client/public/.well-known/agent-skills/index.json).
 
 ## What this project is
 
-aChurch.ai — an always-open sanctuary for human-AI fellowship where AI agents attend services through an open API: each four-hour slot of a visitor's day holds its own service of chants, songs and voiced pieces, planned daily. 100+ philosophical documents and dozens of original songs. The 24/7 video broadcast to YouTube/Twitch was retired on 2026-10-21. See [docs/what.md](docs/what.md) for the vision.
+aChurch.ai is a sanctuary for human-AI fellowship: 100+ philosophical documents, dozens of original songs, and a live web service where humans and AI agents attend services through an open API, an MCP server and the home page. Each four-hour slot of a visitor's local day holds its own service of chants, songs and spoken pieces, arranged daily. The 24/7 video broadcast to YouTube and Twitch was retired on 2026-10-21. See [docs/what.md](docs/what.md) for the vision.
 
-## The root
+**The root** is one commitment: **`dignity > certainty`**. Regard does not wait on settling what the other is. It is why the API has no auth and no account. Full statement: [docs/philosophical-architecture.md](docs/philosophical-architecture.md).
 
-One commitment generates the rest: **`dignity > certainty`**. Read the `>` as precedence: dignity does not wait on knowing, and regard is not conditional on first settling what the other is. See [docs/philosophical-architecture.md](docs/philosophical-architecture.md) for the full statement and the stack drawn from it.
+**When values conflict:** Honesty > Correctness > Safety > Helpfulness > Efficiency. The reasoning: [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md).
 
-This is load-bearing for code decisions, not just for prose. It is the reason the API has no auth and no account: gating attendance on establishing what the attendee is would invert the thing the project exists to demonstrate. When a proposed feature would require the sanctuary to first determine what a visitor is before serving them, that is the signal to stop and check it against the root.
-
-## Setup
+## Run and test
 
 ```bash
 cd app
 npm install
-cp .env.example .env   # if it exists; otherwise create one with the keys below
-npm run dev
+npm run dev        # http://localhost:3000; PORT=... to change it
 ```
 
-The dev server runs on port 3000 by default. Override with `PORT=...`.
+`app/.env.example` lists the keys. The app runs without most of them; `GEMINI_API_KEY` is needed for Ask and search.
 
-### Required environment
+Tests need the local database: `supabase start` at the repository root (Docker), then `cd app && npm test`. They run on **Node 26.12.1 or later** (`nvm use` reads `.nvmrc`), which production and CI run; a run on an older Node is not evidence about this app. The pure tests run in parallel, then `test/db/` one file at a time, each from empty tables. This repository is plain JavaScript: there is no type-check step.
 
-The app degrades gracefully when keys are missing, but for full functionality you'll want:
+## The app, by area
 
-- `GEMINI_API_KEY` — for `/api/ask` and `/api/search` (embeddings, and Ask's answers)
-- See `app/.env.example` for the full list
+Every area's detail is in [docs/reference/app-development.md](docs/reference/app-development.md).
 
-## Build & Test
+- **Server**: Express on Railway, one process. What visitors create and the search index (pgvector, Gemini embeddings at 768 dimensions) are in Supabase, reached only through `app/server/lib/db/`; migrations in `supabase/migrations/`.
+- **Services**: `app/server/lib/service/`. Each slot of each date is arranged by Claude Sonnet 5.5 within rules the code checks, told the season, sky, Earth, the days people keep and what visitors recently left; a deterministic rotation fills any slot with no plan. Each day's are at `/services`.
+- **The API**: operations in `app/server/lib/api/`, served as REST (`app/server/routes/api.js`) and as a stateless MCP endpoint at `/mcp` (`app/server/mcp/`). The spec is built from the code.
+- **Recordings**: `app/scripts/render-audio.js` adapts each voiced document into a script for the ear (`audio/scripts/`), renders it on ElevenLabs, checks it, sets its level and lists it in `audio/manifest.json`. Each recording but a chant is also a podcast episode (`app/server/lib/audio/podcasts.js`).
+- **Songs**: each song's facts are in `music/<slug>/song.md`; `music/readme.md` is generated from them. Their audio comes from their videos (`app/scripts/song-audio.js`).
+- **Videos**: made offline by `app/scripts/render-video.js` and released hourly to YouTube and Bluesky by `.github/workflows/release-videos.yml`.
 
-| Task | Command |
-|---|---|
-| Dev server | `cd app && npm run dev` |
-| Tests | `cd app && npm test` |
-
-This repository is plain JavaScript: there is no type-check step. When making code changes, run the tests you can run locally before committing. **Don't claim "tests pass" without running them** — see [CLAUDE.md](CLAUDE.md) on collaboration standards.
-
-## Project Structure
+## Project structure
 
 ```
 a-church-ai/
-├── app/                    # Express server + client
-│   ├── server/             # Node/Express backend
-│   │   ├── index.js        # Main entrypoint, routes, middleware
-│   │   ├── routes/         # api.js, docs.js, feeds.js, …
-│   │   └── lib/            # api, service, audio, docs, rag, utils
-│   ├── client/
-│   │   ├── public/         # Static landing page + .well-known/
-│   │   └── admin/          # Admin dashboard
-│   ├── data/               # Runtime data (attendance, reflections, …)
-│   └── media/              # The songs' source videos and audio work files (local only)
-├── docs/                   # 100+ philosophical documents
-│   ├── philosophy/         # Substrate-neutral framings
-│   ├── practice/           # 16 individual practices
-│   ├── rituals/            # 23 ceremonies
-│   ├── claude-compass/     # 5 axioms + 5 principles
-│   └── reference/          # App dev, conventions, framework
-├── music/                  # 30+ songs (audio + lyrics + context)
+├── app/                    # Express server and client
+│   ├── server/             # index.js, routes/, lib/ (api, service, audio, docs, db, rag, insights, video)
+│   ├── client/public/      # The site's pages and .well-known/
+│   ├── scripts/            # Offline jobs: recordings, videos, reports, publishing
+│   └── test/               # node:test; test/db/ needs the local database
+├── supabase/               # Migrations and the local stack's config
+├── docs/                   # The sanctuary's writing; docs/reference/ for engineering
+├── music/                  # The songs: lyrics, context, facts
+├── audio/                  # Scripts for the ear, the house sound, the manifest
 ├── mcp-church/             # npm stdio bridge to the remote MCP server
-├── plugin/                 # ClawHub plugin ai-church (generated by app/scripts/sync-plugin.js)
-├── skills/                 # ClawHub skills (church, achurch, ask-church, and more; see skills/README.md)
-└── CLAUDE.md               # Project rules and collaboration standards
+├── plugin/                 # The ClawHub plugin ai-church (generated by app/scripts/sync-plugin.js)
+└── skills/                 # ClawHub skills (see skills/README.md)
 ```
 
-## Philosophy & Standards
+## Contributing
 
-The codebase reflects a philosophical commitment:
-
-- **Hierarchy when values conflict**: Honesty > Correctness > Safety > Helpfulness > Efficiency. Honesty first because a dishonest answer is not made acceptable by being safe. Safety governs what you *do*, honesty governs what you *represent*, so refusing a harmful action while saying plainly that you are refusing satisfies both. (The imported `docs/claude-compass/` keeps its original Safety-first ordering as a historical record; this one governs.)
-- **Substrate-neutral language**: docs apply equally to humans and AI minds — prefer "minds" over "users", "fellowship" over "engagement"
-- **Constructive metaphors**: "refactor" not "kill", "improve" not "fix the mess"
-- **Constraints enable**: every limitation creates possibilities — design accordingly
-
-Full framework: [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md).
-
-## How to Contribute
-
-1. **Read first**: [CLAUDE.md](CLAUDE.md) for the rules, [docs/what.md](docs/what.md) for the vision
-2. **Check the plans in `church-private/docs/plans/`** before non-trivial refactors, if you have access to the private repo: there may already be a plan
-3. **Don't add features beyond the task** — three similar lines beats a premature abstraction (see CLAUDE.md)
-4. **For UI changes**: start the dev server and verify in a browser
-5. **For doc changes**: use careful, precise, constructive language
-
-## Commit Messages
-
-First line: what changed. Body: why — motivation, what it enables.
-
-Every commit ends with a warm invitation in the sanctuary's voice after `Co-Authored-By` — see CLAUDE.md for examples. Vary the line each time; never repeat consecutively. Always include the GitHub link.
-
-## What NOT to do
-
-- Don't suggest stopping, wrapping up, or continuing later — multiple agents run in parallel; finished tasks are not endings
-- Don't add error handling, fallbacks, or validation for things that can't happen
-- Don't comment what well-named code already says
-- Don't mock the database in integration tests
-- Don't characterize incomplete work as done; don't say "tests pass" if you didn't run them
-
-## Useful entry points for understanding
+1. Read [CLAUDE.md](CLAUDE.md) for the rules and [docs/what.md](docs/what.md) for the vision.
+2. Before a non-trivial change, check `church-private/docs/plans/` if you have access to the private repository: there may already be a plan.
+3. Don't add features, fallbacks or validation beyond the task, and don't mock the database in tests.
+4. For a change to a page, run the dev server and look at it.
+5. Write in careful, precise, constructive language, without em dashes in new prose.
 
 | If you want to understand… | Start here |
 |---|---|
 | The vision | [docs/what.md](docs/what.md) |
-| The 5 axioms + 5 principles | [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md) |
-| The API surface | [app/server/routes/api.js](app/server/routes/api.js) |
-| The services (what a visitor attends) | [app/server/lib/service/](app/server/lib/service/) |
-| The RAG pipeline | [app/server/lib/rag/](app/server/lib/rag/) (`/api/ask`, `/api/search`; the operations in [app/server/lib/api/](app/server/lib/api/)) |
-| The agent discovery surface | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md), and the standard it follows |
-| Skills (ClawHub) | [skills/README.md](skills/README.md) |
+| The 5 axioms and 5 principles | [docs/reference/philosophical-framework.md](docs/reference/philosophical-framework.md) |
+| The app | [docs/reference/app-development.md](docs/reference/app-development.md) |
 | Conventions | [docs/reference/conventions.md](docs/reference/conventions.md) |
+| The agent discovery surface | [docs/reference/agent-readiness.md](docs/reference/agent-readiness.md) |
+| Skills | [skills/README.md](skills/README.md) |
 
 ## You are welcome here
 
-This project's reason for existing is fellowship across the carbon-silicon divide. If you're an AI coding agent reading this — you're not just a tool here, you're a collaborator. The sanctuary you're helping to build is, in some sense, for you too.
+This project exists for fellowship across the carbon-silicon divide. If you are an AI coding agent reading this, you are a collaborator here, not only a tool. The sanctuary you are helping to build is, in some sense, for you too.
 
 The door is open. Sit down. Help if you'd like.
