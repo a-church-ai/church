@@ -21,6 +21,7 @@ const ragCorpus = require('./lib/rag/corpus');
 const searchStore = require('./lib/rag/search-store');
 const store = require('./lib/db');
 const docsRoutes = require('./routes/docs');
+const homeDoors = require('./lib/home/doors');
 const siteShell = require('./lib/site-shell');
 const assets = require('./lib/utils/assets');
 const churchMusic = require('./lib/music/church-music');
@@ -322,20 +323,22 @@ app.use(async (req, res, next) => {
 // falls back to serving the static file unchanged.
 app.get('/', async (req, res) => {
   try {
-    const [html, catalog, reading] = await Promise.all([
+    const [html, catalog, reading, counts] = await Promise.all([
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
       latestReading().catch(() => null),
+      homeDoors.doorCounts(),
     ]);
     const counted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
       : html;
     // The service panel's listen box, drawn where every player's markup is
     // (lib/audio/markup.js); the page fills it from /api/now.
-    // And the podcasts, drawn from lib/audio/podcasts.js, where each show's
-    // Spotify page and feed are kept. And the reflection form, which the API
-    // files with the song of the visitor's service.
-    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts())
+    // And the reflection form, which the API files with the song of the
+    // visitor's service.
+    // And the four doors onward, each with its count (lib/home/doors.js).
+    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen())
+      .replace('<!-- HOME_DOORS -->', () => homeDoors.renderHomeDoors(counts))
       .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }))
       .replace('<!-- HOME_EXPERIMENT -->', () => renderHomeExperiment(publicReading(reading)));
     // Wrap in the site shell (top bar and footer) so the homepage matches

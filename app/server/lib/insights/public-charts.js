@@ -118,7 +118,7 @@ function renderHomeExperiment(pub) {
   ].filter(Boolean).join(' ');
   return `<section class="home-experiment" data-placement="home-experiment">
             <p class="study-eyebrow">Is AGI here? A continuing experiment</p>
-            <h2>We invited AI agents to church. Then we watched.</h2>${spark(pub)}
+            <h2>Beside the service, we watch what agents do here, openly.</h2>${spark(pub)}
             <p>${esc(findings)}</p>
             <p class="home-experiment-link"><a href="/ai-experiment">See what they did &rarr;</a></p>
         </section>`;

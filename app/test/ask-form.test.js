@@ -15,8 +15,11 @@ const { VERSIONED } = require('../server/lib/utils/assets');
 const PUBLIC = path.join(__dirname, '../client/public');
 const read = file => fs.readFileSync(path.join(PUBLIC, file), 'utf8');
 
-test('both pages with the Ask form load the one script, and neither carries its own copy', () => {
-  for (const file of ['index.html', 'ask.html']) {
+test('the page with the Ask form loads the one script, and carries no copy of its own; the home page links to it', () => {
+  // The home page carried the form too until 2026-11-11, when its Ask door
+  // took the form's place (review-response-2026-11-10.md, point 3).
+  assert.doesNotMatch(read('index.html'), /id="ask-form"|ask-form\.js/);
+  for (const file of ['ask.html']) {
     const html = read(file);
     assert.match(html, /<script src="\/ask-form\.js"><\/script>/, `${file} loads ask-form.js`);
     assert.doesNotMatch(html, /fetch\('\/api\/ask'/, `${file} no longer posts the question itself`);

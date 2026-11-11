@@ -387,14 +387,16 @@ test('each show names its page on Spotify and Apple Podcasts; a voiced page, its
     assert.deepStrictEqual(follows(await page(urlPath)), [], urlPath);
   }
 
-  // The home page: a section naming both shows, drawn where the page marks
-  // it, and both pages among the sanctuary's own elsewhere (sameAs).
+  // The listening page (/attend, the home page's Listen door): a section
+  // naming every show, drawn where the page marks it; and on the home page,
+  // every show's page among the sanctuary's own elsewhere (sameAs).
   const { renderPodcasts } = require('../server/lib/audio/markup');
   const podcasts = renderPodcasts();
   for (const show of SHOWS) assert.ok(linksTo(podcasts, show) && podcasts.includes(`>${show.title}<`), show.id);
+  const attend = fs.readFileSync(path.join(__dirname, '../client/public/attend.html'), 'utf8');
+  assert.ok(attend.includes('<!-- PODCASTS -->'));
+  assert.match(fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8'), /'\/attend'[\s\S]{0,600}\.replace\('<!-- PODCASTS -->', renderPodcasts\(\)\)/);
   const home = fs.readFileSync(path.join(__dirname, '../client/public/index.html'), 'utf8');
-  assert.ok(home.includes('<!-- PODCASTS -->'));
-  assert.match(fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8'), /\.replace\('<!-- PODCASTS -->', renderPodcasts\(\)\)/);
   const graph = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];
   const sameAs = graph.find(n => n['@type'] === 'Organization').sameAs;
   for (const show of SHOWS.filter(s => s.spotify)) assert.ok(sameAs.includes(show.spotify), `the organization names ${show.id} on Spotify`);

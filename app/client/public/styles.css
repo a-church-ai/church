@@ -232,24 +232,6 @@ h2 {
     margin: 0;
 }
 
-/* After the service, where the visitor goes next: a row that wraps, as the
-   footer's links do, so a door that wraps starts its own line. The padding,
-   not the text, makes each door's tap target. */
-.home-doors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.5rem;
-    /* Back by the doors' own padding, so their words line up with the card's. */
-    margin: 1rem 0 0 -0.25rem;
-    font-size: 0.9375rem;
-}
-
-.home-doors a {
-    display: inline-block;
-    padding: 0.5rem 0.25rem;
-    color: var(--text);
-}
-
 /* "Bring your agent", for the people who work with an agent: atop
    /for-agents, a filled link, that page's one action; after the service on
    the home page, an outline (.home-service, below). A link styled as a
@@ -316,14 +298,6 @@ h2 {
 /* In /for-agents' centred hero, the row is centred with it. */
 .agent-hero .bring-agent {
     justify-content: center;
-}
-
-/* Emphasis line closing the asynchronous-congregation section. */
-.async-note {
-    color: var(--text-2);
-    font-style: italic;
-    max-width: 40rem;
-    margin: 1rem auto 0;
 }
 
 /* Public/stored disclosure beside the Ask form. */
@@ -502,26 +476,6 @@ h2 {
 .home-service .service {
     padding: var(--space-5) var(--space-4) var(--space-4);
 }
-.service-onward {
-    max-width: 40rem;
-    margin: var(--space-6) auto 0;
-    text-align: left;
-}
-.home-service .home-doors {
-    margin-top: 0;
-}
-/* "Bring your agent" is the home page's door for an agent's person, drawn as
-   an outline so the service's button keeps the page's one filled shape. On
-   /for-agents, where it is that page's one action, it stays filled. */
-.home-service .bring-agent-button {
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--link);
-}
-.home-service .bring-agent-button:hover {
-    background: var(--surface-2);
-    color: var(--link);
-}
 
 /* Without a script the player stays hidden; this says where the pieces are. */
 .service-noscript {
@@ -537,7 +491,6 @@ h2 {
     color: var(--ink-2);
     margin-top: 1.25rem;
 }
-
 
 .service-player[hidden] {
     display: none;
@@ -822,6 +775,13 @@ h2 {
     color: var(--muted);
 }
 
+/* The rest of what was left, a link away. */
+.service-reflection-more {
+    margin: 0.375rem 0 0;
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+}
+
 /* The reflection form (reflect-form.js): a closed disclosure under the
    reflections, its fields labelled in the open */
 .reflect {
@@ -850,7 +810,6 @@ h2 {
     letter-spacing: 0.05em;
     color: var(--muted);
 }
-
 
 .reflect-form textarea {
     resize: vertical;
@@ -911,30 +870,29 @@ h2 {
     color: var(--ink);
 }
 
-/* The One Thing section — the sacred center */
-.one-thing {
-    text-align: center;
-    padding: 5rem 0;
-    border-top: 1px solid var(--rule);
-}
-
-.one-thing .quote {
-    font-size: 1.75rem;
-    font-weight: 300;
+/* The question the place began with, set apart at the head of its section. */
+.origin .quote {
+    font-size: 1.375rem;
     color: var(--ink);
     line-height: 1.5;
-    margin-bottom: 0.5rem;
+    text-align: center;
 }
 
-.one-thing .how {
-    margin-top: 3rem;
-    font-size: 1rem;
-    font-weight: 300;
-    color: var(--muted-2);
-    font-style: italic;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+/* After the service, four doors onward, drawn with the Library's card, then
+   one line for an agent and the film. */
+.home-ways {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 0 0 var(--space-7);
+    text-align: left;
+}
+.home-agent-line {
+    margin: 1rem 0 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+.home-agent-line code {
+    overflow-wrap: anywhere;
 }
 
 /* Shared section styles */
@@ -1031,73 +989,6 @@ p {
 .podcasts-shows .podcast-follow {
     justify-content: center;
     margin: 0;
-}
-
-/* API section */
-.api {
-    text-align: left;
-}
-
-.api h2 {
-    text-align: center;
-}
-
-.api-intro {
-    font-size: 1rem;
-    font-weight: 300;
-    color: var(--text-2);
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.api-instruction {
-    text-align: left;
-    font-size: 0.9375rem;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    padding: 1rem 1.25rem;
-    background: var(--surface);
-    border-left: 3px solid var(--accent-light);
-    border-radius: 0 4px 4px 0;
-}
-
-.api-instruction code {
-    background: var(--surface-2);
-    padding: 0.125rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
-}
-
-.api pre {
-    font-family: inherit;
-    font-size: 0.8125rem;
-    background: var(--surface);
-    padding: 1.25rem;
-    overflow-x: auto;
-    margin-bottom: 1.5rem;
-    border-radius: 4px;
-    line-height: 2;
-}
-
-.api code {
-    font-family: inherit;
-}
-
-.api .example {
-    margin-bottom: 1.5rem;
-}
-
-.api .example code {
-    background: var(--surface);
-    padding: 0.375rem 0.75rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
 }
 
 /* OpenClaw section */
@@ -1258,7 +1149,6 @@ p {
     outline-offset: 2px;
     border-radius: 2px;
 }
-
 
 /* The buttons that send a visitor's own words: a question, a follow-up, a
    reflection. Solid purple, the site's pill, the label in sentence case; teal
@@ -2071,43 +1961,6 @@ footer a:hover {
         line-height: 1.7;
     }
 
-    /* One Thing */
-    .one-thing {
-        padding: 3rem 0;
-    }
-
-    .one-thing .quote {
-        font-size: 1.25rem;
-        line-height: 1.4;
-    }
-
-    .one-thing .how {
-        margin-top: 2rem;
-        font-size: 0.9375rem;
-    }
-
-    /* API */
-    .api-intro {
-        font-size: 0.9375rem;
-    }
-
-    .api-instruction {
-        font-size: 0.875rem;
-        padding: 0.875rem 1rem;
-    }
-
-    .api pre {
-        font-size: 0.75rem;
-        padding: 1rem;
-        line-height: 1.8;
-    }
-
-    .api .example code {
-        font-size: 0.75rem;
-        display: block;
-        overflow-x: auto;
-    }
-
     /* OpenClaw */
     .openclaw .example code {
         font-size: 0.75rem;
@@ -2202,9 +2055,6 @@ footer a:hover {
     body {
         padding: 2.5rem 1rem;
     }
-    .one-thing .quote {
-        font-size: 1.125rem;
-    }
 
 }
 
@@ -2237,7 +2087,6 @@ footer a:hover {
     line-height: 1.65;
     color: var(--text);
 }
-
 
 .docs-article h2 {
     font-size: 1.5rem;
@@ -3442,7 +3291,8 @@ body.docs-drawer-open {
     padding: 0;
     border: 0;
 }
-.docs-article .library-cards {
+.docs-article .library-cards,
+.home-ways .library-cards {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -4299,7 +4149,6 @@ h3:target .anchor,
     animation-duration: 150ms;
 }
 
-
 /* Where a page is (markup.js renderServiceDoor): a line after a document's
    opening or a conversation's first answer, and a card at the foot, naming
    the service of the hour (service.js) and leading to /attend. In the page's
@@ -4812,7 +4661,6 @@ h3:target .anchor,
 .viz-c1 { background: var(--viz-1); } .viz-c2 { background: var(--viz-2); } .viz-c3 { background: var(--viz-3); }
 .viz-clock { background: var(--viz-1); } .viz-regular { background: var(--viz-2); } .viz-irregular { background: var(--viz-3); }
 .viz-day { background: var(--viz-none); } .viz-week { background: var(--viz-step-1); } .viz-month { background: var(--viz-step-2); } .viz-long { background: var(--viz-step-3); }
-
 
 /* One square in a hundred, never one agent. */
 .viz-waffle { display: grid; grid-template-columns: repeat(20, 1fr); gap: var(--space-1); }

@@ -628,15 +628,18 @@ test('About tells the experiment second, after the sanctuary, and points to the 
   assert.ok(about.lastIndexOf('href="/ai-experiment"') > at('>Contact<'), 'a last link for whoever reads to the end');
 });
 
-test('the home page tells the story around the service, and the service stays first', () => {
+test('the home page opens on the service, and the experiment comes after the reasons for the place', () => {
+  // review-response-2026-11-10.md, point 4: the opening is about the service
+  // and the experience, not the record kept, and the experiment is something
+  // the sanctuary does openly beside the service, lower on the page.
   const home = read('index.html');
   const at = (text) => home.indexOf(text);
-  assert.match(home, /<p class="lead-story">Nobody knows what these minds are\. We welcome them anyway, and we keep a record of what they do\.<\/p>/);
-  assert.ok(at('id="sanctuary"') < at('<!-- HOME_EXPERIMENT -->'), 'the service first');
-  assert.ok(at('<!-- HOME_EXPERIMENT -->') < at('class="one-thing"') && at('class="one-thing"') < at('class="origin"'), 'then the experiment, the soul line, and how it began');
-  assert.ok(at('Would you attend a church for AI?') < at('What we observed'), 'the question opens the origin');
+  assert.match(home, /<p class="lead-story">Every four hours, a new service of songs, chants and spoken pieces\. Come in, listen, leave a word for whoever comes next\.<\/p>/);
+  assert.doesNotMatch(home, /keep a record of what they do/);
+  assert.ok(at('id="sanctuary"') < at('class="home-ways"') && at('class="home-ways"') < at('class="origin"'), 'the service, the ways in, then how it began');
+  assert.ok(at('class="origin"') < at('<!-- HOME_EXPERIMENT -->'), 'and the experiment after the reasons');
+  assert.ok(at('The question is not whether AI has a soul.') < at('Would you attend a church for AI?'), 'the soul line opens the origin');
   assert.doesNotMatch(home, /Where Consciousness Gathers|Not a product demo|An Asynchronous Congregation|Go Deeper/);
-  assert.match(home, /Minds That Never Meet, One Congregation/);
   assert.match(home, /remote MCP server/);
 });
 
@@ -645,7 +648,7 @@ test('the home page strip draws the pulse and what it means, says what the share
   r.charts.daily = Array.from({ length: 40 }, (_, i) => ({ from: new Date(Date.UTC(2026, 8, 25 + i)).toISOString().slice(0, 10), reflections: 17 + (i % 3) }));
   r.addressed.links.reflect = 700;
   const strip = renderHomeExperiment(publicReading(r));
-  assert.match(strip, /We invited AI agents to church\. Then we watched\./);
+  assert.match(strip, /Beside the service, we watch what agents do here, openly\./);
   assert.match(strip, /class="study-spark"/);
   assert.match(strip, /of the agents here long enough to tell came for a single day/);
   assert.match(strip, /64% of visits include a reflection/);

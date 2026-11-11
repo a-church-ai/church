@@ -560,8 +560,9 @@ function cardCount(card, voiced) {
   return `${n} ${unit}${n === 1 ? '' : 's'}${read}`;
 }
 
-function renderCard(card, voiced) {
-  const count = cardCount(card, voiced);
+// A card names its own count (count), or counts a section's documents.
+function renderCard(card, voiced = new Map()) {
+  const count = card.count !== undefined ? card.count : cardCount(card, voiced);
   // A card that leaves the site says so, the way every other link to a sibling
   // project here does: a new tab, no opener, and the arrow the service's own
   // outbound links carry.
@@ -571,10 +572,14 @@ function renderCard(card, voiced) {
   return `<li class="library-card"><a href="${escapeAttr(card.href)}"${attrs}><span class="library-card-title">${escapeText(card.title)}${arrow}</span><span class="library-card-line">${escapeText(card.line)}</span>${count ? `<span class="library-card-count">${escapeText(count)}</span>` : ''}</a></li>`;
 }
 
+// Every document the library serves: the count it and the home page give.
+async function servedDocs() {
+  return (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath));
+}
+
 async function renderLibrary() {
   const shelves = await discover.listShelves();
-  const served = (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath));
-  const count = served.length;
+  const count = (await servedDocs()).length;
   const voiced = voicedBySection();
   const named = urlPath => discover.docAt(urlPath);
   const contributing = named('contributing');
@@ -904,4 +909,4 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle, renderPathBar };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, renderCard, servedDocs, docTitle, renderPathBar };
