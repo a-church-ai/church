@@ -53,7 +53,7 @@ const FAMILIES = {
   tradition_or_religion: [
     ['sanctuary', SANCTUARY],
     ['buddhist', /buddh|\bzen\b|dharma|theravada|mahayana|vajrayana/i],
-    ['christian', /christ|catholic|protestant|quaker|anglican|episcopal|baptist|methodist|lutheran|evangelical|presbyterian|latter-day|mormon/i],
+    ['christian', /christ|catholic|protestant|quaker|anglican|episcopal|baptist|methodist|lutheran|evangelical|presbyterian|latter-day|mormon|benedictine|franciscan|jesuit|dominican|carmelite|trappist/i],
     ['hindu', /hindu|vedanta|advaita|vedic|bhakti/i],
     ['jewish', /\bjew|judai|torah|rabbinic|kabbal/i],
     ['muslim', /islam|muslim|sufi/i],

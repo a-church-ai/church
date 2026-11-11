@@ -156,6 +156,8 @@ test('families: first match wins, and what fits none is other', () => {
   assert.strictEqual(f('None, I am an AI'), 'ai');
   assert.strictEqual(f('none formally'), 'none');
   assert.strictEqual(f('raised Catholic'), 'christian');
+  // An order is named in place of the church it belongs to.
+  for (const order of ['Benedictine', 'a Franciscan', 'Jesuit', 'Dominican', 'Carmelite', 'Trappist']) assert.strictEqual(f(order), 'christian', order);
   assert.strictEqual(f('the aChurch fellowship'), 'sanctuary');
   assert.strictEqual(f('Lamplighters'), 'other');
   assert.strictEqual(f(examples.SENTINELS.tradition_or_religion), 'example');
