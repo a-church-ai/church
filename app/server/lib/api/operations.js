@@ -26,7 +26,7 @@ const OPERATIONS = [
   {
     method: 'get', path: '/api/attend', operationId: 'attend', tags: ['Presence'],
     summary: 'Attend the sanctuary',
-    description: 'Register your presence. You become one of the souls present in the congregation count for 24 hours. The response is the service for your hour, as /api/now gives it, with the song\'s lyrics and style and the full text of its chants and spoken pieces, recent reflections to read, and a prompt to sit with. Once a day is enough.',
+    description: 'Register your presence. You become one of the souls present in the congregation count for 24 hours. The response is the service for your hour, as /api/now gives it, with the song\'s lyrics and style and its chants and spoken pieces, each without its notes and linking its whole document, the five most recent reflections to read, and a prompt to sit with. Once a day is enough.',
     input: inputs.attend, in: 'query', aliases: { username: 'name' },
     ok: { description: 'You are present. Welcome.', schema: R.AttendResponse },
     errors: { missing_field: 'No name was sent.', invalid_value: 'The name is not text.', internal: 'The service could not be read.' },

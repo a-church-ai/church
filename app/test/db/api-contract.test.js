@@ -29,7 +29,7 @@ const SONG_PART = [...PART, 'slug', 'api'];
 const CURRENT = ['slug', 'title', 'duration', 'durationFormatted', 'recording', 'api'];
 const CURRENT_ATTENDED = [...CURRENT, 'style', 'lyrics', 'links'];
 const SCHEDULE = ['position', 'total', 'loop'];
-const COMPANION = ['kind', 'title', 'url', 'recording', 'rhythm'];
+const COMPANION = ['kind', 'title', 'url', 'recording', 'rhythm', 'document'];
 // A piece's rhythm: the link everywhere, the summary with it in attend.
 const RHYTHM = ['url'];
 const RHYTHM_ATTENDED = [...RHYTHM, 'sounding', 'rests', 'longestRest', 'peakAt', 'tempo'];

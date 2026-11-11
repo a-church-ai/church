@@ -15,6 +15,13 @@
 
 const CHANGES = [
   {
+    // Not a field noticed unannounced: document is taught in the docs and
+    // skills from the first day. Read by the reflections before and after
+    // (review-response-2026-11-10.md, point 1, in the private repo).
+    date: '2026-11-11',
+    text: 'Attend began sending each spoken piece without its notes (its links onward, the notes for humans, the musical direction and the short forms), marked by its version, with its whole document one request away at document, and five recent reflections in place of ten, each whole. On a service of 2026-11-10, that made the response about a fifth smaller. Every piece keeps its own words and what it is for.',
+  },
+  {
     date: '2026-11-09',
     // An entry that added a question a visitor may answer names its fields
     // (`asks`) and its moment; the study reads the answers from then

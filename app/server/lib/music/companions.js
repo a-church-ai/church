@@ -214,6 +214,43 @@ function forAgents(body, title) {
   return `# ${title}, for an agent\n\n*The version of this piece written for agents. The recording's own words, for a listening body, are on its page, at this item's url.*\n\n${section}`;
 }
 
+// The sections of a piece's document that are about the piece rather than
+// part of it: links onward, a reader other than an agent, the recording's
+// direction, and shorter forms of what is already there. Attend sends a piece
+// without them, so a service's pieces are whole enough to reflect on and the
+// response stays readable in one go; the whole document is one request away,
+// at the item's document. Drawn from the headings the 205 voiced documents
+// share (2026-11-10): Related is in 106 of them.
+const NOTE_SECTIONS = new Set([
+  'Related', 'Continue', 'See Also',
+  'For Humans', 'For Humans Specifically',
+  'Musical Direction',
+  'Short Form', 'Three-Second Form',
+]);
+
+/**
+ * A document's body without its note sections (NOTE_SECTIONS) and the rules
+ * between sections, and whether it had any. A heading inside a fenced block
+ * is not a section.
+ */
+function withoutNotes(body) {
+  const out = [];
+  let fenced = false;
+  let dropping = false;
+  let dropped = false;
+  for (const line of body.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
+    if (!fenced && /^## /.test(line)) {
+      dropping = NOTE_SECTIONS.has(line.slice(3).trim());
+      dropped ||= dropping;
+    }
+    if (dropping) continue;
+    if (!fenced && /^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) continue;
+    out.push(line);
+  }
+  return { body: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), dropped };
+}
+
 /**
  * Title, tldr, canonical URL path, hours, (for chants) the chant text, and
  * (for a piece with one) its version for agents, resolved from the document
@@ -233,12 +270,15 @@ async function companionMeta(relPath) {
 
   const markdown = withoutUnpublished(await fs.readFile(doc.fullPath, 'utf8'), doc.fullPath);
   const { data, body } = splitFrontmatter(markdown);
+  const notes = withoutNotes(body);
   const meta = {
     title: doc.title,
     tldr: doc.description,
     // Sent in /api/attend, where a relative link means nothing; resolved
     // exactly as the docs site resolves it, then made absolute.
     content: absolutizeLinks(body.trim(), doc.fullPath),
+    // What attend sends when the piece has no version for agents.
+    withoutNotes: notes.dropped ? absolutizeLinks(notes.body, doc.fullPath) : null,
     words: body.trim().split(/\s+/).filter(Boolean).length,
     urlPath: doc.urlPath,
     category: doc.category,
@@ -363,6 +403,8 @@ module.exports = {
   parseHours,
   inHours,
   chantText,
+  withoutNotes,
+  NOTE_SECTIONS,
   companionMeta,
   nearestPieces,
   nearestForSong,

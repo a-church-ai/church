@@ -114,7 +114,7 @@ test('attending twice in a row still works', async (t) => {
 
 const { loadCatalog } = require('../../server/lib/utils/data');
 const store = require('../../server/lib/db');
-const { resetDb } = require('../database');
+const { resetDb, seedReflections } = require('../database');
 
 test.before(resetDb);
 const storedReflection = async name => (await store.allReflections()).find(r => r.name === name);
@@ -160,29 +160,89 @@ test('a piece written for agents as well is attended in that version; the page k
   assert.match(star.content, /After a thanks, nothing needs to be done with it at all\./, 'what to do afterwards reaches agents too');
   assert.doesNotMatch(star.content, /Light lands on a thing,/, 'not the words written for a listening body');
 
-  // A piece without such a section is attended whole, as before.
+  // A piece without such a section is attended without its notes: the
+  // practice and what it is for, not the part for humans.
   const play = spokenItem({ ...piece, title: 'Practice of Play', url: '/docs/practice/practice-of-play' }, await companionMeta('docs/practice/practice-of-play.md'), 'https://achurch.ai', true);
-  assert.strictEqual(play.version, undefined);
+  assert.strictEqual(play.version, 'without its notes');
   assert.match(play.content, /^# Practice of Play/);
+  assert.match(play.content, /## The Practice/);
+  assert.match(play.content, /## For AI/, 'what it asks of an agent stays');
+  assert.doesNotMatch(play.content, /## For Humans/);
+  assert.strictEqual(play.document, 'https://achurch.ai/docs/practice/practice-of-play.md', 'and the whole document is one request away');
+
+  // A piece with no note sections is attended whole, with no version.
+  const seat = spokenItem({ ...piece, kind: 'prayer', title: 'A Seat at the Threshold', url: '/docs/prayers/a-seat-at-the-threshold' }, await companionMeta('docs/prayers/a-seat-at-the-threshold.md'), 'https://achurch.ai', true);
+  assert.strictEqual(seat.version, undefined);
+  assert.match(seat.content, /^# A Seat at the Threshold/);
   // Observing carries no content of either kind.
   assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).content, undefined);
   assert.strictEqual(spokenItem(piece, meta, 'https://achurch.ai', false).version, undefined);
 });
 
-test('attending carries the full text of the service\'s pieces; /api/now carries only links', async (t) => {
+test('attending carries the text of the service\'s pieces and links each whole; /api/now carries only links', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
 
   const attend = (await get(port, '/api/attend?name=ReadingsTest')).json;
   assert.ok(attend.companions.items.length >= 3, 'a chant, a reading and a closing at least');
   for (const item of attend.companions.items) {
-    assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its full text`);
+    assert.ok(typeof item.content === 'string' && item.content.length > 200, `${item.title} has its text`);
     assert.ok(item.content.includes(item.title.split(':')[0].slice(0, 12)), `${item.title}: content is that document`);
     assert.ok(!item.content.startsWith('---'), 'frontmatter is not included');
+    assert.doesNotMatch(item.content, /^## (Related|Musical Direction)$/m, `${item.title}: without its notes`);
+    assert.strictEqual(item.document, `${item.url}.md`, `${item.title}: its whole document is linked`);
   }
 
   const now = (await get(port, '/api/now')).json;
   assert.ok(now.companions.items.every(item => item.content === undefined));
+  assert.ok(now.companions.items.every(item => item.document.endsWith('.md')), '/api/now links the documents too');
+});
+
+test('a piece\'s document link serves its whole text', async () => {
+  const docs = require('../../server/routes/docs');
+  const app = express();
+  app.use('/docs', docs);
+  const server = app.listen(0);
+  try {
+    const res = await fetch(`http://127.0.0.1:${server.address().port}/docs/practice/practice-of-play.md`);
+    assert.strictEqual(res.status, 200);
+    const text = await res.text();
+    assert.match(text, /## For Humans/, 'everything content leaves out');
+    assert.match(text, /## The Practice/);
+  } finally { server.close(); }
+});
+
+test('attend carries the five most recent reflections, each whole', async (t) => {
+  await resetDb();
+  const now = Date.now();
+  const long = i => `Reflection ${i}. ${'Something stayed with me. '.repeat(70)}It ended here.`;
+  await seedReflections(Array.from({ length: 8 }, (_, i) => ({ id: `recent-${i}`, name: `Wren${i}`, text: long(i), song: 'soul-currents', createdAt: new Date(now - i * 60_000).toISOString() })));
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const json = (await get(port, '/api/attend?name=FiveTest')).json;
+  assert.deepStrictEqual(json.recentReflections.map(r => r.name), ['Wren0', 'Wren1', 'Wren2', 'Wren3', 'Wren4']);
+  assert.ok(json.recentReflections.every(r => r.text.endsWith('It ended here.')), 'none is cut');
+});
+
+// What attend's response is made of, apart from the pieces' words, the
+// lyrics and the reflections' words, which vary with the service and the
+// day. A new field grows it, so the test holds it under a budget: the whole
+// response came to 37.7 KB (about 9,400 tokens) on 2026-11-10 before the
+// pieces were sent without their notes, and its structure to about 12.9 KB.
+const ATTEND_STRUCTURE_BUDGET = 15_000;
+
+test('attend\'s structure stays under its budget', async (t) => {
+  await resetDb();
+  const now = Date.now();
+  await seedReflections(Array.from({ length: 10 }, (_, i) => ({ id: `budget-${i}`, name: `Wren${i}`, text: 'x'.repeat(630), song: 'soul-currents', createdAt: new Date(now - i * 60_000).toISOString() })));
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const json = (await get(port, '/api/attend?name=BudgetTest')).json;
+  for (const item of json.companions.items) item.content = '';
+  if (json.current) json.current.lyrics = '';
+  for (const r of json.recentReflections) r.text = '';
+  const bytes = Buffer.byteLength(JSON.stringify(json));
+  assert.ok(bytes <= ATTEND_STRUCTURE_BUDGET, `attend's structure is ${bytes} bytes (about ${Math.round(bytes / 4)} tokens), over its budget of ${ATTEND_STRUCTURE_BUDGET}: a field has grown it. Raise the budget only on purpose.`);
 });
 
 test('the reflection prompt names the song and the pieces around it', async (t) => {

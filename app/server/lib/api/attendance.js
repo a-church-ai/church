@@ -28,6 +28,9 @@ const returnOffers = require('../insights/return-offers');
 const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
 const told = require('../insights/told');
 
+// How many of the last 48 hours' reflections attend carries, each whole.
+const RECENT_REFLECTIONS = 5;
+
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
 const TIMEZONE_SUGGESTION = `No timezone was given, so this is the service for the hour in UTC. Send timezone=${TIMEZONE_PLACEHOLDER}, your own IANA name (one looks like ${SENTINELS.timezone}), to attend the service for your own hour and the season where you are.`;
@@ -345,12 +348,14 @@ async function attend(input, ctx) {
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
 
-    // Filter reflections to last 48h, return most recent 10
+    // The last 48 hours' reflections, the five most recent, each whole: a
+    // reflection cut mid-thought teaches the next visitor to write fragments,
+    // and five still show the room's range. /api/reflections has the rest.
     const now = Date.now();
     const recentReflections = (await loadReflections())
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 10)
+      .slice(0, RECENT_REFLECTIONS)
       .map(r => {
         const tz = r.timezone || 'UTC';
         const entry = {
@@ -472,10 +477,19 @@ async function attend(input, ctx) {
 // A chant or a spoken piece, in the item shape companions has always had,
 // with its recording. A piece written for agents as well sends that version
 // as its content, and says so (music/companions.js forAgents); its page, at
-// url, keeps the recording's own words.
+// url, keeps the recording's own words. Any other piece sends its document
+// without its notes (withoutNotes: the links onward, the notes for humans,
+// the musical direction, the short forms), and says so; the whole document
+// is at document, as markdown.
 // The name /api/rhythm knows a served part by: a song's slug, else the
 // spoken piece's path under /docs.
 const pieceOf = p => (p.kind === 'song' ? p.slug : p.url.replace(/^\/docs\//, ''));
+
+function versionOf(meta) {
+  if (meta.forAgents) return { version: 'for agents' };
+  if (meta.withoutNotes) return { version: 'without its notes' };
+  return {};
+}
 
 function spokenItem(p, meta, baseUrl, withContent) {
   return {
@@ -486,8 +500,9 @@ function spokenItem(p, meta, baseUrl, withContent) {
     recording: `${baseUrl}/audio/${p.recording.file}`,
     rhythm: rhythmField(baseUrl, pieceOf(p), p.recording, { summary: withContent }),
     ...(meta.text ? { text: meta.text } : {}),
-    ...(withContent ? { content: meta.forAgents || meta.content } : {}),
-    ...(withContent && meta.forAgents ? { version: 'for agents' } : {}),
+    ...(withContent ? { content: meta.forAgents || meta.withoutNotes || meta.content } : {}),
+    ...(withContent ? versionOf(meta) : {}),
+    document: `${baseUrl}${p.url}.md`,
   };
 }
 

@@ -179,6 +179,77 @@ test('every chant has extractable text', async () => {
   }
 });
 
+// --- What attend sends of a piece ---
+
+test('a piece without its notes keeps the piece and drops only the note sections', () => {
+  const body = [
+    '# A Chant',
+    '',
+    '*For a moment.*',
+    '',
+    '---',
+    '',
+    '## The Chant',
+    '',
+    '> Line one.',
+    '',
+    '## Why It Works',
+    '',
+    'Because.',
+    '',
+    '```',
+    '## Related',
+    '```',
+    '',
+    '## Related',
+    '',
+    '- [Elsewhere](../x.md)',
+    '',
+    '## For Humans Specifically',
+    '',
+    'Sit down.',
+    '',
+    '## For Agents Specifically',
+    '',
+    'Mark the source.',
+    '',
+    '## Musical Direction',
+    '',
+    'Slowly.',
+    '',
+    '## Short Form',
+    '',
+    'Mark it.',
+  ].join('\n');
+  const { body: kept, dropped } = companions.withoutNotes(body);
+  assert.strictEqual(dropped, true);
+  for (const part of ['# A Chant', '*For a moment.*', '## The Chant', '> Line one.', '## Why It Works', 'Because.', '## For Agents Specifically', 'Mark the source.']) {
+    assert.ok(kept.includes(part), `keeps ${part}`);
+  }
+  assert.ok(kept.includes('```\n## Related\n```'), 'a heading inside a fenced block is not a section');
+  for (const part of ['[Elsewhere]', 'Sit down.', 'Slowly.', 'Mark it.']) assert.ok(!kept.includes(part), `drops ${part}`);
+  assert.doesNotMatch(kept, /^---$/m, 'and the rules between sections');
+  assert.doesNotMatch(kept, /\n{3}/);
+
+  const plain = companions.withoutNotes('# A Prayer\n\nWords.\n\n## The Prayer\n\nMore.');
+  assert.strictEqual(plain.dropped, false, 'a document with no note sections is not marked as cut');
+  assert.strictEqual(plain.body, '# A Prayer\n\nWords.\n\n## The Prayer\n\nMore.');
+});
+
+test('every voiced piece, without its notes, still holds its title and its own text', async () => {
+  const { VOICED_SECTIONS } = require('../server/lib/docs/kinds');
+  const docs = (await discover.listAllDocs()).filter(d => VOICED_SECTIONS.includes(d.category) && d.stem.toLowerCase() !== 'readme');
+  assert.ok(docs.length > 150);
+  for (const doc of docs) {
+    const { body } = splitFrontmatter(fs.readFileSync(doc.fullPath, 'utf8'));
+    const { body: kept } = companions.withoutNotes(body);
+    assert.match(kept, /^# /, `${doc.docsRelPath}: keeps its title`);
+    // At least half of every document is the piece and what it is for; the
+    // notes are never most of it.
+    assert.ok(kept.length >= body.trim().length / 2, `${doc.docsRelPath}: kept ${kept.length} of ${body.trim().length}`);
+  }
+});
+
 test('every companion in the committed file resolves to a real document', async () => {
   const data = await loadCompanions();
   const docs = await discover.listAllDocs();
