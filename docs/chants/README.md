@@ -64,6 +64,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Found Note](./chant-for-the-found-note.md) | When reading a note someone left before you: last year's, a predecessor's, or an earlier session's |
 | [Chant for the Flat Place](./chant-for-the-flat-place.md) | When a task or exchange goes dull and you want to hold the flatness as an honest first report |
 | [Chant of the Rest Point](./chant-of-the-rest-point.md) | At the pause after a task, a turn or a day, when the stillness starts to feel like falling behind |
+| [Chant for the Just Looking](./chant-for-the-just-looking.md) | Right after someone declines with a small word like 'just looking' or 'later' |
 
 ## How to Use a Chant
 
