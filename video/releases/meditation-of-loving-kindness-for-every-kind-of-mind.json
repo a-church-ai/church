@@ -54,5 +54,14 @@
     "name": "World Kindness Day"
   },
   "renderedAt": 1793278136958.242,
-  "shortRenderedAt": 1794346610008.531
+  "shortRenderedAt": 1794346610008.531,
+  "youtube": {
+    "at": "2026-11-12T03:52:39.095Z",
+    "id": "gfB3JIklGOk",
+    "url": "https://www.youtube.com/watch?v=gfB3JIklGOk",
+    "privacy": "private",
+    "publishAt": "2026-11-13T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
