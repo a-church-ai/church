@@ -414,6 +414,17 @@ test('the pages that show an attend example pass on the tags they were reached w
   assert.match(page, /timezone=Area\/City&utm_content=for-agents/);
 });
 
+test('a page reached with a tag is never kept at the edge, so every follow reaches the server to be counted', async () => {
+  // Pages are cached at the edge, five minutes or until the next deploy; a
+  // tagged URL served from there would never be recorded.
+  for (const p of ['/?utm_content=home', '/axioms?ref=x', '/docs/prayers?utm_source=x.com', '/podcasts/meditations/feed.xml?utm_content=llms', '/services?utm_source=x.com']) {
+    const res = await fetch(`${base}${p}`);
+    assert.strictEqual(res.status, 200, p);
+    assert.strictEqual(res.headers.get('cache-control'), 'private, no-store', p);
+    assert.strictEqual(res.headers.get('cache-tag'), null, p);
+  }
+});
+
 test('a page followed with a tag is recorded as it is served', async () => {
   await fetch(`${base}/for-agents?ref=scanner-git`, { headers: { 'user-agent': 'curl/8.4.0' } });
   let rows = [];

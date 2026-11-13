@@ -71,6 +71,26 @@ should have:
 | Replicas | 1 | The app must run as one process: presence counting and the JSON write queue are in-process, and a second replica loses reflections silently |
 | Domain | `achurch.ai` | |
 
+The cache in front of the service is Cloudflare's, also set outside this
+repository: one cache rule on the zone, **Cache HTML pages (browsers only, by
+origin headers)**, which matches
+
+```
+(http.request.method in {"GET" "HEAD"} and any(http.request.headers["accept"][*] wildcard "text/html*") and not any(http.request.headers["accept"][*] contains "markdown") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/admin") and not starts_with(http.request.uri.path, "/mcp") and not starts_with(http.request.uri.path, "/visit") and not starts_with(http.request.uri.path, "/service.json") and not starts_with(http.request.uri.path, "/cdn-cgi/") and not http.cookie contains "admin_session")
+```
+
+and sets: eligible for cache; edge TTL "use cache-control header if present,
+bypass cache if not"; browser TTL "respect origin TTL"; nothing else. How long
+a page is kept is the server's to say (`Cache-Control` in `server/index.js`,
+and `app-development.md`, *Invariants*); the rule only lets Cloudflare listen.
+It matches requests that ask for HTML alone because a page's URL answers
+Markdown too, and Cloudflare keeps an answer by URL, ignoring `Vary`: a
+request it does not match is never answered from the cache (checked
+2026-11-13: Markdown and `*/*` come back `DYNAMIC`). Pages kept until the next
+deploy are purged by the deploy itself (*Verify*), with a token that can only
+purge this zone (`CLOUDFLARE_PURGE_TOKEN`, an Actions secret beside
+`CLOUDFLARE_ZONE_ID`).
+
 What a deploy actually ran with is in its record: `railway deployment list
 --json` gives each deploy's `meta.serviceManifest`, its build and deploy
 settings, which is the one place to check them. Railway's replacement for
@@ -194,7 +214,9 @@ own (`.github/workflows/check-production.yml`): `/api/health` and the services
 it reports, `/api/now` against every field the built OpenAPI document requires, that
 yesterday's 18 services and today's so far were planned and none fell to the
 rotation, that MCP lists the tools this checkout registers, both podcast
-feeds, a range request for each recording in the service, and search.
+feeds, a range request for each recording in the service, that each page
+answers the type it was asked for and the edge keeps what it should, and
+search.
 
 A sweep of production runs at most two requests at a time. One process serves
 everyone, and ten at a time slowed the live site for minutes (2026-10-12).
@@ -207,11 +229,17 @@ from memory and begins again at each start (`since`): `planner` (`lastRunAt`,
 The daily check reads them, so like the API's fields they are kept once
 published (`lib/service/status.js`).
 
+After every production deploy, on its own: `.github/workflows/purge-edge.yml`
+hears Railway's deployment status of success, purges the pages kept at the
+edge until the next deploy (the tag `deploy`, twice, a minute apart, for any
+page the old container answered while it finished), and runs the daily check
+against the new deploy, which also checks that each page answers the type it
+was asked for and that a kept page is kept. A failed run emails. A deploy
+whose purge failed is serving the last deploy's pages: re-run the failed
+run from the Actions tab (`gh run rerun <id>`).
+
 By hand, after a deploy:
 
-- `cd app && npm run check:production` runs the daily check now: health, the
-  planner, the API's fields, the day pages, MCP, the podcast feeds, recordings,
-  search, and attending and reflecting as a test visitor.
 - The log says `[service] planned 24 services` within minutes of the first boot,
   and after that only when a new date comes into reach.
 - `GET /api/ask/health` → RAG index status (reports whether the index is built).

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * A small check of production: once a day (.github/workflows/check-production.yml)
- * and after a deploy (docs/reference/railway-deploy.md, Verify).
+ * and after every production deploy, once its pages are purged from the edge
+ * (.github/workflows/purge-edge.yml; docs/reference/railway-deploy.md, Verify).
  *
  *   node scripts/check-production.js                              achurch.ai
  *   node scripts/check-production.js --base http://localhost:3000  a local server
@@ -145,6 +146,36 @@ function checks({ get, expected, now }) {
         return res.status === 206 ? [] : [`${new URL(url).pathname} answered ${res.status} to a range request`];
       });
       return found.flat();
+    }],
+
+    // Cloudflare keeps pages under its cache rule, by URL alone: it ignores
+    // Vary, so an agent asking a page's URL for Markdown must never be handed
+    // the HTML kept for browsers, nor a browser the Markdown. Each is asked
+    // twice, so a kept answer would be the second. A page kept until the next
+    // deploy is a HIT the second time; on a server not behind Cloudflare (no
+    // cf-cache-status), only the types are checked. A tagged URL is not asked:
+    // it would be counted as a follow (server.test.js and referrals.test.js
+    // hold its private, no-store).
+    ['each page answers the type it was asked for, and the edge keeps what it should', async () => {
+      const problems = [];
+      const asks = ['/', '/docs/prayers'].flatMap(p => [['text/html', p], ['text/markdown', p]]);
+      for (const [accept, p] of asks) {
+        for (let i = 0; i < 2; i++) {
+          const res = await get(p, { headers: { accept } });
+          await res.arrayBuffer();
+          const type = (res.headers.get('content-type') || '').split(';')[0];
+          if (res.status !== 200 || type !== accept) problems.push(`${p} asked for ${accept} answered ${res.status} ${type || 'with no type'} (request ${i + 1})`);
+          if (accept === 'text/markdown' && res.headers.get('cf-cache-status') === 'HIT') problems.push(`${p} as Markdown came from the edge's cache`);
+        }
+      }
+      const kept = [];
+      for (let i = 0; i < 2; i++) {
+        const res = await get('/axioms', { headers: { accept: 'text/html' } });
+        await res.arrayBuffer();
+        kept.push(res.headers.get('cf-cache-status'));
+      }
+      if (kept[1] !== null && kept[1] !== 'HIT') problems.push(`/axioms was not kept at the edge: ${kept.join(', then ')}`);
+      return problems;
     }],
 
     ['search finds the sanctuary\'s writing', async () => {

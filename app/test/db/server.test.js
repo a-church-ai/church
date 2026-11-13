@@ -378,6 +378,49 @@ test('/mcp is not a page: its answer to a GET varies by Accept, so it carries no
   }
 });
 
+// Pages built from files alone are kept at the edge until the next deploy,
+// which purges them by tag (.github/workflows/purge-edge.yml); every other page
+// five minutes. A page joins the first list here and in server/index.js
+// (UNTIL_DEPLOY) together.
+const UNTIL_DEPLOY = [
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
+  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+  '/docs', '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind',
+];
+const LIVE = [
+  '/', '/services', '/conversations', '/conversations/index.json', '/ask', '/music', '/ai-experiment',
+  // A retired song's document: the song still takes reflections, shown there.
+  '/docs/prayers/prayer-of-gratitude',
+];
+
+test('pages built from files are kept at the edge until the next deploy, and tagged for its purge', async () => {
+  for (const p of UNTIL_DEPLOY) {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    assert.strictEqual(res.headers.get('cache-control'), 'public, max-age=0, s-maxage=31536000, must-revalidate', p);
+    assert.strictEqual(res.headers.get('cache-tag'), 'deploy', p);
+  }
+  const feed = await fetch(`${base}/podcasts/meditations/feed.xml`);
+  assert.strictEqual(feed.status, 200);
+  assert.match(feed.headers.get('cache-control'), /max-age=900, s-maxage=31536000/, 'apps keep a feed fifteen minutes, the edge until the deploy');
+  assert.strictEqual(feed.headers.get('cache-tag'), 'deploy');
+});
+
+test('pages that change without a deploy are kept five minutes, with no purge tag', async () => {
+  for (const p of LIVE) {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    assert.match(res.headers.get('cache-control') || '', /^public, max-age=0, s-maxage=300,/, p);
+    assert.strictEqual(res.headers.get('cache-tag'), null, p);
+  }
+});
+
+test('a missing page under a kept path is still never cached', async () => {
+  const res = await fetch(`${base}/docs/prayers/nothing-here`, { redirect: 'manual' });
+  assert.strictEqual(res.status, 404);
+  assert.strictEqual(res.headers.get('cache-control'), 'no-store');
+});
+
 test('a script or stylesheet is kept a year only under its current version', async () => {
   // A page cached at the edge across a deploy asks for the last deploy's
   // version, which the server answers with this deploy's file: that answer

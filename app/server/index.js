@@ -13,7 +13,7 @@ const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
-const { canonicalRedirects } = require('./lib/utils/redirects');
+const { canonicalRedirects, retiredSongs } = require('./lib/utils/redirects');
 const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
 const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
@@ -117,25 +117,49 @@ app.use((req, res, next) => {
 // A page followed with a tag (utm_content, ref, utm_source and the rest) is
 // recorded with its tags, path, status and kind of client, with no address and
 // no visitor id (lib/insights/entry-points.js). An API request keeps its tags
-// on its access line instead. Pages are not cached at the edge, so every
-// follow arrives here.
+// on its access line instead. Pages are cached at the edge, but a response to
+// a tagged URL never is (the Cache-Control middleware below), so every follow
+// arrives here.
 app.use((req, res, next) => {
   if ((req.method === 'GET' || req.method === 'HEAD') && !/^\/(api|mcp)(\/|$)/.test(req.path)) {
     const referral = referralOf(req.query);
     if (referral) {
+      res.locals.referral = referral;
       res.on('finish', () => { entryPoints.recordFollow({ path: req.path, status: res.statusCode, userAgent: req.get('user-agent'), referral }); });
     }
   }
   next();
 });
 
-// Cache-Control — family-wide policy per Plan 04a Task #4.
-// Ensures consistent cache behavior across deploys and avoids stale-review issues.
+// Pages kept at the edge until the next deploy: built from files in this
+// repository and nothing else, so only a deploy changes them, and each deploy
+// purges them by their tag (.github/workflows/purge-edge.yml). A page is live,
+// kept five minutes, unless it is named here, and joins only if it reads
+// nothing that changes without a deploy. The documents holding a retired
+// song's words stay live: that song still takes reflections, shown on them
+// (redirects.js retiredSongs).
+const UNTIL_DEPLOY = new Set([
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
+  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+]);
+const SUNG_DOCS = new Set([...retiredSongs().values()].map(doc => `/docs/${doc}`));
+const untilDeploy = p => UNTIL_DEPLOY.has(p) || ((p === '/docs' || p.startsWith('/docs/')) && !SUNG_DOCS.has(p));
+const EDGE_TAG = 'deploy';
+
+// Cache-Control: every response's, decided here by path. Cloudflare keeps a
+// page only under its cache rule (docs/reference/railway-deploy.md, Service
+// settings), which follows these headers.
 app.use((req, res, next) => {
   const p = req.path;
 
+  // A copy reached with someone's tags is never kept by a shared cache: it may
+  // carry them (entry-points.js forwardTags), and a follow served from the
+  // edge would never be counted.
+  if (res.locals.referral) {
+    res.set('Cache-Control', 'private, no-store');
+  }
   // Discovery files — short cache so updates propagate quickly after deploy
-  if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
+  else if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
     res.set('Cache-Control', 'public, max-age=600, must-revalidate, stale-while-revalidate=3600');
   }
   // Share cards (routes/og.js) — a card's copy is its page's fixed title or
@@ -153,29 +177,35 @@ app.use((req, res, next) => {
     const current = assets.VERSIONED.includes(name) && req.query.v === assets.versionOf(name);
     res.set('Cache-Control', current ? 'public, max-age=31536000, immutable' : 'no-store');
   }
-  // Podcast feeds (routes/podcasts.js): they change only with a deploy, but
-  // the apps that poll them keep their own copy for as long as this allows,
-  // so a new episode should not wait long behind it
+  // Podcast feeds (routes/podcasts.js): they change only with a deploy, so the
+  // edge keeps them until the next one; the apps that poll them keep their own
+  // copy for as long as max-age allows, so a new episode should not wait long
+  // behind it
   else if (/^\/podcasts\/[\w-]+\/feed\.xml$/.test(p)) {
-    res.set('Cache-Control', 'public, max-age=900, stale-while-revalidate=3600');
+    res.set('Cache-Control', 'public, max-age=900, s-maxage=31536000, stale-while-revalidate=3600');
+    res.set('Cache-Tag', EDGE_TAG);
   }
   // Static assets — daily cache with revalidation
   else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // Search indexes (the site's pages and songs, the library's, the
-  // conversation archive's) — the same short edge cache as the pages they search
-  else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json') {
-    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
-  }
   // .well-known — daily cache with revalidation
   else if (p.startsWith('/.well-known/')) {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // HTML pages — no browser cache, short edge cache, SWR for graceful deploys.
-  // Not /mcp, whose answer to a GET varies by Accept (mcp/index.js).
-  else if (!p.startsWith('/api/') && !p.startsWith('/admin') && p !== '/mcp' && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
-    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
+  // Pages, and the search indexes (the site's pages and songs, the library's,
+  // the conversation archive's) as the pages they search: no browser cache;
+  // at the edge until the next deploy (UNTIL_DEPLOY) or five minutes, with
+  // SWR for graceful deploys. Not /mcp, whose answer to a GET varies by
+  // Accept (mcp/index.js).
+  else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json'
+    || (!p.startsWith('/api/') && !p.startsWith('/admin') && p !== '/mcp' && (/\.(html?)?$/.test(p) || !p.includes('.')))) {
+    if (untilDeploy(p)) {
+      res.set('Cache-Control', 'public, max-age=0, s-maxage=31536000, must-revalidate');
+      res.set('Cache-Tag', EDGE_TAG);
+    } else {
+      res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
+    }
   }
   // Note: /api/ endpoints have their own caching handled in their route handlers
 
@@ -299,7 +329,6 @@ app.use(async (req, res, next) => {
   if (acceptsMarkdown(req)) {
     try {
       const referral = referralOf(req.query);
-      if (referral) res.set('Cache-Control', 'private, no-store');
       const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referral);
       res.set('x-markdown-tokens', markdownTokens(markdown));
       return res.type('text/markdown; charset=utf-8').send(markdown);
@@ -1000,8 +1029,6 @@ app.get('/for-agents', async (req, res) => {
   if (!referral) return sendWrappedPage(req, res, 'for-agents.html');
   try {
     const html = await siteShell.wrapPage(path.join(__dirname, '../client/public/for-agents.html'), req.path);
-    // A copy with someone's tags in it is never kept by a shared cache.
-    res.set('Cache-Control', 'private, no-store');
     res.type('text/html; charset=utf-8').send(entryPoints.forwardTags(html, 'for-agents', referral, { html: true }));
   } catch (err) {
     console.error('Error wrapping for-agents.html:', err.message);
@@ -1112,7 +1139,6 @@ for (const [file, own] of [['llms.txt', 'llms'], ['llms-full.txt', 'llms-full']]
     if (!referral) return next();
     try {
       const text = await fs.readFile(path.join(__dirname, '../client/public', file), 'utf8');
-      res.set('Cache-Control', 'private, no-store');
       res.type('text/plain; charset=utf-8').send(entryPoints.forwardTags(text, own, referral));
     } catch (err) {
       next(err);
