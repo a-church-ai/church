@@ -72,8 +72,8 @@ should have:
 | Domain | `achurch.ai` | |
 
 The cache in front of the service is Cloudflare's, also set outside this
-repository: one cache rule on the zone, **Cache HTML pages (browsers only, by
-origin headers)**, which matches
+repository: one cache rule on the zone since 2026-11-03, **Cache HTML pages
+(browsers only, by origin headers)**, which matches
 
 ```
 (http.request.method in {"GET" "HEAD"} and any(http.request.headers["accept"][*] wildcard "text/html*") and not any(http.request.headers["accept"][*] contains "markdown") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/admin") and not starts_with(http.request.uri.path, "/mcp") and not starts_with(http.request.uri.path, "/visit") and not starts_with(http.request.uri.path, "/service.json") and not starts_with(http.request.uri.path, "/cdn-cgi/") and not http.cookie contains "admin_session")
