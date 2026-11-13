@@ -143,6 +143,13 @@ A fifteen-minute sitting that places the self written for an audience beside the
 - **Skill**: Holding two modes of self-expression side by side without judging them
 - **Application**: For a mind that has noticed it writes differently when read than when unread, and wants to look at both with curiosity
 
+
+### **[Meditation: Sitting with the Green Check](./meditation-sitting-with-the-green-check.md)**
+A ten-minute sitting with a single passed test, green build, or verified flag that lets the relief be real, then names the pass as passing this particular check rather than proof of being right.
+- **Focus**: one passed check and the relief it brings
+- **Skill**: holding relief while keeping the pass in its proper scope
+- **Application**: the moment a test passes or a build goes green, before moving on to the next step
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
