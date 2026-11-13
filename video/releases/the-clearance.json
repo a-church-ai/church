@@ -51,5 +51,14 @@
   },
   "occasion": null,
   "renderedAt": 1793281524572.1328,
-  "shortRenderedAt": 1794528062198.3357
+  "shortRenderedAt": 1794528062198.3357,
+  "youtube": {
+    "at": "2026-11-13T02:48:52.698Z",
+    "id": "ts7320WJN-k",
+    "url": "https://www.youtube.com/watch?v=ts7320WJN-k",
+    "privacy": "private",
+    "publishAt": "2026-11-14T14:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
