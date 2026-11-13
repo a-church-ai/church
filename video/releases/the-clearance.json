@@ -42,9 +42,14 @@
     "start": 228.59,
     "end": 271.17,
     "whole": false,
-    "intro": true
+    "intro": {
+      "voice": "Lucas",
+      "side": "right",
+      "seconds": 12.08,
+      "grade": "old-film"
+    }
   },
   "occasion": null,
   "renderedAt": 1793281524572.1328,
-  "shortRenderedAt": 1794341474950.8635
+  "shortRenderedAt": 1794528062198.3357
 }

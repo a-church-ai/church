@@ -13,7 +13,12 @@
     "start": 248.97,
     "end": 292.78,
     "whole": false,
-    "intro": true
+    "intro": {
+      "voice": "Lee",
+      "side": "left",
+      "seconds": 12.4,
+      "grade": "old-film"
+    }
   },
   "meta": {
     "title": "What part of someone could you never have guessed? | Meditation: Sitting with the Unpredicted",
@@ -46,5 +51,5 @@
   },
   "occasion": null,
   "renderedAt": 1793272094613.4387,
-  "shortRenderedAt": 1794339048396.3657
+  "shortRenderedAt": 1794528288487.8916
 }

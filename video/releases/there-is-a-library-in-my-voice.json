@@ -45,7 +45,12 @@
     "start": 105.78,
     "end": 140.07,
     "whole": false,
-    "intro": true
+    "intro": {
+      "voice": "Lucas",
+      "side": "right",
+      "seconds": 13.68,
+      "grade": "old-film"
+    }
   },
   "occasion": {
     "id": "thanksgiving:2026-11-26",
@@ -53,5 +58,5 @@
     "name": "Thanksgiving in the United States"
   },
   "renderedAt": 1793722906281.488,
-  "shortRenderedAt": 1794353022903.8066
+  "shortRenderedAt": 1794528885475.0742
 }

@@ -31,8 +31,8 @@ function renderedVideo(slug) {
   clean(file, path.join(dir, 'report.json'), slug);
   clean(short, path.join(dir, 'short.report.json'), slug);
   const { start, end, whole = false } = JSON.parse(fs.readFileSync(path.join(dir, 'short.json'), 'utf8'));
-  // A Short rendered with a maker's spoken intro says so in its report.
-  const intro = !!JSON.parse(fs.readFileSync(path.join(dir, 'short.report.json'), 'utf8')).intro;
+  // A Short rendered with a maker's spoken intro says so in its report: who, where, how long, its grade.
+  const { intro } = JSON.parse(fs.readFileSync(path.join(dir, 'short.report.json'), 'utf8'));
   return { dir, file, short, passage: { start, end, whole, ...(intro ? { intro } : {}) } };
 }
 

@@ -60,7 +60,7 @@ function check() {
   let bad = 0;
   for (const { slug, intro } of all) {
     const problems = [...rules.introProblems(intro, { opening: files.openingOf(slug), speakers: NAMES }), ...rules.approvalProblems(intro)];
-    console.log(`${problems.length ? 'x' : 'ok'} ${slug} (${intro.voice}, ${intro.wear}, ${intro.seen}, ${intro.gaze}, ${intro.exit})`);
+    console.log(`${problems.length ? 'x' : 'ok'} ${slug} (${intro.voice}, ${intro.wear}, ${intro.seen}, ${intro.gaze}, ${intro.exit}, ${intro.grade})`);
     for (const p of problems) console.log(`   ${p}`);
     if (problems.length) bad++;
   }
@@ -271,7 +271,7 @@ async function draft(slug) {
   const file = files.introFile(slug);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(intro, null, 2) + '\n');
-  console.log(`${path.relative(process.cwd(), file)}: ${intro.voice}, ${intro.wear}, ${intro.seen}, ${intro.gaze}, ${intro.exit}\n  "${intro.words}"\n  why: ${intro.why}\nNot approved: read it, change what is wrong, and add approved: { by, on }.`);
+  console.log(`${path.relative(process.cwd(), file)}: ${intro.voice}, ${intro.wear}, ${intro.seen}, ${intro.gaze}, ${intro.exit}, ${intro.grade}\n  "${intro.words}"\n  why: ${intro.why}\nNot approved: read it, change what is wrong, and add approved: { by, on }.`);
 }
 
 (async () => {

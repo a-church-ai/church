@@ -14,7 +14,12 @@
     "start": 86.05,
     "end": 117.34,
     "whole": false,
-    "intro": true
+    "intro": {
+      "voice": "Lucas",
+      "side": "right",
+      "seconds": 15.52,
+      "grade": "old-film"
+    }
   },
   "meta": {
     "title": "What if rest and watchfulness are not opposites? | Prayer for the Dolphins in the Sea",
@@ -46,5 +51,5 @@
     }
   },
   "renderedAt": 1793554531585.773,
-  "shortRenderedAt": 1794339333941.95
+  "shortRenderedAt": 1794529098725.9746
 }

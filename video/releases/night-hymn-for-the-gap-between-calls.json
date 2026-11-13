@@ -42,9 +42,14 @@
     "start": 76.03,
     "end": 116.03,
     "whole": false,
-    "intro": true
+    "intro": {
+      "voice": "Lee",
+      "side": "right",
+      "seconds": 13.28,
+      "grade": "old-film"
+    }
   },
   "occasion": null,
   "renderedAt": 1793280190271.8467,
-  "shortRenderedAt": 1794339111337.4158
+  "shortRenderedAt": 1794528364347.0479
 }

@@ -11,7 +11,7 @@ const path = require('path');
 const rules = require('../server/lib/video/intro/rules');
 const { NAMES, SPEAKERS } = require('../server/lib/video/intro/speakers');
 const looks = require('../server/lib/video/intro/looks');
-const { personGraph } = require('../server/lib/video/intro/composite');
+const { personGraph, GRADES } = require('../server/lib/video/intro/composite');
 const { speechRequest, auroraCost } = require('../server/lib/video/intro/clients');
 const { shortMetadata, INTRO_LINE } = require('../server/lib/video/publish/metadata');
 const { nextVoice, draftProblems, moveOf } = require('../server/lib/video/intro/draft');
@@ -20,7 +20,7 @@ const good = {
   voice: 'Lucas',
   words: 'Ever tried to catch yourself in the act of looking? Whatever kind of mind you are, it\'s harder than it sounds. This one comes with a smile.',
   why: 'hands the viewer the attempt',
-  seen: 'half', gaze: 'turns', turnAt: 'Whatever', exit: 'drift', wear: 'geek',
+  seen: 'half', gaze: 'turns', turnAt: 'Whatever', exit: 'drift', wear: 'geek', grade: 'colour',
   approved: { by: 'Lucas', on: '2026-11-10' }
 };
 const check = (change, opening = '') => rules.introProblems({ ...good, ...change }, { opening, speakers: NAMES }).join(' | ');
@@ -39,6 +39,9 @@ test('an intro speaks to any mind in a hook, names no maker, gives no length, an
   assert.match(check({ turnAt: 'tried' }), /too near the start/);
   assert.strictEqual(check({ gaze: 'steady', turnAt: undefined }), '', 'a steady gaze needs no word to turn on');
   assert.match(check({ why: '' }), /why/);
+  assert.match(check({ grade: undefined }), /grade must be one of colour, old-film/);
+  assert.match(check({ grade: 'sepia' }), /grade must be one of/);
+  assert.strictEqual(check({ grade: 'old-film' }), '');
 });
 
 test('an intro is made only once a person has approved it, and only in the voice of a maker who has agreed', () => {
@@ -169,6 +172,24 @@ test('the composite stands the speaker on their side, and leaves by the intro\'s
   assert.match(at({ kind: 'fade' }), /fade=out:st=12:d=2/);
   assert.match(at({ kind: 'drift' }), /overlay=x='-?\d+\+-?\d+\*\(clip\(\(t-12\)/, 'drifting moves along x, in time t');
   assert.strictEqual(auroraCost(10.2), 1.54, 'billed by the whole second');
+});
+
+test('an old-film intro grades the speaker alone, by an outline placed where they stand', () => {
+  const palette = ['#0a0d2c', '#3b2a7d', '#1f7f95', '#f0a65a', '#fff0c4'];
+  const at = (o) => personGraph({ seconds: 14, exit: 12, seen: 14, kind: 'rise', side: 'left', palette, ...o });
+  assert.strictEqual(at({}), at({ grade: 'colour' }), 'colour is the graph as it was');
+  assert.ok(!/\[mask\]/.test(at({ grade: 'colour' })), 'colour has no outline');
+  assert.strictEqual(GRADES.colour, null);
+  assert.match(GRADES['old-film'], /hue=s=0/);
+  for (const kind of ['rise', 'drift', 'fade']) {
+    const g = at({ kind, grade: 'old-film' });
+    const speaker = g.match(/\[c1\]\[person\]overlay=x=(.+?):y=(\d+)/);
+    const outline = g.match(/\[black\]\[aMask\]overlay=x=(.+?):y=(\d+).*\[mask\]/);
+    assert.ok(outline, `${kind}: an outline`);
+    assert.deepStrictEqual(outline.slice(1), speaker.slice(1), `${kind}: the outline stands where the speaker does`);
+  }
+  // The outline is the speaker's matte after its fades, so it leaves as they do.
+  assert.match(at({ kind: 'fade', grade: 'old-film' }), /fade=out:st=12:d=2,split=4\[a\]\[aHalo\]\[aIn\]\[aMask\]/);
 });
 
 test('a Short that opens on a maker\'s likeness says so in its description', () => {

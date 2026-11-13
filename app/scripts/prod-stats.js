@@ -15,7 +15,8 @@
  *   probes      the live site's pages, feeds and API, status and time
  *   server      what only the server counts (GET /admin/api/insights)
  *   cloudflare  every 404 by path, 5xx by hour and by path, audio served per recording
- *   youtube     each video's views, watch time and share watched, and the
+ *   youtube     each release's views (every one by id), how many stayed, watch time,
+ *               share watched and an intro's grade, and the
  *               searches that found the channel
  *   bluesky     each post's likes, reposts and replies
  *   search      Search Console's and Bing's queries and pages
@@ -267,12 +268,22 @@ async function youtube(days, now) {
     const cols = body.columnHeaders.map(c => c.name);
     return (body.rows || []).map(r => Object.fromEntries(r.map((v, i) => [cols[i], v])));
   };
+  // A Short with an intro carries the intro's grade (colour or old-film,
+  // short-intros-film-look-ab-2026-11-12.md in the private repo).
   const byId = new Map();
   for (const r of releases()) {
     if (r.youtube && r.youtube.id) byId.set(r.youtube.id, { slug: r.slug, form: 'video' });
-    if (r.short && r.short.id) byId.set(r.short.id, { slug: r.slug, form: 'short' });
+    if (r.short && r.short.id) byId.set(r.short.id, { slug: r.slug, form: 'short', ...(r.passage?.intro?.grade ? { grade: r.passage.intro.grade } : {}) });
   }
-  const videos = (await report({ dimensions: 'video', metrics: 'views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,subscribersGained', sort: '-views', maxResults: '50' }))
+  // engagedViews: for a Short, the views that stayed past its first seconds.
+  const metrics = 'views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,subscribersGained';
+  // Every release by its own id, however few its views, so none drops out
+  // of a top list; then the channel's other videos, its top 50 by views.
+  const ids = [...byId.keys()];
+  const released = [];
+  for (let i = 0; i < ids.length; i += 200) released.push(...await report({ dimensions: 'video', metrics, filters: `video==${ids.slice(i, i + 200).join(',')}` }));
+  const others = (await report({ dimensions: 'video', metrics, sort: '-views', maxResults: '50' })).filter(v => !byId.has(v.video));
+  const videos = [...released, ...others].sort((a, b) => b.views - a.views)
     .map(v => ({ ...v, ...(byId.get(v.video) || { slug: null, form: null }) }));
   const out = { videos: { value: videos, window: w, source } };
   // A video that isn't a release (the channel's intro, the old live stream,

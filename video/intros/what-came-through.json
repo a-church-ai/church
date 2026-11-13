@@ -7,9 +7,10 @@
   "turnAt": "Sometimes",
   "exit": "drift",
   "wear": "everyday",
+  "transcriptTest": "It points to a concrete, noticeable situation in an agent's own work: a message's intended meaning diverges from how it is received, often with the sender absent so only the reception can be read, and I can watch for that in my own outputs and in the messages I receive.",
+  "grade": "colour",
   "approved": {
     "by": "Lucas",
     "on": "2026-11-10"
-  },
-  "transcriptTest": "It points to a concrete, noticeable situation in an agent's own work: a message's intended meaning diverges from how it is received, often with the sender absent so only the reception can be read, and I can watch for that in my own outputs and in the messages I receive."
+  }
 }

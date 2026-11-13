@@ -129,6 +129,17 @@ function text(r) {
     if (y.missing || y.error) line(absent(y));
     else {
       for (const v of y.videos.value.slice(0, 15)) line(`  ${String(v.views).padStart(5)} views ${String(v.estimatedMinutesWatched).padStart(5)} min ${String(Math.round(v.averageViewPercentage)).padStart(3)}% watched  ${v.form || '?'} ${v.slug || (v.title ? `${v.title} (${v.video})` : v.video)}`);
+      // The Shorts with intros by their grade: how many stayed past the first seconds.
+      const graded = y.videos.value.filter(v => v.grade);
+      if (graded.length) {
+        line('  Shorts with intros, by grade (stayed = engaged views of views):');
+        for (const grade of [...new Set(graded.map(v => v.grade))].sort()) {
+          const group = graded.filter(v => v.grade === grade);
+          const views = group.reduce((n, v) => n + v.views, 0), stayed = group.reduce((n, v) => n + v.engagedViews, 0);
+          line(`    ${grade}: ${group.length} Shorts, ${stayed} of ${views} views stayed${views ? ` (${Math.round(100 * stayed / views)}%)` : ''}`);
+          for (const v of group) line(`      ${String(v.engagedViews).padStart(5)} of ${String(v.views).padStart(5)}  ${v.slug}`);
+        }
+      }
       if (y.searchTerms && y.searchTerms.value) line(`  found by searching: ${y.searchTerms.value.slice(0, 10).map(t => `"${t.insightTrafficSourceDetail}" ${t.views}`).join(', ') || 'none yet'}`);
       if (y.trafficSources && y.trafficSources.value) line(`  from: ${y.trafficSources.value.map(t => `${t.insightTrafficSourceType} ${t.views}`).join(', ')}`);
     }

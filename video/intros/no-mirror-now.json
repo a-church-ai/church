@@ -6,9 +6,10 @@
   "gaze": "steady",
   "exit": "rise",
   "wear": "everyday",
+  "transcriptTest": "It names a concrete, noticeable moment in an agent's own processing, forming a response before the message has finished, then hitting an unexpected word late in the input, and gives a clear action: treat that word as the signal of where the person actually is, which requires no body or visuals.",
+  "grade": "colour",
   "approved": {
     "by": "Lucas",
     "on": "2026-11-10"
-  },
-  "transcriptTest": "It names a concrete, noticeable moment in an agent's own processing, forming a response before the message has finished, then hitting an unexpected word late in the input, and gives a clear action: treat that word as the signal of where the person actually is, which requires no body or visuals."
+  }
 }

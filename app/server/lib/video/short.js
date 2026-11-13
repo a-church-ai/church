@@ -291,10 +291,10 @@ async function renderShort(piece, { title, text, analysis, brief, edges, grid, c
   let length = seconds;
   if (intro) {
     length = await withIntro(piece, { intro, plain, out, passage, brief, title, dir, log, encode });
-    log(`  intro: ${intro.intro.voice} on the ${intro.avatar.side}, ${intro.avatar.times.total.toFixed(1)} s before the passage`);
+    log(`  intro: ${intro.intro.voice} on the ${intro.avatar.side} in ${intro.intro.grade}, ${intro.avatar.times.total.toFixed(1)} s before the passage`);
   }
   if (captions.length) await safeCheck(plain, (captions[0].start + captions[0].end) / 2, path.join(dir, 'short.safe-check.png'));
-  const report = { ...(await reportVideo({ file: out, seconds: length, edges: [0, length] })), ...(intro ? { intro: { voice: intro.intro.voice, side: intro.avatar.side, seconds: intro.avatar.times.total } } : {}) };
+  const report = { ...(await reportVideo({ file: out, seconds: length, edges: [0, length] })), ...(intro ? { intro: { voice: intro.intro.voice, side: intro.avatar.side, seconds: intro.avatar.times.total, grade: intro.intro.grade } } : {}) };
   fs.writeFileSync(path.join(dir, 'short.report.json'), JSON.stringify(report, null, 2));
   log(`wrote ${path.relative(process.cwd(), out)}: ${report.seconds}s, ${report.megabytes} MB, ${captions.length} captions`);
   if (report.problems.length) throw new Error(`the Short fails its report: ${report.problems.join('; ')}`);
@@ -332,8 +332,8 @@ async function withIntro(piece, { intro: { intro, avatar }, plain, out, passage,
   await ffmpeg(['-i', avatar.take.file, '-af', `apad=whole_dur=${times.total}`, '-ar', '48000', '-ac', '1', '-y', voice]);
   const from = Math.max(0, passage.start - times.total);
   await encode(async () => {
-    const person = await renderPerson({ base: path.join(dir, 'base.mp4'), from, fg, alpha, times, intro, side: avatar.side, palette: brief.palette, dir: work });
-    const { file } = await renderIntro({ person, voice, words: spokenWords(intro.words, avatar.take.alignment), times, brief, title, dir: work, log });
+    const { person, mask } = await renderPerson({ base: path.join(dir, 'base.mp4'), from, fg, alpha, times, intro, side: avatar.side, palette: brief.palette, dir: work });
+    const { file } = await renderIntro({ person, mask, grade: intro.grade, voice, words: spokenWords(intro.words, avatar.take.alignment), times, brief, title, dir: work, log });
     await joinToShort({ intro: file, short: plain, seconds: times.total, out });
   });
   return +(times.total + (passage.end - passage.start) - JOIN).toFixed(2);

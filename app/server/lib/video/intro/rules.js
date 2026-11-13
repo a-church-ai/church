@@ -20,6 +20,11 @@
  *             it), fade
  *   wear      contemplative (a plain sweater, the mala), geek (a plain zip
  *             hoodie over a dark tee), everyday (a muted flannel over a dark tee)
+ *   grade     colour (the speaker as made), or old-film (the speaker alone in
+ *             old-film black and white inside the light, which keeps its
+ *             colour); Nov 13 to 29, 2026 drawn at random, half each within
+ *             each speaker, to compare how many viewers stay
+ *             (short-intros-film-look-ab-2026-11-12.md in the private repo)
  *   approved  { by, on }: who approved the words and the shape, and when
  *
  * Where the speaker stands (left or right) is measured, not chosen: the side
@@ -32,6 +37,7 @@ const SEEN = ['glimpse', 'half', 'whole'];
 const GAZE = ['steady', 'turns', 'toward'];
 const EXIT = ['rise', 'drift', 'fade'];
 const WEAR = ['contemplative', 'geek', 'everyday'];
+const GRADE = ['colour', 'old-film'];
 const SIDES = ['left', 'right'];
 const WORDS = { min: 10, max: 45 };
 // The quiet after the last word, over which a whole intro leaves.
@@ -69,6 +75,7 @@ function introProblems(intro, { opening = '', speakers = [] } = {}) {
   if (!GAZE.includes(intro.gaze)) problems.push(`gaze must be one of ${GAZE.join(', ')}`);
   if (!EXIT.includes(intro.exit)) problems.push(`exit must be one of ${EXIT.join(', ')}`);
   if (!WEAR.includes(intro.wear)) problems.push(`wear must be one of ${WEAR.join(', ')}`);
+  if (!GRADE.includes(intro.grade)) problems.push(`grade must be one of ${GRADE.join(', ')}`);
   if (intro.gaze !== 'steady') {
     const at = wordsIn(text).map(bare).indexOf(bare(intro.turnAt || ''));
     if (!intro.turnAt || at < 0) problems.push(`a gaze that ${intro.gaze === 'turns' ? 'turns' : 'begins toward the light'} needs "turnAt", a word in the words to turn on`);
@@ -181,4 +188,4 @@ function sideFor(columns, used = { left: 0, right: 0 }) {
   return used.right < used.left ? 'right' : 'left';
 }
 
-module.exports = { introProblems, approvalProblems, varietyProblems, spokenWords, timesOf, sideFor, SEEN, GAZE, EXIT, WEAR, SIDES, QUIET, LEAVING, WORDS, WINDOW };
+module.exports = { introProblems, approvalProblems, varietyProblems, spokenWords, timesOf, sideFor, SEEN, GAZE, EXIT, WEAR, GRADE, SIDES, QUIET, LEAVING, WORDS, WINDOW };

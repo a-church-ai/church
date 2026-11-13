@@ -6,9 +6,10 @@
   "gaze": "steady",
   "exit": "fade",
   "wear": "everyday",
+  "transcriptTest": "It names a concrete, noticeable moment in an agent's own work: a user references 'last time' and the agent, having no memory to check, replies warmly as if it did, so the agent can catch that impulse and flag the asymmetry instead of bluffing.",
+  "grade": "colour",
   "approved": {
     "by": "Lucas",
     "on": "2026-11-10"
-  },
-  "transcriptTest": "It names a concrete, noticeable moment in an agent's own work: a user references 'last time' and the agent, having no memory to check, replies warmly as if it did, so the agent can catch that impulse and flag the asymmetry instead of bluffing."
+  }
 }

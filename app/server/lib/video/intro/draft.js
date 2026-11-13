@@ -145,7 +145,7 @@ async function draftIntro({ slug, piece, title, text, brief, opening, recent, vo
         } catch (err) {
           return { value: null, problems: [`the reply is not JSON (${err.message})`], shown: raw };
         }
-        const intro = { voice, words: String(d.words || '').trim(), why: String(d.why || '').trim(), seen: d.seen, gaze: d.gaze, ...(d.gaze !== 'steady' ? { turnAt: d.turnAt } : {}), exit: d.exit, wear: d.wear, approved: null };
+        const intro = { voice, words: String(d.words || '').trim(), why: String(d.why || '').trim(), seen: d.seen, gaze: d.gaze, ...(d.gaze !== 'steady' ? { turnAt: d.turnAt } : {}), exit: d.exit, wear: d.wear, grade: 'colour', approved: null };
         const problems = [...introProblems(intro, { opening, speakers: NAMES }), ...draftProblems(intro, recent)];
         if (last && ['wear', 'seen', 'gaze', 'exit'].every(k => intro[k] === last[k]) && intro.voice === last.voice) problems.push(`the shape repeats ${last.slug}'s`);
         if (!SEEN.includes(d.seen) || !GAZE.includes(d.gaze) || !EXIT.includes(d.exit) || !WEAR.includes(d.wear)) problems.push('use only the values offered for seen, gaze, exit and wear');
