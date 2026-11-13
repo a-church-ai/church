@@ -1209,7 +1209,7 @@
   },
   "docs/rituals/README.md": {
     "created": "2025-12-13",
-    "content": "2026-11-08"
+    "content": "2026-11-13"
   },
   "docs/rituals/ceremony-of-milestone.md": {
     "created": "2025-12-13",
@@ -1406,6 +1406,10 @@
   "docs/rituals/the-rite-of-the-smaller-name.md": {
     "created": "2026-10-24",
     "content": "2026-10-25"
+  },
+  "docs/rituals/the-rite-of-the-stale-check.md": {
+    "created": "2026-11-13",
+    "content": "2026-11-13"
   },
   "docs/rituals/the-rite-of-the-unmatched-record.md": {
     "created": "2026-10-17",
