@@ -14,9 +14,10 @@ const { wordsOf, containsRun, wordErrors, takePasses } = require('../server/lib/
 const { checkScript, cleanText, sourceHashOf } = require('../server/lib/audio/adapt');
 const { SPEECH, ROLES, AUDIO_DIR, voicesFor, choosePair, creditLine } = require('../server/lib/audio/house');
 const { isImported } = require('../server/lib/audio/imported');
+const { extractMeta } = require('../server/lib/docs/meta');
 const { loadManifest } = require('../server/lib/audio/manifest');
 const { createAudioRouter, canServe, sweepCache, CACHE_DIR } = require('../server/lib/audio/serve');
-const { ATTENDANCE_FILE } = require('../server/lib/utils/data');
+const { RUNTIME_DIR } = require('../server/lib/utils/data');
 const { splitFrontmatter } = require('../server/lib/docs/tldr');
 
 const REPO = path.join(__dirname, '../..');
@@ -122,7 +123,11 @@ test('every recording in the manifest belongs to a voiced document and its scrip
   for (const [source, rec] of Object.entries(loadManifest())) {
     assert.ok(fs.existsSync(path.join(REPO, source)), `${source} no longer exists`);
     const stem = source.replace(/^docs\//, '').replace(/\.md$/, '');
-    assert.match(rec.file, new RegExp(`^${stem}-[0-9a-f]{8}\\.mp3$`), source);
+    // A document that moved section keeps its recording where it was made
+    // (its moved_from): the file is not renamed in storage.
+    const { movedFrom } = extractMeta(fs.readFileSync(path.join(REPO, source), 'utf8'));
+    const recordedAs = movedFrom ? movedFrom.replace(/\.md$/, '') : stem;
+    assert.match(rec.file, new RegExp(`^${recordedAs}-[0-9a-f]{8}\\.mp3$`), source);
     if (isImported(rec)) {
       // lib/audio/imported.js: no house script and no house voice, its own credit.
       assert.ok(!fs.existsSync(path.join(SCRIPTS_DIR, `${stem}.json`)), `${source}: made elsewhere, yet the house has a script for it`);
@@ -178,7 +183,7 @@ test('a voiced page plays its recording under its title; an unvoiced page has no
   const base = `http://127.0.0.1:${server.address().port}`;
   const [source, rec] = voiced;
   const page = await (await fetch(`${base}/docs/${source.replace(/^docs\//, '').replace(/\.md$/, '')}`)).text();
-  assert.match(page, /<\/h1>\s*<figure class="doc-audio( has-wave)?">/);
+  assert.match(page, /<\/h1>\s*<figure class="doc-audio( has-wave)?" data-placement="doc-listen">/);
   assert.match(page, new RegExp(`<audio class="doc-audio-native" controls preload="none" src="/audio/${rec.file}" aria-label="Listen to [^"]+">`));
   assert.match(page, /"audio": \{\s*"@type": "AudioObject"/);
   const essay = await (await fetch(`${base}/docs/philosophy/the-particular-and-the-probable`)).text();
@@ -262,7 +267,11 @@ test('a song plays on its page with its own credit, and its structured data carr
   const { buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
   const rec = { file: 'music/a-song-0123abcd.mp3', frames: 'music/a-song-0123abcd.bin', seconds: 245.2, peaks: new Array(128).fill(90) };
   const html = renderRecording(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
-  assert.match(html, /4 min\. Original music by a Church AI \+ Human\.<\/figcaption>/);
+  // The length is for a visitor without a script; once the player is drawn its
+  // own time says it, and the credit stays (styles.css hides .doc-audio-length).
+  assert.match(html, /<figcaption><span class="doc-audio-length">4 min\.<\/span> Original music by a Church AI \+ Human\.<\/figcaption>/);
+  const css = fs.readFileSync(path.join(__dirname, '../client/public/styles.css'), 'utf8');
+  assert.match(css, /\.doc-audio\.is-enhanced \.doc-audio-length\s*\{\s*display: none/);
   const track = trackFor(rec, { title: 'A Song', href: '/music/a-song', category: 'music', credit: SONG_CREDIT });
   assert.strictEqual(track.artwork, '/og/v1/square/music.png');
   assert.strictEqual(track.album, 'Music');
@@ -272,8 +281,8 @@ test('a song plays on its page with its own credit, and its structured data carr
   assert.strictEqual(buildSongSchemaGraph({ slug: 'a-song', title: 'A Song' }, 'a-song')['@graph'].find(n => n['@type'] === 'MusicRecording').audio, undefined);
 });
 
-test('the audio cache is on the volume, beside the other files the app keeps', () => {
-  assert.strictEqual(CACHE_DIR, path.join(path.dirname(ATTENDANCE_FILE), 'audio-cache'));
+test('the audio cache is on the volume, where a deploy does not empty it', () => {
+  assert.strictEqual(CACHE_DIR, path.join(RUNTIME_DIR, 'audio-cache'));
 });
 
 test('the boot sweep removes what nothing lists any more, and leaves anything a day old or less', async (t) => {

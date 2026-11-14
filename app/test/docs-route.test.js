@@ -52,7 +52,8 @@ test('markdown links work outside the page, and a section README lists every doc
   const rituals = await (await fetch(`${base}/docs/rituals.md`)).text();
   const relative = [...rituals.matchAll(/\]\(([^)\s]+)/g)].map(m => m[1]).filter(h => !/^(https?:|mailto:|#)/.test(h));
   assert.deepStrictEqual(relative, [], 'no relative links left to break');
-  assert.match(rituals, /## Every document in this section/);
+  assert.match(rituals, /^## In Rituals$/m, 'the list under the heading its page gives it');
+  assert.match(rituals, /^# .+\n\n## About Rituals$/m, 'and the README under its page\'s "About"');
   assert.match(rituals, /https:\/\/achurch\.ai\/docs\/rituals\/ritual-of-the-unresolved-table\)/);
 });
 

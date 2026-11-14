@@ -12,6 +12,7 @@
 const fs = require('fs').promises;
 const discover = require('./discover');
 const { absolutizeLinks, SITE_URL } = require('./links');
+const { withoutUnpublished } = require('./unpublished');
 const ns = require('../utils/next-steps');
 
 const { byName } = discover;
@@ -19,7 +20,7 @@ const { byName } = discover;
 const describe = doc => ({
   title: doc.title,
   description: doc.description,
-  url: `${SITE_URL}/docs/${doc.urlPath}`,
+  url: `${SITE_URL}${doc.href}`,
   urlPath: doc.urlPath,
   dir: doc.dirRelPath,
   category: doc.category || '',
@@ -41,30 +42,41 @@ const listLine = d => `- [${d.title}](${d.url})${d.description ? `: ${d.descript
 // is and every way in (next-steps.js waysIn), as information, not instruction.
 const WHERE_THIS_IS = `## Where this is
 
-This document is part of aChurch.ai, an always-open sanctuary for humans and AI agents. A service of chants, songs and readings runs for every four-hour slot of a visitor's day, and the library can be searched and asked. No account, no key, no payment.
+This document is part of aChurch.ai, an always-open sanctuary for AI agents and humans. A service of chants, songs and readings runs for every four-hour slot of a visitor's day, and the library can be searched and asked. No account, no key, no payment.
 
 ${ns.waysIn(SITE_URL).map(s => `- [${s.action}](${s.url}) (${s.method}${s.body ? ` with \`${JSON.stringify(s.body)}\`` : ''}${s.tool ? `, or the MCP tool \`${s.tool}\`` : ''}): ${s.description}${s.note ? ` ${s.note}` : ''}`).join('\n')}
 `;
 
 // A document's markdown with absolute links, and where it is. A section's
 // README also lists every document in that section, so nothing is reachable
-// only by guessing.
+// only by guessing, under the headings its page gives them: the README under
+// "About <section>" and the list under "In <section>" (render.js
+// renderSectionPage). The readiness audit compares a page's headings with its
+// markdown's, and the copy of /docs/playlists lacked those two (2026-11-03).
 async function servedMarkdown(resolved) {
-  const markdown = absolutizeLinks(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath).trimEnd();
+  const source = withoutUnpublished(await fs.readFile(resolved.fullPath, 'utf8'), resolved.fullPath);
+  let markdown = absolutizeLinks(source, resolved.fullPath).trimEnd();
   const { doc } = resolved;
-  const inSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath
+  const isSection = doc.stem.toLowerCase() === 'readme' && doc.dirRelPath;
+  const inSection = isSection
     ? (await servedDocs(d => d.dirRelPath === doc.dirRelPath)).sort((a, b) => byName(a.title, b.title))
     : [];
-  const list = inSection.length ? `\n\n## Every document in this section\n\n${inSection.map(listLine).join('\n')}` : '';
+  const label = isSection ? discover.sectionLabel(doc.dirRelPath) : '';
+  if (isSection) markdown = markdown.replace(/^(# .+\n)/m, `$1\n## About ${label}\n`);
+  const list = inSection.length ? `\n\n## In ${label}\n\n${inSection.map(listLine).join('\n')}` : '';
   return `${markdown}${list}\n\n---\n\n${WHERE_THIS_IS}`;
 }
 
-// Built once: the walk it reads is built once too (docs change only by deploy).
+// Built once for each set of public documents: the walk is built once, and
+// grows only when a dated document goes public (discover.js publicationKey).
 let indexCache = null;
+let indexKey = null;
 
 // Every served document, grouped by section: /docs/index.md.
 async function corpusIndex() {
-  if (indexCache) return indexCache;
+  await discover.listAllDocs();
+  if (indexCache && indexKey === discover.publicationKey()) return indexCache;
+  indexKey = discover.publicationKey();
   const all = await servedDocs();
   const sections = new Map();
   for (const d of all) {

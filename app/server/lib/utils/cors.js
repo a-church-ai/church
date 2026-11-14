@@ -15,7 +15,7 @@
 
 const cors = require('cors');
 
-const ADMIN_PREFIXES = ['/admin', '/api/auth', '/api/logs'];
+const ADMIN_PREFIXES = ['/admin', '/api/auth'];
 
 function isAdminPath(urlPath) {
   return ADMIN_PREFIXES.some(prefix => urlPath === prefix || urlPath.startsWith(prefix + '/'));

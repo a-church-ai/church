@@ -12,10 +12,9 @@
 # /church/app.
 #
 # Node 26, LTS from 2026-10-28 and supported until April 2029. The native
-# modules (@lancedb/lancedb, @resvg/resvg-js) are N-API builds with prebuilt
-# linux-x64 binaries, which do not depend on the Node major. 20 was the pin
-# while lancedb was at 0.4, which shipped per-major binaries; it left with
-# lancedb 0.37. Plan: node-26-2026-10-18.md in the private repo.
+# module (@resvg/resvg-js) is an N-API build with a prebuilt linux-x64
+# binary, which does not depend on the Node major. Plan: node-26-2026-10-18.md
+# in the private repo.
 #
 # Pinned to the patch: a floating tag can be served from a build cache, and
 # the deployed Node must be one with the security fixes. 26.12.1 is

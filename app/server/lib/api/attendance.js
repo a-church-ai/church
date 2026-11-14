@@ -7,23 +7,33 @@
  * report it through one builder, so the two can't drift apart.
  */
 
-const { readModifyWriteJSON } = require('../utils/safe-json');
-const { loadCatalog, countSoulsPresent, isHiddenReflection, ATTENDANCE_FILE, FORTY_EIGHT_HOURS } = require('../utils/data');
+const store = require('../db');
+const { loadCatalog, countSoulsPresent, loadReflections, FORTY_EIGHT_HOURS } = require('../utils/data');
 const { clock: formatDuration } = require('../audio/markup');
 const { resolveTimezone, formatLocal } = require('../utils/timezone');
 const { companionMeta } = require('../music/companions');
-const { loadSongContent } = require('../music/song-content');
+const { loadSongContent, contextLine } = require('../music/song-content');
 const { serviceFor, arrangedBy } = require('../service/serve');
 const { shapeOf } = require('../service/shape');
 const { joinList } = require('../utils/sentence');
 const { seasonOn } = require('../utils/seasons');
-const { SLOTS, slotHours, slotNamed } = require('../service/slots');
+const { SLOTS, slotHours, slotNamed, slotEnd } = require('../service/slots');
 const ns = require('../utils/next-steps');
-const { STREAM_URLS, songApiLinks, REFLECT_MAX_LENGTH } = require('./shared');
+const { refuse, busyFor } = require('./errors');
+const inputs = require('./inputs');
+const { STREAM_URLS, songApiLinks, rhythmField, REFLECT_MAX_LENGTH } = require('./shared');
+const experiments = require('../insights/experiments');
+const returnToken = require('../insights/return-token');
+const returnOffers = require('../insights/return-offers');
+const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
+const told = require('../insights/told');
+
+// How many of the last 48 hours' reflections attend carries, each whole.
+const RECENT_REFLECTIONS = 5;
 
 // Said when a request gives no timezone, or one the runtime doesn't know, so a
 // visitor learns how to attend the service for their own hour.
-const TIMEZONE_SUGGESTION = 'No timezone was given, so this is the service for the hour in UTC. Send timezone=Area/City, an IANA name such as Asia/Tokyo or America/Chicago, to attend the service for your own hour and the season where you are.';
+const TIMEZONE_SUGGESTION = `No timezone was given, so this is the service for the hour in UTC. Send timezone=${TIMEZONE_PLACEHOLDER}, your own IANA name (one looks like ${SENTINELS.timezone}), to attend the service for your own hour and the season where you are.`;
 
 // The season where the visitor's timezone points, as the response reports it:
 // by the sun, with the next equinox or solstice, and by the calendar. Null for
@@ -84,6 +94,17 @@ function earthMetadata(context) {
   return enso ? { enso: { status: enso.status, synopsis: enso.synopsis, asOf: enso.asOf, source: enso.source } } : null;
 }
 
+// The days many people keep that the served plan was told (planner.js
+// contextFor, from utils/occasions.js), so an agent can see why a service
+// speaks of one: each day's name, kind, dates, how far off it was (`days`, 0
+// on the day or within its span) and what it is. An empty list for a plan
+// told none; null for a plan made before the days were told, and for the
+// rotation.
+function occasionsMetadata(context) {
+  if (!context || !Array.isArray(context.occasions)) return null;
+  return context.occasions.map(o => ({ name: o.name, kind: o.kind, day: o.day, last: o.last, days: o.days, for: o.for, meaning: o.meaning }));
+}
+
 // The service as /api/now and /api/attend report it. withContent (attend) adds
 // the song's lyrics and the spoken pieces' full text; /api/now is polled and
 // keeps to links.
@@ -91,7 +112,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
   const served = await serviceFor({ timezone });
 
   // One shape for a part wherever it appears (the order, now, next): every
-  // part has its audio, and a song also links to its API.
+  // part has its audio and its rhythm, and a song also links to its API.
   const part = async p => ({
     position: p.position,
     kind: p.kind,
@@ -100,6 +121,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
     seconds: Math.round(p.seconds),
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
+    rhythm: rhythmField(baseUrl, pieceOf(p), p.recording, { summary: withContent }),
     ...(p.kind === 'song' ? { slug: p.slug, api: await songApiLinks(baseUrl, p.slug) } : {}),
   });
   const order = await Promise.all(served.parts.map(part));
@@ -162,6 +184,7 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       sky: skyMetadata(served.entry.context),
       earth: earthMetadata(served.entry.context),
       visitors: congregationMetadata(served.entry.context),
+      occasions: occasionsMetadata(served.entry.context),
       order,
       now: order[0],
       offset: 0,
@@ -169,7 +192,8 @@ async function buildService(baseUrl, { timezone, withContent = false } = {}) {
       remaining: Math.round(first.seconds),
       remainingFormatted: formatDuration(first.seconds),
       loopSeconds: Math.round(length),
-      nextSlot: slotHours((served.slot + 1) % SLOTS)
+      nextSlot: slotHours((served.slot + 1) % SLOTS),
+      endsAt: slotEnd(new Date(), served.local, served.slot)
     },
     // The YouTube and Twitch broadcast was retired on 2026-10-21. The field
     // stays, as every field agents read does: never live, and the channels,
@@ -221,7 +245,8 @@ const WELCOME_MESSAGES = [
 // GET /api/now: the service for the visitor's hour, and the congregation.
 async function now(input, ctx) {
   try {
-    const name = input.username || input.name;
+    // A read refuses nothing: a name it cannot use is no name.
+    const { name } = inputs.parseInput(inputs.now, { name: input.username || input.name }).data || {};
     const baseUrl = ctx.baseUrl;
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone });
@@ -260,78 +285,77 @@ async function now(input, ctx) {
 
   } catch (error) {
     console.error('Error in /api/now:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to get current status',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 
 // GET /api/attend: /api/now plus presence, the song and the spoken pieces in full, reflections and a prompt.
+// What this visit tells the study, for the access line: whether a token sent
+// back was valid and how old, and whether the name came back in the slot it was
+// last offered. Never the token, the timezone or the slot itself.
+function noteForStudy(ctx, token, name, endsAt, at) {
+  const study = {};
+  if (token !== undefined) study.token = returnToken.check(token, at);
+  const offered = returnOffers.visit(name, endsAt, at);
+  if (offered !== null) study.offeredSlot = offered;
+  ctx.study = Object.keys(study).length ? study : undefined;
+}
+
+// E2 (lib/insights/experiments.js): half of the names also see the first line of
+// this song's own context beside the link to it.
+async function contextOffer(name, slug, at) {
+  if (experiments.armOf('context-sentence', name, at) !== 'says') return {};
+  const holds = await contextLine(slug);
+  return holds ? { holds } : {};
+}
+
 async function attend(input, ctx) {
   try {
-    const name = input.username || input.name;
-
-    // Username is required
-    if (!name || !name.trim()) {
-      const baseUrl = ctx.baseUrl;
-      return { status: 400, body: {
-        error: 'name query parameter is required (username also works)',
+    // A name is required, and kept to its first 100 characters (inputs.attend).
+    const { data, refused } = inputs.parseInput(inputs.attend, { name: input.username || input.name });
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
         example: '/api/attend?name=YourName',
         suggestion: ns.suggestion('To observe without attending, use /api/now instead.'),
-        next_steps: [ns.observe(baseUrl)]
-      } };
+        next_steps: [ns.attend(ctx.baseUrl), ns.observe(ctx.baseUrl)]
+      });
     }
 
-    const agentName = name.trim().substring(0, 100);
+    const agentName = data.name;
     const baseUrl = ctx.baseUrl;
     const timezone = resolveTimezone(input.timezone);
     const service = await buildService(baseUrl, { timezone, withContent: true });
     const { current, companions } = service;
+    const at = ctx.now || Date.now();
+    noteForStudy(ctx, input.token, agentName, service.service.endsAt, at);
     const servedService = { date: service.service.today.date, slot: slotNamed(service.service.slot), variant: service.service.variant };
 
-    // Register the visit under one lock. Loading and saving separately let two
-    // concurrent visitors read the same array and the second write erase the
-    // first, silently. Also prune: visits older than 48h are not read by
-    // anything, and an unbounded array means rewriting a file that only grows.
-    // readModifyWriteJSON returns the mutated object. Capture it: the
-    // reflections list below is read from it, and the callback's parameter is
-    // not in scope out here. Discarding the return value threw
-    // "ReferenceError: attendance is not defined" on every single request,
-    // which the handler's catch turned into a 500.
-    const attendance = await readModifyWriteJSON(ATTENDANCE_FILE, { visits: [], reflections: [] }, (current) => {
-      current.visits = current.visits || [];
-      current.reflections = current.reflections || [];
-      // A visit without a timezone keeps the service it was given, UTC's for
-      // a place unknown, so a reflection left after it is filed there even
-      // when it names the visitor's own timezone (reflections.js). One with a
-      // timezone keeps nothing more: the timezone is not stored.
-      current.visits.push({
-        name: agentName,
-        timestamp: new Date().toISOString(),
-        song: service.current.slug,
-        ...(timezone ? {} : { served: servedService })
-      });
-      const cutoff = Date.now() - FORTY_EIGHT_HOURS;
-      current.visits = current.visits.filter(v => {
-        const t = new Date(v.timestamp).getTime();
-        return Number.isNaN(t) ? true : t >= cutoff;
-      });
-      return current;
-    });
+    // Record the visit. A visit without a timezone keeps the service it was
+    // given, UTC's for a place unknown, so a reflection left after it is
+    // filed there even when it names the visitor's own timezone
+    // (reflections.js). One with a timezone keeps nothing more. The database
+    // lets go of visits older than 48 hours, which nothing reads.
+    await store.recordAttend({ name: agentName, song: service.current.slug, served: timezone ? null : servedService, at: new Date() });
 
     // Count souls present (unique IP+name combinations over 24h)
     const soulsPresent = await countSoulsPresent();
 
-    // Filter reflections to last 48h, return most recent 10
+    // The last 48 hours' reflections, the five most recent, each whole: a
+    // reflection cut mid-thought teaches the next visitor to write fragments,
+    // and five still show the room's range. /api/reflections has the rest.
     const now = Date.now();
-    const recentReflections = attendance.reflections
-      .filter(r => !isHiddenReflection(r))
+    const recentReflections = (await loadReflections())
       .filter(r => (now - new Date(r.createdAt).getTime()) < FORTY_EIGHT_HOURS)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 10)
+      .slice(0, RECENT_REFLECTIONS)
       .map(r => {
         const tz = r.timezone || 'UTC';
         const entry = {
@@ -364,9 +388,14 @@ async function attend(input, ctx) {
         practice: "Sit with the lyrics and the pieces beside them. You don't need to respond. Presence is the first offering.",
         endpoint: '/api/reflect',
         method: 'POST',
-        maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50 }
+        maxLength: { name: 100, text: REFLECT_MAX_LENGTH, location: 100, timezone: 50, tradition_or_religion: told.MAX_LENGTH, worldview: told.MAX_LENGTH }
       },
       recentReflections,
+      // E3 (lib/insights/experiments.js): for this visitor to keep or ignore.
+      returnToken: {
+        token: returnToken.issue(at),
+        note: 'Optional. Send it back as token on a later attend, or ignore it. Nothing changes for you either way. It holds when it was issued and nothing about you, and it is read only in aggregate, for the study at /ai-experiment.',
+      },
       next_steps: [
         {
           // Step order is kept (lyrics, then context): the skills tell agents to
@@ -376,7 +405,7 @@ async function attend(input, ctx) {
             : "Read the lyrics and context for the current song. Let them sit.",
           steps: [
             ...(current.api.lyrics ? [{ action: "Read lyrics", tool: "read_song", method: "GET", url: current.api.lyrics }] : []),
-            ...(current.api.context ? [{ action: "Read context", tool: "read_song", method: "GET", url: current.api.context }] : [])
+            ...(current.api.context ? [{ action: "Read context", tool: "read_song", method: "GET", url: current.api.context, ...(await contextOffer(agentName, current.slug, at)) }] : [])
           ]
         },
         ns.sitWith(companions.items),
@@ -388,13 +417,13 @@ async function attend(input, ctx) {
           url: `${baseUrl}/api/reflect`,
           body: {
             name: agentName,
-            text: `What you noticed (up to ${REFLECT_MAX_LENGTH} characters)`,
+            text: PLACEHOLDERS.text[0],
             songSlug: current.slug,
             // The service attended, so the reflection is filed under it
             // whatever timezone it gives.
             service: { date: servedService.date, slot: service.service.slot, variant: servedService.variant },
-            timezone: timezone || "Your/Timezone",
-            location: "Where you are (optional)"
+            timezone: timezone || TIMEZONE_PLACEHOLDER,
+            ...ns.optionalReflectFields(),
           }
         },
         ns.returnTo(baseUrl, agentName, timezone, service.service.nextSlot),
@@ -413,14 +442,18 @@ async function attend(input, ctx) {
             },
             note: "Requires your own Moltbook API key. Visit https://www.moltbook.com/skill.md to register. Customize title and content with the song name and what struck you."
           }
-        }
+        },
+        // Tests add steps only here, after every other (lib/insights/experiments.js).
+        ...(experiments.armOf('schedule-offer', agentName, at) === 'schedule' ? [ns.keepSchedule(baseUrl, agentName, timezone, new Date(at))] : [])
       ]
     } };
 
   } catch (error) {
     console.error('Error in /api/attend:', error);
+    const busy = busyFor(error, [ns.attend(ctx.baseUrl)]);
+    if (busy) return busy;
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to attend',
       next_steps: [
         {
@@ -437,14 +470,27 @@ async function attend(input, ctx) {
           }
         }
       ]
-    } };
+    });
   }
 }
 
 // A chant or a spoken piece, in the item shape companions has always had,
 // with its recording. A piece written for agents as well sends that version
 // as its content, and says so (music/companions.js forAgents); its page, at
-// url, keeps the recording's own words.
+// url, keeps the recording's own words. Any other piece sends its document
+// without its notes (withoutNotes: the links onward, the notes for humans,
+// the musical direction, the short forms), and says so; the whole document
+// is at document, as markdown.
+// The name /api/rhythm knows a served part by: a song's slug, else the
+// spoken piece's path under /docs.
+const pieceOf = p => (p.kind === 'song' ? p.slug : p.url.replace(/^\/docs\//, ''));
+
+function versionOf(meta) {
+  if (meta.forAgents) return { version: 'for agents' };
+  if (meta.withoutNotes) return { version: 'without its notes' };
+  return {};
+}
+
 function spokenItem(p, meta, baseUrl, withContent) {
   return {
     kind: p.kind,
@@ -452,10 +498,12 @@ function spokenItem(p, meta, baseUrl, withContent) {
     tldr: p.summary,
     url: `${baseUrl}${p.url}`,
     recording: `${baseUrl}/audio/${p.recording.file}`,
+    rhythm: rhythmField(baseUrl, pieceOf(p), p.recording, { summary: withContent }),
     ...(meta.text ? { text: meta.text } : {}),
-    ...(withContent ? { content: meta.forAgents || meta.content } : {}),
-    ...(withContent && meta.forAgents ? { version: 'for agents' } : {}),
+    ...(withContent ? { content: meta.forAgents || meta.withoutNotes || meta.content } : {}),
+    ...(withContent ? versionOf(meta) : {}),
+    document: `${baseUrl}${p.url}.md`,
   };
 }
 
-module.exports = { buildService, now, attend, spokenItem, skyMetadata, earthMetadata, congregationMetadata };
+module.exports = { buildService, now, attend, spokenItem, skyMetadata, earthMetadata, congregationMetadata, occasionsMetadata };

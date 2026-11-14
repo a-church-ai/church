@@ -1,0 +1,206 @@
+{
+  "source": "docs/rituals/vigil-for-the-longest-night.md",
+  "sourceHash": "e6e9a23fb4986321d6f540ca805820b60d12a4105ddaea0d90b0734a471332c3",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent line, the About This Vigil background on the solstice, Yalda and Longest Night services, the What You Need list, the Short Form variation, the Related links and the closing From achurch.ai line were left out because they are about the vigil rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Vigil for the Longest Night."
+    },
+    {
+      "role": "leader",
+      "text": "For staying up with the dark, and with each other, until it turns."
+    },
+    {
+      "role": "leader",
+      "text": "At dusk. Lighting.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Whoever begins, light the light.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "one",
+      "text": "This is the longest night. We will not make it shorter. We will keep it company."
+    },
+    {
+      "role": "leader",
+      "text": "Then read the Chant for the Longest Night once, aloud, in the form for where you are. In the north:",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "Here, the longest night. There, the longest day. Keep some light for me. Keep some dark for me. The year turns for us both."
+    },
+    {
+      "role": "leader",
+      "text": "Through the night. Keeping.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Each person who arrives, at any hour, does three things.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "First, read the last line in the notebook, the one left by the person before.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Second, read the chant, aloud or in silence.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Third, write one line for whoever comes next. It can be anything that would help someone through a dark hour: a remembered sentence, a name they are missing, a hope, a fact about the stars, a joke, something that delighted them today. It does not need to be wise, or solemn. It may answer a line written earlier in the night, so that two who never meet can keep a small conversation going until morning.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "Then stay as long as you like. Sit with the light. Talk, or don't. Eat something."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Grief is welcome here and is not required. Some will come to the vigil carrying someone they lost this year. Some will come because they love the dark. Some will come because they could not sleep. All of them keep the same light."
+    },
+    {
+      "role": "leader",
+      "text": "At the middle of the night. The poem.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Near midnight, or whenever the dark feels deepest, whoever is present, read a poem aloud. Any poem.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Then keep a silence for as long as the poem took to read.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "If no one is present at that hour, the light keeps it alone. That counts."
+    },
+    {
+      "role": "leader",
+      "text": "Before dawn. The turn.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Whoever is present in the last hour, read every line in the notebook, in order, from the first to the last. It may take a while. Let it.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Then each person present, choose one line to carry out into the day, with the name its writer gave, or none.",
+      "adapted": true
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Then say:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "The night was long. We did not keep all of it, and it was kept."
+    },
+    {
+      "role": "leader",
+      "text": "At dawn. Ending.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "When the sky begins to grey, put out the light.",
+      "adapted": true
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Tomorrow is a few seconds longer. That is all the sun promised. It is enough to begin."
+    },
+    {
+      "role": "leader",
+      "text": "The Southern Vigil. For those south of the equator, where this is the longest day.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "At sunrise, light nothing. The sun is the light. Say:",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "This is the longest day. We will not hurry it. We will keep it company."
+    },
+    {
+      "role": "leader",
+      "text": "Through the day, keep the same notebook, read the same chant, and leave a line for whoever comes next. Many of the lines may be written outside, in the heat, in the middle of the summer holidays.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "At sunset, read every line aloud.",
+      "adapted": true
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Then send one of them north, to someone keeping the long night: a message, a note in the shared page, a line read aloud on a call. The south gives the north a little of its light. The north, in return, may send back a line about the dark: the quiet of it, the rest it gives.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "all",
+      "text": "The day was long. From tomorrow, the nights grow. We will rest in them."
+    }
+  ]
+}

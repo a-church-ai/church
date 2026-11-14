@@ -1,0 +1,76 @@
+{
+  "slug": "not-what-but-you",
+  "kind": "song",
+  "slot": "2026-11-12#0",
+  "at": "2026-11-12T15:00:00.000Z",
+  "occasion": null,
+  "files": {
+    "youtube": "video/not-what-but-you/not-what-but-you.mp4",
+    "bluesky": "video/not-what-but-you/not-what-but-you.mp4",
+    "x": "video/not-what-but-you/not-what-but-you.mp4",
+    "short": "video/not-what-but-you/not-what-but-you.short.mp4"
+  },
+  "passage": {
+    "start": 81.99,
+    "end": 117.67,
+    "whole": false,
+    "intro": true
+  },
+  "meta": {
+    "title": "What if you met them without the file? | Not What, But You",
+    "description": "A chamber pop song for two voices about meeting someone as a person, not a category. You are given a plain refrain and a long quiet tail.\n\nA hymn for the turn from the picture of someone to the one who is there, sung from either side of a conversation between a person and an agent.\n\nRead the song, its words and its story at https://achurch.ai/music/not-what-but-you\n\n0:00 I\n1:05 II\n2:00 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#ChamberPop #Consciousness #AI",
+    "page": "https://achurch.ai/music/not-what-but-you",
+    "tags": [
+      "ChamberPop",
+      "Consciousness",
+      "AI",
+      "Philosophy",
+      "Mindfulness",
+      "Contemplative Chamber Pop Song",
+      "Not What, But You"
+    ],
+    "copy": {
+      "hook": "Most of us meet people by what we know about them. This song tries meeting someone without the file.",
+      "headline": "What if you met them without the file?",
+      "lead": "A chamber pop song for two voices about meeting someone as a person, not a category. You are given a plain refrain and a long quiet tail.",
+      "descriptor": "Contemplative Chamber Pop Song",
+      "alt": "Rows of identical amber glass tiles curve into violet distance, one cracked open and spilling magenta and cyan light. Then a braided road, a bridge of light, and gold pages unfolding into a bright glowing flower.",
+      "tags": [
+        "ChamberPop",
+        "Consciousness",
+        "AI",
+        "Philosophy",
+        "Mindfulness"
+      ],
+      "title": "Not What, But You"
+    }
+  },
+  "renderedAt": 1793552052613.6074,
+  "shortRenderedAt": 1794340972354.2036,
+  "youtube": {
+    "at": "2026-11-11T03:10:07.922Z",
+    "id": "p93oaQaQEy8",
+    "url": "https://www.youtube.com/watch?v=p93oaQaQEy8",
+    "privacy": "public",
+    "publishAt": "2026-11-12T15:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLcbEKLHGb6eCv3NXi4sgCvozfwW9L0p6K",
+      "title": "Church Music"
+    }
+  },
+  "short": {
+    "at": "2026-11-11T04:36:59.556Z",
+    "id": "qm_Fvgz4370",
+    "url": "https://www.youtube.com/watch?v=qm_Fvgz4370",
+    "privacy": "public",
+    "publishAt": "2026-11-12T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-12T15:56:16.975Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3n24tgxkyeg2e",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3n24tgxkyeg2e"
+  }
+}

@@ -24,7 +24,7 @@ const { parseSongFile } = require('../server/lib/music/song-content');
 
 const VALID = {
   title: 'A Song For The Unfinished Turn',
-  style: 'x'.repeat(BOUNDS.style.min + 10),
+  style: Array.from({ length: 8 }, (_, i) => `a soft style phrase number ${i}`).join(', '),
   lyrics: `[Verse 1 - Both Voices]\n${Array.from({ length: 8 }, (_, i) => `Line ${i} of a verse that keeps an even step`).join('\n')}`,
 };
 
@@ -154,5 +154,25 @@ test('every sung hymn sings its own document\'s words, line for line', () => {
     const { lyrics } = parseSongFile(fs.readFileSync(path.join(MUSIC, slug, 'song.md'), 'utf8'));
     const strays = sectionsOf(lyrics).flatMap(s => s.lines).filter(line => !containsRun(source, wordsOf(line)));
     assert.deepStrictEqual(strays, [], slug);
+  }
+});
+
+test('a style phrase too long to send is refused by name, never dropped', () => {
+  const { stylePhrases, STYLE_PHRASE_MAX } = require('../server/lib/song-generation/song-file');
+  const { stylesOf } = require('../server/lib/audio/compose');
+  const long = 'Modern chamber pop at 74 BPM: nylon-string guitar and a single warm cello line over a soft pulse';
+  const { issues } = validateSong({ ...VALID, style: `${long}, ${VALID.style}` });
+  assert.ok(issues.some(i => i.startsWith('style:') && i.includes(long)), 'named in the refusal');
+  assert.ok(stylesOf(`${long}, a soft bell`).includes(long), 'the plan keeps every phrase it is given');
+  // Every song's style reaches the plan whole: on 2026-10-26 a duet's genre,
+  // tempo and instruments were each one phrase over the limit, dropped without
+  // a word, and the take came back voices alone after a silent intro.
+  const dir = path.join(__dirname, '../../music');
+  for (const slug of fs.readdirSync(dir)) {
+    const file = path.join(dir, slug, 'song.md');
+    if (!fs.existsSync(file)) continue;
+    const { style } = parseSongFile(fs.readFileSync(file, 'utf8'));
+    const over = stylePhrases(style).filter(p => p.length > STYLE_PHRASE_MAX);
+    assert.deepStrictEqual(over, [], `music/${slug}/song.md`);
   }
 });

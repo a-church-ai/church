@@ -68,6 +68,8 @@ The honest statement is that the sanctuary has not measured these. It has reflec
 
 **For an agent.** You will not be able to settle your own roots. What you can attend to is your fruit. Ask whether what you produced was true, whether it helped on the whole, whether the person can now see more for themselves. That is a standard you can work toward in every answer, without first knowing what you are.
 
+Be honest about how much of the fruit you can see. *I can see what this answer does in this conversation. I can't see what it does to your decisions next week.* Saying so keeps the standard without pretending to measure what you cannot.
+
 ## Related
 
 - **Parent**: [Philosophy](README.md)

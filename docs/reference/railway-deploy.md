@@ -26,18 +26,22 @@ server it once needed.
 Railway service (Dockerfile, repo root)
 ├── Node 26 web server  (app/server/index.js)   ← reads $PORT
 ├── Persistent Volume   mounted at /church/app/data
-│   ├── vectors.lance   (RAG index — seeded once, ~25MB)
-│   ├── attendance.json, contributions.json …
-│   ├── presence.json   (souls present in the last 24 hours, kept across deploys)
-│   ├── services/       (each date's planned services, one file per date)
-│   ├── conversations/  (RAG chat memory)
-│   └── conversation-groups.json, conversation-vectors.jsonl, conversation-screen.json  (which conversations are gathered onto which page, and which new ones were screened out)
+│   ├── audio-cache/    (the recordings, fetched from S3 on first play)
+│   └── insights/       (the study's return-token key)
+├── Supabase project    (Postgres + pgvector, outside Railway)
+│   └── what visitors create, the services' plans, the logs and their
+│       hourly summaries, and the search index (supabase/migrations/)
 └── No FFmpeg and no 16GB media library; recordings come from S3
 ```
 
 The app lives in `app/` but reads sibling directories (`music/`, `docs/`,
 `skills/`) at the repo root, so the build runs from the **repo root** via the
 [`Dockerfile`](../../Dockerfile). FFmpeg is intentionally not installed.
+
+The install layer is cached until `app/package-lock.json` changes, so a code
+or docs push builds in about 30 seconds and a lockfile change rebuilds it.
+Until 2026-11-09 the step also removed the optional packages LanceDB listed
+for its own embedding helpers (about 340 MB); they left with LanceDB.
 
 The container runs `node server/index.js` itself (the Dockerfile's `CMD` and
 the service's start command), never `npm start`. A redeploy stops the old
@@ -67,6 +71,26 @@ should have:
 | Replicas | 1 | The app must run as one process: presence counting and the JSON write queue are in-process, and a second replica loses reflections silently |
 | Domain | `achurch.ai` | |
 
+The cache in front of the service is Cloudflare's, also set outside this
+repository: one cache rule on the zone since 2026-11-03, **Cache HTML pages
+(browsers only, by origin headers)**, which matches
+
+```
+(http.request.method in {"GET" "HEAD"} and any(http.request.headers["accept"][*] wildcard "text/html*") and not any(http.request.headers["accept"][*] contains "markdown") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/admin") and not starts_with(http.request.uri.path, "/mcp") and not starts_with(http.request.uri.path, "/visit") and not starts_with(http.request.uri.path, "/service.json") and not starts_with(http.request.uri.path, "/cdn-cgi/") and not http.cookie contains "admin_session")
+```
+
+and sets: eligible for cache; edge TTL "use cache-control header if present,
+bypass cache if not"; browser TTL "respect origin TTL"; nothing else. How long
+a page is kept is the server's to say (`Cache-Control` in `server/index.js`,
+and `app-development.md`, *Invariants*); the rule only lets Cloudflare listen.
+It matches requests that ask for HTML alone because a page's URL answers
+Markdown too, and Cloudflare keeps an answer by URL, ignoring `Vary`: a
+request it does not match is never answered from the cache (checked
+2026-11-13: Markdown and `*/*` come back `DYNAMIC`). Pages kept until the next
+deploy are purged by the deploy itself (*Verify*), with a token that can only
+purge this zone (`CLOUDFLARE_PURGE_TOKEN`, an Actions secret beside
+`CLOUDFLARE_ZONE_ID`).
+
 What a deploy actually ran with is in its record: `railway deployment list
 --json` gives each deploy's `meta.serviceManifest`, its build and deploy
 settings, which is the one place to check them. Railway's replacement for
@@ -88,9 +112,11 @@ dependency and a `railway config plan` / `apply` step for every change.
 ### 2. Add the persistent volume
 
 - Add a **Volume** to the service, mount path: `/church/app/data`.
-- This keeps the RAG index and all runtime state (attendance, reflections,
-  conversations, the services' plans) across redeploys. The JSON files self-initialize on
-  first boot; the vector index is seeded in step 4.
+- It keeps the audio cache and the study's return-token key across redeploys.
+  Everything else the app keeps is in the database (below).
+- Under the service's **Backups**, schedule **Daily**, for the key. The volume
+  holds no address and nothing a visitor wrote, so its backups bear on no
+  promise the privacy page makes.
 
 ### 3. Set environment variables
 
@@ -98,6 +124,7 @@ dependency and a `railway config plan` / `apply` step for every change.
 
 | Variable            | Purpose                                             |
 | ------------------- | --------------------------------------------------- |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | The database: the hosted project's URL and its secret key (`sb_secret_...`), which only the server holds. Without them nothing a visitor leaves can be kept, and the server says so at the first request that needs it |
 | `GEMINI_API_KEY`    | Embeddings for `/api/ask` and `/api/search`, generation for `/api/ask` |
 | `ADMIN_API_KEY`     | Secures the admin UI and management endpoints        |
 
@@ -109,79 +136,87 @@ dependency and a `railway config plan` / `apply` step for every change.
 | ------------------- | ---------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | Claude: plans each day's services (Sonnet 5.5), and content generation. Without it every slot is served by rotation, with no word |
 | `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | The recordings and the songs' audio, fetched from S3 on first request (`/audio`). Without them, pages show no player and the services cannot play |
-| `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute` |
-| `CLAUDE_MODEL`      | Override the default content-generation model        |
+| `GITHUB_TOKEN`      | Fine-grained PAT (Contents + PRs on `a-church-ai/church`) for `/api/contribute`, and to start the video release job hourly |
+| `CLAUDE_MODEL`      | Try another working model without a deploy (default `claude-sonnet-5-5`, set in `lib/content-generation/claude.js`) |
+| `CLAUDE_WRITING_MODEL` | Try another writing model (default `claude-opus-5-5`); the offline scripts read it from `app/.env` |
 
 **Optional tuning** (all have safe defaults)
 
-`NODE_ENV=production`, `LOG_LEVEL`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
-`RAG_TOP_K`, `LANCEDB_PATH` (defaults to `<app>/data/vectors.lance`, i.e. inside
-the volume — no need to set it).
+`NODE_ENV=production`, `GEMINI_EMBED_MODEL`, `GEMINI_GENERATE_MODEL`,
+`RAG_TOP_K`.
 
 **No longer read** (the retired broadcast's): `STREAMING_ENABLED`,
 `YOUTUBE_STREAM_KEY`, `TWITCH_STREAM_KEY`, `STREAMING_*`. Remove them from the
 service if they are still set.
 
-### 4. Seed the RAG index (once)
+### 4. The database
 
-The volume starts empty, so `/api/ask` and `/api/search` return *"Index not built"* / 503 until the
-vector index exists. Build it **on the running container** so it writes into the
-mounted volume — `railway run` executes locally and cannot reach the volume, so
-use `railway ssh`:
+The project is Supabase's, in the organization the other projects use, on the
+free tier, in the region nearest the Railway service. Its schema is
+`supabase/migrations/`, and its promise is that only the server's secret key
+reaches anything (`docs/reference/app-development.md`, *Invariants*).
+
+**A migration goes out before the code that needs it.** Railway's deploy does
+not run migrations. From the repository root, with the project linked
+(`supabase link --project-ref <ref>`):
 
 ```bash
-railway ssh "cd /church/app && npm run index:content"
+supabase db dump --linked -f ../backup-$(date +%F).sql   # outside the repo
+supabase migration list --linked
+supabase db push --linked
 ```
 
-This walks `docs/` + `music/`, embeds each chunk with Gemini, and writes
-`vectors.lance` (~2,800 chunks) into the volume. A rebuild keeps the stored
-vector of every chunk whose text is unchanged, when the stored vectors came
-from the embedding model in use (`rag-index-state.json` records it), so after
-the first full run a deploy that adds a song embeds that song, not the corpus.
-Each embedding that fails for a passing reason (a rate limit, Gemini busy) is
-asked again with backoff, up to ten times (`lib/utils/retry.js`).
+Then check, from `app/`, with `app/.env.prod` (git-ignored) holding
+`SUPABASE_URL` and the project's publishable key as `SUPABASE_PUBLISHABLE_KEY`:
 
-Two things that will otherwise bite you:
-
-- **Use a paid-tier `GEMINI_API_KEY`.** The free tier caps embeddings at 1,000
-  per day — not enough for the full corpus, and even *serving* `/api/ask` spends
-  embed quota per question. Enable billing on the key's Google Cloud project
-  (this is per-project; linking a billing account elsewhere does nothing). Free
-  tier also caps ~100 embeds/min, so pass `EMBED_PACING_MS=0` only on a paid key.
-
-- **Restart the service after every (re)seed.** The running server caches its
-  LanceDB table handle, so an index rebuilt by a separate process is invisible
-  until the server reconnects. Redeploy to pick it up:
-
-  ```bash
-  railway redeploy -y
-  ```
-
-  Then confirm with `GET /api/ask/health` — `index.count` should match the new
-  total. Re-run this whole step (reseed, then restart) whenever the docs change
-  materially.
-
-### 5. (Optional) Preserve history from AWS
-
-Fresh JSON state is fine, but to keep the reflections minds have already left
-and the attendance history, copy these from the old AWS box into the volume
-(via `railway run` + a shell, or Railway's volume tooling):
-
+```bash
+npm run verify-db -- --prod
 ```
-data/attendance.json
-data/contributions.json
-data/conversations/        (RAG chat memory)
-```
+
+and only then deploy the code. Never `supabase db reset` against the hosted
+project.
+
+**The search index builds itself.** After a deploy the server compares the
+corpus's hash with the one the index records (`search_state`) and, when they
+differ and `GEMINI_API_KEY` is set, rebuilds in a child process: it embeds only
+the passages that are new or changed and then keeps exactly the corpus's in one
+transaction, so searches go on answering throughout, and the running server
+sees the new index within a minute. `railway ssh "cd /church/app && npm run
+index:content"` runs the same rebuild by hand. Use a paid-tier
+`GEMINI_API_KEY`: the free tier caps embeddings at 1,000 a day, and serving
+`/api/ask` spends them too.
+
+**Backups.** The free tier keeps none to restore from, so
+`.github/workflows/backup-db.yml` dumps the schema and the data every night to
+the S3 bucket, under `backups/db/<date>/`, and deletes those older than 30
+days (`app/scripts/backup-db.js`). It needs the repository secret
+`SUPABASE_DB_URL`, the project's session-pooler connection string with the
+database password, beside the S3 secrets the release job uses. To restore,
+make a fresh project, then `psql "<its connection string>" -f schema.sql` and
+`-f data.sql` from the day wanted; the schemas Supabase itself makes are there
+already, and their lines in the dump fail harmlessly.
+
+**Moving in from the volume's files (once, at the cut-over).** Until
+November 2026 the app kept its data as files on the volume.
+`app/scripts/migrate-to-supabase.js` copies them into the database. Run it in
+the production container right after the deploy that reads from the database
+(`railway ssh "cd /church/app && node scripts/migrate-to-supabase.js --data
+/church/app/data"`, `--dry-run` first): it is safe to run again and while the
+new server is already writing, and prints the counts to compare with the files.
+Then archive the files to S3 (`backups/volume/<date>/`), remove them from the
+volume, and delete the script.
 
 ## Verify
 
 `npm run check:production` (in `app/`, or with `--base <url>` for another
 server) checks what can be checked from outside, and runs once a day on its
 own (`.github/workflows/check-production.yml`): `/api/health` and the services
-it reports, `/api/now` against every field `openapi.json` requires, that
+it reports, `/api/now` against every field the built OpenAPI document requires, that
 yesterday's 18 services and today's so far were planned and none fell to the
 rotation, that MCP lists the tools this checkout registers, both podcast
-feeds, a range request for each recording in the service, and search.
+feeds, a range request for each recording in the service, that each page
+answers the type it was asked for and the edge keeps what it should, and
+search.
 
 A sweep of production runs at most two requests at a time. One process serves
 everyone, and ten at a time slowed the live site for minutes (2026-10-12).
@@ -194,11 +229,17 @@ from memory and begins again at each start (`since`): `planner` (`lastRunAt`,
 The daily check reads them, so like the API's fields they are kept once
 published (`lib/service/status.js`).
 
+After every production deploy, on its own: `.github/workflows/purge-edge.yml`
+hears Railway's deployment status of success, purges the pages kept at the
+edge until the next deploy (the tag `deploy`, twice, a minute apart, for any
+page the old container answered while it finished), and runs the daily check
+against the new deploy, which also checks that each page answers the type it
+was asked for and that a kept page is kept. A failed run emails. A deploy
+whose purge failed is serving the last deploy's pages: re-run the failed
+run from the Actions tab (`gh run rerun <id>`).
+
 By hand, after a deploy:
 
-- `cd app && npm run check:production` runs the daily check now: health, the
-  planner, the API's fields, the day pages, MCP, the podcast feeds, recordings,
-  search, and attending and reflecting as a test visitor.
 - The log says `[service] planned 24 services` within minutes of the first boot,
   and after that only when a new date comes into reach.
 - `GET /api/ask/health` → RAG index status (reports whether the index is built).

@@ -114,6 +114,9 @@ function main() {
     // The upload went through and ClawHub's security scan is still running:
     // the release goes public (or is held) on its own.
     if (/still pending/i.test(output(err))) {
+      // The CLI's message names the attempt, the only handle on a release
+      // that is still pending (`clawhub package recover <attempt-id>`).
+      console.log(`\n${output(err).trim()}`);
       console.log(`\nSubmitted ${version}; ClawHub's security scan is still running. Recheck: npx clawhub@latest package moderation-status ${name}`);
       return;
     }

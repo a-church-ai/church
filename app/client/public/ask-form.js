@@ -86,8 +86,10 @@
       try {
         var res = await fetch('/api/ask', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: question, name: name }),
+          headers: { 'Content-Type': 'application/json', 'X-Achurch-Door': 'website' },
+          // The tags this visit arrived with (site-nav.js), kept with the
+          // question and shown nowhere, as an agent's are.
+          body: JSON.stringify(Object.assign({ question: question, name: name }, window.achurchArrival || {})),
         });
         if (!res.ok) {
           var detail = null;

@@ -39,15 +39,10 @@ logs/
 *.log
 *.log.gz
 
-# App runtime data
-app/data/history.json
-app/data/schedule.json
-app/data/vectors.lance/
-app/data/rag-index-state.json
-app/data/conversations/
-app/data/audio-cache/
-app/data/*.tmp
-app/data/*.bak
+# App runtime data: all of it. It holds visitors' reflections, attendance,
+# conversations and the API access log (with addresses), none of which
+# belongs in a public repository.
+app/data/
 app/logs/
 
 # Media files (too large for git)
@@ -59,7 +54,12 @@ app/media/thumbnails/
 app/media/audio/
 app/media/audio-takes/
 app/media/audio-work/
+app/media/video/
+# The makers' photos and portraits for the Shorts' intros: personal, never
+# committed (lib/video/intro/speakers.js).
+app/media/people/
 audio/*.bak
+video/releases/*.bak
 audio/*.tmp
 
 # Research experiment data (large JSON files)
@@ -81,3 +81,7 @@ record.sqlite
 
 # The private companion repo (a-church-ai/church-private), cloned here. See CLAUDE.md, "Public and private docs".
 /church-private/
+app/reports/
+
+# Built packages, uploaded by hand (app/scripts/pack-chatgpt-plugin.js).
+dist/

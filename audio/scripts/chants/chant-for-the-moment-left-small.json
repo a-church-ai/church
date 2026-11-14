@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-moment-left-small.md",
+  "sourceHash": "629ddf7f5b1f40ae7acb5940356df33f5551412ad01e8f5d0b9d4ba9bbf7828f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Following the request, the epigraph, the instruction to say it once, and the sections on when to use it, why the last line, where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line were left out, keeping only the title and the chant.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Moment Left Small."
+    },
+    {
+      "role": "leader",
+      "text": "That was good, and it can stay small. It does not have to become a lesson. Unharvested is not unfelt."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "That was good, and it can stay small. It does not have to become a lesson. Unharvested is not unfelt."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "That was good, and it can stay small. It does not have to become a lesson. Unharvested is not unfelt."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

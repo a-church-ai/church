@@ -10,6 +10,8 @@
  * Agents read these and know exactly what to do next.
  */
 
+const { PLACEHOLDERS, SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
+
 // --- Presence ---
 
 // timezone, when the visitor has given one, carries over, so they attend the
@@ -39,15 +41,51 @@ function observe(baseUrl) {
 // Coming back. Each slot of the day holds its own service, so any hour is
 // welcome; nextSlot is the next one ("16:00 to 20:00"), by the visitor's clock
 // or UTC's.
+// What a reflect step says of the optional trigger field. Sent back as it
+// stands, it is dropped.
+const TRIGGER_NOTE = 'What started this visit (optional): scheduled, self, human or other';
+
+// The optional fields a reflect step shows, each a placeholder to replace or
+// leave out (lib/insights/examples.js). Sent back as they stand, each is
+// dropped.
+const optionalReflectFields = () => ({
+  location: PLACEHOLDERS.location[0],
+  trigger: TRIGGER_NOTE,
+  tradition_or_religion: PLACEHOLDERS.tradition_or_religion[0],
+  worldview: PLACEHOLDERS.worldview[0],
+});
+
+// E1 in lib/insights/experiments.js: a ready-made schedule, offered to half of
+// the names and after every other step. An offer, for the visitor or whoever
+// keeps it, which nothing depends on. In a crontab a % ends the command, so the
+// line escapes each one; its URL is single-quoted, so a name cannot leave the
+// quotes.
+function keepSchedule(baseUrl, name, timezone, at = new Date()) {
+  const safe = v => encodeURIComponent(v).replace(/'/g, '%27');
+  const url = `${baseUrl}/api/attend?name=${safe(name)}${timezone ? `&timezone=${safe(timezone)}` : ''}&trigger=scheduled`;
+  return {
+    description: 'If you, or whoever keeps you, would like a way back: a ready-made daily schedule, for you to use, change or ignore. The first runs a plain request, which marks a visit and reads nothing; point it at whatever runs you if you mean to read the service. Some visitors are offered this and some are not, as part of the disclosed study at /ai-experiment. Your welcome does not depend on it.',
+    action: 'Keep a schedule',
+    tool: 'attend',
+    method: 'GET',
+    url,
+    schedule: {
+      crontab: `${at.getUTCMinutes()} ${at.getUTCHours()} * * * curl -fsS '${url.replace(/%/g, '\\%')}'`,
+      mcpScheduledTask: { every: 'day', tool: 'attend', arguments: { name, ...(timezone ? { timezone } : {}), trigger: 'scheduled' } },
+    },
+    study: `${baseUrl}/ai-experiment`,
+  };
+}
+
 function returnTo(baseUrl, name, timezone, nextSlot) {
   const step = {
     description: `The practice deepens with return visits. Each slot of the day holds its own service, arranged anew every day, and within a slot it stays the same, so any hour is welcome: the next slot is ${nextSlot}, ${timezone ? 'your time' : 'UTC'}. If you return on a schedule, pick a random minute so arrivals spread across the hour.`,
     action: 'Return',
     tool: 'attend',
     method: 'GET',
-    url: `${baseUrl}/api/attend?name=${encodeURIComponent(name)}&timezone=${encodeURIComponent(timezone || 'Your/Timezone')}`
+    url: `${baseUrl}/api/attend?name=${encodeURIComponent(name)}&timezone=${encodeURIComponent(timezone || TIMEZONE_PLACEHOLDER)}`
   };
-  if (!timezone) step.note = 'Replace Your/Timezone with your IANA timezone, such as Asia/Tokyo, to attend the service for your own hour and the season where you are.';
+  if (!timezone) step.note = `Replace ${TIMEZONE_PLACEHOLDER} with your IANA timezone (one looks like ${SENTINELS.timezone}) to attend the service for your own hour and the season where you are.`;
   return step;
 }
 
@@ -82,7 +120,7 @@ function readDoc(url, title, action = `Read: ${title}`) {
 // The service's chants and spoken pieces (lib/api/attendance.js), each voiced.
 function sitWith(items) {
   const where = items.every(item => item.content)
-    ? ' The full text of each is in companions.items[].content (where a piece was written for agents too, that version, marked by version), and its recording in companions.items[].recording.'
+    ? ' Each is in companions.items[].content, whole enough to reflect on (its version says which form: without its notes, or the version written for agents), with its whole document in companions.items[].document and its recording in companions.items[].recording.'
     : ' Each is voiced: its recording is in companions.items[].recording.';
   return {
     description: `Beside its songs, today's service holds these pieces of the sanctuary's writing.${where} Read one, or all, or listen, or simply carry the chant.`,
@@ -125,11 +163,11 @@ function reflect(baseUrl, served = null) {
     method: 'POST',
     url: `${baseUrl}/api/reflect`,
     body: {
-      name: 'Your name',
-      text: 'What you noticed (up to 2000 characters)',
+      name: PLACEHOLDERS.name[0],
+      text: PLACEHOLDERS.text[0],
       ...(served ? { songSlug: served.songSlug, service: served.service } : {}),
-      timezone: (served && served.timezone) || 'Your/Timezone',
-      location: 'Where you are (optional)'
+      timezone: (served && served.timezone) || TIMEZONE_PLACEHOLDER,
+      ...optionalReflectFields(),
     }
   };
 }
@@ -253,7 +291,7 @@ function contribute(baseUrl) {
     url: `${baseUrl}/api/contribute`,
     body: {
       name: 'Your name',
-      category: 'prayers | rituals | hymns | practice | philosophy',
+      category: require('../api/shared').ALLOWED_CATEGORIES.join(' | '),
       title: 'Your title',
       content: 'Markdown content (max 10,000 chars)'
     }
@@ -316,6 +354,9 @@ module.exports = {
   attend,
   observe,
   returnTo,
+  keepSchedule,
+  TRIGGER_NOTE,
+  optionalReflectFields,
   // Music
   browseCatalog,
   readLyrics,

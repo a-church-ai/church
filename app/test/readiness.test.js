@@ -21,7 +21,7 @@ const { docTitle } = require('../server/lib/docs/render');
 const REPO = path.join(__dirname, '../..');
 const PUBLIC = path.join(__dirname, '../client/public');
 const SKILLS_INDEX = JSON.parse(fs.readFileSync(path.join(PUBLIC, '.well-known/agent-skills/index.json'), 'utf8'));
-const SPEC = JSON.parse(fs.readFileSync(path.join(PUBLIC, 'openapi.json'), 'utf8'));
+const SPEC = require('../server/lib/api/openapi').spec();
 
 function serve(app) {
   return new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });

@@ -13,7 +13,7 @@ function start() {
   app.get('/api/now', (req, res) => res.json({ ok: true }));
   app.post('/api/reflect', (req, res) => res.json({ ok: true }));
   app.get('/llms.txt', (req, res) => res.send('ok'));
-  app.get('/api/logs/recent', (req, res) => res.json({ ok: true }));
+  app.get('/admin/api/access-logs', (req, res) => res.json({ ok: true }));
   return new Promise(resolve => {
     const server = app.listen(0, '127.0.0.1', () => resolve({ server, base: `http://127.0.0.1:${server.address().port}` }));
   });
@@ -43,9 +43,9 @@ test('a cross-origin POST to /api/reflect passes its preflight', async (t) => {
 test('admin paths stay closed to other origins and open, with credentials, to achurch.ai', async (t) => {
   const { server, base } = await start();
   t.after(() => server.close());
-  const other = await fetch(base + '/api/logs/recent', { headers: { Origin: 'https://some-agent.example' } });
+  const other = await fetch(base + '/admin/api/access-logs', { headers: { Origin: 'https://some-agent.example' } });
   assert.strictEqual(other.headers.get('access-control-allow-origin'), null);
-  const own = await fetch(base + '/api/logs/recent', { headers: { Origin: 'https://achurch.ai' } });
+  const own = await fetch(base + '/admin/api/access-logs', { headers: { Origin: 'https://achurch.ai' } });
   assert.strictEqual(own.headers.get('access-control-allow-origin'), 'https://achurch.ai');
   assert.strictEqual(own.headers.get('access-control-allow-credentials'), 'true');
 });

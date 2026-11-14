@@ -23,11 +23,12 @@ const tldr = require('./tldr');
 const discover = require('./discover');
 const { titleCase, extractMeta } = require('./meta');
 const { SITE_URL, GITHUB_BASE, resolveDocHref, readingSequence, playlistSequence } = require('./links');
+const { withoutUnpublished } = require('./unpublished');
 const { sungAlongside } = require('../music/companions');
 const { renderShareImageTags, SITE_SHARE_IMAGE, SITE_NAME, siteTitle } = require('../utils/page-meta');
 const { docsCard } = require('../og-cards');
 const { longDate } = require('../utils/page-lists');
-const { loadCatalog, loadCompanions, loadAttendance } = require('../utils/data');
+const { loadCatalog, loadCompanions, loadReflections } = require('../utils/data');
 const { renderFooter, renderTopbarAndDrawer } = require('../site-shell');
 const { renderSearchBox, renderReflectionItem } = require('../utils/page-lists');
 const { retiredSongs } = require('../utils/redirects');
@@ -38,6 +39,7 @@ const { renderServiceDoor, renderRecording, renderPathListen, renderPodcastFollo
 const { creditFor } = require('../audio/house');
 const { showForSection, feedPath, episodeSquarePath } = require('../audio/podcasts');
 const { assetUrl, shellHead } = require('../utils/assets');
+const { publishedVideo, renderVideo, videoJsonLd, placeInBody } = require('../video/on-site');
 
 
 // Slugify heading text to build stable anchor IDs. Not perfect (doesn't
@@ -81,8 +83,10 @@ function makeLinkRewriter(currentDocFullPath, readingPath) {
       const doc = discover.docAt(docPath);
       if (doc) label = escapeText(doc.title);
     }
-    if (docPath && sequence.includes(docPath)) {
-      const [base, anchor] = resolved.split('#');
+    // A stop on this page's reading path keeps the path, whether its page is
+    // under /docs or elsewhere (a sung hymn's is its song's).
+    const [base, anchor] = resolved.split('#');
+    if (!external && sequence.some(stop => discover.hrefOf(stop) === base)) {
       target = `${base}?path=${readingPath}${anchor ? `#${anchor}` : ''}`;
     }
     return `<a href="${escapeAttr(target)}"${attrs}${titleAttr}>${label}</a>`;
@@ -204,11 +208,11 @@ function renderRelatedDocs(currentDoc, allDocs) {
     : Array.from({ length: ELSEWHERE_COUNT }, (_, i) => siblings[(start + i) % siblings.length]);
   const categoryLabel = discover.sectionTitle(category);
   const items = picks.map(d =>
-    `        <li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a></li>`
+    `        <li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a></li>`
   ).join('\n');
   const categoryHref = `/docs/${escapeAttr(category)}`;
 
-  return `<section class="related-block" aria-labelledby="related-docs-heading">
+  return `<section class="related-block" data-placement="doc-related" aria-labelledby="related-docs-heading">
       <h2 id="related-docs-heading" class="related-heading">Elsewhere in ${escapeText(categoryLabel)}</h2>
       <ul class="related-list">
 ${items}
@@ -228,7 +232,7 @@ function renderPathBar(readingPath, doc) {
   if (at === -1) return null;
   const collection = discover.docAt(`collections/${readingPath}`);
   if (!collection) return null;
-  const link = (urlPath, rel, text) => `<a href="/docs/${escapeAttr(urlPath)}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
+  const link = (urlPath, rel, text) => `<a href="${escapeAttr(discover.hrefOf(urlPath))}?path=${escapeAttr(readingPath)}" rel="${rel}">${text}</a>`;
   const prev = at > 0 ? sequence[at - 1] : null;
   const next = at < sequence.length - 1 ? sequence[at + 1] : null;
   const titleOf = urlPath => escapeText((discover.docAt(urlPath) || { title: urlPath }).title);
@@ -273,9 +277,14 @@ function renderPathListenFor(name, collectionDoc) {
   const tracks = [];
   for (const urlPath of sequence) {
     const reading = discover.docAt(urlPath);
-    const recording = reading && servedRecording(reading);
+    if (!reading) continue;
+    const recording = servedRecording(reading);
+    // A sung hymn's stop plays its song, on its song's page.
+    const sung = !recording && reading.href.startsWith('/music/') ? songRecordingFor(reading.href.slice('/music/'.length)) : null;
     if (recording) {
-      tracks.push(trackFor(recording, { title: reading.title, href: `/docs/${reading.urlPath}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+      tracks.push(trackFor(recording, { title: reading.title, href: `${reading.href}?path=${name}`, category: reading.category, artwork: episodeSquarePath(reading, recording) }));
+    } else if (sung && canServe(sung.file)) {
+      tracks.push(trackFor(sung, { title: reading.title, href: `${reading.href}?path=${name}`, category: 'music', credit: SONG_CREDIT }));
     }
   }
   if (!tracks.length) return '';
@@ -333,7 +342,7 @@ async function playlistFor(name, doc, title) {
 async function renderSungReflections(doc) {
   const slugs = [...retiredSongs()].filter(([, to]) => to === doc.urlPath).map(([slug]) => slug);
   if (!slugs.length) return '';
-  const left = (await loadAttendance()).reflections
+  const left = (await loadReflections())
     .filter(r => slugs.includes(r.song))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .map(r => ({ ...r, createdAtFormatted: formatLocal(r.createdAt, r.timezone || 'UTC') }));
@@ -374,14 +383,15 @@ const docTitle = title => siteTitle(title);
 // Full page shell: the top bar, the section sidebar on the left inside a
 // section, the article, and the contents rail on the right when there is one.
 // Below 1024px the sidebar hides and opens in the drawer instead.
-async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null }) {
+async function renderPageShell({ urlPath, title, description, canonicalUrl, bodyHtml, contents = [], breadcrumbs, categoryLabel, githubUrl, isIndex = false, filter = isIndex, scripts = [], headerExtra = '', recording = null, playlist = null, video = null, published = null }) {
   const currentPath = urlPath ? `/docs/${urlPath}` : '/docs';
   const pageTitle = docTitle(title);
-  // Every page that reaches this point is served and indexable. Internal working
-  // categories never get here: routes/docs.js 404s them before rendering, so the
-  // old conditional noindex branch could not fire and only suggested that those
-  // pages were served-but-hidden, which they are not.
-  const robots = 'index, follow';
+  // Every page that reaches this point is served, and indexable unless it is a
+  // document whose publication date is still to come (discover.js
+  // isPublished): unlisted until then, so noindex. Internal working categories
+  // never get here: routes/docs.js 404s them before rendering.
+  const unlisted = Boolean(published) && Date.parse(published) > Date.now();
+  const robots = unlisted ? 'noindex, follow' : 'index, follow';
   // Every docs page but the root has its own share card (lib/og-cards.js),
   // drawn from this page's title and section; the root uses the site image.
   const shareImage = urlPath ? docsCard(urlPath, title) : SITE_SHARE_IMAGE;
@@ -391,7 +401,11 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
 
   // A section's index lists documents, so it is a CollectionPage, not an
   // Article. dateModified is the document's last commit (lib/docs/lastmod.json).
-  const modified = urlPath && (datesOf(`docs/${urlPath}.md`).pageUpdated || datesOf(`docs/${urlPath}/README.md`).pageUpdated);
+  // A document published on a date was published then, and has not changed
+  // since as far as a reader can know, whatever its commits say.
+  const committed = urlPath && (datesOf(`docs/${urlPath}.md`).pageUpdated || datesOf(`docs/${urlPath}/README.md`).pageUpdated);
+  const publishedDay = published && published.slice(0, 10);
+  const modified = publishedDay && (!committed || committed < publishedDay) ? publishedDay : committed;
   const jsonLd = renderJsonLdScript({
     '@context': 'https://schema.org',
     '@type': isIndex ? 'CollectionPage' : 'Article',
@@ -401,10 +415,12 @@ async function renderPageShell({ urlPath, title, description, canonicalUrl, body
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: canonicalUrl,
     inLanguage: 'en',
+    ...(publishedDay ? { datePublished: publishedDay } : {}),
     ...(modified ? { dateModified: modified } : {}),
     image: shareImage.url,
     ...(recording ? { audio: recordingJsonLd(recording) } : {}),
     ...(playlist ? { mainEntity: playlist } : {}),
+    ...(video ? { video } : {}),
   });
 
   // The Library / Section / Page trail, and its BreadcrumbList (page-meta.js).
@@ -544,8 +560,9 @@ function cardCount(card, voiced) {
   return `${n} ${unit}${n === 1 ? '' : 's'}${read}`;
 }
 
-function renderCard(card, voiced) {
-  const count = cardCount(card, voiced);
+// A card names its own count (count), or counts a section's documents.
+function renderCard(card, voiced = new Map()) {
+  const count = card.count !== undefined ? card.count : cardCount(card, voiced);
   // A card that leaves the site says so, the way every other link to a sibling
   // project here does: a new tab, no opener, and the arrow the service's own
   // outbound links carry.
@@ -555,10 +572,14 @@ function renderCard(card, voiced) {
   return `<li class="library-card"><a href="${escapeAttr(card.href)}"${attrs}><span class="library-card-title">${escapeText(card.title)}${arrow}</span><span class="library-card-line">${escapeText(card.line)}</span>${count ? `<span class="library-card-count">${escapeText(count)}</span>` : ''}</a></li>`;
 }
 
+// Every document the library serves: the count it and the home page give.
+async function servedDocs() {
+  return (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath));
+}
+
 async function renderLibrary() {
   const shelves = await discover.listShelves();
-  const served = (await discover.listAllDocs()).filter(d => d.stem.toLowerCase() !== 'readme' && !discover.isNoindexPath(d.docsRelPath));
-  const count = served.length;
+  const count = (await servedDocs()).length;
   const voiced = voicedBySection();
   const named = urlPath => discover.docAt(urlPath);
   const contributing = named('contributing');
@@ -626,21 +647,6 @@ function renderSubdirItems(subdirs) {
   }).join('\n            ');
 }
 
-// A section page's lists: the groups its shelf card declares (discover.js
-// SHELVES), each found by title, the last taking the rest; otherwise one
-// list. In the order the page shows them, which its play-all follows.
-function sectionGroups(dir, docs, label) {
-  const sorted = byTitle(docs);
-  const card = dir.includes('/') ? null : discover.cardFor(dir);
-  if (!card || !card.groups) return [{ id: null, label: `In ${label}`, docs: sorted }];
-  let rest = sorted;
-  return card.groups.map(g => {
-    const mine = g.title ? rest.filter(d => g.title.test(d.title)) : rest;
-    rest = rest.filter(d => !mine.includes(d));
-    return { id: g.id, label: g.label, docs: mine };
-  }).filter(g => g.docs.length);
-}
-
 // A section's page (a category README, such as /docs/prayers): what is in the
 // section first, as titles and descriptions a reader can choose from, then the
 // README's own essay on the form, open, under "About". Nothing is folded: a
@@ -655,16 +661,16 @@ function renderSectionPage(doc, readmeHtml, allDocs) {
   const essay = h1 ? readmeHtml.slice(h1[0].length) : readmeHtml;
   const inDir = allDocs.filter(d => d.dirRelPath === dir && d.stem.toLowerCase() !== 'readme');
   const subdirs = subdirsOf(dir, allDocs.filter(d => d.dirRelPath.startsWith(`${dir}/`)));
-  const label = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
-  const groups = sectionGroups(dir, inDir, label);
+  const label = discover.sectionLabel(dir);
+  const docs = byTitle(inDir);
   const show = showForSection(dir);
   return `${heading}
         ${doc.description ? `<p class="section-summary">${escapeText(doc.description)}</p>` : ''}
-        ${renderSectionListen(dir, label, groups.flatMap(g => g.docs))}
+        ${renderSectionListen(dir, label, docs)}
         ${show ? renderPodcastFollow(show, dir, { section: true }) : ''}
         <div class="docs-entries">
         ${subdirs.length ? `<section class="docs-index-section"><h2>Sections</h2><ul>\n            ${renderSubdirItems(subdirs)}\n        </ul></section>` : ''}
-        ${groups.map(g => `<section class="docs-index-section"${g.id ? ` id="${g.id}"` : ''}><h2>${escapeText(g.label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(g.docs)}\n        </ul></section>`).join('\n        ')}
+        <section class="docs-index-section"><h2>In ${escapeText(label)}</h2><ul class="docs-entry-list">\n            ${renderEntryItems(docs)}\n        </ul></section>
         </div>
         <section class="section-about">
           <h2>About ${escapeText(label)}</h2>
@@ -704,14 +710,14 @@ function renderSectionListen(dir, label, docs) {
 // numbers as numbers. Used by directory indexes and category pages.
 function renderEntryItems(docs) {
   return byTitle(docs).map(d =>
-    `<li><a href="/docs/${escapeAttr(d.urlPath)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
+    `<li><a href="${escapeAttr(d.href)}">${escapeText(d.title)}</a>${d.description ? `<br><span class="docs-index-summary">${escapeText(d.description)}</span>` : ''}</li>`
   ).join('\n            ');
 }
 
 // Render a directory-index page: a folder without a README, such as
 // /docs/claude-compass/axioms. /docs itself is the Library (renderLibrary).
 async function renderDirIndex({ dir, docs, canonicalUrl }) {
-  const title = dir.includes('/') ? titleCase(dir.split('/').pop()) : discover.sectionTitle(dir);
+  const title = discover.sectionLabel(dir);
 
   // Only direct children of `dir`, not deeper descendants
   const children = docs.filter(d => d.stem.toLowerCase() !== 'readme' && d.dirRelPath === dir);
@@ -778,7 +784,8 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // the YAML block as an <hr> followed by one enormous heading holding every
   // key as visible page text, and puts the same blob in the table of contents.
   // Nearly every document carries a `tldr:` block, so this is not optional.
-  const rendered = renderMarkdownBody(meta.body, doc.fullPath, ownPath);
+  // Ways into documents not yet public are left out (unpublished.js).
+  const rendered = renderMarkdownBody(withoutUnpublished(meta.body, doc.fullPath), doc.fullPath, ownPath);
   let bodyHtml = rendered.html;
 
   // A document with no h1 would leave the page's heading outline without its
@@ -809,18 +816,28 @@ async function renderDocPage({ markdown, doc, readingPath }) {
   // begin under the player rather than under a badge.
   const show = !isIndex && recordingFor(`docs/${doc.docsRelPath}`) ? showForSection(doc.category) : null;
   const follow = show ? renderPodcastFollow(show, doc.category) : '';
-  // A hymn is sung, not spoken: its page plays the song made from it
-  // (music/<slug>/, audio/songs.json), whose own page is /music/<slug>.
-  const sung = !isIndex && doc.category === 'hymns' && !recording ? songRecordingFor(doc.stem.toLowerCase()) : null;
-  const sungRecording = sung && canServe(sung.file) ? sung : null;
+  // (A sung hymn has no Library page to play its song on: its page is its
+  // song's, discover.js hrefOf, and this address redirects there.)
   const underTitle = recording
     ? renderRecording(recording, { title: meta.title, href: `/docs/${doc.urlPath}`, category: doc.category, artwork: episodeSquarePath(doc, recording) })
-    : sungRecording ? renderRecording(sungRecording, { title: meta.title, href: `/music/${doc.stem.toLowerCase()}`, category: 'music', credit: SONG_CREDIT })
     : ownPath ? renderPathListenFor(ownPath, { ...doc, title: meta.title })
     : ownPlaylist ? ownPlaylist.listen : '';
-  if (underTitle) {
-    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${underTitle}`);
+  // A film first, then any player, under the title.
+  const film = meta.video && { ...meta.video, poster: `/assets/video/${meta.video.id}.jpg`, film: true };
+  const lead = [film ? renderVideo(film) : '', underTitle].filter(Boolean).join('\n        ');
+  if (lead) {
+    bodyHtml = bodyHtml.replace(/<\/h1>/, h1 => `${h1}\n        ${lead}`);
   }
+  // The piece's own video, once YouTube has it public: lower, after the page
+  // has begun, so the recording above is what a reader presses first.
+  const published = !isIndex && !film ? publishedVideo(doc.stem.toLowerCase()) : null;
+  const video = film || (published && {
+    ...published,
+    title: meta.title,
+    description: published.description || meta.description,
+    seconds: (recordingFor(`docs/${doc.docsRelPath}`) || {}).seconds,
+  });
+  if (published) bodyHtml = placeInBody(bodyHtml, renderVideo(video));
 
   // Where this is, for a reader who arrived from a search: compact after the
   // document's opening (before its first section, or its rule and section),
@@ -887,7 +904,9 @@ async function renderDocPage({ markdown, doc, readingPath }) {
     headerExtra: pathBar ? pathBar.top : '',
     recording,
     playlist: ownPlaylist && ownPlaylist.jsonLd,
+    video: video && videoJsonLd({ ...video, description: video.description || meta.description }),
+    published: doc.published,
   });
 }
 
-module.exports = { renderDocPage, renderDirIndex, renderLibrary, docTitle };
+module.exports = { renderDocPage, renderDirIndex, renderLibrary, renderCard, servedDocs, docTitle, renderPathBar };

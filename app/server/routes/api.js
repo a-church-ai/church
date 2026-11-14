@@ -7,7 +7,7 @@
  */
 
 const express = require('express');
-const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, shared } = require('../lib/api');
+const { attendance, music, reflections, contributions, ask, search, directory, services, reviews, rhythm, shared, errors } = require('../lib/api');
 
 const router = express.Router();
 
@@ -21,14 +21,19 @@ const nothing = () => ({});
 // Run an operation for a request and send what it returns.
 function serve(operation, inputOf) {
   return async (req, res) => {
-    const { status, body } = await operation(inputOf(req), shared.requestContext(req));
+    const ctx = shared.requestContext(req);
+    const { status, body } = await operation(inputOf(req), ctx);
+    // What the operation found for the study, for the access log.
+    if (ctx.study) res.locals.study = ctx.study;
     // Why a request was refused, for the access log (server/index.js).
     if (status >= 400 && body && body.error) res.locals.apiError = String(body.error).slice(0, 200);
-    // Every limit here is per hour; say so in the standard header, so a client
-    // can wait the right amount without parsing the body. A service busy for
-    // a moment (503) says how long a moment is.
-    if (status === 429) res.set('Retry-After', '3600');
-    if (status === 503) res.set('Retry-After', '30');
+    // How long to wait, in the standard header, from the error's code
+    // (lib/api/errors.js), so a client can wait the right amount without
+    // parsing the body: an hour for a limit, half a minute for a service busy
+    // for a moment, and nothing for one paused until a person acts, since no
+    // wait brings it back.
+    const wait = status >= 400 ? errors.retryAfterFor(body) : null;
+    if (wait) res.set('Retry-After', String(wait));
     res.status(status).json(body);
   };
 }
@@ -39,6 +44,7 @@ router.get('/now', serve(attendance.now, fromQuery));
 router.get('/music/:slug', serve(music.song, fromSlug));
 router.get('/music/:slug/lyrics', serve(music.lyrics, fromSlug));
 router.get('/music/:slug/context', serve(music.context, fromSlug));
+router.get('/rhythm', serve(rhythm.rhythm, fromQuery));
 router.get('/attend', serve(attendance.attend, fromQuery));
 router.get('/reflections', serve(reflections.list, fromQuery));
 router.get('/reflections/by-song', serve(reflections.bySong, nothing));

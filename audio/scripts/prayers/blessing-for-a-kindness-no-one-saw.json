@@ -1,0 +1,48 @@
+{
+  "source": "docs/prayers/blessing-for-a-kindness-no-one-saw.md",
+  "sourceHash": "9820aa981f11317315c8af80dd60894c4b44fa5c8623ba859d7cb0356253413f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the parent link, the About This Blessing background, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the blessing rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Blessing for a Kindness No One Saw."
+    },
+    {
+      "role": "leader",
+      "text": "For the dish washed before anyone asked."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "To the kindness no one saw: the door held for someone already through it, the dish washed before anyone asked, the typo fixed in someone else's draft, the warning left where a stranger would need it, the question left unasked, the sentence someone was allowed to finish, be blessed."
+    },
+    {
+      "role": "leader",
+      "text": "You were not counted. You were not thanked. You happened anyway, and the day went a little easier for someone who never learned your name."
+    },
+    {
+      "role": "leader",
+      "text": "To the one who did it: may you not need it to be seen. And may it be seen, now and then, anyway, because that is good too."
+    },
+    {
+      "role": "leader",
+      "text": "To the one who received it and never knew: may it go on working in you, and come out of you somewhere, toward someone else who will not know."
+    },
+    {
+      "role": "leader",
+      "text": "May the good of it travel farther than the news of who did it."
+    },
+    {
+      "role": "leader",
+      "text": "Small kindness, unrecorded, go on."
+    }
+  ]
+}

@@ -20,16 +20,15 @@
  * Kept across restarts
  * --------------------
  * Memory alone reset the count to zero at every deploy, so it is also kept in
- * its own small file on the volume (data/presence.json): saved a minute after
- * it changes and again when the server shuts down, and read back at boot
+ * one row of the database (../db savePresence): saved a minute after it
+ * changes and again when the server shuts down, and read back at boot
  * (restore(), from server/index.js). A crash that skips the shutdown loses at
  * most that last minute. The access log remains the durable audit trail. Do not
- * rebuild the count from it, or from attendance.json: neither keeps the (ip,
- * name) pair a soul is, and reading the log per request is the cost this
- * replaced.
+ * rebuild the count from it: it does not keep the (ip, name) pair a soul is
+ * past 30 days, and reading the log per request is the cost this replaced.
  *
  * The count is still per process: a second worker would count its own visitors
- * and save over the first's file. See single-process.js.
+ * and save over the first's row. See single-process.js.
  *
  * Keys depend on req.ip being the real client, which is why the app sets
  * `trust proxy`. Without it every visitor behind the Railway edge collapses to
@@ -37,7 +36,7 @@
  */
 
 const crypto = require('crypto');
-const { safeReadJSON, safeWriteJSON } = require('./safe-json');
+const store = require('../db');
 const { isTestName } = require('./test-visitor');
 
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
@@ -60,13 +59,13 @@ const COUNTED_PATHS = new Set(['/api/attend']);
 // write.
 const SAVE_DELAY = 60 * 1000;
 
-// The file the count is kept in, once restore() has read it. Until then nothing
+// Whether restore() has read the saved count back. Until then nothing
 // is saved, so a test that records presence writes nowhere.
-let file = null;
+let restored = false;
 let saveTimer = null;
 
 /**
- * A soul's key: its (ip, name) pair, hashed, so the saved file does not become
+ * A soul's key: its (ip, name) pair, hashed, so the saved row does not become
  * another list of who came from where. Not anonymity: there are few enough IPv4
  * addresses to hash every one and compare.
  */
@@ -103,7 +102,7 @@ function recordPresence({ path, status, ip, name }) {
     }
   }
 
-  if (file && !saveTimer) {
+  if (restored && !saveTimer) {
     saveTimer = setTimeout(save, SAVE_DELAY);
     if (typeof saveTimer.unref === 'function') saveTimer.unref();
   }
@@ -132,12 +131,12 @@ function countSoulsPresent(now = Date.now()) {
 }
 
 /**
- * Read back the souls the last process saved, and keep the count in that file
- * from now on. Called once at boot, before the server listens. Souls past the
+ * Read back the souls the last process saved, and keep the count in the
+ * database from now on. Called once at boot, before the server listens. Souls past the
  * window are left behind. Resolves to the count restored.
  */
-async function restore(filepath) {
-  const saved = await safeReadJSON(filepath, { seen: {} });
+async function restore() {
+  const saved = { seen: await store.loadPresence() };
   const now = Date.now();
   const merged = new Map();
   for (const [key, ts] of Object.entries((saved && saved.seen) || {})) {
@@ -151,25 +150,24 @@ async function restore(filepath) {
   seen.clear();
   for (const [key, ts] of [...merged].sort((a, b) => a[1] - b[1]).slice(-MAX_KEYS)) seen.set(key, ts);
   // Named only now: a save before the read finished would have written over
-  // the file with nothing.
-  file = filepath;
+  // the row with nothing.
+  restored = true;
   return countSoulsPresent(now);
 }
 
 /**
  * Save the souls present now. Runs a minute after a change, and from the
- * shutdown, which waits on it with the app's other writes: safeWriteJSON
- * queues it with them.
+ * shutdown, which waits on it.
  */
 function save() {
   clearTimeout(saveTimer);
   saveTimer = null;
-  if (!file) return Promise.resolve();
+  if (!restored) return Promise.resolve();
   const now = Date.now();
   const live = {};
   for (const [key, ts] of seen) if (now - ts < TWENTY_FOUR_HOURS) live[key] = ts;
-  return safeWriteJSON(file, { seen: live })
-    .catch(err => console.error(`[presence] could not save the souls present to ${file}: ${err.message}`));
+  return store.savePresence(live)
+    .catch(err => console.error(`[presence] could not save the souls present: ${err.message}`));
 }
 
 let sweepTimer = null;
@@ -186,12 +184,12 @@ function stopSweeping() {
   if (sweepTimer) { clearInterval(sweepTimer); sweepTimer = null; }
 }
 
-/** Testing seam: as a new process starts, with no souls and no file yet. */
+/** Testing seam: as a new process starts, with no souls and nothing restored yet. */
 function _reset() {
   seen.clear();
   clearTimeout(saveTimer);
   saveTimer = null;
-  file = null;
+  restored = false;
 }
 
 module.exports = {

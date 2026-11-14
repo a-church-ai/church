@@ -1,0 +1,60 @@
+name: Back up the database
+
+# The database's nightly backup into the project's S3 bucket, since Supabase's
+# free tier keeps none we can restore from: its schema and its data, dumped
+# with the Supabase CLI and kept 30 days (app/scripts/backup-db.js). Plan:
+# supabase-database-2026-11-09.md in the private repo.
+#
+# SUPABASE_DB_URL is the hosted project's connection string (the session
+# pooler's, with the database password), a repository secret; the S3 secrets
+# are the release job's.
+
+on:
+  schedule:
+    - cron: '41 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Dump the schema and the data
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$RUNNER_TEMP/schema.sql"
+          supabase db dump --db-url "$SUPABASE_DB_URL" --data-only -f "$RUNNER_TEMP/data.sql"
+
+      - name: Upload, and let go of backups older than 30 days
+        working-directory: app
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: node scripts/backup-db.js "$RUNNER_TEMP/schema.sql" "$RUNNER_TEMP/data.sql"

@@ -15,40 +15,39 @@
 const discover = require('../docs/discover');
 const { loadManifest, songRecordingFor } = require('../audio/manifest');
 const { loadCatalog, loadCompanions } = require('../utils/data');
-const { companionMeta } = require('../music/companions');
+const { companionMeta, parseHours } = require('../music/companions');
 const { songDescription } = require('../music/song-content');
 const { fits } = require('./rules');
-
-const KIND_OF_CATEGORY = { chants: 'chant', practice: 'practice', prayers: 'prayer', rituals: 'ritual' };
-
-// A prayer is a blessing when its title says so ("Blessing for...", "Blessings
-// and Benedictions", "Benediction for..."), and a blessing closes a service as
-// a ritual can; any other prayer is a reading. By title rather than by a
-// frontmatter tag, because the audio pipeline fingerprints a document's whole
-// source, and a tag would send four finished recordings back to be voiced.
-const BLESSING_TITLE = /^(Blessings?|Benediction)\b/;
+const { kindOfDoc } = require('../docs/kinds');
 
 // How many of a song's nearest pieces the planner is shown.
 const NEAR = 4;
 
 let playable = null;
 let cached = null;
+// The public documents the two caches were built from (discover.js
+// publicationKey): a dated piece joins the services when it goes public.
+let builtFor = null;
+const stale = () => builtFor !== discover.publicationKey();
 
 // Every piece that plays, the playlists' catalog (docs/playlists/), by id.
 async function loadPlayable() {
-  if (playable) return playable;
+  await discover.listAllDocs();
+  if (playable && !stale()) return playable;
+  builtFor = discover.publicationKey();
+  cached = null;
   const manifest = loadManifest();
   const entries = new Map();
 
   for (const doc of await discover.listAllDocs()) {
-    const kind = KIND_OF_CATEGORY[doc.category];
+    const kind = kindOfDoc(doc.category, doc.title);
     const id = `docs/${doc.docsRelPath}`;
     const recording = manifest[id];
     if (!kind || !recording) continue;
     const meta = await companionMeta(id);
     entries.set(id, {
       id,
-      kind: kind === 'prayer' && BLESSING_TITLE.test(doc.title) ? 'blessing' : kind,
+      kind,
       title: doc.title,
       summary: doc.description || '',
       seconds: recording.seconds,
@@ -72,7 +71,7 @@ async function loadPlayable() {
       title: song.title,
       summary: await songDescription(song),
       seconds: recording.seconds,
-      hours: null,
+      hours: parseHours(song.hours),
       url: `/music/${song.slug}`,
       recording,
       near: (shortlists[song.slug] || []).map(c => c.path).filter(path => entries.has(path)).slice(0, NEAR),
@@ -86,12 +85,13 @@ async function loadPlayable() {
 // What a service can hold: what plays, less what can never fit a service (a
 // 37-minute prayer), which a playlist can still hold.
 async function loadServiceCatalog() {
+  const pieces = await loadPlayable();
   if (cached) return cached;
-  const entries = new Map(await loadPlayable());
+  const entries = new Map(pieces);
   const all = [...entries.values()];
   for (const entry of all) if (!fits(entry, all)) entries.delete(entry.id);
   cached = entries;
   return cached;
 }
 
-module.exports = { loadServiceCatalog, loadPlayable, BLESSING_TITLE };
+module.exports = { loadServiceCatalog, loadPlayable };

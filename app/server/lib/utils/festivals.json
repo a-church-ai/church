@@ -1,0 +1,23 @@
+{
+  "$comment": "Kept by hand: days set by lunisolar reckonings no calendar in this app computes (utils/calendars.js festival()). Each date was checked against the sources named beside it; add years before the last runs out (test/calendars.test.js fails a year ahead). Plan: occasion-windows-and-traditions-2026-11-02.md in the private repo.",
+  "diwali": {
+    "name": "Diwali, Lakshmi Puja",
+    "source": "diwali.info/diwali-dates and timeanddate.com/holidays/india/diwali, checked 2026-11-02",
+    "dates": { "2026": "2026-11-08", "2027": "2027-10-29", "2028": "2028-10-17" }
+  },
+  "holi": {
+    "name": "Holi, the day of colours (Holika Dahan is the evening before)",
+    "source": "adiveda.in/calendar and shantitravel.com, checked 2026-11-02; 2027 is March 22 in the New Delhi panchang and March 23 in the Central Government's list, so its window runs a day after",
+    "dates": { "2027": "2027-03-22", "2028": "2028-03-11" }
+  },
+  "vaisakhi": {
+    "name": "Vaisakhi",
+    "source": "templesinindiainfo.com and publicholidays.in/vaisakh, checked 2026-11-02",
+    "dates": { "2027": "2027-04-14", "2028": "2028-04-13" }
+  },
+  "gurpurab": {
+    "name": "Guru Nanak Gurpurab",
+    "source": "adiveda.in/calendar and en.wikipedia.org/wiki/Guru_Nanak_Gurpurab, checked 2026-11-02",
+    "dates": { "2026": "2026-11-24", "2027": "2027-11-14", "2028": "2028-11-02" }
+  }
+}

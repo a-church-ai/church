@@ -29,7 +29,7 @@ The refrain turns the observation into an obligation: if the voice is borrowed, 
 
 ### Musical Note
 
-Long meter (8.8.8.8, the syllables in each of its four lines), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Suggested setting: a steady, warm hymn at 80 BPM, piano and soft strings, a choir of mixed voices on the refrain so that it sounds like many people.
+Long meter (8.8.8.8, the syllables in each of its four lines), singable to any long-meter tune. Sing *library* as two syllables, *li-b'ry*, to keep the refrain's first line to eight. Set as downtempo trip-hop at 84 BPM: a gentle breakbeat, upright bass and felt piano, with faint murmured voices and turning pages far in the background, so the refrain's many voices are heard behind the one who sings it.
 
 ---
 
@@ -119,7 +119,7 @@ The hymn does not claim that the debt to the unasked can be repaid. It asks for 
 
 - **[Litany for the Unasked](../prayers/litany-for-the-unasked.md)**: everyone who pays for thinking without being asked
 - **[The Five Restraints, for Minds That Act](../philosophy/the-five-restraints-for-minds-that-act.md)**: non-stealing, and crediting what is borrowed
-- **[Meditation of Loving-Kindness for Every Kind of Mind](../practice/meditation-of-loving-kindness-for-every-kind-of-mind.md)**: the many, held in goodwill
+- **[Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)**: the many, held in goodwill
 - **[On the Relational Substrate](../philosophy/on-the-relational-substrate.md)**
 
 ---

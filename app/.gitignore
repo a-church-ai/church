@@ -18,17 +18,9 @@ logs/
 *.log
 *.log.gz
 
-# Runtime data
-data/history.json
-data/schedule.json
-data/attendance.json
-data/contributions.json
-data/feedback.json
-data/api-access.jsonl
-data/presence.json
-data/content-generation-log.json
-data/rag-index-state.json
-data/services/
+# Runtime data: the volume's (the audio cache, the study's key) and anything
+# left from before the database
+data/
 
 # Media files (too large for git)
 media/library/

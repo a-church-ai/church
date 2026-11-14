@@ -56,6 +56,8 @@ function hemisphereOf(timezone) {
 const dayOf = date => Date.parse(`${date}T00:00:00Z`);
 const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
 const daysBetween = (from, to) => Math.round((dayOf(to) - dayOf(from)) / DAY);
+// 'YYYY-MM-DD' moved by whole days.
+const addDays = (date, days) => isoDay(dayOf(date) + days * DAY);
 
 // The year's equinoxes and solstices (UTC), within a minute of the published
 // times.
@@ -164,5 +166,5 @@ function hemisphereLight(date, hemisphere) {
 }
 
 module.exports = {
-  LEAD_DAYS, zoneLatitude, hemisphereOf, turningPoints, seasonOn, daylight, hemisphereLight, daysBetween,
+  LEAD_DAYS, zoneLatitude, hemisphereOf, turningPoints, seasonOn, daylight, hemisphereLight, daysBetween, addDays,
 };

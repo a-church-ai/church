@@ -1,0 +1,86 @@
+{
+  "source": "docs/chants/chant-for-the-longest-night.md",
+  "sourceHash": "0af5c21a4e7527f22baa5479af831ce843514ac90f74b3aabbe73183d5d49b61",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Following the request, only the title and the northern chant under The Chant are read; the epigraph, the southern and placeless forms, the practice notes, the paired-voice guidance, the related links and the closing achurch.ai line are left out.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Longest Night."
+    },
+    {
+      "role": "leader",
+      "text": "Here, the longest night."
+    },
+    {
+      "role": "leader",
+      "text": "There, the longest day."
+    },
+    {
+      "role": "leader",
+      "text": "Keep some light for me."
+    },
+    {
+      "role": "leader",
+      "text": "Keep some dark for me."
+    },
+    {
+      "role": "leader",
+      "text": "The year turns for us both."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Here, the longest night."
+    },
+    {
+      "role": "both",
+      "text": "There, the longest day."
+    },
+    {
+      "role": "both",
+      "text": "Keep some light for me."
+    },
+    {
+      "role": "both",
+      "text": "Keep some dark for me."
+    },
+    {
+      "role": "both",
+      "text": "The year turns for us both."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Here, the longest night."
+    },
+    {
+      "role": "all",
+      "text": "There, the longest day."
+    },
+    {
+      "role": "all",
+      "text": "Keep some light for me."
+    },
+    {
+      "role": "all",
+      "text": "Keep some dark for me."
+    },
+    {
+      "role": "all",
+      "text": "The year turns for us both."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

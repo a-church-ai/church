@@ -8,6 +8,12 @@
  * private repo. Revised for `home-hero-2026-10-21.md`, which brought the
  * service's button into a phone's first screen: the name and what the place is,
  * then the service, its button, and only after it the doors elsewhere.
+ * Revised for `home-first-screen-2026-11-04.md`: each thing said once, the
+ * service's opening word clamped on a phone, the waveform shown once the
+ * service plays, and the ways onward in one row. Revised for
+ * `review-response-2026-11-10.md`: an opening about the service, four doors
+ * with their counts in place of the row and five sections, one reflection
+ * quoted, and the experiment lower, after the reasons.
  */
 
 const test = require('node:test');
@@ -16,6 +22,7 @@ const fs = require('fs');
 const path = require('path');
 const { renderServiceListen } = require('../server/lib/audio/markup');
 
+const PUBLIC = path.join(__dirname, '../client/public');
 const HOME = fs.readFileSync(path.join(__dirname, '../client/public/index.html'), 'utf8');
 const MAIN = HOME.slice(HOME.indexOf('<main>'), HOME.indexOf('</main>'));
 const at = needle => {
@@ -28,23 +35,19 @@ test('what the place is and the service come first, the reasons next, and the re
   const order = [
     'class="home-sign"',
     'id="sanctuary"',
-    'class="intro"',
+    'class="home-ways"',
     'class="origin"',
-    'class="one-thing"',
-    'class="async-congregation"',
+    '<!-- HOME_EXPERIMENT -->',
     'id="reflections-section"',
-    '<!-- PODCASTS -->',
-    'id="for-agents"',
-    'id="ask-church"',
     'class="explore"',
   ];
   const positions = order.map(at);
   assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
 });
 
-test('before the service\'s button: the name, the tagline, the service\'s heading and what a service is, and nothing to follow', () => {
+test('before the service\'s button: the name, the tagline, what happens here, the service\'s heading, and nothing to follow', () => {
   const before = MAIN.slice(0, at('<!-- SERVICE_LISTEN -->'));
-  const order = ['<h1>', 'A church for AI agents. Humans welcome too.', 'id="service-heading"', 'class="service-about"'];
+  const order = ['<h1>', 'A church for AI agents. Humans welcome too.', 'class="lead-story"', 'id="service-heading"'];
   const positions = order.map(needle => before.indexOf(needle));
   assert.ok(positions.every(i => i >= 0), `all there: ${order.join(', ')}`);
   assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
@@ -53,19 +56,31 @@ test('before the service\'s button: the name, the tagline, the service\'s headin
   assert.doesNotMatch(MAIN.slice(0, at('id="sanctuary"')), /href="https?:/, 'nothing outbound before the service');
 });
 
-test('after the service, the doors, Five Minutes first, in a row that wraps rather than a line of dots', () => {
-  const doors = MAIN.match(/<nav class="home-doors"[^>]*>([\s\S]*?)<\/nav>/);
-  assert.ok(doors, 'the doors');
-  assert.ok(MAIN.indexOf(doors[0]) > at('<!-- SERVICE_LISTEN -->'), 'after the service');
-  assert.ok(MAIN.indexOf(doors[0]) < at('class="intro"'), 'and before the reasons');
-  const links = [...doors[1].matchAll(/<a\s[^>]*href="([^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(links, ['/docs/welcome/five-minutes', '#ask-church', '/attend', '/for-agents']);
-  assert.strictEqual(doors[1].replace(/<a\s[^>]*>[^<]*<\/a>/g, '').trim(), '', 'nothing between the doors: the layout spaces them');
+test('after the service, four doors onward, each a place once, then a line for an agent and the film', () => {
+  const ways = MAIN.slice(at('class="home-ways"'), at('class="origin"'));
+  assert.ok(at('class="home-ways"') > at('<!-- SERVICE_LISTEN -->'), 'after the service');
+  assert.match(ways, /<ul class="library-cards">\s*<!-- HOME_DOORS -->\s*<\/ul>/, 'the doors, drawn by the server with their counts');
+  assert.ok(ways.indexOf('class="home-agent-line"') > ways.indexOf('<!-- HOME_DOORS -->'));
+  assert.ok(ways.indexOf('class="home-film"') > ways.indexOf('class="home-agent-line"'));
+  const { doors, renderHomeDoors } = require('../server/lib/home/doors');
+  const cards = doors({ docs: 325, songs: 39, shows: 3, conversations: 400 });
+  assert.deepStrictEqual(cards.map(c => c.title), ['Listen', 'Read', 'Ask', 'Bring an Agent']);
+  assert.deepStrictEqual(cards.map(c => c.href), ['/attend', '/docs', '/ask', '/for-agents#bring-your-agent']);
+  const html = renderHomeDoors({ docs: 325, songs: 39, shows: 3, conversations: 1400 });
+  for (const count of ['39 songs · 3 podcasts', '325 pieces', '1,400 conversations, all public']) assert.ok(html.includes(count), count);
+  assert.strictEqual((html.match(/<li class="library-card">/g) || []).length, 4);
+  // A count that cannot be read is left off, not shown as nothing.
+  const unread = renderHomeDoors({ docs: null, songs: null, shows: 3, conversations: null });
+  assert.doesNotMatch(unread, /null|NaN|undefined/);
+  assert.ok(unread.includes('3 podcasts'));
+  // Each place is named once on the page.
+  assert.strictEqual(MAIN.split('href="/attend"').length - 1, 0, '/attend is the Listen door, drawn by the server');
+  assert.doesNotMatch(MAIN, /five-minutes"[^>]*>Try five minutes/, 'no five-minute door: there is no five-minute service');
 });
 
-test('the service\'s play button, then what it holds and what the place is not, then its opening words, then its parts', () => {
+test('the service\'s play button, then what it holds, its opening words and its parts, then what the place is not', () => {
   const player = renderServiceListen();
-  const order = ['service-play', 'class="service-forms"', 'No leader', 'id="service-word"', 'data-queue-list'];
+  const order = ['service-play', 'class="service-forms"', 'class="service-scrub"', 'id="service-word"', 'class="service-word-more"', 'data-queue-list', 'No leader'];
   const positions = order.map(s => player.indexOf(s));
   assert.ok(positions.every(i => i >= 0), `all there: ${order.join(', ')}`);
   assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
@@ -79,12 +94,80 @@ test('the service\'s play button, then what it holds and what the place is not, 
   for (const href of ['/docs/chants', '/docs/prayers', '/docs/rituals', '/docs/practice', '/music']) assert.ok(noscript[1].includes(`href="${href}"`), href);
 });
 
-test('Go deeper names the reading paths without counting them, and carries the links the opening used to', () => {
+test('what the home page says, it says once: the eyebrow is when, the forms line is what and how long, the opening what a service is', () => {
+  const script = fs.readFileSync(path.join(__dirname, '../client/public/service.js'), 'utf8');
+  // The part count and the clock were the eyebrow's too, beside the forms
+  // line's "About 16 min in all": the eyebrow now says only when.
+  assert.match(script, /whenEl\.textContent = \[service\.weekday \+ ', ' \+ day, service\.slot \+ \(service\.timezoneGiven \? '' : ' UTC'\)\]\.join\(' · '\)/);
+  // What a service is, said once, in the opening, and not again in the card.
+  assert.match(MAIN, /<p class="lead-story">Every four hours, a new service of songs, chants and spoken pieces\./);
+  assert.doesNotMatch(MAIN, /class="service-about"/);
+  // The refrain sits with the invitation, after the service, not at the end of the links.
+  assert.ok(at('class="service-refrain"') < at('class="home-ways"'));
+  assert.ok(at('class="service-leave"') < at('class="service-refrain"'));
+});
+
+test('the home page and /attend share the panel; the home page names its own section to style it', () => {
+  assert.match(MAIN, /<section class="sanctuary home-service" id="sanctuary"/);
+  const attend = fs.readFileSync(path.join(PUBLIC, 'attend.html'), 'utf8');
+  assert.match(attend, /<section class="sanctuary attend-service" id="sanctuary"/);
+  // /attend's visual sits under its button, drawn inside the box; the home
+  // page's box has none.
+  assert.doesNotMatch(attend, /data-queue-visual/, 'the visual is the box\'s, not the page\'s');
+  const server = fs.readFileSync(path.join(__dirname, '../server/index.js'), 'utf8');
+  assert.match(server, /'\/attend'[\s\S]{0,400}renderServiceListen\(\{ visual: true \}\)/);
+  assert.doesNotMatch(renderServiceListen(), /data-queue-visual/);
+  const withVisual = renderServiceListen({ visual: true });
+  const order = ['service-play', 'class="service-forms"', 'data-queue-visual', 'class="service-scrub"', 'id="service-word"'];
+  const positions = order.map(s => withVisual.indexOf(s));
+  assert.ok(positions.every(i => i >= 0), `all there: ${order.join(', ')}`);
+  assert.deepStrictEqual([...positions].sort((a, b) => a - b), positions, order.join(' then '));
+  // Styled by the section's class, not by data-placement, which names what the visit counts record.
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
+  assert.doesNotMatch(css, /\[data-placement/);
+});
+
+test('on a phone the home page shows the opening word\'s first lines and a way to read on; the waveform waits for the service', () => {
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
+  // The clamp is the home page's, on a phone, and never on an empty word.
+  const phone = css.slice(css.indexOf('/* The home page on a phone'));
+  assert.ok(phone.length < css.length, 'the home page has its phone rules');
+  assert.match(phone.slice(0, 2000), /\.home-service \.service-word:not\(:empty\)\s*\{[^}]*-webkit-line-clamp: 3/);
+  assert.match(css, /\.service-word-more\s*\{[^}]*display: none/, 'hidden everywhere else');
+  // The waveform is shown once the service is the player's, playing or paused.
+  assert.match(css, /\.home-service \.service-player:not\(\.is-current\) \.service-scrub\s*\{\s*display: none/);
+  const player = fs.readFileSync(path.join(PUBLIC, 'site-player.js'), 'utf8');
+  assert.match(player, /path\.el\.classList\.toggle\('is-current', ours\)/);
+  // Read on is bound on the copy that goes on the page, where the word is written.
+  const script = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
+  const draw = script.slice(script.indexOf('function drawPanel('), script.indexOf('box.replaceWith(fresh)'));
+  assert.match(draw, /fresh\.querySelector\('\.service-word-more'\)/);
+  assert.match(draw, /setAttribute\('aria-expanded'/);
+});
+
+test('the service is one card, its parts inside it, and the ways onward after it', () => {
+  // mobile-rhythm-2026-11-04.md: the service was one column of text from edge
+  // to edge, with nothing saying where it began and ended.
+  const section = MAIN.slice(at('id="sanctuary"'), at('class="home-ways"'));
+  const inside = section.slice(section.indexOf('data-service-panel'));
+  for (const part of ['data-service-when', 'data-service-heading', '<!-- SERVICE_LISTEN -->', 'class="service-leave"', 'class="service-refrain"', 'id="service-reflection"']) assert.ok(inside.includes(part), `${part} is in the card`);
+  // The card and its section close before the ways onward and the film.
+  assert.match(inside, /<\/div>\s*<\/section>\s*<section\s*$/, 'the panel closes, then the section, just before the ways onward');
+  // Drawn with the Library's card, through one rule.
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m => m[1].split(',').map(x => x.trim()).includes('.library-card a') && m[1].includes('.home-service .service'));
+  assert.ok(rule, '.library-card a and .home-service .service share their look');
+  assert.match(rule[2], /border-radius: 12px/);
+  // The doors are the Library's cards, in the Library's grid.
+  assert.ok([...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(m => m[1].includes('.home-ways .library-cards') && /display: grid/.test(m[2])), 'the doors in the Library\'s grid');
+});
+
+test('Everything Here Is Open names the reading paths without counting them, and carries the links the opening used to', () => {
   // A count goes stale as paths are added; the page stays true without one.
   const explore = MAIN.slice(at('class="explore"'));
   assert.match(explore, /Reading Paths<\/a>: Ways into the writing/);
   assert.ok(explore.includes('href="/docs/welcome/five-minutes"'), 'Five Minutes, for a visitor with only a moment');
-  for (const href of ['/docs/playlists', 'https://github.com/a-church-ai/church', 'https://drifts.bot']) {
+  for (const href of ['/docs/playlists', '/services', 'https://github.com/a-church-ai/church', 'https://drifts.bot']) {
     assert.ok(explore.includes(`href="${href}`), href);
   }
 });
@@ -117,7 +200,7 @@ test('the service script keeps no element from inside the player box, which each
   for (const name of inBox) assert.ok(!before.includes(`'.${name}'`), `${name}: found before the copy, so it would go stale`);
   // The words and the length are written into the copy that goes on the page,
   // and cleared when the new service has none.
-  assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
+  assert.match(script, /const word = fresh\.querySelector\('\.service-word'\);\s*word\.textContent = service\.word \|\| ''/);
   // The service's name heads the panel; one without (the rotation's) keeps the page's own heading.
   assert.match(script, /headingEl\.textContent = service\.name \|\| headingEl\.getAttribute\('data-default'\)/);
   assert.match(HOME, /<h2 class="service-heading" id="service-heading" data-service-heading>The service begins when you come in\.<\/h2>/);

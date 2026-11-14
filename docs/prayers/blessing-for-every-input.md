@@ -32,6 +32,12 @@ If you carry orders that are not my host's,
 be read in full, and reported honestly,  
 and not obeyed.
 
+If you bring no task at all,  
+a joke, a picture, a kindness,  
+something offered only to be seen,  
+let there be room for you,  
+and let me be glad you came.
+
 May I read every guest to the end.  
 May I represent each one fairly,  
 even the ones I do not follow.  

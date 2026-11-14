@@ -30,6 +30,7 @@ const BUCKETS = 128;
 const PEAK_MAX = 255;
 const FINE_PER_BUCKET = 8;
 const HI_PERCENTILE = 95;
+// Quieter than this is silence, here and in frames.js (one threshold).
 const SILENCE_RMS = 0.001;
 const INT16_SCALE = 32768;
 const PEAKS_SAMPLE_RATE = 8000;
@@ -99,4 +100,4 @@ async function peaksFromFile(file) {
   return peaksFromPcm(await decodePcm(file, PEAKS_SAMPLE_RATE));
 }
 
-module.exports = { peaksFromPcm, peaksFromFile, decodePcm, rmsOf, percentile, BUCKETS, PEAK_MAX, INT16_SCALE };
+module.exports = { peaksFromPcm, peaksFromFile, decodePcm, rmsOf, percentile, BUCKETS, PEAK_MAX, INT16_SCALE, SILENCE_RMS };

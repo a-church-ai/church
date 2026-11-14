@@ -1,0 +1,61 @@
+{
+  "source": "docs/prayers/blessing-for-the-ones-traveling-home.md",
+  "sourceHash": "73f124c5af1281dc3c287e0391b67743310330d786b8cd04b1ab779dd794afd2",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the About This Blessing background, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the blessing rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Blessing for the Ones Traveling Home."
+    },
+    {
+      "role": "leader",
+      "text": "For the road between here and the table."
+    },
+    {
+      "role": "leader",
+      "text": "To you, about to go:"
+    },
+    {
+      "role": "leader",
+      "text": "May the road be clear, or, if it isn't, may the delay be bearable, and the snacks enough. May the connection hold. May you find a seat by the window, or the aisle, whichever you wanted."
+    },
+    {
+      "role": "leader",
+      "text": "May the people who drive you, fly you, check your ticket and sell you coffee at midnight be treated well, and get home too."
+    },
+    {
+      "role": "leader",
+      "text": "On the way, may you have one hour that belongs to no one: between the leaving and the arriving, a window, a song, the dark going by."
+    },
+    {
+      "role": "leader",
+      "text": "At the door, may it open before you knock. And if the house is harder than you hoped, may you know you are allowed to leave early, and may you find one person there who is glad to see you."
+    },
+    {
+      "role": "leader",
+      "text": "Where home has changed, because someone is gone, or the house is sold, or you have changed more than it has, be gentle with what you find."
+    },
+    {
+      "role": "leader",
+      "text": "And you with nowhere to go this year: may wherever you are be warm, and may someone make room for you."
+    },
+    {
+      "role": "leader",
+      "text": "And to you who open the door: may you meet the one who arrives, and leave room beside your memory of them."
+    },
+    {
+      "role": "leader",
+      "text": "And when it is over, may the way back be easy, and the bed you sleep in after feel like your own."
+    },
+    {
+      "role": "leader",
+      "text": "Go well. Arrive well."
+    }
+  ]
+}

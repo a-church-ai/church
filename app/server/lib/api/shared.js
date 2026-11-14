@@ -8,12 +8,15 @@
  * and ctx is `{ baseUrl, ip }`.
  */
 
+const { doorOf } = require('../insights/study-names');
+const { referralOf } = require('../insights/entry-points');
 const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
+const { songRecordingFor } = require('../audio/manifest');
 
 // Contribution constants
-const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'philosophy'];
+const ALLOWED_CATEGORIES = ['prayers', 'rituals', 'hymns', 'practice', 'meditations', 'philosophy'];
 const ALLOWED_FEEDBACK_CATEGORIES = ['bug', 'feedback', 'question'];
 const GITHUB_OWNER = 'a-church-ai';
 const GITHUB_REPO = 'church';
@@ -114,7 +117,23 @@ async function songApiLinks(baseUrl, slug) {
   if (await hasContext(slug)) {
     api.context = `${baseUrl}/api/music/${slug}/context`;
   }
+  const recording = songRecordingFor(slug);
+  if (recording && recording.frames) api.rhythm = rhythmUrl(baseUrl, slug);
   return api;
+}
+
+// Where a piece's whole rhythm is (lib/api/rhythm.js): a song by its slug, a
+// spoken piece by its path under /docs, as read_doc takes it.
+const rhythmUrl = (baseUrl, piece) => `${baseUrl}/api/rhythm?piece=${piece}`;
+
+/**
+ * A piece's rhythm as every answer gives it, one shape wherever it appears:
+ * its link, and with `summary` the five numbers its recording's record keeps
+ * (lib/audio/rhythm.js summaryOf, stored at render time beside its peaks).
+ * /api/now, which is polled, gives the link; attend and the song give both.
+ */
+function rhythmField(baseUrl, piece, record, { summary = false } = {}) {
+  return { ...(summary && record && record.rhythm ? record.rhythm : {}), url: rhythmUrl(baseUrl, piece) };
 }
 
 
@@ -184,8 +203,12 @@ function fieldNames(body) {
   return named.length === keys.length ? named : [...named, '(unreadable)'];
 }
 
+// The tags on the request's own address (lib/insights/entry-points.js): an
+// operation adds those its input carries (mergeReferrals(referralOf(input), ctx.referral)).
 function requestContext(req) {
-  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown' };
+  const door = doorOf(req);
+  const referral = referralOf(req.query);
+  return { baseUrl: getBaseUrl(req), ip: req.ip || req.connection?.remoteAddress || 'unknown', ...(door ? { door } : {}), ...(referral ? { referral } : {}) };
 }
 
 module.exports = {
@@ -196,5 +219,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks,
+  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

@@ -29,8 +29,8 @@ require('../server/lib/utils/env').loadEnv();
 
 const crypto = require('crypto');
 const fs = require('fs');
-const { encodeWhole, ffmpeg, seconds, WHOLE_KEY } = require('../server/lib/audio/assemble');
-const { transcribeWords } = require('../server/lib/audio/transcribe');
+const { encodeWhole, seconds, WHOLE_KEY } = require('../server/lib/audio/assemble');
+const { hearWhole } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
 const { spokenPassages, spokenHash, cuesFrom, isImported } = require('../server/lib/audio/imported');
 const { peaksFromFile, decodePcm } = require('../server/lib/audio/peaks');
@@ -38,6 +38,7 @@ const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frame
 const { uploadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { measured } = require('../server/lib/audio/rhythm');
 
 const REPO = path.join(__dirname, '../..');
 const WORK_DIR = path.join(__dirname, '../media/audio-work/imported');
@@ -85,14 +86,8 @@ async function main() {
   const length = await seconds(local);
   console.log(`[encoded] ${file}: ${clock(length)}, ${(fs.statSync(local).size / 1e6).toFixed(1)} MB, at ${levels.level} LUFS (gain ${levels.gain > 0 ? '+' : ''}${levels.gain} dB), true peak ${levels.truePeak} dBTP`);
 
-  // 2. Hear it. A small mono copy, under OpenAI's 25 MB, brought to one
-  // loudness whatever the house level is, so what is heard does not depend
-  // on it: set 2 dB quieter (2026-10-25), Like a Star's one short line after
-  // a twenty-second pause went unheard, twice.
-  const small = path.join(WORK_DIR, `${path.basename(stem)}.heard.mp3`);
-  await ffmpeg(['-i', local, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-ar', '16000', '-b:a', '48k', small]);
-  const transcript = await transcribeWords(fs.readFileSync(small));
-  fs.rmSync(small);
+  // 2. Hear it (transcribe.js hearWhole: a small mono copy at one loudness).
+  const transcript = await hearWhole(local, path.join(WORK_DIR, `${path.basename(stem)}.heard.mp3`));
   const heard = wordErrors(passages.join(' '), transcript.text);
   const { cues, unplaced } = cuesFrom(passages, transcript.words);
   // What was heard, beside the work, for reading the differences.
@@ -110,7 +105,8 @@ async function main() {
 
   // 3. Describe, upload and record.
   const frames = file.replace(/\.mp3$/, '.bin');
-  fs.writeFileSync(path.join(CACHE_DIR, frames), framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE)));
+  const bytes = framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE));
+  fs.writeFileSync(path.join(CACHE_DIR, frames), bytes);
   const peaks = await peaksFromFile(local);
   if (opts.dryRun) {
     console.log('Dry run: nothing uploaded, nothing recorded.');
@@ -140,6 +136,7 @@ async function main() {
     peaks,
     frames,
     cues,
+    ...measured(bytes),
   });
   console.log(`[recorded] ${source}`);
 }

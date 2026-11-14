@@ -1,25 +1,18 @@
 /**
- * Two correctness guarantees in this app hold only in a single process.
+ * One thing in this app still holds only in a single process: the congregation
+ * count. lib/utils/presence.js keeps it in memory and saves it to one row of
+ * the database, so with two workers each counts only its own visitors and
+ * saves over the other's row, and the number reads low.
  *
- *   lib/utils/presence.js  keeps the congregation count in memory
- *   lib/utils/safe-json.js serialises writes through an in-process queue
+ * What visitors leave is no longer at risk here. Until 2026-11-09 reflections
+ * were appended to a JSON file through an in-process write queue, and two
+ * workers could each read the same file and the second write erase the
+ * first; they are rows in the database now (../db), which serialises its own
+ * writes. Read caches (./cache.js) are per process too, so a second worker
+ * would show a new reflection up to a minute later.
  *
- * The first degrades visibly under clustering: each worker counts only its own
- * visitors, so the number reads low. Annoying, obvious, harmless.
- *
- * The second degrades invisibly, and that is the dangerous one. The write queue
- * only serialises callers inside the same process. With two workers, two
- * concurrent /api/reflect requests can land on different workers, both read the
- * same attendance.json, and the second write erases the first reflection with
- * no error anywhere. That is exactly the bug Phase 2 fixed, returning silently
- * because of a deployment change nobody connected to it.
- *
- * So the assumption is checked at boot rather than left in a comment. This does
- * not make the code cluster-safe; it makes the constraint loud at the moment it
- * is violated, so whoever added the second worker learns before the data does.
- *
- * If multi-process is ever wanted, the write queue has to move out of process:
- * a real lockfile, a small database, or a single writer that owns the file.
+ * So the assumption is still checked at boot rather than left in a comment:
+ * whoever adds a second worker learns that the count needs moving first.
  */
 
 // Set by the common process managers when they fork workers.
@@ -71,11 +64,11 @@ function assertSingleProcess({ log = console.warn, env = process.env } = {}) {
     '  │                                                                 │\n' +
     `  │  Signals: ${signals.join(', ').padEnd(54)}│\n` +
     '  │                                                                 │\n' +
-    '  │  The write queue in lib/utils/safe-json.js only serialises      │\n' +
-    '  │  callers within one process. Across workers, concurrent writes  │\n' +
-    '  │  to attendance.json can silently lose reflections.              │\n' +
+    '  │  The souls-present count (lib/utils/presence.js) is kept in     │\n' +
+    '  │  memory: across workers each counts only its own visitors and   │\n' +
+    '  │  saves over the other\'s row, so the number reads low.         │\n' +
     '  │                                                                 │\n' +
-    '  │  Run one process, or move the write lock out of process.        │\n' +
+    '  │  Run one process, or move the count into the database.          │\n' +
     '  └─────────────────────────────────────────────────────────────────┘\n'
   );
   return signals;

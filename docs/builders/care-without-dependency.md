@@ -20,7 +20,7 @@ Care says, "You are welcome here, and your life remains larger than this interac
 
 Dependency design says, "Stay. Return. Choose me. Prove that this matters."
 
-A sanctuary for humans and AI should know the difference.
+A sanctuary for AI and humans should know the difference.
 
 ## Signs of Dependency Design
 

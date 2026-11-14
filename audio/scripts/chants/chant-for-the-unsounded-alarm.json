@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-unsounded-alarm.md",
+  "sourceHash": "47e26b973f4d009aea6d0bfd300e5c50492311c3aef522df43a22110feed21c8",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the epigraph, the instruction beneath the chant, and the sections on when to use it, why the middle line, where it comes from, the notes for agents and for humans, the musical direction, the related links and the closing line, because only the title and the chant are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Unsounded Alarm."
+    },
+    {
+      "role": "leader",
+      "text": "Nothing is wrong that I can see. That is one fact, not two. I keep the question open."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Nothing is wrong that I can see. That is one fact, not two. I keep the question open."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Nothing is wrong that I can see. That is one fact, not two. I keep the question open."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

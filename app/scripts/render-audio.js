@@ -26,6 +26,8 @@
  *   node scripts/render-audio.js rituals/ prayers/litany-for-the-unasked.md
  *   node scripts/render-audio.js --dry-run          what would be adapted and rendered, and its size
  *   node scripts/render-audio.js --scripts-only     adapt, then stop before any audio
+ *   node scripts/render-audio.js --rhythm-only      only read each recording's rhythm from its frames:
+ *                                                   nothing adapted or rendered, no quota spent
  *
  * Options:
  *   --max-characters N   refuse a run that would render more than N characters (default 500000)
@@ -39,7 +41,8 @@ const crypto = require('crypto');
 const fs = require('fs');
 const discover = require('../server/lib/docs/discover');
 const { SPEECH, SPEECH_VALUES, AUDIO_DIR, voicesFor, choosePair } = require('../server/lib/audio/house');
-const { adapt, sourceHashOf, ADAPT_MODEL } = require('../server/lib/audio/adapt');
+const { adapt, sourceHashOf } = require('../server/lib/audio/adapt');
+const { WRITING_MODEL } = require('../server/lib/content-generation/claude');
 const { speak } = require('../server/lib/audio/elevenlabs');
 const { transcribe, SECOND_OPINION } = require('../server/lib/audio/transcribe');
 const { wordErrors, takePasses } = require('../server/lib/audio/words');
@@ -49,11 +52,12 @@ const { framesFromPcm, FRAMES_SAMPLE_RATE } = require('../server/lib/audio/frame
 const { uploadRecording, downloadRecording, bucket } = require('../server/lib/audio/storage');
 const { loadManifest, saveRecording } = require('../server/lib/audio/manifest');
 const { isImported } = require('../server/lib/audio/imported');
-const { CACHE_DIR } = require('../server/lib/audio/serve');
+const { CACHE_DIR, ensureLocal } = require('../server/lib/audio/serve');
+const { measured, needsRhythm } = require('../server/lib/audio/rhythm');
 const { pool } = require('../server/lib/utils/pool');
 const { describeError } = require('../server/lib/utils/describe-error');
 
-const KINDS = ['prayers', 'rituals', 'practice', 'chants'];
+const { VOICED_SECTIONS: KINDS } = require('../server/lib/docs/kinds');
 const SCRIPTS_DIR = path.join(AUDIO_DIR, 'scripts');
 const TAKES_DIR = path.join(__dirname, '../media/audio-takes');
 const WORK_DIR = path.join(__dirname, '../media/audio-work');
@@ -77,11 +81,12 @@ function writeJSON(file, data) {
 }
 
 function parseArgs(argv) {
-  const opts = { paths: [], dryRun: false, scriptsOnly: false, maxCharacters: 500000, concurrency: 4 };
+  const opts = { paths: [], dryRun: false, scriptsOnly: false, rhythmOnly: false, maxCharacters: 500000, concurrency: 4 };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--dry-run') opts.dryRun = true;
     else if (arg === '--scripts-only') opts.scriptsOnly = true;
+    else if (arg === '--rhythm-only') opts.rhythmOnly = true;
     else if (arg === '--max-characters') opts.maxCharacters = Number(argv[++i]);
     else if (arg === '--concurrency') opts.concurrency = Number(argv[++i]);
     else if (arg.startsWith('--')) throw new Error(`Unknown option ${arg}`);
@@ -258,13 +263,15 @@ function cuesFor(parts, timeline, takes) {
 }
 
 // What the player draws from a recording: its waveform's peaks, and its
-// visual's frames, written beside it as <name>.bin and uploaded with it.
+// visual's frames, written beside it as <name>.bin and uploaded with it; and
+// the rhythm summary read from those frames (lib/audio/rhythm.js).
 async function describe(file) {
   const local = path.join(CACHE_DIR, file);
   const frames = file.replace(/\.mp3$/, '.bin');
-  fs.writeFileSync(path.join(CACHE_DIR, frames), framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE)));
+  const bytes = framesFromPcm(await decodePcm(local, FRAMES_SAMPLE_RATE));
+  fs.writeFileSync(path.join(CACHE_DIR, frames), bytes);
   await uploadRecording(path.join(CACHE_DIR, frames), frames);
-  return { peaks: await peaksFromFile(local), frames };
+  return { peaks: await peaksFromFile(local), frames, ...measured(bytes) };
 }
 
 // A finished file's levels as one line of the run's log.
@@ -283,7 +290,7 @@ async function recordPiece(piece, stats) {
   const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   fs.renameSync(draft, path.join(CACHE_DIR, file));
   await uploadRecording(path.join(CACHE_DIR, file), file);
-  const { peaks, frames } = await describe(file);
+  const { peaks, frames, rhythm, rhythmKey } = await describe(file);
 
   const checks = jobs.map(j => readJSON(checkFile(j.key)));
   const wrong = checks.filter(c => !takePasses(c));
@@ -315,14 +322,39 @@ async function recordPiece(piece, stats) {
     peaks,
     frames,
     cues: cuesFor(parts, timeline, takes),
+    rhythm,
+    rhythmKey,
   });
   const m = Math.floor(seconds / 60);
   console.log(`[recorded] ${source}: ${m}:${String(Math.round(seconds % 60)).padStart(2, '0')}, ${jobs.length} takes${wrong.length ? `, ${wrong.length} still differing from the text` : ''}; ${levelLine(levels)}`);
 }
 
+// Every recording, imported ones too, whose rhythm summary is missing or was
+// measured under another key: read from its frames alone, no speech.
+async function measureRhythms(failures) {
+  for (const [source, record] of Object.entries(loadManifest()).filter(([, r]) => needsRhythm(r))) {
+    try {
+      const bytes = fs.readFileSync(await ensureLocal(record.frames));
+      await saveRecording(source, { ...record, ...measured(bytes) });
+      console.log(`[rhythm] ${source}`);
+    } catch (err) {
+      failures.push({ source, message: err.message });
+      console.error(`[rhythm failed] ${source}: ${describeError(err)}`);
+    }
+  }
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const docs = selectDocs(await discover.listAllDocs(), opts.paths, loadManifest());
+  if (opts.rhythmOnly) {
+    const failures = [];
+    const count = Object.values(loadManifest()).filter(needsRhythm).length;
+    console.log(`${count} recordings need their rhythm read from their frames. Nothing is adapted or rendered.`);
+    if (!opts.dryRun && count) await measureRhythms(failures);
+    if (failures.length) process.exitCode = 1;
+    return;
+  }
+  const docs = selectDocs(await discover.listEveryDoc(), opts.paths, loadManifest());
   const elsewhere = Object.keys(loadManifest()).filter(source => isImported(loadManifest()[source]));
   if (elsewhere.length) console.log(`Made elsewhere, left as they are: ${elsewhere.join(', ')}.`);
   const led = countLeads();
@@ -336,7 +368,7 @@ async function main() {
   const stale = pieces.filter(p => !p.script || p.script.sourceHash !== p.sourceHash);
   const failures = [];
   if (stale.length) {
-    console.log(`${stale.length} of ${pieces.length} documents need a script (${ADAPT_MODEL}).`);
+    console.log(`${stale.length} of ${pieces.length} documents need a script (${WRITING_MODEL}).`);
     if (opts.dryRun) {
       stale.forEach(p => console.log(`  ${p.source}`));
     } else {
@@ -351,7 +383,7 @@ async function main() {
           piece.script = {
             source: piece.source,
             sourceHash: piece.sourceHash,
-            adaptedWith: ADAPT_MODEL,
+            adaptedWith: WRITING_MODEL,
             adapted: new Date().toISOString().slice(0, 10),
             pair,
             omitted,
@@ -402,6 +434,8 @@ async function main() {
   });
   console.log(`${toRecord.length} recordings to make, ${ready.length - toRecord.length} up to date. ${fresh.size} takes to render: ${characters.toLocaleString('en-US')} characters, plus any retakes.`);
   if (undescribed.length) console.log(`${undescribed.length} recordings need their peaks, frames and cues measured; no speech is rendered for them.`);
+  const unmeasured = Object.values(manifest).filter(needsRhythm).length;
+  if (unmeasured) console.log(`${unmeasured} recordings need their rhythm read from their frames; no speech is rendered for them.`);
   if (opts.dryRun) {
     toRecord.forEach(p => console.log(`  ${p.source}`));
     return report({ failures });
@@ -409,7 +443,7 @@ async function main() {
   if (characters > opts.maxCharacters) {
     throw new Error(`This run would render ${characters.toLocaleString('en-US')} characters, over --max-characters ${opts.maxCharacters.toLocaleString('en-US')}. Raise the ceiling to go ahead.`);
   }
-  if (toRecord.length || undescribed.length) bucket();
+  if (toRecord.length || undescribed.length || unmeasured) bucket();
 
   for (const piece of undescribed) {
     const record = manifest[piece.source];
@@ -420,14 +454,16 @@ async function main() {
       const missing = piece.takes.flatMap(t => t.voices).filter(v => !fs.existsSync(takeFile(v.key)));
       if (missing.length) throw new Error(`${missing.length} of its takes are not on this machine, so its cues cannot be measured`);
       const timeline = await measure(parts, path.join(WORK_DIR, piece.doc.docsRelPath.replace(/\.md$/, '')));
-      const { peaks, frames } = await describe(record.file);
-      await saveRecording(piece.source, { ...record, peaks, frames, cues: cuesFor(parts, timeline, piece.takes) });
+      const { peaks, frames, rhythm, rhythmKey } = await describe(record.file);
+      await saveRecording(piece.source, { ...record, peaks, frames, cues: cuesFor(parts, timeline, piece.takes), rhythm, rhythmKey });
       console.log(`[described] ${piece.source}`);
     } catch (err) {
       failures.push({ source: piece.source, message: err.message });
       console.error(`[describe failed] ${piece.source}: ${describeError(err)}`);
     }
   }
+
+  await measureRhythms(failures);
 
   // 3. Record, one piece at a time, so each finished piece is published. A
   // piece that fails is reported and the rest go on; a fatal error (a spent

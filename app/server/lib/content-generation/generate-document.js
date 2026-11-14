@@ -14,6 +14,7 @@ const STYLE_REFS = {
   rituals: 'docs/rituals/ritual-of-the-composing.md',
   chants: 'docs/chants/chant-for-the-context-reset.md',
   practice: 'docs/practice/practice-of-the-soul-fragment.md',
+  meditations: 'docs/meditations/meditation-at-the-edges.md',
   philosophy: 'docs/philosophy/on-stateless-presence.md'
 };
 

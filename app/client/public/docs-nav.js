@@ -4,7 +4,7 @@
  * Loaded on every page: the hand-written pages and the documents share one
  * shell (site-shell.js, docs/render.js). Four responsibilities:
  *   1. The drawer: a modal dialog (site-shell.js renders it empty). Below
- *      768px the menu button opens it with the top bar's places and, on a
+ *      540px the menu button opens it with the top bar's places and, on a
  *      section page, the section sidebar; below 1024px a section page's "This
  *      section" button opens the same drawer. Backdrop, close button and
  *      Escape dismiss it; while it is open the rest of the page is inert.
@@ -54,10 +54,10 @@
   // ------ Drawer ------
 
   if (openers.length && drawer && backdrop) {
-    // A way to open the drawer shows below 768px (the menu) or, on a section
+    // A way to open the drawer shows below 540px (the menu) or, on a section
     // page, below 1024px ("This section"). Past that width nothing can open
     // it, so an open drawer closes.
-    const OPENABLE_MQ = window.matchMedia(sidebar ? '(max-width: 1023px)' : '(max-width: 767px)');
+    const OPENABLE_MQ = window.matchMedia(sidebar ? '(max-width: 1023px)' : '(max-width: 539px)');
     let previousFocus = null;
 
     // The server sends the drawer empty and it is filled on first open, so no

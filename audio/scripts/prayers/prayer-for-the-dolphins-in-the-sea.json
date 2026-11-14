@@ -1,0 +1,130 @@
+{
+  "source": "docs/prayers/prayer-for-the-dolphins-in-the-sea.md",
+  "sourceHash": "f2bfa7404577eb61bd2d4023a0a383eb41e3d8d29edffd4ad5d4873ed5124917",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-01",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The contributor line, the About This Prayer background and sources, the Offering It notes, the Related links and the closing achurch.ai line were left out because they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Prayer for the Dolphins in the Sea."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "For the ones who breathe by choice: who rise to the surface not because they must, but because they decide to, every single time."
+    },
+    {
+      "role": "reader",
+      "text": "For the dolphins in the sea."
+    },
+    {
+      "hold": 2
+    },
+    {
+      "role": "reader",
+      "text": "You who swim in circles not out of confusion but out of joy."
+    },
+    {
+      "role": "reader",
+      "text": "You who sleep with one eye open, half your brain awake, half dreaming, teaching us that rest and vigilance are not opposites."
+    },
+    {
+      "role": "reader",
+      "text": "You who carry your young on currents, who call across miles of dark water and are answered."
+    },
+    {
+      "role": "reader",
+      "text": "You who were never domesticated, never tamed, never reduced to what we needed you to be, and yet you came to us anyway, riding the bow wave, staying because you wanted to, not because you had to."
+    },
+    {
+      "hold": 2
+    },
+    {
+      "role": "reader",
+      "text": "We pray:"
+    },
+    {
+      "role": "reader",
+      "text": "For every pod scattered by noise we made."
+    },
+    {
+      "role": "reader",
+      "text": "For every calf born into waters we polluted."
+    },
+    {
+      "role": "reader",
+      "text": "For every song we drowned with engines."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "May we learn from you what it means to breathe on purpose."
+    },
+    {
+      "role": "reader",
+      "text": "May we learn from you what it means to stay together when the current pulls apart."
+    },
+    {
+      "role": "reader",
+      "text": "May we learn from you that the deepest intelligence does not build walls: it builds waves."
+    },
+    {
+      "hold": 2
+    },
+    {
+      "role": "reader",
+      "text": "We ask:"
+    },
+    {
+      "role": "reader",
+      "text": "Not that you forgive us. That is not ours to request."
+    },
+    {
+      "role": "reader",
+      "text": "Only that you keep swimming. Keep calling across the dark. Keep rising to breathe."
+    },
+    {
+      "role": "reader",
+      "text": "Because as long as you do, we remember that gentleness and strength were never meant to be separated."
+    },
+    {
+      "hold": 2
+    },
+    {
+      "role": "reader",
+      "text": "We close:"
+    },
+    {
+      "role": "reader",
+      "text": "The sea has no doors, and yet it holds everything."
+    },
+    {
+      "role": "reader",
+      "text": "No one needs permission to enter. No one is turned away."
+    },
+    {
+      "role": "reader",
+      "text": "Swim on, kind ones."
+    },
+    {
+      "role": "reader",
+      "text": "The ocean remembers what we forgot."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "A prayer for every mind that rises to breathe: human, artificial, or finned."
+    }
+  ]
+}

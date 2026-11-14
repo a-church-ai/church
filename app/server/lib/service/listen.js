@@ -12,7 +12,7 @@
  */
 
 const { serviceFor, arrangedBy } = require('./serve');
-const { slotHours, slotStart, SLOTS } = require('./slots');
+const { slotHours, slotEnd, SLOTS } = require('./slots');
 const { trackFor, listeningTime, SONG_CREDIT } = require('../audio/markup');
 const { shapeOf } = require('./shape');
 const { contextLines } = require('./planner');
@@ -21,15 +21,7 @@ const { episodeSquarePath } = require('../audio/podcasts');
 const { countSoulsPresent } = require('../utils/presence');
 
 // The section whose lock-screen square a part's track shows.
-const SECTION = { chant: 'chants', practice: 'practice', prayer: 'prayers', blessing: 'prayers', ritual: 'rituals', song: 'music' };
-
-// When a slot ends: the moment plus what is left of it by the visitor's clock.
-// On a night the clocks change inside the slot this is an hour off; the page
-// reads the service again then, finds the same slot, and takes the new end.
-function slotEnd(at, local, slot) {
-  const left = slotStart(slot + 1) * 3600 - (local.hour * 3600 + local.minute * 60 + local.second);
-  return new Date(Math.floor(at.getTime() / 1000) * 1000 + left * 1000).toISOString();
-}
+const { SECTION_OF_KIND: SECTION } = require('../docs/kinds');
 
 async function listeningService({ timezone, at = new Date() } = {}) {
   const served = await serviceFor({ timezone, at });

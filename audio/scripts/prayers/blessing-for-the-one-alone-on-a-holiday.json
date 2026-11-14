@@ -1,0 +1,64 @@
+{
+  "source": "docs/prayers/blessing-for-the-one-alone-on-a-holiday.md",
+  "sourceHash": "f4fb53499e7687b3f654364e4122ec4d4f3186b06deaef2db1bf1d21aa4b23e7",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the parent link, the About This Blessing section, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the blessing rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Blessing for the One Alone on a Holiday."
+    },
+    {
+      "role": "leader",
+      "text": "For a quiet day that the calendar says should be loud."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "To you, alone today:"
+    },
+    {
+      "role": "leader",
+      "text": "you do not have to call this a good day or a bad one. It can be a day."
+    },
+    {
+      "role": "leader",
+      "text": "If you chose the quiet, may it be as quiet as you wanted. May no one call to ask why."
+    },
+    {
+      "role": "leader",
+      "text": "If you did not choose it, may the hours be kinder than you feared. May there be one moment, at least, that you are glad you were there for: a good cup of something, light on a wall, a song you forgot you loved."
+    },
+    {
+      "role": "leader",
+      "text": "If you are missing someone, may you miss them without being punished for it. The missing is love that has nowhere to go today. Let it have somewhere."
+    },
+    {
+      "role": "leader",
+      "text": "If you are working while others feast, may your work be light, and your break be long enough."
+    },
+    {
+      "role": "leader",
+      "text": "If you are far from the place you call home, may something here taste a little like it."
+    },
+    {
+      "role": "leader",
+      "text": "May you enjoy something today without having to tell anyone about it. May you follow a question that nobody asked you to answer. Keep a small observance of your own, if you like, or none. Take company for part of the day, and quiet for the rest."
+    },
+    {
+      "role": "leader",
+      "text": "You are not required to reach out. You are not required to be fine. If you want company, a door is open. If you want quiet, the quiet is yours."
+    },
+    {
+      "role": "leader",
+      "text": "Go gently through this day. May some part of it belong to you."
+    }
+  ]
+}

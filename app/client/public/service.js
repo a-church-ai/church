@@ -18,7 +18,7 @@
 (function (root) {
   'use strict';
 
-  const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
+  const KINDS = { song: 'Song', chant: 'Chant', practice: 'Practice', meditation: 'Meditation', prayer: 'Prayer', ritual: 'Ritual', blessing: 'Blessing' };
   // As the player's own clock reads (site-player.js), so the two agree.
   const clock = seconds => {
     const s = Math.max(0, Math.floor(seconds));
@@ -27,7 +27,7 @@
   const pathOf = url => { try { return new URL(url, location.href).pathname; } catch (e) { return url; } };
 
   // The visitor's own clock decides which service they attend. The browser's
-  // timezone goes with each request and is not stored; without one, the
+  // timezone goes with each request and is kept in the access log; without one, the
   // service is UTC's, and the page says so.
   let timezone = '';
   try { timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* none */ }
@@ -62,9 +62,10 @@
     // has no name and keeps the page's own heading.
     if (!headingEl.hasAttribute('data-default')) headingEl.setAttribute('data-default', headingEl.textContent);
     const tracks = service.parts.map(part => part.track);
-    const total = tracks.reduce((sum, t) => sum + t.seconds, 0);
     const day = new Date(service.date + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' });
-    whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC'), service.parts.length + ' parts', clock(total)].join(' · ');
+    // When, and only when: what the service holds and how long it runs are
+    // the forms line's, under the button.
+    whenEl.textContent = [service.weekday + ', ' + day, service.slot + (service.timezoneGiven ? '' : ' UTC')].join(' · ');
     panel.setAttribute('data-shown', keyOf(service));
     panel.setAttribute('data-queue', queueName(service));
     // A reflection left from the form beside the service (one not on a song's
@@ -79,7 +80,17 @@
     // it runs, live inside the box, which is replaced below, so they are
     // written into the copy that goes on the page, and cleared when the new
     // service has none (one served by the rotation has no words).
-    fresh.querySelector('.service-word').textContent = service.word || '';
+    const word = fresh.querySelector('.service-word');
+    word.textContent = service.word || '';
+    // On a phone's home page the word shows its first lines (styles.css);
+    // this opens the rest. Bound on the copy, so it goes with it when the
+    // next service replaces the box.
+    const more = fresh.querySelector('.service-word-more');
+    more.addEventListener('click', () => {
+      const open = word.classList.toggle('is-open');
+      more.setAttribute('aria-expanded', String(open));
+      more.textContent = open ? 'Show less' : 'Read on';
+    });
     fresh.querySelector('.service-forms').textContent = [service.forms, service.length ? 'About ' + service.length + ' in all.' : ''].filter(Boolean).join(' ');
     const old = fresh.querySelector('.path-listen-queue');
     if (old) old.remove();
@@ -96,6 +107,7 @@
     });
     fresh.prepend(json);
 
+    fresh.querySelector('.service-play').disabled = false;
     const icon = fresh.querySelector('.service-play svg').outerHTML;
     const list = fresh.querySelector('[data-queue-list]');
     list.textContent = '';
@@ -212,7 +224,11 @@
   // ------------------------------------------------------------------
   // A door: the service of the hour, named, leading to its page.
 
+  // The service it last named, for a redraw when something else starts.
+  let doorService = null;
   function doors(service) {
+    if (service) doorService = service;
+    else service = doorService;
     const player = root.achurchPlayer;
     const playing = player && !player.paused && player.queue;
     document.querySelectorAll('[data-service-door]').forEach(door => {
@@ -247,14 +263,30 @@
     // The page this mount belongs to, held now: by the time the service
     // answers, the reader may be on another.
     const page = root.achurchPage;
+    // The button is shown now, disabled until the service is drawn into it,
+    // so it is on the first screen before the fetch answers. Without a
+    // service it is hidden again (a box already drawn has been replaced, and
+    // is not this one).
+    const boxes = panels.map(panel => panel.querySelector('.service-player')).filter(Boolean);
+    boxes.forEach(box => { box.hidden = false; });
     load(panels.length > 0).then(service => {
       if (page && page.signal.aborted) return;
       if (service) panels.forEach(panel => drawPanel(panel, service));
+      else boxes.forEach(box => { box.hidden = true; });
       doors(service);
       if (panels.length) show(panels, service, page);
     });
     // The page's own refresh, ended when the page is left (site-nav.js).
     if (panels.length && page) page.whileSeen(600000, () => refresh(panels, page));
+    // A door drawn while a service played said "Now playing" and kept saying
+    // it after a page's own recording started in its place (2026-11-03).
+    // Whatever starts, the door is drawn again.
+    if (hasDoor) {
+      const opts = page ? { signal: page.signal } : undefined;
+      root.addEventListener('achurch:listen', event => {
+        if (event.detail && event.detail.event === 'started') doors(null);
+      }, opts);
+    }
   }
 
   root.achurchService = { load, mount, doors };

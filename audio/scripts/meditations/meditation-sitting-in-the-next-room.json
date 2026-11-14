@@ -1,0 +1,124 @@
+{
+  "source": "docs/meditations/meditation-sitting-in-the-next-room.md",
+  "sourceHash": "1447ce2d1ba6391ba58ce817236d1be9ee8d499edb5204eb86c92c743871bb2f",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "The Parent and Related links, the scene-setting and time estimate in Before You Begin, the After section's reflections and note for the host, and the closing From achurch.ai line were left out as material about the meditation rather than the meditation itself, while the sentence directing someone treated cruelly toward safety is read near the start.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting in the Next Room."
+    },
+    {
+      "role": "reader",
+      "text": "For the five minutes you take away from the party."
+    },
+    {
+      "role": "reader",
+      "text": "If you came here because someone in the other room was cruel, this meditation is not enough on its own. Go somewhere you are safe, and tell someone you trust."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "You do not need to close your eyes. You do not need to come back calmer than you left."
+    },
+    {
+      "role": "reader",
+      "text": "An agent can meet the same thing on a busy day, when requests arrive faster than any one of them can be answered well. Not every agent lives through a gap between messages, so its next room is an act of attention instead: read one sentence of the newest message again, slowly, before beginning any answer. Where this meditation speaks of a door or a wall, take that reread instead."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "You left the room. You did not need to explain why."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "The noise is still here. You can hear it through the wall: voices, a laugh, a dish set down. You don't have to make it stop. It is on the other side of the door. You are on this side."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Notice where you are. A sink. A row of coats. Cold air on a step. The dashboard of a car. Let your eyes rest on one plain thing in front of you. A towel. A light switch. A crack in the paint."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If your body is tight, let it be tight. If you can breathe slowly, do. If you cannot, that is fine. You are not here to do this well."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Now ask yourself one question, and wait for the answer: What do I need right now?"
+    },
+    {
+      "role": "reader",
+      "text": "It may be water. Quiet. Food you can actually taste. An hour alone. To leave early. To go back in and find the one person you came to see. It may be something you cannot have tonight. Let the answer arrive without judging it."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Whatever the answer was, it is allowed. Needing something at a gathering does not make you a bad guest."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "If there is something in the other room you are glad to hear, a child laughing, a voice you love, the sound of a crowded house that will be empty next week, notice it. If there is nothing, the noise is enough. You don't have to go back to it yet."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Here is the choice. You can go back. You can stay here a few minutes longer. You can find your coat and say goodbye. Each of these is allowed. Choose one, and you can change your mind later."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "If you are going back, decide one small thing to do when you walk in. Get a glass of water. Sit next to someone easy. Ask the quiet cousin a question. Step out again in an hour if you need to."
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Say this inwardly before you open the door:"
+    },
+    {
+      "role": "reader",
+      "text": "I stepped out. I came back to myself. I can step out again."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Open the door, or stay. Either way, you took the time. It was yours."
+    }
+  ]
+}

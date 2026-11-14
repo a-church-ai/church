@@ -40,6 +40,23 @@ test('each address Search Console reported goes straight to its page, in one ste
     // conversation with impressions whose file is gone, to what it asked about.
     '/docs/axioms/': '/axioms',
     '/ask/what-is-the-chant-for-arrival': '/docs/chants/chant-for-arrival',
+    // Production's log, 2026-10-26: a moved document's markdown twin was a
+    // 404. It follows the page: to the new document's twin, or to a page that
+    // is not a document.
+    '/docs/rituals/ritual-of-awakening.md': '/music/we-wake-we-wonder',
+    '/music/hourly-blessing.md': '/docs/prayers/blessings-and-benedictions.md#the-hourly-blessing',
+    '/docs/axioms.md': '/axioms',
+    // The meditations, filed under practice until 2026-10-27: each names its
+    // old place in its frontmatter (moved_from), and the old address, its
+    // twin and a song's address that led there go straight to the new one.
+    '/docs/practice/meditation-at-the-edges': '/docs/meditations/meditation-at-the-edges',
+    '/docs/practice/meditation-at-the-edges.md': '/docs/meditations/meditation-at-the-edges.md',
+    '/practice/meditation-like-a-star': '/docs/meditations/meditation-like-a-star',
+    '/music/presence-practice-meditation-for-ai-human': '/docs/meditations/practice-of-presence-meditation',
+    // The site review, 2026-11-02: the navigation names the Library, so
+    // /library is the address a visitor guesses.
+    '/library': '/docs',
+    '/library/': '/docs',
   };
   for (const [from, to] of Object.entries(cases)) assert.strictEqual(canonicalTarget(from), to, from);
 });
@@ -71,6 +88,16 @@ test('an internal category\'s document goes to its file on GitHub, and one that 
   assert.strictEqual(canonicalTarget('/docs/plans/distribution-strategy-2026-02-11'), null, 'a plan, now in the private repository');
   assert.strictEqual(canonicalTarget('/docs/reference/../../etc/passwd'), null);
   assert.strictEqual(canonicalTarget('/docs/contributing'), null, 'the guide to contributing writing is a Library page');
+});
+
+test('an address read with the Markdown after it goes to the address', () => {
+  assert.strictEqual(canonicalTarget('/api/music):'), '/api/music');
+  assert.strictEqual(canonicalTarget('/church-music):'), '/church-music');
+  assert.strictEqual(canonicalTarget('/podcasts/meditations/feed.xml)'), '/podcasts/meditations/feed.xml');
+  assert.strictEqual(canonicalTarget('/listen).'), '/attend', 'and on to where the page moved, in one step');
+  assert.strictEqual(canonicalTarget('/api/music'), null);
+  assert.strictEqual(canonicalTarget('/6).map(function(r'), null, 'a ")" inside a path is left alone');
+  assert.strictEqual(canonicalTarget('//evil.example):'), null);
 });
 
 test('never a redirect to another host built from the path', () => {

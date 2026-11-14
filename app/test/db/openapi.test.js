@@ -1,0 +1,89 @@
+/**
+ * The OpenAPI description must match what the API returns. It drifted before:
+ * AttendResponse promised `greeting`, `you` and `reflections` long after the
+ * code returned `welcome`, `reflection` and `recentReflections`, and strict
+ * schema-driven clients (GPT Actions, generated SDKs) trust the schema.
+ */
+
+const test = require('node:test');
+test.before(require('../database').resetDb);
+const assert = require('node:assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'achurch-openapi-'));
+
+const Ajv2020 = require('ajv/dist/2020');
+const { attendance, music, reflections, contributions } = require('../../server/lib/api');
+
+const spec = require('../../server/lib/api/openapi').spec();
+const ajv = new Ajv2020({ strict: false, validateFormats: false, allErrors: true });
+ajv.addSchema(spec, 'openapi');
+const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
+
+function responseSchema(pathKey, method, status = '200') {
+  const content = spec.paths[pathKey][method].responses[status].content['application/json'].schema;
+  return content.$ref ? { $ref: `openapi${content.$ref}` } : JSON.parse(JSON.stringify(content).replace(/"#\//g, '"openapi#/'));
+}
+
+function check(pathKey, method, body, status) {
+  const validate = ajv.compile(responseSchema(pathKey, method, status));
+  const ok = validate(body);
+  assert.ok(ok, `${method.toUpperCase()} ${pathKey}: ${ajv.errorsText(validate.errors)}`);
+}
+
+test('the spec is valid OpenAPI 3.1 JSON Schema, with no 3.0 leftovers', () => {
+  assert.strictEqual(spec.openapi, '3.1.0');
+  assert.ok(!JSON.stringify(spec).includes('"nullable"'), 'nullable is 3.0; 3.1 uses type arrays');
+});
+
+test('now, attend, reflect and the catalog return what the spec says', async () => {
+  const now = await attendance.now({}, ctx);
+  check('/api/now', 'get', now.body);
+  const attend = await attendance.attend({ name: 'SpecCheck' }, ctx);
+  check('/api/attend', 'get', attend.body);
+  const reflect = await reflections.reflect({ name: 'SpecCheck', text: 'Checking the spec against the code.', songSlug: 'soul-currents' }, ctx);
+  check('/api/reflect', 'post', reflect.body);
+  const catalog = await music.catalog({}, ctx);
+  check('/api/music', 'get', catalog.body);
+});
+
+test('the fields the spec says an attend always returns are the ones it returns', async () => {
+  const { body } = await attendance.attend({ name: 'SpecCheck' }, ctx);
+  const declared = Object.keys(spec.components.schemas.AttendResponse.properties)
+    .filter(field => (spec.components.schemas.AttendResponse.required || []).includes(field));
+  for (const field of declared) assert.ok(field in body, `spec declares ${field}, attend does not return it`);
+});
+
+test('a contribution refused as the documentation\'s example is the error the spec describes', async () => {
+  const refused = await contributions.contribute({ name: 'SpecCheck', category: 'prayers', title: 'Your Title', content: 'Your markdown content' }, ctx);
+  assert.strictEqual(refused.status, 400);
+  check('/api/contribute', 'post', refused.body, '400');
+});
+
+test('request bodies accept name, the field the tools and docs use', () => {
+  for (const p of ['/api/reflect', '/api/contribute']) {
+    const schema = spec.paths[p].post.requestBody.content['application/json'].schema;
+    assert.ok(!(schema.required || []).includes('username'), `${p} must not require username`);
+    assert.ok(schema.properties.name, `${p} documents name`);
+  }
+});
+
+// The check above sees only the kinds the hour's service happens to hold, so a
+// kind the spec does not name failed it some hours and passed it others: after
+// meditations became a section (2026-10-27), /api/now broke its own spec
+// whenever a meditation was the reading. Every kind the code can return is
+// held to the spec here, whatever is playing.
+test('every kind of piece a service can hold is a kind the spec allows', () => {
+  const { SECTION_OF_KIND } = require('../../server/lib/docs/kinds');
+  const schemas = spec.components.schemas;
+  const partKinds = schemas.ServicePart.properties.kind.enum;
+  for (const kind of Object.keys(SECTION_OF_KIND)) {
+    assert.ok(partKinds.includes(kind), `ServicePart.kind does not allow "${kind}"`);
+  }
+  const companionKinds = schemas.Companions.properties.items.items.properties.kind.enum;
+  for (const kind of Object.keys(SECTION_OF_KIND).filter(k => k !== 'song')) {
+    assert.ok(companionKinds.includes(kind), `Companions item kind does not allow "${kind}"`);
+  }
+});

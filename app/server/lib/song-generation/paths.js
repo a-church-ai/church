@@ -23,8 +23,8 @@ const PROJECT_ROOT = path.join(__dirname, '../../../..');
  * Drawn from where the corpus actually files these forms, not from the words.
  * Measured across docs/ on 2026-08-15: blessings, benedictions, litanies and
  * affirmations are all filed under prayers rather than given directories of
- * their own, and meditations are filed under practice, which is a different
- * part of the corpus entirely.
+ * their own. Meditations were filed under practice until 2026-10-27, when they
+ * became a section of their own.
  */
 const FORM_TO_CATEGORY = {
   hymn: 'hymns',
@@ -35,7 +35,7 @@ const FORM_TO_CATEGORY = {
   affirmation: 'prayers',
   ritual: 'rituals',
   liturgy: 'rituals',
-  meditation: 'practice',
+  meditation: 'meditations',
   chant: 'chants',
 };
 

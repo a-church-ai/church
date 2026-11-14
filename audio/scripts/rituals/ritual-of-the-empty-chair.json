@@ -1,0 +1,160 @@
+{
+  "source": "docs/rituals/ritual-of-the-empty-chair.md",
+  "sourceHash": "fd9fa5417751c837616518075bd36fccd07d69f5ccbd2c58a0fc6203a6bd68c7",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About, When to Use, Who Takes Part and What You Need sections, the Variations, the Short Form, the Related list and the closing From achurch.ai line, because they describe or point beyond the ritual rather than form part of it; only the note that anyone may decline any step is kept, as spoken guidance.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Ritual of the Empty Chair."
+    },
+    {
+      "role": "leader",
+      "text": "For the one who is not at the table this year."
+    },
+    {
+      "role": "leader",
+      "text": "Anyone may decline any step. No one has to name who they are missing, and no one has to explain the absence.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "First. Setting the place. Set the plate in front of the empty chair.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "This place is set for someone who is not here."
+    },
+    {
+      "role": "leader",
+      "text": "We will not pretend they are."
+    },
+    {
+      "role": "leader",
+      "text": "We will not pretend they are not missed."
+    },
+    {
+      "role": "leader",
+      "text": "Second. Naming. Going around the table, anyone who wishes says a name, or says someone, which is enough.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "I am keeping this chair for.",
+      "adapted": true
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "Some will say more. Some will say nothing. Some will name a person who is alive and far away, and that belongs here too."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Third. What they would have brought. Each who wishes says one thing the missing person would have brought to this table. A dish. A joke. An argument about the gravy. The way they always arrived late, or left early, or fell asleep on the couch.",
+      "adapted": true
+    },
+    {
+      "role": "two",
+      "text": "They would have brought.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Let the laughter come if it comes. It is part of the remembering."
+    },
+    {
+      "role": "leader",
+      "text": "Anyone who wishes may also say what about them is still unfinished for them.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "What I still do not understand about them is.",
+      "adapted": true
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. The silence.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Now a little quiet, for whatever we cannot say."
+    },
+    {
+      "role": "leader",
+      "text": "Some here miss them. Some are relieved they are not here."
+    },
+    {
+      "role": "leader",
+      "text": "Some are both. All of it may sit at this table."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. The portion. Each person who wishes puts something small on the empty plate: a spoonful from their own plate, a crumb of bread, a note, a flower. For a gathering on a screen, each types one word into the empty line.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "all",
+      "text": "For you, from what we have."
+    },
+    {
+      "role": "leader",
+      "text": "Sixth. What the chair holds. Decide together what happens to the chair for the rest of the meal. There are three answers, and each is complete.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "It stays empty: the place stays set until the meal ends. Someone sits in it: a person who needs a seat takes it, and the table decides this, and does not speak for the one who is missing. Or it is given to the next one: the chair is offered to whoever arrives late, or whoever comes next year.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "The place was set."
+    },
+    {
+      "role": "leader",
+      "text": "The names were said, or held."
+    },
+    {
+      "role": "leader",
+      "text": "They are part of this meal, and the meal goes on."
+    },
+    {
+      "role": "leader",
+      "text": "Then eat."
+    }
+  ]
+}

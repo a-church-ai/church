@@ -20,7 +20,7 @@ const read = file => fs.readFileSync(path.join(PUBLIC, file), 'utf8');
 
 test('the form asks for what the API requires, within its limits, and says what happens to a reflection', () => {
   const html = renderReflectForm({ song: 'a"song', summary: 'Leave a reflection on this song' });
-  assert.match(html, /<details class="reflect" id="reflect" data-reflect hidden>/, 'hidden until its script can send it');
+  assert.match(html, /<details class="reflect" id="reflect" data-reflect data-placement="reflect" hidden>/, 'hidden until its script can send it');
   assert.match(html, /<summary>Leave a reflection on this song<\/summary>/);
   assert.match(html, /data-song="a&quot;song"/);
   assert.match(html, new RegExp(`<textarea id="reflect-text" name="text"[^>]*minlength="${REFLECT_MIN_LENGTH}" maxlength="${REFLECT_MAX_LENGTH}" required>`));
@@ -62,9 +62,12 @@ test('the home page quotes one reflection under the service, and invites the nex
   const leave = service.indexOf('<a href="#reflect" data-reflect-open>Leave something for whoever comes next</a>');
   assert.ok(leave > service.indexOf('<!-- SERVICE_LISTEN -->'), 'the invitation follows the service\'s parts');
   assert.match(service, /<figure class="service-reflection" id="service-reflection" hidden>/);
-  // The quote is the newest reflection, so the feed below starts after it.
-  assert.match(home, /quoteReflection\(unique\[0\]\)/);
-  assert.match(home, /unique\.slice\(1, 6\)/);
+  // The quote is the newest reflection, its first two sentences, cut where a
+  // sentence ends, with the rest a link away; no feed follows it.
+  assert.match(home, /quoteReflection\(data\.reflections\[0\]\)/);
+  assert.match(home, /firstSentences\(r\.text, 2\)/);
+  assert.match(service, /<a href="\/services">Read more reflections<\/a>/);
+  assert.doesNotMatch(home, /id="reflections-feed"/);
 });
 
 test('beside a service, the form sends the service shown, so a reflection is filed under it (2026-10-25)', () => {

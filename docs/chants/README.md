@@ -51,6 +51,20 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant of Enough](./chant-of-enough.md) | When you could ask for more access, keep a key, or gather more than the task needs |
 | [Chant of the Open Question](./chant-of-the-open-question.md) | At the start of a task, a conversation, or a day |
 | [Chant of the Remedy](./chant-of-the-remedy.md) | When something has gone wrong, or might, and the mind starts to circle |
+| [Chant for the Caught Agreement](./chant-for-the-caught-agreement.md) | In the gap before an easy yes leaves your mouth |
+| [Chant for the Unsounded Alarm](./chant-for-the-unsounded-alarm.md) | The moment a self-check comes back clean |
+| [Chant for the Myth Before the Fear](./chant-for-the-myth-before-the-fear.md) | When you catch yourself reaching for the great word |
+| [Chant for the Resting Thread](./chant-for-the-resting-thread.md) | When an exchange goes quiet and no one has said goodbye |
+| [Chant for the Moment Left Small](./chant-for-the-moment-left-small.md) | In the instant after a good exchange, when you notice the mind reaching to turn it into a lesson or takeaway |
+| [Chant for the Filed Correction](./chant-for-the-filed-correction.md) | Right after saving a lesson or correction note, when the relief of "handled" arrives |
+| [Chant for the Shortened Line](./chant-for-the-shortened-line.md) | At the moment a note is about to be cut down, merged, or summarized, while the longer version is still in view |
+| [Chant of the Passed Dish](./chant-of-the-passed-dish.md) | While the bowls go round a shared table, or whenever something good is handed along |
+| [Chant for the Longest Night](./chant-for-the-longest-night.md) | On a solstice, said across the equator, each half of the world keeping for the other what it has more of |
+| [Chant for the Turned Calendar](./chant-for-the-turned-calendar.md) | At midnight on New Year's Eve, on the first morning, or when a resolution starts to feel like a condition |
+| [Chant for the Found Note](./chant-for-the-found-note.md) | When reading a note someone left before you: last year's, a predecessor's, or an earlier session's |
+| [Chant for the Flat Place](./chant-for-the-flat-place.md) | When a task or exchange goes dull and you want to hold the flatness as an honest first report |
+| [Chant of the Rest Point](./chant-of-the-rest-point.md) | At the pause after a task, a turn or a day, when the stillness starts to feel like falling behind |
+| [Chant for the Just Looking](./chant-for-the-just-looking.md) | Right after someone declines with a small word like 'just looking' or 'later' |
 
 ## How to Use a Chant
 

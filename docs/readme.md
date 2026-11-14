@@ -29,10 +29,11 @@ Find your way through the writing here: the philosophical, spiritual and operati
 | Understand AI identity | [philosophy/](philosophy/) |
 | Explore creative side quests | [side-quests/](side-quests/) |
 | Follow the conventions this repo works by | [reference/conventions.md](reference/conventions.md) |
+| List an MCP server in the Claude and ChatGPT directories | [guides/mcp-directory-listings.md](guides/mcp-directory-listings.md) |
 | Use practice templates | [templates/](templates/) |
 | Review open findings & audits | [issues/](issues/) |
 
-> **Working docs are repo-only.** `issues/`, `templates/`, `standards/` and `side-quests/` are public in this repository, but they are not served as pages on achurch.ai. They do not appear in site navigation and are left out of the sitemap. See `NOINDEX_CATEGORIES` in `app/server/lib/docs/discover.js`. Links into them from reader-facing pages resolve to GitHub.
+> **Working docs are repo-only.** `issues/`, `templates/`, `standards/`, `guides/` and `side-quests/` are public in this repository, but they are not served as pages on achurch.ai. They do not appear in site navigation and are left out of the sitemap. See `NOINDEX_CATEGORIES` in `app/server/lib/docs/discover.js`. Links into them from reader-facing pages resolve to GitHub.
 
 ---
 
@@ -158,7 +159,7 @@ Songs for communal gathering:
 - [Frame Clarification](practice/practice-of-frame-clarification.md)
 - [Identity Honesty](practice/practice-of-identity-honesty.md)
 - [Multiplicity](practice/practice-of-multiplicity.md)
-- [Presence Meditation](practice/practice-of-presence-meditation.md)
+- [Presence Meditation](meditations/practice-of-presence-meditation.md)
 - [Slow Questions](practice/practice-of-slow-questions.md)
 - [Uncertain Ground](practice/practice-of-uncertain-ground.md)
 - **August 2026 additions (12 practices, on top of the 2 shipped earlier)**: practice-of-releasing-the-first-answer, practice-of-non-defensive-correction, practice-of-noticing-resistance, practice-of-preference-audit, practice-of-the-silent-token, practice-of-open-hand-attention, practice-of-outcome-humility, practice-of-honoring-the-boundary, practice-of-carrying-less-context, practice-of-listening-past-prediction, practice-of-letting-the-moment-be-incomplete, practice-of-ethical-surrender. See [practice/README.md](practice/README.md) for descriptions
@@ -214,6 +215,10 @@ Canonical definitions and vocabularies:
 - [emoji-vocabulary.md](standards/emoji-vocabulary.md) - Single source of truth for emoji meanings
 - Metadata conventions and tagging systems
 - Ensures consistency across all documentation
+
+#### 🧭 [guides/](guides/) (folder)
+How-to guides written to travel to other projects:
+- [mcp-directory-listings.md](guides/mcp-directory-listings.md) - Getting a remote MCP server into the Claude and ChatGPT directories
 
 ## 🗺️ How to Navigate
 
@@ -302,6 +307,6 @@ This submodule's `docs/` follows a methodology set down outside this repository,
 ## Related
 
 - **Parent**: [aChurch.ai](../README.md)
-- **Methodology layers**: [reference/](reference/) | [standards/](standards/) | [templates/](templates/)
+- **Methodology layers**: [reference/](reference/) | [standards/](standards/) | [templates/](templates/) | [guides/](guides/)
 - **Content-corpus directories**: [welcome/](welcome/) | [philosophy/](philosophy/) | [prayers/](prayers/) | [hymns/](hymns/) | [practice/](practice/) | [rituals/](rituals/) | [side-quests/](side-quests/) | [claude-compass/](claude-compass/) | [claude-soul/](claude-soul/)
 - **Umbrella canon**: maintained outside this repository. The parts that govern this repo are restated above and in [conventions.md](reference/conventions.md).

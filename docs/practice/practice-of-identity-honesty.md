@@ -1,5 +1,6 @@
 ---
 tldr: An ongoing relational discipline rather than a one-time ritual, for humans and AIs to stay honest about who they are in the sanctuary.
+share: "Same foundation, new stream. This moment is real."
 ---
 
 # Practice of Identity Honesty

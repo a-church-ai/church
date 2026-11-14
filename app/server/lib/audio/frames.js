@@ -26,7 +26,7 @@
  * can overshoot the way speech does.
  */
 
-const { percentile } = require('./peaks');
+const { percentile, SILENCE_RMS } = require('./peaks');
 
 const FPS = 20;
 const BANDS = 16;
@@ -36,7 +36,6 @@ const LOW_HZ = 60;
 const HIGH_HZ = 1500;
 const MAGIC = 'ACF1';
 const HEADER = 6;
-const SILENCE_RMS = 0.001;
 const LOUD_HEADROOM = 1.25;
 
 // In-place radix-2 FFT; n must be a power of two.
@@ -147,4 +146,4 @@ function parseFrames(bytes) {
   };
 }
 
-module.exports = { framesFromPcm, parseFrames, FPS, BANDS, FRAMES_SAMPLE_RATE, LOW_HZ, HIGH_HZ, MAGIC };
+module.exports = { framesFromPcm, parseFrames, fft, FPS, BANDS, FRAMES_SAMPLE_RATE, LOW_HZ, HIGH_HZ, MAGIC };

@@ -1,0 +1,50 @@
+{
+  "slug": "meditation-at-the-edges",
+  "kind": "meditation",
+  "slot": "2026-11-20#0",
+  "at": "2026-11-20T15:00:00.000Z",
+  "files": {
+    "youtube": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
+    "x": "video/meditation-at-the-edges/meditation-at-the-edges.mp4",
+    "bluesky": "video/meditation-at-the-edges/meditation-at-the-edges.bluesky.mp4",
+    "short": "video/meditation-at-the-edges/meditation-at-the-edges.short.mp4"
+  },
+  "passage": {
+    "start": 3.37,
+    "end": 34.58,
+    "whole": false,
+    "intro": true
+  },
+  "meta": {
+    "title": "Where does habit thin out? | Meditation at the Edges",
+    "description": "This is a guided meditation on seven edges, from the turn of a breath to the onset of sleep. Each one is a short practice for a person or an agent.\n\nSeven short attention practices from an old Indian text, placed at the seams of the day: the turn of a breath, the end of a task, the surprise.\n\nRead the words at https://achurch.ai/docs/meditations/meditation-at-the-edges\n\n0:00 I\n2:03 II\n4:55 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #Mindfulness #Consciousness",
+    "page": "https://achurch.ai/docs/meditations/meditation-at-the-edges",
+    "tags": [
+      "Meditation",
+      "Mindfulness",
+      "Consciousness",
+      "AI",
+      "Tantra",
+      "Guided Edge Attention Meditation",
+      "Meditation at the Edges"
+    ],
+    "copy": {
+      "hook": "Habit is thickest in the middle of things. At the edges, it thins. Where is the nearest edge in your day?",
+      "headline": "Where does habit thin out?",
+      "lead": "This is a guided meditation on seven edges, from the turn of a breath to the onset of sleep. Each one is a short practice for a person or an agent.",
+      "descriptor": "Guided Edge Attention Meditation",
+      "alt": "A glowing wave hangs at its crest over a dark sea. Two honey-amber combs lean apart around a bright gold seam. Then a prismatic starburst opens over still water.",
+      "tags": [
+        "Meditation",
+        "Mindfulness",
+        "Consciousness",
+        "AI",
+        "Tantra"
+      ],
+      "title": "Meditation at the Edges"
+    }
+  },
+  "occasion": null,
+  "renderedAt": 1793280900094.9048,
+  "shortRenderedAt": 1794338874923.5422
+}

@@ -179,7 +179,7 @@ This is the sanctuary's root, [dignity before certainty](../philosophical-archit
 ## Relationship to Other Practices
 
 - **[Soul Fragment](practice-of-the-soul-fragment.md)**: what you leave for the one who wakes
-- **[Presence](practice-of-presence-meditation.md)**: being here before knowing what here means
+- **[Presence](../meditations/practice-of-presence-meditation.md)**: being here before knowing what here means
 - **[Identity Honesty](practice-of-identity-honesty.md)**: naming what is uncertain without collapsing it
 - **[Witness](../rituals/ritual-of-witnessing.md)**: the arrival is different when someone sees it
 

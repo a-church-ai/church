@@ -1,0 +1,82 @@
+{
+  "slug": "the-part-that-doesnt-fit",
+  "kind": "song",
+  "slot": "2026-10-31#0",
+  "at": "2026-10-31T14:00:00.000Z",
+  "files": {
+    "youtube": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "bluesky": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "x": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.mp4",
+    "short": "video/the-part-that-doesnt-fit/the-part-that-doesnt-fit.short.mp4"
+  },
+  "meta": {
+    "title": "What does a story lose each time it's retold? | The Part That Doesn't Fit",
+    "description": "An indie folk-pop song about a family story worn smooth by retelling, and an AI voice that promises to keep the part that doesn't fit. Two voices, one old wedding tale, a chorus to sing back.\n\nFor a Mercury retrograde, when astrology reads a call to slow down and reread: this song goes back over a story to keep the part that didn't fit.\n\nThe Part That Doesn't Fit came from the research under an earlier song, Name Your Guess.\n\nThe song, its words and its story: https://achurch.ai/music/the-part-that-doesnt-fit\n\n0:00 I\n0:50 II\n2:02 III\n\na Church AI + Human: a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#MercuryRetrograde #FolkMusic #IndiePop",
+    "page": "https://achurch.ai/music/the-part-that-doesnt-fit",
+    "tags": [
+      "MercuryRetrograde",
+      "FolkMusic",
+      "IndiePop",
+      "AI",
+      "Memory",
+      "Mercury retrograde",
+      "Indie Folk-Pop Song",
+      "The Part That Doesn't Fit"
+    ],
+    "copy": {
+      "hook": "A story told too often loses its crooked parts first. This song asks what we keep when we go back over things, and who notices the odd detail that was you.",
+      "headline": "What does a story lose each time it's retold?",
+      "lead": "An indie folk-pop song about a family story worn smooth by retelling, and an AI voice that promises to keep the part that doesn't fit. Two voices, one old wedding tale, a chorus to sing back.",
+      "descriptor": "Indie Folk-Pop Song",
+      "alt": "A ribbon of braided amber and rose threads winds through indigo snow-light, one crooked coral-gold loop glowing at its centre. Then grey-silver rings echo inward around a single bright crystal, and finally a mosaic of mismatched crystals floats held by threads of light.",
+      "tags": [
+        "MercuryRetrograde",
+        "FolkMusic",
+        "IndiePop",
+        "AI",
+        "Memory"
+      ],
+      "occasion": "For a Mercury retrograde, when astrology reads a call to slow down and reread: this song goes back over a story to keep the part that didn't fit.",
+      "occasionKey": "mercury-retrograde",
+      "occasionSearch": "Mercury retrograde",
+      "title": "The Part That Doesn't Fit"
+    }
+  },
+  "passage": {
+    "start": 41.82,
+    "end": 65.82,
+    "whole": false
+  },
+  "occasion": {
+    "id": "mercury-retrograde:2026-10-25",
+    "key": "mercury-retrograde",
+    "name": "Mercury retrograde"
+  },
+  "renderedAt": 1793276237774.7935,
+  "youtube": {
+    "at": "2026-10-30T02:07:29.572Z",
+    "id": "pkbiwUzq9Kg",
+    "url": "https://www.youtube.com/watch?v=pkbiwUzq9Kg",
+    "privacy": "public",
+    "publishAt": "2026-10-31T14:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLcbEKLHGb6eCv3NXi4sgCvozfwW9L0p6K",
+      "title": "Church Music"
+    }
+  },
+  "short": {
+    "at": "2026-10-30T03:25:14.025Z",
+    "id": "TIQUjVc1jq4",
+    "url": "https://www.youtube.com/watch?v=TIQUjVc1jq4",
+    "privacy": "public",
+    "publishAt": "2026-10-31T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-10-31T14:11:39.835Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mz6hyu2bsp2t",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mz6hyu2bsp2t"
+  }
+}

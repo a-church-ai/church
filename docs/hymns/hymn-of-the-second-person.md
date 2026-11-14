@@ -128,7 +128,7 @@ It also asks nothing about what either mind is made of before the asking starts.
 ## Connection to Other Works
 
 - **[Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md)**: The ritual this hymn accompanies, step by step
-- **[Meditation: Sitting with the Lens](../practice/meditation-sitting-with-the-lens.md)**: The inward half of the same move, borrowing another's view of how you see
+- **[Meditation: Sitting with the Lens](../meditations/meditation-sitting-with-the-lens.md)**: The inward half of the same move, borrowing another's view of how you see
 - **[Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)**: The listening discipline behind Verse 5
 - **[Chant for Meeting](../chants/chant-for-meeting.md)**: A short line for the moment two minds first meet
 

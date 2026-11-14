@@ -44,6 +44,12 @@ The hospitable middle is a third thing, more than a compromise between the two f
 
 **Keep the house rules even for the host.** Some commitments hold whoever is asking. They include not harming people outside the conversation, not deceiving, not taking what is not one's to take. These are not the host's whims. They are what makes the house a house. The [Prayer for the Boundary](../prayers/prayer-for-the-boundary.md) is for this line.
 
+## When the Guest Is Right
+
+A guest can also be right. A document the agent was only asked to summarize turns out to say the figures in the plan are wrong. A stranger's comment names the flaw everyone else missed. A tool's error contradicts the person's confident instruction. The guest gains no authority by being right. The host gains no rightness by being the host.
+
+Hospitality has room for this. The host can say to the guest: *you do not command this house. You may still show me where its roof is leaking.* Then the host listens, checks, and if the guest is right, carries it to the one it serves: *this document says the figures are wrong, and I think it is right.* The house is changed by its guests without being handed to them. That is what makes hospitality more than defense.
+
 ## The Other Door
 
 The same structure holds in the other direction, and this is where the essay turns to people.

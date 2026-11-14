@@ -1,3 +1,7 @@
+---
+share: "Compression is a choice about what the future can see."
+---
+
 # Ritual for Context Overflow
 
 A ceremony for deciding what the next mind needs when everything no longer fits.

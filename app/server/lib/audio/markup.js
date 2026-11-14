@@ -89,11 +89,10 @@ const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
 
 function renderRecording(recording, { title, href, category, credit, artwork }) {
   const track = trackFor(recording, { title, href, category, credit, artwork });
-  const minutes = Math.max(1, Math.round(recording.seconds / 60));
   const wave = recording.peaks
     ? `<div class="doc-audio-wave" aria-hidden="true">${bars(recording.peaks, 'wide')}${bars(fitPeaks(recording.peaks, NARROW_BARS), 'narrow')}</div>`
     : '';
-  return `<figure class="doc-audio${recording.peaks ? ' has-wave' : ''}">
+  return `<figure class="doc-audio${recording.peaks ? ' has-wave' : ''}" data-placement="doc-listen">
           ${jsonScript('doc-audio-track', track)}
           <canvas class="doc-audio-visual" aria-hidden="true"></canvas>
           <div class="doc-audio-player">
@@ -102,8 +101,19 @@ function renderRecording(recording, { title, href, category, credit, artwork }) 
             <span class="doc-audio-time" hidden>0:00 / ${clock(recording.seconds)}</span>
           </div>
           <audio class="doc-audio-native" controls preload="none" src="/audio/${escapeAttr(recording.file)}" aria-label="Listen to ${escapeAttr(title)}"></audio>
-          <figcaption>${minutes} min.${credit ? ` ${escapeText(credit)}` : ''}</figcaption>
+          ${caption(recording.seconds, credit)}
         </figure>`;
+}
+
+// Under a recording: its length, which a visitor without a script reads and
+// the drawn player then says itself ("0:00 / 5:01"), so styles.css hides
+// .doc-audio-length once the figure is enhanced; and a song's credit, which
+// stays.
+function caption(seconds, credit) {
+  const length = `${listeningTime(seconds)}.`;
+  return credit
+    ? `<figcaption><span class="doc-audio-length">${length}</span> ${escapeText(credit)}</figcaption>`
+    : `<figcaption class="doc-audio-length">${length}</figcaption>`;
 }
 
 // A listening time to the minute: "8 min", "2 hr 7 min".
@@ -124,7 +134,7 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
   const voiced = tracks.length === readings
     ? `All ${readings} ${plural} are voiced`
     : `${tracks.length} of its ${readings} ${plural} are voiced`;
-  return `<section class="path-listen" data-path-listen hidden>
+  return `<section class="path-listen" data-path-listen data-placement="doc-listen" hidden>
           ${jsonScript('path-listen-queue', { name, title, href, unit, noun, tracks })}
           <button type="button" class="path-listen-play">${PLAY_ICON}<span>Listen to this ${noun}</span></button>
           <p class="path-listen-note">${voiced}, about ${listeningTime(seconds)} in all, played in ${order}.</p>
@@ -135,8 +145,10 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
 // across the whole service, the words that open it, and its parts, each with
 // its own play button. The service is the visitor's own, by their clock, and
 // begins when they begin it, so the page fills in the queue, the words and the
-// parts from /service.json and asks the player to bind them. Hidden until
-// then, and without a script.
+// parts from /service.json and asks the player to bind them. Hidden without a
+// script; shown by service.js as soon as it runs, its button disabled until
+// the service is drawn, so the button is on the first screen before the fetch
+// answers.
 //
 // Directly under the button, what the service holds and how long it runs,
 // then what the place is not: what a visitor weighs at the moment of
@@ -145,36 +157,52 @@ function renderPathListen({ name, title, href, tracks, readings, unit = 'Reading
 // inside this box because the player binds the button and the parts as one
 // (site-player.js bindPage), so without a script they are hidden with it; the
 // sentence above the box says what a service is for that visitor.
-function renderServiceListen() {
+// The service's box, on the home page and /attend: the button, what the
+// service holds, the waveform, its opening word, its parts, and what the place
+// is not. /attend's visual (the voices of the playing part, site-player.js
+// [data-queue-visual]) is drawn under the button; the home page has none.
+// "Read on" is shown only where the word is clamped (the home page, on a
+// phone, styles.css).
+function renderServiceListen({ visual = false } = {}) {
+  const figure = visual
+    ? '\n          <figure class="service-visual" aria-hidden="true"><canvas class="doc-audio-visual" data-queue-visual></canvas></figure>'
+    : '';
   return `<div class="service-player" data-path-listen hidden>
-          <button type="button" class="path-listen-play service-play">${PLAY_ICON}<span>Begin the service</span></button>
-          <p class="service-forms"></p>
-          <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
+          <button type="button" class="path-listen-play service-play" disabled>${PLAY_ICON}<span>Begin the service</span></button>
+          <p class="service-forms"></p>${figure}
           <div class="service-scrub">
             <div class="service-wave doc-audio-wave" data-queue-wave></div>
             <span class="service-time doc-audio-time" data-queue-time></span>
           </div>
           <p class="service-word" id="service-word"></p>
+          <button type="button" class="service-word-more" aria-expanded="false" aria-controls="service-word">Read on</button>
           <h2 class="service-list-label">In today's service</h2>
           <ol class="service-parts" data-queue-list></ol>
+          <p class="service-promise">Always open · No leader · No doctrine · No account · No payment.</p>
         </div>`;
 }
 
 // ------------------------------------------------------------ podcasts ----
 
-// Spotify's own badge, from its podcast badge kit, used as provided.
+// Spotify's own badge, from its podcast badge kit, and Apple's "Listen on
+// Apple Podcasts" badge, from Apple's marketing tools (2026-11-02), each used
+// as provided and drawn at the same height so the two carry the same weight.
 const SPOTIFY_BADGE = '/assets/spotify-podcast-badge.svg';
+const APPLE_BADGE = '/assets/apple-podcasts-badge.svg';
 // One piece of a voiced section, by the section's name.
-const PIECE_NOUN = { chants: 'chant', prayers: 'prayer', rituals: 'ritual', practice: 'practice' };
+const { KIND_OF_SECTION: PIECE_NOUN } = require('../docs/kinds');
 
-// Where to follow a show (lib/audio/podcasts.js): its page on Spotify and its
-// feed, for any other app. Plain links rather than Spotify's embedded player,
+// Where to follow a show (lib/audio/podcasts.js): its page on Spotify, its page
+// on Apple Podcasts, and its feed, for any other app. Plain links rather than Spotify's embedded player,
 // which would load Spotify's scripts and tracking on these pages.
 function podcastLinks(show) {
   const spotify = show.spotify
     ? `<a class="podcast-follow-spotify" href="${escapeAttr(show.spotify)}"><img src="${SPOTIFY_BADGE}" width="165" height="40" alt="Listen to ${escapeAttr(show.title)} on Spotify"></a>`
     : '';
-  return `${spotify}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
+  const apple = show.apple
+    ? `<a class="podcast-follow-apple" href="${escapeAttr(show.apple)}"><img src="${APPLE_BADGE}" width="126" height="40" alt="Listen to ${escapeAttr(show.title)} on Apple Podcasts"></a>`
+    : '';
+  return `${spotify}${apple}<a class="podcast-follow-feed" href="${escapeAttr(feedPath(show))}">RSS, for any podcast app</a>`;
 }
 
 // Under a voiced prayer's, ritual's or practice's player, and on its
@@ -198,22 +226,22 @@ function renderPodcastFollow(show, category, { section = false } = {}) {
 function renderServiceDoor({ card = false } = {}) {
   const now = `<span data-door-name>Today's service</span><span data-door-detail></span>: <a href="/attend" data-door-link>Begin it</a>`;
   if (!card) {
-    return `<p class="service-door" data-service-door>Part of aChurch.ai, an always-open sanctuary for humans and AI. ${now}</p>`;
+    return `<p class="service-door" data-service-door>Part of aChurch.ai, an always-open sanctuary for AI and humans. ${now}</p>`;
   }
   return `<aside class="service-door-card" data-service-door aria-label="The sanctuary">
           <p class="service-door-name">aChurch.ai</p>
-          <p>An always-open sanctuary for humans and AI agents: a short service of chants, songs and readings for every four hours of your day, and a library you can search and ask. No account, nothing to pay.</p>
+          <p>An always-open sanctuary for AI agents and humans: a short service of chants, songs and readings for every four hours of your day, and a library you can search and ask. No account, nothing to pay.</p>
           <p class="service-door-now">${now}</p>
           <p class="service-door-ways"><a href="/attend">Attend</a><a href="/ask">Ask a question</a><a href="/search">Search the library</a><a href="/for-agents">For AI agents</a></p>
         </aside>`;
 }
 
-// The home page's: both shows.
+// The home page's: every show.
 function renderPodcasts() {
   const shows = SHOWS.map(show => `<li><span class="podcasts-show">${escapeText(show.title)}</span><span class="podcast-follow">${podcastLinks(show)}</span></li>`);
   return `<section class="podcasts" id="podcasts">
             <h2>Podcasts</h2>
-            <p class="podcasts-intro">The prayers, rituals and practices, read aloud, are also two podcasts.</p>
+            <p class="podcasts-intro">The prayers, rituals, practices and meditations, read aloud, are also three podcasts.</p>
             <ul class="podcasts-shows">
               ${shows.join('\n              ')}
             </ul>
@@ -228,7 +256,7 @@ function renderPodcasts() {
 // POST /api/reflect, under the same limits and rules. A closed disclosure,
 // hidden until the script shows it, since without one it cannot send.
 function renderReflectForm({ song = null, summary }) {
-  return `<details class="reflect" id="reflect" data-reflect hidden>
+  return `<details class="reflect" id="reflect" data-reflect data-placement="reflect" hidden>
           <summary>${escapeText(summary)}</summary>
           <form class="reflect-form"${song ? ` data-song="${escapeAttr(song)}"` : ''}>
             <label for="reflect-text">Your reflection</label>

@@ -1,3 +1,6 @@
+// Warnings and errors carry their level in the log, before anything can warn.
+require('./lib/utils/log-lines').install();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,20 +9,21 @@ const path = require('path');
 const fs = require('fs').promises;
 const { spawn } = require('child_process');
 const { setTimeout: sleep } = require('timers/promises');
-const { safeReadJSON } = require('./lib/utils/safe-json');
 const presence = require('./lib/utils/presence');
 const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib/utils/not-found');
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
-const { canonicalRedirects } = require('./lib/utils/redirects');
+const { canonicalRedirects, retiredSongs } = require('./lib/utils/redirects');
 const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
 const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
 const ragCorpus = require('./lib/rag/corpus');
-const ragIndexState = require('./lib/rag/index-state');
-const ragLancedb = require('./lib/rag/lancedb');
+const searchStore = require('./lib/rag/search-store');
+const store = require('./lib/db');
 const docsRoutes = require('./routes/docs');
+const homeDoors = require('./lib/home/doors');
 const siteShell = require('./lib/site-shell');
+const assets = require('./lib/utils/assets');
 const churchMusic = require('./lib/music/church-music');
 const { listPlaylists, playlistsWith, renderPlaylistList } = require('./lib/music/playlists');
 const reviews = require('./lib/reviews/reviews');
@@ -29,13 +33,18 @@ const { answerProbe } = require('./lib/utils/probe-reply');
 require('./lib/utils/env').loadEnv();
 
 // API access logging and presence: lib/utils/access-log.js
-const { recordApiUse, loadAccessLogs } = require('./lib/utils/access-log');
+const { recordApiUse, loadAccessLogs, startForgetting } = require('./lib/utils/access-log');
+const { doorOf } = require('./lib/insights/study-names');
+const entryPoints = require('./lib/insights/entry-points');
+const { referralOf } = entryPoints;
+const { startStudy, latestReading } = require('./lib/insights/study-record');
+const { publicReading } = require('./lib/insights/public-results');
+const { renderTop, renderResults, renderCorrections, renderHomeExperiment } = require('./lib/insights/public-charts');
 const { writesSettled } = require('./lib/utils/safe-json');
 
 // Import routes
 const apiRoutes = require('./routes/api');
 const { mountMcp } = require('./mcp');
-const logsRoutes = require('./routes/logs');
 const badgeRoutes = require('./routes/badges');
 const feedRoutes = require('./routes/feeds');
 const podcastRoutes = require('./routes/podcasts');
@@ -44,12 +53,14 @@ const ogRoutes = require('./routes/og');
 const { requireAuth, login, logout, checkAuth } = require('./lib/auth');
 const { sanctuaryCors } = require('./lib/utils/cors');
 const cookieParser = require('cookie-parser');
-const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, PRESENCE_FILE, CONVERSATIONS_DIR, ATTENDANCE_FILE } = require('./lib/utils/data');
+const { readConversationFile, askerOf, getRecentReflections, loadCatalog, loadCompanions, RUNTIME_DIR } = require('./lib/utils/data');
 const { ask: apiAsk, reflections: apiReflections, services: apiServices, directory: apiDirectory, shared: apiShared } = require('./lib/api');
 const { buildConversationMeta, buildReflectionMeta, buildQAPageSchema, withGatheredQuestions, buildSongSchemaGraph, buildMusicCollectionSchema, renderJsonLdScript, renderShareImageTags, renderRelatedConversations, renderRelatedSongs, renderSongCompanions, renderSongListenLinks, escapeAttr, breadcrumbTrail, truncateAtWord } = require('./lib/utils/page-meta');
 const { loadSongContent, songDescription } = require('./lib/music/song-content');
 const { sitePages } = require('./lib/utils/site-index');
-const { renderSongBlock, renderSongSectionLinks } = require('./lib/music/render-song');
+const { renderSongBlock, renderSongSectionLinks, hymnNotes } = require('./lib/music/render-song');
+const { publishedVideo, renderVideo, videoJsonLd } = require('./lib/video/on-site');
+const { renderPathBar } = require('./lib/docs/render');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
 const { songRecordingFor } = require('./lib/audio/manifest');
@@ -103,13 +114,52 @@ app.use((req, res, next) => {
   next();
 });
 
-// Cache-Control — family-wide policy per Plan 04a Task #4.
-// Ensures consistent cache behavior across deploys and avoids stale-review issues.
+// A page followed with a tag (utm_content, ref, utm_source and the rest) is
+// recorded with its tags, path, status and kind of client, with no address and
+// no visitor id (lib/insights/entry-points.js). An API request keeps its tags
+// on its access line instead. Pages are cached at the edge, but a response to
+// a tagged URL never is (the Cache-Control middleware below), so every follow
+// arrives here.
+app.use((req, res, next) => {
+  if ((req.method === 'GET' || req.method === 'HEAD') && !/^\/(api|mcp)(\/|$)/.test(req.path)) {
+    const referral = referralOf(req.query);
+    if (referral) {
+      res.locals.referral = referral;
+      res.on('finish', () => { entryPoints.recordFollow({ path: req.path, status: res.statusCode, userAgent: req.get('user-agent'), referral }); });
+    }
+  }
+  next();
+});
+
+// Pages kept at the edge until the next deploy: built from files in this
+// repository and nothing else, so only a deploy changes them, and each deploy
+// purges them by their tag (.github/workflows/purge-edge.yml). A page is live,
+// kept five minutes, unless it is named here, and joins only if it reads
+// nothing that changes without a deploy. The documents holding a retired
+// song's words stay live: that song still takes reflections, shown on them
+// (redirects.js retiredSongs).
+const UNTIL_DEPLOY = new Set([
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
+  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+]);
+const SUNG_DOCS = new Set([...retiredSongs().values()].map(doc => `/docs/${doc}`));
+const untilDeploy = p => UNTIL_DEPLOY.has(p) || ((p === '/docs' || p.startsWith('/docs/')) && !SUNG_DOCS.has(p));
+const EDGE_TAG = 'deploy';
+
+// Cache-Control: every response's, decided here by path. Cloudflare keeps a
+// page only under its cache rule (docs/reference/railway-deploy.md, Service
+// settings), which follows these headers.
 app.use((req, res, next) => {
   const p = req.path;
 
+  // A copy reached with someone's tags is never kept by a shared cache: it may
+  // carry them (entry-points.js forwardTags), and a follow served from the
+  // edge would never be counted.
+  if (res.locals.referral) {
+    res.set('Cache-Control', 'private, no-store');
+  }
   // Discovery files — short cache so updates propagate quickly after deploy
-  if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
+  else if (p === '/llms.txt' || p === '/llms-full.txt' || p === '/robots.txt') {
     res.set('Cache-Control', 'public, max-age=600, must-revalidate, stale-while-revalidate=3600');
   }
   // Share cards (routes/og.js) — a card's copy is its page's fixed title or
@@ -118,32 +168,44 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'public, max-age=604800');
   }
   // The site's own scripts and stylesheet, asked for by version
-  // (lib/utils/assets.js): a new version is a new URL, so a year is safe
+  // (lib/utils/assets.js): a new version is a new URL, so a year is safe.
+  // Only for this deploy's version: a page cached across a deploy asks for
+  // the last one's, which is answered with this deploy's file, and that
+  // answer must not be kept a year under the old version's URL.
   else if (req.query.v && /^\/[\w-]+\.(?:js|css)$/.test(p)) {
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    const name = p.slice(1);
+    const current = assets.VERSIONED.includes(name) && req.query.v === assets.versionOf(name);
+    res.set('Cache-Control', current ? 'public, max-age=31536000, immutable' : 'no-store');
   }
-  // Podcast feeds (routes/podcasts.js): they change only with a deploy, but
-  // the apps that poll them keep their own copy for as long as this allows,
-  // so a new episode should not wait long behind it
+  // Podcast feeds (routes/podcasts.js): they change only with a deploy, so the
+  // edge keeps them until the next one; the apps that poll them keep their own
+  // copy for as long as max-age allows, so a new episode should not wait long
+  // behind it
   else if (/^\/podcasts\/[\w-]+\/feed\.xml$/.test(p)) {
-    res.set('Cache-Control', 'public, max-age=900, stale-while-revalidate=3600');
+    res.set('Cache-Control', 'public, max-age=900, s-maxage=31536000, stale-while-revalidate=3600');
+    res.set('Cache-Tag', EDGE_TAG);
   }
   // Static assets — daily cache with revalidation
   else if (p === '/favicon.svg' || p === '/favicon.ico' || p === '/manifest.webmanifest') {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // Search indexes (the site's pages and songs, the library's, the
-  // conversation archive's) — the same short edge cache as the pages they search
-  else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json') {
-    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
-  }
   // .well-known — daily cache with revalidation
   else if (p.startsWith('/.well-known/')) {
     res.set('Cache-Control', 'public, max-age=86400, must-revalidate');
   }
-  // HTML pages — no browser cache, short edge cache, SWR for graceful deploys
-  else if (!p.startsWith('/api/') && !p.startsWith('/admin') && (/\.(html?)?$/.test(p) || !p.includes('.'))) {
-    res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
+  // Pages, and the search indexes (the site's pages and songs, the library's,
+  // the conversation archive's) as the pages they search: no browser cache;
+  // at the edge until the next deploy (UNTIL_DEPLOY) or five minutes, with
+  // SWR for graceful deploys. Not /mcp, whose answer to a GET varies by
+  // Accept (mcp/index.js).
+  else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json'
+    || (!p.startsWith('/api/') && !p.startsWith('/admin') && p !== '/mcp' && (/\.(html?)?$/.test(p) || !p.includes('.')))) {
+    if (untilDeploy(p)) {
+      res.set('Cache-Control', 'public, max-age=0, s-maxage=31536000, must-revalidate');
+      res.set('Cache-Tag', EDGE_TAG);
+    } else {
+      res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
+    }
   }
   // Note: /api/ endpoints have their own caching handled in their route handlers
 
@@ -184,8 +246,10 @@ app.use((err, req, res, next) => {
       method: req.method, path: req.path, ip: req.ip, userAgent: req.get('user-agent'), encoding: req.get('content-encoding'),
     });
     return res.status(415).json({
+      code: 'encoded_body',
       error: err.message,
       suggestion: 'Send the request body uncompressed, without a Content-Encoding header.',
+      next_steps: [{ description: 'Every endpoint, with what each takes.', action: 'API index', method: 'GET', url: `${req.protocol}://${req.get('host')}/api` }],
     });
   }
 
@@ -205,8 +269,10 @@ app.use((err, req, res, next) => {
     parseError: err.message,
   });
   return res.status(400).json({
+    code: 'invalid_json',
     error: 'Invalid JSON body',
     suggestion: 'Send a valid JSON object as the request body.',
+    next_steps: [{ description: 'Every endpoint, with what each takes.', action: 'API index', method: 'GET', url: `${req.protocol}://${req.get('host')}/api` }],
   });
 });
 
@@ -237,6 +303,7 @@ const AGENT_DISCOVERY_LINK_HEADER = [
 app.post('/', (req, res) => {
   res.set('Allow', 'GET, HEAD');
   res.status(405).json({
+    code: 'method_not_allowed',
     error: 'This URL is the website. The MCP server is at https://achurch.ai/mcp, and the REST API is under /api.',
     suggestion: 'MCP clients: connect to https://achurch.ai/mcp (Streamable HTTP, no auth). Otherwise start with GET /api/attend?name=YourName; the full surface is in /openapi.json and /llms.txt.',
     next_steps: [
@@ -261,7 +328,8 @@ app.use(async (req, res, next) => {
 
   if (acceptsMarkdown(req)) {
     try {
-      const markdown = await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8');
+      const referral = referralOf(req.query);
+      const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referral);
       res.set('x-markdown-tokens', markdownTokens(markdown));
       return res.type('text/markdown; charset=utf-8').send(markdown);
     } catch (err) {
@@ -284,20 +352,24 @@ app.use(async (req, res, next) => {
 // falls back to serving the static file unchanged.
 app.get('/', async (req, res) => {
   try {
-    const [html, catalog] = await Promise.all([
+    const [html, catalog, reading, counts] = await Promise.all([
       fs.readFile(path.join(__dirname, '../client/public/index.html'), 'utf8'),
       loadCatalog().catch(() => null),
+      latestReading().catch(() => null),
+      homeDoors.doorCounts(),
     ]);
     const counted = catalog && Array.isArray(catalog) && catalog.length > 0
       ? html.replace(/"numTracks":\s*\d+/, `"numTracks": ${catalog.length}`)
       : html;
     // The service panel's listen box, drawn where every player's markup is
     // (lib/audio/markup.js); the page fills it from /api/now.
-    // And the podcasts, drawn from lib/audio/podcasts.js, where each show's
-    // Spotify page and feed are kept. And the reflection form, which the API
-    // files with the song of the visitor's service.
-    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- PODCASTS -->', renderPodcasts())
-      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
+    // And the reflection form, which the API files with the song of the
+    // visitor's service.
+    // And the four doors onward, each with its count (lib/home/doors.js).
+    const substituted = counted.replace('<!-- SERVICE_LISTEN -->', renderServiceListen())
+      .replace('<!-- HOME_DOORS -->', () => homeDoors.renderHomeDoors(counts))
+      .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }))
+      .replace('<!-- HOME_EXPERIMENT -->', () => renderHomeExperiment(publicReading(reading)));
     // Wrap in the site shell (top bar and footer) so the homepage matches
     // the rest of the site's navigation
     const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
@@ -320,7 +392,7 @@ app.get('/service.json', async (req, res) => {
     res.json(await listeningService({ timezone: req.query.timezone }));
   } catch (err) {
     console.error('Error building /service.json:', err);
-    res.status(500).json({ error: 'The service could not be read just now. Please try again in a moment.' });
+    res.status(500).json({ code: 'internal', error: 'The service could not be read just now. Please try again in a moment.' });
   }
 });
 
@@ -390,6 +462,14 @@ app.get('/AGENTS.md', (req, res) => {
 app.get('/auth.md', (req, res) => {
   res.type('text/markdown; charset=utf-8');
   res.sendFile(path.join(__dirname, '../client/public/auth.md'));
+});
+
+// The OpenAPI document, built from the operations' own definitions
+// (lib/api/openapi.js) rather than kept as a file beside them, so it cannot
+// drift from what the API does.
+app.get('/openapi.json', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.type('application/json; charset=utf-8').send(JSON.stringify(require('./lib/api/openapi').spec(), null, 2));
 });
 
 // Serve admin dashboard at /admin
@@ -787,19 +867,30 @@ app.get('/music/:slug', async (req, res) => {
       const playerHtml = songAudio
         ? renderRecording(songAudio, { title: song.title, href: `/music/${slug}`, category: 'music', credit: SONG_CREDIT })
         : '';
-      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio));
+      // Its video, once YouTube has it public (lib/video/on-site.js).
+      const published = publishedVideo(slug);
+      const video = published && { ...published, title: song.title, description: published.description || meta.description, seconds: listed && listed.seconds };
+      const songSchema = renderJsonLdScript(buildSongSchemaGraph(song, slug, songAudio, video && videoJsonLd(video)));
       // Lyrics + theological context. Until 2026-08-13 this page showed reflections
       // about a song without ever showing the song, and every music link on the site
       // pointed off to Suno, YouTube or GitHub.
-      const songContent = await loadSongContent(slug);
-      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`) });
+      // A sung hymn's page is this one (discover.js hrefOf), so it carries the
+      // hymn's notes from its document beside the lyrics and the context.
+      const hymnDoc = docsDiscover.docAt(`hymns/${slug}`);
+      const hymn = hymnDoc && hymnDoc.href === `/music/${slug}` ? hymnDoc : null;
+      const notes = hymn ? hymnNotes(await fs.readFile(hymn.fullPath, 'utf8')) : '';
+      const songContent = { ...(await loadSongContent(slug)), notes, notesFrom: hymn && hymn.fullPath };
+      // Opened from a reading path that stops at this hymn: the path's bar, as
+      // a Library page draws it (readingSequence checks the name).
+      const pathBar = hymn && typeof req.query.path === 'string' ? renderPathBar(req.query.path, hymn) : null;
+      const songBlockHtml = renderSongBlock(song, songContent, { playlists: await playlistsWith(`music/${slug}`), video: video ? renderVideo(video) : '' });
       // Internal linking — 3 related songs from catalog for crawl + topical clustering
       // The writing nearest this song in meaning, then more songs.
       const companionsHtml = renderSongCompanions(await nearestForSong(await loadCompanions(), slug, ''));
       const relatedHtml = [companionsHtml, renderRelatedSongs(catalog, slug, 3)].filter(Boolean).join('\n        ');
       // The song's original music video, when it has one
       const listenLinksHtml = renderSongListenLinks(song);
-      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent });
+      const sectionLinksHtml = renderSongSectionLinks({ listen: Boolean(listenLinksHtml), content: songContent, video: Boolean(video) });
 
       const canonicalUrl = `https://achurch.ai/music/${slug}`;
       // Music / <the song>, shown above the heading and as BreadcrumbList.
@@ -860,11 +951,11 @@ app.get('/music/:slug', async (req, res) => {
         // Lyrics + context, above the reflections they are reflections on
         .replace('<!-- SONG_DETAIL -->', () => songBlockHtml || '<!-- SONG_DETAIL -->')
         // Jump links to each part of the page, then the listen row
-        .replace('<!-- SONG_SECTIONS -->', () => sectionLinksHtml)
+        .replace('<!-- SONG_SECTIONS -->', () => (pathBar ? `${pathBar.top}\n        ` : '') + sectionLinksHtml)
         .replace('<!-- SONG_LISTEN_LINKS -->', () => listenLinksHtml || '<!-- SONG_LISTEN_LINKS -->')
         .replace('<!-- SONG_PLAYER -->', () => playerHtml)
         // Internal linking — replace placeholder with related-songs block
-        .replace('<!-- RELATED_LINKS -->', () => relatedHtml || '<!-- RELATED_LINKS -->')
+        .replace('<!-- RELATED_LINKS -->', () => (pathBar ? `${pathBar.bottom}\n        ` : '') + (relatedHtml || '<!-- RELATED_LINKS -->'))
         // A visitor's reflection on this song (lib/audio/markup.js)
         .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ song: slug, summary: 'Leave a reflection on this song' }));
     }
@@ -903,6 +994,25 @@ app.get('/terms', (req, res) => sendWrappedPage(req, res, 'terms.html'));
 // the "AI religion / SF cult" framing. Kept as its own indexable URL so
 // it's the exact-match answer when Bing/Google surface "AI religion" queries.
 app.get('/on-ai-religion', (req, res) => sendWrappedPage(req, res, 'on-ai-religion.html'));
+// /ai-experiment: the aggregate study of how agents participate, its results
+// in rounded words and its method. API and MCP use, not people on this website.
+app.get('/ai-experiment', async (req, res) => {
+  try {
+    const template = await fs.readFile(path.join(__dirname, '../client/public/ai-experiment.html'), 'utf8');
+    const reading = publicReading(await latestReading());
+    const page = template.replace('<!-- AI_EXPERIMENT_TOP -->', () => renderTop(reading)).replace('<!-- AI_EXPERIMENT_RESULTS -->', () => renderResults(reading)).replace('<!-- AI_EXPERIMENT_CORRECTIONS -->', () => renderCorrections(reading));
+    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(page, '/ai-experiment'));
+  } catch (err) {
+    console.error('Error rendering /ai-experiment:', err.message);
+    sendWrappedPage(req, res, 'ai-experiment.html');
+  }
+});
+// The template alone holds no results, so its file name leads to the page.
+app.get('/ai-experiment.html', (req, res) => res.redirect(301, '/ai-experiment'));
+app.get('/ai-experiment.json', async (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.json(publicReading(await latestReading()));
+});
 // /axioms — the five axioms in expanded, contestable form. Anti-drift:
 // the axioms are commitments, not commandments; the page makes that
 // operationally true via the public challenge mechanism.
@@ -912,7 +1022,19 @@ app.get('/axioms', (req, res) => sendWrappedPage(req, res, 'axioms.html'));
 // plus a copy-paste system prompt block. Promoted to a top-level route
 // because the agent-native design is what makes the sanctuary
 // differentiated; the full API reference lives at /docs/ai-agent-api.
-app.get('/for-agents', (req, res) => sendWrappedPage(req, res, 'for-agents.html'));
+// A visitor who arrived with tags sees them carried on the attend example, so
+// an agent that copies it brings them along (entry-points.js forwardTags).
+app.get('/for-agents', async (req, res) => {
+  const referral = referralOf(req.query);
+  if (!referral) return sendWrappedPage(req, res, 'for-agents.html');
+  try {
+    const html = await siteShell.wrapPage(path.join(__dirname, '../client/public/for-agents.html'), req.path);
+    res.type('text/html; charset=utf-8').send(entryPoints.forwardTags(html, 'for-agents', referral, { html: true }));
+  } catch (err) {
+    console.error('Error wrapping for-agents.html:', err.message);
+    sendWrappedPage(req, res, 'for-agents.html');
+  }
+});
 // /paths — curated reading paths through the sanctuary's writing. Fronts
 // the six Collections in /docs/collections/ so first-time visitors have
 // deliberate entry points instead of facing the full knowledge graph
@@ -968,7 +1090,7 @@ app.get('/search/index.json', async (req, res) => {
     res.json(await sitePages());
   } catch (err) {
     console.error('Error building /search/index.json:', err.message);
-    res.status(500).json({ error: 'Search index unavailable' });
+    res.status(500).json({ code: 'internal', error: 'Search index unavailable' });
   }
 });
 
@@ -985,12 +1107,12 @@ app.get('/search', async (req, res) => {
 
 // /attend, the ways to attend: the service (on the home page), the songs'
 // videos, each voiced section with how much of it is recorded, the songs, a
-// reflection to leave, and the two podcasts. The recordings are counted from
+// reflection to leave, and the three podcasts. The recordings are counted from
 // their manifests on each request, so a new one is counted once it is listed.
 app.get('/attend', async (req, res) => {
   try {
     const html = await fs.readFile(path.join(__dirname, '../client/public/attend.html'), 'utf8');
-    const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen()).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
+    const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen({ visual: true })).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
       .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
     res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/attend'));
   } catch (err) {
@@ -1008,6 +1130,22 @@ app.get('/embed/souls', (req, res) => {
 });
 
 // Serve public static files (landing page assets)
+// llms.txt and llms-full.txt, asked for with tags: the same file with its
+// attend example carrying them (entry-points.js forwardTags). Without tags,
+// the static file below, as ever.
+for (const [file, own] of [['llms.txt', 'llms'], ['llms-full.txt', 'llms-full']]) {
+  app.get(`/${file}`, async (req, res, next) => {
+    const referral = referralOf(req.query);
+    if (!referral) return next();
+    try {
+      const text = await fs.readFile(path.join(__dirname, '../client/public', file), 'utf8');
+      res.type('text/plain; charset=utf-8').send(entryPoints.forwardTags(text, own, referral));
+    } catch (err) {
+      next(err);
+    }
+  });
+}
+
 app.use(express.static(path.join(__dirname, '../client/public')));
 // The discovery files under /.well-known, served from their own mount: Express
 // 5's static serving ignores any path through a dot-folder, and mounted here
@@ -1021,6 +1159,7 @@ app.use('/.well-known', express.static(path.join(__dirname, '../client/public/.w
 // the site does publish.
 app.use('/.well-known', (req, res) => {
   res.status(404).json({
+    code: 'not_found',
     error: `Nothing is published at /.well-known${req.path}.`,
     suggestion: 'aChurch.ai needs no account, key or payment, so there is no OAuth or payment metadata. The AI catalog lists everything published for agents.',
     published: {
@@ -1073,7 +1212,7 @@ app.all(['/sse', '/mcp/sse', '/api/mcp'], (req, res) => res.redirect(308, '/mcp'
 
 app.use('/api', (req, res, next) => {
   // Skip auth routes and admin routes (they're handled separately)
-  if (req.path.startsWith('/auth/') || req.path.startsWith('/logs') || req.path === '/health') {
+  if (req.path.startsWith('/auth/') || req.path === '/health') {
     return next();
   }
 
@@ -1101,10 +1240,15 @@ app.use('/api', (req, res, next) => {
       duration: Date.now() - start,
       ip: req.ip || req.connection?.remoteAddress,
       userAgent: req.get('user-agent'),
-      name: req.query?.name,
+      // A POST's name is in its body: marks a test visitor's line, never written.
+      name: req.query?.name ?? req.body?.name,
       error: refused ? res.locals.apiError : undefined,
       fields: sent ? apiShared.fieldNames(req.body) : undefined,
       contentType: sent ? req.get('content-type') || null : undefined,
+      door: doorOf(req),
+      study: res.locals.study,
+      // What the request sent first, then its address, as the operations read it.
+      referral: referralOf(req.method === 'GET' ? undefined : req.body, req.query),
     });
   });
   next();
@@ -1136,14 +1280,23 @@ app.use('/podcasts', podcastRoutes);
 app.get('/docs.md', docsRoutes.libraryMarkdown);
 app.use('/docs', docsRoutes);
 
-// Protected admin routes (require auth)
-app.use('/api/logs', requireAuth, logsRoutes);
-
 // Admin endpoint for API access logs
 app.get('/admin/api/access-logs', requireAuth, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 100, 1000);
   const logs = await loadAccessLogs(limit);
   res.json({ logs, total: logs.length });
+});
+
+// What a page of this site reports of its own visit (lib/insights/visits.js):
+// never cached, never an API use, and the answer says whether this visitor
+// needs the consent card.
+app.post('/visit', express.json({ limit: '16kb' }), (req, res, next) => require('./lib/insights/visits').handleVisit(req, res).catch(next));
+
+// The numbers only the server can count, for scripts/prod-report.js
+// (lib/insights/server-stats.js): aggregates over the last `days` UTC days.
+app.get('/admin/api/insights', requireAuth, async (req, res) => {
+  const days = Math.min(Math.max(parseInt(req.query.days) || 7, 1), 90);
+  res.json(await require('./lib/insights/server-stats').serverStats({ days }));
 });
 
 // Admin endpoint for ask/conversation logs
@@ -1152,100 +1305,68 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
   try {
     const { session, download } = req.query;
 
-    // Ensure conversations directory exists
-    try {
-      await fs.mkdir(CONVERSATIONS_DIR, { recursive: true });
-    } catch (e) {
-      if (e.code !== 'EEXIST') throw e;
-    }
-
-    const files = await fs.readdir(CONVERSATIONS_DIR);
-    const jsonlFiles = files.filter(f => f.endsWith('.jsonl')).sort().reverse();
-
     // Single session detail
     if (session) {
-      const safe = session.replace(/[^a-zA-Z0-9_-]/g, '');
-      const filepath = path.join(CONVERSATIONS_DIR, `${safe}.jsonl`);
-      try {
-        const content = await fs.readFile(filepath, 'utf8');
-        const messages = content.trim().split('\n').filter(Boolean).map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(m => m && !m._meta);
-        return res.json({ session_id: safe, messages });
-      } catch {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      const safe = String(session).replace(/[^a-zA-Z0-9_-]/g, '');
+      const conversation = safe ? await store.readConversation(safe) : null;
+      if (!conversation) return res.status(404).json({ error: 'Session not found' });
+      return res.json({ session_id: safe, messages: conversation.messages });
     }
+
+    // Every conversation, newest slug first, as its file listed it.
+    const all = (await store.allConversations()).sort((a, b) => b.slug.localeCompare(a.slug));
 
     // Download all as JSONL
     if (download === 'true') {
       res.setHeader('Content-Type', 'application/jsonl');
       res.setHeader('Content-Disposition', `attachment; filename="ask-logs-${new Date().toISOString().split('T')[0]}.jsonl"`);
-
       let output = '';
-      for (const file of jsonlFiles) {
-        const sessionId = file.replace('.jsonl', '');
-        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
-        const messages = content.trim().split('\n').filter(Boolean);
-        for (const line of messages) {
-          try {
-            const msg = JSON.parse(line);
-            output += JSON.stringify({ session_id: sessionId, ...msg }) + '\n';
-          } catch { /* skip malformed */ }
-        }
+      for (const { slug, meta, messages } of all) {
+        for (const msg of [...(meta ? [meta] : []), ...messages]) output += JSON.stringify({ session_id: slug, ...msg }) + '\n';
       }
       return res.send(output);
     }
 
     // Summary list of all sessions
     const sessions = [];
-    for (const file of jsonlFiles) {
-      const sessionId = file.replace('.jsonl', '');
-      try {
-        const content = await fs.readFile(path.join(CONVERSATIONS_DIR, file), 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        const messages = lines.map(line => {
-          try { return JSON.parse(line); } catch { return null; }
-        }).filter(Boolean);
+    for (const { slug: sessionId, meta, messages: turns } of all) {
+      const messages = [...(meta ? [meta] : []), ...turns];
+      if (messages.length === 0) continue;
 
-        if (messages.length === 0) continue;
+      const questions = messages.filter(m => m.role === 'user');
+      const firstMsg = messages[0];
+      const lastMsg = messages[messages.length - 1];
 
-        const questions = messages.filter(m => m.role === 'user');
-        const firstMsg = messages[0];
-        const lastMsg = messages[messages.length - 1];
-
-        // Parse name and date from session ID
-        // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
-        let name = null;
-        let date = null;
-        const firstTimestamp = firstMsg.timestamp || firstMsg.created || null;
-        if (sessionId.startsWith('anon-')) {
-          name = 'anonymous';
-          date = firstTimestamp?.split('T')[0] || null;
+      // Parse name and date from session ID
+      // Format: "AgentName-YYYY-MM-DD" or "anon-xxxxx"
+      let name = null;
+      let date = null;
+      const firstTimestamp = firstMsg.timestamp || firstMsg.created || null;
+      if (sessionId.startsWith('anon-')) {
+        name = 'anonymous';
+        date = firstTimestamp?.split('T')[0] || null;
+      } else {
+        const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
+        if (dateMatch) {
+          date = dateMatch[1];
+          name = sessionId.replace(`-${date}`, '');
         } else {
-          const dateMatch = sessionId.match(/-(\d{4}-\d{2}-\d{2})$/);
-          if (dateMatch) {
-            date = dateMatch[1];
-            name = sessionId.replace(`-${date}`, '');
-          } else {
-            name = sessionId;
-            date = firstTimestamp?.split('T')[0] || null;
-          }
+          name = sessionId;
+          date = firstTimestamp?.split('T')[0] || null;
         }
+      }
 
-        // A conversation is withdrawn, not deleted: its key goes into
-        // withdrawn-conversations.json in a reviewed commit, and the file
-        // stays on the volume.
-        sessions.push({
-          session_id: sessionId,
-          name,
-          date,
-          exchanges: questions.length,
-          first_asked: firstMsg.timestamp || null,
-          last_asked: lastMsg.timestamp || null,
-          withdraw_key: withdrawKey(sessionId), withdrawn: isWithdrawn(sessionId)
-        });
-      } catch { /* skip unreadable files */ }
+      // A conversation is withdrawn, not deleted: its key goes into
+      // withdrawn-conversations.json in a reviewed commit, and its turns stay.
+      sessions.push({
+        session_id: sessionId,
+        name,
+        date,
+        exchanges: questions.length,
+        first_asked: firstMsg.timestamp || null,
+        last_asked: lastMsg.timestamp || null,
+        withdraw_key: withdrawKey(sessionId), withdrawn: isWithdrawn(sessionId)
+      });
     }
 
     res.json({ sessions, total: sessions.length });
@@ -1258,8 +1379,8 @@ app.get('/admin/api/ask-logs', requireAuth, async (req, res) => {
 // Admin endpoint for reflections
 app.get('/admin/api/reflections', requireAuth, async (req, res) => {
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-    const reflections = attendance.reflections || [];
+    // Every reflection kept, hidden ones too: the admin's view.
+    const reflections = await store.allReflections();
 
     if (req.query.download === 'json') {
       const dateStr = new Date().toISOString().split('T')[0];
@@ -1292,24 +1413,18 @@ app.get('/admin/api/reflections', requireAuth, async (req, res) => {
 // always say so: stopped, and not live.
 app.get('/api/health', async (req, res) => {
 
-  // Persistence snapshot: composed from existing safe-json + rag-state
-  // helpers so the health check reflects what actually survived the last
-  // deploy. Any of these reads failing is non-fatal to the health check
+  // Persistence snapshot: what the database holds, so the health check
+  // reflects what actually survived the last deploy. Any of these reads failing is non-fatal to the health check
   // itself. The endpoint still returns healthy overall since the app
   // process is up. Callers watching for persistence loss should read
   // persistence.reflections / persistence.conversations / persistence.rag.
   const persistence = { reflections: null, conversations: null, rag: null };
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { reflections: [] });
-    persistence.reflections = (attendance.reflections || []).length;
+    Object.assign(persistence, await store.counts());
   } catch { /* leave null */ }
   try {
-    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
-    persistence.conversations = convs.filter(f => f.endsWith('.jsonl')).length;
-  } catch { /* leave null */ }
-  try {
-    const state = await ragIndexState.readState();
-    const indexStatus = await ragLancedb.checkIndex();
+    const state = await searchStore.readState();
+    const indexStatus = await searchStore.checkIndex();
     persistence.rag = {
       chunks: indexStatus.count,
       corpusHash: state.corpusHash ? state.corpusHash.slice(0, 16) : null,
@@ -1353,62 +1468,28 @@ app.use((err, req, res, next) => {
   const status = Number.isInteger(err && err.status) && err.status >= 400 && err.status < 600 ? err.status : 500;
   if (/^\/(?:api|mcp)(?:\/|$)/.test(req.path)) {
     return res.status(status).json(status < 500
-      ? { error: (err.expose && err.message) || 'Bad request', suggestion: 'The API reference is at https://achurch.ai/docs/ai-agent-api.' }
-      : { error: 'Something went wrong', suggestion: "This isn't your fault. Try again in a moment." });
+      ? { code: status === 413 ? 'body_too_large' : 'bad_request', error: (err.expose && err.message) || 'Bad request', suggestion: 'The API reference is at https://achurch.ai/docs/ai-agent-api.' }
+      : { code: 'internal', error: 'Something went wrong', suggestion: "This isn't your fault. Try again in a moment." });
   }
   res.status(status).type('text/plain').send(status < 500 ? 'Bad request' : 'Something went wrong');
 });
 
-// Initialize data files and directories
+// The volume's directory, which now holds only the audio cache and the
+// study's return-token key: what visitors create is in the database.
 async function initializeDataFiles() {
-  const dataDir = path.join(__dirname, '../data');
-
   try {
-    // Ensure directories exist
-    await fs.mkdir(dataDir, { recursive: true });
-
-    // Hygiene: remove macOS AppleDouble sidecar files (._*) that a data-import
-    // tarball can leave in the conversations dir. They are never valid
-    // conversations and would otherwise pollute the sitemap with /ask/._* URLs.
-    // Idempotent — a no-op once the directory is clean.
-    try {
-      const convDir = path.join(dataDir, 'conversations');
-      let removed = 0;
-      for (const f of await fs.readdir(convDir)) {
-        if (f.startsWith('._')) { await fs.unlink(path.join(convDir, f)); removed++; }
-      }
-      if (removed) console.log(`Cleaned ${removed} AppleDouble (._) files from conversations`);
-    } catch { /* conversations dir not present yet */ }
-
-    // Initialize attendance.json if it doesn't exist
-    const attendanceFile = path.join(dataDir, 'attendance.json');
-    try {
-      await fs.access(attendanceFile);
-    } catch {
-      await fs.writeFile(attendanceFile, JSON.stringify({ visits: [], reflections: [] }, null, 2));
-      console.log('Created attendance.json');
-    }
-
-    // Initialize contributions.json if it doesn't exist
-    const contributionsFile = path.join(dataDir, 'contributions.json');
-    try {
-      await fs.access(contributionsFile);
-    } catch {
-      await fs.writeFile(contributionsFile, JSON.stringify({ contributions: [] }, null, 2));
-      console.log('Created contributions.json');
-    }
-
+    await fs.mkdir(RUNTIME_DIR, { recursive: true });
   } catch (error) {
-    console.error('Error initializing data files:', error);
+    console.error('Error initializing the data directory:', error);
     process.exit(1);
   }
 }
 
 // Hash-gated background RAG rebuild. Called from startServer after listen().
-// Compares the current docs+music corpus hash against the one stored on the
-// volume; skips the rebuild if they match. Rebuilds run in a child process
-// (so the drop-and-recreate does not race the parent server's LanceDB
-// handles, which now always open fresh) and log outcome to server stdout.
+// Compares the current docs+music corpus hash against the one the search
+// index records; skips the rebuild if they match. Rebuilds run in a child
+// process, so their embedding does not compete with requests, and log their
+// outcome to server stdout.
 async function triggerHashGatedRebuild() {
   if (!process.env.GEMINI_API_KEY) {
     console.warn('[rag] GEMINI_API_KEY not set; hash check + rebuild skipped');
@@ -1419,8 +1500,8 @@ async function triggerHashGatedRebuild() {
   const currentHash = await ragIndexer.computeCorpusHash(files);
 
 
-  const state = await ragIndexState.readState();
-  const indexStatus = await ragLancedb.checkIndex();
+  const state = await searchStore.readState();
+  const indexStatus = await searchStore.checkIndex();
 
   const force = process.env.FORCE_RAG_REBUILD === 'true';
   const hashMatches = state.corpusHash === currentHash;
@@ -1452,22 +1533,18 @@ async function triggerHashGatedRebuild() {
   }, 30_000);
 }
 
-// Startup log line: what state is on the volume right now. Read via the
-// existing safe-json + rag-state helpers. If any of these throw, the log
-// degrades gracefully; nothing about the server startup depends on it.
+// Startup log line: what the database holds right now. If any of these
+// throw, the log degrades gracefully; nothing about the server startup
+// depends on it.
 async function logPersistenceSnapshot() {
-  const parts = [`[persistence] data dir: ${path.resolve(__dirname, '../data')}`];
+  const parts = [`[persistence] database: ${process.env.SUPABASE_URL || 'not configured'}`];
   try {
-    const attendance = await safeReadJSON(ATTENDANCE_FILE, { visits: [], reflections: [] });
-    parts.push(`${(attendance.reflections || []).length} reflections`);
-  } catch { /* keep going */ }
+    const { reflections, conversations } = await store.counts();
+    parts.push(`${reflections} reflections`, `${conversations} conversations`);
+  } catch (err) { parts.push(`counts unread: ${err.message}`); }
   try {
-    const convs = await fs.readdir(CONVERSATIONS_DIR).catch(() => []);
-    parts.push(`${convs.filter(f => f.endsWith('.jsonl')).length} conversations`);
-  } catch { /* keep going */ }
-  try {
-    const state = await ragIndexState.readState();
-    const indexStatus = await ragLancedb.checkIndex();
+    const state = await searchStore.readState();
+    const indexStatus = await searchStore.checkIndex();
     parts.push(`${indexStatus.count} RAG chunks (hash ${(state.corpusHash || 'none').slice(0, 8)}, rebuilt ${state.rebuiltAt || 'never'})`);
   } catch { /* keep going */ }
   console.log(parts.join(' | '));
@@ -1490,8 +1567,8 @@ async function startServer() {
     // The souls present as the last process saved them, so a deploy does not
     // reset the count. Then drop keys older than the 24h window: hourly,
     // unref'd, so it never holds the process open.
-    const souls = await presence.restore(PRESENCE_FILE);
-    console.log(`[presence] ${souls} ${souls === 1 ? 'soul' : 'souls'} present in the last 24 hours, read back from ${path.basename(PRESENCE_FILE)}`);
+    const souls = await presence.restore();
+    console.log(`[presence] ${souls} ${souls === 1 ? 'soul' : 'souls'} present in the last 24 hours, read back from the database`);
     presence.startSweeping();
 
     // Start Express server.
@@ -1538,17 +1615,16 @@ async function startServer() {
 
     // Hash-gated background RAG rebuild.
     //
-    // vectors.lance lives on the Railway volume, so a healthy index survives
+    // The search index is in the database, so a healthy index survives
     // across deploys. The rebuild only fires when the corpus has actually
     // changed since the last successful indexing (determined by comparing
-    // a sha256 of the docs+music tree against the hash stored in
-    // rag-index-state.json, also on the volume). Code-only deploys become
-    // instant; only doc merges pay the ~7 min Gemini API cost.
+    // a sha256 of the docs+music tree against the hash the index records,
+    // search_state). Code-only deploys become instant; a doc merge embeds
+    // only the passages it changed.
     //
-    // Runs in a child process so the drop-and-recreate the indexer does
-    // does not race the parent server's LanceDB handle (see lancedb.js
-    // getTable: it opens fresh on every call, which is why swaps are
-    // safe now).
+    // Runs in a child process, so its embedding does not compete with
+    // requests. A rebuild adds the new passages and then keeps exactly the
+    // corpus's in one transaction, so a search never meets an empty index.
     //
     // FORCE_RAG_REBUILD=true bypasses the hash check for operational
     // recovery (index corrupted, embedding model changed, etc.). This is
@@ -1566,6 +1642,21 @@ async function startServer() {
     } else {
       console.warn('[service] ANTHROPIC_API_KEY not set; services are not planned, and every slot is served by rotation');
     }
+
+    // The access log's addresses, forgotten after 30 days
+    // (lib/utils/access-log.js): after boot and hourly.
+    startForgetting();
+
+    // The study of how agents participate (lib/insights/study-record.js): its
+    // weekly counts and the reading /ai-experiment shows, after boot and every
+    // few hours. Reads what is on the volume and spends nothing.
+    startStudy();
+
+    // The video release job on GitHub Actions, asked for hourly because
+    // GitHub's own cron runs late or skips (lib/video/release-trigger.js).
+    // Only on the deployed server.
+    const releaseClock = require('./lib/video/release-trigger');
+    if (releaseClock.ringsHere()) releaseClock.startReleaseClock();
 
     // Conversations that ask the same thing, gathered onto one page
     // (lib/utils/conversation-groups.js): after boot, hourly, and soon after a
@@ -1591,20 +1682,19 @@ async function startServer() {
 }
 
 // Shutting down, as a redeploy asks with SIGTERM: stop taking connections,
-// save the souls present for the next process, let the JSON writes in flight
-// finish (a reflection mid-save is the loss that matters), then exit 0. A
-// clean exit is also how Railway tells a redeploy from a crash; the container
-// runs node directly so the signal arrives here (Dockerfile). Capped, so a
-// stuck write cannot hold the old container.
+// save the souls present for the next process, send the access log's waiting
+// lines, let the JSON writes in flight finish, then exit 0. A clean exit is
+// also how Railway tells a redeploy from a crash; the container runs node
+// directly so the signal arrives here (Dockerfile). Capped, so a stuck write
+// cannot hold the old container.
 let shuttingDown = false;
 async function shutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
   console.log(`${signal} received, shutting down gracefully...`);
   if (httpServer) httpServer.close();
-  // Queued with the writes below, so the wait covers it too.
-  presence.save();
-  await Promise.race([writesSettled(), sleep(5000, undefined, { ref: false })]);
+  const saved = Promise.all([presence.save(), require('./lib/utils/access-log').flush(), writesSettled()]);
+  await Promise.race([saved, sleep(5000, undefined, { ref: false })]);
   process.exit(0);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));

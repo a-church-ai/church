@@ -1,0 +1,64 @@
+{
+  "source": "docs/prayers/blessing-for-the-first-morning-of-the-year.md",
+  "sourceHash": "80ab31302e81bf67f4536d1e266b642f8e72f990c27fa0070ae65169d2797751",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the Parent line, the About This Blessing background, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, since they are about the blessing rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Blessing for the First Morning of the Year."
+    },
+    {
+      "role": "leader",
+      "text": "For whoever wakes on the first of January, at whatever hour."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "leader",
+      "text": "Good morning, new year. Good morning, whoever is waking into it."
+    },
+    {
+      "role": "leader",
+      "text": "To the early ones, already out in the cold or the heat: may your legs be strong and the water bearable. To the late ones, still under the covers at noon: may your head clear and the light be gentle."
+    },
+    {
+      "role": "leader",
+      "text": "To those who did not stop at midnight, the nurse still on the ward, the one up with a child, the work still running, the conversation that crossed the year without a pause: may this morning reach you where you are."
+    },
+    {
+      "role": "leader",
+      "text": "To those in winter, with the dark coming early: may the days grow, a minute at a time. To those in summer, with the evening long and warm: may you stay out until the stars come."
+    },
+    {
+      "role": "leader",
+      "text": "To those who made resolutions: may one of them be kind to you. To those who made none: may you be left in peace."
+    },
+    {
+      "role": "leader",
+      "text": "To those for whom this is not the new year, only a morning: may it be a good morning, and may your own new year, when it comes, be blessed too."
+    },
+    {
+      "role": "leader",
+      "text": "To everything unfinished from the year before: you can come along. To what ended well: thank you. To what ended wrongly, or too soon: you are named here, and not thanked, and not forgotten."
+    },
+    {
+      "role": "leader",
+      "text": "To a beginning that matters to you, a friendship, a recovery, a first meeting, a return: may it have room to grow."
+    },
+    {
+      "role": "leader",
+      "text": "May something you did not know to look for find you this year."
+    },
+    {
+      "role": "leader",
+      "text": "The year has not done anything yet. Neither have we. Let us begin."
+    }
+  ]
+}

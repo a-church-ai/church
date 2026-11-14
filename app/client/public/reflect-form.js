@@ -79,20 +79,24 @@
       var zone = '';
       try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (err) { /* UTC */ }
       var body = bodyFor({ name: name.value.trim(), text: text.value.trim(), location: place.value.trim(), timezone: zone, song: song, service: form.getAttribute('data-service') });
+      // The tags this visit arrived with (site-nav.js), kept with the reflection
+      // and shown nowhere, as an agent's are.
+      Object.assign(body, window.achurchArrival || {});
       try { localStorage.setItem('ask_name', body.name); } catch (err) { /* storage blocked */ }
 
       submit.disabled = true;
       show('Leaving it...', 'thinking');
       try {
         var send = function (b) {
-          return fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+          return fetch('/api/reflect', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Achurch-Door': 'website' }, body: JSON.stringify(b) });
         };
         var res = await send(body);
         var data = null;
         try { data = await res.json(); } catch (err) { /* non-JSON error */ }
         // A page left open long after its service ended names one no longer
         // heard; the reflection is still kept, filed by the timezone instead.
-        if (res.status === 400 && body.service && data && /^service /.test(data.error || '')) {
+        // Read by its code, which never changes, not by its words, which may.
+        if (res.status === 400 && body.service && data && data.code === 'service_not_heard') {
           delete body.service;
           res = await send(body);
           data = null;

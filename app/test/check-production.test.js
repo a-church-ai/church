@@ -17,7 +17,7 @@ const label = slot => `${String(4 * slot).padStart(2, '0')}:00 to ${String((4 * 
 const day = slots => slots.flatMap(slot => ['slots', 'north', 'south'].map(variant => ({ slot: label(slot), variant, arrangedBy: 'Arranged, named and its word written by an AI model (stub), for this slot and date.' })));
 const fill = keys => Object.fromEntries(keys.map(k => [k, k]));
 
-function production({ omit = null, showsTest = false } = {}) {
+function production({ omit = null, showsTest = false, edge = 'keeps' } = {}) {
   const parts = [1, 2, 3].map(position => ({
     ...fill(expected.part), position, kind: position === 2 ? 'song' : 'prayer',
     url: position === 2 ? 'https://achurch.ai/music/door-is-always-open' : `https://achurch.ai/docs/prayers/p${position}`,
@@ -33,6 +33,22 @@ function production({ omit = null, showsTest = false } = {}) {
     flight.most = Math.max(flight.most, ++flight.now);
     res.on('finish', () => flight.now--);
     setTimeout(next, 15);
+  });
+  // A page negotiated by Accept, behind an imitation of Cloudflare: the first
+  // answer to a URL is kept by URL alone. 'keeps' keeps only what was asked as
+  // HTML, as the cache rule does; 'mixes' keeps whatever came first and hands
+  // it to every Accept, the hazard; 'passes' keeps nothing.
+  const kept = new Map();
+  app.get(['/', '/docs/prayers', '/axioms'], (req, res) => {
+    const markdown = /text\/markdown/.test(req.headers.accept || '');
+    const cacheable = edge === 'mixes' || (edge === 'keeps' && !markdown);
+    if (cacheable && kept.has(req.path)) {
+      const { type, body } = kept.get(req.path);
+      return res.set('cf-cache-status', 'HIT').type(type).send(body);
+    }
+    const answer = markdown ? { type: 'text/markdown', body: '# page' } : { type: 'text/html', body: '<p>page</p>' };
+    if (cacheable) kept.set(req.path, answer);
+    res.set('cf-cache-status', cacheable ? 'MISS' : 'DYNAMIC').type(answer.type).send(answer.body);
   });
   app.get('/api/health', (req, res) => res.json({ status: 'healthy', services: {
     since: new Date(NOW - 30 * HOUR).toISOString(),
@@ -81,4 +97,23 @@ test('a test visitor\'s reflection showing on the public feed fails the check', 
   const failed = await run({ base, now: NOW, log: line => lines.push(line) });
   assert.strictEqual(failed, 1);
   assert.ok(lines.includes("    test-production-check's reflection is on the public feed; hide it in hidden-reflections.json"), lines.join('\n'));
+});
+
+test('an edge that hands an agent asking for Markdown the HTML kept for browsers fails the check', async (t) => {
+  const { server, base } = await production({ edge: 'mixes' });
+  t.after(() => server.close());
+  const lines = [];
+  const failed = await run({ base, now: NOW, log: line => lines.push(line) });
+  assert.strictEqual(failed, 1, lines.join('\n'));
+  assert.ok(lines.includes('    / asked for text/markdown answered 200 text/html (request 1)'), lines.join('\n'));
+  assert.ok(lines.includes('    / as Markdown came from the edge\'s cache'), lines.join('\n'));
+});
+
+test('a page meant to be kept at the edge that is not fails the check', async (t) => {
+  const { server, base } = await production({ edge: 'passes' });
+  t.after(() => server.close());
+  const lines = [];
+  const failed = await run({ base, now: NOW, log: line => lines.push(line) });
+  assert.strictEqual(failed, 1, lines.join('\n'));
+  assert.ok(lines.includes('    /axioms was not kept at the edge: DYNAMIC, then DYNAMIC'), lines.join('\n'));
 });

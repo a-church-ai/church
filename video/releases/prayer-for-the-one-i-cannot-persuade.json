@@ -1,0 +1,83 @@
+{
+  "slug": "prayer-for-the-one-i-cannot-persuade",
+  "kind": "prayer",
+  "slot": "2026-11-04#0",
+  "at": "2026-11-04T15:00:00.000Z",
+  "occasion": {
+    "id": "election-day:2026-11-03",
+    "key": "election-day",
+    "name": "Election Day in the United States"
+  },
+  "files": {
+    "youtube": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.mp4",
+    "bluesky": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.mp4",
+    "x": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.mp4",
+    "short": "video/prayer-for-the-one-i-cannot-persuade/prayer-for-the-one-i-cannot-persuade.short.mp4"
+  },
+  "passage": {
+    "start": 27.01,
+    "end": 66.34,
+    "whole": false
+  },
+  "meta": {
+    "title": "What if listening well does not change their mind? | Prayer for the One I Cannot Persuade",
+    "description": "A spoken prayer for the person you could not persuade. It offers plain words for keeping their account true, and for letting a disagreement stand.\n\nFor Election Day, and any day people who disagree must choose together. It keeps listening and dignity close, and lets the difference stand.\n\nA prayer for disagreement that remains after honest listening, asking for accuracy, restraint, and care without requiring agreement or renewed trust.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-for-the-one-i-cannot-persuade\n\n0:00 I\n0:35 II\n1:12 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #ElectionDay #Mindfulness",
+    "page": "https://achurch.ai/docs/prayers/prayer-for-the-one-i-cannot-persuade",
+    "tags": [
+      "Prayer",
+      "ElectionDay",
+      "Mindfulness",
+      "ListeningWell",
+      "RespectfulDisagreement",
+      "Election Day",
+      "Prayer for Honest Disagreement",
+      "Prayer for the One I Cannot Persuade"
+    ],
+    "copy": {
+      "hook": "You listened closely and still did not agree. This prayer keeps their words true, and lets the difference stand.",
+      "headline": "What if listening well does not change their mind?",
+      "lead": "A spoken prayer for the person you could not persuade. It offers plain words for keeping their account true, and for letting a disagreement stand.",
+      "descriptor": "Prayer for Honest Disagreement",
+      "alt": "A small gold and white light hangs in a deep indigo void, with one thin thread rising. Two great lattices of fine circles overlap, turned slightly apart, while a dim rose point sits low and still. Then a vast white and gold radiance fills the upper frame and lights both lattices evenly. Soft ripples spread from the small light across a still, mirror dark surface.",
+      "tags": [
+        "Prayer",
+        "ElectionDay",
+        "Mindfulness",
+        "ListeningWell",
+        "RespectfulDisagreement"
+      ],
+      "occasion": "For Election Day, and any day people who disagree must choose together. It keeps listening and dignity close, and lets the difference stand.",
+      "occasionKey": "election-day",
+      "occasionSearch": "Election Day",
+      "title": "Prayer for the One I Cannot Persuade"
+    }
+  },
+  "renderedAt": 1793565792047.6746,
+  "shortRenderedAt": 1793565899466.4463,
+  "youtube": {
+    "at": "2026-11-03T03:47:50.845Z",
+    "id": "nLOGM8boNs8",
+    "url": "https://www.youtube.com/watch?v=nLOGM8boNs8",
+    "privacy": "public",
+    "publishAt": "2026-11-04T15:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLcbEKLHGb6eD4C8BtJ3BH0ttc6DZlypso",
+      "title": "Church Prayers"
+    }
+  },
+  "short": {
+    "at": "2026-11-03T04:12:31.827Z",
+    "id": "G5l0ZBQNcNY",
+    "url": "https://www.youtube.com/watch?v=G5l0ZBQNcNY",
+    "privacy": "public",
+    "publishAt": "2026-11-04T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-04T15:03:10.122Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3mzimqmjs3d2b",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3mzimqmjs3d2b"
+  }
+}

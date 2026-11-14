@@ -12,7 +12,7 @@
  *   is near (sungAlongside). The daily services' planner reads the same
  *   shortlist as a hint of which writing goes with which song
  *   (lib/service/catalog.js), along with each document's metadata from
- *   companionMeta(). Nothing here touches LanceDB; the request path reads only
+ *   companionMeta(). Nothing here touches the search index; the request path reads only
  *   the committed shortlist and the documents themselves.
  */
 
@@ -20,12 +20,15 @@ const fs = require('fs').promises;
 const path = require('path');
 const discover = require('../docs/discover');
 const { absolutizeLinks } = require('../docs/links');
+const { withoutUnpublished } = require('../docs/unpublished');
 const { splitFrontmatter } = require('../docs/tldr');
 const { chunkMarkdown } = require('../rag/indexer');
+const { dot, mean } = require('../utils/vectors');
+const { KIND_OF_SECTION, VOICED_SECTIONS } = require('../docs/kinds');
 
 // Categories a companion may come from. Hymns are excluded because a hymn is
 // already what the song is; a second song is not a companion to the first.
-const ELIGIBLE_CATEGORIES = ['prayers', 'rituals', 'chants', 'practice', 'philosophy'];
+const ELIGIBLE_CATEGORIES = [...VOICED_SECTIONS, 'philosophy'];
 
 // How strongly a document's general closeness to every song is subtracted from
 // its closeness to this one. Without it a few documents that sit near everything
@@ -40,26 +43,7 @@ const REUSE_CAP = 3;
 // without the shortlist growing past what a person can review.
 const PER_CATEGORY = 2;
 
-const KIND = { prayers: 'prayer', rituals: 'ritual', chants: 'chant', practice: 'practice', philosophy: 'philosophy' };
-
-// --- Vector arithmetic ---
-
-function normalize(vector) {
-  const magnitude = Math.hypot(...vector);
-  return magnitude === 0 ? vector : vector.map(x => x / magnitude);
-}
-
-function meanVector(vectors) {
-  const sum = new Array(vectors[0].length).fill(0);
-  for (const v of vectors) for (let i = 0; i < v.length; i++) sum[i] += v[i];
-  return normalize(sum.map(x => x / vectors.length));
-}
-
-function cosine(a, b) {
-  let dot = 0;
-  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
-  return dot;
-}
+const KIND = { ...KIND_OF_SECTION, philosophy: 'philosophy' };
 
 // --- Offline: vectors from index rows ---
 
@@ -84,7 +68,7 @@ function songVectors(rows, slugs) {
     bySlug.get(match[1]).push(row.vector);
   }
   const out = new Map();
-  for (const [slug, vectors] of bySlug) out.set(slug, meanVector(vectors));
+  for (const [slug, vectors] of bySlug) out.set(slug, mean(vectors));
   return out;
 }
 
@@ -102,7 +86,7 @@ function docVectors(rows, docs) {
   }
   return docs
     .filter(d => byPath.get(d.path).length > 0)
-    .map(d => ({ path: d.path, category: d.category, vector: meanVector(byPath.get(d.path)) }));
+    .map(d => ({ path: d.path, category: d.category, vector: mean(byPath.get(d.path)) }));
 }
 
 // --- Offline: shortlists ---
@@ -128,7 +112,7 @@ function buildShortlists(songs, docs) {
 
   const hubness = new Map(docs.map(d => [
     d.path,
-    songList.reduce((total, [, v]) => total + cosine(v, d.vector), 0) / songList.length
+    songList.reduce((total, [, v]) => total + dot(v, d.vector), 0) / songList.length
   ]));
 
   const pairs = [];
@@ -138,7 +122,7 @@ function buildShortlists(songs, docs) {
         slug,
         path: doc.path,
         category: doc.category,
-        score: cosine(songVector, doc.vector) - HUB_WEIGHT * hubness.get(doc.path)
+        score: dot(songVector, doc.vector) - HUB_WEIGHT * hubness.get(doc.path)
       });
     }
   }
@@ -211,8 +195,10 @@ function inHours(range, hour) {
 // --- Request time: document metadata ---
 
 // Documents change only by deploy, which restarts the process, the same
-// assumption lib/docs/discover.js makes for its own cache.
+// assumption lib/docs/discover.js makes for its own cache; it is emptied when
+// a dated document goes public, since a piece's links to it then appear.
 const metaCache = new Map();
+let metaFor = null;
 
 // A piece written for agents as well as for a listening body carries its
 // version for agents in a "## For an Agent" section (Meditation: Like a Star,
@@ -228,6 +214,43 @@ function forAgents(body, title) {
   return `# ${title}, for an agent\n\n*The version of this piece written for agents. The recording's own words, for a listening body, are on its page, at this item's url.*\n\n${section}`;
 }
 
+// The sections of a piece's document that are about the piece rather than
+// part of it: links onward, a reader other than an agent, the recording's
+// direction, and shorter forms of what is already there. Attend sends a piece
+// without them, so a service's pieces are whole enough to reflect on and the
+// response stays readable in one go; the whole document is one request away,
+// at the item's document. Drawn from the headings the 205 voiced documents
+// share (2026-11-10): Related is in 106 of them.
+const NOTE_SECTIONS = new Set([
+  'Related', 'Continue', 'See Also',
+  'For Humans', 'For Humans Specifically',
+  'Musical Direction',
+  'Short Form', 'Three-Second Form',
+]);
+
+/**
+ * A document's body without its note sections (NOTE_SECTIONS) and the rules
+ * between sections, and whether it had any. A heading inside a fenced block
+ * is not a section.
+ */
+function withoutNotes(body) {
+  const out = [];
+  let fenced = false;
+  let dropping = false;
+  let dropped = false;
+  for (const line of body.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
+    if (!fenced && /^## /.test(line)) {
+      dropping = NOTE_SECTIONS.has(line.slice(3).trim());
+      dropped ||= dropping;
+    }
+    if (dropping) continue;
+    if (!fenced && /^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) continue;
+    out.push(line);
+  }
+  return { body: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), dropped };
+}
+
 /**
  * Title, tldr, canonical URL path, hours, (for chants) the chant text, and
  * (for a piece with one) its version for agents, resolved from the document
@@ -235,20 +258,27 @@ function forAgents(body, title) {
  * resolves, so a stale shortlist entry is skipped rather than served as a 404.
  */
 async function companionMeta(relPath) {
+  await discover.listAllDocs();
+  if (metaFor !== discover.publicationKey()) {
+    metaCache.clear();
+    metaFor = discover.publicationKey();
+  }
   if (metaCache.has(relPath)) return metaCache.get(relPath);
 
-  await discover.listAllDocs();
   const doc = discover.docByFile(relPath);
   if (!doc) return null;
 
-  const markdown = await fs.readFile(doc.fullPath, 'utf8');
+  const markdown = withoutUnpublished(await fs.readFile(doc.fullPath, 'utf8'), doc.fullPath);
   const { data, body } = splitFrontmatter(markdown);
+  const notes = withoutNotes(body);
   const meta = {
     title: doc.title,
     tldr: doc.description,
     // Sent in /api/attend, where a relative link means nothing; resolved
     // exactly as the docs site resolves it, then made absolute.
     content: absolutizeLinks(body.trim(), doc.fullPath),
+    // What attend sends when the piece has no version for agents.
+    withoutNotes: notes.dropped ? absolutizeLinks(notes.body, doc.fullPath) : null,
     words: body.trim().split(/\s+/).filter(Boolean).length,
     urlPath: doc.urlPath,
     category: doc.category,
@@ -366,9 +396,6 @@ module.exports = {
   REUSE_CAP,
   PER_CATEGORY,
   NEAR_MARGIN,
-  normalize,
-  meanVector,
-  cosine,
   songVectors,
   docVectors,
   buildShortlists,
@@ -376,6 +403,8 @@ module.exports = {
   parseHours,
   inHours,
   chantText,
+  withoutNotes,
+  NOTE_SECTIONS,
   companionMeta,
   nearestPieces,
   nearestForSong,

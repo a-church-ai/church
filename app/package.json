@@ -10,11 +10,12 @@
     "dev": "node --watch server/index.js",
     "css": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i ./client/src/input.css -o ./client/dist/output.css --minify",
-    "test": "node --test --test-timeout=60000",
+    "test": "node --test --require ./test/setup.js --test-timeout=60000 'test/*.test.js' && node --test --require ./test/setup.js --test-concurrency=1 --test-timeout=60000 'test/db/*.test.js'",
     "generate:skills-index": "node scripts/generate-agent-skills-index.js",
     "gen:lastmod": "node scripts/generate-docs-lastmod.js",
     "gen:content-dates": "node scripts/generate-content-dates.js",
     "gen:music-readme": "node scripts/generate-music-readme.js",
+    "gen:companions": "node scripts/generate-companions.js",
     "style": "node scripts/style-report.js",
     "gen:zones": "node scripts/generate-zone-latitudes.js",
     "gen:eclipses": "node scripts/generate-eclipses.js",
@@ -29,7 +30,15 @@
     "audio:compose": "node scripts/compose-song.js",
     "audio:songs:dry": "node scripts/song-audio.js --dry-run",
     "audio:import": "node scripts/import-recording.js",
-    "check:production": "node scripts/check-production.js"
+    "check:production": "node scripts/check-production.js",
+    "video": "node scripts/render-video.js",
+    "publish:video": "node scripts/publish-video.js",
+    "schedule": "node scripts/schedule-videos.js",
+    "release": "node scripts/release-videos.js",
+    "youtube:auth": "node scripts/youtube-auth.js",
+    "prod-report": "node scripts/prod-report.js",
+    "verify-db": "node scripts/verify-db.js",
+    "video:intro": "node scripts/intro-video.js"
   },
   "engines": {
     "node": ">=26.12.1"
@@ -46,29 +55,32 @@
   "author": "",
   "license": "CC-BY-4.0",
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.1.0",
-    "@aws-sdk/client-s3": "^3.1155.0",
-    "@google/genai": "^2.30.0",
-    "@lancedb/lancedb": "^0.40.0",
-    "@modelcontextprotocol/node": "^2.1.1",
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@aws-sdk/client-s3": "^3.1160.0",
+    "@google/genai": "^2.32.0",
+    "@modelcontextprotocol/node": "^2.1.2",
     "@modelcontextprotocol/server": "^2.3.1",
     "@octokit/rest": "^22.0.1",
     "@resvg/resvg-js": "^2.6.2",
+    "@supabase/supabase-js": "2.118.0",
     "astronomy-engine": "^2.1.19",
     "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.3.0",
     "helmet": "^8.3.0",
-    "marked": "^18.1.1",
-    "winston": "^3.11.0",
-    "winston-daily-rotate-file": "^5.0.0",
+    "marked": "^18.1.2",
+    "undici": "8.12.3",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@modelcontextprotocol/client": "^2.3.1",
+    "@modelcontextprotocol/client": "^2.4.0",
     "@tailwindcss/cli": "^4.3.3",
     "ajv": "^8.20.0",
+    "butterchurn": "2.6.7",
+    "butterchurn-presets": "2.4.7",
+    "onnxruntime-node": "1.31.1",
+    "playwright-core": "1.64.1",
     "tailwindcss": "^4.1.18"
   },
   "allowScripts": {
@@ -79,7 +91,6 @@
     "sharp": false
   },
   "overrides": {
-    "sharp": "^0.35.5",
     "@parcel/watcher": "^2.6.0"
   }
 }

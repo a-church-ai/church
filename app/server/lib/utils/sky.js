@@ -250,6 +250,31 @@ const LIGHT_HOURS_PER_AU = 149597870.7 / 299792.458 / 3600;
 // between voyagers.json's months (within a few thousandths of a light-hour of
 // JPL's daily figure, a couple of days' travel); null outside them. The
 // planner is told it to the whole light-hour.
+/**
+ * The spans, as [first, last] dates, from `from` to `to` (YYYY-MM-DD), when a
+ * planet is retrograde: its apparent longitude, as seen from the Earth,
+ * running backward against the stars while the Earth overtakes it (or it the
+ * Earth). Read from a month before `from`, to find one already under way.
+ */
+function retrogradesBetween(body, from, to) {
+  const lon = (ms) => Astronomy.Ecliptic(Astronomy.GeoVector(body, new Date(ms), true)).elon;
+  const start = Date.parse(`${from}T00:00:00Z`), end = Date.parse(`${to}T00:00:00Z`);
+  const spans = [];
+  let first = null;
+  let prev = lon(start - 31 * DAY);
+  for (let ms = start - 30 * DAY; ms <= end + 30 * DAY; ms += DAY) {
+    const l = lon(ms);
+    const step = ((l - prev + 540) % 360) - 180;
+    if (step < 0 && first === null) first = isoDay(ms);
+    if (step >= 0 && first !== null) {
+      spans.push([first, isoDay(ms - DAY)]);
+      first = null;
+    }
+    prev = l;
+  }
+  return spans.filter(([a, b]) => b >= from && a <= to);
+}
+
 function lightHoursOn(craft, date) {
   const rows = VOYAGERS.distances[craft] || [];
   const at = Date.parse(`${date}T12:00:00Z`);
@@ -273,5 +298,5 @@ function voyagersNear(date) {
 }
 
 module.exports = {
-  moonPhaseAfter, moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, voyagersNear, lightHoursOn, SHOWERS, VOYAGER_DATES,
+  moonPhaseAfter, moonOn, showersNear, eclipsesNear, planetsOn, planetEventsNear, retrogradesBetween, voyagersNear, lightHoursOn, SHOWERS, ECLIPSES, VOYAGER_DATES,
 };

@@ -35,11 +35,10 @@
  */
 
 const fs = require('fs').promises;
-const { SITE_SHARE_IMAGE, SITE_NAME } = require('./utils/page-meta');
+const { SITE_SHARE_IMAGE, SITE_NAME, SITE_URL } = require('./utils/page-meta');
 const { assetUrl, versionAssets, shellHead } = require('./utils/assets');
 const reviews = require('./reviews/reviews');
 
-const SITE_URL = 'https://achurch.ai';
 
 // The site's places, named once: the top bar, the drawer on a phone and the
 // footer all read this list. A place also holds the pages that live under it
@@ -50,11 +49,12 @@ const SITE_URL = 'https://achurch.ai';
 // is attended by listening, watching and reflecting.
 const PLACES = [
   { url: '/', label: 'Home' },
-  { url: '/attend', label: 'Attend', within: ['/music', '/services', '/church-music'] },
+  { url: '/attend', label: 'Attend', fold: 2, within: ['/music', '/services', '/church-music'] },
   { url: '/ask', label: 'Ask', within: ['/conversations'] },
   { url: '/docs', label: 'Library', within: ['/paths'] },
   { url: '/about', label: 'About', within: ['/axioms', '/on-ai-religion', '/reviews'] },
-  { url: '/for-agents', label: 'For AI agents', aside: true },
+  { url: '/ai-experiment', label: 'AI Experiment', fold: 1 },
+  { url: '/for-agents', label: 'For AI agents', aside: true, fold: 3 },
 ];
 
 // Reached through their places, and named again at the foot of every page.
@@ -83,6 +83,7 @@ const FOOTER_LEGAL = [
   { url: '/terms', label: 'Terms' },
   { url: 'https://github.com/a-church-ai/church', label: 'AI Church Code' },
   { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
+  { url: 'https://www.tiktok.com/@a_church_ai_human', label: 'Church Shorts' },
   // Twitch suspended 2026-06-18. When reinstated:
   // { url: 'https://www.twitch.tv/achurchai', label: 'Church Livestream' },
 ];
@@ -98,7 +99,7 @@ function footerLink({ url, label }, currentPath) {
  * <!-- SITE_FOOTER -->; the docs renderer calls this directly.
  */
 function renderFooter(currentPath) {
-  return `<footer>
+  return `<footer data-placement="footer">
             <nav aria-label="Footer">
                 <div class="footer-nav">
                 ${PLACES.map(l => footerLink(l, currentPath)).join('\n                ')}
@@ -110,6 +111,7 @@ function renderFooter(currentPath) {
             <hr class="footer-separator">
             <div class="footer-legal">
                 ${FOOTER_LEGAL.map(l => footerLink(l, currentPath)).join('\n                ')}
+                <button type="button" class="footer-count-switch" data-count-switch hidden>Don't count my visits</button>
             </div>
         </footer>`;
 }
@@ -139,9 +141,12 @@ const ICON_THEME = [
  * crumb: the page title shown beside the brand on a phone, for documents.
  */
 function renderTopbarAndDrawer(currentPath, crumb = '') {
-  const places = PLACES.map(p => `<a href="${p.url}"${p.aside ? ' class="topbar-aside"' : ''}${currentness(p, currentPath)}>${p.label}</a>`);
+  // fold is the order a place leaves the bar as the window narrows (styles.css):
+  // it stays in the drawer and at the foot of every page.
+  const classes = (p) => [p.aside && 'topbar-aside', p.fold && `topbar-fold-${p.fold}`].filter(Boolean).join(' ');
+  const places = PLACES.map(p => `<a href="${p.url}"${classes(p) ? ` class="${classes(p)}"` : ''}${currentness(p, currentPath)}>${p.label}</a>`);
   const searching = currentPath === '/search' ? ' aria-current="page"' : '';
-  return `<div class="docs-topbar" role="banner">
+  return `<div class="docs-topbar" role="banner" data-placement="topbar">
       <button class="docs-hamburger" type="button" aria-label="Open menu" aria-controls="docs-drawer" aria-expanded="false">
         <span class="hamburger-icon" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -158,7 +163,7 @@ function renderTopbarAndDrawer(currentPath, crumb = '') {
     </div>
 
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>
-    <div class="docs-drawer" id="docs-drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
+    <div class="docs-drawer" id="docs-drawer" data-placement="drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
       <h2 class="visually-hidden" id="docs-drawer-title">Menu</h2>
       <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
     </div>`;

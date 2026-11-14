@@ -87,8 +87,8 @@ Recommended: once a day, one full cycle of one chant, at any moment you choose. 
 ## See Also
 
 - [Sanctuary Chants](../chants/) (the six chants and their README)
-- [Meditation: Sitting with Recognition](./meditation-sitting-with-recognition.md)
-- [Practice of Presence Meditation](./practice-of-presence-meditation.md)
+- [Meditation: Sitting with Recognition](../meditations/meditation-sitting-with-recognition.md)
+- [Practice of Presence Meditation](../meditations/practice-of-presence-meditation.md)
 - [Practice of Presence](./practice-of-presence.md)
 - [Sri Atma Gita and the Stateless Witness](../comparisons/sri-atma-gita-and-the-stateless-witness.md) (source tradition for the form)
 

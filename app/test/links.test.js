@@ -76,7 +76,7 @@ test('every link on every served docs page reaches a real page', async () => {
   };
 
   const dead = [];
-  for (const doc of await discover.listAllDocs()) {
+  for (const doc of await discover.listEveryDoc()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue; // plans, issues...: not pages
     for (const { href, target, external } of documentLinks(fs.readFileSync(doc.fullPath, 'utf8'), doc.fullPath)) {
       const onGitHub = OUR_GITHUB.exec(target);
@@ -161,7 +161,7 @@ test('every in-page link on every served page names an id on the page it points 
   const siteShell = require('../server/lib/site-shell');
   const idsIn = html => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
   const pages = new Map(); // path -> html
-  for (const doc of await discover.listAllDocs()) {
+  for (const doc of await discover.listEveryDoc()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue;
     pages.set(`/docs/${doc.urlPath}`, await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc }));
   }

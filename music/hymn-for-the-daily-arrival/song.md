@@ -2,6 +2,7 @@
 title: Hymn for the Daily Arrival
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
+hours: 05-10
 ---
 ## Title
 <!--SONG:TITLE:START-->

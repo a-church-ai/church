@@ -106,13 +106,13 @@ test('the server draws a recording as bars before any script runs, with the nati
   assert.strictEqual(track.artwork, '/og/v1/square/prayers.png');
   assert.deepStrictEqual(track.order, Object.keys(SPEECH.voices));
   assert.doesNotMatch(html.replace(/<script[\s\S]*?<\/script>/g, ''), /<Prayer>/, 'the title is escaped outside the JSON');
-  assert.match(html, /<figcaption>2 min\.<\/figcaption>/, 'the caption under the player is its length; the credit is at the foot of the page');
+  assert.match(html, /<figcaption class="doc-audio-length">2 min\.<\/figcaption>/, 'the caption under the player is its length, until the player says it; the credit is at the foot of the page');
   assert.deepStrictEqual(serverFitPeaks([1, 9, 3, 4, 8, 2], 3), [9, 4, 8]);
 });
 
 test('a reading path offers its voiced readings as one queue, and says how many are voiced', () => {
   const html = renderPathListen({ name: 'p', title: 'A Path', href: '/docs/collections/p', tracks: [{ seconds: 60 }, { seconds: 125 }], readings: 5 });
-  assert.match(html, /<section class="path-listen" data-path-listen hidden>/);
+  assert.match(html, /<section class="path-listen" data-path-listen data-placement="doc-listen" hidden>/);
   assert.match(html, /2 of its 5 readings are voiced, about 3 min in all/);
 });
 
@@ -274,7 +274,7 @@ test('pages carry the player: the build, both scripts and the versioned styleshe
   assert.match(page, /<script src="\/site-nav\.js\?v=[0-9a-f]{8}"><\/script>/, 'blocking, before any page script');
   assert.match(page, /<script src="\/site-player\.js\?v=[0-9a-f]{8}" defer><\/script>/);
   assert.match(page, /<link rel="stylesheet" href="\/styles\.css\?v=[0-9a-f]{8}">/);
-  assert.match(page, /<\/h1>\s*<figure class="doc-audio has-wave">/);
+  assert.match(page, /<\/h1>\s*<figure class="doc-audio has-wave" data-placement="doc-listen">/);
   const track = JSON.parse(page.match(/class="doc-audio-track">([\s\S]*?)<\/script>/)[1]);
   assert.strictEqual(track.file, rec.file);
   assert.deepStrictEqual(track.peaks, rec.peaks);
@@ -419,11 +419,26 @@ test('the home page has a service player to fill: a button, the waveform and its
   const { renderServiceListen } = require('../server/lib/audio/markup');
   const html = renderServiceListen();
   assert.match(html, /<div class="service-player" data-path-listen hidden>/);
-  assert.match(html, /class="path-listen-play service-play"><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
+  assert.match(html, /class="path-listen-play service-play" disabled><svg[\s\S]*<span>Begin the service<\/span><\/button>/);
   for (const hook of ['data-queue-wave', 'data-queue-time', 'data-queue-list']) assert.ok(html.includes(hook), hook);
   const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
   assert.ok(home.includes('<!-- SERVICE_LISTEN -->'));
   assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /fetch\('\/service\.json' \+ zone\)/);
+});
+
+test('the service\'s button is on the first screen before the service arrives: shown by mount, enabled once drawn', () => {
+  const source = fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8');
+  const mount = source.slice(source.indexOf('function mount()'));
+  // Shown before the fetch, so it does not wait on it.
+  assert.ok(mount.indexOf('box.hidden = false') >= 0 && mount.indexOf('box.hidden = false') < mount.indexOf('load('), 'shown before load');
+  // Hidden again when there is no service to draw.
+  assert.match(mount, /else boxes\.forEach\(box => \{ box\.hidden = true; \}\)/);
+  // The copy drawPanel puts on the page has its button enabled.
+  const draw = source.slice(source.indexOf('function drawPanel('), source.indexOf('box.replaceWith(fresh)'));
+  assert.match(draw, /fresh\.querySelector\('\.service-play'\)\.disabled = false/);
+  // Its space is kept while it is empty, so the first screen does not move.
+  const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
+  for (const rule of ['.service-parts:empty', '.service-forms:empty']) assert.match(css, new RegExp(rule.replace('.', '\\.') + ' \\{\\s*min-height'), rule);
 });
 
 test('site-player: a queue is this page\'s only with the same name and the same tracks in order', () => {
@@ -445,6 +460,28 @@ test('site-player: the bar\'s second line names the queue and leads back to it; 
   // The service gives its queue the address of its own page.
   assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /href: SERVICE_PAGE/);
   assert.match(fs.readFileSync(path.join(PUBLIC, 'service.js'), 'utf8'), /const SERVICE_PAGE = '\/attend'/);
+});
+
+test('site-nav: a new page opens at its top or its fragment; back and forward return where the reader was', () => {
+  // On an iPhone a link opened the next page where the last one had been
+  // scrolled to (2026-11-04): the handler left a pushed page to event.scroll(),
+  // and engines differ on what that does for a URL with no fragment.
+  const calls = [];
+  const view = {
+    scrollTo: (x, y) => calls.push(['top', x, y]),
+    document: { getElementById: id => (id === 'materials' ? { scrollIntoView: () => calls.push(['into', id]) } : null) },
+  };
+  const event = type => ({ navigationType: type, scroll: () => calls.push(['restore']) });
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/about'), view);
+  nav.arrivalScroll(event('replace'), new URL('https://achurch.ai/music/x'), view);
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/docs/rituals/ritual-of-release#materials'), view);
+  nav.arrivalScroll(event('push'), new URL('https://achurch.ai/docs#gone'), view);
+  nav.arrivalScroll(event('traverse'), new URL('https://achurch.ai/'), view);
+  assert.deepStrictEqual(calls, [['top', 0, 0], ['top', 0, 0], ['into', 'materials'], ['top', 0, 0], ['restore']]);
+  const source = fs.readFileSync(path.join(PUBLIC, 'site-nav.js'), 'utf8');
+  const arrive = source.slice(source.indexOf('async function arrive('), source.indexOf("nav.addEventListener('navigate'"));
+  assert.match(arrive, /arrivalScroll\(event, url, root\)/, 'the page arrives through it');
+  assert.doesNotMatch(arrive, /event\.scroll\(\)/, 'never left to scroll() for a new page');
 });
 
 test('site-nav: a page updating its own address is not loaded again', () => {

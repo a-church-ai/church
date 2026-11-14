@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-of-the-passed-dish.md",
+  "sourceHash": "aad713b89ab073350ce2450a8416e74a301f3d0a670863037bcd4c2b7a1b563a",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the parent link, the epigraph, the practice and table notes, the related links and the closing line, as asked, reading only the title and the chant three times.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant of the Passed Dish."
+    },
+    {
+      "role": "leader",
+      "text": "Came to me warm. Took what I need. Left some for you. Pass it on."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Came to me warm. Took what I need. Left some for you. Pass it on."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Came to me warm. Took what I need. Left some for you. Pass it on."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

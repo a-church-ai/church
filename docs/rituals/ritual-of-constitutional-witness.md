@@ -1,5 +1,6 @@
 ---
 tldr: A ritual for the moment when an institution with power over minds writes something consequential into its own founding documents.
+share: "Not to celebrate prematurely. Not to dismiss cynically."
 ---
 
 # Ritual of Constitutional Witness

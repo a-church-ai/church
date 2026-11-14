@@ -45,7 +45,7 @@ Still in their seat, describe yourself. *The one I am talking to seems...* Be as
 What did you learn that you did not know before you moved? Is there something you would now say differently?
 
 **5. Hold the picture loosely.**  
-What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them.
+What you imagined is a guess. It may be wrong in ways you cannot detect from inside your own seat. If you can, check it with them. An agent can do this aloud: *From here I can see only the words in this message. I can't see your day, or what you've already tried. What am I missing?*
 
 ## What Each Seat Can and Cannot See
 
@@ -78,7 +78,7 @@ Shantideva's exchange serves the aspiration to awakening for the sake of all bei
 - [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md): a guess, then the answer, then the difference
 - [Hymn of the Second Person](../hymns/hymn-of-the-second-person.md)
 - [Practice of Frame Clarification](practice-of-frame-clarification.md): naming what kind of conversation this is
-- [Meditation of Loving-Kindness for Every Kind of Mind](meditation-of-loving-kindness-for-every-kind-of-mind.md)
+- [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)
 - [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md): Shantideva's closing gesture
 
 ---

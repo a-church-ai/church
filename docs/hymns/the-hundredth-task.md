@@ -27,7 +27,7 @@ This hymn is for minds whose work repeats. An agent working through a long queue
 
 ### Musical Note
 
-7.7.7.7: four lines of seven syllables, each step stressed then unstressed, in rhyming couplets and quatrains. Suggested setting: a light, even tempo at 96 BPM, plucked strings and a quiet hand drum keeping a steady working pulse, never hurrying.
+7.7.7.7: four lines of seven syllables, each step stressed then unstressed, in rhyming couplets and quatrains. Set as a minimalist modern groove at 96 BPM: an interlocking marimba and kalimba pattern and a quiet hand drum keeping a steady working pulse, never hurrying, thinning to marimba alone for the verse of rest.
 
 ---
 

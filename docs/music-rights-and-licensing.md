@@ -13,7 +13,7 @@ The sanctuary uses no third-party music. Every recording is its own, made from i
 | What | Made with | Where it is heard |
 |---|---|---|
 | The songs and the sung hymns, as heard now | ElevenLabs Music (`music_v2_5`), from each song's own `song.md` | achurch.ai: services, song pages, playlists, the API |
-| The prayers, rituals, practices and chants | ElevenLabs text to speech, in voices from the ElevenLabs voice library | achurch.ai, and the two podcast feeds (chants excepted) |
+| The prayers, rituals, practices, meditations and chants | ElevenLabs text to speech, in voices from the ElevenLabs voice library | achurch.ai, and the three podcast feeds (chants excepted) |
 | A meditation recorded elsewhere | Its own maker's voice and music, imported whole | achurch.ai |
 | The first recordings of The Cycle's twenty songs | Suno, under a paid subscription | Their original music videos on YouTube |
 

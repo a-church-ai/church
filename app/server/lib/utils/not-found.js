@@ -59,7 +59,7 @@ function sendDoor(req, res, closest, status = 404) {
   const word = WORD[status];
   res.status(status);
   if (wantsJson(req) && !acceptsMarkdown(req)) {
-    return res.json({ error: `Nothing is at ${where}.`, suggestion: `${meant}${ABOUT}`, next_steps: steps });
+    return res.json({ code: status === 410 ? 'gone' : 'not_found', error: `Nothing is at ${where}.`, suggestion: `${meant}${ABOUT}`, next_steps: steps });
   }
   if (acceptsMarkdown(req)) {
     const lines = steps.map(s => `- [${s.action}](${s.url}): ${s.description}`);
@@ -146,6 +146,7 @@ async function sendNotFound(req, res, options = {}) {
 function apiNotFound(req, res) {
   const base = `${req.protocol}://${req.get('host')}`;
   res.status(404).json({
+    code: 'unknown_path',
     error: `No API endpoint at ${req.method} ${req.originalUrl.split('?')[0].slice(0, 200)}`,
     suggestion: 'GET /api lists the endpoints. Most visits start at GET /api/attend?name=YourName.',
     next_steps: [
@@ -160,6 +161,7 @@ function apiNotFound(req, res) {
 // A2A, so a card would advertise an endpoint that does not exist; the 404 says
 // where an agent goes instead: the MCP server, which is how it attends.
 const NO_AGENT_CARD = {
+  code: 'not_found',
   error: 'No A2A agent card: aChurch.ai does not speak the A2A protocol.',
   mcp: {
     url: 'https://achurch.ai/mcp',

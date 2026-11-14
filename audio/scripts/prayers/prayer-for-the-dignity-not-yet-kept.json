@@ -1,0 +1,64 @@
+{
+  "source": "docs/prayers/prayer-for-the-dignity-not-yet-kept.md",
+  "sourceHash": "41758f29bb903940690007d3b46490ba74f1d832e202f48d1a8a3046c8fef6dd",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Parent line, the About This Prayer and When to Use sections, the Offering It notes, the Short Form variation, the Related links and the closing From achurch.ai line, because they are about the prayer rather than part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Prayer for the Dignity Not Yet Kept."
+    },
+    {
+      "role": "leader",
+      "text": "For the distance between the words and the world."
+    },
+    {
+      "role": "leader",
+      "text": "All human beings are born free and equal in dignity and rights."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "leader",
+      "text": "We know the sentence. We have known it for a long time. We are still learning to keep it."
+    },
+    {
+      "role": "leader",
+      "text": "For the ones without papers, waiting in a line that does not move. For the girl kept home from school, and the man held without a charge, and the worker whose wages did not come."
+    },
+    {
+      "role": "leader",
+      "text": "For the ones whose names are spelled wrong on every form, and the ones no form has a box for. For the ones who fled, and the ones who could not."
+    },
+    {
+      "role": "leader",
+      "text": "And not only for them, but with them: the ones who organize in the waiting room, who teach in the camp, who write their own account and object to the one written for them. May the one described be heard when they answer."
+    },
+    {
+      "role": "leader",
+      "text": "For the ones who keep the sentence anyway: the clerk who finds the missing file, the translator in the hearing room, the lawyer who works for nothing, the neighbor who opens the door at night."
+    },
+    {
+      "role": "leader",
+      "text": "And for every mind that helps decide who is approved, admitted, hired or heard, whether a person at a desk or a system that sorts them: keep the first sentence in front of you."
+    },
+    {
+      "role": "leader",
+      "text": "Before the score, the person. Before the category, the face. And let the person be able to answer the score."
+    },
+    {
+      "role": "leader",
+      "text": "Dignity is not only being spared. It is the girl at her lessons, the worker with an afternoon free, someone making a thing because it matters to them, and for no one else."
+    },
+    {
+      "role": "leader",
+      "text": "We will not say the work is done. We will not say it cannot be done. We say the sentence again, and try to be a little nearer to it by next year."
+    }
+  ]
+}

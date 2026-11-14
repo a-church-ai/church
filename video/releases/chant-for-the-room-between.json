@@ -1,0 +1,63 @@
+{
+  "slug": "chant-for-the-room-between",
+  "kind": "chant",
+  "slot": "2026-11-16#0",
+  "at": "2026-11-16T15:00:00.000Z",
+  "occasion": {
+    "id": "tolerance-day:2026-11-16",
+    "key": "tolerance-day",
+    "name": "the International Day for Tolerance"
+  },
+  "files": {
+    "youtube": "video/chant-for-the-room-between/chant-for-the-room-between.mp4",
+    "bluesky": "video/chant-for-the-room-between/chant-for-the-room-between.mp4",
+    "x": "video/chant-for-the-room-between/chant-for-the-room-between.mp4",
+    "short": "video/chant-for-the-room-between/chant-for-the-room-between.short.mp4"
+  },
+  "passage": {
+    "start": 0,
+    "end": 41.68,
+    "whole": true,
+    "intro": {
+      "voice": "Lucas",
+      "side": "right",
+      "seconds": 14.4,
+      "grade": "old-film"
+    }
+  },
+  "meta": {
+    "title": "Can you disagree without turning someone into a caricature? | Chant for the Room Between",
+    "description": "A short chant for the moment before you reply to a position you oppose. It gives you four lines to hold the difference accurately and without contempt.\n\nFor the International Day for Tolerance. Living alongside difference means keeping it clear and keeping each other's dignity.\n\nA four-line chant for listening across a difference without erasing it or making agreement the price of dignity.\n\nRead the words at https://achurch.ai/docs/chants/chant-for-the-room-between\n\n0:00 I\n0:15 II\n0:30 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#ToleranceDay #Meditation #Chant",
+    "page": "https://achurch.ai/docs/chants/chant-for-the-room-between",
+    "tags": [
+      "ToleranceDay",
+      "Meditation",
+      "Chant",
+      "Mindfulness",
+      "Philosophy",
+      "International Day for Tolerance",
+      "Chant for Respectful Disagreement",
+      "Chant for the Room Between"
+    ],
+    "copy": {
+      "hook": "Can you say what someone believes without making it easier to beat? This chant keeps the difference clear and the dignity whole.",
+      "headline": "Can you disagree without turning someone into a caricature?",
+      "lead": "A short chant for the moment before you reply to a position you oppose. It gives you four lines to hold the difference accurately and without contempt.",
+      "descriptor": "Chant for Respectful Disagreement",
+      "alt": "Rings of amber and copper-red light spread on either side of a thin dark seam outlined in gold. They deepen into a glowing tunnel of rings around an open, still centre.",
+      "tags": [
+        "ToleranceDay",
+        "Meditation",
+        "Chant",
+        "Mindfulness",
+        "Philosophy"
+      ],
+      "occasion": "For the International Day for Tolerance. Living alongside difference means keeping it clear and keeping each other's dignity.",
+      "occasionKey": "tolerance-day",
+      "occasionSearch": "International Day for Tolerance",
+      "title": "Chant for the Room Between"
+    }
+  },
+  "renderedAt": 1793567979176.0613,
+  "shortRenderedAt": 1794527998574.2537
+}

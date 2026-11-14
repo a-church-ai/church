@@ -8,7 +8,7 @@ Boundaries, constraints, and contracts that change rarely. Reference docs define
 
 | File | Description |
 |------|-------------|
-| [app-development.md](app-development.md) | Express server, the day's services, LanceDB/Gemini RAG, recordings and the player; how to run the app locally and what powers achurch.ai |
+| [app-development.md](app-development.md) | Express server, the day's services, the database (Supabase) and its Gemini RAG, recordings and the player; how to run the app locally and what powers achurch.ai |
 | [railway-deploy.md](railway-deploy.md) | Deploying the sanctuary on Railway: env vars, persistent volume, the RAG seed + restart runbook, and cutover |
 | [seo-conventions.md](seo-conventions.md) | Structured-data, sitemap, title/description, and canonical conventions for the public pages |
 | [content-dates.md](content-dates.md) | Why `<lastmod>` cannot serve crawlers and content pipelines at once, and how `/sitemap.json` publishes `created`, `contentUpdated` and `pageUpdated` from git history. Written to be portable to other projects |

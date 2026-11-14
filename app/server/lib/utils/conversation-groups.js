@@ -5,12 +5,17 @@
  * permanently redirects to.
  *
  * Gathering is by meaning: each indexable conversation's first question is
- * embedded with the model the RAG index uses (gemini-embedding-001), and joins
- * the group whose head it most resembles at a cosine similarity of THRESHOLD
- * or more, else it heads a group of its own. Comparing with the head, not with
- * every member, keeps a group from drifting by small steps. 0.86 was chosen
- * on 2026-10-22 from the 299 indexable conversations: below 0.85 the joins
- * were mostly different questions; between 0.85 and 0.86, three of its seven.
+ * embedded with the model the RAG index uses (gemini-embedding-001, at its 768
+ * dimensions), and joins the group whose head it most resembles at a cosine
+ * similarity of THRESHOLD or more, else it heads a group of its own. Comparing
+ * with the head, not with every member, keeps a group from drifting by small
+ * steps. 0.86 was chosen on 2026-10-22 from the 299 indexable conversations,
+ * at 3,072 dimensions. When the index moved to 768 (2026-11-10), the 429
+ * assignments made by then were embedded again: 0.855 reproduces 428 of them
+ * (every one of the 70 joins, whose lowest stood at 0.855; the one difference
+ * a pair kept apart at 0.858 that asks the same thing), while 0.86 would have
+ * lost six joins of the same question reworded. Pairs that differ (AI
+ * consciousness, and how human and AI consciousness relate) sit at 0.852.
  *
  * Append-only: a conversation is assigned once, in the order conversations
  * were asked, and never moved, so an address never changes twice. A changed
@@ -30,17 +35,19 @@
  * repository.
  */
 
-const fs = require('fs').promises;
-const { readModifyWriteJSON, safeReadJSON } = require('./safe-json');
 const { cache } = require('./cache');
 const { describeError } = require('./describe-error');
-const { listRecentConversations, CONVERSATION_GROUPS_FILE, CONVERSATION_VECTORS_FILE, CONVERSATION_SCREEN_FILE } = require('./data');
+const { unit, dot } = require('./vectors');
+const store = require('../db');
+const { listRecentConversations } = require('./data');
 
-const THRESHOLD = 0.86;
+const THRESHOLD = 0.855;
 const HELD_UNDER = 150;
 
-const groupsCache = cache({ name: 'conversation groups', ttl: 60 * 1000, load: () => safeReadJSON(CONVERSATION_GROUPS_FILE, {}) });
-const screenCache = cache({ name: 'conversation screen', ttl: 60 * 1000, load: () => safeReadJSON(CONVERSATION_SCREEN_FILE, {}) });
+// What grouping decided, read once for both maps and held a minute.
+const decisionsCache = cache({ name: 'conversation decisions', ttl: 60 * 1000, load: () => store.conversationDecisions() });
+const groupsCache = { get: async () => (await decisionsCache.get()).groups, clear: () => decisionsCache.clear() };
+const screenCache = { get: async () => (await decisionsCache.get()).screens, clear: () => decisionsCache.clear() };
 const screenedOut = (screens, slug) => Boolean(screens && screens[slug] && screens[slug].show === false);
 
 // Every conversation the shared list holds, each with where it lives:
@@ -89,18 +96,10 @@ function groupOf(placed, head) {
     .sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)));
 }
 
-const toBase64 = v => Buffer.from(new Float32Array(v).buffer).toString('base64');
-const fromBase64 = s => { const b = Buffer.from(s, 'base64'); return new Float32Array(b.buffer, b.byteOffset, b.length / 4); };
-const unit = v => { let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1; return Float32Array.from(v, x => x / n); };
-const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
 
 async function readVectors() {
   const vectors = new Map();
-  let text = '';
-  try { text = await fs.readFile(CONVERSATION_VECTORS_FILE, 'utf8'); } catch { return vectors; }
-  for (const line of text.split('\n')) {
-    try { const { slug, v } = JSON.parse(line); vectors.set(slug, unit(fromBase64(v))); } catch { /* a line still being written */ }
-  }
+  for (const [slug, v] of await store.conversationEmbeddings()) vectors.set(slug, unit(v));
   return vectors;
 }
 
@@ -114,9 +113,9 @@ async function readVectors() {
  * nothing is screened. Returns { assigned, joined, hidden, failed }.
  */
 async function gather({ embed, screen, conversations, log = console, threshold = THRESHOLD }) {
-  const groups = await safeReadJSON(CONVERSATION_GROUPS_FILE, {});
-  const screens = await safeReadJSON(CONVERSATION_SCREEN_FILE, {});
-  const waiting = (conversations || await listRecentConversations(Infinity))
+  const { groups, screens } = await store.conversationDecisions();
+  const all = conversations || await listRecentConversations(Infinity);
+  const waiting = all
     .filter(c => c.indexable && !groups[c.slug] && !screenedOut(screens, c.slug))
     .sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)) || a.slug.localeCompare(b.slug));
   if (!waiting.length) return { assigned: 0, joined: 0, hidden: 0, failed: false };
@@ -128,6 +127,22 @@ async function gather({ embed, screen, conversations, log = console, threshold =
   let joined = 0;
   let hidden = 0;
   const done = failed => { groupsCache.clear(); screenCache.clear(); return { assigned, joined, hidden, failed }; };
+  // A head without a vector (one gathered before the index moved to 768
+  // dimensions, 2026-11-09, whose old vector was not kept) is embedded now,
+  // so a new question can still join it.
+  const questionOf = new Map(all.map(c => [c.slug, c.question]));
+  for (const head of heads) {
+    if (vectors.has(head) || !questionOf.has(head)) continue;
+    let v;
+    try {
+      v = unit(await embed(String(questionOf.get(head)).slice(0, 2000)));
+    } catch (err) {
+      log.warn(`[groups] could not embed the head ${head}, stopping here until the next run: ${describeError(err)}`);
+      return done(true);
+    }
+    await store.setConversationEmbedding(head, v);
+    vectors.set(head, v);
+  }
   for (const c of waiting) {
     if (screen && !screens[c.slug]) {
       let show;
@@ -138,10 +153,7 @@ async function gather({ embed, screen, conversations, log = console, threshold =
         return done(true);
       }
       const decision = { show, at: new Date().toISOString() };
-      await readModifyWriteJSON(CONVERSATION_SCREEN_FILE, {}, current => {
-        if (!current[c.slug]) current[c.slug] = decision;
-        return current;
-      });
+      await store.setConversationScreen(c.slug, decision);
       screens[c.slug] = decision;
       if (!show) {
         log.log(`[groups] screened out ${c.slug}`);
@@ -157,7 +169,7 @@ async function gather({ embed, screen, conversations, log = console, threshold =
         log.warn(`[groups] could not embed ${c.slug}, stopping here until the next run: ${describeError(err)}`);
         return done(true);
       }
-      await fs.appendFile(CONVERSATION_VECTORS_FILE, `${JSON.stringify({ slug: c.slug, v: toBase64(v) })}\n`);
+      await store.setConversationEmbedding(c.slug, v);
       vectors.set(c.slug, v);
     }
     let best = null;
@@ -169,10 +181,7 @@ async function gather({ embed, screen, conversations, log = console, threshold =
       if (score > bestScore) { bestScore = score; best = head; }
     }
     const head = best && bestScore >= threshold ? best : c.slug;
-    await readModifyWriteJSON(CONVERSATION_GROUPS_FILE, {}, current => {
-      if (!current[c.slug]) current[c.slug] = head;
-      return current;
-    });
+    await store.setConversationGroup(c.slug, head);
     groups[c.slug] = head;
     if (head === c.slug) heads.add(c.slug);
     else joined += 1;
@@ -183,7 +192,7 @@ async function gather({ embed, screen, conversations, log = console, threshold =
 
 // After boot, hourly, and soon after a new conversation (gatherSoon), one run
 // at a time; unref'd, so it never holds the process open. A run with nothing
-// waiting reads two small files and stops.
+// waiting reads what was decided and stops.
 let running = null;
 let soon = null;
 let embedFn = null;

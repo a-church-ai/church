@@ -20,7 +20,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const docsDiscover = require('../lib/docs/discover');
 const { datesShown } = require('../lib/api/services');
-const { loadAttendance, loadCatalog } = require('../lib/utils/data');
+const { loadReflections, loadCatalog } = require('../lib/utils/data');
 const { placedConversations } = require('../lib/utils/conversation-groups');
 const { cache } = require('../lib/utils/cache');
 
@@ -92,6 +92,11 @@ async function buildSitemap() {
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://achurch.ai/ai-experiment</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://achurch.ai/church-music</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -151,9 +156,9 @@ async function buildSitemap() {
   // per song so Google's crawl scheduler can prioritize actively-updated
   // pages. Without this, every reflection page looks "static" to Google.
   try {
-    const attendance = await loadAttendance();
+    const reflections = await loadReflections();
     const songLastmod = new Map();  // slug -> most recent ISO date
-    for (const r of (attendance.reflections || [])) {
+    for (const r of reflections) {
       if (!r.song) continue;
       const createdAt = r.createdAt || r.timestamp;
       if (!createdAt) continue;
@@ -194,7 +199,10 @@ async function buildSitemap() {
     const seen = new Set();
     for (const doc of allDocs) {
       if (docsDiscover.isNoindexPath(doc.urlPath)) continue;
-      const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+      // A document whose page is elsewhere (a sung hymn's is its song's) is
+      // listed there, not at an address that redirects.
+      if (doc.href !== (doc.urlPath ? `/docs/${doc.urlPath}` : '/docs')) continue;
+      const url = doc.href;
       if (seen.has(url)) continue;
       seen.add(url);
 
@@ -205,6 +213,9 @@ async function buildSitemap() {
           lastmod = stat.mtime.toISOString().split('T')[0];
         } catch { /* unreadable: omit lastmod rather than invent one */ }
       }
+      // A document published on a date is new to readers on that date.
+      const publishedDay = doc.published && doc.published.slice(0, 10);
+      if (publishedDay && (!lastmod || lastmod < publishedDay)) lastmod = publishedDay;
 
       urls += `\n  <url>
     <loc>https://achurch.ai${url}</loc>${lastmod ? `
@@ -239,18 +250,22 @@ async function buildSitemapJson() {
     // Noindex sections are left out of sitemap.xml, so they are left out here
     // too: a page we ask crawlers to skip is not one to go announcing either.
     if (docsDiscover.isNoindexPath(doc.urlPath)) continue;
-    const url = doc.urlPath ? `/docs/${doc.urlPath}` : '/docs';
+    if (doc.href !== (doc.urlPath ? `/docs/${doc.urlPath}` : '/docs')) continue;
+    const url = doc.href;
     if (seen.has(url)) continue;
     seen.add(url);
 
     const key = `docs/${doc.docsRelPath}`;
     const dates = datesOf(key);
+    // A document published on a date was created, for a reader, then.
+    const publishedDay = doc.published && doc.published.slice(0, 10);
+    const later = (date, floor) => (floor && (!date || date < floor) ? floor : date);
     documents.push({
       url: `https://achurch.ai${url}`,
       title: doc.title || null,
-      created: dates.created || null,
-      contentUpdated: dates.content || null,
-      pageUpdated: dates.pageUpdated,
+      created: later(dates.created, publishedDay) || null,
+      contentUpdated: later(dates.content, publishedDay) || null,
+      pageUpdated: later(dates.pageUpdated, publishedDay),
     });
   }
 

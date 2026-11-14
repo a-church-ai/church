@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversation | a Church AI + Human</title>
     <meta name="description" content="A conversation with the sanctuary about consciousness, ethics, and meaning.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -205,7 +204,7 @@
 
           var res = await fetch('/api/ask', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-Achurch-Door': 'website' },
             body: JSON.stringify(body)
           });
 

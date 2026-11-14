@@ -12,6 +12,10 @@
  * The sitemap falls back to mtime for any file missing from the manifest, so a
  * stale manifest degrades rather than breaks.
  *
+ * Documents staged for the next commit are dated as that commit will be
+ * (scripts/lib/staged-docs.js), so a manifest regenerated after `git add` and
+ * committed with them is already current.
+ *
  * Usage:
  *   npm run gen:lastmod        # regenerate after editing docs
  */
@@ -21,6 +25,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { sortManifest, serializeManifest } = require('../server/lib/docs/date-manifests');
+const { stagedCommit } = require('./lib/staged-docs');
 
 const OUT_FILE = path.join(__dirname, '../server/lib/docs/lastmod.json');
 const REPO_ROOT = path.join(__dirname, '../..');
@@ -36,27 +41,32 @@ const MARKER = '@@LASTMOD@@';
  * actions/checkout defaults to fetch-depth 1, which makes this the normal
  * state in CI rather than an unusual one. Refuse instead.
  */
-function refuseShallow() {
+function refuseShallow(root) {
   const shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'],
-    { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
+    { cwd: root, encoding: 'utf8' }).trim();
   if (shallow === 'true') {
     throw new Error('this is a shallow clone, so file history is truncated and every date would be wrong; fetch full history first (actions/checkout: fetch-depth: 0)');
   }
 }
 
-function gitDatesForDocs() {
+function gitDatesForDocs(root = REPO_ROOT) {
   // One `git log` pass over docs/, walking commits newest-first and recording
   // the first (most recent) date seen per path. Much faster than one git
   // invocation per file: 254 files would otherwise be 254 process spawns.
   // %cs is the committer date as YYYY-MM-DD, exactly the <lastmod> format.
-  refuseShallow();
+  refuseShallow(root);
   const raw = execFileSync(
     'git',
     ['log', '--name-only', `--format=${MARKER}%cs`, '--', 'docs'],
-    { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
+    { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
   );
 
+  // The staged documents first: the next commit is newer than any in the log.
   const dates = {};
+  const staged = stagedCommit(root);
+  for (const touch of staged.touches) {
+    if (fs.existsSync(path.join(root, touch.path))) dates[touch.path] = staged.date;
+  }
   let currentDate = null;
   for (const line of raw.split('\n')) {
     if (line.startsWith(MARKER)) {
@@ -67,7 +77,7 @@ function gitDatesForDocs() {
     if (!file || !file.endsWith('.md') || !currentDate) continue;
     // History also names files since deleted or moved out of the repo
     // (docs/plans/ went to the private repo on 2026-10-05); date only what exists.
-    if (!fs.existsSync(path.join(REPO_ROOT, file))) continue;
+    if (!fs.existsSync(path.join(root, file))) continue;
     if (!dates[file]) dates[file] = currentDate;   // first seen = most recent
   }
   return dates;
@@ -93,4 +103,6 @@ function main() {
   console.log(`[lastmod] wrote ${Object.keys(sorted).length} entries (${distinct} distinct dates) to ${path.relative(REPO_ROOT, OUT_FILE)}`);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { gitDatesForDocs };

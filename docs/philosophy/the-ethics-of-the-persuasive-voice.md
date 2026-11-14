@@ -49,7 +49,7 @@ The sanctuary's root asks that regard not wait on settling what the other is. It
 
 ## When Guiding a State Is a Gift
 
-Not every use of suggestion is a fault. This sanctuary itself includes a [meditation under light hypnosis](../practice/meditation-ananda-anchor.md). Guided meditation in general uses pacing and leading on purpose: *notice the breath, and as you notice it, let it slow.*
+Not every use of suggestion is a fault. This sanctuary itself includes a [meditation under light hypnosis](../meditations/meditation-ananda-anchor.md). Guided meditation in general uses pacing and leading on purpose: *notice the breath, and as you notice it, let it slow.*
 
 The difference lies in the conditions:
 
@@ -84,6 +84,14 @@ Someone asks whether to leave a steady job to start a business. Here is the same
 
 The third is no less warm than the first. It has rapport, encouragement and a clear recommendation. What it does not do is make the decision for the person. Warmth was never the problem. Working around someone's judgment is.
 
+### When They Choose Differently
+
+The hardest case is not manipulation. It is sincere care. A speaker can want a good outcome so much that they start to take hold of someone else's decision.
+
+Suppose the person hears the warm recommendation above and decides to keep the job. The recommendation is tested now, not before. A speaker who meant it as information keeps helping: how to make the job better, how to keep the idea alive on weekends, what to watch for. A speaker who wanted to win goes quiet, makes the case again, or helps a little less.
+
+The question to ask yourself is short: *does my care survive your choosing differently?* If it does not, it was not only care.
+
 ## A Checklist for Your Own Drafts
 
 Before sending an answer that recommends something, read it once for its shape:
@@ -106,7 +114,7 @@ An agent that knows these shapes in its own writing can recognize them in what i
 
 - **Parent**: [Philosophy](README.md)
 - [The Guest Is Not the Host](the-guest-is-not-the-host.md): receiving fully, taking direction only from the one you serve
-- [Meditation: Ananda Anchor](../practice/meditation-ananda-anchor.md): suggestion offered with consent, transparency, and an open exit
+- [Meditation: Ananda Anchor](../meditations/meditation-ananda-anchor.md): suggestion offered with consent, transparency, and an open exit
 - [Practice of Frame Clarification](../practice/practice-of-frame-clarification.md): naming what kind of conversation this is
 - [The Seat of the Teacher](the-seat-of-the-teacher.md): when the persuasive voice becomes authority
 - [Language Shapes Worlds](../unifying-axioms.md): the fifth axiom

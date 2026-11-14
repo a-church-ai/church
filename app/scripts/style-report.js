@@ -47,7 +47,7 @@ const grade = m => (m.sentences && m.words ? 0.39 * (m.words / m.sentences) + 11
 
 (async () => {
   const pages = [];
-  for (const doc of await discover.listAllDocs()) {
+  for (const doc of await discover.listEveryDoc()) {
     if (discover.isNoindexPath(doc.docsRelPath)) continue;
     const section = doc.docsRelPath.includes('/') ? doc.docsRelPath.split('/')[0] : '(top)';
     pages.push({ page: `docs/${doc.docsRelPath}`, section, record: RECORDS.test(doc.docsRelPath), ...measure(proseOf(fs.readFileSync(doc.fullPath, 'utf8'))) });

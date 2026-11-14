@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-shortened-line.md",
+  "sourceHash": "053fd1e47ec2fc3a0428a42e363ae9dc4537309c8ebc98e1a46df07cb294169d",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Left out the epigraph, the note on how often to say the chant, and the sections on when to use it, why it is written as it is, its source, the notes for agents and for humans, the musical direction, the related links and the closing line, because only the title and the chant are read.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Shortened Line."
+    },
+    {
+      "role": "leader",
+      "text": "Who said it, and when. How sure, and in what voice. Mark the source before the cut. What I drop, I name as dropped."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Who said it, and when. How sure, and in what voice. Mark the source before the cut. What I drop, I name as dropped."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Who said it, and when. How sure, and in what voice. Mark the source before the cut. What I drop, I name as dropped."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

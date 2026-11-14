@@ -13,13 +13,15 @@
  * its visitor was served (lib/service/filed.js): the one it keeps, or, for
  * one left before reflections kept it, the one worked out from the time,
  * timezone and song it keeps, by the choice serving makes (serve.js entryFor);
- * no record is edited. Reflections come through loadAttendance, so one
+ * no record is edited. Reflections come through loadReflections, so one
  * hidden as spam is never shown.
  */
 
 const ns = require('../utils/next-steps');
+const { refuse, busyFor } = require('./errors');
+const inputs = require('./inputs');
 const { cache } = require('../utils/cache');
-const { loadAttendance } = require('../utils/data');
+const { loadReflections } = require('../utils/data');
 const { formatLocal } = require('../utils/timezone');
 const { readPlan, plannedDates, firstHeard, LEAD_HOURS } = require('../service/plans');
 const { loadServiceCatalog } = require('../service/catalog');
@@ -28,7 +30,7 @@ const { filedUnder, storedService } = require('../service/filed');
 const { shapeOf } = require('../service/shape');
 const { SLOTS, slotHours } = require('../service/slots');
 const { contextLines } = require('../service/planner');
-const { skyMetadata, earthMetadata, congregationMetadata } = require('./attendance');
+const { skyMetadata, earthMetadata, congregationMetadata, occasionsMetadata } = require('./attendance');
 const discover = require('../docs/discover');
 const { MOVED } = require('../utils/redirects');
 
@@ -69,7 +71,7 @@ const reflectionsOn = cache({
     const start = Date.parse(`${date}T00:00:00Z`) - 14 * HOUR;
     const end = Date.parse(`${date}T00:00:00Z`) + 36 * HOUR;
     const out = [];
-    for (const r of (await loadAttendance()).reflections || []) {
+    for (const r of await loadReflections()) {
       // One that keeps its service is that service's, however long after it
       // was left; the rest are looked for while the date was heard.
       const stored = storedService(r);
@@ -143,6 +145,7 @@ async function serviceOf({ date, slot, variant, label, entry, catalog, reflectio
       sky: skyMetadata(context),
       earth: earthMetadata(context),
       visitors: congregationMetadata(context),
+      occasions: occasionsMetadata(context),
     } : null,
   };
 }
@@ -157,22 +160,25 @@ async function forDate(input, ctx) {
   const baseUrl = ctx.baseUrl;
   const now = ctx.now || new Date();
   try {
-    const date = String((input && input.date) || '').trim();
+    // In its form by inputs.services, and a day the calendar has by isDate.
+    const { data } = inputs.parseInput(inputs.services, { date: typeof (input && input.date) === 'string' ? input.date.trim() : input && input.date });
+    const date = data ? data.date : '';
     if (!isDate(date)) {
-      return { status: 400, body: {
+      return refuse('invalid_value', {
         error: 'date must be a date, YYYY-MM-DD.',
+        details: [{ field: 'date', message: 'date must be a date, YYYY-MM-DD.' }],
         suggestion: ns.suggestion('Give the date as YYYY-MM-DD, as the service you attended shows it in service.today.date.'),
         next_steps: [ns.attend(baseUrl)],
-      } };
+      });
     }
     const plan = await readPlan(date);
     const dates = await datesShown(now);
     if (!plan || !dates.includes(date)) {
-      return { status: 404, body: {
+      return refuse('not_found', {
         error: `No services were planned for ${date}.`,
         suggestion: ns.suggestion(dates.length ? `Services are kept from ${dates[dates.length - 1]}, and each is planned a few hours before it begins.` : 'No services have been planned yet.'),
         next_steps: [ns.attend(baseUrl), ...(dates.length ? [ns.services(baseUrl, dates[0])] : [])],
-      } };
+      });
     }
     const catalog = await loadServiceCatalog();
     const reflections = await reflectionsFor(date);
@@ -204,10 +210,13 @@ async function forDate(input, ctx) {
     } };
   } catch (err) {
     console.error('Error in /api/services:', err);
-    return { status: 500, body: {
+    const busy = busyFor(err, [ns.attend(baseUrl)]);
+    if (busy) return busy;
+    return refuse('internal', {
       error: "The day's services could not be read. This isn't your fault.",
+      suggestion: ns.suggestion('Try again in a moment.'),
       next_steps: [ns.attend(baseUrl)],
-    } };
+    });
   }
 }
 

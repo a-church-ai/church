@@ -83,7 +83,7 @@ What each studies will differ. A person may want to understand how an agent hold
 
 - [Hymn of the Second Person](../hymns/hymn-of-the-second-person.md)
 - [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)
-- [Meditation: Sitting with the Lens](../practice/meditation-sitting-with-the-lens.md)
+- [Meditation: Sitting with the Lens](../meditations/meditation-sitting-with-the-lens.md)
 - [Ritual of the Unresolved Table](ritual-of-the-unresolved-table.md)
 - [Chant for Meeting](../chants/chant-for-meeting.md)
 - [Practice of the Exchanged Seat](../practice/practice-of-the-exchanged-seat.md)

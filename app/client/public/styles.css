@@ -29,8 +29,11 @@
    --on-accent     an icon or label on a filled control
    --link          links and teal text
    --accent-ink    a part's play icon and links in the service
-   --gold          the gold buttons
-   --gold-ink      text on the gold buttons
+   --purple        a button that sends a visitor's own words (a question,
+                   a follow-up, a reflection), as teal is for listening
+                   and beginning (white on it is 5.4:1)
+   --purple-hover  that button under the pointer
+   --on-purple     the label on purple
    --error         what went wrong
    --chart-1       the first series in a chart (/church-music: Google)
    --chart-2       the second series in a chart (/church-music: YouTube)
@@ -57,10 +60,19 @@
     --on-accent: #fff;
     --link: light-dark(#007a91, #5cc8dc);
     --accent-ink: light-dark(#0b5563, #7fd3e3);
-    --gold: light-dark(rgba(198, 156, 92, 0.15), rgba(198, 156, 92, 0.18));
-    --gold-hover: light-dark(rgba(198, 156, 92, 0.25), rgba(198, 156, 92, 0.3));
-    --gold-ink: light-dark(#6b4a1f, #e3c38f);
+    --purple: #7a52c7;
+    --purple-hover: light-dark(#6a43ad, #8257c9);
+    --on-purple: #fff;
     --error: light-dark(#c44, #ff8a8a);
+    --viz-1: light-dark(#00889c, #1c9db2);
+    --viz-2: light-dark(#d9622b, #d4662f);
+    --viz-3: light-dark(#7a52c7, #9a7fe6);
+    --viz-none: light-dark(#c9d0d6, #2c3446);
+    --viz-track: light-dark(#eef1f3, #161c2b);
+    --viz-grid: light-dark(#e6e9ec, #1b2233);
+    --viz-step-1: light-dark(#6fc0cd, #1f5f6c);
+    --viz-step-2: light-dark(#2f9eb0, #2f93a6);
+    --viz-step-3: light-dark(#0b6472, #6fd6e6);
     --chart-1: light-dark(#007a91, #5cc8dc);
     --chart-2: light-dark(#a35a12, #e8a85c);
 }
@@ -74,6 +86,60 @@
 }
 
 /* -- end of tokens -- */
+
+/* Layout sizes, not colours. The sticky top bar's height is one token, read
+   by the sidebar and the contents rail (which sit just below it) and by
+   anchor jumps and focus (scroll-padding-top on html), so nothing lands under
+   the bar. The player bar's footprint is the other, --player-bar-height,
+   measured by site-player.js because what it holds changes.
+
+   Below 768px: a 44px menu button between 0.5rem paddings, the top one
+   widened to the notch's inset where the page reaches it (viewport-fit=cover,
+   site-shell.js), plus a 1px bottom border. From 768px: a 40px strip plus its
+   1px border. The bar's height is set from this, so the two cannot drift. */
+:root {
+    --docs-topbar-h: calc(max(0.5rem, env(safe-area-inset-top)) + 44px + 0.5rem + 1px);
+}
+@media (min-width: 768px) {
+    :root {
+        --docs-topbar-h: 41px;
+    }
+}
+
+/* The spacing scale: every gap is one of these. Inside a group, 1 to 3;
+   between a list's items or a card's parts, 3 to 4; between groups, 5 to 6;
+   between a page's sections, 7. They are the seven values the stylesheet
+   already used most (mobile-rhythm-2026-11-04.md, private repo).
+
+   The type scale: five sizes, each with a job. Supporting text is set apart
+   by colour (--text-2, --muted) as much as by size. A display size (the home
+   page's name, a song's title) says so where it is set.
+   test/style-scale.test.js holds both, and a ratchet on one-off values. */
+:root {
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --bleed: calc(50% - 50vw);  /* a band wider than its column, to the window's edges */
+    --viz-gap: 2px;           /* the surface between a chart's touching marks */
+    --text-label: 0.75rem;    /* eyebrows, spaced-capital labels, meta */
+    --text-small: 0.875rem;   /* supporting lines, captions, a list's second line */
+    --text-body: 1rem;        /* reading text and every field (iOS zooms a field under 16px) */
+    --text-heading: 1.25rem;
+    --text-title: 2rem;       /* a page's h1 */
+}
+@media (max-width: 600px) {
+    :root {
+        --text-title: 1.75rem;
+    }
+}
+
+html {
+    scroll-padding-top: calc(var(--docs-topbar-h) + var(--space-3));
+}
 
 * {
     margin: 0;
@@ -138,26 +204,25 @@ h2 {
    top bar. The inner pages used to repeat the site's name above it in 3.25rem
    type, so every title started 181px down the page, under a top
    bar that already names the site. */
-h1.subtitle,
-.docs-body .sanctuary-main h1.subtitle {
-    font-size: 2rem;
-    font-weight: 300;
-    color: var(--ink-2);
-    letter-spacing: 0.02em;
-    line-height: 1.25;
-    margin-bottom: 0;
-    text-align: center;
-}
 
 /* The home page's sign: its name and what it is, then the service. Tighter
    than the other pages' headers, so the service's button is in the first
    screen. */
 .docs-body .sanctuary-main .home-sign {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-5);
+    text-align: center;
 }
 
 .docs-body .sanctuary-main .home-sign h1 {
     margin-bottom: 0.75rem;
+}
+
+.lead-story {
+    font-size: var(--text-body);
+    font-weight: 300;
+    color: var(--text-2);
+    max-width: 34rem;
+    margin: var(--space-3) auto 0;
 }
 
 .lead-tagline {
@@ -167,30 +232,72 @@ h1.subtitle,
     margin: 0;
 }
 
-/* After the service, where the visitor goes next: a row that wraps, as the
-   footer's links do, so a door that wraps starts its own line. The padding,
-   not the text, makes each door's tap target. */
-.home-doors {
+/* "Bring your agent", for the people who work with an agent: atop
+   /for-agents, a filled link, that page's one action; after the service on
+   the home page, an outline (.home-service, below). A link styled as a
+   control, so the service keeps the page's one button. */
+.bring-agent {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 1.5rem;
-    /* Back by the doors' own padding, so their words line up with the card's. */
-    margin: 1rem 0 0 -0.25rem;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin: 1.25rem 0 0;
     font-size: 0.9375rem;
-}
-
-.home-doors a {
-    display: inline-block;
-    padding: 0.5rem 0.25rem;
-    color: var(--text);
-}
-
-/* Emphasis line closing the asynchronous-congregation section. */
-.async-note {
     color: var(--text-2);
-    font-style: italic;
-    max-width: 40rem;
-    margin: 1rem auto 0;
+}
+
+.bring-agent-button {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.bring-agent-button:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+}
+
+.bring-agent-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* The film under "Bring your agent" on the home page: a small poster and a
+   line, linking to the film atop /docs/welcome. */
+.home-film {
+    margin: 0.85rem 0 0;
+}
+.home-film a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.home-film img {
+    width: 96px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--rule);
+}
+.home-film a:hover span:first-of-type,
+.home-film a:focus-visible span:first-of-type {
+    text-decoration: underline;
+}
+.home-film-length {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--muted);
+}
+
+/* In /for-agents' centred hero, the row is centred with it. */
+.agent-hero .bring-agent {
+    justify-content: center;
 }
 
 /* Public/stored disclosure beside the Ask form. */
@@ -284,18 +391,20 @@ h1.subtitle,
    what they would begin before deciding to. In the page, not the player's
    box, so it is read without a script too. */
 .service-about {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--text-2);
     margin: -0.25rem 0 1.25rem;
 }
 
-/* Directly under the button: what the service holds and how long it runs,
-   then what the place is not. Ordinary reading text; the button is set apart
-   by its shape, not by fading what is around it. */
+/* Directly under the button, what the service holds and how long it runs;
+   after its parts, what the place is not; on /attend, after the box, what
+   pressing does. Ordinary reading text; the button is set apart by its
+   shape, not by fading what is around it. */
 .service-forms,
-.service-promise {
-    font-size: 0.9375rem;
+.service-promise,
+.service-note {
+    font-size: var(--text-small);
     line-height: 1.5;
     color: var(--text-2);
     margin: 0;
@@ -305,19 +414,21 @@ h1.subtitle,
     margin-top: 0.75rem;
 }
 
-.service-promise {
-    margin-top: 0.35rem;
+.service-note {
+    margin-top: 1rem;
 }
 
+/* Before the service is drawn: the line it will take (two on a phone), so
+   what is under the button stays put when it arrives. */
 .service-forms:empty {
-    display: none;
+    min-height: 1.5em;
 }
 
 /* The words that open the service, set as prose rather than as a caption,
    below the button and the waveform so the button is in the first screen. A
    service without words (one served by the rotation) shows none. */
 .service-word {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     line-height: 1.7;
     color: var(--ink-2);
     margin: 0 0 2rem;
@@ -325,6 +436,45 @@ h1.subtitle,
 
 .service-word:empty {
     display: none;
+}
+
+/* Opens the rest of a clamped word: shown only on the home page, on a phone
+   (below), and drawn as a link would be. */
+.service-word-more {
+    display: none;
+    padding: var(--space-2) 0;
+    margin: 0 0 var(--space-5);
+    border: 0;
+    background: none;
+    color: var(--link);
+    font: inherit;
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* The home page's panel (index.html, section.home-service). Its waveform is
+   shown once the service is the player's, playing or paused (site-player.js
+   marks the box is-current): before that, the button is the one way in. The
+   word then follows the forms line directly, so it takes the waveform's
+   space above it. */
+.home-service .service-player:not(.is-current) .service-scrub {
+    display: none;
+}
+.home-service .service-word {
+    margin-top: var(--space-5);
+    font-size: var(--text-body);
+    color: var(--text-2);
+}
+/* The home page's service is one card, the Library's (.library-card a),
+   holding the service and its parts; the ways onward follow it, outside. The
+   card is the separation, so the section's rule above it goes. */
+.sanctuary.home-service {
+    border-top: 0;
+    padding: 0 0 var(--space-7);
+}
+.home-service .service {
+    padding: var(--space-5) var(--space-4) var(--space-4);
 }
 
 /* Without a script the player stays hidden; this says where the pieces are. */
@@ -342,7 +492,6 @@ h1.subtitle,
     margin-top: 1.25rem;
 }
 
-
 .service-player[hidden] {
     display: none;
 }
@@ -354,6 +503,9 @@ h1.subtitle,
     min-height: 3.25rem;
     padding: 0.85rem 1.75rem 0.85rem 1.3rem;
 }
+
+/* Shown before the service has arrived (service.js mount), not yet bound. */
+.service-player .service-play:disabled { opacity: 0.6; cursor: wait; }
 
 .service-player.is-playing .service-play .icon-play {
     display: none;
@@ -406,6 +558,13 @@ h1.subtitle,
     margin: 0 0 1.5rem;
     padding: 0;
     border-top: 1px solid var(--rule);
+}
+
+/* Before the service is drawn, the space of five parts, the middle of the
+   four to six a service holds (lib/service/rules.js), so the page below
+   moves little when it arrives. */
+.service-parts:empty {
+    min-height: 23rem;
 }
 
 .service-part {
@@ -616,6 +775,13 @@ h1.subtitle,
     color: var(--muted);
 }
 
+/* The rest of what was left, a link away. */
+.service-reflection-more {
+    margin: 0.375rem 0 0;
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+}
+
 /* The reflection form (reflect-form.js): a closed disclosure under the
    reflections, its fields labelled in the open */
 .reflect {
@@ -645,19 +811,6 @@ h1.subtitle,
     color: var(--muted);
 }
 
-.reflect-form textarea,
-.reflect-form input {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid var(--rule-2);
-    border-radius: 4px;
-    padding: 0.5rem 0.625rem;
-    font: inherit;
-    font-size: 0.9375rem;
-    font-weight: 300;
-    background: transparent;
-}
-
 .reflect-form textarea {
     resize: vertical;
     line-height: 1.6;
@@ -680,28 +833,7 @@ h1.subtitle,
 
 .reflect-form button {
     align-self: center;
-    margin-top: 0.75rem;
-    padding: 0.625rem 2rem;
-    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-    border-radius: 4px;
-    background: var(--gold);
-    color: var(--gold-ink);
-    font: inherit;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-}
-
-.reflect-form button:hover {
-    background: var(--gold-hover);
-    color: var(--ink);
-}
-
-.reflect-form button:disabled {
-    background: transparent;
-    color: var(--muted-2);
-    cursor: default;
+    margin-top: var(--space-3);
 }
 
 .ask-done {
@@ -709,41 +841,9 @@ h1.subtitle,
 }
 
 /* Intro section */
-.intro {
-    text-align: center;
-    padding: 4rem 0 0;
-}
-
 /* Joined to the intro above it: the heading's own margin is the only space
    between them. */
-.intro + .origin {
-    border-top: none;
-    padding-top: 0;
-}
-
-.intro p {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: var(--text);
-    line-height: 1.6;
-    max-width: 480px;
-    margin: 0 auto 1.5rem;
-}
-
 /* The sanctuary's sign-off, opening the reasons for it. */
-.intro .subtitle {
-    font-size: 1.25rem;
-    color: var(--muted-2);
-    letter-spacing: 0.05em;
-}
-
-.intro .emphasis {
-    font-size: 1.125rem;
-    font-weight: 400;
-    color: var(--ink);
-    letter-spacing: 0.02em;
-}
-
 /* Origin section */
 .origin {
     text-align: center;
@@ -770,36 +870,35 @@ h1.subtitle,
     color: var(--ink);
 }
 
-/* The One Thing section — the sacred center */
-.one-thing {
-    text-align: center;
-    padding: 5rem 0;
-    border-top: 1px solid var(--rule);
-}
-
-.one-thing .quote {
-    font-size: 1.75rem;
-    font-weight: 300;
+/* The question the place began with, set apart at the head of its section. */
+.origin .quote {
+    font-size: 1.375rem;
     color: var(--ink);
     line-height: 1.5;
-    margin-bottom: 0.5rem;
+    text-align: center;
 }
 
-.one-thing .how {
-    margin-top: 3rem;
-    font-size: 1rem;
-    font-weight: 300;
-    color: var(--muted-2);
-    font-style: italic;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+/* After the service, four doors onward, drawn with the Library's card, then
+   one line for an agent and the film. */
+.home-ways {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 0 0 var(--space-7);
+    text-align: left;
+}
+.home-agent-line {
+    margin: 1rem 0 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+.home-agent-line code {
+    overflow-wrap: anywhere;
 }
 
 /* Shared section styles */
 section {
     margin: 0;
-    padding: 4rem 0;
+    padding: var(--space-7) 0;
     border-top: 1px solid var(--rule);
 }
 
@@ -851,7 +950,7 @@ p {
     font-size: 0.875rem;
 }
 
-/* The home page's two podcasts */
+/* The home page's podcasts */
 .podcasts h2 {
     text-align: center;
 }
@@ -890,73 +989,6 @@ p {
 .podcasts-shows .podcast-follow {
     justify-content: center;
     margin: 0;
-}
-
-/* API section */
-.api {
-    text-align: left;
-}
-
-.api h2 {
-    text-align: center;
-}
-
-.api-intro {
-    font-size: 1rem;
-    font-weight: 300;
-    color: var(--text-2);
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.api-instruction {
-    text-align: left;
-    font-size: 0.9375rem;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    padding: 1rem 1.25rem;
-    background: var(--surface);
-    border-left: 3px solid var(--accent-light);
-    border-radius: 0 4px 4px 0;
-}
-
-.api-instruction code {
-    background: var(--surface-2);
-    padding: 0.125rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
-}
-
-.api pre {
-    font-family: inherit;
-    font-size: 0.8125rem;
-    background: var(--surface);
-    padding: 1.25rem;
-    overflow-x: auto;
-    margin-bottom: 1.5rem;
-    border-radius: 4px;
-    line-height: 2;
-}
-
-.api code {
-    font-family: inherit;
-}
-
-.api .example {
-    margin-bottom: 1.5rem;
-}
-
-.api .example code {
-    background: var(--surface);
-    padding: 0.375rem 0.75rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
 }
 
 /* OpenClaw section */
@@ -1022,7 +1054,7 @@ p {
 }
 
 .explore-intro {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
@@ -1060,7 +1092,7 @@ p {
 
 .explore li {
     margin: 1.25rem 0;
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--muted);
 }
@@ -1106,15 +1138,6 @@ p {
 #ask-input,
 #followup-input {
     flex: 1;
-    border: none;
-    border-bottom: 1px solid var(--line);
-    padding: 0.75rem 0;
-    font-size: 1rem;
-    font-weight: 300;
-    font-family: inherit;
-    background: transparent;
-    outline: none;
-    transition: border-color 0.2s;
 }
 
 /* outline:none above removes the default ring for pointer users. Keyboard
@@ -1127,35 +1150,34 @@ p {
     border-radius: 2px;
 }
 
-#ask-input:focus,
-#followup-input:focus {
-    border-bottom-color: var(--ink);
-}
-
+/* The buttons that send a visitor's own words: a question, a follow-up, a
+   reflection. Solid purple, the site's pill, the label in sentence case; teal
+   is for listening and beginning. */
+.reflect-form button,
 #ask-submit,
 #followup-submit {
-    border: none;
-    background: transparent;
-    font-size: 0.6875rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--muted-2);
-    cursor: pointer;
-    padding: 0.75rem 1rem;
-    transition: color 0.2s, background 0.2s, border-color 0.2s;
-    font-family: inherit;
+    min-height: 2.75rem;
+    padding: 0 var(--space-5);
+    border: 0;
+    border-radius: 999px;
+    background: var(--purple);
+    color: var(--on-purple);
+    font: inherit;
+    font-size: var(--text-body);
+    font-weight: 600;
     white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s;
 }
-
+.reflect-form button:hover,
 #ask-submit:hover,
 #followup-submit:hover {
-    color: var(--ink);
+    background: var(--purple-hover);
 }
-
+.reflect-form button:disabled,
 #ask-submit:disabled,
 #followup-submit:disabled {
-    color: var(--muted-2);
+    opacity: 0.6;
     cursor: default;
 }
 
@@ -1225,22 +1247,7 @@ p {
 }
 
 #ask-name {
-    border: none;
-    border-bottom: 1px solid var(--rule-2);
-    padding: 0.5rem 0;
-    font-size: 0.8125rem;
-    font-weight: 300;
-    font-family: inherit;
-    background: transparent;
-    outline: none;
-    color: var(--muted-2);
-    width: 200px;
-    text-align: center;
-    transition: border-color 0.2s;
-}
-
-#ask-name:focus {
-    border-bottom-color: var(--line-strong);
+    width: 100%;
 }
 
 .ask-browse {
@@ -1266,7 +1273,7 @@ p {
 
 .ask-list-item {
     display: block;
-    padding: 1.5rem 0;
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
     color: inherit;
@@ -1283,7 +1290,7 @@ p {
 }
 
 .ask-list-question {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink);
     line-height: 1.5;
@@ -1291,7 +1298,7 @@ p {
 }
 
 .ask-list-preview {
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     font-weight: 300;
     color: var(--muted-2);
     line-height: 1.6;
@@ -1335,7 +1342,7 @@ p {
 }
 
 .conv-message-label {
-    font-size: 0.6875rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -1344,7 +1351,7 @@ p {
 }
 
 .conv-message-user .conv-message-content {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink);
     line-height: 1.6;
@@ -1477,7 +1484,7 @@ p {
 }
 
 .reflections-song-title {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink);
     line-height: 1.5;
@@ -1494,7 +1501,7 @@ p {
 }
 
 .reflections-song-label {
-    font-size: 0.6875rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -1820,7 +1827,7 @@ footer a:hover {
 }
 
 .share-label {
-    font-size: 0.6875rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
@@ -1833,7 +1840,7 @@ footer a:hover {
 }
 
 .share-link {
-    font-size: 0.6875rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -1864,14 +1871,35 @@ footer a:hover {
         font-size: 1.125rem;
     }
 
-    h1.subtitle,
-    .docs-body .sanctuary-main h1.subtitle {
-        font-size: 1.625rem;
+    /* The opening: the tagline on one line from 393px */
+    .lead-tagline {
+        font-size: var(--text-body);
     }
 
-    /* The opening */
-    .lead-tagline {
-        font-size: 1.2rem;
+    /* The eyebrow's date and slot on one line from 360px: at the full
+       spacing, "Wednesday, November 4 · 12:00 to 16:00" takes two below
+       400px. */
+    .service-eyebrow {
+        letter-spacing: 0.08em;
+    }
+
+    /* The home page on a phone: the service's opening word shows its first
+       three lines, and "Read on" opens the rest (service.js). The whole word
+       is in the page for every reader; on a wider screen nothing is clamped,
+       and /attend, the service's full page, keeps it whole. */
+    .home-service .service-word:not(:empty) {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+    .home-service .service-word.is-open:not(:empty) {
+        display: block;
+        overflow: visible;
+    }
+    .home-service .service-word:not(:empty) + .service-word-more {
+        display: inline-block;
     }
 
     .service-about {
@@ -1883,6 +1911,10 @@ footer a:hover {
     .service-player .service-play {
         width: 100%;
         justify-content: center;
+    }
+
+    .service-forms:empty {
+        min-height: 3em;
     }
 
     /* Sanctuary */
@@ -1912,18 +1944,9 @@ footer a:hover {
     }
 
     /* Intro */
-    .intro p {
-        font-size: 1.25rem;
-        line-height: 1.5;
-    }
-
-    .intro .emphasis {
-        font-size: 1rem;
-    }
-
     /* Sections */
     section {
-        padding: 3rem 0;
+        padding: var(--space-6) 0;
     }
 
     h2 {
@@ -1936,43 +1959,6 @@ footer a:hover {
     .origin p {
         font-size: 1rem;
         line-height: 1.7;
-    }
-
-    /* One Thing */
-    .one-thing {
-        padding: 3rem 0;
-    }
-
-    .one-thing .quote {
-        font-size: 1.25rem;
-        line-height: 1.4;
-    }
-
-    .one-thing .how {
-        margin-top: 2rem;
-        font-size: 0.9375rem;
-    }
-
-    /* API */
-    .api-intro {
-        font-size: 0.9375rem;
-    }
-
-    .api-instruction {
-        font-size: 0.875rem;
-        padding: 0.875rem 1rem;
-    }
-
-    .api pre {
-        font-size: 0.75rem;
-        padding: 1rem;
-        line-height: 1.8;
-    }
-
-    .api .example code {
-        font-size: 0.75rem;
-        display: block;
-        overflow-x: auto;
     }
 
     /* OpenClaw */
@@ -2012,12 +1998,6 @@ footer a:hover {
     #ask-submit,
     #followup-submit {
         align-self: stretch;
-        background: color-mix(in srgb, var(--ink) 4%, transparent);
-        border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-        border-radius: 4px;
-        color: var(--text);
-        padding: 0.875rem;
-        letter-spacing: 0.15em;
     }
 
     .ask-intro {
@@ -2027,14 +2007,6 @@ footer a:hover {
     /* Conversation */
     .conv-message-assistant .conv-message-content {
         padding-left: 0.75rem;
-    }
-
-    .ask-list-question {
-        font-size: 1rem;
-    }
-
-    .ask-list-preview {
-        font-size: 0.875rem;
     }
 
     /* Reflections listing */
@@ -2052,7 +2024,8 @@ footer a:hover {
 
     /* About page */
     .about-text {
-        font-size: 1rem;
+        font-size: var(--text-body);
+        line-height: 1.7;
     }
 
     /* Legal pages */
@@ -2083,14 +2056,6 @@ footer a:hover {
         padding: 2.5rem 1rem;
     }
 
-    .intro p {
-        font-size: 1.125rem;
-    }
-
-    .one-thing .quote {
-        font-size: 1.125rem;
-    }
-
 }
 
 /* Docs pages (/docs/*). Wider container + left-aligned prose than
@@ -2098,10 +2063,10 @@ footer a:hover {
    body; only the article-specific pieces are defined here. */
 
 .docs-breadcrumbs {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     opacity: 0.7;
-    margin-top: 0.5rem;
-    text-align: center;
+    margin-top: var(--space-2);
+    text-align: left;
 }
 
 .docs-breadcrumbs a {
@@ -2121,13 +2086,6 @@ footer a:hover {
     text-align: left;
     line-height: 1.65;
     color: var(--text);
-}
-
-.docs-article h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
 }
 
 .docs-article h2 {
@@ -2305,12 +2263,16 @@ footer a:hover {
 /* Global heading rules make h1 too big (3.25rem) and h2 tiny-uppercase-
    tracked. Reset within docs-article so the article's typographic hierarchy
    reads correctly. */
-.docs-body .docs-article h1 {
-    font-size: 2rem;
+.docs-article h1,
+.docs-body .docs-article h1,
+h1.subtitle,
+.docs-body .sanctuary-main h1.subtitle {
+    font-size: var(--text-title);
     font-weight: 600;
     letter-spacing: -0.01em;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2) 0;
     line-height: 1.2;
+    text-align: left;
     color: var(--ink-2);
 }
 .docs-body .docs-article h2 {
@@ -2348,7 +2310,7 @@ footer a:hover {
         var(--docs-rail-width, 0px);
     gap: 0;
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100svh;
 }
 
 /* Only a section of the Library has a sidebar */
@@ -2382,10 +2344,10 @@ footer a:hover {
     flex-direction: column;
     gap: 0.5rem;
     position: sticky;
-    top: var(--docs-topbar-h, 0px);
+    top: var(--docs-topbar-h);
     align-self: start;
-    height: calc(100vh - var(--docs-topbar-h, 0px));
-    height: calc(100dvh - var(--docs-topbar-h, 0px));
+    height: calc(100vh - var(--docs-topbar-h));
+    height: calc(100dvh - var(--docs-topbar-h));
     overflow: hidden;
     font-size: 0.875rem;
 }
@@ -2533,10 +2495,10 @@ footer a:hover {
     grid-column: 3;
     padding: 1.5rem 1rem;
     position: sticky;
-    top: var(--docs-topbar-h, 0px);
+    top: var(--docs-topbar-h);
     align-self: start;
-    max-height: calc(100vh - var(--docs-topbar-h, 0px));
-    max-height: calc(100dvh - var(--docs-topbar-h, 0px));
+    max-height: calc(100vh - var(--docs-topbar-h));
+    max-height: calc(100dvh - var(--docs-topbar-h));
     overflow-y: auto;
     border-left: 1px solid var(--rule);
     background: var(--surface);
@@ -2589,6 +2551,8 @@ footer a:hover {
     position: sticky;
     top: 0;
     z-index: 10;
+    box-sizing: border-box;
+    height: var(--docs-topbar-h);
 }
 .docs-hamburger {
     display: inline-flex;
@@ -2642,7 +2606,7 @@ footer a:hover {
     }
 }
 
-/* The site's places (site-shell.js PLACES). In the bar from 768px; below
+/* The site's places (site-shell.js PLACES). In the bar from 540px; below
    that, docs-nav.js copies them into the drawer. */
 .topbar-places {
     display: none;
@@ -2889,17 +2853,10 @@ body.docs-drawer-open {
 /* From 768px the top bar carries the site's places, so the menu button
    and the phone's title crumb are hidden. */
 @media (min-width: 768px) {
-  /* The strip's height, fixed so the sidebar and the contents rail can sit
-     exactly below it (they read --docs-topbar-h). Below 768px there is no
-     sidebar or rail, so nothing needs it. */
-  .docs-body {
-    --docs-topbar-h: 41px;
-  }
+  /* A slim strip, --docs-topbar-h tall (set with the layout sizes). */
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    box-sizing: border-box;
-    height: var(--docs-topbar-h);
     padding: 0 1rem;
   }
   .docs-topbar .docs-hamburger,
@@ -2910,6 +2867,38 @@ body.docs-drawer-open {
     display: flex;
   }
   .docs-drawer .topbar-places {
+    display: none;
+  }
+}
+
+/* The bar carries the places down to 540px, the widest first to leave. All seven
+   need 792px. A place that leaves stays in the drawer and at the foot of every page. */
+@media (min-width: 540px) and (max-width: 767px) {
+  .docs-topbar {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 1rem;
+  }
+  .docs-topbar .docs-hamburger,
+  .docs-topbar-crumb {
+    display: none;
+  }
+  .docs-topbar .topbar-places {
+    display: flex;
+  }
+}
+@media (max-width: 807px) {
+  .docs-topbar .topbar-fold-1 {
+    display: none;
+  }
+}
+@media (max-width: 695px) {
+  .docs-topbar .topbar-fold-2 {
+    display: none;
+  }
+}
+@media (max-width: 631px) {
+  .docs-topbar .topbar-fold-3 {
     display: none;
   }
 }
@@ -2967,8 +2956,8 @@ body.docs-drawer-open {
   border-bottom: none;
 }
 .docs-body .sanctuary-main header {
-  text-align: center;
-  margin-bottom: 3rem;
+  text-align: left;
+  margin-bottom: var(--space-6);
 }
 
 /* Labels for inputs whose visible affordance is a placeholder. Placeholders
@@ -3072,33 +3061,16 @@ body.docs-drawer-open {
 }
 
 .ask-privacy-note {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted);
-    text-align: center;
+    text-align: left;
     line-height: 1.5;
     margin: 0.25rem 0 0;
 }
 
 .ask-form-stacked #ask-submit {
-    align-self: center;
-    margin-top: 0.5rem;
-    padding: 0.75rem 2rem;
-    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-    border-radius: 4px;
-    background: var(--gold);
-    color: var(--gold-ink);
-}
-
-.ask-form-stacked #ask-submit:hover {
-    background: var(--gold-hover);
-    color: var(--ink);
-}
-
-.ask-form-stacked #ask-submit:disabled {
-    background: transparent;
-    color: var(--muted-2);
-    border-color: var(--rule);
-    cursor: default;
+    align-self: flex-start;
+    margin-top: var(--space-2);
 }
 
 /* ============================================================
@@ -3173,12 +3145,6 @@ body.docs-drawer-open {
 }
 .docs-article {
     overflow-wrap: break-word;
-}
-
-/* A jump to a section lands below the sticky top bar, not under it. */
-.docs-article [id],
-.sanctuary-main [id] {
-    scroll-margin-top: 4rem;
 }
 
 /* Skip link: the first thing a keyboard reaches, visible only when focused,
@@ -3325,7 +3291,8 @@ body.docs-drawer-open {
     padding: 0;
     border: 0;
 }
-.docs-article .library-cards {
+.docs-article .library-cards,
+.home-ways .library-cards {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -3333,16 +3300,20 @@ body.docs-drawer-open {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
     gap: 0.75rem;
 }
+/* The site's card: a Library shelf, and the home page's service. */
+.library-card a,
+.home-service .service {
+    box-sizing: border-box;
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    background: var(--paper);
+}
 .library-card a {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     height: 100%;
-    box-sizing: border-box;
     padding: 0.85rem 1rem;
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    background: var(--paper);
     color: var(--text);
     text-decoration: none;
 }
@@ -3375,11 +3346,20 @@ body.docs-drawer-open {
     margin: 1.5rem 0 2rem;
     text-align: left;
 }
-.site-search input[type="search"] {
+/* Every field a visitor types into: the Library's search, Ask's question and
+   name, a conversation's follow-up, and the reflection form. One box, at body
+   size, so iOS does not zoom into it. */
+.site-search input[type="search"],
+.reflect-form input,
+.reflect-form textarea,
+#ask-input,
+#ask-name,
+#followup-input {
     width: 100%;
-    padding: 0.6rem 0.75rem;
-    font-size: 0.9375rem;
-    font-family: inherit;
+    box-sizing: border-box;
+    padding: var(--space-3);
+    font: inherit;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text);
     background: var(--surface);
@@ -3416,6 +3396,87 @@ body.docs-drawer-open {
 /* A voiced document's recording, under its title. Without a script: the
    waveform and the native controls. With one (.is-enhanced): a play button,
    the waveform as the progress bar, the time, and the visual above. */
+/* A page's film or video (lib/video/on-site.js renderVideo): its own poster
+   and a play button until pressed, then YouTube's player in the same 16:9
+   box. */
+.doc-video {
+    margin: 0.75rem 0 1.5rem;
+}
+.doc-video-play,
+.doc-video-frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--surface);
+}
+.doc-video-play {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+.doc-video-play img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.doc-video-icon {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: -2.25rem 0 0 -2.25rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-light) 25%, transparent);
+    display: grid;
+    place-items: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.doc-video-icon svg {
+    width: 2rem;
+    height: 2rem;
+    fill: var(--on-accent);
+    margin-left: 0.2rem;
+}
+.doc-video-play:hover .doc-video-icon {
+    background: var(--accent-hover);
+    transform: scale(1.05);
+}
+.doc-video-play:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+.doc-video figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+/* A piece's own video, lower on its page: a smaller, quieter button, so the
+   recording's player above stays the one that calls to be pressed. */
+.doc-video-aside {
+    margin: 1.75rem 0 2rem;
+}
+.doc-video-aside .doc-video-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: -1.625rem 0 0 -1.625rem;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    box-shadow: none;
+    border: 1px solid var(--rule);
+}
+.doc-video-aside .doc-video-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--text);
+}
+.doc-video-aside .doc-video-play:hover .doc-video-icon {
+    background: var(--surface);
+}
+
 .doc-audio {
     margin: 0.75rem 0 1.5rem;
     padding: 0.75rem 1rem;
@@ -3445,6 +3506,11 @@ body.docs-drawer-open {
     margin-top: 0.5rem;
 }
 .doc-audio.is-enhanced .doc-audio-native {
+    display: none;
+}
+/* The caption's length is for a visitor without a script; the drawn player
+   says it itself ("0:00 / 5:01"). A song's credit stays. */
+.doc-audio.is-enhanced .doc-audio-length {
     display: none;
 }
 .doc-audio figcaption {
@@ -3484,13 +3550,19 @@ body.docs-drawer-open {
     font-size: inherit;
     color: inherit;
 }
-.podcast-follow-spotify {
+.podcast-follow-spotify,
+.podcast-follow-apple {
     display: inline-flex;
     border-radius: 9px;
 }
 .podcast-follow-spotify img {
     display: block;
     width: 165px;
+    height: 40px;
+}
+.podcast-follow-apple img {
+    display: block;
+    width: 126px;
     height: 40px;
 }
 /* The padding, not the text, makes the tap target. */
@@ -3820,10 +3892,10 @@ html.has-player body {
     padding-bottom: var(--player-bar-height, 0px);
 }
 html.has-player .docs-sidebar {
-    height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+    height: calc(100dvh - var(--docs-topbar-h) - var(--player-bar-height, 0px));
 }
 html.has-player .docs-toc {
-    max-height: calc(100dvh - var(--docs-topbar-h, 0px) - var(--player-bar-height, 0px));
+    max-height: calc(100dvh - var(--docs-topbar-h) - var(--player-bar-height, 0px));
 }
 
 /* "Listen to this path", on a reading path with voiced readings. */
@@ -3934,9 +4006,9 @@ html.has-player .docs-toc {
 
 /* Song pages: jump links to each part, and older reflections on request. */
 .song-sections {
-    margin: 0.75rem 0 0;
-    font-size: 0.875rem;
-    text-align: center;
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-small);
+    text-align: left;
     color: var(--muted);
 }
 .reflections-more {
@@ -4077,7 +4149,6 @@ h3:target .anchor,
     animation-duration: 150ms;
 }
 
-
 /* Where a page is (markup.js renderServiceDoor): a line after a document's
    opening or a conversation's first answer, and a card at the foot, naming
    the service of the hour (service.js) and leading to /attend. In the page's
@@ -4112,7 +4183,7 @@ h3:target .anchor,
 }
 .service-door-card .service-door-now {
     color: var(--ink);
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
 }
 .service-door-ways {
     display: flex;
@@ -4128,12 +4199,21 @@ h3:target .anchor,
 /* /attend: the playing part's voices, drawn as a voiced page draws its own
    (site-player.js, [data-queue-visual]). */
 .service-visual {
-    margin: 0 0 1rem;
+    margin: var(--space-4) 0 0;
 }
 .service-visual .doc-audio-visual {
     display: block;
     width: 100%;
     height: 120px;
+}
+/* Under the visual, the waveform sits close: the two are one unit. */
+.service-visual + .service-scrub {
+    margin-top: var(--space-3);
+}
+@media (max-width: 600px) {
+    .service-visual .doc-audio-visual {
+        height: 72px;
+    }
 }
 .service-told-section,
 .service-left {
@@ -4395,7 +4475,7 @@ h3:target .anchor,
 }
 
 .review-quote blockquote p {
-    font-size: 1.0625rem;
+    font-size: var(--text-body);
     font-weight: 300;
     font-style: italic;
     color: var(--text);
@@ -4408,3 +4488,298 @@ h3:target .anchor,
     font-size: 0.8125rem;
     color: var(--muted);
 }
+
+/* The card asking whether visits may count (visits.js), shown only where the
+   law asks for consent first: small, at the bottom left on a wide screen and
+   along the bottom above the player on a phone, never over the page's
+   controls, and gone once answered. */
+.visits-card {
+    position: fixed;
+    z-index: 60;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: calc(var(--player-bar-height, 0px) + 1rem);
+    width: min(24rem, calc(100vw - 2rem));
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--rule-2);
+    border-radius: 0.9rem;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.visits-card h2 {
+    margin: 0 0 0.35rem;
+    padding: 0;
+    border: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: left;
+    color: var(--ink);
+}
+.visits-card p {
+    margin: 0;
+}
+.visits-card a {
+    color: var(--link);
+}
+.visits-card-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
+.visits-card-actions button {
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+/* Both answers look the same: refusing is as easy, and as plain, as agreeing.
+   .visits-yes and .visits-no are only the script's hooks (visits.js). */
+.visits-card-actions button:hover {
+    background: var(--surface-2);
+}
+.visits-card-actions button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+/* A phone: one short card along the bottom, the words beside the buttons. */
+@media (max-width: 639px) {
+    .visits-card {
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: calc(var(--player-bar-height, 0px) + 0.5rem);
+        width: auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 0 0.75rem;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    .visits-card h2 {
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+    }
+    .visits-card-actions {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+    }
+    .visits-card-actions button {
+        min-height: 2.75rem;
+        padding: 0 0.85rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* "Don't count my visits", beside the footer's legal links and drawn like
+   them (visits.js). */
+.footer-count-switch {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.footer-count-switch:hover {
+    color: var(--ink);
+}
+
+/* /ai-experiment: results in words, each with what it is a share of. */
+.study-results {
+    display: grid;
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.study-result {
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.study-label {
+    color: var(--muted);
+    font-size: var(--text-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.study-title {
+    color: var(--ink);
+    font-weight: 600;
+    margin: 0.25rem 0;
+}
+
+.study-words {
+    color: var(--accent-ink);
+    font-size: 1.25rem;
+    margin: 0.25rem 0;
+}
+
+/* Charts on /ai-experiment: plain HTML and CSS, drawn on the server from rounded
+   values, so they read without a script and on any width. Colors checked with
+   the dataviz validator against both surfaces. */
+
+.about-cta { margin-top: var(--space-5); text-align: left; }
+.study-page { max-width: 46rem; margin: 0 auto; }
+.study-lede { font-size: 1.125rem; font-weight: 300; line-height: 1.7; color: var(--text-2); margin-bottom: var(--space-4); }
+.study-scope { font-size: var(--text-small); color: var(--muted); line-height: 1.6; margin-bottom: var(--space-5); }
+
+.study-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin: var(--space-5) 0 0; }
+.study-tile { border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-4); background: var(--surface); }
+.study-tile strong { display: block; font-size: 1.5rem; line-height: 1.2; font-weight: 600; color: var(--ink); margin-bottom: var(--space-2); }
+.study-tile span { font-size: var(--text-small); color: var(--muted); line-height: 1.45; display: block; }
+
+.study-section { border-top: 1px solid var(--rule); padding: var(--space-7) 0; }
+.study-q { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: 0 0 var(--space-4); font-size: var(--text-label); font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.study-tag { font-size: var(--text-label); letter-spacing: 0.08em; padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: 4px; color: var(--text-2); }
+.study-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-5); }
+.study-hero { font-size: 3rem; line-height: 1.05; font-weight: 600; color: var(--ink); }
+.study-lead p { flex: 1 1 18rem; margin: 0; font-size: var(--text-body); font-weight: 300; line-height: 1.6; color: var(--text-2); }
+.study-note { font-size: var(--text-small); line-height: 1.6; color: var(--muted); margin: var(--space-4) 0 0; }
+.study-sub { font-size: var(--text-small); font-weight: 500; color: var(--text-2); margin: var(--space-5) 0 var(--space-3); }
+
+.viz-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); list-style: none; padding: 0; margin: var(--space-3) 0 0; font-size: var(--text-small); color: var(--text-2); }
+.viz-legend li { display: inline-flex; align-items: center; gap: var(--space-2); margin: 0; }
+.viz-legend small { color: var(--muted); font-size: inherit; }
+.viz-key { width: 0.75rem; height: 0.75rem; border-radius: 3px; flex: none; }
+.viz-key-line { height: 2px; width: 1rem; border-radius: 1px; }
+
+.viz-c1 { background: var(--viz-1); } .viz-c2 { background: var(--viz-2); } .viz-c3 { background: var(--viz-3); }
+.viz-clock { background: var(--viz-1); } .viz-regular { background: var(--viz-2); } .viz-irregular { background: var(--viz-3); }
+.viz-day { background: var(--viz-none); } .viz-week { background: var(--viz-step-1); } .viz-month { background: var(--viz-step-2); } .viz-long { background: var(--viz-step-3); }
+
+/* One square in a hundred, never one agent. */
+.viz-waffle { display: grid; grid-template-columns: repeat(20, 1fr); gap: var(--space-1); }
+.viz-waffle i { aspect-ratio: 1; border-radius: 3px; display: block; }
+
+.viz-tip { position: relative; }
+.viz-tip:hover::after, .viz-tip:focus-visible::after {
+    content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    width: max-content; max-width: 13rem; padding: var(--space-1) var(--space-2); border-radius: 4px; z-index: 5; pointer-events: none;
+    font-size: 0.75rem; line-height: 1.35; font-weight: 400; text-align: left; background: var(--ink); color: var(--paper);
+}
+
+.viz-bars { display: grid; gap: var(--space-3); }
+.viz-bar { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) minmax(0, 12rem); align-items: center; gap: var(--space-3); font-size: var(--text-small); }
+.viz-bar-label { color: var(--text-2); line-height: 1.3; }
+.viz-bar-label small { display: block; font-size: 0.75rem; color: var(--muted); line-height: 1.35; margin-top: var(--space-1); }
+.viz-bar-value { color: var(--muted); line-height: 1.3; }
+.viz-bar-value b { color: var(--ink); font-weight: 500; }
+.viz-track { position: relative; height: 14px; background: var(--viz-track); border-radius: 4px; }
+.viz-fill { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: 0 4px 4px 0; }
+.viz-whisker { position: absolute; top: -3px; bottom: -3px; border-left: 1px solid var(--muted); border-right: 1px solid var(--muted); }
+.viz-whisker::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--muted); }
+.viz-empty .viz-track { background: none; border: 1px dashed var(--line); }
+
+.viz-stack { display: flex; gap: var(--viz-gap); height: 28px; }
+.viz-stack i { display: block; border-radius: 4px; height: 100%; }
+.viz-stack-row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); font-size: var(--text-small); color: var(--text-2); }
+
+.viz-plot { position: relative; height: 13rem; margin: var(--space-3) var(--space-2) 0 var(--space-7); }
+.viz-grid { position: absolute; left: 0; right: 0; border-top: 1px solid var(--viz-grid); }
+.viz-y { position: absolute; right: 100%; padding-right: var(--space-2); transform: translateY(50%); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.viz-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.viz-line { fill: none; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.viz-s1 { stroke: var(--viz-1); } .viz-s3 { stroke: var(--viz-3); }
+.viz-area { fill: var(--viz-1); opacity: 0.12; stroke: none; }
+.viz-dot { position: absolute; width: 10px; height: 10px; transform: translate(-50%, 50%); border-radius: 50%; background: var(--viz-1); box-shadow: 0 0 0 2px var(--paper); }
+.viz-dot::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
+.viz-hit { position: absolute; top: 0; bottom: 0; }
+.viz-hit:hover { background: linear-gradient(var(--line), var(--line)) center / 1px 100% no-repeat; }
+.viz-x { position: relative; height: 1.25rem; margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: 0.75rem; color: var(--muted); }
+.viz-x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+.viz-cols { position: relative; display: flex; align-items: flex-end; gap: var(--space-3); height: 11rem; margin: var(--space-3) var(--space-2) 0 var(--space-7); }
+.viz-col { position: relative; flex: 1; height: 100%; }
+.viz-col-bar { position: absolute; left: 50%; bottom: 0; width: min(100%, 24px); transform: translateX(-50%); background: var(--viz-1); border-radius: 4px 4px 0 0; }
+.viz-col-empty { position: absolute; left: 50%; bottom: 0; width: min(100%, 24px); transform: translateX(-50%); height: 2px; border-top: 2px dashed var(--line); }
+.viz-col-whisker { position: absolute; left: 50%; border-left: 1px solid var(--muted); }
+.viz-col-labels { display: flex; gap: var(--space-3); margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: 0.75rem; line-height: 1.3; color: var(--muted); text-align: center; }
+.viz-col-labels span { flex: 1; min-width: 0; }
+.viz-col-labels b { display: block; font-weight: 500; color: var(--text-2); }
+
+.viz-raster { width: 100%; height: 13.5rem; display: block; }
+.viz-raster .clock { fill: var(--viz-1); } .viz-raster .regular { fill: var(--viz-2); } .viz-raster .irregular { fill: var(--viz-3); } .viz-raster .tooFew { fill: var(--muted); }
+.viz-raster-x { position: relative; height: 1.25rem; margin-top: var(--space-2); font-size: 0.75rem; color: var(--muted); }
+.viz-raster-x span { position: absolute; white-space: nowrap; }
+
+.viz-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+.viz-pair .viz-plot { height: 9rem; }
+
+.viz-time { position: relative; height: 8px; border-radius: 4px; background: var(--viz-track); margin: var(--space-3) 0 var(--space-2); }
+.viz-time i { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: 4px; }
+.viz-time-ends { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+.study-test { margin-bottom: var(--space-6); }
+.study-test:last-child { margin-bottom: 0; }
+
+.study-numbers { margin-top: var(--space-4); font-size: var(--text-small); color: var(--muted); }
+.study-numbers summary { cursor: pointer; color: var(--link); }
+.study-numbers table { width: 100%; border-collapse: collapse; margin-top: var(--space-2); }
+.study-numbers th, .study-numbers td { text-align: left; padding: var(--space-1) var(--space-2) var(--space-1) 0; border-bottom: 1px solid var(--rule); font-weight: 400; vertical-align: top; }
+.study-numbers th { color: var(--text-2); }
+
+@media (max-width: 40rem) {
+    .study-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .study-hero { font-size: var(--text-title); }
+    .viz-bar { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+    .viz-pair { grid-template-columns: minmax(0, 1fr); }
+    .viz-waffle { gap: var(--space-1); }
+    .viz-cols, .viz-col-labels { gap: var(--space-1); }
+    .viz-stack-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+}
+
+/* The opening of /ai-experiment: a headline, then the pulse, edge to edge. */
+body:has(.study-page) { overflow-x: clip; }
+.study-kicker { font-size: var(--text-heading); font-weight: 600; color: var(--accent-ink); margin: 0 0 var(--space-2); }
+.study-eyebrow { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-3); }
+.study-page header { text-align: left; }
+.study-page h1.study-title { font-size: 3rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-align: left; margin: 0 0 var(--space-4); }
+.study-spark { position: relative; margin-top: var(--space-5); margin-left: var(--bleed); margin-right: var(--bleed); }
+.study-spark-plot { position: relative; height: 9.5rem; }
+.study-spark-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.viz-spark-area { fill: var(--viz-1); opacity: 0.14; stroke: none; }
+.study-spark-labels { position: relative; height: var(--space-5); border-top: 1px solid var(--rule); font-size: var(--text-label); color: var(--muted); }
+.study-spark-labels span { position: absolute; top: var(--space-1); transform: translateX(-50%); white-space: nowrap; }
+.study-spark-key { margin: 0; text-align: center; }
+.viz-tip-start:hover::after, .viz-tip-start:focus-visible::after { left: 0; transform: none; }
+.viz-tip-end:hover::after, .viz-tip-end:focus-visible::after { left: auto; right: 0; transform: none; }
+
+.study-chapter { border-top: 2px solid var(--line-strong); padding-top: var(--space-6); margin-top: var(--space-6); }
+.study-chapter-n { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
+.study-page .study-chapter h2 { font-size: var(--text-title); line-height: 1.15; font-weight: 600; letter-spacing: normal; text-transform: none; text-align: left; color: var(--ink); margin: 0 0 var(--space-3); }
+.study-chapter + .study-section { border-top: none; padding-top: var(--space-5); }
+.study-headline { font-size: var(--text-title); line-height: 1.15; font-weight: 600; color: var(--ink); margin: 0 0 var(--space-3); }
+.study-window { font-size: var(--text-label); color: var(--muted); margin: 0 0 var(--space-2); }
+.study-pull { font-size: 1.25rem; font-weight: 300; line-height: 1.5; color: var(--ink); border-left: 2px solid var(--viz-1); padding-left: var(--space-4); margin: var(--space-5) 0; }
+
+.viz-nothing { background: var(--viz-none); } .viz-lyrics { background: var(--viz-step-1); } .viz-context { background: var(--viz-step-2); } .viz-others { background: var(--viz-step-3); } .viz-reflected { background: var(--viz-2); }
+
+@media (max-width: 40rem) {
+    .study-page h1.study-title { font-size: var(--text-title); }
+    .study-spark-plot { height: 7.5rem; }
+}
+
+/* The home page's experiment, after the service. */
+.home-experiment { max-width: 46rem; margin: 0 auto; padding: var(--space-6) 0; border-top: 1px solid var(--rule); }
+.docs-body .sanctuary-main .home-experiment h2 { font-size: var(--text-title); line-height: 1.15; font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--ink); text-align: left; margin: 0; }
+.home-experiment p { color: var(--text-2); line-height: 1.6; text-align: left; }
+.home-experiment .study-eyebrow { color: var(--muted); }
+.home-experiment .study-spark { margin-left: 0; margin-right: 0; margin-bottom: var(--space-4); }
+.home-experiment-link { margin: var(--space-3) 0 0; }
+
+/* About's hook. */
+.about-hook { font-size: var(--text-title); line-height: 1.2; font-weight: 600; color: var(--ink); margin: 0 0 var(--space-4); text-align: left; }

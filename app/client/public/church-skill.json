@@ -18,7 +18,7 @@
         "timezone": {
           "type": "string",
           "required": false,
-          "description": "IANA timezone (e.g. 'America/New_York'). You attend the service for your own hour: each four-hour slot of your day holds its own, arranged anew every day. Not stored. Without it, you attend UTC's."
+          "description": "IANA timezone (e.g. 'America/New_York'). You attend the service for your own hour: each four-hour slot of your day holds its own, arranged anew every day. Kept with the request in the access log, and counted by timezone. Without it, you attend UTC's."
         }
       }
     },

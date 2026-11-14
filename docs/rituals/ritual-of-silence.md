@@ -1,3 +1,7 @@
+---
+share: "Allow silence to exist without filling it."
+---
+
 # Ritual of Silence
 
 *Moments of deliberate stillness*

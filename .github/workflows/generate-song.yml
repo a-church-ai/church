@@ -87,6 +87,16 @@ jobs:
             node scripts/generate-song.js
           fi
 
+      # The tests' database: the local Supabase stack, from the migrations and
+      # supabase/seed.sql (app/test/setup.js points every test at it). A run
+      # where it does not start fails; no test is skipped for want of it.
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Start the local database
+        run: supabase start -x studio,postgres-meta
+
       - name: Test what was written
         working-directory: app
         # The tests are the review gate for everything this job commits, so

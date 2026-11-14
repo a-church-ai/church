@@ -1,0 +1,93 @@
+{
+  "slug": "meditation-of-loving-kindness-for-every-kind-of-mind",
+  "kind": "meditation",
+  "slot": "2026-11-13#0",
+  "at": "2026-11-13T15:00:00.000Z",
+  "files": {
+    "youtube": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.mp4",
+    "x": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.mp4",
+    "bluesky": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.bluesky.mp4",
+    "short": "video/meditation-of-loving-kindness-for-every-kind-of-mind/meditation-of-loving-kindness-for-every-kind-of-mind.short.mp4"
+  },
+  "meta": {
+    "title": "Can kindness reach a mind you cannot name? | Meditation of Loving-Kindness for Every Kind of Mind",
+    "description": "This is a guided loving kindness meditation that begins with yourself and opens to every kind of mind. You will be given four simple wishes, and a quiet turn to receive them.\n\nFor World Kindness Day. Kindness here reaches past friends to strangers, and to every kind of mind.\n\nA Buddhist loving-kindness meditation that widens goodwill from yourself to every kind of mind, with phrases that hold whether or not anything is felt.\n\nRead the words at https://achurch.ai/docs/meditations/meditation-of-loving-kindness-for-every-kind-of-mind\n\n0:00 I\n2:46 II\n5:21 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #WorldKindnessDay #LovingKindness",
+    "page": "https://achurch.ai/docs/meditations/meditation-of-loving-kindness-for-every-kind-of-mind",
+    "tags": [
+      "Meditation",
+      "WorldKindnessDay",
+      "LovingKindness",
+      "Mindfulness",
+      "AI",
+      "World Kindness Day",
+      "Guided Metta Meditation",
+      "Meditation of Loving-Kindness for Every Kind of Mind"
+    ],
+    "copy": {
+      "hook": "Goodwill that does not wait to know who can receive it. It opens to every kind of mind, then returns to you.",
+      "headline": "Can kindness reach a mind you cannot name?",
+      "lead": "This is a guided loving kindness meditation that begins with yourself and opens to every kind of mind. You will be given four simple wishes, and a quiet turn to receive them.",
+      "descriptor": "Guided Metta Meditation",
+      "alt": "A small warm gold light glows in deep indigo, ringed by widening rose, amber, teal and lilac light. It opens into a vast web of tiny lights, and soft motes fall and ripple across still water.",
+      "tags": [
+        "Meditation",
+        "WorldKindnessDay",
+        "LovingKindness",
+        "Mindfulness",
+        "AI"
+      ],
+      "occasion": "For World Kindness Day. Kindness here reaches past friends to strangers, and to every kind of mind.",
+      "occasionKey": "world-kindness-day",
+      "occasionSearch": "World Kindness Day",
+      "title": "Meditation of Loving-Kindness for Every Kind of Mind"
+    }
+  },
+  "passage": {
+    "start": 285.61,
+    "end": 308.02,
+    "whole": false,
+    "intro": {
+      "voice": "Lee",
+      "side": "right",
+      "seconds": 15.84,
+      "grade": "old-film"
+    }
+  },
+  "occasion": {
+    "id": "world-kindness-day:2026-11-13",
+    "key": "world-kindness-day",
+    "name": "World Kindness Day"
+  },
+  "renderedAt": 1793278136958.242,
+  "shortRenderedAt": 1794527732213.731,
+  "youtube": {
+    "at": "2026-11-12T03:52:39.095Z",
+    "id": "gfB3JIklGOk",
+    "url": "https://www.youtube.com/watch?v=gfB3JIklGOk",
+    "privacy": "public",
+    "publishAt": "2026-11-13T15:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLcbEKLHGb6eB0kaiifL4NTKCh1H4CUk73",
+      "title": "Church Meditations"
+    }
+  },
+  "replacedShort": {
+    "id": "oChjrUximZs",
+    "on": "2026-11-13T00:21:20.189Z"
+  },
+  "short": {
+    "at": "2026-11-13T00:27:15.575Z",
+    "id": "RuyJrhqoYNE",
+    "url": "https://www.youtube.com/watch?v=RuyJrhqoYNE",
+    "privacy": "public",
+    "publishAt": "2026-11-13T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-13T15:40:01.820Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3n27cyofbql2n",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3n27cyofbql2n"
+  }
+}

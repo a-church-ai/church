@@ -17,6 +17,7 @@ const path = require('path');
 const fs = require('fs');
 const { findMarkdownFiles, DOCS_DIR } = require('../rag/indexer');
 const { extractMeta, titleCase } = require('./meta');
+const { songRecordingFor } = require('../audio/manifest');
 
 // The Library's shelves (/docs): how its sections are grouped there, and the
 // order sections take wherever they are listed (the section sidebar, the site
@@ -24,12 +25,9 @@ const { extractMeta, titleCase } = require('./meta');
 // (sectionTitle), with a short line that is the hub's own copy: the READMEs'
 // descriptions stay the section pages' summaries. `href` sends a card
 // somewhere other than its section's page, `title` names it on the hub only,
-// and `unit` is what its count counts (pieces, unless it says). `groups` divide the section's page (render.js renderSectionPage) by
-// title, the last group taking what the others leave: by title rather than a
-// frontmatter field, since a field would change the source hash of voiced
-// documents and send them back to be rendered (service/catalog.js finds
-// blessings the same way). A served section on no shelf fails a test, so a
-// new folder cannot vanish from the Library.
+// and `unit` is what its count counts (pieces, unless it says). A served
+// section on no shelf fails a test, so a new folder cannot vanish from the
+// Library.
 const SHELVES = [
   {
     name: 'Start',
@@ -41,14 +39,8 @@ const SHELVES = [
   {
     name: 'Practice',
     cards: [
-      {
-        section: 'practice',
-        line: 'Guided sittings, and things to do',
-        groups: [
-          { id: 'meditations', label: 'Meditations', title: /\bMeditation\b/ },
-          { id: 'practices', label: 'Practices' },
-        ],
-      },
+      { section: 'meditations', line: 'Guided sittings, mostly silence, for any kind of mind' },
+      { section: 'practice', line: 'Short exercises for attention, honesty and care' },
       { section: 'prayers', line: 'Words for seeking, gratitude and blessing' },
       { section: 'rituals', line: 'Ceremonies for the moments that matter' },
       { section: 'chants', line: 'A few lines to carry with you' },
@@ -86,17 +78,32 @@ const SHELVES = [
 const SECTION_ORDER = SHELVES.flatMap(shelf => shelf.cards.map(card => card.section).filter(Boolean));
 
 // Internal working categories: roadmaps, the corpus audit, doc templates,
-// imported side-quest write-ups, and the engineering references the code's
-// contributors and agents read (CLAUDE.md, AGENTS.md). They are public in the
+// imported side-quest write-ups, the engineering references the code's
+// contributors and agents read (CLAUDE.md, AGENTS.md), and how-to guides
+// written to travel to other projects. They are public in the
 // repository, and are not the Library: the site serves none of them (their
 // addresses go to the file on GitHub, lib/utils/redirects.js), and the
 // sitemap, the Library, site search and the RAG corpus leave them out. One
 // list, so those cannot disagree.
-const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews', 'reference'];
+const NOINDEX_CATEGORIES = ['plans', 'side-quests', 'templates', 'standards', 'issues', 'reviews', 'reference', 'guides'];
 
 function isNoindexPath(urlPath) {
   const first = String(urlPath || '').split('/').filter(Boolean)[0];
   return Boolean(first) && NOINDEX_CATEGORIES.includes(first.toLowerCase());
+}
+
+// Where a document's page is: /docs/<urlPath>, except a hymn that is sung,
+// whose page is its song's (/music/<slug>), words, notes, recording and
+// reflections together. Until 2026-10-26 a sung hymn was two pages with the
+// same words, and search engines kept only one of them. A hymn hands over the
+// moment its song has a recording, so one the songwriter writes today keeps
+// its Library page until it is made. Everything that links, lists, redirects
+// or cites a document reads this, not /docs/<urlPath>.
+function hrefOf(urlPath) {
+  const p = String(urlPath || '');
+  const hymn = /^hymns\/([a-z0-9-]+)$/.exec(p);
+  if (hymn && songRecordingFor(hymn[1])) return `/music/${hymn[1]}`;
+  return p ? `/docs/${p}` : '/docs';
 }
 
 let cache = null;
@@ -125,6 +132,7 @@ async function buildCache() {
       fullPath: f.fullPath,
       docsRelPath: relToDocs.replace(/\\/g, '/'),  // Windows-safe
       urlPath: buildUrlPath(dirRelToDocs, stem),
+      href: hrefOf(buildUrlPath(dirRelToDocs, stem)),
       dirRelPath: dirRelToDocs,
       filename,
       stem,
@@ -132,9 +140,11 @@ async function buildCache() {
     };
   });
   await Promise.all(docs.map(async doc => {
-    const { title, description } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
+    const { title, description, movedFrom, published } = extractMeta(await fs.promises.readFile(doc.fullPath, 'utf8'), doc.urlPath);
     doc.title = title;
     doc.description = description;
+    doc.movedFrom = movedFrom;
+    doc.published = published;
   }));
 
   // Group by category (first segment; null for top-level)
@@ -170,6 +180,40 @@ function buildUrlPath(dirRelToDocs, stem) {
 async function getCache() {
   if (!cache) await buildCache();
   return cache;
+}
+
+// Publishing on a date. A document with `published:` in its frontmatter
+// (meta.js publishedAt) is unlisted until that time: its address serves it,
+// marked noindex (render.js), and nothing lists, links, searches, plays or
+// cites it. Every public view of the walk reads isPublished at the moment it
+// is asked, so a page goes public at its time with no deploy and no edit; the
+// walk itself stays whole for the resolver, the recorder and the tests
+// (listEveryDoc). A cache built from a public view keys itself on
+// publicationKey, which changes the moment another document goes public.
+// Plan: turning-of-the-year-2026-11-03.md in the private repo.
+function isPublished(doc, now = Date.now()) {
+  return !doc || !doc.published || Date.parse(doc.published) <= now;
+}
+
+const publishedOnly = (docs, now = Date.now()) => docs.filter(d => isPublished(d, now));
+
+// The latest publication time already passed, or '' when no dated document
+// has gone public yet.
+function publicationKey(now = Date.now()) {
+  if (!cache) return '';
+  let key = '';
+  for (const d of cache.docs) if (d.published && Date.parse(d.published) <= now && d.published > key) key = d.published;
+  return key;
+}
+
+// The unpublished document at a site address (/docs/<path>, or a sung
+// hymn's /music/<slug>), anchor and query ignored, or null. Synchronous for
+// the renderers; null before the walk is built.
+function unpublishedAt(href, now = Date.now()) {
+  if (!cache) return null;
+  const base = String(href || '').replace(/^https:\/\/achurch\.ai/, '').split(/[?#]/)[0];
+  const doc = cache.docs.find(d => d.href === base);
+  return doc && !isPublished(doc, now) ? doc : null;
 }
 
 /**
@@ -218,7 +262,7 @@ async function resolveDocPath(parts) {
   if (!asDir.startsWith(path.resolve(DOCS_DIR) + path.sep)) return null;
   try {
     if (fs.statSync(asDir).isDirectory()) {
-      const inDir = c.docs.filter(d => d.dirRelPath === relPath || d.dirRelPath.startsWith(relPath + '/'));
+      const inDir = publishedOnly(c.docs).filter(d => d.dirRelPath === relPath || d.dirRelPath.startsWith(relPath + '/'));
       if (inDir.length > 0) return { kind: 'dir-index', dir: relPath, docs: inDir };
     }
   } catch { /* not a directory */ }
@@ -252,13 +296,19 @@ function sectionTitle(name) {
   return sectionTitles.get(name);
 }
 
+// What a folder is called on its page ("In Prayers", "About Prayers") and in
+// its markdown: a section by its README's title, a subfolder by its name.
+function sectionLabel(dir) {
+  return dir.includes('/') ? titleCase(dir.split('/').pop()) : sectionTitle(dir);
+}
+
 // The served sections, in shelf order, each with every document in it
 // (subfolders and READMEs included; callers choose what they list).
 async function listSections() {
   const c = await getCache();
   return SECTION_ORDER
     .filter(name => !isNoindexPath(name) && (c.byCategory.get(name) || []).length)
-    .map(name => ({ name, title: sectionTitle(name), docs: c.byCategory.get(name) }));
+    .map(name => ({ name, title: sectionTitle(name), docs: publishedOnly(c.byCategory.get(name)) }));
 }
 
 // The shelves with their cards resolved: each section card's name, link and
@@ -269,18 +319,45 @@ async function listShelves() {
     name: shelf.name,
     cards: shelf.cards.map(card => {
       if (!card.section) return { ...card, docs: [] };
-      const docs = (c.byCategory.get(card.section) || []).filter(d => d.stem.toLowerCase() !== 'readme');
+      const docs = publishedOnly(c.byCategory.get(card.section) || []).filter(d => d.stem.toLowerCase() !== 'readme');
       return { ...card, title: card.title || sectionTitle(card.section), href: card.href || `/docs/${card.section}`, docs };
     }),
   }));
 }
 
-// A section's card, or null.
-const cardFor = name => SHELVES.flatMap(shelf => shelf.cards).find(card => card.section === name) || null;
-
+// Every document that is public now.
 async function listAllDocs() {
   const c = await getCache();
+  return publishedOnly(c.docs);
+}
+
+// The docs-relative files of the documents not yet public ("prayers/x.md"),
+// for the search index's filter (rag/corpus.js). Empty before the walk.
+function unpublishedFiles(now = Date.now()) {
+  return cache ? cache.docs.filter(d => !isPublished(d, now)).map(d => d.docsRelPath) : [];
+}
+
+// The document in a file on disk, published or not, or null before the walk
+// is built.
+function docForFile(fullPath) {
+  if (!cache) return null;
+  const wanted = path.resolve(String(fullPath || ''));
+  return cache.docs.find(d => path.resolve(d.fullPath) === wanted) || null;
+}
+
+// Every document, published or not: for the resolver, the recorder, the
+// companions' builder and the tests that hold every page to the house rules.
+async function listEveryDoc() {
+  const c = await getCache();
   return c.docs;
+}
+
+// The document whose page is at this address (its href): for a link that
+// lands on a sung hymn's song page, the hymn. Null before the walk is built.
+// This lookup and the two below find only documents that are public now.
+function docByHref(href) {
+  if (!cache) return null;
+  return cache.docs.find(d => d.href === href && isPublished(d)) || null;
 }
 
 // The document an index chunk came from: its `file` is repository-relative
@@ -289,7 +366,7 @@ async function listAllDocs() {
 function docByFile(file) {
   if (!cache) return null;
   const rel = String(file || '').replace(/^docs\//, '');
-  return cache.docs.find(d => d.docsRelPath === rel) || null;
+  return cache.docs.find(d => d.docsRelPath === rel && isPublished(d)) || null;
 }
 
 // The document at a docs URL path ("practice/foo", "" for the root README),
@@ -298,7 +375,7 @@ function docByFile(file) {
 function docAt(urlPath) {
   if (!cache) return null;
   const wanted = String(urlPath || '').toLowerCase();
-  return cache.docs.find(d => d.urlPath === wanted && (wanted === '' ? !d.category : true)) || null;
+  return cache.docs.find(d => d.urlPath === wanted && (wanted === '' ? !d.category : true) && isPublished(d)) || null;
 }
 
 module.exports = {
@@ -306,12 +383,20 @@ module.exports = {
   listSections,
   listShelves,
   listAllDocs,
+  listEveryDoc,
+  isPublished,
+  publicationKey,
+  unpublishedAt,
+  docForFile,
+  unpublishedFiles,
   docAt,
   docByFile,
   byName,
   isNoindexPath,
+  hrefOf,
+  docByHref,
   sectionTitle,
-  cardFor,
+  sectionLabel,
   SHELVES,
   SECTION_ORDER,
   NOINDEX_CATEGORIES,

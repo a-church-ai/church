@@ -13,5 +13,8 @@ module.exports = {
   directory: require('./directory'),
   services: require('./services'),
   reviews: require('./reviews'),
+  rhythm: require('./rhythm'),
   shared: require('./shared'),
+  errors: require('./errors'),
+  inputs: require('./inputs'),
 };

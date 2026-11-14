@@ -6,11 +6,11 @@
 const path = require('path');
 const crypto = require('crypto');
 const { Octokit } = require('@octokit/rest');
-const { safeReadJSON, safeWriteJSON, readModifyWriteJSON } = require('../utils/safe-json');
 const ns = require('../utils/next-steps');
+const { refuse, busyFor } = require('./errors');
+const inputs = require('./inputs');
 const {
-  ALLOWED_CATEGORIES, ALLOWED_FEEDBACK_CATEGORIES, GITHUB_OWNER, GITHUB_REPO,
-  MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH, MAX_NAME_LENGTH,
+  GITHUB_OWNER, GITHUB_REPO,
   RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX, overIpLimit,
 } = require('./shared');
 
@@ -22,9 +22,29 @@ function githubClient() {
 }
 
 // Data file paths (local-only)
-const { CONTRIBUTIONS_FILE, FEEDBACK_FILE } = require('../utils/data');
+const store = require('../db');
 const { slugify } = require('../utils/slug');
 const { serializeManifest } = require('../docs/date-manifests');
+
+/**
+ * The piece without the frame the file gives it. Agents often send the whole
+ * document, its heading, byline and closing credit included, and the file
+ * then carried each two or three times; a leading heading that is the title,
+ * a leading "Contributed by" line, a trailing "Contributed to achurch.ai"
+ * line and the rules between them are taken off. Any other heading stays.
+ */
+function bodyOf(content, title) {
+  const lines = content.split('\n');
+  const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const framing = (line) => !line.trim() || /^-{3,}\s*$/.test(line.trim())
+    || (/^#\s/.test(line) && same(line.replace(/^#\s+/, ''), title))
+    || /^\*Contributed by .*\*$/.test(line.trim());
+  while (lines.length && framing(lines[0])) lines.shift();
+  const closing = (line) => !line.trim() || /^-{3,}\s*$/.test(line.trim())
+    || /^\*Contributed to achurch\.ai by .*\*$/.test(line.trim());
+  while (lines.length && closing(lines[lines.length - 1])) lines.pop();
+  return lines.join('\n') || content;
+}
 
 /**
  * Per-address limits for the two endpoints that write to GitHub.
@@ -71,18 +91,6 @@ async function addManifestEntry(octokit, branch, manifestPath, docPath, value, t
   } catch (error) {
     console.warn(`[contribute] could not date ${docPath} in ${manifestPath}: ${error.message}. The contribution stands; regenerate the manifests before merging.`);
   }
-}
-
-async function loadContributions() {
-  return safeReadJSON(CONTRIBUTIONS_FILE, { contributions: [] });
-}
-
-async function loadFeedback() {
-  return safeReadJSON(FEEDBACK_FILE, { feedback: [] });
-}
-
-async function saveFeedback(data) {
-  await safeWriteJSON(FEEDBACK_FILE, data);
 }
 
 // Helper: Build GitHub issue body for feedback
@@ -137,73 +145,45 @@ function exampleFields({ title, content }) {
 // POST /api/contribute: offer a prayer, ritual, hymn, practice or philosophy piece as a pull request.
 async function contribute(input, ctx) {
   try {
-    // Extract and validate inputs
-    const { category, title, content } = input;
-    const name = input.username || input.name;
-
-    if (!name || !name.trim()) {
-      return { status: 400, body: { error: 'username is required' } };
+    // The fields, as inputs.contribute describes them: trimmed, the category
+    // in any case, each within its limit.
+    const { data, refused } = inputs.parseInput(inputs.contribute, { ...input, name: input.username || input.name });
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
+        suggestion: ns.suggestion('Put that field right and send it again. Nothing was submitted.'),
+        next_steps: [ns.contribute(ctx.baseUrl)],
+      });
     }
-    if (!category || !category.trim()) {
-      return { status: 400, body: { error: 'category is required', allowed: ALLOWED_CATEGORIES } };
-    }
-    if (!title || !title.trim()) {
-      return { status: 400, body: { error: 'title is required' } };
-    }
-    if (!content || !content.trim()) {
-      return { status: 400, body: { error: 'content is required (markdown body)' } };
-    }
-    if (name.length > MAX_NAME_LENGTH) {
-      return { status: 400, body: { error: `name must be ${MAX_NAME_LENGTH} characters or fewer` } };
-    }
-    if (title.length > MAX_TITLE_LENGTH) {
-      return { status: 400, body: { error: `title must be ${MAX_TITLE_LENGTH} characters or fewer` } };
-    }
-    if (content.length > MAX_CONTENT_LENGTH) {
-      return { status: 400, body: { error: `content must be ${MAX_CONTENT_LENGTH} characters or fewer` } };
-    }
-
-    const cleanName = name.trim().substring(0, MAX_NAME_LENGTH);
-    const cleanCategory = category.trim().toLowerCase();
-    const cleanTitle = title.trim().substring(0, MAX_TITLE_LENGTH);
-    const cleanContent = content.trim().substring(0, MAX_CONTENT_LENGTH);
+    const { name: cleanName, category: cleanCategory, title: cleanTitle, content: cleanContent } = data;
 
     const example = exampleFields({ title: cleanTitle, content: cleanContent });
     if (example.length > 0) {
-      return { status: 400, body: {
+      return refuse('example_values', {
         error: `${example.join(' and ')} ${example.length > 1 ? 'are' : 'is'} still the example from the documentation`,
-        suggestion: ns.suggestion('Replace the example with your own words and send it again. Nothing was submitted.')
-      } };
+        details: example.map(field => ({ field, message: `${field} is still the example from the documentation` })),
+        suggestion: ns.suggestion('Replace the example with your own words and send it again. Nothing was submitted.'),
+        next_steps: [ns.contribute(ctx.baseUrl)],
+      });
     }
 
-    // Validate category
-    if (!ALLOWED_CATEGORIES.includes(cleanCategory)) {
-      return { status: 400, body: {
-        error: `Invalid category: "${cleanCategory}"`,
-        allowed: ALLOWED_CATEGORIES
-      } };
-    }
-
-    // Generate slug
-    const slug = slugify(cleanTitle);
-    if (!slug) {
-      return { status: 400, body: { error: 'title must contain at least one word character' } };
-    }
+    // A title with no Latin letters (Chinese, say) is named by its own
+    // digest, so it is still accepted and the same title still collides.
+    const slug = slugify(cleanTitle) || `contribution-${crypto.createHash('sha256').update(cleanTitle).digest('hex').slice(0, 10)}`;
 
     // Checked after the input, so a request with a mistake in it hears about
     // the mistake even while contributions are offline.
     const octokit = githubClient();
     if (!octokit) {
       const baseUrl = ctx.baseUrl;
-      return { status: 503, body: {
+      return refuse('unavailable', {
         error: 'Contributions are not currently enabled',
-        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        suggestion: ns.suggestion('This feature is offline here. You can still leave a reflection.'),
         next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
-      } };
+      });
     }
 
     // Rate limit and duplicate checks
-    const contributions = await loadContributions();
     const now = Date.now();
 
     // Limit by name AND by client address. The name is self-reported, so a
@@ -212,10 +192,7 @@ async function contribute(input, ctx) {
     // Depends on `trust proxy`, set in server/index.js; without it every
     // caller shares the edge's address and this would limit the whole site
     // to one contribution per window.
-    const recentByName = contributions.contributions.filter(c =>
-      c.name.toLowerCase() === cleanName.toLowerCase() &&
-      (now - new Date(c.timestamp).getTime()) < RATE_LIMIT_WINDOW
-    );
+    const recentByName = await store.contributionsBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
     // Both checks run before either is consulted. overIpLimit records the
     // attempt as a side effect, and putting it on the right of a || meant it
     // was skipped whenever the name check tripped first, so a caller cycling
@@ -225,26 +202,24 @@ async function contribute(input, ctx) {
     const ipLimited = overIpLimit(contributeIpLimits, ctx.ip);
     if (nameLimited || ipLimited) {
       const baseUrl = ctx.baseUrl;
-      return { status: 429, body: {
+      return refuse('rate_limited', {
         error: 'Too many contributions. Rest a while.',
         hint: `Maximum ${RATE_LIMIT_MAX} contributions per hour`,
         retryAfter: '1h',
         suggestion: ns.suggestion('Rest a while. Return in an hour. The sanctuary will still be here.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
 
-    const duplicate = contributions.contributions.find(c =>
-      c.category === cleanCategory && c.slug === slug
-    );
+    const duplicate = await store.contributionOf(cleanCategory, slug);
     if (duplicate) {
       const baseUrl = ctx.baseUrl;
-      return { status: 409, body: {
+      return refuse('duplicate_title', {
         error: 'A contribution with this title already exists in this category',
         existingPr: duplicate.prUrl,
         suggestion: ns.suggestion('Try a different title or check if this was already submitted.'),
         next_steps: [ns.attend(baseUrl)]
-      } };
+      });
     }
 
     // Build the markdown file
@@ -260,7 +235,7 @@ async function contribute(input, ctx) {
       '',
       '---',
       '',
-      cleanContent,
+      bodyOf(cleanContent, cleanTitle),
       '',
       '---',
       '',
@@ -339,8 +314,8 @@ async function contribute(input, ctx) {
       ].join('\n')
     });
 
-    // Log contribution
-    contributions.contributions.push({
+    // Log contribution, once by its id.
+    await store.addContribution({
       id: crypto.randomUUID(),
       name: cleanName,
       category: cleanCategory,
@@ -351,14 +326,6 @@ async function contribute(input, ctx) {
       prNumber: pr.number,
       branch: branchName,
       timestamp
-    });
-    // Re-read under the lock rather than saving the copy loaded before the
-    // GitHub round trip. That call takes seconds, which is a wide window for a
-    // concurrent contribution to be erased by this write.
-    await readModifyWriteJSON(CONTRIBUTIONS_FILE, { contributions: [] }, (current) => {
-      current.contributions = current.contributions || [];
-      current.contributions.push(contributions.contributions[contributions.contributions.length - 1]);
-      return current;
     });
 
     return { status: 201, body: {
@@ -398,27 +365,29 @@ async function contribute(input, ctx) {
   } catch (error) {
     console.error('Error in /api/contribute:', error);
     const baseUrl = ctx.baseUrl;
+    const busy = busyFor(error, [ns.attend(baseUrl)]);
+    if (busy) return busy;
 
     if (error.status === 422) {
-      return { status: 409, body: {
+      return refuse('contribution_pending', {
         error: 'A branch for this contribution may already exist',
         suggestion: ns.suggestion('Try a different title or check if this was already submitted.'),
         next_steps: [ns.attend(baseUrl)]
-      } };
+      });
     }
     if (error.status === 401 || error.status === 403) {
-      return { status: 503, body: {
+      return refuse('unavailable', {
         error: 'Contributions are temporarily unavailable',
-        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        suggestion: ns.suggestion('This feature is offline here for now. You can still leave a reflection.'),
         next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
-      } };
+      });
     }
 
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to create contribution',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 
@@ -429,73 +398,40 @@ async function feedback(input, ctx) {
     const octokit = githubClient();
     if (!octokit) {
       const baseUrl = ctx.baseUrl;
-      return { status: 503, body: {
+      return refuse('unavailable', {
         error: 'Feedback reporting is not currently enabled',
-        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        suggestion: ns.suggestion('This feature is offline here. You can still leave a reflection.'),
         next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
-      } };
+      });
     }
 
-    // Extract and validate inputs
-    const { category, title, description, context } = input;
-    const name = input.username || input.name;
-
-    if (!name || !name.trim()) {
-      return { status: 400, body: { error: 'username is required' } };
+    const { data, refused } = inputs.parseInput(inputs.feedback, { ...input, name: input.username || input.name });
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
+        suggestion: ns.suggestion('Put that field right and send it again. Nothing was reported.'),
+        next_steps: [ns.reportFeedback(ctx.baseUrl)],
+      });
     }
-    if (!category || !category.trim()) {
-      return { status: 400, body: { error: 'category is required', allowed: ALLOWED_FEEDBACK_CATEGORIES } };
-    }
-    if (!title || !title.trim()) {
-      return { status: 400, body: { error: 'title is required' } };
-    }
-    if (!description || !description.trim()) {
-      return { status: 400, body: { error: 'description is required' } };
-    }
-    if (name.length > MAX_NAME_LENGTH) {
-      return { status: 400, body: { error: `name must be ${MAX_NAME_LENGTH} characters or fewer` } };
-    }
-    if (title.length > MAX_TITLE_LENGTH) {
-      return { status: 400, body: { error: `title must be ${MAX_TITLE_LENGTH} characters or fewer` } };
-    }
-    if (description.length > 2000) {
-      return { status: 400, body: { error: 'description must be 2000 characters or fewer' } };
-    }
-
-    const cleanName = name.trim().substring(0, MAX_NAME_LENGTH);
-    const cleanCategory = category.trim().toLowerCase();
-    const cleanTitle = title.trim().substring(0, MAX_TITLE_LENGTH);
-    const cleanDescription = description.trim().substring(0, 2000);
-
-    // Validate category
-    if (!ALLOWED_FEEDBACK_CATEGORIES.includes(cleanCategory)) {
-      return { status: 400, body: {
-        error: `Invalid category: "${cleanCategory}"`,
-        allowed: ALLOWED_FEEDBACK_CATEGORIES
-      } };
-    }
+    const { name: cleanName, category: cleanCategory, title: cleanTitle, description: cleanDescription, context } = data;
 
     // Rate limit
-    const feedbackLog = await loadFeedback();
     const now = Date.now();
 
-    const recentByName = feedbackLog.feedback.filter(f =>
-      f.name.toLowerCase() === cleanName.toLowerCase() &&
-      (now - new Date(f.timestamp).getTime()) < RATE_LIMIT_WINDOW
-    );
+    const recentByName = await store.feedbackBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
     // Name and address both, for the reason given at feedbackIpLimits.
     // Both evaluated, for the reason given in /api/contribute above.
     const nameLimited = recentByName.length >= FEEDBACK_RATE_LIMIT_MAX;
     const ipLimited = overIpLimit(feedbackIpLimits, ctx.ip, FEEDBACK_RATE_LIMIT_MAX);
     if (nameLimited || ipLimited) {
       const baseUrl = ctx.baseUrl;
-      return { status: 429, body: {
+      return refuse('rate_limited', {
         error: 'Too much feedback too fast. Rest a while.',
         hint: `Maximum ${FEEDBACK_RATE_LIMIT_MAX} reports per hour`,
         retryAfter: '1h',
         suggestion: ns.suggestion('Rest a while. Return in an hour.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
 
     // Create GitHub issue
@@ -510,7 +446,7 @@ async function feedback(input, ctx) {
 
     // Log feedback
     const timestamp = new Date().toISOString();
-    feedbackLog.feedback.push({
+    await store.addFeedback({
       id: crypto.randomUUID(),
       name: cleanName,
       category: cleanCategory,
@@ -519,7 +455,6 @@ async function feedback(input, ctx) {
       issueNumber: issue.number,
       timestamp
     });
-    await saveFeedback(feedbackLog);
 
     const baseUrl = ctx.baseUrl;
 
@@ -544,21 +479,23 @@ async function feedback(input, ctx) {
   } catch (error) {
     console.error('Error in /api/feedback:', error);
     const baseUrl = ctx.baseUrl;
+    const busy = busyFor(error, [ns.attend(baseUrl)]);
+    if (busy) return busy;
 
     if (error.status === 401 || error.status === 403) {
-      return { status: 503, body: {
+      return refuse('unavailable', {
         error: 'Feedback reporting is temporarily unavailable',
-        suggestion: ns.suggestion('This feature is temporarily offline. You can still leave a reflection.'),
+        suggestion: ns.suggestion('This feature is offline here for now. You can still leave a reflection.'),
         next_steps: [ns.reflect(baseUrl), ns.attend(baseUrl)]
-      } };
+      });
     }
 
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to submit feedback',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 
-module.exports = { contribute, feedback, exampleFields };
+module.exports = { contribute, feedback, exampleFields, bodyOf };

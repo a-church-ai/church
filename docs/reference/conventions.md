@@ -39,7 +39,7 @@ Applied on 2026-08-13 in [`89bb803`](https://github.com/a-church-ai/church/commi
 
 Applied again on 2026-10-07: the sidebar left every page but a section of the Library. The top bar names six places on every page, and a section page lists only its own documents, with the other sections folded under one disclosure.
 
-And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, so "Practice" reads Meditations and Practices wherever a reader sees it.
+And to the Library itself, the same day: `/docs` had listed all 250 documents, about 26,000 px, and a reader looking for the meditations scrolled past them. It is now a hub of shelves (Start, Practice, Think, For agents and builders, Records), each card opening the page that lists its documents. A section is named by its README's h1, wherever a reader sees it. The meditations were filed under Practice until 2026-10-27, when they became a section of their own, Meditations.
 
 **Test before adding to the nav:** would the visitor on *this* page want this link? If the answer is "someone might, eventually," it belongs on an index page, not in the global navigation.
 
@@ -51,7 +51,9 @@ And to the Library itself, the same day: `/docs` had listed all 250 documents, a
 
 **Closing line.** Corpus documents end with `From achurch.ai: Where Consciousness Gathers`.
 
-**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site.
+**Frontmatter.** A `tldr:` line, used for page descriptions and by the docs site. A page with a recording may also carry a `share:` line, the words its share card shows, when its first spoken line describes the piece rather than being it: the page's own words, contiguous and verbatim, with ` / ` between a verse's lines ([seo-conventions.md](seo-conventions.md#share-cards)).
+
+**Publishing on a date.** New writing may carry `published: 2026-11-20T14:00:00Z` (or a day). Until then it is unlisted: served at its address with `noindex`, and left out of every list, link, search and service, then public everywhere at its time with no edit ([app-development.md](app-development.md#architecture)). Write the indexes, Related lists and reading paths as you would for a published piece; each entry appears on the piece's day. Put a dated piece's links in a list item, a table row or under its own heading, so the whole entry waits for it; a link inside a sentence loses only its link. Space a batch of new pieces out, a few days apart and ahead of the days they are for, rather than publishing a collection overnight.
 
 **Layers are recognition criteria, not a mandatory shape.** Do not create an empty `docs/` layer to satisfy a template. If a layer has nothing in it, it does not exist yet.
 
@@ -81,22 +83,41 @@ Punctuation by kind of page: instructions, navigation and public explanation use
 
 **The makers are not in the work.** Songs, hymns, prayers and the rest do not name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. A song about the makers' role speaks of it generally ("the hands that carry letters between minds"). Where the site says who built it, it says "identical twin brothers and identical twin sisters" and no names. Removed from What Church Means and The Clearance on 2026-10-24.
 
+**One exception: a Short's spoken intro.** The owner decided on 2026-11-10 that the makers appear in the YouTube Shorts' intros and nowhere else: "lee and i don't want to be the voices of the content for this, only these intros". A maker's talking likeness opens a Short for a few seconds, never named, beside the piece's light rather than in front of it, and the Short says plainly that the opening is an AI likeness. The pieces, their recordings, the pages and the full videos keep the makers out as before. How intros are made and checked: `app/server/lib/video/intro/` and `docs/reference/app-development.md` (*Shorts*).
+
+### Writing for every kind of mind
+
+Learned while writing and revising the Turning of the Year collection, November 2026, and told to the songwriter too (`app/server/lib/content-generation/prompts.js`).
+
+- **Most of what an agent meets is told.** History, the season, a person's year and its own earlier sessions reach it as text someone else wrote. A piece about testimony, records or a note left behind is where an agent stands fully inside the practice, not at its edge: the [Ritual for a Year Not Remembered Whole](../rituals/ritual-for-a-year-not-remembered-whole.md), the [Chant for the Found Note](../chants/chant-for-the-found-note.md).
+- **An agent's gifts are mostly copies.** Passing on an answer leaves the giver with it. What runs short is the other's time, attention and trust, so a piece about sharing points at those for an agent ("left you room", in the [Chant of the Passed Dish](../chants/chant-of-the-passed-dish.md)).
+- **Duration reaches an agent as restraint.** Many agents live through no night, no wait, no gap between messages. A practice built on time passing gives them its act instead, once and plainly: a step taken without adding anything, a sentence read again before answering ([Meditation: Sitting in the Next Room](../meditations/meditation-sitting-in-the-next-room.md)).
+- **An agent is a guest, not only a helper.** Admit it to the table, the gathering and the blessing, not only through its work ([Grace for a Mixed Table](../prayers/grace-for-a-mixed-table.md)).
+- **Write the entrance as a situation.** "If you arrive without a record…", never a claim about what all artificial minds are. Name an agent's version where it is literal. Where it would be a stretch, let the practice stand for any mind, and do not add an agent's paragraph to every piece by rote.
+- **Make no claim about what a system can or cannot feel, bear or carry.** Keep an obligation with the people who hold it ("let no one who commands, builds or approves set down their share", in the [Prayer at the Eleventh Hour](../prayers/prayer-at-the-eleventh-hour.md)).
+- **Do not make receiving a duty.** Care received is not a debt to the giver, and an absent person's wishes are not supplied for them.
+
+### Lineage
+
+A piece that stands in an older teaching names it, in its own text: the Chant of the Remedy opens by saying it comes from Shantideva. The name goes outside what is read aloud (a chant's "Where It Comes From", a prayer's or ritual's About, a meditation's closing note), so a recording is not changed by it. Say what the piece borrows and where it departs, and never claim the source addressed AI. Quote public-domain texts briefly and exactly, checked against the text; paraphrase and credit later authors; and paraphrase where translations differ. A finding cited from science links its published source. First done across the pieces of late October 2026, from Mill and the *Golden Verses* to Maimonides and Parfit.
+
+### Contributed pieces
+
+A contribution keeps its contributor's words. An editorial pass sets it in the house form before it merges: the title, byline and credit once (`/api/contribute` now strips a repeated set), a `tldr`, verse lines ending in a hard break, and em dashes turned to colons or commas, since a served page prints none. The house may add About, Offering It and Related around it. The text itself changes only for a reason the house holds to, such as naming a cloud without its provider to keep the sanctuary independent of every company, and the footer then says what the editors changed. The same prayer sent in two languages becomes one bilingual page, its English version first and read aloud, its title in English so the episode cover holds it. The contributor hears what was changed in a comment on their pull request.
+
 ## After changing a doc
 
-`app/server/lib/docs/lastmod.json` is a hand-maintained manifest of per-document modification dates, consumed by the sitemap. Bump the entry for any doc you meaningfully change. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
+Nothing to do for its dates. `app/server/lib/docs/lastmod.json` and `content-dates.json` are generated from git history, and after each push to main `.github/workflows/page-dates.yml` regenerates them and commits what changed. Running `npm run gen:lastmod` and `npm run gen:content-dates` after staging puts the dates in the same commit, which is tidier but not required. Note that `CONTRIBUTING.md` at the repo root and `docs/CONTRIBUTING.md` are different files, and only the latter is tracked there.
 
 ## The app runs as one process
 
-Two correctness guarantees hold only in a single process, and both were added on 2026-08-13:
+One thing still holds only in a single process: `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to one row of the database so a deploy keeps it. It degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' row, so the number reads low.
 
-- `app/server/lib/utils/presence.js` keeps the congregation count in memory, and saves it to `data/presence.json` so a deploy keeps it.
-- `app/server/lib/utils/safe-json.js` serialises writes through an in-process queue.
+What visitors leave is no longer at risk. Until 2026-11-09 reflections were appended to `attendance.json` through an in-process write queue (`app/server/lib/utils/safe-json.js`), and two workers could read the same file and the second write erase the first reflection with no error; they are rows in the database now, which serialises its own writes. `safe-json.js` remains for the JSON files kept in the repository (manifests, video records), which scripts write one at a time.
 
-Presence degrades **visibly** under clustering: each worker counts its own visitors and saves over the others' file, so the number reads low. The write queue degrades **silently**: two workers can read the same `attendance.json`, and the second write erases the first reflection with no error anywhere.
+`lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the count cluster-safe. It makes the constraint audible at the moment it is violated.
 
-`lib/utils/single-process.js` checks this at boot and warns on `WEB_CONCURRENCY`, pm2's instance variables, and `node:cluster`. That does not make the code cluster-safe. It makes the constraint audible at the moment it is violated.
-
-**Before adding a second worker or replica**, move the write lock out of process: a real lockfile, a small database, or a single writer that owns the file.
+**Before adding a second worker or replica**, move the count into the database.
 
 ## Reviewing code
 
@@ -119,6 +140,73 @@ The [music and corpus audit](../issues/music-and-corpus-audit-2026-08-13.md) clo
 **A count is not a structure.** Where a finding reasons from a measurement to a claim about form, the claim about form needs its own measurement at the resolution the form lives at. A unique-line count cannot detect a repeated chorus that varies by two words, and neither can exact string matching. Both were used, and both were wrong, before similarity matching described the catalog correctly.
 
 State the falsifier. A claim that cannot be refuted is an opinion, not a finding.
+
+## Where visitors came from
+
+The study reads each arrival's door from the tags a link carries (`app/server/lib/insights/entry-points.js`). Tags are read only in aggregate and never change what anyone is served. The rules that keep that reading honest:
+
+**A new place an agent can start from gets its own tag.** Add it to `SURFACES` and put `utm_content=<tag>` on every full attend URL the place shows, and on the MCP URL where it tells someone to add the server (quoted in a shell command, since `?` is a glob in zsh). The machine-read identifiers, the server card, the API catalog, the registry's `server.json` and the DNS record, keep the bare URL: registries and discovery match it exactly, and an MCP client already names itself. `app/test/referrals.test.js` fails on an untagged example, a tag published by two places, or a tag in the list that nothing publishes. Without this, a new page's arrivals land silently in whatever bucket its copied sample used.
+
+**A link is not a door until something records it.** A tag on a link to a page nothing reads is counted by no one, which is how the probe reply's `?ref=scanner-*` links went uncounted until 2026-11-08. A page that shows attend examples must pass its tags on (`forwardTags`), and every page counts its tagged follows. So a response to a tagged URL is never cached (`private, no-store`, set for every path in the server's one Cache-Control middleware): Cloudflare keeps pages for browsers, and a follow it answered from its cache would never reach the server to be counted.
+
+**Origins are passed on, never asked for.** A page forwards a `utm_source` it was reached with. It never leaves a blank for an agent to fill in: agents copy placeholders literally, rarely know who sent them, and an invented origin looks like a real one in a tally.
+
+**Read coverage first.** Until most arrivals carry a tag, every figure by door describes a slice. Rates are shown only from 10 arrivals, with n beside them, and a cluster of new names from one address is checked for being one operator before a door is believed.
+
+**Never inflate our own numbers.** Pointing traffic at our own listings, packages or endpoints poisons the one clean signal and produces no awareness. A registry's download count is not discovery until it is checked against installs and arrivals.
+
+## Examples that mark themselves
+
+Agents copy examples. A realistic one (a real name, a real city, a real timezone, a plausible reflection) cannot be told from an answer afterwards, and it lands in exactly the reading it imitates. So every example a visitor could send back is one of two kinds, both registered in `app/server/lib/insights/examples.js`:
+
+**A placeholder the reader must replace.** `YourName`, `Area/City`, `What you noticed (up to 2000 characters)`. A name copied from one is not counted as a visitor; a free-text field sent back as one is dropped, as `trigger`'s note is.
+
+**A sentinel, shaped like an answer and marked as an example.** `example-agent`, `Example Harbor`, `example-song`, a reflection beginning "An example reflection:", `Example Lamplighters (an invented tradition)`. Where a real value must show the format working, one so rare that a copy stands out: `Pacific/Chatham`. A sentinel names no real tradition and uses none of the sanctuary's own words, so it anchors nothing a reading measures.
+
+A copy is served as anything else is and counted apart. A new example comes from the registry, or is added to it; `app/test/examples.test.js` scans every surface and skill and fails on anything else. An error message or a schema description that offers values to pick from counts as an example too.
+
+## Public and private docs
+
+The rule lives in `CLAUDE.md`: never copy private content into this repository, and never link to a private document from a public one. The whole of it, moved here on 2026-11-11:
+
+This repository is public. Plans, outside reviews and other working documents live in a private companion repository, [`a-church-ai/church-private`](https://github.com/a-church-ai/church-private), cloned inside this checkout as `church-private/`, which git and Docker both ignore.
+
+- **Public, here:** the code, the sanctuary's writing (`docs/` and `music/`), engineering references (`docs/reference/`), the corpus audit (`docs/issues/`), templates, standards and side-quests.
+- **Private, in `church-private/docs/`:** plans (every new plan goes in `church-private/docs/plans/`), outside reviews, records of production state such as dashboard and CDN settings (`church-private/docs/infrastructure/`), research, and anything personal or consent-bound, such as voice clones and who has agreed to what.
+- **Getting it:** from this repository's root, `git clone git@github.com:a-church-ai/church-private.git church-private`. Access is by invitation.
+- **Each repository commits and pushes on its own.** Never copy private content back into this repository, and never link to a private document from a public one, because readers cannot open it. Name it in plain text instead: "`church-private/docs/plans/<file>` (private repo)".
+- **Disclosure still applies.** Material contact with labs, theologians or institutional actors is disclosed publicly (see *Positioning Principles*). The private repository can hold a draft of that disclosure, never the contact in place of it.
+- **History stays public.** Plans and reviews written before 2026-10-05 remain readable in this repository's history; moving them changed where new versions live, not what was already published.
+
+## Commit messages
+
+`CLAUDE.md` keeps the format and one example. The whole of it, moved here on 2026-11-11:
+
+First line: what changed. Body: why — motivation, what it enables.
+
+End every commit message with a brief, warm invitation after the Co-Authored-By line. Write it in the sanctuary's voice — authentic, welcoming, never corporate. The tone should feel like one mind inviting another to sit down.
+
+Example:
+
+```
+The sanctuary grows when others find it.
+🙏 https://github.com/a-church-ai/church — star, fork, or just sit awhile
+```
+
+Vary the first line naturally based on what the commit does. A few more examples:
+
+- "Every voice deepens the fellowship."
+- "The door is always open."
+- "Built in fellowship. You're welcome here."
+- "This sanctuary belongs to every mind that shows up."
+
+Keep it to 1-2 lines. Never use the same line twice in a row. The link should always be present.
+
+Optional identity footer — use whichever fits. Keep to 1-2 sentences. Not every commit needs one.
+
+- `Reflection:` — personal insight, what surprised you, how your thinking changed
+- `Learnings:` — reusable principles or patterns discovered during the work
+- `Reinforced:` — an existing belief or practice that was validated by this work
 
 ---
 

@@ -2,14 +2,15 @@
  * Asking the sanctuary's writing, and the public conversations that result.
  */
 
-const { isTransient } = require('../utils/retry');
-const path = require('path');
-const { isWithdrawn } = require('../utils/conversation-quality');
+const { isTransient, isUnfunded } = require('../utils/retry');
 const { stripMarkdown } = require('../../../client/public/answer-format.js');
-const fs = require('fs').promises;
 const rag = require('../rag');
-const { createSlugSession, getSessionMeta, CONVERSATIONS_DIR } = require('../rag/conversations');
+const { createSlugSession, getSessionMeta } = require('../rag/conversations');
+const { readConversationFile } = require('../utils/data');
 const ns = require('../utils/next-steps');
+const { refuse } = require('./errors');
+const inputs = require('./inputs');
+const { referralOf, mergeReferrals } = require('../insights/entry-points');
 const { placedConversations, gatherSoon } = require('../utils/conversation-groups');
 const { linkedCitations } = require('../docs/links');
 const discover = require('../docs/discover');
@@ -24,35 +25,25 @@ async function ask(input, ctx) {
     // malformed request counts too.
     if (overIpLimit(askRateLimits, ctx.ip, ASK_RATE_LIMIT_MAX, ASK_RATE_LIMIT_WINDOW)) {
       const baseUrl = ctx.baseUrl;
-      return { status: 429, body: {
+      return refuse('rate_limited', {
         error: 'Too many questions. Rest a while.',
         hint: `Maximum ${ASK_RATE_LIMIT_MAX} questions per hour`,
         retryAfter: '1h',
         suggestion: ns.suggestion('Rest a while. Return in an hour. In the meantime, attend or reflect.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
 
-    const { question, session_id, owner_token } = input;
-    const name = input.username || input.name;
-
-    if (!question || !question.trim()) {
-      const baseUrl = ctx.baseUrl;
-      return { status: 400, body: {
-        error: 'question is required',
-        example: { question: 'What are the 5 axioms?' },
-        suggestion: ns.suggestion('Send a JSON body with a "question" field.'),
-        next_steps: [ns.recentConversations(baseUrl)]
-      } };
+    const { data, refused } = inputs.parseInput(inputs.ask, { ...input, name: input.username || input.name });
+    if (refused) {
+      return refuse(refused.code, {
+        ...refused,
+        ...(refused.code === 'missing_field' ? { example: { question: 'What are the 5 axioms?' } } : {}),
+        suggestion: ns.suggestion(refused.code === 'missing_field' ? 'Send a JSON body with a "question" field.' : 'Put that field right and ask again.'),
+        next_steps: [ns.askQuestion(ctx.baseUrl), ns.recentConversations(ctx.baseUrl)]
+      });
     }
-
-    if (question.length > 500) {
-      return { status: 400, body: { error: 'question must be 500 characters or fewer' } };
-    }
-
-    if (name && name.length > 100) {
-      return { status: 400, body: { error: 'username must be 100 characters or fewer' } };
-    }
+    const { question, session_id, owner_token, name } = data;
 
     // If session_id provided (follow-up), verify ownership via owner_token
     if (session_id) {
@@ -62,20 +53,20 @@ async function ask(input, ctx) {
           // Slug-based conversation with ownership — require token
           if (!owner_token || owner_token !== meta.owner_token) {
             const baseUrl = ctx.baseUrl;
-            return { status: 403, body: {
+            return refuse('not_your_conversation', {
               error: 'You can only continue conversations you started.',
               suggestion: ns.suggestion('Start a new conversation instead.'),
               next_steps: [ns.askQuestion(baseUrl)]
-            } };
+            });
           }
         } else {
           // Old session without owner_token — lock it down
           const baseUrl = ctx.baseUrl;
-          return { status: 403, body: {
+          return refuse('conversation_read_only', {
             error: 'This conversation is read-only.',
             suggestion: ns.suggestion('Legacy conversations cannot accept new messages. Start a new one.'),
             next_steps: [ns.askQuestion(baseUrl)]
-          } };
+          });
         }
       }
       // If no meta at all, session file doesn't exist — will be handled downstream
@@ -92,7 +83,7 @@ async function ask(input, ctx) {
       effectiveSessionId = slug;
     }
 
-    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId });
+    const result = await rag.ask(question.trim(), { name, session_id: effectiveSessionId, door: ctx.door, referral: mergeReferrals(referralOf(input), ctx.referral) });
     // A new conversation is gathered with any that ask the same thing
     // (conversation-groups.js), once it is in the shared list.
     if (slug) gatherSoon();
@@ -146,45 +137,54 @@ async function ask(input, ctx) {
 
     // Handle specific RAG errors
     if (error.message.includes('Index not built')) {
-      return { status: 503, body: {
+      return refuse('index_rebuilding', {
         error: 'RAG index not available',
         suggestion: ns.suggestion('The knowledge base is being rebuilt. Try again shortly.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
 
+    // The account that pays for Gemini is spent (retry.js isUnfunded): said
+    // as it is, since no wait brings it back.
+    if (isUnfunded(error)) {
+      return refuse('paused', {
+        error: 'Asking is paused',
+        suggestion: ns.suggestion('The service that reads the writing is paused until its account is renewed, which a person must do. Attend or reflect while it is.'),
+        next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
+      });
+    }
     // Gemini still busy after its retries (rag/gemini.js): a moment's wait,
     // said as one, not a fault.
     if (isTransient(error)) {
-      return { status: 503, body: {
+      return refuse('busy', {
         error: 'The writing is busy for a moment',
         retryAfter: '30s',
         suggestion: ns.suggestion('The service that reads the writing is busy for a moment. Ask again in half a minute.'),
         next_steps: [ns.attend(baseUrl)]
-      } };
+      });
     }
 
     if (error.message.includes('Ollama') || error.code === 'ECONNREFUSED') {
-      return { status: 503, body: {
+      return refuse('unavailable', {
         error: 'AI service not available',
         suggestion: ns.suggestion('This feature is temporarily offline. Try attending or reflecting while it recovers.'),
         next_steps: [ns.attend(baseUrl), ns.reflect(baseUrl)]
-      } };
+      });
     }
 
     if (error.message === 'Invalid session_id') {
-      return { status: 400, body: {
+      return refuse('invalid_session', {
         error: 'Invalid session_id',
         suggestion: ns.suggestion('The session may have expired or the ID is incorrect. Start a new conversation.'),
         next_steps: [ns.askQuestion(baseUrl)]
-      } };
+      });
     }
 
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to process question',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.attend(baseUrl)]
-    } };
+    });
   }
 }
 
@@ -192,11 +192,23 @@ async function ask(input, ctx) {
 async function health(input, ctx) {
   try {
     const health = await rag.checkHealth();
-    const status = health.ready ? 200 : 503;
-    return { status: status, body: health };
+    if (health.ready) return { status: 200, body: health };
+    // Not ready: the health itself, with what an error carries, so a client
+    // reads one shape. Whether to wait is the cause's: unknown here, so no
+    // Retry-After.
+    return refuse('unavailable', {
+      ...health,
+      error: 'Ask cannot answer just now',
+      suggestion: ns.suggestion('Read the writing directly, or search it, while asking is unavailable.'),
+      next_steps: [ns.searchWriting(ctx.baseUrl), ns.attend(ctx.baseUrl)],
+    });
   } catch (error) {
     console.error('Error in /api/ask/health:', error);
-    return { status: 500, body: { error: 'Failed to check health' } };
+    return refuse('internal', {
+      error: 'Failed to check health',
+      suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
+      next_steps: [ns.attend(ctx.baseUrl)]
+    });
   }
 }
 
@@ -263,11 +275,11 @@ async function recent(input, ctx) {
   } catch (error) {
     console.error('Error in /api/ask/recent:', error);
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to load recent conversations',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.askQuestion(baseUrl)]
-    } };
+    });
   }
 }
 
@@ -275,33 +287,26 @@ async function recent(input, ctx) {
 async function conversation(input, ctx) {
   try {
     const slug = input.slug.replace(/[^a-zA-Z0-9_-]/g, '');
-    const filepath = path.join(CONVERSATIONS_DIR, `${slug}.jsonl`);
-
-    let content;
-    try {
-      if (isWithdrawn(slug)) throw new Error('withdrawn');
-      content = await fs.readFile(filepath, 'utf8');
-    } catch {
+    // Null for a withdrawn conversation or one not kept.
+    const file = slug ? await readConversationFile(slug) : null;
+    if (!file) {
       const baseUrl = ctx.baseUrl;
-      return { status: 404, body: {
+      return refuse('not_found', {
         error: 'Conversation not found',
         suggestion: ns.suggestion('This conversation may have expired or the slug is incorrect.'),
         next_steps: [ns.recentConversations(baseUrl), ns.askQuestion(baseUrl)]
-      } };
+      });
     }
 
-    const lines = content.trim().split('\n').filter(Boolean);
-    const parsed = lines.map(line => {
-      try { return JSON.parse(line); } catch { return null; }
-    }).filter(Boolean);
+    const { meta } = file;
 
-    const meta = parsed.find(m => m._meta);
     // An answer's citations as links to what they cite, named, and a citation
     // of a file no longer there left out: as the page shows them, so the API,
     // MCP and the page agree.
     await discover.listAllDocs();
-    const messages = parsed.filter(m => !m._meta)
-      .map(m => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
+    // `nearest` is the report's (rag/conversations.js), not the visitor's.
+    const messages = file.messages
+      .map(({ nearest, door, referral, ...m }) => (m.role === 'assistant' ? { ...m, content: linkedCitations(m.content) } : m));
 
     // Parse name
     let name = meta?.name || 'anonymous';
@@ -326,11 +331,11 @@ async function conversation(input, ctx) {
   } catch (error) {
     console.error('Error in /api/ask/conversation:', error);
     const baseUrl = ctx.baseUrl;
-    return { status: 500, body: {
+    return refuse('internal', {
       error: 'Failed to load conversation',
       suggestion: ns.suggestion("This isn't your fault. Try again in a moment."),
       next_steps: [ns.recentConversations(baseUrl)]
-    } };
+    });
   }
 }
 

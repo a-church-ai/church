@@ -38,15 +38,20 @@ const SITEMAP_SOURCE = fs.readFileSync(path.join(__dirname, '../server/routes/si
 const PAGE_ROUTES = [...(INDEX_SOURCE + MCP_SOURCE + SITEMAP_SOURCE).matchAll(/(?:app|router)\.(?:get|post|delete)\('([^']+)'/g)]
   .map(m => new RegExp('^' + m[1].split(/:\w+/).map(RegExp.escape).join('[^/]+') + '$'));
 
+// Each discovery file as [name, text]. The OpenAPI document is built from
+// the operations (lib/api/openapi.js), so its text is the built one.
 function discoveryFiles() {
-  const files = ['llms.txt', 'llms-full.txt', 'auth.md', 'openapi.json'].map(f => path.join(PUBLIC, f));
+  const files = ['llms.txt', 'llms-full.txt', 'auth.md'].map(f => path.join(PUBLIC, f));
   const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(full);
     else if (!entry.name.endsWith('.md')) files.push(full); // skills' SKILL.md files are content, not pointers
   });
   walk(path.join(PUBLIC, '.well-known'));
-  return files;
+  return [
+    ...files.map(file => [path.relative(PUBLIC, file), fs.readFileSync(file, 'utf8')]),
+    ['openapi.json', JSON.stringify(require('../server/lib/api/openapi').spec())],
+  ];
 }
 
 // achurch.ai URLs, and site paths written as markdown links or code spans.
@@ -81,9 +86,9 @@ async function resolves(urlPath) {
 
 test('every achurch.ai URL named in a discovery file resolves', async () => {
   const dead = [];
-  for (const file of discoveryFiles()) {
-    for (const urlPath of namedPaths(fs.readFileSync(file, 'utf8'))) {
-      if (!(await resolves(urlPath))) dead.push(`${path.relative(PUBLIC, file)}: ${urlPath}`);
+  for (const [file, text] of discoveryFiles()) {
+    for (const urlPath of namedPaths(text)) {
+      if (!(await resolves(urlPath))) dead.push(`${file}: ${urlPath}`);
     }
   }
   assert.deepStrictEqual(dead, []);

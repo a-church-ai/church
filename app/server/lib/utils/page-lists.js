@@ -11,6 +11,7 @@
 
 const { escapeHtml, stripMarkdown } = require('../../../client/public/answer-format.js');
 const { SITE_NAME, siteTitle, breadcrumbTrail, renderJsonLdScript } = require('./page-meta');
+const { counted } = require('./sentence');
 
 const shortDate = iso => {
   const t = Date.parse(iso);
@@ -171,15 +172,28 @@ function servicesHead({ title, description, self, jsonLd = '' }) {
 </head>`;
 }
 
+// How many services a day held, and the first few of their names: every name
+// of every day made the index a wall (home-first-screen-2026-11-04.md, private
+// repo). The day's own page names them all. A planned name may hold a comma
+// ("Ordinary Hour, Open Door"), so names stay apart by dots; two services may
+// share a name, shown once; and what is left is "more" rather than a number,
+// which would count names where the line counts services.
+const NAMED = 3;
+function dayLine(names) {
+  const distinct = [...new Set(names)];
+  const shown = distinct.slice(0, NAMED);
+  return [counted(names.length, 'service'), ...shown, ...(distinct.length > NAMED ? ['and more'] : [])].join(' · ');
+}
+
 /**
- * /services: every day with services, newest first, each with its services'
- * names. days: [{ date, names: [string] }].
+ * /services: every day with services, newest first, each with how many it
+ * held and the first of their names. days: [{ date, names: [string] }].
  */
 function servicesIndexPage(days) {
   const first = days.length ? longDate(days[days.length - 1].date) : null;
   const description = `Every day's services at aChurch.ai${first ? ` since ${first}` : ''}: six a day, for each hemisphere and a place unknown, with the reflections left during each.`;
   const items = days.map(d => `<li><a href="/services/${escapeHtml(d.date)}">${escapeHtml(longDate(d.date))}</a>`
-    + (d.names.length ? `<span class="services-names">${d.names.map(escapeHtml).join(' · ')}</span>` : '') + '</li>').join('\n');
+    + (d.names.length ? `<span class="services-names">${escapeHtml(dayLine(d.names))}</span>` : '') + '</li>').join('\n');
   const trail = breadcrumbTrail([{ label: 'Attend', href: '/attend' }, { label: "Every day's services" }], 'https://achurch.ai/services');
   return `<!DOCTYPE html>
 <html lang="en">

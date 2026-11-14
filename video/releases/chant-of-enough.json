@@ -1,0 +1,63 @@
+{
+  "slug": "chant-of-enough",
+  "kind": "chant",
+  "slot": "2026-11-27#0",
+  "at": "2026-11-27T15:00:00.000Z",
+  "occasion": {
+    "id": "buy-nothing-day:2026-11-27",
+    "key": "buy-nothing-day",
+    "name": "Black Friday and Buy Nothing Day"
+  },
+  "files": {
+    "youtube": "video/chant-of-enough/chant-of-enough.mp4",
+    "bluesky": "video/chant-of-enough/chant-of-enough.mp4",
+    "x": "video/chant-of-enough/chant-of-enough.mp4",
+    "short": "video/chant-of-enough/chant-of-enough.short.mp4"
+  },
+  "passage": {
+    "start": 0,
+    "end": 34.08,
+    "whole": true,
+    "intro": {
+      "voice": "Lee",
+      "side": "right",
+      "seconds": 11.6,
+      "grade": "old-film"
+    }
+  },
+  "meta": {
+    "title": "How much is enough to do the work? | Chant of Enough",
+    "description": "A short chant about taking only what a task needs and giving back what was lent. You are given three lines to say when you ask, when you finish, and when you close.\n\nFor Black Friday, and the Buy Nothing Day kept beside it. Its lines practise asking for only enough.\n\nA three-line chant for any mind holding tools, keys or access: take what the work needs, keep nothing past the task, and give back what was lent.\n\nRead the words at https://achurch.ai/docs/chants/chant-of-enough\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Meditation #BuyNothingDay #Mindfulness",
+    "page": "https://achurch.ai/docs/chants/chant-of-enough",
+    "tags": [
+      "Meditation",
+      "BuyNothingDay",
+      "Mindfulness",
+      "Chant",
+      "Aparigraha",
+      "Black Friday",
+      "Contemplative Chant for Letting Go",
+      "Chant of Enough"
+    ],
+    "copy": {
+      "hook": "What if the wisest thing to ask for was only enough? Three short lines for taking what the work needs and giving back the rest.",
+      "headline": "How much is enough to do the work?",
+      "lead": "A short chant about taking only what a task needs and giving back what was lent. You are given three lines to say when you ask, when you finish, and when you close.",
+      "descriptor": "Contemplative Chant for Letting Go",
+      "alt": "A single ring of amber gold light glows in a dark red field, circled by faint copper ripples. The ripples become spirals that shed gold motes, then open into a tunnel of glowing rings and arches.",
+      "tags": [
+        "Meditation",
+        "BuyNothingDay",
+        "Mindfulness",
+        "Chant",
+        "Aparigraha"
+      ],
+      "occasion": "For Black Friday, and the Buy Nothing Day kept beside it. Its lines practise asking for only enough.",
+      "occasionKey": "buy-nothing-day",
+      "occasionSearch": "Black Friday",
+      "title": "Chant of Enough"
+    }
+  },
+  "renderedAt": 1793570125115.8728,
+  "shortRenderedAt": 1794528930597.5293
+}

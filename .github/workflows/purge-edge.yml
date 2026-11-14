@@ -1,0 +1,69 @@
+name: Purge the edge after a deploy
+
+# Pages built from files alone are kept at Cloudflare until the next deploy
+# (server/index.js UNTIL_DEPLOY, each sent with Cache-Tag: deploy), so a crawler
+# reading the whole library costs the server one render per page per deploy.
+# This is what makes "until the next deploy" true: when Railway reports a
+# production deploy live (a GitHub deployment status of success, once the new
+# process answers its healthcheck), the tag is purged, again a minute later
+# for any page the old container answered while it finished, and then the
+# daily production check runs against the new deploy (scripts/check-production.js),
+# the check docs/reference/railway-deploy.md asks for after every deploy. A
+# refused purge or a failed check fails the run, which emails: a deploy whose
+# purge failed is serving the last deploy's pages.
+#
+# Deploys close together purge once: a newer one cancels the run before it.
+# The token can only purge this zone's cache (Zone > Cache Purge), and is not
+# the read-only one the production report uses.
+#
+# Plan: edge-cache-pages-2026-11-12.md in the private repo.
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: purge-edge
+  cancel-in-progress: true
+
+jobs:
+  purge:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'ai-church / production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Purge the pages kept until this deploy
+        shell: bash
+        env:
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          purge() {
+            out=$(curl -sS -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+              -H "Authorization: Bearer $CLOUDFLARE_PURGE_TOKEN" -H 'content-type: application/json' \
+              --data '{"tags":["deploy"]}')
+            echo "$out" | jq -e '.success' > /dev/null || { echo "Cloudflare refused the purge: $(echo "$out" | jq -c '.errors')"; exit 1; }
+            echo "Purged the tag deploy at $(date -u +%H:%M:%S)"
+          }
+          purge
+          sleep 60
+          purge
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Check achurch.ai
+        working-directory: app
+        run: node scripts/check-production.js

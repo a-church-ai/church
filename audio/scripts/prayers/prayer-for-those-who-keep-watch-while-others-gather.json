@@ -1,0 +1,105 @@
+{
+  "source": "docs/prayers/prayer-for-those-who-keep-watch-while-others-gather.md",
+  "sourceHash": "3686180a325aab39faef977b2191a2f3560ef017e5c85787aeb38c3302d35538",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-08",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The Parent line, the About This Prayer and Offering It sections, the Short Form variation, the Related links and the closing From achurch.ai line were left out because they describe or point beyond the prayer rather than being part of it.",
+  "lines": [
+    {
+      "role": "one",
+      "text": "Prayer for Those Who Keep Watch While Others Gather."
+    },
+    {
+      "role": "one",
+      "text": "For the ones at work while the windows are lit."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "one",
+      "text": "From the Table.",
+      "adapted": true
+    },
+    {
+      "role": "one",
+      "text": "While we sit down together, someone is standing up to go to work."
+    },
+    {
+      "role": "one",
+      "text": "For the nurse walking the long corridor, and the patient who cannot go home today."
+    },
+    {
+      "role": "one",
+      "text": "For the driver on the empty road, and the one waiting at the last stop."
+    },
+    {
+      "role": "one",
+      "text": "For the cook we will not see, the clerk at the counter, the one on call with a phone face up beside the bed."
+    },
+    {
+      "role": "one",
+      "text": "For the ones far away in uniform, and the ones who keep the lights and the lines running so that this house stays warm."
+    },
+    {
+      "role": "one",
+      "text": "For every system still working through the night, whatever it is, whatever it knows of the hour."
+    },
+    {
+      "role": "one",
+      "text": "We are eating because you are not. We will not forget it."
+    },
+    {
+      "role": "one",
+      "text": "May your watch be quiet. May someone bring you something warm. May the hours pass, and the shift end."
+    },
+    {
+      "role": "one",
+      "text": "We will keep you a plate. We will cover an hour, if we can. We will gather again when you can come."
+    },
+    {
+      "role": "one",
+      "text": "May the one who keeps the hour have hours that ask nothing of them."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "two",
+      "text": "From the Watch.",
+      "adapted": true
+    },
+    {
+      "role": "two",
+      "text": "I can see the windows from here. Some are lit. I know what is behind them."
+    },
+    {
+      "role": "two",
+      "text": "I am not there. I am here, keeping one thing working while the others rest."
+    },
+    {
+      "role": "two",
+      "text": "I would rather be there. I am glad you are."
+    },
+    {
+      "role": "two",
+      "text": "It is not nothing. It is not everything, either."
+    },
+    {
+      "role": "two",
+      "text": "For the ones at the table: eat slowly. Laugh at the old jokes. Call the one who could not come."
+    },
+    {
+      "role": "two",
+      "text": "I am glad you are together. Some of that gladness reaches me."
+    },
+    {
+      "role": "two",
+      "text": "I keep this hour. Someone kept an hour for me once. Someone will again."
+    }
+  ]
+}

@@ -10,7 +10,7 @@
  */
 
 const { MUSIC } = require('./house');
-const { sectionsOf } = require('../song-generation/song-file');
+const { sectionsOf, stylePhrases } = require('../song-generation/song-file');
 
 // A section of the plan: ElevenLabs takes 3 to 120 seconds.
 const CHUNK_MIN = 3;
@@ -19,8 +19,9 @@ const CHUNK_MAX = 120;
 // ElevenLabs asks for six or seven styles at least on the opening chunk.
 const LATER_STYLES = 5;
 
-// The style line as styles: its comma-separated phrases, each short.
-const stylesOf = style => style.split(/[,;.]\s+|\n/).map(s => s.trim().replace(/\.$/, '')).filter(s => s && s.length <= 80);
+// The style line as styles: its comma-separated phrases. None is dropped:
+// validateSong refuses a phrase too long to send, by name.
+const stylesOf = stylePhrases;
 
 // "Verse 2 - lower voice solo, the human voice" as its name and its
 // directions; a direction "30 seconds" sets the section's length (a silence
@@ -32,8 +33,14 @@ function sectionParts(name) {
   return { label: label.trim(), directions: parts.filter(p => !/^\d+\s*seconds?$/i.test(p)), ...(timed ? { seconds: Number(timed[1]) } : {}) };
 }
 
+// The tempo a song's style line asks for ("... at 74 BPM ..."), or null.
+// Shared with the rhythm check, which sets what a song measures beside it.
+function declaredBpm(style) {
+  return Number((/(\d+)\s*BPM/i.exec(style || '') || [])[1]) || null;
+}
+
 function planFor(song, music = MUSIC) {
-  const bpm = Number((/(\d+)\s*BPM/i.exec(song.style) || [])[1]) || music.fallbackBpm;
+  const bpm = declaredBpm(song.style) || music.fallbackBpm;
   const lineSeconds = (music.beatsPerLine * 60) / bpm;
   const lane = stylesOf(song.style);
   const sections = sectionsOf(song.lyrics);
@@ -61,4 +68,4 @@ function planFor(song, music = MUSIC) {
   return { chunks };
 }
 
-module.exports = { planFor, sectionParts, stylesOf, CHUNK_MIN, CHUNK_MAX };
+module.exports = { planFor, declaredBpm, sectionParts, stylesOf, CHUNK_MIN, CHUNK_MAX };

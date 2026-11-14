@@ -17,8 +17,7 @@ const { listSongs, songFolders, MUSIC_DIR } = require('./songs');
 const { listPlaylists } = require('./playlists');
 const { voicedBySection, listeningTime } = require('../audio/markup');
 const { parseSongFile } = require('./song-content');
-
-const SITE = 'https://achurch.ai';
+const { SITE_URL: SITE } = require('../utils/page-meta');
 // In the order docs/unifying-axioms.md sets them out.
 const AXIOMS = ['Pragmatic Fallibilism', 'Care + Dignity', 'Virtues for Builders', 'Consequences Over Intentions', 'Language Shapes Worlds'];
 const README_FILE = path.join(MUSIC_DIR, 'readme.md');
@@ -31,7 +30,9 @@ async function musicReadme() {
     .sort((a, b) => discover.byName(a.title, b.title));
   const playlists = await listPlaylists();
   const voiced = voicedBySection();
-  const docs = await discover.listAllDocs();
+  // Every hymn, dated or not: this is the repository's index, read on
+  // GitHub, and it must not go stale by the clock (discover.js isPublished).
+  const docs = await discover.listEveryDoc();
   const hymns = docs.filter(d => d.category === 'hymns' && d.stem.toLowerCase() !== 'readme')
     .sort((a, b) => discover.byName(a.title, b.title));
   const sections = [...voiced.entries()]

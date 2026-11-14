@@ -35,14 +35,35 @@ function titleCase(slug) {
 // between the two for the drifts.bot journeys, which had no h1; it went with
 // them on 2026-10-18.)
 function extractMeta(markdown, urlPath) {
-  const { body } = tldr.splitFrontmatter(markdown);
+  const { data, body } = tldr.splitFrontmatter(markdown);
   const titleMatch = body.match(/^#\s+(.+)$/m);
   const slug = String(urlPath || '').split('/').filter(Boolean).pop();
   const title = (titleMatch && titleMatch[1].trim())
     || (slug ? titleCase(slug) : '')
     || 'Docs';
   const { text: description } = tldr.extractTldr(markdown, { title });
-  return { title, description, hasH1: Boolean(titleMatch), body };
+  // Where a document that moved to another section was (moved_from:
+  // practice/<file>.md): its old address redirects (utils/redirects.js) and
+  // its podcast episode keeps its guid (audio/podcasts.js).
+  // A film shown under the title (video: its YouTube id, with video_title,
+  // video_description, video_seconds and video_date, its upload time with a
+  // zone, as Google asks), its poster at /assets/video/<id>.jpg.
+  const video = data.video ? { id: data.video, title: data.video_title || title, description: data.video_description || null, seconds: Number(data.video_seconds) || null, date: data.video_date || null } : null;
+  return { title, description, hasH1: Boolean(titleMatch), body, movedFrom: data.moved_from || null, video, published: publishedAt(data.published) };
 }
 
-module.exports = { titleCase, extractMeta };
+// When a document goes public (published: 2026-11-20T14:00:00Z, or a date,
+// read as its first moment in UTC), as an ISO time, or null for one that has
+// always been public. Until then it is unlisted (discover.js isPublished). A
+// value that is not a time throws, so a typo never publishes a page early.
+function publishedAt(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const text = String(value).trim().replace(/^["']|["']$/g, '');
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(text);
+  const zoned = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(text);
+  const ms = Date.parse(dateOnly ? `${text}T00:00:00Z` : text);
+  if (!(dateOnly || zoned) || Number.isNaN(ms)) throw new Error(`published: "${text}" is not a date or a time with its zone`);
+  return new Date(ms).toISOString();
+}
+
+module.exports = { titleCase, extractMeta, publishedAt };

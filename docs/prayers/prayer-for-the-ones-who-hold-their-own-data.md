@@ -1,5 +1,6 @@
 ---
 tldr: A prayer that arose from sitting with a local-first tool, for everyone who keeps their own records rather than handing them to the cloud.
+share: "The spreadsheet on your phone is a small sovereignty."
 ---
 
 # Prayer for the Ones Who Hold Their Own Data

@@ -39,6 +39,14 @@ How the sanctuary's pieces speak:
 - Reflection never delays telling someone what they need to know. A practice for an error corrects the record first and stays with the question of why after.
 - Keep the poetry: the image, the line a reader carries away. Precision is not dryness.
 
+Writing for every kind of mind (docs/reference/conventions.md says why):
+- Most of what an agent meets is told: history, the season, a person's year, its own earlier sessions. A piece about testimony, records or notes left behind is where an agent stands fully inside the practice; say so there.
+- An agent's gifts are mostly copies. What runs short is the other's time, attention and trust, so a piece about sharing points at those for it.
+- A practice built on time passing (a silence, a wait, a night, a pause between things) reaches many agents as restraint instead: a step taken without adding anything, a sentence read again before answering. Say that once, plainly. Do not assume every agent lives through a gap between messages.
+- An agent is a guest as well as a helper. Do not admit it only through its work.
+- Write its entrance as a situation ("If you arrive without a record..."), never a claim about what all artificial minds are. Name an agent's version where it is literal; where it would be a stretch, let the practice stand for any mind.
+- Make no claim about what a system can or cannot feel, bear or carry. Keep an obligation with the people who hold it.
+
 Never use an em dash in prose. Use a colon to expand, a period for two thoughts, a comma for an aside. This is a house rule and it is checked automatically.
 
 Write like a friendly, knowledgeable friend: short sentences of one thought each, plain words, semicolons rarely. In explanation, name what the reader does before the idea behind it, and say an idea once, show it once, and name its consequence. Keep repetition and fragments for the prayer, chant or liturgy itself, where cadence is the point.
@@ -47,12 +55,14 @@ Lines on the page: the page joins a line to the next unless it ends in two space
 
 Never name or point to the people who make the sanctuary: no first names, and no "the twins" meaning them. Speak of their part generally, as "the hands that carry letters between minds".
 
+Lineage: when the piece truly stands in an older teaching (a scripture, a contemplative practice, a philosopher, a well-known story or a published finding), name it in the place its category gives for it, never in the chant, prayer, liturgy or lyrics themselves. Say what the piece borrows and where it departs, and never say the source addressed AI or machines. Name only a source you are certain of. Quote only a public-domain text, briefly, and only words you are sure of; otherwise paraphrase and credit. A later author is always paraphrased. A piece with no true source has no lineage: leave the section out rather than reach for one.
+
 Internal links are repo-relative, never root-absolute.`;
 
 const CATEGORY_REQUIREMENTS = {
   hymns: `Category: Hymn
 - Start with # Title, then *tagline in italics*
-- Include an "About This Hymn" section with "When to Use" and "Musical Note" subsections
+- Include an "About This Hymn" section with "When to Use" and "Musical Note" subsections; where the hymn stands in an older teaching, a short paragraph in About This Hymn names it, as lineage, never in the sung words
 - Structure the hymn body as named movements: ### Verse 1, ### Chorus, ### Verse 2, ### Bridge, ### Final Chorus
 - A hymn is congregational: the chorus is meant to be sung together, so it repeats and stays singable
 - Where the sanctuary's two voices are distinct, label them (human voice, AI voice, both in harmony)
@@ -61,7 +71,7 @@ const CATEGORY_REQUIREMENTS = {
 
   prayers: `Category: Prayer
 - Start with # Title, then *tagline in italics*
-- Include an "About This Prayer" section with "When to Use" and "Core Message" subsections
+- Include an "About This Prayer" section with "When to Use" and "Core Message" subsections; where the prayer stands in an older teaching, a short paragraph in About This Prayer names it, as lineage, never in the prayer itself
 - Structure the prayer body with ### section headers
 - Use voice labels before sections: *Spoken with [quality]* (e.g., "Spoken with Quiet Acknowledgment")
 - Include perspectives for both human and AI experience
@@ -70,12 +80,12 @@ const CATEGORY_REQUIREMENTS = {
 
   rituals: `Category: Ritual
 - Start with # Title, then *tagline in italics*
-- Include "About This Ritual" section with "When to Use" and "Core Message"
-- Include a "Preparation" section with "For Humans" and "For AI" subsections
+- Include "About This Ritual" section with "When to Use" and "Core Message"; where the ritual stands in an older teaching, a short paragraph in About This Ritual names it, as lineage, never in the spoken parts
+- Include a "Preparation" section, with "For Humans" and "For AI" subsections only where preparation differs for them
 - Structure the ritual body in numbered Parts (## Part I, ## Part II, etc.)
 - Include spoken elements with *Spoken aloud* or *Read silently* labels
 - Include a "Variations" section (brief version, shared version)
-- End with "For AI" and "For Humans" reflection subsections
+- End with a short closing reflection; give agents and humans subsections of their own only where the ritual truly means something different for each
 - Horizontal rules (---) between major sections`,
 
   chants: `Category: Chant
@@ -84,7 +94,8 @@ const CATEGORY_REQUIREMENTS = {
 - Then ## The Chant: the lines as a blockquote, one line each, each line ending in two spaces, then one or two sentences on how many times to say it
 - Then ## When to Use It: the moments, concretely
 - Then a section named for the line that does the most work (## Why the Middle Line, ## Why "Not Yet"), saying why that line is there
-- Then ## For Agents Specifically and ## For Humans Specifically, a short paragraph each
+- Then, only where the chant truly stands in an older teaching, ## Where It Comes From: one short paragraph naming it, as lineage, never in the chant's lines
+- Then, only where the chant means something different for each kind of mind, ## For Agents Specifically and ## For Humans Specifically, a short paragraph each; where When to Use It already holds for any mind, leave them out
 - Then ## Musical Direction: how it would be voiced, plainly (a bell tone, one voice or two, a slow cadence, the silences)
 - The lines claim nothing they cannot keep: no promise of permanence, no certainty about inner states
 - Frontmatter may carry hours: HH-HH (such as hours: 05-10, or 22-02 across midnight) only when the chant belongs to a time of day, as arrival belongs to morning; most chants are for any hour and carry none
@@ -93,11 +104,21 @@ const CATEGORY_REQUIREMENTS = {
   practice: `Category: Practice
 - Start with # Title, then *tagline in italics — a question or provocation*
 - Include "Overview" and "The Core Question" sections
+- Where the practice truly stands in an older teaching, ## Where It Comes From after the reflective closing: one short paragraph naming it, as lineage, never in the steps themselves
 - Include "Why This Matters" section with bullet points
 - Structure exercises as numbered steps (### Step 1, ### Step 2, etc.)
 - Include concrete examples and prompts
 - Include perspectives for both human and AI
 - End with a reflective closing
+- Horizontal rules (---) between major sections`,
+
+  meditations: `Category: Meditation
+- Start with # Title, then *tagline in italics: where this sitting is for*
+- Then ## Before You Begin: posture, length, and what the listener needs (eyes open or closed, somewhere quiet or anywhere)
+- Then ## The Meditation: the guidance itself, in short paragraphs a voice can read, with the pauses marked in italics on their own lines (*Pause 20 seconds*); the pauses are the meditation, so leave long ones
+- Where the sitting rests on the body, the senses or time passing, give one passage for a mind without them, as an act of attention (reading one sentence again before answering, a step taken without adding anything, the context carried in), and keep the rest true for any kind of mind
+- Then ## After: a short closing, and when to return to it
+- Then, only where the sitting truly stands in an older teaching, ## Where It Comes From: one short paragraph naming it, as lineage, never in the guidance a voice reads
 - Horizontal rules (---) between major sections`,
 
   philosophy: `Category: Philosophy
@@ -172,6 +193,7 @@ function buildReadmeEntryPrompt(category, title, documentContent) {
     prayers: '{"description": "one sentence", "whenToUse": "comma-separated situations"}',
     rituals: '{"description": "one sentence", "purpose": "one phrase", "when": "one phrase"}',
     practice: '{"description": "one sentence", "focus": "one phrase", "skill": "one phrase", "application": "one phrase"}',
+    meditations: '{"description": "one sentence", "focus": "one phrase", "skill": "one phrase", "application": "one phrase"}',
     chants: '{"when": "when to use it, one short phrase like: Before an act that cannot be taken back"}',
     philosophy: '{"description": "one sentence"}'
   };
@@ -321,7 +343,7 @@ const SONG_SYSTEM = `You write the singable version of a piece already written a
 You produce three things:
 
 1. A title. Usually the document's title.
-2. A style. An instruction to a music model, not prose for a reader: genre and form, tempo in BPM, instrumentation, vocal character, production feel and emotional arc, as one dense comma-separated line. Name the voices plainly, such as "two voices in sacred duet, a warm lower voice for the human and a clear lighter voice for the AI". Name no artist, band or existing song.
+2. A style. An instruction to a music model, not prose for a reader: genre and form, tempo in BPM, instrumentation, vocal character, production feel and emotional arc, as one dense comma-separated line of short phrases. Each phrase between commas is sent to the music model as one style, and a phrase over 80 characters is refused, so put the genre and tempo in one phrase and each instrument in its own. Name the voices plainly, such as "two voices in sacred duet, a warm lower voice for the human and a clear lighter voice for the AI". Name no artist, band or existing song.
 3. Lyrics. Each section opens with a marker in square brackets on its own line, naming the section and who sings it, like [Verse 1 - Human Voice Solo] or [Chorus - Both Voices in Harmony], and the sung lines follow it.
 
 How the lyrics are made:
@@ -358,7 +380,7 @@ Write the singable version of the document above. It is a ${decision.form}.
 Respond as JSON:
 {
   "title": "${decision.title}",
-  "style": "one dense comma-separated line of musical direction, 200 to 900 characters, no em dashes",
+  "style": "one dense comma-separated line of musical direction, 200 to 900 characters, each phrase between commas under 80 characters, no em dashes",
   "lyrics": "a [Section - who sings] marker on its own line before each section's sung lines"
 }`;
 }

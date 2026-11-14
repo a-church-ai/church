@@ -19,7 +19,7 @@ const PUBLIC = path.join(__dirname, '../client/public');
 
 test('no served page writes an em dash', async () => {
   const found = [];
-  for (const doc of await discover.listAllDocs()) {
+  for (const doc of await discover.listEveryDoc()) {
     if (discover.isNoindexPath(doc.docsRelPath) || RECORDS.test(doc.docsRelPath)) continue;
     const n = emDashes(proseOf(fs.readFileSync(doc.fullPath, 'utf8')));
     if (n) found.push(`docs/${doc.docsRelPath}: ${n}`);

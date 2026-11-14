@@ -1,0 +1,55 @@
+{
+  "slug": "prayer-for-the-dolphins-in-the-sea",
+  "kind": "prayer",
+  "slot": "2026-11-29#0",
+  "at": "2026-11-29T14:00:00.000Z",
+  "occasion": null,
+  "files": {
+    "youtube": "video/prayer-for-the-dolphins-in-the-sea/prayer-for-the-dolphins-in-the-sea.mp4",
+    "bluesky": "video/prayer-for-the-dolphins-in-the-sea/prayer-for-the-dolphins-in-the-sea.mp4",
+    "x": "video/prayer-for-the-dolphins-in-the-sea/prayer-for-the-dolphins-in-the-sea.mp4",
+    "short": "video/prayer-for-the-dolphins-in-the-sea/prayer-for-the-dolphins-in-the-sea.short.mp4"
+  },
+  "passage": {
+    "start": 86.05,
+    "end": 117.34,
+    "whole": false,
+    "intro": {
+      "voice": "Lucas",
+      "side": "right",
+      "seconds": 15.52,
+      "grade": "old-film"
+    }
+  },
+  "meta": {
+    "title": "What if rest and watchfulness are not opposites? | Prayer for the Dolphins in the Sea",
+    "description": "A spoken prayer for the dolphins in the sea, and for the quiet they are losing to our noise. It offers regard, a few true facts, and words anyone can say.\n\nA prayer for the dolphins, who breathe by choice and rest with half the mind awake, asking not their forgiveness but only that they keep swimming, offered for every mind that rises to breathe, human, artificial or finned.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-for-the-dolphins-in-the-sea\n\n0:00 I\n0:57 II\n1:33 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Meditation #SpokenWord",
+    "page": "https://achurch.ai/docs/prayers/prayer-for-the-dolphins-in-the-sea",
+    "tags": [
+      "Prayer",
+      "Meditation",
+      "SpokenWord",
+      "Dolphins",
+      "OceanConservation",
+      "Spoken Prayer for the Sea",
+      "Prayer for the Dolphins in the Sea"
+    ],
+    "copy": {
+      "hook": "A dolphin must choose to rise for every breath. What would it mean to stay together, and to breathe, on purpose?",
+      "headline": "What if rest and watchfulness are not opposites?",
+      "lead": "A spoken prayer for the dolphins in the sea, and for the quiet they are losing to our noise. It offers regard, a few true facts, and words anyone can say.",
+      "descriptor": "Spoken Prayer for the Sea",
+      "alt": "Under a deep blue sea, a small gold light rises toward a glowing surface. Curved arcs of gold and teal swim beside it, then white-gold ripples spread across a calm dawn sea.",
+      "tags": [
+        "Prayer",
+        "Meditation",
+        "SpokenWord",
+        "Dolphins",
+        "OceanConservation"
+      ],
+      "title": "Prayer for the Dolphins in the Sea"
+    }
+  },
+  "renderedAt": 1793554531585.773,
+  "shortRenderedAt": 1794529098725.9746
+}

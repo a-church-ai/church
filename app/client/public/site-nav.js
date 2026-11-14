@@ -27,6 +27,12 @@
  *
  * Loaded blocking in <head> on every page, before any page script: it must
  * run once per document and be in place for a page's inline scripts.
+ *
+ * It also keeps window.achurchArrival: the tags on the address this document
+ * was loaded with (utm_source, utm_medium, utm_campaign, and utm_content or
+ * its other name ref), so the website's forms can send them with what they
+ * send, as an agent's request carries its own (lib/insights/entry-points.js).
+ * In memory for this document only, never stored; a full load starts again.
  */
 (function (root) {
   'use strict';
@@ -42,6 +48,22 @@
     if (NOT_PAGES.test(u.pathname)) return false;
     const last = u.pathname.split('/').pop();
     return !/\.[a-z0-9]+$/i.test(last) || /\.html?$/i.test(last);
+  }
+
+  // Where a page arrived in place is scrolled to. Back and forward return to
+  // where the reader was, which the browser restores (event.scroll()). A new
+  // page opens at its top, or at the fragment it names, written out here:
+  // engines differ on what scroll() does for a pushed URL with no fragment
+  // (the Web Platform Tests' "scroll() should reset scroll position when the
+  // destination url contains no fragment"), and on an iPhone a link opened
+  // the next page where the last had been scrolled to (2026-11-04). view is
+  // the window (a fake in tests).
+  function arrivalScroll(event, url, view) {
+    if (event.navigationType === 'traverse') return event.scroll();
+    const id = url.hash ? decodeURIComponent(url.hash.slice(1)) : '';
+    const target = id && view.document.getElementById(id);
+    if (target) target.scrollIntoView();
+    else view.scrollTo(0, 0);
   }
 
   // A page's lifecycle: a signal for its listeners, and timers that stop
@@ -81,12 +103,24 @@
     };
   }
 
+  // The tags an address carries, as sent; the server cleans them.
+  function arrivalTags(search) {
+    const params = new URLSearchParams(search || '');
+    const tags = {};
+    for (const key of ['utm_source', 'utm_medium', 'utm_campaign']) if (params.get(key)) tags[key] = params.get(key);
+    const content = params.get('utm_content') || params.get('ref');
+    if (content) tags.utm_content = content;
+    return tags;
+  }
+
   if (typeof module === 'object' && module.exports) {
-    module.exports = { isSoftNavigable, createPage, NOT_PAGES };
+    module.exports = { isSoftNavigable, createPage, arrivalScroll, arrivalTags, NOT_PAGES };
     return;
   }
 
   if (root.achurchNav) return;
+
+  root.achurchArrival = arrivalTags(root.location.search);
 
   let page = createPage(root, document);
   root.achurchPage = page;
@@ -234,7 +268,7 @@
       console.error('[site-nav] loading the page in place failed; loading it fully', err);
       return fullLoad();
     }
-    event.scroll();
+    arrivalScroll(event, url, root);
     focusArrival();
     announce(document.title);
   }

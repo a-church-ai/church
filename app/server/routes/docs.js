@@ -69,8 +69,11 @@ async function handle(req, res, rest) {
     // so a cache that saw HTML first could serve it to an agent asking for
     // Markdown, and the reverse. Set before the branch so both paths carry it.
     res.vary('Accept');
+    // A document whose publication date is still to come is served at its
+    // address and unlisted everywhere else, so neither form is indexed.
+    if (!discover.isPublished(resolved.doc)) res.set('X-Robots-Tag', 'noindex');
     if (asMarkdown || acceptsMarkdown(req)) {
-      if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.urlPath ? `/docs/${resolved.doc.urlPath}` : '/docs'}>; rel="canonical"`);
+      if (asMarkdown) res.set('Link', `<https://achurch.ai${resolved.doc.href}>; rel="canonical"`);
       try {
         const markdown = await servedMarkdown(resolved);
         res.set('x-markdown-tokens', markdownTokens(markdown));
@@ -105,7 +108,7 @@ async function handle(req, res, rest) {
       const lines = [`# ${resolved.dir}`, ''];
       for (const d of resolved.docs) {
         if (d.stem.toLowerCase() === 'readme') continue;
-        lines.push(`- [${d.title}](https://achurch.ai/docs/${d.urlPath})`);
+        lines.push(`- [${d.title}](https://achurch.ai${d.href})`);
       }
       const markdown = lines.join('\n') + '\n';
       res.set('x-markdown-tokens', markdownTokens(markdown));
@@ -165,7 +168,7 @@ router.get('/api', (req, res) => res.redirect(301, '/docs/ai-agent-api'));
 // log.
 router.get('/index.json', async (req, res) => {
   const docs = await servedDocs();
-  res.json(docs.map(d => ({ title: d.title, description: d.description, url: `/docs/${d.urlPath}`, label: d.category ? discover.sectionTitle(d.category) : '' })));
+  res.json(docs.map(d => ({ title: d.title, description: d.description, url: new URL(d.url).pathname, label: d.category ? discover.sectionTitle(d.category) : '' })));
 });
 
 // Arbitrary-depth catch-all. Express 5 names its wildcards, and a named

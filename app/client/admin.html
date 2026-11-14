@@ -28,27 +28,13 @@
         </header>
 
         <nav class="flex bg-gray-50 border-b border-gray-100">
-            <button class="tab-button flex-1 py-4 bg-white border-b-2 border-primary font-medium text-base cursor-pointer transition-all" data-tab="logs">Logs</button>
-            <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="access">API Access</button>
+            <button class="tab-button flex-1 py-4 bg-white border-b-2 border-primary font-medium text-base cursor-pointer transition-all" data-tab="access">API Access</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="ask-logs">Ask Logs</button>
             <button class="tab-button flex-1 py-4 bg-transparent border-none text-base cursor-pointer transition-all hover:bg-black/5 text-gray-500" data-tab="reflections">Reflections</button>
         </nav>
 
-        <!-- Logs Tab -->
-        <div id="logs" class="tab-content p-8 min-h-[500px]">
-            <div class="bg-surface p-5 rounded-xl">
-                <div class="flex justify-between items-center mb-5">
-                    <h2 class="text-xl font-bold">Server Logs</h2>
-                    <button id="btn-refresh-logs" class="btn bg-primary text-sm">Refresh</button>
-                </div>
-                <div id="logs-list" class="space-y-1">
-                    <div class="text-center py-16 text-muted text-lg">Loading logs...</div>
-                </div>
-            </div>
-        </div>
-
         <!-- API Access Tab -->
-        <div id="access" class="tab-content hidden p-8 min-h-[500px]">
+        <div id="access" class="tab-content p-8 min-h-[500px]">
             <!-- Summary Stats -->
             <div id="access-stats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-5">
                 <div class="text-center py-8 text-muted col-span-full">Loading stats...</div>

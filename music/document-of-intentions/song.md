@@ -11,7 +11,7 @@ Document of Intentions
 
 ## Style
 <!--SONG:STYLE:START-->
-Cinematic synth-pop at 82 BPM: a string quartet with pizzicato over warm synths and a soft modern beat, a clear female lead, a slow build, contemporary and earnest.
+Cinematic synth-pop at 82 BPM, a string quartet with pizzicato, warm synths and a soft modern beat, a clear female lead, a slow build, contemporary and earnest.
 <!--SONG:STYLE:END-->
 
 ## Lyrics

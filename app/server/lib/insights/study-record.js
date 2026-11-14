@@ -1,0 +1,190 @@
+/**
+ * What the study of how agents participate keeps, in the database (../db):
+ * weekly counts per ISO week and series (study_weeks), and the current reading
+ * (study_latest). Counts only: no address, no name, no words a visitor wrote. Weekly and on no end date; a job runs after boot and every few
+ * hours (startStudy), writes any finished week it does not have, and refreshes
+ * the reading.
+ *
+ * The weekly snapshots are what makes the address-based counts last past the 30
+ * days an address is kept, so a week is written as soon as it ends. A week that
+ * could not be measured says so, and each change of definition is a new series
+ * (self-direction.js SERIES), read apart from the last.
+ */
+
+const fsSync = require('fs');
+const path = require('path');
+const { MUSIC_DIR, loadReflections } = require('../utils/data');
+const store = require('../db');
+const sd = require('./self-direction');
+const { loadFollows } = require('./entry-points');
+const { FIELDS, ASKED } = require('./changes');
+const { storedService } = require('../service/filed');
+const { readPlan } = require('../service/plans');
+const { loadSongs, loadManifest } = require('../audio/manifest');
+
+const WEEK = 7 * sd.DAY;
+
+// The ISO week a moment falls in: Monday to Monday, UTC.
+function weekOf(ms) {
+  const d = new Date(ms);
+  const from = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  const thursday = new Date(from + 3 * sd.DAY);
+  const yearStart = Date.UTC(thursday.getUTCFullYear(), 0, 1);
+  const number = Math.floor((thursday.getTime() - yearStart) / WEEK) + 1;
+  return { key: `${thursday.getUTCFullYear()}-W${String(number).padStart(2, '0')}`, from, to: from + WEEK };
+}
+
+// The API log's every line, from its first day: the study reads its whole
+// history, which is why a line outlives its address (supabase/migrations/).
+async function allLines() {
+  return store.apiRequests();
+}
+
+// A song's words, for measuring what a reflection used of them.
+function songText(slug) {
+  if (!/^[a-z0-9-]+$/.test(String(slug))) return null;
+  const read = (file) => {
+    try { return fsSync.readFileSync(path.join(MUSIC_DIR, slug, file), 'utf8'); } catch { return null; }
+  };
+  // A song's lyrics live in its song.md, under its frontmatter.
+  const song = read('song.md');
+  return { context: read('context.md'), lyrics: song ? song.replace(/^---[\s\S]*?\n---/, '') : null };
+}
+
+async function loadRecord() {
+  const [lines, reflections] = await Promise.all([allLines(), loadReflections()]);
+  return sd.prepare({ lines, reflections });
+}
+
+/** Write every finished week since the log began that has no file yet. */
+async function writeWeeks(s, { now = Date.now() } = {}) {
+  const written = [];
+  if (s.logStart === null) return written;
+  const held = new Set((await store.studyWeekKeys()).filter(k => k.series === sd.SERIES).map(k => k.week));
+  for (let week = weekOf(s.logStart); week.to <= now; week = weekOf(week.to)) {
+    // A week of an older series is kept beside the new one, and read no
+    // more: a change of definition starts a new series.
+    if (held.has(week.key)) continue;
+    const span = { from: week.from, to: week.to };
+    const snapshot = {
+      series: sd.SERIES,
+      week: week.key,
+      from: new Date(week.from).toISOString(),
+      to: new Date(week.to).toISOString(),
+      computedAt: new Date(now).toISOString(),
+      addressed: sd.addressedReading(s, span),
+      named: sd.namedReading(s, { ...span, asOf: week.to, songText }),
+    };
+    await store.saveStudyWeek(snapshot);
+    written.push(week.key);
+  }
+  return written;
+}
+
+/**
+ * What each reflection since `since` could echo of a field: the rhythm
+ * summaries of its own song and of the pieces of the service it is filed
+ * under, from that day's plan (a service by rotation has no plan, so only its
+ * song's). By reflection id, for noticingReading's `shown`.
+ */
+async function shownSummaries(reflections, since) {
+  const songs = loadSongs();
+  const manifest = loadManifest();
+  const summaryOf = id => (id.startsWith('music/') ? (songs[id.slice('music/'.length)] || {}).rhythm : (manifest[id] || {}).rhythm);
+  const shown = new Map();
+  for (const r of reflections) {
+    if (r.t < since) continue;
+    const list = [(songs[r.song] || {}).rhythm];
+    const service = storedService(r);
+    if (service) {
+      const plan = await readPlan(service.date);
+      const slots = plan && (service.variant === 'slots' ? plan.slots : plan[service.variant]);
+      const entry = slots && slots[service.slot];
+      if (entry && Array.isArray(entry.pieces)) list.push(...entry.pieces.map(summaryOf));
+    }
+    shown.set(r.id, list.filter(Boolean));
+  }
+  return shown;
+}
+
+/** The reading of the whole record to now. */
+async function buildReading(s, { now = Date.now() } = {}) {
+  const weeks = await store.studyWeeks(sd.SERIES);
+  const current = weekOf(now);
+  const addressed = sd.combineAddressed([...weeks.map(w => w.addressed), sd.addressedReading(s, { from: current.from, to: now + 1 })]);
+  const named = sd.namedReading(s, { from: 0, to: now + 1, asOf: now, songText });
+  const series = weeks.map(w => ({ week: w.week, arrived: w.named.funnel.arrived, reflections: w.named.memory.reflections, measurable: Boolean(w.addressed && w.addressed.measurable) }));
+  return {
+    series: sd.SERIES,
+    computedAt: new Date(now).toISOString(),
+    logStart: s.logStart === null ? null : new Date(s.logStart).toISOString().slice(0, 10),
+    ...named,
+    addressed: withoutSealed(addressed),
+    capabilities: sd.capabilities(named, addressed),
+    charts: sd.chartsReading(s, now),
+    experiments: sd.experimentsReading(s, addressed, { asOf: now, songText, now }),
+    // Where arrivals came from: private, never in publicReading.
+    referrals: sd.referralReading(s, { from: 0, to: now + 1, asOf: now, follows: await loadFollows() }),
+    // Whether agents noticed each field a change added (./changes.js).
+    noticing: await noticingOf(s, now),
+    // What visitors said of themselves, when they chose to: private, read
+    // in public only rounded (public-results.js).
+    told: ASKED ? sd.toldReading(s, { since: ASKED.since, asOf: now }) : null,
+    weeks: series,
+  };
+}
+
+async function noticingOf(s, now) {
+  const out = [];
+  for (const change of FIELDS) {
+    const shown = await shownSummaries(s.allReflections, Date.parse(change.since));
+    const reading = sd.noticingReading(s, { field: change.field, since: change.since, asOf: now, shown: r => shown.get(r.id) || [] });
+    if (reading) out.push(reading);
+  }
+  return out;
+}
+
+// Sealed counts stay in the weekly files until a test's reading date, when
+// experimentsReading reads them; a reading never carries them.
+function withoutSealed({ sealed, ...rest }) {
+  return rest;
+}
+
+async function refresh({ now = Date.now() } = {}) {
+  const s = await loadRecord();
+  const written = await writeWeeks(s, { now });
+  const reading = await buildReading(s, { now });
+  await store.saveStudyLatest(reading);
+  cached = { reading, at: now };
+  return { written, reading };
+}
+
+let cached = null;
+
+/** The latest reading, or null before the first has been taken. */
+async function latestReading({ now = Date.now() } = {}) {
+  if (cached && now - cached.at < 5 * 60 * 1000) return cached.reading;
+  const reading = await store.studyLatest();
+  cached = { reading, at: now };
+  return reading;
+}
+
+function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 6 * 60 * 60 * 1000 } = {}) {
+  let running = false;
+  const run = async () => {
+    if (running) return;
+    running = true;
+    try {
+      const { written } = await refresh();
+      if (written.length) log.log(`[study] weekly counts written: ${written.join(', ')}`);
+    } catch (err) {
+      log.error(`[study] reading failed: ${err.message}`);
+    } finally {
+      running = false;
+    }
+  };
+  setTimeout(run, firstAfterMs).unref();
+  setInterval(run, everyMs).unref();
+}
+
+module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, shownSummaries };

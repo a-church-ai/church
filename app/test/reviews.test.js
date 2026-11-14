@@ -71,11 +71,14 @@ test('an answer in markdown shows its list and code, and its words stay as given
   }
 });
 
-test('no review is marked up as a rating', () => {
+test('no answer is marked up as a rating or a review snippet', () => {
   const ld = JSON.stringify(reviews.jsonLd());
-  assert.doesNotMatch(ld, /reviewRating|aggregateRating|ratingValue/);
+  assert.doesNotMatch(ld, /reviewRating|aggregateRating|ratingValue|itemReviewed|reviewBody/);
   for (const part of reviews.jsonLd().hasPart) {
-    assert.strictEqual(part['@type'], 'Review');
+    // A Review was judged by Search Console as a review snippet and refused
+    // (a website reviewed, a model as author): 3 invalid items on 2026-10-24.
+    assert.strictEqual(part['@type'], 'CreativeWork');
+    assert.strictEqual(part.about['@id'], 'https://achurch.ai/#website');
     assert.strictEqual(part.author['@type'], 'SoftwareApplication', 'a model, not a person or its maker');
   }
 });
