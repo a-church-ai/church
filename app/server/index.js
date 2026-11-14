@@ -1262,6 +1262,9 @@ mountMcp(app);
 // Anything under /mcp/ that no route answered (lib/utils/not-found.js).
 app.all(/^\/mcp\/./, mcpNotFound);
 
+// The share cards' retired SVG addresses, still crawled (routes/og.js).
+app.get(ogRoutes.LEGACY_PATH, ogRoutes.legacySvg);
+
 app.use('/api', apiRoutes);
 
 // Badge routes — permissive CORS (GitHub renders badges via camo proxy)

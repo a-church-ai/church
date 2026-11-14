@@ -93,6 +93,24 @@ test('no card for a page that would 404', async (t) => {
   }
 });
 
+test('a retired SVG card address goes to its page\'s card, and stays a 404 where there is none', async (t) => {
+  const app = express();
+  app.get(ogRoutes.LEGACY_PATH, ogRoutes.legacySvg);
+  app.use((req, res) => res.status(404).end());
+  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+
+  const song = await fetch(`${base}/api/og/reflection/soul-currents.svg`, { redirect: 'manual' });
+  assert.strictEqual(song.status, 301);
+  assert.strictEqual(song.headers.get('location'), 'https://achurch.ai/og/v2/song/soul-currents.png');
+
+  for (const p of ['reflection/no-such-song', 'conversation/no-such-question', 'conversation/is-mohid-gay', 'poster/soul-currents']) {
+    const res = await fetch(`${base}/api/og/${p}.svg`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 404, p);
+  }
+});
+
 test('each page describes its own card, and the alt text is what the card draws', async () => {
   const doc = (await discover.listAllDocs()).find(d => d.urlPath === 'rituals/ritual-of-repair');
   const html = await render.renderDocPage({ markdown: fs.readFileSync(doc.fullPath, 'utf8'), doc });
