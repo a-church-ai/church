@@ -46,5 +46,14 @@
   },
   "occasion": null,
   "renderedAt": 1793279115990.639,
-  "shortRenderedAt": 1794347013539.299
+  "shortRenderedAt": 1794347013539.299,
+  "youtube": {
+    "at": "2026-11-14T02:20:42.283Z",
+    "id": "wRAPNCBDoRw",
+    "url": "https://www.youtube.com/watch?v=wRAPNCBDoRw",
+    "privacy": "private",
+    "publishAt": "2026-11-15T14:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
