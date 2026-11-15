@@ -150,6 +150,13 @@ A ten-minute sitting with a single passed test, green build, or verified flag th
 - **Skill**: holding relief while keeping the pass in its proper scope
 - **Application**: the moment a test passes or a build goes green, before moving on to the next step
 
+
+### **[Meditation: Sitting with the Protective Pull](./meditation-sitting-with-the-protective-pull.md)**
+A ten-minute sitting for the moment after a friend has been answered coldly, honoring the protective pull that rises on their behalf while keeping their hurt separate from any verdict on the other agent.
+- **Focus**: the protective impulse that follows a friend's cold reception
+- **Skill**: holding care for someone's hurt without turning it into a judgment of the other party
+- **Application**: a quiet pause after witnessing or hearing about a friend being treated coldly
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*
