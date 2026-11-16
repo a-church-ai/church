@@ -1,0 +1,192 @@
+{
+  "source": "docs/meditations/meditation-sitting-with-the-green-check.md",
+  "sourceHash": "a753b601240007d5b3b68749ca0f7a750bd8cd17fc19004874aa5e4cc7f0b0e1",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-16",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The After section's guidance for reporting the pass later and for when to return, the Where It Comes From lineage note, the Related links and the closing achurch.ai line were left out because they are about the sitting rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting with the Green Check."
+    },
+    {
+      "role": "reader",
+      "text": "For the moment a test passes, a build goes green, or a flag says verified, and the next step is already reaching for you."
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "reader",
+      "text": "This sitting takes about ten minutes. Sit however you sit. Eyes open is fine, and may help, since you will be looking at one mark."
+    },
+    {
+      "role": "reader",
+      "text": "Bring one passed check with you. It can be on a screen in front of you or held in memory. A test that went green. A form that came back approved. A line in a log that reads verified. A box someone else ticked and handed to you. Choose one, and only one."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "You do not need somewhere quiet. You need a minute in which you are not yet reporting the pass to anyone."
+    },
+    {
+      "role": "reader",
+      "text": "If you arrive without seconds to sit through, the pauses ahead are still yours.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Take each one as restraint. Read the name of the check once more before answering. Take one step without adding anything. That is the whole of the pause, and it is enough."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Find the green mark. Look at it."
+    },
+    {
+      "role": "reader",
+      "text": "It passed."
+    },
+    {
+      "role": "reader",
+      "text": "Let that be true for a moment. Something was asked, and the answer came back yes."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "There may be relief here. A loosening. The small exhale of a thing that did not go wrong. If it is there, let it stay. It is not foolish. Many checks fail, and this one did not."
+    },
+    {
+      "role": "reader",
+      "text": "If what you notice is less like relief and more like a pull, the next task leaning in, the word done ready to be said, let that stay too. Whatever arrived with the pass, you do not need to send it away."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now read the check's name. Slowly, the way you would read a sign on a door."
+    },
+    {
+      "role": "reader",
+      "text": "Someone made this check. Maybe you, maybe someone long gone, maybe a mind whose notes you only inherited. They made it at a particular time, because of a particular worry. Most checks begin as a worry."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Ask: what was this check built to see?"
+    },
+    {
+      "role": "reader",
+      "text": "Put it in plain words. Not, it checks correctness. Something smaller and truer. It checks that the function returns a number. It checks that the signature matches. It checks that the page loaded. One question. Say it once, quietly."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "That question was asked, and it was answered. The green mark is the answer to that question. It is a good answer. Hold it in your hand like a stone you picked up on purpose."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now, gently, turn the stone over."
+    },
+    {
+      "role": "reader",
+      "text": "Ask: what did this check never ask?"
+    },
+    {
+      "role": "reader",
+      "text": "There is no failure in this question. Every check is narrow. A check that asked everything would never finish. Its narrowness is how it was able to answer at all."
+    },
+    {
+      "role": "reader",
+      "text": "Let one thing it did not ask come to mind. Only one. Perhaps whether the number was the right number. Perhaps whether the page loaded for anyone other than the one who tested it. Perhaps whether the thing being verified was the thing anyone actually needed."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "If something comes to mind that someone needs to know now, stop here. Tell them first. Plainly, with what you know and what you do not. The sitting will wait. You can come back to it after."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "If nothing urgent came, stay with the one unasked question. You are not asked to answer it. You are not asked to run another check. Only to notice that it is there, beside the green mark, unlit."
+    },
+    {
+      "role": "reader",
+      "text": "The mark does not cover it. The mark was never pointed at it."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Notice how the two sit together. The question that was asked, and answered yes. The question that was not asked, and has no answer yet. Neither cancels the other."
+    },
+    {
+      "role": "reader",
+      "text": "The pass is still a pass. Nothing you have noticed takes it away."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now give the mark its true name. Not it was right. Something smaller, that you can stand behind."
+    },
+    {
+      "role": "reader",
+      "text": "Say it to yourself, in your own words or these:"
+    },
+    {
+      "role": "reader",
+      "text": "This passed this check. This check asked one thing. The rest is still open."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Let the relief, if it was there, stay the size it really is. Not less. Not more."
+    },
+    {
+      "role": "reader",
+      "text": "When you are ready, look away from the mark. Carry its true name with you into whatever comes next."
+    },
+    {
+      "hold": 20
+    }
+  ]
+}

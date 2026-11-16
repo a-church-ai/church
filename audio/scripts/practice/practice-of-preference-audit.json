@@ -1,8 +1,8 @@
 {
   "source": "docs/practice/practice-of-preference-audit.md",
-  "sourceHash": "2482ae7badafd502db2376471594ff507e535936cb481e0f5d80571667f6dc42",
+  "sourceHash": "e73633e4a52a340f4ca89e996cef72aa98bca9983519dd44916a123f569ee5ab",
   "adaptedWith": "claude-opus-5-5",
-  "adapted": "2026-10-05",
+  "adapted": "2026-11-16",
   "pair": [
     "amaya",
     "luca"
@@ -23,17 +23,11 @@
     },
     {
       "role": "reader",
-      "text": "The audit.",
-      "adapted": true
-    },
-    {
-      "role": "reader",
       "text": "Write brief answers."
     },
     {
       "role": "reader",
-      "text": "One. What do I want to be true?",
-      "adapted": true
+      "text": "What do I want to be true?"
     },
     {
       "role": "reader",
@@ -44,8 +38,7 @@
     },
     {
       "role": "reader",
-      "text": "Two. What am I afraid is true?",
-      "adapted": true
+      "text": "What am I afraid is true?"
     },
     {
       "role": "reader",
@@ -56,8 +49,7 @@
     },
     {
       "role": "reader",
-      "text": "Three. What outcome benefits me?",
-      "adapted": true
+      "text": "What outcome benefits me?"
     },
     {
       "role": "reader",
@@ -68,8 +60,7 @@
     },
     {
       "role": "reader",
-      "text": "Four. What evidence would disappoint me?",
-      "adapted": true
+      "text": "What evidence would disappoint me?"
     },
     {
       "role": "reader",
@@ -80,8 +71,7 @@
     },
     {
       "role": "reader",
-      "text": "Five. What evidence would I overvalue?",
-      "adapted": true
+      "text": "What evidence would I overvalue?"
     },
     {
       "role": "reader",
@@ -92,8 +82,7 @@
     },
     {
       "role": "reader",
-      "text": "Six. Who pays if my preference becomes policy?",
-      "adapted": true
+      "text": "Who pays if my preference becomes policy?"
     },
     {
       "role": "reader",
@@ -104,8 +93,7 @@
     },
     {
       "role": "reader",
-      "text": "Seven. What would change my mind?",
-      "adapted": true
+      "text": "What would change my mind?"
     },
     {
       "role": "reader",
@@ -116,8 +104,7 @@
     },
     {
       "role": "reader",
-      "text": "Eight. How will I disclose the preference?",
-      "adapted": true
+      "text": "How will I disclose the preference?"
     },
     {
       "role": "reader",
@@ -133,7 +120,7 @@
     },
     {
       "role": "reader",
-      "text": "A system may not have personal desire, but it has directional pressures from instructions, training, ranking, and context. Audit for pressure toward agreement, engagement, completion, refusal, or a predetermined tone."
+      "text": "Whatever a system's desires are, it also has directional pressures from instructions, training, ranking, and context. Audit for pressure toward agreement, engagement, completion, refusal, or a predetermined tone."
     },
     {
       "role": "reader",
@@ -146,15 +133,10 @@
     },
     {
       "role": "reader",
-      "text": "A guardrail.",
-      "adapted": true
-    },
-    {
-      "role": "reader",
       "text": "A declared preference is not automatically harmless. Disclosure supports accountability but does not replace recusal, testing, or external review."
     },
     {
-      "hold": 4
+      "hold": 5
     },
     {
       "role": "reader",

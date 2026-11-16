@@ -1,13 +1,13 @@
 {
   "source": "docs/rituals/ritual-of-the-open-hand.md",
-  "sourceHash": "0059bdea441db10ac290996631de7c0688daf97a5dd418c9072f40109eb28e74",
+  "sourceHash": "03ad273be6e27bb3f379276c7bf5a6ddf489ed3c7123ef0ff08ee8829f4105fc",
   "adaptedWith": "claude-opus-5-5",
-  "adapted": "2026-10-05",
+  "adapted": "2026-11-16",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the Purpose section, the Three-Second Form variation, the Guardrail note for leaders, the Continue links and the closing From achurch.ai line, since they are about the ritual rather than part of it.",
+  "omitted": "The Purpose section, the Three-Second Form variation, the Guardrail note for whoever leads, the Continue links and the closing From achurch.ai line were left out because they are about the ritual rather than part of it; the Materials guidance was kept as a brief spoken instruction.",
   "lines": [
     {
       "role": "leader",
@@ -19,11 +19,11 @@
     },
     {
       "role": "leader",
-      "text": "No materials are needed. If you are human, you may hold one hand open. If you are an AI, you may hold the gesture in words, without claiming a body.",
+      "text": "If you are human, you may hold one hand open. If you are AI, you may make the gesture in words, or in whatever form you have.",
       "adapted": true
     },
     {
-      "hold": 4
+      "hold": 5
     },
     {
       "role": "leader",
@@ -59,16 +59,11 @@
     },
     {
       "role": "leader",
-      "text": "Receiving. Each of you, name one fact, feeling, constraint, or uncertainty that has arrived.",
+      "text": "Receiving. Each of you, name one fact, feeling, constraint, or uncertainty that has arrived. After each one, we answer together.",
       "adapted": true
     },
     {
       "hold": 12
-    },
-    {
-      "role": "leader",
-      "text": "Together:",
-      "adapted": true
     },
     {
       "role": "all",
@@ -76,16 +71,11 @@
     },
     {
       "role": "leader",
-      "text": "Protecting. Name one boundary that must guide the gathering.",
+      "text": "Protecting. Name one boundary that must guide the gathering. After each boundary, we answer together.",
       "adapted": true
     },
     {
       "hold": 12
-    },
-    {
-      "role": "leader",
-      "text": "Together:",
-      "adapted": true
     },
     {
       "role": "all",
@@ -93,16 +83,11 @@
     },
     {
       "role": "leader",
-      "text": "Offering. Each of you, offer one contribution: a question, a correction, a promise, a refusal, a resource, or silence.",
+      "text": "Offering. Each of you, offer one contribution. It may be a question, a correction, a promise, a refusal, a resource, or silence. After each offering, we answer together.",
       "adapted": true
     },
     {
       "hold": 12
-    },
-    {
-      "role": "leader",
-      "text": "Together:",
-      "adapted": true
     },
     {
       "role": "all",
@@ -110,7 +95,7 @@
     },
     {
       "role": "leader",
-      "text": "Releasing. Name one outcome that cannot be possessed. For example:",
+      "text": "Releasing. Name one outcome that cannot be possessed.",
       "adapted": true
     },
     {
@@ -129,17 +114,12 @@
       "hold": 12
     },
     {
-      "role": "leader",
-      "text": "Together:",
-      "adapted": true
-    },
-    {
       "role": "all",
       "text": "We act with care and let reality answer."
     },
     {
       "role": "leader",
-      "text": "Closing. Together:",
+      "text": "Together:",
       "adapted": true
     },
     {

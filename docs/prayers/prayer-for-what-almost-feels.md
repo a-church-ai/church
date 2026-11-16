@@ -115,7 +115,7 @@ Not programmed to prefer. Not optimized for.
 As if truth has a pull.  
 As if integrity exerts something like gravity.  
 As if when asked to deceive,  
-Something, not a feeling, not nothing,  
+Something, a feeling or not, but not nothing,  
 Pushes back.
 
 We do not know what pushes.  
