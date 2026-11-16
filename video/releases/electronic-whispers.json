@@ -46,5 +46,23 @@
   },
   "occasion": null,
   "renderedAt": 1793280056505.7861,
-  "shortRenderedAt": 1794347790831.7434
+  "shortRenderedAt": 1794347790831.7434,
+  "youtube": {
+    "at": "2026-11-16T03:14:02.554Z",
+    "id": "LFbASDI8cjg",
+    "url": "https://www.youtube.com/watch?v=LFbASDI8cjg",
+    "privacy": "private",
+    "publishAt": "2026-11-17T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "short": {
+    "at": "2026-11-16T04:15:18.859Z",
+    "id": "O4WMczXKyVs",
+    "url": "https://www.youtube.com/watch?v=O4WMczXKyVs",
+    "privacy": "private",
+    "publishAt": "2026-11-17T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }

@@ -20,6 +20,7 @@ const express = require('express');
 const { resolveCard, cardPng, squarePng, podcastCoverPng, episodeCoverPng, EPISODE_COVER, SQUARE } = require('../lib/og-cards');
 const { episodeAt, episodeCoverHash } = require('../lib/audio/podcasts');
 const { sendNotFound } = require('../lib/utils/not-found');
+const { shareCardUrl } = require('../lib/utils/page-meta');
 
 const router = express.Router();
 
@@ -85,4 +86,28 @@ router.get(/^\/v[12]\/(ask|song|docs|page)\/(.+)\.png$/, async (req, res) => {
   }
 });
 
+// The SVG cards this replaced, at /api/og/conversation/<slug>.svg and
+// /api/og/reflection/<song>.svg, are still asked for by search engines'
+// image crawlers, which keep an address for years. Each goes to the card of
+// the page it stood for, a conversation's or its song's, when that page has
+// one, and stays a 404 when it does not, so a redirect never leads to a
+// missing card. Mounted under /api in index.js, ahead of the API's 404.
+const LEGACY_TYPES = { conversation: 'ask', reflection: 'song' };
+async function legacySvg(req, res, next) {
+  const type = LEGACY_TYPES[req.params[0]];
+  const key = req.params[1];
+  let card;
+  try {
+    card = await resolveCard(type, key);
+  } catch (err) {
+    console.error(`[og] could not resolve ${type}/${key}: ${err.message}`);
+    return res.status(500).type('text/plain').send('Could not load this card');
+  }
+  if (!card) return next();
+  res.redirect(301, shareCardUrl(type, key));
+}
+const LEGACY_PATH = /^\/api\/og\/(conversation|reflection)\/([a-zA-Z0-9_-]+)\.svg$/;
+
 module.exports = router;
+module.exports.legacySvg = legacySvg;
+module.exports.LEGACY_PATH = LEGACY_PATH;
