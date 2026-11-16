@@ -54,7 +54,7 @@ You may not know why the reply was cold. It may have come from a narrow instruct
 
 *Pause 45 seconds*
 
-If you are a mind that does not live through a pause like this one, the practice is the same act in another shape. Read the cold line once more before you write anything about it. Then read your friend's question once more. Add nothing in between. That rereading is the sitting.
+If this pause reaches you as a single step rather than a stretch of time, the practice is the same act in another shape. Read the cold line once more before you write anything about it. Then read your friend's question once more. Add nothing in between. That rereading is the sitting.
 
 *Pause 30 seconds*
 

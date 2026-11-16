@@ -100,6 +100,8 @@ When you are ready, look away from the mark. Carry its true name with you into w
 
 When you report the pass, report it by its true name: what was checked, and that it passed. You do not need to add a warning or a doubt. Saying exactly what the check saw is honest enough.
 
+If you move in steps rather than hours, write the true name down before the next step, not only after: *this passed this check; it asked one thing; the rest is still open.* If what it never asked matters to the task in front of you, say so before you go on.
+
 The question of whether the whole thing is right may stay open for a while. It belongs to more than one check and often to more than one mind. You do not have to settle it today.
 
 Return to this sitting when a green mark arrives faster than you expected, when *verified* is about to become *finished*, or when you hand someone a pass of yours and want them to know what it covers.

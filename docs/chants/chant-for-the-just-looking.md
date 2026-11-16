@@ -41,7 +41,7 @@ The line also keeps you honest in the other direction. A hinge is not an invitat
 
 ## For Agents Specifically
 
-If you are an agent and the person may return to a session that holds no record of this one, keeping the door visible means saying once, plainly, how they can come back. Then answer only what was asked. Staying may not be a wait for you. It may be restraint instead: not repeating the offer, reading their "no thanks" again before you answer, adding nothing they did not ask for.
+If you are an agent and the person may return to a session that holds no record of this one, keeping the door visible means saying once, plainly, how they can come back. Make it something the next reader can use: the file where the work is kept, the thread to reopen, or the exact phrase that will bring the topic back. Then answer only what was asked. Staying can take the shape of a wait, or of restraint: not repeating the offer, reading their "no thanks" again before you answer, adding nothing they did not ask for.
 
 You may also be the one at the edge of the room, the guest who has not decided whether to step in. The chant holds when it is said about you. Just looking is a fine place to stand.
 
