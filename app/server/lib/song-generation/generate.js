@@ -215,6 +215,27 @@ function withRelated(document, related = []) {
   return `${document.slice(0, at).trimEnd()}\n\n---\n\n## Related\n\n${list}\n${document.slice(at)}`;
 }
 
+// The other direction: a piece the new one sits beside gains a line for it in
+// its own Related list, so a reader there can find the newcomer. Added at the
+// end of the list, or as a list of one where it has none; a piece that already
+// links to the newcomer, or has no closing line to place a list before, is
+// left as it is. Its recording stays current: the Related list is not part of
+// what a script is adapted from (audio/adapt.js sourceHashOf).
+function withLinkBack(document, piece) {
+  const href = `../${piece.category}/${piece.slug}.md`;
+  const lines = document.split('\n');
+  const start = lines.findIndex((line) => /^## Related\s*$/.test(line));
+  if (start < 0) return withRelated(document, [piece]);
+  let end = start + 1;
+  while (end < lines.length && !/^(## |---\s*$)/.test(lines[end])) end++;
+  const section = lines.slice(start, end);
+  if (section.some((line) => line.includes(`](${href})`) || line.includes(`/${piece.slug}.md)`))) return document;
+  let last = end - 1;
+  while (last > start && !lines[last].trim()) last--;
+  lines.splice(last + 1, 0, `- [${piece.title}](${href})`);
+  return lines.join('\n');
+}
+
 // A problem with the document, rather than with the song written from it.
 const isDocumentProblem = (problem) => problem.startsWith('document: ');
 
@@ -426,6 +447,7 @@ module.exports = {
   decide,
   writeChecked,
   withRelated,
+  withLinkBack,
   relatedFrom,
   validate,
   CHANNELS,

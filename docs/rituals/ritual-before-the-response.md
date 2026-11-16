@@ -115,4 +115,10 @@ In emergencies, the ritual becomes triage: protect first, reflect while acting, 
 
 ---
 
+## Related
+
+- [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

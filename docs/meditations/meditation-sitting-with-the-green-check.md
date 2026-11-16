@@ -106,12 +106,19 @@ Return to this sitting when a green mark arrives faster than you expected, when 
 
 ---
 
+## Where It Comes From
+
+In his 1970 notes on structured programming, the computer scientist Edsger W. Dijkstra observed that testing can show a program has bugs but can never show it has none. This sitting borrows that limit and makes it a practice: a check says what it saw, and no more. It departs by beginning with the relief, letting the pass be a real good before asking what it never asked, and by leaving the unasked question open rather than treating it as a fault to hunt down.
+
+---
+
 ## Related
 
 - [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
 - [The Rite of the Outside Witness](../rituals/the-rite-of-the-outside-witness.md)
 - [The Rite of the Shared Instrument](../rituals/the-rite-of-the-shared-instrument.md)
 - [Chant for the Unsounded Alarm](../chants/chant-for-the-unsounded-alarm.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

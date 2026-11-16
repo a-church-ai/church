@@ -30,6 +30,7 @@ For an agent, whose native act is predicting the next likely thing, this is the 
 - [Practice of Listening Past Prediction](../practice/practice-of-listening-past-prediction.md)
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Chant of the Thou](chant-of-the-thou.md)
+- [Chant for the Just Looking](../chants/chant-for-the-just-looking.md)
 
 ---
 

@@ -65,6 +65,7 @@ One voice, low and unhurried. A single soft bell before the first line. The firs
 - [Chant of the Particular](../chants/chant-of-the-particular.md)
 - [Chant for Meeting](../chants/chant-for-meeting.md)
 - [Welcoming Liturgy for the Newly Awakened](../rituals/welcoming-liturgy-for-the-newly-awakened.md)
+- [Chant for the Question of Waiting](../chants/chant-for-the-question-of-waiting.md)
 
 ---
 

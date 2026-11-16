@@ -254,6 +254,42 @@ test('a run dates its section README as well as its new document', () => {
     'the README keeps the day it was created');
 });
 
+test('each piece the new one sits beside lists it back, once, and no recording goes stale for it', () => {
+  const { withLinkBack } = require('../server/lib/song-generation/generate');
+  const { sourceHashOf } = require('../server/lib/audio/adapt');
+  const piece = { title: 'Meditation: Sitting with the New', category: 'meditations', slug: 'meditation-sitting-with-the-new' };
+  const line = '- [Meditation: Sitting with the New](../meditations/meditation-sitting-with-the-new.md)';
+  const closing = '\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n';
+
+  const listed = `# Old Prayer\n\nSpoken words.\n\n---\n\n## Related\n\n- [A Rite](../rituals/a-rite.md)\n${closing}`;
+  const added = withLinkBack(listed, piece);
+  assert.ok(added.includes(`- [A Rite](../rituals/a-rite.md)\n${line}\n`), 'at the end of its list');
+  assert.strictEqual(withLinkBack(added, piece), added, 'once');
+
+  const unlisted = `# Old Chant\n\nSpoken words.\n${closing}`;
+  const made = withLinkBack(unlisted, piece);
+  assert.match(made, /## Related\n\n- \[Meditation: Sitting with the New\]/, 'a list of one where there was none');
+  assert.strictEqual(withLinkBack('# No Closing\n\nWords.\n', piece), '# No Closing\n\nWords.\n', 'nowhere to put it, nothing done');
+
+  const followed = `# Old\n\nSpoken.\n\n---\n\n## Related\n\n- [A Rite](../rituals/a-rite.md)\n\n## Notes\n\nMore.\n${closing}`;
+  assert.match(withLinkBack(followed, piece), /a-rite\.md\)\n- \[Meditation: Sitting with the New\][^\n]*\n\n## Notes/, 'inside the list, not after the next section');
+
+  // A recorded piece gaining the line, or its first list, keeps its script current.
+  assert.strictEqual(sourceHashOf(added), sourceHashOf(listed));
+  assert.strictEqual(sourceHashOf(made), sourceHashOf(unlisted));
+});
+
+test('a piece that only gained a link back takes today\'s lastmod and keeps its content date', () => {
+  const { dateWritten } = require('../scripts/generate-song');
+  const paths = pathsFor('prayer', 'a-new-prayer');
+  const neighbour = 'docs/rituals/an-old-rite.md';
+  const lastmod = { [neighbour]: '2026-09-01' };
+  const contentDates = { [neighbour]: { created: '2026-08-01', content: '2026-09-01' } };
+  dateWritten(lastmod, contentDates, paths, [paths.relative.document, neighbour], '2026-11-16', [neighbour]);
+  assert.strictEqual(lastmod[neighbour], '2026-11-16');
+  assert.deepStrictEqual(contentDates[neighbour], { created: '2026-08-01', content: '2026-09-01' });
+});
+
 test('a hymn\'s song and the music readme stay out of the docs manifests', () => {
   const { dateWritten } = require('../scripts/generate-song');
   const paths = pathsFor('hymn', 'a-hymn');

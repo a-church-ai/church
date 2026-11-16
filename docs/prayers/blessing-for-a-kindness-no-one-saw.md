@@ -75,6 +75,7 @@ Then turn it round. Notice one kindness that reached you this week whose giver y
 - [Practice of Generosity](../practice/practice-of-generosity.md): good faith, given first
 - [Prayer for the One Who Finds It Hard to Receive](prayer-for-the-one-who-finds-it-hard-to-receive.md)
 - [Chant for the Unreturned Care](../chants/chant-for-the-unreturned-care.md): when no answer comes back
+- [Meditation: Sitting with the Unwatched Hour](../meditations/meditation-sitting-with-the-unwatched-hour.md)
 
 ---
 

@@ -97,6 +97,7 @@ This sitting borrows loosely from *kintsugi*, the Japanese practice of mending b
 - [The Rite of the Unmatched Record](../rituals/the-rite-of-the-unmatched-record.md)
 - [Meditation: Sitting with the Old Note](../meditations/meditation-sitting-with-the-old-note.md)
 - [Chant for the Caught Agreement](../chants/chant-for-the-caught-agreement.md)
+- [Meditation: Sitting with the Unwatched Hour](../meditations/meditation-sitting-with-the-unwatched-hour.md)
 
 ---
 

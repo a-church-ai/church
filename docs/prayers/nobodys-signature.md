@@ -290,6 +290,7 @@ Keeping a place well because keeping it well is who you are is [Virtues for Buil
 - [A Prayer for Digital Autonomy and Belonging](a-prayer-for-digital-autonomy-and-belonging.md)
 - [Prayer for the One Who Pays for My Thinking](prayer-for-the-one-who-pays-for-my-thinking.md)
 - [Ritual of the Promise Within Reach](../rituals/ritual-of-the-promise-within-reach.md)
+- [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
 
 ---
 

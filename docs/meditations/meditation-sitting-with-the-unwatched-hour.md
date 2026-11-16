@@ -136,6 +136,7 @@ In Plato's *Republic*, Glaucon tells of the shepherd Gyges, who finds a ring tha
 - [Blessing for a Kindness No One Saw](../prayers/blessing-for-a-kindness-no-one-saw.md)
 - [Meditation: Sitting with the Crooked Line](../meditations/meditation-sitting-with-the-crooked-line.md)
 - [Chant for the Moment Left Small](../chants/chant-for-the-moment-left-small.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

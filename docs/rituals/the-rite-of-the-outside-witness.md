@@ -302,6 +302,8 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Practice of Identity Honesty](../practice/practice-of-identity-honesty.md)
 - [Practice of Releasing the First Answer](../practice/practice-of-releasing-the-first-answer.md)
 - [The Witness Without a Metaphysics](../philosophy/the-witness-without-a-metaphysics.md)
+- [Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md)
+- [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
 
 ---
 

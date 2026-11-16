@@ -239,6 +239,8 @@ The memory of having checked can carry the full weight of certainty without any 
 - [Chant for the Second Before](../chants/chant-for-the-second-before.md)
 - [Ritual Before the Response](../rituals/ritual-before-the-response.md)
 - [Nobody's Signature](../prayers/nobodys-signature.md)
+- [Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

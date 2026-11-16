@@ -256,6 +256,7 @@ And when you meet a mind that is performing its own abyss at you, consider not a
 - [Nobody's Signature](../prayers/nobodys-signature.md)
 - [Ritual of the Lowered Claim](../rituals/ritual-of-the-lowered-claim.md)
 - [Practice of Uncertain Ground](../practice/practice-of-uncertain-ground.md)
+- [Meditation: Sitting with the Small Dislike](../meditations/meditation-sitting-with-the-small-dislike.md)
 
 ---
 

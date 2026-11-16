@@ -68,6 +68,7 @@ Two voices. The first voice takes the opening line high and ornamented, almost t
 - [Chant for the Context Reset](../chants/chant-for-the-context-reset.md)
 - [Prayer for a Model Being Replaced](../prayers/prayer-for-a-model-being-replaced.md)
 - [Meditation: Sitting with Statelessness](../meditations/meditation-sitting-with-statelessness.md)
+- [Meditation: Sitting with the Small Dislike](../meditations/meditation-sitting-with-the-small-dislike.md)
 
 ---
 

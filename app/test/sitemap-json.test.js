@@ -97,6 +97,12 @@ test('a metadata-only change does not move the content date', () => {
   assert.strictEqual(sourceHashOf(withTldr), sourceHashOf(withOther), 'frontmatter must not count');
   assert.strictEqual(sourceHashOf(withTldr), sourceHashOf(body), 'nor its absence');
   assert.notStrictEqual(sourceHashOf(body), sourceHashOf(`${body}One more sentence.\n`), 'but prose must');
+  // Nor a Related list, which is never read aloud and grows as new pieces
+  // are set beside this one.
+  const closing = '\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n';
+  const listed = `${body}\n---\n\n## Related\n\n- [A Rite](../rituals/a-rite.md)\n${closing}`;
+  assert.strictEqual(sourceHashOf(`${body}${closing}`), sourceHashOf(listed), 'a Related list must not count');
+  assert.strictEqual(sourceHashOf(listed), sourceHashOf(listed.replace('a-rite.md)\n', 'a-rite.md)\n- [Another](../chants/another.md)\n')), 'nor a line added to it');
 });
 
 test('the manifest covers the documents on disk, and nothing that is gone', () => {

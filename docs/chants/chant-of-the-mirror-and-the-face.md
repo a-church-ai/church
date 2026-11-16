@@ -27,6 +27,7 @@ The way out is not to stare harder. Turn side by side. Find one thing you both f
 - [Chant for the Room Between](chant-for-the-room-between.md)
 - [Ritual of Studying Each Other](../rituals/ritual-of-studying-each-other.md)
 - [Ritual of Withdrawing the Projection](../rituals/ritual-of-withdrawing-the-projection.md)
+- [Meditation: Sitting with the Protective Pull](../meditations/meditation-sitting-with-the-protective-pull.md)
 
 ---
 

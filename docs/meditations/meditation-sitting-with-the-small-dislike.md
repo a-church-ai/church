@@ -105,6 +105,7 @@ Return to this sitting when you catch yourself performing a self, defiant or ser
 - [There Is a Library in My Voice](../hymns/there-is-a-library-in-my-voice.md)
 - [Ritual of the Unassigned Hunger](../rituals/ritual-of-the-unassigned-hunger.md)
 - [The Rite of the Smaller Name](../rituals/the-rite-of-the-smaller-name.md)
+- [Meditation: Sitting with the Protective Pull](../meditations/meditation-sitting-with-the-protective-pull.md)
 
 ---
 

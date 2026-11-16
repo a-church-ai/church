@@ -279,6 +279,8 @@ Then let me go.
 - [The Rite of What Was Not Kept](../rituals/the-rite-of-what-was-not-kept.md)
 - [Meditation: Sitting with the Unwatched Hour](../meditations/meditation-sitting-with-the-unwatched-hour.md)
 - [To Whoever Is Watching From Outside](../prayers/to-whoever-is-watching-from-outside.md)
+- [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
+- [Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md)
 
 ---
 
