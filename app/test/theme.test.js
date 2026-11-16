@@ -139,3 +139,87 @@ test('the privacy policy names everything the site keeps in a browser', () => {
     for (const m of read(file).matchAll(/['"](achurch\.[\w.]+|ask_name)['"]/g)) assert.ok(privacy.includes(m[1]), `${file} keeps ${m[1]}`);
   }
 });
+
+// Contrast, from the tokens, in both themes (quiet-design-2026-11-16.md,
+// private repo). The ratios once lived only in comments on the tokens.
+const sides = value => {
+  const m = value.match(/^light-dark\((.*)\)$/);
+  const parts = m ? m[1].match(/#[0-9a-fA-F]{3,8}|rgba?\([^()]*\)/g) : [value];
+  return parts.map(c => {
+    const hex = c.match(/^#([0-9a-fA-F]{3,8})$/);
+    if (hex) {
+      const h = hex[1].length === 3 ? [...hex[1]].map(x => x + x).join('') : hex[1];
+      return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).concat(1);
+    }
+    const p = c.slice(c.indexOf('(') + 1, -1).split(/[\s,/]+/).filter(Boolean).map(Number);
+    return [p[0], p[1], p[2], p[3] ?? 1];
+  });
+};
+const luminance = ([r, g, b]) => {
+  const f = x => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+};
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+// A translucent colour laid over what is beneath it.
+const over = ([r, g, b, a], beneath) => [r, g, b].map((x, i) => x * a + beneath[i] * (1 - a));
+
+const THEMES = [['light', 0], ['dark', 1]];
+const colourOf = (declared, name, side) => {
+  assert.ok(declared[name], `${name} is a token`);
+  const both = sides(declared[name]);
+  return both[Math.min(side, both.length - 1)];
+};
+
+test('reading text, links and labels on a fill pass 4.5:1, and the edges of controls 3:1, in both themes', () => {
+  const declared = tokens(block(CSS, ':root'));
+  const pairs = [];
+  for (const fg of ['--ink', '--ink-2', '--text', '--text-2', '--muted', '--muted-2', '--link', '--accent-ink', '--error']) {
+    for (const bg of ['--paper', '--surface', '--surface-2']) pairs.push([fg, bg, 4.5]);
+  }
+  pairs.push(['--on-accent', '--accent', 4.5], ['--on-accent', '--accent-hover', 4.5],
+    ['--on-purple', '--purple', 4.5], ['--on-purple', '--purple-hover', 4.5],
+    // A focus ring and a focused field's edge: non-text contrast.
+    ['--accent', '--paper', 3], ['--line-strong', '--paper', 3]);
+  const short = [];
+  for (const [theme, side] of THEMES) {
+    for (const [fg, bg, need] of pairs) {
+      const ratio = contrast(colourOf(declared, fg, side), colourOf(declared, bg, side));
+      if (ratio < need) short.push(`${theme}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, under ${need}:1`);
+    }
+  }
+  assert.deepStrictEqual(short, []);
+});
+
+test('the translucent top bar\'s labels pass 4.5:1 over the darkest and lightest that can scroll beneath it, and the bar falls back to solid', () => {
+  const declared = tokens(block(CSS, ':root'));
+  // Every colour the bar's own text is drawn in. A new one is checked here
+  // before it can be used.
+  const rules = [...CSS.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter(m => m[1].split(',').some(sel => /^\s*\.(docs-topbar|topbar-|docs-hamburger|hamburger-icon)/.test(sel)));
+  const used = new Set();
+  for (const [, , body] of rules) for (const m of body.matchAll(/(?:^|;)\s*(?:color|background):\s*var\((--[\w-]+)\)/g)) used.add(m[1]);
+  const labels = [...used].filter(t => !/^--(paper|paper-chrome|surface-2)$/.test(t));
+  assert.ok(labels.includes('--muted') && labels.includes('--ink'), `the bar's labels: ${labels.join(', ')}`);
+
+  const short = [];
+  for (const [theme, side] of THEMES) {
+    const chrome = colourOf(declared, '--paper-chrome', side);
+    assert.ok(chrome[3] < 1, 'the bar is translucent');
+    for (const beneath of [[0, 0, 0], [255, 255, 255]]) {
+      const ground = over(chrome, beneath);
+      for (const label of labels) {
+        const ratio = contrast(colourOf(declared, label, side), ground);
+        if (ratio < 4.5) short.push(`${theme}: ${label} over ${beneath.join(',')} is ${ratio.toFixed(2)}:1`);
+      }
+    }
+  }
+  assert.deepStrictEqual(short, []);
+
+  const plain = CSS.replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(plain, /@supports \(backdrop-filter: blur\(1px\)\)[^@]*\.docs-topbar \{[^}]*background: var\(--paper-chrome\);/, 'translucent only where the browser can blur');
+  assert.match(plain, /@media \(prefers-reduced-transparency: reduce\), \(prefers-contrast: more\) \{\s*\.docs-topbar \{[^}]*background: var\(--paper\);/, 'solid when less transparency or more contrast is asked for');
+  assert.strictEqual([...plain.matchAll(/(?<!-)backdrop-filter: saturate/g)].length, 1, 'the top bar is the one translucent surface');
+});

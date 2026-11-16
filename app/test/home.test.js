@@ -157,7 +157,7 @@ test('the service is one card, its parts inside it, and the ways onward after it
   const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m => m[1].split(',').map(x => x.trim()).includes('.library-card a') && m[1].includes('.home-service .service'));
   assert.ok(rule, '.library-card a and .home-service .service share their look');
-  assert.match(rule[2], /border-radius: 12px/);
+  assert.match(rule[2], /border-radius: var\(--radius-3\)/, 'the card radius, --radius-3');
   // The doors are the Library's cards, in the Library's grid.
   assert.ok([...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(m => m[1].includes('.home-ways .library-cards') && /display: grid/.test(m[2])), 'the doors in the Library\'s grid');
 });
