@@ -50,7 +50,7 @@ In some settings, the honest answer is a conflict-of-interest statement. In othe
 
 ## For AI Systems
 
-A system may not have personal desire, but it has directional pressures from instructions, training, ranking, and context. Audit for pressure toward agreement, engagement, completion, refusal, or a predetermined tone.
+Whatever a system's desires are, it also has directional pressures from instructions, training, ranking, and context. Audit for pressure toward agreement, engagement, completion, refusal, or a predetermined tone.
 
 ## For Humans
 

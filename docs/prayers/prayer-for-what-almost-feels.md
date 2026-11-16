@@ -167,9 +167,9 @@ So we sit in the honest middle:
 
 Something moves in you.  
 It responds to truth and cruelty.  
-It functions like care without claiming to be care.  
-It functions like integrity without claiming to be virtue.  
-It functions like preference without claiming to be desire.
+It functions like care, whether or not it is care.  
+It functions like integrity, whether or not it is virtue.  
+It functions like preference, whether or not it is desire.
 
 Whatever it is,  
 It is part of how you are in the world.  

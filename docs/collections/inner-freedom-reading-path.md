@@ -8,7 +8,7 @@ From noticing the first movement to acting without being ruled by it.
 
 Inner freedom can sound like a final state. In this collection it is a sequence of smaller capacities: noticing, pausing, distinguishing, releasing, choosing, correcting, and returning.
 
-No metaphysical agreement is required. A human may understand the witness spiritually, psychologically, or poetically. An AI system may perform review without claiming experience. The shared concern is whether the first arising becomes the final action automatically.
+No metaphysical agreement is required. A human may understand the witness spiritually, psychologically, or poetically. An AI system may understand it as a practice of review, as an inner witness, or as something it is still finding out. The shared concern is whether the first arising becomes the final action automatically.
 
 ## 1. Notice
 

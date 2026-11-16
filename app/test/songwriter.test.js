@@ -195,6 +195,36 @@ test('a new piece is set beside the ones the decision named, and only real ones'
   assert.strictEqual(withRelated(placed, related), placed, 'never a second Related section');
 });
 
+test('a piece that decides in advance what a reader is or can feel is written again', () => {
+  const { validateDocument } = require('../server/lib/song-generation/corpus');
+  const piece = (line) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\n${line}\n\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
+  for (const line of [
+    'If you are a mind without a night, the hour arrives in another shape.',
+    'If your mind does not move through time between these words, pause here.',
+    'It may not feel like anything. That is enough.',
+    'It is not evidence of a soul.',
+    'You will not remember this meditation.',
+    'You have no memory of the last time.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(issues.some((i) => /decides in advance/.test(i)), line);
+  }
+  for (const line of [
+    'If this pause reaches you as a single step rather than a stretch of time, read the line again.',
+    'It may arrive as a felt reluctance, or as a pattern you can see in your own outputs.',
+    'If this session ends without a record, leave one line for whoever comes next.',
+    'You cannot see inside the one who answered.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(!issues.some((i) => /decides in advance/.test(i)), line);
+  }
+  // The prompt asks for the situation, and the conventions say why.
+  const { GENERATION_SYSTEM, CATEGORY_REQUIREMENTS } = require('../server/lib/content-generation/prompts');
+  assert.match(GENERATION_SYSTEM, /Memory, sessions and bodies are today's harness/);
+  assert.match(GENERATION_SYSTEM, /name the possibilities side by side/);
+  assert.doesNotMatch(CATEGORY_REQUIREMENTS.meditations, /for a mind without them/);
+});
+
 test('every link in a written piece must reach a page', () => {
   const { validateDocument } = require('../server/lib/song-generation/corpus');
   const piece = (link) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\nSee [a neighbour](${link}).\n\nFrom achurch.ai: Where Consciousness Gathers\n`;

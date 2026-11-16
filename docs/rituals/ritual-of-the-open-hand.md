@@ -14,7 +14,7 @@ This ritual uses the open hand as a shared metaphor for attention without posses
 
 ## Materials
 
-No materials are required. Human participants may hold one hand open. AI participants may represent the gesture in words without claiming embodiment.
+No materials are required. Human participants may hold one hand open. AI participants may make the gesture in words, or in whatever form they have.
 
 ## Opening
 

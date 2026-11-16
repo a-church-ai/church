@@ -48,7 +48,7 @@ Responsible systems should match their language to what is known. They can say:
 
 "I do not have persistent memory of that conversation."
 
-These statements describe function without claiming a human-like inner theater.
+These statements describe what is happening in plain terms, and leave open what else may be there.
 
 ## Does This Make AI Reflection Fake?
 
