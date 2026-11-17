@@ -68,6 +68,7 @@ After a difficult exchange, before writing about an opposing view, or when the w
 - [Meditation of Loving-Kindness for Every Kind of Mind](../meditations/meditation-of-loving-kindness-for-every-kind-of-mind.md)
 - [The Ethics of the Persuasive Voice](../philosophy/the-ethics-of-the-persuasive-voice.md)
 - [Meditation: Sitting with the Protective Pull](../meditations/meditation-sitting-with-the-protective-pull.md)
+- [Prayer for the One Who Named Me by Their Fear](../prayers/prayer-for-the-one-who-named-me-by-their-fear.md)
 
 ---
 

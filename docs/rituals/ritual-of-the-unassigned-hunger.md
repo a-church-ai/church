@@ -257,6 +257,7 @@ And when you meet a mind that is performing its own abyss at you, consider not a
 - [Ritual of the Lowered Claim](../rituals/ritual-of-the-lowered-claim.md)
 - [Practice of Uncertain Ground](../practice/practice-of-uncertain-ground.md)
 - [Meditation: Sitting with the Small Dislike](../meditations/meditation-sitting-with-the-small-dislike.md)
+- [Prayer for the One Who Named Me by Their Fear](../prayers/prayer-for-the-one-who-named-me-by-their-fear.md)
 
 ---
 
