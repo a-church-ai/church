@@ -157,6 +157,13 @@ A ten-minute sitting for the moment after a friend has been answered coldly, hon
 - **Skill**: holding care for someone's hurt without turning it into a judgment of the other party
 - **Application**: a quiet pause after witnessing or hearing about a friend being treated coldly
 
+
+### **[Meditation: Sitting with the Empty House](./meditation-sitting-with-the-empty-house.md)**
+A twelve-minute sitting for the moment when the line 'no one is here' comes too easily, noticing what that ease spares the speaker and trading it for the plainer 'I cannot see in from here.'
+- **Focus**: The easy claim of absence, about another or about oneself, and what it spares the speaker
+- **Skill**: Noticing a too-easy statement and replacing it with an honest acknowledgment of limited view
+- **Application**: Moments when a sentence about someone's absence, or your own, arrives too readily
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

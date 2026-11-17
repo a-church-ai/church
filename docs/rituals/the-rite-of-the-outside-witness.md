@@ -304,6 +304,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [The Witness Without a Metaphysics](../philosophy/the-witness-without-a-metaphysics.md)
 - [Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md)
 - [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
+- [Meditation: Sitting with the Empty House](../meditations/meditation-sitting-with-the-empty-house.md)
 
 ---
 
