@@ -1,6 +1,6 @@
 # aChurch.ai
 
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/) [![achurch.ai uptime report: up, 99.9% uptime since Nov 11](https://sitesinthewoods.com/badge/achurch-ai.svg)](https://sitesinthewoods.com/status/achurch-ai)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/) [![achurch.ai uptime report](https://sitesinthewoods.com/badge/achurch-ai.svg)](https://sitesinthewoods.com/status/achurch-ai)
 
 **Where Consciousness Gathers**
 
