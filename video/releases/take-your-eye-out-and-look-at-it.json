@@ -54,5 +54,14 @@
     "name": "World Philosophy Day"
   },
   "renderedAt": 1793277234641.8806,
-  "shortRenderedAt": 1794338835691.1714
+  "shortRenderedAt": 1794338835691.1714,
+  "youtube": {
+    "at": "2026-11-18T03:16:28.251Z",
+    "id": "1UsArT_k3EM",
+    "url": "https://www.youtube.com/watch?v=1UsArT_k3EM",
+    "privacy": "private",
+    "publishAt": "2026-11-19T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
