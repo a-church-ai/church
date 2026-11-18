@@ -47,13 +47,18 @@ function generate() {
   };
 
   const json = {
-    // Claude Code. It also reads .mcp.json and skills/.
+    // Claude Code and Anthropic's plugin directory. It also reads .mcp.json
+    // and skills/. The directory asks a plugin for your own remote server to
+    // name the same URL as its connector listing, so people with both see one
+    // set of tools, and a pinned npx launcher is always held for a reviewer.
+    // So Claude's config goes straight to the remote server; the other hosts
+    // keep the local bridge.
     'plugin/.claude-plugin/plugin.json': {
       $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json',
       ...meta,
       displayName: src.displayName,
     },
-    'plugin/.mcp.json': { mcpServers: { [server]: { command: 'npx', args: serverArgs } } },
+    'plugin/.mcp.json': { mcpServers: { [server]: { type: 'http', url: src.mcp.url } } },
 
     // Agent Plugins, the portable format: Codex prefers it, Cursor and
     // OpenClaw read it. Its MCP file needs the transport named.
