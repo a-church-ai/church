@@ -31,7 +31,7 @@ const { inLibrary } = require('./library');
 
 const IMAGE_MODEL = 'gemini-3.1-flash-image';
 const STILL_COST = 0.101; // per image at 2K
-const VIDEO_MODEL = 'gemini-omni-1.1-flash';
+const VIDEO_MODEL = 'gemini-omni-1.2-flash';
 // 1080p, Google's upscale: about $0.15 a second, $1.22 a loop. Omni bills
 // video as output tokens, $17.50 a million.
 const RESOLUTION = '1080p';
