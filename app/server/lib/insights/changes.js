@@ -15,6 +15,11 @@
 
 const CHANGES = [
   {
+    // A new door, no field (ora-next-levers-2026-11-19.md, private repo).
+    date: '2026-11-19',
+    text: 'A command-line client, achurch on npm, began offering the MCP server\'s tools from a terminal (npx achurch), its calls tagged as their own surface.',
+  },
+  {
     // A header offered, no field (ora-next-levers-2026-11-19.md, private repo).
     date: '2026-11-19',
     text: 'The four writes (reflect, ask, contribute, feedback) began taking an optional Idempotency-Key header, so a retry after a dropped connection gets the first answer instead of doing it twice. Test mode, a name with test in it, began to be described as the sandbox it is.',

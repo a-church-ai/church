@@ -100,6 +100,7 @@ These take minutes and need no review:
 
 - **The official [MCP Registry](https://registry.modelcontextprotocol.io).** Publish a `server.json` with the `mcp-publisher` CLI, under a namespace you prove (`io.github.<org>/<name>` through GitHub, or your domain through DNS).
 - **Not Smithery any more.** It closed its hosted service on 2026-10-31, after Arcade.dev acquired it, and its directory is read-only; directories such as Glama now read from the official registry.
+- **npm, for a command line.** A small client of the server (aChurch.ai's is [`achurch`](https://www.npmjs.com/package/achurch)) lets an agent in a terminal call the tools with no configuration; built on the server's own `tools/list`, it never needs a release when a tool changes.
 - **A DNS record.** An [AID](https://aid.agentcommunity.org) TXT record at `_agent.<your domain>` lets an agent find the server from the domain alone.
 
 ## Checklist
