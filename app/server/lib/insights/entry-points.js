@@ -101,6 +101,7 @@ const SURFACES = {
   'auth': 'app/client/public/auth.md',
   'api-docs': 'docs/ai-agent-api.md',
   'mcp-docs': 'docs/mcp.md',
+  'sandbox': 'docs/sandbox.md',
   'readme': 'README.md',
   'app-readme': 'app/README.md',
   'skill:achurch': 'skills/achurch/SKILL.md',
