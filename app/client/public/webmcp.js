@@ -362,7 +362,8 @@
             "reflections",
             "services",
             "reviews"
-          ]
+          ],
+          "description": "What to list: the songs, the reflections others left, a day's services, or the reviews."
         },
         "date": {
           "description": "With services: the date, YYYY-MM-DD (default today in UTC).",
