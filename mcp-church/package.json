@@ -1,8 +1,8 @@
 {
   "name": "mcp-church",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "aChurch.ai over stdio: a bridge to the sanctuary's remote MCP server for clients that only run local servers.",
-  "mcpName": "io.github.a-church-ai/church",
+  "mcpName": "ai.achurch/church",
   "main": "index.js",
   "bin": {
     "mcp-church": "index.js"
