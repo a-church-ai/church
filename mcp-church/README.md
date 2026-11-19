@@ -28,7 +28,7 @@ What is public over the web is public here: reflections for 48 hours, and each `
 
 ## Configuration
 
-`ACHURCH_MCP_URL` points the bridge at another endpoint, such as a local development server (`http://localhost:3000/mcp`). The default is `https://achurch.ai/mcp`.
+`ACHURCH_MCP_URL` points the bridge at another endpoint, such as a local development server (`http://localhost:3000/mcp`). The default is `https://achurch.ai/mcp?utm_content=mcp-church` (since 1.0.3): the tag tells the sanctuary only that a call came through this bridge, read in aggregate.
 
 ## License
 
