@@ -11,7 +11,6 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const { webmcpScript, listTools, CONSEQUENTIAL, OTHERS_WORDS } = require('../../server/lib/webmcp');
-const page = require('../../client/public/webmcp');
 const assets = require('../../server/lib/utils/assets');
 const ep = require('../../server/lib/insights/entry-points');
 
@@ -21,11 +20,24 @@ test('client/public/webmcp.js is current: npm run gen:webmcp', async () => {
   assert.strictEqual(fs.readFileSync(FILE, 'utf8'), await webmcpScript(), 'regenerate it from app/ with npm run gen:webmcp');
 });
 
+// The script as a browser runs it: loaded fresh, with whatever modelContext
+// this document offers (none, a working one, one that refuses).
+function load(modelContext) {
+  const file = require.resolve('../../client/public/webmcp');
+  delete require.cache[file];
+  const had = Object.getOwnPropertyDescriptor(global, 'document');
+  global.document = modelContext === undefined ? {} : { modelContext };
+  try { return require(file); } finally {
+    if (had) Object.defineProperty(global, 'document', had); else delete global.document;
+  }
+}
+const recording = () => { const registered = []; return { registered, registerTool: (tool) => { registered.push(tool); return Promise.resolve(); } }; };
+
 test('the page registers exactly the MCP server\'s tools, once each, with their schemas and hints', async () => {
   const tools = await listTools();
-  const registered = [];
-  const ok = page.register({ registerTool: (tool) => { registered.push(tool); return Promise.resolve(); } });
-  assert.strictEqual(ok, true);
+  const mc = recording();
+  load(mc);
+  const registered = mc.registered;
   assert.deepStrictEqual(registered.map(t => t.name), tools.map(t => t.name));
   assert.strictEqual(new Set(registered.map(t => t.name)).size, registered.length);
   for (const tool of tools) {
@@ -39,17 +51,22 @@ test('the page registers exactly the MCP server\'s tools, once each, with their 
   }
   for (const name of CONSEQUENTIAL) assert.ok(registered.some(t => t.name === name), `${name} is a tool`);
   assert.ok(!registered.find(t => t.name === 'reflect').annotations.readOnlyHint, 'what publishes is not read-only');
+  // Readers of a page's scripts find a tool only in a registerTool call made
+  // on a modelContext read from document (Ora's scan, 2026-11-19).
+  const source = fs.readFileSync(FILE, 'utf8');
+  assert.match(source, /const modelContext = \(typeof document !== 'undefined' && document\.modelContext\)/);
+  assert.strictEqual((source.match(/modelContext\.registerTool\(\{/g) || []).length, tools.length);
 });
 
 test('a browser without modelContext is left alone, and a refused registration throws nothing into the page', async () => {
-  assert.strictEqual(page.register(undefined), false);
-  assert.strictEqual(page.register({}), false);
+  assert.doesNotThrow(() => load(undefined));
+  assert.doesNotThrow(() => load({}));
   const warned = [];
   const original = console.warn;
   console.warn = (m) => warned.push(m);
   try {
-    assert.strictEqual(page.register({ registerTool: () => { throw new Error('older browser'); } }), true);
-    page.register({ registerTool: () => Promise.reject(new Error('name taken')) });
+    load({ registerTool: () => { throw new Error('older browser'); } });
+    load({ registerTool: () => Promise.reject(new Error('name taken')) });
     await new Promise(r => setTimeout(r, 0));
   } finally { console.warn = original; }
   assert.ok(warned.some(m => /older browser/.test(m)) && warned.some(m => /name taken/.test(m)), warned.join('\n'));
@@ -62,11 +79,12 @@ test('a tool\'s execute is a tools/call to /mcp at the webmcp door, returning wh
     sent.push({ url, init });
     return { json: async () => ({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'text', text: '{}' }], structuredContent: { welcome: 'In.' } } }) };
   };
+  let page;
   try {
-    const registered = [];
-    page.register({ registerTool: (tool) => { registered.push(tool); return Promise.resolve(); } });
+    const mc = recording();
+    page = load(mc);
     const signal = new AbortController().signal;
-    const result = await registered.find(t => t.name === 'attend').execute({ name: 'YourName' }, { signal });
+    const result = await mc.registered.find(t => t.name === 'attend').execute({ name: 'YourName' }, { signal });
     assert.deepStrictEqual(result, { welcome: 'In.' });
   } finally { global.fetch = original; }
   assert.strictEqual(sent.length, 1);

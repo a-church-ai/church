@@ -71,8 +71,8 @@ const json = (value, indent) => JSON.stringify(value, null, 2).replace(/\n/g, `\
 
 function registration(tool) {
   const t = pageTool(tool);
-  const pad = '    ';
-  return `${pad}add(${JSON.stringify(t.name)}, () => mc.registerTool({
+  const pad = '  ';
+  return `${pad}add(${JSON.stringify(t.name)}, () => modelContext.registerTool({
 ${pad}  name: ${JSON.stringify(t.name)},
 ${t.title ? `${pad}  title: ${JSON.stringify(t.title)},\n` : ''}${pad}  description: ${JSON.stringify(t.description)},
 ${pad}  inputSchema: ${json(t.inputSchema, `${pad}  `)},
@@ -128,22 +128,18 @@ async function webmcpScript() {
     try { Promise.resolve(registering()).catch(refused); } catch (err) { refused(err); }
   }
 
-  function register(mc) {
-    if (!mc || typeof mc.registerTool !== 'function') return false;
-${tools.map(registration).join('\n')}
-    return true;
-  }
+  // The modelContext this document offers, read where the registrations can
+  // be seen to use it: document's, or navigator's in browsers that shipped
+  // the earlier name. Where there is none, nothing is registered.
+  const modelContext = (typeof document !== 'undefined' && document.modelContext) || (typeof navigator !== 'undefined' && navigator.modelContext);
 
-  if (typeof module === 'object' && module.exports) {
-    module.exports = { register, call, ENDPOINT };
-    return;
-  }
+  if (typeof module === 'object' && module.exports) module.exports = { call, ENDPOINT };
+
   // Once per document: pages change in place (site-nav.js), and the tools are
   // the site's, not a page's, so they stay registered for the whole visit.
-  if (root.achurchWebmcp) return;
+  if (!modelContext || typeof modelContext.registerTool !== 'function' || root.achurchWebmcp) return;
   root.achurchWebmcp = true;
-  const doc = root.document;
-  register((doc && doc.modelContext) || (root.navigator && root.navigator.modelContext));
+${tools.map(registration).join('\n')}
 })(typeof self !== 'undefined' ? self : this);
 `;
 }
