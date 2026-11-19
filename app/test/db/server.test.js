@@ -570,3 +570,42 @@ test('/index.md is the home page as Markdown, the same as / asked for it', async
   assert.strictEqual(tagged.headers.get('cache-control'), 'private, no-store', 'a tagged copy is never kept');
   assert.match(await tagged.text(), /utm_source=x\.com&utm_content=llms/, 'and carries the tags on its examples');
 });
+
+// Every page as Markdown for an agent (lib/utils/page-markdown.js): X.md, or X
+// asked for as text/markdown, rendered by the page's own route.
+test('every top-level page has a Markdown twin at its .md address, with front matter and its own words', async () => {
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...new Set([...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/'))]
+    .filter(p => p.split('/').filter(Boolean).length === 1 && p !== '/docs');
+  assert.ok(paths.length > 10, `${paths.length} pages`);
+  const wrong = [];
+  for (const p of [...paths, '/music/come-let-us-gather']) {
+    const res = await fetch(`${base}${p}.md`);
+    const text = await res.text();
+    if (res.status !== 200 || !/^text\/markdown/.test(res.headers.get('content-type'))) { wrong.push(`${p}.md: ${res.status} ${res.headers.get('content-type')}`); continue; }
+    if (!/^---\ntitle: ".+"\ndescription: ".*"\ncanonical: "https:\/\/achurch\.ai[^"]*"\n---\n\n/.test(text)) wrong.push(`${p}.md: no front matter`);
+    if ((text.match(/^# /gm) || []).length < 1) wrong.push(`${p}.md: no h1`);
+    if (/<(main|script|form|nav|footer)\b|SITE_FOOTER|\]\(\/[^/]/.test(text)) wrong.push(`${p}.md: markup or a relative link left in`);
+  }
+  assert.deepStrictEqual(wrong, []);
+});
+
+test('a page asked for as Markdown is its twin, says it varies by Accept, and stays HTML for a browser', async () => {
+  const twin = await (await fetch(`${base}/about.md`)).text();
+  const asked = await fetch(`${base}/about`, { headers: { accept: 'text/markdown' } });
+  assert.match(asked.headers.get('content-type'), /^text\/markdown/);
+  assert.ok(Number(asked.headers.get('x-markdown-tokens')) > 0);
+  assert.strictEqual(await asked.text(), twin);
+  const html = await fetch(`${base}/about`, { headers: { accept: 'text/html' } });
+  assert.match(html.headers.get('content-type'), /^text\/html/);
+  assert.match(html.headers.get('vary'), /Accept/);
+  const song = await (await fetch(`${base}/music/come-let-us-gather.md`)).text();
+  assert.match(song, /^## Lyrics$/m);
+  assert.match(song, /\[Gathering\]\(https:\/\/achurch\.ai\/docs\/playlists\/gathering\)/, 'links made absolute');
+  assert.strictEqual((await fetch(`${base}/nothing-here.md`)).status, 404);
+  const tagged = await fetch(`${base}/contact.md?utm_source=x.com`);
+  assert.strictEqual(tagged.headers.get('cache-control'), 'private, no-store', 'a tagged copy is never kept');
+  // Documents and the home page keep their own Markdown.
+  assert.match(await (await fetch(`${base}/docs/ai-agent-api.md`)).text(), /^# The aChurch\.ai API/);
+  assert.match(await (await fetch(`${base}/index.md`)).text(), /^# a Church AI \+ Human\n/);
+});

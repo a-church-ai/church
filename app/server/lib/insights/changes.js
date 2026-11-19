@@ -15,6 +15,12 @@
 
 const CHANGES = [
   {
+    // An address and a format, no field (agent-readiness-ora-2026-11-19.md,
+    // private repo).
+    date: '2026-11-19',
+    text: 'Every page of the website began answering in Markdown at its .md address or when asked for text/markdown, as documents already did: About, Contact, each song, each conversation, each day\'s services and the rest, each with front matter. The MCP server began to be listed in the official registry as ai.achurch/church, under the site\'s own domain; the earlier name points to it.',
+  },
+  {
     // A new door, no field: read by the door's own counts (study-names.js
     // DOORS) and the funnel (agent-readiness-ora-2026-11-19.md, private repo).
     date: '2026-11-19',

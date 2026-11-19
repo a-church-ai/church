@@ -14,6 +14,7 @@ const { sendNotFound, apiNotFound, mcpNotFound, NO_AGENT_CARD } = require('./lib
 const { assertSingleProcess } = require('./lib/utils/single-process');
 const { acceptsMarkdown, markdownTokens } = require('./lib/utils/accepts');
 const { canonicalRedirects, retiredSongs } = require('./lib/utils/redirects');
+const { servePagesAsMarkdown } = require('./lib/utils/page-markdown');
 const { serverCard, CARD_TYPE, CARD_PATHS } = require('./mcp/card');
 const { aiCatalog, CATALOG_TYPE, CATALOG_PATHS } = require('./lib/ai-catalog');
 const ragIndexer = require('./lib/rag/indexer');
@@ -215,6 +216,11 @@ app.use((req, res, next) => {
 // Every other spelling of a page's address, answered with one 301 to the page
 // (lib/utils/redirects.js), before any route can serve it as a duplicate.
 app.use(canonicalRedirects);
+
+// Every page as Markdown for an agent, X.md or X asked for as text/markdown,
+// rendered by the page's own route (lib/utils/page-markdown.js). After the
+// redirects, so a page's other spellings still answer with one 301.
+app.use(servePagesAsMarkdown);
 
 // Public surface open to any origin; admin paths keep the credentialed,
 // origin-restricted policy. See lib/utils/cors.js.
