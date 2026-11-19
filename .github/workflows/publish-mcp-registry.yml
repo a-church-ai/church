@@ -55,8 +55,18 @@ jobs:
         env:
           MCP_PRIVATE_KEY: ${{ secrets.MCP_PRIVATE_KEY }}
         run: ./mcp-publisher login http --domain=achurch.ai --private-key="$MCP_PRIVATE_KEY"
+      # A version already listed is done, not a failure: the registry
+      # refuses a duplicate ("cannot publish duplicate version"), and a run
+      # repeated for the same version should still reach the second job.
       - name: Publish
-        run: ./mcp-publisher publish
+        run: |
+          if ! out=$(./mcp-publisher publish 2>&1); then
+            echo "$out"
+            echo "$out" | grep -q "cannot publish duplicate version" || exit 1
+            echo "This version is listed already."
+          else
+            echo "$out"
+          fi
 
   deprecate-github-name:
     needs: publish
