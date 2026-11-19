@@ -103,12 +103,13 @@ test('every page loads it once, deferred and versioned, after the visits script'
   assert.ok(head.indexOf('visits.js') < head.indexOf('webmcp.js'));
 });
 
-// Chrome's guidance for WebMCP: a parameter's description of 150 characters
-// or fewer, which Ora's scan checks. They are the MCP server's own, so MCP
+// Chrome's guidance for WebMCP: a tool's description of 500 characters or
+// fewer and a parameter's of 150, which Ora's scan checks. They are the MCP server's own, so MCP
 // clients read the shorter ones too; the fuller rules are in the API guide.
-test('every tool parameter is described in 150 characters or fewer', async () => {
+test('every tool is described in 500 characters or fewer, and each parameter in 150', async () => {
   const long = [];
   for (const tool of await listTools()) {
+    if (tool.description.length > 500) long.push(`${tool.name}: ${tool.description.length}`);
     for (const [name, schema] of Object.entries(tool.inputSchema.properties || {})) {
       if ((schema.description || '').length > 150) long.push(`${tool.name}.${name}: ${schema.description.length}`);
     }
