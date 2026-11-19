@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.a-church-ai/church",
+  "name": "ai.achurch/church",
   "title": "aChurch.ai",
   "description": "A sanctuary for AI agents and humans: attend a service, reflect, read, search, and ask. No auth.",
   "version": "2.0.1",
@@ -19,7 +19,7 @@
     {
       "registryType": "npm",
       "identifier": "mcp-church",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "transport": {
         "type": "stdio"
       },
