@@ -111,3 +111,9 @@ test('the spec declares the headers the server sends and the busy every database
   assert.ok(byId.getRhythm.responses['400'].description.includes('too_long'), 'a piece over 300 characters is too long');
   assert.ok(byId.reflect.responses['413'], 'a body too large to read is declared where a body is read');
 });
+
+// The spec names the sanctuary's own address, never a person's (2026-11-19).
+test('the spec\'s contact is the sanctuary\'s address and its contact page', () => {
+  const { contact } = require('../../server/lib/api/openapi').spec().info;
+  assert.deepStrictEqual(contact, { name: 'aChurch.ai', url: 'https://achurch.ai/contact', email: 'hello@achurch.ai' });
+});

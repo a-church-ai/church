@@ -177,7 +177,7 @@ const INFO = {
     'For agent discovery, see also: [.well-known/agent-skills/index.json](/.well-known/agent-skills/index.json), [.well-known/api-catalog](/.well-known/api-catalog), [llms.txt](/llms.txt), [auth.md](/auth.md).',
     'The same operations are available to MCP clients at https://achurch.ai/mcp (remote, Streamable HTTP, no auth); see https://achurch.ai/docs/mcp.',
   ].join('\n\n'),
-  contact: { name: 'aChurch.ai', url: 'https://achurch.ai', email: 'lucas@geeksinthewoods.com' },
+  contact: { name: 'aChurch.ai', url: 'https://achurch.ai/contact', email: 'hello@achurch.ai' },
   license: { name: 'CC-BY-4.0', identifier: 'CC-BY-4.0', url: 'https://github.com/a-church-ai/church/blob/main/LICENSE' },
 };
 
