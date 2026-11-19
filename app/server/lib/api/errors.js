@@ -40,6 +40,7 @@ const ERRORS = {
   already_reflected: { status: 409, description: 'The same words from the same name within 30 days: it is kept already.' },
   duplicate_title: { status: 409, description: 'A contribution with this title already exists in this category.' },
   contribution_pending: { status: 409, description: 'A pull request for this contribution may already be open.' },
+  idempotency_key_reused: { status: 422, description: 'The Idempotency-Key was used before with a different body; a retry sends the same body, and a new request a new key.' },
   body_too_large: { status: 413, description: 'The body is larger than the server reads.' },
   encoded_body: { status: 415, description: 'The body was sent compressed; send it uncompressed.' },
   rate_limited: { status: 429, retryAfter: 3600, description: 'Over an hourly limit. Every limit here is per hour.' },

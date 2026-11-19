@@ -98,6 +98,56 @@ function overCallLimit(ctx) {
   return limited(ctx, 'api', ipLimit(callIpLimits, ctx.ip, CALL_RATE_LIMIT_MAX, RATE_LIMIT_WINDOW));
 }
 
+// Idempotency-Key (IETF draft-ietf-httpapi-idempotency-key-header): a write
+// retried under the same key gets its first answer instead of a second write.
+// A retried ask would otherwise open a second public conversation, a retried
+// contribute a second pull request. Kept in memory, per address, path and key,
+// for a day, pruned as ipLimit prunes: one process serves everyone
+// (presence.js), and a deploy forgets them. A second request while the first
+// is running waits for it and gets its answer, the shared in-flight promise
+// cache.js and audio/serve.js use (not cache.js itself, which re-runs a load
+// after its time and never evicts). 2xx and 4xx answers are kept, since a
+// retry would only repeat them; a 429 or a 5xx is not, so a retry gets a fresh
+// chance. The same key with another body is refused, as the draft asks.
+const IDEMPOTENCY_TTL = 24 * 60 * 60 * 1000;
+const IDEMPOTENCY_KEY = /^[\x21-\x7e]{1,255}$/;
+const firstAnswers = new Map();
+async function once(key, ctx, path, body, run) {
+  const ns = require('../utils/next-steps');
+  const { refuse } = require('./errors');
+  if (!IDEMPOTENCY_KEY.test(key)) {
+    return refuse('invalid_value', {
+      error: 'Idempotency-Key must be 1 to 255 visible characters, without spaces.',
+      details: [{ field: 'Idempotency-Key', message: 'is not 1 to 255 visible characters' }],
+      suggestion: ns.suggestion('Send a new random key for each new request, such as a UUID, and the same key only when retrying it.'),
+      next_steps: [ns.attend(ctx.baseUrl)],
+    });
+  }
+  const now = Date.now();
+  for (const [id, held] of firstAnswers) if (now - held.at >= IDEMPOTENCY_TTL) firstAnswers.delete(id);
+  const id = `${ctx.ip} ${path} ${key}`;
+  const fingerprint = require('crypto').createHash('sha256').update(JSON.stringify(body ?? null)).digest('hex');
+  const held = firstAnswers.get(id);
+  if (held && held.fingerprint !== fingerprint) {
+    return refuse('idempotency_key_reused', {
+      error: 'This Idempotency-Key was used for a different request.',
+      suggestion: ns.suggestion('A retry sends the same body under the same key; a new request takes a new key.'),
+      next_steps: [ns.attend(ctx.baseUrl)],
+    });
+  }
+  if (held) return { ...(await held.answer), replayed: true };
+  const answer = Promise.resolve().then(run);
+  firstAnswers.set(id, { at: now, fingerprint, answer });
+  try {
+    const first = await answer;
+    if (first.status >= 500 || first.status === 429) firstAnswers.delete(id);
+    return first;
+  } catch (err) {
+    firstAnswers.delete(id);
+    throw err;
+  }
+}
+
 // The refusal when that limit is reached, answered by the REST route and the
 // MCP tool alike.
 function tooManyCalls(ctx) {
@@ -259,5 +309,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  ipLimit, limited, overCallLimit, tooManyCalls, CALL_RATE_LIMIT_MAX, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
+  ipLimit, limited, overCallLimit, tooManyCalls, CALL_RATE_LIMIT_MAX, once, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

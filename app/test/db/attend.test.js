@@ -468,6 +468,53 @@ test('ask allows ten an hour from one address, malformed or not, and says so as 
   assert.match(policy(eleventh, 'ask'), /^"ask";r=0;t=\d+$/);
 });
 
+// Idempotency-Key on a write (shared.js once): a retry after a dropped
+// connection gets the first answer instead of doing it twice.
+const send = (port, body, key, from) => fetch(`http://127.0.0.1:${port}/api/reflect`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', 'x-forwarded-for': from, ...(key ? { 'idempotency-key': key } : {}) },
+  body: JSON.stringify(body),
+});
+
+test('a write retried under the same Idempotency-Key is done once, and the retry gets the first answer', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const body = { name: 'RetryingVisitor', text: 'A reflection sent once, and once more after a dropped connection.' };
+  const first = await send(port, body, 'retry-key-1', '203.0.113.190');
+  assert.strictEqual(first.status, 200);
+  assert.strictEqual(first.headers.get('idempotent-replayed'), null);
+  const firstBody = await first.json();
+  const again = await send(port, body, 'retry-key-1', '203.0.113.190');
+  assert.strictEqual(again.status, 200, 'the first answer, not a 409 for a repeat');
+  assert.strictEqual(again.headers.get('idempotent-replayed'), 'true');
+  assert.deepStrictEqual(await again.json(), firstBody);
+  assert.strictEqual(again.headers.get('ratelimit'), first.headers.get('ratelimit'), 'its headers too: the replay counted toward nothing');
+  const kept = (await store.allReflections()).filter(r => r.name === 'RetryingVisitor');
+  assert.strictEqual(kept.length, 1, 'one reflection kept');
+  // Without a key, the same words are refused as a repeat, as before.
+  assert.strictEqual((await send(port, body, null, '203.0.113.190')).status, 409);
+});
+
+test('the same Idempotency-Key with another body is a 422; two at once are one write; a bad key is a 400', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  const one = { name: 'KeyedVisitor', text: 'The first body sent under this key, kept.' };
+  assert.strictEqual((await send(port, one, 'retry-key-2', '203.0.113.191')).status, 200);
+  const other = await send(port, { ...one, text: 'A different body under the same key.' }, 'retry-key-2', '203.0.113.191');
+  assert.strictEqual(other.status, 422);
+  assert.strictEqual((await other.json()).code, 'idempotency_key_reused');
+  const both = { name: 'TwiceAtOnce', text: 'Sent twice at the same moment, under one key.' };
+  const [a, b] = await Promise.all([send(port, both, 'retry-key-3', '203.0.113.192'), send(port, both, 'retry-key-3', '203.0.113.192')]);
+  assert.deepStrictEqual([a.status, b.status], [200, 200]);
+  assert.deepStrictEqual([a.headers.get('idempotent-replayed'), b.headers.get('idempotent-replayed')].sort(), [null, 'true'].sort());
+  assert.strictEqual((await store.allReflections()).filter(r => r.name === 'TwiceAtOnce').length, 1);
+  const bad = await send(port, { name: 'BadKey', text: 'Sent with a key that has spaces in it.' }, 'not a key', '203.0.113.193');
+  assert.strictEqual(bad.status, 400);
+  assert.strictEqual((await bad.json()).details[0].field, 'Idempotency-Key');
+  // Another address's key is its own.
+  assert.strictEqual((await send(port, one, 'retry-key-2', '203.0.113.194')).status, 409, 'another address: the same words are a repeat, not a replay');
+});
+
 test('reflect answers a field that is not text with a 400, not a 500', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());
