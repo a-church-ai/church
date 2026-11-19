@@ -1,11 +1,23 @@
 # Lists the remote MCP server (https://achurch.ai/mcp) in the official MCP
-# Registry as io.github.a-church-ai/church. Interactive `mcp-publisher login
-# github` can't publish under an org namespace (registry issue #1649: its login
-# app isn't installed on the org); GitHub Actions OIDC from a repo the org owns
-# can. The listing names the live endpoint and the mcp-church npm bridge, so
-# run it by hand once the new version is deployed and the bridge version it
-# names is on npm (`npm publish` from mcp-church/):
+# Registry as ai.achurch/church, a name under the site's own domain. The
+# registry checks the domain by fetching
+# https://achurch.ai/.well-known/mcp-registry-auth (the public half of an
+# Ed25519 key, served by the site) and the publisher signs with the private
+# half, the Actions secret MCP_PRIVATE_KEY (also in app/.env.prod, never
+# printed). HTTP proof grants ai.achurch/* only.
+#
+# The listing names the live endpoint and the mcp-church npm bridge, whose
+# mcpName must match it, so run it by hand once the version in server.json is
+# deployed and the bridge version it names is on npm (`npm publish` from
+# mcp-church/):
 #   gh workflow run publish-mcp-registry.yml -R a-church-ai/church
+#
+# Until November 2026 the entry was io.github.a-church-ai/church, published
+# with GitHub OIDC. The second job marks that name deprecated, with a message
+# that points to the new one, so a client that pinned it is pointed on; GitHub
+# OIDC is the old name's credential. Deprecating again changes nothing.
+#
+# Plan: agent-readiness-ora-2026-11-19.md in the private repo.
 name: Publish to MCP Registry
 on:
   workflow_dispatch:
@@ -13,27 +25,49 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
     defaults:
       run:
         working-directory: app/server/mcp
     steps:
       - uses: actions/checkout@v7
-      - name: Check the live server is this version
+      - name: Check the live server is this entry and this version
         run: |
+          NAME=$(node -p "require('./server.json').name")
           VERSION=$(node -p "require('./server.json').version")
-          LIVE=$(curl -fsS https://achurch.ai/mcp/server-card | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
-          echo "server.json $VERSION, live $LIVE"
+          CARD=$(curl -fsS https://achurch.ai/mcp/server-card)
+          LIVE_NAME=$(echo "$CARD" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).name")
+          LIVE=$(echo "$CARD" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+          echo "server.json $NAME $VERSION, live $LIVE_NAME $LIVE"
+          test "$NAME" = "$LIVE_NAME"
           test "$VERSION" = "$LIVE"
-      - name: Check npm has the bridge version this entry names
+      - name: Check npm has the bridge version this entry names, under this name
         run: |
           BRIDGE=$(node -p "const p = require('./server.json').packages.find(p => p.registryType === 'npm'); p.identifier + '@' + p.version")
-          npm view "$BRIDGE" version
+          test "$(npm view "$BRIDGE" mcpName)" = "$(node -p "require('./server.json').name")"
+      - name: Check the domain's proof is served
+        run: curl -fsS https://achurch.ai/.well-known/mcp-registry-auth | grep -q '^v=MCPv1; k=ed25519; p='
       - name: Install mcp-publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
-      - name: Log in with GitHub OIDC
-        run: ./mcp-publisher login github-oidc
+      - name: Log in with the domain's key
+        env:
+          MCP_PRIVATE_KEY: ${{ secrets.MCP_PRIVATE_KEY }}
+        run: ./mcp-publisher login http --domain=achurch.ai --private-key="$MCP_PRIVATE_KEY"
       - name: Publish
         run: ./mcp-publisher publish
+
+  deprecate-github-name:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+      - name: Log in with GitHub OIDC, the old name's credential
+        run: ./mcp-publisher login github-oidc
+      - name: Mark the old name deprecated, pointing to the new
+        run: ./mcp-publisher status --status deprecated --all-versions -y --message "Moved to ai.achurch/church, the same server under its own domain." io.github.a-church-ai/church

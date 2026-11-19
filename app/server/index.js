@@ -403,6 +403,19 @@ app.get('/service.json', async (req, res) => {
 // Agent-readiness: explicit routes for .well-known resources that need
 // non-default handling (specific content-type, or files outside public/).
 
+// The MCP Registry's proof that achurch.ai publishes ai.achurch/church: the
+// public half of the key the publish workflow signs with
+// (.github/workflows/publish-mcp-registry.yml), fetched by the registry as
+// plain text. A file with no extension is served with no type of its own, and
+// sendFile refuses a path through a dot-folder, so it is read and sent.
+app.get('/.well-known/mcp-registry-auth', async (req, res, next) => {
+  try {
+    res.type('text/plain; charset=utf-8').send(await fs.readFile(path.join(__dirname, '../client/public/.well-known/mcp-registry-auth'), 'utf8'));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // API Catalog — content-type per RFC 9727 (linkset+json with profile)
 app.get('/.well-known/api-catalog', (req, res) => {
   res.type('application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"');

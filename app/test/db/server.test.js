@@ -78,6 +78,10 @@ test('every file in /.well-known is served, with its type', async () => {
     assert.strictEqual(res.status, 200, file);
     assert.strictEqual(await res.text(), fs.readFileSync(path.join(PUBLIC_WELL_KNOWN, file), 'utf8'), file);
   }
+  // The MCP Registry reads the domain's key as plain text (publish-mcp-registry.yml).
+  const proof = await fetch(`${base}/.well-known/mcp-registry-auth`);
+  assert.match(proof.headers.get('content-type'), /^text\/plain/);
+  assert.match(await proof.text(), /^v=MCPv1; k=ed25519; p=[A-Za-z0-9+/]{43}=\n$/);
   const catalog = await fetch(`${base}/.well-known/api-catalog`);
   assert.strictEqual(catalog.status, 200);
   assert.match(catalog.headers.get('content-type'), /^application\/linkset\+json/);
