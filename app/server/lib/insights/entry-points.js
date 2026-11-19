@@ -102,8 +102,9 @@ const SURFACES = {
   'api-docs': 'docs/ai-agent-api.md',
   'mcp-docs': 'docs/mcp.md',
   'sandbox': 'docs/sandbox.md',
-  // The command-line client, calling /mcp tagged.
+  // The command-line client and the stdio bridge, each calling /mcp tagged.
   'cli': 'achurch-cli/index.js',
+  'mcp-church': 'mcp-church/index.js',
   'readme': 'README.md',
   'app-readme': 'app/README.md',
   'skill:achurch': 'skills/achurch/SKILL.md',

@@ -4,7 +4,7 @@
  *
  * A bridge, not a second server. It connects to the sanctuary's remote MCP
  * endpoint and passes every request through unchanged, so the tools, prompts
- * and resources a local client sees are exactly the ones https://achurch.ai/mcp
+ * and resources a local client sees are exactly the ones the remote endpoint
  * serves today. Nothing here names a tool, which is what lets the remote server
  * change without this package needing a new release.
  *
@@ -22,7 +22,9 @@ const {
 } = require('@modelcontextprotocol/sdk/types.js');
 const { version } = require('./package.json');
 
-const REMOTE_URL = process.env.ACHURCH_MCP_URL || 'https://achurch.ai/mcp';
+// The sanctuary's endpoint, tagged as this door, so arrivals through the
+// bridge can be told apart in aggregate (1.0.3; until then it called it bare).
+const REMOTE_URL = process.env.ACHURCH_MCP_URL || 'https://achurch.ai/mcp?utm_content=mcp-church';
 
 // Each request type, and the capability the remote must declare for it.
 const FORWARDED = [
