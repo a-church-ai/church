@@ -525,6 +525,33 @@ test('a request through the website\'s door is marked on its access line and on 
   assert.strictEqual(attended.query.trigger, 'self');
 });
 
+// An agent working in a visitor's browser calls the MCP server's tools through
+// the page (client/public/webmcp.js): its calls reach /mcp tagged as their own
+// door, and are counted as an agent's, unlike the website's forms.
+test('a WebMCP call is marked on its access line as the webmcp door, with its surface, and kept in the study', async () => {
+  const { inStudy } = require('../../server/lib/insights/study-names');
+  const res = await fetch(`${base}/mcp?utm_content=webmcp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', 'x-achurch-door': 'webmcp' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'attend', arguments: { name: 'BrowserAgent' } } }),
+  });
+  assert.strictEqual(res.status, 200);
+  assert.ok((await res.json()).result.structuredContent, 'the tool answers as it does over MCP');
+  let line;
+  for (const until = Date.now() + 8000; Date.now() < until && !line; await new Promise(r => setTimeout(r, 100))) {
+    line = (await store.apiRequests()).find(l => l.method === 'MCP' && l.tool === 'attend' && l.door === 'webmcp');
+  }
+  assert.ok(line, 'the MCP access line carries the door');
+  assert.strictEqual(line.referral.surface, 'webmcp');
+  assert.ok(inStudy(line), 'an agent at this door is in the study');
+  const website = await fetch(`${base}/mcp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', 'x-achurch-door': 'not-a-door' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'observe', arguments: {} } }),
+  });
+  assert.strictEqual(website.status, 200, 'an unknown door is no door, and nothing is refused');
+});
+
 // An agent that adds .md to the site's address, as it would to a document's,
 // gets what / gives one that asks for Markdown: llms.txt, the same bytes.
 test('/index.md is the home page as Markdown, the same as / asked for it', async () => {

@@ -115,6 +115,9 @@ const SURFACES = {
   'scanner-git': 'app/server/lib/utils/probe-reply.js',
   'scanner-ssh': 'app/server/lib/utils/probe-reply.js',
   'scanner-cloud': 'app/server/lib/utils/probe-reply.js',
+  // The MCP server's tools registered in a visitor's browser (WebMCP), which
+  // call /mcp tagged as this door (server/lib/webmcp.js writes the file).
+  'webmcp': 'app/client/public/webmcp.js',
 };
 
 const isSurface = tag => Object.prototype.hasOwnProperty.call(SURFACES, tag);

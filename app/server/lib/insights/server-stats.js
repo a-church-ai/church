@@ -21,7 +21,7 @@ const { cleanTag } = require('./entry-points');
 const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
 // Which way a write came in (the website's forms, or the API and MCP) and the
 // door its link named (lib/insights/entry-points.js), as one key to count by.
-const doorKey = (x) => `${x.door === 'website' ? 'website' : 'api'}: ${(x.referral && x.referral.surface) || '-'} / ${(x.referral && x.referral.source) || '-'}`;
+const doorKey = (x) => `${x.door || 'api'}: ${(x.referral && x.referral.surface) || '-'} / ${(x.referral && x.referral.source) || '-'}`;
 
 // The window of `days` UTC days ending today, and the one before it.
 function windows(days, now = Date.now()) {

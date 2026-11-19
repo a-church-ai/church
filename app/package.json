@@ -38,7 +38,8 @@
     "youtube:auth": "node scripts/youtube-auth.js",
     "prod-report": "node scripts/prod-report.js",
     "verify-db": "node scripts/verify-db.js",
-    "video:intro": "node scripts/intro-video.js"
+    "video:intro": "node scripts/intro-video.js",
+    "gen:webmcp": "node scripts/generate-webmcp.js"
   },
   "engines": {
     "node": ">=26.12.1"

@@ -88,7 +88,7 @@ async function run(ctx, { tool, path, logged = {}, name: who, args }, operation)
   const body = withoutSharing(answered);
   recordApiUse({
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,
-    ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool,
+    ip: ctx.ip, userAgent: ctx.userAgent, client: ctx.client, name: who, tool, door: ctx.door,
     error: status >= 400 && body && body.error ? String(body.error).slice(0, 200) : undefined,
     study: ctx.study,
     referral,
