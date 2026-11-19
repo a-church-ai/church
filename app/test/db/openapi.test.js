@@ -87,3 +87,27 @@ test('every kind of piece a service can hold is a kind the spec allows', () => {
     assert.ok(companionKinds.includes(kind), `Companions item kind does not allow "${kind}"`);
   }
 });
+
+// What the server sends, the spec says (2026-11-19): the RateLimit fields on
+// every answer of an operation with an hourly limit, Retry-After where a code
+// says how long to wait, and every error each operation can give. Nine
+// operations reach the database and answer busy when it does not; until this
+// date only ask and search declared it.
+test('the spec declares the headers the server sends and the busy every database operation can answer', () => {
+  const doc = require('../../server/lib/api/openapi').spec();
+  const ops = Object.values(doc.paths).flatMap(item => Object.values(item));
+  const byId = Object.fromEntries(ops.map(o => [o.operationId, o]));
+  for (const id of ['reflect', 'contribute', 'postFeedback', 'ask', 'search']) {
+    for (const [status, response] of Object.entries(byId[id].responses)) {
+      assert.ok(response.headers && response.headers['RateLimit-Policy'] && response.headers.RateLimit, `${id} ${status} says what the hour leaves`);
+    }
+    assert.ok(byId[id].responses['429'].headers['Retry-After'], `${id} 429 says how long to wait`);
+  }
+  assert.strictEqual(byId.getNow.responses['200'].headers, undefined, 'no limit, so no RateLimit header');
+  for (const id of ['getNow', 'attend', 'getServices', 'getReflections', 'getReflectionsBySong', 'getReflectionsForSong', 'reflect', 'contribute', 'postFeedback', 'ask', 'search']) {
+    assert.ok(byId[id].responses['503'], `${id} declares the 503 it can answer`);
+    assert.ok(byId[id].responses['503'].headers['Retry-After'], `${id}: busy says how long to wait`);
+  }
+  assert.ok(byId.getRhythm.responses['400'].description.includes('too_long'), 'a piece over 300 characters is too long');
+  assert.ok(byId.reflect.responses['413'], 'a body too large to read is declared where a body is read');
+});

@@ -34,6 +34,15 @@ function serve(operation, inputOf) {
     // wait brings it back.
     const wait = status >= 400 ? errors.retryAfterFor(body) : null;
     if (wait) res.set('Retry-After', String(wait));
+    // What an hourly limit leaves, on every answer of an operation that has
+    // one (shared.js limited), in the IETF RateLimit fields
+    // (draft-ietf-httpapi-ratelimit-headers-11), so a caller can pace itself
+    // before it is refused. Operations without a limit send none.
+    if (ctx.rateLimit) {
+      const { policy, limit, window, remaining, reset } = ctx.rateLimit;
+      res.set('RateLimit-Policy', `"${policy}";q=${limit};w=${window}`);
+      res.set('RateLimit', `"${policy}";r=${remaining};t=${reset}`);
+    }
     res.status(status).json(body);
   };
 }

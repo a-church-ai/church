@@ -416,6 +416,55 @@ test('reflect allows five an hour under one name, counted from what is kept', as
   assert.strictEqual(res.status, 429, 'the name, whatever its case, from a new address');
 });
 
+// What an hourly limit leaves, told before it is reached: the IETF RateLimit
+// fields on every answer of a limited operation (routes/api.js), so a caller
+// can pace itself instead of learning the limit from a 429.
+test('a limited operation says what its hour leaves, in RateLimit headers, and an unlimited one says nothing', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: `Pacer${i}`, text: `Paced reflection number ${i}.` }, '203.0.113.140');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.headers.get('ratelimit-policy'), '"reflect";q=5;w=3600');
+    assert.match(res.headers.get('ratelimit'), new RegExp(`^"reflect";r=${5 - i};t=(\\d+)$`), `reflection ${i}`);
+    assert.ok(Number(res.headers.get('ratelimit').split('t=')[1]) <= 3600);
+  }
+  const refused = await post(port, '/api/reflect', { name: 'Pacer6', text: 'One more reflection, past what the hour allows.' }, '203.0.113.140');
+  assert.strictEqual(refused.status, 429);
+  assert.match(refused.headers.get('ratelimit'), /^"reflect";r=0;t=\d+$/);
+  assert.strictEqual(refused.headers.get('retry-after'), '3600');
+  const now = await fetch(`http://127.0.0.1:${port}/api/now`);
+  assert.strictEqual(now.status, 200);
+  assert.strictEqual(now.headers.get('ratelimit'), null, 'no limit, so no header');
+  assert.strictEqual(now.headers.get('ratelimit-policy'), null);
+});
+
+test('a reflection refused by its name\'s count says none are left, from a fresh address', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 5; i++) {
+    const res = await post(port, '/api/reflect', { name: 'NamedPacer', text: `A reflection under one name, number ${i}.` }, `203.0.113.${150 + i}`);
+    assert.match(res.headers.get('ratelimit'), new RegExp(`^"reflect";r=${5 - i};`), `reflection ${i}: the name's count lowers what is left`);
+  }
+  const refused = await post(port, '/api/reflect', { name: 'NamedPacer', text: 'Under the same name, from an address never seen.' }, '203.0.113.160');
+  assert.strictEqual(refused.status, 429);
+  assert.match(refused.headers.get('ratelimit'), /^"reflect";r=0;t=3600$/);
+});
+
+test('ask allows ten an hour from one address, malformed or not, and says so as it goes', async (t) => {
+  const { server, port } = await startServer();
+  t.after(() => server.close());
+  for (let i = 1; i <= 10; i++) {
+    const res = await post(port, '/api/ask', {}, '203.0.113.170');
+    assert.strictEqual(res.status, 400, `ask ${i} is missing its question`);
+    assert.match(res.headers.get('ratelimit'), new RegExp(`^"ask";r=${10 - i};`));
+  }
+  const eleventh = await post(port, '/api/ask', {}, '203.0.113.170');
+  assert.strictEqual(eleventh.status, 429);
+  assert.strictEqual(eleventh.headers.get('ratelimit-policy'), '"ask";q=10;w=3600');
+  assert.match(eleventh.headers.get('ratelimit'), /^"ask";r=0;t=\d+$/);
+});
+
 test('reflect answers a field that is not text with a 400, not a 500', async (t) => {
   const { server, port } = await startServer();
   t.after(() => server.close());

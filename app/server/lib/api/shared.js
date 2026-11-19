@@ -53,8 +53,10 @@ function keepUpTo(text, max = REFLECT_MAX_LENGTH) {
   return `${room.slice(0, word > max / 2 ? word : max - 1).trimEnd()}…`;
 }
 
-// Records the attempt as it checks, so a refused request still counts.
-function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
+// An address's hourly limit. Records the attempt as it checks, so a refused
+// request still counts, and says what the limit leaves: how many remain and
+// in how many seconds the oldest call in the window ages out.
+function ipLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
   const now = Date.now();
   const recent = (store.get(ip) || []).filter(t => now - t < windowMs);
 
@@ -63,13 +65,24 @@ function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WIND
     if (key !== ip && !times.some(t => now - t < windowMs)) store.delete(key);
   }
 
-  if (recent.length >= max) {
-    store.set(ip, recent);
-    return true;
-  }
-  recent.push(now);
+  const over = recent.length >= max;
+  if (!over) recent.push(now);
   store.set(ip, recent);
-  return false;
+  return { over, limit: max, window: windowMs / 1000, remaining: max - recent.length, reset: Math.ceil((recent[0] + windowMs - now) / 1000) };
+}
+
+// Whether a limited operation refuses this call, by address and, where one
+// applies, by the name's own count in the window (nameUsed, at the same
+// limit). Both are counted before either is consulted. What is left is put on
+// the request's context, as ctx.study is, for the RateLimit headers
+// (routes/api.js): the smaller of the two, so a call refused by name never
+// says calls remain.
+function limited(ctx, policy, ip, nameUsed = null) {
+  const nameOver = nameUsed !== null && nameUsed >= ip.limit;
+  const over = ip.over || nameOver;
+  const nameLeft = nameUsed === null ? ip.remaining : Math.max(0, ip.limit - nameUsed - (over ? 0 : 1));
+  ctx.rateLimit = { policy, limit: ip.limit, window: ip.window, remaining: over ? 0 : Math.min(ip.remaining, nameLeft), reset: nameOver && !ip.over ? ip.window : ip.reset };
+  return over;
 }
 
 const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
@@ -219,5 +232,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
+  ipLimit, limited, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

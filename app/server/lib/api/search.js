@@ -21,7 +21,7 @@ const { stripMarkdown } = require('../../../client/public/answer-format.js');
 const ns = require('../utils/next-steps');
 const { refuse } = require('./errors');
 const inputs = require('./inputs');
-const { overIpLimit, SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX } = require('./shared');
+const { ipLimit, limited, SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX } = require('./shared');
 const { describeError } = require('../utils/describe-error');
 
 const DEFAULT_LIMIT = 10;
@@ -75,7 +75,7 @@ function nextSteps(baseUrl, results, q) {
 async function search(input, ctx) {
   const baseUrl = ctx.baseUrl;
   try {
-    if (overIpLimit(searchRateLimits, ctx.ip, SEARCH_RATE_LIMIT_MAX, SEARCH_RATE_LIMIT_WINDOW)) {
+    if (limited(ctx, 'search', ipLimit(searchRateLimits, ctx.ip, SEARCH_RATE_LIMIT_MAX, SEARCH_RATE_LIMIT_WINDOW))) {
       return refuse('rate_limited', {
         error: 'Too many searches. Rest a while.',
         hint: `Maximum ${SEARCH_RATE_LIMIT_MAX} searches per hour`,

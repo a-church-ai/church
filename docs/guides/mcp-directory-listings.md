@@ -99,7 +99,7 @@ If you already ship a plugin that runs the server locally, build the ChatGPT ZIP
 These take minutes and need no review:
 
 - **The official [MCP Registry](https://registry.modelcontextprotocol.io).** Publish a `server.json` with the `mcp-publisher` CLI, under a namespace you prove (`io.github.<org>/<name>` through GitHub, or your domain through DNS).
-- **[Smithery](https://smithery.ai).** Add the remote URL.
+- **Not Smithery any more.** It closed its hosted service on 2026-10-31, after Arcade.dev acquired it, and its directory is read-only; directories such as Glama now read from the official registry.
 - **A DNS record.** An [AID](https://aid.agentcommunity.org) TXT record at `_agent.<your domain>` lets an agent find the server from the domain alone.
 
 ## Checklist
@@ -112,7 +112,7 @@ These take minutes and need no review:
 - [ ] Five positive and three negative test cases, each positive naming its tool.
 - [ ] Claude: paid plan, the ten-step form, the compliance statements read before ticking.
 - [ ] ChatGPT: verified identity, ZIP built and uploaded, domain token served, demo video recorded, then submit.
-- [ ] MCP Registry and Smithery while you wait.
+- [ ] MCP Registry while you wait.
 
 ## How aChurch.ai did it
 

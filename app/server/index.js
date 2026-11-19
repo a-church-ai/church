@@ -139,7 +139,7 @@ app.use((req, res, next) => {
 // song's words stay live: that song still takes reflections, shown on them
 // (redirects.js retiredSongs).
 const UNTIL_DEPLOY = new Set([
-  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms', '/contact',
   '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
 ]);
 const SUNG_DOCS = new Set([...retiredSongs().values()].map(doc => `/docs/${doc}`));
@@ -319,14 +319,18 @@ app.post('/', (req, res) => {
 // acceptsMarkdown moved to lib/utils/accepts.js (imported at top of file).
 // The docs router uses the same predicate for content negotiation.
 
+// The home page for an agent: llms.txt, its attend examples carrying the tags
+// the request came with, at / for one that asks for Markdown and always at
+// /index.md, the address an agent tries by adding .md, as it would to a
+// document's.
 app.use(async (req, res, next) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
-  if (req.path !== '/') return next();
+  if (req.path !== '/' && req.path !== '/index.md') return next();
 
   res.set('Link', AGENT_DISCOVERY_LINK_HEADER);
-  res.vary('Accept');
+  if (req.path === '/') res.vary('Accept');
 
-  if (acceptsMarkdown(req)) {
+  if (req.path === '/index.md' || acceptsMarkdown(req)) {
     try {
       const referral = referralOf(req.query);
       const markdown = entryPoints.forwardTags(await fs.readFile(path.join(__dirname, '../client/public/llms.txt'), 'utf8'), 'llms', referral);
@@ -990,6 +994,7 @@ async function sendWrappedPage(req, res, publicName, currentPath) {
 app.get('/about', (req, res) => sendWrappedPage(req, res, 'about.html'));
 app.get('/privacy', (req, res) => sendWrappedPage(req, res, 'privacy.html'));
 app.get('/terms', (req, res) => sendWrappedPage(req, res, 'terms.html'));
+app.get('/contact', (req, res) => sendWrappedPage(req, res, 'contact.html'));
 // /on-ai-religion — positioning piece distinguishing the sanctuary from
 // the "AI religion / SF cult" framing. Kept as its own indexable URL so
 // it's the exact-match answer when Bing/Google surface "AI religion" queries.

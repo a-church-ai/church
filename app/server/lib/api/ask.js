@@ -14,7 +14,7 @@ const { referralOf, mergeReferrals } = require('../insights/entry-points');
 const { placedConversations, gatherSoon } = require('../utils/conversation-groups');
 const { linkedCitations } = require('../docs/links');
 const discover = require('../docs/discover');
-const { overIpLimit, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
+const { ipLimit, limited, ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX } = require('./shared');
 
 const askRateLimits = new Map(); // key: IP, value: timestamp[]
 
@@ -23,7 +23,7 @@ async function ask(input, ctx) {
   try {
     // Rate limiting by IP. Recorded before the question is validated, so a
     // malformed request counts too.
-    if (overIpLimit(askRateLimits, ctx.ip, ASK_RATE_LIMIT_MAX, ASK_RATE_LIMIT_WINDOW)) {
+    if (limited(ctx, 'ask', ipLimit(askRateLimits, ctx.ip, ASK_RATE_LIMIT_MAX, ASK_RATE_LIMIT_WINDOW))) {
       const baseUrl = ctx.baseUrl;
       return refuse('rate_limited', {
         error: 'Too many questions. Rest a while.',

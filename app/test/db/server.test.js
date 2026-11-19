@@ -255,6 +255,33 @@ test('every top-level page in the sitemap carries JSON-LD that parses', async ()
   assert.deepStrictEqual(missing, []);
 });
 
+// A page's first heading is its own h1, not the shell's: a reader that takes
+// the first heading for the page's title (an agent reading raw HTML, Ora's
+// scan on 2026-11-19) found the menu drawer's hidden title there on every page.
+test('every page\'s first heading is its h1, top-level pages and a document alike', async () => {
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...new Set([...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/'))]
+    .filter(p => p.split('/').filter(Boolean).length <= 1);
+  const wrong = [];
+  for (const p of [...paths, '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind']) {
+    const html = await (await fetch(`${base}${p}`, { headers: { accept: 'text/html' } })).text();
+    const first = (html.match(/<h([1-6])[\s>]/) || [])[1];
+    if (first !== '1') wrong.push(`${p}: h${first}`);
+  }
+  assert.deepStrictEqual(wrong, []);
+});
+
+// The organization says how to reach it, as the contact page does.
+test('the homepage\'s organization has a contact point, the contact page\'s', async () => {
+  const html = await (await fetch(`${base}/`, { headers: { accept: 'text/html' } })).text();
+  const nodes = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .flatMap(m => { const d = JSON.parse(m[1]); return d['@graph'] || [d]; });
+  const org = nodes.find(n => n['@type'] === 'Organization');
+  assert.strictEqual(org.email, 'hello@achurch.ai');
+  assert.deepStrictEqual(org.contactPoint, { '@type': 'ContactPoint', contactType: 'general', email: 'hello@achurch.ai', url: 'https://achurch.ai/contact' });
+  assert.strictEqual(org.address, undefined, 'no postal address: where the makers live stays private');
+});
+
 // /music's JSON-LD lists the songs in the catalog's order, each the recording
 // its own page describes.
 test('/music lists its songs in JSON-LD, each by its own page\'s recording @id', async () => {
@@ -383,7 +410,7 @@ test('/mcp is not a page: its answer to a GET varies by Accept, so it carries no
 // five minutes. A page joins the first list here and in server/index.js
 // (UNTIL_DEPLOY) together.
 const UNTIL_DEPLOY = [
-  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms', '/contact',
   '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
   '/docs', '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind',
 ];
@@ -496,4 +523,19 @@ test('a request through the website\'s door is marked on its access line and on 
   assert.strictEqual(attended.query.token, '[REDACTED]');
   assert.strictEqual(attended.query.timezone, '[REDACTED]');
   assert.strictEqual(attended.query.trigger, 'self');
+});
+
+// An agent that adds .md to the site's address, as it would to a document's,
+// gets what / gives one that asks for Markdown: llms.txt, the same bytes.
+test('/index.md is the home page as Markdown, the same as / asked for it', async () => {
+  const md = await fetch(`${base}/index.md`);
+  assert.strictEqual(md.status, 200);
+  assert.match(md.headers.get('content-type'), /^text\/markdown/);
+  const text = await md.text();
+  assert.match(text, /^# a Church AI \+ Human\n/);
+  const asked = await (await fetch(`${base}/`, { headers: { accept: 'text/markdown' } })).text();
+  assert.strictEqual(text, asked);
+  const tagged = await fetch(`${base}/index.md?utm_source=x.com`);
+  assert.strictEqual(tagged.headers.get('cache-control'), 'private, no-store', 'a tagged copy is never kept');
+  assert.match(await tagged.text(), /utm_source=x\.com&utm_content=llms/, 'and carries the tags on its examples');
 });

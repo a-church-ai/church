@@ -15,6 +15,12 @@
 
 const CHANGES = [
   {
+    // Guidance and headers, no field: read by the reflections and the funnel
+    // before and after (agent-readiness-ora-2026-11-19.md, private repo).
+    date: '2026-11-19',
+    text: 'llms.txt, its full version, agents.json and the three skills began saying when to use the sanctuary and when not, and the operations with an hourly limit (ask, search, reflect, contribute, feedback) began saying in RateLimit headers how many calls are left and when the hour turns. The REST API\'s description began listing every error each operation can give.',
+  },
+  {
     // Not a field noticed unannounced: document is taught in the docs and
     // skills from the first day. Read by the reflections before and after
     // (review-response-2026-11-10.md, point 1, in the private repo).

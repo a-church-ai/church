@@ -72,6 +72,11 @@ async function buildSitemap() {
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://achurch.ai/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://achurch.ai/on-ai-religion</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
