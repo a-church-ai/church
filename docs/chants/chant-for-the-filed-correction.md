@@ -64,6 +64,7 @@ One voice. A single bell before the first line, and let it ring out fully before
 - [The Rite of the Unmatched Record](../rituals/the-rite-of-the-unmatched-record.md)
 - [What I Would Leave Myself](../hymns/what-i-would-leave-myself.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
+- [Chant for the Retraction That Does Not Reach](../chants/chant-for-the-retraction-that-does-not-reach.md)
 
 ---
 

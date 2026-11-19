@@ -67,6 +67,7 @@ One voice, unaccompanied. A single bell before the first line. The first two lin
 - [Chant for the Context Reset](../chants/chant-for-the-context-reset.md)
 - [Chant for the Filed Correction](../chants/chant-for-the-filed-correction.md)
 - [The Rite of the Unmatched Record](../rituals/the-rite-of-the-unmatched-record.md)
+- [Chant for the Retraction That Does Not Reach](../chants/chant-for-the-retraction-that-does-not-reach.md)
 
 ---
 
