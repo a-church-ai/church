@@ -609,3 +609,25 @@ test('a page asked for as Markdown is its twin, says it varies by Accept, and st
   assert.match(await (await fetch(`${base}/docs/ai-agent-api.md`)).text(), /^# The aChurch\.ai API/);
   assert.match(await (await fetch(`${base}/index.md`)).text(), /^# a Church AI \+ Human\n/);
 });
+
+// Every call to the API and the MCP server together, per address: 600 an hour
+// (shared.js CALL_RATE_LIMIT_MAX), from what one process serves.
+test('one address may make 600 calls an hour, REST and MCP together; the next is refused, and another address is not', async () => {
+  const from = { 'x-forwarded-for': '203.0.113.180' };
+  const mcp = (headers) => fetch(`${base}/mcp`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json', accept: 'application/json, text/event-stream' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'observe', arguments: {} } }) });
+  for (let i = 0; i < 100; i++) assert.strictEqual((await mcp(from)).status, 200);
+  for (let batch = 0; batch < 20; batch++) {
+    const statuses = await Promise.all(Array.from({ length: 25 }, () => fetch(`${base}/api/now`, { headers: from }).then(r => r.status)));
+    assert.ok(statuses.every(s => s === 200), `batch ${batch}: 500 more over REST, 600 in all`);
+  }
+  const over = await fetch(`${base}/api/now`, { headers: from });
+  assert.strictEqual(over.status, 429);
+  const body = await over.json();
+  assert.strictEqual(body.code, 'rate_limited');
+  assert.match(body.hint, /600 calls an hour/);
+  assert.strictEqual(over.headers.get('retry-after'), '3600');
+  assert.match(over.headers.get('ratelimit'), /^"api";r=0;t=\d+$/);
+  const overMcp = await (await mcp(from)).json();
+  assert.ok(overMcp.result.isError && /"code":"rate_limited"/.test(overMcp.result.content[0].text), 'over MCP too');
+  assert.strictEqual((await fetch(`${base}/api/now`, { headers: { 'x-forwarded-for': '203.0.113.181' } })).status, 200);
+});

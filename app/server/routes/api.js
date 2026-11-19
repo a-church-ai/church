@@ -22,7 +22,7 @@ const nothing = () => ({});
 function serve(operation, inputOf) {
   return async (req, res) => {
     const ctx = shared.requestContext(req);
-    const { status, body } = await operation(inputOf(req), ctx);
+    const { status, body } = shared.overCallLimit(ctx) ? shared.tooManyCalls(ctx) : await operation(inputOf(req), ctx);
     // What the operation found for the study, for the access log.
     if (ctx.study) res.locals.study = ctx.study;
     // Why a request was refused, for the access log (server/index.js).
@@ -34,14 +34,13 @@ function serve(operation, inputOf) {
     // wait brings it back.
     const wait = status >= 400 ? errors.retryAfterFor(body) : null;
     if (wait) res.set('Retry-After', String(wait));
-    // What an hourly limit leaves, on every answer of an operation that has
-    // one (shared.js limited), in the IETF RateLimit fields
-    // (draft-ietf-httpapi-ratelimit-headers-11), so a caller can pace itself
-    // before it is refused. Operations without a limit send none.
-    if (ctx.rateLimit) {
-      const { policy, limit, window, remaining, reset } = ctx.rateLimit;
-      res.set('RateLimit-Policy', `"${policy}";q=${limit};w=${window}`);
-      res.set('RateLimit', `"${policy}";r=${remaining};t=${reset}`);
+    // What each hourly limit leaves (shared.js limited), in the IETF
+    // RateLimit fields (draft-ietf-httpapi-ratelimit-headers-11), one item per
+    // policy: every call's "api", and an operation's own beside it, so a
+    // caller can pace itself before it is refused.
+    if (ctx.rateLimits) {
+      res.set('RateLimit-Policy', ctx.rateLimits.map(l => `"${l.policy}";q=${l.limit};w=${l.window}`).join(', '));
+      res.set('RateLimit', ctx.rateLimits.map(l => `"${l.policy}";r=${l.remaining};t=${l.reset}`).join(', '));
     }
     res.status(status).json(body);
   };

@@ -84,7 +84,8 @@ async function run(ctx, { tool, path, logged = {}, name: who, args }, operation)
   // The door named on the endpoint's address (/mcp?utm_source=...), or in the
   // arguments of a tool that takes the tags (attend, reflect, ask).
   const referral = mergeReferrals(referralOf(args), ctx.referral);
-  const { status, body: answered } = await operation();
+  // Every call counts toward the address's hourly limit, as over REST.
+  const { status, body: answered } = shared.overCallLimit(ctx) ? shared.tooManyCalls(ctx) : await operation();
   const body = withoutSharing(answered);
   recordApiUse({
     method: 'MCP', path, query: logged, status, duration: Date.now() - started,

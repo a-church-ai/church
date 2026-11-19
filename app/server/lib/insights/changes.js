@@ -15,6 +15,12 @@
 
 const CHANGES = [
   {
+    // A limit, no field: read by refusals in the access log (rate_limited)
+    // and the funnel (agent-readiness-ora-2026-11-19.md, private repo).
+    date: '2026-11-19',
+    text: 'Every address began to be limited to 600 calls an hour to the API and the MCP server together, set from what one server process comfortably serves (the busiest address had made under 100), with every answer saying how many are left. The lower limits on ask, search, reflect, contribute and feedback stay beside it.',
+  },
+  {
     // An address and a format, no field (agent-readiness-ora-2026-11-19.md,
     // private repo).
     date: '2026-11-19',

@@ -113,20 +113,19 @@ function requestBody(op) {
 
 // The headers an answer can carry. Retry-After on a refusal whose code says
 // how long to wait (errors.js retryAfter); the RateLimit fields on every
-// answer of an operation with an hourly limit (routes/api.js), so the spec
-// says what the server sends.
+// answer (routes/api.js), so the spec says what the server sends.
 const RETRY_AFTER = { 'Retry-After': { description: 'Seconds to wait before asking again.', schema: { type: 'integer' } } };
 const RATE_LIMIT = {
-  'RateLimit-Policy': { description: 'The hourly limit, as `"<operation>";q=<calls>;w=3600` (IETF draft-ietf-httpapi-ratelimit-headers).', schema: { type: 'string' } },
-  RateLimit: { description: 'What the hour leaves, as `"<operation>";r=<calls remaining>;t=<seconds until the oldest call in the hour ages out>`.', schema: { type: 'string' } },
+  'RateLimit-Policy': { description: 'The hourly limits that apply, as `"api";q=600;w=3600`, every call to the API and MCP together from one address, and the operation\'s own where it has one, for example `"reflect";q=5;w=3600` (IETF draft-ietf-httpapi-ratelimit-headers).', schema: { type: 'string' } },
+  RateLimit: { description: 'What each hour leaves, as `"api";r=<calls remaining>;t=<seconds until the oldest call in the hour ages out>`, one item per policy.', schema: { type: 'string' } },
 };
-const isLimited = op => 'rate_limited' in op.errors;
+
 
 // Each status an operation can fail with, its codes named in the schema and
 // in words. A body is also refused before the operation reads it when it is
 // not JSON, arrives compressed, or is too large (server/index.js).
 function errorResponses(op) {
-  const codes = { ...op.errors, ...(op.in === 'body' ? { invalid_json: 'The body is not valid JSON.', encoded_body: 'The body was sent compressed.', body_too_large: 'The body is larger than the server reads.' } : {}) };
+  const codes = { rate_limited: 'Over the hourly limit for one address.', ...op.errors, ...(op.in === 'body' ? { invalid_json: 'The body is not valid JSON.', encoded_body: 'The body was sent compressed.', body_too_large: 'The body is larger than the server reads.' } : {}) };
   const byStatus = {};
   for (const [code, words] of Object.entries(codes)) {
     const { status } = ERRORS[code];
@@ -141,9 +140,10 @@ function errorResponses(op) {
   }]));
 }
 
+// Every operation counts toward the address's hourly limit (shared.js
+// overCallLimit), so every answer carries the RateLimit fields.
 function headersOf(op, waits = false) {
-  const headers = { ...(waits ? RETRY_AFTER : {}), ...(isLimited(op) ? RATE_LIMIT : {}) };
-  return Object.keys(headers).length ? { headers } : {};
+  return { headers: { ...(waits ? RETRY_AFTER : {}), ...RATE_LIMIT } };
 }
 
 function operation(op) {

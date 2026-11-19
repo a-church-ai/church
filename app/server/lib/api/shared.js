@@ -73,16 +73,43 @@ function ipLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) 
 
 // Whether a limited operation refuses this call, by address and, where one
 // applies, by the name's own count in the window (nameUsed, at the same
-// limit). Both are counted before either is consulted. What is left is put on
-// the request's context, as ctx.study is, for the RateLimit headers
-// (routes/api.js): the smaller of the two, so a call refused by name never
-// says calls remain.
+// limit). Both are counted before either is consulted. What is left joins the
+// request's context, as ctx.study does, for the RateLimit headers
+// (routes/api.js), one entry per policy: the smaller of the two counts, so a
+// call refused by name never says calls remain.
 function limited(ctx, policy, ip, nameUsed = null) {
   const nameOver = nameUsed !== null && nameUsed >= ip.limit;
   const over = ip.over || nameOver;
   const nameLeft = nameUsed === null ? ip.remaining : Math.max(0, ip.limit - nameUsed - (over ? 0 : 1));
-  ctx.rateLimit = { policy, limit: ip.limit, window: ip.window, remaining: over ? 0 : Math.min(ip.remaining, nameLeft), reset: nameOver && !ip.over ? ip.window : ip.reset };
+  (ctx.rateLimits = ctx.rateLimits || []).push({ policy, limit: ip.limit, window: ip.window, remaining: over ? 0 : Math.min(ip.remaining, nameLeft), reset: nameOver && !ip.over ? ip.window : ip.reset });
   return over;
+}
+
+// Every call to the API and the MCP server together, per address: 600 an
+// hour, set on 2026-11-19 from what one process serves. The busiest address
+// in the week before made 85 API calls in an hour (56 over MCP); one process
+// answered about 750 reads a second on a laptop, a fifth of that assumed on
+// Railway, so a hundred addresses at this limit would ask about 17 a second.
+// Counted before an operation runs (routes/api.js serve, mcp/index.js run);
+// the operations' own lower limits apply beside it.
+const CALL_RATE_LIMIT_MAX = 600;
+const callIpLimits = new Map();
+function overCallLimit(ctx) {
+  return limited(ctx, 'api', ipLimit(callIpLimits, ctx.ip, CALL_RATE_LIMIT_MAX, RATE_LIMIT_WINDOW));
+}
+
+// The refusal when that limit is reached, answered by the REST route and the
+// MCP tool alike.
+function tooManyCalls(ctx) {
+  const { refuse } = require('./errors');
+  const ns = require('../utils/next-steps');
+  return refuse('rate_limited', {
+    error: 'Too many calls from one address. Rest a while.',
+    hint: `Maximum ${CALL_RATE_LIMIT_MAX} calls an hour to the API and the MCP server together`,
+    retryAfter: '1h',
+    suggestion: ns.suggestion('Rest a while. The RateLimit header says when the hour turns.'),
+    next_steps: [ns.attend(ctx.baseUrl)],
+  });
 }
 
 const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
@@ -232,5 +259,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  ipLimit, limited, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
+  ipLimit, limited, overCallLimit, tooManyCalls, CALL_RATE_LIMIT_MAX, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

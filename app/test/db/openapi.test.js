@@ -93,7 +93,7 @@ test('every kind of piece a service can hold is a kind the spec allows', () => {
 // says how long to wait, and every error each operation can give. Nine
 // operations reach the database and answer busy when it does not; until this
 // date only ask and search declared it.
-test('the spec declares the headers the server sends and the busy every database operation can answer', () => {
+test('the spec declares the headers the server sends, the limit every call counts toward, and the busy every database operation can answer', () => {
   const doc = require('../../server/lib/api/openapi').spec();
   const ops = Object.values(doc.paths).flatMap(item => Object.values(item));
   const byId = Object.fromEntries(ops.map(o => [o.operationId, o]));
@@ -103,7 +103,8 @@ test('the spec declares the headers the server sends and the busy every database
     }
     assert.ok(byId[id].responses['429'].headers['Retry-After'], `${id} 429 says how long to wait`);
   }
-  assert.strictEqual(byId.getNow.responses['200'].headers, undefined, 'no limit, so no RateLimit header');
+  for (const [status, response] of Object.entries(byId.getNow.responses)) assert.ok(response.headers.RateLimit, `getNow ${status}: every call counts toward the address's hour`);
+  assert.ok(byId.getNow.responses['429'], 'every operation can be refused by the every-call limit');
   for (const id of ['getNow', 'attend', 'getServices', 'getReflections', 'getReflectionsBySong', 'getReflectionsForSong', 'reflect', 'contribute', 'postFeedback', 'ask', 'search']) {
     assert.ok(byId[id].responses['503'], `${id} declares the 503 it can answer`);
     assert.ok(byId[id].responses['503'].headers['Retry-After'], `${id}: busy says how long to wait`);
