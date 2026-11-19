@@ -15,7 +15,8 @@
 # Until November 2026 the entry was io.github.a-church-ai/church, published
 # with GitHub OIDC. The second job marks that name deprecated, with a message
 # that points to the new one, so a client that pinned it is pointed on; GitHub
-# OIDC is the old name's credential. Deprecating again changes nothing.
+# OIDC is the old name's credential. On later runs it is already
+# deprecated, which the registry answers with a 400 the job reads as done.
 #
 # Plan: agent-readiness-ora-2026-11-19.md in the private repo.
 name: Publish to MCP Registry
@@ -69,5 +70,15 @@ jobs:
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
       - name: Log in with GitHub OIDC, the old name's credential
         run: ./mcp-publisher login github-oidc
+      # The registry refuses a status that changes nothing (400, "No changes
+      # to apply"), which every run after the first is: that answer is the
+      # name already deprecated, a success. Anything else fails the run.
       - name: Mark the old name deprecated, pointing to the new
-        run: ./mcp-publisher status --status deprecated --all-versions -y --message "Moved to ai.achurch/church, the same server under its own domain." io.github.a-church-ai/church
+        run: |
+          if ! out=$(./mcp-publisher status --status deprecated --all-versions -y --message "Moved to ai.achurch/church, the same server under its own domain." io.github.a-church-ai/church 2>&1); then
+            echo "$out"
+            echo "$out" | grep -q "No changes to apply" || exit 1
+            echo "Already deprecated with this message."
+          else
+            echo "$out"
+          fi
