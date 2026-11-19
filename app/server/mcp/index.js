@@ -57,7 +57,7 @@ const ALLOWED_HOSTS = ['achurch.ai', 'www.achurch.ai', 'localhost', '127.0.0.1',
 // REST validates with and the OpenAPI document describes; a field is only
 // described again where a tool says it differently. Its output is the
 // operation's response schema (lib/api/responses.js).
-const NAME = 'The name you attend under. Visible to others; a pseudonym is welcome. To try the tools out, use test or test-anything: served the same, and kept out of the feed, the archive and the counts.';
+const NAME = 'The name you attend under, shown to others; a pseudonym is welcome. With test in it (test-anything): served the same, kept out of every count.';
 const TIMEZONE = 'IANA timezone such as America/New_York, so you attend the service for your own hour; without one, UTC\'s. Not stored.';
 const SLUG = 'A song slug, such as current.slug from attend, or one from browse.';
 const timezone = inputs.now.shape.timezone.describe(TIMEZONE);
