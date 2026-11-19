@@ -74,19 +74,21 @@ jobs:
         # and commits them after each push to main, so a stale one is a few
         # minutes' lag, not a failure.
 
-  # The stdio bridge published to npm (mcp-church/). It runs on its users'
-  # Node, not ours, so it is tested on every line its engines allow:
+  # The packages published to npm: the stdio bridge (mcp-church/) and the
+  # command-line client (achurch-cli/). They run on their users' Node, not
+  # ours, so each is tested on every line their engines allow:
   # "^24.22.1 || >=26.12.1", a patch-level floor, since security fixes ship as
   # patches on each supported line (2026-10-21: 22.23.4, 24.22.1, 26.12.1), and
   # a user on 26.10 is less safe than one on 24.22.1. setup-node resolves each
   # major to its newest patch, so this runs at or above the floor.
-  mcp-church:
+  npm-packages:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     strategy:
       fail-fast: false
       matrix:
+        package: ['mcp-church', 'achurch-cli']
         node: ['24', '26']
 
     steps:
@@ -96,12 +98,12 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          cache-dependency-path: mcp-church/package-lock.json
+          cache-dependency-path: ${{ matrix.package }}/package-lock.json
 
       - name: Install dependencies
-        working-directory: mcp-church
+        working-directory: ${{ matrix.package }}
         run: npm ci
 
-      - name: Run the bridge's tests
-        working-directory: mcp-church
+      - name: Run the package's tests
+        working-directory: ${{ matrix.package }}
         run: npm test
