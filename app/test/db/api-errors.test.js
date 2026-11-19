@@ -123,7 +123,8 @@ test('the spec\'s ErrorResponse lists every code, and each operation\'s errors a
     for (const code of Object.keys(o.errors)) assert.ok(errors.ERRORS[code], `${o.operationId}: ${code} is not in the catalog`);
     const responses = doc.paths[o.path][o.method].responses;
     for (const [status, response] of Object.entries(responses).filter(([s]) => s >= '400')) {
-      const listed = response.content['application/json'].schema.allOf[1].properties.code.enum;
+      assert.strictEqual(response.content['application/json'].schema.$ref, '#/components/schemas/ErrorResponse', `${status}: the error schema itself`);
+      const listed = response['x-codes'];
       for (const code of listed) assert.strictEqual(String(errors.ERRORS[code].status), status, `${o.operationId}: ${code} under ${status}`);
     }
   }

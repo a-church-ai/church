@@ -284,6 +284,8 @@ test('the homepage\'s organization has a contact point, the contact page\'s', as
   assert.strictEqual(org.email, 'hello@achurch.ai');
   assert.deepStrictEqual(org.contactPoint, { '@type': 'ContactPoint', contactType: 'general', email: 'hello@achurch.ai', url: 'https://achurch.ai/contact' });
   assert.strictEqual(org.address, undefined, 'no postal address: where the makers live stays private');
+  assert.ok(org.sameAs.includes('https://github.com/a-church-ai'), 'the organization on GitHub, beside its repository');
+  assert.match(html, /href="https:\/\/github\.com\/a-church-ai"/, 'and linked where a reader sees it');
 });
 
 // /music's JSON-LD lists the songs in the catalog's order, each the recording
