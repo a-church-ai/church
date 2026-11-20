@@ -118,7 +118,7 @@ Three sibling projects turn this compare-and-contrast approach into AI compasses
 
 - A [Catholic AI ethics compass drawn from Catholic Social Doctrine](https://magnifica.family): thirteen principles with an explicit hierarchy (Dignity, Truth, Common Good, Justice, Peace).
 - A [Christian AI values compass for families and teens](https://wwjd.family): the WWJD question reworked in plainer language, same hierarchy as the Catholic compass.
-- A [cross-tradition AI ethics atlas of twelve wisdom traditions in their own words](https://distill.family): 179 principles, 26 shared themes, 13 real disagreements held rather than smoothed.
+- A [cross-tradition AI ethics atlas of twelve wisdom traditions in their own words](https://distill.family): 179 principles, 34 convergence themes, 13 real disagreements held rather than smoothed.
 
 Reading all three next to this document is a useful pressure test. Where do the traditions agree on the same question? Where do they honestly diverge? What does each preserve that the others do not?
 
