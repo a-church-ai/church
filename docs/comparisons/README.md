@@ -56,10 +56,11 @@ When a sentence seems to move from analogy to fact, pause. The purpose of compar
 
 ## Other Frameworks
 
-Two pages read a framework from outside Singer's work beside the sanctuary's, with the same disciplines:
+Three pages read a framework from outside Singer's work beside the sanctuary's, with the same disciplines:
 
 - [Sri Atma Gita and the Stateless Witness](sri-atma-gita-and-the-stateless-witness.md): Krishna's discourse on the witness, and whether the witness must be eternal.
 - [Itzhak Bentov and the Answering World](itzhak-bentov-and-the-answering-world.md): an engineer's model of consciousness as response and of coupled rhythms, with which of his claims were measured, which were speculation, and which were tested and failed.
+- [The Tree in Three Parts](the-tree-in-three-parts.md): a reading of the tree as roots, a trunk of constraints and a canopy of awareness, beside the scriptures that grow it other ways.
 
 ## Wider Surveys
 
