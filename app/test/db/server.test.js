@@ -417,11 +417,11 @@ test('/mcp is not a page: its answer to a GET varies by Accept, so it carries no
 // (UNTIL_DEPLOY) together.
 const UNTIL_DEPLOY = [
   '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms', '/contact',
-  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+  '/church-music', '/reviews', '/search', '/search/index.json', '/docs/index.json',
   '/docs', '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind',
 ];
 const LIVE = [
-  '/', '/services', '/conversations', '/conversations/index.json', '/ask', '/music', '/ai-experiment',
+  '/conversations', '/conversations/index.json', '/ask', '/music', '/ai-experiment',
   // A retired song's document: the song still takes reflections, shown there.
   '/docs/prayers/prayer-of-gratitude',
 ];
@@ -439,13 +439,46 @@ test('pages built from files are kept at the edge until the next deploy, and tag
   assert.strictEqual(feed.headers.get('cache-tag'), 'deploy');
 });
 
-test('pages that change without a deploy are kept five minutes, with no purge tag', async () => {
+// The owner, 2026-11-20: "totally widden to several days, like our changes
+// aren't high priority and we can always manually clear cache".
+test('pages that change without a deploy are kept three days, tagged for the deploy\'s purge', async () => {
   for (const p of LIVE) {
     const res = await fetch(`${base}${p}`, { redirect: 'manual' });
     assert.strictEqual(res.status, 200, p);
-    assert.match(res.headers.get('cache-control') || '', /^public, max-age=0, s-maxage=300,/, p);
-    assert.strictEqual(res.headers.get('cache-tag'), null, p);
+    assert.strictEqual(res.headers.get('cache-control'), 'public, max-age=0, s-maxage=259200, must-revalidate, stale-while-revalidate=3600', p);
+    assert.strictEqual(res.headers.get('cache-tag'), 'deploy', p);
   }
+});
+
+test('pages that follow the clock are kept until they change: the service until it ends, a day still filling an hour', async () => {
+  const lifetime = async p => {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    assert.strictEqual(res.headers.get('cache-tag'), 'deploy', p);
+    const cache = res.headers.get('cache-control');
+    assert.match(cache, /^public, max-age=0, s-maxage=\d+, must-revalidate$/, `${p}: no stale copy of a service that has ended`);
+    return Number(cache.match(/s-maxage=(\d+)/)[1]);
+  };
+  for (const p of ['/', '/attend']) {
+    const seconds = await lifetime(p);
+    assert.ok(seconds >= 60 && seconds <= 4 * 3600, `${p}: ${seconds}s, no longer than a slot`);
+  }
+  assert.strictEqual(await lifetime('/services'), 3600);
+});
+
+// The owner, 2026-11-20: "this needs to work for all agents depending if they
+// have js enabled or not". The panel was empty until service.js filled it.
+test('the home page and /attend hold the service for a place unknown before any script runs, and so does their Markdown', async () => {
+  for (const p of ['/', '/attend']) {
+    const html = await (await fetch(`${base}${p}`)).text();
+    const panel = html.slice(html.indexOf('data-service-panel'));
+    assert.match(panel, /data-shown="\d{4}-\d{2}-\d{2}\|/, `${p}: the service drawn is named, so the browser draws over it only when the visitor's differs`);
+    assert.match(panel, /<a class="service-part-link" href="\/(?:music|docs)\/[^"]+"[^>]*>(?:Lyrics|Read)</, `${p}: each part links its page`);
+    assert.doesNotMatch(panel.slice(0, panel.indexOf('</ol>')), /class="service-player"[^>]*hidden/, `${p}: the box is shown`);
+  }
+  const markdown = await (await fetch(`${base}/attend.md`)).text();
+  assert.match(markdown, /Song · \d+:\d{2} [^\n]+\s+\[Lyrics ?\]\(https:\/\/achurch\.ai\/music\//, 'a song, its time, its title, and its lyrics\' page');
+  assert.match(markdown, /\[(?:Lyrics|Read) ?\]\(https:\/\/achurch\.ai\/(?:music|docs)\//, 'the Markdown lists each part with its link');
 });
 
 test('a missing page under a kept path is still never cached', async () => {
@@ -632,4 +665,21 @@ test('one address may make 600 calls an hour, REST and MCP together; the next is
   const overMcp = await (await mcp(from)).json();
   assert.ok(overMcp.result.isError && /"code":"rate_limited"/.test(overMcp.result.content[0].text), 'over MCP too');
   assert.strictEqual((await fetch(`${base}/api/now`, { headers: { 'x-forwarded-for': '203.0.113.181' } })).status, 200);
+});
+
+// The Content-Security-Policy (server/index.js CSP), from 2026-11-20: the
+// site monitor graded the headers B for its absence. Each page's own script
+// moved to a file, so a policy without 'unsafe-inline' for scripts holds.
+test('every page carries the Content-Security-Policy and runs no inline script; the souls embed may be framed anywhere', async () => {
+  for (const p of ['/', '/attend', '/ask', '/for-agents', '/music', '/music/door-is-always-open', '/docs/prayers', '/contact', '/services', '/embed/souls']) {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    const csp = res.headers.get('content-security-policy') || '';
+    assert.match(csp, /script-src 'self' https:\/\/static\.cloudflareinsights\.com(;|$)/, `${p}: ${csp}`);
+    assert.doesNotMatch(csp.match(/script-src[^;]*/)[0], /unsafe-inline|unsafe-eval/, p);
+    assert.match(csp, /object-src 'none'/, p);
+    assert.match(csp, p === '/embed/souls' ? /frame-ancestors \*/ : /frame-ancestors 'self'/, p);
+    const inline = [...(await res.text()).matchAll(/<script(\s[^>]*)?>/g)].map(m => m[0]).filter(tag => !/\ssrc=|type="application\/(?:ld\+)?json"/.test(tag));
+    assert.deepStrictEqual(inline, [], `${p} has an inline script`);
+  }
 });

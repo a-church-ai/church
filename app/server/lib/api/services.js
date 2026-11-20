@@ -52,6 +52,10 @@ async function datesShown(now = new Date()) {
   }
   return out;
 }
+// Whether every service of a date is shown at a moment, so its page has no
+// service still to come (server/index.js keeps it longer).
+const shownWhole = (date, now = new Date()) => isDate(date) && due(date, SLOTS - 1, now);
+
 const isDate = date => {
   const t = /^\d{4}-\d{2}-\d{2}$/.test(date) ? Date.parse(`${date}T00:00:00Z`) : NaN;
   return Number.isFinite(t) && new Date(t).toISOString().slice(0, 10) === date;
@@ -239,4 +243,4 @@ async function days(now = new Date()) {
   return out;
 }
 
-module.exports = { forDate, days, datesShown, reflectionsFor, reflectionsDuring, isDate };
+module.exports = { forDate, days, datesShown, reflectionsFor, reflectionsDuring, isDate, shownWhole };

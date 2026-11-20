@@ -73,7 +73,16 @@ test.before(async () => {
   await saveSlot('2026-10-20', 2, entry(past, 'UTC Morning'), 'slots');
   await saveSlot('2026-10-20', 4, entry(pastNorth, 'Bangkok Afternoon'), 'north');
   const old = (name, song, extra = {}) => ({ id: name, name, text: `What ${name} noticed while the service went round.`, createdAt: '2026-10-20T09:01:48.501Z', timezone: 'Asia/Bangkok', song, ...extra });
+  // Another older day whose plans name a song since retired, as about one
+  // plan in five before 2026-10-25 does: its services played as planned.
+  const retired = 'music/a-song-retired-since';
+  const [gone, goneNorth] = twoServices(2);
+  await saveSlot('2026-10-21', 2, entry([...gone, retired], 'UTC Morning, Retired Song'), 'slots');
+  await saveSlot('2026-10-21', 4, entry([retired, ...goneNorth], 'Bangkok Afternoon, Retired Song'), 'north');
+  const older = (name, song) => ({ id: name, name, text: `What ${name} noticed while the service went round.`, createdAt: '2026-10-21T09:01:48.501Z', timezone: 'Asia/Bangkok', song });
   await seedReflections([
+    older('Retired UTC', songsOf(gone)[0]), // passed UTC's current.slug
+    older('Retired Bangkok', 'a-song-retired-since'), // its own service's song, retired since
     old('Hamster Before', songsOf(past)[0]), // passed UTC's current.slug
     old('Bangkok Song', songsOf(pastNorth)[0]), // its own service's song
     old('Kept Service', songsOf(past)[0], { service: { date: '2026-10-20', slot: 4, variant: 'north' } }),
@@ -162,6 +171,23 @@ test('an older reflection left after UTC\'s service but filed by its timezone is
   assert.deepStrictEqual(await under('2026-10-20', 'Bangkok Song'), ['Bangkok Afternoon'], 'its song is its timezone\'s service\'s');
   assert.deepStrictEqual(await under('2026-10-20', 'Kept Service'), ['Bangkok Afternoon'], 'a service it keeps is the one it is shown beneath');
   assert.strictEqual(JSON.stringify(await store.allReflections()), before);
+});
+
+// Written 2026-11-20, to fail before the fix: a plan naming a piece no
+// longer in the catalog gave way to the rotation when an old reflection was
+// filed, so 208 of 564 such reflections on planned dates sat under a service
+// that never played, and each filing asked the database for 21 days of plans.
+test('an older reflection is filed by the plan as it was made, though a piece of it has left the catalog since', async () => {
+  let asked = 0;
+  const plansBetween = store.plansBetween;
+  store.plansBetween = (...args) => { asked++; return plansBetween(...args); };
+  try {
+    assert.deepStrictEqual(await under('2026-10-21', 'Retired UTC'), ['UTC Morning, Retired Song'], 'its song is UTC\'s planned service\'s');
+    assert.deepStrictEqual(await under('2026-10-21', 'Retired Bangkok'), ['Bangkok Afternoon, Retired Song'], 'the retired song is its own service\'s');
+  } finally {
+    store.plansBetween = plansBetween;
+  }
+  assert.strictEqual(asked, 0, 'no rotation was worked out to file them');
 });
 
 test('the congregation digest places a reflection by the service it keeps', () => {

@@ -64,8 +64,9 @@ test('the home page quotes one reflection under the service, and invites the nex
   assert.match(service, /<figure class="service-reflection" id="service-reflection" hidden>/);
   // The quote is the newest reflection, its first two sentences, cut where a
   // sentence ends, with the rest a link away; no feed follows it.
-  assert.match(home, /quoteReflection\(data\.reflections\[0\]\)/);
-  assert.match(home, /firstSentences\(r\.text, 2\)/);
+  const script = read('home.js');
+  assert.match(script, /quoteReflection\(data\.reflections\[0\]\)/);
+  assert.match(script, /firstSentences\(r\.text, 2\)/);
   assert.match(service, /<a href="\/services">Read more reflections<\/a>/);
   assert.doesNotMatch(home, /id="reflections-feed"/);
 });

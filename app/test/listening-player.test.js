@@ -356,7 +356,7 @@ test('page scripts bind their window listeners and timers to the page, so none o
   const listeners = (docsNav.match(/(?:window|_MQ)\.addEventListener\(/g) || []).length;
   assert.ok(listeners >= 2, 'docs-nav.js still listens on window and its media query');
   assert.strictEqual((docsNav.match(/\{ signal: pageSignal \}/g) || []).length, listeners, 'each window and media-query listener is bound to the page');
-  const home = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
+  const home = fs.readFileSync(path.join(PUBLIC, 'home.js'), 'utf8');
   assert.match(home, /achurchPage\.whileSeen\(600000, fetchReflections\)/);
   // The service's own refresh (service.js, on the home page and /attend): from
   // /service.json only, and when its slot ends, a timer the page clears.
@@ -433,9 +433,11 @@ test('the service\'s button is on the first screen before the service arrives: s
   assert.ok(mount.indexOf('box.hidden = false') >= 0 && mount.indexOf('box.hidden = false') < mount.indexOf('load('), 'shown before load');
   // Hidden again when there is no service to draw.
   assert.match(mount, /else boxes\.forEach\(box => \{ box\.hidden = true; \}\)/);
-  // The copy drawPanel puts on the page has its button enabled.
-  const draw = source.slice(source.indexOf('function drawPanel('), source.indexOf('box.replaceWith(fresh)'));
-  assert.match(draw, /fresh\.querySelector\('\.service-play'\)\.disabled = false/);
+  // The copy fillPanel puts on the page (in the browser, and on the server
+  // for a place unknown) has its button enabled and is shown.
+  const draw = source.slice(source.indexOf('function fillPanel('), source.indexOf('box.parentNode.replaceChild(fresh, box)'));
+  assert.match(draw, /fresh\.querySelector\('\.service-play'\)\.removeAttribute\('disabled'\)/);
+  assert.match(draw, /fresh\.removeAttribute\('hidden'\)/);
   // Its space is kept while it is empty, so the first screen does not move.
   const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8');
   for (const rule of ['.service-parts:empty', '.service-forms:empty']) assert.match(css, new RegExp(rule.replace('.', '\\.') + ' \\{\\s*min-height'), rule);

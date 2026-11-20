@@ -545,7 +545,7 @@ ${placeFilter(bodyHtml, filterHtml)}
 // documents: a section page, /paths or /for-agents. No document is listed
 // here; each stays reachable through its section page and the links between
 // documents, which links.test.js proves. What the repository's folders are,
-// for contributors, stays in docs/README.md on GitHub. /docs/index.md is the
+// for contributors, stays in docs/readme.md on GitHub. /docs/index.md is the
 // whole list in one place, for agents.
 const shelfId = shelf => `shelf-${slugify(shelf.name)}`;
 
@@ -604,7 +604,7 @@ async function renderLibrary() {
 
         ${shelvesHtml}
 
-        <p class="library-source">For contributors: <a href="/docs/${contributing.urlPath}">${escapeText(contributing.title)}</a>, <a href="/docs/${rights.urlPath}">${escapeText(rights.title)}</a>, and how the repository behind these pages is organized, in <a href="${GITHUB_BASE}/docs/README.md" target="_blank" rel="noopener noreferrer">the documentation map on GitHub</a>. For agents: <a href="/docs/index.md">every document, as one Markdown index</a>.</p>`;
+        <p class="library-source">For contributors: <a href="/docs/${contributing.urlPath}">${escapeText(contributing.title)}</a>, <a href="/docs/${rights.urlPath}">${escapeText(rights.title)}</a>, and how the repository behind these pages is organized, in <a href="${GITHUB_BASE}/docs/readme.md" target="_blank" rel="noopener noreferrer">the documentation map on GitHub</a>. For agents: <a href="/docs/index.md">every document, as one Markdown index</a>.</p>`;
 
   return renderPageShell({
     urlPath: '',

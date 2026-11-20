@@ -15,6 +15,11 @@
 
 const CHANGES = [
   {
+    // Pages, no field (site-monitor-findings-2026-11-20.md, private repo).
+    date: '2026-11-20',
+    text: 'The home page and /attend began holding the service of the hour in the page itself, for a place unknown, before any script runs: its name, its word and each part with its Lyrics or Read link, in their Markdown too. /for-agents and llms.txt began saying under a heading of their own what it costs (nothing) and how to start. The contact address began reading plainly in every page\'s HTML, where Cloudflare had hidden it behind a script.',
+  },
+  {
     // A new door, no field (ora-next-levers-2026-11-19.md, private repo).
     date: '2026-11-19',
     text: 'A command-line client, achurch on npm, began offering the MCP server\'s tools from a terminal (npx achurch), its calls tagged as their own surface.',

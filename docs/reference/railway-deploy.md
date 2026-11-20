@@ -72,24 +72,42 @@ should have:
 | Domain | `achurch.ai` | |
 
 The cache in front of the service is Cloudflare's, also set outside this
-repository: one cache rule on the zone since 2026-11-03, **Cache HTML pages
-(browsers only, by origin headers)**, which matches
+repository: one cache rule on the zone since 2026-11-03, widened 2026-11-20,
+**Cache pages (any but Markdown or JSON, by origin headers)**, which matches
 
 ```
-(http.request.method in {"GET" "HEAD"} and any(http.request.headers["accept"][*] wildcard "text/html*") and not any(http.request.headers["accept"][*] contains "markdown") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/admin") and not starts_with(http.request.uri.path, "/mcp") and not starts_with(http.request.uri.path, "/visit") and not starts_with(http.request.uri.path, "/service.json") and not starts_with(http.request.uri.path, "/cdn-cgi/") and not http.cookie contains "admin_session")
+(http.request.method in {"GET" "HEAD"} and (any(http.request.headers["accept"][*] wildcard "text/html*") or not http.request.uri.path contains ".") and not any(http.request.headers["accept"][*] contains "markdown") and not any(http.request.headers["accept"][*] contains "json") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/admin") and not starts_with(http.request.uri.path, "/mcp") and not starts_with(http.request.uri.path, "/visit") and not starts_with(http.request.uri.path, "/service.json") and not starts_with(http.request.uri.path, "/cdn-cgi/") and not http.cookie contains "admin_session")
 ```
 
 and sets: eligible for cache; edge TTL "use cache-control header if present,
 bypass cache if not"; browser TTL "respect origin TTL"; nothing else. How long
 a page is kept is the server's to say (`Cache-Control` in `server/index.js`,
 and `app-development.md`, *Invariants*); the rule only lets Cloudflare listen.
-It matches requests that ask for HTML alone because a page's URL answers
-Markdown too, and Cloudflare keeps an answer by URL, ignoring `Vary`: a
-request it does not match is never answered from the cache (checked
-2026-11-13: Markdown and `*/*` come back `DYNAMIC`). Pages kept until the next
-deploy are purged by the deploy itself (*Verify*), with a token that can only
-purge this zone (`CLOUDFLARE_PURGE_TOKEN`, an Actions secret beside
-`CLOUDFLARE_ZONE_ID`).
+A page's URL answers Markdown too, and the home page answers JSON, and
+Cloudflare keeps an answer by URL, ignoring `Vary`, so the rule never matches
+a request asking for either. Until 2026-11-20 it matched only requests that
+asked for HTML, which left every agent's `*/*` to the server: 36% of pages
+came from the cache in the week before. The server answers `*/*` and no Accept
+as it answers `text/html`, so those are kept with it now. Only page paths (no
+file extension) are widened, so a discovery file such as
+`/.well-known/mcp/server-card.json` is never kept past a deploy (checked
+2026-11-20: `text/html`, `*/*` and no Accept come back `HIT`; Markdown and
+JSON `DYNAMIC`). Every page is purged by the deploy itself (*Verify*), with a
+token that can only purge this zone (`CLOUDFLARE_PURGE_TOKEN`, an Actions
+secret beside `CLOUDFLARE_ZONE_ID`), and by hand with
+`gh workflow run purge-edge.yml -R a-church-ai/church`.
+
+Other settings on the zone that change what visitors are served:
+- **Email Address Obfuscation: off** (Security, Settings), since 2026-11-20. It
+  rewrote every address in a page's HTML into `[email protected]`, restored
+  by a script, so an agent reading `/contact` found no address. The address is
+  public on purpose. `check-production.js` checks that it reads plainly.
+- **Bot Fight Mode and AI Labyrinth: off**, and AI Crawl Control blocks no
+  crawler. A request that names a crawler but does not come from it may still
+  be refused by Cloudflare: on 2026-11-18 the site monitor's requests naming
+  Claude-SearchBot were reset for an hour while the real crawler was allowed
+  every time (AI Crawl Control, Security: 130 allowed, 0 unsuccessful in the
+  week).
 
 What a deploy actually ran with is in its record: `railway deployment list
 --json` gives each deploy's `meta.serviceManifest`, its build and deploy

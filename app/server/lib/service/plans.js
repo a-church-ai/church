@@ -68,9 +68,17 @@ async function plansAround(date, back = 21) {
   return plans;
 }
 
-// Every date with plans, newest first: what the day pages list.
+// Every date with plans, newest first: what the day pages list. The day
+// pages then read every date's plan (lib/api/services.js datesShown), so when
+// any is not held fresh, all are read in one query, as plansAround reads its
+// span, instead of one query a date (48 on 2026-11-20).
 async function plannedDates() {
-  return (await store.plannedDates()).reverse();
+  const dates = (await store.plannedDates()).reverse();
+  if (dates.some(date => !planCache.fresh(date))) {
+    const found = await store.plansBetween(dates[dates.length - 1], dates[0]);
+    for (const date of dates) planCache.set(date, found.get(date) || null);
+  }
+  return dates;
 }
 
 // Save a slot's entry: in `slots` (the season-less plan) or a hemisphere's

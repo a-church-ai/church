@@ -17,7 +17,7 @@ const label = slot => `${String(4 * slot).padStart(2, '0')}:00 to ${String((4 * 
 const day = slots => slots.flatMap(slot => ['slots', 'north', 'south'].map(variant => ({ slot: label(slot), variant, arrangedBy: 'Arranged, named and its word written by an AI model (stub), for this slot and date.' })));
 const fill = keys => Object.fromEntries(keys.map(k => [k, k]));
 
-function production({ omit = null, showsTest = false, edge = 'keeps' } = {}) {
+function production({ omit = null, showsTest = false, edge = 'keeps', hidesAddress = false } = {}) {
   const parts = [1, 2, 3].map(position => ({
     ...fill(expected.part), position, kind: position === 2 ? 'song' : 'prayer',
     url: position === 2 ? 'https://achurch.ai/music/door-is-always-open' : `https://achurch.ai/docs/prayers/p${position}`,
@@ -35,18 +35,24 @@ function production({ omit = null, showsTest = false, edge = 'keeps' } = {}) {
     setTimeout(next, 15);
   });
   // A page negotiated by Accept, behind an imitation of Cloudflare: the first
-  // answer to a URL is kept by URL alone. 'keeps' keeps only what was asked as
-  // HTML, as the cache rule does; 'mixes' keeps whatever came first and hands
-  // it to every Accept, the hazard; 'passes' keeps nothing.
+  // answer to a URL is kept by URL alone. 'keeps' keeps what was not asked as
+  // Markdown or JSON, as the cache rule does; 'mixes' keeps whatever came
+  // first and hands it to every Accept, the hazard; 'passes' keeps nothing.
   const kept = new Map();
-  app.get(['/', '/docs/prayers', '/axioms'], (req, res) => {
-    const markdown = /text\/markdown/.test(req.headers.accept || '');
-    const cacheable = edge === 'mixes' || (edge === 'keeps' && !markdown);
+  const served = '<div data-service-panel data-shown="2026-10-12|12:00 to 16:00|planned|x"><a class="service-part-link" href="/music/door-is-always-open">Lyrics</a></div>';
+  app.get(['/', '/docs/prayers', '/axioms', '/attend', '/contact'], (req, res) => {
+    const accept = req.headers.accept || '';
+    const markdown = /text\/markdown/.test(accept);
+    const json = req.path === '/' && /application\/json/.test(accept);
+    const cacheable = edge === 'mixes' || (edge === 'keeps' && !markdown && !/json/.test(accept));
     if (cacheable && kept.has(req.path)) {
       const { type, body } = kept.get(req.path);
       return res.set('cf-cache-status', 'HIT').type(type).send(body);
     }
-    const answer = markdown ? { type: 'text/markdown', body: '# page' } : { type: 'text/html', body: '<p>page</p>' };
+    const page = req.path === '/contact'
+      ? (hidesAddress ? '<a href="/cdn-cgi/l/email-protection#81e9"><span class="__cf_email__">[email&#160;protected]</span></a>' : '<a href="mailto:hello@achurch.ai">hello@achurch.ai</a>')
+      : ['/', '/attend'].includes(req.path) ? served : '<p>page</p>';
+    const answer = markdown ? { type: 'text/markdown', body: '# page' } : json ? { type: 'application/json', body: '{}' } : { type: 'text/html', body: page };
     if (cacheable) kept.set(req.path, answer);
     res.set('cf-cache-status', cacheable ? 'MISS' : 'DYNAMIC').type(answer.type).send(answer.body);
   });
@@ -106,7 +112,16 @@ test('an edge that hands an agent asking for Markdown the HTML kept for browsers
   const failed = await run({ base, now: NOW, log: line => lines.push(line) });
   assert.strictEqual(failed, 1, lines.join('\n'));
   assert.ok(lines.includes('    / asked for text/markdown answered 200 text/html (request 1)'), lines.join('\n'));
-  assert.ok(lines.includes('    / as Markdown came from the edge\'s cache'), lines.join('\n'));
+  assert.ok(lines.includes('    / as text/markdown came from the edge\'s cache'), lines.join('\n'));
+});
+
+test('an address hidden by Cloudflare\'s email obfuscation fails the check', async (t) => {
+  const { server, base } = await production({ hidesAddress: true });
+  t.after(() => server.close());
+  const lines = [];
+  const failed = await run({ base, now: NOW, log: line => lines.push(line) });
+  assert.strictEqual(failed, 1, lines.join('\n'));
+  assert.ok(lines.includes('    /contact has no plain hello@achurch.ai'), lines.join('\n'));
 });
 
 test('a page meant to be kept at the edge that is not fails the check', async (t) => {

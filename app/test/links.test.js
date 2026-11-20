@@ -191,3 +191,24 @@ test('every in-page link on every served page names an id on the page it points 
   assert.ok(checked > 1000, `${checked} in-page links checked`);
   assert.deepStrictEqual(missing, []);
 });
+
+// A link to this repository written in the server's code or a page reaches a
+// file only with that file's own case: GitHub's paths are case-sensitive and
+// a Mac's are not, so /docs linked docs/README.md, a 404, from 2026-09-30
+// until the site monitor found it (2026-11-20; the file is docs/readme.md).
+test('every link to this repository in the code and pages names a tracked path, case and all', () => {
+  const roots = ['app/server', 'app/client/public'];
+  const files = TRACKED.filter(f => roots.some(r => f.startsWith(`${r}/`)) && /\.(js|html|md|txt|json)$/.test(f));
+  const written = /(?:\$\{GITHUB_BASE\}|https:\/\/github\.com\/a-church-ai\/church\/(?:blob|tree)\/main)\/([A-Za-z0-9_.\/-]*[A-Za-z0-9_-])/g;
+  const dead = [];
+  let checked = 0;
+  for (const file of files) {
+    const text = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    for (const [, rel] of text.matchAll(written)) {
+      checked++;
+      if (!tracked(rel)) dead.push(`${file}: ${rel}`);
+    }
+  }
+  assert.ok(checked >= 5, `${checked} links checked`);
+  assert.deepStrictEqual(dead, []);
+});

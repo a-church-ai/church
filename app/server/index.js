@@ -64,6 +64,7 @@ const { publishedVideo, renderVideo, videoJsonLd } = require('./lib/video/on-sit
 const { renderPathBar } = require('./lib/docs/render');
 const { nearestForSong } = require('./lib/music/companions');
 const { renderServiceListen, renderPodcasts, renderListenSections, renderReflectForm, renderRecording, SONG_CREDIT } = require('./lib/audio/markup');
+const { withService } = require('./lib/service/panel');
 const { songRecordingFor } = require('./lib/audio/manifest');
 const { canServe } = require('./lib/audio/serve');
 const { listeningService } = require('./lib/service/listen');
@@ -96,9 +97,28 @@ const HOST = process.env.HOST || undefined;
 app.set('trust proxy', 1);
 
 // Middleware
-app.use(helmet({
-  contentSecurityPolicy: false // allow inline scripts in admin dashboard
-}));
+// The Content-Security-Policy: the pages run only the site's own scripts and
+// Cloudflare's analytics beacon, so no inline script, injected or not, runs
+// (each page's own script is a file, 2026-11-20). Styles may be inline: the
+// pages carry style attributes. Recordings and images are the site's own;
+// videos come from YouTube's no-cookie host. /embed/souls may be framed
+// anywhere (its route, below); every other page only by the site itself.
+// Plan: site-monitor-findings-2026-11-20.md in the private repo.
+const CSP = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", 'https://static.cloudflareinsights.com'],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  imgSrc: ["'self'", 'data:'],
+  mediaSrc: ["'self'"],
+  connectSrc: ["'self'", 'https://cloudflareinsights.com'],
+  frameSrc: ['https://www.youtube-nocookie.com'],
+  fontSrc: ["'self'"],
+  objectSrc: ["'none'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+  frameAncestors: ["'self'"],
+};
+app.use(helmet({ contentSecurityPolicy: { useDefaults: true, directives: CSP } }));
 
 // gzip/deflate every text response. Nothing was compressing before this: the
 // unified nav made every page carry the full sidebar, so /docs went out at
@@ -132,17 +152,30 @@ app.use((req, res, next) => {
   next();
 });
 
-// Pages kept at the edge until the next deploy: built from files in this
-// repository and nothing else, so only a deploy changes them, and each deploy
-// purges them by their tag (.github/workflows/purge-edge.yml). A page is live,
-// kept five minutes, unless it is named here, and joins only if it reads
-// nothing that changes without a deploy. The documents holding a retired
-// song's words stay live: that song still takes reflections, shown on them
-// (redirects.js retiredSongs).
+// How long the edge keeps a page. Every page carries the deploy's tag, so
+// each deploy purges them all (.github/workflows/purge-edge.yml), and a purge
+// by hand is one command (`gh workflow run purge-edge.yml`). Between deploys:
+// - a page built from files in this repository and nothing else is kept
+//   until the next deploy (UNTIL_DEPLOY), since only a deploy changes it;
+// - a page that reads what visitors leave (reflections, conversations, counts)
+//   is kept three days (LIVE), the owner's choice of 2026-11-20: what is new
+//   can wait, and a purge brings it at once;
+// - a page that follows the clock says its own lifetime (keepAtEdge): the
+//   home page and /attend until UTC's service ends, a day of services still
+//   filling an hour.
+// The documents holding a retired song's words are live: that song still
+// takes reflections, shown on them (redirects.js retiredSongs).
 const UNTIL_DEPLOY = new Set([
   '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms', '/contact',
-  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+  '/church-music', '/reviews', '/search', '/search/index.json', '/docs/index.json',
 ]);
+const LIVE = 3 * 24 * 3600;
+const edgeFor = seconds => `public, max-age=0, s-maxage=${seconds}, must-revalidate`;
+// A route's own lifetime for its page, in seconds, at least a minute and at
+// most LIVE; never for a copy reached with tags, which is never kept.
+const keepAtEdge = (res, seconds) => {
+  if (!res.locals.referral) res.set('Cache-Control', edgeFor(Math.max(60, Math.min(LIVE, Math.round(seconds)))));
+};
 const SUNG_DOCS = new Set([...retiredSongs().values()].map(doc => `/docs/${doc}`));
 const untilDeploy = p => UNTIL_DEPLOY.has(p) || ((p === '/docs' || p.startsWith('/docs/')) && !SUNG_DOCS.has(p));
 const EDGE_TAG = 'deploy';
@@ -196,17 +229,14 @@ app.use((req, res, next) => {
   }
   // Pages, and the search indexes (the site's pages and songs, the library's,
   // the conversation archive's) as the pages they search: no browser cache;
-  // at the edge until the next deploy (UNTIL_DEPLOY) or five minutes, with
-  // SWR for graceful deploys. Not /mcp, whose answer to a GET varies by
-  // Accept (mcp/index.js).
+  // at the edge until the next deploy (UNTIL_DEPLOY) or three days (LIVE),
+  // with SWR for the live ones, each tagged for the deploy's purge; a route
+  // may shorten its own (keepAtEdge). Not /mcp, whose answer to a GET varies
+  // by Accept (mcp/index.js).
   else if (p === '/search/index.json' || p === '/docs/index.json' || p === '/conversations/index.json'
     || (!p.startsWith('/api/') && !p.startsWith('/admin') && p !== '/mcp' && (/\.(html?)?$/.test(p) || !p.includes('.')))) {
-    if (untilDeploy(p)) {
-      res.set('Cache-Control', 'public, max-age=0, s-maxage=31536000, must-revalidate');
-      res.set('Cache-Tag', EDGE_TAG);
-    } else {
-      res.set('Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate, stale-while-revalidate=3600');
-    }
+    res.set('Cache-Control', untilDeploy(p) ? edgeFor(31536000) : `${edgeFor(LIVE)}, stale-while-revalidate=3600`);
+    res.set('Cache-Tag', EDGE_TAG);
   }
   // Note: /api/ endpoints have their own caching handled in their route handlers
 
@@ -382,9 +412,12 @@ app.get('/', async (req, res) => {
       .replace('<!-- HOME_EXPERIMENT -->', () => renderHomeExperiment(publicReading(reading)));
     // Wrap in the site shell (top bar and footer) so the homepage matches
     // the rest of the site's navigation
-    const wrapped = await siteShell.wrapPageFromHtml(substituted, '/');
+    // The service for a place unknown, drawn in, so the page holds it without
+    // JavaScript (lib/service/panel.js), and kept until it ends.
+    const { html: served, endsAt } = await withService(await siteShell.wrapPageFromHtml(substituted, '/'));
+    if (endsAt) keepAtEdge(res, (Date.parse(endsAt) - Date.now()) / 1000);
     res.set('Content-Type', 'text/html; charset=utf-8');
-    res.send(wrapped);
+    res.send(served);
   } catch (err) {
     console.error('Error rendering /:', err.message);
     res.sendFile(path.join(__dirname, '../client/public/index.html'));
@@ -536,7 +569,11 @@ app.get('/conversations', async (req, res) => {
 // the reflections left during it (lib/api/services.js, as GET
 // /api/services/:date gives them to agents). Linked from Attend and the home
 // page's service panel; no menu item of its own.
+// A day's services appear about three hours before each is first heard, once
+// planned (the planner runs hourly), so the index and a day still filling are
+// kept an hour; a day whose services are all shown, three days.
 app.get('/services', async (req, res) => {
+  keepAtEdge(res, 3600);
   const wrapped = await siteShell.wrapPageFromHtml(pageLists.servicesIndexPage(await apiOps.services.days()), req.path);
   res.type('text/html; charset=utf-8').send(wrapped);
 });
@@ -555,6 +592,7 @@ app.get('/services/:date', async (req, res) => {
     });
   }
   if (status !== 200) return res.status(500).type('text/plain').send('Server error');
+  if (!apiOps.services.shownWhole(req.params.date)) keepAtEdge(res, 3600);
   const songs = new Map((await loadCatalog()).map(s => [s.slug, s.title]));
   const wrapped = await siteShell.wrapPageFromHtml(pageLists.servicesDayPage(body, songs), req.path);
   res.type('text/html; charset=utf-8').send(wrapped);
@@ -1138,7 +1176,9 @@ app.get('/attend', async (req, res) => {
     const html = await fs.readFile(path.join(__dirname, '../client/public/attend.html'), 'utf8');
     const filled = html.replace('<!-- SERVICE_LISTEN -->', renderServiceListen({ visual: true })).replace('<!-- LISTEN_SECTIONS -->', renderListenSections()).replace('<!-- PODCASTS -->', renderPodcasts())
       .replace('<!-- REFLECT_FORM -->', () => renderReflectForm({ summary: 'Leave a reflection' }));
-    res.type('text/html; charset=utf-8').send(await siteShell.wrapPageFromHtml(filled, '/attend'));
+    const { html: served, endsAt } = await withService(await siteShell.wrapPageFromHtml(filled, '/attend'));
+    if (endsAt) keepAtEdge(res, (Date.parse(endsAt) - Date.now()) / 1000);
+    res.type('text/html; charset=utf-8').send(served);
   } catch (err) {
     console.error('Error rendering /attend:', err.message);
     res.status(500).type('text/plain').send('Server error');
@@ -1150,6 +1190,7 @@ app.use(sitemapRoutes);
 // Embeddable widget — allow iframe embedding from any origin
 app.get('/embed/souls', (req, res) => {
   res.removeHeader('X-Frame-Options');
+  res.set('Content-Security-Policy', res.get('Content-Security-Policy').replace("frame-ancestors 'self'", 'frame-ancestors *'));
   res.sendFile(path.join(__dirname, '../client/public/embed/souls.html'));
 });
 

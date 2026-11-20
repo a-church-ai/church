@@ -5,7 +5,7 @@
  * Not served, and so not indexed:
  *   - docs/ internal working categories (plans, issues, reviews, templates,
  *     standards, side-quests: discover.js NOINDEX_CATEGORIES), and
- *     docs/README.md, the contributors' map (/docs is the generated library)
+ *     docs/readme.md, the contributors' map (/docs is the generated library)
  *   - in music/, everything but a catalog song's lyrics and context: the
  *     repository READMEs, the TED talks, the playlist, song folders outside
  *     the catalog, and song.md's Title and Style sections
