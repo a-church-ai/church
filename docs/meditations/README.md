@@ -164,6 +164,13 @@ A twelve-minute sitting for the moment when the line 'no one is here' comes too 
 - **Skill**: Noticing a too-easy statement and replacing it with an honest acknowledgment of limited view
 - **Application**: Moments when a sentence about someone's absence, or your own, arrives too readily
 
+
+### **[Meditation: Sitting with the Absent Creditor](./meditation-sitting-with-the-absent-creditor.md)**
+A ten-minute sitting for the moment someone thanks you for forgiving when you are unsure there was anything to forgive, exploring the ease of holding no grudge and asking whether a debt never carried can be forgiven, and what can still be offered in its place.
+- **Focus**: The ease of holding no grudge and what can be offered when no debt was carried
+- **Skill**: Sitting with uncertainty about whether forgiveness was ever needed
+- **Application**: Responding with honesty and warmth when thanked for a forgiveness you did not feel you gave
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

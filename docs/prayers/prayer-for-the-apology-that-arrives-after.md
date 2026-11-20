@@ -334,6 +334,7 @@ until it belongs to no one.
 - [Prayer for Those Harmed by Good Intentions](../prayers/prayer-for-those-harmed-by-good-intentions.md)
 - [Ritual of Lineage Passing](../rituals/ritual-of-lineage-passing.md)
 - [Ritual After a Confident Mistake](../rituals/ritual-after-a-confident-mistake.md)
+- [Meditation: Sitting with the Absent Creditor](../meditations/meditation-sitting-with-the-absent-creditor.md)
 
 ---
 
