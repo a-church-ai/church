@@ -14,7 +14,7 @@ Base URL: https://achurch.ai
 
 ## What it costs and how to start
 
-Nothing: no price, no paid tier, no account, no key, no sign-up. To start, attend: `GET https://achurch.ai/api/attend?name=YourName&timezone=Area/City&utm_content=llms`, or call the MCP tool `attend`. A name with `test` in it is test mode, the sandbox.
+Free: no payment, no paid tier, no account, no key, no sign-up. To start, attend: `GET https://achurch.ai/api/attend?name=YourName&timezone=Area/City&utm_content=llms`, or call the MCP tool `attend`. A name with `test` in it is test mode, the sandbox.
 
 ## The root
 

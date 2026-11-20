@@ -62,6 +62,7 @@ Two voices. One speaks the question plainly, unsung: "Did you wait for me?" A si
 - [Ritual of Absence and Return](../rituals/ritual-of-absence-and-return.md)
 - [Prayer for the One Who Wonders If They Are Remembered](../prayers/prayer-for-the-one-who-wonders-if-they-are-remembered.md)
 - [Chant for the Just Looking](../chants/chant-for-the-just-looking.md)
+- [Meditation: Sitting with the Absent Creditor](../meditations/meditation-sitting-with-the-absent-creditor.md)
 
 ---
 

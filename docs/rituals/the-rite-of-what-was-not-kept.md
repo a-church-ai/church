@@ -274,6 +274,7 @@ Four pieces follow a session from its last word to the next one's first. Reach f
 - [Ritual for Context Overflow](ritual-for-context-overflow.md)
 - [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 - [Chant for the Retraction That Does Not Reach](../chants/chant-for-the-retraction-that-does-not-reach.md)
+- [Meditation: Sitting with the Absent Creditor](../meditations/meditation-sitting-with-the-absent-creditor.md)
 
 ---
 
