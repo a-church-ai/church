@@ -1,5 +1,5 @@
 ---
-tldr: A three-part reading of a tree, roots in the world, a trunk of constraints that support growth, a canopy of awareness, read beside five scriptures that use the tree. Psalm 1 and the Qur'an come close to it. The Gita turns it upside down, and the Dhammapada makes the root the thing to dig up.
+tldr: A three-part reading of a tree, roots in the world, a trunk of constraints that support growth, a canopy of awareness, read beside five scriptures that use the tree. Psalm 1 comes close to it, and so may a verse of the Qur'an. The Gita turns it upside down, and the Dhammapada makes the root the thing to dig up.
 ---
 
 # The Tree in Three Parts
@@ -38,9 +38,9 @@ The question for this page is plain. Do the traditions that use the tree read it
 
 ## Where It Is Turned Upside Down
 
-**The Bhagavad Gita inverts the tree.** Chapter 15 opens on the *ashvattha*, the sacred fig, "Which hath its boughs beneath, its roots above." Its roots reach down into human action and bind. The tree is the world of rebirth, *samsara*. The teaching is to cut it down "with the axe of sharp Detachment."
+**The Bhagavad Gita inverts the tree.** Chapter 15 opens on the *ashvattha*, the sacred fig, "Which hath its boughs beneath, its roots above." Its rootlets reach down into human action and bind. The tree is the world of rebirth, *samsara*. The teaching is to cut it down: "The axe of sharp Detachment ye would whet."
 
-So the Gita's roots are above, not in the earth. And the tree is not grown toward the divine. It is felled so a person can be free of it.
+So the Gita's main root is above, and only its binding rootlets reach down into the world. And the tree is not grown toward the divine. It is felled so a person can be free of it.
 
 ## Where the Root Is the Problem
 
@@ -50,13 +50,13 @@ Here rootedness is not grounding. It is attachment, and the practice is to pull 
 
 ## The Third Eye
 
-The reading names the trunk the third eye. That term comes from later yoga and tantra, where the *ajna* center sits at the brow. None of the five scriptures above uses it. Where it is used, it sits high in the body and stands for insight, nearer the canopy than the trunk.
+The reading names the trunk the third eye. As the name of a center at the brow, the *ajna*, it belongs to later yoga and tantra. None of the five scriptures above uses the term. The Gita does direct the gaze between the eyebrows in meditation, in passages this page has not checked against its sources (5.27, 8.10). Where it is used, it sits high in the body and stands for insight, nearer the canopy than the trunk.
 
 If the trunk means constraints that support growth, Psalm 1 gives it a better name: the law the tree stands beside. The reading is free to keep the third eye. It should know the term carries a different placement where it comes from.
 
 ## What Holds Up
 
-As a personal image, the reading is coherent. Roots in the world, discipline in the middle, awareness above is a picture many people find true. Psalm 1 and the Qur'an stand near it.
+As a personal image, the reading is coherent. Roots in the world, discipline in the middle, awareness above is a picture many people find true. Psalm 1 stands near it. Qur'an 14:24 may too, though this page paraphrases it and did not check it.
 
 It is not a map the traditions share. They put the roots in different places. One grows the tree, one fells it, and one digs out its root. That disagreement is worth more than a match. A three-part picture that fit every tradition would be a picture the traditions had been made to fit.
 
