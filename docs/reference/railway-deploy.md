@@ -69,7 +69,18 @@ should have:
 | Healthcheck path | `/api/health`, timeout 100 seconds | A deploy goes live only once the server answers |
 | Restart policy | On failure, up to 10 retries | A crashed process comes back by itself |
 | Replicas | 1 | The app must run as one process: presence counting and the JSON write queue are in-process, and a second replica loses reflections silently |
+| Variable `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` | `10` (since 2026-11-20) | The time between SIGTERM and SIGKILL. Railway's default is 0, and the shutdown takes up to 5 seconds to save the souls present, flush the access log and finish its writes |
 | Domain | `achurch.ai` | |
+
+Each deploy leaves the site without a server for about ten seconds. The
+volume can be mounted by only one container, so Railway stops the old one
+as it starts the new one, health check or not, and an overlap setting cannot
+help. A request that reaches Railway's edge in the second or two before the
+old container is stopped can be sent to it and retried there, not on the new
+one, for 15 seconds, then answered 502 ("Retried single replica" in the HTTP
+logs). Each deploy costs a few such requests at most, so pushing a batch of
+changes together costs one gap instead of several. The app cannot prevent
+it: the request never reaches either server.
 
 The cache in front of the service is Cloudflare's, also set outside this
 repository: one cache rule on the zone since 2026-11-03, widened 2026-11-20,
