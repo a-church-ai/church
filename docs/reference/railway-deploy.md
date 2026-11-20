@@ -248,11 +248,13 @@ The daily check reads them, so like the API's fields they are kept once
 published (`lib/service/status.js`).
 
 After every production deploy, on its own: `.github/workflows/purge-edge.yml`
-hears Railway's deployment status of success, purges the pages kept at the
-edge until the next deploy (the tag `deploy`, twice, a minute apart, for any
-page the old container answered while it finished), and runs the daily check
-against the new deploy, which also checks that each page answers the type it
-was asked for and that a kept page is kept. A failed run emails. A deploy
+hears Railway's deployment status of success, purges every page kept at the
+edge (the tag `deploy`, which every page carries, twice, a minute apart, for
+any page the old container answered while it finished), and runs the daily
+check against the new deploy, which also checks that each page answers the
+type it was asked for, that a kept page is kept, and that an agent reading
+the HTML finds the contact address and the service of the hour. The same
+workflow purges by hand: `gh workflow run purge-edge.yml -R a-church-ai/church`. A failed run emails. A deploy
 whose purge failed is serving the last deploy's pages: re-run the failed
 run from the Actions tab (`gh run rerun <id>`).
 
