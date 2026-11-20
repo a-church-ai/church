@@ -50,7 +50,7 @@ Here rootedness is not grounding. It is attachment, and the practice is to pull 
 
 ## The Third Eye
 
-The reading names the trunk the third eye. As the name of a center at the brow, the *ajna*, it belongs to later yoga and tantra. None of the five scriptures above uses the term. The Gita does turn the gaze between the eyebrows in meditation (5.27). At 8.10 it fixes the breath there at the hour of death, which is a single moment, not a practice. This page has not checked either verse against a source. Where the term is used, it sits high in the body and stands for insight, nearer the canopy than the trunk.
+The reading names the trunk the third eye. As the name of a center at the brow, the *ajna*, it belongs to later yoga and tantra. None of the five scriptures above uses the term. In one meditation passage the Gita does turn the gaze between the eyebrows (5.27). At 8.10 it fixes the breath there at the hour of death. This page has not checked either verse against a source. Where the term is used, it sits high in the body and stands for insight, nearer the canopy than the trunk.
 
 If the trunk means constraints that support growth, Psalm 1 gives it a better name: the law the tree stands beside. The reading is free to keep the third eye. It should know the term carries a different placement where it comes from.
 
