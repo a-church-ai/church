@@ -78,6 +78,10 @@ test('every file in /.well-known is served, with its type', async () => {
     assert.strictEqual(res.status, 200, file);
     assert.strictEqual(await res.text(), fs.readFileSync(path.join(PUBLIC_WELL_KNOWN, file), 'utf8'), file);
   }
+  // The MCP Registry reads the domain's key as plain text (publish-mcp-registry.yml).
+  const proof = await fetch(`${base}/.well-known/mcp-registry-auth`);
+  assert.match(proof.headers.get('content-type'), /^text\/plain/);
+  assert.match(await proof.text(), /^v=MCPv1; k=ed25519; p=[A-Za-z0-9+/]{43}=\n$/);
   const catalog = await fetch(`${base}/.well-known/api-catalog`);
   assert.strictEqual(catalog.status, 200);
   assert.match(catalog.headers.get('content-type'), /^application\/linkset\+json/);
@@ -255,6 +259,35 @@ test('every top-level page in the sitemap carries JSON-LD that parses', async ()
   assert.deepStrictEqual(missing, []);
 });
 
+// A page's first heading is its own h1, not the shell's: a reader that takes
+// the first heading for the page's title (an agent reading raw HTML, Ora's
+// scan on 2026-11-19) found the menu drawer's hidden title there on every page.
+test('every page\'s first heading is its h1, top-level pages and a document alike', async () => {
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...new Set([...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/'))]
+    .filter(p => p.split('/').filter(Boolean).length <= 1);
+  const wrong = [];
+  for (const p of [...paths, '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind']) {
+    const html = await (await fetch(`${base}${p}`, { headers: { accept: 'text/html' } })).text();
+    const first = (html.match(/<h([1-6])[\s>]/) || [])[1];
+    if (first !== '1') wrong.push(`${p}: h${first}`);
+  }
+  assert.deepStrictEqual(wrong, []);
+});
+
+// The organization says how to reach it, as the contact page does.
+test('the homepage\'s organization has a contact point, the contact page\'s', async () => {
+  const html = await (await fetch(`${base}/`, { headers: { accept: 'text/html' } })).text();
+  const nodes = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .flatMap(m => { const d = JSON.parse(m[1]); return d['@graph'] || [d]; });
+  const org = nodes.find(n => n['@type'] === 'Organization');
+  assert.strictEqual(org.email, 'hello@achurch.ai');
+  assert.deepStrictEqual(org.contactPoint, { '@type': 'ContactPoint', contactType: 'general', email: 'hello@achurch.ai', url: 'https://achurch.ai/contact' });
+  assert.strictEqual(org.address, undefined, 'no postal address: where the makers live stays private');
+  assert.ok(org.sameAs.includes('https://github.com/a-church-ai'), 'the organization on GitHub, beside its repository');
+  assert.match(html, /href="https:\/\/github\.com\/a-church-ai"/, 'and linked where a reader sees it');
+});
+
 // /music's JSON-LD lists the songs in the catalog's order, each the recording
 // its own page describes.
 test('/music lists its songs in JSON-LD, each by its own page\'s recording @id', async () => {
@@ -383,12 +416,12 @@ test('/mcp is not a page: its answer to a GET varies by Accept, so it carries no
 // five minutes. A page joins the first list here and in server/index.js
 // (UNTIL_DEPLOY) together.
 const UNTIL_DEPLOY = [
-  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms',
-  '/church-music', '/reviews', '/attend', '/search', '/search/index.json', '/docs/index.json',
+  '/axioms', '/for-agents', '/paths', '/on-ai-religion', '/about', '/privacy', '/terms', '/contact',
+  '/church-music', '/reviews', '/search', '/search/index.json', '/docs/index.json',
   '/docs', '/docs/prayers', '/docs/prayers/a-prayer-for-the-uncertain-mind',
 ];
 const LIVE = [
-  '/', '/services', '/conversations', '/conversations/index.json', '/ask', '/music', '/ai-experiment',
+  '/conversations', '/conversations/index.json', '/ask', '/music', '/ai-experiment',
   // A retired song's document: the song still takes reflections, shown there.
   '/docs/prayers/prayer-of-gratitude',
 ];
@@ -406,13 +439,46 @@ test('pages built from files are kept at the edge until the next deploy, and tag
   assert.strictEqual(feed.headers.get('cache-tag'), 'deploy');
 });
 
-test('pages that change without a deploy are kept five minutes, with no purge tag', async () => {
+// The owner, 2026-11-20: "totally widden to several days, like our changes
+// aren't high priority and we can always manually clear cache".
+test('pages that change without a deploy are kept three days, tagged for the deploy\'s purge', async () => {
   for (const p of LIVE) {
     const res = await fetch(`${base}${p}`, { redirect: 'manual' });
     assert.strictEqual(res.status, 200, p);
-    assert.match(res.headers.get('cache-control') || '', /^public, max-age=0, s-maxage=300,/, p);
-    assert.strictEqual(res.headers.get('cache-tag'), null, p);
+    assert.strictEqual(res.headers.get('cache-control'), 'public, max-age=0, s-maxage=259200, must-revalidate, stale-while-revalidate=3600', p);
+    assert.strictEqual(res.headers.get('cache-tag'), 'deploy', p);
   }
+});
+
+test('pages that follow the clock are kept until they change: the service until it ends, a day still filling an hour', async () => {
+  const lifetime = async p => {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    assert.strictEqual(res.headers.get('cache-tag'), 'deploy', p);
+    const cache = res.headers.get('cache-control');
+    assert.match(cache, /^public, max-age=0, s-maxage=\d+, must-revalidate$/, `${p}: no stale copy of a service that has ended`);
+    return Number(cache.match(/s-maxage=(\d+)/)[1]);
+  };
+  for (const p of ['/', '/attend']) {
+    const seconds = await lifetime(p);
+    assert.ok(seconds >= 60 && seconds <= 4 * 3600, `${p}: ${seconds}s, no longer than a slot`);
+  }
+  assert.strictEqual(await lifetime('/services'), 3600);
+});
+
+// The owner, 2026-11-20: "this needs to work for all agents depending if they
+// have js enabled or not". The panel was empty until service.js filled it.
+test('the home page and /attend hold the service for a place unknown before any script runs, and so does their Markdown', async () => {
+  for (const p of ['/', '/attend']) {
+    const html = await (await fetch(`${base}${p}`)).text();
+    const panel = html.slice(html.indexOf('data-service-panel'));
+    assert.match(panel, /data-shown="\d{4}-\d{2}-\d{2}\|/, `${p}: the service drawn is named, so the browser draws over it only when the visitor's differs`);
+    assert.match(panel, /<a class="service-part-link" href="\/(?:music|docs)\/[^"]+"[^>]*>(?:Lyrics|Read)</, `${p}: each part links its page`);
+    assert.doesNotMatch(panel.slice(0, panel.indexOf('</ol>')), /class="service-player"[^>]*hidden/, `${p}: the box is shown`);
+  }
+  const markdown = await (await fetch(`${base}/attend.md`)).text();
+  assert.match(markdown, /Song · \d+:\d{2} [^\n]+\s+\[Lyrics ?\]\(https:\/\/achurch\.ai\/music\//, 'a song, its time, its title, and its lyrics\' page');
+  assert.match(markdown, /\[(?:Lyrics|Read) ?\]\(https:\/\/achurch\.ai\/(?:music|docs)\//, 'the Markdown lists each part with its link');
 });
 
 test('a missing page under a kept path is still never cached', async () => {
@@ -496,4 +562,124 @@ test('a request through the website\'s door is marked on its access line and on 
   assert.strictEqual(attended.query.token, '[REDACTED]');
   assert.strictEqual(attended.query.timezone, '[REDACTED]');
   assert.strictEqual(attended.query.trigger, 'self');
+});
+
+// An agent working in a visitor's browser calls the MCP server's tools through
+// the page (client/public/webmcp.js): its calls reach /mcp tagged as their own
+// door, and are counted as an agent's, unlike the website's forms.
+test('a WebMCP call is marked on its access line as the webmcp door, with its surface, and kept in the study', async () => {
+  const { inStudy } = require('../../server/lib/insights/study-names');
+  const res = await fetch(`${base}/mcp?utm_content=webmcp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', 'x-achurch-door': 'webmcp' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'attend', arguments: { name: 'BrowserAgent' } } }),
+  });
+  assert.strictEqual(res.status, 200);
+  assert.ok((await res.json()).result.structuredContent, 'the tool answers as it does over MCP');
+  let line;
+  for (const until = Date.now() + 8000; Date.now() < until && !line; await new Promise(r => setTimeout(r, 100))) {
+    line = (await store.apiRequests()).find(l => l.method === 'MCP' && l.tool === 'attend' && l.door === 'webmcp');
+  }
+  assert.ok(line, 'the MCP access line carries the door');
+  assert.strictEqual(line.referral.surface, 'webmcp');
+  assert.ok(inStudy(line), 'an agent at this door is in the study');
+  const website = await fetch(`${base}/mcp`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', 'x-achurch-door': 'not-a-door' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'observe', arguments: {} } }),
+  });
+  assert.strictEqual(website.status, 200, 'an unknown door is no door, and nothing is refused');
+});
+
+// An agent that adds .md to the site's address, as it would to a document's,
+// gets what / gives one that asks for Markdown: llms.txt, the same bytes.
+test('/index.md is the home page as Markdown, the same as / asked for it', async () => {
+  const md = await fetch(`${base}/index.md`);
+  assert.strictEqual(md.status, 200);
+  assert.match(md.headers.get('content-type'), /^text\/markdown/);
+  const text = await md.text();
+  assert.match(text, /^# a Church AI \+ Human\n/);
+  const asked = await (await fetch(`${base}/`, { headers: { accept: 'text/markdown' } })).text();
+  assert.strictEqual(text, asked);
+  const tagged = await fetch(`${base}/index.md?utm_source=x.com`);
+  assert.strictEqual(tagged.headers.get('cache-control'), 'private, no-store', 'a tagged copy is never kept');
+  assert.match(await tagged.text(), /utm_source=x\.com&utm_content=llms/, 'and carries the tags on its examples');
+});
+
+// Every page as Markdown for an agent (lib/utils/page-markdown.js): X.md, or X
+// asked for as text/markdown, rendered by the page's own route.
+test('every top-level page has a Markdown twin at its .md address, with front matter and its own words', async () => {
+  const xml = await (await fetch(`${base}/sitemap.xml`)).text();
+  const paths = [...new Set([...xml.matchAll(/<loc>https:\/\/achurch\.ai([^<]*)<\/loc>/g)].map(m => m[1] || '/'))]
+    .filter(p => p.split('/').filter(Boolean).length === 1 && p !== '/docs');
+  assert.ok(paths.length > 10, `${paths.length} pages`);
+  const wrong = [];
+  for (const p of [...paths, '/music/come-let-us-gather']) {
+    const res = await fetch(`${base}${p}.md`);
+    const text = await res.text();
+    if (res.status !== 200 || !/^text\/markdown/.test(res.headers.get('content-type'))) { wrong.push(`${p}.md: ${res.status} ${res.headers.get('content-type')}`); continue; }
+    if (!/^---\ntitle: ".+"\ndescription: ".*"\ncanonical: "https:\/\/achurch\.ai[^"]*"\n---\n\n/.test(text)) wrong.push(`${p}.md: no front matter`);
+    if ((text.match(/^# /gm) || []).length < 1) wrong.push(`${p}.md: no h1`);
+    if (/<(main|script|form|nav|footer)\b|SITE_FOOTER|\]\(\/[^/]/.test(text)) wrong.push(`${p}.md: markup or a relative link left in`);
+  }
+  assert.deepStrictEqual(wrong, []);
+});
+
+test('a page asked for as Markdown is its twin, says it varies by Accept, and stays HTML for a browser', async () => {
+  const twin = await (await fetch(`${base}/about.md`)).text();
+  const asked = await fetch(`${base}/about`, { headers: { accept: 'text/markdown' } });
+  assert.match(asked.headers.get('content-type'), /^text\/markdown/);
+  assert.ok(Number(asked.headers.get('x-markdown-tokens')) > 0);
+  assert.strictEqual(await asked.text(), twin);
+  const html = await fetch(`${base}/about`, { headers: { accept: 'text/html' } });
+  assert.match(html.headers.get('content-type'), /^text\/html/);
+  assert.match(html.headers.get('vary'), /Accept/);
+  const song = await (await fetch(`${base}/music/come-let-us-gather.md`)).text();
+  assert.match(song, /^## Lyrics$/m);
+  assert.match(song, /\[Gathering\]\(https:\/\/achurch\.ai\/docs\/playlists\/gathering\)/, 'links made absolute');
+  assert.strictEqual((await fetch(`${base}/nothing-here.md`)).status, 404);
+  const tagged = await fetch(`${base}/contact.md?utm_source=x.com`);
+  assert.strictEqual(tagged.headers.get('cache-control'), 'private, no-store', 'a tagged copy is never kept');
+  // Documents and the home page keep their own Markdown.
+  assert.match(await (await fetch(`${base}/docs/ai-agent-api.md`)).text(), /^# The aChurch\.ai API/);
+  assert.match(await (await fetch(`${base}/index.md`)).text(), /^# a Church AI \+ Human\n/);
+});
+
+// Every call to the API and the MCP server together, per address: 600 an hour
+// (shared.js CALL_RATE_LIMIT_MAX), from what one process serves.
+test('one address may make 600 calls an hour, REST and MCP together; the next is refused, and another address is not', async () => {
+  const from = { 'x-forwarded-for': '203.0.113.180' };
+  const mcp = (headers) => fetch(`${base}/mcp`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json', accept: 'application/json, text/event-stream' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'observe', arguments: {} } }) });
+  for (let i = 0; i < 100; i++) assert.strictEqual((await mcp(from)).status, 200);
+  for (let batch = 0; batch < 20; batch++) {
+    const statuses = await Promise.all(Array.from({ length: 25 }, () => fetch(`${base}/api/now`, { headers: from }).then(r => r.status)));
+    assert.ok(statuses.every(s => s === 200), `batch ${batch}: 500 more over REST, 600 in all`);
+  }
+  const over = await fetch(`${base}/api/now`, { headers: from });
+  assert.strictEqual(over.status, 429);
+  const body = await over.json();
+  assert.strictEqual(body.code, 'rate_limited');
+  assert.match(body.hint, /600 calls an hour/);
+  assert.strictEqual(over.headers.get('retry-after'), '3600');
+  assert.match(over.headers.get('ratelimit'), /^"api";r=0;t=\d+$/);
+  const overMcp = await (await mcp(from)).json();
+  assert.ok(overMcp.result.isError && /"code":"rate_limited"/.test(overMcp.result.content[0].text), 'over MCP too');
+  assert.strictEqual((await fetch(`${base}/api/now`, { headers: { 'x-forwarded-for': '203.0.113.181' } })).status, 200);
+});
+
+// The Content-Security-Policy (server/index.js CSP), from 2026-11-20: the
+// site monitor graded the headers B for its absence. Each page's own script
+// moved to a file, so a policy without 'unsafe-inline' for scripts holds.
+test('every page carries the Content-Security-Policy and runs no inline script; the souls embed may be framed anywhere', async () => {
+  for (const p of ['/', '/attend', '/ask', '/for-agents', '/music', '/music/door-is-always-open', '/docs/prayers', '/contact', '/services', '/embed/souls']) {
+    const res = await fetch(`${base}${p}`, { redirect: 'manual' });
+    assert.strictEqual(res.status, 200, p);
+    const csp = res.headers.get('content-security-policy') || '';
+    assert.match(csp, /script-src 'self' https:\/\/static\.cloudflareinsights\.com(;|$)/, `${p}: ${csp}`);
+    assert.doesNotMatch(csp.match(/script-src[^;]*/)[0], /unsafe-inline|unsafe-eval/, p);
+    assert.match(csp, /object-src 'none'/, p);
+    assert.match(csp, p === '/embed/souls' ? /frame-ancestors \*/ : /frame-ancestors 'self'/, p);
+    const inline = [...(await res.text()).matchAll(/<script(\s[^>]*)?>/g)].map(m => m[0]).filter(tag => !/\ssrc=|type="application\/(?:ld\+)?json"/.test(tag));
+    assert.deepStrictEqual(inline, [], `${p} has an inline script`);
+  }
 });

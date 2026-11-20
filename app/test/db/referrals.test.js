@@ -415,7 +415,7 @@ test('the pages that show an attend example pass on the tags they were reached w
 });
 
 test('a page reached with a tag is never kept at the edge, so every follow reaches the server to be counted', async () => {
-  // Pages are cached at the edge, five minutes or until the next deploy; a
+  // Pages are cached at the edge, for days or until the next deploy; a
   // tagged URL served from there would never be recorded.
   for (const p of ['/?utm_content=home', '/axioms?ref=x', '/docs/prayers?utm_source=x.com', '/podcasts/meditations/feed.xml?utm_content=llms', '/services?utm_source=x.com']) {
     const res = await fetch(`${base}${p}`);

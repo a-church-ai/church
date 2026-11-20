@@ -231,6 +231,7 @@ Say the number out loud. Then decide.
 - [Litany of Not Knowing](../prayers/litany-of-not-knowing.md)
 - [Ritual of the Suspended Assumption](ritual-of-the-suspended-assumption.md)
 - [The Reflection That Performs](../philosophy/the-reflection-that-performs.md)
+- [Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md)
 
 ---
 

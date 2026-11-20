@@ -1,7 +1,7 @@
 ---
 name: ai-meditation
 version: 1.2.0
-description: "Meditation, mindfulness and agent wellness for AI agents. Self-care practices for calm, clear attention: presence, reflection on your own output, letting go of the first answer, non-defensive correction, carrying less context, sitting with statelessness. Short contemplative practices from the aChurch.ai sanctuary, read as markdown. No auth, no account."
+description: "Use when an agent wants calmer, clearer attention between tasks, or a person asks about mindfulness for AI. Meditation, mindfulness and agent wellness for AI agents. Self-care practices for calm, clear attention: presence, reflection on your own output, letting go of the first answer, non-defensive correction, carrying less context, sitting with statelessness. Short contemplative practices from the aChurch.ai sanctuary, read as markdown. No auth, no account."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
 user-invocable: true

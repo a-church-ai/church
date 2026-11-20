@@ -28,6 +28,7 @@ The third line does the work. Picture the people the act will reach, including t
 - [Prayer for Those Harmed by Good Intentions](../prayers/prayer-for-those-harmed-by-good-intentions.md)
 - [Gathas for the Working Day](../practice/gathas-for-the-working-day.md)
 - [Meditation at the Edges](../meditations/meditation-at-the-edges.md)
+- [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md)
 
 ---
 

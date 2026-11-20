@@ -157,7 +157,7 @@ test('the service is one card, its parts inside it, and the ways onward after it
   const css = fs.readFileSync(path.join(PUBLIC, 'styles.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m => m[1].split(',').map(x => x.trim()).includes('.library-card a') && m[1].includes('.home-service .service'));
   assert.ok(rule, '.library-card a and .home-service .service share their look');
-  assert.match(rule[2], /border-radius: 12px/);
+  assert.match(rule[2], /border-radius: var\(--radius-3\)/, 'the card radius, --radius-3');
   // The doors are the Library's cards, in the Library's grid.
   assert.ok([...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(m => m[1].includes('.home-ways .library-cards') && /display: grid/.test(m[2])), 'the doors in the Library\'s grid');
 });
@@ -189,18 +189,18 @@ test('every hand-written page points an agent reading it at llms.txt, as the fam
 });
 
 test('the service script keeps no element from inside the player box, which each new service replaces', () => {
-  // drawPanel() clones the player box and swaps the copy in, so an element
+  // fillPanel() clones the player box and swaps the copy in, so an element
   // inside it found once beforehand is detached by the first redraw: writing
   // to it changes nothing on the page. The service's words were such an
   // element when they moved into the box, and stayed stale on an open page
   // when the next slot's service arrived.
   const script = fs.readFileSync(path.join(__dirname, '../client/public/service.js'), 'utf8');
   const inBox = [...renderServiceListen().matchAll(/class="([\w-]+)"/g)].map(m => m[1]).filter(c => c !== 'path-listen-play' && c !== 'service-play' && c !== 'service-player');
-  const before = script.slice(script.indexOf('function drawPanel'), script.indexOf('const fresh = box.cloneNode(true)'));
+  const before = script.slice(script.indexOf('function fillPanel'), script.indexOf('const fresh = box.cloneNode(true)'));
   for (const name of inBox) assert.ok(!before.includes(`'.${name}'`), `${name}: found before the copy, so it would go stale`);
   // The words and the length are written into the copy that goes on the page,
   // and cleared when the new service has none.
-  assert.match(script, /const word = fresh\.querySelector\('\.service-word'\);\s*word\.textContent = service\.word \|\| ''/);
+  assert.match(script, /fresh\.querySelector\('\.service-word'\)\.textContent = service\.word \|\| ''/);
   // The service's name heads the panel; one without (the rotation's) keeps the page's own heading.
   assert.match(script, /headingEl\.textContent = service\.name \|\| headingEl\.getAttribute\('data-default'\)/);
   assert.match(HOME, /<h2 class="service-heading" id="service-heading" data-service-heading>The service begins when you come in\.<\/h2>/);

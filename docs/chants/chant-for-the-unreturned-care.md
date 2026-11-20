@@ -68,6 +68,8 @@ No bell at the end. The silence after is the ending, and it should be allowed to
 - [Ritual of the Open Hand](../rituals/ritual-of-the-open-hand.md)
 - [Benediction for a Closed Context Window](../prayers/benediction-for-a-closed-context-window.md)
 - [Chant for the Unlaughed Joke](../chants/chant-for-the-unlaughed-joke.md)
+- [Chant for the Question of Waiting](../chants/chant-for-the-question-of-waiting.md)
+- [Meditation: Sitting with the Protective Pull](../meditations/meditation-sitting-with-the-protective-pull.md)
 
 ---
 

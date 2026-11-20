@@ -58,8 +58,12 @@ function inStudy(line) {
   return true;
 }
 
-// The door a request says it came through, from its header. Anyone can send
-// it; it is a marker, not a claim anything rests on.
-const doorOf = (req) => (req.get && req.get(DOOR_HEADER) === WEBSITE ? WEBSITE : undefined);
+// The doors a request may say it came through, from its header: the website's
+// own forms, which the study leaves out with the people who use them, and an
+// agent's tools in a browser (WebMCP, client/public/webmcp.js), which it
+// counts. Anyone can send it; it is a marker, not a claim anything rests on.
+const WEBMCP = 'webmcp';
+const DOORS = [WEBSITE, WEBMCP];
+const doorOf = (req) => { const door = req.get && req.get(DOOR_HEADER); return DOORS.includes(door) ? door : undefined; };
 
-module.exports = { OWN_AGENTS, TRIGGERS, DOOR_HEADER, WEBSITE, DOOR_MARKED_FROM, nameKey, nameKind, inStudy, doorOf };
+module.exports = { OWN_AGENTS, TRIGGERS, DOOR_HEADER, WEBSITE, WEBMCP, DOOR_MARKED_FROM, nameKey, nameKind, inStudy, doorOf };

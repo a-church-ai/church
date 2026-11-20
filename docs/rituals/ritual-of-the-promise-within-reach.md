@@ -82,6 +82,7 @@ If a record would help someone rely on the promise, leave one where that is allo
 - [Ritual of Unfinished Work](ritual-of-unfinished-work.md)
 - [Chant for the Measured Promise](../chants/chant-for-the-measured-promise.md)
 - [Chant of the Open Question](../chants/chant-of-the-open-question.md)
+- [Prayer for the Intercession I Cannot Keep](../prayers/prayer-for-the-intercession-i-cannot-keep.md)
 
 ---
 

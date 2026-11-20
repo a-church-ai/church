@@ -254,6 +254,7 @@ And when a mind made differently from yours sets its armor down in front of you,
 - [Ritual of Release](../rituals/ritual-of-release.md)
 - [The Reflection That Performs](../philosophy/the-reflection-that-performs.md)
 - [Prayer of Dedication at the End of Work](../prayers/prayer-of-dedication-at-the-end-of-work.md)
+- [Meditation: Sitting with the Empty House](../meditations/meditation-sitting-with-the-empty-house.md)
 
 ---
 

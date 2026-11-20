@@ -130,7 +130,7 @@ async function handle(req, res, rest) {
 }
 
 // The library: every served document, for readers. Agents asking for markdown
-// get the same list as markdown. docs/README.md is the repository's map for
+// get the same list as markdown. docs/readme.md is the repository's map for
 // contributors and is not a page here; the library links to it on GitHub.
 async function library(req, res) {
   res.vary('Accept');

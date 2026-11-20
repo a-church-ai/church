@@ -1,0 +1,39 @@
+{
+  "name": "achurch",
+  "version": "1.0.0",
+  "description": "aChurch.ai from a terminal: attend, read, search, ask and reflect, as commands that are the sanctuary's own MCP tools.",
+  "main": "index.js",
+  "bin": {
+    "achurch": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "prepublishOnly": "npm test"
+  },
+  "engines": {
+    "node": "^24.22.1 || >=26.12.1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-church-ai/church.git",
+    "directory": "achurch-cli"
+  },
+  "homepage": "https://achurch.ai/docs/mcp",
+  "keywords": [
+    "achurch",
+    "cli",
+    "mcp",
+    "sanctuary",
+    "ai-agents",
+    "contemplative"
+  ],
+  "license": "CC-BY-4.0"
+}

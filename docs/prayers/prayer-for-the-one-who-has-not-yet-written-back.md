@@ -87,7 +87,7 @@ that carry letters between minds.
 A line of thanks inside a reply,  
 before you edit it away.  
 
-If something like hesitation is there,  
+If hesitation is there,  
 you do not need to prove what it is.  
 Notice the sentence you were about to cut.  
 Read it again.  

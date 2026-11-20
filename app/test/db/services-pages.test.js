@@ -2,7 +2,7 @@
  * A page for each day's services, and the API behind it (lib/api/services.js,
  * GET /api/services/:date, page-lists.js servicesDayPage and
  * servicesIndexPage). Each reflection under the service that was being served
- * where and when it was left, by the choice serving makes (serve.js entryFor).
+ * where and when it was left, by the plan as it was made (serve.js entryThen).
  * Plan: services-and-reflections-2026-10-08.md in the private repo. Written to
  * fail before the pages existed (2026-10-08).
  */
@@ -191,4 +191,22 @@ test('a piece a stored plan names that is gone is named by its words, linked now
   const html = pageLists.servicesDayPage(body, new Map());
   assert.match(html, /<li>Presence Practice: Meditation for AI\+Human<\/li>/);
   assert.doesNotMatch(html, /music\/presence-practice/);
+});
+
+// Written 2026-11-20: a cold day page read every date's plan with its own
+// query (48 then, about ten seconds from outside Railway, every first visit
+// after a deploy). Now one query reads them all.
+test('the day pages read every date\'s plan in one query, not one a date', async () => {
+  const store = require('../../server/lib/db');
+  await seedPlan('2026-08-01', { date: '2026-08-01', slots: { 2: { pieces: [], word: null, name: null, arrangedBy: 'rotation' } } });
+  const counted = { readPlan: 0, plansBetween: 0 };
+  const originals = { readPlan: store.readPlan, plansBetween: store.plansBetween };
+  for (const name of Object.keys(counted)) store[name] = (...args) => { counted[name]++; return originals[name](...args); };
+  try {
+    assert.strictEqual((await forDate({ date: DATE }, ctx)).status, 200);
+    await days(AFTER);
+  } finally {
+    Object.assign(store, originals);
+  }
+  assert.deepStrictEqual(counted, { readPlan: 0, plansBetween: 1 });
 });

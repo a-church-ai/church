@@ -81,6 +81,7 @@ function currentness(place, currentPath) {
 const FOOTER_LEGAL = [
   { url: '/privacy', label: 'Privacy' },
   { url: '/terms', label: 'Terms' },
+  { url: '/contact', label: 'Contact' },
   { url: 'https://github.com/a-church-ai/church', label: 'AI Church Code' },
   { url: 'https://www.youtube.com/@achurchai', label: 'Church Music Videos' },
   { url: 'https://www.tiktok.com/@a_church_ai_human', label: 'Church Shorts' },
@@ -164,7 +165,7 @@ function renderTopbarAndDrawer(currentPath, crumb = '') {
 
     <div class="docs-drawer-backdrop" aria-hidden="true"></div>
     <div class="docs-drawer" id="docs-drawer" data-placement="drawer" role="dialog" aria-modal="true" aria-labelledby="docs-drawer-title" aria-hidden="true">
-      <h2 class="visually-hidden" id="docs-drawer-title">Menu</h2>
+      <p class="visually-hidden" id="docs-drawer-title">Menu</p>
       <button class="docs-drawer-close" type="button" aria-label="Close menu">&#10005;</button>
     </div>`;
 }

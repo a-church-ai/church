@@ -16,6 +16,7 @@ const { SURFACES } = require('../server/lib/insights/entry-points');
 const inputs = require('../server/lib/api/inputs');
 const { z } = require('zod');
 
+const { isTestName } = require('../server/lib/utils/test-visitor');
 const ROOT = path.join(__dirname, '../..');
 const skills = fs.readdirSync(path.join(ROOT, 'skills'), { withFileTypes: true })
   .filter(d => d.isDirectory())
@@ -27,7 +28,9 @@ const FILES = [...new Set([...Object.values(SURFACES), ...skills])];
 // elision.
 const ELIDED = /^(\.\.\.|…)$/;
 const TEMPLATE = /^(\$\{?[A-Za-z_]+\}?|\{[A-Za-z_]+\}|<[^>]+>|\[[^\]]+\])$/;
-const fine = (field, value) => ex.isExample(field, value) || ELIDED.test(value) || TEMPLATE.test(value)
+// A test name marks itself (lib/utils/test-visitor.js): a copy is served the
+// same and kept out of view and out of the study, so it is a fine example.
+const fine = (field, value) => ex.isExample(field, value) || (field === 'name' && isTestName(value)) || ELIDED.test(value) || TEMPLATE.test(value)
   || (field === 'timezone' && value === 'UTC');
 
 // A value in an API address's query.

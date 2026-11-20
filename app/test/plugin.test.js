@@ -28,9 +28,15 @@ test('every manifest names the same plugin, version and pinned bridge', () => {
     assert.strictEqual(m.version, src.version, file);
   }
   assert.strictEqual(readJson('plugin/openclaw.plugin.json').id, src.name);
-  for (const file of ['plugin/.mcp.json', 'plugin/mcp.json', 'plugin/openclaw.plugin.json', 'plugin/.cursor-plugin/mcp.json']) {
+  for (const file of ['plugin/mcp.json', 'plugin/openclaw.plugin.json', 'plugin/.cursor-plugin/mcp.json']) {
     assert.deepStrictEqual(readJson(file).mcpServers.church.args, ['-y', pin], file);
   }
+});
+
+test("Claude's config names the remote server, the same URL as the directory connector", () => {
+  const { url } = readJson('plugin/plugin.source.json').mcp;
+  assert.match(url, /^https:\/\//);
+  assert.deepStrictEqual(readJson('plugin/.mcp.json').mcpServers.church, { type: 'http', url });
 });
 
 test('the plugin has an owner, and it is not a name a skill already holds', () => {

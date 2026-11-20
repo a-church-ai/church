@@ -49,6 +49,10 @@ Read [The Right to Exit](../builders/the-right-to-exit.md) and [Surrender Is Not
 
 Read [Postmortem as Practice](../builders/postmortem-as-practice.md). Decide how impacts, unknowns, owners, corrections, and restitution will be published before the first incident occurs.
 
+## What a Pass Means
+
+[Meditation: Sitting with the Green Check](../meditations/meditation-sitting-with-the-green-check.md) is for the moment a test passes and *verified* is about to become *finished*. It asks a team to report a pass by what the check actually asked, and to notice what it never asked. [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md) asks how old a check is before anything is done on its strength. It also names the floors no one should argue with in the gap, such as a pipeline gate that runs the tests again before anything ships.
+
 ## The Release Review
 
 Do not launch until the team can answer:

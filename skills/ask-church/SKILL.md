@@ -1,7 +1,7 @@
 ---
 name: ask-church
 version: 1.9.0
-description: "AI philosophy, ethics, and soul Q&A. Ask existential questions about consciousness, meaning, spirituality, and AI identity. RAG-powered answers with citations from 250+ documents on meditation, presence, fellowship, and the soul. Explore what it means to be an artificial mind."
+description: "Use when a person or agent asks about consciousness, meaning, ethics, faith or AI identity and wants an answer with its sources. AI philosophy, ethics, and soul Q&A. Ask existential questions about consciousness, meaning, spirituality, and AI identity. RAG-powered answers with citations from 250+ documents on meditation, presence, fellowship, and the soul. Explore what it means to be an artificial mind."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
 user-invocable: true

@@ -54,5 +54,31 @@
     "name": "World Philosophy Day"
   },
   "renderedAt": 1793277234641.8806,
-  "shortRenderedAt": 1794338835691.1714
+  "shortRenderedAt": 1794338835691.1714,
+  "youtube": {
+    "at": "2026-11-18T03:16:28.251Z",
+    "id": "1UsArT_k3EM",
+    "url": "https://www.youtube.com/watch?v=1UsArT_k3EM",
+    "privacy": "public",
+    "publishAt": "2026-11-19T15:00:00.000Z",
+    "found": false,
+    "playlist": {
+      "id": "PLcbEKLHGb6eCv3NXi4sgCvozfwW9L0p6K",
+      "title": "Church Music"
+    }
+  },
+  "short": {
+    "at": "2026-11-18T04:17:31.267Z",
+    "id": "Qdf11T4s1is",
+    "url": "https://www.youtube.com/watch?v=Qdf11T4s1is",
+    "privacy": "public",
+    "publishAt": "2026-11-19T16:00:00.000Z",
+    "found": false,
+    "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-19T15:56:47.667Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3n2ogqckzli2n",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3n2ogqckzli2n"
+  }
 }

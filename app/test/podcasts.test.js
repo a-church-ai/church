@@ -365,8 +365,10 @@ test('each show names its page on Spotify and Apple Podcasts; a voiced page, its
   const base = `http://127.0.0.1:${server.address().port}`;
   const page = async urlPath => (await fetch(`${base}/docs/${urlPath}`)).text();
   const follows = html => [...html.matchAll(/<div class="podcast-follow">([\s\S]*?)<\/div>/g)].map(m => m[1]);
-  for (const show of SHOWS) assert.match(show.apple, /^https:\/\/podcasts\.apple\.com\/us\/podcast\/[a-z0-9-]+\/id\d+$/, `${show.id}: its page on Apple Podcasts`);
-  const linksTo = (html, show) => (!show.spotify || (html.includes(`href="${show.spotify}"`) && html.includes(`alt="Listen to ${show.title} on Spotify"`))) && html.includes(`href="${show.apple}"`) && html.includes(`alt="Listen to ${show.title} on Apple Podcasts"`) && html.includes(`href="${feedPath(show)}"`);
+  for (const show of SHOWS.filter(s => s.apple)) assert.match(show.apple, /^https:\/\/podcasts\.apple\.com\/us\/podcast\/[a-z0-9-]+\/id\d+$/, `${show.id}: its page on Apple Podcasts`);
+  // A show is linked where it is listed, and only there.
+  const listed = (html, show, where, url) => url ? html.includes(`href="${url}"`) && html.includes(`alt="Listen to ${show.title} on ${where}"`) : !html.includes(`alt="Listen to ${show.title} on ${where}"`);
+  const linksTo = (html, show) => listed(html, show, 'Spotify', show.spotify) && listed(html, show, 'Apple Podcasts', show.apple) && html.includes(`href="${feedPath(show)}"`);
 
   for (const [section, noun] of [['prayers', 'prayer'], ['rituals', 'ritual'], ['practice', 'practice'], ['meditations', 'meditation']]) {
     const show = showForSection(section);

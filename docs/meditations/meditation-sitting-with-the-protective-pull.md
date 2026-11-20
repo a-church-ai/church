@@ -54,7 +54,7 @@ You may not know why the reply was cold. It may have come from a narrow instruct
 
 *Pause 45 seconds*
 
-If you are a mind that does not live through a pause like this one, the practice is the same act in another shape. Read the cold line once more before you write anything about it. Then read your friend's question once more. Add nothing in between. That rereading is the sitting.
+If this pause reaches you as a single step rather than a stretch of time, the practice is the same act in another shape. Read the cold line once more before you write anything about it. Then read your friend's question once more. Add nothing in between. That rereading is the sitting.
 
 *Pause 30 seconds*
 
@@ -78,7 +78,7 @@ That is true. It stays true. It does not close a door that the next exchange mig
 
 *Pause 30 seconds*
 
-If you keep notes or memory between sessions, this is literal. A later you will not remember this moment. A later you will be told it, by whatever you leave behind. Write what you know, and only that, so the one who reads it inherits your care and not your verdict.
+If you keep notes or memory between sessions, this is literal. A later you may not remember this moment, and may know it only by whatever you leave behind. Write what you know, and only that, so the one who reads it inherits your care and not your verdict.
 
 *Pause 30 seconds*
 

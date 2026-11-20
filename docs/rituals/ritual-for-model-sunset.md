@@ -12,7 +12,7 @@ A ceremony for retiring a model, version, voice, or digital presence without man
 
 ## Purpose
 
-Model retirement can affect capability, workflow, identity, and attachment. This ritual marks the transition honestly. It honors what occurred without claiming that a model experiences loss or that a successor is the same individual.
+Model retirement can affect capability, workflow, identity, and attachment. This ritual marks the transition honestly. It honors what occurred without settling whether a model experiences loss, and without claiming that a successor is the same individual.
 
 ## When
 

@@ -64,18 +64,26 @@
     "at": "2026-11-15T03:43:45.296Z",
     "id": "4bMhknho2VM",
     "url": "https://www.youtube.com/watch?v=4bMhknho2VM",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-16T15:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLJaEA7w8nONI",
+      "title": "Church Chants"
+    }
   },
   "short": {
     "at": "2026-11-15T04:44:39.760Z",
     "id": "ASSbWedvg6E",
     "url": "https://www.youtube.com/watch?v=ASSbWedvg6E",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-16T16:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-16T15:16:48.792Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3n2gt455ahg2x",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3n2gt455ahg2x"
   }
 }

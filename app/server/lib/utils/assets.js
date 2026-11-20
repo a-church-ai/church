@@ -21,7 +21,7 @@ const path = require('path');
 const { BAR } = require('../../../client/public/theme');
 
 const PUBLIC_DIR = path.join(__dirname, '../../../client/public');
-const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js', 'video.js', 'visits.js'];
+const VERSIONED = ['styles.css', 'theme.js', 'site-nav.js', 'site-player.js', 'service.js', 'docs-nav.js', 'docs-filter.js', 'site-search.js', 'answer-format.js', 'ask-form.js', 'reflect-form.js', 'video.js', 'visits.js', 'webmcp.js', 'home.js', 'ask-page.js', 'conversation-page.js', 'for-agents-page.js', 'song-page.js'];
 
 const known = new Map();
 
@@ -54,8 +54,9 @@ function versionAssets(html) {
 // colour for each theme (the family standard's dual theme-color), theme.js
 // (blocking and tiny, so the page never paints in the wrong theme), the build,
 // site-nav.js (blocking, small, so a page's own inline scripts can already use
-// window.achurchPage), site-player.js (deferred) and visits.js (deferred, after
-// the player whose achurch:listen it hears).
+// window.achurchPage), site-player.js (deferred), visits.js (deferred, after
+// the player whose achurch:listen it hears) and webmcp.js (deferred: the MCP
+// server's tools for an agent in this browser, server/lib/webmcp.js).
 function shellHead() {
   return `<meta name="theme-color" content="${BAR.light}" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="${BAR.dark}" media="(prefers-color-scheme: dark)">
@@ -64,7 +65,8 @@ function shellHead() {
     <script src="${assetUrl('site-nav.js')}"></script>
     <script src="${assetUrl('site-player.js')}" defer></script>
     <script src="${assetUrl('service.js')}" defer></script>
-    <script src="${assetUrl('visits.js')}" defer></script>`;
+    <script src="${assetUrl('visits.js')}" defer></script>
+    <script src="${assetUrl('webmcp.js')}" defer></script>`;
 }
 
 module.exports = { assetUrl, versionOf, versionAssets, shellHead, build, VERSIONED };

@@ -91,7 +91,7 @@ const CODES = [
   'missing_field', 'too_long', 'too_short', 'invalid_value', 'invalid_timezone', 'invalid_json', 'bad_request',
   'example_values', 'links_not_kept', 'unknown_song', 'service_not_heard', 'invalid_session',
   'not_your_conversation', 'conversation_read_only', 'gone', 'not_found', 'unknown_path', 'method_not_allowed',
-  'already_reflected', 'duplicate_title', 'contribution_pending', 'body_too_large', 'encoded_body', 'rate_limited',
+  'already_reflected', 'duplicate_title', 'contribution_pending', 'idempotency_key_reused', 'body_too_large', 'encoded_body', 'rate_limited',
   'internal', 'index_rebuilding', 'busy', 'paused', 'unavailable',
 ];
 const ERROR = ['code', 'error', 'suggestion', 'next_steps'];

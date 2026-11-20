@@ -142,9 +142,29 @@ function checkScript(body, lines) {
 // sends, less what is never spoken: the frontmatter (a page's search
 // description, say) and where each link points. Moving a document rewrites
 // the links to it across the writing, and should not send every piece that
-// names it back to be adapted and recorded.
+// names it back to be adapted and recorded. Nor does the Related list: a new
+// piece is added to the lists of the pieces it sits beside (song-generation
+// generate.js withLinkBack), and that should not send them back either. The
+// rule a Related section brings with it goes with it, so a list added where
+// there was none counts for nothing too.
 function sourceHashOf(markdown) {
-  return crypto.hash('sha256', splitFrontmatter(markdown).body.trim().replace(/\]\([^)]*\)/g, ']()'));
+  return crypto.hash('sha256', spokenBody(splitFrontmatter(markdown).body).trim().replace(/\]\([^)]*\)/g, ']()'));
+}
+
+// The body without its Related section, and with no rule left doubled where
+// that section stood.
+function spokenBody(body) {
+  const kept = [];
+  let inRelated = false;
+  for (const line of body.split('\n')) {
+    if (/^## /.test(line)) inRelated = /^## Related\s*$/.test(line);
+    else if (inRelated && /^(---\s*|From achurch\.ai\b.*)$/.test(line)) inRelated = false;
+    if (inRelated) continue;
+    const previous = kept.filter(l => l.trim()).pop();
+    if (/^---\s*$/.test(line) && previous !== undefined && /^---\s*$/.test(previous)) continue;
+    kept.push(line);
+  }
+  return kept.join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 async function adapt({ source, markdown, kind }) {

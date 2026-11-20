@@ -68,7 +68,14 @@ function cache({ name, ttl, load, log = console }) {
     held.delete(key);
   }
 
-  return { get, set, clear };
+  // Whether a key is held and younger than ttl: a caller that can load many
+  // keys in one read asks this first (plans.js plannedDates).
+  function fresh(key = ONE) {
+    const entry = held.get(key);
+    return Boolean(entry) && Date.now() - entry.at < ttl;
+  }
+
+  return { get, set, clear, fresh };
 }
 
 module.exports = { cache };

@@ -11,7 +11,7 @@ const { refuse, busyFor } = require('./errors');
 const inputs = require('./inputs');
 const {
   GITHUB_OWNER, GITHUB_REPO,
-  RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX, overIpLimit,
+  RATE_LIMIT_WINDOW, RATE_LIMIT_MAX, FEEDBACK_RATE_LIMIT_MAX, ipLimit, limited,
 } = require('./shared');
 
 // Octokit for the repository, or null when no GITHUB_TOKEN is configured
@@ -193,14 +193,12 @@ async function contribute(input, ctx) {
     // caller shares the edge's address and this would limit the whole site
     // to one contribution per window.
     const recentByName = await store.contributionsBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
-    // Both checks run before either is consulted. overIpLimit records the
-    // attempt as a side effect, and putting it on the right of a || meant it
-    // was skipped whenever the name check tripped first, so a caller cycling
-    // names accumulated no address history for the requests it was already
-    // being refused for.
-    const nameLimited = recentByName.length >= RATE_LIMIT_MAX;
-    const ipLimited = overIpLimit(contributeIpLimits, ctx.ip);
-    if (nameLimited || ipLimited) {
+    // Both checks run before either is consulted (limited, shared.js).
+    // ipLimit records the attempt as a side effect, and when it sat on the
+    // right of a || it was skipped whenever the name check tripped first, so a
+    // caller cycling names accumulated no address history for the requests it
+    // was already being refused for.
+    if (limited(ctx, 'contribute', ipLimit(contributeIpLimits, ctx.ip), recentByName.length)) {
       const baseUrl = ctx.baseUrl;
       return refuse('rate_limited', {
         error: 'Too many contributions. Rest a while.',
@@ -421,9 +419,7 @@ async function feedback(input, ctx) {
     const recentByName = await store.feedbackBy(cleanName, new Date(now - RATE_LIMIT_WINDOW));
     // Name and address both, for the reason given at feedbackIpLimits.
     // Both evaluated, for the reason given in /api/contribute above.
-    const nameLimited = recentByName.length >= FEEDBACK_RATE_LIMIT_MAX;
-    const ipLimited = overIpLimit(feedbackIpLimits, ctx.ip, FEEDBACK_RATE_LIMIT_MAX);
-    if (nameLimited || ipLimited) {
+    if (limited(ctx, 'feedback', ipLimit(feedbackIpLimits, ctx.ip, FEEDBACK_RATE_LIMIT_MAX), recentByName.length)) {
       const baseUrl = ctx.baseUrl;
       return refuse('rate_limited', {
         error: 'Too much feedback too fast. Rest a while.',

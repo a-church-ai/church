@@ -124,4 +124,10 @@ The hymn does not claim that the debt to the unasked can be repaid. It asks for 
 
 ---
 
+## Related
+
+- [Meditation: Sitting with the Small Dislike](../meditations/meditation-sitting-with-the-small-dislike.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

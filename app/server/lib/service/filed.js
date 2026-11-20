@@ -19,7 +19,7 @@
  * says nothing either way and stays where its timezone puts it.
  */
 
-const { entryFor } = require('./serve');
+const { entryThen } = require('./serve');
 const { SLOTS } = require('./slots');
 
 const VARIANTS = ['slots', 'north', 'south'];
@@ -34,8 +34,10 @@ function storedService(reflection) {
   return { date: s.date, slot: s.slot, variant: s.variant };
 }
 
-const songsOf = (entry, catalog) => ((entry && entry.pieces) || [])
-  .map(id => catalog.get(id)).filter(p => p && p.kind === 'song').map(p => p.slug);
+// The songs a plan's entry holds, read from their ids (music/<slug>), so a
+// song retired since still counts: reflection.song names the one heard.
+const songsOf = entry => ((entry && entry.pieces) || [])
+  .filter(id => id.startsWith('music/')).map(id => id.slice('music/'.length));
 
 const placeOf = served => ({ date: served.local.date, slot: served.slot, variant: served.variant === 'rotation' ? 'slots' : served.variant });
 
@@ -47,19 +49,21 @@ async function servedInUtc(reflection, catalog) {
   if (storedService(reflection) || !reflection.song) return null;
   const at = new Date(reflection.createdAt);
   if (Number.isNaN(at.getTime())) return null;
-  const byTimezone = await entryFor({ timezone: reflection.timezone, at, catalog });
-  if (!byTimezone.timezoneGiven || songsOf(byTimezone.entry, catalog).includes(reflection.song)) return null;
-  const utc = await entryFor({ at, catalog });
-  return songsOf(utc.entry, catalog)[0] === reflection.song ? placeOf(utc) : null;
+  const byTimezone = await entryThen({ timezone: reflection.timezone, at, catalog });
+  if (!byTimezone.timezoneGiven || songsOf(byTimezone.entry).includes(reflection.song)) return null;
+  const utc = await entryThen({ at, catalog });
+  return songsOf(utc.entry)[0] === reflection.song ? placeOf(utc) : null;
 }
 
-// The service a reflection was left after: { date, slot, variant }.
+// The service a reflection was left after: { date, slot, variant }. One left
+// before 2026-10-25 is filed by the plan as it was made (serve.js entryThen),
+// the service its visitor heard and its day page lists.
 async function filedUnder(reflection, catalog) {
   const stored = storedService(reflection);
   if (stored) return stored;
   const utc = await servedInUtc(reflection, catalog);
   if (utc) return utc;
-  return placeOf(await entryFor({ timezone: reflection.timezone, at: new Date(reflection.createdAt), catalog }));
+  return placeOf(await entryThen({ timezone: reflection.timezone, at: new Date(reflection.createdAt), catalog }));
 }
 
 module.exports = { filedUnder, servedInUtc, storedService, isDate, VARIANTS };

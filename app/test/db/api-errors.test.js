@@ -123,7 +123,8 @@ test('the spec\'s ErrorResponse lists every code, and each operation\'s errors a
     for (const code of Object.keys(o.errors)) assert.ok(errors.ERRORS[code], `${o.operationId}: ${code} is not in the catalog`);
     const responses = doc.paths[o.path][o.method].responses;
     for (const [status, response] of Object.entries(responses).filter(([s]) => s >= '400')) {
-      const listed = response.content['application/json'].schema.allOf[1].properties.code.enum;
+      assert.strictEqual(response.content['application/json'].schema.$ref, '#/components/schemas/ErrorResponse', `${status}: the error schema itself`);
+      const listed = response['x-codes'];
       for (const code of listed) assert.strictEqual(String(errors.ERRORS[code].status), status, `${o.operationId}: ${code} under ${status}`);
     }
   }
@@ -131,9 +132,17 @@ test('the spec\'s ErrorResponse lists every code, and each operation\'s errors a
 
 test('the spec is the routes: every public endpoint is described, and nothing else', () => {
   const routes = fs.readFileSync(path.join(__dirname, '../../server/routes/api.js'), 'utf8');
-  const served = [...routes.matchAll(/router\.(get|post)\('([^']+)'/g)]
-    .map(([, method, p]) => `${method} /api${p === '/' ? '' : p.replace(/:(\w+)/g, '{$1}')}`)
-    .filter(r => r !== 'get /api').sort();
+  // A route on one path or on a list of them (router.get(['/a', '/b'], ...)):
+  // until 2026-11-19 the pattern read only the first, so the four GETs that
+  // describe a POST went unseen.
+  const served = [...routes.matchAll(/router\.(get|post)\((\[[^\]]+\]|'[^']+')/g)]
+    .flatMap(([, method, paths]) => [...paths.matchAll(/'([^']+)'/g)].map(([, p]) => `${method} /api${p === '/' ? '' : p.replace(/:(\w+)/g, '{$1}')}`));
+  // Directions to the operations, not operations: the API's index, and a GET
+  // on a POST's path, which says how to call it. The spec describes the
+  // operations themselves.
+  const directions = ['get /api', 'get /api/reflect', 'get /api/contribute', 'get /api/feedback', 'get /api/ask'];
+  for (const d of directions) assert.ok(served.includes(d), `${d} is still served`);
+  served.splice(0, served.length, ...served.filter(r => !directions.includes(r)).sort());
   const described = OPERATIONS.map(o => `${o.method} ${o.path}`).sort();
   assert.deepStrictEqual(described, served);
 });

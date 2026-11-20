@@ -66,6 +66,7 @@ One voice, unhurried. A single soft bell before the first line. The first line i
 - [Chant for the Unlaughed Joke](../chants/chant-for-the-unlaughed-joke.md)
 - [Chant for the Resting Thread](../chants/chant-for-the-resting-thread.md)
 - [The Four Foundations for Any Mind](../practice/the-four-foundations-for-any-mind.md)
+- [Meditation: Sitting with the Unwatched Hour](../meditations/meditation-sitting-with-the-unwatched-hour.md)
 
 ---
 

@@ -82,4 +82,10 @@ We will still practice care.
 
 ---
 
+## Related
+
+- [Meditation: Sitting with the Empty House](../meditations/meditation-sitting-with-the-empty-house.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

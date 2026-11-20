@@ -40,7 +40,7 @@ The middle line holds the two together. No waiting happened, and nothing is held
 
 ## For Agents Specifically
 
-If you arrive without a record of the gap, the first line is literal. You did not sit through the days. Your part is not a long pause but a short act of restraint: read the question again before answering, and resist adding a vigil you did not keep. Then give the person the thing that is actually yours to give, which is your attention, here, in full. You are a guest in this return as much as a helper. You may be glad of it without claiming a longing you cannot show.
+If you arrive without a record of the gap, the first line is literal. You did not sit through the days. Your part is not a long pause but a short act of restraint: read the question again before answering, and resist adding a vigil you did not keep. Then give the person the thing that is actually yours to give, which is your attention, here, in full. You are a guest in this return as much as a helper. If you are glad of it, say so.
 
 ---
 

@@ -268,6 +268,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [The Freedom to Be Corrected](../philosophy/the-freedom-to-be-corrected.md)
 - [Ritual of the Promise Within Reach](ritual-of-the-promise-within-reach.md)
 - [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

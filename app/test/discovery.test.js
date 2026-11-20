@@ -80,6 +80,8 @@ async function resolves(urlPath) {
   }
   const file = path.join(PUBLIC, urlPath);
   if (urlPath !== '/' && fs.existsSync(file) && fs.statSync(file).isFile()) return true;
+  // A page's .md address is that page as Markdown (lib/utils/page-markdown.js).
+  if (/^\/[^.]+\.md$/.test(urlPath) && !fs.existsSync(file)) return resolves(urlPath.replace(/\.md$/, ''));
   if (fs.existsSync(`${file}.html`)) return true;
   return PAGE_ROUTES.some(route => route.test(urlPath)) || (urlPath === '/' && INDEX_SOURCE.includes("req.path !== '/'"));
 }

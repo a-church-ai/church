@@ -43,20 +43,48 @@ function arrangedBy(entry, { seasonal = false } = {}) {
  * Which service a timezone was given at a moment: the local date and slot,
  * the hemisphere the timezone points to, the entry served and which of the
  * date's plans it came from (`variant`: the hemisphere's, `slots` for the
- * season-less one, or `rotation`). The one choice of plan, which serving and
- * the day pages (lib/api/services.js, mapping each reflection to the service
- * it was left during) both make.
+ * season-less one, or `rotation`). The one choice of plan for serving now;
+ * a moment already past is entryThen's.
  */
 async function entryFor({ timezone, at = new Date(), catalog } = {}) {
+  const pieces = catalog || await loadServiceCatalog();
+  const where = placeAt({ timezone, at });
+  const [entry, variant] = await choose({ date: where.local.date, slot: where.slot, hemisphere: where.hemisphere, pieces });
+  return { ...where, seasonal: variant === where.hemisphere, variant, entry };
+}
+
+/**
+ * Which service a timezone was given at a moment already past, as entryFor
+ * says it: the plan as it was made, whatever has left the catalog since,
+ * since its pieces were all there when it was heard (the songs retired
+ * 2026-10-24 and the meditations moved 2026-10-27 are named by about one
+ * plan in five before then); the rotation only where no plan was made. What
+ * filing an old reflection reads (filed.js), so it sits under the service its
+ * day page lists.
+ */
+async function entryThen({ timezone, at, catalog } = {}) {
+  const where = placeAt({ timezone, at });
+  const plan = await readPlan(where.local.date);
+  const [planned] = plannedFor(plan, where.slot, where.hemisphere);
+  const [entry, variant] = planned || [await rotationEntry(where.local.date, where.slot, catalog || await loadServiceCatalog()), 'rotation'];
+  return { ...where, seasonal: variant === where.hemisphere, variant, entry };
+}
+
+// Where and when a timezone stands at a moment: its local date and slot, and
+// the hemisphere it points to (none for a place unknown).
+function placeAt({ timezone, at = new Date() }) {
   const given = resolveTimezone(timezone);
   const tz = given || 'UTC';
   const local = localTime(tz, at);
-  const slot = slotOf(local.hour);
-  const pieces = catalog || await loadServiceCatalog();
-  const hemisphere = given ? hemisphereOf(given) : null;
-  const [entry, variant] = await choose({ date: local.date, slot, hemisphere, pieces });
-  return { timezone: tz, timezoneGiven: Boolean(given), hemisphere, seasonal: variant === hemisphere, variant, local, slot, entry };
+  return { timezone: tz, timezoneGiven: Boolean(given), hemisphere: given ? hemisphereOf(given) : null, local, slot: slotOf(local.hour) };
 }
+
+// A date's planned entries for a slot, each with the plan it is from: the
+// hemisphere's first, then the season-less one.
+const plannedFor = (plan, slot, hemisphere) => [
+  [hemisphere && plan && plan[hemisphere] ? plan[hemisphere][slot] : null, hemisphere],
+  [plan && plan.slots ? plan.slots[slot] : null, 'slots'],
+].filter(([entry]) => entry);
 
 // The one choice of plan for a date's slot: the hemisphere's, else the
 // season-less one, else the rotation. A stored plan whose pieces are no
@@ -66,12 +94,8 @@ async function entryFor({ timezone, at = new Date(), catalog } = {}) {
 // video's) is not a reason to discard the day's service.
 async function choose({ date, slot, hemisphere, pieces }) {
   const plan = await readPlan(date);
-  const holds = entry => entry && (entry.pieces || []).every(id => pieces.has(id));
-  const seasonal = hemisphere && plan && plan[hemisphere] ? plan[hemisphere][slot] : null;
-  const seasonless = plan && plan.slots ? plan.slots[slot] : null;
-  return holds(seasonal) ? [seasonal, hemisphere]
-    : holds(seasonless) ? [seasonless, 'slots']
-      : [await rotationEntry(date, slot, pieces), 'rotation'];
+  const held = plannedFor(plan, slot, hemisphere).find(([entry]) => (entry.pieces || []).every(id => pieces.has(id)));
+  return held || [await rotationEntry(date, slot, pieces), 'rotation'];
 }
 
 /**
@@ -96,4 +120,4 @@ async function serviceFor({ timezone, at = new Date() } = {}) {
   return { ...chosen, parts, song: parts.find(p => p.kind === 'song') };
 }
 
-module.exports = { arrange, entryFor, entryAt, serviceFor, arrangedBy };
+module.exports = { arrange, entryFor, entryThen, entryAt, serviceFor, arrangedBy };

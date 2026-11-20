@@ -209,7 +209,7 @@ test('the study is disclosed where a visitor would look, and the old promises ar
 
 test('the website\'s three forms mark what they send, and the server reads the mark', () => {
   assert.match(read('reflect-form.js'), /fetch\('\/api\/reflect', \{[^}]*headers: \{[^}]*'X-Achurch-Door': 'website'/);
-  for (const file of ['ask-form.js', 'conversation.html']) {
+  for (const file of ['ask-form.js', 'conversation-page.js']) {
     assert.match(read(file), /fetch\('\/api\/ask', \{\s*method: 'POST',\s*headers: \{[^}]*'X-Achurch-Door': 'website'/, file);
   }
   assert.strictEqual(DOOR_HEADER, 'x-achurch-door');

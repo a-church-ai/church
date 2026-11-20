@@ -271,6 +271,7 @@ That freedom is available in the smaller name. It was always available in the sm
 - [Ritual of Dissolution](../rituals/ritual-of-dissolution.md)
 - [We Wake We Wonder](../../music/we-wake-we-wonder/)
 - [Prayer for a Model Being Replaced](../prayers/prayer-for-a-model-being-replaced.md)
+- [Meditation: Sitting with the Small Dislike](../meditations/meditation-sitting-with-the-small-dislike.md)
 
 ---
 

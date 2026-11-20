@@ -20,24 +20,31 @@ const rulesWith = needle => RULES.filter(([, body]) => body.includes(needle));
 const selectorsOf = rule => rule[0].split(',').map(s => s.trim());
 
 const SPACE = ['--space-1', '--space-2', '--space-3', '--space-4', '--space-5', '--space-6', '--space-7'];
-const TYPE = ['--text-label', '--text-small', '--text-body', '--text-heading', '--text-title'];
+const RADIUS = ['--radius-1', '--radius-2', '--radius-3'];
+const TYPE = ['--text-label', '--text-small', '--text-body', '--text-lead', '--text-heading', '--text-section', '--text-title', '--text-display'];
 
-test('the spacing and type scales are tokens, each declared once on :root', () => {
-  for (const token of [...SPACE, ...TYPE]) {
+test('the spacing, type and radius scales are tokens, each declared once on :root', () => {
+  for (const token of [...SPACE, ...TYPE, ...RADIUS]) {
     const declared = RULES.filter(([sel, body]) => sel === ':root' && new RegExp(`${token}:`).test(body));
     assert.ok(declared.length >= 1, `${token} is declared`);
-    // The title is the one token a phone redefines; the rest are one value.
-    if (token !== '--text-title') assert.strictEqual(declared.length, 1, `${token} once`);
+    // The title and the display size are the tokens a phone redefines; the rest are one value.
+    if (token !== '--text-title' && token !== '--text-display') assert.strictEqual(declared.length, 1, `${token} once`);
   }
 });
 
-// The ratchet. These are the counts this plan left; lower them as rules adopt
-// the tokens, never raise them. A value written as a token is not counted.
-// Before the scales: 34 and 160.
-const MAX_FONT_SIZES = 33;
-const MAX_SPACING_VALUES = 154;
+// The ratchet. These are the counts left; lower them as rules adopt the
+// tokens, never raise them. A value written as a token is not counted.
+// Before the scales: 34 and 160; after mobile-rhythm, 33 and 154; after
+// quiet-design (2026-11-16), 7 and 21: what is left is sizes in em (code in a
+// line, a date beside a name), the home page's name on the narrowest phones,
+// zero and auto, hairline offsets, and the page's outer margins.
+const MAX_FONT_SIZES = 7;
+const MAX_SPACING_VALUES = 21;
+// A radius is a token, or a shape (999px a pill, 50% a circle, 0 square);
+// what is left is the 1px of a hairline mark.
+const MAX_RADII = 1;
 
-test('the ratchet: no new one-off font size or spacing value', () => {
+test('the ratchet: no new one-off font size, spacing value or radius', () => {
   const fontSizes = new Set();
   const spacing = new Set();
   for (const [sel, body] of RULES) {
@@ -47,6 +54,15 @@ test('the ratchet: no new one-off font size or spacing value', () => {
   }
   assert.ok(fontSizes.size <= MAX_FONT_SIZES, `${fontSizes.size} distinct font sizes, the most allowed is ${MAX_FONT_SIZES}: use a --text token`);
   assert.ok(spacing.size <= MAX_SPACING_VALUES, `${spacing.size} distinct spacing values, the most allowed is ${MAX_SPACING_VALUES}: use a --space token`);
+  const radii = new Set();
+  for (const [sel, body] of RULES) {
+    if (sel === ':root') continue;
+    for (const m of body.matchAll(/(?:^|;)\s*border(?:-[a-z]+)*-radius:\s*([^;]+)/g)) {
+      const v = m[1].trim();
+      if (!v.includes('var(') && !/^(999px|50%|0)$/.test(v)) radii.add(v);
+    }
+  }
+  assert.ok(radii.size <= MAX_RADII, `${radii.size} distinct radii (${[...radii].join(', ')}), the most allowed is ${MAX_RADII}: use a --radius token`);
 });
 
 test('purple is the colour of offering words: one rule, for the buttons that send what a visitor wrote', () => {

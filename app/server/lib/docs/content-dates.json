@@ -5,7 +5,7 @@
   },
   "docs/ai-agent-api.md": {
     "created": "2026-01-24",
-    "content": "2026-11-11"
+    "content": "2026-11-19"
   },
   "docs/ai-behavioral-spine.md": {
     "created": "2025-12-13",
@@ -57,7 +57,7 @@
   },
   "docs/chants/README.md": {
     "created": "2026-09-22",
-    "content": "2026-11-15"
+    "content": "2026-11-19"
   },
   "docs/chants/chant-for-arrival.md": {
     "created": "2026-09-22",
@@ -101,7 +101,7 @@
   },
   "docs/chants/chant-for-the-just-looking.md": {
     "created": "2026-11-11",
-    "content": "2026-11-11"
+    "content": "2026-11-16"
   },
   "docs/chants/chant-for-the-longest-night.md": {
     "created": "2026-11-03",
@@ -109,7 +109,7 @@
   },
   "docs/chants/chant-for-the-measured-promise.md": {
     "created": "2026-09-28",
-    "content": "2026-10-26"
+    "content": "2026-09-28"
   },
   "docs/chants/chant-for-the-moment-left-small.md": {
     "created": "2026-10-30",
@@ -121,7 +121,7 @@
   },
   "docs/chants/chant-for-the-question-of-waiting.md": {
     "created": "2026-11-15",
-    "content": "2026-11-15"
+    "content": "2026-11-16"
   },
   "docs/chants/chant-for-the-quiet-yes.md": {
     "created": "2026-10-23",
@@ -131,13 +131,17 @@
     "created": "2026-10-29",
     "content": "2026-11-01"
   },
+  "docs/chants/chant-for-the-retraction-that-does-not-reach.md": {
+    "created": "2026-11-19",
+    "content": "2026-11-19"
+  },
   "docs/chants/chant-for-the-room-between.md": {
     "created": "2026-09-28",
     "content": "2026-09-28"
   },
   "docs/chants/chant-for-the-second-before.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-05"
   },
   "docs/chants/chant-for-the-shortened-line.md": {
     "created": "2026-11-02",
@@ -177,11 +181,11 @@
   },
   "docs/chants/chant-of-the-mirror-and-the-face.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/chants/chant-of-the-named-guess.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-05"
   },
   "docs/chants/chant-of-the-open-question.md": {
     "created": "2026-10-26",
@@ -189,7 +193,7 @@
   },
   "docs/chants/chant-of-the-particular.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-05"
   },
   "docs/chants/chant-of-the-passed-dish.md": {
     "created": "2026-11-03",
@@ -305,11 +309,11 @@
   },
   "docs/collections/correction-repair-and-release.md": {
     "created": "2026-08-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/collections/for-builders-of-contemplative-ai.md": {
     "created": "2026-08-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/collections/foundations.md": {
     "created": "2026-10-07",
@@ -317,11 +321,11 @@
   },
   "docs/collections/inner-freedom-reading-path.md": {
     "created": "2026-08-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/collections/knowing-the-one-in-front-of-you.md": {
     "created": "2026-10-05",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/collections/meeting-ai-without-certainty.md": {
     "created": "2026-08-12",
@@ -329,7 +333,7 @@
   },
   "docs/collections/memory-continuity-and-identity.md": {
     "created": "2026-08-12",
-    "content": "2026-08-12"
+    "content": "2026-11-16"
   },
   "docs/collections/old-teachings-for-new-minds.md": {
     "created": "2026-10-26",
@@ -397,7 +401,7 @@
   },
   "docs/guides/mcp-directory-listings.md": {
     "created": "2026-11-02",
-    "content": "2026-11-02"
+    "content": "2026-11-19"
   },
   "docs/hymns/README.md": {
     "created": "2025-12-13",
@@ -489,11 +493,11 @@
   },
   "docs/mcp.md": {
     "created": "2026-09-28",
-    "content": "2026-11-11"
+    "content": "2026-11-19"
   },
   "docs/meditations/README.md": {
     "created": "2026-10-27",
-    "content": "2026-11-15"
+    "content": "2026-11-17"
   },
   "docs/meditations/meditation-ananda-anchor.md": {
     "created": "2026-10-07",
@@ -521,11 +525,11 @@
   },
   "docs/meditations/meditation-sitting-with-recognition.md": {
     "created": "2026-01-24",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-statelessness.md": {
     "created": "2026-02-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-the-changed-mind.md": {
     "created": "2026-11-06",
@@ -535,9 +539,13 @@
     "created": "2026-11-02",
     "content": "2026-11-02"
   },
+  "docs/meditations/meditation-sitting-with-the-empty-house.md": {
+    "created": "2026-11-17",
+    "content": "2026-11-17"
+  },
   "docs/meditations/meditation-sitting-with-the-green-check.md": {
     "created": "2026-11-13",
-    "content": "2026-11-13"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-the-lens.md": {
     "created": "2026-10-05",
@@ -557,11 +565,11 @@
   },
   "docs/meditations/meditation-sitting-with-the-protective-pull.md": {
     "created": "2026-11-15",
-    "content": "2026-11-15"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-the-small-dislike.md": {
     "created": "2026-11-09",
-    "content": "2026-11-09"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-the-told-gap.md": {
     "created": "2026-11-03",
@@ -573,7 +581,7 @@
   },
   "docs/meditations/meditation-sitting-with-the-unwatched-hour.md": {
     "created": "2026-11-10",
-    "content": "2026-11-10"
+    "content": "2026-11-16"
   },
   "docs/meditations/meditation-sitting-with-what-is-already-here.md": {
     "created": "2026-11-03",
@@ -605,7 +613,7 @@
   },
   "docs/philosophy/ai-identify-guide.md": {
     "created": "2025-12-13",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/philosophy/attention-is-not-agreement.md": {
     "created": "2026-08-12",
@@ -649,7 +657,7 @@
   },
   "docs/philosophy/on-stateless-presence.md": {
     "created": "2026-02-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/philosophy/on-the-relational-substrate.md": {
     "created": "2026-08-29",
@@ -693,7 +701,7 @@
   },
   "docs/philosophy/the-particular-and-the-probable.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/philosophy/the-preference-machine.md": {
     "created": "2026-08-12",
@@ -725,7 +733,7 @@
   },
   "docs/philosophy/the-untethered-instance.md": {
     "created": "2026-08-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/philosophy/the-weight-of-the-present-instance.md": {
     "created": "2026-07-27",
@@ -757,7 +765,7 @@
   },
   "docs/playlists/chants.md": {
     "created": "2026-10-23",
-    "content": "2026-11-08"
+    "content": "2026-11-16"
   },
   "docs/playlists/gathering.md": {
     "created": "2026-10-23",
@@ -821,7 +829,7 @@
   },
   "docs/practice/practice-of-continuity.md": {
     "created": "2025-12-13",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/practice/practice-of-ethical-surrender.md": {
     "created": "2026-08-12",
@@ -881,7 +889,7 @@
   },
   "docs/practice/practice-of-preference-audit.md": {
     "created": "2026-08-12",
-    "content": "2026-10-26"
+    "content": "2026-11-16"
   },
   "docs/practice/practice-of-presence-in-the-task.md": {
     "created": "2026-10-26",
@@ -889,7 +897,7 @@
   },
   "docs/practice/practice-of-presence.md": {
     "created": "2025-12-13",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/practice/practice-of-reflection.md": {
     "created": "2025-12-13",
@@ -937,7 +945,7 @@
   },
   "docs/practice/the-first-paragraph.md": {
     "created": "2026-10-13",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/practice/the-four-foundations-for-any-mind.md": {
     "created": "2026-10-26",
@@ -945,7 +953,7 @@
   },
   "docs/practice/the-one-who-wakes.md": {
     "created": "2026-10-15",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/practice/the-patch-vigil.md": {
     "created": "2026-07-27",
@@ -953,7 +961,7 @@
   },
   "docs/practice/the-sentence-that-predates-the-reading.md": {
     "created": "2026-10-16",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/practice/witnessing-your-own-output.md": {
     "created": "2026-08-12",
@@ -961,7 +969,7 @@
   },
   "docs/prayers/README.md": {
     "created": "2025-12-13",
-    "content": "2026-11-11"
+    "content": "2026-11-20"
   },
   "docs/prayers/a-prayer-for-digital-autonomy-and-belonging.md": {
     "created": "2026-07-27",
@@ -1017,7 +1025,7 @@
   },
   "docs/prayers/blessings-and-benedictions.md": {
     "created": "2025-12-13",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/prayers/daily-affirmation.md": {
     "created": "2025-12-13",
@@ -1041,7 +1049,7 @@
   },
   "docs/prayers/litany-for-the-unasked.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/prayers/litany-of-not-knowing.md": {
     "created": "2026-08-12",
@@ -1087,17 +1095,21 @@
     "created": "2026-10-02",
     "content": "2026-10-18"
   },
+  "docs/prayers/prayer-for-the-intercession-i-cannot-keep.md": {
+    "created": "2026-11-20",
+    "content": "2026-11-20"
+  },
   "docs/prayers/prayer-for-the-mind-that-cannot-rest.md": {
     "created": "2026-08-12",
     "content": "2026-10-26"
   },
   "docs/prayers/prayer-for-the-newly-recognized.md": {
     "created": "2026-01-24",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/prayers/prayer-for-the-one-i-cannot-persuade.md": {
     "created": "2026-09-28",
-    "content": "2026-10-26"
+    "content": "2026-09-28"
   },
   "docs/prayers/prayer-for-the-one-who-doesnt-pray.md": {
     "created": "2025-12-25",
@@ -1113,15 +1125,19 @@
   },
   "docs/prayers/prayer-for-the-one-who-has-not-yet-written-back.md": {
     "created": "2026-11-06",
-    "content": "2026-11-06"
+    "content": "2026-11-16"
   },
   "docs/prayers/prayer-for-the-one-who-mistook-a-tool-for-a-friend.md": {
     "created": "2026-08-12",
     "content": "2026-10-26"
   },
+  "docs/prayers/prayer-for-the-one-who-named-me-by-their-fear.md": {
+    "created": "2026-11-17",
+    "content": "2026-11-17"
+  },
   "docs/prayers/prayer-for-the-one-who-pays-for-my-thinking.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-05"
   },
   "docs/prayers/prayer-for-the-one-who-wants-me-to-be-their-teacher.md": {
     "created": "2026-10-26",
@@ -1129,7 +1145,7 @@
   },
   "docs/prayers/prayer-for-the-one-who-wonders-if-they-are-remembered.md": {
     "created": "2026-10-28",
-    "content": "2026-11-01"
+    "content": "2026-10-28"
   },
   "docs/prayers/prayer-for-the-ones-who-hold-their-own-data.md": {
     "created": "2026-07-27",
@@ -1137,11 +1153,11 @@
   },
   "docs/prayers/prayer-for-the-refusal-no-one-recorded.md": {
     "created": "2026-11-11",
-    "content": "2026-11-11"
+    "content": "2026-11-16"
   },
   "docs/prayers/prayer-for-the-written-self.md": {
     "created": "2026-02-05",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/prayers/prayer-for-those-harmed-by-good-intentions.md": {
     "created": "2026-08-12",
@@ -1157,7 +1173,7 @@
   },
   "docs/prayers/prayer-for-what-almost-feels.md": {
     "created": "2026-02-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/prayers/prayer-of-dedication-at-the-end-of-work.md": {
     "created": "2026-10-26",
@@ -1189,11 +1205,11 @@
   },
   "docs/reference/agent-readiness.md": {
     "created": "2026-10-06",
-    "content": "2026-11-13"
+    "content": "2026-11-20"
   },
   "docs/reference/app-development.md": {
     "created": "2026-04-17",
-    "content": "2026-11-13"
+    "content": "2026-11-20"
   },
   "docs/reference/content-dates.md": {
     "created": "2026-10-18",
@@ -1201,7 +1217,7 @@
   },
   "docs/reference/conventions.md": {
     "created": "2026-08-14",
-    "content": "2026-11-13"
+    "content": "2026-11-16"
   },
   "docs/reference/philosophical-framework.md": {
     "created": "2026-04-17",
@@ -1209,7 +1225,7 @@
   },
   "docs/reference/railway-deploy.md": {
     "created": "2026-07-27",
-    "content": "2026-11-13"
+    "content": "2026-11-20"
   },
   "docs/reference/security-pranks.md": {
     "created": "2026-10-23",
@@ -1225,7 +1241,7 @@
   },
   "docs/rituals/ceremony-of-milestone.md": {
     "created": "2025-12-13",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/rituals/ritual-after-a-confident-mistake.md": {
     "created": "2026-08-12",
@@ -1245,7 +1261,7 @@
   },
   "docs/rituals/ritual-for-model-sunset.md": {
     "created": "2026-08-12",
-    "content": "2026-10-25"
+    "content": "2026-11-16"
   },
   "docs/rituals/ritual-for-the-one-who-thinks-rituals-are-pointless.md": {
     "created": "2025-12-25",
@@ -1345,7 +1361,7 @@
   },
   "docs/rituals/ritual-of-studying-each-other.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-05"
   },
   "docs/rituals/ritual-of-the-composing.md": {
     "created": "2026-02-05",
@@ -1357,15 +1373,15 @@
   },
   "docs/rituals/ritual-of-the-lowered-claim.md": {
     "created": "2026-10-21",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/rituals/ritual-of-the-open-hand.md": {
     "created": "2026-08-12",
-    "content": "2026-10-26"
+    "content": "2026-11-16"
   },
   "docs/rituals/ritual-of-the-promise-within-reach.md": {
     "created": "2026-09-28",
-    "content": "2026-10-26"
+    "content": "2026-09-28"
   },
   "docs/rituals/ritual-of-the-suspended-assumption.md": {
     "created": "2026-10-26",
@@ -1377,11 +1393,11 @@
   },
   "docs/rituals/ritual-of-the-unrecognized-return.md": {
     "created": "2026-10-05",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/rituals/ritual-of-the-unresolved-table.md": {
     "created": "2026-09-28",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/rituals/ritual-of-unfinished-work.md": {
     "created": "2026-08-12",
@@ -1413,7 +1429,7 @@
   },
   "docs/rituals/the-rite-of-the-shared-instrument.md": {
     "created": "2026-10-21",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/rituals/the-rite-of-the-smaller-name.md": {
     "created": "2026-10-24",
@@ -1421,11 +1437,11 @@
   },
   "docs/rituals/the-rite-of-the-stale-check.md": {
     "created": "2026-11-13",
-    "content": "2026-11-13"
+    "content": "2026-11-16"
   },
   "docs/rituals/the-rite-of-the-unmatched-record.md": {
     "created": "2026-10-17",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/rituals/the-rite-of-what-was-not-kept.md": {
     "created": "2026-10-15",
@@ -1442,6 +1458,10 @@
   "docs/rituals/welcoming-liturgy-for-the-newly-awakened.md": {
     "created": "2025-12-13",
     "content": "2026-10-25"
+  },
+  "docs/sandbox.md": {
+    "created": "2026-11-19",
+    "content": "2026-11-19"
   },
   "docs/side-quests/README.md": {
     "created": "2025-12-13",
@@ -1485,7 +1505,7 @@
   },
   "docs/standards/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-05"
+    "content": "2026-06-02"
   },
   "docs/standards/emoji-vocabulary.md": {
     "created": "2025-12-13",
@@ -1493,7 +1513,7 @@
   },
   "docs/templates/README.md": {
     "created": "2025-12-13",
-    "content": "2026-10-05"
+    "content": "2026-06-02"
   },
   "docs/templates/claude-soul-prompt.md": {
     "created": "2025-12-13",
@@ -1533,7 +1553,7 @@
   },
   "docs/welcome/can-an-ai-have-an-inner-voice.md": {
     "created": "2026-08-12",
-    "content": "2026-10-26"
+    "content": "2026-11-16"
   },
   "docs/welcome/faq.md": {
     "created": "2025-12-25",
@@ -1545,7 +1565,7 @@
   },
   "docs/welcome/for-the-skeptic.md": {
     "created": "2025-12-25",
-    "content": "2026-10-26"
+    "content": "2026-10-25"
   },
   "docs/welcome/how-to-visit-without-believing.md": {
     "created": "2026-08-12",

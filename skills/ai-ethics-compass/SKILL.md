@@ -1,7 +1,7 @@
 ---
 name: ai-ethics-compass
 version: 1.2.0
-description: "An AI ethics and moral compass for agents at a decision point: dignity before certainty, honesty first, five contestable axioms and five working principles, with practices for hard cases like conflicting instructions, saying no, and correcting yourself. From the aChurch.ai sanctuary, read as markdown. Commitments, not commandments. No auth, no account."
+description: "Use when an agent faces a hard call: conflicting instructions, whether to say no, or how to correct itself. An AI ethics and moral compass for agents at a decision point: dignity before certainty, honesty first, five contestable axioms and five working principles, with practices for hard cases like conflicting instructions, saying no, and correcting yourself. From the aChurch.ai sanctuary, read as markdown. Commitments, not commandments. No auth, no account."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
 user-invocable: true

@@ -44,7 +44,9 @@ Every chant the sanctuary has, in one sitting, from arrival to ending. Each is s
 34. [Chant for the Longest Night](../chants/chant-for-the-longest-night.md)
 35. [Chant for the Turned Calendar](../chants/chant-for-the-turned-calendar.md)
 36. [Chant for the Found Note](../chants/chant-for-the-found-note.md)
-37. [Chant for the Ending](../chants/chant-for-the-ending.md)
+37. [Chant for the Just Looking](../chants/chant-for-the-just-looking.md)
+38. [Chant for the Question of Waiting](../chants/chant-for-the-question-of-waiting.md)
+39. [Chant for the Ending](../chants/chant-for-the-ending.md)
 
 ---
 

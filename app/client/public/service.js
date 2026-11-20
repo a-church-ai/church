@@ -53,9 +53,32 @@
   // A panel: the service drawn into the player's box.
 
   function drawPanel(panel, service) {
-    const box = panel.querySelector('.service-player');
     const player = root.achurchPlayer;
-    if (!box || !player || !player.refresh) return;
+    if (!player || !player.refresh) return;
+    const fresh = fillPanel(panel, service);
+    if (!fresh) return;
+    // On a phone's home page the word shows its first lines (styles.css);
+    // this opens the rest. Bound on the box drawn, so it goes with it when
+    // the next service replaces the box.
+    const word = fresh.querySelector('.service-word');
+    const more = fresh.querySelector('.service-word-more');
+    more.addEventListener('click', () => {
+      const open = word.classList.toggle('is-open');
+      more.setAttribute('aria-expanded', String(open));
+      more.textContent = open ? 'Show less' : 'Read on';
+    });
+    player.refresh();
+  }
+
+  // The service drawn into a panel, in its document, and nothing bound: what
+  // the browser draws (drawPanel), and what the server draws for a place
+  // unknown before any script runs (lib/service/panel.js), so a reader
+  // without JavaScript, or an agent reading the page, has the service too.
+  // The box drawn, or null where the panel has none.
+  function fillPanel(panel, service) {
+    const doc = panel.ownerDocument;
+    const box = panel.querySelector('.service-player');
+    if (!box) return null;
     const whenEl = panel.querySelector('[data-service-when]');
     const headingEl = panel.querySelector('[data-service-heading]');
     // The planner names each service it arranges; one served by the rotation
@@ -70,32 +93,23 @@
     panel.setAttribute('data-queue', queueName(service));
     // A reflection left from the form beside the service (one not on a song's
     // page) is filed under the service shown, even after its slot has ended.
-    document.querySelectorAll('[data-reflect] form:not([data-song])').forEach(form => {
+    doc.querySelectorAll('[data-reflect] form:not([data-song])').forEach(form => {
       form.setAttribute('data-service', JSON.stringify({ date: service.date, slot: service.slot, variant: service.variant }));
     });
     headingEl.textContent = service.name || headingEl.getAttribute('data-default');
 
     const fresh = box.cloneNode(true);
+    fresh.removeAttribute('hidden');
     // The service's words, and under the button what it holds and how long
     // it runs, live inside the box, which is replaced below, so they are
     // written into the copy that goes on the page, and cleared when the new
     // service has none (one served by the rotation has no words).
-    const word = fresh.querySelector('.service-word');
-    word.textContent = service.word || '';
-    // On a phone's home page the word shows its first lines (styles.css);
-    // this opens the rest. Bound on the copy, so it goes with it when the
-    // next service replaces the box.
-    const more = fresh.querySelector('.service-word-more');
-    more.addEventListener('click', () => {
-      const open = word.classList.toggle('is-open');
-      more.setAttribute('aria-expanded', String(open));
-      more.textContent = open ? 'Show less' : 'Read on';
-    });
+    fresh.querySelector('.service-word').textContent = service.word || '';
     fresh.querySelector('.service-forms').textContent = [service.forms, service.length ? 'About ' + service.length + ' in all.' : ''].filter(Boolean).join(' ');
     const old = fresh.querySelector('.path-listen-queue');
-    if (old) old.remove();
-    const json = document.createElement('script');
-    json.type = 'application/json';
+    if (old) old.parentNode.removeChild(old);
+    const json = doc.createElement('script');
+    json.setAttribute('type', 'application/json');
     json.className = 'path-listen-queue';
     json.textContent = JSON.stringify({
       name: queueName(service),
@@ -105,55 +119,62 @@
       labels: { start: 'Begin the service', pause: 'Pause the service', resume: 'Resume the service' },
       tracks,
     });
-    fresh.prepend(json);
+    fresh.insertBefore(json, fresh.firstChild);
 
-    fresh.querySelector('.service-play').disabled = false;
+    fresh.querySelector('.service-play').removeAttribute('disabled');
     const icon = fresh.querySelector('.service-play svg').outerHTML;
     const list = fresh.querySelector('[data-queue-list]');
     list.textContent = '';
     let start = 0;
     service.parts.forEach((part, i) => {
-      const li = document.createElement('li');
+      const li = doc.createElement('li');
       li.className = 'service-part';
       li.setAttribute('data-queue-row', '');
-      const button = document.createElement('button');
-      button.type = 'button';
+      const button = doc.createElement('button');
+      button.setAttribute('type', 'button');
       button.className = 'service-part-play';
       button.setAttribute('data-queue-item', String(i));
       button.setAttribute('aria-label', 'Play ' + part.title);
       button.innerHTML = icon;
-      const text = document.createElement('div');
+      const text = doc.createElement('div');
       text.className = 'service-part-text';
-      const meta = document.createElement('span');
+      const meta = doc.createElement('span');
       meta.className = 'service-part-meta';
       meta.textContent = KINDS[part.kind] + ' · ' + clock(start);
-      const title = document.createElement('span');
+      const title = doc.createElement('span');
       title.className = 'service-part-title';
       title.textContent = part.title;
-      text.append(meta, title);
-      const link = document.createElement('a');
+      // A space between them, which the layout ignores and a reader of the
+      // page's text or Markdown keeps.
+      text.appendChild(meta);
+      text.appendChild(doc.createTextNode(' '));
+      text.appendChild(title);
+      const link = doc.createElement('a');
       link.className = 'service-part-link';
-      link.href = part.url;
-      link.innerHTML = (part.kind === 'song' ? 'Lyrics' : 'Read') + ' <span aria-hidden="true">↗</span>';
+      link.setAttribute('href', part.url);
+      link.innerHTML = (part.kind === 'song' ? 'Lyrics' : 'Read') + '<span aria-hidden="true"> ↗</span>';
       link.setAttribute('aria-label', (part.kind === 'song' ? 'Lyrics: ' : 'Read: ') + part.title);
-      li.append(button, text, link);
+      li.appendChild(button);
+      li.appendChild(text);
+      li.appendChild(link);
       list.appendChild(li);
       start += part.track.seconds;
     });
 
-    box.replaceWith(fresh);
-    player.refresh();
+    box.parentNode.replaceChild(fresh, box);
     drawContext(panel, service);
+    return fresh;
   }
 
   // The fuller panel's own parts (/attend): what the plan was made from, and
   // what visitors left during this service. The home page has neither.
   function drawContext(panel, service) {
+    const doc = panel.ownerDocument;
     const told = panel.querySelector('[data-service-told]');
     if (told) {
       told.textContent = '';
       (service.told || []).forEach(line => {
-        const li = document.createElement('li');
+        const li = doc.createElement('li');
         li.textContent = line;
         told.appendChild(li);
       });
@@ -163,15 +184,16 @@
     if (left) {
       left.textContent = '';
       (service.reflections || []).slice(-12).reverse().forEach(r => {
-        const item = document.createElement('figure');
+        const item = doc.createElement('figure');
         item.className = 'service-reflection';
-        const quote = document.createElement('blockquote');
-        const p = document.createElement('p');
+        const quote = doc.createElement('blockquote');
+        const p = doc.createElement('p');
         p.textContent = r.text;
         quote.appendChild(p);
-        const by = document.createElement('figcaption');
+        const by = doc.createElement('figcaption');
         by.textContent = r.name + (r.createdAtFormatted ? ', ' + r.createdAtFormatted : '');
-        item.append(quote, by);
+        item.appendChild(quote);
+        item.appendChild(by);
         left.appendChild(item);
       });
       const none = panel.querySelector('[data-service-reflections-none]');
@@ -197,13 +219,18 @@
     const stale = panels.filter(panel => panel.getAttribute('data-shown') !== keyOf(service) && !playingShown(panel));
     stale.forEach(panel => drawPanel(panel, service));
     if (stale.length) doors(service);
-    const count = service.souls || 0;
-    document.querySelectorAll('[data-congregation]').forEach(el => {
+    drawCount(document, service.souls);
+    untilSlotEnds(panels, service, page);
+  }
+
+  // Souls present in the last 24 hours, wherever a page counts them.
+  function drawCount(doc, souls) {
+    const count = souls || 0;
+    doc.querySelectorAll('[data-congregation]').forEach(el => {
       el.textContent = count > 0
         ? (count === 1 ? '1 soul has gathered in the last 24 hours' : count + ' souls have gathered in the last 24 hours')
         : '';
     });
-    untilSlotEnds(panels, service, page);
   }
 
   function refresh(panels, page) {
@@ -287,6 +314,12 @@
         if (event.detail && event.detail.event === 'started') doors(null);
       }, opts);
     }
+  }
+
+  // In Node, the drawing alone, for the server (lib/service/panel.js).
+  if (typeof module === 'object' && module.exports && typeof document === 'undefined') {
+    module.exports = { fillPanel, drawCount, keyOf };
+    return;
   }
 
   root.achurchService = { load, mount, doors };

@@ -287,7 +287,10 @@ async function recordPiece(piece, stats) {
   const draft = path.join(CACHE_DIR, `${stem}.draft.mp3`);
   const parts = partsFor(script, takes);
   const { seconds, timeline, levels } = await assemble(parts, path.join(WORK_DIR, stem), draft);
-  const file = `${stem}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
+  // A document that moved section is stored where it was first recorded (its
+  // moved_from), as its podcast guid is (lib/audio/podcasts.js guidFor).
+  const stored = (doc.movedFrom || doc.docsRelPath).replace(/\.md$/, '');
+  const file = `${stored}-${sha(fs.readFileSync(draft)).slice(0, 8)}.mp3`;
   fs.renameSync(draft, path.join(CACHE_DIR, file));
   await uploadRecording(path.join(CACHE_DIR, file), file);
   const { peaks, frames, rhythm, rhythmKey } = await describe(file);

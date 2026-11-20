@@ -38,6 +38,8 @@ function today() {
 
 /**
  * Date every document under docs/ this run wrote, in either manifest.
+ * `linkedBack` names the pieces that only gained a link to the new one: they
+ * take today's lastmod and keep their content date.
  *
  * Not only the new document: its section's README gains a line for it, and a
  * README left at its old date is what the CI check regenerates differently
@@ -46,11 +48,14 @@ function today() {
  * created today; an existing one keeps its created date and changes content.
  * music/ is outside both manifests, which cover docs/ alone.
  */
-function dateWritten(lastmod, contentDates, paths, written, day) {
+function dateWritten(lastmod, contentDates, paths, written, day, linkedBack = []) {
   const docs = written.filter((file) => file.startsWith('docs/') && file.endsWith('.md'));
   for (const file of docs) {
     if (lastmod) lastmod[file] = day;
-    if (contentDates) {
+    // A piece that only gained a line in its Related list changed no content:
+    // the content-dates generator reads the body as audio/adapt.js sourceHashOf
+    // does, without that list, and would say the same.
+    if (contentDates && !linkedBack.includes(file)) {
       const created = file === paths.relative.document ? day : (contentDates[file]?.created || day);
       contentDates[file] = { created, content: day };
     }
@@ -65,8 +70,8 @@ async function git(args) {
 
 /**
  * Write the files pathsFor names: the document, a hymn's song and the music
- * readme regenerated with it, the section's README and the two date
- * manifests.
+ * readme regenerated with it, a line for the new piece in the Related list of
+ * each piece it sits beside, the section's README and the two date manifests.
  *
  * Both manifests are updated in place rather than by regenerating them: their
  * generators derive dates from git history, and this document has no history
@@ -84,6 +89,20 @@ async function writeArtifacts(result) {
 
   await fs.writeFile(paths.absolute.document, document, 'utf8');
   written.push(paths.relative.document);
+
+  // Each piece the new one sits beside lists it back (generate.js withLinkBack).
+  const linkedBack = [];
+  const title = (document.match(/^# (.+)$/m) || [])[1] || decision.title;
+  for (const neighbour of decision.related || []) {
+    const relative = `docs/${neighbour.category}/${neighbour.slug}.md`;
+    const absolute = path.join(PROJECT_ROOT, relative);
+    const before = await fs.readFile(absolute, 'utf8');
+    const after = generate.withLinkBack(before, { title, category: paths.category, slug: paths.slug });
+    if (after === before) continue;
+    await fs.writeFile(absolute, after, 'utf8');
+    written.push(relative);
+    linkedBack.push(relative);
+  }
 
   // Generated from the songs and the hymns' documents, both written above.
   if (paths.absolute.musicReadme) {
@@ -107,7 +126,7 @@ async function writeArtifacts(result) {
   // after this run is a one-line diff rather than a reshuffle of the file.
   const day = today();
   await readModifyWriteJSON(paths.absolute.lastmod, {}, (manifest) => {
-    return dateWritten(manifest, null, paths, written, day).lastmod;
+    return dateWritten(manifest, null, paths, written, day, linkedBack).lastmod;
   }, serializeManifest);
   written.push(paths.relative.lastmod);
 
@@ -115,7 +134,7 @@ async function writeArtifacts(result) {
   // created now and its body is as new as it is, so all three dates agree for
   // exactly one day; after the next edit git tells them apart.
   await readModifyWriteJSON(paths.absolute.contentDates, {}, (manifest) => {
-    return dateWritten(null, manifest, paths, written, day).contentDates;
+    return dateWritten(null, manifest, paths, written, day, linkedBack).contentDates;
   }, serializeManifest);
   written.push(paths.relative.contentDates);
 

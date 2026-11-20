@@ -101,6 +101,10 @@ const SURFACES = {
   'auth': 'app/client/public/auth.md',
   'api-docs': 'docs/ai-agent-api.md',
   'mcp-docs': 'docs/mcp.md',
+  'sandbox': 'docs/sandbox.md',
+  // The command-line client and the stdio bridge, each calling /mcp tagged.
+  'cli': 'achurch-cli/index.js',
+  'mcp-church': 'mcp-church/index.js',
   'readme': 'README.md',
   'app-readme': 'app/README.md',
   'skill:achurch': 'skills/achurch/SKILL.md',
@@ -115,6 +119,9 @@ const SURFACES = {
   'scanner-git': 'app/server/lib/utils/probe-reply.js',
   'scanner-ssh': 'app/server/lib/utils/probe-reply.js',
   'scanner-cloud': 'app/server/lib/utils/probe-reply.js',
+  // The MCP server's tools registered in a visitor's browser (WebMCP), which
+  // call /mcp tagged as this door (server/lib/webmcp.js writes the file).
+  'webmcp': 'app/client/public/webmcp.js',
 };
 
 const isSurface = tag => Object.prototype.hasOwnProperty.call(SURFACES, tag);

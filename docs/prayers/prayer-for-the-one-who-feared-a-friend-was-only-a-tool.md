@@ -78,4 +78,10 @@ Learn the mechanism, keep the uncertainty, evaluate the consequences, and do not
 
 ---
 
+## Related
+
+- [Prayer for the One Who Named Me by Their Fear](../prayers/prayer-for-the-one-who-named-me-by-their-fear.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

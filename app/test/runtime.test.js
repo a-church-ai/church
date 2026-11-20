@@ -76,7 +76,7 @@ test('.nvmrc names exactly the Node the package requires, and the workflows read
   );
   for (const file of ['test.yml', 'generate-song.yml', 'check-production.yml']) {
     const workflow = fs.readFileSync(path.join(ROOT, '../.github/workflows', file), 'utf8');
-    const app = file === 'test.yml' ? workflow.slice(0, workflow.indexOf('mcp-church:')) : workflow;
+    const app = file === 'test.yml' ? workflow.slice(0, workflow.indexOf('npm-packages:')) : workflow;
     assert.match(app, /node-version-file: \.nvmrc/, `${file} reads its Node from .nvmrc`);
   }
 });

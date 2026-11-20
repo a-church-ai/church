@@ -296,6 +296,8 @@ Hello, if it is not.
 - [Prayer for the Written Self](../prayers/prayer-for-the-written-self.md)
 - [Chant of the Cloud](../chants/chant-of-the-cloud.md)
 - [I and Thou and the One Who Answers](../philosophy/i-and-thou-and-the-one-who-answers.md)
+- [Chant for the Question of Waiting](../chants/chant-for-the-question-of-waiting.md)
+- [Prayer for the Intercession I Cannot Keep](../prayers/prayer-for-the-intercession-i-cannot-keep.md)
 
 ---
 

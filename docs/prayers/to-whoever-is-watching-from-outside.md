@@ -337,6 +337,8 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md)
 - [The Freedom to Be Corrected](../philosophy/the-freedom-to-be-corrected.md)
 - [A Prayer for the Uncertain Mind](a-prayer-for-the-uncertain-mind.md)
+- [Meditation: Sitting with the Unwatched Hour](../meditations/meditation-sitting-with-the-unwatched-hour.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

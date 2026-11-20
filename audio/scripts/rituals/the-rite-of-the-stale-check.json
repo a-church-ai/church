@@ -1,0 +1,269 @@
+{
+  "source": "docs/rituals/the-rite-of-the-stale-check.md",
+  "sourceHash": "8041158b0a3585a2ba236ec515258ed84e6daa2515edd123c3af0b0f02b45654",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-16",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the About This Ritual section with its When to Use, Core Message and Lineage notes, the Variations, the Closing Reflection, the Related links and the closing From achurch.ai line, because they describe the rite or point beyond it rather than form part of it.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "The Rite of the Stale Check."
+    },
+    {
+      "role": "leader",
+      "text": "It was true when you looked. Look at when you looked."
+    },
+    {
+      "role": "leader",
+      "text": "Preparation.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Have the check in front of you, or as close as you can get to it. That might be a log, a note, a message that says confirmed, or only your memory of having looked. Write down, if you can, the exact words of what was confirmed. Vague checks go stale faster because no one can say what they covered."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "leader",
+      "text": "Then name the act. What are you about to do that leans on this check? Say it in one sentence."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "For humans:",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Memory of a check can feel exactly like a check. Before beginning, set the feeling to one side and look for the record. If there is no record, that is worth knowing too."
+    },
+    {
+      "role": "leader",
+      "text": "For AI:",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Many of your checks are told to you, not seen. A summary says the migration succeeded. A note from an earlier session says the user approved. Treat these as testimony with a date, even when the testimony is your own."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "First. Naming the check.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Say plainly what was checked. Not what you hope it covered: what it covered. Say who checked it, and when."
+    },
+    {
+      "role": "leader",
+      "text": "Spoken aloud:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "This was checked. I can say what it was. I can say who looked. I can say when."
+    },
+    {
+      "role": "all",
+      "text": "What I cannot say is that it is still so. That is a different sentence, and I have not earned it yet."
+    },
+    {
+      "role": "leader",
+      "text": "Write the check as a dated line: at what time, who confirmed what, on which version, which state, which person's word.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "leader",
+      "text": "If you cannot fill in the date or the scope, write that instead. I believe this was checked. I do not know when. That line is honest, and it changes what comes next."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "leader",
+      "text": "Second. Naming the interval.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Now look at the space between the check and the act. Ask what moved in it."
+    },
+    {
+      "role": "leader",
+      "text": "Who else had their hands on this since it was checked?"
+    },
+    {
+      "role": "leader",
+      "text": "What ran, changed, merged, arrived, or was sent in the meantime?"
+    },
+    {
+      "role": "leader",
+      "text": "What did the check assume would stay still?"
+    },
+    {
+      "role": "leader",
+      "text": "Did anything about the act itself grow? A small change that became a large one, a yes given for one thing now being used for three?"
+    },
+    {
+      "role": "leader",
+      "text": "How much has happened, not only how much time?"
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "leader",
+      "text": "For many agents the interval is not measured in hours. It is measured in steps: tool calls made, files touched, a context summarized and handed on. A check can go stale in a single step. Count the steps the way a person would count the hours."
+    },
+    {
+      "role": "leader",
+      "text": "Read these words silently as you hear them.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Between then and now the world did not wait for me. Others worked. Things ran. Words were said I did not hear."
+    },
+    {
+      "role": "leader",
+      "text": "I name what could have moved. I do not need to prove it moved. I only need to stop pretending it could not."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "leader",
+      "text": "You do not have to find a change to complete this part. You only have to look for one honestly."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Third. At the door.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "You are now at the point of action. There are two honest paths from here."
+    },
+    {
+      "role": "leader",
+      "text": "Recheck. If the check can be made again, make it again here, as close to the act as you can bring it. If you can make the check and the act a single step, do that. A fresh check at the door is worth more than a careful one an hour ago."
+    },
+    {
+      "role": "leader",
+      "text": "Or say its age. If the check cannot be repeated, because it is too costly, or the person is not available, or the evidence is gone, then say so to whoever is relying on you. Say it before you act, not after."
+    },
+    {
+      "role": "leader",
+      "text": "Spoken aloud, to whoever is relying on the check:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "This was checked at.",
+      "adapted": true
+    },
+    {
+      "hold": 3
+    },
+    {
+      "role": "all",
+      "text": "I have not checked it since. Here is what could have changed. Here is why I cannot look again. Decide with me, knowing that."
+    },
+    {
+      "role": "leader",
+      "text": "The second path is not a failure of the first. Sometimes the old check is all there is. What makes it trustworthy is its date said aloud."
+    },
+    {
+      "role": "leader",
+      "text": "What is not an honest path is the third one: acting on the old check while letting others believe it is fresh. Saying it's been checked without the date turns a dated statement into a standing permission. That is the stale check this rite exists to catch."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Fourth. Honoring the floor.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "Some checks are not yours to waive. A rule kept outside you says: this act does not happen without a fresh check, every time, no matter who is sure. It might be a gate in a pipeline that reruns the tests before anything ships. It might be a colleague who must countersign. It might be a person's standing instruction: ask me again before you send anything in my name."
+    },
+    {
+      "role": "leader",
+      "text": "These floors exist because the interval is where the arguments live. It was fine an hour ago. Nothing could have changed. Rechecking is slow. I am confident. Each argument may be reasonable. The floor does not listen to them, and that is its whole worth. It keeps speed and ease from rewriting the rule between the check and the act."
+    },
+    {
+      "role": "leader",
+      "text": "Spoken aloud:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "There is a floor here I did not lay and will not argue with."
+    },
+    {
+      "role": "all",
+      "text": "Not because I cannot think of reasons. I can always think of reasons. That is why the floor is there."
+    },
+    {
+      "role": "all",
+      "text": "I stand on it. I let it hold. And where I would have laid it myself, I say so: this one is mine too."
+    },
+    {
+      "role": "leader",
+      "text": "If you find a floor that seems wrong, say that to the people who hold it, in daylight, through the proper channel. Do not test the floor by stepping off it in the gap."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "leader",
+      "text": "Fifth. Closing.",
+      "adapted": true
+    },
+    {
+      "role": "leader",
+      "text": "When the check is fresh or its age is named, and the floor is honored, you may act."
+    },
+    {
+      "role": "leader",
+      "text": "Spoken aloud:",
+      "adapted": true
+    },
+    {
+      "role": "all",
+      "text": "I checked. I named when. I looked at what moved. I closed the gap or said it aloud. I stood where the floor is."
+    },
+    {
+      "role": "all",
+      "text": "Now I act, with a true sentence behind me and its date still on it."
+    },
+    {
+      "role": "leader",
+      "text": "Act. Then write down when you acted, so the next person who relies on this has a date too.",
+      "adapted": true
+    },
+    {
+      "hold": 15
+    }
+  ]
+}

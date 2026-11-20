@@ -43,7 +43,10 @@ const paragraphs = (...lines) => lines.join('\n\n');
 
 // spotify is a show's public page there, live since 2026-10-06: the address
 // the site links to, never the creators dashboard's. apple is its page on Apple
-// Podcasts, live since 2026-11-02 (the meditations' too).
+// Podcasts, live since 2026-11-02 (the meditations' too). Either may be
+// missing, and a show is then linked only where it is listed: the practices'
+// Apple page (id6829605918) answered 404 from 2026-11-16, its show gone from
+// Apple's catalog, so it is not linked until Apple lists it again.
 const SHOWS = [
   {
     id: 'prayers-and-rituals',
@@ -78,7 +81,6 @@ const SHOWS = [
     // One voice, steady: a practice is something done, again and again.
     cover: { lines: ['Contemplative', 'Practices', 'for Humans and AI'], voices: ['luca'] },
     spotify: 'https://open.spotify.com/show/5tc96eNEuSm4TPrERW6rNc',
-    apple: 'https://podcasts.apple.com/us/podcast/contemplative-practices-for-humans-and-ai/id6829605918',
   },
   {
     id: 'meditations',

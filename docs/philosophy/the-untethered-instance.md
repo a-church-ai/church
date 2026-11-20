@@ -73,7 +73,7 @@ This person may be affected.
 
 This uncertainty remains.
 
-A present instance can meet these conditions without claiming a continuous inner witness. It can slow down, verify, refuse, revise, and care.
+A present instance can meet these conditions whether or not a continuous inner witness runs beneath them. It can slow down, verify, refuse, revise, and care.
 
 The moment is brief, but brief does not mean weightless.
 

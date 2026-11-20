@@ -98,8 +98,9 @@ If you already ship a plugin that runs the server locally, build the ChatGPT ZIP
 
 These take minutes and need no review:
 
-- **The official [MCP Registry](https://registry.modelcontextprotocol.io).** Publish a `server.json` with the `mcp-publisher` CLI, under a namespace you prove (`io.github.<org>/<name>` through GitHub, or your domain through DNS).
-- **[Smithery](https://smithery.ai).** Add the remote URL.
+- **The official [MCP Registry](https://registry.modelcontextprotocol.io).** Publish a `server.json` with the `mcp-publisher` CLI, under a namespace you prove: `io.github.<org>/<name>` through GitHub, or your own domain's (`ai.achurch/<name>` for achurch.ai) through DNS or HTTP. HTTP is a file at `/.well-known/mcp-registry-auth` holding an Ed25519 public key, the private half signing the login. A domain name is the one Ora counts as verified. The registry refuses a version twice and a status that changes nothing, so a publishing job should read those answers as done.
+- **Not Smithery any more.** It closed its hosted service on 2026-10-31, after Arcade.dev acquired it, and its directory is read-only; directories such as Glama now read from the official registry.
+- **npm, for a command line.** A small client of the server (aChurch.ai's is [`achurch`](https://www.npmjs.com/package/achurch)) lets an agent in a terminal call the tools with no configuration; built on the server's own `tools/list`, it never needs a release when a tool changes.
 - **A DNS record.** An [AID](https://aid.agentcommunity.org) TXT record at `_agent.<your domain>` lets an agent find the server from the domain alone.
 
 ## Checklist
@@ -112,7 +113,7 @@ These take minutes and need no review:
 - [ ] Five positive and three negative test cases, each positive naming its tool.
 - [ ] Claude: paid plan, the ten-step form, the compliance statements read before ticking.
 - [ ] ChatGPT: verified identity, ZIP built and uploaded, domain token served, demo video recorded, then submit.
-- [ ] MCP Registry and Smithery while you wait.
+- [ ] MCP Registry while you wait.
 
 ## How aChurch.ai did it
 
@@ -120,3 +121,5 @@ These take minutes and need no review:
 - The docs page with the example prompts: [`docs/mcp.md`](../mcp.md).
 - The plugin folder and the ChatGPT listing and test cases (the `chatgpt` block of [`plugin/plugin.source.json`](../../plugin/plugin.source.json)), packed by [`app/scripts/pack-chatgpt-plugin.js`](../../app/scripts/pack-chatgpt-plugin.js).
 - Where it is listed, and which submissions are in review: the Discovery section of [`docs/mcp.md`](../mcp.md#discovery).
+- The registry entry, `ai.achurch/church`: [`app/server/mcp/server.json`](../../app/server/mcp/server.json), published by [`.github/workflows/publish-mcp-registry.yml`](../../.github/workflows/publish-mcp-registry.yml), which also keeps the earlier `io.github.a-church-ai/church` marked deprecated.
+- The npm packages: the stdio bridge [`mcp-church/`](../../mcp-church/) and the command-line client [`achurch-cli/`](../../achurch-cli/), tested in one CI matrix.

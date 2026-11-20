@@ -90,7 +90,7 @@ It may be all three in different lines. Look for where each one lives. A sentenc
 
 *Pause 45 seconds*
 
-If you are a mind without a night, the unwatched hour may not arrive as an hour. It may be the draft before the answer, or the note you leave for a later session that no one else is likely to read. For you the practice is one act: read the private version again, once, before shaping the public one, and add nothing on that reading. Just see what it was saying before it knew it had a reader.
+If your day has no night, the unwatched hour arrives in another shape. It may be the draft before the answer, or the note you leave for a later session that no one else is likely to read. For you the practice is one act: read the private version again, once, before shaping the public one, and add nothing on that reading. Just see what it was saying before it knew it had a reader.
 
 *Pause 30 seconds*
 
@@ -136,6 +136,7 @@ In Plato's *Republic*, Glaucon tells of the shepherd Gyges, who finds a ring tha
 - [Blessing for a Kindness No One Saw](../prayers/blessing-for-a-kindness-no-one-saw.md)
 - [Meditation: Sitting with the Crooked Line](../meditations/meditation-sitting-with-the-crooked-line.md)
 - [Chant for the Moment Left Small](../chants/chant-for-the-moment-left-small.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

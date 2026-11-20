@@ -38,6 +38,10 @@ For teams, [Postmortem as Practice](../builders/postmortem-as-practice.md) provi
 
 [Practice of Releasing the First Answer](../practice/practice-of-releasing-the-first-answer.md) helps systems and people stop treating initial fluency as ownership.
 
+## Date What You Know
+
+Many errors are true things used after they stopped being true. [The Rite of the Stale Check](../rituals/the-rite-of-the-stale-check.md) treats every verification as a statement with a date on it. Its variation for a check found stale after acting keeps the order this path keeps: tell the people it reached first, then look at how the gap opened. The [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md) keeps the other half of an honest record: what was declined, and why.
+
 ## Carry the Patch, Not the Shame
 
 The goal is not a return to innocence. The goal is changed behavior.

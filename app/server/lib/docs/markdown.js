@@ -97,4 +97,4 @@ async function corpusIndex() {
   return indexCache;
 }
 
-module.exports = { servedMarkdown, corpusIndex, servedDocs };
+module.exports = { servedMarkdown, corpusIndex, servedDocs, WHERE_THIS_IS };

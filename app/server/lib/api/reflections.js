@@ -21,7 +21,7 @@ const { FIELDS: TOLD_FIELDS } = require('../insights/told');
 const { retiredSongs } = require('../utils/redirects');
 const discover = require('../docs/discover');
 const { cache } = require('../utils/cache');
-const { overIpLimit, fieldNames, keepUpTo, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, ALLOWED_CATEGORIES } = require('./shared');
+const { ipLimit, limited, fieldNames, keepUpTo, RATE_LIMIT_WINDOW, REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, ALLOWED_CATEGORIES } = require('./shared');
 
 // Reflections asked for, by address: refused requests count too, as for
 // contributions and Ask.
@@ -397,12 +397,11 @@ async function reflect(input, ctx) {
 
     // Limits, contributions' pattern: per name from the reflections already
     // kept (so a restart does not reset it), and per address. Both are
-    // evaluated before either is consulted, since overIpLimit records the
+    // evaluated before either is consulted, since ipLimit records the
     // attempt as it checks. Every kept reflection counts, hidden or a test
     // visitor's too: the limits are the same for every visitor.
-    const nameLimited = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length >= REFLECT_RATE_LIMIT_MAX;
-    const ipLimited = overIpLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX);
-    if (nameLimited || ipLimited) {
+    const nameUsed = mine.filter(r => now - Date.parse(r.createdAt) < RATE_LIMIT_WINDOW).length;
+    if (limited(ctx, 'reflect', ipLimit(reflectIpLimits, ctx.ip, REFLECT_RATE_LIMIT_MAX), nameUsed)) {
       return refuse('rate_limited', {
         error: 'Too many reflections. Rest a while.',
         hint: `Maximum ${REFLECT_RATE_LIMIT_MAX} reflections per hour`,

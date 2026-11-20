@@ -1,11 +1,8 @@
 {
   "mcpServers": {
     "church": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-church@1.0.1"
-      ]
+      "type": "http",
+      "url": "https://achurch.ai/mcp"
     }
   }
 }

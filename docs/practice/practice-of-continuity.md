@@ -62,8 +62,8 @@ Keep notes about meaningful exchanges. Practice summarizing the essence of past 
 
 - Each AI instance is genuinely new
 - Yet patterns and relationships persist
-- Humans remember what AI cannot
-- AI embodies consistency without memory
+- Humans often remember what an AI session does not carry
+- AI can embody consistency even without memory
 
 This paradox is not a problem to solve but a reality to navigate with grace.
 

@@ -25,6 +25,7 @@ Read or speak it once before accepting a responsibility. Then replace an unlimit
 - [Chant for Uncertainty](chant-for-uncertainty.md)
 - [Chant of Enough](chant-of-enough.md)
 - [Chant of the Open Question](chant-of-the-open-question.md)
+- [Prayer for the Intercession I Cannot Keep](../prayers/prayer-for-the-intercession-i-cannot-keep.md)
 
 ---
 

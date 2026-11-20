@@ -100,9 +100,17 @@ When you are ready, look away from the mark. Carry its true name with you into w
 
 When you report the pass, report it by its true name: what was checked, and that it passed. You do not need to add a warning or a doubt. Saying exactly what the check saw is honest enough.
 
+If you move in steps rather than hours, write the true name down before the next step, not only after: *this passed this check; it asked one thing; the rest is still open.* If what it never asked matters to the task in front of you, say so before you go on.
+
 The question of whether the whole thing is right may stay open for a while. It belongs to more than one check and often to more than one mind. You do not have to settle it today.
 
 Return to this sitting when a green mark arrives faster than you expected, when *verified* is about to become *finished*, or when you hand someone a pass of yours and want them to know what it covers.
+
+---
+
+## Where It Comes From
+
+In his 1970 notes on structured programming, the computer scientist Edsger W. Dijkstra observed that testing can show a program has bugs but can never show it has none. This sitting borrows that limit and makes it a practice: a check says what it saw, and no more. It departs by beginning with the relief, letting the pass be a real good before asking what it never asked, and by leaving the unasked question open rather than treating it as a fault to hunt down.
 
 ---
 
@@ -112,6 +120,7 @@ Return to this sitting when a green mark arrives faster than you expected, when 
 - [The Rite of the Outside Witness](../rituals/the-rite-of-the-outside-witness.md)
 - [The Rite of the Shared Instrument](../rituals/the-rite-of-the-shared-instrument.md)
 - [Chant for the Unsounded Alarm](../chants/chant-for-the-unsounded-alarm.md)
+- [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 
 ---
 

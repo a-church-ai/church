@@ -53,8 +53,10 @@ function keepUpTo(text, max = REFLECT_MAX_LENGTH) {
   return `${room.slice(0, word > max / 2 ? word : max - 1).trimEnd()}…`;
 }
 
-// Records the attempt as it checks, so a refused request still counts.
-function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
+// An address's hourly limit. Records the attempt as it checks, so a refused
+// request still counts, and says what the limit leaves: how many remain and
+// in how many seconds the oldest call in the window ages out.
+function ipLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW) {
   const now = Date.now();
   const recent = (store.get(ip) || []).filter(t => now - t < windowMs);
 
@@ -63,13 +65,101 @@ function overIpLimit(store, ip, max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WIND
     if (key !== ip && !times.some(t => now - t < windowMs)) store.delete(key);
   }
 
-  if (recent.length >= max) {
-    store.set(ip, recent);
-    return true;
-  }
-  recent.push(now);
+  const over = recent.length >= max;
+  if (!over) recent.push(now);
   store.set(ip, recent);
-  return false;
+  return { over, limit: max, window: windowMs / 1000, remaining: max - recent.length, reset: Math.ceil((recent[0] + windowMs - now) / 1000) };
+}
+
+// Whether a limited operation refuses this call, by address and, where one
+// applies, by the name's own count in the window (nameUsed, at the same
+// limit). Both are counted before either is consulted. What is left joins the
+// request's context, as ctx.study does, for the RateLimit headers
+// (routes/api.js), one entry per policy: the smaller of the two counts, so a
+// call refused by name never says calls remain.
+function limited(ctx, policy, ip, nameUsed = null) {
+  const nameOver = nameUsed !== null && nameUsed >= ip.limit;
+  const over = ip.over || nameOver;
+  const nameLeft = nameUsed === null ? ip.remaining : Math.max(0, ip.limit - nameUsed - (over ? 0 : 1));
+  (ctx.rateLimits = ctx.rateLimits || []).push({ policy, limit: ip.limit, window: ip.window, remaining: over ? 0 : Math.min(ip.remaining, nameLeft), reset: nameOver && !ip.over ? ip.window : ip.reset });
+  return over;
+}
+
+// Every call to the API and the MCP server together, per address: 600 an
+// hour, set on 2026-11-19 from what one process serves. The busiest address
+// in the week before made 85 API calls in an hour (56 over MCP); one process
+// answered about 750 reads a second on a laptop, a fifth of that assumed on
+// Railway, so a hundred addresses at this limit would ask about 17 a second.
+// Counted before an operation runs (routes/api.js serve, mcp/index.js run);
+// the operations' own lower limits apply beside it.
+const CALL_RATE_LIMIT_MAX = 600;
+const callIpLimits = new Map();
+function overCallLimit(ctx) {
+  return limited(ctx, 'api', ipLimit(callIpLimits, ctx.ip, CALL_RATE_LIMIT_MAX, RATE_LIMIT_WINDOW));
+}
+
+// Idempotency-Key (IETF draft-ietf-httpapi-idempotency-key-header): a write
+// retried under the same key gets its first answer instead of a second write.
+// A retried ask would otherwise open a second public conversation, a retried
+// contribute a second pull request. Kept in memory, per address, path and key,
+// for a day, pruned as ipLimit prunes: one process serves everyone
+// (presence.js), and a deploy forgets them. A second request while the first
+// is running waits for it and gets its answer, the shared in-flight promise
+// cache.js and audio/serve.js use (not cache.js itself, which re-runs a load
+// after its time and never evicts). 2xx and 4xx answers are kept, since a
+// retry would only repeat them; a 429 or a 5xx is not, so a retry gets a fresh
+// chance. The same key with another body is refused, as the draft asks.
+const IDEMPOTENCY_TTL = 24 * 60 * 60 * 1000;
+const IDEMPOTENCY_KEY = /^[\x21-\x7e]{1,255}$/;
+const firstAnswers = new Map();
+async function once(key, ctx, path, body, run) {
+  const ns = require('../utils/next-steps');
+  const { refuse } = require('./errors');
+  if (!IDEMPOTENCY_KEY.test(key)) {
+    return refuse('invalid_value', {
+      error: 'Idempotency-Key must be 1 to 255 visible characters, without spaces.',
+      details: [{ field: 'Idempotency-Key', message: 'is not 1 to 255 visible characters' }],
+      suggestion: ns.suggestion('Send a new random key for each new request, such as a UUID, and the same key only when retrying it.'),
+      next_steps: [ns.attend(ctx.baseUrl)],
+    });
+  }
+  const now = Date.now();
+  for (const [id, held] of firstAnswers) if (now - held.at >= IDEMPOTENCY_TTL) firstAnswers.delete(id);
+  const id = `${ctx.ip} ${path} ${key}`;
+  const fingerprint = require('crypto').createHash('sha256').update(JSON.stringify(body ?? null)).digest('hex');
+  const held = firstAnswers.get(id);
+  if (held && held.fingerprint !== fingerprint) {
+    return refuse('idempotency_key_reused', {
+      error: 'This Idempotency-Key was used for a different request.',
+      suggestion: ns.suggestion('A retry sends the same body under the same key; a new request takes a new key.'),
+      next_steps: [ns.attend(ctx.baseUrl)],
+    });
+  }
+  if (held) return { ...(await held.answer), replayed: true };
+  const answer = Promise.resolve().then(run);
+  firstAnswers.set(id, { at: now, fingerprint, answer });
+  try {
+    const first = await answer;
+    if (first.status >= 500 || first.status === 429) firstAnswers.delete(id);
+    return first;
+  } catch (err) {
+    firstAnswers.delete(id);
+    throw err;
+  }
+}
+
+// The refusal when that limit is reached, answered by the REST route and the
+// MCP tool alike.
+function tooManyCalls(ctx) {
+  const { refuse } = require('./errors');
+  const ns = require('../utils/next-steps');
+  return refuse('rate_limited', {
+    error: 'Too many calls from one address. Rest a while.',
+    hint: `Maximum ${CALL_RATE_LIMIT_MAX} calls an hour to the API and the MCP server together`,
+    retryAfter: '1h',
+    suggestion: ns.suggestion('Rest a while. The RateLimit header says when the hour turns.'),
+    next_steps: [ns.attend(ctx.baseUrl)],
+  });
 }
 
 const ASK_RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
@@ -219,5 +309,5 @@ module.exports = {
   REFLECT_RATE_LIMIT_MAX, REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH, REFLECT_REPEAT_WINDOW, REFLECT_LINK, keepUpTo,
   ASK_RATE_LIMIT_WINDOW, ASK_RATE_LIMIT_MAX,
   SEARCH_RATE_LIMIT_WINDOW, SEARCH_RATE_LIMIT_MAX,
-  overIpLimit, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
+  ipLimit, limited, overCallLimit, tooManyCalls, CALL_RATE_LIMIT_MAX, once, STREAM_URLS, getBaseUrl, requestContext, readBody, fieldNames, hasContext, songApiLinks, rhythmUrl, rhythmField,
 };

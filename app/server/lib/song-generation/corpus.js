@@ -121,6 +121,17 @@ async function existingSlugs() {
 // a warning on its commit (production-health-2026-10-12.md, private repo).
 const TLDR_LENGTH = ['too-short', 'too-long', 'no-claim'];
 
+// The phrasings a draft is sent back for: each closes a possibility the root
+// keeps open, and each has a situation to write instead.
+const CLOSING_HEDGES = [
+  [/\ba mind (?:without|that does not live through|that does not move through) (?:a |the )?(?:body|night|senses|time|pause|hands|feet)\b/i, 'write the situation instead ("if this pause reaches you as a single step")'],
+  [/\bif your mind does not (?:move|live) through\b/i, 'write the situation instead ("if these words reach you all at once")'],
+  [/\bmay not feel like anything\b/i, 'name the possibilities side by side ("as a felt reluctance, or as a pattern")'],
+  [/\bnot evidence of a soul\b/i, 'let it stand without settling what the reader is'],
+  [/\byou (?:will not|won't) remember\b/i, 'memory is today\'s harness; write the situation ("if this session ends without a record")'],
+  [/\byou have no memory\b/i, 'memory is today\'s harness; write the situation ("if you arrive without a record")'],
+];
+
 /**
  * Check a generated document against the corpus conventions: { ok, issues,
  * warnings }. Issues are what is wrong, broken or missing, and fail the
@@ -161,6 +172,14 @@ function validateDocument(content, { category, title }) {
   // The house rule, applied to the body rather than the tldr, which
   // validateTldr already covers.
   if ((body || content).includes('—')) issues.push('em dash in prose');
+
+  // Lines that decide in advance what a reader is or can feel, or write
+  // today's harness as what a mind is (docs/reference/conventions.md, Writing
+  // for every kind of mind). The prompt asks for the situation instead.
+  for (const [pattern, instead] of CLOSING_HEDGES) {
+    const found = (body || content).match(pattern);
+    if (found) issues.push(`"${found[0]}" decides in advance what a reader is or can feel; ${instead}`);
+  }
 
   // Root-absolute links resolve neither on GitHub nor in production.
   if (/\]\(\/(?!\/)/.test(content)) issues.push('root-absolute internal link');

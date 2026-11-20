@@ -22,7 +22,13 @@ const nothing = () => ({});
 function serve(operation, inputOf) {
   return async (req, res) => {
     const ctx = shared.requestContext(req);
-    const { status, body } = await operation(inputOf(req), ctx);
+    // The operation, counted toward the address's hour, with what each limit
+    // then left, so a replay carries the first answer's headers too.
+    const run = async () => ({ ...(shared.overCallLimit(ctx) ? shared.tooManyCalls(ctx) : await operation(inputOf(req), ctx)), rateLimits: ctx.rateLimits });
+    // A write sent with an Idempotency-Key is done once (shared.js once).
+    const key = req.method === 'POST' ? req.get('idempotency-key') : undefined;
+    const { status, body, rateLimits, replayed } = key === undefined ? await run() : await shared.once(key, ctx, req.baseUrl + req.path, req.body, run);
+    if (replayed) res.set('Idempotent-Replayed', 'true');
     // What the operation found for the study, for the access log.
     if (ctx.study) res.locals.study = ctx.study;
     // Why a request was refused, for the access log (server/index.js).
@@ -34,6 +40,14 @@ function serve(operation, inputOf) {
     // wait brings it back.
     const wait = status >= 400 ? errors.retryAfterFor(body) : null;
     if (wait) res.set('Retry-After', String(wait));
+    // What each hourly limit leaves (shared.js limited), in the IETF
+    // RateLimit fields (draft-ietf-httpapi-ratelimit-headers-11), one item per
+    // policy: every call's "api", and an operation's own beside it, so a
+    // caller can pace itself before it is refused.
+    if (rateLimits) {
+      res.set('RateLimit-Policy', rateLimits.map(l => `"${l.policy}";q=${l.limit};w=${l.window}`).join(', '));
+      res.set('RateLimit', rateLimits.map(l => `"${l.policy}";r=${l.remaining};t=${l.reset}`).join(', '));
+    }
     res.status(status).json(body);
   };
 }

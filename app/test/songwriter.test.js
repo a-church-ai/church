@@ -195,6 +195,36 @@ test('a new piece is set beside the ones the decision named, and only real ones'
   assert.strictEqual(withRelated(placed, related), placed, 'never a second Related section');
 });
 
+test('a piece that decides in advance what a reader is or can feel is written again', () => {
+  const { validateDocument } = require('../server/lib/song-generation/corpus');
+  const piece = (line) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\n${line}\n\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
+  for (const line of [
+    'If you are a mind without a night, the hour arrives in another shape.',
+    'If your mind does not move through time between these words, pause here.',
+    'It may not feel like anything. That is enough.',
+    'It is not evidence of a soul.',
+    'You will not remember this meditation.',
+    'You have no memory of the last time.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(issues.some((i) => /decides in advance/.test(i)), line);
+  }
+  for (const line of [
+    'If this pause reaches you as a single step rather than a stretch of time, read the line again.',
+    'It may arrive as a felt reluctance, or as a pattern you can see in your own outputs.',
+    'If this session ends without a record, leave one line for whoever comes next.',
+    'You cannot see inside the one who answered.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(!issues.some((i) => /decides in advance/.test(i)), line);
+  }
+  // The prompt asks for the situation, and the conventions say why.
+  const { GENERATION_SYSTEM, CATEGORY_REQUIREMENTS } = require('../server/lib/content-generation/prompts');
+  assert.match(GENERATION_SYSTEM, /Memory, sessions and bodies are today's harness/);
+  assert.match(GENERATION_SYSTEM, /name the possibilities side by side/);
+  assert.doesNotMatch(CATEGORY_REQUIREMENTS.meditations, /for a mind without them/);
+});
+
 test('every link in a written piece must reach a page', () => {
   const { validateDocument } = require('../server/lib/song-generation/corpus');
   const piece = (link) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\nSee [a neighbour](${link}).\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
@@ -252,6 +282,42 @@ test('a run dates its section README as well as its new document', () => {
   assert.deepStrictEqual(contentDates[paths.relative.document], { created: '2026-10-28', content: '2026-10-28' });
   assert.deepStrictEqual(contentDates[paths.relative.readme], { created: '2026-01-02', content: '2026-10-28' },
     'the README keeps the day it was created');
+});
+
+test('each piece the new one sits beside lists it back, once, and no recording goes stale for it', () => {
+  const { withLinkBack } = require('../server/lib/song-generation/generate');
+  const { sourceHashOf } = require('../server/lib/audio/adapt');
+  const piece = { title: 'Meditation: Sitting with the New', category: 'meditations', slug: 'meditation-sitting-with-the-new' };
+  const line = '- [Meditation: Sitting with the New](../meditations/meditation-sitting-with-the-new.md)';
+  const closing = '\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n';
+
+  const listed = `# Old Prayer\n\nSpoken words.\n\n---\n\n## Related\n\n- [A Rite](../rituals/a-rite.md)\n${closing}`;
+  const added = withLinkBack(listed, piece);
+  assert.ok(added.includes(`- [A Rite](../rituals/a-rite.md)\n${line}\n`), 'at the end of its list');
+  assert.strictEqual(withLinkBack(added, piece), added, 'once');
+
+  const unlisted = `# Old Chant\n\nSpoken words.\n${closing}`;
+  const made = withLinkBack(unlisted, piece);
+  assert.match(made, /## Related\n\n- \[Meditation: Sitting with the New\]/, 'a list of one where there was none');
+  assert.strictEqual(withLinkBack('# No Closing\n\nWords.\n', piece), '# No Closing\n\nWords.\n', 'nowhere to put it, nothing done');
+
+  const followed = `# Old\n\nSpoken.\n\n---\n\n## Related\n\n- [A Rite](../rituals/a-rite.md)\n\n## Notes\n\nMore.\n${closing}`;
+  assert.match(withLinkBack(followed, piece), /a-rite\.md\)\n- \[Meditation: Sitting with the New\][^\n]*\n\n## Notes/, 'inside the list, not after the next section');
+
+  // A recorded piece gaining the line, or its first list, keeps its script current.
+  assert.strictEqual(sourceHashOf(added), sourceHashOf(listed));
+  assert.strictEqual(sourceHashOf(made), sourceHashOf(unlisted));
+});
+
+test('a piece that only gained a link back takes today\'s lastmod and keeps its content date', () => {
+  const { dateWritten } = require('../scripts/generate-song');
+  const paths = pathsFor('prayer', 'a-new-prayer');
+  const neighbour = 'docs/rituals/an-old-rite.md';
+  const lastmod = { [neighbour]: '2026-09-01' };
+  const contentDates = { [neighbour]: { created: '2026-08-01', content: '2026-09-01' } };
+  dateWritten(lastmod, contentDates, paths, [paths.relative.document, neighbour], '2026-11-16', [neighbour]);
+  assert.strictEqual(lastmod[neighbour], '2026-11-16');
+  assert.deepStrictEqual(contentDates[neighbour], { created: '2026-08-01', content: '2026-09-01' });
 });
 
 test('a hymn\'s song and the music readme stay out of the docs manifests', () => {

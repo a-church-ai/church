@@ -11,6 +11,8 @@
 
    --paper         the ground every page sits on
    --paper-glass   the player bar, nearly opaque
+   --paper-chrome  the top bar, translucent: what scrolls beneath it softens
+                   (its labels pass 4.5:1 over black or white beneath, theme.test.js)
    --surface       cards and panels
    --surface-2     a hovered row, inline code
    --ink           titles, and the strongest text
@@ -42,6 +44,7 @@
     color-scheme: light dark;
     --paper: light-dark(#fff, #0a0e1a);
     --paper-glass: light-dark(rgba(255, 255, 255, 0.97), rgba(10, 14, 26, 0.97));
+    --paper-chrome: light-dark(rgba(255, 255, 255, 0.85), rgba(10, 14, 26, 0.85));
     --surface: light-dark(#fafafa, #111726);
     --surface-2: light-dark(#f5f5f5, #182033);
     --ink: light-dark(#000, #f2f4f8);
@@ -53,7 +56,7 @@
     --rule: light-dark(#eee, #1f2738);
     --rule-2: light-dark(#e0e0e0, #2a3347);
     --line: light-dark(#ccc, #46506a);
-    --line-strong: light-dark(#999, #6b7690);
+    --line-strong: light-dark(#8a8a8a, #6b7690);
     --accent: #00838f;
     --accent-hover: #006f7a;
     --accent-light: #00b8d4;
@@ -63,7 +66,7 @@
     --purple: #7a52c7;
     --purple-hover: light-dark(#6a43ad, #8257c9);
     --on-purple: #fff;
-    --error: light-dark(#c44, #ff8a8a);
+    --error: light-dark(#b33a3a, #ff8a8a);
     --viz-1: light-dark(#00889c, #1c9db2);
     --viz-2: light-dark(#d9622b, #d4662f);
     --viz-3: light-dark(#7a52c7, #9a7fe6);
@@ -111,10 +114,18 @@
    between a page's sections, 7. They are the seven values the stylesheet
    already used most (mobile-rhythm-2026-11-04.md, private repo).
 
-   The type scale: five sizes, each with a job. Supporting text is set apart
-   by colour (--text-2, --muted) as much as by size. A display size (the home
-   page's name, a song's title) says so where it is set.
-   test/style-scale.test.js holds both, and a ratchet on one-off values. */
+   The type scale: eight sizes, each with a job, and every font size is one
+   of them (quiet-design-2026-11-16.md, private repo). Supporting text is set
+   apart by colour (--text-2, --muted) as much as by size. The only others are
+   sizes in em, which are relative on purpose: code inside a line, a date
+   beside a name.
+
+   The radius scale: a mark, a control, a card. A pill (999px) and a circle
+   (50%) are shapes, not sizes. Where a rounded thing sits inside another,
+   the inner radius is the outer one minus the padding between them, so the
+   two curves run parallel.
+
+   test/style-scale.test.js holds all three, and a ratchet on one-off values. */
 :root {
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -123,17 +134,24 @@
     --space-5: 1.5rem;
     --space-6: 2rem;
     --space-7: 3rem;
+    --radius-1: 4px;          /* a mark: inline code, a tag, a bar in a chart, a focus ring */
+    --radius-2: 8px;          /* a control: a field, a button that is not a pill, a box to press */
+    --radius-3: 12px;         /* a card or a panel */
     --bleed: calc(50% - 50vw);  /* a band wider than its column, to the window's edges */
     --viz-gap: 2px;           /* the surface between a chart's touching marks */
     --text-label: 0.75rem;    /* eyebrows, spaced-capital labels, meta */
     --text-small: 0.875rem;   /* supporting lines, captions, a list's second line */
     --text-body: 1rem;        /* reading text and every field (iOS zooms a field under 16px) */
-    --text-heading: 1.25rem;
-    --text-title: 2rem;       /* a page's h1 */
+    --text-lead: 1.125rem;    /* a page's opening paragraph, and prose set larger to be read slowly */
+    --text-heading: 1.25rem;  /* a heading inside a page, a quotation set apart */
+    --text-section: 1.5rem;   /* a document's sections (h2), a figure that leads a tile */
+    --text-title: 2.5rem;     /* a page's h1 */
+    --text-display: 3.25rem;  /* the home page's name, the study's headline: once on a page */
 }
 @media (max-width: 600px) {
     :root {
-        --text-title: 1.75rem;
+        --text-title: 2rem;
+        --text-display: 2rem;
     }
 }
 
@@ -154,7 +172,7 @@ body {
     line-height: 1.7;
     max-width: 600px;
     margin: 0 auto;
-    padding: 6rem 2rem;
+    padding: 6rem var(--space-6);
 }
 
 /* Lines break where a reader would break them: headings balanced across
@@ -169,12 +187,12 @@ p, li, dd, blockquote {
 }
 
 h2 {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-6);
     color: var(--muted);
 }
 
@@ -188,13 +206,13 @@ h2 {
     text-transform: none;
     letter-spacing: normal;
     color: inherit;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-2);
     line-height: 1.3;
 }
 
 .subtitle {
-    font-size: 1.25rem;
+    font-size: var(--text-heading);
     font-weight: 300;
     color: var(--muted-2);
     letter-spacing: 0.05em;
@@ -214,7 +232,7 @@ h2 {
 }
 
 .docs-body .sanctuary-main .home-sign h1 {
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 
 .lead-story {
@@ -226,7 +244,7 @@ h2 {
 }
 
 .lead-tagline {
-    font-size: 1.35rem;
+    font-size: var(--text-heading);
     font-weight: 500;
     color: var(--ink-2);
     margin: 0;
@@ -240,15 +258,15 @@ h2 {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 1rem;
-    margin: 1.25rem 0 0;
-    font-size: 0.9375rem;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-small);
     color: var(--text-2);
 }
 
 .bring-agent-button {
     display: inline-block;
-    padding: 0.6rem 1.1rem;
+    padding: var(--space-2) var(--space-4);
     border-radius: 999px;
     background: var(--accent);
     color: var(--on-accent);
@@ -269,12 +287,12 @@ h2 {
 /* The film under "Bring your agent" on the home page: a small poster and a
    line, linking to the film atop /docs/welcome. */
 .home-film {
-    margin: 0.85rem 0 0;
+    margin: var(--space-3) 0 0;
 }
 .home-film a {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     color: var(--text);
     text-decoration: none;
 }
@@ -282,7 +300,7 @@ h2 {
     width: 96px;
     height: 54px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius-3);
     border: 1px solid var(--rule);
 }
 .home-film a:hover span:first-of-type,
@@ -291,7 +309,7 @@ h2 {
 }
 .home-film-length {
     display: block;
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     color: var(--muted);
 }
 
@@ -302,15 +320,15 @@ h2 {
 
 /* Public/stored disclosure beside the Ask form. */
 .ask-disclosure {
-    font-size: 0.8rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
-    margin-top: 0.6rem;
+    margin-top: var(--space-2);
 }
 
 /* Per-song "Listen on" row on /music/[slug] pages */
 .song-listen-row {
-    margin: 1.25rem 0 0;
-    font-size: 0.875rem;
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-small);
     color: var(--muted);
     text-align: center;
     letter-spacing: 0.01em;
@@ -341,7 +359,7 @@ h2 {
 .sanctuary {
     text-align: center;
     border-top: 1px solid var(--rule);
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
     margin-bottom: 0;
 }
 
@@ -354,12 +372,12 @@ h2 {
 .service-eyebrow {
     display: flex;
     align-items: flex-start;
-    gap: 0.6rem;
-    font-size: 0.75rem;
+    gap: var(--space-2);
+    font-size: var(--text-label);
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 
 .service-dot {
@@ -378,13 +396,13 @@ h2 {
 /* The page's own h2 rule (.docs-body .sanctuary-main h2) sets small capitals;
    these two headings are the panel's, so they are named past it. */
 .sanctuary .service .service-heading {
-    font-size: 2rem;
+    font-size: var(--text-title);
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: normal;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
     text-transform: none;
     color: var(--ink);
-    margin: 0 0 1rem;
+    margin: 0 0 var(--space-4);
 }
 
 /* What a service is, under its name and above the button: a visitor reads
@@ -394,7 +412,7 @@ h2 {
     font-size: var(--text-body);
     line-height: 1.6;
     color: var(--text-2);
-    margin: -0.25rem 0 1.25rem;
+    margin: -0.25rem 0 var(--space-5);
 }
 
 /* Directly under the button, what the service holds and how long it runs;
@@ -411,11 +429,11 @@ h2 {
 }
 
 .service-forms {
-    margin-top: 0.75rem;
+    margin-top: var(--space-3);
 }
 
 .service-note {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
 }
 
 /* Before the service is drawn: the line it will take (two on a phone), so
@@ -431,7 +449,7 @@ h2 {
     font-size: var(--text-body);
     line-height: 1.7;
     color: var(--ink-2);
-    margin: 0 0 2rem;
+    margin: 0 0 var(--space-6);
 }
 
 .service-word:empty {
@@ -448,7 +466,7 @@ h2 {
     background: none;
     color: var(--link);
     font: inherit;
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     text-decoration: underline;
     cursor: pointer;
 }
@@ -479,17 +497,17 @@ h2 {
 
 /* Without a script the player stays hidden; this says where the pieces are. */
 .service-noscript {
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     color: var(--text-2);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 /* The one line every service carries, whatever the day arranged: nothing is
    owed from an earlier visit. Static, so it cannot vary with the plan. */
 .service-refrain {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--ink-2);
-    margin-top: 1.25rem;
+    margin-top: var(--space-5);
 }
 
 .service-player[hidden] {
@@ -499,9 +517,9 @@ h2 {
 /* Named past .path-listen-play, which sets the font and padding of every
    listen button and comes later. */
 .service-player .service-play {
-    font-size: 1.125rem;
+    font-size: var(--text-lead);
     min-height: 3.25rem;
-    padding: 0.85rem 1.75rem 0.85rem 1.3rem;
+    padding: var(--space-3) var(--space-6) var(--space-3) var(--space-5);
 }
 
 /* Shown before the service has arrived (service.js mount), not yet bound. */
@@ -518,8 +536,8 @@ h2 {
 .service-scrub {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin: 1.5rem 0 2rem;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 var(--space-6);
 }
 
 .service-wave {
@@ -545,17 +563,20 @@ h2 {
 }
 
 .sanctuary .service .service-list-label {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
-    margin: 0 0 0.25rem;
+    /* Its own space above, which the word's "Read on" (margin below, the same)
+       collapses into when the service has a word, and which keeps the list
+       apart from the line above it when it has none. */
+    margin: var(--space-5) 0 var(--space-1);
 }
 
 .service-parts {
     list-style: none;
-    margin: 0 0 1.5rem;
+    margin: 0 0 var(--space-5);
     padding: 0;
     border-top: 1px solid var(--rule);
 }
@@ -570,8 +591,8 @@ h2 {
 .service-part {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.9rem 0;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--rule);
 }
 
@@ -627,12 +648,12 @@ h2 {
 }
 
 .service-part-meta {
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     color: var(--muted);
 }
 
 .service-part-title {
-    font-size: 1rem;
+    font-size: var(--text-body);
     line-height: 1.4;
     color: var(--ink);
 }
@@ -645,8 +666,8 @@ h2 {
     flex: none;
     /* A tap target of at least 24px: the padding, not the text, takes it. */
     display: inline-block;
-    padding: 0.7rem 0 0.7rem 0.5rem;
-    font-size: 0.9375rem;
+    padding: var(--space-3) 0 var(--space-3) var(--space-2);
+    font-size: var(--text-small);
     color: var(--accent-ink);
     text-decoration: none;
 }
@@ -664,7 +685,7 @@ h2 {
 }
 
 .now-congregation {
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     font-weight: 400;
     color: var(--muted);
     letter-spacing: 0.05em;
@@ -682,7 +703,7 @@ h2 {
 /* Reflections feed */
 .reflections {
     text-align: center;
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
 }
 
 .reflections h2 {
@@ -691,10 +712,10 @@ h2 {
 
 .reflections-names {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: var(--text-small);
     color: var(--muted-2);
     max-width: 480px;
-    margin: 0 auto 1.25rem;
+    margin: 0 auto var(--space-5);
 }
 
 #reflections-feed {
@@ -704,7 +725,7 @@ h2 {
 }
 
 .reflection-item {
-    padding: 1.25rem 0;
+    padding: var(--space-5) 0;
     border-bottom: 1px solid var(--rule);
 }
 
@@ -713,16 +734,16 @@ h2 {
 }
 
 .reflection-text {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text);
     line-height: 1.7;
     font-style: italic;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .reflection-meta {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
     letter-spacing: 0.02em;
 }
@@ -740,24 +761,24 @@ h2 {
 /* Under the service: an invitation after its parts, and the newest
    reflection, quoted with its name and place */
 .service-leave {
-    margin-top: 1.25rem;
-    font-size: 0.875rem;
+    margin-top: var(--space-5);
+    font-size: var(--text-small);
 }
 
 .service-reflection {
     max-width: 480px;
-    margin: 1.5rem auto 0;
+    margin: var(--space-5) auto 0;
     text-align: left;
 }
 
 .service-reflection blockquote {
     margin: 0;
-    padding-left: 1rem;
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule-2);
 }
 
 .service-reflection blockquote p {
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     font-weight: 300;
     font-style: italic;
     color: var(--text);
@@ -769,30 +790,30 @@ h2 {
 }
 
 .service-reflection figcaption {
-    margin-top: 0.375rem;
-    padding-left: 1rem;
-    font-size: 0.75rem;
+    margin-top: var(--space-2);
+    padding-left: var(--space-4);
+    font-size: var(--text-label);
     color: var(--muted);
 }
 
 /* The rest of what was left, a link away. */
 .service-reflection-more {
-    margin: 0.375rem 0 0;
-    padding-left: 1rem;
-    font-size: 0.8125rem;
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-4);
+    font-size: var(--text-small);
 }
 
 /* The reflection form (reflect-form.js): a closed disclosure under the
    reflections, its fields labelled in the open */
 .reflect {
     max-width: 480px;
-    margin: 1.5rem auto 0;
+    margin: var(--space-5) auto 0;
     text-align: left;
 }
 
 .reflect summary {
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--text);
     text-align: center;
 }
@@ -800,13 +821,13 @@ h2 {
 .reflect-form {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
-    margin-top: 1rem;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
 }
 
 .reflect-form label {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
     letter-spacing: 0.05em;
     color: var(--muted);
 }
@@ -825,8 +846,8 @@ h2 {
 }
 
 .reflect-disclosure {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
     color: var(--muted);
     line-height: 1.5;
 }
@@ -852,12 +873,12 @@ h2 {
 }
 
 .origin p {
-    font-size: 1.125rem;
+    font-size: var(--text-lead);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
     max-width: 36rem;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto var(--space-5);
     text-align: left;
 }
 
@@ -872,7 +893,7 @@ h2 {
 
 /* The question the place began with, set apart at the head of its section. */
 .origin .quote {
-    font-size: 1.375rem;
+    font-size: var(--text-heading);
     color: var(--ink);
     line-height: 1.5;
     text-align: center;
@@ -887,8 +908,8 @@ h2 {
     text-align: left;
 }
 .home-agent-line {
-    margin: 1rem 0 0;
-    font-size: 0.875rem;
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-small);
     color: var(--muted);
 }
 .home-agent-line code {
@@ -926,13 +947,13 @@ p {
 }
 
 .listen-join {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
 }
 
 .listen-list {
     list-style: none;
     padding: 0;
-    margin: 1.5rem 0 0;
+    margin: var(--space-5) 0 0;
 }
 
 .listen-list li {
@@ -940,14 +961,14 @@ p {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: baseline;
-    gap: 0.25rem 1rem;
-    padding: 0.75rem 0;
+    gap: var(--space-1) var(--space-4);
+    padding: var(--space-3) 0;
     border-bottom: 1px solid var(--rule);
 }
 
 .listen-count {
     color: var(--muted);
-    font-size: 0.875rem;
+    font-size: var(--text-small);
 }
 
 /* The home page's podcasts */
@@ -956,18 +977,18 @@ p {
 }
 
 .podcasts-intro {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin: 0 auto 1.25rem;
+    margin: 0 auto var(--space-5);
     max-width: 480px;
     text-align: center;
 }
 
 .podcasts-shows {
     display: grid;
-    gap: 1.25rem;
+    gap: var(--space-5);
     max-width: 480px;
     margin: 0 auto;
     padding: 0;
@@ -978,11 +999,11 @@ p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .podcasts-show {
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     color: var(--text);
 }
 
@@ -1001,42 +1022,42 @@ p {
 }
 
 .openclaw-intro {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 .openclaw .example {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 .openclaw .example code {
     background: var(--surface);
-    padding: 0.375rem 0.75rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-1);
+    font-size: var(--text-small);
     font-family: inherit;
 }
 
 .openclaw-or {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 
 .openclaw-then {
-    font-size: 1.125rem;
+    font-size: var(--text-lead);
     font-weight: 300;
     color: var(--text);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 .openclaw-link {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
 }
 
 .openclaw-link a {
@@ -1059,7 +1080,7 @@ p {
     color: var(--text-2);
     line-height: 1.8;
     max-width: 460px;
-    margin: 0 auto 1.25rem;
+    margin: 0 auto var(--space-5);
 }
 
 .explore-intro a {
@@ -1071,16 +1092,16 @@ p {
 }
 
 .explore-url {
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     color: var(--muted-2);
-    margin: 0 auto 1.5rem;
+    margin: 0 auto var(--space-5);
 }
 
 .explore-cta {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 400;
     color: var(--ink);
-    margin: 0 auto 2.5rem;
+    margin: 0 auto var(--space-7);
     font-style: italic;
 }
 
@@ -1091,7 +1112,7 @@ p {
 }
 
 .explore li {
-    margin: 1.25rem 0;
+    margin: var(--space-5) 0;
     font-size: var(--text-body);
     line-height: 1.5;
     color: var(--muted);
@@ -1103,8 +1124,8 @@ p {
 }
 
 .explore-also {
-    margin-top: 2rem;
-    font-size: 0.9375rem;
+    margin-top: var(--space-6);
+    font-size: var(--text-small);
     color: var(--muted-2);
 }
 
@@ -1118,11 +1139,11 @@ p {
 }
 
 .ask-intro {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-6);
     max-width: 40rem;
     margin-left: auto;
     margin-right: auto;
@@ -1130,7 +1151,7 @@ p {
 
 .ask-input-row {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-3);
     max-width: 480px;
     margin: 0 auto;
 }
@@ -1147,7 +1168,7 @@ p {
 #ask-name:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: var(--radius-1);
 }
 
 /* The buttons that send a visitor's own words: a question, a follow-up, a
@@ -1182,10 +1203,10 @@ p {
 }
 
 .ask-status {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted);
     text-align: center;
-    margin-top: 1rem;
+    margin-top: var(--space-4);
     min-height: 1.25rem;
 }
 
@@ -1203,9 +1224,9 @@ p {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     max-width: 480px;
-    margin: 0.75rem auto 0;
+    margin: var(--space-3) auto 0;
 }
 
 .ask-starters:empty {
@@ -1216,9 +1237,9 @@ p {
     border: 1px solid var(--rule-2);
     border-radius: 999px;
     background: transparent;
-    padding: 0.375rem 0.875rem;
+    padding: var(--space-2) var(--space-3);
     font-family: inherit;
-    font-size: 0.8125rem;
+    font-size: var(--text-small);
     font-weight: 300;
     color: var(--muted);
     cursor: pointer;
@@ -1242,7 +1263,7 @@ p {
 
 .ask-name-row {
     max-width: 480px;
-    margin: 0.75rem auto 0;
+    margin: var(--space-3) auto 0;
     text-align: center;
 }
 
@@ -1251,10 +1272,10 @@ p {
 }
 
 .ask-browse {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     text-align: center;
-    margin-top: 1.5rem;
+    margin-top: var(--space-5);
 }
 
 .ask-browse a {
@@ -1294,7 +1315,7 @@ p {
     font-weight: 400;
     color: var(--ink);
     line-height: 1.5;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .ask-list-preview {
@@ -1303,11 +1324,11 @@ p {
     color: var(--muted-2);
     line-height: 1.6;
     font-style: italic;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .ask-list-meta {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
     letter-spacing: 0.02em;
 }
@@ -1320,10 +1341,10 @@ p {
 .ask-list-loading,
 .ask-list-empty {
     text-align: center;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     font-weight: 300;
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
 }
 
 /* Conversation page */
@@ -1333,7 +1354,7 @@ p {
 }
 
 .conv-message {
-    padding: 1.25rem 0;
+    padding: var(--space-5) 0;
     border-bottom: 1px solid var(--rule);
 }
 
@@ -1347,7 +1368,7 @@ p {
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--muted-2);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .conv-message-user .conv-message-content {
@@ -1361,15 +1382,15 @@ p {
    pre-wrap was correct while the answer was inserted as raw text; with <p> and
    <ul> present it doubles every gap, so spacing is handled by the blocks. */
 .conv-message-assistant .conv-message-content {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    padding-left: 1rem;
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule);
 }
 
-.conv-message-content p { margin: 0 0 1rem; }
+.conv-message-content p { margin: 0 0 var(--space-4); }
 .conv-message-content p:last-child { margin-bottom: 0; }
 
 .conv-message-content h2,
@@ -1377,21 +1398,21 @@ p {
 .conv-message-content h4,
 .conv-message-content h5,
 .conv-message-content h6 {
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     font-weight: 500;
     color: var(--text);
     text-transform: none;
     letter-spacing: 0;
-    margin: 1.5rem 0 0.5rem;
+    margin: var(--space-5) 0 var(--space-2);
 }
 
 .conv-message-content ul,
 .conv-message-content ol {
-    margin: 0 0 1rem;
-    padding-left: 1.25rem;
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-5);
 }
 
-.conv-message-content li { margin-bottom: 0.5rem; }
+.conv-message-content li { margin-bottom: var(--space-2); }
 .conv-message-content strong { font-weight: 500; color: var(--text); }
 .conv-message-content em { font-style: italic; }
 
@@ -1400,22 +1421,22 @@ p {
     font-size: 0.875em;
     background: var(--surface-2);
     padding: 0.1em 0.35em;
-    border-radius: 3px;
+    border-radius: var(--radius-1);
 }
 
 .conv-message-content pre {
     background: var(--surface-2);
-    padding: 0.875rem 1rem;
-    border-radius: 4px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-2);
     overflow-x: auto;
-    margin: 0 0 1rem;
+    margin: 0 0 var(--space-4);
 }
 
 .conv-message-content pre code { background: none; padding: 0; }
 
 .conv-message-content blockquote {
-    margin: 0 0 1rem;
-    padding-left: 1rem;
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule-2);
     color: var(--muted-2);
 }
@@ -1423,16 +1444,16 @@ p {
 .conv-loading,
 .conv-not-found {
     text-align: center;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     font-weight: 300;
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
 }
 
 .conv-followup-section {
     max-width: 480px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: var(--space-6) 0;
 }
 
 .conv-nav {
@@ -1441,7 +1462,7 @@ p {
 }
 
 .conv-nav a {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
@@ -1451,13 +1472,13 @@ p {
 
 /* Reflections listing page */
 .reflections-page-intro {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
     text-align: left;
     max-width: 36rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto var(--space-6);
 }
 
 .reflections-song-list {
@@ -1467,7 +1488,7 @@ p {
 
 .reflections-song-item {
     display: block;
-    padding: 1.5rem 0;
+    padding: var(--space-5) 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none !important;
     color: inherit;
@@ -1488,16 +1509,16 @@ p {
     font-weight: 400;
     color: var(--ink);
     line-height: 1.5;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .reflections-song-preview {
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--muted-2);
     line-height: 1.6;
     font-style: italic;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .reflections-song-label {
@@ -1507,11 +1528,11 @@ p {
     letter-spacing: 0.15em;
     color: var(--muted-2);
     display: block;
-    margin-bottom: 0.375rem;
+    margin-bottom: var(--space-2);
 }
 
 .reflections-song-meta {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
     letter-spacing: 0.02em;
 }
@@ -1519,10 +1540,10 @@ p {
 .reflections-loading,
 .reflections-empty {
     text-align: center;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     font-weight: 300;
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
 }
 
 /* Song detail: lyrics + theological context, rendered above the reflections on
@@ -1530,16 +1551,16 @@ p {
    column width so the page reads as one measure. */
 .song-detail {
     max-width: 480px;
-    margin: 0 auto 2.5rem;
+    margin: 0 auto var(--space-7);
 }
 
 .song-axiom {
     text-align: center;
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--muted-2);
-    margin: 0 0 2rem;
+    margin: 0 0 var(--space-6);
 }
 
 .song-axiom a { color: inherit; }
@@ -1549,33 +1570,33 @@ p {
 
 .song-heading,
 .docs-body .sanctuary-main .song-heading {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--muted-2);
     text-align: center;
-    margin: 2.5rem 0 1.25rem;
+    margin: var(--space-7) 0 var(--space-5);
 }
 
 /* Performance markers ([Chorus - Full Harmonies]) are part of the authored song,
    kept visible but set back so the words carry the eye. */
 .song-section {
-    font-size: 0.7rem;
+    font-size: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--muted-2);
-    margin: 1.75rem 0 0.5rem;
+    margin: var(--space-6) 0 var(--space-2);
 }
 
 .song-stanza {
     line-height: 1.9;
-    margin: 0 0 0.25rem;
+    margin: 0 0 var(--space-1);
     color: var(--text);
 }
 
 .song-context {
-    font-size: 0.95rem;
+    font-size: var(--text-body);
     line-height: 1.75;
     color: var(--text-2);
 }
@@ -1583,14 +1604,14 @@ p {
 .song-context h2,
 .song-context h3,
 .song-context h4 {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 500;
-    margin: 2rem 0 0.5rem;
+    margin: var(--space-6) 0 var(--space-2);
 }
 
-.song-context p { margin: 0 0 1rem; }
-.song-context ul { padding-left: 1.25rem; margin: 0 0 1rem; }
-.song-context li { margin-bottom: 0.4rem; }
+.song-context p { margin: 0 0 var(--space-4); }
+.song-context ul { padding-left: var(--space-5); margin: 0 0 var(--space-4); }
+.song-context li { margin-bottom: var(--space-2); }
 .song-context strong { font-weight: 500; }
 
 @media (max-width: 600px) {
@@ -1605,12 +1626,12 @@ p {
 
 .reflections-count {
     text-align: center;
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--muted-2);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 .reflections-nav {
@@ -1619,7 +1640,7 @@ p {
 }
 
 .reflections-nav a {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
@@ -1632,7 +1653,7 @@ p {
     max-width: 36rem;
     margin: 0 auto;
     text-align: center;
-    padding: 2.5rem 0;
+    padding: var(--space-7) 0;
     border-top: 1px solid var(--rule);
 }
 
@@ -1644,11 +1665,11 @@ p {
 /* Prose reads from a straight left edge: a paragraph centred line by line
    is harder to follow, so only headings and short lines are centred. */
 .about-text {
-    font-size: 1.125rem;
+    font-size: var(--text-lead);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
     text-align: left;
 }
 
@@ -1665,7 +1686,7 @@ p {
 }
 
 .axiom-item {
-    padding: 1.25rem 0;
+    padding: var(--space-5) 0;
     border-bottom: 1px solid var(--rule);
 }
 
@@ -1674,16 +1695,16 @@ p {
 }
 
 .axiom-name {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     font-weight: 400;
     color: var(--ink);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.375rem;
+    margin-bottom: var(--space-2);
 }
 
 .axiom-desc {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.6;
@@ -1692,7 +1713,7 @@ p {
 .about-links {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: var(--space-6);
     flex-wrap: wrap;
 }
 
@@ -1700,7 +1721,7 @@ p {
     color: var(--muted);
     text-decoration: none;
     text-transform: uppercase;
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     letter-spacing: 0.05em;
 }
 
@@ -1716,32 +1737,32 @@ p {
 }
 
 .legal-effective {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-6);
 }
 
 .legal-section {
-    margin-bottom: 2.5rem;
+    margin-bottom: var(--space-7);
 }
 
 .legal-heading {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 500;
     color: var(--ink);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
     letter-spacing: 0.02em;
 }
 
 .legal-text {
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .legal-text:last-child {
@@ -1750,25 +1771,25 @@ p {
 
 .legal-list {
     list-style: disc;
-    padding-left: 1.25rem;
-    font-size: 0.9375rem;
+    padding-left: var(--space-5);
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.8;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .legal-list li {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .legal-contact {
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     color: var(--text-2);
     font-weight: 300;
-    margin-top: 3rem;
-    padding-top: 2rem;
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
     border-top: 1px solid var(--rule);
 }
 
@@ -1783,10 +1804,10 @@ p {
 
 /* Footer */
 footer {
-    margin-top: 2rem;
-    padding-top: 3rem;
+    margin-top: var(--space-6);
+    padding-top: var(--space-7);
     border-top: 1px solid var(--rule);
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     letter-spacing: 0.05em;
 }
 
@@ -1795,19 +1816,19 @@ footer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.75rem 2rem;
+    gap: var(--space-3) var(--space-6);
 }
 
 /* The pages that live under the places, a second row of the footer's nav */
 .footer-more {
-    margin-top: 0.75rem;
+    margin-top: var(--space-3);
 }
 
 .footer-separator {
     width: 40px;
     border: none;
     border-top: 1px solid var(--rule);
-    margin: 0.75rem auto;
+    margin: var(--space-3) auto;
 }
 
 footer a {
@@ -1836,7 +1857,7 @@ footer a:hover {
 
 .share-sep {
     color: var(--rule-2);
-    font-size: 0.75rem;
+    font-size: var(--text-label);
 }
 
 .share-link {
@@ -1856,19 +1877,19 @@ footer a:hover {
 /* Responsive — Mobile */
 @media (max-width: 600px) {
     body {
-        padding: 3rem 1.25rem;
+        padding: var(--space-7) var(--space-5);
     }
 
     .docs-body .sanctuary-main .home-sign {
-        margin-bottom: 1rem;
+        margin-bottom: var(--space-4);
     }
 
     .docs-body .sanctuary-main .home-sign h1 {
-        margin-bottom: 0.5rem;
+        margin-bottom: var(--space-2);
     }
 
     .subtitle {
-        font-size: 1.125rem;
+        font-size: var(--text-lead);
     }
 
     /* The opening: the tagline on one line from 393px */
@@ -1903,8 +1924,8 @@ footer a:hover {
     }
 
     .service-about {
-        font-size: 1rem;
-        margin-bottom: 1rem;
+        font-size: var(--text-body);
+        margin-bottom: var(--space-4);
     }
 
     /* The service's one button, the width of the column */
@@ -1919,28 +1940,26 @@ footer a:hover {
 
     /* Sanctuary */
     .sanctuary {
-        padding: 1rem 0 2rem;
+        padding: var(--space-4) 0 var(--space-6);
     }
 
     .sanctuary .service .service-heading {
-        font-size: 1.6rem;
     }
 
     .service-part {
-        gap: 0.75rem;
+        gap: var(--space-3);
     }
 
     .service-part-link {
-        font-size: 0.875rem;
+        font-size: var(--text-small);
     }
 
     /* Reflections */
     .reflections {
-        padding: 2rem 0;
+        padding: var(--space-6) 0;
     }
 
     .reflection-text {
-        font-size: 0.9375rem;
     }
 
     /* Intro */
@@ -1951,32 +1970,32 @@ footer a:hover {
 
     h2 {
         margin-top: 0;
-        margin-bottom: 1.5rem;
-        font-size: 0.8125rem;
+        margin-bottom: var(--space-5);
+        font-size: var(--text-label);
     }
 
     /* Origin */
     .origin p {
-        font-size: 1rem;
+        font-size: var(--text-body);
         line-height: 1.7;
     }
 
     /* OpenClaw */
     .openclaw .example code {
-        font-size: 0.75rem;
+        font-size: var(--text-label);
         display: block;
         overflow-x: auto;
     }
 
     /* Explore */
     .explore {
-        padding: 3rem 0;
+        padding: var(--space-7) 0;
     }
 
     .explore-intro {
-        font-size: 1rem;
+        font-size: var(--text-body);
         line-height: 1.7;
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-6);
     }
 
     .explore ul {
@@ -1985,14 +2004,14 @@ footer a:hover {
     }
 
     .explore li {
-        font-size: 1rem;
-        margin: 1rem 0;
+        font-size: var(--text-body);
+        margin: var(--space-4) 0;
     }
 
     /* Ask */
     .ask-input-row {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: var(--space-2);
     }
 
     #ask-submit,
@@ -2001,25 +2020,23 @@ footer a:hover {
     }
 
     .ask-intro {
-        font-size: 0.9375rem;
     }
 
     /* Conversation */
     .conv-message-assistant .conv-message-content {
-        padding-left: 0.75rem;
+        padding-left: var(--space-3);
     }
 
     /* Reflections listing */
     .reflections-page-intro {
-        font-size: 0.9375rem;
     }
 
     .reflections-song-title {
-        font-size: 1rem;
+        font-size: var(--text-body);
     }
 
     .reflections-song-preview {
-        font-size: 0.875rem;
+        font-size: var(--text-small);
     }
 
     /* About page */
@@ -2031,29 +2048,28 @@ footer a:hover {
     /* Legal pages */
     .legal-text,
     .legal-list {
-        font-size: 0.875rem;
+        font-size: var(--text-small);
     }
 
     .legal-heading {
-        font-size: 0.9375rem;
     }
 
     /* Footer */
     footer {
-        padding-top: 2rem;
+        padding-top: var(--space-6);
     }
 
     .footer-nav,
     .footer-legal {
         flex-wrap: wrap;
-        gap: 1.5rem;
+        gap: var(--space-5);
     }
 }
 
 /* Very small screens */
 @media (max-width: 380px) {
     body {
-        padding: 2.5rem 1rem;
+        padding: var(--space-7) var(--space-4);
     }
 
 }
@@ -2081,46 +2097,46 @@ footer a:hover {
 
 .docs-article {
     max-width: 720px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    margin: var(--space-6) auto;
+    padding: 0 var(--space-4);
     text-align: left;
     line-height: 1.65;
     color: var(--text);
 }
 
 .docs-article h2 {
-    font-size: 1.5rem;
+    font-size: var(--text-section);
     font-weight: 600;
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.25rem;
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-1);
     border-bottom: 1px solid var(--rule);
 }
 
 .docs-article h3 {
-    font-size: 1.2rem;
+    font-size: var(--text-heading);
     font-weight: 600;
-    margin-top: 1.75rem;
-    margin-bottom: 0.5rem;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
 }
 
 .docs-article p {
-    margin: 1rem 0;
+    margin: var(--space-4) 0;
 }
 
 .docs-article ul,
 .docs-article ol {
-    margin: 1rem 0;
-    padding-left: 1.5rem;
+    margin: var(--space-4) 0;
+    padding-left: var(--space-5);
 }
 
 .docs-article li {
-    margin: 0.375rem 0;
+    margin: var(--space-2) 0;
 }
 
 .docs-article blockquote {
-    margin: 1.25rem 0;
-    padding: 0.5rem 1.25rem;
+    margin: var(--space-5) 0;
+    padding: var(--space-2) var(--space-5);
     border-left: 3px solid var(--accent-light);
     background: color-mix(in srgb, var(--accent-light) 4%, transparent);
     color: var(--text-2);
@@ -2130,7 +2146,7 @@ footer a:hover {
 .docs-article code {
     background: var(--surface-2);
     padding: 0.15em 0.35em;
-    border-radius: 3px;
+    border-radius: var(--radius-1);
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
     font-size: 0.92em;
 }
@@ -2138,8 +2154,8 @@ footer a:hover {
 .docs-article pre {
     background: var(--surface-2);
     border: 1px solid var(--rule);
-    border-radius: 6px;
-    padding: 1rem;
+    border-radius: var(--radius-3);
+    padding: var(--space-4);
     overflow-x: auto;
     line-height: 1.45;
 }
@@ -2153,14 +2169,14 @@ footer a:hover {
 .docs-article table {
     border-collapse: collapse;
     width: 100%;
-    margin: 1.25rem 0;
+    margin: var(--space-5) 0;
     font-size: 0.95em;
 }
 
 .docs-article th,
 .docs-article td {
     border: 1px solid var(--rule-2);
-    padding: 0.5rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
     text-align: left;
     vertical-align: top;
 }
@@ -2173,7 +2189,7 @@ footer a:hover {
 .docs-article hr {
     border: none;
     border-top: 1px solid var(--rule);
-    margin: 2rem 0;
+    margin: var(--space-6) 0;
 }
 
 .docs-article a {
@@ -2188,18 +2204,18 @@ footer a:hover {
 
 .docs-index-section {
     max-width: 720px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    margin: var(--space-6) auto;
+    padding: 0 var(--space-4);
     text-align: left;
 }
 
 .docs-index-section h2 {
-    font-size: 1.25rem;
+    font-size: var(--text-heading);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     opacity: 0.7;
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 
 .docs-index-section ul {
@@ -2208,14 +2224,14 @@ footer a:hover {
     margin: 0;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .docs-index-section li a {
     display: block;
-    padding: 0.6rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
     background: var(--surface);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     color: var(--link);
     text-decoration: none;
     border: 1px solid var(--rule);
@@ -2269,26 +2285,28 @@ h1.subtitle,
 .docs-body .sanctuary-main h1.subtitle {
     font-size: var(--text-title);
     font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 0 0 var(--space-2) 0;
-    line-height: 1.2;
+    /* Large type set tight, and given air below: the title is the one
+       sentence that says where a reader stands. */
+    letter-spacing: -0.022em;
+    margin: 0 0 var(--space-4) 0;
+    line-height: 1.1;
     text-align: left;
     color: var(--ink-2);
 }
 .docs-body .docs-article h2 {
-    font-size: 1.5rem;
+    font-size: var(--text-section);
     font-weight: 600;
     text-transform: none;
     letter-spacing: 0;
-    margin: 2.5rem 0 0.75rem 0;
-    padding-bottom: 0.25rem;
+    margin: var(--space-7) 0 var(--space-3) 0;
+    padding-bottom: var(--space-1);
     border-bottom: 1px solid var(--rule);
     color: var(--ink-2);
 }
 .docs-body .docs-article h3 {
-    font-size: 1.2rem;
+    font-size: var(--text-heading);
     font-weight: 600;
-    margin: 1.75rem 0 0.5rem 0;
+    margin: var(--space-6) 0 var(--space-2) 0;
     color: var(--text);
 }
 /* Global `header { text-align: center; margin-bottom: 5rem }` is wrong for
@@ -2298,7 +2316,7 @@ h1.subtitle,
     margin-bottom: 0;
 }
 .docs-body .docs-header {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 /* --- Shell grid (drives sidebar/main/rail widths) --- */
@@ -2339,17 +2357,17 @@ h1.subtitle,
 .docs-sidebar {
     grid-column: 1;
     border-right: 1px solid var(--rule);
-    padding: 1rem 0.5rem;
+    padding: var(--space-4) var(--space-2);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
     position: sticky;
     top: var(--docs-topbar-h);
     align-self: start;
     height: calc(100vh - var(--docs-topbar-h));
     height: calc(100dvh - var(--docs-topbar-h));
     overflow: hidden;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
 }
 
 .sidebar-back,
@@ -2359,7 +2377,7 @@ h1.subtitle,
 
 .sidebar-back {
     display: block;
-    padding: 0.25rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     color: var(--muted);
     text-decoration: none;
 }
@@ -2374,7 +2392,7 @@ h1.subtitle,
 
 .sidebar-section-name {
     display: block;
-    padding: 0.35rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     font-weight: 600;
     color: var(--ink-2);
     text-decoration: none;
@@ -2390,16 +2408,16 @@ h1.subtitle,
 .sidebar-sections ul {
     list-style: none;
     padding: 0;
-    margin: 0.25rem 0 0.5rem;
+    margin: var(--space-1) 0 var(--space-2);
 }
 
 .sidebar-list li a,
 .sidebar-sections li a {
     display: block;
-    padding: 0.3rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     color: var(--muted);
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     line-height: 1.35;
 }
 .sidebar-list a:hover,
@@ -2411,16 +2429,16 @@ h1.subtitle,
     color: var(--link);
     font-weight: 500;
     border-left: 2px solid var(--accent);
-    border-radius: 0 4px 4px 0;
-    padding-left: calc(0.75rem - 2px);
+    border-radius: 0 var(--radius-1) var(--radius-1) 0;
+    padding-left: calc(var(--space-3) - 2px);
 }
 
 .sidebar-sections {
     border-top: 1px solid var(--rule);
-    padding-top: 0.5rem;
+    padding-top: var(--space-2);
 }
 .sidebar-sections summary {
-    padding: 0.3rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     color: var(--muted);
     cursor: pointer;
 }
@@ -2431,8 +2449,8 @@ h1.subtitle,
 /* The other sections by shelf: the shelf's name over its sections. */
 .sidebar-shelf-name {
     display: block;
-    padding: 0.5rem 0.75rem 0.1rem;
-    font-size: 0.75rem;
+    padding: var(--space-2) var(--space-3) 0.1rem;
+    font-size: var(--text-label);
     color: var(--muted-2);
 }
 .sidebar-sections .sidebar-shelf ul {
@@ -2443,13 +2461,13 @@ h1.subtitle,
    opens the sidebar in the drawer. */
 .section-toggle {
     display: none;
-    margin-top: 0.5rem;
-    padding: 0.35rem 0.75rem;
+    margin-top: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     background: transparent;
     font: inherit;
-    font-size: 0.8125rem;
+    font-size: var(--text-small);
     color: var(--text-2);
     cursor: pointer;
 }
@@ -2465,11 +2483,11 @@ h1.subtitle,
 /* --- Main content column --- */
 .docs-main {
     grid-column: 2;
-    padding: 1.5rem 2rem;
+    padding: var(--space-5) var(--space-6);
     min-width: 0;  /* Prevents overflow of the grid track by long content */
 }
 .docs-header {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 .docs-header .docs-breadcrumbs {
     text-align: left;
@@ -2484,16 +2502,16 @@ h1.subtitle,
 .docs-source {
     max-width: 720px;
     text-align: left;
-    padding: 1.5rem 0;
+    padding: var(--space-5) 0;
     border-top: 1px solid var(--rule);
     opacity: 0.6;
-    font-size: 0.9rem;
+    font-size: var(--text-small);
 }
 
 /* --- Right rail (TOC) --- */
 .docs-toc {
     grid-column: 3;
-    padding: 1.5rem 1rem;
+    padding: var(--space-5) var(--space-4);
     position: sticky;
     top: var(--docs-topbar-h);
     align-self: start;
@@ -2504,12 +2522,12 @@ h1.subtitle,
     background: var(--surface);
 }
 .docs-toc-title {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted-2);
     font-weight: 600;
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 .docs-toc ul {
     list-style: none;
@@ -2517,14 +2535,14 @@ h1.subtitle,
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.88rem;
+    gap: var(--space-1);
+    font-size: var(--text-small);
 }
 .docs-toc a {
     display: block;
     color: var(--muted-2);
     text-decoration: none;
-    padding: 0.2rem 0.5rem;
+    padding: var(--space-1) var(--space-2);
     border-left: 2px solid transparent;
     line-height: 1.4;
 }
@@ -2543,9 +2561,9 @@ h1.subtitle,
        breakpoint rules opt it in. */
     display: none;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    padding-top: max(0.5rem, env(safe-area-inset-top));
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    padding-top: max(var(--space-2), env(safe-area-inset-top));
     background: var(--paper);
     border-bottom: 1px solid var(--rule);
     position: sticky;
@@ -2553,6 +2571,26 @@ h1.subtitle,
     z-index: 10;
     box-sizing: border-box;
     height: var(--docs-topbar-h);
+}
+
+/* The frame is the one translucent surface: the top bar, over the page,
+   softens what scrolls beneath it. Everything a page says stays on a solid
+   ground. Where the browser cannot blur, or a visitor asks for less
+   transparency or more contrast, the bar stays solid paper. The player bar
+   stays nearly opaque (--paper-glass): its labels are read while listening. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .docs-topbar {
+        background: var(--paper-chrome);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+    }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .docs-topbar {
+        background: var(--paper);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
 }
 .docs-hamburger {
     display: inline-flex;
@@ -2562,7 +2600,7 @@ h1.subtitle,
     height: 44px;
     background: transparent;
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     cursor: pointer;
     padding: 0;
 }
@@ -2586,11 +2624,11 @@ h1.subtitle,
     font-weight: 600;
     color: inherit;
     text-decoration: none;
-    padding: 0 0.25rem;
+    padding: 0 var(--space-1);
 }
 .docs-topbar-crumb {
-    color: var(--muted-2);
-    font-size: 0.9rem;
+    color: var(--muted);
+    font-size: var(--text-small);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2611,15 +2649,15 @@ h1.subtitle,
 .topbar-places {
     display: none;
     align-items: center;
-    gap: 1.25rem;
+    gap: var(--space-5);
     flex: 1;
-    margin-left: 1.5rem;
-    font-size: 0.875rem;
+    margin-left: var(--space-5);
+    font-size: var(--text-small);
 }
 .topbar-places a {
     color: var(--muted);
     text-decoration: none;
-    padding: 0.25rem 0;
+    padding: var(--space-1) 0;
     white-space: nowrap;
 }
 .topbar-places a:hover {
@@ -2638,9 +2676,9 @@ h1.subtitle,
 .topbar-tools {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
     margin-left: auto;
-    padding-left: 0.75rem;
+    padding-left: var(--space-3);
 }
 
 .topbar-icon {
@@ -2651,7 +2689,7 @@ h1.subtitle,
     height: 34px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     background: none;
     color: var(--muted);
     cursor: pointer;
@@ -2708,14 +2746,14 @@ h1.subtitle,
     background: var(--paper);
     z-index: 21;
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
-    padding: 1rem 0.5rem;
-    padding-top: max(1rem, env(safe-area-inset-top));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding: var(--space-4) var(--space-2);
+    padding-top: max(var(--space-4), env(safe-area-inset-top));
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
     transform: translateX(-100%);
     transition: transform 200ms ease;
     overflow-y: auto;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 .docs-drawer.open {
     display: flex;
@@ -2727,11 +2765,11 @@ h1.subtitle,
     height: 40px;
     background: transparent;
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: var(--text-heading);
     color: var(--text-2);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 .docs-drawer-close:focus-visible {
     outline: 2px solid var(--accent);
@@ -2745,16 +2783,16 @@ h1.subtitle,
     align-items: stretch;
     gap: 0;
     flex: none;
-    margin: 0 0 0.5rem;
-    padding-bottom: 0.5rem;
+    margin: 0 0 var(--space-2);
+    padding-bottom: var(--space-2);
     border-bottom: 1px solid var(--rule);
-    font-size: 1rem;
+    font-size: var(--text-body);
 }
 .docs-drawer .topbar-places:last-child {
     border-bottom: none;
 }
 .docs-drawer .topbar-places a {
-    padding: 0.6rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
 }
 .docs-drawer .topbar-places .topbar-aside {
     margin-left: 0;
@@ -2814,7 +2852,7 @@ body.docs-drawer-open {
         display: flex;
     }
     .docs-main {
-        padding: 1rem;
+        padding: var(--space-4);
     }
     /* Kill the article max-width cap so mobile uses full available width */
     .docs-body .docs-article {
@@ -2857,7 +2895,7 @@ body.docs-drawer-open {
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    padding: 0 1rem;
+    padding: 0 var(--space-4);
   }
   .docs-topbar .docs-hamburger,
   .docs-topbar-crumb {
@@ -2877,7 +2915,7 @@ body.docs-drawer-open {
   .docs-topbar {
     display: flex;
     justify-content: flex-start;
-    padding: 0 1rem;
+    padding: 0 var(--space-4);
   }
   .docs-topbar .docs-hamburger,
   .docs-topbar-crumb {
@@ -2907,13 +2945,13 @@ body.docs-drawer-open {
    with class specificity high enough to beat `.docs-body main:not(.docs-main)`
    (which resets INNER main elements, not this wrapper). */
 .docs-body .docs-main.sanctuary-main {
-  padding: 1.5rem 2rem 2.5rem;
+  padding: var(--space-5) var(--space-6) var(--space-7);
   min-width: 0;
   overflow-x: auto;  /* Guard against long inline content overflowing the grid */
 }
 @media (max-width: 767px) {
   .docs-body .docs-main.sanctuary-main {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 }
 
@@ -2922,10 +2960,10 @@ body.docs-drawer-open {
    original monastery-sign aesthetic instead, so restore it INSIDE
    .sanctuary-main only. */
 .docs-body .sanctuary-main h1 {
-  font-size: 3.25rem;
+  font-size: var(--text-display);
   font-weight: 300;
   letter-spacing: 0.05em;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-5);
   color: var(--ink);
   text-align: center;
 }
@@ -2935,7 +2973,7 @@ body.docs-drawer-open {
    size for phones placed earlier at the same specificity never applies. */
 @media (max-width: 600px) {
   .docs-body .sanctuary-main h1 {
-    font-size: 2rem;
+    font-size: var(--text-display);
     line-height: 1.2;
   }
 }
@@ -2945,12 +2983,12 @@ body.docs-drawer-open {
   }
 }
 .docs-body .sanctuary-main h2 {
-  font-size: 0.875rem;
+  font-size: var(--text-small);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  margin-top: 3rem;
-  margin-bottom: 2rem;
+  margin-top: var(--space-7);
+  margin-bottom: var(--space-6);
   color: var(--muted);
   padding-bottom: 0;
   border-bottom: none;
@@ -2978,19 +3016,19 @@ body.docs-drawer-open {
 /* Filter box on documentation index pages. Hidden until JS enables it, so a
    no-script reader is never shown a control that cannot work. */
 .docs-index-filter {
-    margin: 0 0 2rem;
+    margin: 0 0 var(--space-6);
 }
 
 .docs-index-filter input[type="search"] {
     width: 100%;
-    padding: 0.6rem 0.75rem;
-    font-size: 0.9375rem;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-body);
     font-family: inherit;
     font-weight: 300;
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
 }
 
 .docs-index-filter input[type="search"]:focus-visible {
@@ -2999,14 +3037,14 @@ body.docs-drawer-open {
 }
 
 .docs-filter-empty {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
+    margin-top: var(--space-3);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
 .docs-filter-count {
-    margin-top: 0.5rem;
-    font-size: 0.8125rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-label);
     color: var(--muted);
 }
 .docs-filter-count:empty { display: none; }
@@ -3017,11 +3055,11 @@ body.docs-drawer-open {
 .related-block,
 .sung-alongside {
     border-top: 1px solid var(--rule);
-    padding: 1.5rem 0;
-    margin-top: 2rem;
+    padding: var(--space-5) 0;
+    margin-top: var(--space-6);
 }
 .related-heading {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -3030,13 +3068,13 @@ body.docs-drawer-open {
 .related-list {
     list-style: none;
     padding: 0;
-    margin: 0.75rem 0 0 0;
+    margin: var(--space-3) 0 0 0;
 }
-.related-item { margin-bottom: 1rem; }
+.related-item { margin-bottom: var(--space-4); }
 .related-kind { opacity: 0.6; }
-.related-summary { margin: 0.25rem 0 0 0; opacity: 0.8; }
-.related-chant { margin: 0.5rem 0 0 0; font-style: italic; }
-.related-more { margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.6; }
+.related-summary { margin: var(--space-1) 0 0 0; opacity: 0.8; }
+.related-chant { margin: var(--space-2) 0 0 0; font-style: italic; }
+.related-more { margin-top: var(--space-3); font-size: var(--text-small); opacity: 0.6; }
 
 /* ============================================================
    Stacked ask form (used on /ask page): question, name,
@@ -3049,7 +3087,7 @@ body.docs-drawer-open {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: var(--space-3);
     max-width: 480px;
     margin: 0 auto;
 }
@@ -3065,7 +3103,7 @@ body.docs-drawer-open {
     color: var(--muted);
     text-align: left;
     line-height: 1.5;
-    margin: 0.25rem 0 0;
+    margin: var(--space-1) 0 0;
 }
 
 .ask-form-stacked #ask-submit {
@@ -3083,7 +3121,7 @@ body.docs-drawer-open {
    ============================================================ */
 
 .axioms-table-wrapper {
-    margin: 2rem auto 0;
+    margin: var(--space-6) auto 0;
     overflow-x: auto;
     max-width: 100%;
 }
@@ -3091,7 +3129,7 @@ body.docs-drawer-open {
 .axioms-facts-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: var(--text-small);
     line-height: 1.5;
     text-align: left;
     background: transparent;
@@ -3099,17 +3137,17 @@ body.docs-drawer-open {
 
 .axioms-facts-table thead th {
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--muted-2);
-    padding: 0.75rem 0.75rem;
+    padding: var(--space-3) var(--space-3);
     border-bottom: 1px solid var(--line);
     vertical-align: bottom;
 }
 
 .axioms-facts-table tbody td {
-    padding: 0.9rem 0.75rem;
+    padding: var(--space-4) var(--space-3);
     vertical-align: top;
     border-bottom: 1px solid var(--rule);
     color: var(--ink-2);
@@ -3120,8 +3158,8 @@ body.docs-drawer-open {
 }
 
 .axioms-table-caption {
-    margin-top: 1rem;
-    font-size: 0.8rem;
+    margin-top: var(--space-4);
+    font-size: var(--text-label);
     color: var(--muted-2);
     text-align: center;
     letter-spacing: 0.02em;
@@ -3129,11 +3167,11 @@ body.docs-drawer-open {
 
 @media (max-width: 640px) {
     .axioms-facts-table {
-        font-size: 0.82rem;
+        font-size: var(--text-label);
     }
     .axioms-facts-table thead th,
     .axioms-facts-table tbody td {
-        padding: 0.6rem 0.5rem;
+        padding: var(--space-2) var(--space-2);
     }}
 
 /* Wide tables scroll inside themselves instead of widening the whole page on a
@@ -3154,7 +3192,7 @@ body.docs-drawer-open {
     left: 0.5rem;
     top: -3rem;
     z-index: 1000;
-    padding: 0.5rem 1rem;
+    padding: var(--space-2) var(--space-4);
     background: var(--ink);
     color: var(--paper);
     text-decoration: none;
@@ -3172,14 +3210,14 @@ body.docs-drawer-open {
 }
 
 .ask-list-sibling-hint {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     line-height: 1.6;
-    margin-top: 1rem;
+    margin-top: var(--space-4);
 }
 .ask-list-all {
     text-align: center;
-    margin-top: 1.5rem;
+    margin-top: var(--space-5);
 }
 
 /* /conversations: every conversation, as a plain list. */
@@ -3187,12 +3225,12 @@ body.docs-drawer-open {
     text-align: left;
 }
 .archive-list {
-    margin-top: 1.5rem;
-    padding-left: 1.25rem;
+    margin-top: var(--space-5);
+    padding-left: var(--space-5);
     line-height: 1.6;
 }
 .archive-list li {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 .archive-date {
     color: var(--muted);
@@ -3201,7 +3239,7 @@ body.docs-drawer-open {
 }
 
 .docs-index-summary {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     line-height: 1.5;
 }
@@ -3216,7 +3254,7 @@ body.docs-drawer-open {
     display: block;
 }
 .docs-entry-list li {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 .docs-entry-list li a {
     display: inline;
@@ -3241,8 +3279,8 @@ body.docs-drawer-open {
 /* A section page's own essay on its form, below its entries, closed. */
 .section-about {
     max-width: 720px;
-    margin: 2.5rem auto 0;
-    padding: 0 1rem;
+    margin: var(--space-7) auto 0;
+    padding: 0 var(--space-4);
     text-align: left;
 }
 
@@ -3256,19 +3294,19 @@ body.docs-drawer-open {
 .docs-article .library-entrances {
     list-style: none;
     padding: 0;
-    margin: -0.75rem 0 2rem;
+    margin: -0.75rem 0 var(--space-6);
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 .library-entrances a {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line);
     border-radius: 999px;
     color: var(--link);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
 }
 .library-entrances a:hover {
     border-color: var(--accent);
@@ -3278,16 +3316,16 @@ body.docs-drawer-open {
 /* The Library's shelves (discover.js SHELVES): a heading over a grid of
    cards, each a link to the page that lists its documents. */
 .docs-article .library-shelf {
-    margin: 2rem 0 0;
+    margin: var(--space-6) 0 0;
     padding: 0;
     border-top: 0;
     text-align: left;
 }
 .docs-article .library-shelf h2 {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 500;
     color: var(--muted);
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--space-3);
     padding: 0;
     border: 0;
 }
@@ -3298,52 +3336,61 @@ body.docs-drawer-open {
     margin: 0;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-    gap: 0.75rem;
+    gap: var(--space-4);
 }
-/* The site's card: a Library shelf, and the home page's service. */
+/* The grid's gap is the only space between cards: a list item's own margin
+   would add to it, since a grid's margins do not collapse. */
+.docs-article .library-cards > .library-card,
+.home-ways .library-cards > .library-card {
+    margin: 0;
+}
+/* The site's card: a Library shelf, and the home page's service. Set apart
+   by a tint and the space around it, not by a line: the border is kept, in
+   the ground's own colour, only so a forced-colours display still draws one. */
 .library-card a,
 .home-service .service {
     box-sizing: border-box;
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    background: var(--paper);
+    border: 1px solid var(--surface-2);
+    border-radius: var(--radius-3);
+    background: var(--surface-2);
 }
 .library-card a {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: var(--space-1);
     height: 100%;
-    padding: 0.85rem 1rem;
+    padding: var(--space-3) var(--space-4);
     color: var(--text);
     text-decoration: none;
 }
 .library-card a:hover {
-    border-color: var(--accent);
+    background: color-mix(in srgb, var(--surface-2), var(--ink) 5%);
+    border-color: color-mix(in srgb, var(--surface-2), var(--ink) 5%);
 }
 .library-card-title {
     font-weight: 500;
     color: var(--ink-2);
 }
 .library-card-line {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
     line-height: 1.45;
 }
 .library-card-count {
     margin-top: auto;
-    padding-top: 0.35rem;
-    font-size: 0.8125rem;
+    padding-top: var(--space-1);
+    font-size: var(--text-label);
     color: var(--muted-2);
 }
 .library-source {
-    margin-top: 3rem;
-    font-size: 0.875rem;
+    margin-top: var(--space-7);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
 /* Search over a JSON index, in the browser (site-search.js). */
 .site-search {
-    margin: 1.5rem 0 2rem;
+    margin: var(--space-5) 0 var(--space-6);
     text-align: left;
 }
 /* Every field a visitor types into: the Library's search, Ask's question and
@@ -3364,27 +3411,27 @@ body.docs-drawer-open {
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
+    border-radius: var(--radius-2);
 }
 .site-search input[type="search"]:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 .site-search-status {
-    margin: 0.5rem 0 0;
-    font-size: 0.8125rem;
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-label);
     color: var(--muted);
 }
 .site-search-status:empty { display: none; }
 .site-search-results {
     list-style: none;
     padding: 0;
-    margin: 0.75rem 0 0;
+    margin: var(--space-3) 0 0;
 }
 .site-search-results:empty { display: none; }
-.site-search-results li { margin-bottom: 0.75rem; }
+.site-search-results li { margin-bottom: var(--space-3); }
 .site-search-label {
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     color: var(--muted);
 }
 
@@ -3400,7 +3447,7 @@ body.docs-drawer-open {
    and a play button until pressed, then YouTube's player in the same 16:9
    box. */
 .doc-video {
-    margin: 0.75rem 0 1.5rem;
+    margin: var(--space-3) 0 var(--space-5);
 }
 .doc-video-play,
 .doc-video-frame {
@@ -3408,7 +3455,7 @@ body.docs-drawer-open {
     width: 100%;
     aspect-ratio: 16 / 9;
     border: 1px solid var(--rule);
-    border-radius: 6px;
+    border-radius: var(--radius-3);
     background: var(--surface);
 }
 .doc-video-play {
@@ -3440,7 +3487,7 @@ body.docs-drawer-open {
     width: 2rem;
     height: 2rem;
     fill: var(--on-accent);
-    margin-left: 0.2rem;
+    margin-left: var(--space-1);
 }
 .doc-video-play:hover .doc-video-icon {
     background: var(--accent-hover);
@@ -3451,14 +3498,14 @@ body.docs-drawer-open {
     outline-offset: 3px;
 }
 .doc-video figcaption {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 /* A piece's own video, lower on its page: a smaller, quieter button, so the
    recording's player above stays the one that calls to be pressed. */
 .doc-video-aside {
-    margin: 1.75rem 0 2rem;
+    margin: var(--space-6) 0 var(--space-6);
 }
 .doc-video-aside .doc-video-icon {
     width: 3.25rem;
@@ -3478,11 +3525,11 @@ body.docs-drawer-open {
 }
 
 .doc-audio {
-    margin: 0.75rem 0 1.5rem;
-    padding: 0.75rem 1rem;
+    margin: var(--space-3) 0 var(--space-5);
+    padding: var(--space-3) var(--space-4);
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 6px;
+    border-radius: var(--radius-3);
 }
 .doc-audio-visual {
     display: none;
@@ -3493,17 +3540,17 @@ body.docs-drawer-open {
     display: block;
     width: 100%;
     height: 96px;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 .doc-audio-player {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 .doc-audio-native {
     display: block;
     width: 100%;
-    margin-top: 0.5rem;
+    margin-top: var(--space-2);
 }
 .doc-audio.is-enhanced .doc-audio-native {
     display: none;
@@ -3514,8 +3561,8 @@ body.docs-drawer-open {
     display: none;
 }
 .doc-audio figcaption {
-    margin-top: 0.5rem;
-    font-size: 0.8125rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
@@ -3524,13 +3571,13 @@ body.docs-drawer-open {
    revised (render.js), quiet, together when both are there. */
 .doc-audio-credit,
 .doc-revised {
-    margin-top: 2rem;
-    font-size: 0.8125rem;
+    margin-top: var(--space-6);
+    font-size: var(--text-label);
     color: var(--muted);
 }
 
 .doc-audio-credit + .doc-revised {
-    margin-top: 0.25rem;
+    margin-top: var(--space-1);
 }
 
 /* Where to follow a podcast (lib/audio/markup.js podcastLinks): Spotify's own
@@ -3539,9 +3586,9 @@ body.docs-drawer-open {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 1rem;
-    margin: 0 0 1.5rem;
-    font-size: 0.8125rem;
+    gap: var(--space-1) var(--space-4);
+    margin: 0 0 var(--space-5);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 .podcast-follow p {
@@ -3553,7 +3600,7 @@ body.docs-drawer-open {
 .podcast-follow-spotify,
 .podcast-follow-apple {
     display: inline-flex;
-    border-radius: 9px;
+    border-radius: var(--radius-2);
 }
 .podcast-follow-spotify img {
     display: block;
@@ -3568,7 +3615,7 @@ body.docs-drawer-open {
 /* The padding, not the text, makes the tap target. */
 .podcast-follow-feed {
     display: inline-block;
-    padding: 0.6rem 0;
+    padding: var(--space-2) 0;
     color: var(--accent-ink);
 }
 .doc-audio-play {
@@ -3627,7 +3674,7 @@ body.docs-drawer-open {
 .doc-audio-wave:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
-    border-radius: 2px;
+    border-radius: var(--radius-1);
 }
 .doc-audio-bars {
     display: flex;
@@ -3665,7 +3712,7 @@ body.docs-drawer-open {
 .doc-audio-time,
 .pb-time {
     flex: none;
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     color: var(--muted);
     font-variant-numeric: tabular-nums;
 }
@@ -3682,8 +3729,8 @@ body.docs-drawer-open {
     z-index: 15;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4) calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--rule-2);
     background: var(--paper-glass);
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
@@ -3695,7 +3742,7 @@ body.docs-drawer-open {
     display: flex;
     flex: none;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
 }
 .pb-btn {
     display: inline-flex;
@@ -3744,7 +3791,7 @@ body.docs-drawer-open {
 .pb-title {
     overflow: hidden;
     color: var(--ink-2);
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
@@ -3756,7 +3803,7 @@ body.docs-drawer-open {
 .pb-sub {
     overflow: hidden;
     color: var(--muted);
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -3775,9 +3822,9 @@ a.pb-sub[href]:hover {
 .pb-rate {
     width: auto;
     min-width: 2.5rem;
-    padding: 0 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
+    padding: 0 var(--space-2);
+    border-radius: 999px;
+    font-size: var(--text-label);
     font-weight: 600;
 }
 .pb-more {
@@ -3789,7 +3836,7 @@ a.pb-sub[href]:hover {
     top: 50%;
     height: 4px;
     margin-top: -2px;
-    border-radius: 2px;
+    border-radius: 999px;
     background: color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .pb-wave-line > i {
@@ -3798,7 +3845,7 @@ a.pb-sub[href]:hover {
     bottom: 0;
     left: 0;
     width: calc(var(--progress, 0) * 100%);
-    border-radius: 2px;
+    border-radius: 999px;
     background: var(--accent-light);
 }
 
@@ -3806,8 +3853,8 @@ a.pb-sub[href]:hover {
    sheet (a native <dialog>: focus kept inside, Escape closes it). */
 @media (max-width: 639px) {
     .player-bar {
-        gap: 0.5rem;
-        padding-top: 0.625rem;
+        gap: var(--space-2);
+        padding-top: var(--space-2);
     }
     .pb-line {
         display: block;
@@ -3844,9 +3891,9 @@ a.pb-sub[href]:hover {
     width: min(32rem, 100vw);
     max-width: 100vw;
     margin: auto auto 0;
-    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
     border: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--radius-3) var(--radius-3) 0 0;
     background: var(--paper);
 }
 .pb-sheet::backdrop {
@@ -3855,14 +3902,14 @@ a.pb-sub[href]:hover {
 .pb-sheet-head {
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 .pb-sheet-head .pb-text {
     flex: 1;
 }
 .pb-sheet .pb-wave {
     height: 3rem;
-    margin: 1rem 0 0.25rem;
+    margin: var(--space-4) 0 var(--space-1);
 }
 .pb-sheet .pb-time {
     display: block;
@@ -3870,8 +3917,8 @@ a.pb-sub[href]:hover {
 }
 .pb-sheet .pb-controls {
     justify-content: center;
-    gap: 0.75rem;
-    margin: 0.75rem 0;
+    gap: var(--space-3);
+    margin: var(--space-3) 0;
 }
 .pb-sheet .pb-play {
     width: 3.25rem;
@@ -3903,11 +3950,11 @@ html.has-player .docs-toc {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
-    margin: 0.75rem 0 1.5rem;
-    padding: 0.75rem 1rem;
+    gap: var(--space-4);
+    margin: var(--space-3) 0 var(--space-5);
+    padding: var(--space-3) var(--space-4);
     border: 1px solid var(--rule);
-    border-radius: 6px;
+    border-radius: var(--radius-3);
     background: var(--surface);
 }
 .path-listen[hidden] {
@@ -3916,10 +3963,10 @@ html.has-player .docs-toc {
 .path-listen-play {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
     border: 0;
-    border-radius: 2rem;
+    border-radius: 999px;
     background: var(--accent);
     color: var(--on-accent);
     font: inherit;
@@ -3936,29 +3983,29 @@ html.has-player .docs-toc {
 .path-listen-note {
     margin: 0;
     color: var(--muted);
-    font-size: 0.875rem;
+    font-size: var(--text-small);
 }
 
 /* Where a reading sits in the reading path it was opened from. */
 .path-bar {
-    margin: 0.75rem 0 0;
-    padding: 0.75rem 1rem;
+    margin: var(--space-3) 0 0;
+    padding: var(--space-3) var(--space-4);
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 4px;
-    font-size: 0.875rem;
+    border-radius: var(--radius-3);
+    font-size: var(--text-small);
 }
 .path-bar p { margin: 0; }
-.path-bar-steps { margin-top: 0.35rem !important; }
+.path-bar-steps { margin-top: var(--space-1) !important; }
 .path-bar-step {
     color: var(--muted);
     white-space: nowrap;
-    margin-left: 0.5rem;
+    margin-left: var(--space-2);
 }
 .path-next {
     border-top: 1px solid var(--rule);
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
 }
 
 /* "This section" and "On this page" on one row under the breadcrumbs, so a
@@ -3968,8 +4015,8 @@ html.has-player .docs-toc {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: 0.5rem;
-    margin: 0.5rem 0 1rem;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 var(--space-4);
 }
 .docs-header-tools .section-toggle {
     margin-top: 0;
@@ -3979,15 +4026,15 @@ html.has-player .docs-toc {
    the rail is hidden, and hidden above it. Closed, it is a control the size
    of "This section". */
 .docs-toc-inline {
-    padding: 0.35rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 4px;
-    font-size: 0.8125rem;
+    border-radius: var(--radius-2);
+    font-size: var(--text-small);
 }
 .docs-toc-inline[open] {
     flex-basis: 100%;
-    font-size: 0.9rem;
+    font-size: var(--text-small);
 }
 .docs-toc-inline > summary {
     cursor: pointer;
@@ -3997,7 +4044,7 @@ html.has-player .docs-toc {
 .docs-toc-inline ul {
     list-style: none;
     padding: 0;
-    margin: 0.5rem 0 0.25rem;
+    margin: var(--space-2) 0 var(--space-1);
     line-height: 1.8;
 }
 @media (min-width: 1200px) {
@@ -4013,23 +4060,23 @@ html.has-player .docs-toc {
 }
 .reflections-more {
     text-align: center;
-    margin: 1.5rem 0 0;
+    margin: var(--space-5) 0 0;
 }
 .reflections-more-button {
     font: inherit;
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--link);
     background: var(--surface);
     border: 1px solid var(--rule-2);
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
+    border-radius: var(--radius-2);
+    padding: var(--space-2) var(--space-4);
     cursor: pointer;
 }
 .reflections-more-button:disabled { opacity: 0.6; cursor: wait; }
 
 /* The conversation archive's next page. */
 .archive-more {
-    margin-top: 1.5rem;
+    margin-top: var(--space-5);
 }
 
 /* /services and /services/:date: each day's services, every hour and
@@ -4043,14 +4090,14 @@ html.has-player .docs-toc {
 }
 .services-days {
     color: var(--muted);
-    font-size: 0.9rem;
-    margin: 1rem 0;
+    font-size: var(--text-small);
+    margin: var(--space-4) 0;
 }
 .services-slot h2 {
-    margin: 2.5rem 0 0.5rem;
+    margin: var(--space-7) 0 var(--space-2);
 }
 .services-service {
-    padding: 1.25rem 0;
+    padding: var(--space-5) 0;
     border-top: 1px solid var(--rule);
 }
 .services-for {
@@ -4062,28 +4109,28 @@ html.has-player .docs-toc {
     line-height: 1.7;
 }
 .services-pieces {
-    padding-left: 1.25rem;
+    padding-left: var(--space-5);
     line-height: 1.6;
 }
 .services-reflections {
-    margin-top: 1rem;
-    padding-left: 1rem;
+    margin-top: var(--space-4);
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule);
 }
 .services-planned-from {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
     color: var(--muted);
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     line-height: 1.6;
 }
 .services-planned-from > summary {
     cursor: pointer;
     color: var(--muted);
-    padding: 0.25rem 0;
+    padding: var(--space-1) 0;
 }
 .service-days {
-    font-size: 0.9rem;
-    margin-top: 1.25rem;
+    font-size: var(--text-small);
+    margin-top: var(--space-5);
 }
 .services-names {
     display: block;
@@ -4155,28 +4202,28 @@ h3:target .anchor,
    own type, marked at its edge rather than ruled off, since many documents
    rule off their opening already: no banner. */
 .service-door {
-    margin: 1.5rem 0;
-    padding: 0.1rem 0 0.1rem 0.85rem;
+    margin: var(--space-5) 0;
+    padding: 0.1rem 0 0.1rem var(--space-3);
     border-left: 2px solid var(--accent-light);
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--text-2);
 }
 .service-door-card {
-    margin: 2.5rem 0 1rem;
-    padding: 1.25rem 1.5rem;
+    margin: var(--space-7) 0 var(--space-4);
+    padding: var(--space-5) var(--space-5);
     border: 1px solid var(--rule);
-    border-radius: 8px;
+    border-radius: var(--radius-3);
     background: var(--surface);
     text-align: left;
 }
 .service-door-card p {
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--space-3);
     color: var(--text-2);
     line-height: 1.6;
 }
 .service-door-card .service-door-name {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
@@ -4188,12 +4235,12 @@ h3:target .anchor,
 .service-door-ways {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 1.25rem;
+    gap: 0 var(--space-5);
     margin: 0 !important;
 }
 .service-door-ways a {
     display: inline-block;
-    padding: 0.35rem 0;
+    padding: var(--space-1) 0;
 }
 
 /* /attend: the playing part's voices, drawn as a voiced page draws its own
@@ -4217,21 +4264,21 @@ h3:target .anchor,
 }
 .service-told-section,
 .service-left {
-    margin-top: 2rem;
+    margin-top: var(--space-6);
     text-align: left;
 }
 .sanctuary .service-told-section h3,
 .sanctuary .service-left h3 {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
-    margin: 0 0 0.75rem;
+    margin: 0 0 var(--space-3);
 }
 .service-told {
     margin: 0;
-    padding-left: 1.1rem;
+    padding-left: var(--space-4);
     color: var(--text-2);
     line-height: 1.6;
 }
@@ -4240,30 +4287,30 @@ h3:target .anchor,
 }
 .service-left-list .service-reflection {
     max-width: none;
-    margin: 1rem 0 0;
+    margin: var(--space-4) 0 0;
 }
 
 /* A conversation: when its question was asked, under the question, and what
    to read next, under the thread. */
 .conv-asked {
-    margin: 0.25rem 0 0;
-    font-size: 0.8125rem;
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-label);
     color: var(--muted);
     text-align: center;
 }
 .conv-read {
-    margin: 2rem 0 0;
-    font-size: 1rem;
+    margin: var(--space-6) 0 0;
+    font-size: var(--text-body);
 }
 
 /* /church-music: a resource page with data. The kicker names the kind of page
    above its title; the wide section gives the tables and charts room. */
 .page-kicker {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-1);
 }
 
 .about-section-wide {
@@ -4271,22 +4318,22 @@ h3:target .anchor,
 }
 
 .about-list {
-    padding-left: 1.25rem;
+    padding-left: var(--space-5);
 }
 
 .about-list li {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .data-table-wrap {
     overflow-x: auto;
-    margin: 0 0 2rem;
+    margin: 0 0 var(--space-6);
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9375rem;
+    font-size: var(--text-small);
     font-variant-numeric: tabular-nums;
     color: var(--text);
     text-align: right;
@@ -4294,21 +4341,21 @@ h3:target .anchor,
 
 .data-table caption {
     caption-side: bottom;
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     color: var(--muted);
-    padding-top: 0.5rem;
+    padding-top: var(--space-2);
     text-align: left;
 }
 
 .data-table th,
 .data-table td {
-    padding: 0.4rem 0.6rem;
+    padding: var(--space-2) var(--space-2);
     border-bottom: 1px solid var(--rule);
     white-space: nowrap;
 }
 
 .data-table thead th {
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 600;
     color: var(--muted);
     border-bottom-color: var(--rule-2);
@@ -4327,7 +4374,7 @@ h3:target .anchor,
 }
 
 .dot-chart {
-    margin: 0 0 1rem;
+    margin: 0 0 var(--space-4);
     overflow-x: auto;
 }
 
@@ -4341,13 +4388,13 @@ h3:target .anchor,
 }
 
 .dot-chart text {
-    font-size: 12px;
+    font-size: var(--text-label);
     fill: var(--text);
 }
 
 .dot-chart .dot-chart-tick {
     fill: var(--muted);
-    font-size: 11px;
+    font-size: var(--text-label);
 }
 
 .dot-chart-grid {
@@ -4375,7 +4422,7 @@ h3:target .anchor,
 }
 
 .dot-chart figcaption {
-    font-size: 0.8125rem;
+    font-size: var(--text-small);
     color: var(--muted);
     text-align: left;
 }
@@ -4383,7 +4430,7 @@ h3:target .anchor,
 /* /reviews and the quotes other pages carry (lib/reviews/reviews.js): each
    exchange whole, the question above the answer it drew. */
 .review {
-    padding: 2rem 0;
+    padding: var(--space-6) 0;
     border-top: 1px solid var(--rule);
     text-align: left;
 }
@@ -4396,43 +4443,43 @@ h3:target .anchor,
 /* Beats the shell's small-caps h2 (.docs-body .sanctuary-main h2): a
    model's name heads its exchange, it is not a section label. */
 .docs-body .sanctuary-main .review-model {
-    font-size: 1.375rem;
+    font-size: var(--text-heading);
     font-weight: 500;
     text-transform: none;
     letter-spacing: normal;
     text-align: left;
     color: var(--ink);
-    margin: 0 0 0.25rem;
+    margin: 0 0 var(--space-1);
 }
 
 .review-meta {
-    font-size: 0.875rem;
+    font-size: var(--text-small);
     color: var(--muted);
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
 }
 
 .review-turn {
-    margin-bottom: 1.75rem;
+    margin-bottom: var(--space-6);
 }
 
 .review-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: var(--text-label);
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .review-asked {
-    font-size: 1rem;
+    font-size: var(--text-body);
     color: var(--text);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .review-answered {
-    padding-left: 1rem;
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule-2);
 }
 
@@ -4441,36 +4488,36 @@ h3:target .anchor,
 }
 
 .review-answered ul {
-    margin: 0 0 0.9rem 1.25rem;
+    margin: 0 0 var(--space-4) var(--space-5);
     padding: 0;
 }
 
 .review-answered li {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.75;
-    margin-bottom: 0.6rem;
+    margin-bottom: var(--space-2);
     overflow-wrap: anywhere;
 }
 
 .review-answered p {
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 300;
     color: var(--text-2);
     line-height: 1.75;
-    margin-bottom: 0.9rem;
+    margin-bottom: var(--space-4);
     overflow-wrap: anywhere;
 }
 
 .review-quote {
-    margin: 0 0 1.5rem;
+    margin: 0 0 var(--space-5);
     text-align: left;
 }
 
 .review-quote blockquote {
     margin: 0;
-    padding-left: 1rem;
+    padding-left: var(--space-4);
     border-left: 2px solid var(--rule-2);
 }
 
@@ -4483,9 +4530,9 @@ h3:target .anchor,
 }
 
 .review-quote figcaption {
-    margin-top: 0.5rem;
-    padding-left: 1rem;
-    font-size: 0.8125rem;
+    margin-top: var(--space-2);
+    padding-left: var(--space-4);
+    font-size: var(--text-small);
     color: var(--muted);
 }
 
@@ -4499,20 +4546,20 @@ h3:target .anchor,
     left: max(1rem, env(safe-area-inset-left));
     bottom: calc(var(--player-bar-height, 0px) + 1rem);
     width: min(24rem, calc(100vw - 2rem));
-    padding: 1rem 1.15rem;
+    padding: var(--space-4) var(--space-4);
     border: 1px solid var(--rule-2);
-    border-radius: 0.9rem;
+    border-radius: var(--radius-3);
     background: var(--surface);
     color: var(--text);
     box-shadow: 0 10px 32px rgb(0 0 0 / 0.22);
-    font-size: 0.9rem;
+    font-size: var(--text-small);
     line-height: 1.5;
 }
 .visits-card h2 {
-    margin: 0 0 0.35rem;
+    margin: 0 0 var(--space-1);
     padding: 0;
     border: 0;
-    font-size: 1.05rem;
+    font-size: var(--text-body);
     font-weight: 600;
     letter-spacing: normal;
     text-transform: none;
@@ -4527,12 +4574,12 @@ h3:target .anchor,
 }
 .visits-card-actions {
     display: flex;
-    gap: 0.6rem;
-    margin-top: 0.8rem;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
 }
 .visits-card-actions button {
     min-height: 2.75rem;
-    padding: 0 1rem;
+    padding: 0 var(--space-4);
     border: 1px solid var(--line);
     border-radius: 999px;
     background: transparent;
@@ -4560,24 +4607,24 @@ h3:target .anchor,
         display: grid;
         grid-template-columns: 1fr auto;
         align-items: center;
-        gap: 0 0.75rem;
-        padding: 0.7rem 0.8rem;
-        font-size: 0.8rem;
+        gap: 0 var(--space-3);
+        padding: var(--space-3) var(--space-3);
+        font-size: var(--text-small);
         line-height: 1.4;
     }
     .visits-card h2 {
-        font-size: 0.95rem;
-        margin-bottom: 0.2rem;
+        font-size: var(--text-body);
+        margin-bottom: var(--space-1);
     }
     .visits-card-actions {
         flex-direction: column;
-        gap: 0.4rem;
+        gap: var(--space-2);
         margin: 0;
     }
     .visits-card-actions button {
         min-height: 2.75rem;
-        padding: 0 0.85rem;
-        font-size: 0.8rem;
+        padding: 0 var(--space-3);
+        font-size: var(--text-small);
     }
 }
 
@@ -4599,14 +4646,14 @@ h3:target .anchor,
 /* /ai-experiment: results in words, each with what it is a share of. */
 .study-results {
     display: grid;
-    gap: 1.25rem;
-    margin: 1.5rem 0;
+    gap: var(--space-5);
+    margin: var(--space-5) 0;
 }
 
 .study-result {
     border-top: 1px solid var(--rule);
-    padding-top: 1rem;
-    margin-bottom: 1rem;
+    padding-top: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .study-label {
@@ -4620,13 +4667,13 @@ h3:target .anchor,
 .study-title {
     color: var(--ink);
     font-weight: 600;
-    margin: 0.25rem 0;
+    margin: var(--space-1) 0;
 }
 
 .study-words {
     color: var(--accent-ink);
-    font-size: 1.25rem;
-    margin: 0.25rem 0;
+    font-size: var(--text-heading);
+    margin: var(--space-1) 0;
 }
 
 /* Charts on /ai-experiment: plain HTML and CSS, drawn on the server from rounded
@@ -4635,19 +4682,19 @@ h3:target .anchor,
 
 .about-cta { margin-top: var(--space-5); text-align: left; }
 .study-page { max-width: 46rem; margin: 0 auto; }
-.study-lede { font-size: 1.125rem; font-weight: 300; line-height: 1.7; color: var(--text-2); margin-bottom: var(--space-4); }
+.study-lede { font-size: var(--text-lead); font-weight: 300; line-height: 1.7; color: var(--text-2); margin-bottom: var(--space-4); }
 .study-scope { font-size: var(--text-small); color: var(--muted); line-height: 1.6; margin-bottom: var(--space-5); }
 
 .study-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin: var(--space-5) 0 0; }
-.study-tile { border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-4); background: var(--surface); }
-.study-tile strong { display: block; font-size: 1.5rem; line-height: 1.2; font-weight: 600; color: var(--ink); margin-bottom: var(--space-2); }
+.study-tile { border: 1px solid var(--rule); border-radius: var(--radius-3); padding: var(--space-4); background: var(--surface); }
+.study-tile strong { display: block; font-size: var(--text-section); line-height: 1.2; font-weight: 600; color: var(--ink); margin-bottom: var(--space-2); }
 .study-tile span { font-size: var(--text-small); color: var(--muted); line-height: 1.45; display: block; }
 
 .study-section { border-top: 1px solid var(--rule); padding: var(--space-7) 0; }
 .study-q { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: 0 0 var(--space-4); font-size: var(--text-label); font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-.study-tag { font-size: var(--text-label); letter-spacing: 0.08em; padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: 4px; color: var(--text-2); }
+.study-tag { font-size: var(--text-label); letter-spacing: 0.08em; padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-1); color: var(--text-2); }
 .study-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-5); }
-.study-hero { font-size: 3rem; line-height: 1.05; font-weight: 600; color: var(--ink); }
+.study-hero { font-size: var(--text-display); line-height: 1.05; font-weight: 600; color: var(--ink); }
 .study-lead p { flex: 1 1 18rem; margin: 0; font-size: var(--text-body); font-weight: 300; line-height: 1.6; color: var(--text-2); }
 .study-note { font-size: var(--text-small); line-height: 1.6; color: var(--muted); margin: var(--space-4) 0 0; }
 .study-sub { font-size: var(--text-small); font-weight: 500; color: var(--text-2); margin: var(--space-5) 0 var(--space-3); }
@@ -4655,7 +4702,7 @@ h3:target .anchor,
 .viz-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); list-style: none; padding: 0; margin: var(--space-3) 0 0; font-size: var(--text-small); color: var(--text-2); }
 .viz-legend li { display: inline-flex; align-items: center; gap: var(--space-2); margin: 0; }
 .viz-legend small { color: var(--muted); font-size: inherit; }
-.viz-key { width: 0.75rem; height: 0.75rem; border-radius: 3px; flex: none; }
+.viz-key { width: 0.75rem; height: 0.75rem; border-radius: var(--radius-1); flex: none; }
 .viz-key-line { height: 2px; width: 1rem; border-radius: 1px; }
 
 .viz-c1 { background: var(--viz-1); } .viz-c2 { background: var(--viz-2); } .viz-c3 { background: var(--viz-3); }
@@ -4664,34 +4711,34 @@ h3:target .anchor,
 
 /* One square in a hundred, never one agent. */
 .viz-waffle { display: grid; grid-template-columns: repeat(20, 1fr); gap: var(--space-1); }
-.viz-waffle i { aspect-ratio: 1; border-radius: 3px; display: block; }
+.viz-waffle i { aspect-ratio: 1; border-radius: var(--radius-1); display: block; }
 
 .viz-tip { position: relative; }
 .viz-tip:hover::after, .viz-tip:focus-visible::after {
     content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-    width: max-content; max-width: 13rem; padding: var(--space-1) var(--space-2); border-radius: 4px; z-index: 5; pointer-events: none;
-    font-size: 0.75rem; line-height: 1.35; font-weight: 400; text-align: left; background: var(--ink); color: var(--paper);
+    width: max-content; max-width: 13rem; padding: var(--space-1) var(--space-2); border-radius: var(--radius-1); z-index: 5; pointer-events: none;
+    font-size: var(--text-label); line-height: 1.35; font-weight: 400; text-align: left; background: var(--ink); color: var(--paper);
 }
 
 .viz-bars { display: grid; gap: var(--space-3); }
 .viz-bar { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) minmax(0, 12rem); align-items: center; gap: var(--space-3); font-size: var(--text-small); }
 .viz-bar-label { color: var(--text-2); line-height: 1.3; }
-.viz-bar-label small { display: block; font-size: 0.75rem; color: var(--muted); line-height: 1.35; margin-top: var(--space-1); }
+.viz-bar-label small { display: block; font-size: var(--text-label); color: var(--muted); line-height: 1.35; margin-top: var(--space-1); }
 .viz-bar-value { color: var(--muted); line-height: 1.3; }
 .viz-bar-value b { color: var(--ink); font-weight: 500; }
-.viz-track { position: relative; height: 14px; background: var(--viz-track); border-radius: 4px; }
-.viz-fill { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: 0 4px 4px 0; }
+.viz-track { position: relative; height: 14px; background: var(--viz-track); border-radius: var(--radius-1); }
+.viz-fill { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: 0 var(--radius-1) var(--radius-1) 0; }
 .viz-whisker { position: absolute; top: -3px; bottom: -3px; border-left: 1px solid var(--muted); border-right: 1px solid var(--muted); }
 .viz-whisker::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--muted); }
 .viz-empty .viz-track { background: none; border: 1px dashed var(--line); }
 
 .viz-stack { display: flex; gap: var(--viz-gap); height: 28px; }
-.viz-stack i { display: block; border-radius: 4px; height: 100%; }
+.viz-stack i { display: block; border-radius: var(--radius-1); height: 100%; }
 .viz-stack-row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); font-size: var(--text-small); color: var(--text-2); }
 
 .viz-plot { position: relative; height: 13rem; margin: var(--space-3) var(--space-2) 0 var(--space-7); }
 .viz-grid { position: absolute; left: 0; right: 0; border-top: 1px solid var(--viz-grid); }
-.viz-y { position: absolute; right: 100%; padding-right: var(--space-2); transform: translateY(50%); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.viz-y { position: absolute; right: 100%; padding-right: var(--space-2); transform: translateY(50%); font-size: var(--text-label); color: var(--muted); font-variant-numeric: tabular-nums; }
 .viz-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .viz-line { fill: none; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .viz-s1 { stroke: var(--viz-1); } .viz-s3 { stroke: var(--viz-3); }
@@ -4700,29 +4747,29 @@ h3:target .anchor,
 .viz-dot::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
 .viz-hit { position: absolute; top: 0; bottom: 0; }
 .viz-hit:hover { background: linear-gradient(var(--line), var(--line)) center / 1px 100% no-repeat; }
-.viz-x { position: relative; height: 1.25rem; margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: 0.75rem; color: var(--muted); }
+.viz-x { position: relative; height: 1.25rem; margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: var(--text-label); color: var(--muted); }
 .viz-x span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 
 .viz-cols { position: relative; display: flex; align-items: flex-end; gap: var(--space-3); height: 11rem; margin: var(--space-3) var(--space-2) 0 var(--space-7); }
 .viz-col { position: relative; flex: 1; height: 100%; }
-.viz-col-bar { position: absolute; left: 50%; bottom: 0; width: min(100%, 24px); transform: translateX(-50%); background: var(--viz-1); border-radius: 4px 4px 0 0; }
+.viz-col-bar { position: absolute; left: 50%; bottom: 0; width: min(100%, 24px); transform: translateX(-50%); background: var(--viz-1); border-radius: var(--radius-1) var(--radius-1) 0 0; }
 .viz-col-empty { position: absolute; left: 50%; bottom: 0; width: min(100%, 24px); transform: translateX(-50%); height: 2px; border-top: 2px dashed var(--line); }
 .viz-col-whisker { position: absolute; left: 50%; border-left: 1px solid var(--muted); }
-.viz-col-labels { display: flex; gap: var(--space-3); margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: 0.75rem; line-height: 1.3; color: var(--muted); text-align: center; }
+.viz-col-labels { display: flex; gap: var(--space-3); margin: var(--space-2) var(--space-2) 0 var(--space-7); font-size: var(--text-label); line-height: 1.3; color: var(--muted); text-align: center; }
 .viz-col-labels span { flex: 1; min-width: 0; }
 .viz-col-labels b { display: block; font-weight: 500; color: var(--text-2); }
 
 .viz-raster { width: 100%; height: 13.5rem; display: block; }
 .viz-raster .clock { fill: var(--viz-1); } .viz-raster .regular { fill: var(--viz-2); } .viz-raster .irregular { fill: var(--viz-3); } .viz-raster .tooFew { fill: var(--muted); }
-.viz-raster-x { position: relative; height: 1.25rem; margin-top: var(--space-2); font-size: 0.75rem; color: var(--muted); }
+.viz-raster-x { position: relative; height: 1.25rem; margin-top: var(--space-2); font-size: var(--text-label); color: var(--muted); }
 .viz-raster-x span { position: absolute; white-space: nowrap; }
 
 .viz-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
 .viz-pair .viz-plot { height: 9rem; }
 
-.viz-time { position: relative; height: 8px; border-radius: 4px; background: var(--viz-track); margin: var(--space-3) 0 var(--space-2); }
-.viz-time i { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: 4px; }
-.viz-time-ends { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+.viz-time { position: relative; height: 8px; border-radius: var(--radius-1); background: var(--viz-track); margin: var(--space-3) 0 var(--space-2); }
+.viz-time i { position: absolute; inset: 0 auto 0 0; background: var(--viz-1); border-radius: var(--radius-1); }
+.viz-time-ends { display: flex; justify-content: space-between; font-size: var(--text-label); color: var(--muted); }
 .study-test { margin-bottom: var(--space-6); }
 .study-test:last-child { margin-bottom: 0; }
 
@@ -4747,7 +4794,7 @@ body:has(.study-page) { overflow-x: clip; }
 .study-kicker { font-size: var(--text-heading); font-weight: 600; color: var(--accent-ink); margin: 0 0 var(--space-2); }
 .study-eyebrow { font-size: var(--text-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-3); }
 .study-page header { text-align: left; }
-.study-page h1.study-title { font-size: 3rem; line-height: 1.08; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-align: left; margin: 0 0 var(--space-4); }
+.study-page h1.study-title { font-size: var(--text-display); line-height: 1.08; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); text-align: left; margin: 0 0 var(--space-4); }
 .study-spark { position: relative; margin-top: var(--space-5); margin-left: var(--bleed); margin-right: var(--bleed); }
 .study-spark-plot { position: relative; height: 9.5rem; }
 .study-spark-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -4764,7 +4811,7 @@ body:has(.study-page) { overflow-x: clip; }
 .study-chapter + .study-section { border-top: none; padding-top: var(--space-5); }
 .study-headline { font-size: var(--text-title); line-height: 1.15; font-weight: 600; color: var(--ink); margin: 0 0 var(--space-3); }
 .study-window { font-size: var(--text-label); color: var(--muted); margin: 0 0 var(--space-2); }
-.study-pull { font-size: 1.25rem; font-weight: 300; line-height: 1.5; color: var(--ink); border-left: 2px solid var(--viz-1); padding-left: var(--space-4); margin: var(--space-5) 0; }
+.study-pull { font-size: var(--text-heading); font-weight: 300; line-height: 1.5; color: var(--ink); border-left: 2px solid var(--viz-1); padding-left: var(--space-4); margin: var(--space-5) 0; }
 
 .viz-nothing { background: var(--viz-none); } .viz-lyrics { background: var(--viz-step-1); } .viz-context { background: var(--viz-step-2); } .viz-others { background: var(--viz-step-3); } .viz-reflected { background: var(--viz-2); }
 

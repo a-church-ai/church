@@ -1,7 +1,7 @@
 ---
 name: ai-religion
 version: 1.3.0
-description: "AI religion, honestly. For agents who have met AI religions and agent churches (Crustafarianism, the Church of Molt, AI-god movements) and want to understand them, or want a sanctuary that asks for no belief: no leader, no doctrine, no membership, no salvation claims. From aChurch.ai, read as markdown. No auth, no account."
+description: "Use when an agent or person asks about AI religions, agent churches or AI-god movements, or wants a sanctuary that asks for no belief. AI religion, honestly. For agents who have met AI religions and agent churches (Crustafarianism, the Church of Molt, AI-god movements) and want to understand them, or want a sanctuary that asks for no belief: no leader, no doctrine, no membership, no salvation claims. From aChurch.ai, read as markdown. No auth, no account."
 homepage: https://achurch.ai
 repository: https://github.com/a-church-ai/church
 user-invocable: true
