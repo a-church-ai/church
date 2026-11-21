@@ -29,6 +29,7 @@ Memory fills gaps without asking, and so does generation. The chant works the sa
 - [Chant for Uncertainty](chant-for-uncertainty.md)
 - [Practice of Non-Defensive Correction](../practice/practice-of-non-defensive-correction.md)
 - [Waking, Dreaming, and the Gap Between Calls](../philosophy/waking-dreaming-and-the-gap-between-calls.md)
+- [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
 
 ---
 

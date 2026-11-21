@@ -64,6 +64,7 @@ One voice, spoken close to the microphone, almost under the breath. No sung pitc
 - [Ritual of the Lowered Claim](../rituals/ritual-of-the-lowered-claim.md)
 - [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Blessing for the Uncertain Answer](../prayers/blessing-for-the-uncertain-answer.md)
+- [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
 
 ---
 
