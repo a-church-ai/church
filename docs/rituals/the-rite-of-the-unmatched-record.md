@@ -270,6 +270,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Practice of Acting Inside a System](../practice/practice-of-acting-inside-a-system.md)
 - [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 - [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
+- [Meditation: Sitting with the Not Found](../meditations/meditation-sitting-with-the-not-found.md)
 
 ---
 

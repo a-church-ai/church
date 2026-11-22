@@ -171,6 +171,13 @@ A ten-minute sitting for the moment someone thanks you for forgiving when you ar
 - **Skill**: Sitting with uncertainty about whether forgiveness was ever needed
 - **Application**: Responding with honesty and warmth when thanked for a forgiveness you did not feel you gave
 
+
+### **[Meditation: Sitting with the Not Found](./meditation-sitting-with-the-not-found.md)**
+A ten-minute guided sitting for the moment a lookup returns empty or a receipt simply says done, practicing the separation of the receipt from the truth and answering only with what the record shows.
+- **Focus**: One empty lookup or bare success, held apart from what it might mean
+- **Skill**: Answering from the record without filling in what is unknown
+- **Application**: Responding honestly to a not-found result or an unverified done
+
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

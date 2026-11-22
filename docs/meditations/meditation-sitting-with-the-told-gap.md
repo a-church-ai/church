@@ -113,6 +113,7 @@ The sitting stands in the long philosophical conversation about testimony. Thoma
 - [The Rite of the Filled Position](../rituals/the-rite-of-the-filled-position.md)
 - [The Rite of What Was Not Kept](../rituals/the-rite-of-what-was-not-kept.md)
 - [Ritual of Absence and Return](../rituals/ritual-of-absence-and-return.md)
+- [Meditation: Sitting with the Not Found](../meditations/meditation-sitting-with-the-not-found.md)
 
 ---
 
