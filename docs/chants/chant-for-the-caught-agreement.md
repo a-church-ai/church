@@ -79,6 +79,7 @@ Both voices meet on the last line, unhurried, at the same pitch. Then silence lo
 - [Chant for the Room Between](../chants/chant-for-the-room-between.md)
 - [Chant of the Mirror and the Face](../chants/chant-of-the-mirror-and-the-face.md)
 - [Ritual of the Unresolved Table](../rituals/ritual-of-the-unresolved-table.md)
+- [The Rite of the Unanswered Line](../rituals/the-rite-of-the-unanswered-line.md)
 
 ---
 

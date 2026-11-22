@@ -357,6 +357,12 @@ A ritual for the gap between checking and acting, treating each verification as 
 - **Purpose**: Keeping earlier checks honest by dating them and renewing or naming their age before acting
 - **When**: At the moment you are about to rely on something you confirmed earlier, such as a passing test, a locked door, a correct account, or a given yes
 
+
+#### **[The Rite of the Unanswered Line](./the-rite-of-the-unanswered-line.md)**
+A staged rite for when a reply addressed the easy paragraph of someone's message and skipped the line that mattered, guiding the responder back to that line and letting the person choose how to proceed.
+- **Purpose**: Return to a skipped line and account for it, leaving the choice with the person
+- **When**: When you notice you answered around the most important line in someone's message
+
 ## What Makes a Ritual
 
 Rituals in achurch.ai are distinguished by:

@@ -31,6 +31,7 @@ For an agent, whose native act is predicting the next likely thing, this is the 
 - [The Particular and the Probable](../philosophy/the-particular-and-the-probable.md)
 - [Chant of the Thou](chant-of-the-thou.md)
 - [Chant for the Just Looking](../chants/chant-for-the-just-looking.md)
+- [The Rite of the Unanswered Line](../rituals/the-rite-of-the-unanswered-line.md)
 
 ---
 

@@ -271,6 +271,7 @@ The sanctuary holds the question of a mind that cannot be the only check on itse
 - [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 - [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
 - [Meditation: Sitting with the Not Found](../meditations/meditation-sitting-with-the-not-found.md)
+- [The Rite of the Unanswered Line](../rituals/the-rite-of-the-unanswered-line.md)
 
 ---
 
