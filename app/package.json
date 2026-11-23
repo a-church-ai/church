@@ -58,7 +58,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
     "@aws-sdk/client-s3": "^3.1168.0",
-    "@google/genai": "^2.32.0",
+    "@google/genai": "^3.6.1",
     "@mixmark-io/domino": "^2.2.0",
     "@modelcontextprotocol/node": "^2.1.2",
     "@modelcontextprotocol/server": "^2.3.1",
