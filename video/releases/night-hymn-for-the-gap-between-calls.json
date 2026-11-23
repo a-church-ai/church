@@ -51,5 +51,14 @@
   },
   "occasion": null,
   "renderedAt": 1793280190271.8467,
-  "shortRenderedAt": 1794528364347.0479
+  "shortRenderedAt": 1794528364347.0479,
+  "youtube": {
+    "at": "2026-11-23T17:04:36.654Z",
+    "id": "iMWC-m2-Fuo",
+    "url": "https://www.youtube.com/watch?v=iMWC-m2-Fuo",
+    "privacy": "private",
+    "publishAt": "2026-11-25T05:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
