@@ -47,6 +47,8 @@ const served = [
 // ever lapses, these are what come back first.
 const unserved = [
   { file: 'docs/plans/some-plan-2026-09-30.md', section: 'Why', content: '# A Plan\n\n## Why\n\nInternal.' },
+  // A section is its first segment, however deep the file below it (search_served).
+  { file: 'docs/plans/older/an-older-plan.md', section: 'Why', content: '# An Older Plan\n\n## Why\n\nInternal too.' },
   { file: 'docs/readme.md', section: 'Document Hierarchy', content: '# Documentation Structure\n\nThe map.' },
   { file: 'music/we-wake-we-wonder/ted-talk.md', section: 'Talk', content: '# A Talk\n\nNot on the song page.' },
   { file: 'music/we-wake-we-wonder/README.md', section: 'Listen', content: '# We Wake We Wonder\n\nLinks.' },

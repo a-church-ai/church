@@ -1,12 +1,13 @@
 /**
- * The reflections held in memory are brought up to date by reading only what
- * is new (server/lib/utils/kept-reflections.js), and read whole again only
- * when the table's count says something else changed.
+ * Rows held in memory are brought up to date by reading only what is new
+ * (server/lib/utils/kept-rows.js), and read whole again only when the table's
+ * count says something else changed. Reflections are the first table kept so;
+ * conversation turns and the API log follow.
  */
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { keptReflections } = require('../server/lib/utils/kept-reflections');
+const { keptRows } = require('../server/lib/utils/kept-rows');
 
 const at = minutes => new Date(Date.UTC(2026, 10, 10, 12, 0) + minutes * 60_000).toISOString();
 const r = (id, minutes) => ({ id, createdAt: at(minutes), name: 'Someone', text: `Reflection ${id}` });
@@ -33,7 +34,7 @@ const ids = list => list.map(x => x.id);
 
 test('the first load reads the whole table; the next reads only what is new', async () => {
   const t = table([r('a', 0), r('b', 30), r('c', 60)]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   assert.deepStrictEqual(ids(await kept.load()), ['a', 'b', 'c']);
   assert.strictEqual(t.reads.all, 1);
 
@@ -45,7 +46,7 @@ test('the first load reads the whole table; the next reads only what is new', as
 
 test('a row written late with an earlier time, inside the overlap, is still found', async () => {
   const t = table([r('a', 0), r('c', 60)]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   await kept.load();
   t.rows.push(r('b', 55)); // its request arrived before c's, its row landed after
   assert.deepStrictEqual(ids(await kept.load()), ['a', 'b', 'c']);
@@ -54,7 +55,7 @@ test('a row written late with an earlier time, inside the overlap, is still foun
 
 test('a deleted row, or one copied in with an old time, makes the next load read everything', async () => {
   const t = table([r('a', 0), r('b', 30), r('c', 60)]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   await kept.load();
 
   t.rows = t.rows.filter(x => x.id !== 'b');
@@ -68,7 +69,7 @@ test('a deleted row, or one copied in with an old time, makes the next load read
 
 test('an empty table is read whole until it holds something', async () => {
   const t = table([]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   assert.deepStrictEqual(await kept.load(), []);
   t.rows.push(r('a', 0));
   assert.deepStrictEqual(ids(await kept.load()), ['a']);
@@ -77,7 +78,7 @@ test('an empty table is read whole until it holds something', async () => {
 
 test('a failed read throws and leaves what was held', async () => {
   const t = table([r('a', 0)]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   await kept.load();
   t.failing = true;
   await assert.rejects(kept.load(), /database unavailable/);
@@ -89,7 +90,7 @@ test('a failed read throws and leaves what was held', async () => {
 
 test('two loads at once give the same set, and what each returns is its own array', async () => {
   const t = table([r('a', 0)]);
-  const kept = keptReflections(t);
+  const kept = keptRows(t);
   await kept.load();
   t.rows.push(r('b', 1), r('c', 2));
   const [one, two] = await Promise.all([kept.load(), kept.load()]);
@@ -99,4 +100,28 @@ test('two loads at once give the same set, and what each returns is its own arra
   mine.reverse();
   assert.deepStrictEqual(ids(await kept.load()), ['a', 'b', 'c'], 'a caller sorting its copy changes nothing held');
   assert.strictEqual(t.lastFrom, new Date(Date.parse(at(2)) - 10 * 60_000).toISOString(), 'the window is still read from the newest row');
+});
+
+test('a row keyed and timed another way (a turn, an API line) is kept the same way', async () => {
+  const line = (id, minutes) => ({ n: id, timestamp: at(minutes), path: '/api/now' });
+  const t = table([line(1, 0), line(2, 30)]);
+  t.since = async from => { t.reads.since++; return t.rows.filter(x => x.timestamp >= from); };
+  const kept = keptRows({ ...t, all: t.all, count: t.count, idOf: x => x.n, timeOf: x => x.timestamp });
+  await kept.load();
+  t.rows.push(line(3, 31));
+  assert.deepStrictEqual((await kept.load()).map(x => x.n), [1, 2, 3]);
+  assert.strictEqual(t.reads.all, 1);
+});
+
+test('forget runs over every held row on each load, so memory lets go as the table does', async () => {
+  const now = Date.parse(at(0)) + 40 * 24 * 60 * 60_000; // forty days after the first row
+  const line = (id, minutes, ip) => ({ id, createdAt: at(minutes), ip });
+  const t = table([line('old', 0, '192.0.2.1'), line('new', 40 * 24 * 60 - 5, '192.0.2.2')]);
+  const forget = (r, when) => (when - Date.parse(r.createdAt) > 30 * 24 * 60 * 60_000 && r.ip ? { ...r, ip: undefined } : r);
+  const kept = keptRows({ ...t, forget, now: () => now });
+  const first = await kept.load();
+  assert.strictEqual(first.find(x => x.id === 'old').ip, undefined, 'past thirty days, no address held');
+  assert.strictEqual(first.find(x => x.id === 'new').ip, '192.0.2.2');
+  const again = await kept.load();
+  assert.strictEqual(again.find(x => x.id === 'old').ip, undefined);
 });

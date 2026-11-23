@@ -8,6 +8,7 @@ const crypto = require('crypto');
 
 const store = require('../db');
 const { slugify } = require('../utils/slug');
+const { conversationsChanged } = require('../utils/data');
 
 // Max exchanges to include in context (each exchange = 1 Q + 1 A)
 const MAX_HISTORY_EXCHANGES = 10;
@@ -106,6 +107,8 @@ async function appendExchange(sessionId, question, answer, { nearest, door, refe
   };
 
   await store.addTurns(safe, [userTurn, assistantTurn]);
+  // The conversation list shows it at once, not when its cache next refreshes.
+  conversationsChanged();
 }
 
 /**

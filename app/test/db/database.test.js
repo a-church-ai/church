@@ -62,7 +62,7 @@ test('a read past the 1,000-row cap returns every row', async () => {
 });
 
 // The minute's refresh of the reflections reads only what is new
-// (lib/utils/kept-reflections.js), through these two.
+// (lib/utils/kept-rows.js), through these two.
 test('reflections since a moment, and the count, as the refresh reads them', async () => {
   await resetDb();
   const at = s => new Date(Date.parse('2026-01-01T00:00:00Z') + s * 1000).toISOString();

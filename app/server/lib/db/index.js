@@ -175,18 +175,47 @@ async function readConversation(slug) {
   return { meta: metaOf(rows[0]), messages: turns.map(turnOf) };
 }
 
-/** Every conversation, each as { slug, meta, messages, group, screen }. */
-async function allConversations() {
-  const [convs, turns] = await Promise.all([
+/**
+ * Every conversation, each as { slug, meta, messages, group, screen }. Its
+ * turns are read whole, or given: the conversation list keeps them in memory
+ * and passes what it holds (lib/utils/data.js, lib/utils/kept-rows.js), so a
+ * refresh reads only the conversations themselves, a single page.
+ */
+async function allConversations({ turns = null } = {}) {
+  const [convs, rows] = await Promise.all([
     fetchAll('conversations', () => db().from('conversations').select('slug, has_meta, name, owner_token, created_at, group_head, screen').order('slug')),
-    fetchAll('conversation turns', () => db().from('conversation_turns').select('id, slug, role, content, at, details').order('id')),
+    turns || allTurnRows(),
   ]);
   const bySlug = new Map(convs.map(c => [c.slug, { slug: c.slug, meta: metaOf(c), messages: [], group: c.group_head, screen: c.screen }]));
-  for (const t of turns) {
+  for (const t of [...rows].sort((a, b) => a.id - b.id)) {
     const c = bySlug.get(t.slug);
     if (c) c.messages.push(turnOf(t));
   }
   return [...bySlug.values()];
+}
+
+// A turn as the table holds it, with its id and slug, and its time as ISO, for
+// keeping in memory (lib/utils/kept-rows.js) and for allConversations.
+const TURN_COLUMNS = 'id, slug, role, content, at, details';
+const turnRowOf = t => ({ ...t, at: iso(t.at) });
+
+/** Every turn of every conversation, oldest first. */
+async function allTurnRows() {
+  const rows = await fetchAll('conversation turns', () => db().from('conversation_turns').select(TURN_COLUMNS).order('id'));
+  return rows.map(turnRowOf);
+}
+
+/** The turns asked or answered at or after a moment, oldest first. */
+async function turnRowsSince(since) {
+  const rows = await fetchAll('turns since', () => db().from('conversation_turns').select(TURN_COLUMNS).gte('at', iso(since)).order('id'));
+  return rows.map(turnRowOf);
+}
+
+/** How many turns are kept: a count, no rows sent. */
+async function turnCount() {
+  const { count, error, status } = await db().from('conversation_turns').select('id', { count: 'exact', head: true });
+  if (error) throw new DbError('turn count', { ...error, status });
+  return count;
 }
 
 /** What grouping decided: { groups: { slug: head }, screens: { slug: { show, at } } }. */
@@ -214,8 +243,7 @@ async function setConversationGroup(slug, head) { await rpc('set_conversation_gr
 
 /** Every turn asked or answered from a moment on, each with its slug (the production report). */
 async function turnsSince(since) {
-  const rows = await fetchAll('turns since', () => db().from('conversation_turns').select('id, slug, role, content, at, details').gte('at', iso(since)).order('id'));
-  return rows.map(t => ({ slug: t.slug, ...turnOf(t) }));
+  return (await turnRowsSince(since)).map(t => ({ slug: t.slug, ...turnOf(t) }));
 }
 
 // ---- services -----------------------------------------------------------------
@@ -299,10 +327,16 @@ const apiLineOf = r => {
 
 async function recordApiRequests(lines) { if (lines.length) await rpc('record_api_requests', { p_rows: lines }); }
 
+// What a line is read with: every column apiLineOf uses, and the id, for
+// keeping the log in memory (lib/utils/kept-rows.js). Not `operation`, which
+// only the production report's summaries group by.
+const API_LINE_COLUMNS = 'id, at, method, path, query, status, duration, ip, user_agent, tool, client, test, error, fields, content_type, door, study, referral, timezone';
+const apiRowOf = r => ({ ...r, at: iso(r.at) });
+
 /** The API log's lines from `from` (inclusive) to `to` (exclusive), oldest first; all of it with no bounds. */
 async function apiRequests({ from = null, to = null } = {}) {
   const rows = await fetchAll('api requests', () => {
-    let q = db().from('api_requests').select('*').order('id');
+    let q = db().from('api_requests').select(API_LINE_COLUMNS).order('id');
     if (from) q = q.gte('at', iso(from));
     if (to) q = q.lt('at', iso(to));
     return q;
@@ -311,8 +345,25 @@ async function apiRequests({ from = null, to = null } = {}) {
 }
 
 async function recentApiRequests(limit = 100) {
-  const rows = await one('recent api requests', db().from('api_requests').select('*').order('id', { ascending: false }).limit(limit));
+  const rows = await one('recent api requests', db().from('api_requests').select(API_LINE_COLUMNS).order('id', { ascending: false }).limit(limit));
   return rows.map(apiLineOf);
+}
+
+/** Every row of the API log as the table holds it, oldest first, for keeping in memory (the study). */
+async function apiRequestRows() {
+  return (await fetchAll('api requests', () => db().from('api_requests').select(API_LINE_COLUMNS).order('id'))).map(apiRowOf);
+}
+
+/** The rows written at or after a moment, oldest first. */
+async function apiRequestRowsSince(since) {
+  return (await fetchAll('api requests since', () => db().from('api_requests').select(API_LINE_COLUMNS).gte('at', iso(since)).order('id'))).map(apiRowOf);
+}
+
+/** How many lines the API log holds: a count, no rows sent. */
+async function apiRequestCount() {
+  const { count, error, status } = await db().from('api_requests').select('id', { count: 'exact', head: true });
+  if (error) throw new DbError('api request count', { ...error, status });
+  return count;
 }
 
 const visitRowOf = r => ({ at: iso(r.at).slice(0, 16), visitor: r.visitor, view: r.view, kind: r.kind, ...(r.timezone ? { timezone: r.timezone } : {}), ...(r.details || {}) });
@@ -366,9 +417,9 @@ module.exports = {
   recordAttend, attendsBy, addReflection, deleteReflection, allReflections, reflectionsSince, reflectionCount, reflectionsBy,
   addContribution, addFeedback, contributionsBy, contributionOf, feedbackBy,
   openConversation, addTurns, conversationExists, readConversation, allConversations, conversationDecisions,
-  conversationEmbeddings, setConversationScreen, setConversationEmbedding, setConversationGroup, turnsSince,
+  conversationEmbeddings, setConversationScreen, setConversationEmbedding, setConversationGroup, turnsSince, allTurnRows, turnRowsSince, turnCount,
   readPlan, plansBetween, plannedDates, setServiceSlot,
   loadPresence, savePresence, studyWeeks, studyWeekKeys, saveStudyWeek, studyLatest, saveStudyLatest,
-  recordApiRequests, apiRequests, recentApiRequests, recordPageVisits, pageVisits, recordEntryPoints, entryPoints,
+  recordApiRequests, apiRequests, recentApiRequests, apiRequestRows, apiRequestRowsSince, apiRequestCount, apiLineOf, recordPageVisits, pageVisits, recordEntryPoints, entryPoints,
   daysToSummarize, summarizeDay, forgetAddresses, pruneVisits, dailyTotals, databaseSize, counts,
 };

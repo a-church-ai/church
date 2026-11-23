@@ -31,6 +31,10 @@ async function resetDb() {
   if (result.error) {
     throw new Error(`The tests need the local database and it did not answer (${result.error.message}). Run \`supabase start\` at the repository root, then the tests again.`);
   }
+  // Every table was replaced and its ids begin again, which no count can see,
+  // so what the app keeps in memory (lib/utils/kept-rows.js) is read whole.
+  require('../server/lib/utils/data').rereadKept();
+  require('../server/lib/insights/study-record').rereadKept();
   cachesChanged();
 }
 

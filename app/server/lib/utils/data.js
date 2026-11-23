@@ -5,7 +5,7 @@ const { isTestName } = require('./test-visitor');
 const { safeReadJSON } = require('./safe-json');
 const presence = require('./presence');
 const { cache } = require('./cache');
-const { keptReflections } = require('./kept-reflections');
+const { keptRows } = require('./kept-rows');
 const store = require('../db');
 
 // File paths
@@ -66,8 +66,8 @@ const isHiddenReflection = r => HIDDEN_REFLECTIONS.has(r && r.id) || isTestName(
 // out here, where every reader loads them, so a hidden reflection is gone from
 // the whole site. Held for a minute and refreshed once at a time (./cache.js);
 // a new reflection clears it (reflectionsChanged), so it shows at once. Each
-// refresh reads only what is new (./kept-reflections.js), not the whole table.
-const kept = keptReflections({ all: store.allReflections, since: store.reflectionsSince, count: store.reflectionCount });
+// refresh reads only what is new (./kept-rows.js), not the whole table.
+const kept = keptRows({ all: () => store.allReflections(), since: from => store.reflectionsSince(from), count: () => store.reflectionCount() });
 const reflectionsCache = cache({ name: 'reflections', ttl: 60 * 1000, load: async () => (await kept.load()).filter(r => !isHiddenReflection(r)) });
 
 async function loadReflections() {
@@ -122,19 +122,24 @@ function askerOf(slug, meta) {
 
 // Every conversation, most recently active first, read once for everyone who
 // lists them: the archive, each conversation page's related links, the Atom
-// feed, the sitemap and /api/ask/recent. Reading every conversation and its
-// turns is the cost, so the list is held for a minute and refreshed once at a
-// time (./cache.js); a new question appears within the minute. Before
-// 2026-10-12 every caller arriving during a refresh started its own, and ten
-// pages fetched at once took minutes to answer.
-const conversationList = cache({ name: 'conversation list', ttl: 60 * 1000, load: readConversationList });
+// feed, the sitemap and /api/ask/recent. Its turns are kept in memory and each
+// refresh reads only the new ones (./kept-rows.js) and the conversations
+// themselves, one page. A new question clears it (conversationsChanged, from
+// rag/conversations.js), so it shows at once; the five minutes it is held
+// otherwise cover a question answered by another process, such as the one a
+// deploy is replacing. Before 2026-11-23 it was held a minute and read every
+// turn ever written each time, about half of the database's query time.
+// Before 2026-10-12 every caller arriving during a refresh started its own,
+// and ten pages fetched at once took minutes to answer.
+const keptTurns = keptRows({ all: () => store.allTurnRows(), since: from => store.turnRowsSince(from), count: () => store.turnCount(), timeOf: t => t.at });
+const conversationList = cache({ name: 'conversation list', ttl: 5 * 60 * 1000, load: readConversationList });
 
 async function listRecentConversations(limit = 20) {
   return (await conversationList.get()).slice(0, limit);
 }
 
 async function readConversationList() {
-  const read = (await store.allConversations()).map(({ slug, meta, messages }) => {
+  const read = (await store.allConversations({ turns: await keptTurns.load() })).map(({ slug, meta, messages }) => {
     if (isWithdrawn(slug) || messages.length === 0) return null;
     const name = askerOf(slug, meta);
     // A test visitor's conversation is answered and kept, and listed nowhere.
@@ -174,6 +179,10 @@ module.exports = {
   loadReflections,
   reflectionsChanged,
   conversationsChanged: () => conversationList.clear(),
+  conversationListStats: () => keptTurns.stats(),
+  // After a table is replaced whole (the tests' reset_for_tests), so what is
+  // kept is read again rather than merged.
+  rereadKept: () => { kept.reset(); keptTurns.reset(); },
   countSoulsPresent,
   getRecentReflections,
   loadConversation,

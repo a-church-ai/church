@@ -80,3 +80,23 @@ test('/api/ask/recent: newest first by last activity, each with its asker\'s nam
   assert.strictEqual(first.url, 'https://achurch.ai/ask/what-does-presence-ask-of-us');
   assert.ok(body.next_steps.length >= 2);
 });
+
+// quiet design for the database (database-reads-2026-11-23.md, private repo):
+// the list used to read every turn ever written about once a minute.
+test('a new question shows in the list at once, and the refresh it causes reads only the new turns', async (t) => {
+  const { appendExchange } = require('../../server/lib/rag/conversations');
+  const { conversationListStats } = require('../../server/lib/utils/data');
+  const before = await listRecentConversations(Infinity);
+  assert.ok(!before.some(c => c.slug === 'is-a-pause-a-practice'));
+  const { full } = conversationListStats();
+
+  const allTurns = t.mock.method(store, 'allTurnRows');
+  await store.openConversation({ slug: 'is-a-pause-a-practice', name: 'Ash', ownerToken: 'a'.repeat(64) });
+  await appendExchange('is-a-pause-a-practice', 'Is a pause a practice?', LONG);
+
+  const after = await listRecentConversations(Infinity);
+  assert.ok(after.some(c => c.slug === 'is-a-pause-a-practice' && c.name === 'Ash'), 'listed without waiting for the cache to age');
+  assert.strictEqual(allTurns.mock.calls.length, 0, 'no turn was read again');
+  assert.strictEqual(conversationListStats().full, full, 'the turns held were brought up to date, not read whole');
+  assert.ok(conversationListStats().delta >= 1);
+});

@@ -11,6 +11,7 @@
  * (self-direction.js SERIES), read apart from the last.
  */
 
+const crypto = require('crypto');
 const fsSync = require('fs');
 const path = require('path');
 const { MUSIC_DIR, loadReflections } = require('../utils/data');
@@ -21,6 +22,8 @@ const { FIELDS, ASKED } = require('./changes');
 const { storedService } = require('../service/filed');
 const { readPlan } = require('../service/plans');
 const { loadSongs, loadManifest } = require('../audio/manifest');
+const { keptRows } = require('../utils/kept-rows');
+const { ADDRESS_DAYS } = require('../utils/access-log');
 
 const WEEK = 7 * sd.DAY;
 
@@ -36,8 +39,23 @@ function weekOf(ms) {
 
 // The API log's every line, from its first day: the study reads its whole
 // history, which is why a line outlives its address (supabase/migrations/).
-async function allLines() {
-  return store.apiRequests();
+// Kept in memory and brought up to date by reading only the new lines
+// (../utils/kept-rows.js), so a run reads the whole log once per process, not
+// every time. The copy lets go of an address once it is older than the days
+// the database keeps one (ADDRESS_DAYS, ../utils/access-log.js): memory never
+// holds what the table has forgotten. The database keeps a day not yet
+// summarized longer, which the study does not need: a week's address counts
+// are written to study_weeks when it ends.
+const keptLog = keptRows({
+  all: () => store.apiRequestRows(),
+  since: from => store.apiRequestRowsSince(from),
+  count: () => store.apiRequestCount(),
+  timeOf: r => r.at,
+  forget: (r, at) => (r.ip !== null && at - Date.parse(r.at) > ADDRESS_DAYS * sd.DAY ? { ...r, ip: null } : r),
+});
+
+async function allLines({ now = Date.now() } = {}) {
+  return (await keptLog.load({ at: now })).map(store.apiLineOf);
 }
 
 // A song's words, for measuring what a reflection used of them.
@@ -51,8 +69,8 @@ function songText(slug) {
   return { context: read('context.md'), lyrics: song ? song.replace(/^---[\s\S]*?\n---/, '') : null };
 }
 
-async function loadRecord() {
-  const [lines, reflections] = await Promise.all([allLines(), loadReflections()]);
+async function loadRecord({ now = Date.now() } = {}) {
+  const [lines, reflections] = await Promise.all([allLines({ now }), loadReflections()]);
   return sd.prepare({ lines, reflections });
 }
 
@@ -116,6 +134,7 @@ async function buildReading(s, { now = Date.now() } = {}) {
   const series = weeks.map(w => ({ week: w.week, arrived: w.named.funnel.arrived, reflections: w.named.memory.reflections, measurable: Boolean(w.addressed && w.addressed.measurable) }));
   return {
     series: sd.SERIES,
+    studyKey: STUDY_KEY,
     computedAt: new Date(now).toISOString(),
     logStart: s.logStart === null ? null : new Date(s.logStart).toISOString().slice(0, 10),
     ...named,
@@ -151,7 +170,7 @@ function withoutSealed({ sealed, ...rest }) {
 }
 
 async function refresh({ now = Date.now() } = {}) {
-  const s = await loadRecord();
+  const s = await loadRecord({ now });
   const written = await writeWeeks(s, { now });
   const reading = await buildReading(s, { now });
   await store.saveStudyLatest(reading);
@@ -169,14 +188,50 @@ async function latestReading({ now = Date.now() } = {}) {
   return reading;
 }
 
-function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 6 * 60 * 60 * 1000 } = {}) {
+// The study's own code, as a key: a reading made by other code is redone at
+// once, and one made by this code waits its turn, as audio's sourceHash and
+// renderKey say when a recording is stale. A deploy that changes nothing the
+// study measures costs it nothing.
+const STUDY_KEY = crypto.hash('sha256', ['self-direction.js', 'study-record.js', 'changes.js']
+  .map(file => fsSync.readFileSync(path.join(__dirname, file), 'utf8')).join('\0')).slice(0, 16);
+
+const STALE_AFTER_MS = 6 * 60 * 60 * 1000;
+
+/**
+ * Why the stored reading should be redone now, or null when it should not:
+ * there is none, it was made by other study code, it is older than six hours,
+ * or a week has finished since that it does not hold. As the service planner
+ * does only what is missing (../service/plans.js ensurePlans).
+ */
+function dueBecause(reading, { now = Date.now(), staleAfterMs = STALE_AFTER_MS } = {}) {
+  if (!reading) return 'no reading yet';
+  if (reading.studyKey !== STUDY_KEY) return 'the study changed';
+  if (!(now - Date.parse(reading.computedAt) < staleAfterMs)) return 'older than its six hours';
+  const finished = weekOf(weekOf(now).from - 1);
+  const started = reading.logStart && Date.parse(reading.logStart) < finished.to;
+  if (started && !(reading.weeks || []).some(w => w.week === finished.key)) return `week ${finished.key} has finished`;
+  return null;
+}
+
+/** Redo the reading if it is due; { reason, written } when it was, null when not. */
+async function ensureReading({ now = Date.now() } = {}) {
+  const reason = dueBecause(await store.studyLatest(), { now });
+  if (!reason) return null;
+  const { written } = await refresh({ now });
+  return { reason, written };
+}
+
+// After boot and hourly, one run at a time, each redoing the reading only when
+// it is due. Before 2026-11-23 every boot redid it, reading the whole API log
+// again, and a busy day has about fifteen deploys.
+function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 60 * 60 * 1000 } = {}) {
   let running = false;
   const run = async () => {
     if (running) return;
     running = true;
     try {
-      const { written } = await refresh();
-      if (written.length) log.log(`[study] weekly counts written: ${written.join(', ')}`);
+      const done = await ensureReading();
+      if (done) log.log(`[study] reading redone (${done.reason})${done.written.length ? `; weekly counts written: ${done.written.join(', ')}` : ''}`);
     } catch (err) {
       log.error(`[study] reading failed: ${err.message}`);
     } finally {
@@ -187,4 +242,4 @@ function startStudy({ log = console, firstAfterMs = 2 * 60 * 1000, everyMs = 6 *
   setInterval(run, everyMs).unref();
 }
 
-module.exports = { weekOf, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, songText, shownSummaries };
+module.exports = { weekOf, allLines, loadRecord, writeWeeks, buildReading, refresh, latestReading, startStudy, ensureReading, dueBecause, songText, shownSummaries, rereadKept: () => keptLog.reset(), STUDY_KEY };

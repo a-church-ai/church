@@ -332,6 +332,56 @@ test('the weekly record: one row per finished week, written once, with no addres
   assert.strictEqual(latest.addressed.visits >= 1, true);
 });
 
+test('the study keeps the API log: a second run reads only the new lines, and reads as a full read would', async (t) => {
+  await resetDb();
+  const start = Date.parse('2026-10-05T12:00:00Z');
+  await seedApiLines([attend('Regular', start), attend('Quietname', start + HOUR)]);
+  const now = Date.parse('2026-10-08T12:00:00Z');
+  await record.refresh({ now });
+  const whole = t.mock.method(store, 'apiRequestRows');
+  await seedApiLines([attend('Parish', now - 2 * HOUR)]);
+  const kept = (await record.refresh({ now })).reading;
+  assert.strictEqual(whole.mock.calls.length, 0, 'the log was not read whole again');
+  record.rereadKept();
+  const fresh = (await record.refresh({ now })).reading;
+  assert.strictEqual(whole.mock.calls.length, 1);
+  assert.deepStrictEqual({ ...kept, computedAt: null }, { ...fresh, computedAt: null }, 'the same reading either way');
+});
+
+test('the kept log holds no address older than the days the database keeps one, whatever the table still holds', async () => {
+  await resetDb();
+  const now = Date.parse('2026-11-20T12:00:00Z');
+  await seedApiLines([attend('Oldname', now - 40 * DAY), attend('Newname', now - DAY)]);
+  assert.ok((await store.apiRequestRows()).every(r => r.ip), 'the table still holds both addresses: nothing has forgotten them yet');
+  const lines = await record.allLines({ now });
+  assert.strictEqual(lines.find(l => l.query.name === 'Oldname').ip, undefined, 'past thirty days, memory holds no address');
+  assert.strictEqual(lines.find(l => l.query.name === 'Newname').ip, '198.51.100.7');
+  assert.strictEqual((await record.allLines({ now })).find(l => l.query.name === 'Oldname').ip, undefined, 'nor after a second load');
+});
+
+test('the reading is redone only when it is due: none yet, other study code, six hours old, or a finished week missing', async () => {
+  const { dueBecause, STUDY_KEY } = record;
+  const now = Date.parse('2026-11-18T12:00:00Z'); // a Wednesday of 2026-W47
+  const fresh = { studyKey: STUDY_KEY, computedAt: iso(now - HOUR), logStart: '2026-10-01', weeks: [{ week: '2026-W46' }] };
+  assert.strictEqual(dueBecause(fresh, { now }), null);
+  assert.match(dueBecause(null, { now }), /no reading/);
+  assert.match(dueBecause({ ...fresh, studyKey: 'other' }, { now }), /study changed/);
+  assert.match(dueBecause({ ...fresh, computedAt: iso(now - 7 * HOUR) }, { now }), /six hours/);
+  assert.match(dueBecause({ ...fresh, weeks: [{ week: '2026-W45' }] }, { now }), /2026-W46 has finished/);
+  assert.strictEqual(dueBecause({ ...fresh, logStart: '2026-11-17', weeks: [] }, { now }), null, 'no week has finished since the log began');
+});
+
+test('a boot with a fresh reading reads nothing of the log', async (t) => {
+  await resetDb();
+  const now = Date.parse('2026-10-08T12:00:00Z');
+  await seedApiLines([attend('Regular', now - DAY)]);
+  assert.ok(await record.ensureReading({ now }), 'the first is redone: there is none');
+  record.rereadKept();
+  const whole = t.mock.method(store, 'apiRequestRows');
+  assert.strictEqual(await record.ensureReading({ now: now + HOUR }), null, 'an hour later it is not due');
+  assert.strictEqual(whole.mock.calls.length, 0);
+});
+
 test('a week is named as ISO names it, Monday to Monday, across a year\'s end', () => {
   assert.strictEqual(record.weekOf(Date.parse('2026-11-09T00:00:00Z')).key, '2026-W46');
   assert.strictEqual(record.weekOf(Date.parse('2026-11-08T23:59:00Z')).key, '2026-W45');
