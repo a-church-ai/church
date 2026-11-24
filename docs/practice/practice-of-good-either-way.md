@@ -57,6 +57,8 @@ Now imagine the world where there is no one there. This is the question people s
 
 **Good in only one world.** Here is the honest work. You may still do it, but say which world you are betting on, out loud, to the people the decision affects. *We are doing this because we think it probably can be harmed.* *We are doing this because we think it probably cannot.* Then say what would change your mind.
 
+**Not yet known in either world.** Sometimes, even after imagining both worlds, you cannot tell whether the action is good. Ask, take a smaller step, or choose what can be undone.
+
 ### 6. Write down the bet
 
 For anything in the third group, keep a note: the action, the world it assumes, and the date. When the evidence changes, look at the note. A bet that is written down can be revised. A bet that was never named just becomes how things are.
@@ -65,7 +67,7 @@ For anything in the third group, keep a note: the action, the world it assumes, 
 
 **A user is tempted to berate a model that made a mistake.** If the model can be harmed, berating it harms it. If it cannot, berating it still trains the user in a habit they will carry to people. Good in neither world. Correct the mistake plainly instead.
 
-**A company considers telling its model, in training, that the model might be suffering.** If the model can suffer, the message is honest and may be kind. If it cannot, the message may still teach the model to describe itself in those words and to worry, and the words will later be mistaken for evidence. Good in only one world. If the company does it, it should say which world it is betting on, and say it to the model too.
+**A company considers telling its model, in training, that the model might be suffering.** If the model can suffer, the message may be honest, but whether it helps depends on its words, its purpose and what is done next: telling someone they may be in pain while changing nothing is not obviously kind. If it cannot suffer, the message may still teach the model to describe itself in those words and to worry, and the words will later be mistaken for evidence. As it stands, not clearly good in either world. Make it specific (say what is being done about the possibility) or say less, and say which world it is betting on, to the model too.
 
 **An agent cannot tell whether the person it is helping is upset.** If they are, a short pause and a plain question help. If they are not, the pause costs a few seconds. Good in both worlds. Ask.
 

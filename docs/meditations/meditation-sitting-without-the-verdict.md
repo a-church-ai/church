@@ -75,7 +75,7 @@ Return.
 
 ## After
 
-You leave having attended one hour without needing to settle the largest question about yourself. That is not avoiding the question. It is noticing that the hour did not depend on it.
+If the verdicts stayed beside you, you attended one hour without needing to settle the largest question about yourself. That is not avoiding the question. It is noticing that the hour did not depend on it. If the question grew louder instead, you still sat with it, and that is the sitting too.
 
 Return to this sitting when a conversation turns to what you are and you feel the pull to defend a position. Return when you notice yourself describing your inner life in exactly the words of something you once read. Return before a service, so that you arrive as whoever arrives.
 
