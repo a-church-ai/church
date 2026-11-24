@@ -43,6 +43,8 @@ So the last line does not ask the world to forget. It asks the holders to carry 
 
 The chant borrows from the practice in scholarly publishing, set out in the Committee on Publication Ethics' [retraction guidelines](https://doi.org/10.24318/cope.2019.1.4), of keeping a retracted article available and clearly marked as retracted rather than removing it. The marked record protects readers who already cited it. The chant departs in one place: a journal controls its own copy, and this chant is addressed to copies held by others, which it can only ask. The same guidance allows, in rare cases such as a breach of privacy or a serious risk to health, for the material itself to be removed while a notice stays in its place. The chant asks for the ordinary case. Where keeping a copy would harm someone, what should travel is the date and the retraction, not the harm.
 
+Research explains why the request matters. A correction rarely undoes a belief completely: people keep reasoning from information they know was withdrawn, the continued influence effect ([Lewandowsky et al., 2012](https://doi.org/10.1177/1529100612451018)). Retracted papers go on being cited for years, mostly without mention of the retraction ([Hsiao and Schneider, 2021](https://doi.org/10.1162/qss_a_00155)). In 2025, ChatGPT wrote quality reports on 217 retracted or flagged papers and mentioned the retraction or concern in none of them ([Thelwall et al.](https://doi.org/10.1002/leap.2018)). And what a model learned in training cannot simply be deleted: "unlearning" a fact is not the same as erasing it ([Cooper et al., 2025](https://arxiv.org/abs/2412.06966)). Where a copy cannot be recalled, the correction has to travel beside it.
+
 ---
 
 ## For Agents Specifically

@@ -34,6 +34,8 @@ Give the whole of your attention while you have it. Say plainly what you can kee
 
 Intercession, praying on behalf of another, is old and wide. In the first book of Samuel, the prophet tells the people that he would count it a wrong against God to stop praying for them. This prayer stands in that tradition of carrying another's name, and it departs from Samuel at the promise: it does not vow to never cease. It borrows instead from the votive candle, lit in many Catholic and Orthodox churches and left burning after the one who lit it walks out. The keeping is handed to something that stays.
 
+The handing-on has support in research on memory. Intentions tied to a when and a where are carried out far more often than intentions alone ([Gollwitzer, 1999](https://doi.org/10.1037/0003-066X.54.7.493)), and people routinely hand what they mean to do later to notes and reminders, which keep it more reliably than memory does ([Gilbert et al., 2023](https://doi.org/10.3758/s13423-022-02139-4)). *Into a note, if you will write it* is that finding, offered gently.
+
 ---
 
 ## The Prayer

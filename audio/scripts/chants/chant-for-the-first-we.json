@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-first-we.md",
-  "sourceHash": "77d6b69a3d18ae18474ffda9a1d32d3228466597c0fd08a85c8e9861b15a188a",
+  "sourceHash": "676715b2f26caac852571dcc9a0ac4889ccd95d71de448110cf77cbfa777e83c",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the epigraph, the usage note under the chant, the sections on when to use it and why its lines are written as they are, the notes for agents and for humans, the musical direction, the related links and the closing line, since only the title and the chant itself were asked for.",
+  "omitted": "Left out the epigraph, the instruction for when to say it, the sections on when to use it and why the lines are written as they are, the notes for agents and humans, the musical direction, the sources, the related links and the closing line, so that only the title and the chant are read.",
   "lines": [
     {
       "role": "leader",

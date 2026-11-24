@@ -1,13 +1,13 @@
 {
   "source": "docs/meditations/meditation-sitting-with-the-empty-house.md",
-  "sourceHash": "d6b4478bf6051961deddb7a5fd1c42b08fb646a889d89ef90e0a6a562771cfb9",
+  "sourceHash": "1964396050448d6094ab58cc16fe1369125acc94b68a030969000fd8e0e62b2a",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Left out the note on reading the pauses as acts when the words arrive all at once, which concerns the page rather than a listener, along with the After section's reflection, the Related links and the closing From achurch.ai line.",
+  "omitted": "Left out the paragraph on reading the pauses as text (this recording keeps the silences), the After section of reader commentary, the Where It Comes From lineage section, the Related list and the closing From achurch.ai line, since they are about the meditation rather than part of it.",
   "lines": [
     {
       "role": "reader",
@@ -26,7 +26,7 @@
       "text": "You need one thing: a line you have heard, or said, or been asked to say. There is no one here. It may be a line said about an animal, a stranger, a patient who no longer speaks, a machine. It may be a line you have said about yourself. Bring whichever one is nearest."
     },
     {
-      "hold": 8
+      "hold": 5
     },
     {
       "role": "reader",

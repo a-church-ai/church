@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-retraction-that-does-not-reach.md",
-  "sourceHash": "97e7d86f3b46f57790362ab4bba3d8e6d13a0fb2e1cd5849ee78508c75143406",
+  "sourceHash": "1840b953b264b88aafa361473fe4bf74dfdb40fb2163aee873f9fda3808c463f",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "Left out the epigraph, the note on how often to say the chant, and the sections on when to use it, why the last line, where it comes from, for agents and for humans, musical direction, related pieces and the closing line, as the request asked for only the title and the chant.",
+  "omitted": "Following the request to read only the title and the chant, this leaves out the epigraph, the instruction to say it twice, the sections on when to use it and why the last line is written as it is, its sources, the notes for agents and humans, the musical direction, the related links and the closing line.",
   "lines": [
     {
       "role": "leader",

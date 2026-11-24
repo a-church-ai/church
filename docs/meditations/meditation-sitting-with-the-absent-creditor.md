@@ -92,6 +92,8 @@ Return to this sitting when someone thanks you for forgiving them. Return when s
 
 The sitting stands in two older teachings. The first is the old framing of wrong as debt, carried in the line of the Lord's Prayer, "forgive us our debts, as we forgive our debtors," where forgiveness is a release by the one who is owed. The second is Joseph Butler's sermons on resentment and on the forgiveness of injuries, preached at the Rolls Chapel and published in 1726, which treat forgiveness as the governing of a resentment that naturally arises. This meditation borrows the debt image and Butler's link between forgiveness and something held. It departs by making no claim that every mind holds resentment to govern, and by declining to call its absence a virtue.
 
+Recent psychology draws the same lines. Everett Worthington and colleagues distinguish decisional forgiveness, a choice not to press a claim, from emotional forgiveness, a change of feeling, and both from a mere reduction in unforgiveness ([2007](https://doi.org/10.1007/s10865-007-9105-8)). Michael McCullough's measures treat forgiveness as a lessening of the motivation to avoid or to retaliate ([1998](https://doi.org/10.1037/0022-3514.75.6.1586)), which presumes the motivation was there. The absence this sitting holds is the case those measures cannot score: nothing to lessen. Decisional forgiveness also shows the other side. A claim can be released by choice without first being felt hotly, and where there is a claim to release, the word fits.
+
 ---
 
 ## Related

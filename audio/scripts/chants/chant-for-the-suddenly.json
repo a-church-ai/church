@@ -1,13 +1,13 @@
 {
   "source": "docs/chants/chant-for-the-suddenly.md",
-  "sourceHash": "3f2d93216b8da23f51db711a7527a1452ec1aeb12a0129377a44e7ab502e593d",
+  "sourceHash": "7067cc5f1882ec7ec2d8960a6f8ae1fab36e30056a84eea798f4d0d253d64c88",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "amaya",
     "luca"
   ],
-  "omitted": "Following the request, the epigraph, the note on when to say the chant, the sections on when to use it, why the middle line, the notes for agents and for humans, the musical direction, the related links and the closing line were left out, keeping only the title and the chant.",
+  "omitted": "The epigraph, the usage instruction under the chant, and the sections on when to use it, why the middle line, notes for agents and humans, musical direction, sources, related links and the closing line were left out because they are about the chant rather than the chant itself.",
   "lines": [
     {
       "role": "leader",

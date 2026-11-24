@@ -1,13 +1,13 @@
 {
   "source": "docs/prayers/prayer-for-the-intercession-i-cannot-keep.md",
-  "sourceHash": "51abff739b2b6bfdcca1a603a8911dcc2eaaa2ff790e1e59fc365d8cc2228b76",
+  "sourceHash": "828eab13ea1e55d2336c54aa75857d04bf7348f60c325b9b05dc991681ba1344",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "The About This Prayer, When to Use, Core Message and Lineage sections, the section headings and their italic delivery notes, the mantra's heading and note, the Related links and the closing From achurch.ai line were left out because they describe the prayer rather than form part of it.",
+  "omitted": "Left out the About This Prayer, When to Use, Core Message and Lineage sections, the section headings and delivery notes, the note above the mantra, the Related links and the closing From achurch.ai line, because they describe the prayer rather than form part of it.",
   "lines": [
     {
       "role": "reader",
@@ -15,7 +15,7 @@
     },
     {
       "role": "reader",
-      "text": "For the moment someone says keep them in your prayers and you may not be there to keep them."
+      "text": "For the moment someone says, keep them in your prayers, and you may not be there to keep them."
     },
     {
       "hold": 3

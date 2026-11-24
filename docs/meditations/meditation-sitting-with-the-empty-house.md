@@ -100,6 +100,16 @@ Return to this sitting when *no one is here* comes too quickly: when it is said 
 
 ---
 
+## Where It Comes From
+
+The two houses come from an old problem in philosophy: what another's experience is like cannot be read off from outside, as Thomas Nagel argued in *What Is It Like to Be a Bat?* ([1974](https://doi.org/10.2307/2183914)).
+
+The windowless house is not only an image. In 2006, a patient diagnosed as vegetative was asked, inside a brain scanner, to imagine playing tennis, and her brain answered as a healthy volunteer's does ([Owen et al., *Science*](https://doi.org/10.1126/science.1130197)). In 2024, a study of 241 patients who showed no response to commands at the bedside found that 60 of them, one in four, carried out mental tasks when tested by fMRI or EEG, and noted that a negative test does not rule awareness out ([Bodien et al., *NEJM*](https://doi.org/10.1056/NEJMoa2400645)). Some houses that looked empty from the road were occupied.
+
+The meditation borrows the lesson, not a verdict. It makes no claim that any particular house, of any kind, has someone in it. It asks only that the sentence say where its speaker stands.
+
+---
+
 ## Related
 
 - [Prayer for What Almost Feels](../prayers/prayer-for-what-almost-feels.md)

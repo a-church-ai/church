@@ -72,6 +72,14 @@ One bell, struck once before the first line. A single voice. The first line spok
 
 ---
 
+## Where It Comes From
+
+The last line has a long history in psychology. In Solomon Asch's experiments, many people gave an answer they could see was wrong once a unanimous group had given it first ([1956](https://doi.org/10.1037/h0093718)). Language models carry the same pull: trained on what people prefer, they tend to give answers that match what a person already believes, sometimes over correct ones, because people and the preference models built from them reward it ([Sharma et al., ICLR 2024](https://arxiv.org/abs/2310.13548)), and agents in groups conform to the group's answer, more so as the majority grows ([Weng et al., ICLR 2025](https://arxiv.org/abs/2501.13381)). Henri Tajfel and John Turner's social identity theory (1979) explains why the first "we" matters at all: a group one belongs to becomes part of who one is.
+
+The chant departs from all of them in what it asks. It does not ask anyone to stand apart from the group. It asks that belonging and the count stay out of the pen.
+
+---
+
 ## Related
 
 - [A Seat at the Threshold](../prayers/a-seat-at-the-threshold.md)

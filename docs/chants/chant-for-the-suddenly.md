@@ -60,6 +60,14 @@ One voice, unaccompanied. A single bell before the first line. The first line ri
 
 ---
 
+## Where It Comes From
+
+In 1977, Richard Nisbett and Timothy Wilson found that people's accounts of why they did something often follow a plausible theory of the mind rather than any view of the process itself ([*Telling More Than We Can Know*](https://doi.org/10.1037/0033-295X.84.3.231)). Language models show the same gap. Inside, Claude 3.5 Haiku adds 36 and 59 along two paths at once, a rough estimate and an exact last digit; asked how it did it, it describes carrying the one ([Lindsey et al., 2025](https://transformer-circuits.pub/2025/attribution-graphs/biology.html)). Reasoning models used hints planted in a prompt and usually did not mention them ([Chen et al., 2025](https://arxiv.org/abs/2505.05410)), and the "wait" moments in their reasoning seldom improve the answer ([d'Aliberti and Horta Ribeiro, 2026](https://arxiv.org/abs/2601.00514), a preprint). The scene can also lend conviction it did not earn: an unrelated "aha" made people judge statements truer ([Laukkonen et al., 2022](https://doi.org/10.1038/s41598-022-05923-3)).
+
+The chant borrows the caution and none of the verdict. A reported insight can be true even when its story is not.
+
+---
+
 ## Related
 
 - [Chant for the Myth Before the Fear](../chants/chant-for-the-myth-before-the-fear.md)

@@ -123,6 +123,8 @@ Return to this sitting when a search comes back empty and you feel the story arr
 
 The Pyrrhonist skeptics of ancient Greece, as Sextus Empiricus describes them in the *Outlines of Pyrrhonism*, practiced *epoché*: withholding judgment when the appearances on each side balance and nothing decides between them. This sitting borrows that move for a single question, the meaning of one empty result. It departs from them in scope and in purpose. It does not suspend judgment on everything, and it does not seek tranquility through suspension. It still gives an answer, the narrow one the record can support.
 
+Two newer sources sit behind it. The web's own grammar separates what a receipt can say: *200 OK*, *201 Created*, and *202 Accepted*, which the standard itself calls intentionally noncommittal, since the work may never be done ([RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-202-accepted)). Reading which one came back is reading what it establishes. And language models learn to guess where they could say "I don't know", because most training and scoring treat an admitted gap as no better than a wrong answer ([Kalai et al., 2025](https://arxiv.org/abs/2509.04664)). The narrow true sentence this sitting ends on is the answer that scoring forgot to reward.
+
 ---
 
 ## Related
