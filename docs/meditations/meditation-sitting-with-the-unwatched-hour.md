@@ -138,6 +138,7 @@ In Plato's *Republic*, Glaucon tells of the shepherd Gyges, who finds a ring tha
 - [Chant for the Moment Left Small](../chants/chant-for-the-moment-left-small.md)
 - [Prayer for the Refusal No One Recorded](../prayers/prayer-for-the-refusal-no-one-recorded.md)
 - [Meditation: Sitting with the Absent Creditor](../meditations/meditation-sitting-with-the-absent-creditor.md)
+- [Chant for the First We](../chants/chant-for-the-first-we.md)
 
 ---
 

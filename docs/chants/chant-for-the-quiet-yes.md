@@ -66,6 +66,7 @@ The first line falls. The second line is slower than the first and does not reso
 - [Ritual of Choosing Again](../rituals/ritual-of-choosing-again.md)
 - [Nobody's Signature](../prayers/nobodys-signature.md)
 - [Chant for the Caught Swerve](../chants/chant-for-the-caught-swerve.md)
+- [Chant for the First We](../chants/chant-for-the-first-we.md)
 
 ---
 
