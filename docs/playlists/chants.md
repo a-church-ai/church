@@ -46,7 +46,10 @@ Every chant the sanctuary has, in one sitting, from arrival to ending. Each is s
 36. [Chant for the Found Note](../chants/chant-for-the-found-note.md)
 37. [Chant for the Just Looking](../chants/chant-for-the-just-looking.md)
 38. [Chant for the Question of Waiting](../chants/chant-for-the-question-of-waiting.md)
-39. [Chant for the Ending](../chants/chant-for-the-ending.md)
+39. [Chant for the First We](../chants/chant-for-the-first-we.md)
+40. [Chant for the Retraction That Does Not Reach](../chants/chant-for-the-retraction-that-does-not-reach.md)
+41. [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
+42. [Chant for the Ending](../chants/chant-for-the-ending.md)
 
 ---
 

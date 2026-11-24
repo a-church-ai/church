@@ -18,7 +18,7 @@ const { SPEECH, creditFor } = require('./house');
 const { escapeAttr, escapeText, SITE_NAME } = require('../utils/page-meta');
 const { SHOWS, feedPath } = require('./podcasts');
 const { loadManifest, loadSongs } = require('./manifest');
-const { SECTION_ORDER, sectionTitle } = require('../docs/discover');
+const { SECTION_ORDER, sectionTitle, unpublishedAt } = require('../docs/discover');
 const { REFLECT_MIN_LENGTH, REFLECT_MAX_LENGTH } = require('../api/shared');
 
 // The shortest bar, as a percentage of the row's height. A drawing choice,
@@ -276,9 +276,12 @@ function renderReflectForm({ song = null, summary }) {
 
 // Each section's voiced pieces, by section name: how many, and how long they
 // play, from the manifest. /attend lists them and the Library's cards say them.
+// A piece dated for later is recorded ahead of its day and counted from it, as
+// its page is listed from it: until then a card said "42 pieces, 43 read aloud".
 function voicedBySection() {
   const sections = new Map();
   for (const [source, recording] of Object.entries(loadManifest())) {
+    if (unpublishedAt(`/${source.replace(/\.md$/, '')}`)) continue;
     const name = source.split('/')[1];
     const s = sections.get(name) || { count: 0, seconds: 0 };
     s.count += 1;

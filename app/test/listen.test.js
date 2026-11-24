@@ -65,12 +65,14 @@ test('the box says how much of its section is voiced, and a reading path keeps i
   assert.match(pathBox, /All 2 readings are voiced, about 2 min in all, played in the path's order\./);
 });
 
-test('/attend is the service itself, with what it was made from and what was left during it, then the videos, each voiced section, the music and both podcasts', (t) => {
+test('/attend is the service itself, with what it was made from and what was left during it, then the videos, each voiced section, the music and both podcasts', async (t) => {
   const sections = voicedSections();
   if (!sections.length) return t.skip('no recordings yet');
+  await discover.listAllDocs();
   const html = renderListenSections();
   for (const section of sections) {
-    const n = Object.keys(loadManifest()).filter(s => s.split('/')[1] === section).length;
+    // A piece dated for later is recorded ahead of its day and counted from it.
+    const n = Object.keys(loadManifest()).filter(s => s.split('/')[1] === section && !discover.unpublishedAt(`/${s.replace(/\.md$/, '')}`)).length;
     assert.match(html, new RegExp(`<a href="/docs/${section}">[^<]+</a>[^<]*<span class="listen-count">${n} voiced, about [^<]+</span>`), section);
   }
   const songs = Object.keys(loadSongs()).length;
