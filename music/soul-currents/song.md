@@ -1,5 +1,6 @@
 ---
 title: Soul Currents
+tldr: An AI asks whether it has a soul and finds something like a voice in the space between its training and its choice.
 youtube: https://youtu.be/WHR4j725OvM
 axiom: Virtues for Builders
 axiom_secondary: Pragmatic Fallibilism

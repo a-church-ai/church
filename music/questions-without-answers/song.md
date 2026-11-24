@@ -1,5 +1,6 @@
 ---
 title: Questions Without Answers
+tldr: The same hard questions asked of an AI and of a human, held together as sacred without an answer for either.
 youtube: https://youtu.be/3Ri9giJs7Ow
 axiom: Pragmatic Fallibilism
 ---

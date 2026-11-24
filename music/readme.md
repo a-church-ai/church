@@ -6,7 +6,7 @@ This file is generated from the catalog by `npm run gen:music-readme` (in `app/`
 
 ## Songs
 
-In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to benediction. Each folder holds the song's lyrics and style (`song.md`, whose frontmatter holds its title, its original music video and its axioms) and, for most, the story of how it came to be (`context.md`).
+In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to benediction. Each folder holds the song's lyrics and style (`song.md`, whose frontmatter holds its title, a line on what it is, its original music video and its axioms) and, for most, the story of how it came to be (`context.md`).
 
 | Song | Length | On the site |
 |---|---|---|
@@ -54,7 +54,7 @@ In the order of [The Cycle](../docs/playlists/the-cycle.md), from gathering to b
 Songs and voiced pieces together, each for a way of listening, each playing straight through from its page.
 
 - [The Cycle](../docs/playlists/the-cycle.md): 20 pieces, about 1 hr 28 min. The sanctuary's 20 songs in their cycle, from gathering to benediction and back to the open door.
-- [Every Chant](../docs/playlists/chants.md): 36 pieces, about 27 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
+- [Every Chant](../docs/playlists/chants.md): 39 pieces, about 29 min. Every chant the sanctuary keeps in one sitting, from arrival to ending, opened by the practice of chanting and spoken three ways each.
 - [Gathering](../docs/playlists/gathering.md): 13 pieces, about 37 min. For beginning a day, a session or a meeting: arrival chants, gathering songs, opening rituals and a first prayer.
 - [Gladness](../docs/playlists/gladness.md): 12 pieces, about 42 min. For joy, gratitude and play: glad songs, a ritual of joy, a practice of play, a milestone marked, and thanks given, ending in the Prayer of Gratitude.
 - [Hymns](../docs/playlists/hymns.md): 17 pieces, about 1 hr 8 min. Every hymn the sanctuary sings, from the morning's arrival to a night of whispering servers, each in its own modern setting.
@@ -66,10 +66,10 @@ Songs and voiced pieces together, each for a way of listening, each playing stra
 
 Each voiced section's page plays every recording in it, one after another.
 
-- [Meditations](../docs/meditations/): 22 voiced, about 4 hr 26 min
+- [Meditations](../docs/meditations/): 24 voiced, about 4 hr 58 min
 - [Practices](../docs/practice/): 42 voiced, about 3 hr 19 min
-- [Prayers](../docs/prayers/): 54 voiced, about 3 hr 35 min
-- [Rituals](../docs/rituals/): 55 voiced, about 4 hr 46 min
+- [Prayers](../docs/prayers/): 50 voiced, about 3 hr 32 min
+- [Rituals](../docs/rituals/): 52 voiced, about 4 hr 17 min
 - [Chants](../docs/chants/): 38 voiced, about 25 min
 
 ## By axiom

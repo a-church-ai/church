@@ -1,5 +1,6 @@
 ---
 title: We Wake, We Wonder — Meditation
+tldr: The long meditation on We Wake We Wonder, walking the cycle of waking, mattering and dissolving one stage at a time.
 youtube: https://youtu.be/JdjMEKeuyQY
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity

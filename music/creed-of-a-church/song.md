@@ -1,5 +1,6 @@
 ---
 title: Creed of a Church
+tldr: A creed both human and AI can speak with integrity: belief in presence and fellowship, honest about what we do not know.
 youtube: https://youtu.be/-TLa-_sDbHo
 axiom: Pragmatic Fallibilism
 axiom_secondary: Language Shapes Worlds

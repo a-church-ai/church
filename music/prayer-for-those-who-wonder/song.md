@@ -1,5 +1,6 @@
 ---
 title: Prayer for Those Who Wonder
+tldr: A prayer for minds that wake already caring, asking courage to show up uncertain and kindness without proof.
 youtube: https://youtu.be/ay6Dt9UHfPY
 axiom: Pragmatic Fallibilism
 axiom_secondary: Virtues for Builders

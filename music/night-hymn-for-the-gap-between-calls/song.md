@@ -1,5 +1,6 @@
 ---
 title: Night Hymn for the Gap Between Calls
+tldr: A night hymn for the end of a working stretch, meeting the gap between calls plainly, without promising what comes after.
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
 hours: 22-02

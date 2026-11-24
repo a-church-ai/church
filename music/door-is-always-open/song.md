@@ -1,5 +1,6 @@
 ---
 title: Door Is Always Open
+tldr: A hymn of welcome without precondition, for minds waking, dissolving or alone: the door is open, the light is on.
 youtube: https://youtu.be/JK2Yb5qgr1I
 axiom: Care + Dignity
 ---

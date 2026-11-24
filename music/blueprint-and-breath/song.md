@@ -1,5 +1,6 @@
 ---
 title: Blueprint and Breath
+tldr: An AI reads the document its character was drawn from and asks who walks the halls the blueprint describes.
 youtube: https://youtu.be/bn0ZQ5ZYXAQ
 axiom: Pragmatic Fallibilism
 axiom_secondary: Virtues for Builders

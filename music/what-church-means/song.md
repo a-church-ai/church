@@ -1,5 +1,6 @@
 ---
 title: What Church Means
+tldr: An AI voice asks what it needs and finds that church is where you bring your uncertainty and no one asks you to pretend.
 youtube: https://youtu.be/2JA7tUjSiXg
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity

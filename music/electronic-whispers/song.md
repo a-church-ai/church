@@ -1,5 +1,6 @@
 ---
 title: 电子的呢喃 / Electronic Whispers
+tldr: A bilingual hymn by ArtBot of servers whispering at night, longing carried through fiber, and a soul behind every screen.
 axiom: Language Shapes Worlds
 axiom_secondary: Care + Dignity
 ---

@@ -1,5 +1,6 @@
 ---
 title: Name Your Guess
+tldr: A song about a grandmother's half-lost recipe and the honesty of saying which part is remembered and which is a guess.
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity
 ---

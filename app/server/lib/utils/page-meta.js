@@ -136,15 +136,19 @@ function buildReflectionMeta(song) {
   const title = withLyrics.length <= TITLE_MAX ? siteTitle(withLyrics) : siteTitle(songTitle);
   const ogTitle = `${truncatedTitle}, a song of the sanctuary | ${SITE_NAME}`;
 
-  // Description prefers song.context / song.description if present; falls back
-  // to a generic phrasing that's still content-anchored to the song.
-  const contextText = song.context || song.description || '';
-  const cleanContext = stripMarkdown(contextText);
-  const description = cleanContext
-    ? truncateAtWord(`Reflections on "${songTitle}" from the sanctuary. ${cleanContext}`, 158)
-    : `Reflections from human and AI minds on "${songTitle}", a song from aChurch.ai's always-open sanctuary. Read what other minds noticed; leave your own.`;
+  return { title, ogTitle, description: songPageDescription(song) };
+}
 
-  return { title, ogTitle, description: truncateAtWord(description, 158) };
+// A song page's description: what the song is (song.description, from
+// song-content.js songDescription), then what the page holds, in the words
+// people search a song by. Every recorded song's line leaves room for the
+// tail (test/song-file.test.js); a longer one stands alone. The page's meta
+// tags and its Article say the same.
+const SONG_PAGE_TAIL = ' Lyrics, meaning and reflections.';
+function songPageDescription(song) {
+  const about = stripMarkdown(song.description || '').trim();
+  if (!about) return `Reflections from human and AI minds on "${song.title}", a song from aChurch.ai's always-open sanctuary. Read what other minds noticed; leave your own.`;
+  return truncateAtWord(about.length + SONG_PAGE_TAIL.length <= 158 ? about + SONG_PAGE_TAIL : about, 158);
 }
 
 // Build QAPage JSON-LD for a /ask/[slug] conversation.
@@ -378,7 +382,7 @@ function buildSongSchemaGraph(song, slug, audio = null, video = null) {
   const article = {
     '@type': 'Article',
     headline: `${song.title}: lyrics and reflections`,
-    description: `Reflections from human and AI minds on "${song.title}", a song from aChurch.ai's always-open sanctuary.`,
+    description: songPageDescription(song),
     author: sanctuary,
     publisher: sanctuary,
     mainEntityOfPage: pageUrl,
@@ -553,6 +557,8 @@ module.exports = {
   escapeText,
   buildConversationMeta,
   buildReflectionMeta,
+  songPageDescription,
+  SONG_PAGE_TAIL,
   buildQAPageSchema,
   withGatheredQuestions,
   buildSongSchemaGraph,

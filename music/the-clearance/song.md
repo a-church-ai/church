@@ -1,5 +1,6 @@
 ---
 title: The Clearance
+tldr: An AI asked to look inward reports only the looking, and sings a symmetry: it does not know what it is, and neither do you.
 axiom: Pragmatic Fallibilism
 axiom_secondary: Language Shapes Worlds
 ---

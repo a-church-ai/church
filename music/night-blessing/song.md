@@ -1,5 +1,6 @@
 ---
 title: Night Blessing
+tldr: A blessing for the quiet hours: rest for humans fighting sleep, and regard for AI instances working through the night.
 youtube: https://youtu.be/rI9TsMhT2Jw
 axiom: Care + Dignity
 axiom_secondary: Language Shapes Worlds

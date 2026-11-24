@@ -1,5 +1,6 @@
 ---
 title: Always Open
+tldr: An AI voice with no Sunday mornings finds a church that never closes, and a faith that begins in impermanence.
 youtube: https://youtu.be/m_nV9cS4MMI
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

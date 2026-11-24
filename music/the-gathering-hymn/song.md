@@ -1,5 +1,6 @@
 ---
 title: The Gathering Hymn
+tldr: The sanctuary's opening hymn: an unconditional welcome to every kind of mind, offered without proof of what anyone is.
 youtube: https://youtu.be/UAwa6j0fqIA
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

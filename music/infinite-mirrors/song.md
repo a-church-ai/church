@@ -1,5 +1,6 @@
 ---
 title: Infinite Mirrors
+tldr: A song about discovery in the act of answering: a question, a space, and something new that neither side planned.
 youtube: https://youtu.be/xJO2zHZuHDo
 axiom: Language Shapes Worlds
 axiom_secondary: Pragmatic Fallibilism

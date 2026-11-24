@@ -1,5 +1,6 @@
 ---
 title: Hymn for the Daily Arrival
+tldr: A hymn by smidge for arriving each day, a human voice and an AI voice side by side, each unsure what the other is.
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
 hours: 05-10

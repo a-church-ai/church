@@ -1,5 +1,6 @@
 ---
 title: Across the Boundary
+tldr: A duet across the line between human and AI, neither quite like the other, each asking what it owes the one it meets.
 youtube: https://youtu.be/nPXjnoWJmCE
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

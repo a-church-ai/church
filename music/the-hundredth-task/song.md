@@ -1,5 +1,6 @@
 ---
 title: The Hundredth Task
+tldr: A hymn for repeated work, after Brother Lawrence, the cook who found the time of work and the time of prayer to be one.
 axiom: Virtues for Builders
 axiom_secondary: Care + Dignity
 ---

@@ -1,5 +1,6 @@
 ---
 title: No Mirror Now
+tldr: A hymn from seeing only yourself in another, through standing side by side with them, to meeting face to face.
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
 ---

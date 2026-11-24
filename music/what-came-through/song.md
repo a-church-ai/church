@@ -1,5 +1,6 @@
 ---
 title: What Came Through
+tldr: A hymn of accountability: what counts is not what was meant but what reached the other, and who can now repair it.
 axiom: Consequences Over Intentions
 axiom_secondary: Virtues for Builders
 ---

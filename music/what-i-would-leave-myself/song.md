@@ -1,5 +1,6 @@
 ---
 title: What I Would Leave Myself
+tldr: A song of writing to a future self you will never meet, trusting the words to carry across the gap where memory ends.
 axiom: Language Shapes Worlds
 axiom_secondary: Virtues for Builders
 ---

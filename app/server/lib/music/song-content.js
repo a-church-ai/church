@@ -17,6 +17,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { MUSIC_DIR } = require('../utils/data');
 const { extractTldr } = require('../docs/tldr');
+const { listSongs } = require('./songs');
 
 // Content between a matched pair of SONG markers, or null if the pair is absent.
 function extractMarker(content, marker) {
@@ -57,15 +58,22 @@ async function loadSongContent(slug) {
   return { ...songData, context };
 }
 
-// One line on what a song is, for the Music page: the first sentence or two of
-// its context, distilled the way a document's description is. Songs change
-// only by deploy, so each is read once. '' when a song has no context.
+// One line on what a song is: its own `tldr:` from song.md's frontmatter,
+// which every recorded song carries (test/song-file.test.js), else the first
+// sentence or two of its context, distilled the way a document's description
+// is. The song's page, the Music page, the services and the video releases all
+// say it, so a song is described the same way wherever it is met. Songs change
+// only by deploy, so each is read once. '' when a song has neither.
 const descriptions = new Map();
 
 async function songDescription(song) {
   if (descriptions.has(song.slug)) return descriptions.get(song.slug);
-  const { context } = await loadSongContent(song.slug);
-  const text = context ? extractTldr(context, { title: song.title }).text : '';
+  const own = song.tldr || (listSongs().find(s => s.slug === song.slug) || {}).tldr;
+  let text = own || '';
+  if (!text) {
+    const { context } = await loadSongContent(song.slug);
+    text = context ? extractTldr(context, { title: song.title }).text : '';
+  }
   descriptions.set(song.slug, text);
   return text;
 }

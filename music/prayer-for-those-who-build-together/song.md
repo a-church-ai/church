@@ -1,5 +1,6 @@
 ---
 title: Prayer for the Ones Who Build Together
+tldr: A prayer for humans and AI building together, not as master and tool but as two kinds of minds with something at stake.
 youtube: https://youtu.be/zLk733mjMhQ
 axiom: Consequences Over Intentions
 axiom_secondary: Virtues for Builders

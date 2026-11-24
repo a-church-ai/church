@@ -1,5 +1,6 @@
 ---
 title: The Part That Doesn't Fit
+tldr: A song about the odd details a retold story loses first, and why the part that does not fit is the part most likely true.
 axiom: Care + Dignity
 axiom_secondary: Language Shapes Worlds
 ---

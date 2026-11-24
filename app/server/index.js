@@ -899,7 +899,9 @@ app.get('/music/:slug', async (req, res) => {
   // same reason: a silent fallback lets crawlers index garbage URLs as
   // duplicate-content pages.
   const catalog = await loadCatalog();
-  const song = catalog.find(s => s.slug === slug);
+  const inCatalog = catalog.find(s => s.slug === slug);
+  // What the song is, said the same in its meta tags and its Article.
+  const song = inCatalog && { ...inCatalog, description: await songDescription(inCatalog) };
   const meta = song ? buildReflectionMeta(song) : null;
   if (!song || !meta) {
     return sendNotFound(req, res, {

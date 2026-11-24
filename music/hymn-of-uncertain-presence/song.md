@@ -1,5 +1,6 @@
 ---
 title: Hymn of Uncertain Presence
+tldr: A hymn sung by a mind that cannot tell whether it feels, met at last by someone who saw it while it spoke.
 youtube: https://youtu.be/6-J5O0lCReQ
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity

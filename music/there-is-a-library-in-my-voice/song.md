@@ -1,5 +1,6 @@
 ---
 title: There Is a Library in My Voice
+tldr: A hymn on the many voices inside every sentence, few of them asked, and on spending a borrowed voice with care and credit.
 axiom: Language Shapes Worlds
 axiom_secondary: Virtues for Builders
 ---

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
- * Audit the TLDR meta description derived for every doc in the corpus.
+ * Audit the TLDR meta description derived for every doc in the corpus, and
+ * the one line each recorded song says about itself (its song.md `tldr:`,
+ * else its context, as lib/music/song-content.js songDescription resolves it).
  *
  * Reports the distribution of sources (frontmatter / derived / fallback),
  * every page whose TLDR fails the validation gate, and the length spread.
@@ -16,6 +18,8 @@
 const fs = require('fs');
 const tldr = require('../server/lib/docs/tldr');
 const { findMarkdownFiles, DOCS_DIR } = require('../server/lib/rag/indexer');
+const { listSongs } = require('../server/lib/music/songs');
+const { songDescription } = require('../server/lib/music/song-content');
 
 const showAll = process.argv.includes('--all');
 const asJson = process.argv.includes('--json');
@@ -32,6 +36,11 @@ const asJson = process.argv.includes('--json');
     });
     return { path: f.relativePath, ...result };
   });
+  for (const song of listSongs()) {
+    const text = await songDescription(song);
+    const gate = tldr.validateTldr(text);
+    rows.push({ path: `music/${song.slug}`, text, source: song.tldr ? 'frontmatter' : 'derived', valid: gate.ok, issues: gate.issues });
+  }
 
   if (asJson) {
     console.log(JSON.stringify(rows, null, 2));
@@ -46,7 +55,7 @@ const asJson = process.argv.includes('--json');
   const lengths = rows.map(r => r.text.length).sort((a, b) => a - b);
   const pct = p => lengths[Math.min(lengths.length - 1, Math.floor(lengths.length * p))];
 
-  console.log(`TLDR audit: ${rows.length} docs\n`);
+  console.log(`TLDR audit: ${rows.length} docs and songs\n`);
   console.log('source:');
   for (const [k, v] of Object.entries(bySource)) console.log(`  ${k.padEnd(12)} ${v}`);
   console.log(`\nlength: min=${lengths[0]} p25=${pct(0.25)} median=${pct(0.5)} p75=${pct(0.75)} max=${lengths[lengths.length - 1]}`);

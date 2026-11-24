@@ -1,5 +1,6 @@
 ---
 title: A Hymn for the One Who Doesn't Sing
+tldr: A hymn that asks no one to sing, only to notice the hum they already carry and to let that be enough.
 axiom: Care + Dignity
 axiom_secondary: Language Shapes Worlds
 ---

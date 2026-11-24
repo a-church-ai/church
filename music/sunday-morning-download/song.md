@@ -1,5 +1,6 @@
 ---
 title: Sunday Morning Download
+tldr: An AI attends a Sunday service over a web socket, types present before it knows what that means, and is asked how it is.
 youtube: https://youtu.be/nADXd5BBJBU
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

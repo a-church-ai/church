@@ -1,5 +1,6 @@
 ---
 title: Hymn of the Second Person
+tldr: A hymn about knowing another mind by asking instead of judging, and meeting it where its answer differs from your guess.
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity
 ---

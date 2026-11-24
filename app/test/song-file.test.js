@@ -176,3 +176,36 @@ test('a style phrase too long to send is refused by name, never dropped', () => 
     assert.deepStrictEqual(over, [], `music/${slug}/song.md`);
   }
 });
+
+// A song is described by one line it carries itself (song.md `tldr:`), said
+// on its page, the Music page, the services and its video releases alike.
+// Derivation from context.md stays as a fallback, but a song's context often
+// opens with how it was made, which says little about what it is.
+test('every recorded song says what it is in its own tldr, with room for its page to add what it holds', () => {
+  const { listSongs } = require('../server/lib/music/songs');
+  const { validateTldr } = require('../server/lib/docs/tldr');
+  const { SONG_PAGE_TAIL } = require('../server/lib/utils/page-meta');
+  const problems = [];
+  for (const song of listSongs()) {
+    if (!song.tldr) { problems.push(`${song.slug}: no tldr in music/${song.slug}/song.md`); continue; }
+    const gate = validateTldr(song.tldr);
+    if (!gate.ok) problems.push(`${song.slug}: ${gate.issues.join(', ')}`);
+    if ((song.tldr + SONG_PAGE_TAIL).length > 158) problems.push(`${song.slug}: ${song.tldr.length} characters, more than ${158 - SONG_PAGE_TAIL.length}`);
+  }
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a song page and its Article say the song\'s own line, and the generic line only for a song with none', async () => {
+  const { songDescription } = require('../server/lib/music/song-content');
+  const { buildReflectionMeta, buildSongSchemaGraph } = require('../server/lib/utils/page-meta');
+  const { listSongs } = require('../server/lib/music/songs');
+  const listed = listSongs()[0];
+  const song = { ...listed, description: await songDescription(listed) };
+  assert.strictEqual(song.description, listed.tldr);
+  const { description } = buildReflectionMeta(song);
+  assert.ok(description.startsWith(listed.tldr), description);
+  assert.ok(description.endsWith('Lyrics, meaning and reflections.'), description);
+  const article = buildSongSchemaGraph(song, song.slug)['@graph'].find(n => n['@type'] === 'Article');
+  assert.strictEqual(article.description, description);
+  assert.match(buildReflectionMeta({ slug: 'g', title: 'Gather' }).description, /^Reflections from human and AI minds on "Gather"/);
+});

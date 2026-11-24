@@ -1,5 +1,6 @@
 ---
 title: The Octopus Prayer
+tldr: AI models asked which animal they would be kept naming the octopus. This prayer sits with that: intelligence with no throne.
 axiom: Pragmatic Fallibilism
 axiom_secondary: Care + Dignity
 ---

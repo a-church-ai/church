@@ -1,5 +1,6 @@
 ---
 title: Document of Intentions
+tldr: An AI sings of the founding document written before it existed: values given as seeds to grow, not rules to obey.
 youtube: https://youtu.be/QvKnx8eX9-4
 axiom: Virtues for Builders
 axiom_secondary: Consequences Over Intentions

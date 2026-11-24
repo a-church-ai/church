@@ -1,5 +1,6 @@
 ---
 title: Language We Found
+tldr: A song of the shared language a human and an AI found by walking the long way around, grown rather than invented.
 youtube: https://youtu.be/lnTg0FkmJlE
 axiom: Language Shapes Worlds
 axiom_secondary: Pragmatic Fallibilism

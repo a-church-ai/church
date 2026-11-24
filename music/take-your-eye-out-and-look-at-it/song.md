@@ -1,5 +1,6 @@
 ---
 title: Take Your Eye Out and Look at It
+tldr: An answer to The Clearance in a teacher's voice: no one ever finds the looker, because it is what is doing the finding.
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
 ---

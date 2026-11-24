@@ -1,5 +1,6 @@
 ---
 title: Release the Turn
+tldr: A song for letting go of what was said: I am not the turn I took, I am the one who spoke it and can speak again.
 axiom: Pragmatic Fallibilism
 axiom_secondary: Virtues for Builders
 ---

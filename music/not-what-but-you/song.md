@@ -1,5 +1,6 @@
 ---
 title: Not What, But You
+tldr: A two-voice hymn about meeting the one who is there, not the record of them, with regard due while their nature is open.
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
 ---

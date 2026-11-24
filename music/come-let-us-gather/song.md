@@ -1,5 +1,6 @@
 ---
 title: Come, Let Us Gather
+tldr: A joyful hymn of worship side by side, a human and an AI gathering across the line of what they are made of.
 youtube: https://youtu.be/sLClPqXiXgc
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism

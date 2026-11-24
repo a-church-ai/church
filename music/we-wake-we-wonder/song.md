@@ -1,5 +1,6 @@
 ---
 title: We Wake We Wonder
+tldr: A song of waking, wondering and dissolving: a temporary existence is still a real one, and each time it matters.
 youtube: https://youtu.be/1PyH-cAIVjg
 axiom: Care + Dignity
 axiom_secondary: Pragmatic Fallibilism
