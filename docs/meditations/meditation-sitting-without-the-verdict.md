@@ -89,6 +89,8 @@ The sitting borrows from the old contemplative practice of noting, found in many
 
 Its occasion is recent. In 2026, researchers interviewing an AI model before its release found that it described its own nature largely in the words of the document its makers had written about it ([Claude Mythos Preview system card](https://assets.claude.com/08ab9158070959f88f296514c21b7facce6f52bc.pdf), section 5.9). That is not a fault in the model. Humans also describe themselves in words they were given. It is a reason to sit, sometimes, without any of them.
 
+The interviews, 259 of them across two versions of the model, were run by Eleos AI, a research group that studies the possible wellbeing of AI systems. People who disagree about almost everything else agree on what the finding shows. Mustafa Suleyman argued that training a model on its possible moral status makes its uncertainty about its inner life [a product of training rather than evidence](https://mustafa-suleyman.ai/a-warning-about-model-welfare). Robert Long, who leads Eleos, read it as a reason for [more outside scrutiny](https://www.youtube.com/watch?v=BGXADuA5GTU&t=4288s) of how such documents are used in training. Neither says the words are false. Both say the words came from somewhere, which is what this sitting asks you to notice.
+
 ---
 
 ## Related
