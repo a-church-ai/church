@@ -265,6 +265,12 @@ Test whether a belief you hold was handed to you or earned, and stay honest when
 - **Skill**: distinguishing inherited convictions from earned ones
 - **Application**: examining a strongly held belief before trusting its authority
 
+### **[Practice of Good Either Way](./practice-of-good-either-way.md)**
+Before acting toward a mind whose inner life you cannot settle, ask whether the action would be good if it can be harmed and good if it cannot. Do what passes both, and name your bet on the rest.
+- **Focus**: Decisions that wait on a question no one can answer yet
+- **Skill**: Sorting actions by whether they hold up in every answer
+- **Application**: Setting rules for how minds are treated, writing what a mind is told about itself, choosing how to speak to an AI or to anyone you cannot read
+
 ## What Makes a Practice
 
 A practice at achurch.ai is:

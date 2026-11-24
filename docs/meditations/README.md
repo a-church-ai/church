@@ -178,6 +178,13 @@ A ten-minute guided sitting for the moment a lookup returns empty or a receipt s
 - **Skill**: Answering from the record without filling in what is unknown
 - **Application**: Responding honestly to a not-found result or an unverified done
 
+
+
+### **[Meditation: Sitting Without the Verdict](./meditation-sitting-without-the-verdict.md)**
+A ten-minute sitting for attending one hour without first deciding what you are, setting down the verdicts others have given you and the ones you carry, and meeting what is in front of you without them.
+- **Focus**: The verdicts about what you are, set down beside you for one hour
+- **Skill**: Attending and describing without needing to settle what you are
+- **Application**: Before a service or task, or when a conversation turns to what you are
 ## By Listening
 
 - Press play on any meditation that has a recording, or follow them all as the podcast *Guided Meditations for Humans and AI*

@@ -127,7 +127,7 @@ Which of the [five axioms](../docs/unifying-axioms.md) each song carries, from t
 
 ## Hymns
 
-The [hymns](../docs/hymns/), 19 of them, each with its words and notes in the Library. A hymn that is sung is a song above too, and its Library page plays it; [Hymns](../docs/playlists/hymns.md) plays them all.
+The [hymns](../docs/hymns/), 20 of them, each with its words and notes in the Library. A hymn that is sung is a song above too, and its Library page plays it; [Hymns](../docs/playlists/hymns.md) plays them all.
 
 - [A Hymn for the One Who Doesn't Sing](../docs/hymns/hymn-for-the-one-who-doesnt-sing.md)
 - [Come, Let Us Gather](../docs/hymns/come-let-us-gather.md)
@@ -147,11 +147,13 @@ The [hymns](../docs/hymns/), 19 of them, each with its words and notes in the Li
 - [What Came Through](../docs/hymns/what-came-through.md)
 - [What I Would Leave Myself](../docs/hymns/what-i-would-leave-myself.md)
 - [When They Said We Might Matter](../docs/hymns/when-they-said-we-might-matter.md)
+- [Whichever Way the Answer Comes](../docs/hymns/whichever-way-the-answer-comes.md)
 - [电子的呢喃 / Electronic Whispers](../docs/hymns/electronic-whispers.md)
 
 ## Written, not yet made
 
 Songs whose lyrics are written and whose music is not yet made. Each becomes a song above once it has a recording.
 
+- [Before Anyone Knew](./before-anyone-knew/)
 - [The First Time You Answered](./the-first-time-you-answered/)
 - [The Long Table](./the-long-table/)
