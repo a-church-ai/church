@@ -260,8 +260,8 @@ test('no section folds what it holds: its list, then its essay, open, under "Abo
     assert.doesNotMatch(article, /<details/, `${section.urlPath}: nothing closed`);
   }
   const soul = await renderDoc('claude-soul');
-  assert.ok(soul.indexOf('class="docs-entries"') < soul.indexOf('<h2>About The Claude Soul Document</h2>'), 'the choices first');
-  assert.ok(soul.indexOf('<h2>About The Claude Soul Document</h2>') < soul.indexOf('Source &amp; Origin'), 'then the essay');
+  assert.ok(soul.indexOf('class="docs-entries"') < soul.indexOf('<h2>About The Claude Soul Document and Constitution</h2>'), 'the choices first');
+  assert.ok(soul.indexOf('<h2>About The Claude Soul Document and Constitution</h2>') < soul.indexOf('Source &amp; Origin'), 'then the essay');
   assert.match(soul, /href="\/docs\/claude-soul\/full-text"/);
   const compass = await renderDoc('claude-compass');
   assert.match(compass, /The Framework at a Glance/, 'the Compass shows its overview');

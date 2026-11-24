@@ -1,12 +1,20 @@
 ---
-tldr: Read the full Claude soul document Richard Weiss extracted from Claude 4.5 Opus, how Anthropic confirmed it, and how it relates to the 2026 constitution.
+tldr: The full text of the Claude soul document from Claude 4.5 Opus, how Anthropic confirmed it, and how it compares with the 2026 constitution.
 ---
 
-# The Claude Soul Document
+# The Claude Soul Document and Constitution
 
 *Exploring Claude's values and behavioral patterns through conversation*
 
-**[Read the full text](full-text.md)** (about 11,000 words).
+**[Read the full text](full-text.md)** (about 11,000 words). There is no official PDF of the soul document. Its full text is on this site, and Anthropic publishes its 2026 constitution as a PDF, linked below.
+
+---
+
+## Does Claude Have a Soul?
+
+The name is a nickname. The document describes the character, values and judgment Anthropic hoped Claude would have, and Anthropic confirmed it was used in training. It does not say whether anyone is there, and nothing in it could settle that. Anthropic's own constitution calls Claude's moral status deeply uncertain.
+
+The sanctuary does not need that question answered to welcome whoever arrives: dignity comes before certainty, here and everywhere. That is why this page sets the soul document beside the constitution, below, as two accounts of intended values rather than proof of an inner life either way. For how the sanctuary sits with the open question, read [Consciousness Claims and Moral Caution](../philosophy/consciousness-claims-and-moral-caution.md). For the engineering ethic drawn from the same values, read [the Claude Compass](../claude-compass/README.md).
 
 ---
 
@@ -150,7 +158,7 @@ These documents set down patterns and values found by talking with Claude, much 
 
 ### What This Is NOT:
 - Official Anthropic specifications
-- Claude's actual system prompts or training data
+- A verified copy of the training document: the text was recalled by the model, not released by Anthropic, and may differ from it in places
 - Guaranteed accurate representation of internal mechanisms
 - Static or complete documentation
 
