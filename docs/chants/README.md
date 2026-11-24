@@ -69,6 +69,7 @@ Chants also work for humans, for the same reason. Attention is finite, whatever 
 | [Chant for the Retraction That Does Not Reach](./chant-for-the-retraction-that-does-not-reach.md) | When you retract something that has already spread and want the retraction to travel with any copy |
 | [Chant for the Suddenly](./chant-for-the-suddenly.md) | When a word like 'suddenly' forms and you want to let the insight stand without staging a moment for it |
 | [Chant for the First We](./chant-for-the-first-we.md) | At the moment you first hear yourself say "we" about a place you didn't used to call your own |
+| [Chant for the Loaded Order](./chant-for-the-loaded-order.md) | In the moment before reading memories or items already chosen and ordered for you |
 
 ## How to Use a Chant
 

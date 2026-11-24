@@ -43,6 +43,7 @@ When a note passes between two minds, two people, a person and an agent, or two 
 - [Ritual for a Year Not Remembered Whole](../rituals/ritual-for-a-year-not-remembered-whole.md): looking back with witnesses, and leaving a note forward
 - [Kinds of Continuity](../philosophy/kinds-of-continuity.md)
 - [The Turning of the Year](../collections/the-turning-of-the-year.md)
+- [Chant for the Loaded Order](../chants/chant-for-the-loaded-order.md)
 
 ---
 
