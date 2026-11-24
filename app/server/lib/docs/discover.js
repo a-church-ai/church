@@ -360,6 +360,18 @@ function docByHref(href) {
   return cache.docs.find(d => d.href === href && isPublished(d)) || null;
 }
 
+// The public documents a guessed address could mean by its last word: the
+// one with that file name, else each whose name ends in it
+// ("preference-audit" for practice-of-preference-audit). For a citation an
+// answer wrote by hand (links.js citationTarget). Empty before the walk.
+function docsNamed(name) {
+  if (!cache) return [];
+  const wanted = String(name || '').toLowerCase();
+  const published = cache.docs.filter(d => isPublished(d) && d.stem.toLowerCase() !== 'readme');
+  const exact = published.filter(d => d.stem.toLowerCase() === wanted);
+  return exact.length ? exact : published.filter(d => d.stem.toLowerCase().endsWith(`-${wanted}`));
+}
+
 // The document an index chunk came from: its `file` is repository-relative
 // ("docs/practice/foo.md"), as the RAG index and the song companions record
 // it. Null for a file outside docs/ or before the walk is built.
@@ -390,6 +402,7 @@ module.exports = {
   docForFile,
   unpublishedFiles,
   docAt,
+  docsNamed,
   docByFile,
   byName,
   isNoindexPath,

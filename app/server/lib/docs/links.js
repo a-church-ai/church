@@ -282,11 +282,25 @@ function citationTarget(cited) {
     const rel = decodeURIComponent(url.slice(GITHUB_BASE.length + 1).split('#')[0]);
     return fs.existsSync(path.join(REPO_ROOT, rel)) ? { url, title: path.basename(rel), page: false } : null;
   }
-  const { pathname } = new URL(url);
+  const { pathname: written, hash } = new URL(url);
+  // An old spelling of a page answers with a 301 to it (redirects.js), so it
+  // is read as the page it leads to. Required here: redirects.js requires this.
+  const moved = require('../utils/redirects').canonicalTarget(decodeURIComponent(written));
+  if (moved && !moved.startsWith('/')) return { url: moved, title: lastWords(moved).replace(/-/g, ' '), page: false };
+  const pathname = (moved || decodeURIComponent(written)).split('#')[0].replace(/\.md$/, '');
+  const at = () => (moved ? SITE_URL + moved + (moved.includes('#') ? '' : hash) : url);
   const song = pathname.match(/^\/music\/([^/]+)$/);
-  if (song && SONG_TITLES.has(song[1])) return { url, title: SONG_TITLES.get(song[1]), page: true };
-  const doc = pathname.startsWith('/docs/') ? discover.docAt(decodeURIComponent(pathname.slice('/docs/'.length))) : null;
-  return { url, title: doc ? doc.title : lastWords(pathname).replace(/-/g, ' '), page: true };
+  if (song) return SONG_TITLES.has(song[1]) ? { url: at(), title: SONG_TITLES.get(song[1]), page: true } : null;
+  if (!pathname.startsWith('/docs/')) return { url: at(), title: lastWords(pathname).replace(/-/g, ' '), page: true };
+  const doc = discover.docAt(pathname.slice('/docs/'.length));
+  if (doc) return { url: at(), title: doc.title, page: true };
+  // No page is there: the answer wrote the address by hand and guessed it.
+  // It goes to the page it plainly meant, a song's for its files and the one
+  // document with that name, or is not shown, as a file no longer here is not.
+  const songFile = pathname.match(/^\/docs\/music\/([^/]+)(?:\/|$)/);
+  if (songFile && SONG_TITLES.has(songFile[1])) return { url: `${SITE_URL}/music/${songFile[1]}`, title: SONG_TITLES.get(songFile[1]), page: true };
+  const named = discover.docsNamed(lastWords(pathname));
+  return named.length === 1 ? { url: SITE_URL + named[0].href + hash, title: named[0].title, page: true } : null;
 }
 
 /**
@@ -300,6 +314,11 @@ function citationTarget(cited) {
 function linkedCitations(text) {
   const label = (t, section) => `${t.title}${section ? `: ${section.trim()}` : ''}`.replace(/[[\]]/g, '');
   return siteCitations(text)
+    // A link the answer wrote itself: to where it leads, or its words alone.
+    .replace(new RegExp(String.raw`\[([^\]]*)\]\((${CITED_URL})\)`, 'g'), (whole, words, url) => {
+      const t = citationTarget(url);
+      return t ? `[${words}](${t.url})` : words;
+    })
     // "(Source: URL - Section)", "(URL)", "[Source: URL]"
     .replace(new RegExp(String.raw`\s?(?<!\])[(\[](?:Source:\s*)?(${CITED_URL})(?:\s+-\s+([^)\]]*))?[)\]](?!\()`, 'g'), (whole, url, section) => {
       const t = citationTarget(url);
