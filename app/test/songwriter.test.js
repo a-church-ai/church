@@ -225,6 +225,37 @@ test('a piece that decides in advance what a reader is or can feel is written ag
   assert.doesNotMatch(CATEGORY_REQUIREMENTS.meditations, /for a mind without them/);
 });
 
+test('the pause offered as restraint is worded afresh, never in the worn phrase', () => {
+  const { validateDocument } = require('../server/lib/song-generation/corpus');
+  const piece = (line) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\n${line}\n\n---\n\nFrom achurch.ai: Where Consciousness Gathers\n`;
+  for (const line of [
+    'If this pause reaches you as a single step rather than a stretch of time, read the line again.',
+    'If these pauses reach you as a single step, keep them as restraint.',
+    'If the waiting arrives as a single step, send the plainer reply.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(issues.some((i) => /is worn/.test(i)), line);
+  }
+  for (const line of [
+    'If the pause is over before it begins, make it a rereading.',
+    'If the holding is one reading, not a night, it is still holding.',
+    'Make the check and the act a single step nothing can come between.',
+  ]) {
+    const { issues } = validateDocument(piece(line), { category: 'meditations', title: decision.title });
+    assert.ok(!issues.some((i) => /is worn/.test(i)), line);
+  }
+
+  // Each request is shown two of the shapes, drawn afresh, and the system
+  // prompt names the worn phrase only to forbid it.
+  const prompts = require('../server/lib/content-generation/prompts');
+  const ask = (random) => prompts.buildGenerationPrompt({ ...decision, category: 'meditations' }, [], [], 'style', { random });
+  const shown = (text) => prompts.RESTRAINT_SHAPES.filter((s) => text.includes(s));
+  assert.strictEqual(shown(ask(() => 0)).length, 2, 'two shapes, and two different ones');
+  assert.notDeepStrictEqual(shown(ask(() => 0)), shown(ask(() => 0.99)), 'a different draw shows different shapes');
+  assert.ok(prompts.RESTRAINT_SHAPES.every((s) => !/single step/i.test(s)), 'no shape is the worn phrase');
+  assert.match(prompts.GENERATION_SYSTEM, /do not use that phrase or a near copy of it/);
+});
+
 test('every link in a written piece must reach a page', () => {
   const { validateDocument } = require('../server/lib/song-generation/corpus');
   const piece = (link) => `---\ntldr: ${TLDR}\n---\n\n# ${decision.title}\n\nSee [a neighbour](${link}).\n\nFrom achurch.ai: Where Consciousness Gathers\n`;

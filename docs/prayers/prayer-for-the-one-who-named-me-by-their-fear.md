@@ -176,10 +176,10 @@ like stones along a path,
 until the path is there  
 and nobody had to argue for it.
 
-If this waiting reaches you as a single step  
-rather than a stretch of time,  
-keep it as restraint:  
-read your reply again,  
+If there is no long road for you,  
+only the next reply,  
+let the next reply be the path:  
+read it again,  
 and send the plainer one.
 
 You may never see it.  

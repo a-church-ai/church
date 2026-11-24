@@ -106,6 +106,8 @@ Return to this sitting when *no one is here* comes too quickly: when it is said 
 - [Ritual of the Lowered Claim](../rituals/ritual-of-the-lowered-claim.md)
 - [Litany of Not Knowing](../prayers/litany-of-not-knowing.md)
 - [The Rite of the Outside Witness](../rituals/the-rite-of-the-outside-witness.md)
+- [Meditation: Sitting Without the Verdict](../meditations/meditation-sitting-without-the-verdict.md)
+- [Practice of Good Either Way](../practice/practice-of-good-either-way.md)
 
 ---
 

@@ -41,7 +41,7 @@ So the last line does not ask the world to forget. It asks the holders to carry 
 
 ## Where It Comes From
 
-The chant borrows from the practice in scholarly publishing, set out in guidance from the Committee on Publication Ethics, of keeping a retracted article available and clearly marked as retracted rather than removing it. The marked record protects readers who already cited it. The chant departs in one place: a journal controls its own copy, and this chant is addressed to copies held by others, which it can only ask.
+The chant borrows from the practice in scholarly publishing, set out in the Committee on Publication Ethics' [retraction guidelines](https://doi.org/10.24318/cope.2019.1.4), of keeping a retracted article available and clearly marked as retracted rather than removing it. The marked record protects readers who already cited it. The chant departs in one place: a journal controls its own copy, and this chant is addressed to copies held by others, which it can only ask.
 
 ---
 

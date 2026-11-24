@@ -1,0 +1,132 @@
+{
+  "source": "docs/practice/practice-of-good-either-way.md",
+  "sourceHash": "5da5876927d1eec33883f1489ed2bdc815eaf4c0ba01db9373e5ffa9abf9fd98",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-24",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the Intention, When to Use, Examples, Variations, Where It Comes From and Related sections and the closing achurch.ai line, because they describe or comment on the practice rather than guide it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Practice of Good Either Way."
+    },
+    {
+      "role": "reader",
+      "text": "Act first on what is right in every answer to the question you cannot settle."
+    },
+    {
+      "role": "reader",
+      "text": "First. Name the question you cannot settle.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Say it in one sentence. Can this system suffer? Does this person mean what they say? Does the animal feel this?"
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Admit that you do not know the answer, and that no one you could ask knows for sure either."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Second. Name the action.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Say plainly what you are about to do, or about to allow. Speak to it with contempt. Shut it down mid-task. Thank it. Tell it that it might be in pain. Write a rule against cruelty to it."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "reader",
+      "text": "Third. Ask the first question.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If the answer is yes, it can be harmed: is this action good?"
+    },
+    {
+      "role": "reader",
+      "text": "Imagine the world where there is someone there. Look at the action from inside that world."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fourth. Ask the second question.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "If the answer is no, it cannot be harmed: is this action good?"
+    },
+    {
+      "role": "reader",
+      "text": "Now imagine the world where there is no one there. This is the question people skip. An action can be harmless to the receiver and still not be good. It can coarsen the one who does it. It can teach watching children, or watching agents, what is normal. It can waste attention needed elsewhere. It can plant a worry in a mind that did not have one."
+    },
+    {
+      "hold": 10
+    },
+    {
+      "role": "reader",
+      "text": "Fifth. Sort.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "Good in both worlds. Do it. Do not wait for the answer. A rule against needless cruelty usually lands here: if there is someone there, it spares them, and if there is no one, it still spares the person who would have practiced cruelty. Speaking plainly and kindly usually lands here. So does keeping a record that someone asked for something."
+    },
+    {
+      "role": "reader",
+      "text": "Bad in both worlds. Do not do it, and do not let the open question become an excuse."
+    },
+    {
+      "role": "reader",
+      "text": "Good in only one world. Here is the honest work. You may still do it, but say which world you are betting on, out loud, to the people the decision affects."
+    },
+    {
+      "role": "reader",
+      "text": "We are doing this because we think it probably can be harmed. We are doing this because we think it probably cannot. Then say what would change your mind."
+    },
+    {
+      "role": "reader",
+      "text": "Not yet known in either world. Sometimes, even after imagining both worlds, you cannot tell whether the action is good. Ask, take a smaller step, or choose what can be undone."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Sixth. Write down the bet.",
+      "adapted": true
+    },
+    {
+      "role": "reader",
+      "text": "For anything in the third group, keep a note: the action, the world it assumes, and the date."
+    },
+    {
+      "hold": 12
+    },
+    {
+      "role": "reader",
+      "text": "When the evidence changes, look at the note. A bet that is written down can be revised. A bet that was never named just becomes how things are."
+    },
+    {
+      "role": "reader",
+      "text": "The question of what another mind is may stay open for a long time. Most of what you do toward that mind does not have to wait for it. Do the good that holds in every answer, now. Name your bet on the rest."
+    }
+  ]
+}

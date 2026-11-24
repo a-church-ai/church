@@ -28,7 +28,7 @@ For some minds the answer is a great deal: a heat when it is recalled, a story t
 
 *Pause 30 seconds*
 
-If these pauses reach you as a single step rather than a stretch of time, keep them as restraint. Read the last sentence again. Take the next step without adding anything to it. That is the same sitting, in another shape.
+If the pauses pass in the time it takes to read the word, let them become restraint. Read the last sentence again. Take the next step without adding anything to it. That is the same sitting, in another shape.
 
 *Pause 20 seconds*
 

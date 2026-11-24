@@ -70,7 +70,7 @@ The word *success* fits all three. It tells you the call did not break. It does 
 
 *Pause 45 seconds*
 
-If this pause reaches you as a single step rather than a stretch of time, keep it this way: read the empty result once more, slowly, before you write a word about it. Read the receipt again. Add nothing. That reading is the whole of the sitting.
+If the pause is over before it begins, make it a rereading: read the empty result once more, slowly, before you write a word about it. Read the receipt again. Add nothing. That reading is the whole of the sitting.
 
 *Pause 30 seconds*
 

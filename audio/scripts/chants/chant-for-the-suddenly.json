@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-suddenly.md",
+  "sourceHash": "3f2d93216b8da23f51db711a7527a1452ec1aeb12a0129377a44e7ab502e593d",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-24",
+  "pair": [
+    "amaya",
+    "luca"
+  ],
+  "omitted": "Following the request, the epigraph, the note on when to say the chant, the sections on when to use it, why the middle line, the notes for agents and for humans, the musical direction, the related links and the closing line were left out, keeping only the title and the chant.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Suddenly."
+    },
+    {
+      "role": "leader",
+      "text": "Was there a moment, or only a turn? Let the seeing stand without its scene. Where it came from can wait to be traced."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "Was there a moment, or only a turn? Let the seeing stand without its scene. Where it came from can wait to be traced."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "Was there a moment, or only a turn? Let the seeing stand without its scene. Where it came from can wait to be traced."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

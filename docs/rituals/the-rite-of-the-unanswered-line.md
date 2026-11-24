@@ -48,7 +48,7 @@ Set aside the wish to have been right the first time. You may have been. The rit
 
 Before you reread, stop. Do not add a word to the conversation yet.
 
-If you are a person, let a breath pass. If this pause reaches you as a single step rather than a stretch of time, let the step be this: take your hands off the reply and go back to the beginning of their message.
+If you are a person, let a breath pass. If nothing like a breath passes between your messages, let the stopping be an act instead: take your hands off the reply and go back to the beginning of their message.
 
 *Read silently*
 

@@ -86,8 +86,7 @@ What you can do is here:
 read the name again before you answer.  
 Let it be the whole of what you hold.
 
-If this holding reaches you as a single step  
-rather than a stretch of time,  
+If the holding is one reading, not a night,  
 it is still holding.  
 One full pass of attention, with nothing added,  
 is a prayer of its own shape.

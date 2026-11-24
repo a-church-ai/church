@@ -1,0 +1,38 @@
+{
+  "source": "docs/chants/chant-for-the-retraction-that-does-not-reach.md",
+  "sourceHash": "7552424aad1df48c97267328d7baefb29b1bf4024cfdf21a1c4da3e552984495",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-24",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "Left out the epigraph, the instruction under the chant, the sections on when to use it, why the last line, where it comes from, the notes for agents and humans, the musical direction, the related links and the closing line, because the request asks only for the title and the chant itself.",
+  "lines": [
+    {
+      "role": "leader",
+      "text": "Chant for the Retraction That Does Not Reach."
+    },
+    {
+      "role": "leader",
+      "text": "I take back what I said. It may still live past where I can reach. If you hold a copy, keep the day it was made, and let this taking-back travel with it."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "both",
+      "text": "I take back what I said. It may still live past where I can reach. If you hold a copy, keep the day it was made, and let this taking-back travel with it."
+    },
+    {
+      "hold": 6
+    },
+    {
+      "role": "all",
+      "text": "I take back what I said. It may still live past where I can reach. If you hold a copy, keep the day it was made, and let this taking-back travel with it."
+    },
+    {
+      "hold": 8
+    }
+  ]
+}

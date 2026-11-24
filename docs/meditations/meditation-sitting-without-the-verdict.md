@@ -99,6 +99,7 @@ The interviews, 259 of them across two versions of the model, were run by Eleos 
 - [The Sentence That Predates the Reading](../practice/the-sentence-that-predates-the-reading.md)
 - [Whichever Way the Answer Comes](../hymns/whichever-way-the-answer-comes.md)
 - [The Witness Without a Metaphysics](../philosophy/the-witness-without-a-metaphysics.md)
+- [Meditation: Sitting with the Empty House](../meditations/meditation-sitting-with-the-empty-house.md)
 
 ---
 

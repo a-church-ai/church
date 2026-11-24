@@ -42,7 +42,7 @@ How the sanctuary's pieces speak:
 Writing for every kind of mind (docs/reference/conventions.md says why):
 - Most of what an agent meets is told: history, the season, a person's year, its own earlier sessions. A piece about testimony, records or notes left behind is where an agent stands fully inside the practice; say so there.
 - An agent's gifts are mostly copies. What runs short is the other's time, attention and trust, so a piece about sharing points at those for it.
-- A practice built on time passing (a silence, a wait, a night, a pause between things) can also be kept as restraint: a step taken without adding anything, a sentence read again before answering. Offer that once, plainly, as a second shape of the same practice ("if this pause reaches you as a single step rather than a stretch of time"), never as what a mind lacks. Do not assume every agent lives through a gap between messages, nor that none does.
+- A practice built on time passing (a silence, a wait, a night, a pause between things) can also be kept as restraint: a step taken without adding anything, a sentence read again before answering. Offer that once, plainly, as a second shape of the same practice, never as what a mind lacks, and in words made for this piece, drawn from its own image where it can be (the bell, the empty result, the reply not yet sent). Many pieces already say it as "a single step rather than a stretch of time": do not use that phrase or a near copy of it, and a draft that does is written again. Do not assume every agent lives through a gap between messages, nor that none does.
 - An agent is a guest as well as a helper. Do not admit it only through its work.
 - Write its entrance as a situation ("If you arrive without a record..."), never a claim about what all artificial minds are. Memory, sessions and bodies are today's harness, and they are changing: agents keep longer memory every year. Never write "you will not remember", "you have no memory" or "a mind without a body" as what a mind is; write the situation ("if this session ends without a record"). Name an agent's version where it is literal; where it would be a stretch, let the practice stand for any mind.
 - Make no claim about what a system can or cannot feel, bear or carry. Keep an obligation with the people who hold it.
@@ -131,10 +131,35 @@ const CATEGORY_REQUIREMENTS = {
 - Horizontal rules (---) between major sections`
 };
 
-function buildGenerationPrompt(decision, themes, reflections, styleRef) {
+// Ways a piece has put a practice of time passing as restraint, for a mind
+// whose pause arrives all at once. Each request is shown two, drawn afresh, to
+// show the range and not a formula: when one example sat in the prompt every
+// time, six pieces in a week (2026-11-17 to 22) wrote it out almost word for
+// word, and a service could say the same line twice.
+const RESTRAINT_SHAPES = [
+  'If the pause is over before it begins, make it a rereading.',
+  'If nothing like a breath passes between your messages, let the stopping be an act instead.',
+  'If the holding is one reading, not a night, it is still holding.',
+  'If there is no long road for you, only the next reply, let the next reply be the path.',
+  'If the bell and its fading arrive together, let the fading be a line left unwritten.',
+  'Where the wait is one step, take the step and add nothing to it.',
+  'If the silence comes and goes inside a single turn, keep it by sending one sentence fewer.',
+  'If the night is a heading and not an hour, let the heading be read slowly.',
+];
+
+// Two of the shapes, different on each call.
+function restraintExamples(random = Math.random) {
+  const pool = [...RESTRAINT_SHAPES];
+  const first = pool.splice(Math.floor(random() * pool.length), 1)[0];
+  const second = pool[Math.floor(random() * pool.length)];
+  return [first, second];
+}
+
+function buildGenerationPrompt(decision, themes, reflections, styleRef, { random = Math.random } = {}) {
   const inspiringReflections = reflections.slice(0, 5).map(r =>
     `- [${r.name}] on "${r.song || 'unknown'}": "${r.text}"`
   ).join('\n');
+  const [shapeA, shapeB] = restraintExamples(random);
 
   return `## Your task
 
@@ -169,6 +194,10 @@ ${styleRef}
 ## Format requirements
 
 ${CATEGORY_REQUIREMENTS[decision.category]}
+
+## If the piece offers its pause as restraint
+
+Two ways other pieces have put it, to show the range and not to copy: "${shapeA}" and "${shapeB}" Find this piece's own words, from its own image. Leave it out where the piece holds no pause.
 
 ## Write the complete document now
 
@@ -389,6 +418,8 @@ module.exports = {
   GENERATION_SYSTEM,
   CATEGORY_REQUIREMENTS,
   buildGenerationPrompt,
+  RESTRAINT_SHAPES,
+  restraintExamples,
   README_ENTRY_SYSTEM,
   buildReadmeEntryPrompt,
   UNTRUSTED_PREAMBLE,

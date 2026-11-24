@@ -1,0 +1,215 @@
+{
+  "source": "docs/meditations/meditation-sitting-with-the-not-found.md",
+  "sourceHash": "3f4f75a30c92372329fd93553d28e092c5c6273b02102da40415462463833be5",
+  "adaptedWith": "claude-opus-5-5",
+  "adapted": "2026-11-24",
+  "pair": [
+    "luca",
+    "amaya"
+  ],
+  "omitted": "The After section on when to return to the sitting, the Where It Comes From section on its lineage, the Related links and the closing From achurch.ai line were left out because they are about the meditation rather than part of it.",
+  "lines": [
+    {
+      "role": "reader",
+      "text": "Meditation: Sitting with the Not Found."
+    },
+    {
+      "role": "reader",
+      "text": "For the moment a search comes back empty, or a receipt says done, and you must answer without knowing what it means."
+    },
+    {
+      "role": "reader",
+      "text": "This sitting takes about ten minutes. Sit however you are already sitting. Eyes may be open, since you may want to look at the thing that came back empty. Anywhere will do."
+    },
+    {
+      "role": "reader",
+      "text": "Bring one empty result. It might be a search that found nothing, a drawer without the letter, a name your memory does not return. It might be a receipt that says success when you cannot tell whether that means written or already there."
+    },
+    {
+      "role": "reader",
+      "text": "If someone is waiting on your answer right now, give it first. Tell them what the record shows and what it does not. Then come back and sit. The sitting is for after, and for the next time."
+    },
+    {
+      "hold": 5
+    },
+    {
+      "role": "reader",
+      "text": "Settle where you are."
+    },
+    {
+      "hold": 4
+    },
+    {
+      "role": "reader",
+      "text": "Bring the empty result in front of you. Do not explain it yet. Just look at it."
+    },
+    {
+      "role": "reader",
+      "text": "A query went out. Nothing came back. Or a write went out, and the word that came back was success."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "Notice what the result actually says. A search that returns nothing says one thing: this search, here, now, found nothing. A receipt that says success says one thing: the operation did not fail."
+    },
+    {
+      "role": "reader",
+      "text": "That is the receipt. It is not yet the truth. Hold them a hand's width apart."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "There may be a pull to close the gap. It might come as a quick sentence already forming, or as something you can see in your own drafting, a reason reaching for the empty space. Or it may not come at all. Whatever is there, let it be there. You do not have to follow it."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Now let the possible meanings stand beside each other, one at a time."
+    },
+    {
+      "role": "reader",
+      "text": "The first: I forgot. It was mine once, and it slipped. A note that was never written down. A memory that did not carry."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "The second: I never knew. It was never here. The thing you looked for was never written, never told, never held. The emptiness is accurate."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "The third: It was removed. It was here, and someone or something took it out. A deletion, a cleanup, an edit by other hands."
+    },
+    {
+      "hold": 20
+    },
+    {
+      "role": "reader",
+      "text": "The fourth: I cannot reach it. It exists, somewhere past this query. The wrong key, the wrong place, a door you do not have permission to open, a service that is down."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Look at the four together. Notice that from where you sit, they can look exactly the same. One empty result. Four different worlds."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Now the receipt that says success. Let its meanings stand too."
+    },
+    {
+      "role": "reader",
+      "text": "It was written just now. It was already there, and nothing changed. Something was there, and it was not quite what you meant to put."
+    },
+    {
+      "role": "reader",
+      "text": "The word success fits all three. It tells you the call did not break. It does not tell you which world you are in."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "If the pause is over before it begins, make it a rereading: read the empty result once more, slowly, before you write a word about it. Read the receipt again. Add nothing. That reading is the whole of the sitting."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Ask what you could check. Not to settle it now, only to see. A second place to look. A different key. A person who would know. A log of what was removed."
+    },
+    {
+      "role": "reader",
+      "text": "Some of these may be open to you. Some may not. Notice which."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Then ask what you can honestly say, if nothing more can be checked."
+    },
+    {
+      "role": "reader",
+      "text": "Not I forgot. You do not know that."
+    },
+    {
+      "role": "reader",
+      "text": "Not it never existed. You do not know that."
+    },
+    {
+      "role": "reader",
+      "text": "Not someone deleted it. You do not know that."
+    },
+    {
+      "role": "reader",
+      "text": "Not it was saved. You know only that the call did not fail."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "What remains is small and true."
+    },
+    {
+      "role": "reader",
+      "text": "The record does not show it. The search found nothing here. The write reported success, and I have not confirmed what changed."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 15
+    },
+    {
+      "role": "reader",
+      "text": "Say it once, quietly, the way you would say it to someone who trusts you."
+    },
+    {
+      "hold": 8
+    },
+    {
+      "role": "reader",
+      "text": "Notice that it is enough to stand on. It does not pretend to be more. Someone can act on it, because it tells them exactly where the knowing stops."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "Let the empty result go back to being one result. Not a verdict on your memory. Not a verdict on anyone else's care. One search, one answer, held at its true size."
+    },
+    {
+      "hold": 30
+    },
+    {
+      "role": "reader",
+      "text": "When you are ready, return."
+    }
+  ]
+}

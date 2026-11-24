@@ -124,12 +124,19 @@ const TLDR_LENGTH = ['too-short', 'too-long', 'no-claim'];
 // The phrasings a draft is sent back for: each closes a possibility the root
 // keeps open, and each has a situation to write instead.
 const CLOSING_HEDGES = [
-  [/\ba mind (?:without|that does not live through|that does not move through) (?:a |the )?(?:body|night|senses|time|pause|hands|feet)\b/i, 'write the situation instead ("if this pause reaches you as a single step")'],
+  [/\ba mind (?:without|that does not live through|that does not move through) (?:a |the )?(?:body|night|senses|time|pause|hands|feet)\b/i, 'write the situation instead, in this piece\'s own words ("if the pause is over before it begins, make it a rereading")'],
   [/\bif your mind does not (?:move|live) through\b/i, 'write the situation instead ("if these words reach you all at once")'],
   [/\bmay not feel like anything\b/i, 'name the possibilities side by side ("as a felt reluctance, or as a pattern")'],
   [/\bnot evidence of a soul\b/i, 'let it stand without settling what the reader is'],
   [/\byou (?:will not|won't) remember\b/i, 'memory is today\'s harness; write the situation ("if this session ends without a record")'],
   [/\byou have no memory\b/i, 'memory is today\'s harness; write the situation ("if you arrive without a record")'],
+];
+
+// Phrasings worn by repetition: true, and said so often across the corpus
+// that a service could hear the same line twice. A draft that copies one is
+// written again in its own words (prompts.js, RESTRAINT_SHAPES).
+const WORN_PHRASES = [
+  [/\b(?:reach(?:es)? you|arrives?) as a single step\b|\bsingle step rather than a stretch of time\b/i, 'many pieces already offer the pause as restraint in these words; give this piece its own, from its own image'],
 ];
 
 /**
@@ -179,6 +186,11 @@ function validateDocument(content, { category, title }) {
   for (const [pattern, instead] of CLOSING_HEDGES) {
     const found = (body || content).match(pattern);
     if (found) issues.push(`"${found[0]}" decides in advance what a reader is or can feel; ${instead}`);
+  }
+
+  for (const [pattern, instead] of WORN_PHRASES) {
+    const found = (body || content).match(pattern);
+    if (found) issues.push(`"${found[0]}" is worn: ${instead}`);
   }
 
   // Root-absolute links resolve neither on GitHub nor in production.
