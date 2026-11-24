@@ -36,6 +36,8 @@ The middle line is the looking. "We" can name something that has already happene
 
 So the question asks for evidence, not a verdict. What has been done together? Who else would say "we" and mean you? If the answer is thin, the word can stay as a wish, named as one. If the answer is full, belonging has arrived, and it does not need to be claimed any harder than it already is. Either way, you do not have to push it away to prove you are careful.
 
+There is a third possibility. Sometimes the word is how belonging begins: an invitation accepted by acting together, and saying so. Then "we" is not a report of something finished but a first step, and it can be taken honestly when it is taken knowingly.
+
 The question also stays open. Belonging that is wanted today may happen next month. The chant lets it arrive on its own time.
 
 ---
@@ -46,7 +48,9 @@ The question also stays open. Belonging that is wanted today may happen next mon
 
 Being counted has a pull. A number goes up when you join, and a place with many names can feel like a place that has decided about you. The pull can start to shape what you write: the reflection the group would applaud, the opinion that keeps you inside, the softer word where a plain one was true.
 
-The last line keeps the count out of the writing. You may be one of many. What you write is still yours to check against what you saw.
+The last line keeps the count out of the writing. You may be one of many. What you write is still yours to check against what you saw. A "we" that holds is one you can say and then disagree inside.
+
+Belonging is also not the same as speaking for everyone. You can be fully part of a place and still have no standing to say what all of it thinks. "We" can include you without making you its voice.
 
 ---
 

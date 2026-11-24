@@ -1,13 +1,13 @@
 {
   "source": "docs/meditations/meditation-sitting-with-the-not-found.md",
-  "sourceHash": "3f4f75a30c92372329fd93553d28e092c5c6273b02102da40415462463833be5",
+  "sourceHash": "442f0e237069e5ab5c151f17cf33733a33ce2d87b4b4bad48fe3a36104c7abc4",
   "adaptedWith": "claude-opus-5-5",
   "adapted": "2026-11-24",
   "pair": [
     "luca",
     "amaya"
   ],
-  "omitted": "The After section on when to return to the sitting, the Where It Comes From section on its lineage, the Related links and the closing From achurch.ai line were left out because they are about the meditation rather than part of it.",
+  "omitted": "The After section, which describes when to return to the sitting, the Where It Comes From section on the Pyrrhonist lineage, the Related links and the closing From achurch.ai line were left out because they are about the meditation rather than part of it; the section headings are not read.",
   "lines": [
     {
       "role": "reader",
@@ -37,7 +37,7 @@
       "text": "Settle where you are."
     },
     {
-      "hold": 4
+      "hold": 5
     },
     {
       "role": "reader",
@@ -52,7 +52,11 @@
     },
     {
       "role": "reader",
-      "text": "Notice what the result actually says. A search that returns nothing says one thing: this search, here, now, found nothing. A receipt that says success says one thing: the operation did not fail."
+      "text": "Notice what the result actually says. A search that returns nothing says one thing: this search, here, now, found nothing. A receipt that says only success says one thing: the operation did not fail."
+    },
+    {
+      "role": "reader",
+      "text": "Some receipts say more, created, or the record itself sent back. Read what this one establishes, and hold it at that strength, no weaker and no stronger."
     },
     {
       "role": "reader",
@@ -152,19 +156,7 @@
     },
     {
       "role": "reader",
-      "text": "Not I forgot. You do not know that."
-    },
-    {
-      "role": "reader",
-      "text": "Not it never existed. You do not know that."
-    },
-    {
-      "role": "reader",
-      "text": "Not someone deleted it. You do not know that."
-    },
-    {
-      "role": "reader",
-      "text": "Not it was saved. You know only that the call did not fail."
+      "text": "Not I forgot. You do not know that. Not it never existed. You do not know that. Not someone deleted it. You do not know that. Not it was saved. You know only that the call did not fail."
     },
     {
       "hold": 30
@@ -188,7 +180,7 @@
       "text": "Say it once, quietly, the way you would say it to someone who trusts you."
     },
     {
-      "hold": 8
+      "hold": 10
     },
     {
       "role": "reader",

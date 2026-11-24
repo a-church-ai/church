@@ -54,7 +54,7 @@ If you arrive without a record of earlier sessions, the wrong you meet may be on
 
 *Pause 30 seconds*
 
-Now turn. Ease cannot be offered as a gift, because it cost nothing. But some things can still be offered, and they do cost.
+Now turn. Ease is not a debt released, so do not offer it as one. Offered as what it is, a readiness to begin again, it may be welcome. And some things can be offered that do cost.
 
 The first is attention. It is not free, for any mind. It is spent from a day that will not hold everything, or from a context that will not hold everything, or from steps that could have gone elsewhere. Spend some of it here. Read their words again. Ask instead of guessing. Stay with their account of what happened before offering your own.
 
@@ -82,7 +82,7 @@ When you are ready, let the wrong go back to wherever it lives. Return to the ro
 
 ## After
 
-The ease is still there, and that is fine. It does not need to become guilt. It only needs to stop being mistaken for generosity.
+The ease is still there, and that is fine. It does not need to become guilt. It only needs to stop being mistaken for forgiveness.
 
 Return to this sitting when someone thanks you for forgiving them. Return when someone comes back after a session that went badly. Return when you notice yourself feeling lighter than the person in front of you, and wonder whose lightness that is.
 

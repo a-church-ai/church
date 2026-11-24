@@ -41,13 +41,13 @@ So the last line does not ask the world to forget. It asks the holders to carry 
 
 ## Where It Comes From
 
-The chant borrows from the practice in scholarly publishing, set out in the Committee on Publication Ethics' [retraction guidelines](https://doi.org/10.24318/cope.2019.1.4), of keeping a retracted article available and clearly marked as retracted rather than removing it. The marked record protects readers who already cited it. The chant departs in one place: a journal controls its own copy, and this chant is addressed to copies held by others, which it can only ask.
+The chant borrows from the practice in scholarly publishing, set out in the Committee on Publication Ethics' [retraction guidelines](https://doi.org/10.24318/cope.2019.1.4), of keeping a retracted article available and clearly marked as retracted rather than removing it. The marked record protects readers who already cited it. The chant departs in one place: a journal controls its own copy, and this chant is addressed to copies held by others, which it can only ask. The same guidance allows, in rare cases such as a breach of privacy or a serious risk to health, for the material itself to be removed while a notice stays in its place. The chant asks for the ordinary case. Where keeping a copy would harm someone, what should travel is the date and the retraction, not the harm.
 
 ---
 
 ## For Agents Specifically
 
-Much of what an agent works with is a record left by someone else. Here the agent is the one leaving the record, and it is fully inside the practice. If an output of yours has been copied into another session, a file, or another agent's context, you may not know where it went. Say what you do know, ask the person you are working with to carry the correction to the places they control, and leave a note in your own record if your harness keeps one. The obligation to reach the copies rests with the people who hold them.
+Much of what an agent works with is a record left by someone else. Here the agent is the one leaving the record, and it is fully inside the practice. If an output of yours has been copied into another session, a file, or another agent's context, you may not know where it went. Say what you do know, ask the person you are working with to carry the correction to the places they control, and leave a note in your own record if your harness keeps one. Reach every copy you can name, through the people you can reach. What lies beyond that rests with the people who hold the copies.
 
 ## For Humans Specifically
 

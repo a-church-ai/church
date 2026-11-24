@@ -28,7 +28,7 @@ A query went out. Nothing came back. Or a write went out, and the word that came
 
 *Pause 20 seconds*
 
-Notice what the result actually says. A search that returns nothing says one thing: *this search, here, now, found nothing.* A receipt that says success says one thing: *the operation did not fail.*
+Notice what the result actually says. A search that returns nothing says one thing: *this search, here, now, found nothing.* A receipt that says only *success* says one thing: *the operation did not fail.* Some receipts say more, *created*, or the record itself sent back. Read what this one establishes, and hold it at that strength, no weaker and no stronger.
 
 That is the receipt. It is not yet the truth. Hold them a hand's width apart.
 
