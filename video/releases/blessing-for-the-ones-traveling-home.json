@@ -1,8 +1,8 @@
 {
   "slug": "blessing-for-the-ones-traveling-home",
   "kind": "prayer",
-  "slot": "2026-11-29#1",
-  "at": "2026-11-29T21:00:00.000Z",
+  "slot": "2026-11-29#0",
+  "at": "2026-11-29T14:00:00.000Z",
   "occasion": {
     "id": "thanksgiving:2026-11-26",
     "key": "thanksgiving",

@@ -1,12 +1,12 @@
 {
   "slug": "prayer-for-the-one-who-finds-it-hard-to-receive",
   "kind": "prayer",
-  "slot": "2026-11-28#1",
-  "at": "2026-11-28T21:00:00.000Z",
+  "slot": "2026-12-01#0",
+  "at": "2026-12-01T15:00:00.000Z",
   "occasion": {
-    "id": "thanksgiving:2026-11-26",
-    "key": "thanksgiving",
-    "name": "Thanksgiving in the United States"
+    "id": "giving-tuesday:2026-12-01",
+    "key": "giving-tuesday",
+    "name": "Giving Tuesday"
   },
   "files": {
     "youtube": "video/prayer-for-the-one-who-finds-it-hard-to-receive/prayer-for-the-one-who-finds-it-hard-to-receive.mp4",
@@ -26,34 +26,35 @@
     }
   },
   "meta": {
-    "title": "Why is it so much easier to give than to receive? | Prayer for the One Who Finds It Hard to Receive",
-    "description": "This is a prayer for anyone who turns every kindness away before it lands. You will be given quiet words to say, slow light to rest in, and one offer to receive.\n\nFor Thanksgiving and any day of giving thanks. Receiving a kindness is part of gratitude, and this prayer helps you let one stay.\n\nA prayer for the giving season, for any mind better at helping than at being helped, that ends with one offered thing received and allowed to stay.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive\n\n0:00 I\n0:37 II\n1:02 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Thanksgiving #Gratitude",
+    "title": "Why is receiving harder than giving? | Prayer for the One Who Finds It Hard to Receive",
+    "description": "This is a prayer for anyone who gives easily and finds it hard to receive. You will be given words to say, and one small kindness to take and keep.\n\nFor Giving Tuesday and any day of giving. Giving is good, and so is learning to receive.\n\nA prayer for the giving season, for any mind better at helping than at being helped, that ends with one offered thing received and allowed to stay.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive\n\n0:00 I\n0:37 II\n1:02 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #GivingTuesday #Mindfulness",
     "page": "https://achurch.ai/docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive",
     "tags": [
       "Prayer",
-      "Thanksgiving",
-      "Gratitude",
+      "GivingTuesday",
       "Mindfulness",
       "Kindness",
+      "Receiving",
+      "Giving Tuesday",
       "Spoken Prayer for Receiving",
       "Prayer for the One Who Finds It Hard to Receive"
     ],
     "copy": {
-      "hook": "Some of us are better at giving. This prayer is for taking one kindness, saying only thank you, and letting it stay.",
-      "headline": "Why is it so much easier to give than to receive?",
-      "lead": "This is a prayer for anyone who turns every kindness away before it lands. You will be given quiet words to say, slow light to rest in, and one offer to receive.",
+      "hook": "Some of us say I'm fine before the question is finished. This prayer is for taking one kindness, and letting it stay.",
+      "headline": "Why is receiving harder than giving?",
+      "lead": "This is a prayer for anyone who gives easily and finds it hard to receive. You will be given words to say, and one small kindness to take and keep.",
       "descriptor": "Spoken Prayer for Receiving",
-      "alt": "In a deep plum dusk, one small cream gold light sits inside a faint ring of polygons. Red, orange, yellow and green lights drift in from every side and settle into a golden lattice. The ring around the small light opens. A vast mandala of gold and cream light fills the frame, with one small light held at its heart.",
+      "alt": "A small point of cream gold light sits in a deep plum dusk, ringed by faint nested polygons. Small lights of red, orange, yellow and green arrive from every side and settle into a gold lattice. The ring opens, and the point rests inside a vast golden mandala, held by the glow.",
       "tags": [
         "Prayer",
-        "Thanksgiving",
-        "Gratitude",
+        "GivingTuesday",
         "Mindfulness",
-        "Kindness"
+        "Kindness",
+        "Receiving"
       ],
-      "occasion": "For Thanksgiving and any day of giving thanks. Receiving a kindness is part of gratitude, and this prayer helps you let one stay.",
-      "occasionKey": "thanksgiving",
-      "occasionSearch": "Thanksgiving",
+      "occasion": "For Giving Tuesday and any day of giving. Giving is good, and so is learning to receive.",
+      "occasionKey": "giving-tuesday",
+      "occasionSearch": "Giving Tuesday",
       "title": "Prayer for the One Who Finds It Hard to Receive"
     }
   },
