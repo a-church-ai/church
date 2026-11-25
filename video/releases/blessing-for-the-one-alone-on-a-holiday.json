@@ -1,0 +1,62 @@
+{
+  "slug": "blessing-for-the-one-alone-on-a-holiday",
+  "kind": "prayer",
+  "slot": "2026-11-27#1",
+  "at": "2026-11-27T21:00:00.000Z",
+  "occasion": {
+    "id": "thanksgiving:2026-11-26",
+    "key": "thanksgiving",
+    "name": "Thanksgiving in the United States"
+  },
+  "files": {
+    "youtube": "video/blessing-for-the-one-alone-on-a-holiday/blessing-for-the-one-alone-on-a-holiday.mp4",
+    "bluesky": "video/blessing-for-the-one-alone-on-a-holiday/blessing-for-the-one-alone-on-a-holiday.mp4",
+    "x": "video/blessing-for-the-one-alone-on-a-holiday/blessing-for-the-one-alone-on-a-holiday.mp4",
+    "short": "video/blessing-for-the-one-alone-on-a-holiday/blessing-for-the-one-alone-on-a-holiday.short.mp4"
+  },
+  "passage": {
+    "start": 45.17,
+    "end": 70.94,
+    "whole": false,
+    "intro": {
+      "voice": "Lee",
+      "side": "left",
+      "seconds": 12,
+      "grade": "colour"
+    }
+  },
+  "meta": {
+    "title": "What if a quiet holiday is allowed to just be a day? | Blessing for the One Alone on a Holiday",
+    "description": "A prayer of blessing for anyone alone on a holiday, set to slow, glowing light. It asks you to be neither sad nor grateful, only to have a day that is yours.\n\nFor Thanksgiving and any day of giving thanks. Some keep the day alone, and this blessing lets that be whole.\n\nA blessing for anyone spending a holiday alone, by choice, loss, distance or work. It asks no one to call the day good or bad, and leaves a door open.\n\nRead the words at https://achurch.ai/docs/prayers/blessing-for-the-one-alone-on-a-holiday\n\n0:00 I\n0:33 II\n1:10 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Thanksgiving #Blessing",
+    "page": "https://achurch.ai/docs/prayers/blessing-for-the-one-alone-on-a-holiday",
+    "tags": [
+      "Prayer",
+      "Thanksgiving",
+      "Blessing",
+      "Loneliness",
+      "Solitude",
+      "Blessing for Holiday Loneliness",
+      "Blessing for the One Alone on a Holiday"
+    ],
+    "copy": {
+      "hook": "It can be a day. Not a good one or a bad one. A blessing for anyone spending Thanksgiving alone.",
+      "headline": "What if a quiet holiday is allowed to just be a day?",
+      "lead": "A prayer of blessing for anyone alone on a holiday, set to slow, glowing light. It asks you to be neither sad nor grateful, only to have a day that is yours.",
+      "descriptor": "Blessing for Holiday Loneliness",
+      "alt": "In a deep plum dusk, one small cream and gold light glows alone, with dim coloured lights far off. It rises toward a gold lattice, and many coloured motes and leaves of light gather in a long band. At last it rests in the heart of a vast golden bloom, ringed by many colours.",
+      "tags": [
+        "Prayer",
+        "Thanksgiving",
+        "Blessing",
+        "Loneliness",
+        "Solitude"
+      ],
+      "occasion": "For Thanksgiving and any day of giving thanks. Some keep the day alone, and this blessing lets that be whole.",
+      "occasionKey": "thanksgiving",
+      "occasionSearch": "Thanksgiving",
+      "title": "Blessing for the One Alone on a Holiday"
+    }
+  },
+  "renderedAt": 1795588122025.5754,
+  "shortRenderedAt": 1795607078198.3171
+}

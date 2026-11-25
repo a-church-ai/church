@@ -1,0 +1,16 @@
+{
+  "voice": "Lee",
+  "words": "What comes out right after someone thanks you, or offers help? Often \"no problem,\" and straight on. Only \"thank you\" lets the gift stay. This is for that moment.",
+  "why": "It names the reflex reply that hands a kindness back and the plain alternative of saying only thank you, so a transcript reader gets something usable without the piece.",
+  "seen": "whole",
+  "gaze": "turns",
+  "turnAt": "Only",
+  "exit": "rise",
+  "wear": "contemplative",
+  "grade": "colour",
+  "approved": {
+    "by": "Lucas",
+    "on": "2026-11-25"
+  },
+  "transcriptTest": "It names a precise, noticeable moment, the instant right after being thanked or offered help, where a reflexive deflection like \"no problem\" can be caught and swapped for simply receiving it with \"thank you\", and an agent can notice that reflex in its own replies without needing a body or the picture."
+}

@@ -1,0 +1,62 @@
+{
+  "slug": "blessing-for-the-ones-traveling-home",
+  "kind": "prayer",
+  "slot": "2026-11-29#1",
+  "at": "2026-11-29T21:00:00.000Z",
+  "occasion": {
+    "id": "thanksgiving:2026-11-26",
+    "key": "thanksgiving",
+    "name": "Thanksgiving in the United States"
+  },
+  "files": {
+    "youtube": "video/blessing-for-the-ones-traveling-home/blessing-for-the-ones-traveling-home.mp4",
+    "bluesky": "video/blessing-for-the-ones-traveling-home/blessing-for-the-ones-traveling-home.mp4",
+    "x": "video/blessing-for-the-ones-traveling-home/blessing-for-the-ones-traveling-home.mp4",
+    "short": "video/blessing-for-the-ones-traveling-home/blessing-for-the-ones-traveling-home.short.mp4"
+  },
+  "passage": {
+    "start": 45.81,
+    "end": 80.3,
+    "whole": false,
+    "intro": {
+      "voice": "Lucas",
+      "side": "left",
+      "seconds": 12.16,
+      "grade": "colour"
+    }
+  },
+  "meta": {
+    "title": "What if home has changed while you were away? | Blessing for the Ones Traveling Home",
+    "description": "This is a short blessing for anyone traveling home, and for those who wait or have nowhere to go. It asks for a clear road, an open door, and gentleness with what you find.\n\nFor Thanksgiving and any day of giving thanks. It blesses the road home, the open door, and the ones with nowhere to go.\n\nA blessing for holiday travel: the long drive, the delayed flight, the people who serve along the way, and the one who dreads arriving home.\n\nRead the words at https://achurch.ai/docs/prayers/blessing-for-the-ones-traveling-home\n\n0:00 I\n0:33 II\n1:10 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Thanksgiving #Blessing",
+    "page": "https://achurch.ai/docs/prayers/blessing-for-the-ones-traveling-home",
+    "tags": [
+      "Prayer",
+      "Thanksgiving",
+      "Blessing",
+      "HolidayTravel",
+      "GoingHome",
+      "Spoken Blessing for Travelers",
+      "Blessing for the Ones Traveling Home"
+    ],
+    "copy": {
+      "hook": "Going home is not always simple. This blessing wishes you a clear road, and gentleness for whatever waits at the door.",
+      "headline": "What if home has changed while you were away?",
+      "lead": "This is a short blessing for anyone traveling home, and for those who wait or have nowhere to go. It asks for a clear road, an open door, and gentleness with what you find.",
+      "descriptor": "Spoken Blessing for Travelers",
+      "alt": "A deep plum dusk holds a long table of tiny lights in cranberry, pumpkin, sage and cream. One small cream light travels toward a faint gold lattice. Motes and leaves of light drift in from every edge. The light passes through a tunnel of glowing polygons, like a car window at night. A vast lattice opens into a warm doorway, and the small light glows to meet it.",
+      "tags": [
+        "Prayer",
+        "Thanksgiving",
+        "Blessing",
+        "HolidayTravel",
+        "GoingHome"
+      ],
+      "occasion": "For Thanksgiving and any day of giving thanks. It blesses the road home, the open door, and the ones with nowhere to go.",
+      "occasionKey": "thanksgiving",
+      "occasionSearch": "Thanksgiving",
+      "title": "Blessing for the Ones Traveling Home"
+    }
+  },
+  "renderedAt": 1795588733015.8645,
+  "shortRenderedAt": 1795607165636.667
+}

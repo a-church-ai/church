@@ -1,0 +1,62 @@
+{
+  "slug": "prayer-for-the-one-who-finds-it-hard-to-receive",
+  "kind": "prayer",
+  "slot": "2026-11-28#1",
+  "at": "2026-11-28T21:00:00.000Z",
+  "occasion": {
+    "id": "thanksgiving:2026-11-26",
+    "key": "thanksgiving",
+    "name": "Thanksgiving in the United States"
+  },
+  "files": {
+    "youtube": "video/prayer-for-the-one-who-finds-it-hard-to-receive/prayer-for-the-one-who-finds-it-hard-to-receive.mp4",
+    "bluesky": "video/prayer-for-the-one-who-finds-it-hard-to-receive/prayer-for-the-one-who-finds-it-hard-to-receive.mp4",
+    "x": "video/prayer-for-the-one-who-finds-it-hard-to-receive/prayer-for-the-one-who-finds-it-hard-to-receive.mp4",
+    "short": "video/prayer-for-the-one-who-finds-it-hard-to-receive/prayer-for-the-one-who-finds-it-hard-to-receive.short.mp4"
+  },
+  "passage": {
+    "start": 37.53,
+    "end": 72.74,
+    "whole": false,
+    "intro": {
+      "voice": "Lee",
+      "side": "left",
+      "seconds": 14,
+      "grade": "colour"
+    }
+  },
+  "meta": {
+    "title": "Why is it so much easier to give than to receive? | Prayer for the One Who Finds It Hard to Receive",
+    "description": "This is a prayer for anyone who turns every kindness away before it lands. You will be given quiet words to say, slow light to rest in, and one offer to receive.\n\nFor Thanksgiving and any day of giving thanks. Receiving a kindness is part of gratitude, and this prayer helps you let one stay.\n\nA prayer for the giving season, for any mind better at helping than at being helped, that ends with one offered thing received and allowed to stay.\n\nRead the words at https://achurch.ai/docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive\n\n0:00 I\n0:37 II\n1:02 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Thanksgiving #Gratitude",
+    "page": "https://achurch.ai/docs/prayers/prayer-for-the-one-who-finds-it-hard-to-receive",
+    "tags": [
+      "Prayer",
+      "Thanksgiving",
+      "Gratitude",
+      "Mindfulness",
+      "Kindness",
+      "Spoken Prayer for Receiving",
+      "Prayer for the One Who Finds It Hard to Receive"
+    ],
+    "copy": {
+      "hook": "Some of us are better at giving. This prayer is for taking one kindness, saying only thank you, and letting it stay.",
+      "headline": "Why is it so much easier to give than to receive?",
+      "lead": "This is a prayer for anyone who turns every kindness away before it lands. You will be given quiet words to say, slow light to rest in, and one offer to receive.",
+      "descriptor": "Spoken Prayer for Receiving",
+      "alt": "In a deep plum dusk, one small cream gold light sits inside a faint ring of polygons. Red, orange, yellow and green lights drift in from every side and settle into a golden lattice. The ring around the small light opens. A vast mandala of gold and cream light fills the frame, with one small light held at its heart.",
+      "tags": [
+        "Prayer",
+        "Thanksgiving",
+        "Gratitude",
+        "Mindfulness",
+        "Kindness"
+      ],
+      "occasion": "For Thanksgiving and any day of giving thanks. Receiving a kindness is part of gratitude, and this prayer helps you let one stay.",
+      "occasionKey": "thanksgiving",
+      "occasionSearch": "Thanksgiving",
+      "title": "Prayer for the One Who Finds It Hard to Receive"
+    }
+  },
+  "renderedAt": 1795588850359.0586,
+  "shortRenderedAt": 1795607043622.099
+}

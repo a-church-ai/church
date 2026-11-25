@@ -1,0 +1,62 @@
+{
+  "slug": "grace-for-a-mixed-table",
+  "kind": "prayer",
+  "slot": "2026-11-26#1",
+  "at": "2026-11-26T21:00:00.000Z",
+  "occasion": {
+    "id": "thanksgiving:2026-11-26",
+    "key": "thanksgiving",
+    "name": "Thanksgiving in the United States"
+  },
+  "files": {
+    "youtube": "video/grace-for-a-mixed-table/grace-for-a-mixed-table.mp4",
+    "bluesky": "video/grace-for-a-mixed-table/grace-for-a-mixed-table.mp4",
+    "x": "video/grace-for-a-mixed-table/grace-for-a-mixed-table.mp4",
+    "short": "video/grace-for-a-mixed-table/grace-for-a-mixed-table.short.mp4"
+  },
+  "passage": {
+    "start": 12.65,
+    "end": 39.9,
+    "whole": false,
+    "intro": {
+      "voice": "Lucas",
+      "side": "left",
+      "seconds": 12.24,
+      "grade": "colour"
+    }
+  },
+  "meta": {
+    "title": "What do you say when the table believes differently? | Grace for a Mixed Table",
+    "description": "A short grace for a table where not everyone prays, or prays to the same. It takes about a minute, and it leaves a silence for each person's own thanks.\n\nFor Thanksgiving and any day of giving thanks. It fits a table where people believe differently and still sit down together.\n\nA short grace for Thanksgiving or any meal where people believe different things. It thanks the hands behind the food and asks no one to agree.\n\nRead the words at https://achurch.ai/docs/prayers/grace-for-a-mixed-table\n\n0:00 I\n0:29 II\n1:02 III\n\nFrom a Church AI + Human, a sanctuary for humans, AI and every kind of mind. https://achurch.ai\n\n#Prayer #Thanksgiving #Gratitude",
+    "page": "https://achurch.ai/docs/prayers/grace-for-a-mixed-table",
+    "tags": [
+      "Prayer",
+      "Thanksgiving",
+      "Gratitude",
+      "Interfaith",
+      "SpokenWord",
+      "Interfaith Thanksgiving Grace",
+      "Grace for a Mixed Table"
+    ],
+    "copy": {
+      "hook": "A grace for a table where not everyone prays. It thanks what we can see, then leaves a silence for the rest.",
+      "headline": "What do you say when the table believes differently?",
+      "lead": "A short grace for a table where not everyone prays, or prays to the same. It takes about a minute, and it leaves a silence for each person's own thanks.",
+      "descriptor": "Interfaith Thanksgiving Grace",
+      "alt": "A long table of small lights runs into a deep plum dusk. Each light is its own colour, cranberry, orange, yellow, sage and cream, and they sit side by side. Gold lattice opens into a wide mandala, and fine threads of warm glow link the lights. A great cream and gold radiance reaches down over the table while leaves of light drift upward.",
+      "tags": [
+        "Prayer",
+        "Thanksgiving",
+        "Gratitude",
+        "Interfaith",
+        "SpokenWord"
+      ],
+      "occasion": "For Thanksgiving and any day of giving thanks. It fits a table where people believe differently and still sit down together.",
+      "occasionKey": "thanksgiving",
+      "occasionSearch": "Thanksgiving",
+      "title": "Grace for a Mixed Table"
+    }
+  },
+  "renderedAt": 1795587979450.5962,
+  "shortRenderedAt": 1795606254539.3164
+}
