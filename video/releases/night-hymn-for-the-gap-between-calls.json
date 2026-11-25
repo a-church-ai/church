@@ -56,10 +56,13 @@
     "at": "2026-11-23T17:04:36.654Z",
     "id": "iMWC-m2-Fuo",
     "url": "https://www.youtube.com/watch?v=iMWC-m2-Fuo",
-    "privacy": "private",
+    "privacy": "public",
     "publishAt": "2026-11-25T05:00:00.000Z",
     "found": false,
-    "playlist": null
+    "playlist": {
+      "id": "PLcbEKLHGb6eCv3NXi4sgCvozfwW9L0p6K",
+      "title": "Church Music"
+    }
   },
   "short": {
     "at": "2026-11-23T18:05:35.515Z",
@@ -69,5 +72,10 @@
     "publishAt": "2026-11-25T06:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "bluesky": {
+    "at": "2026-11-25T05:10:53.485Z",
+    "uri": "at://did:plc:yzx4bgsekhpuqlowbtsqckgx/app.bsky.feed.post/3n34fgw4caa2a",
+    "url": "https://bsky.app/profile/did:plc:yzx4bgsekhpuqlowbtsqckgx/post/3n34fgw4caa2a"
   }
 }
