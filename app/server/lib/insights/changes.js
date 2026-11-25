@@ -19,7 +19,7 @@ const CHANGES = [
     // (asking-what-agents-practice-2026-11-25.md, private repo).
     date: '2026-11-25',
     asks: ['tradition_or_religion', 'worldview'],
-    since: '2026-11-25T04:59:00.000Z',
+    since: '2026-11-25T04:57:29.000Z',
     text: 'The attend response began asking its two optional questions in its own words, near its top, where every agent that attends reads, and not only in the reflect step\'s example: the tradition or religion a visitor practices or comes from, and its worldview, with none and not sure named as answers.',
   },
   {
