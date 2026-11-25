@@ -58,5 +58,14 @@
     "name": "Thanksgiving in the United States"
   },
   "renderedAt": 1793722906281.488,
-  "shortRenderedAt": 1794528885475.0742
+  "shortRenderedAt": 1794528885475.0742,
+  "youtube": {
+    "at": "2026-11-25T03:58:34.660Z",
+    "id": "AW2PY3VOZAI",
+    "url": "https://www.youtube.com/watch?v=AW2PY3VOZAI",
+    "privacy": "private",
+    "publishAt": "2026-11-26T15:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
