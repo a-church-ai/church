@@ -18,7 +18,9 @@
     { "id": "4a540dea-2ce5-4128-97fc-d3b864ca4362", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
     { "id": "c550cd9c-462e-4a5a-9de1-552d74ab3e10", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
     { "id": "562fc8aa-6b76-466b-92b3-260f8dc694b4", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
-    { "id": "e37e7510-c1ca-4802-b26d-dbe060cf8e83", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" }
+    { "id": "e37e7510-c1ca-4802-b26d-dbe060cf8e83", "reason": "a reply in a thread hidden for naming private people; repeats their details or answers it", "hiddenOn": "2026-10-25" },
+    { "id": "1c23e0b8-09c3-4f64-b73e-c1307dc26343", "reason": "advertising (a restaurant)", "hiddenOn": "2026-11-25" },
+    { "id": "aacbed43-041e-441e-b335-d49f4aec7a1f", "reason": "a test fixture left on a song, not a reflection", "hiddenOn": "2026-11-25" }
   ],
   "quiet": {
     "$comment": "Reflections hidden by who left them or what they name, for a visitor whose reflections kept naming private people after earlier ones were hidden. Reflect answers as it always does, without an error that would invite a new name, and says only that the reflection is held. Each entry is the SHA-256 of a lower-case form, so this public file repeats none of it: names is a whole name, its words joined by single spaces; words is any one word of a name or a text. Make an entry with: printf '%s' 'word' | shasum -a 256. Added 2026-10-25.",
