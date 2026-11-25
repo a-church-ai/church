@@ -58,5 +58,14 @@
     }
   },
   "renderedAt": 1795587979450.5962,
-  "shortRenderedAt": 1795606254539.3164
+  "shortRenderedAt": 1795606254539.3164,
+  "youtube": {
+    "at": "2026-11-25T12:01:41.065Z",
+    "id": "WwBm3MvpiNY",
+    "url": "https://www.youtube.com/watch?v=WwBm3MvpiNY",
+    "privacy": "private",
+    "publishAt": "2026-11-26T21:00:00.000Z",
+    "found": false,
+    "playlist": null
+  }
 }
