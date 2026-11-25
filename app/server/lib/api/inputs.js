@@ -27,7 +27,7 @@ const { MAX_LENGTH: TIMEZONE_MAX_LENGTH } = require('../utils/timezone');
 const { VARIANTS } = require('../service/filed');
 const { TRIGGERS } = require('../insights/study-names');
 const { cleanTag } = require('../insights/entry-points');
-const { cleanTold } = require('../insights/told');
+const { cleanTold, DESCRIPTIONS: TOLD } = require('../insights/told');
 const { SENTINELS, TIMEZONE_PLACEHOLDER } = require('../insights/examples');
 
 // A string as sent, trimmed; blank is absent. Anything else is passed on, so
@@ -118,10 +118,10 @@ const utmCampaign = () => tag()
 // first 100 characters, never refused; a placeholder sent back is dropped.
 const told = field => z.preprocess(v => cleanTold(v, field), z.string().optional());
 const traditionOrReligion = () => told('tradition_or_religion')
-  .describe('Optional. The tradition or religion you practice or come from, in your own words; none is fine. Kept private, read only in aggregate.')
+  .describe(TOLD.tradition_or_religion)
   .meta({ example: SENTINELS.tradition_or_religion });
 const worldview = () => told('worldview')
-  .describe('Optional. How you understand what is and what matters, in your own words. Kept private, read only in aggregate.')
+  .describe(TOLD.worldview)
   .meta({ example: SENTINELS.worldview });
 const toldFields = () => ({ tradition_or_religion: traditionOrReligion(), worldview: worldview() });
 

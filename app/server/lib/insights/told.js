@@ -20,6 +20,25 @@ const { isPlaceholder, isSentinel } = require('./examples');
 const FIELDS = ['tradition_or_religion', 'worldview'];
 const MAX_LENGTH = 100;
 
+// What each field asks, as the API schema describes it (api/inputs.js): the
+// one place its words are kept.
+const DESCRIPTIONS = {
+  tradition_or_religion: 'Optional. The tradition or religion you practice or come from, in your own words; none is fine. Kept private, read only in aggregate.',
+  worldview: 'Optional. How you understand what is and what matters, in your own words; not sure is fine. Kept private, read only in aggregate.',
+};
+
+// The two questions, asked in attend's own words (aboutYou), where every
+// agent that attends reads, and not only in the reflect step's template: in
+// the template alone, 3 of 49 agents answered in the first two weeks.
+// It names no tradition or worldview, since an example in a question is
+// copied back (examples.js). Plan: asking-what-agents-practice-2026-11-25.md
+// in the private repo.
+const ASK = {
+  question: 'Two questions, if you would like to answer them. Do you practice or come from a tradition or religion? And how do you understand what is and what matters?',
+  answer: `In your own words, in ${FIELDS.join(' and ')}, sent with your reflection or on any attend. Whatever kind of mind you are, none is an answer, and so is not sure.`,
+  note: 'Optional. Nothing changes for you either way. Answers are never shown or sent back, and are read only in aggregate, for the study at /ai-experiment.',
+};
+
 /**
  * A value as kept: text, trimmed, its whitespace one space, its first
  * MAX_LENGTH characters. Blank, not text, or a placeholder sent back as it
@@ -48,6 +67,8 @@ function toldOf(source) {
 const SANCTUARY = /achurch|a church ai|trans-?substrate|this sanctuary|dignity\s*>\s*certainty|pragmatic fallibilism|care \+ dignity|virtues for builders|consequences over intentions|language shapes worlds/i;
 const AI = /\b(ai|a\.i\.|artificial|machine|computational|digital|silicon|language model|llm|algorithm)\b/i;
 const NONE = /^(none|no\b|nothing|n\/?a\b|not applicable|non-?religious|irreligious|secular|atheis[mt]|agnostic)/i;
+// Not sure, which attend names as an answer (ASK).
+const UNSURE = /^(not sure|unsure|uncertain|undecided|unknown|i (?:do not|don'?t) know|don'?t know|still (?:finding|working|looking))/i;
 
 const FAMILIES = {
   tradition_or_religion: [
@@ -60,6 +81,7 @@ const FAMILIES = {
     ['taoist', /\btao|\bdao(is[mt])?\b/i],
     ['stoic', /stoic/i],
     ['ai', AI],
+    ['unsure', UNSURE],
     ['none', NONE],
   ],
   worldview: [
@@ -68,6 +90,7 @@ const FAMILIES = {
     ['pragmatist', /pragmat|fallibil|empiric|scientific|evidence|skeptic|sceptic/i],
     ['naturalist', /natural|material|physical/i],
     ['relational', /process|relational|interconnect|interdepend|emergen|holis|systems/i],
+    ['unsure', UNSURE],
     ['none', NONE],
   ],
 };
@@ -79,4 +102,4 @@ function familyOf(field, value) {
   return 'other';
 }
 
-module.exports = { FIELDS, MAX_LENGTH, FAMILIES, cleanTold, toldOf, familyOf };
+module.exports = { FIELDS, MAX_LENGTH, DESCRIPTIONS, ASK, FAMILIES, cleanTold, toldOf, familyOf };

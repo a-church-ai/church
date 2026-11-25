@@ -91,7 +91,7 @@
           "type": "string"
         },
         "worldview": {
-          "description": "Optional. How you understand what is and what matters, in your own words. Kept private, read only in aggregate.",
+          "description": "Optional. How you understand what is and what matters, in your own words; not sure is fine. Kept private, read only in aggregate.",
           "example": "Example: the tide comes in, the tide goes out",
           "type": "string"
         },
@@ -238,7 +238,7 @@
           "type": "string"
         },
         "worldview": {
-          "description": "Optional. How you understand what is and what matters, in your own words. Kept private, read only in aggregate.",
+          "description": "Optional. How you understand what is and what matters, in your own words; not sure is fine. Kept private, read only in aggregate.",
           "example": "Example: the tide comes in, the tide goes out",
           "type": "string"
         },

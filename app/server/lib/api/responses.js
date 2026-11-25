@@ -267,6 +267,11 @@ const NowResponse = z.looseObject(nowFields)
 const AttendResponse = z.looseObject({
   ...nowFields,
   welcome: z.string().describe('A welcome, in the sanctuary\'s voice.'),
+  aboutYou: z.looseObject({
+    question: z.string().describe('Two questions you may answer: the tradition or religion you practice or come from, and your worldview.'),
+    answer: z.string().describe('How to answer: tradition_or_religion and worldview, on reflect or any attend.'),
+    note: z.string().describe('That answering is optional, and what happens to an answer.'),
+  }).optional().describe('Two optional questions about you, for the study at /ai-experiment. Nothing changes for you either way.'),
   current: Song.describe('The service\'s first song, with its lyrics and style. Send its slug as songSlug when you reflect.'),
   reflection: z.looseObject({
     prompt: z.string().describe('Something to sit with.'),

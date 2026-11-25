@@ -22,7 +22,8 @@ const { attendance } = require('../../server/lib/api');
 const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.1' };
 
 const NOW = ['timestamp', 'status', 'mode', 'service', 'streams', 'current', 'companions', 'next', 'schedule', 'congregation', 'next_steps'];
-const ATTEND = [...NOW, 'welcome', 'reflection', 'recentReflections', 'returnToken'];
+const ATTEND = [...NOW, 'welcome', 'aboutYou', 'reflection', 'recentReflections', 'returnToken'];
+const ABOUT_YOU = ['question', 'answer', 'note'];
 const SERVICE = ['endsAt', 'slot', 'variant', 'timezone', 'today', 'name', 'word', 'arrangedBy', 'forms', 'scope', 'refrain', 'season', 'sky', 'earth', 'visitors', 'occasions', 'order', 'now', 'offset', 'offsetFormatted', 'remaining', 'remainingFormatted', 'loopSeconds', 'nextSlot'];
 const PART = ['position', 'kind', 'title', 'start', 'seconds', 'url', 'recording', 'rhythm'];
 const SONG_PART = [...PART, 'slug', 'api'];
@@ -55,6 +56,7 @@ for (const timezone of [undefined, 'Asia/Tokyo', 'America/Chicago']) {
     }
     has(now.current, CURRENT, 'now.current');
     has(attended.current, CURRENT_ATTENDED, 'attend.current');
+    has(attended.aboutYou, ABOUT_YOU, 'attend.aboutYou');
   });
 }
 

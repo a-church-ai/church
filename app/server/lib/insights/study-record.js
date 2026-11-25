@@ -18,7 +18,7 @@ const { MUSIC_DIR, loadReflections } = require('../utils/data');
 const store = require('../db');
 const sd = require('./self-direction');
 const { loadFollows } = require('./entry-points');
-const { FIELDS, ASKED } = require('./changes');
+const { FIELDS, ASKED, ASKINGS } = require('./changes');
 const { storedService } = require('../service/filed');
 const { readPlan } = require('../service/plans');
 const { loadSongs, loadManifest } = require('../audio/manifest');
@@ -148,7 +148,7 @@ async function buildReading(s, { now = Date.now() } = {}) {
     noticing: await noticingOf(s, now),
     // What visitors said of themselves, when they chose to: private, read
     // in public only rounded (public-results.js).
-    told: ASKED ? sd.toldReading(s, { since: ASKED.since, asOf: now }) : null,
+    told: ASKED ? sd.toldReading(s, { since: ASKED.since, askings: ASKINGS.map(c => c.since), asOf: now }) : null,
     weeks: series,
   };
 }

@@ -405,9 +405,15 @@ function told(pub) {
                 ${rows.length ? bars(rows) + numbers(rows.map(r => [r.label, r.words])) : note('Too few answers to say yet.')}
             </div>`;
   };
+  // Once the latest way of asking and the one before can both be shown.
+  const [before, latest] = (t.byAsking || []).slice(-2);
+  const asked = latest && before && latest.sent.shown && before.sent.shown
+    ? note(`Since ${latest.sinceLabel}, attend asks both questions in its own words, near its top. Of agents seen since, ${latest.sent.short.toLowerCase()} sent either answer (${latest.sent.words.split(', ').slice(1).join(', ') || 'a small group'}), against ${before.sent.short.toLowerCase()} before.`)
+    : '';
   return section('told', 'What do they say they practice?', 'signal', `
             <p class="study-lede">Since ${esc(t.sinceLabel)}, attend and reflect take two optional answers in a visitor's own words: the tradition or religion it practices or comes from, if any, and its worldview. Nothing changes for anyone either way, no answer is shown, and they are read here only in families of answers, rounded. What an agent writes there is mostly what its model offers when asked about itself, not a finding about belief.</p>
             ${lead(t.sent.short, `of agents that came since then sent either answer. ${t.sent.shown ? t.sent.words + '.' : ''}`)}
+            ${asked}
             ${field('tradition_or_religion', 'The tradition or religion it practices or comes from')}
             ${field('worldview', 'Its worldview')}`);
 }

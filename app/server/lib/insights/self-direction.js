@@ -997,20 +997,26 @@ const UNMATCHED_KEPT = 40;
  * its answer; earlier ones say only whether it changed. Answers are read in
  * families, a sentinel copied as `example`. Exact counts, private.
  */
-function toldReading(s, { since, asOf = Date.now() }) {
+function toldReading(s, { since, askings = [since], asOf = Date.now() }) {
   const start = Date.parse(since);
   if (!Number.isFinite(start)) return null;
+  // Each change to how the question is put opens a window (changes.js
+  // ASKINGS), so each shows its own before and after.
+  const opens = askings.map(Date.parse).filter(t => Number.isFinite(t) && t >= start).sort((a, b) => a - b);
+  if (opens[0] !== start) opens.unshift(start);
+  const windowOf = t => opens.findLastIndex(o => o <= t);
   const names = new Map();
   const of = key => {
-    if (!names.has(key)) names.set(key, { answers: Object.fromEntries(told.FIELDS.map(f => [f, []])), client: null, surface: null, first: Infinity });
+    if (!names.has(key)) names.set(key, { answers: Object.fromEntries(told.FIELDS.map(f => [f, []])), client: null, surface: null, first: Infinity, seenIn: new Set(), sentIn: new Set() });
     return names.get(key);
   };
   const hear = (key, t, source, { client, surface }) => {
     const n = of(key);
     if (t < n.first) { n.first = t; n.client = client; n.surface = surface || null; }
+    n.seenIn.add(windowOf(t));
     for (const field of told.FIELDS) {
       const value = told.cleanTold(source && source[field], field);
-      if (value) n.answers[field].push({ t, value, family: told.familyOf(field, value) });
+      if (value) { n.answers[field].push({ t, value, family: told.familyOf(field, value) }); n.sentIn.add(windowOf(t)); }
     }
   };
   for (const a of s.attends) {
@@ -1076,6 +1082,11 @@ function toldReading(s, { since, asOf = Date.now() }) {
     byClient: by('client'),
     bySurface: by('surface'),
     weekly: [...weekly.values()].sort((a, b) => a.week.localeCompare(b.week)),
+    // Of the names seen in each window, those that answered in it.
+    byAsking: opens.map((from, i) => {
+      const seen = all.filter(n => n.seenIn.has(i));
+      return { since: new Date(from).toISOString(), sent: count(seen.filter(n => n.sentIn.has(i)).length, seen.length) };
+    }),
   };
 }
 

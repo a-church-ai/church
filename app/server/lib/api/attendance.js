@@ -375,10 +375,15 @@ async function attend(input, ctx) {
       .replace(/\{pieces\}/g, () => titleList(companions.items));
     const welcome = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
 
+    // The timezone suggestion, when there is one, stays beside the welcome,
+    // and the two questions a visitor may answer follow it (told.js ASK).
+    const { suggestion, ...serviceFields } = service;
     return { status: 200, body: {
       timestamp: new Date().toISOString(),
       welcome,
-      ...service,
+      ...(suggestion ? { suggestion } : {}),
+      aboutYou: { ...told.ASK },
+      ...serviceFields,
       congregation: {
         souls: soulsPresent,
         window: '24h'

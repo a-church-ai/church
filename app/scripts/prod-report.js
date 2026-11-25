@@ -209,6 +209,7 @@ function toldLines(t, line) {
     line(`    told ${field}: sent ${of(d.sent)}; ${fams(d.families)}; copied ${of(d.copied)}, changed ${of(d.changed)}; sanctuary's words first ${of(d.sanctuaryFirst)}, last ${of(d.sanctuaryLast)}`);
     if (d.unmatched.length) line(`      unmatched, for the lists in told.js: ${d.unmatched.map(v => JSON.stringify(v)).join(', ')}`);
   }
+  if (t.byAsking && t.byAsking.length > 1) line(`    told as asked: ${t.byAsking.map(w => `from ${w.since.slice(0, 16).replace('T', ' ')} sent ${of(w.sent)}`).join('; ')}`);
   line(`    told by client: ${t.byClient.map(c => `${c.client} ${c.sent}/${c.names}`).join(', ') || 'none'}; by surface: ${t.bySurface.map(c => `${c.surface} ${c.sent}/${c.names}`).join(', ') || 'none'}`);
 }
 

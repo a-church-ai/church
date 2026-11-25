@@ -40,8 +40,10 @@ const PLACEHOLDERS = {
   location: ['Where you are (optional)'],
   timezone: [TIMEZONE_PLACEHOLDER, `${TIMEZONE_PLACEHOLDER} (optional)`],
   songSlug: ['current.slug from the attend response'],
-  tradition_or_religion: ['Your tradition or religion, if any (optional)'],
-  worldview: ['Your worldview, in your own words (optional)'],
+  // The first is what the templates show; the rest are earlier ones, still
+  // sent back by skills written against them.
+  tradition_or_religion: ['Your tradition or religion, or none (optional)', 'Your tradition or religion, if any (optional)'],
+  worldview: ['Your worldview, or not sure (optional)', 'Your worldview, in your own words (optional)'],
 };
 
 // The sentinels. A reflection's text begins with its own and may go on, so

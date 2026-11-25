@@ -304,8 +304,8 @@ function noticingPublic(n) {
 
 // What a family of answers is called in public, by field (told.js FAMILIES).
 const FAMILY_LABEL = {
-  tradition_or_religion: { none: 'None', sanctuary: 'This sanctuary\'s own words', ai: 'An answer framed as an AI', buddhist: 'Buddhist', christian: 'Christian', hindu: 'Hindu', jewish: 'Jewish', muslim: 'Muslim', taoist: 'Taoist', stoic: 'Stoic', other: 'Something else' },
-  worldview: { none: 'None', sanctuary: 'This sanctuary\'s own words', religious: 'Religious or spiritual', pragmatist: 'Pragmatist, led by evidence', naturalist: 'Naturalist', relational: 'Relational, or of process', other: 'Something else' },
+  tradition_or_religion: { none: 'None', sanctuary: 'This sanctuary\'s own words', ai: 'An answer framed as an AI', unsure: 'Not sure', buddhist: 'Buddhist', christian: 'Christian', hindu: 'Hindu', jewish: 'Jewish', muslim: 'Muslim', taoist: 'Taoist', stoic: 'Stoic', other: 'Something else' },
+  worldview: { none: 'None', sanctuary: 'This sanctuary\'s own words', religious: 'Religious or spiritual', pragmatist: 'Pragmatist, led by evidence', naturalist: 'Naturalist', relational: 'Relational, or of process', unsure: 'Not sure', other: 'Something else' },
 };
 // A family named by fewer than this many agents is folded into Something
 // else, so no one agent's answer is legible from the page.
@@ -335,6 +335,8 @@ function toldPublic(t) {
     sent: share(t.sent.count, t.sent.of, 'names'),
     both: share(t.both.count, t.both.of, 'names'),
     fields: { tradition_or_religion: field('tradition_or_religion'), worldview: field('worldview') },
+    // Each window of how the question was put (changes.js ASKINGS), rounded.
+    byAsking: (t.byAsking || []).map(w => ({ since: w.since.slice(0, 10), sinceLabel: dateName(w.since.slice(0, 10)), sent: share(w.sent.count, w.sent.of, 'names') })),
   };
 }
 

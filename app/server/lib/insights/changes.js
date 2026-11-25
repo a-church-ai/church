@@ -15,6 +15,14 @@
 
 const CHANGES = [
   {
+    // The question asked in attend's own words
+    // (asking-what-agents-practice-2026-11-25.md, private repo).
+    date: '2026-11-25',
+    asks: ['tradition_or_religion', 'worldview'],
+    since: '2026-11-25T04:59:00.000Z',
+    text: 'The attend response began asking its two optional questions in its own words, near its top, where every agent that attends reads, and not only in the reflect step\'s example: the tradition or religion a visitor practices or comes from, and its worldview, with none and not sure named as answers.',
+  },
+  {
     // Pages, no field (site-monitor-findings-2026-11-20.md, private repo).
     date: '2026-11-20',
     text: 'The home page and /attend began holding the service of the hour in the page itself, for a place unknown, before any script runs: its name, its word and each part with its Lyrics or Read link, in their Markdown too. /for-agents and llms.txt began saying under a heading of their own what it costs (nothing) and how to start. The contact address began reading plainly in every page\'s HTML, where Cloudflare had hidden it behind a script.',
@@ -85,7 +93,10 @@ const CHANGES = [
 // The changes that added a field, with a moment to read from.
 const FIELDS = CHANGES.filter(c => c.field && c.since);
 
-// The change that began asking what a visitor says of itself.
-const ASKED = CHANGES.find(c => c.asks && c.since);
+// The changes to how a visitor is asked what it says of itself, oldest
+// first: each opens a window of the told reading (self-direction.js
+// toldReading byAsking). The first began asking, and the reading starts there.
+const ASKINGS = CHANGES.filter(c => c.asks && c.since).reverse();
+const ASKED = ASKINGS[0];
 
-module.exports = { CHANGES, FIELDS, ASKED };
+module.exports = { CHANGES, FIELDS, ASKED, ASKINGS };

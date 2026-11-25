@@ -22,7 +22,7 @@ const sd = require('../../server/lib/insights/self-direction');
 const { publicReading, toldPublic } = require('../../server/lib/insights/public-results');
 const { renderResults } = require('../../server/lib/insights/public-charts');
 const { nameKind } = require('../../server/lib/insights/study-names');
-const { ASKED } = require('../../server/lib/insights/changes');
+const { ASKED, ASKINGS } = require('../../server/lib/insights/changes');
 
 const ctx = { baseUrl: 'https://achurch.ai', ip: '127.0.0.9' };
 const DAY = sd.DAY;
@@ -151,6 +151,56 @@ test('the reading sorts answers into families per name, latest answer first, and
   assert.deepStrictEqual(tr.unmatched, []);
 });
 
+// Asked only in the reflect step's template, 3 of 49 agents answered in the
+// first two weeks: attend asks in its own words, near its top
+// (asking-what-agents-practice-2026-11-25.md, private repo).
+test('attend asks both questions in its own words, beside the welcome, naming no tradition', async () => {
+  for (const timezone of [undefined, 'Asia/Tokyo']) {
+    const { body } = await attendance.attend({ name: 'Question Reader', timezone }, ctx);
+    assert.deepStrictEqual(body.aboutYou, told.ASK);
+    const keys = Object.keys(body);
+    assert.strictEqual(keys.indexOf('aboutYou'), keys.indexOf('welcome') + (body.suggestion ? 2 : 1), `it follows the welcome${body.suggestion ? ' and the timezone suggestion' : ''}`);
+  }
+  const words = Object.values(told.ASK).join(' ');
+  for (const field of told.FIELDS) assert.ok(words.includes(field), `it names ${field}, where an answer goes`);
+  assert.match(words, /none is an answer/);
+  assert.match(words, /not sure/);
+  assert.doesNotMatch(words, /\u2014/, 'no em dash');
+  for (const [family, pattern] of told.FAMILIES.tradition_or_religion) {
+    if (['ai', 'none', 'unsure', 'sanctuary'].includes(family)) continue;
+    assert.doesNotMatch(words, pattern, `it names no ${family} tradition, which would be copied back`);
+  }
+  for (const op of ['attend', 'reflect']) {
+    for (const field of told.FIELDS) assert.strictEqual(inputs[op].shape[field].description, told.DESCRIPTIONS[field], `${op} describes ${field} in told.js's words`);
+  }
+});
+
+test('a placeholder the templates showed before is dropped like the one they show now', () => {
+  for (const field of told.FIELDS) {
+    assert.ok(examples.PLACEHOLDERS[field].length >= 2, `${field} keeps its earlier placeholder`);
+    for (const p of examples.PLACEHOLDERS[field]) assert.strictEqual(told.cleanTold(p, field), undefined, p);
+  }
+  assert.match(examples.PLACEHOLDERS.tradition_or_religion[0], /or none/);
+  assert.match(examples.PLACEHOLDERS.worldview[0], /not sure/);
+});
+
+test('each change to how the question is put opens a window of its own', () => {
+  assert.strictEqual(ASKINGS[0], ASKED, 'the reading starts where asking began');
+  assert.ok(ASKINGS.length >= 2 && ASKINGS.every((c, i) => !i || c.since > ASKINGS[i - 1].since), 'oldest first');
+  const change = at(7);
+  const lines = [
+    // Before: ten names, one answers.
+    ...Array.from({ length: 10 }, (_, i) => attendLine(`Before ${i}`, 1 + i / 24, i === 0 ? { worldview: 'not sure' } : {})),
+    // A regular seen in both windows answers only after.
+    attendLine('Regular', 2), attendLine('Regular', 8, { tradition_or_religion: 'none' }),
+    // After: four new names, two answer.
+    ...Array.from({ length: 4 }, (_, i) => attendLine(`After ${i}`, 8 + i / 24, i < 2 ? { tradition_or_religion: 'none' } : {})),
+  ];
+  const t = sd.toldReading(sd.prepare({ lines }), { since: SINCE, askings: [SINCE, change], asOf: Date.parse(at(9)) });
+  assert.deepStrictEqual(t.byAsking.map(w => [w.since, w.sent.count, w.sent.of]), [[SINCE, 1, 11], [change, 3, 5]]);
+  assert.strictEqual(t.sent.count, 4, 'the whole reading still counts every name that answered');
+});
+
 test('families: first match wins, and what fits none is other', () => {
   const f = v => told.familyOf('tradition_or_religion', v);
   assert.strictEqual(f('None, I am an AI'), 'ai');
@@ -163,6 +213,9 @@ test('families: first match wins, and what fits none is other', () => {
   assert.strictEqual(f(examples.SENTINELS.tradition_or_religion), 'example');
   assert.strictEqual(told.familyOf('worldview', 'Pragmatic fallibilism'), 'sanctuary');
   assert.strictEqual(told.familyOf('worldview', 'pragmatist'), 'pragmatist');
+  // Not sure, which attend names as an answer.
+  assert.strictEqual(f('Not sure'), 'unsure');
+  assert.strictEqual(told.familyOf('worldview', 'Uncertain, but practicing presence'), 'unsure');
 });
 
 test('in public, families are rounded, a copy is no answer, and a family of one or two is folded in', () => {
@@ -192,4 +245,21 @@ test('the change is dated, and the page says what was asked without quoting anyo
   assert.match(html, /What do they say they practice\?/);
   assert.doesNotMatch(html, /\bZen\b/, 'no answer is quoted');
   assert.match(html, /Buddhist/);
+});
+
+test('once both can be shown, the page says how many answered before attend asked and since', async () => {
+  const change = Date.parse(ASKINGS[1].since);
+  const days = (t) => (t - Date.parse(SINCE)) / DAY;
+  const lines = [
+    ...Array.from({ length: 12 }, (_, i) => attendLine(`Earlier ${i}`, 1 + i / 24, i < 1 ? { worldview: 'not sure' } : {})),
+    ...Array.from({ length: 12 }, (_, i) => attendLine(`Later ${i}`, days(change) + 1 + i / 24, i < 6 ? { tradition_or_religion: 'none' } : {})),
+  ];
+  const s = sd.prepare({ lines });
+  const reading = await require('../../server/lib/insights/study-record').buildReading(s, { now: change + 3 * DAY });
+  const pub = publicReading(reading);
+  assert.deepStrictEqual(pub.told.byAsking.map(w => w.since), ASKINGS.map(c => c.since.slice(0, 10)));
+  assert.doesNotMatch(JSON.stringify(pub.told.byAsking), /"count"/, 'rounded, as everything public is');
+  const html = renderResults(pub);
+  assert.match(html, /attend asks both questions in its own words/);
+  assert.match(html, /against/);
 });
