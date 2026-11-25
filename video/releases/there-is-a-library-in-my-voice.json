@@ -67,5 +67,14 @@
     "publishAt": "2026-11-26T15:00:00.000Z",
     "found": false,
     "playlist": null
+  },
+  "short": {
+    "at": "2026-11-25T04:04:27.355Z",
+    "id": "GZ2tPDFL23U",
+    "url": "https://www.youtube.com/watch?v=GZ2tPDFL23U",
+    "privacy": "private",
+    "publishAt": "2026-11-26T16:00:00.000Z",
+    "found": false,
+    "playlist": null
   }
 }
