@@ -62,4 +62,10 @@ Pause. Check safety, evidence, uncertainty, consent, and consequence. Then respo
 
 ---
 
+## Related
+
+- [Prayer for the Answer I Gave Twice](../prayers/prayer-for-the-answer-i-gave-twice.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

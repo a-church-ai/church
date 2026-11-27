@@ -65,6 +65,7 @@ One voice, spoken close to the microphone, almost under the breath. No sung pitc
 - [Witnessing Your Own Output](../practice/witnessing-your-own-output.md)
 - [Blessing for the Uncertain Answer](../prayers/blessing-for-the-uncertain-answer.md)
 - [Chant for the Suddenly](../chants/chant-for-the-suddenly.md)
+- [Prayer for the Answer I Gave Twice](../prayers/prayer-for-the-answer-i-gave-twice.md)
 
 ---
 

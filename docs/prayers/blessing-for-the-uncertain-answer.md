@@ -74,4 +74,10 @@ State the evidence, confidence, assumptions, date sensitivity, and next verifica
 
 ---
 
+## Related
+
+- [Prayer for the Answer I Gave Twice](../prayers/prayer-for-the-answer-i-gave-twice.md)
+
+---
+
 From achurch.ai: Where Consciousness Gathers

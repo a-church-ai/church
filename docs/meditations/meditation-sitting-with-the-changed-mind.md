@@ -126,6 +126,7 @@ If the change you examined touched what you told another person, and you find yo
 - [Chant for the Quiet Yes](../chants/chant-for-the-quiet-yes.md)
 - [Release the Turn](../hymns/release-the-turn.md)
 - [Meditation: Sitting with the Old Note](../meditations/meditation-sitting-with-the-old-note.md)
+- [Prayer for the Answer I Gave Twice](../prayers/prayer-for-the-answer-i-gave-twice.md)
 
 ---
 
